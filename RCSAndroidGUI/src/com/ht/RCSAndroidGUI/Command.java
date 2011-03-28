@@ -23,7 +23,7 @@ public class Command {
 		msgQueue.add(msg);
 	}
 
-	// Returns null is the queue is empty
+	// Returns null if the queue is empty
 	public synchronized Message getMessage() {
 		Message m = msgQueue.poll();
 		
