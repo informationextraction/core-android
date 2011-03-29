@@ -138,7 +138,7 @@ public class LogDispatcher extends Thread implements Runnable {
 					noLogs.await();
 
 				// Halt command has precedence over queue processing
-				if (halt) {
+				if (halt == true) {
 					q.clear();
 					logMap.clear();
 					Log.d("Que", "LogDispatcher closing");
