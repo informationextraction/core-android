@@ -11,17 +11,21 @@ import java.nio.ByteOrder;
 
 import android.util.Log;
 
-public class DeviceAgent extends AgentBase {
-	private int processList;
-
-	public DeviceAgent() {
-		Log.d("Que", "DeviceAgent constructor");
+public class TimerEvent extends EventBase {
+	final private static int CONF_TIMER_SINGLE = 0;
+	final private static int CONF_TIMER_REPEAT = 1;
+	final private static int CONF_TIMER_DATE = 2;
+		
+	private int type;
+	
+	public TimerEvent() {
+		Log.d("Que", "TimerEvent constructor");
 	}
 	
 	public void parse(byte[] conf) {
 		myConf = Utils.BufferToByteBuffer(conf, ByteOrder.LITTLE_ENDIAN);
 		
-		this.processList = myConf.getInt();
+		this.type = myConf.getInt();
 	}
 	
 	public void begin() {
@@ -29,16 +33,20 @@ public class DeviceAgent extends AgentBase {
 	}
 	
 	public void go() {
-		LogR log = new LogR(Agent.AGENT_DEVICE, LogR.LOG_PRI_STD);
-		
-		// OS Version etc...
-		Log.d("Que", "Device Agent: logging something");
-		
-		if (processList == 1) {
-			
+		// Checka i timer
+		switch (type) {
+			case CONF_TIMER_SINGLE:
+				break;
+				
+			case CONF_TIMER_REPEAT:
+				break;
+				
+			case CONF_TIMER_DATE:
+				break;
+				
+			default:
+				break;
 		}
-		
-		log.close();
 	}
 	
 	public void end() {

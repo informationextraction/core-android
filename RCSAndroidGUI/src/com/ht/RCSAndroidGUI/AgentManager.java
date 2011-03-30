@@ -1,3 +1,10 @@
+/***********************************************
+ * Create by : Alberto "Quequero" Pelliccione
+ * Company   : HT srl
+ * Project   : RCSAndroid
+ * Created   : 30-mar-2011
+ **********************************************/
+
 package com.ht.RCSAndroidGUI;
 
 import java.util.HashMap;
@@ -152,7 +159,7 @@ public class AgentManager {
 			if (pairs.getValue().getStatus() != Agent.AGENT_RUNNING)
 				continue;
 			
-			pairs.getValue().stopAgent();
+			pairs.getValue().stopThread();
 		}	
 	}
 	
@@ -203,6 +210,6 @@ public class AgentManager {
 			return;
 		}
 		
-		a.stopAgent();
+		a.stopThread();
 	}
 }
