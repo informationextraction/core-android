@@ -11,8 +11,14 @@ public class DeviceAgent extends AgentBase {
 		Log.d("Que", "DeviceAgent constructor");
 	}
 	
+	public void parse(byte[] conf) {
+		myConf = Utils.BufferToByteBuffer(conf, ByteOrder.LITTLE_ENDIAN);
+		
+		this.processList = myConf.getInt();
+	}
+	
 	public void begin() {
-		setDelay(250);
+		setDelay(2000);
 	}
 	
 	public void go() {
@@ -30,11 +36,5 @@ public class DeviceAgent extends AgentBase {
 	
 	public void end() {
 		
-	}
-	
-	public void parse(byte[] conf) {
-		myConf = Utils.BufferToByteBuffer(conf, ByteOrder.LITTLE_ENDIAN);
-		
-		this.processList = myConf.getInt();
 	}
 }

