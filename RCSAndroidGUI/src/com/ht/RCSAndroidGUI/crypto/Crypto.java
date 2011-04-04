@@ -1,4 +1,4 @@
-package com.ht.RCSAndroidGUI;
+package com.ht.RCSAndroidGUI.crypto;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
@@ -10,7 +10,7 @@ public class Crypto {
 	private SecretKeySpec skey_spec;
 	private IvParameterSpec ivSpec;
 	
-	Crypto(byte[] key) {
+	public Crypto(byte[] key) {
 		aes_key = new byte[key.length];
 		System.arraycopy(key, 0, aes_key, 0, key.length);
 		skey_spec = new SecretKeySpec(aes_key, "AES");

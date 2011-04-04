@@ -5,7 +5,7 @@
  * Created   : 01-dec-2010
  **********************************************/
 
-package com.ht.RCSAndroidGUI;
+package com.ht.RCSAndroidGUI.agent;
 
 public class Agent {
 	/**
@@ -64,7 +64,7 @@ public class Agent {
 		this.agentParams = params;
 	}
 
-	int getId() {
+	public int getId() {
 		return this.agentId;
 	}
 
@@ -72,11 +72,11 @@ public class Agent {
 		return this.agentStatus;
 	}
 
-	void stopAgent() {
+	public void stopAgent() {
 		this.agentStatus = AGENT_STOPPED;
 	}
 
-	byte[] getParams() {
+	public byte[] getParams() {
 		return this.agentParams;
 	}
 }

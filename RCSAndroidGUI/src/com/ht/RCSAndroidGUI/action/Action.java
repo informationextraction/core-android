@@ -5,25 +5,11 @@
  * Created   : 01-dec-2010
  **********************************************/
 
-package com.ht.RCSAndroidGUI;
+package com.ht.RCSAndroidGUI.action;
+
+import com.ht.RCSAndroidGUI.RCSException;
 
 public class Action {
-	/**
-	 * Actions definitions
-	 */
-	public static int ACTION              = 0x4000;
-	public static int ACTION_SYNC         = ACTION + 0x1; // Sync su server
-	public static int ACTION_UNINSTALL    = ACTION + 0x2; // Uninstall
-	public static int ACTION_RELOAD       = ACTION + 0x3; // Reload della backdoor
-	public static int ACTION_SMS          = ACTION + 0x4; // Invia un SMS
-	public static int ACTION_TOOTHING     = ACTION + 0x5; // Non utilizzata
-	public static int ACTION_START_AGENT  = ACTION + 0x6; // Avvia un agente
-	public static int ACTION_STOP_AGENT   = ACTION + 0x7; // Ferma un agente
-	public static int ACTION_SYNC_PDA     = ACTION + 0x8; // Sync su Mediation Node
-	public static int ACTION_EXECUTE      = ACTION + 0x9; // Esegui un comando
-	public static int ACTION_SYNC_APN     = ACTION + 0xa; // Sync su APN
-	public static int ACTION_LOG          = ACTION + 0xb; // Crea un LOG_INFO
-
 	/**
 	 * Action array
 	 */
@@ -73,7 +59,7 @@ public class Action {
 			throw new RCSException("SubAction above Action array boundary");
 		}
 
-		SubAction sub = new SubAction(type, params);
+		SubAction sub = SubAction.factory(type, params);
 
 		this.subArray[this.subActionIndex] = sub;
 		this.subActionIndex++;

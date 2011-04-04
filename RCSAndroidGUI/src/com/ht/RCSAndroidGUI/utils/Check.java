@@ -1,4 +1,4 @@
-package com.ht.RCSAndroidGUI;
+package com.ht.RCSAndroidGUI.utils;
 
 import android.util.Log;
 

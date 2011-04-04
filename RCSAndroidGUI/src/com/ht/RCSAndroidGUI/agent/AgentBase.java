@@ -5,24 +5,26 @@
  * Created   : 30-mar-2011
  **********************************************/
 
-package com.ht.RCSAndroidGUI;
+package com.ht.RCSAndroidGUI.agent;
+
+import com.ht.RCSAndroidGUI.ThreadBase;
 
 import android.util.Log;
 
-public abstract class EventBase extends ThreadBase implements Runnable {
+public abstract class AgentBase extends ThreadBase implements Runnable {
     // Gli eredi devono implementare i seguenti metodi astratti
     public abstract void begin();
     public abstract void end();
     public abstract void parse(byte[] conf);
     
     public synchronized void run() {
-    	status = Event.EVENT_RUNNING;
+    	status = Agent.AGENT_RUNNING;
     	
     	begin();
     	loop();
         end();
         
-        status = Event.EVENT_STOPPED;
-        Log.d("RCS", "EventBase stopped");
+        status = Agent.AGENT_STOPPED;
+        Log.d("RCS", "AgentBase stopped");
     }
 }

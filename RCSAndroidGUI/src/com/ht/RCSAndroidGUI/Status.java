@@ -9,6 +9,10 @@ package com.ht.RCSAndroidGUI;
 
 import java.util.HashMap;
 
+import com.ht.RCSAndroidGUI.action.Action;
+import com.ht.RCSAndroidGUI.agent.Agent;
+import com.ht.RCSAndroidGUI.conf.Option;
+
 // Singleton Class
 public class Status {
 	private volatile static Status singleton;

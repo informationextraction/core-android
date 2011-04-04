@@ -5,11 +5,13 @@
  * Created   : 30-mar-2011
  **********************************************/
 
-package com.ht.RCSAndroidGUI;
+package com.ht.RCSAndroidGUI.agent;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import com.ht.RCSAndroidGUI.Status;
 
 import android.util.Log;
 

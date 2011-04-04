@@ -12,6 +12,8 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import com.ht.RCSAndroidGUI.utils.Utils;
+
 import android.os.Environment;
 import android.util.Log;
 

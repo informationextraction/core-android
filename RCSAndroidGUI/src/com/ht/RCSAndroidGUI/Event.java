@@ -7,6 +7,8 @@
 
 package com.ht.RCSAndroidGUI;
 
+import com.ht.RCSAndroidGUI.agent.Agent;
+
 public class Event {
 	/**
 	 * Events definitions

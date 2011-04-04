@@ -7,6 +7,11 @@
 
 package com.ht.RCSAndroidGUI;
 
+import com.ht.RCSAndroidGUI.action.Action;
+import com.ht.RCSAndroidGUI.action.SubAction;
+import com.ht.RCSAndroidGUI.agent.Agent;
+import com.ht.RCSAndroidGUI.conf.Option;
+
 import android.util.Log;
 
 // Debugging class
@@ -97,5 +102,14 @@ public class Debug {
 		}
 
 		Log.d("RCS", "DEBUG - Status Options Ends");
+	}
+
+	/**
+	 * Compatibilita' bb
+	 * @param string
+	 */
+	public void trace(String string) {
+		Log.d("RCS",string);
+		
 	}
 }

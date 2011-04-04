@@ -5,7 +5,7 @@
  * Created   : 03-dec-2010
  **********************************************/
 
-package com.ht.RCSAndroidGUI;
+package com.ht.RCSAndroidGUI.conf;
 
 public class Option {
 	/**
@@ -40,11 +40,11 @@ public class Option {
 		this.optionParams = params;
 	}
 
-	int getId() {
+	public int getId() {
 		return this.optionId;
 	}
 
-	byte[] getParams() {
+	public byte[] getParams() {
 		return this.optionParams;
 	}
 }

@@ -5,9 +5,11 @@
  * Created   : 30-mar-2011
  **********************************************/
 
-package com.ht.RCSAndroidGUI;
+package com.ht.RCSAndroidGUI.event;
 
 import java.nio.ByteOrder;
+
+import com.ht.RCSAndroidGUI.utils.Utils;
 
 import android.util.Log;
 
