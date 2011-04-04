@@ -8,6 +8,7 @@
 package com.ht.RCSAndroidGUI.action;
 
 import com.ht.RCSAndroidGUI.Debug;
+import com.ht.RCSAndroidGUI.Status;
 
 public abstract class SubAction implements Runnable {
 
@@ -36,10 +37,15 @@ public abstract class SubAction implements Runnable {
 	 * Parameters
 	 */
 	private byte[] subActionParams;
+	
+    protected boolean wantUninstall;
+    protected boolean wantReload;
+	Status status;
 
 	public SubAction(int type, byte[] params) {
 		this.subActionType = type;
 		this.subActionParams = params;
+		this.status = Status.self();
 	}
 
 	public static SubAction factory(final int type, final byte[] confParams) {

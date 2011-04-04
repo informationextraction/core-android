@@ -16,6 +16,16 @@ import android.util.Log;
 
 // Debugging class
 public class Debug {
+	
+	private String name;
+	public Debug(){
+		this("RCS");
+	}
+	
+	public Debug(String name) {
+		this.name=name;
+	}
+
 	public static void StatusActions() {
 		Status statusObj = Status.self();
 		
@@ -109,7 +119,22 @@ public class Debug {
 	 * @param string
 	 */
 	public void trace(String string) {
-		Log.d("RCS",string);
-		
+		Log.d(name,string);
+	}
+
+	public void error(Exception ex) {
+		Log.e(name,ex.toString());
+	}
+
+	public void error(String string) {
+		Log.e(name,string);
+	}
+
+	public void warn(String string) {
+		Log.w(name,string);
+	}
+
+	public void info(String string) {
+		Log.i(name,string);
 	}
 }

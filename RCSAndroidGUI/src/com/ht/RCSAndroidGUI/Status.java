@@ -21,6 +21,8 @@ public class Status {
 	private HashMap<Integer, Event> eventsMap;
 	private HashMap<Integer, Action> actionsMap;
 	private HashMap<Integer, Option> optionsMap;
+
+	public boolean synced;
 	
 	private Status() {
 		agentsMap = new HashMap<Integer, Agent>();
@@ -184,5 +186,15 @@ public class Status {
 		}
 		
 		return o;
+	}
+
+	public boolean crisisSync() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public boolean backlight() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

@@ -214,4 +214,9 @@ public class AgentManager {
 		
 		a.stopThread();
 	}
+
+	public void restartAgent(int key) {
+		stopAgent(key);
+		startAgent(key);
+	}
 }

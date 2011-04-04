@@ -12,14 +12,20 @@ import android.util.Log;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.security.SecureRandom;
+import java.util.Date;
 import java.util.Random;
 
+import com.ht.RCSAndroidGUI.Debug;
+
 public final class Utils {
+	private static Debug debug = new Debug("Utils");
+	
 	/**
 	 * Converts a Buffer to a DataInputStream.
 	 * 
@@ -172,4 +178,152 @@ public final class Utils {
     public static long getTimeStamp() {
 		return System.currentTimeMillis();
     }
+    
+    /**
+     * Copy.
+     * 
+     * @param dest
+     *            the dest
+     * @param src
+     *            the src
+     * @param len
+     *            the len
+     */
+    public static void copy(final byte[] dest, final byte[] src, final int len) {
+        copy(dest, 0, src, 0, len);
+    }
+
+    /**
+     * Copy.
+     * 
+     * @param dest
+     *            the dest
+     * @param offsetDest
+     *            the offset dest
+     * @param src
+     *            the src
+     * @param offsetSrc
+     *            the offset src
+     * @param len
+     *            the len
+     */
+    public static void copy(final byte[] dest, final int offsetDest,
+            final byte[] src, final int offsetSrc, final int len) {
+        //#ifdef DBC
+        Check.requires(dest.length >= offsetDest + len, "wrong dest len");
+        Check.requires(src.length >= offsetSrc + len, "wrong src len");
+        //#endif
+
+        System.arraycopy(src, offsetSrc, dest, offsetDest, len);
+    }
+    
+    /**
+     * Int to byte array.
+     * 
+     * @param value
+     *            the value
+     * @return the byte[]
+     */
+    public static byte[] intToByteArray(final int value) {
+    	try {
+			ByteArrayOutputStream output = new ByteArrayOutputStream();
+			DataOutputStream databuffer = new DataOutputStream(
+					new ByteArrayOutputStream());
+			databuffer.writeInt(value);
+			databuffer.flush();
+			return output.toByteArray();
+		} catch (IOException ex) {
+			debug.error(ex);
+		}
+		
+		return null;
+    }
+
+    /**
+     * Byte array to hex.
+     * 
+     * @param data
+     *            the data
+     * @return the string
+     */
+    public static String byteArrayToHex(final byte[] data) {
+        return byteArrayToHex(data, 0, data.length);
+    }
+
+    /**
+     * Converte un array di byte in una stringa che ne rappresenta il contenuto
+     * in formato esadecimale.
+     * 
+     * @param data
+     *            the data
+     * @param offset
+     *            the offset
+     * @param length
+     *            the length
+     * @return the string
+     */
+    public static String byteArrayToHex(final byte[] data, final int offset,
+            final int length) {
+        final StringBuffer buf = new StringBuffer();
+        for (int i = offset; i < offset + length; i++) {
+            int halfbyte = (data[i] >>> 4) & 0x0F;
+            int twohalfs = 0;
+            do {
+                if ((0 <= halfbyte) && (halfbyte <= 9)) {
+                    buf.append((char) ('0' + halfbyte));
+                } else {
+                    buf.append((char) ('a' + (halfbyte - 10)));
+                }
+                halfbyte = data[i] & 0x0F;
+            } while (twohalfs++ < 1);
+        }
+        return buf.toString();
+    }
+
+    /**
+     * Concatena first e second.
+     * 
+     * @param first
+     * @param lenFirst
+     * @param second
+     * @param lenSecond
+     * @return
+     */
+    public static byte[] concat(final byte[] first, final int lenFirst,
+            final byte[] second, final int lenSecond) {
+
+        final byte[] sum = new byte[lenFirst + lenSecond];
+        copy(sum, 0, first, 0, lenFirst);
+        copy(sum, lenFirst, second, 0, lenSecond);
+        return sum;
+    }
+    
+	public static byte[] concat(byte[] first, byte[] second) {
+		return concat(first, first.length, second, second.length);
+	}
+
+    /**
+     * Restituisce una copia della parte dell'array specificata
+     * @param payload
+     * @param offset
+     * @param length
+     * @return
+     */
+	public static byte[] copy(byte[] payload, int offset, int length) {
+		
+		byte[] buffer = new byte[length];
+		System.arraycopy(payload, offset, buffer, 0, length);
+		return buffer;
+	}
+
+	/**
+	 * Duplicate array
+	 * @param ct
+	 * @return
+	 */
+	public static byte[] copy(byte[] ct) {		
+		return copy(ct,0,ct.length);
+	}
+
+
 }

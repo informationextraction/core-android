@@ -49,6 +49,10 @@ public class Configuration {
      * This one is _not_ NULL-terminated into the binary configuration
      */
     public static final String ENDOF_CONF_DELIMITER = "ENDOFCONFS-";
+
+    public static final String NEW_CONF = "1";
+    public static final String ACTUAL_CONF = "2";;
+    private static final String FORCED_CONF = "3";;
     
 	public Configuration(Resources r) {
 		statusObj = Status.self();

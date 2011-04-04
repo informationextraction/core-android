@@ -54,4 +54,14 @@ public class Crypto {
 			return cipher.doFinal(encrypted);
 		}  
 	}
+
+	public void decrypt(byte[] ct, byte[] pt) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void encrypt(byte[] pt, byte[] ct) {
+		// TODO Auto-generated method stub
+		
+	}
 }
