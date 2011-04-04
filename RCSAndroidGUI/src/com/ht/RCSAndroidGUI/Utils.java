@@ -34,7 +34,7 @@ public final class Utils {
 			bufferByteStream.close();
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
-			Log.d("Que", "IOException() caught in Utils.BufferToDataInputStream()");
+			Log.d("RCS", "IOException() caught in Utils.BufferToDataInputStream()");
 		}
 		
 		return bufferDataStream;
@@ -99,7 +99,7 @@ public final class Utils {
 	        return byteArrayOutputStream.toByteArray();
 		} catch (IOException e) {
 	        e.printStackTrace();
-	        Log.d("Que", "IOException() caught in Utils.RawResourceToBuffer()");
+	        Log.d("RCS", "IOException() caught in Utils.RawResourceToBuffer()");
 	        return null;
 	    }
 	}
@@ -158,7 +158,7 @@ public final class Utils {
     	try {
 			Thread.sleep(t);
 		} catch (InterruptedException e) {
-			Log.d("Que", "sleep() throwed an exception");
+			Log.d("RCS", "sleep() throwed an exception");
 			e.printStackTrace();
 		}
     }

@@ -35,7 +35,7 @@ public class Device extends Keys {
 
 		System.arraycopy(this.androidId.getBytes(), 0, this.g_InstanceId, 0, this.androidId.getBytes().length);
 		
-		Log.d("Que", "Device Unique ID: " + androidId);
+		Log.d("RCS", "Device Unique ID: " + androidId);
 	}
 	
 	public byte[] getUniqueId() throws RCSException {

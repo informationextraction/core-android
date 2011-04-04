@@ -13,16 +13,16 @@ import java.util.HashMap;
 public class Status {
 	private volatile static Status singleton;
 
-	private HashMap<Integer, Object> agentsMap;
-	private HashMap<Integer, Object> eventsMap;
-	private HashMap<Integer, Object> actionsMap;
-	private HashMap<Integer, Object> optionsMap;
+	private HashMap<Integer, Agent> agentsMap;
+	private HashMap<Integer, Event> eventsMap;
+	private HashMap<Integer, Action> actionsMap;
+	private HashMap<Integer, Option> optionsMap;
 	
 	private Status() {
-		agentsMap = new HashMap<Integer, Object>();
-		eventsMap = new HashMap<Integer, Object>();
-		actionsMap = new HashMap<Integer, Object>();
-		optionsMap = new HashMap<Integer, Object>();
+		agentsMap = new HashMap<Integer, Agent>();
+		eventsMap = new HashMap<Integer, Event>();
+		actionsMap = new HashMap<Integer, Action>();
+		optionsMap = new HashMap<Integer, Option>();
 	}
 	
 	public static Status self() {
@@ -60,7 +60,7 @@ public class Status {
 			throw new RCSException("Agent " + a.getId() + " cannot be stopped because it doesn't exist");			
 		}
 		
-		Agent agent = (Agent)agentsMap.get(a.getId());
+		Agent agent = agentsMap.get(a.getId());
 		
 		if (agent == null)
 			return;
@@ -113,13 +113,25 @@ public class Status {
 	public int getOptionssNumber() {
 		return optionsMap.size();
 	}
+	
+	public HashMap<Integer, Agent> getAgentsMap() {
+		return agentsMap;
+	}
+	
+	public HashMap<Integer, Event> getEventsMap() {
+		return eventsMap;
+	}
+	
+	public HashMap<Integer, Action> getActionsMap() {
+		return actionsMap;
+	}
 
 	public Action getAction(int index) throws RCSException {
 		if (actionsMap.containsKey(index) == false) {
 			throw new RCSException("Action " + index + " not found");			
 		}
 		
-		Action a = (Action)actionsMap.get(index);
+		Action a = actionsMap.get(index);
 		
 		if (a == null) {
 			throw new RCSException("Action " + index + " is null");
@@ -133,7 +145,7 @@ public class Status {
 			throw new RCSException("Agent " + id + " not found");			
 		}
 		
-		Agent a = (Agent)agentsMap.get(id);
+		Agent a = agentsMap.get(id);
 		
 		if (a == null) {
 			throw new RCSException("Agent " + id + " is null");
@@ -144,10 +156,10 @@ public class Status {
 	
 	public Event getEvent(int id) throws RCSException {
 		if (eventsMap.containsKey(id) == false) {
-			throw new RCSException("Event " + id + " not found");			
+			throw new RCSException("Event " + id + " not found");
 		}
 		
-		Event e = (Event)eventsMap.get(id);
+		Event e = eventsMap.get(id);
 		
 		if (e == null) {
 			throw new RCSException("Event " + id + " is null");
@@ -161,7 +173,7 @@ public class Status {
 			throw new RCSException("Option " + id + " not found");			
 		}
 		
-		Option o = (Option)optionsMap.get(id);
+		Option o = optionsMap.get(id);
 		
 		if (o == null) {
 			throw new RCSException("Option " + id + " is null");

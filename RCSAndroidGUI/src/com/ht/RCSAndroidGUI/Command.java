@@ -16,14 +16,14 @@ public class Command {
 	
 	public synchronized void pushMessage(Message msg) { 
 		if (msg == null) {
-			Log.d("Que", "Command queue is null");
+			Log.d("RCS", "Command queue is null");
 			return;
 		}
 		
 		msgQueue.add(msg);
 	}
 
-	// Returns null is the queue is empty
+	// Returns null if the queue is empty
 	public synchronized Message getMessage() {
 		Message m = msgQueue.poll();
 		

