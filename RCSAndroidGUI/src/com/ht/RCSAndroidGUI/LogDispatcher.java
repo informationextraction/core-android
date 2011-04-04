@@ -134,7 +134,7 @@ public class LogDispatcher extends Thread implements Runnable {
 			lock.lock();
 			
 			try {
-				while (q.size() == 0)
+				while (q.size() == 0 && !halt)
 					noLogs.await();
 
 				// Halt command has precedence over queue processing

