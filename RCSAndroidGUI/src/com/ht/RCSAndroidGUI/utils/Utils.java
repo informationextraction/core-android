@@ -235,8 +235,7 @@ public final class Utils {
         //#endif
 
     	try {
-			ByteArrayInputStream input = new ByteArrayInputStream(buffer,offset,buffer.length - offset);
-			DataInputStream databuffer = new DataInputStream(input);
+			DataBuffer databuffer = new DataBuffer(buffer,offset,buffer.length - offset);
 			int value = databuffer.readInt();
 			return value;
 		} catch (IOException ex) {

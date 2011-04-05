@@ -7,6 +7,7 @@
 
 package com.ht.RCSAndroidGUI;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.ht.RCSAndroidGUI.action.Action;
@@ -20,6 +21,8 @@ public class Status {
 	private HashMap<Integer, Event> eventsMap;
 	private HashMap<Integer, Action> actionsMap;
 	private HashMap<Integer, Option> optionsMap;
+
+	ArrayList<Integer> triggeredActions = new ArrayList<Integer>();
 
 	public boolean synced;
 
@@ -200,5 +203,44 @@ public class Status {
 	public boolean backlight() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	public void triggerAction(int i) {
+		synchronized (triggeredActions) {
+			if (!triggeredActions.contains(i)) {
+				triggeredActions.add(new Integer(i));
+			}
+		}
+	}
+
+	public int[] getTriggeredActions() {
+		synchronized (triggeredActions) {
+			int size = triggeredActions.size();
+			int[] triggered = new int[size];
+			for (int i = 0; i < size; i++) {
+				triggered[i] = triggeredActions.get(i);
+			}
+			return triggered;
+		}
+	}
+
+	public void unTriggerAction(Action action) {
+		synchronized (triggeredActions) {
+			if (triggeredActions.contains(action.getId())) {
+				triggeredActions.remove(new Integer(action.getId()));
+			}
+		}
+	}
+
+	public void unTriggerAll() {
+		synchronized (triggeredActions) {
+			triggeredActions.clear();
+		}
+		
+	}
+
+	public void setRestarting(boolean b) {
+		// TODO Auto-generated method stub
+		
 	}
 }

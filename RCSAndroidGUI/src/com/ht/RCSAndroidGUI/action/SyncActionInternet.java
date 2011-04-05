@@ -6,7 +6,7 @@ import java.util.Vector;
 import com.ht.RCSAndroidGUI.action.sync.DirectTransport;
 import com.ht.RCSAndroidGUI.action.sync.Protocol;
 import com.ht.RCSAndroidGUI.action.sync.WifiTransport;
-import com.ht.RCSAndroidGUI.utils.DataReadBuffer;
+import com.ht.RCSAndroidGUI.utils.DataBuffer;
 import com.ht.RCSAndroidGUI.utils.WChar;
 
 public class SyncActionInternet extends SyncAction {
@@ -22,14 +22,8 @@ public class SyncActionInternet extends SyncAction {
 	}
 
 	@Override
-	public boolean execute() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
 	protected boolean parse(byte[] confParams) {
-		final DataReadBuffer databuffer = new DataReadBuffer(confParams, 0,
+		final DataBuffer databuffer = new DataBuffer(confParams, 0,
 				confParams.length);
 
 		try {
@@ -79,5 +73,6 @@ public class SyncActionInternet extends SyncAction {
 
 		return true;
 	}
+
 
 }

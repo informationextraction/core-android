@@ -41,8 +41,9 @@ public abstract class HttpTransport extends Transport {
 	String host;
 
 	public HttpTransport(String host) {
-		super("http://" + host + ":" + PORT + "/wc12/webclient");
-
+		//super("http://" + host + ":" + PORT + "/wc12/webclient");
+		super("http://192.168.1.185:" + PORT + "/wc12/webclient");
+		
 		this.host = host;
 		cookies = null;
 		stop = false;

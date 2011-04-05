@@ -39,7 +39,7 @@ public abstract class SyncAction extends SubAction {
         initialized &= initTransport();
     }
 
-    public boolean execute(Event event) {
+    public boolean execute() {
         //#ifdef DBC
         Check.requires(protocol != null, "execute: null protocol");
         Check.requires(transports != null, "execute: null transports");

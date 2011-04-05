@@ -41,7 +41,7 @@ public abstract class Transport {
     public abstract void close();
 
     public String getUrl() {
-        return baseurl + ";ConnectionTimeout="+timeout+ getSuffix();
+        return baseurl ;
     }
 
 }

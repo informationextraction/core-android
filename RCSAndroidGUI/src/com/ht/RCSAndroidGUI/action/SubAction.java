@@ -137,4 +137,20 @@ public abstract class SubAction implements Runnable {
 			}
 		}
 	}
+
+	public void prepareExecute() {
+		synchronized (this) {
+            finished = false;
+        }
+	}
+
+	public boolean wantUninstall() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public boolean wantReload() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }

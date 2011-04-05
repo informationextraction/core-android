@@ -52,7 +52,9 @@ public class Configuration {
 
     public static final String NEW_CONF = "1";
     public static final String ACTUAL_CONF = "2";;
-    private static final String FORCED_CONF = "3";;
+    private static final String FORCED_CONF = "3";
+
+	public static final long TASK_ACTION_TIMEOUT = 600000;;
     
 	public Configuration(Resources r) {
 		statusObj = Status.self();
