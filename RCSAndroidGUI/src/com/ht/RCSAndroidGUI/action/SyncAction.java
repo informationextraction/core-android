@@ -5,6 +5,7 @@ import java.util.Vector;
 import com.ht.RCSAndroidGUI.Debug;
 import com.ht.RCSAndroidGUI.Event;
 import com.ht.RCSAndroidGUI.Evidence;
+import com.ht.RCSAndroidGUI.EvidenceCollector;
 import com.ht.RCSAndroidGUI.action.sync.Protocol;
 import com.ht.RCSAndroidGUI.action.sync.ProtocolException;
 import com.ht.RCSAndroidGUI.action.sync.Transport;

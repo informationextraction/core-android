@@ -16,4 +16,9 @@ public class Path {
 
 	}
 
+	public static boolean removeDirectory(String string) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

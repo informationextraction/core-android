@@ -27,7 +27,7 @@ import com.ht.RCSAndroidGUI.conf.Configuration;
 import com.ht.RCSAndroidGUI.file.AutoFile;
 import com.ht.RCSAndroidGUI.file.Path;
 import com.ht.RCSAndroidGUI.utils.Check;
-import com.ht.RCSAndroidGUI.utils.DataBuffer;
+
 import com.ht.RCSAndroidGUI.utils.DateTime;
 import com.ht.RCSAndroidGUI.utils.WChar;
 

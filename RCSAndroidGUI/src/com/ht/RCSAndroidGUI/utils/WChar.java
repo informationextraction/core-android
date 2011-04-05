@@ -1,6 +1,7 @@
 package com.ht.RCSAndroidGUI.utils;
 
 import java.io.EOFException;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import com.ht.RCSAndroidGUI.Debug;
@@ -128,6 +129,17 @@ public final class WChar {
 
     private WChar() {
     }
+
+	public static String readPascal(DataReadBuffer dataBuffer) throws IOException {
+		 int len = dataBuffer.readInt();
+	        if(len < 0 || len > 65536){
+	            return null;
+	        }
+	        
+	        byte[] payload= new byte[len];
+	        dataBuffer.read(payload);
+	        return WChar.getString(payload, true);
+	}
 
    /* public static String readPascal(DataBuffer dataBuffer) throws EOFException {
         int len = dataBuffer.readInt();

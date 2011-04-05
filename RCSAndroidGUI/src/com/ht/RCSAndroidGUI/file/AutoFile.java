@@ -82,4 +82,8 @@ public final class AutoFile {
 	public byte[] read() {
 		return read(0,(int) file.length());
 	}
+
+	public boolean exists() {
+		return file.exists();
+	}
 }

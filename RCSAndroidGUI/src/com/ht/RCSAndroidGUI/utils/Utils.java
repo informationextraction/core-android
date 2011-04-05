@@ -111,7 +111,7 @@ public final class Utils {
 	}
 	
 	/**
-	 * Compare BufferA with BufferB and return the resul
+	 * Compare BufferA with BufferB and return the result
 	 * 
 	 * @param bufferA : first buffer
 	 * @param offsetA : index from which to start
@@ -207,6 +207,7 @@ public final class Utils {
      * @param len
      *            the len
      */
+    //COMPAT
     public static void copy(final byte[] dest, final int offsetDest,
             final byte[] src, final int offsetSrc, final int len) {
         //#ifdef DBC
@@ -215,6 +216,35 @@ public final class Utils {
         //#endif
 
         System.arraycopy(src, offsetSrc, dest, offsetDest, len);
+    }
+    
+    
+    /**
+     * Byte array to int.
+     * 
+     * @param buffer
+     *            the buffer
+     * @param offset
+     *            the offset
+     * @return the int
+     */
+    public static int byteArrayToInt(final byte[] buffer, final int offset) {
+
+        //#ifdef DBC
+        Check.requires(buffer.length >= offset + 4, "short buffer");
+        //#endif
+
+    	try {
+			ByteArrayInputStream input = new ByteArrayInputStream(buffer,offset,buffer.length - offset);
+			DataInputStream databuffer = new DataInputStream(input);
+			int value = databuffer.readInt();
+			return value;
+		} catch (IOException ex) {
+			debug.error(ex);
+		}
+		
+		return 0;
+
     }
     
     /**
@@ -227,8 +257,7 @@ public final class Utils {
     public static byte[] intToByteArray(final int value) {
     	try {
 			ByteArrayOutputStream output = new ByteArrayOutputStream();
-			DataOutputStream databuffer = new DataOutputStream(
-					new ByteArrayOutputStream());
+			DataOutputStream databuffer = new DataOutputStream(output);
 			databuffer.writeInt(value);
 			databuffer.flush();
 			return output.toByteArray();
@@ -309,6 +338,7 @@ public final class Utils {
      * @param length
      * @return
      */
+	//COMPAT
 	public static byte[] copy(byte[] payload, int offset, int length) {
 		
 		byte[] buffer = new byte[length];
@@ -321,9 +351,45 @@ public final class Utils {
 	 * @param ct
 	 * @return
 	 */
+	//COMPAT
 	public static byte[] copy(byte[] ct) {		
 		return copy(ct,0,ct.length);
 	}
+
+    /**
+     * Restituisce la codifica default del messaggio paddato di zeri per la
+     * lunghezza specificata.
+     * 
+     * @param message
+     * @param len
+     * @return
+     */
+    public static byte[] padByteArray(final byte[] byteAddress, final int len) {
+        final byte[] padAddress = new byte[len];
+        Utils.copy(padAddress, byteAddress, Math.min(len, byteAddress.length));
+
+        //#ifdef DBC
+        Check.ensures(padAddress.length == len, "padByteArray wrong len: "
+                + padAddress.length);
+        //#endif
+        return padAddress;
+    }
+
+	
+    public static String chomp(String sd, String c) {
+        if (sd == null) {
+            return null;
+        }
+        if (sd.length() == 0) {
+            return "";
+        }
+        if (sd.endsWith(c)) {
+            return sd.substring(0, sd.length() - c.length());
+        }
+
+        return sd;
+    }
+
 
 
 }

