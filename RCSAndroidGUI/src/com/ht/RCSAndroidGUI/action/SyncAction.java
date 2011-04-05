@@ -24,7 +24,7 @@ public abstract class SyncAction extends SubAction {
     protected boolean initialized;
 
     //#ifdef DEBUG
-    private static Debug debug = new Debug("SyncAction");
+    protected static Debug debug = new Debug("SyncAction");
     //#endif
 
     public SyncAction(int actionId, final byte[] confParams) {

