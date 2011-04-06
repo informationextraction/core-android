@@ -227,4 +227,9 @@ public class AgentManager {
 		}
 		startAgent(key);
 	}
+
+	public void reloadAgent(int key) {
+		// TODO Auto-generated method stub
+		
+	}
 }

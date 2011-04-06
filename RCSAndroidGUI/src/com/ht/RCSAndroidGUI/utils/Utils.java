@@ -254,17 +254,11 @@ public final class Utils {
      * @return the byte[]
      */
     public static byte[] intToByteArray(final int value) {
-    	try {
-			ByteArrayOutputStream output = new ByteArrayOutputStream();
-			DataOutputStream databuffer = new DataOutputStream(output);
-			databuffer.writeInt(value);
-			databuffer.flush();
-			return output.toByteArray();
-		} catch (IOException ex) {
-			debug.error(ex);
-		}
-		
-		return null;
+    	byte[] output=new byte[4];
+		DataBuffer buffer = new DataBuffer(output,0,4);		
+		buffer.writeInt(value);
+
+		return output;
     }
 
     /**

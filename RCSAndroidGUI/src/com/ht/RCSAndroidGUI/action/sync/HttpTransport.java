@@ -23,6 +23,8 @@ import java.util.List;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.params.ClientPNames;
+import org.apache.http.client.params.CookiePolicy;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.cookie.SetCookie;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -66,7 +68,7 @@ public abstract class HttpTransport extends Transport {
 	boolean acceptWifi = false;
 
 	public void close() {
-		cookies = null;
+		//cookies = null;
 	}
 
 	/**
@@ -81,12 +83,16 @@ public abstract class HttpTransport extends Transport {
 
 		// sending request
 		DefaultHttpClient httpclient = new DefaultHttpClient();
+		//httpclient.getParams().setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.RFC_2965);
+		
 		HttpPost httppost = new HttpPost(baseurl);
+		httppost.setHeader("User-Agent", "Mozilla/5.0 (Linux; U; Android 0.5; en-us) AppleWebKit/522+ (KHTML, like Gecko) Safari/419.3");
+		httppost.setHeader("Content-Type", "application/octet-stream");
 
 		if (cookies != null) {
 			for (Cookie cookie : cookies) {
-
 				httpclient.getCookieStore().addCookie(cookie);
+				//httppost.setHeader("Cookie", cookie.getName());
 			}
 		}
 

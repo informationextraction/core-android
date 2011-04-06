@@ -68,7 +68,7 @@ public abstract class SyncAction extends SubAction {
         wantReload = false;
         wantUninstall = false;
 
-        agentManager.restartAgent(Agent.AGENT_DEVICE);
+        agentManager.reloadAgent(Agent.AGENT_DEVICE);
 
         boolean ret = false;
 

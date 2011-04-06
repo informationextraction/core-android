@@ -45,10 +45,15 @@ public class DataBuffer {
 		byteBuffer.put(data);
 		
 	}
-
+	
+	public void writeInt(int value) {
+		byteBuffer.putInt(value);
+	}
+	
 	public int getPosition() {
-		// TODO Auto-generated method stub
 		return byteBuffer.position();
 	}
+
+
 
 }

