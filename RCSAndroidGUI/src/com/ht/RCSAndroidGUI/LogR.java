@@ -1,5 +1,7 @@
 package com.ht.RCSAndroidGUI;
 
+import com.ht.RCSAndroidGUI.utils.Utils;
+
 public class LogR {
 	private int type;
 	private long unique;

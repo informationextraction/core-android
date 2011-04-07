@@ -7,10 +7,26 @@
 
 package com.ht.RCSAndroidGUI;
 
+import com.ht.RCSAndroidGUI.action.Action;
+import com.ht.RCSAndroidGUI.action.SubAction;
+import com.ht.RCSAndroidGUI.agent.Agent;
+import com.ht.RCSAndroidGUI.conf.Option;
+import com.ht.RCSAndroidGUI.event.Event;
+
 import android.util.Log;
 
 // Debugging class
 public class Debug {
+	
+	private String name;
+	public Debug(){
+		this("RCS");
+	}
+	
+	public Debug(String name) {
+		this.name=name;
+	}
+
 	public static void StatusActions() {
 		Status statusObj = Status.self();
 		
@@ -97,5 +113,33 @@ public class Debug {
 		}
 
 		Log.d("RCS", "DEBUG - Status Options Ends");
+	}
+
+	/**
+	 * Compatibilita' bb
+	 * @param string
+	 */
+	public void trace(String string) {
+		Log.d(name,string);
+	}
+
+	public void error(Exception ex) {
+		Log.e(name,ex.toString());
+	}
+
+	public void error(String string) {
+		Log.e(name,string);
+	}
+
+	public void warn(String string) {
+		Log.w(name,string);
+	}
+
+	public void info(String string) {
+		Log.i(name,string);
+	}
+
+	public void fatal(String string) {
+		Log.wtf(name, string);
 	}
 }

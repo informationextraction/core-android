@@ -12,6 +12,8 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import com.ht.RCSAndroidGUI.utils.Utils;
+
 import android.os.Environment;
 import android.util.Log;
 
@@ -119,7 +121,7 @@ public class LogDispatcher extends Thread implements Runnable {
 
 		return singleton;
 	}
-
+	
 	public void run() {
 		Log.d("RCS", "LogDispatcher started");
 		
@@ -315,6 +317,7 @@ public class LogDispatcher extends Thread implements Runnable {
 			f.delete();
 		}
 	}
+
 	
 	/* Inserire un Intent-receiver per gestire la rimozione della SD
 	private void updateExternalStorageState() {
