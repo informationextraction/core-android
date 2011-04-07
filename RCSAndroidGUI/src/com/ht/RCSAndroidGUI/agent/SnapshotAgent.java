@@ -26,7 +26,7 @@ public class SnapshotAgent extends AgentBase {
 	}
 	
 	public void begin() {
-		setDelay(this.delay);
+		setPeriod(this.delay);
 	}
 	
 	public void go() {

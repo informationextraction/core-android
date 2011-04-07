@@ -10,6 +10,9 @@ package com.ht.RCSAndroidGUI.action;
 import com.ht.RCSAndroidGUI.RCSException;
 
 public class Action {
+	 /** The Constant ACTION_NULL. */
+    public static final int ACTION_NULL = -1;
+    
 	/**
 	 * Action array
 	 */

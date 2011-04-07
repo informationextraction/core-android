@@ -11,11 +11,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import com.ht.RCSAndroidGUI.Debug;
 import com.ht.RCSAndroidGUI.Status;
 
 import android.util.Log;
 
 public class EventManager {
+	private static final String TAG = "EventManager";
+	
 	private volatile static EventManager singleton;
 	private Status statusObj;
 	
@@ -56,43 +59,56 @@ public class EventManager {
 		
 		switch (key) {
 			case Event.EVENT_TIMER:
+				Log.i(TAG,"");
 				e = new TimerEvent();
 				break;
 				
 			case Event.EVENT_SMS:
+				Log.i(TAG,"EVENT_SMS");
 				break;
 				
 			case Event.EVENT_CALL:
+				Log.i(TAG,"EVENT_CALL");
 				break;
 				
 			case Event.EVENT_CONNECTION:
+				Log.i(TAG,"EVENT_CONNECTION");
 				break;
 				
 			case Event.EVENT_PROCESS:
+				Log.i(TAG,"EVENT_PROCESS");
 				break;
 				
 			case Event.EVENT_CELLID:
+				Log.i(TAG,"EVENT_CELLID");
 				break;
 				
 			case Event.EVENT_QUOTA:
+				Log.i(TAG,"EVENT_QUOTA");
 				break;
 				
 			case Event.EVENT_SIM_CHANGE:
+				Log.i(TAG,"EVENT_SIM_CHANGE");
 				break;
 				
 			case Event.EVENT_LOCATION:
+				Log.i(TAG,"EVENT_LOCATION");
 				break;
 				
 			case Event.EVENT_AC:
+				Log.i(TAG,"EVENT_AC");
 				break;
 				
 			case Event.EVENT_BATTERY:
+				Log.i(TAG,"EVENT_BATTERY");
 				break;
 				
 			case Event.EVENT_STANDBY:
+				Log.i(TAG,"EVENT_STANDBY");
 				break;
 				
 			default:
+				Log.e(TAG,"Unknown: " + key);
 				break;
 		}
 		
@@ -118,15 +134,16 @@ public class EventManager {
 			return false;
 		}
 		
+		//TODO BAU (basta una lista di Event)
 		Iterator<Map.Entry<Integer, Event>> it = events.entrySet().iterator();
 
 		while (it.hasNext()) {
 			Map.Entry<Integer, Event> pairs = it.next();
-			
-			EventBase e = mapEvent(pairs.getKey());
+			int key = pairs.getValue().getType();
+			EventBase e = mapEvent(key);
 			
 			if (e != null) {
-				e.parse(pairs.getValue().getParams());
+				e.parse(pairs.getValue());
 				e.start();
 			}
 		}

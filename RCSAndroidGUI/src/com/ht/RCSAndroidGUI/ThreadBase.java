@@ -12,7 +12,11 @@ import java.nio.ByteBuffer;
 import android.util.Log;
 
 public abstract class ThreadBase extends Thread {
-    private long delay = Long.MAX_VALUE;
+    protected static final long NEVER = Long.MAX_VALUE;
+    
+    private long period = NEVER;
+    private long delay = 0;
+    
     private boolean stopped;
     private boolean caffe;
     
@@ -22,6 +26,12 @@ public abstract class ThreadBase extends Thread {
     public abstract void go();
     
 	protected void loop() {
+		try {
+            wait(delay);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+		
 		 while (!stopped) {
             if (caffe) {
                 // fai il caffe'....
@@ -30,7 +40,7 @@ public abstract class ThreadBase extends Thread {
             go();
 
             try {
-                wait(delay);
+                wait(period);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -55,7 +65,13 @@ public abstract class ThreadBase extends Thread {
     }
 
     //definisce il delay al prossimo giro
-    public void setDelay(int delay) {
+    public void setPeriod(long period) {
+        this.period = period;
+        next();
+    }
+    
+    //definisce il delay al primo giro
+    public void setDelay(long delay) {
         this.delay = delay;
         next();
     }

