@@ -13,6 +13,7 @@ import java.util.HashMap;
 import com.ht.RCSAndroidGUI.action.Action;
 import com.ht.RCSAndroidGUI.agent.Agent;
 import com.ht.RCSAndroidGUI.conf.Option;
+import com.ht.RCSAndroidGUI.event.Event;
 
 // Singleton Class
 public class Status {

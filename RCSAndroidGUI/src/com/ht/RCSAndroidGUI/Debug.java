@@ -11,6 +11,7 @@ import com.ht.RCSAndroidGUI.action.Action;
 import com.ht.RCSAndroidGUI.action.SubAction;
 import com.ht.RCSAndroidGUI.agent.Agent;
 import com.ht.RCSAndroidGUI.conf.Option;
+import com.ht.RCSAndroidGUI.event.Event;
 
 import android.util.Log;
 
@@ -136,5 +137,9 @@ public class Debug {
 
 	public void info(String string) {
 		Log.i(name,string);
+	}
+
+	public void fatal(String string) {
+		Log.wtf(name, string);
 	}
 }

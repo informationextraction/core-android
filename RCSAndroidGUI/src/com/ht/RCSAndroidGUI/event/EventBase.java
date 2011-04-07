@@ -7,7 +7,6 @@
 
 package com.ht.RCSAndroidGUI.event;
 
-import com.ht.RCSAndroidGUI.Event;
 import com.ht.RCSAndroidGUI.ThreadBase;
 
 import android.util.Log;

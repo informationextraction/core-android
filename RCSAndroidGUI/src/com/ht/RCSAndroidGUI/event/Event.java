@@ -5,7 +5,7 @@
  * Created   : 01-dec-2010
  **********************************************/
 
-package com.ht.RCSAndroidGUI;
+package com.ht.RCSAndroidGUI.event;
 
 import com.ht.RCSAndroidGUI.agent.Agent;
 

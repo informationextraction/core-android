@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import com.ht.RCSAndroidGUI.Event;
 import com.ht.RCSAndroidGUI.Status;
 
 import android.util.Log;
@@ -57,7 +56,7 @@ public class EventManager {
 		
 		switch (key) {
 			case Event.EVENT_TIMER:
-				// e = new TimerEvent();
+				e = new TimerEvent();
 				break;
 				
 			case Event.EVENT_SMS:
@@ -104,19 +103,19 @@ public class EventManager {
 		return e;
 	}
 	
-	public void startEvents() {
+	public boolean startEvents() {
 		HashMap<Integer, Event> events;
 		
 		events = statusObj.getEventsMap();
 		
 		if (events == null) {
 			Log.d("RCS", "Events map null");
-			return;
+			return false;
 		}
 		
 		if (running == null) {
 			Log.d("RCS", "Running Events map null");
-			return;
+			return false;
 		}
 		
 		Iterator<Map.Entry<Integer, Event>> it = events.entrySet().iterator();
@@ -131,6 +130,8 @@ public class EventManager {
 				e.start();
 			}
 		}
+		
+		return true;
 	}
 	
 	// XXX Deve essere bloccante? Ovvero attendere l'effettivo stop di tutto?

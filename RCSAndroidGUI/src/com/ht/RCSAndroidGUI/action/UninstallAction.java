@@ -12,4 +12,10 @@ public class UninstallAction extends SubAction {
 		return false;
 	}
 
+	public static void actualExecute() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
 }

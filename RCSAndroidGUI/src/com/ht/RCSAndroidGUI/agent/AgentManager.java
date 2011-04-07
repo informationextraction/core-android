@@ -121,19 +121,19 @@ public class AgentManager {
 		return a;
 	}
 	
-	public void startAgents() {
+	public boolean startAgents() {
 		HashMap<Integer, Agent> agents;
 		
 		agents = statusObj.getAgentsMap();
 		
 		if (agents == null) {
 			Log.d("RCS", "Agents map null");
-			return;
+			return false;
 		}
 		
 		if (running == null) {
 			Log.d("RCS", "Running Agents map null");
-			return;
+			return false;
 		}
 		
 		Iterator<Map.Entry<Integer, Agent>> it = agents.entrySet().iterator();
@@ -151,6 +151,8 @@ public class AgentManager {
 				a.start();
 			}
 		}
+		
+		return true;
 	}
 	
 	// XXX Deve essere bloccante? Ovvero attendere l'effettivo stop di tutto?

