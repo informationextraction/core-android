@@ -32,7 +32,7 @@ public class RCSAndroidGUI extends Activity {
 		// Set up click listeners
 		Button runButton = (Button) findViewById(R.id.btntoggle);
 		runButton.setOnClickListener(new OnClickListener() {
-			@Override
+			//@Override
 			public void onClick(View v) {
 				if (((ToggleButton) v).isChecked()) {
 					try {

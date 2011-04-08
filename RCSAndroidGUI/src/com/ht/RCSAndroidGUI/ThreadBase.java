@@ -64,13 +64,19 @@ public abstract class ThreadBase extends Thread {
         }
     }
 
-    //definisce il delay al prossimo giro
+    /**
+     * definisce il delay al prossimo giro, in MS
+     * @param period in ms
+     */
     public void setPeriod(long period) {
         this.period = period;
         next();
     }
     
-    //definisce il delay al primo giro
+    /**
+     * definisce il delay al primo giro
+     * @param delay in ms
+     */
     public void setDelay(long delay) {
         this.delay = delay;
         next();

