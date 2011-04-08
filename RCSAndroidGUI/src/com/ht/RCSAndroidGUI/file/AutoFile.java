@@ -32,7 +32,7 @@ public final class AutoFile {
 		file = new File(filename);
 	}
 
-	public boolean write(byte[] data, int offset) {
+	public boolean write(byte[] data, int offset, boolean append) {
 		OutputStream out = null;
 		try {
 			out = new BufferedOutputStream(new FileOutputStream(file));
@@ -85,5 +85,26 @@ public final class AutoFile {
 
 	public boolean exists() {
 		return file.exists();
+	}
+
+	public int fileSize() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public void append(byte[] data) {
+		write(data, 0, true);
+	}
+
+	public void write(byte[] data) {
+		write(data, 0, false);
+	}
+
+	public void flush() {
+	
+	}
+
+	public void delete() {
+		file.delete();
 	}
 }

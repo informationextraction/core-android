@@ -56,7 +56,7 @@ public abstract class Protocol {
 		AutoFile file = new AutoFile(Path.conf()
 				+ Configuration.NEW_CONF);
 
-		if (file.write(conf, offset)) {
+		if (file.write(conf, offset, false)) {
 			Evidence.info("New configuration received");
 			return true;
 		} else {

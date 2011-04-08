@@ -23,15 +23,10 @@ public class Path {
 	public static boolean makeDirs(){
 		
 		try {
-			File file = new File(conf());
-			file.mkdirs();
-			
-			file = new File(markup());
-			file.mkdirs();
-			
-			file = new File(logs());
-			file.mkdirs();
-			
+			createDirectory(conf());
+			createDirectory(markup());
+			createDirectory(logs());
+
 			return true;
 		} catch (Exception e) {
 			Log.e(TAG,e.toString());
@@ -54,6 +49,16 @@ public class Path {
 	public static boolean removeDirectory(String string) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	public static boolean createDirectory(String dir) {
+		File file = new File(dir);
+		return file.mkdirs();
+	}
+
+	public static long freeSpace() {
+		// TODO Auto-generated method stub
+		return Long.MAX_VALUE;
 	}
 
 

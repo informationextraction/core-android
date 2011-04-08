@@ -169,9 +169,8 @@ public final class Utils {
 		}
     }
     
+	static SecureRandom rand = new SecureRandom();
     public static long getUniqueId() {   	
-    	SecureRandom rand = new SecureRandom();
-    	
     	return rand.nextLong();
     }
     
