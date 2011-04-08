@@ -54,6 +54,10 @@ public class DataBuffer {
 		return byteBuffer.position();
 	}
 
+	public void writeLong(long value) {
+		byteBuffer.putLong(value);
+	}
+
 
 
 }

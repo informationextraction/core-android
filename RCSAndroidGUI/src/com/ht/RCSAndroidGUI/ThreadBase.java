@@ -33,9 +33,6 @@ public abstract class ThreadBase extends Thread {
         }
 		
 		 while (!stopped) {
-            if (caffe) {
-                // fai il caffe'....
-            }
             
             go();
 
@@ -85,10 +82,5 @@ public abstract class ThreadBase extends Thread {
     public synchronized int getStatus() {
     	return status;
     }
-    
-    // fai il caffe'.
-    public void faiCaffe(){
-        caffe = true;
-        notify();
-    }
+
 }

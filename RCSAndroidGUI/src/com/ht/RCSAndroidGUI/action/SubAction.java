@@ -131,6 +131,7 @@ public abstract class SubAction implements Runnable {
 		try {
 			execute();
 		} finally {
+		
 			synchronized (this) {
 				notify();
 				finished = true;

