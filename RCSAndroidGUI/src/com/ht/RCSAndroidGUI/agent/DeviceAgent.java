@@ -95,9 +95,8 @@ public class DeviceAgent extends AgentBase {
 		//log.write(WChar.getBytes(content, true));
 		//log.close();
 		
-		Evidence evidence = new Evidence(Agent.AGENT_DEVICE, Keys.self().getAesKey());
+		Evidence evidence = new Evidence(Agent.AGENT_DEVICE);
 		evidence.atomicWriteOnce(WChar.getBytes(content, true));
-		
 		
 	}
 	

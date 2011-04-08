@@ -115,7 +115,7 @@ public class ZProtocol extends Protocol {
 		// #endif
 
 		// key init
-		cryptoConf.makeKey(Encryption.getKeys().getChallengeKey());
+		cryptoConf.makeKey(Keys.self().getChallengeKey());
 
 		random.nextBytes(Kd);
 		random.nextBytes(Nonce);
@@ -227,7 +227,7 @@ public class ZProtocol extends Protocol {
 
 	// **************** PROTOCOL **************** //
 	protected byte[] forgeAuthentication() {
-		Keys keys = Encryption.getKeys();
+		Keys keys = Keys.self();
 
 		byte[] data = new byte[104];
 		DataBuffer dataBuffer = new DataBuffer(data, 0, data.length);
@@ -316,7 +316,7 @@ public class ZProtocol extends Protocol {
 
 			// PBKDF1 (SHA1, c=1, Salt=KS||Kd)
 			final SHA1Digest digest = new SHA1Digest();
-			digest.update(Encryption.getKeys().getConfKey());
+			digest.update(Keys.self().getConfKey());
 			digest.update(Ks);
 			digest.update(Kd);
 

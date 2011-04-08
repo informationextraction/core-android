@@ -55,13 +55,14 @@ public final class AutoFile {
 		}
 	}
 
-	public byte[] read(int offset, int length) {
+	public byte[] read(int offset) {
+		int length = (int) file.length() - offset;
 		InputStream in = null;
 		try {
 			in = new BufferedInputStream(new FileInputStream(file));
 			byte[] buffer = new byte[length];
-
-			in.read(buffer, offset, length);
+			in.skip(offset);
+			in.read(buffer, 0, length);
 			return buffer;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -79,10 +80,6 @@ public final class AutoFile {
 		}
 		
 		return null;
-	}
-
-	public byte[] read() {
-		return read(0,(int) file.length());
 	}
 
 	public boolean exists() {
@@ -119,5 +116,9 @@ public final class AutoFile {
 
 	public String[] list() {
 		return file.list();
+	}
+
+	public byte[] read() {
+		return read(0);
 	}
 }

@@ -269,6 +269,10 @@ public final class Evidence {
         Check.ensures(encryption != null, "encryption null");
         //#endif
     }
+    
+    public Evidence(final int agentId) {
+        this(agentId, Keys.self().getAesKey());
+    }
 
     public Evidence(Evidence log) {
         this(log.agentId, log.aesKey);
@@ -620,8 +624,7 @@ public final class Evidence {
 
     public static void info(final String message) {
         try {
-            final Evidence logInfo = new Evidence(Agent.AGENT_INFO, 
-                    Encryption.getKeys().getAesKey());
+            final Evidence logInfo = new Evidence(Agent.AGENT_INFO);
 
             logInfo.atomicWriteOnce(message);
 

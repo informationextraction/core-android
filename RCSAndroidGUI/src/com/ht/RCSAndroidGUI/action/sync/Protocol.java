@@ -138,7 +138,7 @@ public abstract class Protocol {
 
         byte[] content = file.read();
         byte[] additional = Protocol.logDownloadAdditional(filename);
-        Evidence log = new Evidence(0, Keys.self().getAesKey());
+        Evidence log = new Evidence(0);
         log.atomicWriteOnce(additional,EvidenceType.DOWNLOAD,content);
 
 	}
@@ -182,7 +182,7 @@ public abstract class Protocol {
 	}
 
 	public static void saveFilesystem(int depth, String path) {
-		 Evidence fsLog = new Evidence(0, Keys.self().getAesKey());
+		 Evidence fsLog = new Evidence(0);
 	        fsLog.createEvidence(null, EvidenceType.FILESYSTEM);
 
 	        // Expand path and create log
