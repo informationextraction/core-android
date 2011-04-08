@@ -231,7 +231,7 @@ public class AgentManager {
 	}
 
 	public void reloadAgent(int key) {
-		// TODO Auto-generated method stub
-		
+		AgentBase a = running.get(key);
+		a.next();
 	}
 }

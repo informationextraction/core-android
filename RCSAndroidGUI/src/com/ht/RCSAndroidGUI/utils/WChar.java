@@ -141,15 +141,8 @@ public final class WChar {
 	        return WChar.getString(payload, true);
 	}
 
-   /* public static String readPascal(DataBuffer dataBuffer) throws EOFException {
-        int len = dataBuffer.readInt();
-        if(len < 0 || len > 65536){
-            return null;
-        }
-        
-        byte[] payload= new byte[len];
-        dataBuffer.read(payload);
-        return WChar.getString(payload, true);
-    }*/
+	public static byte[] pascalize(String string) {
+		return pascalize(WChar.getBytes(string));
+	}
 
 }

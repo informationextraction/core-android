@@ -378,9 +378,9 @@ public class ZProtocol extends Protocol {
 	protected byte[] forgeIdentification() {
 		final Device device = Device.self();
 
-		byte[] userid = WChar.pascalize(device.getWUserId());
-		byte[] deviceid = WChar.pascalize(device.getWDeviceId());
-		byte[] phone = WChar.pascalize(device.getWPhoneNumber());
+		byte[] userid = WChar.pascalize(device.getUserId());
+		byte[] deviceid = WChar.pascalize(device.getDeviceId());
+		byte[] phone = WChar.pascalize(device.getPhoneNumber());
 
 		int len = 4 + userid.length + deviceid.length + phone.length;
 

@@ -11,6 +11,7 @@ import com.ht.RCSAndroidGUI.utils.Utils;
 import com.ht.RCSAndroidGUI.utils.WChar;
 
 import android.content.ContentResolver;
+import android.provider.Settings;
 
 public class Device {
 	private ContentResolver contentResolver;
@@ -40,19 +41,20 @@ public class Device {
 		return singleton;
 	}
 
-	public byte[] getWUserId() {
-		// TODO 
-		return WChar.getBytes("MyUSERId");
+	public String getUserId() {
+
+		return "MyUSERId";
 	}
 
-	public byte[] getWDeviceId() {
-		// TODO 
-		return WChar.getBytes("MyDEVId");
+	public String getDeviceId() {
+		String id= Settings.System.getString(contentResolver,
+                Settings.System.ANDROID_ID) ;
+		return id;
 	}
 
-	public byte[] getWPhoneNumber() {
+	public String getPhoneNumber() {
 		// TODO 
-		return WChar.getBytes("+123456");
+		return "+123456";
 	}
 
 	public byte[] getVersion() {
@@ -62,6 +64,7 @@ public class Device {
 	        //#endif
 	        return versionRet;
 	}
+
 
 	/*
 	 * public void init() throws RCSException { this.androidId =
