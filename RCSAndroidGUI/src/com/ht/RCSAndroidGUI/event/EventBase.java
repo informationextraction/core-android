@@ -7,48 +7,75 @@
 
 package com.ht.RCSAndroidGUI.event;
 
+import android.util.Log;
+
 import com.ht.RCSAndroidGUI.Status;
 import com.ht.RCSAndroidGUI.ThreadBase;
 import com.ht.RCSAndroidGUI.action.Action;
 
-import android.util.Log;
-
+// TODO: Auto-generated Javadoc
+/**
+ * The Class EventBase.
+ */
 public abstract class EventBase extends ThreadBase implements Runnable {
-    private static final String TAG = "EventBase";
+	
+	/** The Constant TAG. */
+	private static final String TAG = "EventBase";
 
-    
 	// Gli eredi devono implementare i seguenti metodi astratti
-    public abstract void begin();
-    public abstract void end();
-    public abstract void parse(Event event);
-    
-    protected Event event;
-    
-    public synchronized void run() {
-    	status = Event.EVENT_RUNNING;
-    	
-    	begin();
-    	loop();
-        end();
-        
-        status = Event.EVENT_STOPPED;
-        Log.d("RCS", "EventBase stopped");
-    }
-    
-	public void setEvent(Event event) {
+	/**
+	 * Begin.
+	 */
+	public abstract void begin();
+
+	/**
+	 * End.
+	 */
+	public abstract void end();
+
+	/**
+	 * Parses the.
+	 *
+	 * @param event the event
+	 */
+	public abstract void parse(Event event);
+
+	/** The event. */
+	protected Event event;
+
+	/* (non-Javadoc)
+	 * @see java.lang.Thread#run()
+	 */
+	public synchronized void run() {
+		status = Event.EVENT_RUNNING;
+
+		begin();
+		loop();
+		end();
+
+		status = Event.EVENT_STOPPED;
+		Log.d("RCS", "EventBase stopped");
+	}
+
+	/**
+	 * Sets the event.
+	 *
+	 * @param event the new event
+	 */
+	public void setEvent(final Event event) {
 		this.event = event;
 	}
-	
-    /**
-     * Trigger.
-     */
-    protected final void trigger() {
-    	int actionId = event.getAction();
-        if (actionId != Action.ACTION_NULL) {
-           Log.d(TAG, "event: " + this + " triggering: " + actionId);
-            //#endif
 
-            Status.self().triggerAction(actionId);
-        }
-    }
+	/**
+	 * Trigger.
+	 */
+	protected final void trigger() {
+		final int actionId = event.getAction();
+		if (actionId != Action.ACTION_NULL) {
+			Log.d(TAG, "event: " + this + " triggering: " + actionId);
+			// #endif
+
+			Status.self().triggerAction(actionId);
+		}
+	}
 }

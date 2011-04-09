@@ -1,3 +1,11 @@
+/* *******************************************
+ * Copyright (c) 2011
+ * HT srl,   All rights reserved.
+ * Project      : RCS, RCSAndroid
+ * File         : DateTime.java
+ * Created      : Apr 9, 2011
+ * Author		: zeno
+ * *******************************************/
 package com.ht.RCSAndroidGUI.utils;
 
 import java.io.ByteArrayOutputStream;
@@ -9,28 +17,48 @@ import java.util.Date;
 
 import com.ht.RCSAndroidGUI.Debug;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class DateTime.
  */
 public final class DateTime {
 	// #ifdef DEBUG
+	/** The debug. */
 	private static Debug debug = new Debug("DateTime");
 	// #endif
-	
+
+	/** The Constant TICK. */
 	public static final long TICK = 1; // 100 nano secondi
+	
+	/** The Constant MILLISEC. */
 	public static final long MILLISEC = 10000 * TICK;
+	
+	/** The Constant SECOND. */
 	public static final long SECOND = 1000 * MILLISEC;
 
+	/** The Constant MINUTE. */
 	public static final long MINUTE = 60 * SECOND;
+	
+	/** The Constant HOUR. */
 	public static final long HOUR = 60 * MINUTE;
+	
+	/** The Constant DAY. */
 	public static final long DAY = 24 * HOUR;
 
+	/** The Constant DAYS_FROM_1601_TO_1970. */
 	public static final long DAYS_FROM_1601_TO_1970 = 134774;
+	
+	/** The Constant TICSK_FROM_1601_TO_1970. */
 	public static final long TICSK_FROM_1601_TO_1970 = DAYS_FROM_1601_TO_1970
 			* DAY;
+	
+	/** The Constant BASE_YEAR_TM. */
 	private static final int BASE_YEAR_TM = 1900;
 
+	/** The ticks. */
 	long ticks;
+	
+	/** The date. */
 	Date date;
 
 	/**
@@ -53,6 +81,11 @@ public final class DateTime {
 		ticks = millisecs * MILLISEC + TICSK_FROM_1601_TO_1970;
 	}
 
+	/**
+	 * Instantiates a new date time.
+	 *
+	 * @param ticks the ticks
+	 */
 	public DateTime(final long ticks) {
 		this.ticks = ticks;
 		date = new Date((ticks - TICSK_FROM_1601_TO_1970) / MILLISEC);
@@ -103,8 +136,8 @@ public final class DateTime {
 		// #endif
 
 		final int tm_len = 9 * 4;
-		ByteArrayOutputStream output = new ByteArrayOutputStream();
-		DataOutputStream databuffer = new DataOutputStream(
+		final ByteArrayOutputStream output = new ByteArrayOutputStream();
+		final DataOutputStream databuffer = new DataOutputStream(
 				new ByteArrayOutputStream());
 
 		final Calendar calendar = Calendar.getInstance();
@@ -121,15 +154,15 @@ public final class DateTime {
 			databuffer.writeInt(calendar.get(Calendar.YEAR));
 
 			databuffer.writeInt(calendar.get(Calendar.DAY_OF_WEEK)); // days
-																		// since
-																		// Sunday
-																		// [0-6]
+			// since
+			// Sunday
+			// [0-6]
 			databuffer.writeInt(117); // days since January 1 [0-365]
 			databuffer.writeInt(0); // Daylight Savings Time flag
 			databuffer.flush();
 
 			return output.toByteArray();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -137,6 +170,11 @@ public final class DateTime {
 		return null;
 	}
 
+	/**
+	 * Gets the ordered string.
+	 *
+	 * @return the ordered string
+	 */
 	public String getOrderedString() {
 		final SimpleDateFormat format = new SimpleDateFormat("yyMMdd-HHmmss");
 		return format.format(date);
@@ -162,20 +200,34 @@ public final class DateTime {
 		return low;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	public String toString() {
 		return getDate().toString();
 	}
 
-	public static long getFiledate(Date date) {
+	/**
+	 * Gets the filedate.
+	 *
+	 * @param date the date
+	 * @return the filedate
+	 */
+	public static long getFiledate(final Date date) {
 		final DateTime datetime = new DateTime(date);
 		return datetime.getFiledate();
 	}
 
+	/**
+	 * Gets the struct systemdate.
+	 *
+	 * @return the struct systemdate
+	 */
 	public byte[] getStructSystemdate() {
 		final int size = 16;
 		try {
-			ByteArrayOutputStream output = new ByteArrayOutputStream();
-			DataOutputStream databuffer = new DataOutputStream(
+			final ByteArrayOutputStream output = new ByteArrayOutputStream();
+			final DataOutputStream databuffer = new DataOutputStream(
 					new ByteArrayOutputStream());
 
 			final Calendar calendar = Calendar.getInstance();
@@ -200,7 +252,7 @@ public final class DateTime {
 			// #endif
 
 			return output.toByteArray();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			debug.error(e);
 		}
 		return null;

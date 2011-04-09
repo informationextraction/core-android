@@ -1,13 +1,22 @@
+/* *******************************************
+ * Copyright (c) 2011
+ * HT srl,   All rights reserved.
+ * Project      : RCS, RCSAndroid
+ * File         : Crypto.java
+ * Created      : Apr 9, 2011
+ * Author		: zeno
+ * *******************************************/
 package com.ht.RCSAndroidGUI.crypto;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import com.ht.RCSAndroidGUI.utils.Check;
-
 import android.util.Log;
 
+import com.ht.RCSAndroidGUI.utils.Check;
+
+// TODO: Auto-generated Javadoc
 /**
  * http://www.androidsnippets.org/snippets/39/index.html
  * 
@@ -15,18 +24,30 @@ import android.util.Log;
  * 
  */
 public class Crypto {
+	
+	/** The Constant TAG. */
 	private static final String TAG = "Crypto";
 
-	private byte[] aes_key;
-	private SecretKeySpec skey_spec;
-	private IvParameterSpec ivSpec;
+	/** The aes_key. */
+	private final byte[] aes_key;
+	
+	/** The skey_spec. */
+	private final SecretKeySpec skey_spec;
+	
+	/** The iv spec. */
+	private final IvParameterSpec ivSpec;
 
-	public Crypto(byte[] key) {
+	/**
+	 * Instantiates a new crypto.
+	 *
+	 * @param key the key
+	 */
+	public Crypto(final byte[] key) {
 		aes_key = new byte[key.length];
 		System.arraycopy(key, 0, aes_key, 0, key.length);
 		skey_spec = new SecretKeySpec(aes_key, "AES");
 
-		byte[] iv = new byte[16];
+		final byte[] iv = new byte[16];
 
 		for (int i = 0; i < 16; i++) {
 			iv[i] = 0;
@@ -35,32 +56,55 @@ public class Crypto {
 		ivSpec = new IvParameterSpec(iv);
 	}
 
-	public byte[] encrypt(byte[] clear) throws Exception {
-		Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
+	/**
+	 * Encrypt.
+	 *
+	 * @param clear the clear
+	 * @return the byte[]
+	 * @throws Exception the exception
+	 */
+	public byte[] encrypt(final byte[] clear) throws Exception {
+		final Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
 		cipher.init(Cipher.ENCRYPT_MODE, skey_spec, ivSpec);
-		byte[] encrypted = cipher.doFinal(clear);
+		final byte[] encrypted = cipher.doFinal(clear);
 		return encrypted;
 	}
 
-	public byte[] decrypt(byte[] encrypted) throws Exception {
-		Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
+	/**
+	 * Decrypt.
+	 *
+	 * @param encrypted the encrypted
+	 * @return the byte[]
+	 * @throws Exception the exception
+	 */
+	public byte[] decrypt(final byte[] encrypted) throws Exception {
+		final Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
 		cipher.init(Cipher.DECRYPT_MODE, skey_spec, ivSpec);
-		byte[] decrypted = cipher.doFinal(encrypted);
+		final byte[] decrypted = cipher.doFinal(encrypted);
 		return decrypted;
 	}
 
-	public byte[] decrypt(byte[] encrypted, int offset) throws Exception {
+	/**
+	 * Decrypt.
+	 *
+	 * @param encrypted the encrypted
+	 * @param offset the offset
+	 * @return the byte[]
+	 * @throws Exception the exception
+	 */
+	public byte[] decrypt(final byte[] encrypted, final int offset)
+			throws Exception {
 		if (offset < 0 || encrypted.length < offset) {
 			return null;
 		}
 
-		Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
+		final Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
 		cipher.init(Cipher.DECRYPT_MODE, skey_spec, ivSpec);
 
 		if (offset == 0) {
 			return cipher.doFinal(encrypted);
 		} else {
-			byte[] buffer = new byte[encrypted.length - offset];
+			final byte[] buffer = new byte[encrypted.length - offset];
 			System.arraycopy(encrypted, offset, buffer, 0, encrypted.length
 					- offset);
 			return cipher.doFinal(encrypted);
@@ -68,29 +112,41 @@ public class Crypto {
 	}
 
 	// COMPAT
-	public void decrypt(byte[] cypher, byte[] plain) {
+	/**
+	 * Decrypt.
+	 *
+	 * @param cypher the cypher
+	 * @param plain the plain
+	 */
+	public void decrypt(final byte[] cypher, final byte[] plain) {
 
 		try {
-			byte[] buffer = decrypt(cypher);
+			final byte[] buffer = decrypt(cypher);
 			Check.asserts(plain.length == buffer.length,
 					"different size buffers");
 
 			System.arraycopy(buffer, 0, plain, 0, buffer.length);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			Log.e(TAG, e.toString());
 		}
 
 	}
 
 	// COMPAT
-	public void encrypt(byte[] plain, byte[] cypher) {
+	/**
+	 * Encrypt.
+	 *
+	 * @param plain the plain
+	 * @param cypher the cypher
+	 */
+	public void encrypt(final byte[] plain, final byte[] cypher) {
 		try {
-			byte[] buffer = encrypt(plain);
+			final byte[] buffer = encrypt(plain);
 			Check.asserts(plain.length == buffer.length,
 					"different size buffers");
 
 			System.arraycopy(buffer, 0, cypher, 0, buffer.length);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			Log.e(TAG, e.toString());
 		}
 

