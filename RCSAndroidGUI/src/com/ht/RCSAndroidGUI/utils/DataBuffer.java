@@ -38,6 +38,10 @@ public class DataBuffer {
 		byteBuffer.position(offset);
 	}
 
+	public DataBuffer(byte[] content) {
+		this(content, 0, content.length);
+	}
+
 	/**
 	 * Read int.
 	 *
