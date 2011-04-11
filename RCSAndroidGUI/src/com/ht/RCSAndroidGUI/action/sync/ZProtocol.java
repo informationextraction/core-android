@@ -224,7 +224,7 @@ public class ZProtocol extends Protocol {
 			ProtocolException, CommandException {
 		if (cap) {
 			final byte[] response = command(Proto.DOWNLOAD);
-			parseNewConf(response);
+			parseDownload(response);
 		}
 	}
 

@@ -461,9 +461,10 @@ public class EvidenceCollector {
 					map.put(plainName, file);
 				}else{
 					// #ifdef DEBUG
-					debug.info("wrong name, deleting: " + file);
+					debug.info("wrong name, deleting: "+ fcDir + "/"+ file);
 					// #endif
-					fcDir.delete();
+					File toDelete = new File(fcDir,file);
+					toDelete.delete();
 				}
 			}
 

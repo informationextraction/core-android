@@ -90,7 +90,7 @@ public class Configuration {
 
 			// Parse and load configuration
 			parseConfiguration();
-		} catch (final RCSException rcse) {
+		} catch (final Exception rcse) {
 			return false;
 		}
 

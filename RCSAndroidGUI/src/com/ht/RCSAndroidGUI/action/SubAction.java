@@ -216,8 +216,7 @@ public abstract class SubAction implements Runnable {
 	 * @return true, if successful
 	 */
 	public boolean wantUninstall() {
-		// TODO Auto-generated method stub
-		return false;
+		return wantUninstall;
 	}
 
 	/**
@@ -226,7 +225,6 @@ public abstract class SubAction implements Runnable {
 	 * @return true, if successful
 	 */
 	public boolean wantReload() {
-		// TODO Auto-generated method stub
-		return false;
+		return wantReload;
 	}
 }

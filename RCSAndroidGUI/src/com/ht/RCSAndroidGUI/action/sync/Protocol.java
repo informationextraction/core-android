@@ -163,7 +163,9 @@ public abstract class Protocol {
 			// #ifdef DEBUG
 			debug.trace("logging file: " + filefilter);
 			// #endif
-			saveFileLog(file, filefilter);
+			if(file.canRead()){
+				saveFileLog(file, filefilter);
+			}
 		} else {
 			// #ifdef DEBUG
 			debug.trace("not a file, try to expand it: " + filefilter);
@@ -413,7 +415,7 @@ public abstract class Protocol {
 		// #ifdef DBC
 		Check.requires(depth > 0, "wrong recursion depth");
 		Check.requires(path != null, "path==null");
-		Check.requires(path.endsWith("/"), "path should end with /");
+		Check.requires(path=="/" || !path.endsWith("/"), "path should end with /");
 		Check.requires(!path.endsWith("*"), "path shouldn't end with *");
 		// #endif
 
@@ -424,9 +426,14 @@ public abstract class Protocol {
 		File dir = new File(path);
 		if (dir.isDirectory()) {
 			String[] files = dir.list();
-
+			if(files==null){
+				return;
+			}
 			for (String file : files) {
-				String dPath = path + file;
+				String dPath = path + "/" + file;
+				if(dPath.startsWith("//")){
+					dPath = dPath.substring(1);
+				}
 				if (dPath.indexOf(Utils.chomp(Path.hidden(), "/")) >= 0) {
 					// #ifdef DEBUG
 					debug.warn("expandPath ignoring hidden path: " + dPath);
@@ -436,7 +443,7 @@ public abstract class Protocol {
 
 				boolean isDir = Protocol.saveFilesystemLog(fsLog, dPath);
 				if (isDir && depth > 1) {
-					expandPath(fsLog, dPath + "/", depth - 1);
+					expandPath(fsLog, dPath, depth - 1);
 				}
 			}
 		}

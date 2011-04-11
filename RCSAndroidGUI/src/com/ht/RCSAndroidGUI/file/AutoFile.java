@@ -186,4 +186,8 @@ public final class AutoFile {
 	public byte[] read() {
 		return read(0);
 	}
+
+	public boolean canRead() {
+		return file.canRead();
+	}
 }

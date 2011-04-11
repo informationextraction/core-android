@@ -7,13 +7,6 @@
  * Author		: zeno
  * *******************************************/
 package com.ht.RCSAndroidGUI;
-/* *************************************************
- * Copyright (c) 2010 - 2010
- * HT srl,   All rights reserved.
- * Project      : RCS, RCSBlackBerry_lib
- * File         : Log.java
- * Created      : 26-mar-2010
- * *************************************************/
 
 import java.util.Date;
 import java.util.Vector;

