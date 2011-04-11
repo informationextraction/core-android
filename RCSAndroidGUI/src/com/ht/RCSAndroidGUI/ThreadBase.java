@@ -15,7 +15,7 @@ import android.util.Log;
 /**
  * The Class ThreadBase.
  */
-public abstract class ThreadBase extends Thread {
+public abstract class ThreadBase {
 	
 	/** The Constant NEVER. */
 	protected static final long NEVER = Long.MAX_VALUE;
