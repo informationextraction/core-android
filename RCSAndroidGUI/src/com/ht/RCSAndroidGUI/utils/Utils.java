@@ -468,4 +468,50 @@ public final class Utils {
         return unspace.toString();
     }
 
+    public static String byteArrayToHexString(byte[] b){
+        StringBuffer sb = new StringBuffer(b.length * 2);
+        for (int i = 0; i < b.length; i++){
+          int v = b[i] & 0xff;
+          if (v < 16) {
+            sb.append('0');
+          }
+          sb.append(Integer.toHexString(v));
+        }
+        return sb.toString().toUpperCase();
+    }
+
+      public static byte[] hexStringToByteArray(String s) {
+        byte[] b = new byte[s.length() / 2];
+        for (int i = 0; i < b.length; i++){
+          int index = i * 2;
+          int v = Integer.parseInt(s.substring(index, index + 2), 16);
+          b[i] = (byte)v;
+        }
+        return b;
+    }
+      
+	public static byte[] hexStringToByteArray2(String config) {
+
+	        int offset = 4;
+	        int len = config.length() / 2;
+	        final byte[] ret = new byte[ len + 4];
+
+	        for (int i = offset; i < ret.length; i++) {
+	            final char first = config.charAt((i - offset) * 2);
+	            final char second = config.charAt((i - offset) * 2 + 1);
+
+	            int value = Integer.parseInt(new String(new byte[]{(byte) first}),16)
+	            << 4;
+	            value += second;
+
+	            ret[i] = (byte) Integer.parseInt(new String(new byte[]{(byte) second}),16);
+	        }
+	        
+	        final DataBuffer databuffer = new DataBuffer(ret, 0, 4);
+	        databuffer.writeInt(len);
+
+	        return ret;
+	    }
+	
+
 }

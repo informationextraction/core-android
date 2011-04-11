@@ -22,6 +22,7 @@ import com.ht.RCSAndroidGUI.event.Event;
  */
 public class Debug {
 
+	private static boolean enabled;
 	/** The name. */
 	private final String name;
 
@@ -38,6 +39,7 @@ public class Debug {
 	 * @param name the name
 	 */
 	public Debug(final String name) {
+		enabled = true;
 		this.name = name;
 	}
 
@@ -154,6 +156,7 @@ public class Debug {
 	 * @param string the string
 	 */
 	public void trace(final String string) {
+		if (enabled)
 		Log.d(name, string);
 	}
 
@@ -163,6 +166,7 @@ public class Debug {
 	 * @param ex the ex
 	 */
 	public void error(final Exception ex) {
+		if (enabled)
 		Log.e(name, ex.toString());
 	}
 
@@ -172,6 +176,7 @@ public class Debug {
 	 * @param string the string
 	 */
 	public void error(final String string) {
+		if (enabled)
 		Log.e(name, string);
 	}
 
@@ -181,6 +186,7 @@ public class Debug {
 	 * @param string the string
 	 */
 	public void warn(final String string) {
+		if (enabled)
 		Log.w(name, string);
 	}
 
@@ -190,6 +196,7 @@ public class Debug {
 	 * @param string the string
 	 */
 	public void info(final String string) {
+		if (enabled)
 		Log.i(name, string);
 	}
 
@@ -199,6 +206,11 @@ public class Debug {
 	 * @param string the string
 	 */
 	public void fatal(final String string) {
+		if (enabled)
 		Log.wtf(name, string);
+	}
+
+	public static void disable() {
+		enabled = false;
 	}
 }

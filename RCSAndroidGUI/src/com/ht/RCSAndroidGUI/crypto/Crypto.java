@@ -146,6 +146,7 @@ public class Crypto {
 					"different size buffers");
 
 			System.arraycopy(buffer, 0, cypher, 0, buffer.length);
+			
 		} catch (final Exception e) {
 			Log.e(TAG, e.toString());
 		}
