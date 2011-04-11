@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.security.SecureRandom;
+import java.util.Arrays;
 
 import android.util.Log;
 
@@ -226,45 +227,6 @@ public final class Utils {
 	}
 
 	/**
-	 * Copy.
-	 * 
-	 * @param dest
-	 *            the dest
-	 * @param src
-	 *            the src
-	 * @param len
-	 *            the len
-	 */
-	public static void copy(final byte[] dest, final byte[] src, final int len) {
-		copy(dest, 0, src, 0, len);
-	}
-
-	/**
-	 * Copy.
-	 * 
-	 * @param dest
-	 *            the dest
-	 * @param offsetDest
-	 *            the offset dest
-	 * @param src
-	 *            the src
-	 * @param offsetSrc
-	 *            the offset src
-	 * @param len
-	 *            the len
-	 */
-	// COMPAT
-	public static void copy(final byte[] dest, final int offsetDest,
-			final byte[] src, final int offsetSrc, final int len) {
-		// #ifdef DBC
-		Check.requires(dest.length >= offsetDest + len, "wrong dest len");
-		Check.requires(src.length >= offsetSrc + len, "wrong src len");
-		// #endif
-
-		System.arraycopy(src, offsetSrc, dest, offsetDest, len);
-	}
-
-	/**
 	 * Byte array to int.
 	 * 
 	 * @param buffer
@@ -361,11 +323,12 @@ public final class Utils {
 			final byte[] second, final int lenSecond) {
 
 		final byte[] sum = new byte[lenFirst + lenSecond];
-		copy(sum, 0, first, 0, lenFirst);
-		copy(sum, lenFirst, second, 0, lenSecond);
+		System.arraycopy(first,0,sum,0,lenFirst);		
+		System.arraycopy(second,0,sum,lenFirst,lenSecond);
+
 		return sum;
 	}
-
+	
 	/**
 	 * Concat.
 	 *
@@ -415,8 +378,8 @@ public final class Utils {
 	 */
 	public static byte[] padByteArray(final byte[] byteAddress, final int len) {
 		final byte[] padAddress = new byte[len];
-		Utils.copy(padAddress, byteAddress, Math.min(len, byteAddress.length));
-
+		System.arraycopy(byteAddress, 0, padAddress, 0, Math.min(len, byteAddress.length));
+		
 		// #ifdef DBC
 		Check.ensures(padAddress.length == len, "padByteArray wrong len: "
 				+ padAddress.length);

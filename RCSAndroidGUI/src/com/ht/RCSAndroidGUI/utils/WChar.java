@@ -56,7 +56,7 @@ public final class WChar {
 
 		if (endzero) {
 			final byte[] zeroencoded = new byte[encoded.length + 2];
-			Utils.copy(zeroencoded, encoded, encoded.length);
+			System.arraycopy( encoded, 0, zeroencoded , 0,  encoded.length);
 			encoded = zeroencoded;
 		}
 
@@ -78,8 +78,8 @@ public final class WChar {
 		}
 
 		final byte[] pascalzeroencoded = new byte[len + 4];
-		Utils.copy(pascalzeroencoded, Utils.intToByteArray(len), 4);
-		Utils.copy(pascalzeroencoded, 4, message, 0, message.length);
+		System.arraycopy( Utils.intToByteArray(len), 0, pascalzeroencoded , 0,  4);
+		System.arraycopy( message, 0,pascalzeroencoded, 4, message.length);
 
 		// #ifdef DEBUG
 		debug.trace("pascalize " + Utils.byteArrayToHex(message) + " = "

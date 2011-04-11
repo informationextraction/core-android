@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class DataBuffer.
  */

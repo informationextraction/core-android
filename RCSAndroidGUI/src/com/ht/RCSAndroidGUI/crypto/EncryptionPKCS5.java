@@ -107,7 +107,7 @@ public class EncryptionPKCS5 extends Encryption {
 			crypto.decrypt(ct, pt);
 			xor(pt, iv);
 			iv = Utils.copy(ct);
-			Utils.copy(paddedplain, i * 16, pt, 0, 16);
+			System.arraycopy( pt, 0,paddedplain, i * 16, 16);
 		}
 
 		final int padlen = paddedplain[paddedplain.length - 1];
@@ -122,7 +122,7 @@ public class EncryptionPKCS5 extends Encryption {
 		plainlen = enclen - padlen;
 		plain = new byte[plainlen];
 
-		Utils.copy(plain, 0, paddedplain, 0, plainlen);
+		System.arraycopy( paddedplain, 0,plain, 0, plainlen);
 
 		// #ifdef DBC
 		Check.ensures(plain != null, "null plain");

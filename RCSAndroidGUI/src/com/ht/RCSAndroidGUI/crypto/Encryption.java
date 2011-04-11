@@ -282,9 +282,9 @@ public class Encryption {
 				// #ifdef DEBUG
 				debug.trace("lastBlockLen: " + lastBlockLen);
 				// #endif
-				Utils.copy(plain, i * 16, pt, 0, lastBlockLen);
+				System.arraycopy( pt, 0,plain, i * 16, lastBlockLen);
 			} else {
-				Utils.copy(plain, i * 16, pt, 0, 16);
+				System.arraycopy( pt, 0,plain, i * 16, 16);
 				// copyblock(plain, i, pt, 0);
 			}
 		}
@@ -339,7 +339,7 @@ public class Encryption {
 				ct = crypto.encrypt(pt);
 				Check.asserts(ct.length == 16, "Wrong size");
 
-				Utils.copy(crypted, i * 16, ct, 0, 16);
+				System.arraycopy( ct, 0,crypted, i * 16, 16);
 				iv = Utils.copy(ct);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -390,7 +390,7 @@ public class Encryption {
 					padplain[clen - i] = (byte) value;
 				}
 			}
-			Utils.copy(padplain, 0, plain, offset, len);
+			System.arraycopy( plain, offset,padplain, 0, len);
 			return padplain;
 		} else {
 			return plain;

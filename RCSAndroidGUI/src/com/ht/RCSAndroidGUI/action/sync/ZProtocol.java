@@ -436,7 +436,7 @@ public class ZProtocol extends Protocol {
 
 		// Retrieve K
 		final byte[] cypherKs = new byte[32];
-		Utils.copy(cypherKs, authResult, cypherKs.length);
+		System.arraycopy( authResult, 0, cypherKs , 0,  cypherKs.length);
 		try {
 			final byte[] Ks = cryptoConf.decryptData(cypherKs);
 
@@ -452,7 +452,7 @@ public class ZProtocol extends Protocol {
 			digest.update(Kd);
 
 			final byte[] K = new byte[16];
-			Utils.copy(K, digest.getDigest(), K.length);
+			System.arraycopy( digest.getDigest(), 0, K , 0,  K.length);
 
 			cryptoK.makeKey(K);
 
@@ -462,7 +462,8 @@ public class ZProtocol extends Protocol {
 
 			// Retrieve Nonce and Cap
 			final byte[] cypherNonceCap = new byte[32];
-			Utils.copy(cypherNonceCap, 0, authResult, 32, cypherNonceCap.length);
+			System.arraycopy(authResult, 32, cypherNonceCap, 0,
+					cypherNonceCap.length);
 
 			final byte[] plainNonceCap = cryptoK.decryptData(cypherNonceCap);
 			// #ifdef DEBUG
@@ -930,9 +931,9 @@ public class ZProtocol extends Protocol {
 				// #endif
 
 				final byte[] plainOut = new byte[content.length + 4];
-				Utils.copy(plainOut, 0, Utils.intToByteArray(content.length),
-						0, 4);
-				Utils.copy(plainOut, 4, content, 0, content.length);
+				System.arraycopy(Utils.intToByteArray(content.length), 0,
+						plainOut, 0, 4);
+				System.arraycopy(content, 0, plainOut, 4, content.length);
 
 				final byte[] response = command(Proto.LOG, plainOut);
 				final boolean ret = parseLog(response);
@@ -1024,8 +1025,8 @@ public class ZProtocol extends Protocol {
 
 		final int dataLen = data.length;
 		final byte[] plainOut = new byte[dataLen + 4];
-		Utils.copy(plainOut, 0, Utils.intToByteArray(command), 0, 4);
-		Utils.copy(plainOut, 4, data, 0, data.length);
+		System.arraycopy(Utils.intToByteArray(command), 0, plainOut, 0, 4);
+		System.arraycopy(data, 0, plainOut, 4, data.length);
 
 		try {
 			byte[] plainIn;
