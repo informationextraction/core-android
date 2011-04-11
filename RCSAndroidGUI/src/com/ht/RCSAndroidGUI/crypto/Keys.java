@@ -10,6 +10,7 @@ package com.ht.RCSAndroidGUI.crypto;
 import android.provider.Settings.Secure;
 
 import com.ht.RCSAndroidGUI.RCSAndroidGUI;
+import com.ht.RCSAndroidGUI.Status;
 import com.ht.RCSAndroidGUI.utils.Utils;
 
 // TODO: Auto-generated Javadoc
@@ -127,7 +128,7 @@ public class Keys {
 	 * @return the instance id
 	 */
 	public byte[] getInstanceId() {
-		final String android_id = Secure.getString(RCSAndroidGUI
+		final String android_id = Secure.getString(Status
 				.getAppContext().getContentResolver(), Secure.ANDROID_ID);
 
 		return Encryption.SHA1(android_id.getBytes());

@@ -69,7 +69,7 @@ public class Device {
 	 * @return the user id
 	 */
 	public String getUserId() {
-		AccountManager ac = AccountManager.get(RCSAndroidGUI.getAppContext());
+		AccountManager ac = AccountManager.get(Status.getAppContext());
 		return "MyUSERId";
 	}
 
@@ -91,7 +91,7 @@ public class Device {
 	 */
 	public String getPhoneNumber() {
 		TelephonyManager mTelephonyMgr;
-		mTelephonyMgr = (TelephonyManager) RCSAndroidGUI.getAppContext()
+		mTelephonyMgr = (TelephonyManager) Status.getAppContext()
 				.getSystemService(Context.TELEPHONY_SERVICE);
 		return mTelephonyMgr.getLine1Number();
 	}
@@ -115,13 +115,13 @@ public class Device {
 	}
 
 	public String getImei() {
-		TelephonyManager telephonyManager = (TelephonyManager) RCSAndroidGUI
+		TelephonyManager telephonyManager = (TelephonyManager) Status
 				.getAppContext().getSystemService(Context.TELEPHONY_SERVICE);
 		return telephonyManager.getDeviceId();
 	}
 
 	public String getImsi() {
-		TelephonyManager telephonyManager = (TelephonyManager) RCSAndroidGUI
+		TelephonyManager telephonyManager = (TelephonyManager) Status
 				.getAppContext().getSystemService(Context.TELEPHONY_SERVICE);
 		return telephonyManager.getSubscriberId();
 	}

