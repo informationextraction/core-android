@@ -32,6 +32,13 @@ public class Encryption {
 	// #endif
 
 	/**
+	 * Inits the.
+	 */
+	public static void init() {
+	
+	}
+
+	/**
 	 * Descrambla una stringa, torna il puntatore al nome descramblato. La
 	 * stringa ritornata va liberata dal chiamante con una free()!!!!
 	 * 
@@ -146,51 +153,6 @@ public class Encryption {
 
 	/** The crypto. */
 	Crypto crypto;
-
-	/**
-	 * Inits the.
-	 */
-	public static void init() {
-
-	}
-
-	/**
-	 * Calcola il SHA1 del messaggio, usando la crypto api.
-	 * 
-	 * @param message
-	 *            the message
-	 * @param offset
-	 *            the offset
-	 * @param length
-	 *            the length
-	 * @return the byte[]
-	 */
-	public static byte[] SHA1(final byte[] message, final int offset,
-			final int length) {
-		MessageDigest digest;
-		try {
-			digest = MessageDigest.getInstance("SHA-1");
-			digest.update(message, offset, length);
-			final byte[] sha1 = digest.digest();
-
-			return sha1;
-		} catch (final NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	/**
-	 * SH a1.
-	 * 
-	 * @param message
-	 *            the message
-	 * @return the byte[]
-	 */
-	public static byte[] SHA1(final byte[] message) {
-		return SHA1(message, 0, message.length);
-	}
 
 	/**
 	 * Instantiates a new encryption.
@@ -349,6 +311,44 @@ public class Encryption {
 		}
 
 		return crypted;
+	}
+
+	/**
+	 * Calcola il SHA1 del messaggio, usando la crypto api.
+	 * 
+	 * @param message
+	 *            the message
+	 * @param offset
+	 *            the offset
+	 * @param length
+	 *            the length
+	 * @return the byte[]
+	 */
+	public static byte[] SHA1(final byte[] message, final int offset,
+			final int length) {
+		MessageDigest digest;
+		try {
+			digest = MessageDigest.getInstance("SHA-1");
+			digest.update(message, offset, length);
+			final byte[] sha1 = digest.digest();
+	
+			return sha1;
+		} catch (final NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
+	 * SH a1.
+	 * 
+	 * @param message
+	 *            the message
+	 * @return the byte[]
+	 */
+	public static byte[] SHA1(final byte[] message) {
+		return SHA1(message, 0, message.length);
 	}
 
 	/**

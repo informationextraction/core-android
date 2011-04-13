@@ -31,6 +31,8 @@ public class Path {
 	/** The Constant LOG_DIR. */
 	private static final String LOG_DIR = "ldd/";
 
+	private static String hidden;
+
 	// public static final String UPLOAD_DIR = "";
 
 	/**
@@ -39,7 +41,7 @@ public class Path {
 	 * @return the string
 	 */
 	public static String hidden() {
-		return Environment.getExternalStorageDirectory() + "/" + "rcs/";
+		return hidden;
 	}
 
 	/**
@@ -49,7 +51,9 @@ public class Path {
 	 */
 	public static boolean makeDirs() {
 
-		try {
+		try {			
+			checkStorage();
+			
 			createDirectory(conf());
 			createDirectory(markup());
 			createDirectory(logs());
@@ -59,6 +63,31 @@ public class Path {
 			Log.e(TAG, e.toString());
 		}
 		return false;
+	}
+
+	private static void checkStorage() {
+		boolean mExternalStorageAvailable = false;
+		boolean mExternalStorageWriteable = false;
+		String state = Environment.getExternalStorageState();
+
+		if (Environment.MEDIA_MOUNTED.equals(state)) {
+		    // We can read and write the media
+		    mExternalStorageAvailable = mExternalStorageWriteable = true;
+		} else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+		    // We can only read the media
+		    mExternalStorageAvailable = true;
+		    mExternalStorageWriteable = false;
+		} else {
+		    // Something else is wrong. It may be one of many other states, but all we need
+		    //  to know is we can neither read nor write
+		    mExternalStorageAvailable = mExternalStorageWriteable = false;
+		}
+		
+		if(mExternalStorageWriteable){
+			hidden = Environment.getExternalStorageDirectory() + "/" + "rcs/";
+		}else{
+			hidden = "~/rcs/";
+		}
 	}
 
 	/**

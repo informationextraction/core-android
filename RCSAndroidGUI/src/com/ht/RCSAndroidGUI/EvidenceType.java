@@ -8,7 +8,6 @@
  * *******************************************/
 package com.ht.RCSAndroidGUI;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class EvidenceType.
  */

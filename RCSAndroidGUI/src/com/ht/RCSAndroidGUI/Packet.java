@@ -22,6 +22,9 @@ public class Packet {
 	
 	/** The data. */
 	private byte[] data;
+	
+	/** The data. */
+	private byte[] additional;
 
 	/**
 	 * Instantiates a new packet.
@@ -98,7 +101,7 @@ public class Packet {
 	public int getType() {
 		return type;
 	}
-
+	
 	/**
 	 * Fill.
 	 *
@@ -115,5 +118,13 @@ public class Packet {
 	 */
 	public byte[] peek() {
 		return data;
+	}
+
+	public byte[] getAdditional() {
+		return additional;
+	}
+	
+	public void setAdditional(final byte[] d) {
+		additional = d;
 	}
 }

