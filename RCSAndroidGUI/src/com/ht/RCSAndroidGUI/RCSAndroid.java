@@ -47,6 +47,7 @@ public class RCSAndroid extends Service {
 		registerListeners();
 		Toast.makeText(this, "Que - Service Created", Toast.LENGTH_LONG).show();
 
+		Status.setAppContext( getApplicationContext( ));
 	}
 
 	/**

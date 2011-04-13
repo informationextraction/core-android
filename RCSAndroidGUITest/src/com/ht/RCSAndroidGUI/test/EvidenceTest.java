@@ -3,7 +3,9 @@ package com.ht.RCSAndroidGUI.test;
 import java.util.Arrays;
 
 import com.ht.RCSAndroidGUI.Evidence;
+import com.ht.RCSAndroidGUI.Status;
 import com.ht.RCSAndroidGUI.agent.Agent;
+import com.ht.RCSAndroidGUI.mock.RCSMockContext;
 import com.ht.RCSAndroidGUI.utils.Utils;
 import com.ht.RCSAndroidGUI.utils.WChar;
 
@@ -12,6 +14,7 @@ import junit.framework.TestCase;
 public class EvidenceTest extends TestCase {
 
 	protected void setUp() throws Exception {
+		Status.self().setAppContext(new RCSMockContext());
 		super.setUp();
 	}
 
