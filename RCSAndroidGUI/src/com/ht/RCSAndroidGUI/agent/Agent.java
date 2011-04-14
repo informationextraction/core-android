@@ -7,7 +7,6 @@
 
 package com.ht.RCSAndroidGUI.agent;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Agent.
  */
@@ -114,10 +113,12 @@ public class Agent {
 	private final int agentId;
 
 	/** Agent status: enabled, disabled, running, stopped. */
-	private int agentStatus;
+	//private int agentStatus;
 
 	/** Parameters. */
 	private final byte[] agentParams;
+
+	private boolean agentEnabled;
 
 	/**
 	 * Instantiates a new agent.
@@ -126,9 +127,10 @@ public class Agent {
 	 * @param status the status
 	 * @param params the params
 	 */
-	public Agent(final int id, final int status, final byte[] params) {
+	public Agent(final int id, final boolean enabled, final byte[] params) {
 		this.agentId = id;
-		this.agentStatus = status;
+		//this.agentStatus = AGENT_STOPPED;
+		this.agentEnabled = enabled;
 		this.agentParams = params;
 	}
 
@@ -141,20 +143,8 @@ public class Agent {
 		return this.agentId;
 	}
 
-	/**
-	 * Gets the status.
-	 *
-	 * @return the status
-	 */
-	int getStatus() {
-		return this.agentStatus;
-	}
-
-	/**
-	 * Stop agent.
-	 */
-	public void stopAgent() {
-		this.agentStatus = AGENT_STOPPED;
+	public boolean isEnabled() {
+		return this.agentEnabled;
 	}
 
 	/**

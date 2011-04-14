@@ -121,28 +121,6 @@ public class Status {
 		agentsMap.put(a.getId(), a);
 	}
 
-	// Stop an agent
-	/**
-	 * Stop agent.
-	 *
-	 * @param a the a
-	 * @throws RCSException the rCS exception
-	 */
-	public void stopAgent(final Agent a) throws RCSException {
-		if (agentsMap.containsKey(a.getId()) == false) {
-			throw new RCSException("Agent " + a.getId()
-					+ " cannot be stopped because it doesn't exist");
-		}
-
-		final Agent agent = agentsMap.get(a.getId());
-
-		if (agent == null) {
-			return;
-		}
-
-		agent.stopAgent();
-	}
-
 	// Add an event to the map
 	/**
 	 * Adds the event.

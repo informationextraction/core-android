@@ -35,7 +35,7 @@ public class AgentManager extends Manager {
 
 	/** The running. */
 	private final HashMap<Integer, AgentBase> running;
-	private HashMap<AgentBase, Thread> threads;
+	private final HashMap<AgentBase, Thread> threads;
 
 	/**
 	 * Self.
@@ -247,12 +247,11 @@ public class AgentManager extends Manager {
 	 */
 	public synchronized void stopAgent(final int key) {
 		final AgentBase a = running.get(key);
-
 		if (a == null) {
 			Log.d("RCS", "Agent " + key + " not present");
 			return;
 		}
-
+		
 		a.stopThread();
 
 		Thread t = threads.get(a);
@@ -288,5 +287,9 @@ public class AgentManager extends Manager {
 	public void reloadAgent(final int key) {
 		final AgentBase a = running.get(key);
 		a.next();
+	}
+
+	public HashMap<Integer, AgentBase> getRunningAgents() {
+		return running;
 	}
 }

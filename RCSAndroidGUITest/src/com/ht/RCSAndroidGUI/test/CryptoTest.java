@@ -15,7 +15,7 @@ public class CryptoTest extends TestCase {
 	Debug debug = new Debug("CryptoTest");
 
 	protected void setUp() throws Exception {
-		Debug.disable();
+		//Debug.disable();
 		super.setUp();
 	}
 
@@ -35,19 +35,7 @@ public class CryptoTest extends TestCase {
 		fail("Not yet implemented"); // TODO
 	}
 
-	public final void testEncryption() {
-		fail("Not yet implemented"); // TODO
-	}
-
 	public final void testMakeKey() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	public final void testDecryptDataByteArray() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	public final void testDecryptDataByteArrayInt() {
 		fail("Not yet implemented"); // TODO
 	}
 
