@@ -11,6 +11,9 @@ package com.ht.RCSAndroidGUI.crypto;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
+
 import android.util.Log;
 
 import com.ht.RCSAndroidGUI.Debug;
@@ -171,7 +174,15 @@ public class Encryption {
 	 *            the key
 	 */
 	public void makeKey(final byte[] key) {
-		crypto = new Crypto(key);
+		try {
+			crypto = new Crypto(key);
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchPaddingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	/**

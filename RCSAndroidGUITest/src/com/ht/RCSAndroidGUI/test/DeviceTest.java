@@ -1,16 +1,24 @@
 package com.ht.RCSAndroidGUI.test;
 
 
+import android.content.Context;
+import android.test.AndroidTestCase;
+
 import com.ht.RCSAndroidGUI.Device;
+import com.ht.RCSAndroidGUI.Status;
+import com.ht.RCSAndroidGUI.mock.RCSMockContext;
 
 import junit.framework.TestCase;
 
-public class DeviceTest extends TestCase {
+public class DeviceTest extends AndroidTestCase {
 
 	private Device device;
 
 	protected void setUp() throws Exception {
 		super.setUp();
+		//RCSMockContext.setContext(getContext());
+		//Context context = new RCSMockContext();
+		Status.self().setAppContext(getContext());
 		device = Device.self();
 	}
 

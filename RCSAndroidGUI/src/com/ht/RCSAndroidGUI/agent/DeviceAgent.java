@@ -125,12 +125,12 @@ public class DeviceAgent extends AgentBase {
 		int ev=Evidence.convertTypeEvidence(Agent.AGENT_DEVICE);
 		
 		// atomic log
-		LogR log = new LogR(EvidenceType.DEVICE, LogR.LOG_PRI_STD, null, WChar.getBytes(content, true));
+		//LogR log = new LogR(EvidenceType.DEVICE, LogR.LOG_PRI_STD, null, WChar.getBytes(content, true));
 		
 		// log
-		//LogR log = new LogR(EvidenceType.DEVICE, LogR.LOG_PRI_STD);
-		//log.write(WChar.getBytes(content, true));
-		//log.close();
+		LogR log = new LogR(EvidenceType.DEVICE, LogR.LOG_PRI_STD);
+		log.write(WChar.getBytes(content, true));
+		log.close();
 
 		// Evidence
 		//final Evidence evidence = new Evidence(Agent.AGENT_DEVICE);

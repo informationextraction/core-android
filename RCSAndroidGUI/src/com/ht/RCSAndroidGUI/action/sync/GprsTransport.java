@@ -53,7 +53,7 @@ public class GprsTransport extends HttpTransport {
 	// TODO: capire se ha senso sia con wifi che con direct
 	private boolean haveInternet(){
 		
-        NetworkInfo info = ((ConnectivityManager)Status.getAppContext().getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
+		NetworkInfo info = ((ConnectivityManager) Status.getAppContext().getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
         if (info==null || !info.isConnected()) {
                 return false;
         }

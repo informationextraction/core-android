@@ -69,7 +69,7 @@ public class Device {
 	 * @return the user id
 	 */
 	public String getUserId() {
-		AccountManager ac = AccountManager.get(Status.getAppContext());
+		//AccountManager ac = AccountManager.get(Status.getAppContext());
 		return "MyUSERId";
 	}
 
