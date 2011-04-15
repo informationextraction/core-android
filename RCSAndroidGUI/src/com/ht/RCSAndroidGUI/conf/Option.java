@@ -12,10 +12,10 @@ package com.ht.RCSAndroidGUI.conf;
  * The Class Option.
  */
 public class Option {
-	
+
 	/** Options definitions. */
 	public static int CONFIGURATION = 0x8000;
-	
+
 	/** The CONFIGURATIO n_ btguid. */
 	public static int CONFIGURATION_BTGUID = CONFIGURATION + 0x1; // Guid del
 	// device
@@ -72,9 +72,11 @@ public class Option {
 
 	/**
 	 * Instantiates a new option.
-	 *
-	 * @param id the id
-	 * @param params the params
+	 * 
+	 * @param id
+	 *            the id
+	 * @param params
+	 *            the params
 	 */
 	public Option(final int id, final byte[] params) {
 		this.optionId = new Integer(id);
@@ -83,7 +85,7 @@ public class Option {
 
 	/**
 	 * Gets the id.
-	 *
+	 * 
 	 * @return the id
 	 */
 	public int getId() {
@@ -92,7 +94,7 @@ public class Option {
 
 	/**
 	 * Gets the params.
-	 *
+	 * 
 	 * @return the params
 	 */
 	public byte[] getParams() {

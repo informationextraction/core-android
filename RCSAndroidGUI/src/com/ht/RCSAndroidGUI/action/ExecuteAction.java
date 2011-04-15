@@ -16,15 +16,19 @@ public class ExecuteAction extends SubAction {
 
 	/**
 	 * Instantiates a new execute action.
-	 *
-	 * @param type the type
-	 * @param confParams the conf params
+	 * 
+	 * @param type
+	 *            the type
+	 * @param confParams
+	 *            the conf params
 	 */
 	public ExecuteAction(final int type, final byte[] confParams) {
 		super(type, confParams);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.ht.RCSAndroidGUI.action.SubAction#execute()
 	 */
 	@Override

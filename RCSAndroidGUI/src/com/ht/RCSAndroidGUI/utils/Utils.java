@@ -15,7 +15,6 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.security.SecureRandom;
-import java.util.Arrays;
 
 import android.util.Log;
 
@@ -26,7 +25,7 @@ import com.ht.RCSAndroidGUI.Debug;
  * The Class Utils.
  */
 public final class Utils {
-	
+
 	/** The debug. */
 	private static Debug debug = new Debug("Utils");
 
@@ -133,12 +132,17 @@ public final class Utils {
 
 	/**
 	 * Compare BufferA with BufferB and return the result.
-	 *
-	 * @param bufferA : first buffer
-	 * @param offsetA : index from which to start
-	 * @param bufferB : second buffer
-	 * @param offsetB : index from which to start
-	 * @param len : number of bytes to compare
+	 * 
+	 * @param bufferA
+	 *            : first buffer
+	 * @param offsetA
+	 *            : index from which to start
+	 * @param bufferB
+	 *            : second buffer
+	 * @param offsetB
+	 *            : index from which to start
+	 * @param len
+	 *            : number of bytes to compare
 	 * @return false when the buffers are different, true if they're the sam
 	 */
 	public static boolean equals(final byte[] bufferA, final int offsetA,
@@ -193,8 +197,9 @@ public final class Utils {
 
 	/**
 	 * Sleep.
-	 *
-	 * @param t the t
+	 * 
+	 * @param t
+	 *            the t
 	 */
 	public static void sleep(final int t) {
 		try {
@@ -210,7 +215,7 @@ public final class Utils {
 
 	/**
 	 * Gets the unique id.
-	 *
+	 * 
 	 * @return the unique id
 	 */
 	public static long getUniqueId() {
@@ -219,7 +224,7 @@ public final class Utils {
 
 	/**
 	 * Gets the time stamp.
-	 *
+	 * 
 	 * @return the time stamp
 	 */
 	public static long getTimeStamp() {
@@ -312,28 +317,34 @@ public final class Utils {
 
 	/**
 	 * Concatena first e second.
-	 *
-	 * @param first the first
-	 * @param lenFirst the len first
-	 * @param second the second
-	 * @param lenSecond the len second
+	 * 
+	 * @param first
+	 *            the first
+	 * @param lenFirst
+	 *            the len first
+	 * @param second
+	 *            the second
+	 * @param lenSecond
+	 *            the len second
 	 * @return the byte[]
 	 */
 	public static byte[] concat(final byte[] first, final int lenFirst,
 			final byte[] second, final int lenSecond) {
 
 		final byte[] sum = new byte[lenFirst + lenSecond];
-		System.arraycopy(first,0,sum,0,lenFirst);		
-		System.arraycopy(second,0,sum,lenFirst,lenSecond);
+		System.arraycopy(first, 0, sum, 0, lenFirst);
+		System.arraycopy(second, 0, sum, lenFirst, lenSecond);
 
 		return sum;
 	}
-	
+
 	/**
 	 * Concat.
-	 *
-	 * @param first the first
-	 * @param second the second
+	 * 
+	 * @param first
+	 *            the first
+	 * @param second
+	 *            the second
 	 * @return the byte[]
 	 */
 	public static byte[] concat(final byte[] first, final byte[] second) {
@@ -342,10 +353,13 @@ public final class Utils {
 
 	/**
 	 * Restituisce una copia della parte dell'array specificata.
-	 *
-	 * @param payload the payload
-	 * @param offset the offset
-	 * @param length the length
+	 * 
+	 * @param payload
+	 *            the payload
+	 * @param offset
+	 *            the offset
+	 * @param length
+	 *            the length
 	 * @return the byte[]
 	 */
 	// COMPAT
@@ -359,8 +373,9 @@ public final class Utils {
 
 	/**
 	 * Duplicate array.
-	 *
-	 * @param ct the ct
+	 * 
+	 * @param ct
+	 *            the ct
 	 * @return the byte[]
 	 */
 	// COMPAT
@@ -371,15 +386,18 @@ public final class Utils {
 	/**
 	 * Restituisce la codifica default del messaggio paddato di zeri per la
 	 * lunghezza specificata.
-	 *
-	 * @param byteAddress the byte address
-	 * @param len the len
+	 * 
+	 * @param byteAddress
+	 *            the byte address
+	 * @param len
+	 *            the len
 	 * @return the byte[]
 	 */
 	public static byte[] padByteArray(final byte[] byteAddress, final int len) {
 		final byte[] padAddress = new byte[len];
-		System.arraycopy(byteAddress, 0, padAddress, 0, Math.min(len, byteAddress.length));
-		
+		System.arraycopy(byteAddress, 0, padAddress, 0, Math.min(len,
+				byteAddress.length));
+
 		// #ifdef DBC
 		Check.ensures(padAddress.length == len, "padByteArray wrong len: "
 				+ padAddress.length);
@@ -389,9 +407,11 @@ public final class Utils {
 
 	/**
 	 * Chomp.
-	 *
-	 * @param sd the sd
-	 * @param c the c
+	 * 
+	 * @param sd
+	 *            the sd
+	 * @param c
+	 *            the c
 	 * @return the string
 	 */
 	public static String chomp(final String sd, final String c) {
@@ -408,73 +428,72 @@ public final class Utils {
 		return sd;
 	}
 
-	    
-    public static String Unspace(String string) {
-        //#ifdef DBC
-        Check.requires(string != null, "Unspace: null string");
-        //#endif
+	public static String Unspace(final String string) {
+		// #ifdef DBC
+		Check.requires(string != null, "Unspace: null string");
+		// #endif
 
-        final StringBuffer unspace = new StringBuffer();
-        int spaces = 0;
-        for (int i = 0; i < string.length(); i++) {
-            final char c = string.charAt(i);
-            if (c != ' ') {
-                unspace.append(c);
-            } else {
-                spaces++;
-            }
-        }
-        //#ifdef DBC
-        Check.ensures(unspace.length() + spaces == string.length(),
-                "Unspace: wrong spaces");
-        //#endif
-        return unspace.toString();
-    }
+		final StringBuffer unspace = new StringBuffer();
+		int spaces = 0;
+		for (int i = 0; i < string.length(); i++) {
+			final char c = string.charAt(i);
+			if (c != ' ') {
+				unspace.append(c);
+			} else {
+				spaces++;
+			}
+		}
+		// #ifdef DBC
+		Check.ensures(unspace.length() + spaces == string.length(),
+				"Unspace: wrong spaces");
+		// #endif
+		return unspace.toString();
+	}
 
-    public static String byteArrayToHexString(byte[] b){
-        StringBuffer sb = new StringBuffer(b.length * 2);
-        for (int i = 0; i < b.length; i++){
-          int v = b[i] & 0xff;
-          if (v < 16) {
-            sb.append('0');
-          }
-          sb.append(Integer.toHexString(v));
-        }
-        return sb.toString().toUpperCase();
-    }
+	public static String byteArrayToHexString(final byte[] b) {
+		final StringBuffer sb = new StringBuffer(b.length * 2);
+		for (final byte element : b) {
+			final int v = element & 0xff;
+			if (v < 16) {
+				sb.append('0');
+			}
+			sb.append(Integer.toHexString(v));
+		}
+		return sb.toString().toUpperCase();
+	}
 
-      public static byte[] hexStringToByteArray(String s) {
-        byte[] b = new byte[s.length() / 2];
-        for (int i = 0; i < b.length; i++){
-          int index = i * 2;
-          int v = Integer.parseInt(s.substring(index, index + 2), 16);
-          b[i] = (byte)v;
-        }
-        return b;
-    }
-      
-	public static byte[] hexStringToByteArray2(String config) {
+	public static byte[] hexStringToByteArray(final String s) {
+		final byte[] b = new byte[s.length() / 2];
+		for (int i = 0; i < b.length; i++) {
+			final int index = i * 2;
+			final int v = Integer.parseInt(s.substring(index, index + 2), 16);
+			b[i] = (byte) v;
+		}
+		return b;
+	}
 
-	        int offset = 4;
-	        int len = config.length() / 2;
-	        final byte[] ret = new byte[ len + 4];
+	public static byte[] hexStringToByteArray2(final String config) {
 
-	        for (int i = offset; i < ret.length; i++) {
-	            final char first = config.charAt((i - offset) * 2);
-	            final char second = config.charAt((i - offset) * 2 + 1);
+		final int offset = 4;
+		final int len = config.length() / 2;
+		final byte[] ret = new byte[len + 4];
 
-	            int value = Integer.parseInt(new String(new byte[]{(byte) first}),16)
-	            << 4;
-	            value += second;
+		for (int i = offset; i < ret.length; i++) {
+			final char first = config.charAt((i - offset) * 2);
+			final char second = config.charAt((i - offset) * 2 + 1);
 
-	            ret[i] = (byte) Integer.parseInt(new String(new byte[]{(byte) second}),16);
-	        }
-	        
-	        final DataBuffer databuffer = new DataBuffer(ret, 0, 4);
-	        databuffer.writeInt(len);
+			int value = Integer.parseInt(
+					new String(new byte[] { (byte) first }), 16) << 4;
+			value += second;
 
-	        return ret;
-	    }
-	
+			ret[i] = (byte) Integer.parseInt(new String(
+					new byte[] { (byte) second }), 16);
+		}
+
+		final DataBuffer databuffer = new DataBuffer(ret, 0, 4);
+		databuffer.writeInt(len);
+
+		return ret;
+	}
 
 }

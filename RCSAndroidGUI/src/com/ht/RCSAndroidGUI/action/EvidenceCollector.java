@@ -8,19 +8,18 @@
  * *******************************************/
 package com.ht.RCSAndroidGUI.action;
 
-
 // TODO: Auto-generated Javadoc
 /**
  * The Class EvidenceCollector.
  */
 public class EvidenceCollector {
-	
+
 	/** The singleton. */
 	private volatile static EvidenceCollector singleton;
 
 	/**
 	 * Self.
-	 *
+	 * 
 	 * @return the evidence collector
 	 */
 	public static EvidenceCollector self() {

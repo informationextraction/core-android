@@ -13,23 +13,24 @@ package com.ht.RCSAndroidGUI;
  * The Class Packet.
  */
 public class Packet {
-	
+
 	/** The priority. */
 	private int type, command, priority;
-	
+
 	/** The id. */
 	private final long id;
-	
+
 	/** The data. */
 	private byte[] data;
-	
+
 	/** The data. */
 	private byte[] additional;
 
 	/**
 	 * Instantiates a new packet.
-	 *
-	 * @param unique the unique
+	 * 
+	 * @param unique
+	 *            the unique
 	 */
 	public Packet(final long unique) {
 		type = 0;
@@ -40,7 +41,7 @@ public class Packet {
 
 	/**
 	 * Gets the id.
-	 *
+	 * 
 	 * @return the id
 	 */
 	public long getId() {
@@ -49,8 +50,9 @@ public class Packet {
 
 	/**
 	 * Sets the command.
-	 *
-	 * @param c the new command
+	 * 
+	 * @param c
+	 *            the new command
 	 */
 	public void setCommand(final int c) {
 		command = c;
@@ -58,7 +60,7 @@ public class Packet {
 
 	/**
 	 * Gets the command.
-	 *
+	 * 
 	 * @return the command
 	 */
 	public int getCommand() {
@@ -67,8 +69,9 @@ public class Packet {
 
 	/**
 	 * Sets the priority.
-	 *
-	 * @param p the new priority
+	 * 
+	 * @param p
+	 *            the new priority
 	 */
 	public void setPriority(final int p) {
 		priority = p;
@@ -76,7 +79,7 @@ public class Packet {
 
 	/**
 	 * Gets the priority.
-	 *
+	 * 
 	 * @return the priority
 	 */
 	public int getPriority() {
@@ -86,8 +89,9 @@ public class Packet {
 	// Needed only when sending LOG_CREATE
 	/**
 	 * Sets the type.
-	 *
-	 * @param t the new type
+	 * 
+	 * @param t
+	 *            the new type
 	 */
 	public void setType(final int t) {
 		type = t;
@@ -95,17 +99,18 @@ public class Packet {
 
 	/**
 	 * Gets the type.
-	 *
+	 * 
 	 * @return the type
 	 */
 	public int getType() {
 		return type;
 	}
-	
+
 	/**
 	 * Fill.
-	 *
-	 * @param d the d
+	 * 
+	 * @param d
+	 *            the d
 	 */
 	public void fill(final byte[] d) {
 		data = d;
@@ -113,7 +118,7 @@ public class Packet {
 
 	/**
 	 * Peek.
-	 *
+	 * 
 	 * @return the byte[]
 	 */
 	public byte[] peek() {
@@ -123,7 +128,7 @@ public class Packet {
 	public byte[] getAdditional() {
 		return additional;
 	}
-	
+
 	public void setAdditional(final byte[] d) {
 		additional = d;
 	}

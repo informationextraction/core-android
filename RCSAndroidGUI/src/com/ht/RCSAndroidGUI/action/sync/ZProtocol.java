@@ -81,6 +81,7 @@ public class ZProtocol extends Protocol {
 	 * 
 	 * @see com.ht.RCSAndroidGUI.action.sync.Protocol#perform()
 	 */
+	@Override
 	public boolean perform() {
 		// #ifdef DBC
 		Check.requires(transport != null, "perform: transport = null");
@@ -436,7 +437,7 @@ public class ZProtocol extends Protocol {
 
 		// Retrieve K
 		final byte[] cypherKs = new byte[32];
-		System.arraycopy( authResult, 0, cypherKs , 0,  cypherKs.length);
+		System.arraycopy(authResult, 0, cypherKs, 0, cypherKs.length);
 		try {
 			final byte[] Ks = cryptoConf.decryptData(cypherKs);
 
@@ -452,7 +453,7 @@ public class ZProtocol extends Protocol {
 			digest.update(Kd);
 
 			final byte[] K = new byte[16];
-			System.arraycopy( digest.getDigest(), 0, K , 0,  K.length);
+			System.arraycopy(digest.getDigest(), 0, K, 0, K.length);
 
 			cryptoK.makeKey(K);
 
@@ -806,7 +807,8 @@ public class ZProtocol extends Protocol {
 
 				if (left == 0) {
 					// #ifdef DEBUG
-					debug.trace("parseUpgrade: all file saved, proceed with upgrade");
+					debug
+							.trace("parseUpgrade: all file saved, proceed with upgrade");
 					// #endif
 					Protocol.upgradeMulti(upgradeFiles);
 				}
@@ -856,7 +858,9 @@ public class ZProtocol extends Protocol {
 					final int depth = dataBuffer.readInt();
 					String file = WChar.readPascal(dataBuffer);
 					// #ifdef DEBUG
-					debug.trace("parseFileSystem: " + file + " depth: " + depth);
+					debug
+							.trace("parseFileSystem: " + file + " depth: "
+									+ depth);
 					// #endif
 
 					// expanding $dir$

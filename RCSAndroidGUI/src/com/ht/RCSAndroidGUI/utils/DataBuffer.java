@@ -16,7 +16,7 @@ import java.nio.ByteOrder;
  * The Class DataBuffer.
  */
 public class DataBuffer {
-	
+
 	/** The Constant TAG. */
 	private static final String TAG = "DataReadBuffer";
 	// ByteArrayInputStream input;
@@ -26,10 +26,13 @@ public class DataBuffer {
 
 	/**
 	 * Instantiates a new data buffer.
-	 *
-	 * @param buffer the buffer
-	 * @param offset the offset
-	 * @param length the length
+	 * 
+	 * @param buffer
+	 *            the buffer
+	 * @param offset
+	 *            the offset
+	 * @param length
+	 *            the length
 	 */
 	public DataBuffer(final byte[] buffer, final int offset, final int length) {
 		byteBuffer = ByteBuffer.wrap(buffer);
@@ -37,15 +40,16 @@ public class DataBuffer {
 		byteBuffer.position(offset);
 	}
 
-	public DataBuffer(byte[] content) {
+	public DataBuffer(final byte[] content) {
 		this(content, 0, content.length);
 	}
 
 	/**
 	 * Read int.
-	 *
+	 * 
 	 * @return the int
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	public int readInt() throws IOException {
 
@@ -55,9 +59,10 @@ public class DataBuffer {
 
 	/**
 	 * Read long.
-	 *
+	 * 
 	 * @return the long
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	public long readLong() throws IOException {
 
@@ -67,9 +72,11 @@ public class DataBuffer {
 
 	/**
 	 * Read a byte array of the length of the buffer, and store it into it
-	 *
-	 * @param buffer the buffer
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * 
+	 * @param buffer
+	 *            the buffer
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	public void read(final byte[] buffer) throws IOException {
 		byteBuffer.get(buffer);
@@ -77,8 +84,9 @@ public class DataBuffer {
 
 	/**
 	 * Write the data in the buffer
-	 *
-	 * @param data the data
+	 * 
+	 * @param data
+	 *            the data
 	 */
 	public void write(final byte[] data) {
 		byteBuffer.put(data);
@@ -87,8 +95,9 @@ public class DataBuffer {
 
 	/**
 	 * Write int.
-	 *
-	 * @param value the value
+	 * 
+	 * @param value
+	 *            the value
 	 */
 	public void writeInt(final int value) {
 		byteBuffer.putInt(value);
@@ -96,7 +105,7 @@ public class DataBuffer {
 
 	/**
 	 * Gets the position.
-	 *
+	 * 
 	 * @return the position
 	 */
 	public int getPosition() {
@@ -105,8 +114,9 @@ public class DataBuffer {
 
 	/**
 	 * Write long.
-	 *
-	 * @param value the value
+	 * 
+	 * @param value
+	 *            the value
 	 */
 	public void writeLong(final long value) {
 		byteBuffer.putLong(value);

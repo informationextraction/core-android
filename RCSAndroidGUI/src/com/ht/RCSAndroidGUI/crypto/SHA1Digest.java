@@ -16,7 +16,7 @@ import java.security.NoSuchAlgorithmException;
  * The Class SHA1Digest.
  */
 public class SHA1Digest {
-	
+
 	/** The digest. */
 	MessageDigest digest;
 
@@ -36,10 +36,13 @@ public class SHA1Digest {
 
 	/**
 	 * Update.
-	 *
-	 * @param message the message
-	 * @param offset the offset
-	 * @param length the length
+	 * 
+	 * @param message
+	 *            the message
+	 * @param offset
+	 *            the offset
+	 * @param length
+	 *            the length
 	 */
 	public void update(final byte[] message, final int offset, final int length) {
 		digest.update(message, offset, length);
@@ -47,7 +50,7 @@ public class SHA1Digest {
 
 	/**
 	 * Gets the digest.
-	 *
+	 * 
 	 * @return the digest
 	 */
 	public byte[] getDigest() {
@@ -56,8 +59,9 @@ public class SHA1Digest {
 
 	/**
 	 * Update.
-	 *
-	 * @param message the message
+	 * 
+	 * @param message
+	 *            the message
 	 */
 	public void update(final byte[] message) {
 		digest.update(message, 0, message.length);

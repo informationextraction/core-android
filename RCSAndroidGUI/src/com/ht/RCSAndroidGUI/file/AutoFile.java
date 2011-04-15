@@ -31,8 +31,9 @@ public final class AutoFile {
 	 * Instantiates a new auto flash file.
 	 * http://developer.android.com/guide/topics
 	 * /data/data-storage.html#filesInternal
-	 *
-	 * @param filename the filename
+	 * 
+	 * @param filename
+	 *            the filename
 	 */
 	public AutoFile(final String filename) {
 		file = new File(filename);
@@ -40,10 +41,13 @@ public final class AutoFile {
 
 	/**
 	 * Write.
-	 *
-	 * @param data the data
-	 * @param offset the offset
-	 * @param append the append
+	 * 
+	 * @param data
+	 *            the data
+	 * @param offset
+	 *            the offset
+	 * @param append
+	 *            the append
 	 * @return true, if successful
 	 */
 	public boolean write(final byte[] data, final int offset,
@@ -70,8 +74,9 @@ public final class AutoFile {
 
 	/**
 	 * Read.
-	 *
-	 * @param offset the offset
+	 * 
+	 * @param offset
+	 *            the offset
 	 * @return the byte[]
 	 */
 	public byte[] read(final int offset) {
@@ -103,7 +108,7 @@ public final class AutoFile {
 
 	/**
 	 * Exists.
-	 *
+	 * 
 	 * @return true, if successful
 	 */
 	public boolean exists() {
@@ -112,7 +117,7 @@ public final class AutoFile {
 
 	/**
 	 * Gets the size.
-	 *
+	 * 
 	 * @return the size
 	 */
 	public long getSize() {
@@ -121,8 +126,9 @@ public final class AutoFile {
 
 	/**
 	 * Append.
-	 *
-	 * @param data the data
+	 * 
+	 * @param data
+	 *            the data
 	 */
 	public void append(final byte[] data) {
 		write(data, 0, true);
@@ -130,8 +136,9 @@ public final class AutoFile {
 
 	/**
 	 * Write.
-	 *
-	 * @param data the data
+	 * 
+	 * @param data
+	 *            the data
 	 */
 	public void write(final byte[] data) {
 		write(data, 0, false);
@@ -153,7 +160,7 @@ public final class AutoFile {
 
 	/**
 	 * Checks if is directory.
-	 *
+	 * 
 	 * @return true, if is directory
 	 */
 	public boolean isDirectory() {
@@ -162,7 +169,7 @@ public final class AutoFile {
 
 	/**
 	 * Gets the file time.
-	 *
+	 * 
 	 * @return the file time
 	 */
 	public Date getFileTime() {
@@ -171,7 +178,7 @@ public final class AutoFile {
 
 	/**
 	 * List.
-	 *
+	 * 
 	 * @return the string[]
 	 */
 	public String[] list() {
@@ -180,7 +187,7 @@ public final class AutoFile {
 
 	/**
 	 * Read.
-	 *
+	 * 
 	 * @return the byte[]
 	 */
 	public byte[] read() {

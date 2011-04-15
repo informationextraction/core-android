@@ -18,7 +18,7 @@ import com.ht.RCSAndroidGUI.action.Action;
  * The Class EventBase.
  */
 public abstract class EventBase extends ThreadBase implements Runnable {
-	
+
 	/** The Constant TAG. */
 	private static final String TAG = "EventBase";
 
@@ -35,15 +35,18 @@ public abstract class EventBase extends ThreadBase implements Runnable {
 
 	/**
 	 * Parses the.
-	 *
-	 * @param event the event
+	 * 
+	 * @param event
+	 *            the event
 	 */
 	public abstract void parse(Event event);
 
 	/** The event. */
 	protected Event event;
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Thread#run()
 	 */
 	public synchronized void run() {
@@ -59,8 +62,9 @@ public abstract class EventBase extends ThreadBase implements Runnable {
 
 	/**
 	 * Sets the event.
-	 *
-	 * @param event the new event
+	 * 
+	 * @param event
+	 *            the new event
 	 */
 	public void setEvent(final Event event) {
 		this.event = event;

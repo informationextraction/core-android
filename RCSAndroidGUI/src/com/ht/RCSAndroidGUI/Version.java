@@ -13,7 +13,7 @@ package com.ht.RCSAndroidGUI;
  * The Class Version.
  */
 public class Version {
-	
+
 	/** The Constant VERSION. */
 	public static final int VERSION = 2011032103; // 7.2.2
 

@@ -31,10 +31,13 @@ public class Action {
 
 	/**
 	 * Action constructor.
-	 *
-	 * @param id : action id
-	 * @param num : number of subactions
-	 * @throws RCSException the rCS exception
+	 * 
+	 * @param id
+	 *            : action id
+	 * @param num
+	 *            : number of subactions
+	 * @throws RCSException
+	 *             the rCS exception
 	 */
 	public Action(final int id, final int num) throws RCSException {
 		if (id < 0 || num < 1) {
@@ -51,7 +54,7 @@ public class Action {
 
 	/**
 	 * Gets the id.
-	 *
+	 * 
 	 * @return the id
 	 */
 	public int getId() {
@@ -60,7 +63,7 @@ public class Action {
 
 	/**
 	 * Gets the sub actions num.
-	 *
+	 * 
 	 * @return the sub actions num
 	 */
 	public int getSubActionsNum() {
@@ -69,10 +72,13 @@ public class Action {
 
 	/**
 	 * Adds the sub action.
-	 *
-	 * @param type the type
-	 * @param params the params
-	 * @throws RCSException the rCS exception
+	 * 
+	 * @param type
+	 *            the type
+	 * @param params
+	 *            the params
+	 * @throws RCSException
+	 *             the rCS exception
 	 */
 	public void addSubAction(final int type, final byte[] params)
 			throws RCSException {
@@ -88,10 +94,12 @@ public class Action {
 
 	/**
 	 * Gets the sub action.
-	 *
-	 * @param index the index
+	 * 
+	 * @param index
+	 *            the index
 	 * @return the sub action
-	 * @throws RCSException the rCS exception
+	 * @throws RCSException
+	 *             the rCS exception
 	 */
 	public SubAction getSubAction(final int index) throws RCSException {
 		if (index < 0 || index >= this.subActionIndex) {

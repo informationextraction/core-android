@@ -8,10 +8,10 @@
  * *******************************************/
 package com.ht.RCSAndroidGUI.action.sync;
 
-import com.ht.RCSAndroidGUI.Status;
-
 import android.content.Context;
 import android.net.wifi.WifiManager;
+
+import com.ht.RCSAndroidGUI.Status;
 
 /**
  * The Class WifiTransport.
@@ -51,17 +51,18 @@ public class WifiTransport extends HttpTransport {
 	 */
 	@Override
 	public boolean isAvailable() {
-		String service = Context.WIFI_SERVICE;
+		final String service = Context.WIFI_SERVICE;
 		final WifiManager wifi = (WifiManager) Status.getAppContext()
 				.getSystemService(service);
 
 		boolean available = wifi.isWifiEnabled();
-		if (!wifi.isWifiEnabled()){
-			if (forced && wifi.getWifiState() != WifiManager.WIFI_STATE_ENABLING){
+		if (!wifi.isWifiEnabled()) {
+			if (forced
+					&& wifi.getWifiState() != WifiManager.WIFI_STATE_ENABLING) {
 				available = wifi.setWifiEnabled(true);
 			}
 		}
-		
+
 		return available;
 	}
 

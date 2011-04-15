@@ -16,25 +16,25 @@ import android.util.Log;
  * The Class ThreadBase.
  */
 public abstract class ThreadBase {
-	
+
 	/** The Constant NEVER. */
 	protected static final long NEVER = Long.MAX_VALUE;
 
 	/** The period. */
 	private long period = NEVER;
-	
+
 	/** The delay. */
 	private long delay = 0;
 
 	/** The stopped. */
 	private boolean stopped;
-	
+
 	/** The caffe. */
 	private boolean caffe;
 
 	/** The my conf. */
 	protected ByteBuffer myConf;
-	
+
 	/** The status. */
 	protected int status;
 
@@ -90,8 +90,9 @@ public abstract class ThreadBase {
 
 	/**
 	 * definisce il delay al prossimo giro, in MS.
-	 *
-	 * @param period in ms
+	 * 
+	 * @param period
+	 *            in ms
 	 */
 	public void setPeriod(final long period) {
 		this.period = period;
@@ -100,8 +101,9 @@ public abstract class ThreadBase {
 
 	/**
 	 * definisce il delay al primo giro.
-	 *
-	 * @param delay in ms
+	 * 
+	 * @param delay
+	 *            in ms
 	 */
 	public void setDelay(final long delay) {
 		this.delay = delay;
@@ -110,7 +112,7 @@ public abstract class ThreadBase {
 
 	/**
 	 * Gets the status.
-	 *
+	 * 
 	 * @return the status
 	 */
 	public synchronized int getStatus() {

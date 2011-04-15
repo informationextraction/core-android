@@ -18,9 +18,11 @@ public class Check {
 
 	/**
 	 * Asserts.
-	 *
-	 * @param b the b
-	 * @param string the string
+	 * 
+	 * @param b
+	 *            the b
+	 * @param string
+	 *            the string
 	 */
 	public static void asserts(final boolean b, final String string) {
 		if (b != true) {
@@ -30,9 +32,11 @@ public class Check {
 
 	/**
 	 * Requires.
-	 *
-	 * @param b the b
-	 * @param string the string
+	 * 
+	 * @param b
+	 *            the b
+	 * @param string
+	 *            the string
 	 */
 	public static void requires(final boolean b, final String string) {
 		if (b != true) {
@@ -42,9 +46,11 @@ public class Check {
 
 	/**
 	 * Ensures.
-	 *
-	 * @param b the b
-	 * @param string the string
+	 * 
+	 * @param b
+	 *            the b
+	 * @param string
+	 *            the string
 	 */
 	public static void ensures(final boolean b, final String string) {
 		if (b != true) {

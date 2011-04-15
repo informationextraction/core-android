@@ -19,7 +19,7 @@ import android.util.Log;
  * The Class Command.
  */
 public class Command {
-	
+
 	/** The msg queue. */
 	private final Queue<Message> msgQueue;
 
@@ -33,8 +33,9 @@ public class Command {
 
 	/**
 	 * Push message.
-	 *
-	 * @param msg the msg
+	 * 
+	 * @param msg
+	 *            the msg
 	 */
 	public synchronized void pushMessage(final Message msg) {
 		if (msg == null) {
@@ -48,7 +49,7 @@ public class Command {
 	// Returns null if the queue is empty
 	/**
 	 * Gets the message.
-	 *
+	 * 
 	 * @return the message
 	 */
 	public synchronized Message getMessage() {

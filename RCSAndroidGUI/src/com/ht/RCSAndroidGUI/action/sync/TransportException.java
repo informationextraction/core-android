@@ -15,14 +15,15 @@ import com.ht.RCSAndroidGUI.Debug;
  * The Class TransportException.
  */
 public class TransportException extends Exception {
-	
+
 	/** The debug. */
 	private static Debug debug = new Debug("TransportEx");
 
 	/**
 	 * Instantiates a new transport exception.
-	 *
-	 * @param i the i
+	 * 
+	 * @param i
+	 *            the i
 	 */
 	public TransportException(final int i) {
 		// #ifdef DEBUG

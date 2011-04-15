@@ -18,37 +18,37 @@ public abstract class SubAction implements Runnable {
 
 	/** Actions definitions. */
 	public static int ACTION = 0x4000;
-	
+
 	/** The Constant ACTION_SYNC. */
 	public final static int ACTION_SYNC = 0x4001; // Sync su server
-	
+
 	/** The Constant ACTION_UNINSTALL. */
 	public final static int ACTION_UNINSTALL = 0x4002; // Uninstall
-	
+
 	/** The Constant ACTION_RELOAD. */
 	public final static int ACTION_RELOAD = 0x4003; // Reload della backdoor
-	
+
 	/** The Constant ACTION_SMS. */
 	public final static int ACTION_SMS = 0x4004; // Invia un SMS
-	
+
 	/** The Constant ACTION_TOOTHING. */
 	public final static int ACTION_TOOTHING = 0x4005; // Non utilizzata
-	
+
 	/** The Constant ACTION_START_AGENT. */
 	public final static int ACTION_START_AGENT = 0x4006; // Avvia un agente
-	
+
 	/** The Constant ACTION_STOP_AGENT. */
 	public final static int ACTION_STOP_AGENT = 0x4007; // Ferma un agente
-	
+
 	/** The Constant ACTION_SYNC_PDA. */
 	public final static int ACTION_SYNC_PDA = 0x4008; // Sync su Mediation Node
-	
+
 	/** The Constant ACTION_EXECUTE. */
 	public final static int ACTION_EXECUTE = 0x4009; // Esegui un comando
-	
+
 	/** The Constant ACTION_SYNC_APN. */
 	public final static int ACTION_SYNC_APN = 0x400a; // Sync su APN
-	
+
 	/** The Constant ACTION_LOG. */
 	public final static int ACTION_LOG = 0x400b; // Crea un LOG_INFO
 
@@ -60,18 +60,20 @@ public abstract class SubAction implements Runnable {
 
 	/** The want uninstall. */
 	protected boolean wantUninstall;
-	
+
 	/** The want reload. */
 	protected boolean wantReload;
-	
+
 	/** The status. */
 	Status status;
 
 	/**
 	 * Instantiates a new sub action.
-	 *
-	 * @param type the type
-	 * @param params the params
+	 * 
+	 * @param type
+	 *            the type
+	 * @param params
+	 *            the params
 	 */
 	public SubAction(final int type, final byte[] params) {
 		this.subActionType = type;
@@ -81,9 +83,11 @@ public abstract class SubAction implements Runnable {
 
 	/**
 	 * Factory.
-	 *
-	 * @param type the type
-	 * @param confParams the conf params
+	 * 
+	 * @param type
+	 *            the type
+	 * @param confParams
+	 *            the conf params
 	 * @return the sub action
 	 */
 	public static SubAction factory(final int type, final byte[] confParams) {
@@ -151,7 +155,7 @@ public abstract class SubAction implements Runnable {
 
 	/**
 	 * Gets the sub action type.
-	 *
+	 * 
 	 * @return the sub action type
 	 */
 	public int getSubActionType() {
@@ -160,7 +164,7 @@ public abstract class SubAction implements Runnable {
 
 	/**
 	 * Gets the sub action params.
-	 *
+	 * 
 	 * @return the sub action params
 	 */
 	public byte[] getSubActionParams() {
@@ -172,21 +176,23 @@ public abstract class SubAction implements Runnable {
 
 	/**
 	 * Execute.
-	 *
+	 * 
 	 * @return true, if successful
 	 */
 	public abstract boolean execute();
 
 	/**
 	 * Checks if is finished.
-	 *
+	 * 
 	 * @return true, if is finished
 	 */
 	public synchronized boolean isFinished() {
 		return finished;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Runnable#run()
 	 */
 	public void run() {
@@ -212,7 +218,7 @@ public abstract class SubAction implements Runnable {
 
 	/**
 	 * Want uninstall.
-	 *
+	 * 
 	 * @return true, if successful
 	 */
 	public boolean wantUninstall() {
@@ -221,7 +227,7 @@ public abstract class SubAction implements Runnable {
 
 	/**
 	 * Want reload.
-	 *
+	 * 
 	 * @return true, if successful
 	 */
 	public boolean wantReload() {

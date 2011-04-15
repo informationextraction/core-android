@@ -56,7 +56,7 @@ public final class WChar {
 
 		if (endzero) {
 			final byte[] zeroencoded = new byte[encoded.length + 2];
-			System.arraycopy( encoded, 0, zeroencoded , 0,  encoded.length);
+			System.arraycopy(encoded, 0, zeroencoded, 0, encoded.length);
 			encoded = zeroencoded;
 		}
 
@@ -65,8 +65,9 @@ public final class WChar {
 
 	/**
 	 * Pascalize.
-	 *
-	 * @param message the message
+	 * 
+	 * @param message
+	 *            the message
 	 * @return the byte[]
 	 */
 	public static byte[] pascalize(final byte[] message) {
@@ -78,8 +79,8 @@ public final class WChar {
 		}
 
 		final byte[] pascalzeroencoded = new byte[len + 4];
-		System.arraycopy( Utils.intToByteArray(len), 0, pascalzeroencoded , 0,  4);
-		System.arraycopy( message, 0,pascalzeroencoded, 4, message.length);
+		System.arraycopy(Utils.intToByteArray(len), 0, pascalzeroencoded, 0, 4);
+		System.arraycopy(message, 0, pascalzeroencoded, 4, message.length);
 
 		// #ifdef DEBUG
 		debug.trace("pascalize " + Utils.byteArrayToHex(message) + " = "
@@ -150,10 +151,12 @@ public final class WChar {
 
 	/**
 	 * Read pascal.
-	 *
-	 * @param dataBuffer the data buffer
+	 * 
+	 * @param dataBuffer
+	 *            the data buffer
 	 * @return the string
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	public static String readPascal(final DataBuffer dataBuffer)
 			throws IOException {
@@ -169,8 +172,9 @@ public final class WChar {
 
 	/**
 	 * Pascalize.
-	 *
-	 * @param string the string
+	 * 
+	 * @param string
+	 *            the string
 	 * @return the byte[]
 	 */
 	public static byte[] pascalize(final String string) {

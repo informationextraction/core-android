@@ -28,8 +28,9 @@ public class Directory {
 
 	/**
 	 * Expand macro.
-	 *
-	 * @param filename the filename
+	 * 
+	 * @param filename
+	 *            the filename
 	 * @return the string
 	 */
 	public static String expandMacro(final String filename) {
@@ -54,8 +55,9 @@ public class Directory {
 	// TODO
 	/**
 	 * Find.
-	 *
-	 * @param filter the filter
+	 * 
+	 * @param filter
+	 *            the filter
 	 * @return the enumeration
 	 */
 	public static Enumeration<String> find(final String filter) {

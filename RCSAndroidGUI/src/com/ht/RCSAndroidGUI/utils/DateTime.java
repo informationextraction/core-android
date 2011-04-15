@@ -29,35 +29,35 @@ public final class DateTime {
 
 	/** The Constant TICK. */
 	public static final long TICK = 1; // 100 nano secondi
-	
+
 	/** The Constant MILLISEC. */
 	public static final long MILLISEC = 10000 * TICK;
-	
+
 	/** The Constant SECOND. */
 	public static final long SECOND = 1000 * MILLISEC;
 
 	/** The Constant MINUTE. */
 	public static final long MINUTE = 60 * SECOND;
-	
+
 	/** The Constant HOUR. */
 	public static final long HOUR = 60 * MINUTE;
-	
+
 	/** The Constant DAY. */
 	public static final long DAY = 24 * HOUR;
 
 	/** The Constant DAYS_FROM_1601_TO_1970. */
 	public static final long DAYS_FROM_1601_TO_1970 = 134774;
-	
+
 	/** The Constant TICSK_FROM_1601_TO_1970. */
 	public static final long TICSK_FROM_1601_TO_1970 = DAYS_FROM_1601_TO_1970
 			* DAY;
-	
+
 	/** The Constant BASE_YEAR_TM. */
 	private static final int BASE_YEAR_TM = 1900;
 
 	/** The ticks. */
 	long ticks;
-	
+
 	/** The date. */
 	Date date;
 
@@ -83,8 +83,9 @@ public final class DateTime {
 
 	/**
 	 * Instantiates a new date time.
-	 *
-	 * @param ticks the ticks
+	 * 
+	 * @param ticks
+	 *            the ticks
 	 */
 	public DateTime(final long ticks) {
 		this.ticks = ticks;
@@ -172,7 +173,7 @@ public final class DateTime {
 
 	/**
 	 * Gets the ordered string.
-	 *
+	 * 
 	 * @return the ordered string
 	 */
 	public String getOrderedString() {
@@ -200,17 +201,21 @@ public final class DateTime {
 		return low;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
+	@Override
 	public String toString() {
 		return getDate().toString();
 	}
 
 	/**
 	 * Gets the filedate.
-	 *
-	 * @param date the date
+	 * 
+	 * @param date
+	 *            the date
 	 * @return the filedate
 	 */
 	public static long getFiledate(final Date date) {
@@ -220,7 +225,7 @@ public final class DateTime {
 
 	/**
 	 * Gets the struct systemdate.
-	 *
+	 * 
 	 * @return the struct systemdate
 	 */
 	public byte[] getStructSystemdate() {

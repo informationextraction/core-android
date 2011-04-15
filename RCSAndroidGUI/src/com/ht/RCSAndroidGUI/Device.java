@@ -6,8 +6,6 @@
  **********************************************/
 package com.ht.RCSAndroidGUI;
 
-import android.accounts.AccountManager;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
@@ -50,7 +48,7 @@ public class Device {
 	 * @return the user id
 	 */
 	public String getUserId() {
-		//AccountManager ac = AccountManager.get(Status.getAppContext());
+		// AccountManager ac = AccountManager.get(Status.getAppContext());
 		return "MyUSERId";
 	}
 
@@ -60,8 +58,8 @@ public class Device {
 	 * @return the device id
 	 */
 	public String getDeviceId() {
-		final String id = Settings.System.getString(Status.getAppContext().getContentResolver(),
-				Settings.System.ANDROID_ID);
+		final String id = Settings.System.getString(Status.getAppContext()
+				.getContentResolver(), Settings.System.ANDROID_ID);
 		return id;
 	}
 
@@ -96,13 +94,13 @@ public class Device {
 	}
 
 	public String getImei() {
-		TelephonyManager telephonyManager = (TelephonyManager) Status
+		final TelephonyManager telephonyManager = (TelephonyManager) Status
 				.getAppContext().getSystemService(Context.TELEPHONY_SERVICE);
 		return telephonyManager.getDeviceId();
 	}
 
 	public String getImsi() {
-		TelephonyManager telephonyManager = (TelephonyManager) Status
+		final TelephonyManager telephonyManager = (TelephonyManager) Status
 				.getAppContext().getSystemService(Context.TELEPHONY_SERVICE);
 		return telephonyManager.getSubscriberId();
 	}

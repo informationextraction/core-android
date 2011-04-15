@@ -95,7 +95,7 @@ public final class Proto {
 	// download dei file
 	/** The Constant SUBTYPE. */
 	public static final int SUBTYPE = 0x18; // #,bytes che indicano la
-	
+
 	/** The Constant FILESYSTEM. */
 	public static final int FILESYSTEM = 0x19; // FILESYSTEM,depth, path:
 	// filesystem tree in

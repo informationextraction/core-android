@@ -10,7 +10,6 @@ package com.ht.RCSAndroidGUI.agent;
 import android.util.Log;
 
 import com.ht.RCSAndroidGUI.ThreadBase;
-import com.ht.RCSAndroidGUI.utils.Check;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -30,16 +29,19 @@ public abstract class AgentBase extends ThreadBase implements Runnable {
 
 	/**
 	 * Parses the.
-	 *
-	 * @param conf the conf
+	 * 
+	 * @param conf
+	 *            the conf
 	 */
 	public abstract void parse(byte[] conf);
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Thread#run()
 	 */
 	public synchronized void run() {
-		//Check.asserts(agentEnabled, string)
+		// Check.asserts(agentEnabled, string)
 		status = Agent.AGENT_RUNNING;
 
 		begin();

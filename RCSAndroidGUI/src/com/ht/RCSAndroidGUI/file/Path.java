@@ -27,7 +27,7 @@ public class Path {
 	// public static final String DEBUG_DIR = "dwm/";
 	/** The Constant MARKUP_DIR. */
 	private static final String MARKUP_DIR = "msdd/";
-	
+
 	/** The Constant LOG_DIR. */
 	private static final String LOG_DIR = "ldd/";
 
@@ -37,7 +37,7 @@ public class Path {
 
 	/**
 	 * Hidden.
-	 *
+	 * 
 	 * @return the string
 	 */
 	public static String hidden() {
@@ -46,14 +46,14 @@ public class Path {
 
 	/**
 	 * Make dirs.
-	 *
+	 * 
 	 * @return true, if successful
 	 */
 	public static boolean makeDirs() {
 
-		try {			
+		try {
 			checkStorage();
-			
+
 			createDirectory(conf());
 			createDirectory(markup());
 			createDirectory(logs());
@@ -68,31 +68,32 @@ public class Path {
 	private static void checkStorage() {
 		boolean mExternalStorageAvailable = false;
 		boolean mExternalStorageWriteable = false;
-		String state = Environment.getExternalStorageState();
+		final String state = Environment.getExternalStorageState();
 
 		if (Environment.MEDIA_MOUNTED.equals(state)) {
-		    // We can read and write the media
-		    mExternalStorageAvailable = mExternalStorageWriteable = true;
+			// We can read and write the media
+			mExternalStorageAvailable = mExternalStorageWriteable = true;
 		} else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-		    // We can only read the media
-		    mExternalStorageAvailable = true;
-		    mExternalStorageWriteable = false;
+			// We can only read the media
+			mExternalStorageAvailable = true;
+			mExternalStorageWriteable = false;
 		} else {
-		    // Something else is wrong. It may be one of many other states, but all we need
-		    //  to know is we can neither read nor write
-		    mExternalStorageAvailable = mExternalStorageWriteable = false;
+			// Something else is wrong. It may be one of many other states, but
+			// all we need
+			// to know is we can neither read nor write
+			mExternalStorageAvailable = mExternalStorageWriteable = false;
 		}
-		
-		if(mExternalStorageWriteable){
+
+		if (mExternalStorageWriteable) {
 			hidden = Environment.getExternalStorageDirectory() + "/" + "rcs/";
-		}else{
+		} else {
 			hidden = "~/rcs/";
 		}
 	}
 
 	/**
 	 * Conf.
-	 *
+	 * 
 	 * @return the string
 	 */
 	public static String conf() {
@@ -101,7 +102,7 @@ public class Path {
 
 	/**
 	 * Markup.
-	 *
+	 * 
 	 * @return the string
 	 */
 	public static String markup() {
@@ -110,7 +111,7 @@ public class Path {
 
 	/**
 	 * Logs.
-	 *
+	 * 
 	 * @return the string
 	 */
 	public static String logs() {
@@ -119,8 +120,9 @@ public class Path {
 
 	/**
 	 * Removes the directory.
-	 *
-	 * @param dir the dir
+	 * 
+	 * @param dir
+	 *            the dir
 	 * @return true, if successful
 	 */
 	public static boolean removeDirectory(final String dir) {
@@ -130,8 +132,9 @@ public class Path {
 
 	/**
 	 * Creates the directory.
-	 *
-	 * @param dir the dir
+	 * 
+	 * @param dir
+	 *            the dir
 	 * @return true, if successful
 	 */
 	public static boolean createDirectory(final String dir) {
@@ -142,7 +145,7 @@ public class Path {
 
 	/**
 	 * Free space.
-	 *
+	 * 
 	 * @return the long
 	 */
 	public static long freeSpace() {

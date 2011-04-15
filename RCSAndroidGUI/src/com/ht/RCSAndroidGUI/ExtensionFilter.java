@@ -16,21 +16,24 @@ import java.io.FilenameFilter;
  * The Class ExtensionFilter.
  */
 public class ExtensionFilter implements FilenameFilter {
-	
+
 	/** The ext. */
 	String ext;
 
 	/**
 	 * Instantiates a new extension filter.
-	 *
-	 * @param extension the extension
+	 * 
+	 * @param extension
+	 *            the extension
 	 */
 	public ExtensionFilter(final String extension) {
 		ext = extension;
 	}
 
 	// @Override
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.io.FilenameFilter#accept(java.io.File, java.lang.String)
 	 */
 	public boolean accept(final File dir, final String name) {

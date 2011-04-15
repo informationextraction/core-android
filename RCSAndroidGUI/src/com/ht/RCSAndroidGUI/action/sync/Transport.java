@@ -8,12 +8,7 @@
  * *******************************************/
 package com.ht.RCSAndroidGUI.action.sync;
 
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-
 import com.ht.RCSAndroidGUI.Debug;
-import com.ht.RCSAndroidGUI.RCSAndroidGUI;
 
 /**
  * The Class Transport.
@@ -29,14 +24,15 @@ public abstract class Transport {
 
 	/** The baseurl. */
 	protected String baseurl;
-	
+
 	/** The suffix. */
 	protected String suffix;
 
 	/**
 	 * Instantiates a new transport.
-	 *
-	 * @param baseurl the baseurl
+	 * 
+	 * @param baseurl
+	 *            the baseurl
 	 */
 	public Transport(final String baseurl) {
 		// this.host = host;
@@ -44,33 +40,38 @@ public abstract class Transport {
 		this.baseurl = baseurl;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
+	@Override
 	public String toString() {
 		return "Transport " + getUrl();
 	}
 
 	/**
 	 * Checks if is available.
-	 *
+	 * 
 	 * @return true, if is available
 	 */
 	public abstract boolean isAvailable();
 
 	/**
 	 * Command.
-	 *
-	 * @param data the data
+	 * 
+	 * @param data
+	 *            the data
 	 * @return the byte[]
-	 * @throws TransportException the transport exception
+	 * @throws TransportException
+	 *             the transport exception
 	 */
 	public abstract byte[] command(byte[] data) throws TransportException;
 
 	// public abstract void initConnectionUrl();
 	/**
 	 * Gets the suffix.
-	 *
+	 * 
 	 * @return the suffix
 	 */
 	protected abstract String getSuffix();
@@ -82,12 +83,11 @@ public abstract class Transport {
 
 	/**
 	 * Gets the url.
-	 *
+	 * 
 	 * @return the url
 	 */
 	public String getUrl() {
 		return baseurl;
 	}
-
 
 }

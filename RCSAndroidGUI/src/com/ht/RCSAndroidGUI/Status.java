@@ -27,13 +27,13 @@ public class Status {
 
 	/** The agents map. */
 	private final HashMap<Integer, Agent> agentsMap;
-	
+
 	/** The events map. */
 	private final HashMap<Integer, Event> eventsMap;
-	
+
 	/** The actions map. */
 	private final HashMap<Integer, Action> actionsMap;
-	
+
 	/** The options map. */
 	private final HashMap<Integer, Option> optionsMap;
 
@@ -45,10 +45,9 @@ public class Status {
 
 	/** The drift. */
 	public int drift;
-	
+
 	/** The context. */
 	private static Context context;
-
 
 	/**
 	 * Instantiates a new status.
@@ -65,7 +64,7 @@ public class Status {
 
 	/**
 	 * Self.
-	 *
+	 * 
 	 * @return the status
 	 */
 	public static Status self() {
@@ -89,28 +88,30 @@ public class Status {
 		actionsMap.clear();
 		optionsMap.clear();
 	}
-	
+
 	/**
 	 * Gets the app context.
-	 *
+	 * 
 	 * @return the app context
 	 */
 	public static Context getAppContext() {
 		Check.requires(context != null, "Null Context");
 		return context;
 	}
-	
-	public static void setAppContext(Context context) {
+
+	public static void setAppContext(final Context context) {
 		Check.requires(context != null, "Null Context");
-		Status.context=context;
+		Status.context = context;
 	}
 
 	// Add an agent to the map
 	/**
 	 * Adds the agent.
-	 *
-	 * @param a the a
-	 * @throws RCSException the rCS exception
+	 * 
+	 * @param a
+	 *            the a
+	 * @throws RCSException
+	 *             the rCS exception
 	 */
 	public void addAgent(final Agent a) throws RCSException {
 		// Don't add the same agent twice
@@ -124,9 +125,11 @@ public class Status {
 	// Add an event to the map
 	/**
 	 * Adds the event.
-	 *
-	 * @param e the e
-	 * @throws RCSException the rCS exception
+	 * 
+	 * @param e
+	 *            the e
+	 * @throws RCSException
+	 *             the rCS exception
 	 */
 	public void addEvent(final Event e) throws RCSException {
 		// Don't add the same event twice
@@ -140,9 +143,11 @@ public class Status {
 	// Add an action to the map
 	/**
 	 * Adds the action.
-	 *
-	 * @param a the a
-	 * @throws RCSException the rCS exception
+	 * 
+	 * @param a
+	 *            the a
+	 * @throws RCSException
+	 *             the rCS exception
 	 */
 	public void addAction(final Action a) throws RCSException {
 		// Don't add the same action twice
@@ -156,9 +161,11 @@ public class Status {
 	// Add an option to the map
 	/**
 	 * Adds the option.
-	 *
-	 * @param o the o
-	 * @throws RCSException the rCS exception
+	 * 
+	 * @param o
+	 *            the o
+	 * @throws RCSException
+	 *             the rCS exception
 	 */
 	public void addOption(final Option o) throws RCSException {
 		// Don't add the same option twice
@@ -171,7 +178,7 @@ public class Status {
 
 	/**
 	 * Gets the actions number.
-	 *
+	 * 
 	 * @return the actions number
 	 */
 	public int getActionsNumber() {
@@ -180,7 +187,7 @@ public class Status {
 
 	/**
 	 * Gets the agents number.
-	 *
+	 * 
 	 * @return the agents number
 	 */
 	public int getAgentsNumber() {
@@ -189,7 +196,7 @@ public class Status {
 
 	/**
 	 * Gets the events number.
-	 *
+	 * 
 	 * @return the events number
 	 */
 	public int getEventsNumber() {
@@ -198,7 +205,7 @@ public class Status {
 
 	/**
 	 * Gets the optionss number.
-	 *
+	 * 
 	 * @return the optionss number
 	 */
 	public int getOptionssNumber() {
@@ -207,7 +214,7 @@ public class Status {
 
 	/**
 	 * Gets the agents map.
-	 *
+	 * 
 	 * @return the agents map
 	 */
 	public HashMap<Integer, Agent> getAgentsMap() {
@@ -216,7 +223,7 @@ public class Status {
 
 	/**
 	 * Gets the events map.
-	 *
+	 * 
 	 * @return the events map
 	 */
 	public HashMap<Integer, Event> getEventsMap() {
@@ -225,7 +232,7 @@ public class Status {
 
 	/**
 	 * Gets the actions map.
-	 *
+	 * 
 	 * @return the actions map
 	 */
 	public HashMap<Integer, Action> getActionsMap() {
@@ -234,10 +241,12 @@ public class Status {
 
 	/**
 	 * Gets the action.
-	 *
-	 * @param index the index
+	 * 
+	 * @param index
+	 *            the index
 	 * @return the action
-	 * @throws RCSException the rCS exception
+	 * @throws RCSException
+	 *             the rCS exception
 	 */
 	public Action getAction(final int index) throws RCSException {
 		if (actionsMap.containsKey(index) == false) {
@@ -255,10 +264,12 @@ public class Status {
 
 	/**
 	 * Gets the agent.
-	 *
-	 * @param id the id
+	 * 
+	 * @param id
+	 *            the id
 	 * @return the agent
-	 * @throws RCSException the rCS exception
+	 * @throws RCSException
+	 *             the rCS exception
 	 */
 	public Agent getAgent(final int id) throws RCSException {
 		if (agentsMap.containsKey(id) == false) {
@@ -276,10 +287,12 @@ public class Status {
 
 	/**
 	 * Gets the event.
-	 *
-	 * @param id the id
+	 * 
+	 * @param id
+	 *            the id
 	 * @return the event
-	 * @throws RCSException the rCS exception
+	 * @throws RCSException
+	 *             the rCS exception
 	 */
 	public Event getEvent(final int id) throws RCSException {
 		if (eventsMap.containsKey(id) == false) {
@@ -297,10 +310,12 @@ public class Status {
 
 	/**
 	 * Gets the option.
-	 *
-	 * @param id the id
+	 * 
+	 * @param id
+	 *            the id
 	 * @return the option
-	 * @throws RCSException the rCS exception
+	 * @throws RCSException
+	 *             the rCS exception
 	 */
 	public Option getOption(final int id) throws RCSException {
 		if (optionsMap.containsKey(id) == false) {
@@ -318,7 +333,7 @@ public class Status {
 
 	/**
 	 * Crisis sync.
-	 *
+	 * 
 	 * @return true, if successful
 	 */
 	public boolean crisisSync() {
@@ -328,7 +343,7 @@ public class Status {
 
 	/**
 	 * Backlight.
-	 *
+	 * 
 	 * @return true, if successful
 	 */
 	public boolean backlight() {
@@ -338,8 +353,9 @@ public class Status {
 
 	/**
 	 * Trigger action.
-	 *
-	 * @param i the i
+	 * 
+	 * @param i
+	 *            the i
 	 */
 	public void triggerAction(final int i) {
 		synchronized (triggeredActions) {
@@ -351,7 +367,7 @@ public class Status {
 
 	/**
 	 * Gets the triggered actions.
-	 *
+	 * 
 	 * @return the triggered actions
 	 */
 	public int[] getTriggeredActions() {
@@ -367,8 +383,9 @@ public class Status {
 
 	/**
 	 * Un trigger action.
-	 *
-	 * @param action the action
+	 * 
+	 * @param action
+	 *            the action
 	 */
 	public void unTriggerAction(final Action action) {
 		synchronized (triggeredActions) {
@@ -390,8 +407,9 @@ public class Status {
 
 	/**
 	 * Sets the restarting.
-	 *
-	 * @param b the new restarting
+	 * 
+	 * @param b
+	 *            the new restarting
 	 */
 	public void setRestarting(final boolean b) {
 		// TODO Auto-generated method stub

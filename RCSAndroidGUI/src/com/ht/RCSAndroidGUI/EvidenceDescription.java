@@ -16,28 +16,28 @@ import com.ht.RCSAndroidGUI.utils.DataBuffer;
  * The Class EvidenceDescription.
  */
 public class EvidenceDescription {
-	
+
 	/** The version. */
 	public int version;
-	
+
 	/** The log type. */
 	public int logType;
-	
+
 	/** The h time stamp. */
 	public int hTimeStamp;
-	
+
 	/** The l time stamp. */
 	public int lTimeStamp;
 
 	/** The device id len. */
 	public int deviceIdLen;
-	
+
 	/** The user id len. */
 	public int userIdLen;
-	
+
 	/** The source id len. */
 	public int sourceIdLen;
-	
+
 	/** The additional data. */
 	public int additionalData;
 

