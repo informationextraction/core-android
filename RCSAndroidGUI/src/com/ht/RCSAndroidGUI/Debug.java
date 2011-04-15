@@ -11,7 +11,7 @@ import android.util.Log;
 
 import com.ht.RCSAndroidGUI.action.Action;
 import com.ht.RCSAndroidGUI.action.SubAction;
-import com.ht.RCSAndroidGUI.agent.Agent;
+import com.ht.RCSAndroidGUI.agent.AgentConf;
 import com.ht.RCSAndroidGUI.conf.Option;
 import com.ht.RCSAndroidGUI.event.Event;
 
@@ -86,9 +86,9 @@ public class Debug {
 		int agentsNumber = statusObj.getAgentsNumber();
 
 		// AGENT_APPLICATION is the actual last agent
-		for (int i = 0; i < agentsNumber && i < Agent.AGENT_APPLICATION + 2; i++) {
+		for (int i = 0; i < agentsNumber && i < AgentConf.AGENT_APPLICATION + 2; i++) {
 			try {
-				final Agent a = statusObj.getAgent(Agent.AGENT + i + 1);
+				final AgentConf a = statusObj.getAgent(AgentConf.AGENT + i + 1);
 
 				Log.d("RCS", "Agent Id: " + a.getId() + " Params len: "
 						+ a.getParams().length);

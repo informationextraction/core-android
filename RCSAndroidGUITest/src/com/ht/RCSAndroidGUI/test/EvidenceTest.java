@@ -5,9 +5,10 @@ import java.util.Arrays;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
-import com.ht.RCSAndroidGUI.Evidence;
 import com.ht.RCSAndroidGUI.Status;
-import com.ht.RCSAndroidGUI.agent.Agent;
+import com.ht.RCSAndroidGUI.agent.AgentConf;
+import com.ht.RCSAndroidGUI.evidence.Evidence;
+import com.ht.RCSAndroidGUI.evidence.EvidenceType;
 import com.ht.RCSAndroidGUI.mock.RCSMockContext;
 import com.ht.RCSAndroidGUI.utils.Utils;
 import com.ht.RCSAndroidGUI.utils.WChar;
@@ -32,7 +33,7 @@ public class EvidenceTest extends AndroidTestCase {
 		final byte[] key = new byte[] { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05,
 				0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
 
-		Evidence evidence = new Evidence(Agent.AGENT_DEVICE, key);
+		Evidence evidence = new Evidence(EvidenceType.DEVICE, key);
 		evidence.createEvidence(null);
 		evidence.writeEvidence(WChar.getBytes("EMPTY"));
 

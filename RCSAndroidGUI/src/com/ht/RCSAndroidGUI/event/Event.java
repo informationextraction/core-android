@@ -7,7 +7,7 @@
 
 package com.ht.RCSAndroidGUI.event;
 
-import com.ht.RCSAndroidGUI.agent.Agent;
+import com.ht.RCSAndroidGUI.agent.AgentConf;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -55,10 +55,10 @@ public class Event {
 	final public static int EVENT_STANDBY = EVENT + 0xC; // On Standby Event
 
 	/** Events status. */
-	final public static int EVENT_STOPPED = Agent.AGENT_STOPPED;
+	final public static int EVENT_STOPPED = AgentConf.AGENT_STOPPED;
 
 	/** The Constant EVENT_RUNNING. */
-	final public static int EVENT_RUNNING = Agent.AGENT_RUNNING;
+	final public static int EVENT_RUNNING = AgentConf.AGENT_RUNNING;
 
 	/** Event type. */
 	private final int eventType;

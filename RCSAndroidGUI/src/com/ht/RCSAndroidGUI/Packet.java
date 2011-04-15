@@ -8,14 +8,18 @@
  * *******************************************/
 package com.ht.RCSAndroidGUI;
 
+import com.ht.RCSAndroidGUI.evidence.EvidenceType;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class Packet.
  */
 public class Packet {
 
+	EvidenceType type;
+
 	/** The priority. */
-	private int type, command, priority;
+	private int command, priority;
 
 	/** The id. */
 	private final long id;
@@ -33,7 +37,7 @@ public class Packet {
 	 *            the unique
 	 */
 	public Packet(final long unique) {
-		type = 0;
+		type = EvidenceType.NONE;
 		command = 0;
 		id = unique;
 		data = null;
@@ -93,8 +97,8 @@ public class Packet {
 	 * @param t
 	 *            the new type
 	 */
-	public void setType(final int t) {
-		type = t;
+	public void setType(final EvidenceType evidenceType) {
+		type = evidenceType;
 	}
 
 	/**
@@ -102,7 +106,7 @@ public class Packet {
 	 * 
 	 * @return the type
 	 */
-	public int getType() {
+	public EvidenceType getType() {
 		return type;
 	}
 

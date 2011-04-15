@@ -42,13 +42,13 @@ public abstract class AgentBase extends ThreadBase implements Runnable {
 	 */
 	public synchronized void run() {
 		// Check.asserts(agentEnabled, string)
-		status = Agent.AGENT_RUNNING;
+		status = AgentConf.AGENT_RUNNING;
 
 		begin();
 		loop();
 		end();
 
-		status = Agent.AGENT_STOPPED;
+		status = AgentConf.AGENT_STOPPED;
 		Log.d("RCS", "AgentBase stopped");
 	}
 }

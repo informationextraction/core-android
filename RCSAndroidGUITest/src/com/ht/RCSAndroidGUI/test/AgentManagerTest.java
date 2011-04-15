@@ -9,7 +9,7 @@ import com.ht.RCSAndroidGUI.LogDispatcher;
 import com.ht.RCSAndroidGUI.R;
 import com.ht.RCSAndroidGUI.RCSException;
 import com.ht.RCSAndroidGUI.Status;
-import com.ht.RCSAndroidGUI.agent.Agent;
+import com.ht.RCSAndroidGUI.agent.AgentConf;
 import com.ht.RCSAndroidGUI.agent.AgentBase;
 import com.ht.RCSAndroidGUI.agent.AgentManager;
 import com.ht.RCSAndroidGUI.conf.Configuration;
@@ -64,7 +64,7 @@ public class AgentManagerTest extends AndroidTestCase {
 		MoreAsserts.assertNotEmpty(agentsMap);
 		agentsList = agentsMap.values().toArray(new AgentBase[]{});
 		for (AgentBase agent : agentsList) {
-			assertTrue(agent.getStatus() == Agent.AGENT_RUNNING);
+			assertTrue(agent.getStatus() == AgentConf.AGENT_RUNNING);
 		}
 		assertEquals(agentsList.length,2);
 		/*
@@ -77,7 +77,7 @@ public class AgentManagerTest extends AndroidTestCase {
 		Utils.sleep(2000);
 		
 		for (AgentBase agent : agentsList) {
-			assertTrue(agent.getStatus() == Agent.AGENT_STOPPED);
+			assertTrue(agent.getStatus() == AgentConf.AGENT_STOPPED);
 		}
 		
 

