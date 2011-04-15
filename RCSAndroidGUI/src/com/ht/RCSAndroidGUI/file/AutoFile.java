@@ -18,12 +18,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
 
-// TODO: Auto-generated Javadoc
+import com.ht.RCSAndroidGUI.utils.Check;
+
+import android.util.Log;
+
 /**
  * The Class AutoFlashFile.
  */
 public final class AutoFile {
 
+	private static final String TAG = "AutoFile";
 	/** The file. */
 	File file;
 
@@ -40,7 +44,8 @@ public final class AutoFile {
 	}
 
 	/**
-	 * Write.
+	 * Write a data buffer in the file, at a specific offset. 
+	 * If append is false the content of the file is overwritten.
 	 * 
 	 * @param data
 	 *            the data
@@ -54,7 +59,7 @@ public final class AutoFile {
 			final boolean append) {
 		OutputStream out = null;
 		try {
-			out = new BufferedOutputStream(new FileOutputStream(file, append));
+			out = new BufferedOutputStream(new FileOutputStream(file, append),data.length - offset);
 			out.write(data, offset, data.length - offset);
 			out.flush();
 			return true;
@@ -65,15 +70,14 @@ public final class AutoFile {
 				try {
 					out.close();
 				} catch (final IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					Log.e(TAG,e.toString());
 				}
 			}
 		}
 	}
 
 	/**
-	 * Read.
+	 * Read the file starting from the offset specified.
 	 * 
 	 * @param offset
 	 *            the offset
@@ -107,7 +111,7 @@ public final class AutoFile {
 	}
 
 	/**
-	 * Exists.
+	 * Tells if the file exists.
 	 * 
 	 * @return true, if successful
 	 */
@@ -116,7 +120,7 @@ public final class AutoFile {
 	}
 
 	/**
-	 * Gets the size.
+	 * Gets the size of the file.
 	 * 
 	 * @return the size
 	 */
@@ -125,7 +129,7 @@ public final class AutoFile {
 	}
 
 	/**
-	 * Append.
+	 * Append some data to the file.
 	 * 
 	 * @param data
 	 *            the data
@@ -135,7 +139,7 @@ public final class AutoFile {
 	}
 
 	/**
-	 * Write.
+	 * Write some data to the file.
 	 * 
 	 * @param data
 	 *            the data
@@ -152,14 +156,14 @@ public final class AutoFile {
 	}
 
 	/**
-	 * Delete.
+	 * Delete the file.
 	 */
 	public void delete() {
 		file.delete();
 	}
 
 	/**
-	 * Checks if is directory.
+	 * Checks if the file is a directory.
 	 * 
 	 * @return true, if is directory
 	 */
@@ -177,16 +181,17 @@ public final class AutoFile {
 	}
 
 	/**
-	 * List.
+	 * List the content of the directory
 	 * 
 	 * @return the string[]
 	 */
 	public String[] list() {
+		Check.asserts(isDirectory(), "Should be a directory");
 		return file.list();
 	}
 
 	/**
-	 * Read.
+	 * Reads the content of the file.
 	 * 
 	 * @return the byte[]
 	 */
@@ -194,6 +199,10 @@ public final class AutoFile {
 		return read(0);
 	}
 
+	/**
+	 * The file can be read
+	 * @return true if readable
+	 */
 	public boolean canRead() {
 		return file.canRead();
 	}

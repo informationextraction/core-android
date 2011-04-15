@@ -16,6 +16,8 @@ public abstract class Manager<T extends ThreadBase> {
 	
 	public Manager(){
 		status = Status.self();
+		running = new HashMap<Integer, T>();
+		threads = new HashMap<T, Thread>();
 	}
 	
 	public abstract boolean startAll();
