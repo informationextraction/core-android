@@ -18,7 +18,7 @@ public class DeviceTest extends AndroidTestCase {
 		super.setUp();
 		//RCSMockContext.setContext(getContext());
 		//Context context = new RCSMockContext();
-		Status.self().setAppContext(getContext());
+		Status.setAppContext(getContext());
 		device = Device.self();
 	}
 

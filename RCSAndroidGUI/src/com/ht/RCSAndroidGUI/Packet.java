@@ -94,7 +94,7 @@ public class Packet {
 	/**
 	 * Sets the type.
 	 * 
-	 * @param t
+	 * @param evidenceType
 	 *            the new type
 	 */
 	public void setType(final EvidenceType evidenceType) {

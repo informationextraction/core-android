@@ -13,14 +13,10 @@ import android.telephony.TelephonyManager;
 import com.ht.RCSAndroidGUI.utils.Check;
 import com.ht.RCSAndroidGUI.utils.Utils;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Device.
  */
 public class Device {
-
-	/** The android id. */
-	private String androidId;
 
 	/** The singleton. */
 	private volatile static Device singleton;

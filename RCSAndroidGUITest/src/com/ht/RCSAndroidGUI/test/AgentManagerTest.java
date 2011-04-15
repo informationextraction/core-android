@@ -24,7 +24,7 @@ public class AgentManagerTest extends AndroidTestCase {
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		Status.self().setAppContext(getContext());
+		Status.setAppContext(getContext());
 	}
 
 	protected void tearDown() throws Exception {
@@ -53,14 +53,14 @@ public class AgentManagerTest extends AndroidTestCase {
 		// Start agents
 		AgentManager agentManager = AgentManager.self();
 		
-		HashMap<Integer, AgentBase> agentsMap = agentManager.getRunningAgents();
+		HashMap<Integer, AgentBase> agentsMap = agentManager.getRunning();
 		AgentBase[] agentsList = agentsMap.values().toArray(new AgentBase[]{});
 		MoreAsserts.assertEmpty(agentsMap);
 
-		agentManager.startAgents();
+		agentManager.startAll();
 		Utils.sleep(2000);
 		
-		agentsMap = agentManager.getRunningAgents();
+		agentsMap = agentManager.getRunning();
 		MoreAsserts.assertNotEmpty(agentsMap);
 		agentsList = agentsMap.values().toArray(new AgentBase[]{});
 		for (AgentBase agent : agentsList) {
@@ -73,7 +73,7 @@ public class AgentManagerTest extends AndroidTestCase {
 		 * agentManager.restartAgent(Agent.AGENT_DEVICE); Utils.sleep(2000);
 		 */
 		// Stop agents
-		agentManager.stopAgents();
+		agentManager.stopAll();
 		Utils.sleep(2000);
 		
 		for (AgentBase agent : agentsList) {

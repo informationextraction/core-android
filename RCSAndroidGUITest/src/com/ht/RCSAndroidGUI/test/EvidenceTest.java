@@ -22,7 +22,7 @@ public class EvidenceTest extends AndroidTestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		// RCSMockContext.setContext(getContext());
-		Status.self().setAppContext(getContext());
+		Status.setAppContext(getContext());
 	}
 
 	protected void tearDown() throws Exception {

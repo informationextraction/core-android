@@ -207,8 +207,8 @@ public class LogDispatcher extends Thread implements Runnable {
 	/**
 	 * Send.
 	 * 
-	 * @param o
-	 *            the o
+	 * @param packet
+	 *            the packet
 	 * @return true, if successful
 	 */
 	public synchronized boolean send(final Packet packet) {

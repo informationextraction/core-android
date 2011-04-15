@@ -84,17 +84,17 @@ public class LogR {
 	/**
 	 * Instantiates a new log, creates the evidence with additional.
 	 * 
-	 * @param logType
+	 * @param evidenceType
 	 *            the log type
 	 * @param priority
 	 *            the priority
 	 * @param additional
 	 *            the additional
 	 */
-	public LogR(final EvidenceType evidence, final int priority, final byte[] additional) {
+	public LogR(final EvidenceType evidenceType, final int priority, final byte[] additional) {
 		unique = Utils.getUniqueId();
 		disp = LogDispatcher.self();
-		type = evidence;
+		type = evidenceType;
 
 		final Packet p = new Packet(unique);
 
@@ -110,18 +110,18 @@ public class LogR {
 	 * Instantiates a new log, creates atomically the evidence with additional
 	 * and data.
 	 * 
-	 * @param logType
+	 * @param evidenceType
 	 *            the log type
 	 * @param priority
 	 *            the priority
 	 * @param additional
 	 *            the additional
 	 */
-	public LogR(final EvidenceType evidence, final int priority, final byte[] additional,
+	public LogR(final EvidenceType evidenceType, final int priority, final byte[] additional,
 			final byte[] data) {
 		unique = Utils.getUniqueId();
 		disp = LogDispatcher.self();
-		type = evidence;
+		type = evidenceType;
 
 		final Packet p = new Packet(unique);
 

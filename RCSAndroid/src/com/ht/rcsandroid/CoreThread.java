@@ -5,10 +5,23 @@ import android.os.Handler;
 import android.os.Message;
 import android.widget.Toast;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class CoreThread.
+ */
 public class CoreThread extends Activity implements Runnable {
+	
+	/** The t. */
 	private Thread t;
+	
+	/** The b stop core. */
 	private boolean bStopCore = false;
 	
+	/**
+	 * Start.
+	 *
+	 * @return true, if successful
+	 */
 	public boolean Start() {
 		this.t = new Thread(this);
 		
@@ -16,12 +29,20 @@ public class CoreThread extends Activity implements Runnable {
 		return true;
 	}
 	
+	/**
+	 * Stop.
+	 *
+	 * @return true, if successful
+	 */
 	public boolean Stop() {
 		bStopCore = true;
 		return true;
 	}
 	
 	// Runnable
+	/* (non-Javadoc)
+	 * @see java.lang.Runnable#run()
+	 */
 	public void run() {
 		/*while(this.bStopCore == false) {
 			//try {
@@ -36,6 +57,7 @@ public class CoreThread extends Activity implements Runnable {
 		}*/
 	}
 	
+	/** The message handler. */
 	private Handler messageHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {  

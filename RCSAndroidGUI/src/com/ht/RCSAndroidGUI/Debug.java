@@ -13,7 +13,7 @@ import com.ht.RCSAndroidGUI.action.Action;
 import com.ht.RCSAndroidGUI.action.SubAction;
 import com.ht.RCSAndroidGUI.agent.AgentConf;
 import com.ht.RCSAndroidGUI.conf.Option;
-import com.ht.RCSAndroidGUI.event.Event;
+import com.ht.RCSAndroidGUI.event.EventConf;
 
 // TODO: Auto-generated Javadoc
 // Debugging class
@@ -111,7 +111,7 @@ public class Debug {
 
 		for (int i = 0; i < statusObj.getEventsNumber(); i++) {
 			try {
-				final Event e = statusObj.getEvent(i);
+				final EventConf e = statusObj.getEvent(i);
 
 				Log.d("RCS", "Event Id: " + e.getId() + " Event Type: "
 						+ e.getType() + " Params len: " + e.getParams().length);

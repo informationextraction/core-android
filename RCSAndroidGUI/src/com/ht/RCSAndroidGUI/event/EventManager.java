@@ -29,13 +29,6 @@ public class EventManager extends Manager {
 	/** The singleton. */
 	private volatile static EventManager singleton;
 
-	/** The status obj. */
-	private final Status statusObj;
-
-	/** The running. */
-	private final HashMap<Integer, EventBase> running;
-	private final HashMap<EventBase, Thread> threads;
-
 	/**
 	 * Self.
 	 * 
@@ -53,15 +46,6 @@ public class EventManager extends Manager {
 		return singleton;
 	}
 
-	/**
-	 * Instantiates a new event manager.
-	 */
-	private EventManager() {
-		statusObj = Status.self();
-
-		running = new HashMap<Integer, EventBase>();
-		threads = new HashMap<EventBase, Thread>();
-	}
 
 	/**
 	 * mapAgent() Add agent id defined by "key" into the running map. If the
@@ -75,56 +59,56 @@ public class EventManager extends Manager {
 		EventBase e = null;
 
 		if (running.containsKey(key) == true) {
-			return running.get(key);
+			return (EventBase) running.get(key);
 		}
 
 		switch (key) {
-		case Event.EVENT_TIMER:
+		case EventConf.EVENT_TIMER:
 			Log.i(TAG, "");
 			e = new TimerEvent();
 			break;
 
-		case Event.EVENT_SMS:
+		case EventConf.EVENT_SMS:
 			Log.i(TAG, "EVENT_SMS");
 			break;
 
-		case Event.EVENT_CALL:
+		case EventConf.EVENT_CALL:
 			Log.i(TAG, "EVENT_CALL");
 			break;
 
-		case Event.EVENT_CONNECTION:
+		case EventConf.EVENT_CONNECTION:
 			Log.i(TAG, "EVENT_CONNECTION");
 			break;
 
-		case Event.EVENT_PROCESS:
+		case EventConf.EVENT_PROCESS:
 			Log.i(TAG, "EVENT_PROCESS");
 			break;
 
-		case Event.EVENT_CELLID:
+		case EventConf.EVENT_CELLID:
 			Log.i(TAG, "EVENT_CELLID");
 			break;
 
-		case Event.EVENT_QUOTA:
+		case EventConf.EVENT_QUOTA:
 			Log.i(TAG, "EVENT_QUOTA");
 			break;
 
-		case Event.EVENT_SIM_CHANGE:
+		case EventConf.EVENT_SIM_CHANGE:
 			Log.i(TAG, "EVENT_SIM_CHANGE");
 			break;
 
-		case Event.EVENT_LOCATION:
+		case EventConf.EVENT_LOCATION:
 			Log.i(TAG, "EVENT_LOCATION");
 			break;
 
-		case Event.EVENT_AC:
+		case EventConf.EVENT_AC:
 			Log.i(TAG, "EVENT_AC");
 			break;
 
-		case Event.EVENT_BATTERY:
+		case EventConf.EVENT_BATTERY:
 			Log.i(TAG, "EVENT_BATTERY");
 			break;
 
-		case Event.EVENT_STANDBY:
+		case EventConf.EVENT_STANDBY:
 			Log.i(TAG, "EVENT_STANDBY");
 			break;
 
@@ -145,10 +129,10 @@ public class EventManager extends Manager {
 	 * 
 	 * @return true, if successful
 	 */
-	public boolean startEvents() {
-		HashMap<Integer, Event> events;
+	public boolean startAll() {
+		HashMap<Integer, EventConf> events;
 
-		events = statusObj.getEventsMap();
+		events = status.getEventsMap();
 
 		if (events == null) {
 			Log.d("RCS", "Events map null");
@@ -160,18 +144,18 @@ public class EventManager extends Manager {
 			return false;
 		}
 
-		final Iterator<Map.Entry<Integer, Event>> it = events.entrySet()
+		final Iterator<Map.Entry<Integer, EventConf>> it = events.entrySet()
 				.iterator();
 
 		while (it.hasNext()) {
-			final Map.Entry<Integer, Event> pairs = it.next();
+			final Map.Entry<Integer, EventConf> pairs = it.next();
 			final int key = pairs.getValue().getType();
 			final EventBase e = mapEvent(key);
 
 			if (e != null) {
 
 				e.parse(pairs.getValue());
-				if (e.getStatus() != Event.EVENT_RUNNING) {
+				if (e.getStatus() != EventConf.EVENT_RUNNING) {
 					final Thread t = new Thread(e);
 					t.start();
 					threads.put(e, t);
@@ -189,7 +173,7 @@ public class EventManager extends Manager {
 	/**
 	 * Stop events.
 	 */
-	public void stopEvents() {
+	public void stopAll() {
 		final Iterator<Map.Entry<Integer, EventBase>> it = running.entrySet()
 				.iterator();
 
@@ -199,10 +183,10 @@ public class EventManager extends Manager {
 
 			Log.d(TAG, "Stopping: " + event);
 
-			if (event.getStatus() == Event.EVENT_RUNNING) {
+			if (event.getStatus() == EventConf.EVENT_RUNNING) {
 				event.stopThread();
 				try {
-					final Thread t = threads.get(event);
+					final Thread t = (Thread) threads.get(event);
 					Check.asserts(t != null, "Null thread");
 
 					t.join();
@@ -218,5 +202,17 @@ public class EventManager extends Manager {
 			}
 
 		}
+	}
+
+	@Override
+	public void start(int key) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void stop(int key) {
+		// TODO Auto-generated method stub
+		
 	}
 }

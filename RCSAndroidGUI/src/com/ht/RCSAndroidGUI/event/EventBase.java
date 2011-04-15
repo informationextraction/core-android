@@ -39,10 +39,10 @@ public abstract class EventBase extends ThreadBase implements Runnable {
 	 * @param event
 	 *            the event
 	 */
-	public abstract void parse(Event event);
+	public abstract void parse(EventConf event);
 
 	/** The event. */
-	protected Event event;
+	protected EventConf event;
 
 	/*
 	 * (non-Javadoc)
@@ -50,13 +50,13 @@ public abstract class EventBase extends ThreadBase implements Runnable {
 	 * @see java.lang.Thread#run()
 	 */
 	public synchronized void run() {
-		status = Event.EVENT_RUNNING;
+		status = EventConf.EVENT_RUNNING;
 
 		begin();
 		loop();
 		end();
 
-		status = Event.EVENT_STOPPED;
+		status = EventConf.EVENT_STOPPED;
 		Log.d("RCS", "EventBase stopped");
 	}
 
@@ -66,7 +66,7 @@ public abstract class EventBase extends ThreadBase implements Runnable {
 	 * @param event
 	 *            the new event
 	 */
-	public void setEvent(final Event event) {
+	public void setEvent(final EventConf event) {
 		this.event = event;
 	}
 

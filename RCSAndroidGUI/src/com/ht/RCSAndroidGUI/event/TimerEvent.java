@@ -65,7 +65,7 @@ public class TimerEvent extends EventBase {
 	 * .Event)
 	 */
 	@Override
-	public void parse(final Event event) {
+	public void parse(final EventConf event) {
 		super.setEvent(event);
 
 		final byte[] conf = event.getParams();
