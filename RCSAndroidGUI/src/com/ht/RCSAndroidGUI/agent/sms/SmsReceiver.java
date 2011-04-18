@@ -15,7 +15,15 @@ import android.os.Bundle;
 import android.telephony.gsm.SmsMessage;
 import android.widget.Toast;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class SmsReceiver.
+ */
 public class SmsReceiver extends BroadcastReceiver {
+	
+	/* (non-Javadoc)
+	 * @see android.content.BroadcastReceiver#onReceive(android.content.Context, android.content.Intent)
+	 */
 	@Override
 	public void onReceive(final Context context, final Intent intent) {
 		// ---get the SMS message passed in---

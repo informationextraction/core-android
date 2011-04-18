@@ -9,6 +9,7 @@ package com.ht.RCSAndroidGUI.agent;
 
 import com.ht.RCSAndroidGUI.RunningConf;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class Agent.
  */
@@ -120,6 +121,7 @@ public class AgentConf implements RunningConf {
 	/** Parameters. */
 	private final byte[] agentParams;
 
+	/** The agent enabled. */
 	private final boolean agentEnabled;
 
 	/**
@@ -148,6 +150,11 @@ public class AgentConf implements RunningConf {
 		return this.agentId;
 	}
 
+	/**
+	 * Checks if is enabled.
+	 *
+	 * @return true, if is enabled
+	 */
 	public boolean isEnabled() {
 		return this.agentEnabled;
 	}

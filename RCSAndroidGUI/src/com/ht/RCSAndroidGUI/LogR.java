@@ -109,13 +109,11 @@ public class LogR {
 	/**
 	 * Instantiates a new log, creates atomically the evidence with additional
 	 * and data.
-	 * 
-	 * @param evidenceType
-	 *            the log type
-	 * @param priority
-	 *            the priority
-	 * @param additional
-	 *            the additional
+	 *
+	 * @param evidenceType the log type
+	 * @param priority the priority
+	 * @param additional the additional
+	 * @param data the data
 	 */
 	public LogR(final EvidenceType evidenceType, final int priority, final byte[] additional,
 			final byte[] data) {

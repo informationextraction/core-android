@@ -204,12 +204,18 @@ public class EventManager extends Manager {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see com.ht.RCSAndroidGUI.Manager#start(int)
+	 */
 	@Override
 	public void start(int key) {
 		// TODO Auto-generated method stub
 		
 	}
 
+	/* (non-Javadoc)
+	 * @see com.ht.RCSAndroidGUI.Manager#stop(int)
+	 */
 	@Override
 	public void stop(int key) {
 		// TODO Auto-generated method stub

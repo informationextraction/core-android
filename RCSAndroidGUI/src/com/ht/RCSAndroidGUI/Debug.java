@@ -22,6 +22,7 @@ import com.ht.RCSAndroidGUI.event.EventConf;
  */
 public class Debug {
 
+	/** The enabled. */
 	private static boolean enabled;
 	/** The name. */
 	private final String name;
@@ -223,6 +224,9 @@ public class Debug {
 		}
 	}
 
+	/**
+	 * Disable.
+	 */
 	public static void disable() {
 		enabled = false;
 	}

@@ -13,6 +13,7 @@ import java.io.UnsupportedEncodingException;
 
 import com.ht.RCSAndroidGUI.Debug;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class WChar.
  */

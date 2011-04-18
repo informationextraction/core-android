@@ -8,6 +8,9 @@
  * *******************************************/
 package com.ht.RCSAndroidGUI;
 
+/**
+ * The Interface RunningConf.
+ */
 public interface RunningConf {
 
 }

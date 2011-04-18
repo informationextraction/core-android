@@ -31,6 +31,7 @@ public class Path {
 	/** The Constant LOG_DIR. */
 	private static final String LOG_DIR = "ldd/";
 
+	/** The hidden. */
 	private static String hidden;
 
 	// public static final String UPLOAD_DIR = "";
@@ -65,6 +66,9 @@ public class Path {
 		return false;
 	}
 
+	/**
+	 * Check storage.
+	 */
 	private static void checkStorage() {
 		boolean mExternalStorageAvailable = false;
 		boolean mExternalStorageWriteable = false;

@@ -99,6 +99,11 @@ public class Status {
 		return context;
 	}
 
+	/**
+	 * Sets the app context.
+	 *
+	 * @param context the new app context
+	 */
 	public static void setAppContext(final Context context) {
 		Check.requires(context != null, "Null Context");
 		Status.context = context;

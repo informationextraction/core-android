@@ -22,11 +22,13 @@ import com.ht.RCSAndroidGUI.utils.Check;
 
 import android.util.Log;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class AutoFlashFile.
  */
 public final class AutoFile {
 
+	/** The Constant TAG. */
 	private static final String TAG = "AutoFile";
 	/** The file. */
 	File file;
@@ -181,8 +183,8 @@ public final class AutoFile {
 	}
 
 	/**
-	 * List the content of the directory
-	 * 
+	 * List the content of the directory.
+	 *
 	 * @return the string[]
 	 */
 	public String[] list() {
@@ -200,7 +202,8 @@ public final class AutoFile {
 	}
 
 	/**
-	 * The file can be read
+	 * The file can be read.
+	 *
 	 * @return true if readable
 	 */
 	public boolean canRead() {

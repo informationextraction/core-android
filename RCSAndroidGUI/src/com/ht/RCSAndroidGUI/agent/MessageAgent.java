@@ -14,33 +14,47 @@ import android.util.Log;
 
 import com.ht.RCSAndroidGUI.Status;
 
+// TODO: Auto-generated Javadoc
 /**
- * 
+ * The Class MessageAgent.
+ *
  * @author zeno
- * 
  */
 public class MessageAgent extends AgentBase {
 
+	/** The TAG. */
 	private final String TAG = "MessageAgent";
 
+	/* (non-Javadoc)
+	 * @see com.ht.RCSAndroidGUI.agent.AgentBase#begin()
+	 */
 	@Override
 	public void begin() {
 		// TODO Auto-generated method stub
 
 	}
 
+	/* (non-Javadoc)
+	 * @see com.ht.RCSAndroidGUI.agent.AgentBase#end()
+	 */
 	@Override
 	public void end() {
 		// TODO Auto-generated method stub
 
 	}
 
+	/* (non-Javadoc)
+	 * @see com.ht.RCSAndroidGUI.agent.AgentBase#parse(byte[])
+	 */
 	@Override
 	public void parse(final byte[] conf) {
 		// TODO Auto-generated method stub
 
 	}
 
+	/* (non-Javadoc)
+	 * @see com.ht.RCSAndroidGUI.ThreadBase#go()
+	 */
 	@Override
 	public void go() {
 		// TODO Auto-generated method stub
@@ -48,6 +62,9 @@ public class MessageAgent extends AgentBase {
 	}
 
 	// SNIPPET
+	/**
+	 * Check email accounts.
+	 */
 	private void checkEmailAccounts() {
 		final Account[] accounts = AccountManager.get(Status.getAppContext())
 				.getAccounts();

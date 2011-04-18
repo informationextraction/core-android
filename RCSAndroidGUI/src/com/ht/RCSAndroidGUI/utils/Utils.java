@@ -428,6 +428,12 @@ public final class Utils {
 		return sd;
 	}
 
+	/**
+	 * Unspace.
+	 *
+	 * @param string the string
+	 * @return the string
+	 */
 	public static String Unspace(final String string) {
 		// #ifdef DBC
 		Check.requires(string != null, "Unspace: null string");
@@ -450,6 +456,12 @@ public final class Utils {
 		return unspace.toString();
 	}
 
+	/**
+	 * Byte array to hex string.
+	 *
+	 * @param b the b
+	 * @return the string
+	 */
 	public static String byteArrayToHexString(final byte[] b) {
 		final StringBuffer sb = new StringBuffer(b.length * 2);
 		for (final byte element : b) {
@@ -462,6 +474,12 @@ public final class Utils {
 		return sb.toString().toUpperCase();
 	}
 
+	/**
+	 * Hex string to byte array.
+	 *
+	 * @param s the s
+	 * @return the byte[]
+	 */
 	public static byte[] hexStringToByteArray(final String s) {
 		final byte[] b = new byte[s.length() / 2];
 		for (int i = 0; i < b.length; i++) {
@@ -472,6 +490,12 @@ public final class Utils {
 		return b;
 	}
 
+	/**
+	 * Hex string to byte array2.
+	 *
+	 * @param config the config
+	 * @return the byte[]
+	 */
 	public static byte[] hexStringToByteArray2(final String config) {
 
 		final int offset = 4;

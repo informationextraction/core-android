@@ -151,6 +151,7 @@ public final class Evidence {
 	/** The device. */
 	Device device;
 
+	/** The type evidence id. */
 	EvidenceType typeEvidenceId;
 
 	/** The progressive. */
@@ -158,6 +159,8 @@ public final class Evidence {
 
 	/** The aes key. */
 	private byte[] aesKey;
+	
+	/** The enc data. */
 	private byte[] encData;
 
 	/**
@@ -173,9 +176,9 @@ public final class Evidence {
 
 	/**
 	 * Instantiates a new log.
-	 * 
-	 * @param aesKey
-	 *            the aes key
+	 *
+	 * @param typeEvidenceId the type evidence id
+	 * @param aesKey the aes key
 	 */
 	public Evidence(final EvidenceType typeEvidenceId, final byte[] aesKey) {
 		this();
@@ -609,6 +612,11 @@ public final class Evidence {
 		return writeEvidence(buffer);
 	}
 
+	/**
+	 * Gets the enc data.
+	 *
+	 * @return the enc data
+	 */
 	public byte[] getEncData() {
 		return encData;
 	}

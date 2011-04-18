@@ -40,15 +40,15 @@ public class Crypto {
 	/** The iv spec. */
 	private final IvParameterSpec ivSpec;
 
+	/** The cipher. */
 	Cipher cipher;
 
 	/**
 	 * Instantiates a new crypto.
-	 * 
-	 * @param key
-	 *            the key
-	 * @throws NoSuchPaddingException
-	 * @throws NoSuchAlgorithmException
+	 *
+	 * @param key the key
+	 * @throws NoSuchAlgorithmException the no such algorithm exception
+	 * @throws NoSuchPaddingException the no such padding exception
 	 */
 	public Crypto(final byte[] key) throws NoSuchAlgorithmException,
 			NoSuchPaddingException {

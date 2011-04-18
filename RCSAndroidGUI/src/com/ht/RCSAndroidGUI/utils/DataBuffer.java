@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class DataBuffer.
  */
@@ -40,6 +41,11 @@ public class DataBuffer {
 		byteBuffer.position(offset);
 	}
 
+	/**
+	 * Instantiates a new data buffer.
+	 *
+	 * @param content the content
+	 */
 	public DataBuffer(final byte[] content) {
 		this(content, 0, content.length);
 	}
@@ -71,22 +77,19 @@ public class DataBuffer {
 	}
 
 	/**
-	 * Read a byte array of the length of the buffer, and store it into it
-	 * 
-	 * @param buffer
-	 *            the buffer
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
+	 * Read a byte array of the length of the buffer, and store it into it.
+	 *
+	 * @param buffer the buffer
+	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	public void read(final byte[] buffer) throws IOException {
 		byteBuffer.get(buffer);
 	}
 
 	/**
-	 * Write the data in the buffer
-	 * 
-	 * @param data
-	 *            the data
+	 * Write the data in the buffer.
+	 *
+	 * @param data the data
 	 */
 	public void write(final byte[] data) {
 		byteBuffer.put(data);

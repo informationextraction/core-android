@@ -16,6 +16,7 @@ import com.ht.RCSAndroidGUI.Manager;
 import com.ht.RCSAndroidGUI.Status;
 import com.ht.RCSAndroidGUI.utils.Check;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class AgentManager.
  */

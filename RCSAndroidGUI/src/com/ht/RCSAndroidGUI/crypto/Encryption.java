@@ -24,6 +24,7 @@ import com.ht.RCSAndroidGUI.utils.Utils;
  */
 public class Encryption {
 
+	/** The Constant TAG. */
 	private static final String TAG = "Encryption";
 	// #ifdef DEBUG
 	/** The debug. */

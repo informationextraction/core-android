@@ -49,6 +49,7 @@ public class LogDispatcher extends Thread implements Runnable {
 	/** The no logs. */
 	final Condition noLogs = lock.newCondition();
 
+	/** The TAG. */
 	private final String TAG = "LogDispatcher";
 
 	/*
@@ -296,8 +297,8 @@ public class LogDispatcher extends Thread implements Runnable {
 	/**
 	 * Creates a simple log, copies the payload and closes it in one atomic
 	 * step.
-	 * 
-	 * @param p
+	 *
+	 * @param p the p
 	 */
 	private void atomicLog(final Packet p) {
 		Check.ensures(!evidences.containsKey(p.getId()),

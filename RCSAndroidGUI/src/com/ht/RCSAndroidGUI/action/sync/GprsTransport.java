@@ -50,6 +50,11 @@ public class GprsTransport extends HttpTransport {
 	}
 
 	// TODO: capire se ha senso sia con wifi che con direct
+	/**
+	 * Have internet.
+	 *
+	 * @return true, if successful
+	 */
 	private boolean haveInternet() {
 
 		final NetworkInfo info = ((ConnectivityManager) Status.getAppContext()

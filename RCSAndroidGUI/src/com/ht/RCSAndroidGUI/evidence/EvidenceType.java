@@ -9,13 +9,16 @@
 package com.ht.RCSAndroidGUI.evidence;
 
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class EvidenceType.
  */
 public enum EvidenceType {
 
+	/** The UNKNOWN. */
 	UNKNOWN (0xFFFF), // in caso di errore
-   NONE (0xFFFF), // in caso di errore
+   /** The NONE. */
+ NONE (0xFFFF), // in caso di errore
 
 	/** The Constant FILEOPEN. */
 	FILEOPEN(0x0000),
@@ -124,20 +127,33 @@ public enum EvidenceType {
 	/** The Constant FILESYSTEM. */
 	FILESYSTEM(0xEDA1);
 
+	/** The value. */
 	private int value;
 
 	/**
 	 * Instantiates a new evidence type.
+	 *
+	 * @param value the value
 	 */
 	private EvidenceType(int value) {
 		this.value = value;
 
 	}
 
+	/**
+	 * Value.
+	 *
+	 * @return the int
+	 */
 	public int value() {
 		return value;
 	}
 
+	/**
+	 * Gets the memo.
+	 *
+	 * @return the memo
+	 */
 	public String getMemo() {
 		return name().substring(0, 3);
 	}

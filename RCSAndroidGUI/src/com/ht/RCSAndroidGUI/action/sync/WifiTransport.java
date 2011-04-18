@@ -13,11 +13,13 @@ import android.net.wifi.WifiManager;
 
 import com.ht.RCSAndroidGUI.Status;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class WifiTransport.
  */
 public class WifiTransport extends HttpTransport {
 
+	/** The forced. */
 	private boolean forced;
 
 	/**

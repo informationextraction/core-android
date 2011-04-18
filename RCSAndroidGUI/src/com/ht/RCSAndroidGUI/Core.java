@@ -23,6 +23,7 @@ import com.ht.RCSAndroidGUI.file.Path;
 import com.ht.RCSAndroidGUI.utils.Check;
 import com.ht.RCSAndroidGUI.utils.Utils;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class CoreThread.
  */

