@@ -8,6 +8,8 @@
  * *******************************************/
 package com.ht.RCSAndroidGUI.action.sync;
 
+import android.util.Log;
+
 import com.ht.RCSAndroidGUI.Debug;
 
 // TODO: Auto-generated Javadoc
@@ -17,7 +19,7 @@ import com.ht.RCSAndroidGUI.Debug;
 public class TransportException extends Exception {
 
 	/** The debug. */
-	private static Debug debug = new Debug("TransportEx");
+	private static String TAG = "TransportEx";
 
 	/**
 	 * Instantiates a new transport exception.
@@ -26,8 +28,6 @@ public class TransportException extends Exception {
 	 *            the i
 	 */
 	public TransportException(final int i) {
-		// #ifdef DEBUG
-		debug.trace("TransportException: " + i);
-		// #endif
+		Log.d(TAG,"TransportException: " + i);
 	}
 }

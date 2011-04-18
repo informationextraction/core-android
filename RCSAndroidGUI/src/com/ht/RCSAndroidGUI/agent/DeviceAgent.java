@@ -101,11 +101,7 @@ public class DeviceAgent extends AgentBase {
 		readCpuUsage();
 
 		final StringBuffer sb = new StringBuffer();
-
-		// #ifdef DEBUG
 		sb.append("Debug\n");
-		// #endif
-
 		sb.append("-- SYSTEM --\r\n");
 		sb.append("Id: " + Device.self().getDeviceId() + "\n");
 		sb.append("cpuUsage: " + cpuUsage + "\n");

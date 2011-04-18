@@ -77,8 +77,6 @@ public abstract class EventBase extends ThreadBase implements Runnable {
 		final int actionId = event.getAction();
 		if (actionId != Action.ACTION_NULL) {
 			Log.d(TAG, "event: " + this + " triggering: " + actionId);
-			// #endif
-
 			Status.self().triggerAction(actionId);
 		}
 	}

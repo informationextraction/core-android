@@ -19,6 +19,8 @@ import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import android.util.Log;
+
 import com.ht.RCSAndroidGUI.Debug;
 
 // TODO: Auto-generated Javadoc
@@ -29,12 +31,8 @@ public abstract class HttpTransport extends Transport {
 
 	/** The Constant PORT. */
 	private static final int PORT = 80;
-
-	// #ifdef DEBUG
 	/** The debug. */
-	private static Debug debug = new Debug("HttpTransport");
-	// #endif
-
+	private static String TAG = "HttpTransport";
 	/** The host. */
 	String host;
 
@@ -151,7 +149,7 @@ public abstract class HttpTransport extends Transport {
 				return null;
 			}
 		} catch (final Exception ex) {
-			debug.error(ex);
+			Log.e(TAG,ex.toString());
 			throw new TransportException(1);
 		} finally {
 			if (in != null) {

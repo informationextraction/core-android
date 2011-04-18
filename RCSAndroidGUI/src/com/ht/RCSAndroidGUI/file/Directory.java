@@ -10,6 +10,8 @@ package com.ht.RCSAndroidGUI.file;
 
 import java.util.Enumeration;
 
+import android.util.Log;
+
 import com.ht.RCSAndroidGUI.Debug;
 import com.ht.RCSAndroidGUI.utils.Utils;
 
@@ -18,11 +20,8 @@ import com.ht.RCSAndroidGUI.utils.Utils;
  * The Class Directory.
  */
 public class Directory {
-	// #ifdef DEBUG
 	/** The debug. */
-	private static Debug debug = new Debug("Directory");
-	// #endif
-
+	private static String TAG = "Directory";
 	/** The hidden dir macro. */
 	public static String hiddenDirMacro = "$dir$";
 
@@ -37,17 +36,12 @@ public class Directory {
 		final int macro = filename.indexOf(hiddenDirMacro, 0);
 		String expandedFilter = filename;
 		if (macro == 0) {
-			// #ifdef DEBUG
-			debug.trace("expanding macro");
-			// #endif
+			Log.d(TAG,"expanding macro");
 			// final String first = filter.substring(0, macro);
 			final String end = filename.substring(macro
 					+ hiddenDirMacro.length(), filename.length());
 			expandedFilter = Utils.chomp(Path.hidden(), "/") + end; // Path.UPLOAD_DIR
-
-			// #ifdef DEBUG
-			debug.trace("expandedFilter: " + expandedFilter);
-			// #endif
+			Log.d(TAG,"expandedFilter: " + expandedFilter);
 		}
 		return expandedFilter;
 	}
@@ -64,11 +58,11 @@ public class Directory {
 
 		return null;
 		/*
-		 * //#ifdef DBC Check.requires(!filter.startsWith("file://"),
-		 * "find filter shouldn't start with file:// : " + filter); //#endif
+		 * //
+		 * "find filter shouldn't start with file:// : " + filter); //
 		 * 
-		 * if (filter.indexOf('*') >= 0) { //#ifdef DEBUG
-		 * debug.trace("asterisc"); //#endif
+		 * if (filter.indexOf('*') >= 0) { //
+		 * Log.d(TAG,"asterisc"); //
 		 * 
 		 * // filter String baseDir = filter.substring(0,
 		 * filter.lastIndexOf('/')); final String asterisc = filter
@@ -78,31 +72,31 @@ public class Directory {
 		 * 
 		 * File fconn = null; try { fconn = new File("file://" + baseDir);
 		 * 
-		 * if (!fconn.isDirectory() || !fconn.canRead()) { //#ifdef DEBUG
-		 * debug.error("not a dir or cannot read"); //#endif return new
+		 * if (!fconn.isDirectory() || !fconn.canRead()) { //
+		 * Log.e(TAG,"not a dir or cannot read"); //
 		 * EmptyEnumeration(); }
 		 * 
 		 * return fconn.list(asterisc, true);
 		 * 
-		 * } catch (final IOException ex) { //#ifdef DEBUG debug.error(ex);
-		 * //#endif } finally { try { if (fconn != null) fconn.close(); } catch
-		 * (IOException e) { } } } else { // single file //#ifdef DEBUG
-		 * debug.trace("single file"); //#endif FileConnection fconn = null; try
+		 * } catch (final IOException ex) { //
+		 * //
+		 * (IOException e) { } } } else { // single file //
+		 * Log.d(TAG,"single file"); //
 		 * { fconn = (FileConnection) Connector.open("file://" + filter,
 		 * Connector.READ);
 		 * 
 		 * if (!fconn.exists() || fconn.isDirectory() || !fconn.canRead()) {
-		 * //#ifdef DEBUG debug.error("not exists, a dir or cannot read");
-		 * //#endif return new EmptyEnumeration(); }
+		 * //
+		 * //
 		 * 
 		 * return new ObjectEnumerator(new Object[] { fconn });
 		 * 
-		 * } catch (final IOException ex) { //#ifdef DEBUG debug.error(ex);
-		 * //#endif fconn = null; } finally { try { //#ifdef DEBUG
-		 * debug.trace("closing"); //#endif if (fconn != null) fconn.close(); }
+		 * } catch (final IOException ex) { //
+		 * //
+		 * Log.d(TAG,"closing"); //
 		 * catch (Exception e) { } } }
 		 * 
-		 * //#ifdef DEBUG debug.trace("exiting"); //#endif return new
+		 * //
 		 * EmptyEnumeration();
 		 */
 	}

@@ -79,9 +79,7 @@ public class Device {
 	 */
 	public byte[] getVersion() {
 		final byte[] versionRet = Utils.intToByteArray(Version.VERSION);
-		// #ifdef DBC
 		Check.ensures(versionRet.length == 4, "Wrong version len");
-		// #endif
 		return versionRet;
 	}
 

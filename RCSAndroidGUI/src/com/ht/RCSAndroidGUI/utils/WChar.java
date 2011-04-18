@@ -11,6 +11,8 @@ package com.ht.RCSAndroidGUI.utils;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
+import android.util.Log;
+
 import com.ht.RCSAndroidGUI.Debug;
 
 // TODO: Auto-generated Javadoc
@@ -18,12 +20,8 @@ import com.ht.RCSAndroidGUI.Debug;
  * The Class WChar.
  */
 public final class WChar {
-	// #ifdef DEBUG
 	/** The debug. */
-	private static Debug debug = new Debug("WChar");
-
-	// #endif
-
+	private static String TAG = "WChar";
 	/**
 	 * Gets the bytes.
 	 * 
@@ -50,9 +48,7 @@ public final class WChar {
 		try {
 			encoded = string.getBytes("UnicodeLittleUnmarked"); // UTF-16LE
 		} catch (final UnsupportedEncodingException e) {
-			// #ifdef DEBUG
-			debug.error("UnsupportedEncodingException");
-			// #endif
+			Log.e(TAG,"UnsupportedEncodingException");
 		}
 
 		if (endzero) {
@@ -82,15 +78,9 @@ public final class WChar {
 		final byte[] pascalzeroencoded = new byte[len + 4];
 		System.arraycopy(Utils.intToByteArray(len), 0, pascalzeroencoded, 0, 4);
 		System.arraycopy(message, 0, pascalzeroencoded, 4, message.length);
-
-		// #ifdef DEBUG
-		debug.trace("pascalize " + Utils.byteArrayToHex(message) + " = "
+		Log.d(TAG,"pascalize " + Utils.byteArrayToHex(message) + " = "
 				+ Utils.byteArrayToHex(pascalzeroencoded));
-		// #endif
-
-		// #ifdef DBC
 		Check.ensures(pascalzeroencoded[len - 1] == 0, "pascalize not null");
-		// #endif
 		return pascalzeroencoded;
 	}
 
@@ -129,9 +119,7 @@ public final class WChar {
 					"UnicodeLittleUnmarked");
 
 		} catch (final UnsupportedEncodingException e) {
-			// #ifdef DEBUG
-			debug.error("UnsupportedEncodingException");
-			// #endif
+			Log.e(TAG,"UnsupportedEncodingException");
 		}
 
 		if (endzero) {

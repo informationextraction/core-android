@@ -24,11 +24,6 @@ public class TimerEvent extends EventBase {
 	/** The Constant SLEEP_TIME. */
 	private static final int SLEEP_TIME = 1000;
 
-	// #ifdef DEBUG
-	/** The debug. */
-	private static Debug debug = new Debug("TimerEvent");
-	// #endif
-
 	/** The Constant CONF_TIMER_SINGLE. */
 	final private static int CONF_TIMER_SINGLE = 0;
 
@@ -39,7 +34,7 @@ public class TimerEvent extends EventBase {
 	final private static int CONF_TIMER_DATE = 2;
 
 	/** The Constant TAG. */
-	private static final String TAG = Class.class.getName();
+	private static String TAG = "TimerEvent";
 
 	/** The type. */
 	private int type;
@@ -75,16 +70,9 @@ public class TimerEvent extends EventBase {
 			type = databuffer.readInt();
 			loDelay = databuffer.readInt();
 			hiDelay = databuffer.readInt();
-
-			// #ifdef DEBUG
-			debug.trace("type: " + type + " lo:" + loDelay + " hi:" + hiDelay);
-			// #endif
-
+			Log.d(TAG,"type: " + type + " lo:" + loDelay + " hi:" + hiDelay);
 		} catch (final IOException e) {
-			// #ifdef DEBUG
-			debug.error("params FAILED");
-			// #endif
-
+			Log.e(TAG,"params FAILED");
 		}
 
 	}
@@ -100,16 +88,12 @@ public class TimerEvent extends EventBase {
 
 		switch (type) {
 		case CONF_TIMER_SINGLE:
-			// #ifdef DEBUG
-			debug.info("TIMER_SINGLE delay: " + loDelay);
-			// #endif
+			Log.i(TAG,"TIMER_SINGLE delay: " + loDelay);
 			setDelay(loDelay);
 			setPeriod(NEVER);
 			break;
 		case CONF_TIMER_REPEAT:
-			// #ifdef DEBUG
-			debug.info("TIMER_REPEAT period: " + loDelay);
-			// #endif
+			Log.i(TAG,"TIMER_REPEAT period: " + loDelay);
 			// TODO: decidere se lasciarlo a 1000 o a loDelay
 			setDelay(1000);
 			setPeriod(loDelay);
@@ -117,17 +101,14 @@ public class TimerEvent extends EventBase {
 		case CONF_TIMER_DATE:
 			long tmpTime = hiDelay << 32;
 			tmpTime += loDelay;
-			// #ifdef DEBUG
 			final Date date = new Date(tmpTime);
-			debug.info("TIMER_DATE: " + date);
-			// #endif
-
+			Log.i(TAG,"TIMER_DATE: " + date);
 			setPeriod(NEVER);
 			setDelay(tmpTime - now);
 			break;
 		/*
-		 * case CONF_TIMER_DELTA: // #ifdef DEBUG debug.info("TIMER_DELTA"); //
-		 * #endif
+		 * case CONF_TIMER_DELTA:
+		 * 
 		 * 
 		 * long deltaTime = hiDelay << 32; deltaTime += loDelay;
 		 * 
@@ -141,19 +122,17 @@ public class TimerEvent extends EventBase {
 		 * 
 		 * setPeriod(NEVER); final long delay = timeInst + deltaTime - now; if
 		 * (delay > 0) { setDelay(timeInst + deltaTime - now); } else { //
-		 * #ifdef DEBUG debug.info("negative delta"); // #endif } // #ifdef
-		 * DEBUG date = new Date(timeInst + deltaTime - now);
-		 * debug.info("DELTA_DATE: " + date); // #endif
 		 * 
-		 * } catch (final IOException e) { // #ifdef ERROR debug.error(e); //
-		 * #endif }
+		 * DEBUG date = new Date(timeInst + deltaTime - now);
+		 * Log.i(TAG,"DELTA_DATE: " + date);
+		 * 
+		 * } catch (final IOException e) {
+		 * 
 		 * 
 		 * break;
 		 */
 		default:
-			// #ifdef DEBUG
-			debug.error("shouldn't be here");
-			// #endif
+			Log.e(TAG,"shouldn't be here");
 			break;
 		}
 	}

@@ -15,6 +15,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import android.util.Log;
+
 import com.ht.RCSAndroidGUI.Debug;
 
 // TODO: Auto-generated Javadoc
@@ -22,11 +24,8 @@ import com.ht.RCSAndroidGUI.Debug;
  * The Class DateTime.
  */
 public final class DateTime {
-	// #ifdef DEBUG
 	/** The debug. */
-	private static Debug debug = new Debug("DateTime");
-	// #endif
-
+	private static String TAG = "DateTime";
 	/** The Constant TICK. */
 	public static final long TICK = 1; // 100 nano secondi
 
@@ -98,15 +97,11 @@ public final class DateTime {
 	 * @return the date
 	 */
 	public Date getDate() {
-
-		// #ifdef DBC
 		final Date ldate = new Date((ticks - TICSK_FROM_1601_TO_1970)
 				/ MILLISEC);
 		Check.ensures(ldate.getTime() == date.getTime(), "Wrong getTime()");
 		Check.ensures((new DateTime(ldate)).getFiledate() == ticks,
 				"Wrong date");
-		// #endif
-
 		return date;
 	}
 
@@ -131,11 +126,7 @@ public final class DateTime {
 	 * @return the struct tm
 	 */
 	public synchronized byte[] getStructTm() {
-
-		// #ifdef DBC
 		Check.requires(date != null, "getStructTm date != null");
-		// #endif
-
 		final int tm_len = 9 * 4;
 		final ByteArrayOutputStream output = new ByteArrayOutputStream();
 		final DataOutputStream databuffer = new DataOutputStream(
@@ -250,15 +241,11 @@ public final class DateTime {
 			databuffer.writeShort(calendar.get(Calendar.MILLISECOND));
 
 			databuffer.flush();
-
-			// #ifdef DBC
 			Check.ensures(output.toByteArray().length == size,
 					"getStructSystemdate wrong size");
-			// #endif
-
 			return output.toByteArray();
 		} catch (final IOException e) {
-			debug.error(e);
+			Log.e(TAG,e.toString());
 		}
 		return null;
 	}

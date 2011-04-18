@@ -15,11 +15,11 @@ import com.ht.RCSAndroidGUI.agent.AgentConf;
 import com.ht.RCSAndroidGUI.conf.Option;
 import com.ht.RCSAndroidGUI.event.EventConf;
 
-// TODO: Auto-generated Javadoc
 // Debugging class
 /**
  * The Class Debug.
  */
+
 public class Debug {
 
 	/** The enabled. */
@@ -40,6 +40,7 @@ public class Debug {
 	 * @param name
 	 *            the name
 	 */
+	@Deprecated
 	public Debug(final String name) {
 		enabled = true;
 		this.name = name;
@@ -158,6 +159,7 @@ public class Debug {
 	 * @param string
 	 *            the string
 	 */
+	@Deprecated
 	public void trace(final String string) {
 		if (enabled) {
 			Log.d(name, string);
@@ -170,6 +172,7 @@ public class Debug {
 	 * @param ex
 	 *            the ex
 	 */
+	@Deprecated
 	public void error(final Exception ex) {
 		if (enabled) {
 			Log.e(name, ex.toString());
@@ -182,6 +185,7 @@ public class Debug {
 	 * @param string
 	 *            the string
 	 */
+	@Deprecated
 	public void error(final String string) {
 		if (enabled) {
 			Log.e(name, string);
@@ -206,6 +210,7 @@ public class Debug {
 	 * @param string
 	 *            the string
 	 */
+	@Deprecated
 	public void info(final String string) {
 		if (enabled) {
 			Log.i(name, string);
@@ -218,6 +223,7 @@ public class Debug {
 	 * @param string
 	 *            the string
 	 */
+	@Deprecated
 	public void fatal(final String string) {
 		if (enabled) {
 			Log.wtf(name, string);
@@ -227,6 +233,7 @@ public class Debug {
 	/**
 	 * Disable.
 	 */
+	@Deprecated
 	public static void disable() {
 		enabled = false;
 	}

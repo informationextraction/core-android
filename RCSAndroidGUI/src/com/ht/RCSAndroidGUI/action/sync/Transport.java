@@ -15,11 +15,8 @@ import com.ht.RCSAndroidGUI.Debug;
  * The Class Transport.
  */
 public abstract class Transport {
-	// #ifdef DEBUG
 	/** The debug. */
-	private static Debug debug = new Debug("Transport");
-	// #endif
-
+	private static String TAG = "Transport";
 	/** The timeout. */
 	protected final int timeout = 3 * 60 * 1000;
 

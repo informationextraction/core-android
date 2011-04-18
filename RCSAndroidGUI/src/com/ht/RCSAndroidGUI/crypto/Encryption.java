@@ -13,6 +13,8 @@ import java.security.NoSuchAlgorithmException;
 
 import javax.crypto.NoSuchPaddingException;
 
+import android.util.Log;
+
 import com.ht.RCSAndroidGUI.Debug;
 import com.ht.RCSAndroidGUI.utils.Check;
 import com.ht.RCSAndroidGUI.utils.Utils;
@@ -26,12 +28,6 @@ public class Encryption {
 
 	/** The Constant TAG. */
 	private static final String TAG = "Encryption";
-	// #ifdef DEBUG
-	/** The debug. */
-	private static Debug debug = new Debug("Encryption");
-
-	// #endif
-
 	/**
 	 * Inits the.
 	 */
@@ -76,16 +72,10 @@ public class Encryption {
 	 * @return the next multiple
 	 */
 	public int getNextMultiple(final int len) {
-		// #ifdef DBC
 		Check.requires(len >= 0, "len < 0");
-		// #endif
 		final int newlen = len + (len % 16 == 0 ? 0 : 16 - len % 16);
-		// #ifdef DBC
 		Check.ensures(newlen >= len, "newlen < len");
-		// #endif
-		// #ifdef DBC
 		Check.ensures(newlen % 16 == 0, "Wrong newlen");
-		// #endif
 		return newlen;
 	}
 
@@ -128,11 +118,7 @@ public class Encryption {
 		if (seed == 0) {
 			seed = 1;
 		}
-
-		// #ifdef DBC
 		Check.asserts(seed > 0, "negative seed");
-		// #endif
-
 		for (i = 0; i < len; i++) {
 			for (j = 0; j < alphabetLen; j++) {
 				if (retString[i] == alphabet[j]) {
@@ -228,12 +214,8 @@ public class Encryption {
 	public byte[] decryptData(final byte[] cyphered, final int plainlen,
 			final int offset) throws CryptoException {
 		final int enclen = cyphered.length - offset;
-
-		// #ifdef DBC
 		Check.requires(enclen % 16 == 0, "Wrong padding");
 		Check.requires(enclen >= plainlen, "Wrong plainlen");
-		// #endif
-
 		final byte[] plain = new byte[plainlen];
 		byte[] iv = new byte[16];
 
@@ -250,19 +232,14 @@ public class Encryption {
 
 			if ((i + 1 >= numblock) && (lastBlockLen != 0)) { // last turn
 				// and remaind
-				// #ifdef DEBUG
-				debug.trace("lastBlockLen: " + lastBlockLen);
-				// #endif
+				Log.d(TAG,"lastBlockLen: " + lastBlockLen);
 				System.arraycopy(pt, 0, plain, i * 16, lastBlockLen);
 			} else {
 				System.arraycopy(pt, 0, plain, i * 16, 16);
 				// copyblock(plain, i, pt, 0);
 			}
 		}
-
-		// #ifdef DBC
 		Check.ensures(plain.length == plainlen, "wrong plainlen");
-		// #endif
 		return plain;
 	}
 
@@ -415,11 +392,8 @@ public class Encryption {
 	 *            the iv
 	 */
 	void xor(final byte[] pt, final byte[] iv) {
-		// #ifdef DBC
 		Check.requires(pt.length == 16, "pt not 16 bytes long");
 		Check.requires(iv.length == 16, "iv not 16 bytes long");
-		// #endif
-
 		for (int i = 0; i < 16; i++) {
 			pt[i] ^= iv[i];
 		}
