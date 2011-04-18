@@ -66,6 +66,7 @@ public abstract class Manager<T extends ThreadBase> {
 	 * @param key the key
 	 */
 	public abstract  void stop( int key) ;
+
 	
 	/**
 	 * Reload .

