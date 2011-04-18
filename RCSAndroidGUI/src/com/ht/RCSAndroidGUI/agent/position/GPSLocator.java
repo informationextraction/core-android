@@ -25,7 +25,7 @@ public class GPSLocator extends Thread {
 
 	public void run() {
 		Looper.prepare();
-		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0L, 0L,
+		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, period, 0L,
 				listener, Looper.getMainLooper());
 		Looper.loop();
 	}

@@ -55,7 +55,7 @@ public class EventManager extends Manager {
 	 *            : Agent ID
 	 * @return the requested agent or null in case of error
 	 */
-	private EventBase mapEvent(final int key) {
+	private EventBase factory(final int key) {
 		EventBase e = null;
 
 		if (running.containsKey(key) == true) {
@@ -149,7 +149,7 @@ public class EventManager extends Manager {
 		while (it.hasNext()) {
 			final Map.Entry<Integer, EventConf> pairs = it.next();
 			final int key = pairs.getValue().getType();
-			final EventBase e = mapEvent(key);
+			final EventBase e = factory(key);
 
 			if (e != null) {
 
