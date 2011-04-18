@@ -175,7 +175,7 @@ public class SmsAction extends SubAction {
 				text = sb.toString();
 				break;
 			default:
-				Log.e(TAG,"SmsAction.parse,  Unknown type: " + type);
+				Log.d(TAG,"Error: SmsAction.parse,  Unknown type: " + type);
 				break;
 			}
 

@@ -73,7 +73,7 @@ public class Directory {
 		 * File fconn = null; try { fconn = new File("file://" + baseDir);
 		 * 
 		 * if (!fconn.isDirectory() || !fconn.canRead()) { //
-		 * Log.e(TAG,"not a dir or cannot read"); //
+		 * Log.d(TAG,"Error: not a dir or cannot read"); //
 		 * EmptyEnumeration(); }
 		 * 
 		 * return fconn.list(asterisc, true);

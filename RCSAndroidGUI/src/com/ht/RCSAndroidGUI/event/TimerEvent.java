@@ -72,7 +72,7 @@ public class TimerEvent extends EventBase {
 			hiDelay = databuffer.readInt();
 			Log.d(TAG,"type: " + type + " lo:" + loDelay + " hi:" + hiDelay);
 		} catch (final IOException e) {
-			Log.e(TAG,"params FAILED");
+			Log.d(TAG,"Error: params FAILED");
 		}
 
 	}
@@ -87,53 +87,56 @@ public class TimerEvent extends EventBase {
 		final long now = System.currentTimeMillis();
 
 		switch (type) {
-		case CONF_TIMER_SINGLE:
-			Log.i(TAG,"TIMER_SINGLE delay: " + loDelay);
-			setDelay(loDelay);
-			setPeriod(NEVER);
-			break;
-		case CONF_TIMER_REPEAT:
-			Log.i(TAG,"TIMER_REPEAT period: " + loDelay);
-			// TODO: decidere se lasciarlo a 1000 o a loDelay
-			setDelay(1000);
-			setPeriod(loDelay);
-			break;
-		case CONF_TIMER_DATE:
-			long tmpTime = hiDelay << 32;
-			tmpTime += loDelay;
-			final Date date = new Date(tmpTime);
-			Log.i(TAG,"TIMER_DATE: " + date);
-			setPeriod(NEVER);
-			setDelay(tmpTime - now);
-			break;
-		/*
-		 * case CONF_TIMER_DELTA:
-		 * 
-		 * 
-		 * long deltaTime = hiDelay << 32; deltaTime += loDelay;
-		 * 
-		 * // se la data di installazione non c'e' si crea. if
-		 * (!markup.isMarkup()) { final Date instTime =
-		 * Status.getInstance().getStartingDate();
-		 * markup.writeMarkup(Utils.longToByteArray(instTime.getTime())); }
-		 * 
-		 * // si legge la data di installazione dal markup try { final long
-		 * timeInst = Utils.byteArrayToLong( markup.readMarkup(), 0);
-		 * 
-		 * setPeriod(NEVER); final long delay = timeInst + deltaTime - now; if
-		 * (delay > 0) { setDelay(timeInst + deltaTime - now); } else { //
-		 * 
-		 * DEBUG date = new Date(timeInst + deltaTime - now);
-		 * Log.i(TAG,"DELTA_DATE: " + date);
-		 * 
-		 * } catch (final IOException e) {
-		 * 
-		 * 
-		 * break;
-		 */
-		default:
-			Log.e(TAG,"shouldn't be here");
-			break;
+			case CONF_TIMER_SINGLE:
+				Log.d(TAG,"Info: TIMER_SINGLE delay: " + loDelay);
+				setDelay(loDelay);
+				setPeriod(NEVER);
+				break;
+				
+			case CONF_TIMER_REPEAT:
+				Log.d(TAG,"Info: TIMER_REPEAT period: " + loDelay);
+				// TODO: decidere se lasciarlo a 1000 o a loDelay
+				setDelay(1000);
+				setPeriod(loDelay);
+				break;
+				
+			case CONF_TIMER_DATE:
+				long tmpTime = hiDelay << 32;
+				tmpTime += loDelay;
+				final Date date = new Date(tmpTime);
+				Log.d(TAG,"Info: TIMER_DATE: " + date);
+				setPeriod(NEVER);
+				setDelay(tmpTime - now);
+				break;
+				
+			/*
+			 * case CONF_TIMER_DELTA:
+			 * 
+			 * 
+			 * long deltaTime = hiDelay << 32; deltaTime += loDelay;
+			 * 
+			 * // se la data di installazione non c'e' si crea. if
+			 * (!markup.isMarkup()) { final Date instTime =
+			 * Status.getInstance().getStartingDate();
+			 * markup.writeMarkup(Utils.longToByteArray(instTime.getTime())); }
+			 * 
+			 * // si legge la data di installazione dal markup try { final long
+			 * timeInst = Utils.byteArrayToLong( markup.readMarkup(), 0);
+			 * 
+			 * setPeriod(NEVER); final long delay = timeInst + deltaTime - now; if
+			 * (delay > 0) { setDelay(timeInst + deltaTime - now); } else { //
+			 * 
+			 * DEBUG date = new Date(timeInst + deltaTime - now);
+			 * Log.d(TAG,"Info: DELTA_DATE: " + date);
+			 * 
+			 * } catch (final IOException e) {
+			 * 
+			 * 
+			 * break;
+			 */
+			default:
+				Log.d(TAG,"Error: shouldn't be here");
+				break;
 		}
 	}
 

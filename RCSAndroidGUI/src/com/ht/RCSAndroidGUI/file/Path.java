@@ -51,7 +51,6 @@ public class Path {
 	 * @return true, if successful
 	 */
 	public static boolean makeDirs() {
-
 		try {
 			checkStorage();
 

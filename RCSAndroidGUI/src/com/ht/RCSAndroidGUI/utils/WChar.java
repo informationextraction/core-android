@@ -48,7 +48,7 @@ public final class WChar {
 		try {
 			encoded = string.getBytes("UnicodeLittleUnmarked"); // UTF-16LE
 		} catch (final UnsupportedEncodingException e) {
-			Log.e(TAG,"UnsupportedEncodingException");
+			Log.d(TAG,"Error: UnsupportedEncodingException");
 		}
 
 		if (endzero) {
@@ -119,7 +119,7 @@ public final class WChar {
 					"UnicodeLittleUnmarked");
 
 		} catch (final UnsupportedEncodingException e) {
-			Log.e(TAG,"UnsupportedEncodingException");
+			Log.d(TAG,"Error: UnsupportedEncodingException");
 		}
 
 		if (endzero) {

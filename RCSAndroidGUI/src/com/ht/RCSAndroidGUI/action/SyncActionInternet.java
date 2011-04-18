@@ -70,7 +70,7 @@ public class SyncActionInternet extends SyncAction {
 			host = WChar.getString(buffer, true);
 
 		} catch (final IOException e) {
-			Log.e(TAG,"params FAILED");
+			Log.d(TAG,"Error: params FAILED");
 			return false;
 		}
 		final StringBuffer sb = new StringBuffer();

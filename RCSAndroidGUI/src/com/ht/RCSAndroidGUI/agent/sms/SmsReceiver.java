@@ -19,6 +19,7 @@ import android.widget.Toast;
 /**
  * The Class SmsReceiver.
  */
+// SNIPPET
 public class SmsReceiver extends BroadcastReceiver {
 	
 	/* (non-Javadoc)

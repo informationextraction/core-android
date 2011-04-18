@@ -144,8 +144,7 @@ public class EventManager extends Manager {
 			return false;
 		}
 
-		final Iterator<Map.Entry<Integer, EventConf>> it = events.entrySet()
-				.iterator();
+		final Iterator<Map.Entry<Integer, EventConf>> it = events.entrySet().iterator();
 
 		while (it.hasNext()) {
 			final Map.Entry<Integer, EventConf> pairs = it.next();
@@ -174,8 +173,7 @@ public class EventManager extends Manager {
 	 * Stop events.
 	 */
 	public void stopAll() {
-		final Iterator<Map.Entry<Integer, EventBase>> it = running.entrySet()
-				.iterator();
+		final Iterator<Map.Entry<Integer, EventBase>> it = running.entrySet().iterator();
 
 		while (it.hasNext()) {
 			final Map.Entry<Integer, EventBase> pairs = it.next();

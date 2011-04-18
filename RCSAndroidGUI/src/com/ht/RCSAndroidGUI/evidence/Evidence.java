@@ -315,7 +315,7 @@ public final class Evidence {
 		final boolean ret = Path.createDirectory(dir);
 
 		if (!ret) {
-			Log.e(TAG,"Dir not created: " + dir);
+			Log.d(TAG,"Error: Dir not created: " + dir);
 			return false;
 		}
 
@@ -333,7 +333,7 @@ public final class Evidence {
 				Log.wtf(TAG,"It should not exist:" + fileName);
 				return false;
 			}
-			Log.i(TAG,"Created: " + fileName);
+			Log.d(TAG,"Info: Created: " + fileName);
 			final byte[] plainBuffer = makeDescription(additionalData,
 					evidenceType);
 			Check.asserts(plainBuffer.length >= 32 + additionalLen,
@@ -355,7 +355,7 @@ public final class Evidence {
 			Log.d(TAG,"additionalData.length: " + plainBuffer.length);
 			Log.d(TAG,"encBuffer.length: " + encBuffer.length);
 		} catch (final Exception ex) {
-			Log.e(TAG,"file: " + name.fileName + " ex:" + ex);
+			Log.d(TAG,"Error: file: " + name.fileName + " ex:" + ex);
 			return false;
 		}
 
@@ -492,17 +492,17 @@ public final class Evidence {
 		encData = encryption.encryptData(data, offset);
 
 		if (fconn == null) {
-			Log.e(TAG,"fconn null");
+			Log.d(TAG,"Error: fconn null");
 			return false;
 		}
-		Log.i(TAG,"writeEvidence encdata: " + encData.length);
-		Log.i(TAG,"fileSize: " + fconn.getSize());
+		Log.d(TAG,"Info: writeEvidence encdata: " + encData.length);
+		Log.d(TAG,"Info: fileSize: " + fconn.getSize());
 		try {
 			fconn.append(Utils.intToByteArray(data.length - offset));
 			fconn.append(encData);
 			fconn.flush();
 		} catch (final Exception e) {
-			Log.e(TAG,"Error writing file: " + e);
+			Log.d(TAG,"Error: Error writing file: " + e);
 			return false;
 		}
 

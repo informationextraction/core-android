@@ -30,7 +30,6 @@ public class WifiTransport extends HttpTransport {
 	 */
 	public WifiTransport(final String host) {
 		super(host);
-
 	}
 
 	/**
@@ -59,8 +58,7 @@ public class WifiTransport extends HttpTransport {
 
 		boolean available = wifi.isWifiEnabled();
 		if (!wifi.isWifiEnabled()) {
-			if (forced
-					&& wifi.getWifiState() != WifiManager.WIFI_STATE_ENABLING) {
+			if (forced && wifi.getWifiState() != WifiManager.WIFI_STATE_ENABLING) {
 				available = wifi.setWifiEnabled(true);
 			}
 		}

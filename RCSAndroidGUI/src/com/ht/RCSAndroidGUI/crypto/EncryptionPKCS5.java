@@ -102,7 +102,7 @@ public class EncryptionPKCS5 extends Encryption {
 		final int padlen = paddedplain[paddedplain.length - 1];
 
 		if (padlen <= 0 || padlen > 16) {
-			Log.e(TAG,"decryptData, wrong padlen: " + padlen);
+			Log.d(TAG,"Error: decryptData, wrong padlen: " + padlen);
 			throw new CryptoException();
 		}
 
@@ -162,7 +162,7 @@ public class EncryptionPKCS5 extends Encryption {
 			Log.d(TAG,"decryptDataIntegrity: sha corrected");
 			return plain;
 		} else {
-			Log.e(TAG,"decryptDataIntegrity: sha error!");
+			Log.d(TAG,"Error: decryptDataIntegrity: sha error!");
 			throw new CryptoException();
 		}
 	}
