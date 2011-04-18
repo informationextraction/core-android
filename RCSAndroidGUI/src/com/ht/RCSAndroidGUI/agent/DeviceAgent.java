@@ -60,7 +60,7 @@ public class DeviceAgent extends AgentBase {
 	 * Instantiates a new device agent.
 	 */
 	public DeviceAgent() {
-		Log.d("RCS", "DeviceAgent constructor");
+		Log.d(TAG, "DeviceAgent constructor");
 	}
 
 	/*
@@ -95,7 +95,7 @@ public class DeviceAgent extends AgentBase {
 	public void go() {
 
 		// OS Version etc...
-		Log.d("RCS", "Android");
+		Log.d(TAG, "Android");
 
 		final Runtime runtime = Runtime.getRuntime();
 		final Properties properties = System.getProperties();
