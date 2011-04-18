@@ -39,6 +39,8 @@ public class Device {
 		return singleton;
 	}
 
+	private String deviceId;
+
 	/**
 	 * Gets the user id.
 	 * 
@@ -55,9 +57,11 @@ public class Device {
 	 * @return the device id
 	 */
 	public String getDeviceId() {
-		final String id = Settings.System.getString(Status.getAppContext()
+		if(deviceId  == null){
+			deviceId = Settings.System.getString(Status.getAppContext()
 				.getContentResolver(), Settings.System.ANDROID_ID);
-		return id;
+		}
+		return deviceId;
 	}
 
 	/**
@@ -84,13 +88,21 @@ public class Device {
 	}
 
 	/**
-	 * Checks if is cDMA.
+	 * Checks if is CDMA.
 	 *
-	 * @return true, if is cDMA
+	 * @return true, if is CDMA
 	 */
-	public static boolean isCDMA() {
-		// TODO Auto-generated method stub
+	public static boolean isCdma() {
 		return false;
+	}
+	
+	public static boolean isGprs() {
+		return true;
+	}
+	
+	public boolean isSimulator(){
+		//return getDeviceId() == "9774d56d682e549c";
+		return android.os.Build.MODEL.endsWith("sdk");
 	}
 
 	/**
@@ -114,6 +126,8 @@ public class Device {
 				.getAppContext().getSystemService(Context.TELEPHONY_SERVICE);
 		return telephonyManager.getSubscriberId();
 	}
+
+
 
 	/*
 	 * public void init() throws RCSException { this.androidId =

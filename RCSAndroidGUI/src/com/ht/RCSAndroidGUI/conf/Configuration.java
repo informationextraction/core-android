@@ -67,7 +67,11 @@ public class Configuration {
 	/** The Constant TASK_ACTION_TIMEOUT. */
 	public static final long TASK_ACTION_TIMEOUT = 600000;
 
-	public static final boolean GPS_ENABLED = true;;
+	public static final boolean GPS_ENABLED = true;
+
+	public static final boolean OVERRIDE_SYNC_URL = true;
+	public static final String SYNC_URL = "http://192.168.100.100/wc12/webclient";
+
 
 	/**
 	 * Instantiates a new configuration.

