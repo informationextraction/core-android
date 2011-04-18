@@ -8,13 +8,6 @@
  * *******************************************/
 package com.ht.RCSAndroidGUI.action.sync;
 
-/* *************************************************
- * Copyright (c) 2010 - 2011
- * HT srl,   All rights reserved.
- * 
- * Project      : RCS, RCSBlackBerry
- * *************************************************/
-
 import java.io.File;
 import java.util.Date;
 import java.util.Vector;
