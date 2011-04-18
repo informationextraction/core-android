@@ -53,7 +53,7 @@ public class CryptoTest extends TestCase {
 	}
 
 	public final void testAes() throws Exception {
-		Log.i(TAG ,"-- RijndaelTest --");
+		Log.d(TAG ,"Info: -- RijndaelTest --");
 		// i valori seguenti sono stati presi dal paper che descriveva il
 		// rijandael per aes
 		final byte[] key = new byte[] { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05,
