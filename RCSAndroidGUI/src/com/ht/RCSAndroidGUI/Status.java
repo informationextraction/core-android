@@ -478,4 +478,22 @@ public class Status {
 			return (isCrisis() && (crisisType & CrisisAgent.SYNC) != 0);
 		}
 	}
+
+	/**
+	 * Start crisis.
+	 */
+	public void startCrisis() {
+		synchronized (lockCrisis) {
+			crisis = true;
+		}
+	}
+
+	/**
+	 * Stop crisis.
+	 */
+	public void stopCrisis() {
+		synchronized (lockCrisis) {
+			crisis = false;
+		}
+	}
 }
