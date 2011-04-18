@@ -129,9 +129,10 @@ public class Status {
 	 *             the rCS exception
 	 */
 	public void addAgent(final AgentConf a) throws RCSException {
-		// Don't add the same agent twice
+		
 		if (agentsMap.containsKey(a.getId()) == true) {
-			throw new RCSException("Agent " + a.getId() + " already loaded");
+			//throw new RCSException("Agent " + a.getId() + " already loaded");
+			Log.w(TAG, "Substituing agent: " + a);
 		}
 
 		agentsMap.put(a.getId(), a);
@@ -149,7 +150,8 @@ public class Status {
 	public void addEvent(final EventConf e) throws RCSException {
 		// Don't add the same event twice
 		if (eventsMap.containsKey(e.getId()) == true) {
-			throw new RCSException("Event " + e.getId() + " already loaded");
+			//throw new RCSException("Event " + e.getId() + " already loaded");
+			Log.w(TAG, "Substituing event: " + e);
 		}
 
 		eventsMap.put(e.getId(), e);
@@ -476,6 +478,24 @@ public class Status {
 	public boolean crisisSync() {
 		synchronized (lockCrisis) {
 			return (isCrisis() && (crisisType & CrisisAgent.SYNC) != 0);
+		}
+	}
+
+	/**
+	 * Start crisis.
+	 */
+	public void startCrisis() {
+		synchronized (lockCrisis) {
+			crisis = true;
+		}
+	}
+
+	/**
+	 * Stop crisis.
+	 */
+	public void stopCrisis() {
+		synchronized (lockCrisis) {
+			crisis = false;
 		}
 	}
 }

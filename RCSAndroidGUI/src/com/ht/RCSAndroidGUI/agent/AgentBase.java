@@ -51,4 +51,18 @@ public abstract class AgentBase extends ThreadBase implements Runnable {
 		status = AgentConf.AGENT_STOPPED;
 		Log.d("RCS", "AgentBase stopped");
 	}
+
+	boolean suspended;
+	public synchronized void suspend() {
+		suspended = true;
+		stopThread();
+	}
+
+	public synchronized void resume() {
+		suspended = false;
+	}
+
+	public synchronized boolean isSuspended() {
+		return suspended;
+	}
 }
