@@ -230,7 +230,7 @@ public class DeviceAgent extends AgentBase {
 																 */
 		final int max = apps.size();
 		for (int i = 0; i < max; i++) {
-			Log.i(TAG, apps.get(i).toString());
+			Log.d(TAG,"Info: " + apps.get(i).toString());
 		}
 		return apps;
 	}

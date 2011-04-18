@@ -176,7 +176,7 @@ public class Debug {
 	@Deprecated
 	public void error(final Exception ex) {
 		if (enabled) {
-			Log.e(name, ex.toString());
+			Log.d(name, "ERROR: " +ex.toString());
 		}
 	}
 
@@ -189,7 +189,7 @@ public class Debug {
 	@Deprecated
 	public void error(final String string) {
 		if (enabled) {
-			Log.e(name, string);
+			Log.d(name,"ERROR: " + string);
 		}
 	}
 
@@ -201,7 +201,7 @@ public class Debug {
 	 */
 	public void warn(final String string) {
 		if (enabled) {
-			Log.w(name, string);
+			Log.d(name, "WARN: " + string);
 		}
 	}
 
@@ -214,7 +214,7 @@ public class Debug {
 	@Deprecated
 	public void info(final String string) {
 		if (enabled) {
-			Log.i(name, string);
+			Log.d(name, "INFO: " + string);
 		}
 	}
 
@@ -227,7 +227,7 @@ public class Debug {
 	@Deprecated
 	public void fatal(final String string) {
 		if (enabled) {
-			Log.wtf(name, string);
+			Log.d(name, "FATAL: " + string);
 		}
 	}
 

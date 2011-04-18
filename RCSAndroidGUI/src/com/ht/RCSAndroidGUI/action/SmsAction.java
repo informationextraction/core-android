@@ -82,7 +82,7 @@ public class SmsAction extends SubAction {
 			}
 			return true;
 		} catch (final Exception ex) {
-			Log.e(TAG,ex.toString());
+			Log.d(TAG,"Error: " +ex.toString());
 			return false;
 		}
 	}

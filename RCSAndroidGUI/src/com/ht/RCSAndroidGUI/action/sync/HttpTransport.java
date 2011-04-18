@@ -147,7 +147,7 @@ public abstract class HttpTransport extends Transport {
 				return null;
 			}
 		} catch (final Exception ex) {
-			Log.e(TAG,ex.toString());
+			Log.d(TAG,"Error: " +ex.toString());
 			throw new TransportException(1);
 		} finally {
 			if (in != null) {

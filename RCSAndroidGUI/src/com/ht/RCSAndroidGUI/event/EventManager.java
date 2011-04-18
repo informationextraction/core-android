@@ -64,56 +64,56 @@ public class EventManager extends Manager {
 
 		switch (key) {
 		case EventConf.EVENT_TIMER:
-			Log.i(TAG, "");
+			Log.d(TAG,"Info: " + "");
 			e = new TimerEvent();
 			break;
 
 		case EventConf.EVENT_SMS:
-			Log.i(TAG, "EVENT_SMS");
+			Log.d(TAG,"Info: " + "EVENT_SMS");
 			break;
 
 		case EventConf.EVENT_CALL:
-			Log.i(TAG, "EVENT_CALL");
+			Log.d(TAG,"Info: " + "EVENT_CALL");
 			break;
 
 		case EventConf.EVENT_CONNECTION:
-			Log.i(TAG, "EVENT_CONNECTION");
+			Log.d(TAG,"Info: " + "EVENT_CONNECTION");
 			break;
 
 		case EventConf.EVENT_PROCESS:
-			Log.i(TAG, "EVENT_PROCESS");
+			Log.d(TAG,"Info: " + "EVENT_PROCESS");
 			break;
 
 		case EventConf.EVENT_CELLID:
-			Log.i(TAG, "EVENT_CELLID");
+			Log.d(TAG,"Info: " + "EVENT_CELLID");
 			break;
 
 		case EventConf.EVENT_QUOTA:
-			Log.i(TAG, "EVENT_QUOTA");
+			Log.d(TAG,"Info: " + "EVENT_QUOTA");
 			break;
 
 		case EventConf.EVENT_SIM_CHANGE:
-			Log.i(TAG, "EVENT_SIM_CHANGE");
+			Log.d(TAG,"Info: " + "EVENT_SIM_CHANGE");
 			break;
 
 		case EventConf.EVENT_LOCATION:
-			Log.i(TAG, "EVENT_LOCATION");
+			Log.d(TAG,"Info: " + "EVENT_LOCATION");
 			break;
 
 		case EventConf.EVENT_AC:
-			Log.i(TAG, "EVENT_AC");
+			Log.d(TAG,"Info: " + "EVENT_AC");
 			break;
 
 		case EventConf.EVENT_BATTERY:
-			Log.i(TAG, "EVENT_BATTERY");
+			Log.d(TAG,"Info: " + "EVENT_BATTERY");
 			break;
 
 		case EventConf.EVENT_STANDBY:
-			Log.i(TAG, "EVENT_STANDBY");
+			Log.d(TAG,"Info: " + "EVENT_STANDBY");
 			break;
 
 		default:
-			Log.e(TAG, "Unknown: " + key);
+			Log.d(TAG,"Error: " + "Unknown: " + key);
 			break;
 		}
 
@@ -160,7 +160,7 @@ public class EventManager extends Manager {
 					threads.put(e, t);
 
 				} else {
-					Log.w(TAG, "event already running");
+					Log.d(TAG,"Warn: " + "event already running");
 				}
 			}
 		}
@@ -192,7 +192,7 @@ public class EventManager extends Manager {
 
 				} catch (final InterruptedException e) {
 					e.printStackTrace();
-					Log.e(TAG, e.toString());
+					Log.d(TAG,"Error: " + e.toString());
 				}
 			} else {
 				Check.asserts(threads.get(event) == null,

@@ -248,7 +248,7 @@ public final class Utils {
 			final int value = databuffer.readInt();
 			return value;
 		} catch (final IOException ex) {
-			Log.e(TAG,ex.toString());
+			Log.d(TAG,"Error: " +ex.toString());
 		}
 
 		return 0;

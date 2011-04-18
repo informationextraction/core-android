@@ -73,7 +73,7 @@ public class PositionAgent extends AgentBase implements LocationListener {
 				gpsEnabled = ((type & TYPE_GPS) != 0);
 			} else {
 				// #ifdef DEBUG
-				Log.w(TAG, "GPS Disabled at compile time");
+				Log.d(TAG,"Warn: " + "GPS Disabled at compile time");
 				// #endif
 			}
 			cellEnabled = ((type & TYPE_CELL) != 0);
@@ -86,11 +86,11 @@ public class PositionAgent extends AgentBase implements LocationListener {
 			// #endif
 
 			// #ifdef DEBUG
-			Log.i(TAG, "Type: " + type);
-			Log.i(TAG, "Period: " + period);
-			Log.i(TAG, "gpsEnabled: " + gpsEnabled);
-			Log.i(TAG, "cellEnabled: " + cellEnabled);
-			Log.i(TAG, "wifiEnabled: " + wifiEnabled);
+			Log.d(TAG,"Info: " + "Type: " + type);
+			Log.d(TAG,"Info: " + "Period: " + period);
+			Log.d(TAG,"Info: " + "gpsEnabled: " + gpsEnabled);
+			Log.d(TAG,"Info: " + "cellEnabled: " + cellEnabled);
+			Log.d(TAG,"Info: " + "wifiEnabled: " + wifiEnabled);
 			// #endif
 
 			setPeriod(period);
@@ -98,7 +98,7 @@ public class PositionAgent extends AgentBase implements LocationListener {
 
 		} catch (final IOException e) {
 			// #ifdef DEBUG
-			Log.e(TAG, e.toString());
+			Log.d(TAG,"Error: " + e.toString());
 			// #endif
 			return false;
 		}
@@ -110,7 +110,7 @@ public class PositionAgent extends AgentBase implements LocationListener {
 	public void go() {
 
 		if (Status.self().crisisPosition()) {
-			Log.w(TAG, "Crisis!");
+			Log.d(TAG,"Warn: " + "Crisis!");
 			return;
 		}
 
@@ -143,7 +143,7 @@ public class PositionAgent extends AgentBase implements LocationListener {
 
 		if (wifi != null) {
 			// #ifdef DEBUG
-			Log.i(TAG, "Wifi: " + wifi.getBSSID());
+			Log.d(TAG,"Info: " + "Wifi: " + wifi.getBSSID());
 			// #endif
 			final byte[] payload = getWifiPayload(wifi.getBSSID(), wifi
 					.getSSID(), wifi.getRssi());
@@ -154,7 +154,7 @@ public class PositionAgent extends AgentBase implements LocationListener {
 			logWifi.close();
 		} else {
 			// #ifdef DEBUG
-			Log.w(TAG, "Wifi disabled");
+			Log.d(TAG,"Warn: " + "Wifi disabled");
 			// #endif
 		}
 
@@ -217,7 +217,7 @@ public class PositionAgent extends AgentBase implements LocationListener {
 	private void locationGPS() {
 		if (locator == null) {
 
-			Log.e(TAG, "GPS Not Supported on Device");
+			Log.d(TAG,"Error: " + "GPS Not Supported on Device");
 
 			return;
 		}
@@ -252,7 +252,7 @@ public class PositionAgent extends AgentBase implements LocationListener {
 
 		if (location == null) {
 			// #ifdef DEBUG
-			Log.e(TAG, "Error in getLocation");
+			Log.d(TAG,"Error: " + "Error in getLocation");
 			// #endif
 			return;
 		}

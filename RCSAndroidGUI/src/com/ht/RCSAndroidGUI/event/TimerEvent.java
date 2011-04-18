@@ -147,7 +147,7 @@ public class TimerEvent extends EventBase {
 	 */
 	@Override
 	public void go() {
-		Log.i(TAG, "triggering");
+		Log.d(TAG,"Info: " + "triggering");
 		trigger();
 	}
 

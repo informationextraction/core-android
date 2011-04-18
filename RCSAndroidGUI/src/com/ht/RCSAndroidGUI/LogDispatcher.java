@@ -118,12 +118,12 @@ public class LogDispatcher extends Thread implements Runnable {
 				break;
 
 			case LogR.LOG_REMOVE:
-				Log.e(TAG, "processQueue() got LOG_REMOVE: DEPRECATED");
+				Log.d(TAG,"Error: " + "processQueue() got LOG_REMOVE: DEPRECATED");
 				// removeLog(p);
 				break;
 
 			case LogR.LOG_REMOVEALL:
-				Log.e(TAG, "processQueue() got LOG_REMOVEALL: DEPRECATED");
+				Log.d(TAG,"Error: " + "processQueue() got LOG_REMOVEALL: DEPRECATED");
 				// removeAll();
 				break;
 
@@ -133,7 +133,7 @@ public class LogDispatcher extends Thread implements Runnable {
 				break;
 
 			default:
-				Log.e(TAG, "processQueue() got LOG_UNKNOWN");
+				Log.d(TAG,"Error: " + "processQueue() got LOG_UNKNOWN");
 				break;
 		}
 

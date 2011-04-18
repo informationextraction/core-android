@@ -91,7 +91,7 @@ public class ZProtocol extends Protocol {
 			uninstall = authentication();
 
 			if (uninstall) {
-				Log.w(TAG,"Uninstall detected, no need to continue");
+				Log.d(TAG,"Warn: " +"Uninstall detected, no need to continue");
 				return true;
 			}
 
@@ -108,13 +108,13 @@ public class ZProtocol extends Protocol {
 			return true;
 
 		} catch (final TransportException e) {
-			Log.e(TAG,e.toString());
+			Log.d(TAG,"Error: " +e.toString());
 			return false;
 		} catch (final ProtocolException e) {
-			Log.e(TAG,e.toString());
+			Log.d(TAG,"Error: " +e.toString());
 			return false;
 		} catch (final CommandException e) {
-			Log.e(TAG,e.toString());
+			Log.d(TAG,"Error: " +e.toString());
 			return false;
 		} finally {
 			transport.close();
@@ -491,7 +491,7 @@ public class ZProtocol extends Protocol {
 				}
 
 			} catch (final IOException e) {
-				Log.e(TAG,e.toString());
+				Log.d(TAG,"Error: " +e.toString());
 				throw new ProtocolException();
 			}
 		} else if (res == Proto.NO) {
@@ -565,7 +565,7 @@ public class ZProtocol extends Protocol {
 				}
 
 			} catch (final IOException e) {
-				Log.e(TAG,e.toString());
+				Log.d(TAG,"Error: " +e.toString());
 				throw new ProtocolException();
 			}
 		} else if (res == Proto.NO) {
@@ -607,7 +607,7 @@ public class ZProtocol extends Protocol {
 				return left > 0;
 
 			} catch (final IOException e) {
-				Log.e(TAG,e.toString());
+				Log.d(TAG,"Error: " +e.toString());
 				throw new ProtocolException();
 			}
 		} else if (res == Proto.NO) {
@@ -657,7 +657,7 @@ public class ZProtocol extends Protocol {
 				return left > 0;
 
 			} catch (final IOException e) {
-				Log.e(TAG,e.toString());
+				Log.d(TAG,"Error: " +e.toString());
 				throw new ProtocolException();
 			}
 		} else if (res == Proto.NO) {
@@ -756,12 +756,12 @@ public class ZProtocol extends Protocol {
 				if (ret) {
 					logCollector.remove(fullLogName);
 				} else {
-					Log.w(TAG,"error sending file, bailing out");
+					Log.d(TAG,"Warn: " +"error sending file, bailing out");
 					return;
 				}
 			}
 			if (!Path.removeDirectory(basePath + dir)) {
-				Log.w(TAG,"Not empty directory");
+				Log.d(TAG,"Warn: " +"Not empty directory");
 			}
 		}
 	}

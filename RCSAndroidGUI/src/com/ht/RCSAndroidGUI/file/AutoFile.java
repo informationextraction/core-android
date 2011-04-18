@@ -72,7 +72,7 @@ public final class AutoFile {
 				try {
 					out.close();
 				} catch (final IOException e) {
-					Log.e(TAG,e.toString());
+					Log.d(TAG,"Error: " +e.toString());
 				}
 			}
 		}

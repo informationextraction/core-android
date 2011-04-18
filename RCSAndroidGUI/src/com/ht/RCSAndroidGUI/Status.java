@@ -132,7 +132,7 @@ public class Status {
 		
 		if (agentsMap.containsKey(a.getId()) == true) {
 			//throw new RCSException("Agent " + a.getId() + " already loaded");
-			Log.w(TAG, "Substituing agent: " + a);
+			Log.d(TAG,"Warn: " + "Substituing agent: " + a);
 		}
 
 		agentsMap.put(a.getId(), a);
@@ -151,7 +151,7 @@ public class Status {
 		// Don't add the same event twice
 		if (eventsMap.containsKey(e.getId()) == true) {
 			//throw new RCSException("Event " + e.getId() + " already loaded");
-			Log.w(TAG, "Substituing event: " + e);
+			Log.d(TAG,"Warn: " + "Substituing event: " + e);
 		}
 
 		eventsMap.put(e.getId(), e);

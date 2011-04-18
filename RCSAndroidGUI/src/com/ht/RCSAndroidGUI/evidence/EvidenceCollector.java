@@ -155,7 +155,7 @@ public class EvidenceCollector {
 
 			fos.close();
 		} catch (final IOException e) {
-			Log.e(TAG,e.toString());
+			Log.d(TAG,"Error: " +e.toString());
 		}
 
 		return progessive;
@@ -178,7 +178,7 @@ public class EvidenceCollector {
 			fos.write(Utils.intToByteArray(logProgressive));
 			fos.close();
 		} catch (final IOException e) {
-			Log.e(TAG,e.toString());
+			Log.d(TAG,"Error: " +e.toString());
 		}
 		
 		Log.d(TAG,"Progressive: " + logProgressive);
@@ -260,7 +260,7 @@ public class EvidenceCollector {
 		if (file.exists()) {
 			file.delete();
 		} else {
-			Log.w(TAG,"File doesn't exists: " + logName);
+			Log.d(TAG,"Warn: " +"File doesn't exists: " + logName);
 		}
 	}
 

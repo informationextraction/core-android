@@ -172,7 +172,7 @@ public class Core extends Activity implements Runnable {
 		} catch (final Throwable ex) {
 			// catching trowable should break the debugger anc log the full
 			// stack trace
-			Log.wtf(TAG,"checkActions error, restart: " + ex);
+			Log.d(TAG,"FATAL: checkActions error, restart: " + ex);
 			return true;
 		}
 	}
@@ -417,7 +417,7 @@ public class Core extends Activity implements Runnable {
 				Log.d(TAG,"CheckActions() waited");
 				
 				if (subAction.wantUninstall()) {
-					Log.w(TAG,"CheckActions() uninstalling");
+					Log.d(TAG,"Warn: " +"CheckActions() uninstalling");
 					exit = 1;
 					break;
 					// return false;
@@ -425,7 +425,7 @@ public class Core extends Activity implements Runnable {
 
 				if (subAction.wantReload()) {
 					status.setRestarting(true);
-					Log.w(TAG,"checkActions: reloading");
+					Log.d(TAG,"Warn: " +"checkActions: reloading");
 					status.unTriggerAll();
 					Log.d(TAG,"checkActions: stopping agents");
 					agentManager.stopAll();
@@ -441,7 +441,7 @@ public class Core extends Activity implements Runnable {
 				}
 
 				if (ret == false) {
-					Log.w(TAG,"CheckActions() error executing: " + subAction);
+					Log.d(TAG,"Warn: " +"CheckActions() error executing: " + subAction);
 					continue;
 				}
 			} catch (final Exception ex) {
