@@ -22,6 +22,8 @@ import android.util.Log;
 
 public class AgentManagerTest extends AndroidTestCase {
 
+	private static final String TAG = "AgentManagerTest";
+
 	protected void setUp() throws Exception {
 		super.setUp();
 		Status.setAppContext(getContext());
@@ -85,6 +87,6 @@ public class AgentManagerTest extends AndroidTestCase {
 		logDispatcher.halt();
 		logDispatcher.join();
 
-		Log.d("RCS", "LogDispatcher Killed");
+		Log.d(TAG, "LogDispatcher Killed");
 	}
 }

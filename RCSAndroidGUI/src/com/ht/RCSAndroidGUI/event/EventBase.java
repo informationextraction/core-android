@@ -57,7 +57,7 @@ public abstract class EventBase extends ThreadBase implements Runnable {
 		end();
 
 		status = EventConf.EVENT_STOPPED;
-		Log.d("RCS", "EventBase stopped");
+		Log.d(TAG, "EventBase stopped");
 	}
 
 	/**

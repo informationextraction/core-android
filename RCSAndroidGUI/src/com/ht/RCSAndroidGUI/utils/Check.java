@@ -16,6 +16,8 @@ import android.util.Log;
  */
 public class Check {
 
+	private static final String TAG = "Check";
+
 	/**
 	 * Asserts.
 	 * 
@@ -26,7 +28,7 @@ public class Check {
 	 */
 	public static void asserts(final boolean b, final String string) {
 		if (b != true) {
-			Log.d("RCS", "Asserts - " + string);
+			Log.d(TAG, "Asserts - " + string);
 		}
 	}
 
@@ -40,7 +42,7 @@ public class Check {
 	 */
 	public static void requires(final boolean b, final String string) {
 		if (b != true) {
-			Log.d("RCS", "Requires - " + string);
+			Log.d(TAG, "Requires - " + string);
 		}
 	}
 
@@ -54,7 +56,7 @@ public class Check {
 	 */
 	public static void ensures(final boolean b, final String string) {
 		if (b != true) {
-			Log.d("RCS", "Ensures - " + string);
+			Log.d(TAG, "Ensures - " + string);
 		}
 	}
 }

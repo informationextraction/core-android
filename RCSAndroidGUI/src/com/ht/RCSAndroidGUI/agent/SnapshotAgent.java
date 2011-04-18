@@ -28,6 +28,8 @@ public class SnapshotAgent extends AgentBase {
 	/** The Constant CAPTURE_FOREGROUND. */
 	final private static int CAPTURE_FOREGROUND = 1;
 
+	private static final String TAG = "SnapshotAgent";
+
 	/** The delay. */
 	private int delay;
 
@@ -38,7 +40,7 @@ public class SnapshotAgent extends AgentBase {
 	 * Instantiates a new snapshot agent.
 	 */
 	public SnapshotAgent() {
-		Log.d("RCS", "SnapshotAgent constructor");
+		Log.d(TAG, "SnapshotAgent constructor");
 	}
 
 	/*
@@ -79,15 +81,15 @@ public class SnapshotAgent extends AgentBase {
 		switch (type) {
 		case CAPTURE_FULLSCREEN:
 
-			Log.d("RCS", "Snapshot Agent: logging full screen");
+			Log.d(TAG, "Snapshot Agent: logging full screen");
 			break;
 
 		case CAPTURE_FOREGROUND:
-			Log.d("RCS", "Snapshot Agent: logging foreground window");
+			Log.d(TAG, "Snapshot Agent: logging foreground window");
 			break;
 
 		default:
-			Log.d("RCS", "Snapshot Agent: wrong capture parameter");
+			Log.d(TAG, "Snapshot Agent: wrong capture parameter");
 			break;
 		}
 

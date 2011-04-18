@@ -46,7 +46,7 @@ public final class Utils {
 			bufferByteStream.close();
 		} catch (final IOException ioe) {
 			ioe.printStackTrace();
-			Log.d("RCS",
+			Log.d(TAG,
 					"IOException() caught in Utils.BufferToDataInputStream()");
 		}
 
@@ -125,7 +125,7 @@ public final class Utils {
 			return byteArrayOutputStream.toByteArray();
 		} catch (final IOException e) {
 			e.printStackTrace();
-			Log.d("RCS", "IOException() caught in Utils.RawResourceToBuffer()");
+			Log.d(TAG, "IOException() caught in Utils.RawResourceToBuffer()");
 			return null;
 		}
 	}
@@ -205,7 +205,7 @@ public final class Utils {
 		try {
 			Thread.sleep(t);
 		} catch (final InterruptedException e) {
-			Log.d("RCS", "sleep() throwed an exception");
+			Log.d(TAG, "sleep() throwed an exception");
 			e.printStackTrace();
 		}
 	}

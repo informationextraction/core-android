@@ -24,6 +24,8 @@ import android.widget.ToggleButton;
  */
 public class RCSAndroidGUI extends Activity {
 
+	protected static final String TAG = "RCSAndroidGUI";
+
 	/**
 	 * Called when the activity is first created.
 	 * 
@@ -46,28 +48,28 @@ public class RCSAndroidGUI extends Activity {
 								"com.ht.RCSAndroid"));
 
 						if (cn == null) {
-							Log.d("RCS", "RCS Service not started");
+							Log.d(TAG, "RCS Service not started");
 						} else {
-							Log.d("RCS", "RCS Service Name: "
+							Log.d(TAG, "RCS Service Name: "
 									+ cn.flattenToShortString());
 						}
 					} catch (final SecurityException se) {
-						Log.d("RCS",
+						Log.d(TAG,
 								"SecurityException caught on startService()");
 					}
 				} else {
 					try {
 						if (stopService(new Intent("com.ht.RCSAndroid")) == true) {
 							Log
-									.d("RCS",
+									.d(TAG,
 											"RCS Service com.ht.RCSAndroid/.RCSAndroid stopped");
 						} else {
 							Log
-									.d("RCS",
+									.d(TAG,
 											"RCS Service com.ht.RCSAndroid/.RCSAndroid doesn't exist");
 						}
 					} catch (final SecurityException se) {
-						Log.d("RCS",
+						Log.d(TAG,
 								"SecurityException caught on stopService()");
 					}
 				}

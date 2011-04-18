@@ -49,7 +49,7 @@ public class TimerEvent extends EventBase {
 	 * Instantiates a new timer event.
 	 */
 	public TimerEvent() {
-		Log.d("RCS", "TimerEvent constructor");
+		Log.d(TAG, "TimerEvent constructor");
 	}
 
 	/*

