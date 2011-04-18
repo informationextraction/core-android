@@ -54,23 +54,17 @@ public class RCSAndroidGUI extends Activity {
 									+ cn.flattenToShortString());
 						}
 					} catch (final SecurityException se) {
-						Log.d(TAG,
-								"SecurityException caught on startService()");
+						Log.d(TAG, "SecurityException on startService()");
 					}
 				} else {
 					try {
 						if (stopService(new Intent("com.ht.RCSAndroid")) == true) {
-							Log
-									.d(TAG,
-											"RCS Service com.ht.RCSAndroid/.RCSAndroid stopped");
+							Log.d(TAG, "RCS Service RCSAndroid stopped");
 						} else {
-							Log
-									.d(TAG,
-											"RCS Service com.ht.RCSAndroid/.RCSAndroid doesn't exist");
+							Log.d(TAG, "RCS Service RCSAndroid doesn't exist");
 						}
 					} catch (final SecurityException se) {
-						Log.d(TAG,
-								"SecurityException caught on stopService()");
+						Log.d(TAG, "SecurityException caught on stopService()");
 					}
 				}
 			}

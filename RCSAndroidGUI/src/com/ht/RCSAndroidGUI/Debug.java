@@ -53,7 +53,7 @@ public class Debug {
 	public static void StatusActions() {
 		final Status statusObj = Status.self();
 
-		Log.d(TAG, "DEBUG - Status Actions Begins");
+		Log.d(TAG, "-- Status Actions Begins --");
 
 		try {
 			for (int i = 0; i < statusObj.getActionsNumber(); i++) {
@@ -75,7 +75,7 @@ public class Debug {
 			Log.d(TAG, "RCSException detected in Debug.StatusActions()");
 		}
 
-		Log.d(TAG, "DEBUG - Status Actions Ends");
+		Log.d(TAG, "Status Actions Ends");
 	}
 
 	/**
@@ -84,7 +84,7 @@ public class Debug {
 	public static void StatusAgents() {
 		final Status statusObj = Status.self();
 
-		Log.d(TAG, "DEBUG - Status Agents Begins");
+		Log.d(TAG, "-- Status Agents Begins --");
 
 		int agentsNumber = statusObj.getAgentsNumber();
 
@@ -101,7 +101,7 @@ public class Debug {
 			}
 		}
 
-		Log.d(TAG, "DEBUG - Status Agents Ends");
+		Log.d(TAG, "Status Agents Ends");
 	}
 
 	/**
@@ -110,7 +110,7 @@ public class Debug {
 	public static void StatusEvents() {
 		final Status statusObj = Status.self();
 
-		Log.d(TAG, "DEBUG - Status Events Begins");
+		Log.d(TAG, "-- Status Events Begins --");
 
 		for (int i = 0; i < statusObj.getEventsNumber(); i++) {
 			try {
@@ -123,7 +123,7 @@ public class Debug {
 			}
 		}
 
-		Log.d(TAG, "DEBUG - Status Events Ends");
+		Log.d(TAG, "Status Events Ends");
 	}
 
 	/**
@@ -132,7 +132,7 @@ public class Debug {
 	public static void StatusOptions() {
 		final Status statusObj = Status.self();
 
-		Log.d(TAG, "DEBUG - Status Options Begins");
+		Log.d(TAG, "-- Status Options Begins --");
 
 		int optionsNumber = statusObj.getOptionssNumber();
 
@@ -151,7 +151,7 @@ public class Debug {
 			}
 		}
 
-		Log.d(TAG, "DEBUG - Status Options Ends");
+		Log.d(TAG, "-- Status Options Ends --");
 	}
 
 	/**
