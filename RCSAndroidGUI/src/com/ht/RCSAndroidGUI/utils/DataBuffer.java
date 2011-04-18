@@ -125,4 +125,18 @@ public class DataBuffer {
 		byteBuffer.putLong(value);
 	}
 
+	public void writeDouble(double value) {
+		byteBuffer.putDouble(value);
+		
+	}
+
+	public void writeFloat(float value) {
+		byteBuffer.putFloat(value);
+	}
+
+	public void writeByte(byte value) {
+		byteBuffer.put(value);
+	}
+
+
 }

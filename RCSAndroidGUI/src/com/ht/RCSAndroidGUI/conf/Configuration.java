@@ -65,7 +65,9 @@ public class Configuration {
 	private static final String FORCED_CONF = "3";
 
 	/** The Constant TASK_ACTION_TIMEOUT. */
-	public static final long TASK_ACTION_TIMEOUT = 600000;;
+	public static final long TASK_ACTION_TIMEOUT = 600000;
+
+	public static final boolean GPS_ENABLED = true;;
 
 	/**
 	 * Instantiates a new configuration.

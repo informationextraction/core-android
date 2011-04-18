@@ -46,9 +46,8 @@ public class CameraAgent extends AgentBase {
 	 * @see com.ht.RCSAndroidGUI.agent.AgentBase#parse(byte[])
 	 */
 	@Override
-	public void parse(final byte[] conf) {
-		// TODO Auto-generated method stub
-
+	public boolean parse(final byte[] conf) {
+		return false;
 	}
 
 	/* (non-Javadoc)

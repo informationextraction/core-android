@@ -468,14 +468,19 @@ public final class Utils {
 	 * @param s the s
 	 * @return the byte[]
 	 */
-	public static byte[] hexStringToByteArray(final String s) {
-		final byte[] b = new byte[s.length() / 2];
+	public static byte[] hexStringToByteArray(final String s, int offset,
+            int len) {
+		final byte[] b = new byte[len / 2];
 		for (int i = 0; i < b.length; i++) {
-			final int index = i * 2;
+			final int index = offset + i * 2;
 			final int v = Integer.parseInt(s.substring(index, index + 2), 16);
 			b[i] = (byte) v;
 		}
 		return b;
+	}
+	
+	public static byte[] hexStringToByteArray(final String string) {
+		return hexStringToByteArray(string, 0, string.length());
 	}
 
 	/**
@@ -507,5 +512,32 @@ public final class Utils {
 
 		return ret;
 	}
+
+    public static byte[] hexStringToByteArray2(final String wchar, int offset,
+            int len) {
+
+        final byte[] ret = new byte[len / 2];
+
+        for (int i = 0; i < ret.length; i++) {
+            final char first = wchar.charAt(offset + (i * 2));
+            final char second = wchar.charAt(offset + (i * 2 + 1));
+
+            //int value = NumberUtilities.hexDigitToInt(first) << 4;
+            //value += NumberUtilities.hexDigitToInt(second);
+            int value = Integer.parseInt(
+					new String(new byte[] { (byte) first }), 16) << 4;
+			value += second;
+
+            //#ifdef DBC
+            Check.asserts(value >= 0 && value < 256,
+                    "HexStringToByteArray: wrong value");
+            //#endif
+
+            ret[i] = (byte) value;
+        }
+
+        return ret;
+
+    }
 
 }

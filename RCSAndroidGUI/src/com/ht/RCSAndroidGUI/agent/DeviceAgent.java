@@ -69,10 +69,11 @@ public class DeviceAgent extends AgentBase {
 	 * @see com.ht.RCSAndroidGUI.agent.AgentBase#parse(byte[])
 	 */
 	@Override
-	public void parse(final byte[] conf) {
+	public boolean parse(final byte[] conf) {
 		myConf = Utils.BufferToByteBuffer(conf, ByteOrder.LITTLE_ENDIAN);
 
 		this.processList = myConf.getInt();
+		return true;
 	}
 
 	/*

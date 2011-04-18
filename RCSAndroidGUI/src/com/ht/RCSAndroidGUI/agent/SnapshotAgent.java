@@ -47,11 +47,13 @@ public class SnapshotAgent extends AgentBase {
 	 * @see com.ht.RCSAndroidGUI.agent.AgentBase#parse(byte[])
 	 */
 	@Override
-	public void parse(final byte[] conf) {
+	public boolean parse(final byte[] conf) {
 		myConf = Utils.BufferToByteBuffer(conf, ByteOrder.LITTLE_ENDIAN);
 
 		this.delay = myConf.getInt();
 		this.type = myConf.getInt();
+		
+		return true;
 	}
 
 	/*

