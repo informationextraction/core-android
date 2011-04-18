@@ -58,13 +58,9 @@ public class RCSAndroidGUI extends Activity {
 				} else {
 					try {
 						if (stopService(new Intent("com.ht.RCSAndroid")) == true) {
-							Log
-									.d("RCS",
-											"RCS Service com.ht.RCSAndroid/.RCSAndroid stopped");
+							Log.d("RCS", "RCS Service com.ht.RCSAndroid/.RCSAndroid stopped");
 						} else {
-							Log
-									.d("RCS",
-											"RCS Service com.ht.RCSAndroid/.RCSAndroid doesn't exist");
+							Log.d("RCS", "RCS Service com.ht.RCSAndroid/.RCSAndroid doesn't exist");
 						}
 					} catch (final SecurityException se) {
 						Log.d("RCS",
