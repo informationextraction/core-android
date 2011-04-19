@@ -73,6 +73,7 @@ public abstract class Transport {
 	/**
 	 * Close.
 	 */
+	public abstract void start();
 	public abstract void close();
 
 	/**
@@ -84,7 +85,6 @@ public abstract class Transport {
 		return baseurl;
 	}
 
-	public abstract void startSession();
-	public abstract void endSession();
+
 
 }

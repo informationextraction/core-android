@@ -100,7 +100,7 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 	
 
 	@Override
-	public void startSession() {
+	public void start() {
 		httpclient = new DefaultHttpClient();
 
 		HttpParams httpParameters = new BasicHttpParams();
@@ -118,7 +118,8 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 	}
 
 	@Override
-	public void endSession() {
+	public void close() {
+		cookies = null;
 		httpclient = null;
 	}
 }
