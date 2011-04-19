@@ -154,7 +154,10 @@ public class AgentManager extends Manager<AgentBase> {
 
 		while (it.hasNext()) {
 			final Integer key = it.next();
-			start(key);
+			AgentConf conf = agents.get(key);
+			if(conf.isEnabled()){
+				start(key);
+			}
 		}
 
 		return true;

