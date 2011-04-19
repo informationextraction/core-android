@@ -14,7 +14,6 @@ import java.util.Queue;
 import android.os.Message;
 import android.util.Log;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Command.
  */
