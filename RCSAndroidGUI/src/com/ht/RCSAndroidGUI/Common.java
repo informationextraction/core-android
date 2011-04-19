@@ -12,5 +12,4 @@ package com.ht.RCSAndroidGUI;
  * The Class Common.
  */
 public class Common {
-
 }
