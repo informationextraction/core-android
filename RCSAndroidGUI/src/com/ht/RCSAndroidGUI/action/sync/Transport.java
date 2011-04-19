@@ -70,17 +70,10 @@ public abstract class Transport {
 	 */
 	public abstract byte[] command(byte[] data) throws TransportException;
 
-	// public abstract void initConnectionUrl();
-	/**
-	 * Gets the suffix.
-	 * 
-	 * @return the suffix
-	 */
-	protected abstract String getSuffix();
-
 	/**
 	 * Close.
 	 */
+	public abstract void start();
 	public abstract void close();
 
 	/**
@@ -91,5 +84,7 @@ public abstract class Transport {
 	public String getUrl() {
 		return baseurl;
 	}
+
+
 
 }

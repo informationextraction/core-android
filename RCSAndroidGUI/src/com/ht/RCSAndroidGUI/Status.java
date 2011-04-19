@@ -412,17 +412,6 @@ public class Status {
 
 	}
 
-	/**
-	 * Sets the restarting.
-	 * 
-	 * @param b
-	 *            the new restarting
-	 */
-	public void setRestarting(final boolean b) {
-		// TODO Auto-generated method stub
-
-	}
-
 	public synchronized void setCrisis(int type) {
 
 		synchronized (lockCrisis) {
@@ -497,5 +486,10 @@ public class Status {
 		synchronized (lockCrisis) {
 			crisis = false;
 		}
+	}
+
+	public void setRestarting(boolean b) {
+		// TODO Auto-generated method stub
+		
 	}
 }
