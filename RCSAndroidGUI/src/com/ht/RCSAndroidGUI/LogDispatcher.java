@@ -301,6 +301,7 @@ public class LogDispatcher extends Thread implements Runnable {
 		final byte[] additional = p.getAdditional();
 		final byte[] data = p.peek();
 		final Evidence evidence = new Evidence(p.getType());
+		
 		evidence.createEvidence(additional);
 		evidence.writeEvidence(data);
 		evidence.close();
