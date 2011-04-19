@@ -7,10 +7,22 @@
 
 package com.ht.RCSAndroidGUI;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class RCSException.
+ */
 public class RCSException extends Exception {
+
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
 
-	public RCSException(String msg){
+	/**
+	 * Instantiates a new rCS exception.
+	 * 
+	 * @param msg
+	 *            the msg
+	 */
+	public RCSException(final String msg) {
 		super(msg);
 	}
 }

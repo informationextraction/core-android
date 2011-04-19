@@ -7,139 +7,235 @@
 
 package com.ht.RCSAndroidGUI;
 
-import com.ht.RCSAndroidGUI.action.Action;
-import com.ht.RCSAndroidGUI.action.SubAction;
-import com.ht.RCSAndroidGUI.agent.Agent;
-import com.ht.RCSAndroidGUI.conf.Option;
-import com.ht.RCSAndroidGUI.event.Event;
-
 import android.util.Log;
 
+import com.ht.RCSAndroidGUI.action.Action;
+import com.ht.RCSAndroidGUI.action.SubAction;
+import com.ht.RCSAndroidGUI.agent.AgentConf;
+import com.ht.RCSAndroidGUI.conf.Option;
+import com.ht.RCSAndroidGUI.event.EventConf;
+
 // Debugging class
+/**
+ * The Class Debug.
+ */
+
 public class Debug {
-	
-	private String name;
-	public Debug(){
-		this("RCS");
-	}
-	
-	public Debug(String name) {
-		this.name=name;
+
+	private static final String TAG = "Debug";
+	/** The enabled. */
+	private static boolean enabled;
+	/** The name. */
+	private final String name;
+
+	/**
+	 * Instantiates a new debug.
+	 */
+	public Debug() {
+		this(TAG);
 	}
 
+	/**
+	 * Instantiates a new debug.
+	 * 
+	 * @param name
+	 *            the name
+	 */
+	@Deprecated
+	public Debug(final String name) {
+		enabled = true;
+		this.name = name;
+	}
+
+	/**
+	 * Status actions.
+	 */
 	public static void StatusActions() {
-		Status statusObj = Status.self();
-		
-		Log.d("RCS", "DEBUG - Status Actions Begins");
-		
+		final Status statusObj = Status.self();
+
+		Log.d(TAG, "DEBUG - Status Actions Begins");
+
 		try {
 			for (int i = 0; i < statusObj.getActionsNumber(); i++) {
-				Action a = statusObj.getAction(i);
+				final Action a = statusObj.getAction(i);
 
-				Log.d("RCS", "Action Id: " + a.getId() + " sub num: " + a.getSubActionsNum());
+				Log.d(TAG, "Action Id: " + a.getId() + " sub num: "
+						+ a.getSubActionsNum());
 
 				for (int j = 0; j < a.getSubActionsNum(); j++) {
-					SubAction s = a.getSubAction(j);
+					final SubAction s = a.getSubAction(j);
 
-					Log.d("RCS", "  -> SubAction " + j + " Type: " + s.getSubActionType() + 
-							" Params len: " + s.getSubActionParams().length);
+					Log.d(TAG, "  -> SubAction " + j + " Type: "
+							+ s.getSubActionType() + " Params len: "
+							+ s.getSubActionParams().length);
 				}
 			}
-		} catch (RCSException rcse) {
+		} catch (final RCSException rcse) {
 			rcse.printStackTrace();
-			Log.d("RCS", "RCSException detected in Debug.StatusActions()");
+			Log.d(TAG, "RCSException detected in Debug.StatusActions()");
 		}
-		
-		Log.d("RCS", "DEBUG - Status Actions Ends");
-	}
-	
-	public static void StatusAgents() {
-		Status statusObj = Status.self();
 
-		Log.d("RCS", "DEBUG - Status Agents Begins");
-		
+		Log.d(TAG, "DEBUG - Status Actions Ends");
+	}
+
+	/**
+	 * Status agents.
+	 */
+	public static void StatusAgents() {
+		final Status statusObj = Status.self();
+
+		Log.d(TAG, "DEBUG - Status Agents Begins");
+
 		int agentsNumber = statusObj.getAgentsNumber();
-		
+
 		// AGENT_APPLICATION is the actual last agent
-		for (int i = 0; i < agentsNumber && i < Agent.AGENT_APPLICATION + 2; i++) {
+		for (int i = 0; i < agentsNumber && i < AgentConf.AGENT_APPLICATION + 2; i++) {
 			try {
-				Agent a = statusObj.getAgent(Agent.AGENT + i + 1);
-				
-				Log.d("RCS", "Agent Id: " + a.getId() + " Params len: " + a.getParams().length);
-			} catch (RCSException rcse) {
+				final AgentConf a = statusObj.getAgent(AgentConf.AGENT + i + 1);
+
+				Log.d(TAG, "Agent Id: " + a.getId() + " Params len: "
+						+ a.getParams().length);
+			} catch (final RCSException rcse) {
 				// No need to print that this agent doesn't exist
 				agentsNumber++;
 			}
 		}
 
-		Log.d("RCS", "DEBUG - Status Agents Ends");
+		Log.d(TAG, "DEBUG - Status Agents Ends");
 	}
-	
-	public static void StatusEvents() {
-		Status statusObj = Status.self();
 
-		Log.d("RCS", "DEBUG - Status Events Begins");
-		
+	/**
+	 * Status events.
+	 */
+	public static void StatusEvents() {
+		final Status statusObj = Status.self();
+
+		Log.d(TAG, "DEBUG - Status Events Begins");
+
 		for (int i = 0; i < statusObj.getEventsNumber(); i++) {
 			try {
-				Event e = statusObj.getEvent(i);
-				
-				Log.d("RCS", "Event Id: " + e.getId() + " Event Type: " + e.getType() + " Params len: " + e.getParams().length);
-			} catch (RCSException rcse) {
+				final EventConf e = statusObj.getEvent(i);
+
+				Log.d(TAG, "Event Id: " + e.getId() + " Event Type: "
+						+ e.getType() + " Params len: " + e.getParams().length);
+			} catch (final RCSException rcse) {
 				// No need to print that this agent doesn't exist
 			}
 		}
 
-		Log.d("RCS", "DEBUG - Status Events Ends");
+		Log.d(TAG, "DEBUG - Status Events Ends");
 	}
-	
-	public static void StatusOptions() {
-		Status statusObj = Status.self();
 
-		Log.d("RCS", "DEBUG - Status Options Begins");
-		
+	/**
+	 * Status options.
+	 */
+	public static void StatusOptions() {
+		final Status statusObj = Status.self();
+
+		Log.d(TAG, "DEBUG - Status Options Begins");
+
 		int optionsNumber = statusObj.getOptionssNumber();
-		
+
 		// CONFIGURATION_WIFIIP is the actual last option
-		for (int i = 0; i < optionsNumber && i < Option.CONFIGURATION_WIFIIP + 2; i++) {
+		for (int i = 0; i < optionsNumber
+				&& i < Option.CONFIGURATION_WIFIIP + 2; i++) {
 			try {
-				Option o = statusObj.getOption(Option.CONFIGURATION + i + 1);
-				
-				Log.d("RCS", "Option Id: " + o.getId() + " Option Type: " + " Params len: " + o.getParams().length);
-			} catch (RCSException rcse) {
+				final Option o = statusObj.getOption(Option.CONFIGURATION + i
+						+ 1);
+
+				Log.d(TAG, "Option Id: " + o.getId() + " Option Type: "
+						+ " Params len: " + o.getParams().length);
+			} catch (final RCSException rcse) {
 				// No need to print that this agent doesn't exist
 				optionsNumber++;
 			}
 		}
 
-		Log.d("RCS", "DEBUG - Status Options Ends");
+		Log.d(TAG, "DEBUG - Status Options Ends");
 	}
 
 	/**
-	 * Compatibilita' bb
+	 * Compatibilita' bb.
+	 * 
 	 * @param string
+	 *            the string
 	 */
-	public void trace(String string) {
-		Log.d(name,string);
+	@Deprecated
+	public void trace(final String string) {
+		if (enabled) {
+			Log.d(name, string);
+		}
 	}
 
-	public void error(Exception ex) {
-		Log.e(name,ex.toString());
+	/**
+	 * Error.
+	 * 
+	 * @param ex
+	 *            the ex
+	 */
+	@Deprecated
+	public void error(final Exception ex) {
+		if (enabled) {
+			Log.d(name, "ERROR: " +ex.toString());
+		}
 	}
 
-	public void error(String string) {
-		Log.e(name,string);
+	/**
+	 * Error.
+	 * 
+	 * @param string
+	 *            the string
+	 */
+	@Deprecated
+	public void error(final String string) {
+		if (enabled) {
+			Log.d(name,"ERROR: " + string);
+		}
 	}
 
-	public void warn(String string) {
-		Log.w(name,string);
+	/**
+	 * Warn.
+	 * 
+	 * @param string
+	 *            the string
+	 */
+	public void warn(final String string) {
+		if (enabled) {
+			Log.d(name, "WARN: " + string);
+		}
 	}
 
-	public void info(String string) {
-		Log.i(name,string);
+	/**
+	 * Info.
+	 * 
+	 * @param string
+	 *            the string
+	 */
+	@Deprecated
+	public void info(final String string) {
+		if (enabled) {
+			Log.d(name, "INFO: " + string);
+		}
 	}
 
-	public void fatal(String string) {
-		Log.wtf(name, string);
+	/**
+	 * Fatal.
+	 * 
+	 * @param string
+	 *            the string
+	 */
+	@Deprecated
+	public void fatal(final String string) {
+		if (enabled) {
+			Log.d(name, "FATAL: " + string);
+		}
+	}
+
+	/**
+	 * Disable.
+	 */
+	@Deprecated
+	public static void disable() {
+		enabled = false;
 	}
 }

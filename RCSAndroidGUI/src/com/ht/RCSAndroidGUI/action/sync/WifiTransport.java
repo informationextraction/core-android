@@ -1,22 +1,76 @@
+/* *******************************************
+ * Copyright (c) 2011
+ * HT srl,   All rights reserved.
+ * Project      : RCS, RCSAndroid
+ * File         : WifiTransport.java
+ * Created      : Apr 9, 2011
+ * Author		: zeno
+ * *******************************************/
 package com.ht.RCSAndroidGUI.action.sync;
 
+import android.content.Context;
+import android.net.wifi.WifiManager;
+
+import com.ht.RCSAndroidGUI.Status;
+
+// TODO: Auto-generated Javadoc
+/**
+ * The Class WifiTransport.
+ */
 public class WifiTransport extends HttpTransport {
 
-	public WifiTransport(String host) {
-		super(host);
+	/** The forced. */
+	private boolean forced;
 
+	/**
+	 * Instantiates a new wifi transport.
+	 * 
+	 * @param host
+	 *            the host
+	 */
+	public WifiTransport(final String host) {
+		super(host);
 	}
 
-	public WifiTransport(String host, boolean wifiForced) {
+	/**
+	 * Instantiates a new wifi transport.
+	 * 
+	 * @param host
+	 *            the host
+	 * @param wifiForced
+	 *            the wifi forced
+	 */
+	public WifiTransport(final String host, final boolean wifiForced) {
 		super(host);
+		this.forced = wifiForced;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.ht.RCSAndroidGUI.action.sync.Transport#isAvailable()
+	 */
 	@Override
 	public boolean isAvailable() {
-		// TODO
-		return true;
+		final String service = Context.WIFI_SERVICE;
+		final WifiManager wifi = (WifiManager) Status.getAppContext()
+				.getSystemService(service);
+
+		boolean available = wifi.isWifiEnabled();
+		if (!wifi.isWifiEnabled()) {
+			if (forced && wifi.getWifiState() != WifiManager.WIFI_STATE_ENABLING) {
+				available = wifi.setWifiEnabled(true);
+			}
+		}
+
+		return available;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.ht.RCSAndroidGUI.action.sync.Transport#getSuffix()
+	 */
 	@Override
 	protected String getSuffix() {
 		// TODO

