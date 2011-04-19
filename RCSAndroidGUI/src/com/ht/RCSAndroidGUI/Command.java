@@ -20,6 +20,7 @@ import android.util.Log;
 public class Command {
 
 	private static final String TAG = "Command";
+	
 	/** The msg queue. */
 	private final Queue<Message> msgQueue;
 
