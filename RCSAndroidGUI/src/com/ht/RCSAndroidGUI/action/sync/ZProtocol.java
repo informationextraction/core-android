@@ -141,6 +141,7 @@ public class ZProtocol extends Protocol {
 		Log.d(TAG,"Kd: " + Utils.byteArrayToHex(Kd));
 		Log.d(TAG,"Nonce: " + Utils.byteArrayToHex(Nonce));
 		final byte[] cypherOut = cryptoConf.encryptData(forgeAuthentication());
+		transport.startSession();
 		final byte[] response = transport.command(cypherOut);
 
 		return parseAuthentication(response);
@@ -306,6 +307,7 @@ public class ZProtocol extends Protocol {
 			CommandException {
 		Log.d(TAG,"Info: ***** END *****");
 		final byte[] response = command(Proto.BYE);
+		transport.endSession();
 		parseNewConf(response);
 
 	}
