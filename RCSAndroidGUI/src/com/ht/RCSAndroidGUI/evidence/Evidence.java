@@ -409,8 +409,7 @@ public final class Evidence {
 		final byte[] plainBuffer = new byte[encryption
 				.getNextMultiple(headerLen)];
 
-		final DataBuffer databuffer = new DataBuffer(plainBuffer, 0,
-				plainBuffer.length);
+		final DataBuffer databuffer = new DataBuffer(plainBuffer, 0, plainBuffer.length);
 		databuffer.write(baseHeader);
 		databuffer.write(WChar.getBytes(device.getDeviceId()));
 		databuffer.write(WChar.getBytes(device.getUserId()));

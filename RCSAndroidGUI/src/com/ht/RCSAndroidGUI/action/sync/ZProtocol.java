@@ -469,10 +469,11 @@ public class ZProtocol extends Protocol {
 		final boolean[] capabilities = new boolean[Proto.LASTTYPE];
 
 		final int res = Utils.byteArrayToInt(result, 0);
+		
 		if (res == Proto.OK) {
 			Log.d(TAG, "Info: got Identification");
-			final DataBuffer dataBuffer = new DataBuffer(result, 4,
-					result.length - 4);
+			final DataBuffer dataBuffer = new DataBuffer(result, 4, result.length - 4);
+			
 			try {
 				// la totSize e' discutibile
 				final int totSize = dataBuffer.readInt();

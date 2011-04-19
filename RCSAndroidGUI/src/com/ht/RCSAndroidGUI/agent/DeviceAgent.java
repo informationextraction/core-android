@@ -132,7 +132,7 @@ public class DeviceAgent extends AgentBase {
 
 		final String content = sb.toString();
 
-		final int ev = Evidence.convertTypeEvidence(AgentConf.AGENT_DEVICE);
+		// final int ev = Evidence.convertTypeEvidence(AgentConf.AGENT_DEVICE);
 
 		// atomic log
 		// LogR log = new LogR(EvidenceType.DEVICE, LogR.LOG_PRI_STD, null,

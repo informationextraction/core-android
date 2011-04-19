@@ -37,13 +37,11 @@ public class Action {
 	 * @param num
 	 *            : number of subactions
 	 * @throws RCSException
-	 *             the rCS exception
+	 *             the RCS exception
 	 */
 	public Action(final int id, final int num) throws RCSException {
 		if (id < 0 || num < 1) {
-			throw new RCSException(
-					"Invalid id or invalid number of sub actions for this action: "
-							+ num);
+			throw new RCSException("Invalid id or invalid number of sub actions for this action: " + num);
 		}
 
 		this.actionId = id;
@@ -78,10 +76,9 @@ public class Action {
 	 * @param params
 	 *            the params
 	 * @throws RCSException
-	 *             the rCS exception
+	 *             the RCS exception
 	 */
-	public void addSubAction(final int type, final byte[] params)
-			throws RCSException {
+	public void addSubAction(final int type, final byte[] params) throws RCSException {
 		if (this.subActionIndex >= this.subActionsNum) {
 			throw new RCSException("SubAction above Action array boundary");
 		}
@@ -103,8 +100,7 @@ public class Action {
 	 */
 	public SubAction getSubAction(final int index) throws RCSException {
 		if (index < 0 || index >= this.subActionIndex) {
-			throw new RCSException(
-					"Subaction index above SubAction array boundary");
+			throw new RCSException("Subaction index above SubAction array boundary");
 		}
 
 		return this.subArray[index];

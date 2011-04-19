@@ -45,4 +45,10 @@ public class UninstallAction extends SubAction {
 
 	}
 
+	@Override
+	protected boolean parse(byte[] params) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

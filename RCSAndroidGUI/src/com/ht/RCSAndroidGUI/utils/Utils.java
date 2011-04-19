@@ -46,8 +46,7 @@ public final class Utils {
 			bufferByteStream.close();
 		} catch (final IOException ioe) {
 			ioe.printStackTrace();
-			Log.d(TAG,
-					"IOException() caught in Utils.BufferToDataInputStream()");
+			Log.d(TAG, "IOException() caught in Utils.BufferToDataInputStream()");
 		}
 
 		return bufferDataStream;
@@ -62,8 +61,7 @@ public final class Utils {
 	 *            : ByteOrder, LITTLE_ENDIAN or BIG_ENDIAN
 	 * @return ByteBuffer.
 	 */
-	public static final ByteBuffer BufferToByteBuffer(final byte[] buffer,
-			final ByteOrder order) {
+	public static final ByteBuffer BufferToByteBuffer(final byte[] buffer, final ByteOrder order) {
 		final ByteBuffer retBuff = ByteBuffer.wrap(buffer);
 		retBuff.order(order);
 
@@ -83,8 +81,7 @@ public final class Utils {
 	 *            : Length at which the conversion will stop
 	 * @return ByteBuffer.
 	 */
-	static final ByteBuffer BufferToByteBuffer(final byte[] buffer,
-			final ByteOrder order, final int start, final int len) {
+	static final ByteBuffer BufferToByteBuffer(final byte[] buffer, final ByteOrder order, final int start, final int len) {
 		final ByteBuffer retBuff = ByteBuffer.wrap(buffer, start, len);
 		retBuff.order(order);
 
@@ -100,8 +97,7 @@ public final class Utils {
 	 *            : Used to discard _offset_ bytes from the resource
 	 * @return byte[], an array filled with data from InpustrStream.
 	 */
-	public static final byte[] InputStreamToBuffer(final InputStream iStream,
-			final int offset) {
+	public static final byte[] InputStreamToBuffer(final InputStream iStream, final int offset) {
 		try {
 			int i, count = 0;
 
@@ -145,8 +141,7 @@ public final class Utils {
 	 *            : number of bytes to compare
 	 * @return false when the buffers are different, true if they're the sam
 	 */
-	public static boolean equals(final byte[] bufferA, final int offsetA,
-			final byte[] bufferB, final int offsetB, final int len) {
+	public static boolean equals(final byte[] bufferA, final int offsetA, final byte[] bufferB, final int offsetB, final int len) {
 		if (len < 0) {
 			return false;
 		}
@@ -243,8 +238,7 @@ public final class Utils {
 	public static int byteArrayToInt(final byte[] buffer, final int offset) {
 		Check.requires(buffer.length >= offset + 4, "short buffer");
 		try {
-			final DataBuffer databuffer = new DataBuffer(buffer, offset,
-					buffer.length - offset);
+			final DataBuffer databuffer = new DataBuffer(buffer, offset, buffer.length - offset);
 			final int value = databuffer.readInt();
 			return value;
 		} catch (final IOException ex) {
@@ -359,8 +353,7 @@ public final class Utils {
 	 * @return the byte[]
 	 */
 	// COMPAT
-	public static byte[] copy(final byte[] payload, final int offset,
-			final int length) {
+	public static byte[] copy(final byte[] payload, final int offset, final int length) {
 
 		final byte[] buffer = new byte[length];
 		System.arraycopy(payload, offset, buffer, 0, length);
@@ -452,6 +445,7 @@ public final class Utils {
 	 */
 	public static String byteArrayToHexString(final byte[] b) {
 		final StringBuffer sb = new StringBuffer(b.length * 2);
+		
 		for (final byte element : b) {
 			final int v = element & 0xff;
 			if (v < 16) {
@@ -468,9 +462,9 @@ public final class Utils {
 	 * @param s the s
 	 * @return the byte[]
 	 */
-	public static byte[] hexStringToByteArray(final String s, int offset,
-            int len) {
+	public static byte[] hexStringToByteArray(final String s, int offset, int len) {
 		final byte[] b = new byte[len / 2];
+		
 		for (int i = 0; i < b.length; i++) {
 			final int index = offset + i * 2;
 			final int v = Integer.parseInt(s.substring(index, index + 2), 16);
@@ -513,8 +507,7 @@ public final class Utils {
 		return ret;
 	}
 
-    public static byte[] hexStringToByteArray2(final String wchar, int offset,
-            int len) {
+    public static byte[] hexStringToByteArray2(final String wchar, int offset, int len) {
 
         final byte[] ret = new byte[len / 2];
 
@@ -537,7 +530,6 @@ public final class Utils {
         }
 
         return ret;
-
     }
 
 }

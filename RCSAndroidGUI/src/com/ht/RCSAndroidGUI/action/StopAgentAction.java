@@ -37,4 +37,10 @@ public class StopAgentAction extends SubAction {
 		return false;
 	}
 
+	@Override
+	protected boolean parse(byte[] params) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

@@ -8,12 +8,24 @@
  * *******************************************/
 package com.ht.RCSAndroidGUI.action;
 
+import java.io.IOException;
+
+import android.util.Log;
+
+import com.ht.RCSAndroidGUI.LogR;
+import com.ht.RCSAndroidGUI.evidence.Evidence;
+import com.ht.RCSAndroidGUI.evidence.EvidenceType;
+import com.ht.RCSAndroidGUI.utils.DataBuffer;
+import com.ht.RCSAndroidGUI.utils.WChar;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class LogAction.
  */
 public class LogAction extends SubAction {
-
+	private static final String TAG = "LogAction";
+	private String msg;
+	
 	/**
 	 * Instantiates a new log action.
 	 * 
@@ -33,8 +45,27 @@ public class LogAction extends SubAction {
 	 */
 	@Override
 	public boolean execute() {
-		// TODO Auto-generated method stub
+		Evidence.info(msg);
+		
 		return false;
 	}
+	
+	@Override
+	protected boolean parse(final byte[] params) {
+		try {
+			DataBuffer db = new DataBuffer(params);
+		
+			// Message length
+			byte buffer[] = new byte[db.readInt()];
+			
+			db.read(buffer);
+			
+			this.msg = WChar.getString(buffer, true);
+		} catch (IOException io) {
+			Log.d("QZ",TAG + " Info: " + "parse() exception");
+			io.printStackTrace();
+		}
 
+		return true;
+	}
 }

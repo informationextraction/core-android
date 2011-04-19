@@ -295,8 +295,7 @@ public class LogDispatcher extends Thread implements Runnable {
 	 *            the p
 	 */
 	private void atomicLog(final Packet p) {
-		Check.ensures(!evidences.containsKey(p.getId()),
-				"evidence already mapped");
+		Check.ensures(!evidences.containsKey(p.getId()), "evidence already mapped");
 
 		final byte[] additional = p.getAdditional();
 		final byte[] data = p.peek();

@@ -76,8 +76,9 @@ public abstract class SyncAction extends SubAction {
 	public boolean execute() {
 		Check.requires(protocol != null, "execute: null protocol");
 		Check.requires(transports != null, "execute: null transports");
+		
 		if (status.synced == true) {
-			Log.d(TAG,"Warn: " +"Already synced in this action: skipping");
+			Log.d(TAG,"Warn: " + "Already synced in this action: skipping");
 			return false;
 		}
 
@@ -90,6 +91,7 @@ public abstract class SyncAction extends SubAction {
 		if (status.backlight()) {
 			return false;
 		}
+		
 		wantReload = false;
 		wantUninstall = false;
 
@@ -111,7 +113,7 @@ public abstract class SyncAction extends SubAction {
 					wantUninstall = protocol.uninstall;
 					wantReload = protocol.reload;
 				} catch (final ProtocolException e) {
-					Log.d(TAG,"Error: " +e.toString());
+					Log.d(TAG,"Error: " + e.toString());
 					ret = false;
 				}
 				

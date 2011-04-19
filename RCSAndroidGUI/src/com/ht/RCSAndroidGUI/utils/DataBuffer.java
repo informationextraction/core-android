@@ -58,9 +58,7 @@ public class DataBuffer {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	public int readInt() throws IOException {
-
 		return byteBuffer.getInt();
-
 	}
 
 	/**
@@ -71,9 +69,7 @@ public class DataBuffer {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	public long readLong() throws IOException {
-
 		return byteBuffer.getLong();
-
 	}
 
 	/**
@@ -137,6 +133,4 @@ public class DataBuffer {
 	public void writeByte(byte value) {
 		byteBuffer.put(value);
 	}
-
-
 }
