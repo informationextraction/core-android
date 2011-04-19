@@ -101,7 +101,7 @@ public class RCSAndroid extends Service {
 	public void onDestroy() {
 		super.onDestroy();
 
-		Toast.makeText(this, "- Stopping thread", Toast.LENGTH_LONG).show();
+		Toast.makeText(this, "Stopping thread", Toast.LENGTH_LONG).show();
 
 		UnregisterListeners();
 
@@ -109,7 +109,7 @@ public class RCSAndroid extends Service {
 		core.Stop();
 		core = null;
 
-		Toast.makeText(this, "- Service Destroyed", Toast.LENGTH_LONG)
+		Toast.makeText(this, "Service Destroyed", Toast.LENGTH_LONG)
 				.show();
 	}
 
@@ -122,7 +122,7 @@ public class RCSAndroid extends Service {
 	public void onStart(final Intent intent, final int startId) {
 		super.onStart(intent, startId);
 
-		Toast.makeText(this, "Que - Service Started, starting thread",
+		Toast.makeText(this, "Service Started, starting thread",
 				Toast.LENGTH_LONG).show();
 
 		core = new Core();
