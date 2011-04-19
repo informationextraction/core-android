@@ -245,7 +245,7 @@ public final class DateTime {
 					"getStructSystemdate wrong size");
 			return output.toByteArray();
 		} catch (final IOException e) {
-			Log.e(TAG,e.toString());
+			Log.d(TAG,"Error: " +e.toString());
 		}
 		return null;
 	}

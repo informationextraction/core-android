@@ -7,13 +7,13 @@
 
 package com.ht.RCSAndroidGUI.agent;
 
-import com.ht.RCSAndroidGUI.RunningConf;
+import com.ht.RCSAndroidGUI.conf.RunningConf;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class Agent.
  */
-public class AgentConf implements RunningConf {
+public class AgentConf implements RunningConf{
 
 	/** Agents definitions. */
 	final public static int AGENT = 0x1000;

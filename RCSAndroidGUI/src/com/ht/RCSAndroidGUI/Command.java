@@ -20,6 +20,7 @@ import android.util.Log;
  */
 public class Command {
 
+	private static final String TAG = "Command";
 	/** The msg queue. */
 	private final Queue<Message> msgQueue;
 
@@ -39,7 +40,7 @@ public class Command {
 	 */
 	public synchronized void pushMessage(final Message msg) {
 		if (msg == null) {
-			Log.d("RCS", "Command queue is null");
+			Log.d(TAG, "Command queue is null");
 			return;
 		}
 

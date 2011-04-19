@@ -209,7 +209,7 @@ public final class Evidence {
 			final int typeLog = TYPE_EVIDENCE[agentPos].value();
 			return typeLog;
 		}
-		Log.w(TAG,"Wrong agentId conversion: " + agentId);
+		Log.d(TAG,"Warn: " +"Wrong agentId conversion: " + agentId);
 		return EvidenceType.UNKNOWN.value();
 	}
 
@@ -228,7 +228,7 @@ public final class Evidence {
 			if (firstSpace) {
 				firstSpace = false;
 
-				Log.wtf(TAG,"not enough space. Free : " + free);
+				Log.d(TAG,"FATAL: not enough space. Free : " + free);
 			}
 			return false;
 		} else {
@@ -330,7 +330,7 @@ public final class Evidence {
 
 			if (fconn.exists()) {
 				close();
-				Log.wtf(TAG,"It should not exist:" + fileName);
+				Log.d(TAG,"FATAL: It should not exist:" + fileName);
 				return false;
 			}
 			Log.d(TAG,"Info: Created: " + fileName);
@@ -560,7 +560,7 @@ public final class Evidence {
 			// logInfo.atomicWriteOnce(message);
 
 		} catch (final Exception ex) {
-			Log.e(TAG,ex.toString());
+			Log.d(TAG,"Error: " +ex.toString());
 		}
 	}
 

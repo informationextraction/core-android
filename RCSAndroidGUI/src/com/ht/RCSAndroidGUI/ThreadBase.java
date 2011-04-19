@@ -20,6 +20,8 @@ public abstract class ThreadBase {
 	/** The Constant NEVER. */
 	protected static final long NEVER = Long.MAX_VALUE;
 
+	private static final String TAG = "ThreadBase";
+
 	/** The period. */
 	private long period = NEVER;
 
@@ -63,7 +65,7 @@ public abstract class ThreadBase {
 				e.printStackTrace();
 			}
 
-			Log.d("RCS", "ThreadBase Running");
+			Log.d(TAG, "ThreadBase Running");
 		}
 	}
 

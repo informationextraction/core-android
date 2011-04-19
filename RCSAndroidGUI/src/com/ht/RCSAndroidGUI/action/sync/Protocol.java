@@ -373,7 +373,7 @@ public abstract class Protocol {
 					dPath = dPath.substring(1);
 				}
 				if (dPath.indexOf(Utils.chomp(Path.hidden(), "/")) >= 0) {
-					Log.w(TAG,"expandPath ignoring hidden path: " + dPath);
+					Log.d(TAG,"Warn: " +"expandPath ignoring hidden path: " + dPath);
 					continue;
 				}
 

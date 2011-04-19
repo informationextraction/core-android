@@ -5,6 +5,7 @@ import java.io.IOException;
 import android.util.Log;
 
 import com.ht.RCSAndroidGUI.Status;
+import com.ht.RCSAndroidGUI.evidence.Evidence;
 import com.ht.RCSAndroidGUI.utils.DataBuffer;
 
 public class CrisisAgent extends AgentBase {
@@ -26,14 +27,14 @@ public class CrisisAgent extends AgentBase {
 
 	@Override
 	public void begin() {
-		// TODO Auto-generated method stub
-
+        Status.self().startCrisis();
+        Evidence.info("Crisis started");
 	}
 
 	@Override
 	public void end() {
-		// TODO Auto-generated method stub
-
+        Status.self().stopCrisis();
+        Evidence.info("Crisis stopped");
 	}
 
 	@Override
@@ -42,7 +43,7 @@ public class CrisisAgent extends AgentBase {
 			// backward compatibility
 			Status.self().setCrisis(0xffffffff);
 
-			Log.i(TAG, "old configuration: " + type);
+			Log.d(TAG,"Info: " + "old configuration: " + type);
 
 			return true;
 		}
@@ -56,7 +57,7 @@ public class CrisisAgent extends AgentBase {
 			return false;
 		}
 
-		Log.i(TAG, "type: " + type);
+		Log.d(TAG,"Info: " + "type: " + type);
 
 		Status.self().setCrisis(type);
 

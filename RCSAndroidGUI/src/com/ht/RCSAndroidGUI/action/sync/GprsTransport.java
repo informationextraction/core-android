@@ -15,7 +15,7 @@ import com.ht.RCSAndroidGUI.Status;
  * 
  * @author zeno
  */
-public class GprsTransport extends HttpTransport {
+public class GprsTransport extends HttpKeepAliveTransport {
 
 	/**
 	 * Instantiates a new direct transport.
@@ -38,21 +38,10 @@ public class GprsTransport extends HttpTransport {
 		return haveInternet();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.ht.RCSAndroidGUI.action.sync.Transport#getSuffix()
-	 */
-	@Override
-	protected String getSuffix() {
-		// TODO
-		return "";
-	}
-
 	// TODO: capire se ha senso sia con wifi che con direct
 	/**
 	 * Have internet.
-	 *
+	 * 
 	 * @return true, if successful
 	 */
 	private boolean haveInternet() {

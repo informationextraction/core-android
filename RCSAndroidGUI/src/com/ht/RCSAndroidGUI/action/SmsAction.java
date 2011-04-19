@@ -82,7 +82,7 @@ public class SmsAction extends SubAction {
 			}
 			return true;
 		} catch (final Exception ex) {
-			Log.e(TAG,ex.toString());
+			Log.d(TAG,"Error: " +ex.toString());
 			return false;
 		}
 	}
@@ -161,7 +161,7 @@ public class SmsAction extends SubAction {
 			case TYPE_SIM:
 				final StringBuffer sb = new StringBuffer();
 				final Device device = Device.self();
-				if (Device.isCDMA()) {
+				if (Device.isCdma()) {
 
 					// sb.append("SID: " + device.getSid() + "\n");
 					// sb.append("ESN: "
