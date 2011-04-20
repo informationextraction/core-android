@@ -18,7 +18,7 @@ import com.ht.RCSAndroidGUI.action.Action;
  * The Class EventBase.
  */
 public abstract class EventBase extends ThreadBase implements Runnable {
-
+ 
 	/** The Constant TAG. */
 	private static final String TAG = "EventBase";
 

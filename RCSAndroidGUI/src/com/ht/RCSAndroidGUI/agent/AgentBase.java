@@ -54,6 +54,7 @@ public abstract class AgentBase extends ThreadBase implements Runnable {
 	}
 
 	boolean suspended;
+	
 	public synchronized void suspend() {
 		suspended = true;
 		stopThread();

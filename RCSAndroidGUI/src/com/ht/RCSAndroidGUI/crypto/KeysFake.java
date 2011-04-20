@@ -8,8 +8,7 @@
  * *******************************************/
 package com.ht.RCSAndroidGUI.crypto;
 
-// TODO: Auto-generated Javadoc
-// ID 179
+// ID 179 su rcs-prod
 /**
  * The Class KeysFake.
  */

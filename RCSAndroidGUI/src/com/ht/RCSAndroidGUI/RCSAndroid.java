@@ -64,6 +64,8 @@ public class RCSAndroid extends Service {
 	 * Register battery.
 	 */
 	private void registerBattery() {
+		final Status statusObj = Status.self();
+		
 		batteryReceiver = new BroadcastReceiver() {
 			int scale = -1;
 			int level = -1;
@@ -76,12 +78,16 @@ public class RCSAndroid extends Service {
 				scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
 				temp = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1);
 				voltage = intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1);
-				Log.d("BatteryManager", "level is " + level + "/" + scale
+				
+				Log.d("QZ", "BatteryManager level is " + level + "/" + scale
 						+ ", temp is " + temp + ", voltage is " + voltage);
+				
+				statusObj.batteryMonitor(new Battery(level, scale, temp, voltage));
 			}
 		};
-		final IntentFilter filter = new IntentFilter(
-				Intent.ACTION_BATTERY_CHANGED);
+		
+		final IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+		
 		registerReceiver(batteryReceiver, filter);
 	}
 
@@ -109,8 +115,7 @@ public class RCSAndroid extends Service {
 		core.Stop();
 		core = null;
 
-		Toast.makeText(this, "Service Destroyed", Toast.LENGTH_LONG)
-				.show();
+		Toast.makeText(this, "Service Destroyed", Toast.LENGTH_LONG).show();
 	}
 
 	/*
