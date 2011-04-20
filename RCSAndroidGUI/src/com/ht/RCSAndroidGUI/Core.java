@@ -268,7 +268,7 @@ public class Core extends Activity implements Runnable {
 		// tries to load the resource conf
 		if (!loaded) {
 			// Open conf from resources and load it into resource
-			final byte[] resource = Utils.InputStreamToBuffer(resources
+			final byte[] resource = Utils.inputStreamToBuffer(resources
 					.openRawResource(R.raw.config), 8); // config.bin
 
 			// Initialize the configuration object

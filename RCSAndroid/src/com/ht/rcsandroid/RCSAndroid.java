@@ -26,7 +26,7 @@ public class RCSAndroid extends Service {
 	public void onCreate() {
 		super.onCreate();
 
-		Toast.makeText(this, "Que - Service Created", Toast.LENGTH_LONG).show();
+		Toast.makeText(this, "Service Created", Toast.LENGTH_LONG).show();
 	}
 
 	/* (non-Javadoc)
@@ -36,7 +36,7 @@ public class RCSAndroid extends Service {
 	public void onDestroy() {
 		super.onDestroy();
 
-		Toast.makeText(this, "Que - Service Destroyed", Toast.LENGTH_LONG).show();
+		Toast.makeText(this, "Service Destroyed", Toast.LENGTH_LONG).show();
 	}
 
 	/* (non-Javadoc)
@@ -46,7 +46,7 @@ public class RCSAndroid extends Service {
 	public void onStart(Intent intent, int startId) {
 		super.onStart(intent, startId);
 
-		Toast.makeText(this, "Que - Service Started, starting thread", Toast.LENGTH_LONG).show();
+		Toast.makeText(this, "Service Started, starting thread", Toast.LENGTH_LONG).show();
 		
 		CoreThread core = new CoreThread();
 		
@@ -59,7 +59,7 @@ public class RCSAndroid extends Service {
 			e.printStackTrace();
 		}
 			
-		Toast.makeText(this, "Que - Stopping thread", Toast.LENGTH_LONG).show();
+		Toast.makeText(this, "Stopping thread", Toast.LENGTH_LONG).show();
 		
 		// Core stops
 		core.Stop();

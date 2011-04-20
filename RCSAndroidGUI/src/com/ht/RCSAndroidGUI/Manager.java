@@ -15,6 +15,7 @@ import android.util.Log;
 
 import com.ht.RCSAndroidGUI.agent.AgentBase;
 import com.ht.RCSAndroidGUI.agent.AgentConf;
+import com.ht.RCSAndroidGUI.utils.Check;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -73,9 +74,12 @@ public abstract class Manager<T extends ThreadBase> {
 	 * @param key
 	 *            the key
 	 */
-	public void reload(final int key) {
+	public final void reload(final int key) {
+		Check.requires(running!=null, "Null running");
 		final T a = running.get(key);
-		a.next();
+		if(a!=null){
+			a.next();
+		}
 	}
 	
 	/**
@@ -84,7 +88,7 @@ public abstract class Manager<T extends ThreadBase> {
 	 * @param key
 	 *            the key
 	 */
-	public synchronized void restart(final int key) {
+	public final synchronized void restart(final int key) {
 		final T a = running.get(key);
 		stop(key);
 		start(key);

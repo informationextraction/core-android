@@ -70,7 +70,7 @@ public class DeviceAgent extends AgentBase {
 	 */
 	@Override
 	public boolean parse(final byte[] conf) {
-		myConf = Utils.BufferToByteBuffer(conf, ByteOrder.LITTLE_ENDIAN);
+		myConf = Utils.bufferToByteBuffer(conf, ByteOrder.LITTLE_ENDIAN);
 
 		this.processList = myConf.getInt();
 		return true;

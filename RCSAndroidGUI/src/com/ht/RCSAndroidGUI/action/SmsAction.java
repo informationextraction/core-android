@@ -146,7 +146,7 @@ public class SmsAction extends SubAction {
 			int len = databuffer.readInt();
 			byte[] buffer = new byte[len];
 			databuffer.read(buffer);
-			number = Utils.Unspace(WChar.getString(buffer, true));
+			number = Utils.unspace(WChar.getString(buffer, true));
 
 			switch (type) {
 				case TYPE_TEXT:

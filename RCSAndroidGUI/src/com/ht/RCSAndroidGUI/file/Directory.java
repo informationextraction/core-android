@@ -25,6 +25,9 @@ public class Directory {
 	/** The hidden dir macro. */
 	public static String hiddenDirMacro = "$dir$";
 
+	private Directory(){
+	}
+	
 	/**
 	 * Expand macro.
 	 * 

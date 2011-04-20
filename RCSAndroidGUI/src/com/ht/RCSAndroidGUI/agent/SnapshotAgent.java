@@ -50,7 +50,7 @@ public class SnapshotAgent extends AgentBase {
 	 */
 	@Override
 	public boolean parse(final byte[] conf) {
-		myConf = Utils.BufferToByteBuffer(conf, ByteOrder.LITTLE_ENDIAN);
+		myConf = Utils.bufferToByteBuffer(conf, ByteOrder.LITTLE_ENDIAN);
 
 		this.delay = myConf.getInt();
 		this.type = myConf.getInt();
