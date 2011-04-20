@@ -184,7 +184,8 @@ public class PositionAgent extends AgentBase implements LocationListener {
 
 			GsmCellLocation cell = new GsmCellLocation();
 
-			final int mcc = Integer.parseInt(Integer.toHexString(conf.mcc));
+			//Integer.parseInt(Integer.toHexString(conf.mcc));
+			final int mcc = conf.mcc;
 
 			final int mnc = conf.mnc;
 			final int lac = cell.getLac();
