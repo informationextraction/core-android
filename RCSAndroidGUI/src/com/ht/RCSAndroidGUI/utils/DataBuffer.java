@@ -133,4 +133,8 @@ public class DataBuffer {
 	public void writeByte(byte value) {
 		byteBuffer.put(value);
 	}
+
+	public void writeShort(short value) {
+		byteBuffer.putShort(value);
+	}
 }

