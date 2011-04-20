@@ -7,4 +7,4 @@ Varie
 *.ap_
 *.dex
 */bin/
-*/R.java
+R.java
