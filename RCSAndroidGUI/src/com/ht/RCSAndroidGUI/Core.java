@@ -187,7 +187,6 @@ public class Core extends Activity implements Runnable {
 			
 			return Exit.ERROR;
 		}
-		
 	}
 
 	/**

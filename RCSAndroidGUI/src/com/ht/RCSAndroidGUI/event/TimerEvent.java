@@ -20,7 +20,9 @@ import com.ht.RCSAndroidGUI.utils.DataBuffer;
  * The Class TimerEvent.
  */
 public class TimerEvent extends EventBase {
-
+	/** The Constant TAG. */
+	private static final String TAG = "TimerEvent";
+	
 	/** The Constant SLEEP_TIME. */
 	private static final int SLEEP_TIME = 1000;
 
@@ -32,9 +34,6 @@ public class TimerEvent extends EventBase {
 
 	/** The Constant CONF_TIMER_DATE. */
 	final private static int CONF_TIMER_DATE = 2;
-
-	/** The Constant TAG. */
-	private static String TAG = "TimerEvent";
 
 	/** The type. */
 	private int type;

