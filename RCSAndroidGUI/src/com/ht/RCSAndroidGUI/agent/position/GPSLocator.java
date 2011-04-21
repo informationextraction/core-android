@@ -32,7 +32,8 @@ public class GPSLocator extends Thread {
 		Looper.loop();
 	}
 	
-	public void requestStop(){
+	public void halt(){
 		lm.removeUpdates(listener);
+		lm = null;
 	}
 }

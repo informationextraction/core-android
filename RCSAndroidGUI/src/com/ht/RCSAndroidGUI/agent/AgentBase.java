@@ -45,9 +45,18 @@ public abstract class AgentBase extends ThreadBase implements Runnable {
 		// Check.asserts(agentEnabled, string)
 		status = AgentConf.AGENT_RUNNING;
 
-		begin();
-		loop();
-		end();
+		try{
+			begin();
+			loop();
+		}catch(Exception ex){
+			Log.d(TAG,"Error: "+ex);
+		}
+		
+		try{
+			end();
+		}catch(Exception ex){
+			Log.d(TAG,"Error: "+ex);
+		}
 
 		status = AgentConf.AGENT_STOPPED;
 		Log.d(TAG, "AgentBase stopped");

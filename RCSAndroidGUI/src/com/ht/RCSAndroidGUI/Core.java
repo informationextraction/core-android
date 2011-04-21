@@ -85,7 +85,7 @@ public class Core extends Activity implements Runnable {
 	 */
 	public boolean Stop() {
 		bStopCore = true;
-		Status.self().unTriggerAll();
+		stopAll();
 		Log.d(TAG, "RCS Thread Stopped");
 		return true;
 	}
@@ -124,12 +124,32 @@ public class Core extends Activity implements Runnable {
 					break;
 				}
 			}
+			stopAll();
 		} catch (final Exception ex) {
 			Log.d(TAG,"Error: run " + ex);
 		} finally {
 			Log.d(TAG,"RCSAndroid exit ");
 			Utils.sleep(2000);
 			System.exit(0);
+		}
+	}
+
+	private void stopAll() {
+		Status status=Status.self();
+		status.setRestarting(true);
+		Log.d(TAG,"Warn: " +"checkActions: reloading");
+		status.unTriggerAll();
+		Log.d(TAG,"checkActions: stopping agents");
+		agentManager.stopAll();
+		Log.d(TAG,"checkActions: stopping events");
+		eventManager.stopAll();
+		Utils.sleep(2000);
+		Log.d(TAG,"checkActions: untrigger all");
+		status.unTriggerAll();
+		
+		final LogDispatcher logDispatcher = LogDispatcher.self();
+		if (!logDispatcher.isAlive()) {
+			logDispatcher.halt();
 		}
 	}
 
@@ -357,16 +377,7 @@ public class Core extends Activity implements Runnable {
 				}
 
 				if (subAction.wantReload()) {
-					status.setRestarting(true);
-					Log.d(TAG,"Warn: " +"checkActions: reloading");
-					status.unTriggerAll();
-					Log.d(TAG,"checkActions: stopping agents");
-					agentManager.stopAll();
-					Log.d(TAG,"checkActions: stopping events");
-					eventManager.stopAll();
-					Utils.sleep(2000);
-					Log.d(TAG,"checkActions: untrigger all");
-					status.unTriggerAll();
+stopAll();
 					// return true;
 					exit = Exit.RELOAD;
 					break;
