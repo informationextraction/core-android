@@ -57,7 +57,7 @@ public class DataBuffer {
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	public int readInt() throws IOException {
+	public final int readInt() throws IOException {
 		return byteBuffer.getInt();
 	}
 
@@ -68,7 +68,7 @@ public class DataBuffer {
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	public long readLong() throws IOException {
+	public final long readLong() throws IOException {
 		return byteBuffer.getLong();
 	}
 
@@ -78,7 +78,7 @@ public class DataBuffer {
 	 * @param buffer the buffer
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
-	public void read(final byte[] buffer) throws IOException {
+	public final void read(final byte[] buffer) throws IOException {
 		byteBuffer.get(buffer);
 	}
 
@@ -87,7 +87,7 @@ public class DataBuffer {
 	 *
 	 * @param data the data
 	 */
-	public void write(final byte[] data) {
+	public final void write(final byte[] data) {
 		byteBuffer.put(data);
 
 	}
@@ -98,7 +98,7 @@ public class DataBuffer {
 	 * @param value
 	 *            the value
 	 */
-	public void writeInt(final int value) {
+	public final void writeInt(final int value) {
 		byteBuffer.putInt(value);
 	}
 
@@ -107,7 +107,7 @@ public class DataBuffer {
 	 * 
 	 * @return the position
 	 */
-	public int getPosition() {
+	public final int getPosition() {
 		return byteBuffer.position();
 	}
 
@@ -117,24 +117,24 @@ public class DataBuffer {
 	 * @param value
 	 *            the value
 	 */
-	public void writeLong(final long value) {
+	public final void writeLong(final long value) {
 		byteBuffer.putLong(value);
 	}
 
-	public void writeDouble(double value) {
+	public final void writeDouble(final double value) {
 		byteBuffer.putDouble(value);
 		
 	}
 
-	public void writeFloat(float value) {
+	public final void writeFloat(final float value) {
 		byteBuffer.putFloat(value);
 	}
 
-	public void writeByte(byte value) {
+	public final void writeByte(final byte value) {
 		byteBuffer.put(value);
 	}
 
-	public void writeShort(short value) {
+	public final void writeShort(final short value) {
 		byteBuffer.putShort(value);
 	}
 }

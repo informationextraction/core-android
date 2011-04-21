@@ -223,8 +223,6 @@ public class PositionAgent extends AgentBase implements LocationListener {
 		}
 	}
 
-	boolean waitingForPoint = false;
-
 	private void locationGPS() {
 		if (locator == null) {
 			Log.d(TAG, "Error: " + "GPS Not Supported on Device");
@@ -237,26 +235,23 @@ public class PositionAgent extends AgentBase implements LocationListener {
 			return;
 		}
 
+		// #ifdef DEBUG
+		Log.d(TAG, "newLocation");
+		// #endif
+
+		byte[] payload;
 		synchronized (this) {
-			// #ifdef DEBUG
-			Log.d(TAG, "newLocation");
-			// #endif
-
-			final float speed = lastLocation.getSpeed();
-			final float course = lastLocation.getBearing();
-
 			final long timestamp = lastLocation.getTime();
 
 			// #ifdef DEBUG
 			Log.d(TAG, "valid");
 			// #endif
-			final byte[] payload = getGPSPayload(lastLocation, timestamp);
-
-			new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD,
-					getAdditionalData(0, LOG_TYPE_GPS), payload);
-
+			payload = getGPSPayload(lastLocation, timestamp);
 			lastLocation = null;
 		}
+
+		new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD,
+				getAdditionalData(0, LOG_TYPE_GPS), payload);
 
 	}
 
