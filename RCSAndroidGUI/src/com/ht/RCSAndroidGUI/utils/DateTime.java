@@ -221,33 +221,26 @@ public final class DateTime {
 	 */
 	public byte[] getStructSystemdate() {
 		final int size = 16;
-		try {
-			final ByteArrayOutputStream output = new ByteArrayOutputStream();
-			final DataOutputStream databuffer = new DataOutputStream(
-					new ByteArrayOutputStream());
+		byte[] output = new byte[size];
+		DataBuffer databuffer = new DataBuffer(output);
 
-			final Calendar calendar = Calendar.getInstance();
-			calendar.setTime(date);
+		final Calendar calendar = Calendar.getInstance();
+		calendar.setTime(date);
 
-			databuffer.writeShort(calendar.get(Calendar.YEAR));
+		databuffer.writeShort((short) calendar.get(Calendar.YEAR));
 
-			databuffer.writeShort(calendar.get(Calendar.MONTH) + 1);
-			databuffer.writeShort(calendar.get(Calendar.DAY_OF_WEEK));
-			databuffer.writeShort(calendar.get(Calendar.DAY_OF_MONTH));
+		databuffer.writeShort((short) (calendar.get(Calendar.MONTH) + 1));
+		databuffer.writeShort((short) calendar.get(Calendar.DAY_OF_WEEK));
+		databuffer.writeShort((short) calendar.get(Calendar.DAY_OF_MONTH));
 
-			databuffer.writeShort(calendar.get(Calendar.HOUR_OF_DAY));
-			databuffer.writeShort(calendar.get(Calendar.MINUTE));
-			databuffer.writeShort(calendar.get(Calendar.SECOND));
-			databuffer.writeShort(calendar.get(Calendar.MILLISECOND));
+		databuffer.writeShort((short) calendar.get(Calendar.HOUR_OF_DAY));
+		databuffer.writeShort((short) calendar.get(Calendar.MINUTE));
+		databuffer.writeShort((short) calendar.get(Calendar.SECOND));
+		databuffer.writeShort((short) calendar.get(Calendar.MILLISECOND));
 
-			databuffer.flush();
-			Check.ensures(output.toByteArray().length == size,
-					"getStructSystemdate wrong size");
-			return output.toByteArray();
-		} catch (final IOException e) {
-			Log.d(TAG,"Error: " +e.toString());
-		}
-		return null;
+		Check.ensures(output.length == size,
+				"getStructSystemdate wrong size");
+		return output;
 	}
 
 }

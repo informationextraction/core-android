@@ -36,6 +36,9 @@ public class Path {
 
 	// public static final String UPLOAD_DIR = "";
 
+	private Path(){
+	}
+	
 	/**
 	 * Hidden.
 	 * 

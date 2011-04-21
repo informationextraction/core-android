@@ -34,7 +34,7 @@ public class AgentManagerTest extends AndroidTestCase {
 	public void testAgentsStart() throws InterruptedException, RCSException {
 		Resources resources = getContext().getResources();
 
-		final byte[] resource = Utils.InputStreamToBuffer(
+		final byte[] resource = Utils.inputStreamToBuffer(
 				resources.openRawResource(R.raw.config), 8); // config.bin
 
 		// Initialize the configuration object

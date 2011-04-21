@@ -10,16 +10,17 @@ package com.ht.RCSAndroidGUI.utils;
 
 import android.util.Log;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Check.
  */
-public class Check {
+public final class Check {
 
 	private static final String TAG = "Check";
 
+	private Check(){
+	}
 	/**
-	 * Asserts.
+	 * Asserts, used to verify the truth of an expression
 	 * 
 	 * @param b
 	 *            the b
@@ -33,7 +34,7 @@ public class Check {
 	}
 
 	/**
-	 * Requires.
+	 * Requires. Used to check prerequisites of a method.
 	 * 
 	 * @param b
 	 *            the b
@@ -47,7 +48,7 @@ public class Check {
 	}
 
 	/**
-	 * Ensures.
+	 * Ensures. Checks to be done at the end of a method.
 	 * 
 	 * @param b
 	 *            the b

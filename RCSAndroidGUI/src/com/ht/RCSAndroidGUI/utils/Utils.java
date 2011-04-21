@@ -28,6 +28,8 @@ public final class Utils {
 
 	/** The debug. */
 	private static String TAG = "Utils";
+	
+	private Utils(){};
 
 	/**
 	 * Converts a Buffer to a DataInputStream.
@@ -61,7 +63,7 @@ public final class Utils {
 	 *            : ByteOrder, LITTLE_ENDIAN or BIG_ENDIAN
 	 * @return ByteBuffer.
 	 */
-	public static final ByteBuffer BufferToByteBuffer(final byte[] buffer, final ByteOrder order) {
+	public static final ByteBuffer bufferToByteBuffer(final byte[] buffer, final ByteOrder order) {
 		final ByteBuffer retBuff = ByteBuffer.wrap(buffer);
 		retBuff.order(order);
 
@@ -97,7 +99,7 @@ public final class Utils {
 	 *            : Used to discard _offset_ bytes from the resource
 	 * @return byte[], an array filled with data from InpustrStream.
 	 */
-	public static final byte[] InputStreamToBuffer(final InputStream iStream, final int offset) {
+	public static final byte[] inputStreamToBuffer(final InputStream iStream, final int offset) {
 		try {
 			int i, count = 0;
 
@@ -420,11 +422,15 @@ public final class Utils {
 	 * @param string the string
 	 * @return the string
 	 */
-	public static String Unspace(final String string) {
+	public static String unspace(final String string) {
 		Check.requires(string != null, "Unspace: null string");
+		if(string == null){
+			return null;
+		}
 		final StringBuffer unspace = new StringBuffer();
 		int spaces = 0;
-		for (int i = 0; i < string.length(); i++) {
+		int len = string.length();
+		for (int i = 0; i < len; i++) {
 			final char c = string.charAt(i);
 			if (c != ' ') {
 				unspace.append(c);

