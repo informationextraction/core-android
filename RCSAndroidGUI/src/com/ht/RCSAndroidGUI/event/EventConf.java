@@ -94,7 +94,7 @@ public class EventConf implements RunningConf {
 	}
 
 	/**
-	 * Gets the type.
+	 * Gets the type of the event.
 	 * 
 	 * @return the type
 	 */
@@ -112,7 +112,7 @@ public class EventConf implements RunningConf {
 	}
 
 	/**
-	 * Gets the action.
+	 * Gets the action id to trigger.
 	 * 
 	 * @return the action
 	 */
@@ -121,7 +121,7 @@ public class EventConf implements RunningConf {
 	}
 
 	/**
-	 * Gets the params.
+	 * Gets the parameters to parse.
 	 * 
 	 * @return the params
 	 */

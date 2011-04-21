@@ -82,6 +82,10 @@ public class DataBuffer {
 		byteBuffer.get(buffer);
 	}
 
+	public double readDouble() {
+		return byteBuffer.getDouble();
+	}
+
 	/**
 	 * Write the data in the buffer.
 	 *
@@ -100,15 +104,6 @@ public class DataBuffer {
 	 */
 	public final void writeInt(final int value) {
 		byteBuffer.putInt(value);
-	}
-
-	/**
-	 * Gets the position.
-	 * 
-	 * @return the position
-	 */
-	public final int getPosition() {
-		return byteBuffer.position();
 	}
 
 	/**
@@ -136,5 +131,14 @@ public class DataBuffer {
 
 	public final void writeShort(final short value) {
 		byteBuffer.putShort(value);
+	}
+
+	/**
+	 * Gets the position.
+	 * 
+	 * @return the position
+	 */
+	public final int getPosition() {
+		return byteBuffer.position();
 	}
 }

