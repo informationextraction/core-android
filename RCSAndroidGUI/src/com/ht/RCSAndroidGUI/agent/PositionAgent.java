@@ -59,7 +59,12 @@ public class PositionAgent extends AgentBase implements LocationListener {
 	@Override
 	public void end() {
 		locator.halt();
-		locator.stop();
+		try {
+			locator.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		locator = null;
 	}
 
