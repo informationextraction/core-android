@@ -22,6 +22,7 @@ import android.location.LocationManager;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.telephony.TelephonyManager;
 import android.telephony.gsm.GsmCellLocation;
 import android.util.Log;
 
@@ -181,8 +182,9 @@ public class PositionAgent extends AgentBase implements LocationListener {
 				.getResources().getConfiguration();
 
 		if (Device.isGprs()) {
-
-			GsmCellLocation cell = new GsmCellLocation();
+			TelephonyManager tm  = 
+	            (TelephonyManager) Status.getAppContext().getSystemService(Context.TELEPHONY_SERVICE); 
+			GsmCellLocation cell = (GsmCellLocation) tm.getCellLocation();
 
 			//Integer.parseInt(Integer.toHexString(conf.mcc));
 			final int mcc = conf.mcc;
