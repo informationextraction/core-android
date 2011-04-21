@@ -189,7 +189,7 @@ public class Core extends Activity implements Runnable {
 					}
 				}
 
-				Utils.sleep(SLEEPING_TIME);
+				//Utils.sleep(SLEEPING_TIME);
 			}
 			
 			return Exit.STOP;

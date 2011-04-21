@@ -58,6 +58,8 @@ public class Status {
 	private boolean crisis = false;
 	private int crisisType;
 
+	private Object triggeredSemaphore=new Object();
+
 	/**
 	 * Instantiates a new status.
 	 */
@@ -370,6 +372,13 @@ public class Status {
 				triggeredActions.add(new Integer(i));
 			}
 		}
+        synchronized (triggeredSemaphore) {
+            try {
+                triggeredSemaphore.notifyAll();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
 	}
 
 	/**
@@ -378,6 +387,15 @@ public class Status {
 	 * @return the triggered actions
 	 */
 	public int[] getTriggeredActions() {
+	       try {
+	    	   synchronized (triggeredSemaphore) {
+	                triggeredSemaphore.wait();
+	            }
+	        } catch (Exception e) {
+	            Log.d(TAG,"Error: " + " getActionIdTriggered: " + e);
+	        }
+
+	        
 		synchronized (triggeredActions) {
 			final int size = triggeredActions.size();
 			final int[] triggered = new int[size];
@@ -400,6 +418,13 @@ public class Status {
 				triggeredActions.remove(new Integer(action.getId()));
 			}
 		}
+        synchronized (triggeredSemaphore) {
+            try {
+                triggeredSemaphore.notifyAll();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
 	}
 
 	/**
@@ -409,7 +434,13 @@ public class Status {
 		synchronized (triggeredActions) {
 			triggeredActions.clear();
 		}
-
+        synchronized (triggeredSemaphore) {
+            try {
+                triggeredSemaphore.notifyAll();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
 	}
 
 	public synchronized void setCrisis(int type) {
