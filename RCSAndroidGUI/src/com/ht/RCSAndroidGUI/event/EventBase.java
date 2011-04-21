@@ -18,7 +18,7 @@ import com.ht.RCSAndroidGUI.action.Action;
  * The Class EventBase.
  */
 public abstract class EventBase extends ThreadBase implements Runnable {
-
+ 
 	/** The Constant TAG. */
 	private static final String TAG = "EventBase";
 
@@ -57,7 +57,7 @@ public abstract class EventBase extends ThreadBase implements Runnable {
 		end();
 
 		status = EventConf.EVENT_STOPPED;
-		Log.d(TAG, "EventBase stopped");
+		Log.d("QZ", TAG + " EventBase stopped");
 	}
 
 	/**
@@ -74,9 +74,12 @@ public abstract class EventBase extends ThreadBase implements Runnable {
 	 * Trigger.
 	 */
 	protected final void trigger() {
-		final int actionId = event.getAction();
+		trigger(event.getAction());
+	}
+	
+	protected final void trigger(int actionId) {
 		if (actionId != Action.ACTION_NULL) {
-			Log.d(TAG, "event: " + this + " triggering: " + actionId);
+			Log.d("QZ", TAG + " event: " + this + " triggering: " + actionId);
 			Status.self().triggerAction(actionId);
 		}
 	}

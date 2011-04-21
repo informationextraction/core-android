@@ -90,12 +90,12 @@ public class SyncActionInternet extends SyncAction {
 	@Override
 	protected boolean initTransport() {
 		if (wifi) {
-			Log.d(TAG,"initTransport adding WifiTransport");
+			Log.d("QZ", TAG + "initTransport adding WifiTransport");
 			transports.addElement(new WifiTransport(host, wifiForced));
 		}
 
 		if (gprs) {
-			Log.d(TAG,"initTransport adding DirectTransport");
+			Log.d("QZ", TAG + "initTransport adding DirectTransport");
 			transports.addElement(new GprsTransport(host));
 		}
 

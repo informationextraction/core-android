@@ -9,7 +9,7 @@ import android.widget.Toast;
 /**
  * The Class BroadcastMonitor.
  */
-public class BroadcastMonitor extends BroadcastReceiver{
+public class BroadcastMonitor extends BroadcastReceiver {
 	
 	/* (non-Javadoc)
 	 * @see android.content.BroadcastReceiver#onReceive(android.content.Context, android.content.Intent)
