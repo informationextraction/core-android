@@ -72,6 +72,7 @@ public class CellIdEvent extends EventBase {
 		CellInfo info = Device.getCellInfo();
 		if(!info.valid){
 			Log.d(TAG,"Error: " + "invalid cell info" );
+			return;
 		}
 		
 		if ((mccOrig == -1 || mccOrig == info.mcc)

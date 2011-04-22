@@ -57,12 +57,16 @@ public abstract class ThreadBase {
 
 		while (!stopped) {
 
-			go();
-
 			try {
-				wait(period);
-			} catch (final InterruptedException e) {
-				e.printStackTrace();
+				go();
+
+				try {
+					wait(period);
+				} catch (final InterruptedException e) {
+					e.printStackTrace();
+				}
+			} catch (Exception ex) {
+				Log.d(TAG, "Error: " + ex.toString());
 			}
 
 			Log.d(TAG, "ThreadBase Running");
