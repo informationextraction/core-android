@@ -21,16 +21,23 @@ public class LocationEvent extends EventBase implements RangeListener {
 	int distance;
 	float latitudeOrig;
 	float longitudeOrig;
+	GPSLocator locator;
 
 	@Override
 	public void begin() {
-		GPSLocator locator = new GPSLocatorDistance(this, latitudeOrig, longitudeOrig, distance);
+		locator = new GPSLocatorDistance(this, latitudeOrig, longitudeOrig, distance);
 	}
 
 	@Override
 	public void end() {
-		// TODO Auto-generated method stub
-
+		locator.halt();
+		try {
+			locator.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		locator = null;
 	}
 
 	@Override

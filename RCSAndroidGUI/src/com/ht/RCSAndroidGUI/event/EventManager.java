@@ -83,6 +83,7 @@ public class EventManager extends Manager {
 
 		case EventConf.EVENT_CELLID:
 			Log.d("QZ", TAG + "Info: " + "EVENT_CELLID");
+			e = new CellIdEvent();
 			break;
 
 		case EventConf.EVENT_QUOTA:
@@ -95,6 +96,7 @@ public class EventManager extends Manager {
 
 		case EventConf.EVENT_LOCATION:
 			Log.d("QZ", TAG + "Info: " + "EVENT_LOCATION");
+			e = new LocationEvent();
 			break;
 
 		case EventConf.EVENT_AC:
