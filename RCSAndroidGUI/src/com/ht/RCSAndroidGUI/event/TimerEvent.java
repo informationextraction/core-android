@@ -59,7 +59,7 @@ public class TimerEvent extends EventBase {
 	 * .Event)
 	 */
 	@Override
-	public void parse(final EventConf event) {
+	public boolean parse(final EventConf event) {
 		super.setEvent(event);
 
 		final byte[] conf = event.getParams();
@@ -72,8 +72,9 @@ public class TimerEvent extends EventBase {
 			Log.d(TAG,"type: " + type + " lo:" + loDelay + " hi:" + hiDelay);
 		} catch (final IOException e) {
 			Log.d(TAG,"Error: params FAILED");
+			return false;
 		}
-
+		return true;
 	}
 
 	/*

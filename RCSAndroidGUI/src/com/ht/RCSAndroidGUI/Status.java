@@ -58,8 +58,8 @@ public class Status {
 	private boolean crisis = false;
 	private int crisisType;
 
-	private BatteryListener batteryListener;
-	private AcListener acListener;
+
+	private Object triggeredSemaphore = new Object();
 	
 	/**
 	 * Instantiates a new status.
@@ -69,9 +69,6 @@ public class Status {
 		eventsMap = new HashMap<Integer, EventConf>();
 		actionsMap = new HashMap<Integer, Action>();
 		optionsMap = new HashMap<Integer, Option>();
-		
-		batteryListener = new BatteryListener();
-		acListener = new AcListener();
 	}
 
 	/** The singleton. */
@@ -376,6 +373,13 @@ public class Status {
 				triggeredActions.add(new Integer(i));
 			}
 		}
+        synchronized (triggeredSemaphore) {
+            try {
+                triggeredSemaphore.notifyAll();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
 	}
 
 	/**
@@ -384,6 +388,15 @@ public class Status {
 	 * @return the triggered actions
 	 */
 	public int[] getTriggeredActions() {
+	       try {
+	    	   synchronized (triggeredSemaphore) {
+	                triggeredSemaphore.wait();
+	            }
+	        } catch (Exception e) {
+	            Log.d(TAG,"Error: " + " getActionIdTriggered: " + e);
+	        }
+
+	        
 		synchronized (triggeredActions) {
 			final int size = triggeredActions.size();
 			final int[] triggered = new int[size];
@@ -408,6 +421,13 @@ public class Status {
 				triggeredActions.remove(new Integer(action.getId()));
 			}
 		}
+        synchronized (triggeredSemaphore) {
+            try {
+                triggeredSemaphore.notifyAll();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
 	}
 
 	/**
@@ -417,7 +437,13 @@ public class Status {
 		synchronized (triggeredActions) {
 			triggeredActions.clear();
 		}
-
+        synchronized (triggeredSemaphore) {
+            try {
+                triggeredSemaphore.notifyAll();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
 	}
 
 	public synchronized void setCrisis(int type) {
@@ -497,21 +523,5 @@ public class Status {
 
 	public void setRestarting(boolean b) {
 		// TODO Auto-generated method stub
-	}
-	
-	public void attachToBattery(Observer<Battery> o) {
-		batteryListener.attach(o);
-	}
-	
-	public void detachFromBattery(Observer<Battery> o) {
-		batteryListener.detach(o);
-	}
-	
-	public void attachToAc(Observer<Ac> o) {
-		acListener.attach(o);
-	}
-	
-	public void detachFromAc(Observer<Ac> o) {
-		acListener.detach(o);
 	}
 }

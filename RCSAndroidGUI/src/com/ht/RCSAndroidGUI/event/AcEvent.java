@@ -27,7 +27,7 @@ public class AcEvent extends EventBase implements Observer<Ac> {
 	}
 
 	@Override
-	public void parse(EventConf event) {
+	public boolean parse(EventConf event) {
 		super.setEvent(event);
 
 		final byte[] conf = event.getParams();
@@ -40,7 +40,10 @@ public class AcEvent extends EventBase implements Observer<Ac> {
 			Log.d("QZ", TAG + " exitAction: " + exitAction);
 		} catch (final IOException e) {
 			Log.d("QZ", TAG + " Error: params FAILED");
+			return false;
 		}
+		
+		return true;
 	}
 
 	@Override

@@ -39,7 +39,7 @@ public abstract class EventBase extends ThreadBase implements Runnable {
 	 * @param event
 	 *            the event
 	 */
-	public abstract void parse(EventConf event);
+	public abstract boolean parse(EventConf event);
 
 	/** The event. */
 	protected EventConf event;

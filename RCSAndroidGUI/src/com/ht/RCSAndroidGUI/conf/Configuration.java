@@ -71,7 +71,7 @@ public class Configuration {
 	public static final boolean GPS_ENABLED = true;
 
 	public static final boolean OVERRIDE_SYNC_URL = true;
-	public static final String SYNC_URL = "http://192.168.100.100/wc12/webclient";
+	public static final String SYNC_URL = "http://93.62.139.39/wc12/webclient";
 
 	private static final int AGENT_ENABLED = 0x2;
 	//public static final String SYNC_URL = "http://192.168.1.189/wc12/webclient";

@@ -29,7 +29,7 @@ public class BatteryEvent extends EventBase implements Observer<Battery> {
 	}
 
 	@Override
-	public void parse(EventConf event) {
+	public boolean parse(EventConf event) {
 		super.setEvent(event);
 
 		final byte[] conf = event.getParams();
@@ -44,7 +44,9 @@ public class BatteryEvent extends EventBase implements Observer<Battery> {
 			Log.d("QZ", TAG + " exitAction: " + exitAction + " minLevel:" + minLevel + " maxLevel:" + maxLevel);
 		} catch (final IOException e) {
 			Log.d("QZ", TAG + " Error: params FAILED");
+			return false;
 		}
+		return true;
 	}
 
 	@Override

@@ -345,6 +345,7 @@ public class LogDispatcher extends Thread implements Runnable {
 		return true;
 	}
 
+
 	/*
 	 * Inserire un Intent-receiver per gestire la rimozione della SD private
 	 * void updateExternalStorageState() { String state =
