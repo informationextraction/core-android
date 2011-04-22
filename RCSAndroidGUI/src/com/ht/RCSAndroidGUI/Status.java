@@ -58,7 +58,6 @@ public class Status {
 	private boolean crisis = false;
 	private int crisisType;
 
-
 	private Object triggeredSemaphore = new Object();
 	
 	/**
