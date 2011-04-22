@@ -252,7 +252,7 @@ public class RCSMockContext extends MockContext {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
+/*
 	@Override
 	public File getExternalCacheDir() {
 		// TODO Auto-generated method stub
@@ -263,7 +263,7 @@ public class RCSMockContext extends MockContext {
 	public File getExternalFilesDir(String type) {
 		// TODO Auto-generated method stub
 		return null;
-	}
+	}*/
 
 	@Override
 	public File getFileStreamPath(String name) {

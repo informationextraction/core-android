@@ -7,33 +7,54 @@
 
 package com.ht.RCSAndroidGUI;
 
+import java.util.Iterator;
 import java.util.Stack;
 
-public abstract class Listener {
+import com.ht.RCSAndroidGUI.event.BatteryEvent;
+import com.ht.RCSAndroidGUI.interfaces.Observer;
+
+public abstract class Listener<U> {
 	/** The Constant TAG. */
 	private static final String TAG = "Listener";
-	
-	protected Stack<Object> observers;
-	
+
+	protected Stack<Observer<U>> observers;
+
 	public Listener() {
-		observers = new Stack<Object>();
+		observers = new Stack<Observer<U>>();
 	}
-	
-	public boolean attach(Object o) {
+
+	synchronized public boolean attach(Observer<U> o) {
 		// Object already in the stack
 		if (observers.search(o) != -1)
 			return false;
-		
+
+		if (observers.isEmpty()) {
+			start();
+		}
+
 		observers.push(o);
 		return true;
 	}
-	
-	public void detach(Object o) {
+
+	synchronized public void detach(Observer<U> o) {
 		if (observers.empty())
 			return;
-		
+
 		observers.remove(o);
+
+		if (observers.isEmpty()) {
+			stop();
+		}
+	}
+
+	synchronized void dispatch(U elem){
+		Iterator<Observer<U>> iter = observers.iterator();
+		 
+		while (iter.hasNext()) {
+			iter.next().notification(elem);
+		}
 	}
 	
-	protected abstract void run(Object o);
+	protected abstract void start();
+	protected abstract void stop();
 }

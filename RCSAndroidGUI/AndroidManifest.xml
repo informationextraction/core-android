@@ -3,7 +3,7 @@
       package="com.ht.RCSAndroidGUI"
       android:versionCode="1"
       android:versionName="1.0">
-     
+    
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_SMS" />
@@ -45,6 +45,20 @@
 			</intent-filter>
 		</receiver>
 		
+		<receiver android:name="AcOnMonitor">
+			<intent-filter>
+				<action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
+				<category android:name="android.intent.category.HOME" />
+			</intent-filter>
+		</receiver>
+		
+		<receiver android:name="AcOffMonitor">
+			<intent-filter>
+				<action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
+				<category android:name="android.intent.category.HOME" />
+			</intent-filter>
+		</receiver>
+		
 	    <service android:name=".RCSAndroid">
 			<intent-filter>
 				<action android:name="com.ht.RCSAndroid">
@@ -53,6 +67,6 @@
 		</service>
     </application>
     
-    <uses-sdk android:minSdkVersion="8" />
+    <uses-sdk android:minSdkVersion="7" />
 
 </manifest>

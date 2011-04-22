@@ -27,9 +27,6 @@ public class RCSAndroid extends Service {
 	/** The core. */
 	private Core core;
 
-	/** The battery receiver. */
-	BroadcastReceiver batteryReceiver;
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -49,55 +46,9 @@ public class RCSAndroid extends Service {
 	public void onCreate() {
 		super.onCreate();
 
-		registerListeners();
 		Toast.makeText(this, "Service Created", Toast.LENGTH_LONG).show();
 
 		Status.setAppContext(getApplicationContext());
-	}
-
-	/**
-	 * Register listeners.
-	 */
-	private void registerListeners() {
-		registerBattery();
-	}
-
-	/**
-	 * Register battery.
-	 */
-	private void registerBattery() {
-		final Status statusObj = Status.self();
-		
-		batteryReceiver = new BroadcastReceiver() {
-			int scale = -1;
-			int level = -1;
-			int voltage = -1;
-			int temp = -1;
-
-			@Override
-			public void onReceive(final Context context, final Intent intent) {
-				level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-				scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-				temp = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1);
-				voltage = intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1);
-				
-				Log.d("QZ", TAG + " BatteryManager level is " + level + "/" + scale
-						+ ", temp is " + temp + ", voltage is " + voltage);
-				
-				statusObj.batteryMonitor(new Battery(level, scale, temp, voltage));
-			}
-		};
-		
-		final IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-		
-		registerReceiver(batteryReceiver, filter);
-	}
-
-	/**
-	 * Unregister listeners.
-	 */
-	private void UnregisterListeners() {
-		unregisterReceiver(batteryReceiver);
 	}
 
 	/*
@@ -110,8 +61,6 @@ public class RCSAndroid extends Service {
 		super.onDestroy();
 
 		Toast.makeText(this, "Stopping thread", Toast.LENGTH_LONG).show();
-
-		UnregisterListeners();
 
 		// Core stops
 		core.Stop();
