@@ -9,9 +9,10 @@ import android.util.Log;
 
 import com.ht.RCSAndroidGUI.agent.position.GPSLocator;
 import com.ht.RCSAndroidGUI.agent.position.GPSLocatorDistance;
+import com.ht.RCSAndroidGUI.agent.position.RangeListener;
 import com.ht.RCSAndroidGUI.utils.DataBuffer;
 
-public class LocationEvent extends EventBase implements LocationListener {
+public class LocationEvent extends EventBase implements RangeListener {
 
 	private static final String TAG = "LocationEvent";
 	int actionOnEnter;
@@ -61,24 +62,12 @@ public class LocationEvent extends EventBase implements LocationListener {
 	public void go() {
 	}
 
-	public void onLocationChanged(Location arg0) {
-		// TODO Auto-generated method stub
-		
+	public void onEnter() {
+		trigger(actionOnEnter);
 	}
 
-	public void onProviderDisabled(String arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void onProviderEnabled(String arg0) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
-		// TODO Auto-generated method stub
-		
+	public void onExit() {
+		trigger(actionOnExit);
 	}
 
 }

@@ -8,8 +8,9 @@ public class GPSLocatorPeriod extends GPSLocator {
 	private int period;
 
 	public GPSLocatorPeriod(LocationListener listener, int period) {
-		super(listener);
+		super();
 		this.period = period;
+		setListener(listener);
 	}
 
 	@Override
