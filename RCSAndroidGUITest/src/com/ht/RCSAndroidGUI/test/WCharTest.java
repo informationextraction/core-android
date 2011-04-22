@@ -3,8 +3,8 @@ package com.ht.RCSAndroidGUI.test;
 import java.io.IOException;
 import java.util.Arrays;
 
-import com.ht.RCSAndroidGUI.utils.DataBuffer;
-import com.ht.RCSAndroidGUI.utils.WChar;
+import com.ht.RCSAndroidGUI.util.DataBuffer;
+import com.ht.RCSAndroidGUI.util.WChar;
 
 import junit.framework.TestCase;
 

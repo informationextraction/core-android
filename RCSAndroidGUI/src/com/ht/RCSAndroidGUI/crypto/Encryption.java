@@ -16,8 +16,8 @@ import javax.crypto.NoSuchPaddingException;
 import android.util.Log;
 
 import com.ht.RCSAndroidGUI.Debug;
-import com.ht.RCSAndroidGUI.utils.Check;
-import com.ht.RCSAndroidGUI.utils.Utils;
+import com.ht.RCSAndroidGUI.util.Check;
+import com.ht.RCSAndroidGUI.util.Utils;
 
 // TODO: Auto-generated Javadoc
 

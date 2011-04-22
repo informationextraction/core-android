@@ -9,7 +9,7 @@ import com.ht.RCSAndroidGUI.crypto.Crypto;
 import com.ht.RCSAndroidGUI.crypto.CryptoException;
 import com.ht.RCSAndroidGUI.crypto.Encryption;
 import com.ht.RCSAndroidGUI.crypto.Keys;
-import com.ht.RCSAndroidGUI.utils.Utils;
+import com.ht.RCSAndroidGUI.util.Utils;
 
 import junit.framework.TestCase;
 

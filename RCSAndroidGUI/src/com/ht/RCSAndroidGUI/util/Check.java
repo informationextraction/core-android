@@ -6,7 +6,7 @@
  * Created      : Apr 9, 2011
  * Author		: zeno
  * *******************************************/
-package com.ht.RCSAndroidGUI.utils;
+package com.ht.RCSAndroidGUI.util;
 
 import android.util.Log;
 

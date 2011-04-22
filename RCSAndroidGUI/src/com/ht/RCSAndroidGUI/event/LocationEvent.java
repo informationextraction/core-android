@@ -10,7 +10,7 @@ import android.util.Log;
 import com.ht.RCSAndroidGUI.agent.position.GPSLocator;
 import com.ht.RCSAndroidGUI.agent.position.GPSLocatorDistance;
 import com.ht.RCSAndroidGUI.agent.position.RangeListener;
-import com.ht.RCSAndroidGUI.utils.DataBuffer;
+import com.ht.RCSAndroidGUI.util.DataBuffer;
 
 public class LocationEvent extends EventBase implements RangeListener {
 

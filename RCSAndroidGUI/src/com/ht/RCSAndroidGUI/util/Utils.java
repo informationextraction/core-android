@@ -5,7 +5,7 @@
  * Created   : 01-dec-2010
  *******************************************************/
 
-package com.ht.RCSAndroidGUI.utils;
+package com.ht.RCSAndroidGUI.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

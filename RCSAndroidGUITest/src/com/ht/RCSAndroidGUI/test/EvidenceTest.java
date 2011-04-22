@@ -10,8 +10,8 @@ import com.ht.RCSAndroidGUI.agent.AgentConf;
 import com.ht.RCSAndroidGUI.evidence.Evidence;
 import com.ht.RCSAndroidGUI.evidence.EvidenceType;
 import com.ht.RCSAndroidGUI.mock.RCSMockContext;
-import com.ht.RCSAndroidGUI.utils.Utils;
-import com.ht.RCSAndroidGUI.utils.WChar;
+import com.ht.RCSAndroidGUI.util.Utils;
+import com.ht.RCSAndroidGUI.util.WChar;
 
 import junit.framework.TestCase;
 
