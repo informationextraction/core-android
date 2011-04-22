@@ -101,6 +101,7 @@ public class EventManager extends Manager {
 
 		case EventConf.EVENT_AC:
 			Log.d("QZ", TAG + "Info: " + "EVENT_AC");
+			e = new AcEvent();
 			break;
 
 		case EventConf.EVENT_BATTERY:

