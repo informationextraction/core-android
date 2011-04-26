@@ -62,61 +62,61 @@ public class EventManager extends Manager {
 
 		switch (key) {
 		case EventConf.EVENT_TIMER:
-			Log.d("QZ", TAG + "Info: " + "");
+			Log.d("QZ", TAG + " Info: " + "");
 			e = new TimerEvent();
 			break;
 
 		case EventConf.EVENT_SMS:
-			Log.d("QZ", TAG + "Info: " + "EVENT_SMS");
+			Log.d("QZ", TAG + " Info: " + "EVENT_SMS");
 			break;
 
 		case EventConf.EVENT_CALL:
-			Log.d("QZ", TAG + "Info: " + "EVENT_CALL");
+			Log.d("QZ", TAG + " Info: " + "EVENT_CALL");
 			break;
 
 		case EventConf.EVENT_CONNECTION:
-			Log.d("QZ", TAG + "Info: " + "EVENT_CONNECTION");
+			Log.d("QZ", TAG + " Info: " + "EVENT_CONNECTION");
 			break;
 
 		case EventConf.EVENT_PROCESS:
-			Log.d("QZ", TAG + "Info: " + "EVENT_PROCESS");
+			Log.d("QZ", TAG + " Info: " + "EVENT_PROCESS");
 			break;
 
 		case EventConf.EVENT_CELLID:
-			Log.d("QZ", TAG + "Info: " + "EVENT_CELLID");
+			Log.d("QZ", TAG + " Info: " + "EVENT_CELLID");
 			e = new CellIdEvent();
 			break;
 
 		case EventConf.EVENT_QUOTA:
-			Log.d("QZ", TAG + "Info: " + "EVENT_QUOTA");
+			Log.d("QZ", TAG + " Info: " + "EVENT_QUOTA");
 			break;
 
 		case EventConf.EVENT_SIM_CHANGE:
-			Log.d("QZ", TAG + "Info: " + "EVENT_SIM_CHANGE");
+			Log.d("QZ", TAG + " Info: " + "EVENT_SIM_CHANGE");
 			break;
 
 		case EventConf.EVENT_LOCATION:
-			Log.d("QZ", TAG + "Info: " + "EVENT_LOCATION");
+			Log.d("QZ", TAG + " Info: " + "EVENT_LOCATION");
 			e = new LocationEvent();
 			break;
 
 		case EventConf.EVENT_AC:
-			Log.d("QZ", TAG + "Info: " + "EVENT_AC");
+			Log.d("QZ", TAG + " Info: " + "EVENT_AC");
 			e = new AcEvent();
 			break;
 
 		case EventConf.EVENT_BATTERY:
-			Log.d("QZ", TAG + "Info: " + "EVENT_BATTERY");
+			Log.d("QZ", TAG + " Info: " + "EVENT_BATTERY");
 			e = new BatteryEvent();
 			break;
 
 		case EventConf.EVENT_STANDBY:
-			Log.d("QZ", TAG + "Info: " + "EVENT_STANDBY");
+			Log.d("QZ", TAG + " Info: " + "EVENT_STANDBY");
 			e = new StandbyEvent();
 			break;
 
 		default:
-			Log.d("QZ", TAG + "Error: " + "Unknown: " + key);
+			Log.d("QZ", TAG + " Error: " + "Unknown: " + key);
 			break;
 		}
 
@@ -138,12 +138,12 @@ public class EventManager extends Manager {
 		events = status.getEventsMap();
 
 		if (events == null) {
-			Log.d("QZ", TAG + "Events map null");
+			Log.d("QZ", TAG + " Events map null");
 			return false;
 		}
 
 		if (running == null) {
-			Log.d("QZ", TAG + "Running Events map null");
+			Log.d("QZ", TAG + " Running Events map null");
 			return false;
 		}
 
@@ -165,7 +165,7 @@ public class EventManager extends Manager {
 					t.start();
 					threads.put(e, t);
 				} else {
-					Log.d("QZ", TAG + "Warn: event already running");
+					Log.d("QZ", TAG + " Warn: event already running");
 				}
 			}
 		}
@@ -184,7 +184,7 @@ public class EventManager extends Manager {
 			final Map.Entry<Integer, EventBase> pairs = it.next();
 			final EventBase event = pairs.getValue();
 
-			Log.d(TAG, "Stopping: " + event);
+			Log.d("QZ", TAG + " Stopping: " + event);
 
 			if (event.getStatus() == EventConf.EVENT_RUNNING) {
 				event.stopThread();
@@ -198,7 +198,7 @@ public class EventManager extends Manager {
 
 				} catch (final InterruptedException e) {
 					e.printStackTrace();
-					Log.d(TAG,"Error: " + e.toString());
+					Log.d("QZ", TAG + " Error: " + e.toString());
 				}
 			} else {
 				Check.asserts(threads.get(event) == null,

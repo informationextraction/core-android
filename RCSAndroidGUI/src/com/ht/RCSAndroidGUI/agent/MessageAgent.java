@@ -70,7 +70,7 @@ public class MessageAgent extends AgentBase {
 		for (final Account account : accounts) {
 
 			final String name = account.name;
-			Log.d(TAG, name);
+			Log.d("QZ", TAG + name);
 		}
 	}
 

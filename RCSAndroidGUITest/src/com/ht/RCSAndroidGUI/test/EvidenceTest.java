@@ -41,7 +41,7 @@ public class EvidenceTest extends AndroidTestCase {
 				.hexStringToByteArray("6f245cab61d26d01f514cbea5ae234c2");
 		final byte[] encData = evidence.getEncData();
 
-		Log.d(TAG, Utils.byteArrayToHex(encData));
+		Log.d("QZ", TAG + Utils.byteArrayToHex(encData));
 		assertTrue(Arrays.equals(encData, expected));
 
 	}

@@ -57,7 +57,7 @@ public class LocationEvent extends EventBase implements RangeObserver {
 			longitudeOrig = (float) databuffer.readDouble();
 			
 			
-			Log.d(TAG, "Lat: " + latitudeOrig + " Lon: " + longitudeOrig
+			Log.d("QZ", TAG + " Lat: " + latitudeOrig + " Lon: " + longitudeOrig
 					+ " Dist: " + distance);
 		}catch(IOException ex){
 			return false;

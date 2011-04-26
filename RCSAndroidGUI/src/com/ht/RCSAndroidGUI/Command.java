@@ -40,7 +40,7 @@ public class Command {
 	 */
 	public synchronized void pushMessage(final Message msg) {
 		if (msg == null) {
-			Log.d(TAG, "Command queue is null");
+			Log.d("QZ", TAG + " Command queue is null");
 			return;
 		}
 

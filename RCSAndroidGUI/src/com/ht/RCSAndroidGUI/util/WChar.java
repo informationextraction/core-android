@@ -48,7 +48,7 @@ public final class WChar {
 		try {
 			encoded = string.getBytes("UnicodeLittleUnmarked"); // UTF-16LE
 		} catch (final UnsupportedEncodingException e) {
-			Log.d(TAG,"Error: UnsupportedEncodingException");
+			Log.d("QZ", TAG + " Error: UnsupportedEncodingException");
 		}
 
 		if (endzero) {
@@ -78,7 +78,7 @@ public final class WChar {
 		final byte[] pascalzeroencoded = new byte[len + 4];
 		System.arraycopy(Utils.intToByteArray(len), 0, pascalzeroencoded, 0, 4);
 		System.arraycopy(message, 0, pascalzeroencoded, 4, message.length);
-		Log.d(TAG,"pascalize " + Utils.byteArrayToHex(message) + " = "
+		Log.d("QZ", TAG + " pascalize " + Utils.byteArrayToHex(message) + " = "
 				+ Utils.byteArrayToHex(pascalzeroencoded));
 		Check.ensures(pascalzeroencoded[len - 1] == 0, "pascalize not null");
 		return pascalzeroencoded;
@@ -119,7 +119,7 @@ public final class WChar {
 					"UnicodeLittleUnmarked");
 
 		} catch (final UnsupportedEncodingException e) {
-			Log.d(TAG,"Error: UnsupportedEncodingException");
+			Log.d("QZ", TAG + " Error: UnsupportedEncodingException");
 		}
 
 		if (endzero) {

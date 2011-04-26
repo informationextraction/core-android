@@ -126,7 +126,7 @@ public final class AutoFile {
 				try {
 					out.close();
 				} catch (final IOException e) {
-					Log.d(TAG,"Error: " +e.toString());
+					Log.d("QZ", TAG + " Error: " +e.toString());
 				}
 			}
 		}
@@ -218,6 +218,6 @@ public final class AutoFile {
 		File newfile = new File(file.getParent(),newname);
 		boolean ret = file.renameTo(newfile);
 		
-		Log.d(TAG,"renaming file: "+newfile+" ret: "+ret);
+		Log.d("QZ", TAG + " renaming file: "+newfile+" ret: "+ret);
 	}
 }

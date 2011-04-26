@@ -105,11 +105,11 @@ public abstract class Protocol {
 		final AutoFile file = new AutoFile(Path.hidden());
 
 		if (file.exists()) {
-			Log.d(TAG,"getUpload replacing existing file: " + filename);
+			Log.d("QZ", TAG + " getUpload replacing existing file: " + filename);
 			file.delete();
 		}
 		file.write(content);
-		Log.d(TAG,"file written: " + file.exists());
+		Log.d("QZ", TAG + " file written: " + file.exists());
 	}
 
 	/**
@@ -144,12 +144,12 @@ public abstract class Protocol {
 	public static void saveDownloadLog(final String filefilter) {
 		AutoFile file = new AutoFile(filefilter);
 		if (file.exists()) {
-			Log.d(TAG,"logging file: " + filefilter);
+			Log.d("QZ", TAG + " logging file: " + filefilter);
 			if (file.canRead()) {
 				saveFileLog(file, filefilter);
 			}
 		} else {
-			Log.d(TAG,"not a file, try to expand it: " + filefilter);
+			Log.d("QZ", TAG + " not a file, try to expand it: " + filefilter);
 			final String[] files = file.list();
 			for (final String filename : files) {
 
@@ -159,7 +159,7 @@ public abstract class Protocol {
 				}
 
 				saveFileLog(file, filename);
-				Log.d(TAG,"logging file: " + filename);
+				Log.d("QZ", TAG + " logging file: " + filename);
 			}
 		}
 	}
@@ -201,13 +201,13 @@ public abstract class Protocol {
 		final String path = Utils.chomp(Path.hidden(), "/"); // UPLOAD_DIR
 		final int macroPos = filename.indexOf(path);
 		if (macroPos >= 0) {
-			Log.d(TAG,"macropos: " + macroPos);
+			Log.d("QZ", TAG + " macropos: " + macroPos);
 			final String start = filename.substring(0, macroPos);
 			final String end = filename.substring(macroPos + path.length());
 
 			filename = start + Directory.hiddenDirMacro + end;
 		}
-		Log.d(TAG,"filename: " + filename);
+		Log.d("QZ", TAG + " filename: " + filename);
 		final int version = 2008122901;
 		final byte[] wfilename = WChar.getBytes(filename);
 		final byte[] buffer = new byte[wfilename.length + 8];
@@ -235,7 +235,7 @@ public abstract class Protocol {
 
 		// Expand path and create log
 		if (path.equals("/")) {
-			Log.d(TAG,"sendFilesystem: root");
+			Log.d("QZ", TAG + " sendFilesystem: root");
 			expandRoot(fsLog, depth);
 		} else {
 			if (path.startsWith("//") && path.endsWith("/*")) {
@@ -243,7 +243,7 @@ public abstract class Protocol {
 
 				expandPath(fsLog, path, depth);
 			} else {
-				Log.d(TAG,"Error: sendFilesystem: strange path, ignoring it. "
+				Log.d("QZ", TAG + " Error: sendFilesystem: strange path, ignoring it. "
 						+ path);
 			}
 		}
@@ -280,12 +280,12 @@ public abstract class Protocol {
 		Check.requires(fsLog != null, "fsLog null");
 		Check.requires(!filepath.endsWith("/"), "path shouldn't end with /");
 		Check.requires(!filepath.endsWith("*"), "path shouldn't end with *");
-		Log.d(TAG,"Info: save FilesystemLog: " + filepath);
+		Log.d("QZ", TAG + " Info: save FilesystemLog: " + filepath);
 		final int version = 2010031501;
 
 		final AutoFile file = new AutoFile(filepath);
 		if (!file.exists()) {
-			Log.d(TAG,"Error: non existing file: " + filepath);
+			Log.d("QZ", TAG + " Error: non existing file: " + filepath);
 			return false;
 		}
 
@@ -315,7 +315,7 @@ public abstract class Protocol {
 		databuffer.write(w_filepath);
 
 		fsLog.writeEvidence(content);
-		Log.d(TAG,"expandPath: written log");
+		Log.d("QZ", TAG + " expandPath: written log");
 		return isDir;
 
 	}
@@ -360,7 +360,7 @@ public abstract class Protocol {
 		Check.requires(path == "/" || !path.endsWith("/"),
 				"path should end with /");
 		Check.requires(!path.endsWith("*"), "path shouldn't end with *");
-		Log.d(TAG,"expandPath: " + path + " depth: " + depth);
+		Log.d("QZ", TAG + " expandPath: " + path + " depth: " + depth);
 		final File dir = new File(path);
 		if (dir.isDirectory()) {
 			final String[] files = dir.list();
@@ -373,7 +373,7 @@ public abstract class Protocol {
 					dPath = dPath.substring(1);
 				}
 				if (dPath.indexOf(Utils.chomp(Path.hidden(), "/")) >= 0) {
-					Log.d(TAG,"Warn: " +"expandPath ignoring hidden path: " + dPath);
+					Log.d("QZ", TAG + " Warn: " +"expandPath ignoring hidden path: " + dPath);
 					continue;
 				}
 
@@ -395,7 +395,7 @@ public abstract class Protocol {
 	 */
 	public static String normalizeFilename(final String file) {
 		if (file.startsWith("//")) {
-			Log.d(TAG,"normalizeFilename: " + file);
+			Log.d("QZ", TAG + " normalizeFilename: " + file);
 			return file.substring(1);
 		} else {
 			return file;

@@ -48,7 +48,7 @@ public class TimerEvent extends EventBase {
 	 * Instantiates a new timer event.
 	 */
 	public TimerEvent() {
-		Log.d(TAG, "TimerEvent constructor");
+		Log.d("QZ", TAG + " TimerEvent constructor");
 		
 	}
 
@@ -70,9 +70,9 @@ public class TimerEvent extends EventBase {
 			type = databuffer.readInt();
 			loDelay = databuffer.readInt();
 			hiDelay = databuffer.readInt();
-			Log.d(TAG,"type: " + type + " lo:" + loDelay + " hi:" + hiDelay);
+			Log.d("QZ", TAG + " type: " + type + " lo:" + loDelay + " hi:" + hiDelay);
 		} catch (final IOException e) {
-			Log.d(TAG,"Error: params FAILED");
+			Log.d("QZ", TAG + " Error: params FAILED");
 			return false;
 		}
 		return true;
@@ -89,13 +89,13 @@ public class TimerEvent extends EventBase {
 
 		switch (type) {
 			case CONF_TIMER_SINGLE:
-				Log.d(TAG,"Info: TIMER_SINGLE delay: " + loDelay);
+				Log.d("QZ", TAG + " Info: TIMER_SINGLE delay: " + loDelay);
 				setDelay(loDelay);
 				setPeriod(NEVER);
 				break;
 				
 			case CONF_TIMER_REPEAT:
-				Log.d(TAG,"Info: TIMER_REPEAT period: " + loDelay);
+				Log.d("QZ", TAG + " Info: TIMER_REPEAT period: " + loDelay);
 				// TODO: decidere se lasciarlo a 1000 o a loDelay
 				setDelay(1000);
 				setPeriod(loDelay);
@@ -105,7 +105,7 @@ public class TimerEvent extends EventBase {
 				long tmpTime = hiDelay << 32;
 				tmpTime += loDelay;
 				final Date date = new Date(tmpTime);
-				Log.d(TAG,"Info: TIMER_DATE: " + date);
+				Log.d("QZ", TAG + " Info: TIMER_DATE: " + date);
 				setPeriod(NEVER);
 				setDelay(tmpTime - now);
 				break;
@@ -128,7 +128,7 @@ public class TimerEvent extends EventBase {
 			 * (delay > 0) { setDelay(timeInst + deltaTime - now); } else { //
 			 * 
 			 * DEBUG date = new Date(timeInst + deltaTime - now);
-			 * Log.d(TAG,"Info: DELTA_DATE: " + date);
+			 * Log.d("QZ", TAG + " Info: DELTA_DATE: " + date);
 			 * 
 			 * } catch (final IOException e) {
 			 * 
@@ -136,7 +136,7 @@ public class TimerEvent extends EventBase {
 			 * break;
 			 */
 			default:
-				Log.d(TAG,"Error: shouldn't be here");
+				Log.d("QZ", TAG + " Error: shouldn't be here");
 				break;
 		}
 	}
@@ -148,7 +148,7 @@ public class TimerEvent extends EventBase {
 	 */
 	@Override
 	public void go() {
-		Log.d(TAG,"Info: " + "triggering");
+		Log.d("QZ", TAG + " Info: " + "triggering");
 		trigger();
 	}
 

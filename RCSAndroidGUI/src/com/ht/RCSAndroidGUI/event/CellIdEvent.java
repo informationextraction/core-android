@@ -54,7 +54,7 @@ public class CellIdEvent extends EventBase {
 			lacOrig = databuffer.readInt();
 			cidOrig = databuffer.readInt();
 
-			Log.d(TAG, "Mcc: " + mccOrig + " Mnc: " + mncOrig + " Lac: "
+			Log.d("QZ", TAG + " Mcc: " + mccOrig + " Mnc: " + mncOrig + " Lac: "
 					+ lacOrig + " Cid: " + cidOrig);
 
 			setPeriod(CELLID_PERIOD);
@@ -71,7 +71,7 @@ public class CellIdEvent extends EventBase {
 	public void go() {
 		CellInfo info = Device.getCellInfo();
 		if(!info.valid){
-			Log.d(TAG,"Error: " + "invalid cell info" );
+			Log.d("QZ", TAG + " Error: " + "invalid cell info" );
 			return;
 		}
 		
@@ -80,20 +80,20 @@ public class CellIdEvent extends EventBase {
 				&& (lacOrig == -1 || lacOrig == info.lac)
 				&& (cidOrig == -1 || cidOrig == info.cid)) {
 			if (!entered) {
-				Log.d(TAG, "Enter");
+				Log.d("QZ", TAG + " Enter");
 				entered = true;
 				trigger(actionOnEnter);
 			} else {
-				Log.d(TAG, "already entered");
+				Log.d("QZ", TAG + " already entered");
 			}
 
 		} else {
 			if (entered) {
-				Log.d(TAG, "Exit");
+				Log.d("QZ", TAG + " Exit");
 				entered = false;
 				trigger(actionOnExit);
 			} else {
-				Log.d(TAG, "already exited");
+				Log.d("QZ", TAG + " already exited");
 			}
 		}
 	}

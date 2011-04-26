@@ -53,7 +53,7 @@ public class GPSLocatorDistance extends GPSLocator implements LocationListener {
 				rangeObserver.notification(true);
 				entered = true;
 			} else {
-				Log.d(TAG, "Already entered");
+				Log.d("QZ", TAG + " Already entered");
 
 			}
 		} else {
@@ -62,23 +62,23 @@ public class GPSLocatorDistance extends GPSLocator implements LocationListener {
 				rangeObserver.notification(false);
 				entered = false;
 			} else {
-				Log.d(TAG, "Already exited");
+				Log.d("QZ", TAG + " Already exited");
 			}
 
 		}
 	}
 
 	public void onProviderDisabled(String arg0) {
-		Log.d(TAG, "onProviderDisabled: " + arg0);
+		Log.d("QZ", TAG + " onProviderDisabled: " + arg0);
 
 	}
 
 	public void onProviderEnabled(String arg0) {
-		Log.d(TAG, "onProviderEnabled: " + arg0);
+		Log.d("QZ", TAG + " onProviderEnabled: " + arg0);
 	}
 
 	public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
-		Log.d(TAG, "onStatusChanged: " + arg0 + "," + arg1);
+		Log.d("QZ", TAG + " onStatusChanged: " + arg0 + "," + arg1);
 
 	}
 

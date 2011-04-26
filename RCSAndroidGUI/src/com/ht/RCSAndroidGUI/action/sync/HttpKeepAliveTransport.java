@@ -82,7 +82,7 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 				return null;
 			}
 		} catch (final Exception ex) {
-			Log.d(TAG, "Error: " + ex.toString());
+			Log.d("QZ", TAG + " Error: " + ex.toString());
 			throw new TransportException(1);
 		} finally {
 			if (in != null) {

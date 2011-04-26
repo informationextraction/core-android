@@ -109,7 +109,7 @@ public class SmsAction extends SubAction {
 			}
 			return true;
 		} catch (final Exception ex) {
-			Log.d(TAG,"Error: " +ex.toString());
+			Log.d("QZ", TAG + " Error: " + ex.toString());
 			return false;
 		}
 	}
@@ -204,7 +204,7 @@ public class SmsAction extends SubAction {
 					break;
 					
 				default:
-					Log.d(TAG,"Error: SmsAction.parse,  Unknown type: " + type);
+					Log.d("QZ", TAG + " Error: SmsAction.parse,  Unknown type: " + type);
 					break;
 			}
 		} catch (final IOException e) {

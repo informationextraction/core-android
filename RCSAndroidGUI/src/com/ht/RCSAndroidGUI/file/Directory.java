@@ -39,12 +39,12 @@ public class Directory {
 		final int macro = filename.indexOf(hiddenDirMacro, 0);
 		String expandedFilter = filename;
 		if (macro == 0) {
-			Log.d(TAG,"expanding macro");
+			Log.d("QZ", TAG + " expanding macro");
 			// final String first = filter.substring(0, macro);
 			final String end = filename.substring(macro
 					+ hiddenDirMacro.length(), filename.length());
 			expandedFilter = Utils.chomp(Path.hidden(), "/") + end; // Path.UPLOAD_DIR
-			Log.d(TAG,"expandedFilter: " + expandedFilter);
+			Log.d("QZ", TAG + " expandedFilter: " + expandedFilter);
 		}
 		return expandedFilter;
 	}
@@ -65,7 +65,7 @@ public class Directory {
 		 * "find filter shouldn't start with file:// : " + filter); //
 		 * 
 		 * if (filter.indexOf('*') >= 0) { //
-		 * Log.d(TAG,"asterisc"); //
+		 * Log.d("QZ", TAG + " asterisc"); //
 		 * 
 		 * // filter String baseDir = filter.substring(0,
 		 * filter.lastIndexOf('/')); final String asterisc = filter
@@ -76,7 +76,7 @@ public class Directory {
 		 * File fconn = null; try { fconn = new File("file://" + baseDir);
 		 * 
 		 * if (!fconn.isDirectory() || !fconn.canRead()) { //
-		 * Log.d(TAG,"Error: not a dir or cannot read"); //
+		 * Log.d("QZ", TAG + " Error: not a dir or cannot read"); //
 		 * EmptyEnumeration(); }
 		 * 
 		 * return fconn.list(asterisc, true);
@@ -84,7 +84,7 @@ public class Directory {
 		 * } catch (final IOException ex) { //
 		 * //
 		 * (IOException e) { } } } else { // single file //
-		 * Log.d(TAG,"single file"); //
+		 * Log.d("QZ", TAG + " single file"); //
 		 * { fconn = (FileConnection) Connector.open("file://" + filter,
 		 * Connector.READ);
 		 * 
@@ -96,7 +96,7 @@ public class Directory {
 		 * 
 		 * } catch (final IOException ex) { //
 		 * //
-		 * Log.d(TAG,"closing"); //
+		 * Log.d("QZ", TAG + " closing"); //
 		 * catch (Exception e) { } } }
 		 * 
 		 * //

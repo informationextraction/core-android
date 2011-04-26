@@ -49,17 +49,17 @@ public abstract class AgentBase extends ThreadBase implements Runnable {
 			begin();
 			loop();
 		}catch(Exception ex){
-			Log.d(TAG,"Error: "+ex);
+			Log.d("QZ", TAG + " Error: "+ex);
 		}
 		
 		try{
 			end();
 		}catch(Exception ex){
-			Log.d(TAG,"Error: "+ex);
+			Log.d("QZ", TAG + " Error: "+ex);
 		}
 
 		status = AgentConf.AGENT_STOPPED;
-		Log.d(TAG, "AgentBase stopped");
+		Log.d("QZ", TAG + " AgentBase stopped");
 	}
 
 	boolean suspended;

@@ -53,7 +53,7 @@ public class CryptoTest extends TestCase {
 	}
 
 	public final void testAes() throws Exception {
-		Log.d(TAG ,"Info: -- RijndaelTest --");
+		Log.d("QZ", TAG + " Info: -- RijndaelTest --");
 		// i valori seguenti sono stati presi dal paper che descriveva il
 		// rijandael per aes
 		final byte[] key = new byte[] { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05,
@@ -113,7 +113,7 @@ public class CryptoTest extends TestCase {
 	}
 
 	public final void testCBC() throws CryptoException {
-		Log.d(TAG,"Info: -- CBCTest --");
+		Log.d("QZ", TAG + " Info: -- CBCTest --");
 		final byte[] key = new byte[] { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05,
 				0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
 		byte[] plain = new byte[] { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66,
@@ -140,7 +140,7 @@ public class CryptoTest extends TestCase {
 	}
 
 	public final void testCBC32() throws CryptoException {
-		Log.d(TAG,"Info: -- CBCTest --");
+		Log.d("QZ", TAG + " Info: -- CBCTest --");
 		String pl = "0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f0f";
 		String cyph = "03a9c8fe778fb8a8668359542ad4d58413de91874e97dbedb518847a49cc0aaa";
 
@@ -166,14 +166,14 @@ public class CryptoTest extends TestCase {
 	}
 
 	public final void testEncryptDataByteArray() throws CryptoException {
-		Log.d(TAG,"Info: -- EncryptTest --");
+		Log.d("QZ", TAG + " Info: -- EncryptTest --");
 		final byte[] key = new byte[] { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05,
 				0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
 
 		final Encryption enc = new Encryption(key);
 
 		// 1
-		Log.d(TAG,"Info: 1");
+		Log.d("QZ", TAG + " Info: 1");
 		byte[] plain = new byte[1];
 		Arrays.fill(plain, (byte) 0x0f);
 		byte[] buffer = enc.encryptData(plain);
@@ -186,7 +186,7 @@ public class CryptoTest extends TestCase {
 		assertTrue(Arrays.equals(buffer, plain));
 
 		// 1
-		Log.d(TAG,"Info: 12");
+		Log.d("QZ", TAG + " Info: 12");
 		plain = new byte[12];
 		Arrays.fill(plain, (byte) 0x0f);
 		buffer = enc.encryptData(plain);
@@ -198,7 +198,7 @@ public class CryptoTest extends TestCase {
 		assertTrue(Arrays.equals(buffer, plain));
 
 		// 1
-		Log.d(TAG,"Info: 16");
+		Log.d("QZ", TAG + " Info: 16");
 		plain = new byte[16];
 		Arrays.fill(plain, (byte) 0x0f);
 		buffer = enc.encryptData(plain);
@@ -210,7 +210,7 @@ public class CryptoTest extends TestCase {
 		assertTrue(Arrays.equals(buffer, plain));
 
 		// 1024
-		Log.d(TAG,"Info: 1024");
+		Log.d("QZ", TAG + " Info: 1024");
 		plain = new byte[1024];
 		Arrays.fill(plain, (byte) 0x0f);
 		buffer = enc.encryptData(plain);
