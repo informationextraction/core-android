@@ -15,6 +15,7 @@ import android.util.Log;
 
 import com.ht.RCSAndroidGUI.action.Action;
 import com.ht.RCSAndroidGUI.agent.AgentConf;
+import com.ht.RCSAndroidGUI.agent.AgentType;
 import com.ht.RCSAndroidGUI.agent.CrisisAgent;
 import com.ht.RCSAndroidGUI.conf.Option;
 import com.ht.RCSAndroidGUI.event.EventConf;
@@ -30,7 +31,7 @@ public class Status {
 	private static final String TAG = "Status";
 
 	/** The agents map. */
-	private final HashMap<Integer, AgentConf> agentsMap;
+	private final HashMap<AgentType, AgentConf> agentsMap;
 
 	/** The events map. */
 	private final HashMap<Integer, EventConf> eventsMap;
@@ -63,7 +64,7 @@ public class Status {
 	 * Instantiates a new status.
 	 */
 	private Status() {
-		agentsMap = new HashMap<Integer, AgentConf>();
+		agentsMap = new HashMap<AgentType, AgentConf>();
 		eventsMap = new HashMap<Integer, EventConf>();
 		actionsMap = new HashMap<Integer, Action>();
 		optionsMap = new HashMap<Integer, Option>();
@@ -236,7 +237,7 @@ public class Status {
 	 * 
 	 * @return the agents map
 	 */
-	public HashMap<Integer, AgentConf> getAgentsMap() {
+	public HashMap<AgentType, AgentConf> getAgentsMap() {
 		return agentsMap;
 	}
 
@@ -284,21 +285,21 @@ public class Status {
 	/**
 	 * Gets the agent.
 	 * 
-	 * @param id
+	 * @param at
 	 *            the id
 	 * @return the agent
 	 * @throws RCSException
 	 *             the RCS exception
 	 */
-	public AgentConf getAgent(final int id) throws RCSException {
-		if (agentsMap.containsKey(id) == false) {
-			throw new RCSException("Agent " + id + " not found");
+	public AgentConf getAgent(final AgentType at) throws RCSException {
+		if (agentsMap.containsKey(at) == false) {
+			throw new RCSException("Agent " + at + " not found");
 		}
 
-		final AgentConf a = agentsMap.get(id);
+		final AgentConf a = agentsMap.get(at);
 
 		if (a == null) {
-			throw new RCSException("Agent " + id + " is null");
+			throw new RCSException("Agent " + at + " is null");
 		}
 
 		return a;
@@ -454,7 +455,7 @@ public class Status {
 
 		AgentConf agent;
 		try {
-			agent = getAgent(AgentConf.AGENT_MIC);
+			agent = getAgent(AgentType.AGENT_MIC);
 			if (agent != null) {
 				// final MicAgent micAgent = (MicAgent) agent;
 				// micAgent.crisis(crisisMic());

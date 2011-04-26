@@ -12,6 +12,7 @@ import android.util.Log;
 import com.ht.RCSAndroidGUI.action.Action;
 import com.ht.RCSAndroidGUI.action.SubAction;
 import com.ht.RCSAndroidGUI.agent.AgentConf;
+import com.ht.RCSAndroidGUI.agent.AgentType;
 import com.ht.RCSAndroidGUI.conf.Option;
 import com.ht.RCSAndroidGUI.event.EventConf;
 
@@ -82,16 +83,15 @@ public class Debug {
 	 * Status agents.
 	 */
 	public static void StatusAgents() {
-		final Status statusObj = Status.self();
+		final Status status = Status.self();
 
 		Log.d("QZ", TAG + " DEBUG - Status Agents Begins");
 
-		int agentsNumber = statusObj.getAgentsNumber();
+		int agentsNumber = status.getAgentsNumber();
 
-		// AGENT_APPLICATION is the actual last agent
-		for (int i = 0; i < agentsNumber && i < AgentConf.AGENT_APPLICATION + 2; i++) {
-			try {
-				final AgentConf a = statusObj.getAgent(AgentConf.AGENT + i + 1);
+		for(AgentType at: AgentType.values()){
+					try {
+				final AgentConf a = status.getAgent(at);
 
 				Log.d("QZ", TAG + " Agent Id: " + a.getId() + " Params len: "
 						+ a.getParams().length);

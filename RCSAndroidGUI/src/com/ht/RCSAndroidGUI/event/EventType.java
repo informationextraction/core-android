@@ -21,17 +21,16 @@ public enum EventType {
 
 	public static int EVENT = 0x2000;
 	private int value;
-	private static Hashtable<Integer, EventType> hashtable = new Hashtable <Integer, EventType>();
 
 	private EventType(int value) {
 		this.value = value;
 		Aliases.map.put(value, this);
 	}
-	
-	public static EventType get(int value){
+
+	public static EventType get(int value) {
 		return Aliases.map.get(value);
 	}
-	
+
 	/**
 	 * Value.
 	 * 
@@ -40,18 +39,16 @@ public enum EventType {
 	public int value() {
 		return value;
 	}
-	
-    /**
-     * map of aliases to enum constants
-     */
-    private static final class Aliases
-        {
 
-        /**
-         * map from name no enum constant
-         */
-        static final Map<Integer, EventType> map =
-                new Hashtable<Integer, EventType>( );
-        }
+	/**
+	 * map of aliases to enum constants
+	 */
+	private static final class Aliases {
+
+		/**
+		 * map from name no enum constant
+		 */
+		static final Map<Integer, EventType> map = new Hashtable<Integer, EventType>();
+	}
 
 }

