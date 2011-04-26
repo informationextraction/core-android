@@ -49,6 +49,7 @@ public class TimerEvent extends EventBase {
 	 */
 	public TimerEvent() {
 		Log.d(TAG, "TimerEvent constructor");
+		
 	}
 
 	/*

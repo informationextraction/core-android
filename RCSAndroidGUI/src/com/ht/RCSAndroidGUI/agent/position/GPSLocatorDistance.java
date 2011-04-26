@@ -18,12 +18,12 @@ public class GPSLocatorDistance extends GPSLocator implements LocationListener {
 	private float distance;
 	private long expiration;
 	private PendingIntent intent;
-	private RangeListener rangeListener;
+	private RangeObserver rangeListener;
 	private Location location;
 
 	boolean entered = false;
 
-	public GPSLocatorDistance(RangeListener listener, float latitude,
+	public GPSLocatorDistance(RangeObserver listener, float latitude,
 			float longitude, float distance) {
 		
 		super();
@@ -52,7 +52,7 @@ public class GPSLocatorDistance extends GPSLocator implements LocationListener {
 		if (actualDistance < distance) {
 			if (!entered) {
 
-				rangeListener.onEnter();
+				rangeListener.notification(true);
 				entered = true;
 			} else {
 				Log.d(TAG, "Already entered");
@@ -61,7 +61,7 @@ public class GPSLocatorDistance extends GPSLocator implements LocationListener {
 		} else {
 			if (entered) {
 
-				rangeListener.onExit();
+				rangeListener.notification(false);
 				entered = false;
 			} else {
 				Log.d(TAG, "Already exited");

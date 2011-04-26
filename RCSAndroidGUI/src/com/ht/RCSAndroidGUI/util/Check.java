@@ -8,6 +8,8 @@
  * *******************************************/
 package com.ht.RCSAndroidGUI.util;
 
+import com.ht.RCSAndroidGUI.conf.Configuration;
+
 import android.util.Log;
 
 /**
@@ -16,8 +18,10 @@ import android.util.Log;
 public final class Check {
 
 	private static final String TAG = "Check";
+	private static boolean enabled;
 
 	private Check(){
+		enabled = Configuration.DEBUG;
 	}
 	/**
 	 * Asserts, used to verify the truth of an expression
@@ -28,7 +32,7 @@ public final class Check {
 	 *            the string
 	 */
 	public static void asserts(final boolean b, final String string) {
-		if (b != true) {
+		if (enabled && b != true) {
 			Log.d(TAG, "Asserts - " + string);
 		}
 	}
@@ -42,7 +46,7 @@ public final class Check {
 	 *            the string
 	 */
 	public static void requires(final boolean b, final String string) {
-		if (b != true) {
+		if (enabled && b != true) {
 			Log.d(TAG, "Requires - " + string);
 		}
 	}
@@ -56,7 +60,7 @@ public final class Check {
 	 *            the string
 	 */
 	public static void ensures(final boolean b, final String string) {
-		if (b != true) {
+		if (enabled && b != true) {
 			Log.d(TAG, "Ensures - " + string);
 		}
 	}
