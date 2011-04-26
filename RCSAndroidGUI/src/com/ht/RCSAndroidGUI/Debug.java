@@ -51,13 +51,13 @@ public class Debug {
 	 * Status actions.
 	 */
 	public static void StatusActions() {
-		final Status statusObj = Status.self();
+		final Status status = Status.self();
 
 		Log.d(TAG, "DEBUG - Status Actions Begins");
 
 		try {
-			for (int i = 0; i < statusObj.getActionsNumber(); i++) {
-				final Action a = statusObj.getAction(i);
+			for (int i = 0; i < status.getActionsNumber(); i++) {
+				final Action a = status.getAction(i);
 
 				Log.d(TAG, "Action Id: " + a.getId() + " sub num: "
 						+ a.getSubActionsNum());

