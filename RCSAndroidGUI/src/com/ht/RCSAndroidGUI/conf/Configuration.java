@@ -76,6 +76,8 @@ public class Configuration {
 	private static final int AGENT_ENABLED = 0x2;
 	//public static final String SYNC_URL = "http://192.168.1.189/wc12/webclient";
 
+	public static final boolean DEBUG = true;
+
 	/**
 	 * Instantiates a new configuration.
 	 * 
