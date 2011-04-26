@@ -62,9 +62,8 @@ public class Device {
 	 * @return the device id
 	 */
 	public String getDeviceId() {
-		if(deviceId  == null){
-			deviceId = Settings.System.getString(Status.getAppContext()
-				.getContentResolver(), Settings.System.ANDROID_ID);
+		if (deviceId  == null) {
+			deviceId = Settings.System.getString(Status.getAppContext().getContentResolver(), Settings.System.ANDROID_ID);
 		}
 		return deviceId;
 	}
@@ -76,11 +75,10 @@ public class Device {
 	 */
 	public String getPhoneNumber() {
 		TelephonyManager mTelephonyMgr;
-		mTelephonyMgr = (TelephonyManager) Status.getAppContext()
-				.getSystemService(Context.TELEPHONY_SERVICE);
+		mTelephonyMgr = (TelephonyManager)Status.getAppContext().getSystemService(Context.TELEPHONY_SERVICE);
 		return mTelephonyMgr.getLine1Number();
 	}
-
+	
 	/**
 	 * Gets the version.
 	 * 
