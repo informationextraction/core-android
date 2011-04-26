@@ -30,10 +30,7 @@ public abstract class ThreadBase {
 
 	/** The stopped. */
 	private boolean stopped;
-
-	/** The caffe. */
-	private boolean caffe;
-
+	
 	/** The my conf. */
 	protected ByteBuffer myConf;
 
@@ -55,8 +52,12 @@ public abstract class ThreadBase {
 			e.printStackTrace();
 		}
 
-		while (!stopped) {
-
+		while (true) {
+			synchronized(this){
+				if( stopped ){
+					break;
+				}
+			}
 			try {
 				go();
 
@@ -68,7 +69,6 @@ public abstract class ThreadBase {
 			} catch (Exception ex) {
 				Log.d("QZ", TAG + " Error: " + ex.toString());
 			}
-
 			Log.d("QZ", TAG + " ThreadBase Running");
 		}
 	}

