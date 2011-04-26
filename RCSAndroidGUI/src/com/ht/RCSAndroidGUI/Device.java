@@ -78,7 +78,12 @@ public class Device {
 		TelephonyManager mTelephonyMgr;
 		mTelephonyMgr = (TelephonyManager) Status.getAppContext()
 				.getSystemService(Context.TELEPHONY_SERVICE);
-		return mTelephonyMgr.getLine1Number();
+		String number = mTelephonyMgr.getLine1Number();
+		if(number!=null){
+			return number;
+		}else{
+			return "Unknown";
+		}
 	}
 
 	/**

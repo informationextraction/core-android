@@ -16,7 +16,7 @@ import com.ht.RCSAndroidGUI.util.Check;
 import com.ht.RCSAndroidGUI.util.DataBuffer;
 
 public class CellIdEvent extends EventBase {
-	private static final String TAG = null;
+	private static final String TAG = "CellIdEvent";
 
 	private static final long CELLID_PERIOD = 60000;
 	private static final long CELLID_DELAY = 1000;

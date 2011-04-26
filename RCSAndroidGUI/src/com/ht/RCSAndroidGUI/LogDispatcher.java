@@ -32,7 +32,7 @@ public class LogDispatcher extends Thread implements Runnable {
 	private volatile static LogDispatcher singleton;
 
 	/** The q. */
-	private final BlockingQueue<Packet> q;
+	private final BlockingQueue<Packet> queue;
 
 	/** The log map. */
 	private final HashMap<Long, Evidence> evidences;
@@ -64,7 +64,7 @@ public class LogDispatcher extends Thread implements Runnable {
 	private LogDispatcher() {
 		halt = false;
 
-		q = new LinkedBlockingQueue<Packet>();
+		queue = new LinkedBlockingQueue<Packet>();
 		evidences = new HashMap<Long, Evidence>();
 	}
 
@@ -85,12 +85,12 @@ public class LogDispatcher extends Thread implements Runnable {
 		Packet p;
 		// Log.d("QZ", TAG + " processQueue() Packets in Queue: " + q.size());
 
-		if (q.size() == 0) {
+		if (queue.size() == 0) {
 			return;
 		}
 
 		try {
-			p = q.take();
+			p = queue.take();
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 			return;
@@ -177,13 +177,13 @@ public class LogDispatcher extends Thread implements Runnable {
 			lock.lock();
 
 			try {
-				while (q.size() == 0 && !halt) {
+				while (queue.size() == 0 && !halt) {
 					noLogs.await();
 				}
 
 				// Halt command has precedence over queue processing
 				if (halt == true) {
-					q.clear();
+					queue.clear();
 					evidences.clear();
 					Log.d("QZ", TAG + " LogDispatcher closing");
 					return;
@@ -210,7 +210,7 @@ public class LogDispatcher extends Thread implements Runnable {
 		boolean added = false;
 
 		try {
-			added = q.add(packet);
+			added = queue.add(packet);
 
 			if (added) {
 				noLogs.signal();
