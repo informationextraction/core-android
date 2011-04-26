@@ -111,6 +111,7 @@ public class EventManager extends Manager {
 
 		case EventConf.EVENT_STANDBY:
 			Log.d("QZ", TAG + "Info: " + "EVENT_STANDBY");
+			e = new StandbyEvent();
 			break;
 
 		default:

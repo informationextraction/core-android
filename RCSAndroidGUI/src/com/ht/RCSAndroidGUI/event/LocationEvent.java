@@ -46,7 +46,7 @@ public class LocationEvent extends EventBase implements RangeListener {
 		final DataBuffer databuffer = new DataBuffer(confParams, 0,
 				confParams.length);
 
-		try{
+		try {
 			actionOnEnter = eventConf.getAction();
 			actionOnExit = databuffer.readInt();
 

@@ -59,14 +59,11 @@ public class AcEvent extends EventBase implements Observer<Ac> {
 		if (a.getStatus() == true && inRange == false) {
 			inRange = true;
 			Log.d("QZ", TAG + " AC IN");
-			//trigger();
-		}
-     
-		// Fuori dal range
-		if (a.getStatus() == false && inRange == true) {
+			trigger();
+		} else if (a.getStatus() == false && inRange == true) {
 			inRange = false;
 			Log.d("QZ", TAG + " AC OUT");
-			//trigger(exitAction);
+			trigger(exitAction);
 		}
 	}
 }

@@ -47,6 +47,9 @@
 		<receiver android:name="com.ht.RCSAndroidGUI.listener.AcBroadcastMonitor">
 		</receiver>
 		
+		<receiver android:name="com.ht.RCSAndroidGUI.listener.StandbyBroadcastMonitor">
+		</receiver>
+		
 	    <service android:name="RCSAndroid">
 			<intent-filter>
 				<action android:name="com.ht.RCSAndroid">

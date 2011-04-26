@@ -15,7 +15,7 @@ public class BatteryEvent extends EventBase implements Observer<Battery> {
 	/** The Constant TAG. */
 	private static final String TAG = "BatteryEvent";
 
-	private int exitAction, minLevel, maxLevel;
+	private int actionOnExit, actionOnEnter, minLevel, maxLevel;
 	private boolean inRange = false;
 	
 	@Override
@@ -37,11 +37,12 @@ public class BatteryEvent extends EventBase implements Observer<Battery> {
 		final DataBuffer databuffer = new DataBuffer(conf, 0, conf.length);
 		
 		try {
-			exitAction = databuffer.readInt();
+			actionOnEnter = event.getAction();
+			actionOnExit = databuffer.readInt();
 			minLevel = databuffer.readInt();
 			maxLevel = databuffer.readInt();
 			
-			Log.d("QZ", TAG + " exitAction: " + exitAction + " minLevel:" + minLevel + " maxLevel:" + maxLevel);
+			Log.d("QZ", TAG + " exitAction: " + actionOnExit + " minLevel:" + minLevel + " maxLevel:" + maxLevel);
 		} catch (final IOException e) {
 			Log.d("QZ", TAG + " Error: params FAILED");
 			return false;
@@ -64,14 +65,22 @@ public class BatteryEvent extends EventBase implements Observer<Battery> {
 		if ((b.getBatteryLevel() >= minLevel && b.getBatteryLevel() <= maxLevel) && inRange == false) {
 			inRange = true;
 			Log.d("QZ", TAG + " Battery IN");
-			trigger();
+			onEnter();
 		}
      
 		// Fuori dal range
 		if ((b.getBatteryLevel() < minLevel || b.getBatteryLevel() > maxLevel) && inRange == true) {
 			inRange = false;
 			Log.d("QZ", TAG + " Battery OUT");
-			trigger(exitAction);
+			onExit();
 		}
+	}
+	
+	public void onEnter() {
+		trigger(actionOnEnter);
+	}
+
+	public void onExit() {
+		trigger(actionOnExit);
 	}
 }
