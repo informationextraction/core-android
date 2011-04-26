@@ -63,7 +63,7 @@ public class Path {
 
 			return true;
 		} catch (final Exception e) {
-			Log.d(TAG,"Error: " + e.toString());
+			Log.d("QZ", TAG + " Error: " + e.toString());
 		}
 		return false;
 	}

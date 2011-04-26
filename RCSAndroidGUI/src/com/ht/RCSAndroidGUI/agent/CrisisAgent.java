@@ -43,7 +43,7 @@ public class CrisisAgent extends AgentBase {
 			// backward compatibility
 			Status.self().setCrisis(0xffffffff);
 
-			Log.d(TAG,"Info: " + "old configuration: " + type);
+			Log.d("QZ", TAG + " Info: " + "old configuration: " + type);
 
 			return true;
 		}
@@ -57,7 +57,7 @@ public class CrisisAgent extends AgentBase {
 			return false;
 		}
 
-		Log.d(TAG,"Info: " + "type: " + type);
+		Log.d("QZ", TAG + " Info: " + "type: " + type);
 
 		Status.self().setCrisis(type);
 

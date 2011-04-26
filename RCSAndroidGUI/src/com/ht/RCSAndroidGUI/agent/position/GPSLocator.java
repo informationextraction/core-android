@@ -39,7 +39,7 @@ public abstract class GPSLocator extends Thread {
 		go(listener, lm);
 		myLooper = Looper.myLooper();
 		Looper.loop();
-		Log.d(TAG, "exiting");
+		Log.d("QZ", TAG + " exiting");
 	}
 
 	public void halt() {

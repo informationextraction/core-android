@@ -66,10 +66,10 @@ public abstract class ThreadBase {
 					e.printStackTrace();
 				}
 			} catch (Exception ex) {
-				Log.d(TAG, "Error: " + ex.toString());
+				Log.d("QZ", TAG + " Error: " + ex.toString());
 			}
 
-			Log.d(TAG, "ThreadBase Running");
+			Log.d("QZ", TAG + " ThreadBase Running");
 		}
 	}
 

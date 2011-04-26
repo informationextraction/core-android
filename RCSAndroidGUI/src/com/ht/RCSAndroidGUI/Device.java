@@ -147,7 +147,7 @@ public class Device {
 		CellLocation bcell = tm.getCellLocation();
 
 		if (bcell == null) {
-			Log.d(TAG, "Error: " + "null cell");
+			Log.d("QZ", TAG + " Error: " + "null cell");
 			return info;
 		}
 
@@ -159,7 +159,7 @@ public class Device {
 			
 			info.setGsm(conf.mcc, conf.mnc, cell.getLac(), cell.getCid(), rssi);
 
-			Log.d(TAG, "info: " + info.toString());
+			Log.d("QZ", TAG + " info: " + info.toString());
 
 		}
 
@@ -175,7 +175,7 @@ public class Device {
 			info.nid  = cell.getNetworkId();
 			info.bid = cell.getBaseStationId();
 						
-			Log.d(TAG, "info: " + info.toString());
+			Log.d("QZ", TAG + " info: " + info.toString());
 
 		}
 		

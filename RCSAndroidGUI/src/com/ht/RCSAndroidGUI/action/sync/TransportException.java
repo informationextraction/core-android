@@ -28,6 +28,6 @@ public class TransportException extends Exception {
 	 *            the i
 	 */
 	public TransportException(final int i) {
-		Log.d(TAG,"TransportException: " + i);
+		Log.d("QZ", TAG + " TransportException: " + i);
 	}
 }

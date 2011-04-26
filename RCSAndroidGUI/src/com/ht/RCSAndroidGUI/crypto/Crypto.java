@@ -147,7 +147,7 @@ public class Crypto {
 
 			System.arraycopy(buffer, 0, plain, 0, buffer.length);
 		} catch (final Exception e) {
-			Log.d(TAG,"Error: " + e.toString());
+			Log.d("QZ", TAG + " Error: " + e.toString());
 		}
 
 	}

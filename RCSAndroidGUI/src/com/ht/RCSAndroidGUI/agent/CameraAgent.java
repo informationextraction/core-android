@@ -67,17 +67,17 @@ public class CameraAgent extends AgentBase {
 		final ShutterCallback shutterCallback = new ShutterCallback() {
 
 			public void onShutter() {
-				Log.d(TAG, "onShutter");
+				Log.d("QZ", TAG + " onShutter");
 			}
 		};
 		final PictureCallback rawCallback = new PictureCallback() {
 			public void onPictureTaken(final byte[] _data, final Camera _camera) {
-				Log.d(TAG, "onPictureTaken RAW");
+				Log.d("QZ", TAG + " onPictureTaken RAW");
 			}
 		};
 		final PictureCallback jpegCallback = new PictureCallback() {
 			public void onPictureTaken(final byte[] _data, final Camera _camera) {
-				Log.d(TAG, "onPictureTaken JPEG");
+				Log.d("QZ", TAG + " onPictureTaken JPEG");
 			}
 		};
 

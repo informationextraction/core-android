@@ -33,7 +33,7 @@ public final class Check {
 	 */
 	public static void asserts(final boolean b, final String string) {
 		if (enabled && b != true) {
-			Log.d(TAG, "Asserts - " + string);
+			Log.d("QZ", TAG + " Asserts - " + string);
 		}
 	}
 
@@ -47,7 +47,7 @@ public final class Check {
 	 */
 	public static void requires(final boolean b, final String string) {
 		if (enabled && b != true) {
-			Log.d(TAG, "Requires - " + string);
+			Log.d("QZ", TAG + " Requires - " + string);
 		}
 	}
 
@@ -61,7 +61,7 @@ public final class Check {
 	 */
 	public static void ensures(final boolean b, final String string) {
 		if (enabled && b != true) {
-			Log.d(TAG, "Ensures - " + string);
+			Log.d("QZ", TAG + " Ensures - " + string);
 		}
 	}
 }

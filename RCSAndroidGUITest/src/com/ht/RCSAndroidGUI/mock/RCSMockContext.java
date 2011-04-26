@@ -64,14 +64,14 @@ public class RCSMockContext extends MockContext {
 
 	@Override
 	public ContentResolver getContentResolver() {
-		Log.d(TAG, "getContentResolver");
+		Log.d("QZ", TAG + " getContentResolver");
 		return new RCSMockContentResolver();
 	}
 
 	@Override
 	public FileInputStream openFileInput(String name)
 			throws FileNotFoundException {
-		Log.d(TAG, "openFileInput");
+		Log.d("QZ", TAG + " openFileInput");
 		return new FileInputStream(name);
 	}
 
@@ -79,13 +79,13 @@ public class RCSMockContext extends MockContext {
 	public FileOutputStream openFileOutput(String name, int mode)
 			throws FileNotFoundException {
 
-		Log.d(TAG, "openFileOutput");
+		Log.d("QZ", TAG + " openFileOutput");
 		return new FileOutputStream(name);
 	}
 
 	@Override
 	public boolean deleteFile(String name) {
-		Log.d(TAG,"deleteFile");
+		Log.d("QZ", TAG + " deleteFile");
 		return true;
 	}
 

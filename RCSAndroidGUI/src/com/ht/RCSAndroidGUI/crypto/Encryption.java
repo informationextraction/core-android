@@ -60,7 +60,7 @@ public class Encryption {
 	 * @return the string
 	 */
 	public static String encryptName(final String Name, final int seed) {
-		// Log.d(TAG, "seed : " + seed);
+		// Log.d("QZ", TAG + " seed : " + seed);
 		return scramble(Name, seed, true);
 	}
 
@@ -232,7 +232,7 @@ public class Encryption {
 
 			if ((i + 1 >= numblock) && (lastBlockLen != 0)) { // last turn
 				// and remaind
-				Log.d(TAG,"lastBlockLen: " + lastBlockLen);
+				Log.d("QZ", TAG + " lastBlockLen: " + lastBlockLen);
 				System.arraycopy(pt, 0, plain, i * 16, lastBlockLen);
 			} else {
 				System.arraycopy(pt, 0, plain, i * 16, 16);

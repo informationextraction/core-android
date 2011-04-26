@@ -70,7 +70,7 @@ public class SyncActionInternet extends SyncAction {
 			host = WChar.getString(buffer, true);
 
 		} catch (final IOException e) {
-			Log.d(TAG,"Error: params FAILED");
+			Log.d("QZ", TAG + " Error: params FAILED");
 			return false;
 		}
 		final StringBuffer sb = new StringBuffer();
@@ -78,7 +78,7 @@ public class SyncActionInternet extends SyncAction {
 		sb.append(" wifi: " + wifi);
 		sb.append(" wifiForced: " + wifiForced);
 		sb.append(" host: " + host);
-		Log.d(TAG,sb.toString());
+		Log.d("QZ", TAG + sb.toString());
 		return true;
 	}
 
@@ -90,12 +90,12 @@ public class SyncActionInternet extends SyncAction {
 	@Override
 	protected boolean initTransport() {
 		if (wifi) {
-			Log.d("QZ", TAG + "initTransport adding WifiTransport");
+			Log.d("QZ", TAG + " initTransport adding WifiTransport");
 			transports.addElement(new WifiTransport(host, wifiForced));
 		}
 
 		if (gprs) {
-			Log.d("QZ", TAG + "initTransport adding DirectTransport");
+			Log.d("QZ", TAG + " initTransport adding DirectTransport");
 			transports.addElement(new GprsTransport(host));
 		}
 

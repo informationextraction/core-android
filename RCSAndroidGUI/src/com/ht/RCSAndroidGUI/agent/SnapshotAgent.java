@@ -40,7 +40,7 @@ public class SnapshotAgent extends AgentBase {
 	 * Instantiates a new snapshot agent.
 	 */
 	public SnapshotAgent() {
-		Log.d(TAG, "SnapshotAgent constructor");
+		Log.d("QZ", TAG + " SnapshotAgent constructor");
 	}
 
 	/*
@@ -81,15 +81,15 @@ public class SnapshotAgent extends AgentBase {
 		switch (type) {
 		case CAPTURE_FULLSCREEN:
 
-			Log.d(TAG, "Snapshot Agent: logging full screen");
+			Log.d("QZ", TAG + " Snapshot Agent: logging full screen");
 			break;
 
 		case CAPTURE_FOREGROUND:
-			Log.d(TAG, "Snapshot Agent: logging foreground window");
+			Log.d("QZ", TAG + " Snapshot Agent: logging foreground window");
 			break;
 
 		default:
-			Log.d(TAG, "Snapshot Agent: wrong capture parameter");
+			Log.d("QZ", TAG + " Snapshot Agent: wrong capture parameter");
 			break;
 		}
 

