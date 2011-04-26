@@ -26,6 +26,7 @@ public class LocationEvent extends EventBase implements RangeObserver {
 	@Override
 	public void begin() {
 		locator = new GPSLocatorDistance(this, latitudeOrig, longitudeOrig, distance);
+		locator.start();
 	}
 
 	@Override
