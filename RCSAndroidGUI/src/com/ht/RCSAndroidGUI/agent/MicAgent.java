@@ -85,6 +85,10 @@ public class MicAgent extends AgentBase {
 				if (state != StateRun.STARTED) {
 					addPhoneListener();
 					recorder = new MediaRecorder();
+					
+					final DateTime dateTime = new DateTime();
+					fId = dateTime.getFiledate();
+					
 					startRecorder();
 					Log.d("QZ", TAG + "started");
 				}
@@ -242,8 +246,7 @@ public class MicAgent extends AgentBase {
 	 */
 	private void startRecorder() throws IllegalStateException, IOException {
 
-		final DateTime dateTime = new DateTime();
-		fId = dateTime.getFiledate();
+
 		numFailures = 0;
 
 		currentRecFile = Path.hidden() + "currentRec";
