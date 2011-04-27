@@ -36,9 +36,9 @@ public class Path {
 
 	// public static final String UPLOAD_DIR = "";
 
-	private Path(){
+	private Path() {
 	}
-	
+
 	/**
 	 * Hidden.
 	 * 
@@ -57,6 +57,7 @@ public class Path {
 		try {
 			checkStorage();
 
+			Log.d("QZ", TAG + " (makeDirs): hidden = " + hidden());
 			createDirectory(conf());
 			createDirectory(markup());
 			createDirectory(logs());

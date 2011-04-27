@@ -31,7 +31,8 @@ public final class AutoFile {
 	private static final String TAG = "AutoFile";
 	/** The file. */
 	File file;
-	//String filename;
+
+	// String filename;
 
 	/**
 	 * Instantiates a new auto flash file.
@@ -43,7 +44,7 @@ public final class AutoFile {
 	 */
 	public AutoFile(final String filename) {
 		file = new File(filename);
-		//this.filename = filename;
+		// this.filename = filename;
 	}
 
 	/**
@@ -66,7 +67,7 @@ public final class AutoFile {
 		final int length = (int) file.length() - offset;
 		InputStream in = null;
 		try {
-			in = new BufferedInputStream(new FileInputStream(file),length);
+			in = new BufferedInputStream(new FileInputStream(file), length);
 			final byte[] buffer = new byte[length];
 			in.skip(offset);
 			in.read(buffer, 0, length);
@@ -74,7 +75,7 @@ public final class AutoFile {
 		} catch (final IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-	
+
 		} finally {
 			if (in != null) {
 				try {
@@ -85,7 +86,7 @@ public final class AutoFile {
 				}
 			}
 		}
-	
+
 		return null;
 	}
 
@@ -100,8 +101,8 @@ public final class AutoFile {
 	}
 
 	/**
-	 * Write a data buffer in the file, at a specific offset. 
-	 * If append is false the content of the file is overwritten.
+	 * Write a data buffer in the file, at a specific offset. If append is false
+	 * the content of the file is overwritten.
 	 * 
 	 * @param data
 	 *            the data
@@ -111,11 +112,10 @@ public final class AutoFile {
 	 *            the append
 	 * @return true, if successful
 	 */
-	public boolean write(final byte[] data, final int offset,
-			final boolean append) {
+	public boolean write(final byte[] data, final int offset, final boolean append) {
 		OutputStream out = null;
 		try {
-			out = new BufferedOutputStream(new FileOutputStream(file, append),data.length - offset);
+			out = new BufferedOutputStream(new FileOutputStream(file, append), data.length - offset);
 			out.write(data, offset, data.length - offset);
 			out.flush();
 			return true;
@@ -126,7 +126,7 @@ public final class AutoFile {
 				try {
 					out.close();
 				} catch (final IOException e) {
-					Log.d("QZ", TAG + " Error: " +e.toString());
+					Log.d("QZ", TAG + " Error: " + e.toString());
 				}
 			}
 		}
@@ -153,7 +153,7 @@ public final class AutoFile {
 
 	/**
 	 * The file can be read.
-	 *
+	 * 
 	 * @return true if readable
 	 */
 	public boolean canRead() {
@@ -171,7 +171,7 @@ public final class AutoFile {
 
 	/**
 	 * List the content of the directory.
-	 *
+	 * 
 	 * @return the string[]
 	 */
 	public String[] list() {
@@ -214,10 +214,10 @@ public final class AutoFile {
 	public void dropExtension(String ext) {
 		String filename = file.getName();
 		int pos = filename.lastIndexOf(ext);
-		String newname = filename.substring(0,pos);
-		File newfile = new File(file.getParent(),newname);
+		String newname = filename.substring(0, pos);
+		File newfile = new File(file.getParent(), newname);
 		boolean ret = file.renameTo(newfile);
-		
-		Log.d("QZ", TAG + " renaming file: "+newfile+" ret: "+ret);
+
+		Log.d("QZ", TAG + " renaming file: " + newfile + " ret: " + ret);
 	}
 }
