@@ -16,44 +16,7 @@ import com.ht.RCSAndroidGUI.conf.RunningConf;
  */
 public class EventConf implements RunningConf {
 
-	/** Events definitions. */
-	final public static int EVENT = 0x2000;
-
-	/** The Constant EVENT_TIMER. */
-	final public static int EVENT_TIMER = EVENT + 0x1; // Timer Event
-
-	/** The Constant EVENT_SMS. */
-	final public static int EVENT_SMS = EVENT + 0x2; // On Sms Event
-
-	/** The Constant EVENT_CALL. */
-	final public static int EVENT_CALL = EVENT + 0x3; // On Call Event
-
-	/** The Constant EVENT_CONNECTION. */
-	final public static int EVENT_CONNECTION = EVENT + 0x4; // On Connectivity
-	// Event
-	/** The Constant EVENT_PROCESS. */
-	final public static int EVENT_PROCESS = EVENT + 0x5; // On Process Event
-
-	/** The Constant EVENT_CELLID. */
-	final public static int EVENT_CELLID = EVENT + 0x6; // On CellID Event
-
-	/** The Constant EVENT_QUOTA. */
-	final public static int EVENT_QUOTA = EVENT + 0x7; // On Disk Quota Event
-
-	/** The Constant EVENT_SIM_CHANGE. */
-	final public static int EVENT_SIM_CHANGE = EVENT + 0x8; // On Sim Change
-	// Event
-	/** The Constant EVENT_LOCATION. */
-	final public static int EVENT_LOCATION = EVENT + 0x9; // On Position Event
-
-	/** The Constant EVENT_AC. */
-	final public static int EVENT_AC = EVENT + 0xA; // On AC (power charger)
-	// Event
-	/** The Constant EVENT_BATTERY. */
-	final public static int EVENT_BATTERY = EVENT + 0xB; // On Battery Level
-	// Event
-	/** The Constant EVENT_STANDBY. */
-	final public static int EVENT_STANDBY = EVENT + 0xC; // On Standby Event
+	
 
 	/** Events status. */
 	final public static int EVENT_STOPPED = AgentConf.AGENT_STOPPED;
@@ -62,7 +25,7 @@ public class EventConf implements RunningConf {
 	final public static int EVENT_RUNNING = AgentConf.AGENT_RUNNING;
 
 	/** Event type. */
-	private final int eventType;
+	private final EventType eventType;
 
 	/** Event unique ID. */
 	private final int eventId;
@@ -85,7 +48,7 @@ public class EventConf implements RunningConf {
 	 * @param params
 	 *            the params
 	 */
-	public EventConf(final int type, final int id, final int action,
+	public EventConf(final EventType type, final int id, final int action,
 			final byte[] params) {
 		this.eventType = type;
 		this.eventId = id;
@@ -98,7 +61,7 @@ public class EventConf implements RunningConf {
 	 * 
 	 * @return the type
 	 */
-	public int getType() {
+	public EventType getType() {
 		return this.eventType;
 	}
 

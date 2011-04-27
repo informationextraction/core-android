@@ -196,25 +196,6 @@ public final class Evidence {
 	}
 
 	/**
-	 * Convert type log.
-	 * 
-	 * @param agentId
-	 *            the agent id
-	 * @return the int
-	 */
-	public static int convertTypeEvidence(final int agentId) {
-		final int agentPos = agentId - AgentConf.AGENT;
-		Check.requires(TYPE_EVIDENCE != null, "Null TypeEvidence");
-		if (agentPos >= 0 && agentPos < TYPE_EVIDENCE.length) {
-			final int typeLog = TYPE_EVIDENCE[agentPos].value();
-			return typeLog;
-		}
-		Log.d("QZ", TAG + " Warn: " +"Wrong agentId conversion: " + agentId);
-		return EvidenceType.UNKNOWN.value();
-	}
-
-
-	/**
 	 * Enough space.
 	 * 
 	 * @return true, if successful

@@ -8,7 +8,6 @@
  * *******************************************/
 package com.ht.RCSAndroidGUI.evidence;
 
-
 // TODO: Auto-generated Javadoc
 /**
  * The Class EvidenceType.
@@ -16,9 +15,9 @@ package com.ht.RCSAndroidGUI.evidence;
 public enum EvidenceType {
 
 	/** The UNKNOWN. */
-	UNKNOWN (0xFFFF), // in caso di errore
-   /** The NONE. */
- NONE (0xFFFF), // in caso di errore
+	UNKNOWN(0xFFFF), // in caso di errore
+	/** The NONE. */
+	NONE(0xFFFF), // in caso di errore
 
 	/** The Constant FILEOPEN. */
 	FILEOPEN(0x0000),
@@ -104,7 +103,7 @@ public enum EvidenceType {
 	CALLLIST(0x0230),
 
 	/** The Constant DEVICE. */
-	DEVICE (0x0240),
+	DEVICE(0x0240),
 
 	/** The Constant INFO. */
 	INFO(0x0241),
@@ -132,17 +131,17 @@ public enum EvidenceType {
 
 	/**
 	 * Instantiates a new evidence type.
-	 *
-	 * @param value the value
+	 * 
+	 * @param value
+	 *            the value
 	 */
 	private EvidenceType(int value) {
 		this.value = value;
-
 	}
 
 	/**
 	 * Value.
-	 *
+	 * 
 	 * @return the int
 	 */
 	public int value() {
@@ -151,7 +150,7 @@ public enum EvidenceType {
 
 	/**
 	 * Gets the memo.
-	 *
+	 * 
 	 * @return the memo
 	 */
 	public String getMemo() {

