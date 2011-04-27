@@ -329,14 +329,12 @@ public final class Evidence {
 					.getNextMultiple(plainBuffer.length), "Wrong encBuffer");
 			// scriviamo la dimensione dell'header paddato
 			fconn.write(Utils.intToByteArray(plainBuffer.length));
-			Log.d("QZ", TAG + Long.toString(fconn.getSize()));
 			// scrittura dell'header cifrato
 			fconn.append(encBuffer);
-			Log.d("QZ", TAG + Long.toString(fconn.getSize()));
 			Check.asserts(fconn.getSize() == encBuffer.length + 4,
 					"Wrong filesize");
-			Log.d("QZ", TAG + " additionalData.length: " + plainBuffer.length);
-			Log.d("QZ", TAG + " encBuffer.length: " + encBuffer.length);
+			//Log.d("QZ", TAG + " additionalData.length: " + plainBuffer.length);
+			//Log.d("QZ", TAG + " encBuffer.length: " + encBuffer.length);
 		} catch (final Exception ex) {
 			Log.d("QZ", TAG + " Error: file: " + name.fileName + " ex:" + ex);
 			return false;
