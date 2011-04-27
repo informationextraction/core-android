@@ -13,7 +13,7 @@ public class AcEvent extends EventBase implements Observer<Ac> {
 	/** The Constant TAG. */
 	private static final String TAG = "AcEvent";
 
-	private int exitAction;
+	private int actionOnExit, actionOnEnter;
 	private boolean inRange = false;
 	
 	@Override
@@ -35,9 +35,8 @@ public class AcEvent extends EventBase implements Observer<Ac> {
 		final DataBuffer databuffer = new DataBuffer(conf, 0, conf.length);
 		
 		try {
-			exitAction = databuffer.readInt();
-			
-			Log.d("QZ", TAG + " exitAction: " + exitAction);
+			actionOnEnter = event.getAction();
+			actionOnExit = databuffer.readInt();
 		} catch (final IOException e) {
 			Log.d("QZ", TAG + " Error: params FAILED");
 			return false;
@@ -59,11 +58,19 @@ public class AcEvent extends EventBase implements Observer<Ac> {
 		if (a.getStatus() == true && inRange == false) {
 			inRange = true;
 			Log.d("QZ", TAG + " AC IN");
-			trigger();
+			onEnter();
 		} else if (a.getStatus() == false && inRange == true) {
 			inRange = false;
 			Log.d("QZ", TAG + " AC OUT");
-			trigger(exitAction);
+			onExit();
 		}
+	}
+	
+	public void onEnter() {
+		trigger(actionOnEnter);
+	}
+
+	public void onExit() {
+		trigger(actionOnExit);
 	}
 }

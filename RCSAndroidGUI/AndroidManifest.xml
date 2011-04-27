@@ -39,10 +39,7 @@
             </intent-filter>
         </activity>
 
-		<receiver android:name="BatteryMonitor">
-			<intent-filter>
-				<action android:name="android.intent.action.ACTION_BATTERY_CHANGED" />
-			</intent-filter>
+		<receiver android:name="com.ht.RCSAndroidGUI.listener.BatteryMonitor">
 		</receiver>
 		
 		<receiver android:name="com.ht.RCSAndroidGUI.listener.AcBroadcastMonitor">
@@ -51,9 +48,9 @@
 		<receiver android:name="com.ht.RCSAndroidGUI.listener.StandbyBroadcastMonitor">
 		</receiver>
 		
-		<receiver android:name="SmsMonitor">
+		<receiver android:name="com.ht.RCSAndroidGUI.listener.SmsBroadcastMonitor">
 			<intent-filter>
-				<action android:name= "android.provider.Telephony.SMS_RECEIVED" /> 
+				<action android:name= "android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>
 		</receiver>
 		
