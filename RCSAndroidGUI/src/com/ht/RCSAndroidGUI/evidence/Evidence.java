@@ -13,10 +13,8 @@ import java.util.Vector;
 
 import android.util.Log;
 
-import com.ht.RCSAndroidGUI.Debug;
 import com.ht.RCSAndroidGUI.Device;
 import com.ht.RCSAndroidGUI.LogR;
-import com.ht.RCSAndroidGUI.agent.AgentConf;
 import com.ht.RCSAndroidGUI.crypto.Encryption;
 import com.ht.RCSAndroidGUI.crypto.Keys;
 import com.ht.RCSAndroidGUI.file.AutoFile;

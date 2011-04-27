@@ -199,8 +199,9 @@ public abstract class SubAction implements Runnable {
 	public void run() {
 		try {
 			execute();
+		} catch (Exception e) {
+			e.printStackTrace();
 		} finally {
-
 			synchronized (this) {
 				notify();
 				finished = true;

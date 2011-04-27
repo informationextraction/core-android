@@ -70,6 +70,7 @@ public class EventManager extends Manager<EventBase, Integer> {
 
 			case EVENT_SMS:
 				Log.d("QZ", TAG + " Info: " + "EVENT_SMS");
+				e = new SmsEvent();
 				break;
 
 			case EVENT_CALL:

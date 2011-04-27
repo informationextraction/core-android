@@ -80,11 +80,11 @@ public class Device {
 		
 		String number = mTelephonyMgr.getLine1Number();
 		
-		if (number != null) {
-			return number;
-		} else {
-			return "Unknown";
+		if (number == null || number.length() == 0) {
+			number = "Unknown";
 		}
+	
+		return number;
 	}
 	
 	/**
@@ -124,7 +124,14 @@ public class Device {
 	public String getImei() {
 		final TelephonyManager telephonyManager = (TelephonyManager) Status
 				.getAppContext().getSystemService(Context.TELEPHONY_SERVICE);
-		return telephonyManager.getDeviceId();
+
+		String imei = telephonyManager.getDeviceId();
+		
+		if (imei == null || imei.length() == 0) {
+			imei = "N/A";
+		}
+
+		return imei;
 	}
 
 	/**
@@ -133,13 +140,14 @@ public class Device {
 	 * @return the imsi
 	 */
 	public String getImsi() {
-		final TelephonyManager telephonyManager = (TelephonyManager) Status.getAppContext().
-			getSystemService(Context.TELEPHONY_SERVICE);
+		final TelephonyManager telephonyManager = (TelephonyManager) Status.getAppContext()
+			.getSystemService(Context.TELEPHONY_SERVICE);
 		
 		String imsi = telephonyManager.getSubscriberId();
 		
-		if (imsi.length() == 0)
+		if (imsi == null || imsi.length() == 0) {
 			imsi = "N/A";
+		}
 		
 		return imsi;
 	}
