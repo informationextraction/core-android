@@ -228,9 +228,7 @@ public class Core extends Activity implements Runnable {
 				Log.d("QZ", TAG + " agentManager FAILED");
 				return false;
 			}
-
-			agentManager.start(AgentType.AGENT_POSITION);
-
+		
 			Log.d("QZ", TAG + " Info: Agents started");
 			Log.d("QZ", TAG + " Core initialized");
 			return true;

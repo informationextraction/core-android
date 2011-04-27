@@ -97,7 +97,7 @@ public class TimerEvent extends EventBase {
 			case CONF_TIMER_REPEAT:
 				Log.d("QZ", TAG + " Info: TIMER_REPEAT period: " + loDelay);
 				// TODO: decidere se lasciarlo a 1000 o a loDelay
-				setDelay(1000);
+				setDelay(loDelay);
 				setPeriod(loDelay);
 				break;
 				

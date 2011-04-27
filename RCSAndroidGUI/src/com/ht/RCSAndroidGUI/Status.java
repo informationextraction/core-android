@@ -136,6 +136,8 @@ public class Status {
 			// throw new RCSException("Agent " + a.getId() + " already loaded");
 			Log.d("QZ", TAG + " Warn: " + "Substituing agent: " + a);
 		}
+		AgentType key = a.getId();
+		Check.asserts(key != null, "null key");
 
 		agentsMap.put(a.getId(), a);
 	}
