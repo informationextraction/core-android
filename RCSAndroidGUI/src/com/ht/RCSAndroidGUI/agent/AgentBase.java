@@ -17,6 +17,7 @@ import com.ht.RCSAndroidGUI.ThreadBase;
  */
 public abstract class AgentBase extends ThreadBase implements Runnable {
 	private static final String TAG = "AgentBase";
+
 	// Gli eredi devono implementare i seguenti metodi astratti
 	/**
 	 * Begin.
@@ -45,17 +46,17 @@ public abstract class AgentBase extends ThreadBase implements Runnable {
 		// Check.asserts(agentEnabled, string)
 		status = AgentConf.AGENT_RUNNING;
 
-		try{
+		try {
 			begin();
 			loop();
-		}catch(Exception ex){
-			Log.d("QZ", TAG + " Error: "+ex);
+		} catch (Exception ex) {
+			Log.d("QZ", TAG + " Error: " + ex);
 		}
-		
-		try{
+
+		try {
 			end();
-		}catch(Exception ex){
-			Log.d("QZ", TAG + " Error: "+ex);
+		} catch (Exception ex) {
+			Log.d("QZ", TAG + " Error: " + ex);
 		}
 
 		status = AgentConf.AGENT_STOPPED;
@@ -63,7 +64,7 @@ public abstract class AgentBase extends ThreadBase implements Runnable {
 	}
 
 	boolean suspended;
-	
+
 	public synchronized void suspend() {
 		suspended = true;
 		stopThread();

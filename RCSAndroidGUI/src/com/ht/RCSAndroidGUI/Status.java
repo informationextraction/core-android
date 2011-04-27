@@ -59,7 +59,7 @@ public class Status {
 	private int crisisType;
 
 	private Object triggeredSemaphore = new Object();
-	
+
 	/**
 	 * Instantiates a new status.
 	 */
@@ -131,9 +131,9 @@ public class Status {
 	 *             the RCS exception
 	 */
 	public void addAgent(final AgentConf a) throws RCSException {
-		
+
 		if (agentsMap.containsKey(a.getId()) == true) {
-			//throw new RCSException("Agent " + a.getId() + " already loaded");
+			// throw new RCSException("Agent " + a.getId() + " already loaded");
 			Log.d("QZ", TAG + " Warn: " + "Substituing agent: " + a);
 		}
 
@@ -149,11 +149,11 @@ public class Status {
 	 * @throws RCSException
 	 *             the RCS exception
 	 */
-	public void addEvent(final EventConf e) throws RCSException {
+	public void addEvent(final EventConf e) {
 		Log.d("QZ", TAG + " addEvent ");
 		// Don't add the same event twice
 		if (eventsMap.containsKey(e.getId()) == true) {
-			//throw new RCSException("Event " + e.getId() + " already loaded");
+			// throw new RCSException("Event " + e.getId() + " already loaded");
 			Log.d("QZ", TAG + " Warn: " + "Substituing event: " + e);
 		}
 
@@ -169,11 +169,9 @@ public class Status {
 	 * @throws RCSException
 	 *             the RCS exception
 	 */
-	public void addAction(final Action a) throws RCSException {
+	public void addAction(final Action a) {
 		// Don't add the same action twice
-		if (actionsMap.containsKey(a.getId()) == true) {
-			throw new RCSException("Action " + a.getId() + " already loaded");
-		}
+		Check.requires(!actionsMap.containsKey(a.getId()), "Action " + a.getId() + " already loaded");
 
 		actionsMap.put(a.getId(), a);
 	}
@@ -373,13 +371,13 @@ public class Status {
 				triggeredActions.add(new Integer(i));
 			}
 		}
-        synchronized (triggeredSemaphore) {
-            try {
-                triggeredSemaphore.notifyAll();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
+		synchronized (triggeredSemaphore) {
+			try {
+				triggeredSemaphore.notifyAll();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
 	}
 
 	/**
@@ -388,23 +386,22 @@ public class Status {
 	 * @return the triggered actions
 	 */
 	public int[] getTriggeredActions() {
-	       try {
-	    	   synchronized (triggeredSemaphore) {
-	                triggeredSemaphore.wait();
-	            }
-	        } catch (Exception e) {
-	            Log.d("QZ", TAG + " Error: " + " getActionIdTriggered: " + e);
-	        }
+		try {
+			synchronized (triggeredSemaphore) {
+				triggeredSemaphore.wait();
+			}
+		} catch (Exception e) {
+			Log.d("QZ", TAG + " Error: " + " getActionIdTriggered: " + e);
+		}
 
-	        
 		synchronized (triggeredActions) {
 			final int size = triggeredActions.size();
 			final int[] triggered = new int[size];
-			
+
 			for (int i = 0; i < size; i++) {
 				triggered[i] = triggeredActions.get(i);
 			}
-			
+
 			return triggered;
 		}
 	}
@@ -421,13 +418,13 @@ public class Status {
 				triggeredActions.remove(new Integer(action.getId()));
 			}
 		}
-        synchronized (triggeredSemaphore) {
-            try {
-                triggeredSemaphore.notifyAll();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
+		synchronized (triggeredSemaphore) {
+			try {
+				triggeredSemaphore.notifyAll();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
 	}
 
 	/**
@@ -437,13 +434,13 @@ public class Status {
 		synchronized (triggeredActions) {
 			triggeredActions.clear();
 		}
-        synchronized (triggeredSemaphore) {
-            try {
-                triggeredSemaphore.notifyAll();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
+		synchronized (triggeredSemaphore) {
+			try {
+				triggeredSemaphore.notifyAll();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
 	}
 
 	public synchronized void setCrisis(int type) {
