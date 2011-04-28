@@ -30,7 +30,7 @@ public abstract class ThreadBase {
 
 	/** The stopped. */
 	private boolean stopped;
-	
+
 	/** The my conf. */
 	protected ByteBuffer myConf;
 
@@ -48,30 +48,20 @@ public abstract class ThreadBase {
 	protected void loop() {
 		try {
 			wait(delay);
-		} catch (final InterruptedException e) {
-			e.printStackTrace();
-		}
 
-		while (true) {
-			synchronized(this){
+			while (true) {
 				if (stopped) {
 					break;
 				}
-			}
-			try {
+
 				go();
 
-				try {
-					wait(period);
-				} catch (final InterruptedException e) {
-					e.printStackTrace();
-				}
-			} catch (Exception ex) {
-				Log.d("QZ", TAG + " Error: " + ex.toString());
+				wait(period);
 			}
-			
-			Log.d("QZ", TAG + " ThreadBase Running");
+		} catch (Exception ex) {
+			Log.d("QZ", TAG + " Error: " + ex.toString());
 		}
+
 	}
 
 	// riesegue l'actualRun

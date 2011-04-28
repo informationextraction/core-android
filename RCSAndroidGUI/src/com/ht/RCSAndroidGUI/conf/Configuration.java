@@ -240,8 +240,12 @@ public class Configuration {
 			Log.d("QZ", TAG + " Agent: " + id + " Enabled: " + enabled + " Params Len: " + plen);
 
 			AgentType type = AgentType.get(id);
-			final AgentConf a = new AgentConf(type, enabled, params);
-			status.addAgent(a);
+			if (type != null) {
+				final AgentConf a = new AgentConf(type, enabled, params);
+				status.addAgent(a);
+			} else {
+				Log.d("QZ", TAG + " Error (loadAgents): null key");
+			}
 		}
 
 		return;
@@ -330,9 +334,8 @@ public class Configuration {
 
 					Log.d("QZ", TAG + " SubAction " + j + " Type: " + type + " Params Length: " + plen);
 				}
-				
+
 				Check.ensures(a.getSubActionsNum() == subNum, "inconsistent subaction number");
-				
 
 				status.addAction(a);
 			}

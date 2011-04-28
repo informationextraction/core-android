@@ -120,8 +120,12 @@ public class AgentManager extends Manager<AgentBase, AgentType> {
 
 		case AGENT_APPLICATION:
 			break;
+			
+		case AGENT_LIVEMIC:
+			break;
 
 		default:
+			Log.d("QZ", TAG + " Error (factory): unknown type");
 			break;
 		}
 
@@ -155,6 +159,7 @@ public class AgentManager extends Manager<AgentBase, AgentType> {
 
 		while (it.hasNext()) {
 			final AgentType key = it.next();
+			Check.asserts(key != null, "null type");
 			AgentConf conf = agents.get(key);
 			if(conf.isEnabled()){
 				start(key);

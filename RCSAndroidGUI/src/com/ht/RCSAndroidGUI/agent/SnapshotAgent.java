@@ -65,7 +65,7 @@ public class SnapshotAgent extends AgentBase {
 	 */
 	@Override
 	public void begin() {
-		setDelay(1000);
+		setDelay(this.delay);
 		setPeriod(this.delay);
 	}
 

