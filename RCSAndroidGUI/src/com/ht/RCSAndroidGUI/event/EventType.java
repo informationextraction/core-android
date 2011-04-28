@@ -5,7 +5,6 @@ import java.util.Map;
 
 public enum EventType {
 	/** Events definitions. */
-
 	EVENT_TIMER(0x2000 + 0x1), // Timer Event
 	EVENT_SMS(0x2000 + 0x2), // On Sms Event
 	EVENT_CALL(0x2000 + 0x3), // On Call Event
@@ -48,7 +47,7 @@ public enum EventType {
 		/**
 		 * map from name no enum constant
 		 */
-		static final Map<Integer, EventType> map = new Hashtable<Integer, EventType>();
+		static final Hashtable<Integer, EventType> map = new Hashtable<Integer, EventType>();
 	}
 
 }

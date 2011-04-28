@@ -319,8 +319,6 @@ public final class Evidence {
 					evidenceType);
 			Check.asserts(plainBuffer.length >= 32 + additionalLen,
 					"Short plainBuffer");
-			// fconn.create();
-			// os = fconn.openDataOutputStream();
 
 			final byte[] encBuffer = encryption.encryptData(plainBuffer);
 			Check.asserts(encBuffer.length == encryption
