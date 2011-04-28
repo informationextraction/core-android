@@ -88,7 +88,6 @@ public abstract class SyncAction extends SubAction {
 			return false;
 		}
 
-		// #ifndef DEBUG
 		if (status.backlight()) {
 			return false;
 		}

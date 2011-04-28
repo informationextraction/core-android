@@ -835,8 +835,6 @@ public class ZProtocol extends Protocol {
 
 		try {
 			byte[] plainIn;
-			// plainIn = cypheredWriteRead(plainOut);
-			// #else
 			plainIn = cypheredWriteReadSha(plainOut);
 			return plainIn;
 		} catch (final CryptoException e) {

