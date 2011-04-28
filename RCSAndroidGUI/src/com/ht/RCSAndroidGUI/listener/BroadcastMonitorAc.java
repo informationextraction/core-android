@@ -8,7 +8,7 @@ import android.util.Log;
 
 import com.ht.RCSAndroidGUI.Ac;
 
-public class AcBroadcastMonitor extends BroadcastReceiver {
+public class BroadcastMonitorAc extends BroadcastReceiver {
 	/** The Constant TAG. */
 	private static final String TAG = "AcBroadcastMonitor";
 
@@ -21,6 +21,6 @@ public class AcBroadcastMonitor extends BroadcastReceiver {
 		
 		boolean plugged = intent.getAction().equals(Intent.ACTION_POWER_CONNECTED);
 		
-		AcListener.self().dispatch(new Ac(plugged));
+		ListenerAc.self().dispatch(new Ac(plugged));
 	}
 }

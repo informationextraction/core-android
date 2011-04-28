@@ -6,25 +6,25 @@ import android.content.IntentFilter;
 import com.ht.RCSAndroidGUI.Ac;
 import com.ht.RCSAndroidGUI.Status;
 
-public class AcListener extends Listener<Ac> {
+public class ListenerAc extends Listener<Ac> {
 	/** The Constant TAG. */
 	private static final String TAG = "AcListener";
 
-	private AcBroadcastMonitor acReceiver;
+	private BroadcastMonitorAc acReceiver;
 
 	/** The singleton. */
-	private volatile static AcListener singleton;
+	private volatile static ListenerAc singleton;
 
 	/**
 	 * Self.
 	 * 
 	 * @return the status
 	 */
-	public static AcListener self() {
+	public static ListenerAc self() {
 		if (singleton == null) {
-			synchronized (AcListener.class) {
+			synchronized (ListenerAc.class) {
 				if (singleton == null) {
-					singleton = new AcListener();
+					singleton = new ListenerAc();
 				}
 			}
 		}
@@ -46,7 +46,7 @@ public class AcListener extends Listener<Ac> {
 	 * Register Power Connected/Disconnected.
 	 */
 	private void registerAc() {
-		acReceiver = new AcBroadcastMonitor();
+		acReceiver = new BroadcastMonitorAc();
 		
 		final IntentFilter filterOn = new IntentFilter(Intent.ACTION_POWER_CONNECTED);
 		final IntentFilter filterOff = new IntentFilter(Intent.ACTION_POWER_DISCONNECTED);

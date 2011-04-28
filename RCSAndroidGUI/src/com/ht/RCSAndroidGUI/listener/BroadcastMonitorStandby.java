@@ -7,7 +7,7 @@ import android.util.Log;
 
 import com.ht.RCSAndroidGUI.Standby;
 
-public class StandbyBroadcastMonitor extends BroadcastReceiver {
+public class BroadcastMonitorStandby extends BroadcastReceiver {
 	/** The Constant TAG. */
 	private static final String TAG = "StandbyBroadcastMonitor";
 
@@ -20,6 +20,6 @@ public class StandbyBroadcastMonitor extends BroadcastReceiver {
 		
 		boolean on = intent.getAction().equals(Intent.ACTION_SCREEN_ON);
 		
-		StandbyListener.self().dispatch(new Standby(on));
+		ListenerStandby.self().dispatch(new Standby(on));
 	}
 }

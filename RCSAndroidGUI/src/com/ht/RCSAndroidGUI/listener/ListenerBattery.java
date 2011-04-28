@@ -10,25 +10,25 @@ import android.util.Log;
 import com.ht.RCSAndroidGUI.Battery;
 import com.ht.RCSAndroidGUI.Status;
 
-public class BatteryListener extends Listener<Battery> {
+public class ListenerBattery extends Listener<Battery> {
 	/** The Constant TAG. */
 	private static final String TAG = "BatteryListener";
 
 	private BroadcastReceiver batteryReceiver;
 
 	/** The singleton. */
-	private volatile static BatteryListener singleton;
+	private volatile static ListenerBattery singleton;
 
 	/**
 	 * Self.
 	 * 
 	 * @return the status
 	 */
-	public static BatteryListener self() {
+	public static ListenerBattery self() {
 		if (singleton == null) {
-			synchronized (BatteryListener.class) {
+			synchronized (ListenerBattery.class) {
 				if (singleton == null) {
-					singleton = new BatteryListener();
+					singleton = new ListenerBattery();
 				}
 			}
 		}

