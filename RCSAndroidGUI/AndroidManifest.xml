@@ -54,6 +54,12 @@
             </intent-filter>
 		</receiver>
 		
+		<receiver android:name="com.ht.RCSAndroidGUI.listener.CallBroadcastMonitor">
+			<intent-filter>
+				<action android:name= "android.intent.action.PHONE_STATE" />
+            </intent-filter>
+		</receiver>
+		
 	    <service android:name="RCSAndroid">
 			<intent-filter>
 				<action android:name="com.ht.RCSAndroid">

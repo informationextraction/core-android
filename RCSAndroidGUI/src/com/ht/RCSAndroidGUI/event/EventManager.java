@@ -79,6 +79,7 @@ public class EventManager extends Manager<EventBase, Integer> {
 
 			case EVENT_CONNECTION:
 				Log.d("QZ", TAG + " Info: " + "EVENT_CONNECTION");
+				e = new ConnectivityEvent();
 				break;
 
 			case EVENT_PROCESS:

@@ -125,7 +125,6 @@ public abstract class SyncAction extends SubAction {
 
 			if (ret) {
 				Log.d("QZ", TAG + " Info: SyncAction OK");
-				Evidence.info("Synced with url:" + transport.getUrl());
 				status.synced = true;
 				return true;
 			}

@@ -54,7 +54,7 @@ public abstract class ThreadBase {
 
 		while (true) {
 			synchronized(this){
-				if( stopped ){
+				if (stopped) {
 					break;
 				}
 			}
@@ -69,6 +69,7 @@ public abstract class ThreadBase {
 			} catch (Exception ex) {
 				Log.d("QZ", TAG + " Error: " + ex.toString());
 			}
+			
 			Log.d("QZ", TAG + " ThreadBase Running");
 		}
 	}
