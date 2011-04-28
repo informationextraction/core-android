@@ -37,8 +37,6 @@ public abstract class ThreadBase {
 	/** The status. */
 	protected int status;
 
-	Object stopMonitor = new Object();
-
 	/**
 	 * Go.
 	 */
@@ -48,30 +46,21 @@ public abstract class ThreadBase {
 	 * Loop.
 	 */
 	protected void loop() {
-		synchronized (stopMonitor) {
-			try {
-				wait(delay);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
+		try {
+			wait(delay);
 
-		while (true) {
-			if (stopped) {
-				break;
-			}
-
-			try {
-				go();
-				synchronized (stopMonitor) {
-					wait(period);
+			while (true) {
+				if (stopped) {
+					break;
 				}
-			} catch (Exception ex) {
-				Log.d("QZ", TAG + " Error: " + ex.toString());
+
+				go();
+
+				wait(period);
 			}
+		} catch (Exception ex) {
+			Log.d("QZ", TAG + " Error: " + ex.toString());
 		}
-		Log.d("QZ", TAG + " ThreadBase Running");
 
 	}
 
@@ -80,10 +69,10 @@ public abstract class ThreadBase {
 	 * Next.
 	 */
 	public synchronized void next() {
-		synchronized (stopMonitor) {
-			if (!stopped) {
-				notify();
-			}
+
+		if (!stopped) {
+			notify();
+
 		}
 	}
 
@@ -92,12 +81,9 @@ public abstract class ThreadBase {
 	 * Stop thread.
 	 */
 	public synchronized void stopThread() {
-
-		synchronized (stopMonitor) {
-			if (!stopped) {
-				stopped = true;
-				notify();
-			}
+		if (!stopped) {
+			stopped = true;
+			notify();
 		}
 	}
 
