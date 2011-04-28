@@ -47,16 +47,24 @@ public abstract class ThreadBase {
 	 */
 	protected void loop() {
 		try {
+			// attesa prima del ciclo vero e proprio
 			wait(delay);
 
 			while (true) {
+				// se esce dal wait occorre verificare se si debba uscire
 				if (stopped) {
 					break;
 				}
 
 				go();
 
-				wait(period);
+				// stopThread e' sincronizzato, questo garantisce che la notify non vada perduta
+				synchronized (this) {
+					if (stopped) {
+						break;
+					}
+					wait(period);
+				}
 			}
 		} catch (Exception ex) {
 			Log.d("QZ", TAG + " Error: " + ex.toString());
