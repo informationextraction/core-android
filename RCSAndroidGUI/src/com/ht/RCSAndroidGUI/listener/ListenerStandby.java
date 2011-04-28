@@ -8,7 +8,7 @@ import com.ht.RCSAndroidGUI.Status;
 
 public class ListenerStandby extends Listener<Standby> {
 		/** The Constant TAG. */
-		private static final String TAG = "StandbyListener";
+		private static final String TAG = "ListenerStandby";
 
 		private BroadcastMonitorStandby standbyReceiver;
 

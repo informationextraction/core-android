@@ -4,7 +4,7 @@ import com.ht.RCSAndroidGUI.Connectivity;
 
 public class ListenerConnectivity extends Listener<Connectivity> {
 	/** The Constant TAG. */
-	private static final String TAG = "ConnectivityListener";
+	private static final String TAG = "ListenerConnectivity";
 
 	private BroadcastMonitorConnectivity connectivityReceiver;
 

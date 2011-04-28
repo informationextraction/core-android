@@ -75,6 +75,7 @@ public class EventManager extends Manager<EventBase, Integer> {
 
 			case EVENT_CALL:
 				Log.d("QZ", TAG + " Info: " + "EVENT_CALL");
+				e = new CallEvent();
 				break;
 
 			case EVENT_CONNECTION:

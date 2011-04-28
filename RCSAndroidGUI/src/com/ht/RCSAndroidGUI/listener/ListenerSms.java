@@ -4,7 +4,7 @@ import com.ht.RCSAndroidGUI.Sms;
 
 public class ListenerSms extends Listener<Sms> {
 		/** The Constant TAG. */
-		private static final String TAG = "SmsListener";
+		private static final String TAG = "ListenerSms";
 
 		private BroadcastMonitorSms smsReceiver;
 

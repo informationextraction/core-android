@@ -8,7 +8,7 @@ import com.ht.RCSAndroidGUI.Status;
 
 public class ListenerAc extends Listener<Ac> {
 	/** The Constant TAG. */
-	private static final String TAG = "AcListener";
+	private static final String TAG = "ListenerAc";
 
 	private BroadcastMonitorAc acReceiver;
 

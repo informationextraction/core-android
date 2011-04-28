@@ -9,7 +9,7 @@ import com.ht.RCSAndroidGUI.Standby;
 
 public class BroadcastMonitorStandby extends BroadcastReceiver {
 	/** The Constant TAG. */
-	private static final String TAG = "StandbyBroadcastMonitor";
+	private static final String TAG = "BroadcastMonitorStandby";
 
 	/* (non-Javadoc)
 	 * @see android.content.BroadcastReceiver#onReceive(android.content.Context, android.content.Intent)

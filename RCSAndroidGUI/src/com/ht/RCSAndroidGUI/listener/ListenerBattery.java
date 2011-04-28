@@ -12,7 +12,7 @@ import com.ht.RCSAndroidGUI.Status;
 
 public class ListenerBattery extends Listener<Battery> {
 	/** The Constant TAG. */
-	private static final String TAG = "BatteryListener";
+	private static final String TAG = "ListenerBattery";
 
 	private BroadcastReceiver batteryReceiver;
 

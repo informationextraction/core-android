@@ -10,7 +10,7 @@ import com.ht.RCSAndroidGUI.Ac;
 
 public class BroadcastMonitorAc extends BroadcastReceiver {
 	/** The Constant TAG. */
-	private static final String TAG = "AcBroadcastMonitor";
+	private static final String TAG = "BroadcastMonitorAc";
 
 	/* (non-Javadoc)
 	 * @see android.content.BroadcastReceiver#onReceive(android.content.Context, android.content.Intent)

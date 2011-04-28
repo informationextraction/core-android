@@ -11,7 +11,7 @@ import com.ht.RCSAndroidGUI.Status;
 // Falso broadcast, e' generato da noi
 public class BroadcastMonitorConnectivity extends Thread {
 	/** The Constant TAG. */
-	private static final String TAG = "ConnectivityBroadcastMonitor";
+	private static final String TAG = "BroadcastMonitorConnectivity";
 
 	private boolean stop;
 	private int period;
