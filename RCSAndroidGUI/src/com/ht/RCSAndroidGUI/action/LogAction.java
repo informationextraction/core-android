@@ -47,7 +47,7 @@ public class LogAction extends SubAction {
 	public boolean execute() {
 		Evidence.info(msg);
 		
-		return false;
+		return true;
 	}
 	
 	@Override
