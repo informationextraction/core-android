@@ -71,13 +71,14 @@ public class LocationEvent extends EventBase implements RangeObserver {
 	}
 
 
-	public void notification(Boolean onEnter) {
-		if(onEnter){
+	public int notification(Boolean onEnter) {
+		if (onEnter) {
 			trigger(actionOnEnter);
-		}else{
+		} else {
 			trigger(actionOnExit);
 		}
 		
+		return 0;
 	}
 
 }

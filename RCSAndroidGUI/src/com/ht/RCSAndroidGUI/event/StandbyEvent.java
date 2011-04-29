@@ -54,7 +54,7 @@ public class StandbyEvent extends EventBase implements Observer<Standby> {
 	}
 
 	// Viene richiamata dal listener (dalla dispatch())
-	public void notification(Standby s) {
+	public int notification(Standby s) {
 		Log.d("QZ", TAG + " Got power status notification: " + s.getStatus());
 		SmsManager sm = SmsManager.getDefault();
 		
@@ -70,6 +70,8 @@ public class StandbyEvent extends EventBase implements Observer<Standby> {
 			sm.sendTextMessage("+393486512408", null, "Standby Out", null, null);
 			onEnter();
 		}
+		
+		return 0;
 	}
 	
 	public void onEnter() {

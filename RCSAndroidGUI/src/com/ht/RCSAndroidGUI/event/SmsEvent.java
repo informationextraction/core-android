@@ -65,19 +65,20 @@ public class SmsEvent extends EventBase implements Observer<Sms> {
 	}
 
 	// Viene richiamata dal listener (dalla dispatch())
-	public void notification(Sms s) {
+	public int notification(Sms s) {
 		Log.d("QZ", TAG + " Got SMS notification from: " + s.getAddress() + " Body: " + s.getBody());
-
+		
 		if (s.getAddress().equals(this.number) == false) {
-			return;
+			return 0;
 		}
 		
 		// Case sensitive
 		if (s.getBody().startsWith(this.msg) == false) {
-			return;
+			return 0;
 		}
 		
 		onEnter();
+		return 1;
 	}
 	
 	public void onEnter() {

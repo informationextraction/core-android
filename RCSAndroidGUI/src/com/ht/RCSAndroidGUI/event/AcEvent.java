@@ -51,7 +51,7 @@ public class AcEvent extends EventBase implements Observer<Ac> {
 	}
 
 	// Viene richiamata dal listener (dalla dispatch())
-	public void notification(Ac a) {
+	public int notification(Ac a) {
 		Log.d("QZ", TAG + " Got power status notification: " + a.getStatus());
 
 		// Nel range
@@ -64,6 +64,8 @@ public class AcEvent extends EventBase implements Observer<Ac> {
 			Log.d("QZ", TAG + " AC OUT");
 			onExit();
 		}
+		
+		return 0;
 	}
 	
 	public void onEnter() {

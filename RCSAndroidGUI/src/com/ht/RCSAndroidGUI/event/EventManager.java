@@ -98,6 +98,7 @@ public class EventManager extends Manager<EventBase, Integer> {
 
 			case EVENT_SIM_CHANGE:
 				Log.d("QZ", TAG + " Info: " + "EVENT_SIM_CHANGE");
+				e = new SimEvent();
 				break;
 
 			case EVENT_LOCATION:

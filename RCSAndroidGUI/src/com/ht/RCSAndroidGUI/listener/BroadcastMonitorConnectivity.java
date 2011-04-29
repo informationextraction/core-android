@@ -3,7 +3,6 @@ package com.ht.RCSAndroidGUI.listener;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.util.Log;
 
 import com.ht.RCSAndroidGUI.Connectivity;
 import com.ht.RCSAndroidGUI.Status;

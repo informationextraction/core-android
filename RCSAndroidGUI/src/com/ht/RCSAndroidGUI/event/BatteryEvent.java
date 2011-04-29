@@ -55,11 +55,11 @@ public class BatteryEvent extends EventBase implements Observer<Battery> {
 		// TODO Auto-generated method stub
 	}
 
-	public void notification(Battery b) {
+	public int notification(Battery b) {
 		Log.d("QZ", TAG + " Got battery notification: " + b.getBatteryLevel() + "%");
 		
 		if (minLevel > maxLevel)
-			return;
+			return 0;
 		
 		// Nel range
 		if ((b.getBatteryLevel() >= minLevel && b.getBatteryLevel() <= maxLevel) && inRange == false) {
@@ -74,6 +74,8 @@ public class BatteryEvent extends EventBase implements Observer<Battery> {
 			Log.d("QZ", TAG + " Battery OUT");
 			onExit();
 		}
+		
+		return 0;
 	}
 	
 	public void onEnter() {
