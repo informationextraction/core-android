@@ -214,18 +214,20 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 
 	public void suspend(AgentBase agent) {
 		// suspending a thread implies a stop
-		agent.suspend();
+		if (agent.isRunning()) {
+			agent.suspend();
 
-		final Thread t = threads.get(agent);
-		if (t != null) {
-			try {
-				t.join();
-			} catch (final InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			final Thread t = threads.get(agent);
+			if (t != null) {
+				try {
+					t.join();
+				} catch (final InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
+			threads.remove(agent);
 		}
-		threads.remove(agent);
 
 	}
 
@@ -236,6 +238,7 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 	 *            the key
 	 */
 	private void resume(int key) {
+
 		final AgentBase a = running.get(key);
 		if (a == null) {
 			Log.d("QZ", TAG + " Agent " + key + " not present");
@@ -243,6 +246,7 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 		}
 
 		resume(a);
+
 	}
 
 	public void resume(AgentBase agent) {

@@ -77,4 +77,8 @@ public abstract class AgentBase extends ThreadBase implements Runnable {
 	public synchronized boolean isSuspended() {
 		return suspended;
 	}
+
+	public boolean isRunning() {
+		return status == AgentConf.AGENT_RUNNING;
+	}
 }

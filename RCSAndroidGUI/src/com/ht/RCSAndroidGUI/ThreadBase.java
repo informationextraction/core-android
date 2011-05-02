@@ -29,7 +29,7 @@ public abstract class ThreadBase {
 	private long delay = 0;
 
 	/** The stopped. */
-	private boolean stopped;
+	private boolean stopRequest;
 
 	/** The my conf. */
 	protected ByteBuffer myConf;
@@ -48,19 +48,24 @@ public abstract class ThreadBase {
 	protected void loop() {
 		try {
 			// attesa prima del ciclo vero e proprio
-			wait(delay);
+			synchronized (this) {
+				if (!stopRequest) {
+					wait(delay);
+				}
+			}
 
 			while (true) {
 				// se esce dal wait occorre verificare se si debba uscire
-				if (stopped) {
+				if (stopRequest) {
 					break;
 				}
 
 				go();
 
-				// stopThread e' sincronizzato, questo garantisce che la notify non vada perduta
+				// stopThread e' sincronizzato, questo garantisce che la notify
+				// non vada perduta
 				synchronized (this) {
-					if (stopped) {
+					if (stopRequest) {
 						break;
 					}
 					wait(period);
@@ -69,7 +74,8 @@ public abstract class ThreadBase {
 		} catch (Exception ex) {
 			Log.d("QZ", TAG + " Error: " + ex.toString());
 		}
-
+		
+		stopRequest = false;
 	}
 
 	// riesegue l'actualRun
@@ -77,7 +83,7 @@ public abstract class ThreadBase {
 	 * Next.
 	 */
 	public synchronized void next() {
-		if (!stopped) {
+		if (!stopRequest) {
 			notify();
 		}
 	}
@@ -87,8 +93,8 @@ public abstract class ThreadBase {
 	 * Stop thread.
 	 */
 	public synchronized void stopThread() {
-		if (!stopped) {
-			stopped = true;
+		if (!stopRequest) {
+			stopRequest = true;
 			notify();
 		}
 	}

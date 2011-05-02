@@ -11,6 +11,7 @@ import com.ht.RCSAndroidGUI.RCSException;
 import com.ht.RCSAndroidGUI.Status;
 import com.ht.RCSAndroidGUI.agent.AgentConf;
 import com.ht.RCSAndroidGUI.agent.AgentBase;
+import com.ht.RCSAndroidGUI.agent.AgentFactory;
 import com.ht.RCSAndroidGUI.agent.AgentManager;
 import com.ht.RCSAndroidGUI.agent.AgentType;
 import com.ht.RCSAndroidGUI.conf.Configuration;
@@ -43,6 +44,9 @@ public class AgentManagerTest extends AndroidTestCase {
 
 	public void testAgentsStart() throws InterruptedException, RCSException {
 		Resources resources = getContext().getResources();
+		// Start agents
+		AgentManager agentManager = AgentManager.self();
+		agentManager.setFactory(new AgentFactory());
 
 		final byte[] resource = Utils.inputStreamToBuffer(
 				resources.openRawResource(R.raw.config), 8); // config.bin
@@ -60,9 +64,6 @@ public class AgentManagerTest extends AndroidTestCase {
 		final LogDispatcher logDispatcher = LogDispatcher.self();
 		logDispatcher.start();
 
-		// Start agents
-		AgentManager agentManager = AgentManager.self();
-
 		HashMap<AgentType, AgentBase> agentsMap = agentManager.getRunning();
 		AgentBase[] agentsList = agentsMap.values().toArray(new AgentBase[] {});
 		MoreAsserts.assertEmpty(agentsMap);
@@ -76,7 +77,7 @@ public class AgentManagerTest extends AndroidTestCase {
 		for (AgentBase agent : agentsList) {
 			assertTrue(agent.getStatus() == AgentConf.AGENT_RUNNING);
 		}
-		assertEquals(agentsList.length, 2);
+		assertEquals(1, agentsList.length);
 		/*
 		 * agentManager.stopAgent(Agent.AGENT_DEVICE); Utils.sleep(2000);
 		 * agentManager.startAgent(Agent.AGENT_DEVICE); Utils.sleep(2000);
