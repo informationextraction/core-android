@@ -77,13 +77,15 @@ public class Action {
 	 * @throws RCSException
 	 *             the RCS exception
 	 */
-	public void addSubAction(final int typeId, final byte[] params) throws RCSException {
+	public boolean addSubAction(final int typeId, final byte[] params) throws RCSException {
 		SubActionType type = SubActionType.get(typeId);
 		if (type != null) {
 			final SubAction sub = SubAction.factory(type, params);
 			list.add(sub);
+			return true;
 		}else{
 			Log.d("QZ", TAG + " Error (addSubAction): unknown type Id = " + typeId);
+			return false;
 		}
 	}
 

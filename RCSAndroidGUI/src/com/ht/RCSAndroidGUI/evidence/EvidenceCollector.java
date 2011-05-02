@@ -258,7 +258,7 @@ public class EvidenceCollector {
 	 *            the log name
 	 */
 	public void remove(final String logName) {
-		Log.d("QZ", TAG + " Removing file: " + logName);
+		//Log.d("QZ", TAG + " Removing file: " + logName);
 		final AutoFile file = new AutoFile(logName);
 		if (file.exists()) {
 			file.delete();
@@ -293,7 +293,6 @@ public class EvidenceCollector {
 	 * @return the int
 	 */
 	private int removeLogRecursive(final String basePath, final int numFiles) {
-		Log.d("QZ", TAG + " Info: RemovingLog: " + basePath + " numFiles: " + numFiles);
 		int numLogsDeleted = 0;
 
 		File fc;
@@ -304,10 +303,8 @@ public class EvidenceCollector {
 				final String[] fileLogs = fc.list();
 
 				for (final String file : fileLogs) {
-					Log.d("QZ", TAG + " removeLog: " + file);
 					final int removed = removeLogRecursive(basePath + file,
 							numFiles - numLogsDeleted);
-					Log.d("QZ", TAG + " removeLog removed: " + removed);
 					numLogsDeleted += removed;
 				}
 			}
@@ -392,9 +389,7 @@ public class EvidenceCollector {
 
 				if (file.endsWith(encLogMask)) {
 					// String encName = fcFile.getName();
-					Log.d("QZ", TAG + " enc name: " + file);
 					final String plainName = decryptName(file);
-					Log.d("QZ", TAG + " Info: plain name: " + plainName);
 					map.put(plainName, file);
 				} else if (file.endsWith(EvidenceCollector.LOG_TMP)) {
 					Log.d("QZ", TAG + " ignoring temp file: " + file);

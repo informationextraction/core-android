@@ -77,7 +77,6 @@ public class EncryptionPKCS5 extends Encryption {
 	@Override
 	public byte[] decryptData(final byte[] cyphered, final int enclen,
 			final int offset) throws CryptoException {
-		Log.d("QZ", TAG + " decryptData PKCS5");
 		// int padlen = cyphered[cyphered.length -1];
 		// int plainlen = enclen - padlen;
 		Check.requires(enclen % 16 == 0, "Wrong padding");
@@ -129,8 +128,6 @@ public class EncryptionPKCS5 extends Encryption {
 		Check.asserts(sha.length == DIGEST_LENGTH, "sha.length");
 		Check.asserts(plainSha.length == plain.length + DIGEST_LENGTH,
 				"plainSha.length");
-		Log.d("QZ", TAG + " encryptDataIntegrity plain: " + plain.length);
-		Log.d("QZ", TAG + " encryptDataIntegrity plainSha: " + plainSha.length);
 		return encryptData(plainSha, 0);
 	}
 
@@ -159,7 +156,6 @@ public class EncryptionPKCS5 extends Encryption {
 		Check.asserts(calculatedSha.length == DIGEST_LENGTH,
 				"calculatedSha.length");
 		if (Arrays.equals(calculatedSha, sha)) {
-			Log.d("QZ", TAG + " decryptDataIntegrity: sha corrected");
 			return plain;
 		} else {
 			Log.d("QZ", TAG + " Error: decryptDataIntegrity: sha error!");

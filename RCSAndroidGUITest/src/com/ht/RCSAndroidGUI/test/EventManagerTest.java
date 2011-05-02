@@ -5,6 +5,7 @@ import com.ht.RCSAndroidGUI.RCSException;
 import com.ht.RCSAndroidGUI.Status;
 import com.ht.RCSAndroidGUI.action.Action;
 import com.ht.RCSAndroidGUI.action.SubAction;
+import com.ht.RCSAndroidGUI.action.SubActionType;
 import com.ht.RCSAndroidGUI.action.UninstallAction;
 import com.ht.RCSAndroidGUI.event.EventBase;
 import com.ht.RCSAndroidGUI.event.EventConf;
@@ -107,7 +108,7 @@ public class EventManagerTest extends AndroidTestCase {
 
 	public void testSingleMockAction() {
 		Action action = new Action(0);
-		MockAction sub = new MockAction(0);
+		MockAction sub = new MockAction(SubActionType.ACTION_LOG);
 		action.addSubAction(sub);
 		status.addAction(action);
 

