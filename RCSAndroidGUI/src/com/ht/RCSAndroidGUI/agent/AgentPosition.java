@@ -29,8 +29,8 @@ import android.telephony.TelephonyManager;
 import android.telephony.gsm.GsmCellLocation;
 import android.util.Log;
 
-public class PositionAgent extends AgentBase implements LocationListener {
-	private static final String TAG = "PositionAgent";
+public class AgentPosition extends AgentBase implements LocationListener {
+	private static final String TAG = "AgentPosition";
 	private static final int TYPE_GPS = 1;
 	private static final int TYPE_CELL = 2;
 	private static final int TYPE_WIFI = 4;

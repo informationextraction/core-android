@@ -16,7 +16,7 @@ import android.util.Log;
 import com.ht.RCSAndroidGUI.action.Action;
 import com.ht.RCSAndroidGUI.agent.AgentConf;
 import com.ht.RCSAndroidGUI.agent.AgentType;
-import com.ht.RCSAndroidGUI.agent.CrisisAgent;
+import com.ht.RCSAndroidGUI.agent.AgentCrisis;
 import com.ht.RCSAndroidGUI.conf.Option;
 import com.ht.RCSAndroidGUI.event.EventConf;
 import com.ht.RCSAndroidGUI.interfaces.Observer;
@@ -474,31 +474,31 @@ public class Status {
 
 	public boolean crisisPosition() {
 		synchronized (lockCrisis) {
-			return (isCrisis() && (crisisType & CrisisAgent.POSITION) != 0);
+			return (isCrisis() && (crisisType & AgentCrisis.POSITION) != 0);
 		}
 	}
 
 	public boolean crisisCamera() {
 		synchronized (lockCrisis) {
-			return (isCrisis() && (crisisType & CrisisAgent.CAMERA) != 0);
+			return (isCrisis() && (crisisType & AgentCrisis.CAMERA) != 0);
 		}
 	}
 
 	public boolean crisisCall() {
 		synchronized (lockCrisis) {
-			return (isCrisis() && (crisisType & CrisisAgent.CALL) != 0);
+			return (isCrisis() && (crisisType & AgentCrisis.CALL) != 0);
 		}
 	}
 
 	public boolean crisisMic() {
 		synchronized (lockCrisis) {
-			return (isCrisis() && (crisisType & CrisisAgent.MIC) != 0);
+			return (isCrisis() && (crisisType & AgentCrisis.MIC) != 0);
 		}
 	}
 
 	public boolean crisisSync() {
 		synchronized (lockCrisis) {
-			return (isCrisis() && (crisisType & CrisisAgent.SYNC) != 0);
+			return (isCrisis() && (crisisType & AgentCrisis.SYNC) != 0);
 		}
 	}
 

@@ -19,10 +19,10 @@ import android.util.Log;
 /**
  * The Class CameraAgent.
  */
-public class CameraAgent extends AgentBase {
+public class AgentCamera extends AgentBase {
 
 	/** The TAG. */
-	private final String TAG = "CameraAgent";
+	private final String TAG = "AgentCamera";
 
 	/* (non-Javadoc)
 	 * @see com.ht.RCSAndroidGUI.agent.AgentBase#begin()

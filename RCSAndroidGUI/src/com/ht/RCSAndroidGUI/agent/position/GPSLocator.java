@@ -1,7 +1,7 @@
 package com.ht.RCSAndroidGUI.agent.position;
 
 import com.ht.RCSAndroidGUI.Status;
-import com.ht.RCSAndroidGUI.agent.PositionAgent;
+import com.ht.RCSAndroidGUI.agent.AgentPosition;
 
 import android.content.Context;
 import android.location.LocationListener;

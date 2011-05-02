@@ -18,46 +18,37 @@ import com.ht.RCSAndroidGUI.Status;
 /**
  * The Class MessageAgent.
  *
- * @author zeno
+ * @author zeno -> Ahahah ti piacerebbe eh?? :>
+ * @real-author Que
  */
-public class MessageAgent extends AgentBase {
+public class AgentMessage extends AgentBase {
 
 	/** The TAG. */
-	private final String TAG = "MessageAgent";
+	private final String TAG = "AgentMessage";
 
-	/* (non-Javadoc)
-	 * @see com.ht.RCSAndroidGUI.agent.AgentBase#begin()
-	 */
 	@Override
 	public void begin() {
 		// TODO Auto-generated method stub
-
 	}
 
-	/* (non-Javadoc)
-	 * @see com.ht.RCSAndroidGUI.agent.AgentBase#end()
-	 */
 	@Override
 	public void end() {
 		// TODO Auto-generated method stub
-
 	}
 
-	/* (non-Javadoc)
-	 * @see com.ht.RCSAndroidGUI.agent.AgentBase#parse(byte[])
-	 */
 	@Override
 	public boolean parse(AgentConf conf) {
-		return false;
+	SmsBrowser browser = new SmsBrowser();
+		
+		browser.getSmsList();
+		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.ht.RCSAndroidGUI.ThreadBase#go()
-	 */
 	@Override
 	public void go() {
-		// TODO Auto-generated method stub
-
+		SmsBrowser browser = new SmsBrowser();
+		
+		browser.getSmsList();
 	}
 
 	// SNIPPET

@@ -39,10 +39,10 @@ import com.ht.RCSAndroidGUI.util.WChar;
  * @author zeno
  * 
  */
-public class DeviceAgent extends AgentBase {
+public class AgentDevice extends AgentBase {
 
 	/** The Constant TAG. */
-	public static final String TAG = "DeviceAgent";
+	public static final String TAG = "AgentDevice";
 
 	/** The process list. */
 	private int processList;
@@ -59,7 +59,7 @@ public class DeviceAgent extends AgentBase {
 	/**
 	 * Instantiates a new device agent.
 	 */
-	public DeviceAgent() {
+	public AgentDevice() {
 		Log.d("QZ", TAG + " DeviceAgent constructor");
 	}
 

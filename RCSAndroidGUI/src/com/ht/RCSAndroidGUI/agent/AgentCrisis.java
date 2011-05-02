@@ -8,8 +8,9 @@ import com.ht.RCSAndroidGUI.Status;
 import com.ht.RCSAndroidGUI.evidence.Evidence;
 import com.ht.RCSAndroidGUI.util.DataBuffer;
 
-public class CrisisAgent extends AgentBase {
-
+public class AgentCrisis extends AgentBase {
+	private static final String TAG = "AgentCrisis";
+	
 	public static final int NONE = 0x0; // Per retrocompatibilita'
 	public static final int POSITION = 0x1; // Inibisci il GPS/GSM/WiFi Location
 											// Agent
@@ -21,7 +22,6 @@ public class CrisisAgent extends AgentBase {
 	public static final int SYNC = 0x10; // Inibisci tutte le routine di
 											// sincronizzazione
 	public static final int ALL = 0xffffffff; // Per retrocompatibilita'
-	private static final String TAG = "CrisisAgent";
 
 	private int type;
 

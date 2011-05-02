@@ -61,7 +61,7 @@ public class RunningProcess {
 	
 	// DEBUG
 	public void print() {
-		if (list == null)
+		if (list == null || list.size() == 0)
 			return;
 		
 		Iterator<ActivityManager.RunningAppProcessInfo> iter = list.listIterator();
@@ -69,7 +69,7 @@ public class RunningProcess {
 		while (iter.hasNext()) {
 			ActivityManager.RunningAppProcessInfo element = iter.next();
 
-			Log.d("QZ", TAG + " (update): " + element.processName);
+			Log.d("QZ", TAG + " (update) proc: " + element.processName);
 		}
 	}
 	
@@ -96,5 +96,9 @@ public class RunningProcess {
 		}
 		
 		return false;
+	}
+	
+	public synchronized ArrayList<ActivityManager.RunningAppProcessInfo> getProcessList() {
+		return list;
 	}
 }

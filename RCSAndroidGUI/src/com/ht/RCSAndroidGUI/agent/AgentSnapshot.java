@@ -20,9 +20,9 @@ import com.ht.RCSAndroidGUI.util.Utils;
 /**
  * The Class SnapshotAgent.
  */
-public class SnapshotAgent extends AgentBase {
+public class AgentSnapshot extends AgentBase {
 
-	private static final String TAG = "SnapshotAgent";
+	private static final String TAG = "AgentSnapshot";
 
 	/** The Constant CAPTURE_FULLSCREEN. */
 	final private static int CAPTURE_FULLSCREEN = 0;
@@ -39,7 +39,7 @@ public class SnapshotAgent extends AgentBase {
 	/**
 	 * Instantiates a new snapshot agent.
 	 */
-	public SnapshotAgent() {
+	public AgentSnapshot() {
 		Log.d("QZ", TAG + " SnapshotAgent constructor");
 	}
 
