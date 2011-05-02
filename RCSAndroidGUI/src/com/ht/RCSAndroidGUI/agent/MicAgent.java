@@ -238,7 +238,8 @@ public class MicAgent extends AgentBase implements Observer<Call> {
 	 * @see com.ht.RCSAndroidGUI.agent.AgentBase#parse(byte[])
 	 */
 	@Override
-	public boolean parse(final byte[] confParameters) {
+	public boolean parse(AgentConf conf) {
+		byte[] confParameters = conf.getParams();
 		final DataBuffer databuffer = new DataBuffer(confParameters, 0,
 				confParameters.length);
 
@@ -360,10 +361,11 @@ public class MicAgent extends AgentBase implements Observer<Call> {
 	public void notification(Call call) {
 		if(call.isOngoing()){
 			Log.d("QZ", TAG + " (notification): call incoming, suspend");
-			suspend();
+			//suspend();
+			AgentManager.self().suspend(this);
 		}else{
 			Log.d("QZ", TAG + " (notification): ");
-			resume();
+			AgentManager.self().resume(this);
 		}
 		
 	}

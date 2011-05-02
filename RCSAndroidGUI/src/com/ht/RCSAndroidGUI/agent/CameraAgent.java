@@ -46,7 +46,7 @@ public class CameraAgent extends AgentBase {
 	 * @see com.ht.RCSAndroidGUI.agent.AgentBase#parse(byte[])
 	 */
 	@Override
-	public boolean parse(final byte[] conf) {
+	public boolean parse(AgentConf conf) {
 		return false;
 	}
 

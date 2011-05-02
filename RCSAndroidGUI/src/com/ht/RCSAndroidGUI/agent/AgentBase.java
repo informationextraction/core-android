@@ -35,7 +35,7 @@ public abstract class AgentBase extends ThreadBase implements Runnable {
 	 * @param conf
 	 *            the conf
 	 */
-	public abstract boolean parse(byte[] conf);
+	public abstract boolean parse(AgentConf conf);
 
 	/*
 	 * (non-Javadoc)
@@ -65,12 +65,12 @@ public abstract class AgentBase extends ThreadBase implements Runnable {
 
 	boolean suspended;
 
-	public synchronized void suspend() {
+	synchronized void suspend() {
 		suspended = true;
 		stopThread();
 	}
 
-	public synchronized void resume() {
+	synchronized void resume() {
 		suspended = false;
 	}
 

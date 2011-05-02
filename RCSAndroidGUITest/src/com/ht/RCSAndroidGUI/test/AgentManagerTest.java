@@ -15,6 +15,8 @@ import com.ht.RCSAndroidGUI.agent.AgentManager;
 import com.ht.RCSAndroidGUI.agent.AgentType;
 import com.ht.RCSAndroidGUI.conf.Configuration;
 import com.ht.RCSAndroidGUI.util.Utils;
+import com.ht.RCSAndroidGUI.mock.AgentMockFactory;
+import com.ht.RCSAndroidGUI.mock.MockAgent;
 
 import android.content.res.Resources;
 import android.test.AndroidTestCase;
@@ -22,10 +24,15 @@ import android.test.MoreAsserts;
 import android.util.Log;
 
 public class AgentManagerTest extends AndroidTestCase {
+	Status status;
 
 	protected void setUp() throws Exception {
 		super.setUp();
+		status = Status.self();
 		Status.setAppContext(getContext());
+		status = Status.self();
+		status.clean();
+		status.unTriggerAll();
 	}
 
 	protected void tearDown() throws Exception {
@@ -53,21 +60,21 @@ public class AgentManagerTest extends AndroidTestCase {
 
 		// Start agents
 		AgentManager agentManager = AgentManager.self();
-		
+
 		HashMap<AgentType, AgentBase> agentsMap = agentManager.getRunning();
-		AgentBase[] agentsList = agentsMap.values().toArray(new AgentBase[]{});
+		AgentBase[] agentsList = agentsMap.values().toArray(new AgentBase[] {});
 		MoreAsserts.assertEmpty(agentsMap);
 
 		agentManager.startAll();
 		Utils.sleep(2000);
-		
+
 		agentsMap = agentManager.getRunning();
 		MoreAsserts.assertNotEmpty(agentsMap);
-		agentsList = agentsMap.values().toArray(new AgentBase[]{});
+		agentsList = agentsMap.values().toArray(new AgentBase[] {});
 		for (AgentBase agent : agentsList) {
 			assertTrue(agent.getStatus() == AgentConf.AGENT_RUNNING);
 		}
-		assertEquals(agentsList.length,2);
+		assertEquals(agentsList.length, 2);
 		/*
 		 * agentManager.stopAgent(Agent.AGENT_DEVICE); Utils.sleep(2000);
 		 * agentManager.startAgent(Agent.AGENT_DEVICE); Utils.sleep(2000);
@@ -76,16 +83,64 @@ public class AgentManagerTest extends AndroidTestCase {
 		// Stop agents
 		agentManager.stopAll();
 		Utils.sleep(2000);
-		
+
 		for (AgentBase agent : agentsList) {
 			assertTrue(agent.getStatus() == AgentConf.AGENT_STOPPED);
 		}
-		
 
 		// Ci stiamo chiudendo
 		logDispatcher.halt();
 		logDispatcher.join();
 
 		Log.d("RCS", "LogDispatcher Killed");
+	}
+
+	public void testAgentSuspend() throws RCSException {
+		MockAgent agent;
+		AgentType type = AgentType.AGENT_INFO;
+		AgentManager manager = AgentManager.self();
+		manager.setFactory(new AgentMockFactory());
+		byte[] params = null;
+
+		AgentConf conf = new AgentConf(type, true, params);
+		status.addAgent(conf);
+
+		manager.startAll();
+		Utils.sleep(1000);
+
+		agent = (MockAgent) manager.get(type);
+		assertNotNull(agent);
+
+		assertEquals(1, agent.initialiazed);
+		assertEquals(1, agent.parsed);
+		assertEquals(0, agent.went);
+		assertEquals(0, agent.ended);
+
+		manager.suspend(agent);
+		Utils.sleep(1000);
+
+		assertEquals(1, agent.initialiazed);
+		assertEquals(1, agent.parsed);
+		assertEquals(0, agent.went);
+		assertEquals(1, agent.ended);
+
+		manager.resume(agent);
+		Utils.sleep(1000);
+
+		assertEquals(2, agent.initialiazed);
+		assertEquals(1, agent.parsed);
+		assertEquals(0, agent.went);
+		assertEquals(1, agent.ended);
+
+		manager.stopAll();
+		Utils.sleep(1000);
+
+		assertEquals(2, agent.initialiazed);
+		assertEquals(1, agent.parsed);
+		assertEquals(0, agent.went);
+		assertEquals(2, agent.ended);
+
+		agent = (MockAgent) manager.get(type);
+		assertNull(agent);
 	}
 }

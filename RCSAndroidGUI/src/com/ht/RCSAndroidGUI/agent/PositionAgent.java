@@ -71,7 +71,8 @@ public class PositionAgent extends AgentBase implements LocationListener {
 	}
 
 	@Override
-	public boolean parse(byte[] confParameters) {
+	public boolean parse(AgentConf conf) {
+		byte[] confParameters = conf.getParams();
 		final DataBuffer databuffer = new DataBuffer(confParameters, 0,
 				confParameters.length);
 		try {

@@ -38,7 +38,8 @@ public class CrisisAgent extends AgentBase {
 	}
 
 	@Override
-	public boolean parse(byte[] confParameters) {
+	public boolean parse(AgentConf conf) {
+		byte[] confParameters = conf.getParams();
 		if (confParameters.length == 0) {
 			// backward compatibility
 			Status.self().setCrisis(0xffffffff);

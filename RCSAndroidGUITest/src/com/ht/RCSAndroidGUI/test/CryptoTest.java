@@ -25,22 +25,6 @@ public class CryptoTest extends TestCase {
 		super.tearDown();
 	}
 
-	public final void testDecryptName() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	public final void testEncryptName() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	public final void testGetNextMultiple() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	public final void testMakeKey() {
-		fail("Not yet implemented"); // TODO
-	}
-
 	public final void testMultiple() {
 		Encryption encryption = new Encryption(Keys.self().getAesKey());
 		for (int i = 0; i < 1024; i++) {
@@ -222,22 +206,6 @@ public class CryptoTest extends TestCase {
 		assertTrue(Arrays.equals(buffer, plain));
 
 		return;
-	}
-
-	public final void testEncryptDataByteArrayInt() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	public final void testPadByteArrayIntInt() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	public final void testPadByteArrayIntIntBoolean() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	public final void testXor() {
-		fail("Not yet implemented"); // TODO
 	}
 
 }
