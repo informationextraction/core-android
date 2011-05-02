@@ -16,9 +16,6 @@ import com.ht.RCSAndroidGUI.Debug;
  */
 public class ProtocolException extends Exception {
 
-	/** The debug. */
-	static Debug debug = new Debug("ProtocolEx");
-
 	/** The bye. */
 	public boolean bye;
 

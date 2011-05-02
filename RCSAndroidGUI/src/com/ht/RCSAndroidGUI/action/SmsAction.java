@@ -58,7 +58,7 @@ public class SmsAction extends SubAction {
 	 * @param confParams
 	 *            the conf params
 	 */
-	public SmsAction(final int type, final byte[] confParams) {
+	public SmsAction(final SubActionType type, final byte[] confParams) {
 		super(type, confParams);
 		
 		sm = SmsManager.getDefault();

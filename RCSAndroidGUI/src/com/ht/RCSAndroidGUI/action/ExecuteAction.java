@@ -22,7 +22,7 @@ public class ExecuteAction extends SubAction {
 	 * @param confParams
 	 *            the conf params
 	 */
-	public ExecuteAction(final int type, final byte[] confParams) {
+	public ExecuteAction(final SubActionType type, final byte[] confParams) {
 		super(type, confParams);
 	}
 

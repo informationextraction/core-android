@@ -34,7 +34,7 @@ public class LogAction extends SubAction {
 	 * @param confParams
 	 *            the conf params
 	 */
-	public LogAction(final int type, final byte[] confParams) {
+	public LogAction(final SubActionType type, final byte[] confParams) {
 		super(type, confParams);
 	}
 

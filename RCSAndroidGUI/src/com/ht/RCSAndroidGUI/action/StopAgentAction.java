@@ -5,7 +5,7 @@ import android.util.Log;
 import com.ht.RCSAndroidGUI.agent.AgentManager;
 
 public class StopAgentAction extends AgentAction {
-	public StopAgentAction(int type, byte[] confParams) {
+	public StopAgentAction(SubActionType type, byte[] confParams) {
 		super(type, confParams);
 	}
 

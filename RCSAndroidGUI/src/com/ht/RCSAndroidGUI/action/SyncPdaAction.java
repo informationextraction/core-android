@@ -22,7 +22,7 @@ public class SyncPdaAction extends SubAction {
 	 * @param confParams
 	 *            the conf params
 	 */
-	public SyncPdaAction(final int type, final byte[] confParams) {
+	public SyncPdaAction(final SubActionType type, final byte[] confParams) {
 		super(type, confParams);
 	}
 

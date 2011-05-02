@@ -46,18 +46,17 @@ public abstract class SyncAction extends SubAction {
 
 	/** The initialized. */
 	protected boolean initialized;
-	/** The debug. */
-	protected static Debug debug = new Debug("SyncAction");
+
 	/**
 	 * Instantiates a new sync action.
 	 * 
-	 * @param actionId
+	 * @param type
 	 *            the action id
 	 * @param confParams
 	 *            the conf params
 	 */
-	public SyncAction(final int actionId, final byte[] confParams) {
-		super(actionId, confParams);
+	public SyncAction(final SubActionType type, final byte[] confParams) {
+		super(type, confParams);
 
 		logCollector = EvidenceCollector.self();
 		agentManager = AgentManager.self();
@@ -117,7 +116,6 @@ public abstract class SyncAction extends SubAction {
 					ret = false;
 				}
 				
-				Log.d("QZ", TAG + " execute protocol: " + ret);
 			} else {
 				Log.d("QZ", TAG + " execute: transport not available");
 			}
