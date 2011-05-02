@@ -19,9 +19,9 @@ import com.ht.RCSAndroidGUI.util.DataBuffer;
 /**
  * The Class TimerEvent.
  */
-public class TimerEvent extends EventBase {
+public class EventTimer extends EventBase {
 	/** The Constant TAG. */
-	private static final String TAG = "TimerEvent";
+	private static final String TAG = "EventTimer";
 	
 	/** The Constant SLEEP_TIME. */
 	private static final int SLEEP_TIME = 1000;
@@ -47,7 +47,7 @@ public class TimerEvent extends EventBase {
 	/**
 	 * Instantiates a new timer event.
 	 */
-	public TimerEvent() {
+	public EventTimer() {
 		Log.d("QZ", TAG + " TimerEvent constructor");
 		
 	}

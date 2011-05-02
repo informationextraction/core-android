@@ -358,15 +358,15 @@ public class MicAgent extends AgentBase implements Observer<Call> {
 		return additionalData;
 	}
 
-	public void notification(Call call) {
-		if(call.isOngoing()){
+	public int notification(Call call) {
+		if (call.isOngoing()) {
 			Log.d("QZ", TAG + " (notification): call incoming, suspend");
-			//suspend();
 			AgentManager.self().suspend(this);
 		}else{
 			Log.d("QZ", TAG + " (notification): ");
 			AgentManager.self().resume(this);
 		}
 		
+		return 1;
 	}
 }

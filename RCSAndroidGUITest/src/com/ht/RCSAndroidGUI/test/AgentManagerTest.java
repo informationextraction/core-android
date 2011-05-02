@@ -33,6 +33,8 @@ public class AgentManagerTest extends AndroidTestCase {
 		status = Status.self();
 		status.clean();
 		status.unTriggerAll();
+		AgentManager agentManager = AgentManager.self();
+		agentManager.stopAll();
 	}
 
 	protected void tearDown() throws Exception {

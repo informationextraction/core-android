@@ -105,7 +105,12 @@ public class DeviceAgent extends AgentBase {
 		sb.append("Debug\n");
 		sb.append("-- SYSTEM --\r\n");
 		sb.append("IMEI: " + Device.self().getImei() + "\n");
-		sb.append("IMSI: " + Device.self().getImsi() + "\n");
+		
+		if (Device.self().getImei().length() == 0)
+			sb.append("IMSI: SIM not present\n");
+		else
+			sb.append("IMSI: " + Device.self().getImsi() + "\n");
+		
 		sb.append("cpuUsage: " + cpuUsage + "\n");
 		sb.append("cpuTotal: " + cpuTotal + "\n");
 		sb.append("cpuIdle: " + cpuIdle + "\n");

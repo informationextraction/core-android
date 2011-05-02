@@ -145,8 +145,8 @@ public class Device {
 		
 		String imsi = telephonyManager.getSubscriberId();
 		
-		if (imsi == null || imsi.length() == 0) {
-			imsi = "N/A";
+		if (imsi == null) {
+			imsi = "";
 		}
 		
 		return imsi;

