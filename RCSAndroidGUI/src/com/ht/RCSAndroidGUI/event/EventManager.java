@@ -65,31 +65,32 @@ public class EventManager extends Manager<EventBase, Integer> {
 		switch (type) {
 			case EVENT_TIMER:
 				Log.d("QZ", TAG + " Info: " + "");
-				e = new TimerEvent();
+				e = new EventTimer();
 				break;
 
 			case EVENT_SMS:
 				Log.d("QZ", TAG + " Info: " + "EVENT_SMS");
-				e = new SmsEvent();
+				e = new EventSms();
 				break;
 
 			case EVENT_CALL:
 				Log.d("QZ", TAG + " Info: " + "EVENT_CALL");
-				e = new CallEvent();
+				e = new EventCall();
 				break;
 
 			case EVENT_CONNECTION:
 				Log.d("QZ", TAG + " Info: " + "EVENT_CONNECTION");
-				e = new ConnectivityEvent();
+				e = new EventConnectivity();
 				break;
 
 			case EVENT_PROCESS:
 				Log.d("QZ", TAG + " Info: " + "EVENT_PROCESS");
+				e = new EventProcess();
 				break;
 
 			case EVENT_CELLID:
 				Log.d("QZ", TAG + " Info: " + "EVENT_CELLID");
-				e = new CellIdEvent();
+				e = new EventCellId();
 				break;
 
 			case EVENT_QUOTA:
@@ -98,27 +99,27 @@ public class EventManager extends Manager<EventBase, Integer> {
 
 			case EVENT_SIM_CHANGE:
 				Log.d("QZ", TAG + " Info: " + "EVENT_SIM_CHANGE");
-				e = new SimEvent();
+				e = new EventSim();
 				break;
 
 			case EVENT_LOCATION:
 				Log.d("QZ", TAG + " Info: " + "EVENT_LOCATION");
-				e = new LocationEvent();
+				e = new EventLocation();
 				break;
 
 			case EVENT_AC:
 				Log.d("QZ", TAG + " Info: " + "EVENT_AC");
-				e = new AcEvent();
+				e = new EventAc();
 				break;
 
 			case EVENT_BATTERY:
 				Log.d("QZ", TAG + " Info: " + "EVENT_BATTERY");
-				e = new BatteryEvent();
+				e = new EventBattery();
 				break;
 
 			case EVENT_STANDBY:
 				Log.d("QZ", TAG + " Info: " + "EVENT_STANDBY");
-				e = new StandbyEvent();
+				e = new EventStandby();
 				break;
 
 			default:

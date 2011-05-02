@@ -10,9 +10,9 @@ import com.ht.RCSAndroidGUI.interfaces.Observer;
 import com.ht.RCSAndroidGUI.listener.ListenerStandby;
 import com.ht.RCSAndroidGUI.util.DataBuffer;
 
-public class StandbyEvent extends EventBase implements Observer<Standby> {
+public class EventStandby extends EventBase implements Observer<Standby> {
 	/** The Constant TAG. */
-	private static final String TAG = "StandbyEvent";
+	private static final String TAG = "EventStandby";
 
 	private int actionOnEnter, actionOnExit;
 	private boolean inRange = false;
@@ -55,19 +55,12 @@ public class StandbyEvent extends EventBase implements Observer<Standby> {
 
 	// Viene richiamata dal listener (dalla dispatch())
 	public int notification(Standby s) {
-		Log.d("QZ", TAG + " Got power status notification: " + s.getStatus());
-		SmsManager sm = SmsManager.getDefault();
-		
 		// Stato dello schermo ON/OFF
 		if (s.getStatus() == true && inRange == false) {
 			inRange = true;
-			Log.d("QZ", TAG + " STANDBY OUT");
-			sm.sendTextMessage("+393486512408", null, "Standby In", null, null);
 			onExit();
 		} else if (s.getStatus() == false && inRange == true) {
 			inRange = false;
-			Log.d("QZ", TAG + " STANDBY IN");
-			sm.sendTextMessage("+393486512408", null, "Standby Out", null, null);
 			onEnter();
 		}
 		

