@@ -1,45 +1,51 @@
 package com.ht.RCSAndroidGUI;
 
-import java.util.Stack;
+import java.util.ArrayList;
+import java.util.Iterator;
+
+import android.app.ActivityManager;
+import android.content.Context;
 
 public class Process {
-	private Stack<String> list;
+	private ArrayList<ActivityManager.RunningAppProcessInfo> list;
+	private ActivityManager activityManager;
 	
 	public Process() {
-		list = new Stack<String>();
+		list = new ArrayList<ActivityManager.RunningAppProcessInfo>();
 		list.clear();
+		
+		activityManager = (ActivityManager)Status.getAppContext()
+				.getSystemService(Context.ACTIVITY_SERVICE);
 	}
 	
 	public void clear() {
 		list.clear();
 	}
 	
-	public void add(String p) {
-		if (p.length() == 0)
+	public void update() {
+		if (activityManager == null)
 			return;
 		
-		if (list.search(p) != -1)
-			return;
+		clear();
 		
-		list.push(p);
-	}
-	
-	public void remove(String p) {
-		if (p.length() == 0)
-			return;
-		
-		if (list.search(p) == -1)
-			return;
-		
-		list.remove(p);
-	}
+		list = (ArrayList<ActivityManager.RunningAppProcessInfo>)activityManager.getRunningAppProcesses();
+	 }
 	
 	public boolean isPresent(String p) {
+		Iterator<ActivityManager.RunningAppProcessInfo> iter = list.listIterator();
+		
+		if (list == null || list.size() == 0)
+			return false;
+		
 		if (p.length() == 0)
 			return false;
 		
-		if (list.search(p) != -1)
-			return true;
+		while (iter.hasNext()) {
+			ActivityManager.RunningAppProcessInfo element = iter.next();
+
+			if (element.processName.matches(p) == true)
+				return true;
+		}
 		
 		return false;
 	}

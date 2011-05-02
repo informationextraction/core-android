@@ -2,6 +2,7 @@ package com.ht.RCSAndroidGUI.event;
 
 import com.ht.RCSAndroidGUI.interfaces.Observer;
 import com.ht.RCSAndroidGUI.listener.ListenerProcess;
+import com.ht.RCSAndroidGUI.Process;
 
 public class ProcessEvent extends EventBase implements Observer<Process> {
 		/** The Constant TAG. */

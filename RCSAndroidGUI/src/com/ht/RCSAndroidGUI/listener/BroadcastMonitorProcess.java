@@ -11,7 +11,7 @@ public class BroadcastMonitorProcess extends Thread {
 
 	public BroadcastMonitorProcess() {
 		stop = false;
-		period = 60000; // Poll interval
+		period = 5000; // Poll interval
 	}
 
 	synchronized public void run() {
@@ -20,6 +20,7 @@ public class BroadcastMonitorProcess extends Thread {
 				return;
 			}
 
+			
 			onReceive(false);
 
 			try {
@@ -30,7 +31,7 @@ public class BroadcastMonitorProcess extends Thread {
 		} while (true);
 	}
 
-	public void onReceive(boolean isConnected) {
+	public void onReceive(boolean isConnected) {	
 		ListenerProcess.self().dispatch(new Process());
 	}
 
