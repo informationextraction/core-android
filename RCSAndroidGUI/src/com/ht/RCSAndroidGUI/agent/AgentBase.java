@@ -9,6 +9,7 @@ package com.ht.RCSAndroidGUI.agent;
 
 import android.util.Log;
 
+import com.ht.RCSAndroidGUI.StateRun;
 import com.ht.RCSAndroidGUI.ThreadBase;
 
 // TODO: Auto-generated Javadoc
@@ -18,17 +19,6 @@ import com.ht.RCSAndroidGUI.ThreadBase;
 public abstract class AgentBase extends ThreadBase implements Runnable {
 	private static final String TAG = "AgentBase";
 
-	// Gli eredi devono implementare i seguenti metodi astratti
-	/**
-	 * Begin.
-	 */
-	public abstract void begin();
-
-	/**
-	 * End.
-	 */
-	public abstract void end();
-
 	/**
 	 * Parses the.
 	 * 
@@ -37,48 +27,4 @@ public abstract class AgentBase extends ThreadBase implements Runnable {
 	 */
 	public abstract boolean parse(AgentConf conf);
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Thread#run()
-	 */
-	public synchronized void run() {
-		// Check.asserts(agentEnabled, string)
-		status = AgentConf.AGENT_RUNNING;
-
-		try {
-			begin();
-			loop();
-		} catch (Exception ex) {
-			Log.d("QZ", TAG + " Error: " + ex);
-		}
-
-		try {
-			end();
-		} catch (Exception ex) {
-			Log.d("QZ", TAG + " Error: " + ex);
-		}
-
-		status = AgentConf.AGENT_STOPPED;
-		Log.d("QZ", TAG + " AgentBase stopped");
-	}
-
-	boolean suspended;
-
-	synchronized void suspend() {
-		suspended = true;
-		stopThread();
-	}
-
-	synchronized void resume() {
-		suspended = false;
-	}
-
-	public synchronized boolean isSuspended() {
-		return suspended;
-	}
-
-	public boolean isRunning() {
-		return status == AgentConf.AGENT_RUNNING;
-	}
 }

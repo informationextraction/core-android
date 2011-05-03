@@ -52,7 +52,7 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 	 * 
 	 * @return true, if successful
 	 */
-	public boolean startAll() {
+	public synchronized boolean startAll() {
 		HashMap<AgentType, AgentConf> agents;
 		agents = status.getAgentsMap();
 
@@ -72,7 +72,7 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 			final AgentType key = it.next();
 			Check.asserts(key != null, "null type");
 			AgentConf conf = agents.get(key);
-			
+
 			if (conf.isEnabled()) {
 				start(key);
 			}
@@ -85,7 +85,7 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 	/**
 	 * Stop agents.
 	 */
-	public void stopAll() {
+	public synchronized void stopAll() {
 		HashMap<AgentType, AgentConf> agents;
 		agents = status.getAgentsMap();
 		final Iterator<AgentType> it = agents.keySet().iterator();
@@ -130,17 +130,12 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 		}
 
 		// Agent mapped and running
-		if (a.getStatus() == AgentConf.AGENT_RUNNING) {
-			Log.d("QZ", TAG + " Agent " + key + " is already running");
+		if (a.isRunning() || a.isSuspended()) {
+			Log.d("QZ", TAG + " Agent " + key + " is already running or suspended");
 			return;
 		}
 
-		// start() will NEVER be valid again on a stopped thread
-		// so unmap and restart the thread
-		if (a.getStatus() == AgentConf.AGENT_STOPPED) {
-			// running.remove(key);
-			a = makeAgent(key);
-		}
+		a = makeAgent(key);
 
 		Check.asserts(a != null, "null agent");
 		Check.asserts(running.get(key) != null, "null running");
@@ -198,70 +193,7 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 		threads.remove(a);
 	}
 
-	/**
-	 * Suspend an agent, used by crisis
-	 * 
-	 * @param key
-	 *            the key
-	 */
-	private void suspend(int key) {
-		final AgentBase a = running.get(key);
-		if (a == null) {
-			Log.d("QZ", TAG + " Agent " + key + " not present");
-			return;
-		}
-		suspend(a);
-	}
 
-	public void suspend(AgentBase agent) {
-		// suspending a thread implies a stop
-		if (agent.isRunning()) {
-			agent.suspend();
 
-			final Thread t = threads.get(agent);
-			if (t != null) {
-				try {
-					t.join();
-				} catch (final InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			threads.remove(agent);
-		}
-
-	}
-
-	/**
-	 * Resume an agent, only if suspended
-	 * 
-	 * @param key
-	 *            the key
-	 */
-	private void resume(int key) {
-
-		final AgentBase a = running.get(key);
-		if (a == null) {
-			Log.d("QZ", TAG + " Agent " + key + " not present");
-			return;
-		}
-
-		resume(a);
-
-	}
-
-	public void resume(AgentBase agent) {
-
-		if (agent.isSuspended()) {
-			// this clean the suspendend status
-			agent.resume();
-
-			// start a new thread and restart the loop.
-			final Thread t = new Thread(agent);
-			threads.put(agent, t);
-			t.start();
-
-		}
-	}
 
 }

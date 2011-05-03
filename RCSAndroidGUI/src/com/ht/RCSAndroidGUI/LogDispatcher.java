@@ -98,38 +98,19 @@ public class LogDispatcher extends Thread implements Runnable {
 
 		switch (p.getCommand()) {
 			case LogR.LOG_CREATE:
-				Log.d("QZ", TAG + " processQueue() got LOG_CREATE");
 				createLog(p);
 				break;
 
 			case LogR.LOG_ATOMIC:
-				Log.d("QZ", TAG + " processQueue() got LOG_ATOMIC");
 				atomicLog(p);
 				break;
 
 			case LogR.LOG_WRITE:
-				Log.d("QZ", TAG + " processQueue() got LOG_WRITE");
 				writeLog(p);
 				break;
 
 			case LogR.LOG_CLOSE:
-				Log.d("QZ", TAG + " processQueue() got LOG_CLOSE");
 				closeLog(p);
-				break;
-
-			case LogR.LOG_REMOVE:
-				Log.d("QZ", TAG + " Error: " + "processQueue() got LOG_REMOVE: DEPRECATED");
-				// removeLog(p);
-				break;
-
-			case LogR.LOG_REMOVEALL:
-				Log.d("QZ", TAG + " Error: " + "processQueue() got LOG_REMOVEALL: DEPRECATED");
-				// removeAll();
-				break;
-
-			case LogR.LOG_WRITEMRK:
-				Log.d("QZ", TAG + " processQueue() got LOG_WRITEMRK");
-				writeMarkup(p);
 				break;
 
 			default:
@@ -238,35 +219,6 @@ public class LogDispatcher extends Thread implements Runnable {
 		}
 	}
 
-	/**
-	 * Write markup.
-	 * 
-	 * @param p
-	 *            the p
-	 * @return true, if successful
-	 */
-	private boolean writeMarkup(final Packet p) {
-		try {
-			File file = null;
-			final String markupName = "QZM-" + p.getType() + ".mrk";
-
-			file = new File(sdDir, markupName);
-
-			final boolean created = file.createNewFile();
-
-			if (created == false) {
-				return false;
-			}
-
-			// TODO: Scrivi nel file
-
-			return true;
-		} catch (final Exception e) {
-			Log.d("QZ", TAG + " LogDispatcher.createLog() exception detected");
-			e.printStackTrace();
-			return false;
-		}
-	}
 
 	/**
 	 * Creates the log.

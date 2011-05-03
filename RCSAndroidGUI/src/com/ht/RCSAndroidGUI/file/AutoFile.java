@@ -222,8 +222,6 @@ public final class AutoFile {
 		String newname = filename.substring(0, pos);
 		File newfile = new File(file.getParent(), newname);
 		boolean ret = file.renameTo(newfile);
-
-		Log.d("QZ", TAG + " renaming file: " + newfile + " ret: " + ret);
 	}
 
 	public void create() {
