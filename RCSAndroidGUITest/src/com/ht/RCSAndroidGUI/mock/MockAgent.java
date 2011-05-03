@@ -5,8 +5,8 @@ import com.ht.RCSAndroidGUI.agent.AgentConf;
 
 public class MockAgent extends AgentBase {
 
-	public int initialiazed=0;
-	public int ended=0;
+	public int initialiazed;
+	public int ended;
 	public int parsed;
 	public int went;
 	

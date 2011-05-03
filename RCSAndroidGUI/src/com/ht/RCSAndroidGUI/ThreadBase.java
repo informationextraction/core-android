@@ -103,7 +103,9 @@ public abstract class ThreadBase {
 					break;
 				}
 
-				go();
+				if(!isSuspended()){
+					go();
+				}
 
 				// stopThread e' sincronizzato, questo garantisce che la notify
 				// non vada perduta
@@ -177,4 +179,20 @@ public abstract class ThreadBase {
 		return status == StateRun.STARTED || status == StateRun.STARTING;
 	}
 
+	boolean suspended;
+
+	public synchronized void suspend() {
+		Log.d("QZ", TAG + " (suspend)");
+		suspended = true;
+	}
+
+	public synchronized void resume() {
+		Log.d("QZ", TAG + " (resume)");
+		suspended = false;
+		next();
+	}
+
+	public synchronized boolean isSuspended() {
+		return suspended;
+	}
 }

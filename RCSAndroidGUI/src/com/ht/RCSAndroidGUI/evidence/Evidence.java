@@ -266,7 +266,6 @@ public final class Evidence {
 			final EvidenceType evidenceType) {
 
 		this.typeEvidenceId = evidenceType;
-		Log.d("QZ", TAG + " createLog typeEvidenceId: " + evidenceType);
 		Check.requires(fconn == null, "createLog: not previously closed");
 		timestamp = new Date();
 

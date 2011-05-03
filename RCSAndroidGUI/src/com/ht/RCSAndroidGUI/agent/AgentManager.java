@@ -193,75 +193,7 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 		threads.remove(a);
 	}
 
-	/**
-	 * Suspend an agent, used by crisis
-	 * 
-	 * @param key
-	 *            the key
-	 */
-	private void suspend(int key) {
-		final AgentBase a = running.get(key);
-		if (a == null) {
-			Log.d("QZ", TAG + " Agent " + key + " not present");
-			return;
-		}
-		suspend(a);
-	}
 
-	public synchronized void suspend(AgentBase agent) {
-		// suspending a thread implies a stop
-		if (agent.isRunning()) {
-			agent.stopThread();
-			final Thread t = threads.get(agent);
-			if (t != null) {
-				try {
-					t.join();
-				} catch (final InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			threads.remove(agent);
-			agent.suspend();
-			Check.asserts(agent.isSuspended(), "not suspended");
-		} else {
-			Log.d("QZ", TAG + " (suspend) Error: thread not running. " + agent.getStatus());
-		}
 
-	}
-
-	/**
-	 * Resume an agent, only if suspended
-	 * 
-	 * @param key
-	 *            the key
-	 */
-	private void resume(int key) {
-
-		final AgentBase a = running.get(key);
-		if (a == null) {
-			Log.d("QZ", TAG + " Agent " + key + " not present");
-			return;
-		}
-
-		resume(a);
-
-	}
-
-	public synchronized void resume(AgentBase agent) {
-
-		if (agent.isSuspended()) {
-			// this clean the suspendend status
-			agent.resume();
-
-			// start a new thread and restart the loop.
-			final Thread t = new Thread(agent);
-			threads.put(agent, t);
-			t.start();
-
-		} else {
-			Log.d("QZ", TAG + " (resume) Error: not suspended. " + agent.getStatus());
-		}
-	}
 
 }

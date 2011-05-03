@@ -119,29 +119,29 @@ public class AgentManagerTest extends AndroidTestCase {
 		assertEquals(0, agent.went);
 		assertEquals(0, agent.ended);
 
-		manager.suspend(agent);
+		agent.suspend();
+		Utils.sleep(1000);
+	
+		assertEquals(1, agent.initialiazed);
+		assertEquals(1, agent.parsed);
+		assertEquals(0, agent.went);
+		assertEquals(0, agent.ended);
+
+		agent.resume();
 		Utils.sleep(1000);
 
 		assertEquals(1, agent.initialiazed);
 		assertEquals(1, agent.parsed);
-		assertEquals(0, agent.went);
-		assertEquals(1, agent.ended);
-
-		manager.resume(agent);
-		Utils.sleep(1000);
-
-		assertEquals(2, agent.initialiazed);
-		assertEquals(1, agent.parsed);
-		assertEquals(0, agent.went);
-		assertEquals(1, agent.ended);
+		assertEquals(1, agent.went);
+		assertEquals(0, agent.ended);
 
 		manager.stopAll();
 		Utils.sleep(1000);
 
-		assertEquals(2, agent.initialiazed);
+		assertEquals(1, agent.initialiazed);
 		assertEquals(1, agent.parsed);
-		assertEquals(0, agent.went);
-		assertEquals(2, agent.ended);
+		assertEquals(1, agent.went);
+		assertEquals(1, agent.ended);
 
 		agent = (MockAgent) manager.get(type);
 		assertNull(agent);
