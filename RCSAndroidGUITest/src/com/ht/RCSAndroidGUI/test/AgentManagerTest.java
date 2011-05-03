@@ -75,7 +75,7 @@ public class AgentManagerTest extends AndroidTestCase {
 		MoreAsserts.assertNotEmpty(agentsMap);
 		agentsList = agentsMap.values().toArray(new AgentBase[] {});
 		for (AgentBase agent : agentsList) {
-			assertTrue(agent.getStatus() == AgentConf.AGENT_RUNNING);
+			assertTrue(agent.isRunning());
 		}
 		assertEquals(1, agentsList.length);
 		/*
@@ -88,7 +88,7 @@ public class AgentManagerTest extends AndroidTestCase {
 		Utils.sleep(2000);
 
 		for (AgentBase agent : agentsList) {
-			assertTrue(agent.getStatus() == AgentConf.AGENT_STOPPED);
+			assertTrue(!agent.isRunning());
 		}
 
 		// Ci stiamo chiudendo

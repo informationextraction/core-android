@@ -371,6 +371,7 @@ public class EvidenceCollector {
 		Check.requires(currentPath != null, "null argument");
 		Check.requires(!currentPath.startsWith("file://"),
 				"currentPath shouldn't start with file:// : " + currentPath);
+		
 		final TreeMap<String, String> map = new TreeMap<String, String>();
 
 		File fcDir = null;
