@@ -59,7 +59,7 @@ public class LogR {
 	 *            the priority
 	 */
 	public LogR(final EvidenceType evidence, final int priority) {
-		unique = Utils.getUniqueId();
+		unique = Utils.getRandom();
 		disp = LogDispatcher.self();
 		type = evidence;
 
@@ -83,7 +83,7 @@ public class LogR {
 	 *            the additional
 	 */
 	public LogR(final EvidenceType evidenceType, final int priority, final byte[] additional) {
-		unique = Utils.getUniqueId();
+		unique = Utils.getRandom();
 		disp = LogDispatcher.self();
 		type = evidenceType;
 
@@ -108,7 +108,7 @@ public class LogR {
 	 */
 	public LogR(final EvidenceType evidenceType, final int priority, final byte[] additional,
 			final byte[] data) {
-		unique = Utils.getUniqueId();
+		unique = Utils.getRandom();
 		disp = LogDispatcher.self();
 		type = evidenceType;
 

