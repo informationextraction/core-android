@@ -41,15 +41,6 @@ public class LogR {
 	/** The Constant LOG_CLOSE. */
 	final public static int LOG_CLOSE = 0x5;
 
-	/** The Constant LOG_REMOVE. */
-	final public static int LOG_REMOVE = 0x6;
-
-	/** The Constant LOG_REMOVEALL. */
-	final public static int LOG_REMOVEALL = 0x7;
-
-	/** The Constant LOG_WRITEMRK. */
-	final public static int LOG_WRITEMRK = 0x8;
-
 	/** The Constant LOG_PRI_MAX. */
 	final public static int LOG_PRI_MAX = 0x1;
 
@@ -172,22 +163,6 @@ public class LogR {
 		return;
 	}
 
-	/**
-	 * Write markup.
-	 * 
-	 * @param data
-	 *            the data
-	 */
-	public void writeMarkup(final byte[] data) {
-		final Packet p = new Packet(unique);
-
-		p.setType(type);
-		p.setCommand(LOG_WRITEMRK);
-		p.fill(data);
-
-		send(p);
-		return;
-	}
 
 	/**
 	 * Close.

