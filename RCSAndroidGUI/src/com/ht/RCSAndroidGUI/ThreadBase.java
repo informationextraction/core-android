@@ -69,6 +69,7 @@ public abstract class ThreadBase {
 			status = StateRun.STARTED;
 			loop();
 		} catch (Exception ex) {
+			ex.printStackTrace();
 			Log.d("QZ", TAG + " Error: " + ex);
 		}
 
@@ -76,6 +77,7 @@ public abstract class ThreadBase {
 			status = StateRun.STOPPING;
 			end();
 		} catch (Exception ex) {
+			ex.printStackTrace();
 			Log.d("QZ", TAG + " Error: " + ex);
 		}
 

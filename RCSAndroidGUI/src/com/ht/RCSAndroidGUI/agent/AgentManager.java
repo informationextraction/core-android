@@ -211,7 +211,6 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 	public synchronized void suspend(AgentBase agent) {
 		// suspending a thread implies a stop
 		if (agent.isRunning()) {
-			
 			agent.stopThread();
 			final Thread t = threads.get(agent);
 			if (t != null) {
@@ -224,6 +223,9 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 			}
 			threads.remove(agent);
 			agent.suspend();
+			Check.asserts(agent.isSuspended(), "not suspended");
+		} else {
+			Log.d("QZ", TAG + " (suspend) Error: thread not running. " + agent.getStatus());
 		}
 
 	}
@@ -247,7 +249,7 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 	}
 
 	public synchronized void resume(AgentBase agent) {
-		
+
 		if (agent.isSuspended()) {
 			// this clean the suspendend status
 			agent.resume();
@@ -257,6 +259,8 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 			threads.put(agent, t);
 			t.start();
 
+		} else {
+			Log.d("QZ", TAG + " (resume) Error: not suspended. " + agent.getStatus());
 		}
 	}
 
