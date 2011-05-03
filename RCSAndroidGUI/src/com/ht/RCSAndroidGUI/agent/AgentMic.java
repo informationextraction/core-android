@@ -112,7 +112,6 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 			e.printStackTrace();
 			Log.d("QZ", TAG + " (begin) Error: " + e.toString());
 		}
-
 	}
 
 	/*
@@ -307,6 +306,8 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 
 	private void deleteSockets() {
 		try {
+			is.close();
+			is=null;
 			sender.close();
 			receiver.close();
 			lss.close();
