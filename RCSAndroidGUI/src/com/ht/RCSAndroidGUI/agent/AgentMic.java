@@ -250,10 +250,10 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 			stopRecorder();
 			startRecorder();
 		} catch (IllegalStateException e) {
-			// TODO Auto-generated catch block
+			Log.d("QZ", TAG + " (restartRecorder) Error: " + e);
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			Log.d("QZ", TAG + " (restartRecorder) Error: " + e);
 			e.printStackTrace();
 		}
 	}
