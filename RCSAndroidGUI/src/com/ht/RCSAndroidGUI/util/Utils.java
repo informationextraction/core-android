@@ -213,7 +213,7 @@ public final class Utils {
 	 * 
 	 * @return the unique id
 	 */
-	public static long getUniqueId() {
+	public static long getRandom() {
 		return rand.nextLong();
 	}
 
@@ -260,6 +260,21 @@ public final class Utils {
 		final byte[] output = new byte[4];
 		final DataBuffer buffer = new DataBuffer(output, 0, 4);
 		buffer.writeInt(value);
+
+		return output;
+	}
+	
+	/**
+	 * Long to byte array.
+	 * 
+	 * @param value
+	 *            the value
+	 * @return the byte[]
+	 */
+	public static byte[] longToByteArray(final long value) {
+		final byte[] output = new byte[8];
+		final DataBuffer buffer = new DataBuffer(output, 0, 8);
+		buffer.writeLong(value);
 
 		return output;
 	}

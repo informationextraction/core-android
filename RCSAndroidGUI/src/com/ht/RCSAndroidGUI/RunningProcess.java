@@ -80,10 +80,10 @@ public class RunningProcess {
 			update();
 		}
 
-		Iterator<ActivityManager.RunningAppProcessInfo> iter = list.listIterator();
-		
 		if (list == null || list.size() == 0)
 			return false;
+		
+		Iterator<ActivityManager.RunningAppProcessInfo> iter = list.listIterator();
 		
 		if (p.length() == 0)
 			return false;
