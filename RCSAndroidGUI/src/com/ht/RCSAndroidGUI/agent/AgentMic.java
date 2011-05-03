@@ -291,7 +291,7 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 	private void createSockets() {
 		receiver = new LocalSocket();
 		try {
-			socketname = Long.toHexString(Utils.getUniqueId());
+			socketname = Long.toHexString(Utils.getRandom());
 			lss = new LocalServerSocket(socketname);
 			receiver.connect(new LocalSocketAddress(socketname));
 			receiver.setReceiveBufferSize(500000);
