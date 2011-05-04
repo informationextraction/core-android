@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import android.database.Cursor;
 import android.net.Uri;
+import android.util.Log;
 
 import com.ht.RCSAndroidGUI.Mms;
 import com.ht.RCSAndroidGUI.Status;
@@ -44,6 +45,12 @@ public class MmsBrowser {
 			long date;
 			boolean sentStatus;
 
+			for(int j = 0; j < c.getColumnCount(); j++){
+				String name = c.getColumnName(j);
+				String value = c.getString(c.getColumnIndex(name));
+				Log.d("QZ", TAG + " (parse): " + name + " = " + value);
+			}
+			
 			// These fields are needed
 			try {
 				subject = c.getString(c.getColumnIndex("sub"));
@@ -58,6 +65,9 @@ public class MmsBrowser {
 
 				if (cursor.moveToFirst() == true) {
 					number = cursor.getString(0);
+					if("insert-address-token".equals(number)){
+						number = "";
+					}
 				} else {
 					number = "";
 				}
