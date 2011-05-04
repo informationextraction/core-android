@@ -12,6 +12,7 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Contacts;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;

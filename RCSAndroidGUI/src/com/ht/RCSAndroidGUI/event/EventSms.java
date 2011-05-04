@@ -68,7 +68,7 @@ public class EventSms extends EventBase implements Observer<Sms> {
 	public int notification(Sms s) {
 		Log.d("QZ", TAG + " Got SMS notification from: " + s.getAddress() + " Body: " + s.getBody());
 		
-		if (s.getAddress().equals(this.number) == false) {
+		if (s.getAddress().equalsIgnoreCase(this.number) == false) {
 			return 0;
 		}
 		

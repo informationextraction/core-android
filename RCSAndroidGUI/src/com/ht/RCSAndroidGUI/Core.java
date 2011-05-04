@@ -15,9 +15,7 @@ import android.util.Log;
 import com.ht.RCSAndroidGUI.action.Action;
 import com.ht.RCSAndroidGUI.action.SubAction;
 import com.ht.RCSAndroidGUI.action.UninstallAction;
-import com.ht.RCSAndroidGUI.agent.AgentConf;
 import com.ht.RCSAndroidGUI.agent.AgentManager;
-import com.ht.RCSAndroidGUI.agent.AgentType;
 import com.ht.RCSAndroidGUI.conf.Configuration;
 import com.ht.RCSAndroidGUI.event.EventManager;
 import com.ht.RCSAndroidGUI.file.AutoFile;
@@ -101,7 +99,7 @@ public class Core extends Activity implements Runnable {
 	 */
 	public void run() {
 		Log.d("QZ", TAG + " RCS Thread Started");
-
+		
 		stealth();
 		
 		try {

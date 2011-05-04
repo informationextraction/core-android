@@ -13,7 +13,7 @@ import com.ht.RCSAndroidGUI.conf.RunningConf;
 /**
  * The Class Agent.
  */
-public class AgentConf implements RunningConf{
+public class AgentConf implements RunningConf {
 
 	/** Agent status definitions. */
 	final public static int AGENT_DISABLED = 0x1;

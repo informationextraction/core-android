@@ -1,8 +1,15 @@
 package com.ht.RCSAndroidGUI.agent;
 
-import java.io.EOFException;
 import java.io.IOException;
 import java.util.Date;
+
+import android.content.Context;
+import android.location.Location;
+import android.location.LocationListener;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
+import android.os.Bundle;
+import android.util.Log;
 
 import com.ht.RCSAndroidGUI.CellInfo;
 import com.ht.RCSAndroidGUI.Device;
@@ -17,17 +24,6 @@ import com.ht.RCSAndroidGUI.util.Check;
 import com.ht.RCSAndroidGUI.util.DataBuffer;
 import com.ht.RCSAndroidGUI.util.DateTime;
 import com.ht.RCSAndroidGUI.util.Utils;
-
-import android.content.Context;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
-import android.os.Bundle;
-import android.telephony.TelephonyManager;
-import android.telephony.gsm.GsmCellLocation;
-import android.util.Log;
 
 public class AgentPosition extends AgentBase implements LocationListener {
 	private static final String TAG = "AgentPosition";
