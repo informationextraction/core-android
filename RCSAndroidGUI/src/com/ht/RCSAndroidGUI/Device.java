@@ -44,30 +44,6 @@ public class Device {
 		return singleton;
 	}
 
-	private String deviceId;
-
-	/**
-	 * Gets the user id.
-	 * 
-	 * @return the user id
-	 */
-	public String getUserId() {
-		// AccountManager ac = AccountManager.get(Status.getAppContext());
-		return "MyUSERId";
-	}
-
-	/**
-	 * Gets the device id.
-	 * 
-	 * @return the device id
-	 */
-	public String getDeviceId() {
-		if (deviceId  == null) {
-			deviceId = Settings.System.getString(Status.getAppContext().getContentResolver(), Settings.System.ANDROID_ID);
-		}
-		return deviceId;
-	}
-
 	/**
 	 * Gets the phone number.
 	 * 

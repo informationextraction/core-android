@@ -23,7 +23,6 @@ import com.ht.RCSAndroidGUI.Call;
 import com.ht.RCSAndroidGUI.LogR;
 import com.ht.RCSAndroidGUI.StateRun;
 import com.ht.RCSAndroidGUI.Status;
-import com.ht.RCSAndroidGUI.agent.call.PhoneListener;
 import com.ht.RCSAndroidGUI.evidence.EvidenceType;
 import com.ht.RCSAndroidGUI.interfaces.Observer;
 import com.ht.RCSAndroidGUI.listener.ListenerCall;
