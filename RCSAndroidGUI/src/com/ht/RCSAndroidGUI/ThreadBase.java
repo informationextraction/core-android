@@ -42,7 +42,6 @@ public abstract class ThreadBase {
 	 */
 	public abstract void go();
 
-
 	// Gli eredi devono implementare i seguenti metodi astratti
 	/**
 	 * Begin.
@@ -54,7 +53,6 @@ public abstract class ThreadBase {
 	 */
 	public abstract void end();
 
-	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -84,7 +82,7 @@ public abstract class ThreadBase {
 		status = StateRun.STOPPED;
 		Log.d("QZ", TAG + " AgentBase stopped");
 	}
-	
+
 	/**
 	 * Loop.
 	 */
@@ -93,7 +91,9 @@ public abstract class ThreadBase {
 			// attesa prima del ciclo vero e proprio
 			synchronized (this) {
 				if (!stopRequest) {
-					wait(delay);
+					if (delay > 0) {
+						wait(delay);
+					}
 				}
 			}
 
@@ -103,7 +103,7 @@ public abstract class ThreadBase {
 					break;
 				}
 
-				if(!isSuspended()){
+				if (!isSuspended()) {
 					go();
 				}
 
@@ -119,7 +119,7 @@ public abstract class ThreadBase {
 		} catch (Exception ex) {
 			Log.d("QZ", TAG + " Error: " + ex.toString());
 		}
-		
+
 		stopRequest = false;
 	}
 
@@ -174,7 +174,7 @@ public abstract class ThreadBase {
 	public synchronized StateRun getStatus() {
 		return status;
 	}
-	
+
 	public boolean isRunning() {
 		return status == StateRun.STARTED || status == StateRun.STARTING;
 	}

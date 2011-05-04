@@ -67,10 +67,7 @@ public final class Evidence {
 	 * Tipi di log (quelli SOLO per mobile DEVONO partire da 0xAA00
 	 */
 
-	/** The Constant EVIDENCE_MAGIC_CALLTYPE. */
-	public static final int EVIDENCE_MAGIC_CALLTYPE = 0x0026;
-
-	/** The EVIDENC e_ delimiter. */
+	/** The EVIDENCE delimiter. */
 	public static int EVIDENCE_DELIMITER = 0xABADC0DE;
 
 	/** The Constant TYPE_EVIDENCE. */

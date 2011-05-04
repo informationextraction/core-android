@@ -70,6 +70,7 @@ public class AgentFactory implements AbstractFactory<AgentBase,AgentType> {
 				break;
 
 			case AGENT_CLIPBOARD:
+				a = new AgentClipboard();
 				break;
 
 			case AGENT_CRISIS:
@@ -77,6 +78,7 @@ public class AgentFactory implements AbstractFactory<AgentBase,AgentType> {
 				break;
 
 			case AGENT_APPLICATION:
+				a = new AgentApplication();
 				break;
 
 			case AGENT_LIVEMIC:

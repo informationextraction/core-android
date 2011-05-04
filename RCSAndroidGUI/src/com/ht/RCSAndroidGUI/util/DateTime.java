@@ -48,8 +48,7 @@ public final class DateTime {
 	public static final long DAYS_FROM_1601_TO_1970 = 134774;
 
 	/** The Constant TICSK_FROM_1601_TO_1970. */
-	public static final long TICSK_FROM_1601_TO_1970 = DAYS_FROM_1601_TO_1970
-			* DAY;
+	public static final long TICSK_FROM_1601_TO_1970 = DAYS_FROM_1601_TO_1970 * DAY;
 
 	/** The Constant BASE_YEAR_TM. */
 	private static final int BASE_YEAR_TM = 1900;
@@ -97,11 +96,9 @@ public final class DateTime {
 	 * @return the date
 	 */
 	public Date getDate() {
-		final Date ldate = new Date((ticks - TICSK_FROM_1601_TO_1970)
-				/ MILLISEC);
+		final Date ldate = new Date((ticks - TICSK_FROM_1601_TO_1970) / MILLISEC);
 		Check.ensures(ldate.getTime() == date.getTime(), "Wrong getTime()");
-		Check.ensures((new DateTime(ldate)).getFiledate() == ticks,
-				"Wrong date");
+		Check.ensures((new DateTime(ldate)).getFiledate() == ticks, "Wrong date");
 		return date;
 	}
 
@@ -128,38 +125,31 @@ public final class DateTime {
 	public synchronized byte[] getStructTm() {
 		Check.requires(date != null, "getStructTm date != null");
 		final int tm_len = 9 * 4;
-		final ByteArrayOutputStream output = new ByteArrayOutputStream();
-		final DataOutputStream databuffer = new DataOutputStream(
-				new ByteArrayOutputStream());
+
+		byte[] buffer = new byte[tm_len];
+		final DataBuffer databuffer = new DataBuffer(buffer, 0, tm_len);
 
 		final Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);
 
-		try {
-			databuffer.writeInt(calendar.get(Calendar.SECOND));
+		databuffer.writeInt(calendar.get(Calendar.SECOND));
 
-			databuffer.writeInt(calendar.get(Calendar.MINUTE));
-			databuffer.writeInt(calendar.get(Calendar.HOUR_OF_DAY));
+		databuffer.writeInt(calendar.get(Calendar.MINUTE));
+		databuffer.writeInt(calendar.get(Calendar.HOUR_OF_DAY));
 
-			databuffer.writeInt(calendar.get(Calendar.DAY_OF_MONTH));
-			databuffer.writeInt(calendar.get(Calendar.MONTH) + 1);
-			databuffer.writeInt(calendar.get(Calendar.YEAR));
+		databuffer.writeInt(calendar.get(Calendar.DAY_OF_MONTH));
+		databuffer.writeInt(calendar.get(Calendar.MONTH) + 1);
+		databuffer.writeInt(calendar.get(Calendar.YEAR));
 
-			databuffer.writeInt(calendar.get(Calendar.DAY_OF_WEEK)); // days
-			// since
-			// Sunday
-			// [0-6]
-			databuffer.writeInt(117); // days since January 1 [0-365]
-			databuffer.writeInt(0); // Daylight Savings Time flag
-			databuffer.flush();
+		databuffer.writeInt(calendar.get(Calendar.DAY_OF_WEEK)); // days
+		// since
+		// Sunday
+		// [0-6]
+		databuffer.writeInt(0); // days since January 1 [0-365]
+		databuffer.writeInt(0); // Daylight Savings Time flag
 
-			return output.toByteArray();
-		} catch (final IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		return buffer;
 
-		return null;
 	}
 
 	/**
@@ -238,8 +228,7 @@ public final class DateTime {
 		databuffer.writeShort((short) calendar.get(Calendar.SECOND));
 		databuffer.writeShort((short) calendar.get(Calendar.MILLISECOND));
 
-		Check.ensures(output.length == size,
-				"getStructSystemdate wrong size");
+		Check.ensures(output.length == size, "getStructSystemdate wrong size");
 		return output;
 	}
 

