@@ -41,4 +41,8 @@ public class Call {
 		long duration = timestamp.getTime() - lastCall.getTimestamp().getTime();
 		return (int) (duration / 1000);
 	}
+	
+	public String toString(){
+		return number + " ongoing: " + ongoing + " incoming: " +incoming + " " + timestamp;
+	}
 }

