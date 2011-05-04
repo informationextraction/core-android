@@ -20,9 +20,10 @@ public final class Check {
 	private static final String TAG = "Check";
 	private static boolean enabled;
 
-	private Check(){
+	private Check() {
 		enabled = Configuration.DEBUG;
 	}
+
 	/**
 	 * Asserts, used to verify the truth of an expression
 	 * 
@@ -33,7 +34,7 @@ public final class Check {
 	 */
 	public static void asserts(final boolean b, final String string) {
 		if (enabled && b != true) {
-			Log.d("QZ", TAG + " Asserts - " + string);
+			Log.d("QZ", TAG + "##### Asserts - " + string + " #####");
 		}
 	}
 
@@ -47,7 +48,7 @@ public final class Check {
 	 */
 	public static void requires(final boolean b, final String string) {
 		if (enabled && b != true) {
-			Log.d("QZ", TAG + " Requires - " + string);
+			Log.d("QZ", TAG + "##### Requires - " + string + " #####");
 		}
 	}
 
@@ -61,7 +62,7 @@ public final class Check {
 	 */
 	public static void ensures(final boolean b, final String string) {
 		if (enabled && b != true) {
-			Log.d("QZ", TAG + " Ensures - " + string);
+			Log.d("QZ", TAG + "##### Ensures - " + string + " #####");
 		}
 	}
 }

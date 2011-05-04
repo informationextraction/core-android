@@ -45,7 +45,6 @@ public class AgentCallList extends AgentBase implements Observer<Call> {
 	Call callInAction;
 
 	public int notification(Call call) {
-		String number = call.getNumber();
 		String name = "";
 		boolean missed = false;
 		final String nametype = "u";
@@ -55,10 +54,7 @@ public class AgentCallList extends AgentBase implements Observer<Call> {
 		if (call.isOngoing()) {
 			callInAction = call;
 			return 0;
-		} else if (!callInAction.getNumber().equals(call.getNumber())) {
-			Log.d("QZ", TAG + " (notification) Error: inconsistent number" + call.getNumber());
-			return 0;
-		}
+		} 
 
 		Check.asserts(callInAction != null, "null callInAction");
 
@@ -67,6 +63,7 @@ public class AgentCallList extends AgentBase implements Observer<Call> {
 
 		int len = 28; // 0x1C;
 
+		String number = callInAction.getNumber();
 		len += wsize(number);
 		len += wsize(name);
 		len += wsize(note);
@@ -79,6 +76,8 @@ public class AgentCallList extends AgentBase implements Observer<Call> {
 		final DateTime from = new DateTime(callInAction.getTimestamp());
 		final DateTime to = new DateTime(call.getTimestamp());
 
+		callInAction=null;
+		
 		databuffer.writeInt(len);
 		databuffer.writeInt(LOG_CALLIST_VERSION);
 		databuffer.writeLong(from.getFiledate());
