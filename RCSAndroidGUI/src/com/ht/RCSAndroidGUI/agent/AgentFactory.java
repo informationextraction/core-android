@@ -24,7 +24,6 @@ public class AgentFactory implements AbstractFactory<AgentBase,AgentType> {
 				break;
 
 			case AGENT_TASK:
-				a = new AgentTask();
 				break;
 
 			case AGENT_CALLLIST:

