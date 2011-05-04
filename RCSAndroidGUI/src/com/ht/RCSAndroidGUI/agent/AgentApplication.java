@@ -68,6 +68,8 @@ public class AgentApplication extends AgentBase implements Observer<ProcessInfo>
 		LogR log = new LogR(EvidenceType.APPLICATION);
 		log.write(items);
 		log.close();
+		
+		Log.d("QZ", TAG + " (saveEvidence): " + name + " " + status.name());
 	}
 
 }

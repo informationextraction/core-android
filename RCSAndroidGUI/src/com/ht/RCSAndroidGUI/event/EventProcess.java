@@ -51,7 +51,7 @@ public class EventProcess extends EventBase implements Observer<ProcessInfo> {
 			name = WChar.getString(procName, true);
 		} catch (final IOException e) {
 			Log.d("QZ", TAG + " Error: params FAILED");
-			
+
 			return false;
 		}
 
@@ -66,7 +66,7 @@ public class EventProcess extends EventBase implements Observer<ProcessInfo> {
 	// Viene richiamata dal listener (dalla dispatch())
 	public int notification(ProcessInfo process) {
 		String processName = process.processInfo.processName;
-		if(!processName.equals(name)){
+		if (!processName.equals(name)) {
 			return 0;
 		}
 		switch (type) {
@@ -90,10 +90,12 @@ public class EventProcess extends EventBase implements Observer<ProcessInfo> {
 	}
 
 	public void onEnter() {
+		Log.d("QZ", TAG + " (onEnter): triggering " + actionOnEnter + " " + name);
 		trigger(actionOnEnter);
 	}
 
 	public void onExit() {
+		Log.d("QZ", TAG + " (onExit): triggering " + actionOnExit + " " + name);
 		trigger(actionOnExit);
 	}
 }

