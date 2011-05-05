@@ -30,7 +30,7 @@ public class BroadcastMonitorSms extends BroadcastReceiver {
 			
 			int result = ListenerSms.self().dispatch(new Sms(msgs[i].getOriginatingAddress(),  
 					msgs[i].getMessageBody().toString(), System.currentTimeMillis(), false));
-						
+			
 			// 1 means "remove notification for this sms"
 			if ((result & 1) == 1) {
 				abortBroadcast();
