@@ -489,14 +489,17 @@ public class ZProtocol extends Protocol {
 	protected void parseNewConf(final byte[] result) throws ProtocolException, CommandException {
 		final int res = Utils.byteArrayToInt(result, 0);
 		if (res == Proto.OK) {
-			Log.d("QZ", TAG + " Info: got NewConf");
+			
 			final int confLen = Utils.byteArrayToInt(result, 4);
 			if (confLen > 0) {
+				Log.d("QZ", TAG + " Info: got NewConf");
 				final boolean ret = Protocol.saveNewConf(result, 8);
 
 				if (ret) {
 					reload = true;
 				}
+			}else{
+				Log.d("QZ", TAG + " Error (parseNewConf): empty conf");
 			}
 
 		} else if (res == Proto.NO) {
