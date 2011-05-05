@@ -1,6 +1,15 @@
 package com.ht.RCSAndroidGUI.evidence;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+
+import java.io.Serializable;
+
 
 import android.util.Log;
 
@@ -253,5 +262,29 @@ public class Markup {
 
 		return fileRet.exists();
 	}
+	
+	public synchronized boolean writeMarkupSerializable(final Serializable object) throws IOException {
+	
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		ObjectOutput out = new ObjectOutputStream(bos);   
+		out.writeObject(object);
+		byte[] data = bos.toByteArray(); 
+		return writeMarkup(data);
+		
+	}
+	
+	public synchronized Object readMarkupSerializable() throws IOException{
+		byte[] data = readMarkup();
+		ByteArrayInputStream bis = new ByteArrayInputStream(data);
+		ObjectInput in = new ObjectInputStream(bis);
+		try {
+			Object o = in.readObject();
+			return o;
+		} catch (ClassNotFoundException e) {
+			Log.d("QZ", TAG + " Error (readMarkupSerializable): " + e);
+			throw new IOException();
+		}
+	}
+		
 
 }
