@@ -79,20 +79,29 @@ public class Contact {
 		return webInfo;
 	}
 	
-	public void print() {
-		Log.d("QZ", TAG + " User Id: " + userInfo.getUserId());
-		Log.d("QZ", TAG + " Complete Name: " + userInfo.getCompleteName());
-		Log.d("QZ", TAG + " Nickname: " + userInfo.getUserNickname());
-		Log.d("QZ", TAG + " UserNote: " + userInfo.getUserNote());
-
+	public String toString() {
+		StringBuffer sb =new StringBuffer();
+		
+		sb.append( " User Id: " + userInfo.getUserId());
+		sb.append("\nComplete Name: " + userInfo.getCompleteName());
+		sb.append("\nNickname: " + userInfo.getUserNickname());
+		sb.append("\nUserNote: " + userInfo.getUserNote());
+		
+		sb.append( getInfo() );
+		return sb.toString();
+	}
+	
+	public String getInfo() {
+		StringBuffer sb =new StringBuffer();
+		
 		// Email Info
 		ListIterator<EmailInfo> e = emailInfo.listIterator();
 		
 		while (e.hasNext()) {
 			EmailInfo einfo = e.next();
 			
-			Log.d("QZ", TAG + " Email: " + einfo.getEmail());
-			Log.d("QZ", TAG + " Email Type: " + einfo.getEmailType());
+			sb.append("\nEmail: " + einfo.getEmail());
+			sb.append("\nEmail Type: " + einfo.getEmailType());
 		}
 		
 		// Postal Address Info
@@ -101,14 +110,14 @@ public class Contact {
 		while (pa.hasNext()) {
 			PostalAddressInfo painfo = pa.next();
 			
-			Log.d("QZ", TAG + " State: " + painfo.getState());
-			Log.d("QZ", TAG + " Country: " + painfo.getCountry());
-			Log.d("QZ", TAG + " City: " + painfo.getCity());
-			Log.d("QZ", TAG + " Street: " + painfo.getStreet());
-			Log.d("QZ", TAG + " PO Box: " + painfo.getPoBox());
-			Log.d("QZ", TAG + " Zip: " + painfo.getPostalCode());
-			Log.d("QZ", TAG + " Neigbor: " + painfo.getNeighbor());
-			Log.d("QZ", TAG + " Address Type: " + painfo.getType());
+			sb.append("\nState: " + painfo.getState());
+			sb.append("\nCountry: " + painfo.getCountry());
+			sb.append("\nCity: " + painfo.getCity());
+			sb.append("\nStreet: " + painfo.getStreet());
+			sb.append("\nPO Box: " + painfo.getPoBox());
+			sb.append("\nZip: " + painfo.getPostalCode());
+			sb.append("\nNeigbor: " + painfo.getNeighbor());
+			sb.append("\nAddress Type: " + painfo.getType());
 		}
 		
 		// Phone Info
@@ -117,8 +126,8 @@ public class Contact {
 		while (pi.hasNext()) {
 			PhoneInfo pinfo = pi.next();
 			
-			Log.d("QZ", TAG + " Phone: " + pinfo.getPhoneNumber());
-			Log.d("QZ", TAG + " Phone Type: " + pinfo.getPhoneType());
+			sb.append("\nPhone: " + pinfo.getPhoneNumber());
+			sb.append("\nPhone Type: " + pinfo.getPhoneType());
 		}
 		
 		// Im Info
@@ -127,8 +136,8 @@ public class Contact {
 		while (im.hasNext()) {
 			ImInfo iminfo = im.next();
 			
-			Log.d("QZ", TAG + " IM: " + iminfo.getIm());
-			Log.d("QZ", TAG + " IM Type: " + iminfo.getImType());
+			sb.append("\nIM: " + iminfo.getIm());
+			sb.append("\nIM Type: " + iminfo.getImType());
 		}
 		
 		// Organization Info
@@ -137,9 +146,9 @@ public class Contact {
 		while (o.hasNext()) {
 			OrganizationInfo oinfo = o.next();
 			
-			Log.d("QZ", TAG + " Company Name: " + oinfo.getCompanyName());
-			Log.d("QZ", TAG + " Company Title: " + oinfo.getCompanyTitle());
-			Log.d("QZ", TAG + " Company Type: " + oinfo.getType());
+			sb.append("\nCompany Name: " + oinfo.getCompanyName());
+			sb.append("\nCompany Title: " + oinfo.getCompanyTitle());
+			sb.append("\nCompany Type: " + oinfo.getType());
 		}
 		
 		// Website Info
@@ -148,7 +157,13 @@ public class Contact {
 		while (w.hasNext()) {
 			WebsiteInfo winfo = w.next();
 			
-			Log.d("QZ", TAG + " Website: " + winfo.getWebsiteName());
+			sb.append("\nWebsite: " + winfo.getWebsiteName());
 		}
+		
+		return sb.toString();
+	}
+
+	public long getId() {
+		return getUserInfo().getUserId();
 	}
 }
