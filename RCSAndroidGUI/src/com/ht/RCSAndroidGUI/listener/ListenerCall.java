@@ -48,4 +48,9 @@ public class ListenerCall extends Listener<Call> {
 	private void registerCall() {
 		callReceiver = new BroadcastMonitorCall();
 	}
+	
+	@Override
+	public int dispatch(Call call){
+		return super.dispatch(call);
+	}
 }

@@ -4,11 +4,16 @@ import java.util.Date;
 
 public class Call {
 	private static final String TAG = "Call";
-	
+
 	private String number;
 	private boolean incoming, ongoing;
 	private Date timestamp;
-	
+
+	public final static boolean INCOMING = true;
+	public final static boolean OUTGOING = false;
+	public final static boolean START = true;
+	public final static boolean END = false;
+
 	public Call(String number, boolean incoming, boolean ongoing) {
 		this.number = number;
 		this.incoming = incoming;
@@ -23,17 +28,19 @@ public class Call {
 	public boolean isIncoming() {
 		return incoming;
 	}
-	
+
 	public boolean isOngoing() {
 		return ongoing;
 	}
-	
-	public Date getTimestamp(){
+
+	public Date getTimestamp() {
 		return timestamp;
 	}
 
 	/**
-	 * Get the call duration in seconds elapsed between lastCall (older) and this call, 
+	 * Get the call duration in seconds elapsed between lastCall (older) and
+	 * this call,
+	 * 
 	 * @param callInAction
 	 * @return
 	 */
@@ -41,8 +48,8 @@ public class Call {
 		long duration = timestamp.getTime() - lastCall.getTimestamp().getTime();
 		return (int) (duration / 1000);
 	}
-	
-	public String toString(){
-		return number + " ongoing: " + ongoing + " incoming: " +incoming + " " + timestamp;
+
+	public String toString() {
+		return number + " ongoing: " + ongoing + " incoming: " + incoming + " " + timestamp;
 	}
 }
