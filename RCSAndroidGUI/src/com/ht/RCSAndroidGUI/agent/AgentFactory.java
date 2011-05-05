@@ -4,7 +4,7 @@ import com.ht.RCSAndroidGUI.interfaces.AbstractFactory;
 
 import android.util.Log;
 
-public class AgentFactory implements AbstractFactory<AgentBase,AgentType> {
+public class AgentFactory implements AbstractFactory<AgentBase, AgentType> {
 	private static final String TAG = "AgentFactory";
 
 	/**
@@ -28,6 +28,7 @@ public class AgentFactory implements AbstractFactory<AgentBase,AgentType> {
 				break;
 
 			case AGENT_CALLLIST:
+				a = new AgentCallList();
 				break;
 
 			case AGENT_DEVICE:

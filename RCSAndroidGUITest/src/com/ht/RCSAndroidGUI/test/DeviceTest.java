@@ -16,20 +16,18 @@ public class DeviceTest extends AndroidTestCase {
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		//RCSMockContext.setContext(getContext());
-		//Context context = new RCSMockContext();
 		Status.setAppContext(getContext());
 		device = Device.self();
 	}
-
-	public void testGetUserId() {
-		byte[] res=device.getVersion();
+	
+	public void testGetImei() {
+		String res = device.getImei();
 		assertNotNull(res);
-		assertTrue(res.length>0);
+		assertTrue(res.length()>0);
 	}
-
-	public void testGetDeviceId() {
-		String res = device.getDeviceId();
+	
+	public void testGetImsi() {
+		String res = device.getImsi();
 		assertNotNull(res);
 		assertTrue(res.length()>0);
 	}
