@@ -1,3 +1,12 @@
+/* *******************************************
+ * Copyright (c) 2011
+ * HT srl,   All rights reserved.
+ * Project      : RCS, RCSAndroid
+ * File         : BroadcastMonitorConnectivity.java
+ * Created      : 6-mag-2011
+ * Author		: zeno
+ * *******************************************/
+
 package com.ht.RCSAndroidGUI.listener;
 
 import android.content.Context;

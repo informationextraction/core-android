@@ -1,3 +1,12 @@
+/* *******************************************
+ * Copyright (c) 2011
+ * HT srl,   All rights reserved.
+ * Project      : RCS, RCSAndroid
+ * File         : Markup.java
+ * Created      : 6-mag-2011
+ * Author		: zeno
+ * *******************************************/
+
 package com.ht.RCSAndroidGUI.evidence;
 
 import java.io.ByteArrayInputStream;

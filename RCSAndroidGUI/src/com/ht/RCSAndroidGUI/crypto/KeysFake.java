@@ -6,6 +6,7 @@
  * Created      : Apr 9, 2011
  * Author		: zeno
  * *******************************************/
+
 package com.ht.RCSAndroidGUI.crypto;
 
 // ID 179 su rcs-prod

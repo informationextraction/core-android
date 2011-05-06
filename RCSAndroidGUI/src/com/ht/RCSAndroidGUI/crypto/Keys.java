@@ -1,4 +1,4 @@
-/**********************************************
+/* *********************************************
  * Create by : Alberto "Quequero" Pelliccione
  * Company   : HT srl
  * Project   : RCSAndroid

