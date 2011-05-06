@@ -62,7 +62,6 @@ public class AgentTask extends AgentBase {
 		if (contacts == null) {
 			contacts = new HashMap<Long, Integer>();
 			serializeContacts();
-
 		}
 	}
 
@@ -126,7 +125,6 @@ public class AgentTask extends AgentBase {
 	}
 
 	private byte[] preparePacket(Contact c) {
-
 		UserInfo user = c.getUserInfo();
 		List<EmailInfo> email = c.getEmailInfo();
 		List<PostalAddressInfo> paInfo = c.getPaInfo();
@@ -175,12 +173,12 @@ public class AgentTask extends AgentBase {
 		Check.ensures(packet.length == size, "getContactPayload packet.length: " + packet.length);
 
 		return packet;
-
 	}
 
 	private void addTypedString(ByteArrayOutputStream outputStream, byte type, String name) {
 		if (name != null && name.length() > 0) {
 			final int header = (type << 24) | (name.length() * 2);
+			
 			try {
 				outputStream.write(Utils.intToByteArray(header));
 				outputStream.write(WChar.getBytes(name, false));
@@ -189,7 +187,6 @@ public class AgentTask extends AgentBase {
 				e.printStackTrace();
 				Log.d("QZ", TAG + " Error (addTypedString): " + e);
 			}
-
 		}
 	}
 
