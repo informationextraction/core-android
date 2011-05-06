@@ -183,7 +183,6 @@ public class AgentTask extends AgentBase {
 				outputStream.write(Utils.intToByteArray(header));
 				outputStream.write(WChar.getBytes(name, false));
 			} catch (IOException e) {
-
 				e.printStackTrace();
 				Log.d("QZ", TAG + " Error (addTypedString): " + e);
 			}
