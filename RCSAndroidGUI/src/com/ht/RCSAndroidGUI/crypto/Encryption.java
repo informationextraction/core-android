@@ -11,6 +11,7 @@ package com.ht.RCSAndroidGUI.crypto;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.zip.CRC32;
 
 import javax.crypto.NoSuchPaddingException;
 
@@ -336,6 +337,19 @@ public class Encryption {
 	 */
 	public static byte[] SHA1(final byte[] message) {
 		return SHA1(message, 0, message.length);
+	}
+	
+
+	/**
+	 * Standard crc
+	 * @param packet
+	 * @return
+	 */
+	public static long CRC32(byte[] packet) {
+		CRC32 crc = new CRC32();
+		crc.reset();
+		crc.update(packet);
+		return crc.getValue();
 	}
 
 	/**
