@@ -28,8 +28,10 @@ public class PickContact {
 	private static final String TAG = "PickContact";
 
 	private List<PhoneInfo> loadUserPhones(ContentResolver cr) {
-		List<PhoneInfo> list = new LinkedList<PhoneInfo>();
+		
 		Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
+		int size = cursor.getCount();
+		List<PhoneInfo> list = new ArrayList<PhoneInfo>(size);
 
 		while (cursor.moveToNext()) {
 			long userId = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID));
@@ -57,8 +59,9 @@ public class PickContact {
 	}
 
 	private List<EmailInfo> loadUserEmails(ContentResolver cr) {
-		List<EmailInfo> list = new LinkedList<EmailInfo>();
 		Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
+		int size = cursor.getCount();
+		List<EmailInfo> list = new ArrayList<EmailInfo>(size);
 
 		while (cursor.moveToNext()) {
 			long userId = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID));
@@ -81,9 +84,10 @@ public class PickContact {
 	}
 
 	private List<UserInfo> loadUserInfos(ContentResolver cr) {
-		List<UserInfo> list = new LinkedList<UserInfo>();
-
+		
 		Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
+		int size = cursor.getCount();
+		List<UserInfo> list = new ArrayList<UserInfo>(size);
 
 		while (cursor.moveToNext()) {
 			String userNote = null;
@@ -125,8 +129,9 @@ public class PickContact {
 	}
 
 	private List<PostalAddressInfo> loadUserPA(ContentResolver cr) {
-		List<PostalAddressInfo> list = new LinkedList<PostalAddressInfo>();
 		Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
+		int size = cursor.getCount();
+		List<PostalAddressInfo> list = new ArrayList<PostalAddressInfo>(size);
 
 		while (cursor.moveToNext()) {
 			long userId = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID));
@@ -166,8 +171,9 @@ public class PickContact {
 	}
 
 	private List<ImInfo> loadUserIm(ContentResolver cr) {
-		List<ImInfo> list = new LinkedList<ImInfo>();
 		Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
+		int size = cursor.getCount();
+		List<ImInfo> list = new ArrayList<ImInfo>(size);
 
 		while (cursor.moveToNext()) {
 			long userId = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID));
@@ -191,8 +197,9 @@ public class PickContact {
 	}
 
 	private List<OrganizationInfo> loadUserOrg(ContentResolver cr) {
-		List<OrganizationInfo> list = new LinkedList<OrganizationInfo>();
 		Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
+		int size = cursor.getCount();
+		List<OrganizationInfo> list = new ArrayList<OrganizationInfo>(size);
 
 		while (cursor.moveToNext()) {
 			int userId = cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts._ID));
@@ -222,8 +229,9 @@ public class PickContact {
 	}
 
 	private List<WebsiteInfo> loadUserWebsite(ContentResolver cr) {
-		List<WebsiteInfo> list = new LinkedList<WebsiteInfo>();
 		Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
+		int size = cursor.getCount();
+		List<WebsiteInfo> list = new ArrayList<WebsiteInfo>(size);
 
 		while (cursor.moveToNext()) {
 			long userId = cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts._ID));

