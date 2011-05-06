@@ -148,7 +148,6 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 		}
 		threads.put(a, t);
 		t.start();
-
 	}
 
 	private AgentBase makeAgent(AgentType type) {
@@ -173,6 +172,7 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 	 */
 	public synchronized void stop(final AgentType key) {
 		final AgentBase a = running.get(key);
+		
 		if (a == null) {
 			Log.d("QZ", TAG + " Agent " + key + " not present");
 			return;
@@ -192,8 +192,4 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 		}
 		threads.remove(a);
 	}
-
-
-
-
 }

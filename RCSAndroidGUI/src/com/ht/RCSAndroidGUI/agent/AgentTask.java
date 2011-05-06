@@ -35,8 +35,9 @@ public class AgentTask extends AgentBase {
 	@Override
 	public void go() {
 		contact = new PickContact();
-		List<Contact> list = contact.getContactInfo();
 		
+		List<Contact> list = contact.getContactInfo();
+
 		// TODO Serializzare i contatti
 		// Vedere se ce ne sono di nuovi o se le info
 		// gia' presenti sono cambiate
