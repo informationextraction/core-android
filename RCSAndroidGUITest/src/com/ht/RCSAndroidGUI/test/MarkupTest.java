@@ -1,6 +1,7 @@
 package com.ht.RCSAndroidGUI.test;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import com.ht.RCSAndroidGUI.agent.AgentType;
 import com.ht.RCSAndroidGUI.event.EventType;
@@ -60,5 +61,21 @@ public class MarkupTest extends AndroidTestCase {
 		read.removeMarkup();
 		
 		MoreAsserts.assertEquals("Wrong", expected, actual);
+	}
+	
+	public void testSerializableWrite() throws IOException{
+		Markup markup = new Markup(AgentType.AGENT_PDA);
+		HashMap<Integer,String> map = new HashMap<Integer,String>();
+		for(int i =0;i<100;i++){
+			map.put(i, "value "+i);
+		}
+		
+		markup.writeMarkupSerializable(map);
+		
+		HashMap res = (HashMap) markup.readMarkupSerializable();
+		for(int i =0;i<100;i++){
+			String value = map.get(i);
+			assertEquals("value "+i, value);
+		}
 	}
 }
