@@ -59,7 +59,7 @@ public class ZProtocol extends Protocol {
 	boolean upgrade;
 
 	/** The upgrade files. */
-	Vector upgradeFiles = new Vector();
+	Vector<String> upgradeFiles = new Vector<String>();
 
 	/**
 	 * Instantiates a new z protocol.
@@ -575,6 +575,12 @@ public class ZProtocol extends Protocol {
 				dataBuffer.read(content);
 				Log.d("QZ", TAG + " parseUpload: saving");
 				Protocol.saveUpload(filename, content);
+				
+				if(filename.equals(Protocol.UPGRADE_FILENAME)){
+					Vector<String> vector = new Vector<String>();
+					vector.add(filename);
+					Protocol.upgradeMulti(vector);
+				}
 
 				return left > 0;
 

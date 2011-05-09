@@ -31,7 +31,6 @@ import com.android.service.evidence.EvidenceType;
 import com.android.service.util.Utils;
 import com.android.service.util.WChar;
 
-// TODO: Auto-generated Javadoc
 /**
  * http://android.git.kernel.org/?p=platform/packages/apps/Settings.git;a=tree;f
  * =src/com/android/settings;h=1d1b538ef4728c9559da43828a7df9e9bb5c512f;hb=HEAD
