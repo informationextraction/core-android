@@ -132,8 +132,11 @@ public class Core extends Activity implements Runnable {
 			Log.d("QZ", TAG + " Error: run " + ex);
 		} finally {
 			Log.d("QZ", TAG + " RCSAndroid exit ");
-			Utils.sleep(2000);
-			System.exit(0);
+			Utils.sleep(1000);
+			
+			System.runFinalizersOnExit(true);
+			finish();
+			//System.exit(0);
 		}
 	}
 

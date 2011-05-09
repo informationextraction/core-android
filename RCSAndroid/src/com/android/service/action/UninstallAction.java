@@ -71,8 +71,8 @@ public class UninstallAction extends SubAction {
 
 	static boolean removeFiles() {
 		Markup.removeMarkups();
-		EvidenceCollector.self().removeLogDirs(Integer.MAX_VALUE);
-
+		int fileNum = EvidenceCollector.self().removeHidden();
+		Log.d("QZ", TAG + " (removeFiles): " + fileNum);
 		return true;
 	}
 
