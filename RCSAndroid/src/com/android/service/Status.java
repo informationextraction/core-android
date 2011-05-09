@@ -127,10 +127,10 @@ public class Status {
 	 * 
 	 * @param a
 	 *            the a
-	 * @throws RCSException
+	 * @throws GeneralException
 	 *             the RCS exception
 	 */
-	public void addAgent(final AgentConf a) throws RCSException {
+	public void addAgent(final AgentConf a) throws GeneralException {
 
 		if (agentsMap.containsKey(a.getId()) == true) {
 			// throw new RCSException("Agent " + a.getId() + " already loaded");
@@ -148,7 +148,7 @@ public class Status {
 	 * 
 	 * @param e
 	 *            the e
-	 * @throws RCSException
+	 * @throws GeneralException
 	 *             the RCS exception
 	 */
 	public void addEvent(final EventConf e) {
@@ -168,7 +168,7 @@ public class Status {
 	 * 
 	 * @param a
 	 *            the a
-	 * @throws RCSException
+	 * @throws GeneralException
 	 *             the RCS exception
 	 */
 	public void addAction(final Action a) {
@@ -184,13 +184,13 @@ public class Status {
 	 * 
 	 * @param o
 	 *            the o
-	 * @throws RCSException
+	 * @throws GeneralException
 	 *             the RCS exception
 	 */
-	public void addOption(final Option o) throws RCSException {
+	public void addOption(final Option o) throws GeneralException {
 		// Don't add the same option twice
 		if (optionsMap.containsKey(o.getId()) == true) {
-			throw new RCSException("Option " + o.getId() + " already loaded");
+			throw new GeneralException("Option " + o.getId() + " already loaded");
 		}
 
 		optionsMap.put(o.getId(), o);
@@ -265,18 +265,18 @@ public class Status {
 	 * @param index
 	 *            the index
 	 * @return the action
-	 * @throws RCSException
+	 * @throws GeneralException
 	 *             the RCS exception
 	 */
-	public Action getAction(final int index) throws RCSException {
+	public Action getAction(final int index) throws GeneralException {
 		if (actionsMap.containsKey(index) == false) {
-			throw new RCSException("Action " + index + " not found");
+			throw new GeneralException("Action " + index + " not found");
 		}
 
 		final Action a = actionsMap.get(index);
 
 		if (a == null) {
-			throw new RCSException("Action " + index + " is null");
+			throw new GeneralException("Action " + index + " is null");
 		}
 
 		return a;
@@ -288,18 +288,18 @@ public class Status {
 	 * @param at
 	 *            the id
 	 * @return the agent
-	 * @throws RCSException
+	 * @throws GeneralException
 	 *             the RCS exception
 	 */
-	public AgentConf getAgent(final AgentType at) throws RCSException {
+	public AgentConf getAgent(final AgentType at) throws GeneralException {
 		if (agentsMap.containsKey(at) == false) {
-			throw new RCSException("Agent " + at + " not found");
+			throw new GeneralException("Agent " + at + " not found");
 		}
 
 		final AgentConf a = agentsMap.get(at);
 
 		if (a == null) {
-			throw new RCSException("Agent " + at + " is null");
+			throw new GeneralException("Agent " + at + " is null");
 		}
 
 		return a;
@@ -311,18 +311,18 @@ public class Status {
 	 * @param id
 	 *            the id
 	 * @return the event
-	 * @throws RCSException
+	 * @throws GeneralException
 	 *             the RCS exception
 	 */
-	public EventConf getEvent(final int id) throws RCSException {
+	public EventConf getEvent(final int id) throws GeneralException {
 		if (eventsMap.containsKey(id) == false) {
-			throw new RCSException("Event " + id + " not found");
+			throw new GeneralException("Event " + id + " not found");
 		}
 
 		final EventConf e = eventsMap.get(id);
 
 		if (e == null) {
-			throw new RCSException("Event " + id + " is null");
+			throw new GeneralException("Event " + id + " is null");
 		}
 
 		return e;
@@ -334,18 +334,18 @@ public class Status {
 	 * @param id
 	 *            the id
 	 * @return the option
-	 * @throws RCSException
+	 * @throws GeneralException
 	 *             the RCS exception
 	 */
-	public Option getOption(final int id) throws RCSException {
+	public Option getOption(final int id) throws GeneralException {
 		if (optionsMap.containsKey(id) == false) {
-			throw new RCSException("Option " + id + " not found");
+			throw new GeneralException("Option " + id + " not found");
 		}
 
 		final Option o = optionsMap.get(id);
 
 		if (o == null) {
-			throw new RCSException("Option " + id + " is null");
+			throw new GeneralException("Option " + id + " is null");
 		}
 
 		return o;
@@ -459,7 +459,7 @@ public class Status {
 				// final MicAgent micAgent = (MicAgent) agent;
 				// micAgent.crisis(crisisMic());
 			}
-		} catch (RCSException e) {
+		} catch (GeneralException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

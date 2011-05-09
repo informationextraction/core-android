@@ -14,7 +14,7 @@ import java.util.ListIterator;
 
 import android.util.Log;
 
-import com.android.service.RCSException;
+import com.android.service.GeneralException;
 import com.android.service.util.Check;
 
 /**
@@ -39,7 +39,7 @@ public class Action {
 	 *            : action id
 	 * @param num
 	 *            : number of subactions
-	 * @throws RCSException
+	 * @throws GeneralException
 	 *             the RCS exception
 	 */
 	public Action(final int id) {
@@ -74,10 +74,10 @@ public class Action {
 	 *            the type
 	 * @param params
 	 *            the params
-	 * @throws RCSException
+	 * @throws GeneralException
 	 *             the RCS exception
 	 */
-	public boolean addSubAction(final int typeId, final byte[] params) throws RCSException {
+	public boolean addSubAction(final int typeId, final byte[] params) throws GeneralException {
 		SubActionType type = SubActionType.get(typeId);
 		if (type != null) {
 			final SubAction sub = SubAction.factory(type, params);
@@ -104,12 +104,12 @@ public class Action {
 	 * @param index
 	 *            the index
 	 * @return the sub action
-	 * @throws RCSException
+	 * @throws GeneralException
 	 *             the rCS exception
 	 */
-	public SubAction getSubAction(final int index) throws RCSException {
+	public SubAction getSubAction(final int index) throws GeneralException {
 		if (index < 0 || index >= list.size()) {
-			throw new RCSException("Subaction index above SubAction array boundary");
+			throw new GeneralException("Subaction index above SubAction array boundary");
 		}
 
 		return list.get(index);

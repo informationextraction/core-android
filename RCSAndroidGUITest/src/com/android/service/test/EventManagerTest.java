@@ -1,7 +1,7 @@
 package com.android.service.test;
 
 import com.android.service.Exit;
-import com.android.service.RCSException;
+import com.android.service.GeneralException;
 import com.android.service.Status;
 import com.android.service.action.Action;
 import com.android.service.action.SubAction;
@@ -27,7 +27,7 @@ public class EventManagerTest extends AndroidTestCase {
 		status.unTriggerAll();
 	}
 
-	public void testStart() throws RCSException {
+	public void testStart() throws GeneralException {
 		EventManager em = EventManager.self();
 
 		int max = 10;
@@ -123,7 +123,7 @@ public class EventManagerTest extends AndroidTestCase {
 				checkActions();
 				Utils.sleep(2000);
 			}
-		} catch (RCSException e) {
+		} catch (GeneralException e) {
 			e.printStackTrace();
 		}
 
@@ -133,7 +133,7 @@ public class EventManagerTest extends AndroidTestCase {
 
 	}
 
-	private void checkActions() throws RCSException {
+	private void checkActions() throws GeneralException {
 
 		int[] actionIds = status.getTriggeredActions();
 		for (int actionId : actionIds) {

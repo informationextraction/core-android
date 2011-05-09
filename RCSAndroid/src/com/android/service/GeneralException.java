@@ -11,7 +11,7 @@ package com.android.service;
 /**
  * The Class RCSException.
  */
-public class RCSException extends Exception {
+public class GeneralException extends Exception {
 
 	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = 1L;
@@ -22,7 +22,7 @@ public class RCSException extends Exception {
 	 * @param msg
 	 *            the msg
 	 */
-	public RCSException(final String msg) {
+	public GeneralException(final String msg) {
 		super(msg);
 	}
 }

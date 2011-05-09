@@ -9,7 +9,7 @@ import android.util.Log;
 
 import com.android.service.Device;
 import com.android.service.LogDispatcher;
-import com.android.service.RCSException;
+import com.android.service.GeneralException;
 import com.android.service.Status;
 import com.android.service.agent.AgentBase;
 import com.android.service.agent.AgentConf;
@@ -40,7 +40,7 @@ public class AgentManagerTest extends AndroidTestCase {
 		super.tearDown();
 	}
 
-	public void testAgentsStart() throws InterruptedException, RCSException {
+	public void testAgentsStart() throws InterruptedException, GeneralException {
 		Resources resources = getContext().getResources();
 		// Start agents
 		AgentManager agentManager = AgentManager.self();
@@ -96,7 +96,7 @@ public class AgentManagerTest extends AndroidTestCase {
 		Log.d("RCS", "LogDispatcher Killed");
 	}
 
-	public void testAgentSuspend() throws RCSException {
+	public void testAgentSuspend() throws GeneralException {
 		MockAgent agent;
 		AgentType type = AgentType.AGENT_INFO;
 		AgentManager manager = AgentManager.self();

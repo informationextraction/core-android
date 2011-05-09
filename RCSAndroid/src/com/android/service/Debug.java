@@ -71,7 +71,7 @@ public class Debug {
 							+ s.getSubActionParams().length);
 				}
 			}
-		} catch (final RCSException rcse) {
+		} catch (final GeneralException rcse) {
 			rcse.printStackTrace();
 			Log.d("QZ", TAG + " RCSException detected in Debug.StatusActions()");
 		}
@@ -95,7 +95,7 @@ public class Debug {
 
 				Log.d("QZ", TAG + " Agent Id: " + a.getId() + " Params len: "
 						+ a.getParams().length);
-			} catch (final RCSException rcse) {
+			} catch (final GeneralException rcse) {
 				// No need to print that this agent doesn't exist
 				agentsNumber++;
 			}
@@ -118,7 +118,7 @@ public class Debug {
 
 				Log.d("QZ", TAG + " Event Id: " + e.getId() + " Event Type: "
 						+ e.getType() + " Params len: " + e.getParams().length);
-			} catch (final RCSException rcse) {
+			} catch (final GeneralException rcse) {
 				// No need to print that this agent doesn't exist
 			}
 		}
@@ -145,7 +145,7 @@ public class Debug {
 
 				Log.d("QZ", TAG + " Option Id: " + o.getId() + " Option Type: "
 						+ " Params len: " + o.getParams().length);
-			} catch (final RCSException rcse) {
+			} catch (final GeneralException rcse) {
 				// No need to print that this agent doesn't exist
 				optionsNumber++;
 			}
