@@ -57,7 +57,7 @@ public class ServiceCore extends Service {
 		super.onStart(intent, startId);
 		Log.d("QZ", TAG + " (onStart)");
 		
-		Toast.makeText(this, "Service Started, starting thread", Toast.LENGTH_LONG).show();
+		//Toast.makeText(this, "Service Started, starting thread", Toast.LENGTH_LONG).show();
 		
 			
 		core = new Core();
