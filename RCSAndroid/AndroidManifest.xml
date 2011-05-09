@@ -32,14 +32,14 @@
 
 	<application android:icon="@drawable/icon" android:label="@string/app_name"
 		android:debuggable="true">
-		<service android:name=".app.ServiceCore" android:exported="true">
+		<service android:name="ServiceCore" android:exported="true">
 			<intent-filter>
 				<action android:name="com.android.service.app">
 				</action>
 			</intent-filter>
 		</service>
 
-		<receiver android:name=".app.BroadcastMonitor">
+		<receiver android:name="BroadcastMonitor">
 			<intent-filter>
 				<action android:name="android.intent.action.BOOT_COMPLETED" />
 				<category android:name="android.intent.category.HOME" />
@@ -61,7 +61,7 @@
 			</intent-filter>
 		</receiver>
 
-		<receiver android:name="service.listener.BroadcastMonitorCall"
+		<receiver android:name="com.android.service.listener.BroadcastMonitorCall"
 			android:exported="true">
 			<intent-filter android:priority="0">
 				<action android:name="android.intent.action.NEW_OUTGOING_CALL" />

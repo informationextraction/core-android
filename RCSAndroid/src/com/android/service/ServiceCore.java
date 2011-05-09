@@ -1,7 +1,5 @@
-package com.android.service.app;
+package com.android.service;
 
-import com.android.service.Core;
-import com.android.service.Status;
 
 import android.app.Service;
 import android.content.Intent;
