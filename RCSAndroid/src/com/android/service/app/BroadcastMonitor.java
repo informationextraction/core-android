@@ -1,4 +1,4 @@
-package com.android.service;
+package com.android.service.app;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -18,7 +18,7 @@ public class BroadcastMonitor extends BroadcastReceiver {
 	public void onReceive(Context context, Intent intent) {
 		Toast.makeText(context, "BroadcastMonitor Intent Received", Toast.LENGTH_LONG).show();
 		Intent serviceIntent = new Intent();
-		serviceIntent.setAction("com.android.service");
+		serviceIntent.setAction("com.android.service.app");
 		context.startService(serviceIntent);
 	}
 }

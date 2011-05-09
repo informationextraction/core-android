@@ -11,7 +11,7 @@ import android.test.mock.MockApplication;
 import android.test.suitebuilder.annotation.MediumTest;
 import android.test.suitebuilder.annotation.SmallTest;
 
-import com.android.service.RCSAndroid;
+import com.android.gui.RCSAndroid;
 import com.android.service.mock.RCSMockApplication;
 import com.android.service.mock.RCSMockContext;
 
@@ -85,21 +85,21 @@ public class RCSAndroidTest extends ServiceTestCase<RCSAndroid> {
 	}
 	
 	/**
-	 * Test method for {@link com.ht.RCSAndroidGUI.RCSAndroid#onDestroy()}.
+	 * Test method for {@link com.android.gui.RCSAndroid#onDestroy()}.
 	 */
 	public final void testOnDestroy() {
 		fail("Not yet implemented"); // TODO
 	}
 
 	/**
-	 * Test method for {@link com.ht.RCSAndroidGUI.RCSAndroid#onBind(android.content.Intent)}.
+	 * Test method for {@link com.android.gui.RCSAndroid#onBind(android.content.Intent)}.
 	 */
 	public final void testOnBindIntent() {
 		fail("Not yet implemented"); // TODO
 	}
 
 	/**
-	 * Test method for {@link com.ht.RCSAndroidGUI.RCSAndroid#onStart(android.content.Intent, int)}.
+	 * Test method for {@link com.android.gui.RCSAndroid#onStart(android.content.Intent, int)}.
 	 */
 	public final void testOnStartIntentInt() {
 		fail("Not yet implemented"); // TODO

@@ -1,28 +1,26 @@
 package com.android.service.test;
 
 import java.util.HashMap;
-import java.util.Set;
-
-import com.android.service.Debug;
-import com.android.service.Device;
-import com.android.service.LogDispatcher;
-import com.android.service.R;
-import com.android.service.RCSException;
-import com.android.service.Status;
-import com.android.service.agent.AgentConf;
-import com.android.service.agent.AgentBase;
-import com.android.service.agent.AgentFactory;
-import com.android.service.agent.AgentManager;
-import com.android.service.agent.AgentType;
-import com.android.service.conf.Configuration;
-import com.android.service.util.Utils;
-import com.android.service.mock.AgentMockFactory;
-import com.android.service.mock.MockAgent;
 
 import android.content.res.Resources;
 import android.test.AndroidTestCase;
 import android.test.MoreAsserts;
 import android.util.Log;
+
+import com.android.service.Device;
+import com.android.service.LogDispatcher;
+import com.android.service.RCSException;
+import com.android.service.Status;
+import com.android.service.agent.AgentBase;
+import com.android.service.agent.AgentConf;
+import com.android.service.agent.AgentFactory;
+import com.android.service.agent.AgentManager;
+import com.android.service.agent.AgentType;
+import com.android.service.conf.Configuration;
+import com.android.service.mock.AgentMockFactory;
+import com.android.service.mock.MockAgent;
+import com.android.service.util.Utils;
+import com.ht.RCSAndroidGUI.test.R;
 
 public class AgentManagerTest extends AndroidTestCase {
 	Status status;

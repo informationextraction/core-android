@@ -12,6 +12,7 @@ import android.content.ContentResolver;
 import android.content.res.Resources;
 import android.util.Log;
 
+import com.android.service.R;
 import com.android.service.action.Action;
 import com.android.service.action.SubAction;
 import com.android.service.action.UninstallAction;

