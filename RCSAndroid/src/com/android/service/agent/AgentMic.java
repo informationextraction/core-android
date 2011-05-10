@@ -37,30 +37,7 @@ import com.android.service.util.Utils;
  * The Class MicAgent. 8000KHz, 32bit
  * 
  * @ref: http://developer.android.com/reference/android/media/MediaRecorder.html
- *       Recipe: Recording Audio Files Recording audio using MediaRecorder is
- *       similar to playback from the previous recipe, except a few more things
- *       need to be specified (note, DEFAULT can also be used and is the same as
- *       the first choice in these lists): n MediaRecorder.AudioSource: n
- *       MICÑBuilt-in microphone n VOICE_UPLINKÑTransmitted audio during voice
- *       call n VOICE_DOWNLINKÑReceived audio during voice call n
- *       VOICE_CALLÑBoth uplink and downlink audio during voice call n
- *       CAMCORDERÑMicrophone associated with camera if available n
- *       VOICE_RECOGNITIONÑMicrophone tuned for voice recognition if available n
- *       MediaRecorder.OutputFormat: n THREE_GPPÑ3GPP media file format n
- *       MPEG_4ÑMPEG4 media file format n AMR_NBÑAdaptive multirate narrowband
- *       file format Audio 157 158 Chapter 6 Multimedia Techniques n
- *       MediaRecorder.AudioEncoder: n AMR_NBÑAdaptive multirate narrowband
- *       vocoder The steps to record audio are 1. Create an instance of the
- *       MediaRecorder: MediaRecorder m_Recorder = new MediaRecorder(); 2.
- *       Specify the source of media, for example the microphone:
- *       m_Recorder.setAudioSource(MediaRecorder.AudioSource.MIC); 3. Set the
- *       output file format and encoding, such as:
- *       m_Recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
- *       m_Recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB); 4. Set
- *       the path for the file to be saved: m_Recorder.setOutputFile(path); 5.
- *       Prepare and start the recording: m_Recorder.prepare();
- *       m_Recorder.start(); These steps for audio recording can be used just as
- *       they were in the previous recipe for playback.
+ *      
  * @author zeno
  */
 public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListener, OnInfoListener {
