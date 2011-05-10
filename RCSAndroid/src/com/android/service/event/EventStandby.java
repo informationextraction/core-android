@@ -24,7 +24,6 @@ public class EventStandby extends EventBase implements Observer<Standby> {
 	private static final String TAG = "EventStandby";
 
 	private int actionOnEnter, actionOnExit;
-	private boolean inRange = false;
 
 	@Override
 	public void begin() {
@@ -59,17 +58,17 @@ public class EventStandby extends EventBase implements Observer<Standby> {
 
 	@Override
 	public void go() {
-		// TODO Auto-generated method stub
+		
 	}
 
 	// Viene richiamata dal listener (dalla dispatch())
 	public int notification(Standby s) {
 		// Stato dello schermo ON/OFF
-		if (s.getStatus() == true && inRange == false) {
-			inRange = true;
+		if (s.getStatus() == true) {
+			// SCREEN ON			
 			onExit();
-		} else if (s.getStatus() == false && inRange == true) {
-			inRange = false;
+		} else { 
+			// STANDBY			
 			onEnter();
 		}
 		
