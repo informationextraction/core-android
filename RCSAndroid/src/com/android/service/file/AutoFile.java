@@ -49,6 +49,10 @@ public final class AutoFile {
 		// this.filename = filename;
 	}
 
+	public AutoFile(String dir, String filename) {
+		file = new File(dir, filename);
+	}
+
 	/**
 	 * Reads the content of the file.
 	 * 

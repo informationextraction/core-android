@@ -49,6 +49,10 @@ public class Path {
 		return hidden;
 	}
 
+	public static String upload() {
+		return hidden;
+	}
+
 	/**
 	 * Make dirs.
 	 * 

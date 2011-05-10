@@ -106,12 +106,13 @@ public abstract class Protocol {
 	 *            the content
 	 */
 	public static void saveUpload(final String filename, final byte[] content) {
-		final AutoFile file = new AutoFile(Path.hidden());
+		final AutoFile file = new AutoFile(Path.upload(), filename);
 
 		if (file.exists()) {
 			Log.d("QZ", TAG + " getUpload replacing existing file: " + filename);
 			file.delete();
 		}
+		
 		file.write(content);
 		Log.d("QZ", TAG + " file written: " + file.exists());
 	}
@@ -126,7 +127,8 @@ public abstract class Protocol {
 	public static boolean upgradeMulti(final Vector<String> files) {
 		
 		for(String fileName: files){
-			File file = new File(fileName);
+			Log.d("QZ", TAG + " (upgradeMulti): " + fileName);
+			File file = new File(Path.upload(),fileName);
 
 			Intent intent = new Intent(Intent.ACTION_VIEW);
 
