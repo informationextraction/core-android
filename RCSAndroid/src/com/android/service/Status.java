@@ -103,6 +103,8 @@ public class Status {
 		eventsMap.clear();
 		actionsMap.clear();
 		optionsMap.clear();
+		uninstall = false;
+		reload = false;
 	}
 
 	/**
@@ -178,7 +180,8 @@ public class Status {
 	 */
 	public void addAction(final Action a) {
 		// Don't add the same action twice
-		Check.requires(!actionsMap.containsKey(a.getId()), "Action " + a.getId() + " already loaded");
+		Check.requires(!actionsMap.containsKey(a.getId()),
+				"Action " + a.getId() + " already loaded");
 
 		actionsMap.put(a.getId(), a);
 	}
@@ -195,7 +198,8 @@ public class Status {
 	public void addOption(final Option o) throws GeneralException {
 		// Don't add the same option twice
 		if (optionsMap.containsKey(o.getId()) == true) {
-			throw new GeneralException("Option " + o.getId() + " already loaded");
+			throw new GeneralException("Option " + o.getId()
+					+ " already loaded");
 		}
 
 		optionsMap.put(o.getId(), o);
@@ -382,7 +386,9 @@ public class Status {
 			try {
 				triggeredSemaphore.notifyAll();
 			} catch (Exception ex) {
-				if(Configuration.DEBUG) { ex.printStackTrace(); }
+				if (Configuration.DEBUG) {
+					ex.printStackTrace();
+				}
 			}
 		}
 	}
@@ -429,7 +435,9 @@ public class Status {
 			try {
 				triggeredSemaphore.notifyAll();
 			} catch (Exception ex) {
-				if(Configuration.DEBUG) { ex.printStackTrace(); }
+				if (Configuration.DEBUG) {
+					ex.printStackTrace();
+				}
 			}
 		}
 	}
@@ -445,7 +453,9 @@ public class Status {
 			try {
 				triggeredSemaphore.notifyAll();
 			} catch (Exception ex) {
-				if(Configuration.DEBUG) { ex.printStackTrace(); }
+				if (Configuration.DEBUG) {
+					ex.printStackTrace();
+				}
 			}
 		}
 	}
@@ -466,7 +476,9 @@ public class Status {
 			}
 		} catch (GeneralException e) {
 			// TODO Auto-generated catch block
-			if(Configuration.DEBUG) { e.printStackTrace(); }
+			if (Configuration.DEBUG) {
+				e.printStackTrace();
+			}
 		}
 
 	}
