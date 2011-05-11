@@ -340,22 +340,22 @@ public class Core extends Activity implements Runnable {
 				subAction.prepareExecute();
 				boolean ret = subAction.execute();
 
-				if (subAction.wantUninstall()) {
+				if (status.uninstall) {
 					Log.d("QZ", TAG + " Warn: (CheckActions): uninstalling");
 					
 					UninstallAction.actualExecute();
 					
 					exit = Exit.UNINSTALL;
 					break;
-					// return false;
+
 				}
 
-				if (subAction.wantReload()) {
+				if (status.reload) {
 					Log.d("QZ", TAG + " (CheckActions): reloading");
 					stopAll();
 
-					// return true;
 					exit = Exit.RELOAD;
+					status.reload = false;
 					break;
 				}
 

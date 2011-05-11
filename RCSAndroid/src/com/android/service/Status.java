@@ -61,6 +61,10 @@ public class Status {
 
 	private Object triggeredSemaphore = new Object();
 
+	public boolean uninstall;
+
+	public boolean reload;
+
 	/**
 	 * Instantiates a new status.
 	 */

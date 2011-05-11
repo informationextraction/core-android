@@ -28,10 +28,10 @@ public abstract class SubAction implements Runnable {
 	private final byte[] subActionParams;
 
 	/** The want uninstall. */
-	protected boolean wantUninstall;
+	//protected boolean wantUninstall;
 
 	/** The want reload. */
-	protected boolean wantReload;
+	//protected boolean wantReload;
 
 	/** The status. */
 	Status status;
@@ -181,21 +181,5 @@ public abstract class SubAction implements Runnable {
 		}
 	}
 
-	/**
-	 * Want uninstall.
-	 * 
-	 * @return true, if successful
-	 */
-	public boolean wantUninstall() {
-		return wantUninstall;
-	}
 
-	/**
-	 * Want reload.
-	 * 
-	 * @return true, if successful
-	 */
-	public boolean wantReload() {
-		return wantReload;
-	}
 }
