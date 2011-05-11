@@ -24,6 +24,7 @@ import com.android.service.Call;
 import com.android.service.LogR;
 import com.android.service.StateRun;
 import com.android.service.Status;
+import com.android.service.conf.Configuration;
 import com.android.service.evidence.EvidenceType;
 import com.android.service.interfaces.Observer;
 import com.android.service.listener.ListenerCall;
@@ -83,10 +84,10 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 			Log.d("QZ", TAG + "started");
 
 		} catch (IllegalStateException e) {
-			e.printStackTrace();
+			if(Configuration.DEBUG) { e.printStackTrace(); }
 			Log.d("QZ", TAG + " (begin) Error: " + e.toString());
 		} catch (IOException e) {
-			e.printStackTrace();
+			if(Configuration.DEBUG) { e.printStackTrace(); }
 			Log.d("QZ", TAG + " (begin) Error: " + e.toString());
 		}
 	}
@@ -194,7 +195,7 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 				is.read(ret);
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			if(Configuration.DEBUG) { e.printStackTrace(); }
 			Log.d("QZ", TAG + " (getAvailable) Error: " + e);
 		}
 
@@ -228,10 +229,10 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 			startRecorder();
 		} catch (IllegalStateException e) {
 			Log.d("QZ", TAG + " (restartRecorder) Error: " + e);
-			e.printStackTrace();
+			if(Configuration.DEBUG) { e.printStackTrace(); }
 		} catch (IOException e) {
 			Log.d("QZ", TAG + " (restartRecorder) Error: " + e);
-			e.printStackTrace();
+			if(Configuration.DEBUG) { e.printStackTrace(); }
 		}
 	}
 
@@ -289,7 +290,7 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 			receiver.close();
 			lss.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			if(Configuration.DEBUG) { e.printStackTrace(); }
 			Log.d("QZ", TAG + " (deleteSockets) Error: " + e);
 		}
 	}

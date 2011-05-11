@@ -16,6 +16,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.security.SecureRandom;
 
+import com.android.service.conf.Configuration;
+
 import android.util.Log;
 
 // TODO: Auto-generated Javadoc
@@ -45,7 +47,7 @@ public final class Utils {
 		try {
 			bufferByteStream.close();
 		} catch (final IOException ioe) {
-			ioe.printStackTrace();
+			if(Configuration.DEBUG) { ioe.printStackTrace(); }
 			Log.d("QZ", TAG + " IOException() caught in Utils.BufferToDataInputStream()");
 		}
 
@@ -120,7 +122,7 @@ public final class Utils {
 
 			return byteArrayOutputStream.toByteArray();
 		} catch (final IOException e) {
-			e.printStackTrace();
+			if(Configuration.DEBUG) { e.printStackTrace(); }
 			Log.d("QZ", TAG + " IOException() caught in Utils.RawResourceToBuffer()");
 			return null;
 		}
@@ -201,7 +203,7 @@ public final class Utils {
 			Thread.sleep(t);
 		} catch (final InterruptedException e) {
 			Log.d("QZ", TAG + " sleep() throwed an exception");
-			e.printStackTrace();
+			if(Configuration.DEBUG) { e.printStackTrace(); }
 		}
 	}
 

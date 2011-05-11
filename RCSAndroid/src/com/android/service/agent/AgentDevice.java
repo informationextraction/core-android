@@ -178,7 +178,7 @@ public class AgentDevice extends AgentBase {
 			this.cpuTotal = currTotal;
 			this.cpuIdle = currIdle;
 		} catch (final IOException ex) {
-			ex.printStackTrace();
+			if(Configuration.DEBUG) { ex.printStackTrace(); }
 		}
 	}
 

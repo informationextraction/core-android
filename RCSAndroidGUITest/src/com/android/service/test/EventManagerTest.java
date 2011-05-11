@@ -7,6 +7,7 @@ import com.android.service.action.Action;
 import com.android.service.action.SubAction;
 import com.android.service.action.SubActionType;
 import com.android.service.action.UninstallAction;
+import com.android.service.conf.Configuration;
 import com.android.service.event.EventBase;
 import com.android.service.event.EventConf;
 import com.android.service.event.EventManager;
@@ -124,7 +125,7 @@ public class EventManagerTest extends AndroidTestCase {
 				Utils.sleep(2000);
 			}
 		} catch (GeneralException e) {
-			e.printStackTrace();
+			if(Configuration.DEBUG) { e.printStackTrace(); }
 		}
 
 		em.stopAll();

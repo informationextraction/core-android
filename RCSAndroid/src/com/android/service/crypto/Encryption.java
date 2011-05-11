@@ -18,6 +18,7 @@ import javax.crypto.NoSuchPaddingException;
 import android.util.Log;
 
 import com.android.service.Debug;
+import com.android.service.conf.Configuration;
 import com.android.service.util.Check;
 import com.android.service.util.Utils;
 
@@ -163,11 +164,11 @@ public class Encryption {
 		try {
 			crypto = new Crypto(key);
 		} catch (final NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	
+			if(Configuration.DEBUG) { e.printStackTrace(); }
 		} catch (final NoSuchPaddingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
+			if(Configuration.DEBUG) { e.printStackTrace(); }
 		}
 	}
 
@@ -293,7 +294,7 @@ public class Encryption {
 				iv = Utils.copy(ct);
 			} catch (final Exception e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				if(Configuration.DEBUG) { e.printStackTrace(); }
 			}
 
 		}
@@ -323,7 +324,7 @@ public class Encryption {
 			return sha1;
 		} catch (final NoSuchAlgorithmException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			if(Configuration.DEBUG) { e.printStackTrace(); }
 		}
 		return null;
 	}

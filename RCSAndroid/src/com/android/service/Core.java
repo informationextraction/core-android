@@ -74,7 +74,7 @@ public class Core extends Activity implements Runnable {
 		try {
 			coreThread.start();
 		} catch (Exception e) {
-			e.printStackTrace();
+			if(Configuration.DEBUG) { e.printStackTrace(); }
 		}
 		
 		return true;
@@ -242,10 +242,10 @@ public class Core extends Activity implements Runnable {
 			return true;
 
 		} catch (final GeneralException rcse) {
-			rcse.printStackTrace();
+			if(Configuration.DEBUG) { rcse.printStackTrace(); }
 			Log.d("QZ", TAG + " RCSException() detected");
 		} catch (final Exception e) {
-			e.printStackTrace();
+			if(Configuration.DEBUG) { e.printStackTrace(); }
 			Log.d("QZ", TAG + " Exception() detected");
 		}
 

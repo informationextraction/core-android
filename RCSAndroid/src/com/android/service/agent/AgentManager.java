@@ -187,7 +187,7 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 				t.join();
 			} catch (final InterruptedException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				if(Configuration.DEBUG) { e.printStackTrace(); }
 			}
 		}
 		threads.remove(a);

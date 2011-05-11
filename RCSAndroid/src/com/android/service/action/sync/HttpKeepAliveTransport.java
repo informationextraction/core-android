@@ -22,6 +22,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 
+import com.android.service.conf.Configuration;
 import com.android.service.util.Check;
 
 import android.util.Log;
@@ -98,7 +99,7 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 				try {
 					in.close();
 				} catch (final IOException e) {
-					e.printStackTrace();
+					if(Configuration.DEBUG) { e.printStackTrace(); }
 				}
 			}
 		}

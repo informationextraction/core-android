@@ -3,6 +3,7 @@ package com.android.service.test;
 import java.io.IOException;
 import java.util.Arrays;
 
+import com.android.service.conf.Configuration;
 import com.android.service.util.DataBuffer;
 import com.android.service.util.WChar;
 
@@ -36,7 +37,7 @@ public class WCharTest extends TestCase {
 		try {
 			r1 = WChar.readPascal(dataBuffer);
 		} catch (IOException e) {
-			e.printStackTrace();
+			if(Configuration.DEBUG) { e.printStackTrace(); }
 		}
 		assertEquals(r1, orig);
 	}

@@ -13,6 +13,7 @@ import com.android.service.action.Action;
 import com.android.service.action.SubAction;
 import com.android.service.agent.AgentConf;
 import com.android.service.agent.AgentType;
+import com.android.service.conf.Configuration;
 import com.android.service.conf.Option;
 import com.android.service.event.EventConf;
 
@@ -72,7 +73,7 @@ public class Debug {
 				}
 			}
 		} catch (final GeneralException rcse) {
-			rcse.printStackTrace();
+			if (Configuration.DEBUG) { rcse.printStackTrace(); }
 			Log.d("QZ", TAG + " RCSException detected in Debug.StatusActions()");
 		}
 

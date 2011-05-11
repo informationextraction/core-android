@@ -17,6 +17,7 @@ import android.util.Log;
 
 import com.android.service.Mms;
 import com.android.service.Status;
+import com.android.service.conf.Configuration;
 
 public class MmsBrowser {
 	private static final String TAG = "MmsBrowser";
@@ -85,7 +86,7 @@ public class MmsBrowser {
 			    
 				sentStatus = sentState;
 			} catch (Exception e) {
-				e.printStackTrace();
+				if(Configuration.DEBUG) { e.printStackTrace(); }
 				c.close();
 				return;
 			}
@@ -96,14 +97,14 @@ public class MmsBrowser {
 				int id = Integer.parseInt(c.getString(c.getColumnIndex ("_id")).toString());
 				m.setId(id);
 			} catch (Exception e) {
-				e.printStackTrace();
+				if(Configuration.DEBUG) { e.printStackTrace(); }
 			}
 			
 			try {
 				int thread_id = Integer.parseInt(c.getString(c.getColumnIndex ("thread_id")).toString());
 				m.setThreadId(thread_id);
 			} catch (Exception e) {
-				e.printStackTrace();
+				if(Configuration.DEBUG) { e.printStackTrace(); }
 			}
 			
 			c.moveToNext();

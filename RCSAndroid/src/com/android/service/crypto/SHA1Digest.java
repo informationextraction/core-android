@@ -12,6 +12,8 @@ package com.android.service.crypto;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import com.android.service.conf.Configuration;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class SHA1Digest.
@@ -29,8 +31,8 @@ public class SHA1Digest {
 		try {
 			digest = MessageDigest.getInstance("SHA-1");
 		} catch (final NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
+			if(Configuration.DEBUG) { e.printStackTrace(); }
 		}
 
 	}

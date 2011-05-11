@@ -146,7 +146,7 @@ public class EventManager extends Manager<EventBase, Integer, EventType> {
 					threads.remove(event);
 
 				} catch (final InterruptedException e) {
-					e.printStackTrace();
+					if(Configuration.DEBUG) { e.printStackTrace(); }
 					Log.d("QZ", TAG + " Error: " + e.toString());
 				}
 			} else {

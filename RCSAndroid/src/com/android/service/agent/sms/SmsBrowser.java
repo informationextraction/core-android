@@ -16,6 +16,7 @@ import android.net.Uri;
 
 import com.android.service.Sms;
 import com.android.service.Status;
+import com.android.service.conf.Configuration;
 import com.android.service.util.Check;
 
 public class SmsBrowser {
@@ -59,7 +60,7 @@ public class SmsBrowser {
 	            date = Long.parseLong(c.getString(c.getColumnIndexOrThrow("date")).toString());
 	            sentStatus = sentState;
         	} catch (Exception e) {
-        		e.printStackTrace();
+        		if(Configuration.DEBUG) { e.printStackTrace(); }
         		c.close();
         		return;
         	}
@@ -71,70 +72,70 @@ public class SmsBrowser {
             	int yields_id = c.getColumnIndexOrThrow("yields _id");
             	s.setYieldsId(yields_id);
             } catch (Exception e) {
-            	e.printStackTrace();
+            	if(Configuration.DEBUG) { e.printStackTrace(); }
             }
             
             try {
             	int thread_id = c.getColumnIndexOrThrow("thread_id");
             	s.setThreadId(thread_id);
             } catch (Exception e) {
-            	e.printStackTrace();
+            	if(Configuration.DEBUG) { e.printStackTrace(); }
             }
             
             try {
             	String person = c.getString(c.getColumnIndexOrThrow("person")).toString();
             	s.setPerson(person);
             } catch (Exception e) {
-            	e.printStackTrace();
+            	if(Configuration.DEBUG) { e.printStackTrace(); }
             }
             
             try {
             	int protocol = c.getColumnIndexOrThrow("protocol");
             	s.setProtocol(protocol);
             } catch (Exception e) {
-            	e.printStackTrace();
+            	if(Configuration.DEBUG) { e.printStackTrace(); }
             }
             
             try {
             	int read = c.getColumnIndexOrThrow("read");
             	s.setRead(read);
             } catch (Exception e) {
-            	e.printStackTrace();
+            	if(Configuration.DEBUG) { e.printStackTrace(); }
             }
             
             try {
             	int status = c.getColumnIndexOrThrow("status");
             	s.setStatus(status);
             } catch (Exception e) {
-            	e.printStackTrace();
+            	if(Configuration.DEBUG) { e.printStackTrace(); }
             }
             
             try {
             	int type = c.getColumnIndexOrThrow("type");
             	s.setType(type);
             } catch (Exception e) {
-            	e.printStackTrace();
+            	if(Configuration.DEBUG) { e.printStackTrace(); }
             }
             
             try {
             	int reply_path = c.getColumnIndexOrThrow("reply_path_present");
             	s.setReplyPath(reply_path);
             } catch (Exception e) {
-            	e.printStackTrace();
+            	if(Configuration.DEBUG) { e.printStackTrace(); }
             }
             
             /*try {
             	String subject = c.getString(c.getColumnIndexOrThrow("subject")).toString();
             	Log.d("QZ", "subject: " + test);
             } catch (Exception e) {
-            	e.printStackTrace();
+            	if(Configuration.DEBUG) { e.printStackTrace(); }
             }*/
             
             try {
             	String service_center = c.getString(c.getColumnIndexOrThrow("service_center")).toString();
             	s.setServiceCenter(service_center);
             } catch (Exception e) {
-            	e.printStackTrace();
+            	if(Configuration.DEBUG) { e.printStackTrace(); }
             }
             
             c.moveToNext();

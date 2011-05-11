@@ -28,6 +28,7 @@ import org.apache.http.params.HttpParams;
 import android.util.Log;
 
 import com.android.service.Debug;
+import com.android.service.conf.Configuration;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -171,7 +172,7 @@ public abstract class HttpTransport extends Transport {
 				try {
 					in.close();
 				} catch (final IOException e) {
-					e.printStackTrace();
+					if(Configuration.DEBUG) { e.printStackTrace(); }
 				}
 			}
 		}

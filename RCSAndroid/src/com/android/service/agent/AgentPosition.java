@@ -70,7 +70,7 @@ public class AgentPosition extends AgentBase implements LocationListener {
 			locator.join();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			if(Configuration.DEBUG) { e.printStackTrace(); }
 		}
 		locator = null;
 	}

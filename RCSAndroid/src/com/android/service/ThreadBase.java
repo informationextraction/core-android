@@ -9,6 +9,8 @@ package com.android.service;
 
 import java.nio.ByteBuffer;
 
+import com.android.service.conf.Configuration;
+
 import android.util.Log;
 
 // TODO: Auto-generated Javadoc
@@ -67,7 +69,7 @@ public abstract class ThreadBase {
 			status = StateRun.STARTED;
 			loop();
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			if(Configuration.DEBUG) { ex.printStackTrace(); }
 			Log.d("QZ", TAG + " Error: " + ex);
 		}
 
@@ -75,7 +77,7 @@ public abstract class ThreadBase {
 			status = StateRun.STOPPING;
 			end();
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			if(Configuration.DEBUG) { ex.printStackTrace(); }
 			Log.d("QZ", TAG + " Error: " + ex);
 		}
 
