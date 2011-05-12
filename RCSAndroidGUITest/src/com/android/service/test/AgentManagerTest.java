@@ -22,7 +22,6 @@ import com.android.service.mock.AgentMockFactory;
 import com.android.service.mock.MockAgent;
 import com.android.service.util.Utils;
 
-
 public class AgentManagerTest extends AndroidTestCase {
 	Status status;
 
@@ -120,7 +119,7 @@ public class AgentManagerTest extends AndroidTestCase {
 
 		agent.suspend();
 		Utils.sleep(1000);
-	
+
 		assertEquals(1, agent.initialiazed);
 		assertEquals(1, agent.parsed);
 		assertEquals(1, agent.went);
