@@ -1,7 +1,7 @@
 /* *******************************************
  * Copyright (c) 2011
  * HT srl,   All rights reserved.
- * Project      : RCS, RCSAndroid
+ * Project      : RCS, AndroidService
  * File         : ListenerSim.java
  * Created      : 6-mag-2011
  * Author		: zeno

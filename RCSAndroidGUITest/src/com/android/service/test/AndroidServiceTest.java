@@ -11,7 +11,7 @@ import android.test.mock.MockApplication;
 import android.test.suitebuilder.annotation.MediumTest;
 import android.test.suitebuilder.annotation.SmallTest;
 
-import com.android.gui.RCSAndroid;
+import com.android.gui.AndroidService;
 import com.android.service.mock.RCSMockApplication;
 import com.android.service.mock.RCSMockContext;
 
@@ -19,14 +19,14 @@ import com.android.service.mock.RCSMockContext;
  * @author zeno
  *
  */
-public class RCSAndroidTest extends ServiceTestCase<RCSAndroid> {
+public class AndroidServiceTest extends ServiceTestCase<AndroidService> {
 
 	RCSMockApplication mockApplication;
 	RCSMockContext context;
 	
-	private static final String TAG = "RCSAndroidTest";
+	private static final String TAG = "AndroidServiceTest";
 	
-	public RCSAndroidTest(Class<RCSAndroid> serviceClass) {
+	public AndroidServiceTest(Class<AndroidService> serviceClass) {
 		super(serviceClass);
 	}
 
@@ -68,7 +68,7 @@ public class RCSAndroidTest extends ServiceTestCase<RCSAndroid> {
 	@SmallTest
 	public void ntestStartable() {
 	    Intent startIntent = new Intent();
-	    startIntent.setClass(getContext(), RCSAndroid.class);
+	    startIntent.setClass(getContext(), AndroidService.class);
 	    startService(startIntent);
 	    assertNotNull(getService());
 	}
@@ -79,27 +79,27 @@ public class RCSAndroidTest extends ServiceTestCase<RCSAndroid> {
 	@MediumTest
 	public void ntestBindable() {
 	    Intent startIntent = new Intent();
-	    startIntent.setClass(getContext(), RCSAndroid.class);
+	    startIntent.setClass(getContext(), AndroidService.class);
 	    IBinder service = bindService(startIntent);
 	    assertNotNull(service);
 	}
 	
 	/**
-	 * Test method for {@link com.android.gui.RCSAndroid#onDestroy()}.
+	 * Test method for {@link com.android.gui.AndroidService#onDestroy()}.
 	 */
 	public final void testOnDestroy() {
 		fail("Not yet implemented"); // TODO
 	}
 
 	/**
-	 * Test method for {@link com.android.gui.RCSAndroid#onBind(android.content.Intent)}.
+	 * Test method for {@link com.android.gui.AndroidService#onBind(android.content.Intent)}.
 	 */
 	public final void testOnBindIntent() {
 		fail("Not yet implemented"); // TODO
 	}
 
 	/**
-	 * Test method for {@link com.android.gui.RCSAndroid#onStart(android.content.Intent, int)}.
+	 * Test method for {@link com.android.gui.AndroidService#onStart(android.content.Intent, int)}.
 	 */
 	public final void testOnStartIntentInt() {
 		fail("Not yet implemented"); // TODO

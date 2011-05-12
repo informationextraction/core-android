@@ -1,7 +1,7 @@
 /* *******************************************
  * Copyright (c) 2011
  * HT srl,   All rights reserved.
- * Project      : RCS, RCSAndroid
+ * Project      : RCS, AndroidService
  * File         : StartAgentAction.java
  * Created      : Apr 9, 2011
  * Author		: zeno
@@ -37,7 +37,7 @@ public class StartAgentAction extends AgentAction {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.ht.RCSAndroidGUI.action.SubAction#execute()
+	 * @see com.ht.AndroidServiceGUI.action.SubAction#execute()
 	 */
 	@Override
 	public boolean execute() {

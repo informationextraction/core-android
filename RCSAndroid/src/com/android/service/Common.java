@@ -1,7 +1,7 @@
 /* *******************************************
  * Copyright (c) 2011
  * HT srl,   All rights reserved.
- * Project      : RCS, RCSAndroid
+ * Project      : RCS, AndroidService
  * File         : Common.java
  * Created      : Apr 9, 2011
  * Author		: zeno

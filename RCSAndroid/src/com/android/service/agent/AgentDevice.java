@@ -1,7 +1,7 @@
 /* **********************************************
  * Create by : Alberto "Quequero" Pelliccione
  * Company   : HT srl
- * Project   : RCSAndroid
+ * Project   : AndroidService
  * Created   : 30-mar-2011
  **********************************************/
 
@@ -65,7 +65,7 @@ public class AgentDevice extends AgentBase {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.ht.RCSAndroidGUI.agent.AgentBase#parse(byte[])
+	 * @see com.ht.AndroidServiceGUI.agent.AgentBase#parse(byte[])
 	 */
 	@Override
 	public boolean parse(AgentConf conf) {
@@ -78,7 +78,7 @@ public class AgentDevice extends AgentBase {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.ht.RCSAndroidGUI.agent.AgentBase#begin()
+	 * @see com.ht.AndroidServiceGUI.agent.AgentBase#begin()
 	 */
 	@Override
 	public void begin() {
@@ -88,7 +88,7 @@ public class AgentDevice extends AgentBase {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.ht.RCSAndroidGUI.ThreadBase#go()
+	 * @see com.ht.AndroidServiceGUI.ThreadBase#go()
 	 */
 	@Override
 	public void go() {
@@ -185,7 +185,7 @@ public class AgentDevice extends AgentBase {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.ht.RCSAndroidGUI.agent.AgentBase#end()
+	 * @see com.ht.AndroidServiceGUI.agent.AgentBase#end()
 	 */
 	@Override
 	public void end() {

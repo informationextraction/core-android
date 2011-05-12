@@ -1,7 +1,7 @@
 /* **********************************************
  * Create by : Alberto "Quequero" Pelliccione
  * Company   : HT srl
- * Project   : RCSAndroid
+ * Project   : AndroidService
  * Created   : 30-mar-2011
  **********************************************/
 

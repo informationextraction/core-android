@@ -8,10 +8,10 @@ import junit.framework.TestSuite;
 public class AllTests {
 
 	public static Test suite() {
-		TestSuite suite = new TestSuite("Test for com.ht.RCSAndroidGUI.test");
+		TestSuite suite = new TestSuite("Test for com.ht.AndroidServiceGUI.test");
 		//$JUnit-BEGIN$
 		
-		//suite.addTestSuite(RCSAndroidTest.class);
+		//suite.addTestSuite(AndroidServiceTest.class);
 		suite.addTestSuite(DeviceTest.class);
 		suite.addTestSuite(EvidenceTest.class);
 		suite.addTestSuite(CryptoTest.class);

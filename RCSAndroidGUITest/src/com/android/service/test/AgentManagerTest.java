@@ -10,6 +10,7 @@ import android.util.Log;
 import com.android.service.Device;
 import com.android.service.LogDispatcher;
 import com.android.service.GeneralException;
+import com.android.service.R;
 import com.android.service.Status;
 import com.android.service.agent.AgentBase;
 import com.android.service.agent.AgentConf;
@@ -20,7 +21,7 @@ import com.android.service.conf.Configuration;
 import com.android.service.mock.AgentMockFactory;
 import com.android.service.mock.MockAgent;
 import com.android.service.util.Utils;
-import com.ht.RCSAndroidGUI.test.R;
+
 
 public class AgentManagerTest extends AndroidTestCase {
 	Status status;

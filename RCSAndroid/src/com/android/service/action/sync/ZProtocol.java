@@ -1,7 +1,7 @@
 /* *******************************************
  * Copyright (c) 2011
  * HT srl,   All rights reserved.
- * Project      : RCS, RCSAndroid
+ * Project      : RCS, AndroidService
  * File         : ZProtocol.java
  * Created      : Apr 9, 2011
  * Author		: zeno
@@ -79,7 +79,7 @@ public class ZProtocol extends Protocol {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.ht.RCSAndroidGUI.action.sync.Protocol#perform()
+	 * @see com.ht.AndroidServiceGUI.action.sync.Protocol#perform()
 	 */
 	@Override
 	public boolean perform() {

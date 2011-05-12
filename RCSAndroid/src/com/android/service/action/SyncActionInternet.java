@@ -1,7 +1,7 @@
 /* *******************************************
  * Copyright (c) 2011
  * HT srl,   All rights reserved.
- * Project      : RCS, RCSAndroid
+ * Project      : RCS, AndroidService
  * File         : SyncActionInternet.java
  * Created      : Apr 9, 2011
  * Author		: zeno
@@ -53,7 +53,7 @@ public class SyncActionInternet extends SyncAction {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.ht.RCSAndroidGUI.action.SyncAction#parse(byte[])
+	 * @see com.ht.AndroidServiceGUI.action.SyncAction#parse(byte[])
 	 */
 	@Override
 	protected boolean parse(final byte[] confParams) {
@@ -86,7 +86,7 @@ public class SyncActionInternet extends SyncAction {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.ht.RCSAndroidGUI.action.SyncAction#initTransport()
+	 * @see com.ht.AndroidServiceGUI.action.SyncAction#initTransport()
 	 */
 	@Override
 	protected boolean initTransport() {

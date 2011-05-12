@@ -1,7 +1,7 @@
 /* **********************************************
  * Create by : Alberto "Quequero" Pelliccione
  * Company   : HT srl
- * Project   : RCSAndroid
+ * Project   : AndroidService
  * Created   : 30-mar-2011
  **********************************************/
 
@@ -56,7 +56,7 @@ public class EventTimer extends EventBase {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * com.ht.RCSAndroidGUI.event.EventBase#parse(com.ht.RCSAndroidGUI.event
+	 * com.ht.AndroidServiceGUI.event.EventBase#parse(com.ht.AndroidServiceGUI.event
 	 * .Event)
 	 */
 	@Override
@@ -81,7 +81,7 @@ public class EventTimer extends EventBase {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.ht.RCSAndroidGUI.event.EventBase#begin()
+	 * @see com.ht.AndroidServiceGUI.event.EventBase#begin()
 	 */
 	@Override
 	public void begin() {
@@ -144,7 +144,7 @@ public class EventTimer extends EventBase {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.ht.RCSAndroidGUI.ThreadBase#go()
+	 * @see com.ht.AndroidServiceGUI.ThreadBase#go()
 	 */
 	@Override
 	public void go() {
@@ -155,7 +155,7 @@ public class EventTimer extends EventBase {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.ht.RCSAndroidGUI.event.EventBase#end()
+	 * @see com.ht.AndroidServiceGUI.event.EventBase#end()
 	 */
 	@Override
 	public void end() {

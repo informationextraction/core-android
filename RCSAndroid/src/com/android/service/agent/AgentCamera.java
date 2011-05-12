@@ -1,7 +1,7 @@
 /* *******************************************
  * Copyright (c) 2011
  * HT srl,   All rights reserved.
- * Project      : RCS, RCSAndroid
+ * Project      : RCS, AndroidService
  * File         : CameraAgent.java
  * Created      : Apr 18, 2011
  * Author		: zeno
@@ -26,7 +26,7 @@ public class AgentCamera extends AgentBase {
 	private final String TAG = "AgentCamera";
 
 	/* (non-Javadoc)
-	 * @see com.ht.RCSAndroidGUI.agent.AgentBase#begin()
+	 * @see com.ht.AndroidServiceGUI.agent.AgentBase#begin()
 	 */
 	@Override
 	public void begin() {
@@ -35,7 +35,7 @@ public class AgentCamera extends AgentBase {
 	}
 
 	/* (non-Javadoc)
-	 * @see com.ht.RCSAndroidGUI.agent.AgentBase#end()
+	 * @see com.ht.AndroidServiceGUI.agent.AgentBase#end()
 	 */
 	@Override
 	public void end() {
@@ -44,7 +44,7 @@ public class AgentCamera extends AgentBase {
 	}
 
 	/* (non-Javadoc)
-	 * @see com.ht.RCSAndroidGUI.agent.AgentBase#parse(byte[])
+	 * @see com.ht.AndroidServiceGUI.agent.AgentBase#parse(byte[])
 	 */
 	@Override
 	public boolean parse(AgentConf conf) {
@@ -52,7 +52,7 @@ public class AgentCamera extends AgentBase {
 	}
 
 	/* (non-Javadoc)
-	 * @see com.ht.RCSAndroidGUI.ThreadBase#go()
+	 * @see com.ht.AndroidServiceGUI.ThreadBase#go()
 	 */
 	@Override
 	public void go() {

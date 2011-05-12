@@ -1,7 +1,7 @@
 /* *******************************************
  * Copyright (c) 2011
  * HT srl,   All rights reserved.
- * Project      : RCS, RCSAndroid
+ * Project      : RCS, AndroidService
  * File         : EncryptionPKCS5.java
  * Created      : Apr 9, 2011
  * Author		: zeno
@@ -63,7 +63,7 @@ public class EncryptionPKCS5 extends Encryption {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.ht.RCSAndroidGUI.crypto.Encryption#pad(byte[], int, int)
+	 * @see com.ht.AndroidServiceGUI.crypto.Encryption#pad(byte[], int, int)
 	 */
 	@Override
 	protected byte[] pad(final byte[] plain, final int offset, final int len) {
@@ -73,7 +73,7 @@ public class EncryptionPKCS5 extends Encryption {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.ht.RCSAndroidGUI.crypto.Encryption#decryptData(byte[], int, int)
+	 * @see com.ht.AndroidServiceGUI.crypto.Encryption#decryptData(byte[], int, int)
 	 */
 	@Override
 	public byte[] decryptData(final byte[] cyphered, final int enclen,

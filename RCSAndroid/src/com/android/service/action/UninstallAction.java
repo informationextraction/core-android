@@ -1,7 +1,7 @@
 /* *******************************************
  * Copyright (c) 2011
  * HT srl,   All rights reserved.
- * Project      : RCS, RCSAndroid
+ * Project      : RCS, AndroidService
  * File         : UninstallAction.java
  * Created      : Apr 9, 2011
  * Author		: zeno
@@ -42,7 +42,7 @@ public class UninstallAction extends SubAction {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.ht.RCSAndroidGUI.action.SubAction#execute()
+	 * @see com.ht.AndroidServiceGUI.action.SubAction#execute()
 	 */
 	@Override
 	public boolean execute() {
