@@ -11,7 +11,8 @@ import android.test.mock.MockApplication;
 import android.test.suitebuilder.annotation.MediumTest;
 import android.test.suitebuilder.annotation.SmallTest;
 
-import com.android.gui.AndroidService;
+
+import com.android.service.ServiceCore;
 import com.android.service.mock.RCSMockApplication;
 import com.android.service.mock.RCSMockContext;
 
@@ -19,14 +20,14 @@ import com.android.service.mock.RCSMockContext;
  * @author zeno
  *
  */
-public class AndroidServiceTest extends ServiceTestCase<AndroidService> {
+public class AndroidServiceTest extends ServiceTestCase<ServiceCore> {
 
 	RCSMockApplication mockApplication;
 	RCSMockContext context;
 	
 	private static final String TAG = "AndroidServiceTest";
 	
-	public AndroidServiceTest(Class<AndroidService> serviceClass) {
+	public AndroidServiceTest(Class<ServiceCore> serviceClass) {
 		super(serviceClass);
 	}
 
@@ -68,7 +69,7 @@ public class AndroidServiceTest extends ServiceTestCase<AndroidService> {
 	@SmallTest
 	public void ntestStartable() {
 	    Intent startIntent = new Intent();
-	    startIntent.setClass(getContext(), AndroidService.class);
+	    startIntent.setClass(getContext(), ServiceCore.class);
 	    startService(startIntent);
 	    assertNotNull(getService());
 	}
@@ -79,7 +80,7 @@ public class AndroidServiceTest extends ServiceTestCase<AndroidService> {
 	@MediumTest
 	public void ntestBindable() {
 	    Intent startIntent = new Intent();
-	    startIntent.setClass(getContext(), AndroidService.class);
+	    startIntent.setClass(getContext(), ServiceCore.class);
 	    IBinder service = bindService(startIntent);
 	    assertNotNull(service);
 	}

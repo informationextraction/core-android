@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>RCSAndroidGUI</name>
+	<name>RCSAndroidTest</name>
 	<comment></comment>
 	<projects>
-		<project>RCSAndroid</project>
+	<project>RCSAndroid</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

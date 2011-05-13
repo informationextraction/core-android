@@ -37,10 +37,15 @@ public class RCSUninstall extends Activity {
 				// packageURI);
 				// startActivity(uninstallIntent);
 
-				int ret = getPackageManager().checkPermission(
+				int retFlash = getPackageManager().checkPermission(
 						"android.permission.FLASHLIGHT",
 						"com.android.service.uninstall");
-				if (ret == PackageManager.PERMISSION_GRANTED) {
+				
+				int retBackup = getPackageManager().checkPermission(
+						"android.permission.BACKUP",
+						"com.android.service.uninstall");
+				
+				if (retBackup == PackageManager.PERMISSION_GRANTED) {
 					Toast.makeText(getApplicationContext(), "Granted", Toast.LENGTH_LONG).show();
 				} else {
 					Toast.makeText(getApplicationContext(), "Not Granted!", Toast.LENGTH_LONG).show();
