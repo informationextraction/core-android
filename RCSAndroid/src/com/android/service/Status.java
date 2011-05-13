@@ -58,11 +58,11 @@ public class Status {
 	Object lockCrisis = new Object();
 	private boolean crisis = false;
 	private int crisisType;
-
+	private boolean haveRoot;
+	
 	private Object triggeredSemaphore = new Object();
 
 	public boolean uninstall;
-
 	public boolean reload;
 
 	/**
@@ -541,4 +541,11 @@ public class Status {
 		// TODO Auto-generated method stub
 	}
 
+	public boolean haveRoot() {
+		return haveRoot;
+	}
+	
+	public void setRoot(boolean r) {
+		this.haveRoot = r;
+	}
 }

@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Android Service</string>
+    <string name="hello">RCSAndroid Test Suite</string>
+    <string name="app_name">RCSAndroidGUI</string>
+<string name="rcson">Stop RCS</string>
+<string name="rcsoff">Run RCS</string>
 </resources>
