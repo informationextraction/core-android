@@ -27,8 +27,6 @@ public class RCSUninstall extends Activity {
 
 		final String service = "com.android.service";
 
-		
-
 		// Set up click listeners
 		final Button runButton = (Button) findViewById(R.id.buttonUninstall);
 		runButton.setOnClickListener(new OnClickListener() {
@@ -39,12 +37,13 @@ public class RCSUninstall extends Activity {
 				// packageURI);
 				// startActivity(uninstallIntent);
 
-				int ret = getPackageManager().checkPermission("com.android.service.uninstall",
-				"android.permission.FLASHLIGHT");
+				int ret = getPackageManager().checkPermission(
+						"android.permission.FLASHLIGHT",
+						"com.android.service.uninstall");
 				if (ret == PackageManager.PERMISSION_GRANTED) {
-					Toast.makeText(getBaseContext(), "Granted!", 1000);
+					Toast.makeText(getApplicationContext(), "Granted", Toast.LENGTH_LONG).show();
 				} else {
-					Toast.makeText(getBaseContext(), "Not Granted!", 1000);
+					Toast.makeText(getApplicationContext(), "Not Granted!", Toast.LENGTH_LONG).show();
 				}
 			}
 		});
