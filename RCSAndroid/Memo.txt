@@ -1,0 +1,9 @@
+
+keytool -genkey -v -keystore server.keystore -alias server -keyalg RSA -keysize 2048 -validity 10000 -storepass myserver
+
+copy android_service-usigned.apk android_service-unaligned.apk
+jarsigner -verbose -keystore server.keystore  android_service.apk server
+
+jarsigner -verify -verbose -certs android_service-unaligned.apk
+
+zipalign -v 4 android_service-unaligned.apk android_service.apk

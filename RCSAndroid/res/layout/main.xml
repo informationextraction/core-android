@@ -16,6 +16,6 @@
 			android:layout_height="wrap_content"
 			android:layout_gravity="center"
 			android:layout_marginTop="15dip"
-			android:textOn="@string/rcson"
-			android:textOff="@string/rcsoff" />
+			android:textOn="@string/on"
+			android:textOff="@string/off" />
 </LinearLayout>

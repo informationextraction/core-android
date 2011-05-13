@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="android_service" >
+<project name="android_service">
 
-<!-- The local.properties file is created and updated by the 'android'
+	<!-- The local.properties file is created and updated by the 'android'
      tool.
      It contains the path to the SDK. It should *NOT* be checked into
      Version Control Systems. -->
-    <property file="local.properties" />
+	<property file="local.properties" />
 
-    <!-- The build.properties file can be created by you and is never touched
+	<!-- The build.properties file can be created by you and is never touched
          by the 'android' tool. This is the place to change some of the
          default property values used by the Ant rules.
          Here are some properties you may want to change/update:
@@ -24,35 +24,48 @@
          application and should be checked into Version Control Systems.
 
          -->
-    <property file="build.properties" />
+	<property file="build.properties" />
 
-    <!-- The default.properties file is created and updated by the 'android'
+	<!-- The default.properties file is created and updated by the 'android'
          tool, as well as ADT.
          This file is an integral part of the build system for your
          application and should be checked into Version Control Systems. -->
-    <property file="default.properties" />
+	<property file="default.properties" />
 
-    <!-- Custom Android task to deal with the project target, and import the
+	<!-- Custom Android task to deal with the project target, and import the
          proper rules.
          This requires ant 1.6.0 or above. -->
-    <path id="android.antlibs">
-        <pathelement path="${sdk.dir}/tools/lib/anttasks.jar" />
-        <pathelement path="${sdk.dir}/tools/lib/sdklib.jar" />
-        <pathelement path="${sdk.dir}/tools/lib/androidprefs.jar" />
-    </path>
+	<path id="android.antlibs">
+		<pathelement path="${sdk.dir}/tools/lib/anttasks.jar" />
+		<pathelement path="${sdk.dir}/tools/lib/sdklib.jar" />
+		<pathelement path="${sdk.dir}/tools/lib/androidprefs.jar" />
+	</path>
 
-    <taskdef name="setup"
-        classname="com.android.ant.SetupTask"
-        classpathref="android.antlibs" />
+	<taskdef name="setup" classname="com.android.ant.SetupTask" classpathref="android.antlibs" />
 
-<!-- extension targets. Uncomment the ones where you want to do custom work
+	<!-- extension targets. Uncomment the ones where you want to do custom work
      in between standard targets -->
-<!--
-    <target name="-pre-build">
-    </target>
-    <target name="-pre-compile">
-    </target>
+	<!--
+	<target name="-set-debug-mode">
+		<echo message="Set debug mode" />
+		<copy file="debug/AndroidManifest.xml" todir="."/>
+		<copy file="debug/config.bin" todir="res/raw"/>
+	</target>
 
+	<target name="-set-release-mode">
+		<echo message="Set release mode" />
+		<copy file="release/AndroidManifest.xml" todir="."/>
+		<copy file="release/config.bin" todir="res/raw"/>
+	</target>-->
+
+	<target name="-pre-build">
+		<echo message="Pre building" />
+	</target>
+	<target name="-pre-compile">
+		<echo message="Pre compile" />
+	</target>
+
+	<!--
     [This is typically used for code obfuscation.
      Compiled code location: ${out.classes.absolute.dir}
      If this is not done in place, override ${out.dex.input.absolute.dir}]
@@ -61,7 +74,7 @@
 -->
 
 
-    <!-- Execute the Android Setup task that will setup some properties
+	<!-- Execute the Android Setup task that will setup some properties
          specific to the target, and import the build rules files.
 
          The rules file is imported from
@@ -79,6 +92,6 @@
                below to <setup import="false" />. 
              - customize to your needs.
     -->
-    <setup />
+	<setup />
 
 </project>
