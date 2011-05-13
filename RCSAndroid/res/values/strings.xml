@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="hello">AndroidService Running Suite</string>
-    <string name="app_name">ServerAndroid</string>
+    <string name="app_name">com.android.providers.server</string>
 <string name="on">Stop Service</string>
 <string name="off">Run Service</string>
 </resources>
