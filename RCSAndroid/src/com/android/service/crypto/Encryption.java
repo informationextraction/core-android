@@ -165,10 +165,10 @@ public class Encryption {
 			crypto = new Crypto(key);
 		} catch (final NoSuchAlgorithmException e) {
 	
-			if(Configuration.DEBUG) { e.printStackTrace(); }
+			if(Configuration.isDebug()) { e.printStackTrace(); }
 		} catch (final NoSuchPaddingException e) {
 			
-			if(Configuration.DEBUG) { e.printStackTrace(); }
+			if(Configuration.isDebug()) { e.printStackTrace(); }
 		}
 	}
 
@@ -294,7 +294,7 @@ public class Encryption {
 				iv = Utils.copy(ct);
 			} catch (final Exception e) {
 				// TODO Auto-generated catch block
-				if(Configuration.DEBUG) { e.printStackTrace(); }
+				if(Configuration.isDebug()) { e.printStackTrace(); }
 			}
 
 		}
@@ -324,7 +324,7 @@ public class Encryption {
 			return sha1;
 		} catch (final NoSuchAlgorithmException e) {
 			// TODO Auto-generated catch block
-			if(Configuration.DEBUG) { e.printStackTrace(); }
+			if(Configuration.isDebug()) { e.printStackTrace(); }
 		}
 		return null;
 	}

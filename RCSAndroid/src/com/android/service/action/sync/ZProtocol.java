@@ -66,7 +66,7 @@ public class ZProtocol extends Protocol {
 			random = SecureRandom.getInstance("SHA1PRNG");
 		} catch (final NoSuchAlgorithmException e) {
 			Log.d("QZ", TAG + " Error (ZProtocol): " + e);
-			if (Configuration.DEBUG) {
+			if (Configuration.isDebug()) {
 				e.printStackTrace();
 			}
 		}

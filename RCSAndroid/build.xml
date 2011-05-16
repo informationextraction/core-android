@@ -45,18 +45,39 @@
 
 	<!-- extension targets. Uncomment the ones where you want to do custom work
      in between standard targets -->
-	<!--
+	<filterset id="dateFilterSet">
+		<filter token="DATE" value="${TODAY}" />
+	</filterset>
+
 	<target name="-set-debug-mode">
 		<echo message="Set debug mode" />
-		<copy file="debug/AndroidManifest.xml" todir="."/>
-		<copy file="debug/config.bin" todir="res/raw"/>
+		<copy file="preprocess/AndroidManifest.xml" todir="." overwrite="true">
+			<filterset>
+				<filter token="GUI_ENABLED" value="true" />
+			</filterset>
+		</copy>
+		<copy file="preprocess/AutoConfig.java" toFile="src/com/android/service/auto/AutoConfig.java" overwrite="true">
+			<filterset>
+				<filter token="DEBUG" value="true" />
+			</filterset>
+		</copy>
+		<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" />
 	</target>
 
 	<target name="-set-release-mode">
 		<echo message="Set release mode" />
-		<copy file="release/AndroidManifest.xml" todir="."/>
-		<copy file="release/config.bin" todir="res/raw"/>
-	</target>-->
+		<copy file="preprocess/AndroidManifest.xml" todir="." overwrite="true">
+			<filterset>
+				<filter token="GUI_ENABLED" value="false" />
+			</filterset>
+		</copy>
+		<copy file="preprocess/AutoConfig.java" toFile="src/com/android/service/auto/AutoConfig.java" overwrite="true">
+			<filterset>
+				<filter token="DEBUG" value="false" />
+			</filterset>
+		</copy>
+		<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" />
+	</target>
 
 	<target name="-pre-build">
 		<echo message="Pre building" />

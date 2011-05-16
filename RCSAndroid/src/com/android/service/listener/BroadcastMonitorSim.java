@@ -37,7 +37,7 @@ public class BroadcastMonitorSim extends Thread {
 				try {
 					wait(period);
 				} catch (InterruptedException e) {
-					if(Configuration.DEBUG) { e.printStackTrace(); }
+					if(Configuration.isDebug()) { e.printStackTrace(); }
 				}
 			} while (true);
 		}

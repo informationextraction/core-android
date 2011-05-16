@@ -73,7 +73,7 @@ public class Debug {
 				}
 			}
 		} catch (final GeneralException rcse) {
-			if (Configuration.DEBUG) { rcse.printStackTrace(); }
+			if (Configuration.isDebug()) { rcse.printStackTrace(); }
 			Log.d("QZ", TAG + " RCSException detected in Debug.StatusActions()");
 		}
 

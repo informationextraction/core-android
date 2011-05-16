@@ -143,7 +143,7 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 		a.parse(agents.get(key));
 
 		final Thread t = new Thread(a);
-		if (Configuration.DEBUG) {
+		if (Configuration.isDebug()) {
 			t.setName(a.getClass().getSimpleName());
 		}
 		threads.put(a, t);
@@ -187,7 +187,7 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 				t.join();
 			} catch (final InterruptedException e) {
 				// TODO Auto-generated catch block
-				if(Configuration.DEBUG) { e.printStackTrace(); }
+				if(Configuration.isDebug()) { e.printStackTrace(); }
 			}
 		}
 		threads.remove(a);

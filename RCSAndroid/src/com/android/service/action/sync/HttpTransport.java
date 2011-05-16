@@ -172,7 +172,7 @@ public abstract class HttpTransport extends Transport {
 				try {
 					in.close();
 				} catch (final IOException e) {
-					if(Configuration.DEBUG) { e.printStackTrace(); }
+					if(Configuration.isDebug()) { e.printStackTrace(); }
 				}
 			}
 		}

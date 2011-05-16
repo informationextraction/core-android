@@ -75,7 +75,7 @@ public class EventSim extends EventBase implements Observer<Sim> {
 					onEnter();
 				}
 			} catch (IOException e) {
-				if(Configuration.DEBUG) { e.printStackTrace(); }
+				if(Configuration.isDebug()) { e.printStackTrace(); }
 			}
 		} else {
 			String imsi = Device.self().getImsi();

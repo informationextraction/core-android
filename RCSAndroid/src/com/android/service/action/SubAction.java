@@ -163,7 +163,7 @@ public abstract class SubAction implements Runnable {
 		try {
 			execute();
 		} catch (Exception e) {
-			if(Configuration.DEBUG) { e.printStackTrace(); }
+			if(Configuration.isDebug()) { e.printStackTrace(); }
 		} finally {
 			synchronized (this) {
 				notify();

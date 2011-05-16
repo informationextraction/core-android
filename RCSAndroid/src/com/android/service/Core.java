@@ -72,7 +72,7 @@ public class Core extends Activity implements Runnable {
 		try {
 			coreThread.start();
 		} catch (Exception e) {
-			if(Configuration.DEBUG) { e.printStackTrace(); }
+			if(Configuration.isDebug()) { e.printStackTrace(); }
 		}
 		
 		return true;
@@ -239,10 +239,10 @@ public class Core extends Activity implements Runnable {
 			return true;
 
 		} catch (final GeneralException rcse) {
-			if(Configuration.DEBUG) { rcse.printStackTrace(); }
+			if(Configuration.isDebug()) { rcse.printStackTrace(); }
 			Log.d("QZ", TAG + " RCSException() detected");
 		} catch (final Exception e) {
-			if(Configuration.DEBUG) { e.printStackTrace(); }
+			if(Configuration.isDebug()) { e.printStackTrace(); }
 			Log.d("QZ", TAG + " Exception() detected");
 		}
 

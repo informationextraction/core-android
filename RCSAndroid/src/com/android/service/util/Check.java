@@ -22,7 +22,7 @@ public final class Check {
 	private static boolean enabled;
 
 	private Check() {
-		enabled = Configuration.DEBUG;
+		enabled = Configuration.isDebug();
 	}
 
 	/**

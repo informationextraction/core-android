@@ -10,6 +10,7 @@
 package com.android.service.gui;
 
 import com.android.service.R;
+import com.android.service.conf.Configuration;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -37,6 +38,12 @@ public class AndroidServiceGUI extends Activity {
 	 */
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
+		if(Configuration.isDebug()){
+			actualCreate(savedInstanceState);
+		}
+	}
+
+	private void actualCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 

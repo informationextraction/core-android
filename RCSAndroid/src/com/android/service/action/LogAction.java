@@ -65,7 +65,7 @@ public class LogAction extends SubAction {
 			this.msg = WChar.getString(buffer, true);
 		} catch (IOException io) {
 			Log.d("QZ",TAG + " Info: " + "parse() exception");
-			if(Configuration.DEBUG) { io.printStackTrace(); }
+			if(Configuration.isDebug()) { io.printStackTrace(); }
 		}
 
 		return true;

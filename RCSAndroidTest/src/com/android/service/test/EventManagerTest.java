@@ -125,7 +125,7 @@ public class EventManagerTest extends AndroidTestCase {
 				Utils.sleep(2000);
 			}
 		} catch (GeneralException e) {
-			if(Configuration.DEBUG) { e.printStackTrace(); }
+			if(Configuration.isDebug()) { e.printStackTrace(); }
 		}
 
 		em.stopAll();

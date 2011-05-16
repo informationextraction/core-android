@@ -46,7 +46,7 @@ public class EventLocation extends EventBase implements RangeObserver {
 			locator.join();
 		} catch (InterruptedException e) {
 			
-			if(Configuration.DEBUG) { e.printStackTrace(); }
+			if(Configuration.isDebug()) { e.printStackTrace(); }
 		}
 		locator = null;
 	}

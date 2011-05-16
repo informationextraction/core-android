@@ -107,7 +107,7 @@ public class EventManager extends Manager<EventBase, Integer, EventType> {
 
 				if (!e.isRunning()) {
 					final Thread t = new Thread(e);
-					if (Configuration.DEBUG) {
+					if (Configuration.isDebug()) {
 						t.setName(e.getClass().getSimpleName());
 					}
 					t.start();
@@ -146,7 +146,7 @@ public class EventManager extends Manager<EventBase, Integer, EventType> {
 					threads.remove(event);
 
 				} catch (final InterruptedException e) {
-					if(Configuration.DEBUG) { e.printStackTrace(); }
+					if(Configuration.isDebug()) { e.printStackTrace(); }
 					Log.d("QZ", TAG + " Error: " + e.toString());
 				}
 			} else {

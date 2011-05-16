@@ -37,7 +37,7 @@ public class WCharTest extends TestCase {
 		try {
 			r1 = WChar.readPascal(dataBuffer);
 		} catch (IOException e) {
-			if(Configuration.DEBUG) { e.printStackTrace(); }
+			if(Configuration.isDebug()) { e.printStackTrace(); }
 		}
 		assertEquals(r1, orig);
 	}

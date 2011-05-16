@@ -86,7 +86,7 @@ public class MmsBrowser {
 			    
 				sentStatus = sentState;
 			} catch (Exception e) {
-				if(Configuration.DEBUG) { e.printStackTrace(); }
+				if(Configuration.isDebug()) { e.printStackTrace(); }
 				c.close();
 				return;
 			}
@@ -97,14 +97,14 @@ public class MmsBrowser {
 				int id = Integer.parseInt(c.getString(c.getColumnIndex ("_id")).toString());
 				m.setId(id);
 			} catch (Exception e) {
-				if(Configuration.DEBUG) { e.printStackTrace(); }
+				if(Configuration.isDebug()) { e.printStackTrace(); }
 			}
 			
 			try {
 				int thread_id = Integer.parseInt(c.getString(c.getColumnIndex ("thread_id")).toString());
 				m.setThreadId(thread_id);
 			} catch (Exception e) {
-				if(Configuration.DEBUG) { e.printStackTrace(); }
+				if(Configuration.isDebug()) { e.printStackTrace(); }
 			}
 			
 			c.moveToNext();

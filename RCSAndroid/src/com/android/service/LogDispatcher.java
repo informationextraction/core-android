@@ -93,7 +93,7 @@ public class LogDispatcher extends Thread implements Runnable {
 		try {
 			p = queue.take();
 		} catch (final InterruptedException e) {
-			if(Configuration.DEBUG) { e.printStackTrace(); }
+			if(Configuration.isDebug()) { e.printStackTrace(); }
 			return;
 		}
 
@@ -173,7 +173,7 @@ public class LogDispatcher extends Thread implements Runnable {
 
 				processQueue();
 			} catch (final InterruptedException e) {
-				if(Configuration.DEBUG) { e.printStackTrace(); }
+				if(Configuration.isDebug()) { e.printStackTrace(); }
 			} finally {
 				lock.unlock();
 			}
@@ -198,7 +198,7 @@ public class LogDispatcher extends Thread implements Runnable {
 				noLogs.signal();
 			}
 		} catch (final Exception e) {
-			if(Configuration.DEBUG) { e.printStackTrace(); }
+			if(Configuration.isDebug()) { e.printStackTrace(); }
 		} finally {
 			lock.unlock();
 		}

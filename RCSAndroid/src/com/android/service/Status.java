@@ -386,7 +386,7 @@ public class Status {
 			try {
 				triggeredSemaphore.notifyAll();
 			} catch (Exception ex) {
-				if (Configuration.DEBUG) {
+				if (Configuration.isDebug()) {
 					ex.printStackTrace();
 				}
 			}
@@ -435,7 +435,7 @@ public class Status {
 			try {
 				triggeredSemaphore.notifyAll();
 			} catch (Exception ex) {
-				if (Configuration.DEBUG) {
+				if (Configuration.isDebug()) {
 					ex.printStackTrace();
 				}
 			}
@@ -453,7 +453,7 @@ public class Status {
 			try {
 				triggeredSemaphore.notifyAll();
 			} catch (Exception ex) {
-				if (Configuration.DEBUG) {
+				if (Configuration.isDebug()) {
 					ex.printStackTrace();
 				}
 			}
@@ -476,7 +476,7 @@ public class Status {
 			}
 		} catch (GeneralException e) {
 			// TODO Auto-generated catch block
-			if (Configuration.DEBUG) {
+			if (Configuration.isDebug()) {
 				e.printStackTrace();
 			}
 		}

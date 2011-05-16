@@ -80,7 +80,7 @@ public final class AutoFile {
 			in.read(buffer, 0, length);
 			return buffer;
 		} catch (final IOException e) {
-			if(Configuration.DEBUG) { e.printStackTrace(); }
+			if(Configuration.isDebug()) { e.printStackTrace(); }
 
 		} finally {
 			if (in != null) {
@@ -88,7 +88,7 @@ public final class AutoFile {
 					in.close();
 				} catch (final IOException e) {
 					// TODO Auto-generated catch block
-					if(Configuration.DEBUG) { e.printStackTrace(); }
+					if(Configuration.isDebug()) { e.printStackTrace(); }
 				}
 			}
 		}
