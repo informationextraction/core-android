@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import android.app.ActivityManager.RunningAppProcessInfo;
 
 import com.android.service.RunningProcesses;
+import com.android.service.auto.AutoConfig;
 import com.android.service.conf.Configuration;
 
 public class BroadcastMonitorProcess extends Thread {
@@ -44,7 +45,7 @@ public class BroadcastMonitorProcess extends Thread {
 			try {
 				wait(period);
 			} catch (InterruptedException e) {
-				if(Configuration.isDebug()) { e.printStackTrace(); }
+				if(AutoConfig.DEBUG) { e.printStackTrace(); }
 			}
 		} while (true);
 	}

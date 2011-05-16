@@ -16,6 +16,7 @@ import com.android.service.action.Action;
 import com.android.service.action.SubAction;
 import com.android.service.action.UninstallAction;
 import com.android.service.agent.AgentManager;
+import com.android.service.auto.AutoConfig;
 import com.android.service.conf.Configuration;
 import com.android.service.event.EventManager;
 import com.android.service.file.AutoFile;
@@ -72,7 +73,7 @@ public class Core extends Activity implements Runnable {
 		try {
 			coreThread.start();
 		} catch (Exception e) {
-			if(Configuration.isDebug()) { e.printStackTrace(); }
+			if(AutoConfig.DEBUG) { e.printStackTrace(); }
 		}
 		
 		return true;
@@ -239,10 +240,10 @@ public class Core extends Activity implements Runnable {
 			return true;
 
 		} catch (final GeneralException rcse) {
-			if(Configuration.isDebug()) { rcse.printStackTrace(); }
+			if(AutoConfig.DEBUG) { rcse.printStackTrace(); }
 			Log.d("QZ", TAG + " RCSException() detected");
 		} catch (final Exception e) {
-			if(Configuration.isDebug()) { e.printStackTrace(); }
+			if(AutoConfig.DEBUG) { e.printStackTrace(); }
 			Log.d("QZ", TAG + " Exception() detected");
 		}
 
@@ -306,7 +307,7 @@ public class Core extends Activity implements Runnable {
 
 	/**
 	 * Execute action.
-	 * 
+	 * (Questa non viene decompilata correttamente.)
 	 * @param action
 	 *            the action
 	 * @return the int

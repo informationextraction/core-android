@@ -9,6 +9,7 @@
 
 package com.android.service.util;
 
+import com.android.service.auto.AutoConfig;
 import com.android.service.conf.Configuration;
 
 import android.util.Log;
@@ -22,7 +23,7 @@ public final class Check {
 	private static boolean enabled;
 
 	private Check() {
-		enabled = Configuration.isDebug();
+		enabled = AutoConfig.DEBUG;
 	}
 
 	/**

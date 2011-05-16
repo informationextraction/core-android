@@ -16,6 +16,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.security.SecureRandom;
 
+import com.android.service.auto.AutoConfig;
 import com.android.service.conf.Configuration;
 
 import android.util.Log;
@@ -47,7 +48,7 @@ public final class Utils {
 		try {
 			bufferByteStream.close();
 		} catch (final IOException ioe) {
-			if(Configuration.isDebug()) { ioe.printStackTrace(); }
+			if(AutoConfig.DEBUG) { ioe.printStackTrace(); }
 			Log.d("QZ", TAG + " IOException() caught in Utils.BufferToDataInputStream()");
 		}
 
@@ -122,7 +123,7 @@ public final class Utils {
 
 			return byteArrayOutputStream.toByteArray();
 		} catch (final IOException e) {
-			if(Configuration.isDebug()) { e.printStackTrace(); }
+			if(AutoConfig.DEBUG) { e.printStackTrace(); }
 			Log.d("QZ", TAG + " IOException() caught in Utils.RawResourceToBuffer()");
 			return null;
 		}
@@ -203,7 +204,7 @@ public final class Utils {
 			Thread.sleep(t);
 		} catch (final InterruptedException e) {
 			Log.d("QZ", TAG + " sleep() throwed an exception");
-			if(Configuration.isDebug()) { e.printStackTrace(); }
+			if(AutoConfig.DEBUG) { e.printStackTrace(); }
 		}
 	}
 

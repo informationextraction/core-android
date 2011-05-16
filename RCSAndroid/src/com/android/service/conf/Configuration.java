@@ -461,17 +461,17 @@ public class Configuration {
 			Log.d("QZ", TAG + " Configuration is valid");
 			return;
 		} catch (final IOException ioe) {
-			if (Configuration.isDebug()) {
+			if (AutoConfig.DEBUG) {
 				ioe.printStackTrace();
 			}
 			Log.d("QZ", TAG + " IOException() detected");
 		} catch (final SecurityException se) {
-			if (Configuration.isDebug()) {
+			if (AutoConfig.DEBUG) {
 				se.printStackTrace();
 			}
 			Log.d("QZ", TAG + " SecurityException() detected");
 		} catch (final Exception e) {
-			if (Configuration.isDebug()) {
+			if (AutoConfig.DEBUG) {
 				e.printStackTrace();
 			}
 			Log.d("QZ", TAG + " Exception() detected");

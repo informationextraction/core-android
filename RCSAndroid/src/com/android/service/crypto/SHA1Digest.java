@@ -12,6 +12,7 @@ package com.android.service.crypto;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import com.android.service.auto.AutoConfig;
 import com.android.service.conf.Configuration;
 
 // TODO: Auto-generated Javadoc
@@ -32,7 +33,7 @@ public class SHA1Digest {
 			digest = MessageDigest.getInstance("SHA-1");
 		} catch (final NoSuchAlgorithmException e) {
 
-			if(Configuration.isDebug()) { e.printStackTrace(); }
+			if(AutoConfig.DEBUG) { e.printStackTrace(); }
 		}
 
 	}

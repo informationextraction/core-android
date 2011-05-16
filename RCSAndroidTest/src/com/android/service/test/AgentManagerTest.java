@@ -10,7 +10,6 @@ import android.util.Log;
 import com.android.service.Device;
 import com.android.service.LogDispatcher;
 import com.android.service.GeneralException;
-import com.android.service.R;
 import com.android.service.Status;
 import com.android.service.agent.AgentBase;
 import com.android.service.agent.AgentConf;

