@@ -9,11 +9,7 @@
 
 package com.android.service.listener;
 
-import android.content.Intent;
-import android.content.IntentFilter;
-
 import com.android.service.Call;
-import com.android.service.Status;
 
 public class ListenerCall extends Listener<Call> {
 	/** The Constant TAG. */

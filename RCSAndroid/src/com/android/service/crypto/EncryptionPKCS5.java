@@ -13,7 +13,7 @@ import java.util.Arrays;
 
 import android.util.Log;
 
-import com.android.service.Debug;
+import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
 import com.android.service.util.Utils;
 
@@ -102,7 +102,7 @@ public class EncryptionPKCS5 extends Encryption {
 		final int padlen = paddedplain[paddedplain.length - 1];
 
 		if (padlen <= 0 || padlen > 16) {
-			Log.d("QZ", TAG + " Error: decryptData, wrong padlen: " + padlen);
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: decryptData, wrong padlen: " + padlen);
 			throw new CryptoException();
 		}
 
@@ -159,7 +159,7 @@ public class EncryptionPKCS5 extends Encryption {
 		if (Arrays.equals(calculatedSha, sha)) {
 			return plain;
 		} else {
-			Log.d("QZ", TAG + " Error: decryptDataIntegrity: sha error!");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: decryptDataIntegrity: sha error!");
 			throw new CryptoException();
 		}
 	}

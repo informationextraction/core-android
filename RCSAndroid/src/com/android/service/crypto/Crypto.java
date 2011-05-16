@@ -18,6 +18,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import android.util.Log;
 
+import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
 
 // TODO: Auto-generated Javadoc
@@ -148,7 +149,7 @@ public class Crypto {
 
 			System.arraycopy(buffer, 0, plain, 0, buffer.length);
 		} catch (final Exception e) {
-			Log.d("QZ", TAG + " Error: " + e.toString());
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: " + e.toString());
 		}
 
 	}

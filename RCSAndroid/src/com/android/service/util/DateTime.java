@@ -9,16 +9,9 @@
 
 package com.android.service.util;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-
-import android.util.Log;
-
-import com.android.service.Debug;
 
 // TODO: Auto-generated Javadoc
 /**

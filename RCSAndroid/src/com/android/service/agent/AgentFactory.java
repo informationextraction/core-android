@@ -9,9 +9,10 @@
 
 package com.android.service.agent;
 
-import com.android.service.interfaces.AbstractFactory;
-
 import android.util.Log;
+
+import com.android.service.auto.Cfg;
+import com.android.service.interfaces.AbstractFactory;
 
 public class AgentFactory implements AbstractFactory<AgentBase, AgentType> {
 	private static final String TAG = "AgentFactory";
@@ -95,7 +96,7 @@ public class AgentFactory implements AbstractFactory<AgentBase, AgentType> {
 				break;
 
 			default:
-				Log.d("QZ", TAG + " Error (factory): unknown type");
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " Error (factory): unknown type");
 				break;
 		}
 

@@ -9,10 +9,9 @@
 
 package com.android.service.util;
 
-import com.android.service.auto.AutoConfig;
-import com.android.service.conf.Configuration;
-
 import android.util.Log;
+
+import com.android.service.auto.Cfg;
 
 /**
  * The Class Check.
@@ -23,7 +22,7 @@ public final class Check {
 	private static boolean enabled;
 
 	private Check() {
-		enabled = AutoConfig.DEBUG;
+		enabled = Cfg.DEBUG;
 	}
 
 	/**
@@ -36,7 +35,7 @@ public final class Check {
 	 */
 	public static void asserts(final boolean b, final String string) {
 		if (enabled && b != true) {
-			Log.d("QZ", TAG + "##### Asserts - " + string + " #####");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + "##### Asserts - " + string + " #####");
 		}
 	}
 
@@ -50,7 +49,7 @@ public final class Check {
 	 */
 	public static void requires(final boolean b, final String string) {
 		if (enabled && b != true) {
-			Log.d("QZ", TAG + "##### Requires - " + string + " #####");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + "##### Requires - " + string + " #####");
 		}
 	}
 
@@ -64,7 +63,7 @@ public final class Check {
 	 */
 	public static void ensures(final boolean b, final String string) {
 		if (enabled && b != true) {
-			Log.d("QZ", TAG + "##### Ensures - " + string + " #####");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + "##### Ensures - " + string + " #####");
 		}
 	}
 }

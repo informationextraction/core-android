@@ -16,6 +16,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.util.Log;
 
+import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
 import com.android.service.util.Utils;
 
@@ -56,7 +57,7 @@ public class RunningProcesses {
 		while (iter.hasNext()) {
 			ActivityManager.RunningAppProcessInfo element = iter.next();
 
-			Log.d("QZ", TAG + " (update) proc: " + element.processName);
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " (update) proc: " + element.processName);
 		}
 	}
 

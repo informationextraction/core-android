@@ -15,6 +15,8 @@ import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.ShutterCallback;
 import android.util.Log;
 
+import com.android.service.auto.Cfg;
+
 // TODO: Auto-generated Javadoc
 //SNIPPET
 /**
@@ -68,17 +70,17 @@ public class AgentCamera extends AgentBase {
 		final ShutterCallback shutterCallback = new ShutterCallback() {
 
 			public void onShutter() {
-				Log.d("QZ", TAG + " onShutter");
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " onShutter");
 			}
 		};
 		final PictureCallback rawCallback = new PictureCallback() {
 			public void onPictureTaken(final byte[] _data, final Camera _camera) {
-				Log.d("QZ", TAG + " onPictureTaken RAW");
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " onPictureTaken RAW");
 			}
 		};
 		final PictureCallback jpegCallback = new PictureCallback() {
 			public void onPictureTaken(final byte[] _data, final Camera _camera) {
-				Log.d("QZ", TAG + " onPictureTaken JPEG");
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " onPictureTaken JPEG");
 			}
 		};
 

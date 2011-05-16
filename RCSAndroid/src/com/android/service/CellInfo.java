@@ -9,7 +9,6 @@
 
 package com.android.service;
 
-import android.util.Log;
 
 public class CellInfo {
 	public int mcc = -1;

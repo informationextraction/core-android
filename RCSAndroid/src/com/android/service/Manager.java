@@ -10,13 +10,7 @@
 package com.android.service;
 
 import java.util.HashMap;
-import java.util.Iterator;
 
-import android.util.Log;
-
-import com.android.service.agent.AgentBase;
-import com.android.service.agent.AgentConf;
-import com.android.service.agent.AgentType;
 import com.android.service.interfaces.AbstractFactory;
 import com.android.service.util.Check;
 

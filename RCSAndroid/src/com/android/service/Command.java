@@ -15,6 +15,8 @@ import java.util.Queue;
 import android.os.Message;
 import android.util.Log;
 
+import com.android.service.auto.Cfg;
+
 /**
  * The Class Command.
  */
@@ -41,7 +43,7 @@ public class Command {
 	 */
 	public synchronized void pushMessage(final Message msg) {
 		if (msg == null) {
-			Log.d("QZ", TAG + " Command queue is null");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Command queue is null");
 			return;
 		}
 

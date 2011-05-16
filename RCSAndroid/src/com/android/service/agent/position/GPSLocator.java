@@ -9,14 +9,14 @@
 
 package com.android.service.agent.position;
 
-import com.android.service.Status;
-import com.android.service.agent.AgentPosition;
-
 import android.content.Context;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Looper;
 import android.util.Log;
+
+import com.android.service.Status;
+import com.android.service.auto.Cfg;
 
 public abstract class GPSLocator extends Thread {
 
@@ -48,7 +48,7 @@ public abstract class GPSLocator extends Thread {
 		go(listener, lm);
 		myLooper = Looper.myLooper();
 		Looper.loop();
-		Log.d("QZ", TAG + " exiting");
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " exiting");
 	}
 
 	public void halt() {

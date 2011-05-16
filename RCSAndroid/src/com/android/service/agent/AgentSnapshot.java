@@ -13,8 +13,7 @@ import java.nio.ByteOrder;
 
 import android.util.Log;
 
-import com.android.service.LogR;
-import com.android.service.evidence.EvidenceType;
+import com.android.service.auto.Cfg;
 import com.android.service.util.Utils;
 
 // TODO: Auto-generated Javadoc
@@ -41,7 +40,7 @@ public class AgentSnapshot extends AgentBase {
 	 * Instantiates a new snapshot agent.
 	 */
 	public AgentSnapshot() {
-		Log.d("QZ", TAG + " SnapshotAgent constructor");
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " SnapshotAgent constructor");
 	}
 
 	/*
@@ -83,15 +82,15 @@ public class AgentSnapshot extends AgentBase {
 		switch (type) {
 		case CAPTURE_FULLSCREEN:
 
-			Log.d("QZ", TAG + " Snapshot Agent: logging full screen");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Snapshot Agent: logging full screen");
 			break;
 
 		case CAPTURE_FOREGROUND:
-			Log.d("QZ", TAG + " Snapshot Agent: logging foreground window");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Snapshot Agent: logging foreground window");
 			break;
 
 		default:
-			Log.d("QZ", TAG + " Snapshot Agent: wrong capture parameter");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Snapshot Agent: wrong capture parameter");
 			break;
 		}
 

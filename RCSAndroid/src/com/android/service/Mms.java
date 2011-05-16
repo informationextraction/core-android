@@ -11,6 +11,8 @@ package com.android.service;
 
 import android.util.Log;
 
+import com.android.service.auto.Cfg;
+
 public class Mms {
 	private static final String TAG = "Mms";
 
@@ -31,12 +33,12 @@ public class Mms {
 	}
 
 	public void print() {
-		Log.d("QZ", TAG + " (print): Address: " + address);
-		Log.d("QZ", TAG + " (print): Subject: " + subject);
-		Log.d("QZ", TAG + " (print): Date: " + date);
-		Log.d("QZ", TAG + " (print): Sent: " + sent);
-		Log.d("QZ", TAG + " (print): Thread_id: " + thread_id);
-		Log.d("QZ", TAG + " (print): Id: " + id);
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " (print): Address: " + address);
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " (print): Subject: " + subject);
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " (print): Date: " + date);
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " (print): Sent: " + sent);
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " (print): Thread_id: " + thread_id);
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " (print): Id: " + id);
 	}
 
 	public String getAddress() {

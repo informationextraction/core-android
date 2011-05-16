@@ -7,13 +7,13 @@
 package com.android.service;
 
 import android.content.Context;
-import android.provider.Settings;
 import android.telephony.CellLocation;
 import android.telephony.TelephonyManager;
 import android.telephony.cdma.CdmaCellLocation;
 import android.telephony.gsm.GsmCellLocation;
 import android.util.Log;
 
+import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
 import com.android.service.util.Utils;
 
@@ -143,7 +143,7 @@ public class Device {
 		CellLocation bcell = tm.getCellLocation();
 
 		if (bcell == null) {
-			Log.d("QZ", TAG + " Error: " + "null cell");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: " + "null cell");
 			return info;
 		}
 
@@ -155,7 +155,7 @@ public class Device {
 			
 			info.setGsm(conf.mcc, conf.mnc, cell.getLac(), cell.getCid(), rssi);
 
-			Log.d("QZ", TAG + " info: " + info.toString());
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " info: " + info.toString());
 
 		}
 
@@ -171,7 +171,7 @@ public class Device {
 			info.nid  = cell.getNetworkId();
 			info.bid = cell.getBaseStationId();
 						
-			Log.d("QZ", TAG + " info: " + info.toString());
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " info: " + info.toString());
 
 		}
 		

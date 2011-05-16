@@ -5,7 +5,6 @@ import android.database.ContentObserver;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Handler;
-import android.util.Log;
 
 import com.android.service.Sms;
 import com.android.service.Status;

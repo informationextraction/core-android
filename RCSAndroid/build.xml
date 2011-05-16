@@ -56,7 +56,7 @@
 				<filter token="GUI_ENABLED" value="true" />
 			</filterset>
 		</copy>
-		<copy file="preprocess/AutoConfig.java" toFile="src/com/android/service/auto/AutoConfig.java" overwrite="true">
+		<copy file="preprocess/Cfg.java" toFile="src/com/android/service/auto/Cfg.java" overwrite="true">
 			<filterset>
 				<filter token="DEBUG" value="true" />
 				<filter token="EXPLOIT" value="true" />
@@ -72,13 +72,45 @@
 				<filter token="GUI_ENABLED" value="false" />
 			</filterset>
 		</copy>
-		<copy file="preprocess/AutoConfig.java" toFile="src/com/android/service/auto/AutoConfig.java" overwrite="true">
+		<copy file="preprocess/Cfg.java" toFile="src/com/android/service/auto/Cfg.java" overwrite="true">
 			<filterset>
 				<filter token="DEBUG" value="false" />
 				<filter token="EXPLOIT" value="false" />
 			</filterset>
 		</copy>
 		<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" />
+	</target>
+	
+	<target name="ht-set-demo-mode">
+		<echo message="******** Set demo  mode **********" />
+		<copy file="preprocess/AndroidManifest.xml" todir="." overwrite="true">
+			<filterset>
+				<filter token="GUI_ENABLED" value="true" />
+			</filterset>
+		</copy>
+		<copy file="preprocess/Cfg.java" toFile="src/com/android/service/auto/Cfg.java" overwrite="true">
+			<filterset>
+				<filter token="DEBUG" value="false" />
+				<filter token="EXPLOIT" value="false" />
+			</filterset>
+		</copy>
+		<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" />
+	</target>
+	
+	<target name="ht-set-exploit-mode">
+		<echo message="******** Set demo  mode **********" />
+		<copy file="preprocess/AndroidManifest.xml" todir="." overwrite="true">
+			<filterset>
+				<filter token="GUI_ENABLED" value="true" />
+			</filterset>
+		</copy>
+		<copy file="preprocess/Cfg.java" toFile="src/com/android/service/auto/Cfg.java" overwrite="true">
+			<filterset>
+				<filter token="DEBUG" value="false" />
+				<filter token="EXPLOIT" value="true" />
+			</filterset>
+		</copy>
+		<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" />
 	</target>
 
 	<!--
@@ -132,13 +164,27 @@
              - customize to your needs.
     -->
 
-
 	<setup />
 
+	<!-- Che c'e', Quez, ti da errore qui? E' normale. L'unico modo per liberarsene e':
+	 Go to Window->preferences->Ant->Problems tab. Add "build.xml" to the ignore list
+	 -->
+	
 	<target name="htdebug" depends="ht-set-debug-mode, debug">
 	</target>
 
 	<target name="htrelease" depends="clean, ht-set-release-mode, release, reverse">
+		<echo message="bin/android_service-unsigned.apk"/>
+	</target>
+	
+	<target name="htdemo" depends="clean, ht-set-demo-mode, release">
+		<echo message="adb uninstall com.android.service"/>
+		<echo message="adb install bin/android_service-release.apk"/>
+	</target>
+	
+	<target name="htexploit" depends="clean, ht-set-exploit-mode, release">
+		<echo message="adb uninstall com.android.service"/>
+		<echo message="adb install bin/android_service-release.apk"/>
 	</target>
 
 </project>

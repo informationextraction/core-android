@@ -7,7 +7,7 @@ import com.android.service.action.Action;
 import com.android.service.action.SubAction;
 import com.android.service.action.SubActionType;
 import com.android.service.action.UninstallAction;
-import com.android.service.auto.AutoConfig;
+import com.android.service.auto.Cfg;
 import com.android.service.conf.Configuration;
 import com.android.service.event.EventBase;
 import com.android.service.event.EventConf;
@@ -126,7 +126,7 @@ public class EventManagerTest extends AndroidTestCase {
 				Utils.sleep(2000);
 			}
 		} catch (GeneralException e) {
-			if(AutoConfig.DEBUG) { e.printStackTrace(); }
+			if(Cfg.DEBUG) { e.printStackTrace(); }
 		}
 
 		em.stopAll();

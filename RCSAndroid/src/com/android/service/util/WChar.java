@@ -14,7 +14,7 @@ import java.io.UnsupportedEncodingException;
 
 import android.util.Log;
 
-import com.android.service.Debug;
+import com.android.service.auto.Cfg;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -49,7 +49,7 @@ public final class WChar {
 		try {
 			encoded = string.getBytes("UnicodeLittleUnmarked"); // UTF-16LE
 		} catch (final UnsupportedEncodingException e) {
-			Log.d("QZ", TAG + " Error: UnsupportedEncodingException");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: UnsupportedEncodingException");
 		}
 
 		if (endzero) {
@@ -118,7 +118,7 @@ public final class WChar {
 					"UnicodeLittleUnmarked");
 
 		} catch (final UnsupportedEncodingException e) {
-			Log.d("QZ", TAG + " Error: UnsupportedEncodingException");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: UnsupportedEncodingException");
 		}
 
 		if (endzero) {

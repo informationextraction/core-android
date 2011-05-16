@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.android.service.Standby;
+import com.android.service.auto.Cfg;
 
 public class BroadcastMonitorStandby extends BroadcastReceiver {
 	/** The Constant TAG. */
@@ -25,7 +26,7 @@ public class BroadcastMonitorStandby extends BroadcastReceiver {
 	 */
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		Log.d("QZ", TAG + " standby notification, action: " + intent.getAction());
+		if(Cfg.DEBUG) Log.d("QZ", TAG + " standby notification, action: " + intent.getAction());
 		
 		boolean on = intent.getAction().equals(Intent.ACTION_SCREEN_ON);
 		

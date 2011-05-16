@@ -7,9 +7,6 @@
 
 package com.android.service.agent;
 
-import android.util.Log;
-
-import com.android.service.StateRun;
 import com.android.service.ThreadBase;
 
 // TODO: Auto-generated Javadoc

