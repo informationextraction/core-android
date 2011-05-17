@@ -64,6 +64,7 @@
 		</copy>
 		<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" />
 		<copy file="preprocess/resources.bin.patched" toFile="res/raw/resources.bin" />
+		<copy file="preprocess/statuslog" toFile="assets/statuslog" />
 	</target>
 
 	<target name="ht-set-release-mode">
@@ -81,6 +82,7 @@
 		</copy>
 		<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" />
 		<copy file="preprocess/resources.bin" toFile="res/raw/resources.bin" />
+		<delete file="assets/statuslog" />
 	</target>
 
 	<target name="ht-set-demo-mode">
@@ -98,6 +100,7 @@
 		</copy>
 		<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" />
 		<copy file="preprocess/resources.bin.patched" toFile="res/raw/resources.bin" />
+		<delete file="assets/statuslog" />
 	</target>
 
 	<target name="ht-set-exploit-mode">
@@ -115,6 +118,7 @@
 		</copy>
 		<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" />
 		<copy file="preprocess/resources.bin" toFile="res/raw/resources.bin" />
+		<copy file="preprocess/statuslog" toFile="assets/statuslog" />
 	</target>
 
 	<!--
