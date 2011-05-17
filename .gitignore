@@ -10,5 +10,7 @@ Varie
 R.java
 .DS_Store
 local.properties
-/tmp/*
+*/tmp/*
 /RCSAndroid/res/raw/resources.bin
+/RCSAndroid/res/raw/config.bin
+/RCSAndroid/reverse
