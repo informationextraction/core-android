@@ -146,13 +146,16 @@
 
 	<target name="bp">
 		<echo message="Binary Patch" />
-		<deltree dir="tmp/bp" />
+		<delete dir="tmp" />
 		<unzip src="bin/android_service-unsigned.apk" dest="tmp/bp" />
 
 		<copy file="preprocess/config.debug.bin" toFile="/tmp/bp/res/raw/config.bin" />
 		<copy file="preprocess/resources.bin" toFile="/tmp/bp/res/raw/resources.bin" />
 
 		<zip destfile="tmp/android_service-bp.apk" basedir="tmp/bp" />
+		<exec executable="install/sign.sh"/>
+		<delete file="tmp/android_service-bp.apk"/>
+		<echo message="adb install tmp/android_service.apk" />
 
 	</target>
 

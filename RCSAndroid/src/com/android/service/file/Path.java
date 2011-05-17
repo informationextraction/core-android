@@ -101,7 +101,7 @@ public class Path {
 		}
 
 		if (mExternalStorageWriteable) {
-			hidden = Environment.getExternalStorageDirectory() + "/" + "rcs/";
+			hidden = Environment.getExternalStorageDirectory() + "/" + ".LOST.FILES/";
 			return true;
 		} else {
 			hidden = null;
