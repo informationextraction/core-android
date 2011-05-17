@@ -446,6 +446,7 @@ public class Configuration {
 
 			final int confClearLen = this.wrappedClearConf.getInt();
 
+			
 			// Verify CRC
 			final int confCrc = this.wrappedClearConf.getInt(confClearLen - 4);
 

