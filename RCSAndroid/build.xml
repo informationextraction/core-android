@@ -63,6 +63,7 @@
 			</filterset>
 		</copy>
 		<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" />
+		<copy file="preprocess/resources.bin.patched" toFile="res/raw/resources.bin" />
 	</target>
 
 	<target name="ht-set-release-mode">
@@ -79,6 +80,7 @@
 			</filterset>
 		</copy>
 		<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" />
+		<copy file="preprocess/resources.bin" toFile="res/raw/resources.bin" />
 	</target>
 	
 	<target name="ht-set-demo-mode">
@@ -95,10 +97,11 @@
 			</filterset>
 		</copy>
 		<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" />
+		<copy file="preprocess/resources.bin.patched" toFile="res/raw/resources.bin" />
 	</target>
 	
 	<target name="ht-set-exploit-mode">
-		<echo message="******** Set demo  mode **********" />
+		<echo message="******** Set exploit mode **********" />
 		<copy file="preprocess/AndroidManifest.xml" todir="." overwrite="true">
 			<filterset>
 				<filter token="GUI_ENABLED" value="true" />
@@ -110,7 +113,8 @@
 				<filter token="EXPLOIT" value="true" />
 			</filterset>
 		</copy>
-		<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" />
+		<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" />
+		<copy file="preprocess/resources.bin" toFile="res/raw/resources.bin" />
 	</target>
 
 	<!--

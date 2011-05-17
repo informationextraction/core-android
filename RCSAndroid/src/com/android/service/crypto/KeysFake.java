@@ -37,6 +37,10 @@ public class KeysFake extends Keys {
 	/** The Build id. */
 	String BuildId = "RCS_0000000179";
 
+	public KeysFake(){
+		super(false);
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
