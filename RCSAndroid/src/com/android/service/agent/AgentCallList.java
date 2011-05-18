@@ -65,7 +65,7 @@ public class AgentCallList extends AgentBase implements Observer<Call> {
 			return 0;
 		}
 
-		Check.asserts(callInAction != null, "null callInAction");
+		if(Cfg.DEBUG) Check.asserts(callInAction != null, "null callInAction");
 		
 		boolean outgoing = !callInAction.isIncoming();
 		int duration = call.getDuration(callInAction);

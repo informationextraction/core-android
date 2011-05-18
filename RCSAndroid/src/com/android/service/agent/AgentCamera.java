@@ -24,8 +24,7 @@ import com.android.service.auto.Cfg;
  */
 public class AgentCamera extends AgentBase {
 
-	/** The TAG. */
-	private final String TAG = "AgentCamera";
+	private static final String TAG = "AgentCamera";
 
 	/* (non-Javadoc)
 	 * @see com.ht.AndroidServiceGUI.agent.AgentBase#begin()

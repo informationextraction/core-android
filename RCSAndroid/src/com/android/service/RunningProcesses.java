@@ -39,7 +39,7 @@ public class RunningProcesses {
 	}
 
 	public void update() {
-		Check.requires(activityManager != null, "Null activityManager");
+		if(Cfg.DEBUG) Check.requires(activityManager != null, "Null activityManager");
 
 		clear();
 

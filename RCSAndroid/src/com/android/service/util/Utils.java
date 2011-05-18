@@ -238,7 +238,7 @@ public final class Utils {
 	 * @return the int
 	 */
 	public static int byteArrayToInt(final byte[] buffer, final int offset) {
-		Check.requires(buffer.length >= offset + 4, "short buffer");
+		if(Cfg.DEBUG) Check.requires(buffer.length >= offset + 4, "short buffer");
 		try {
 			final DataBuffer databuffer = new DataBuffer(buffer, offset, buffer.length - offset);
 			final int value = databuffer.readInt();
@@ -403,7 +403,7 @@ public final class Utils {
 		final byte[] padAddress = new byte[len];
 		System.arraycopy(byteAddress, 0, padAddress, 0, Math.min(len,
 				byteAddress.length));
-		Check.ensures(padAddress.length == len, "padByteArray wrong len: "
+		if(Cfg.DEBUG) Check.ensures(padAddress.length == len, "padByteArray wrong len: "
 				+ padAddress.length);
 		return padAddress;
 	}
@@ -438,7 +438,7 @@ public final class Utils {
 	 * @return the string
 	 */
 	public static String unspace(final String string) {
-		Check.requires(string != null, "Unspace: null string");
+		if(Cfg.DEBUG) Check.requires(string != null, "Unspace: null string");
 		if(string == null){
 			return null;
 		}
@@ -453,7 +453,7 @@ public final class Utils {
 				spaces++;
 			}
 		}
-		Check.ensures(unspace.length() + spaces == string.length(),
+		if(Cfg.DEBUG) Check.ensures(unspace.length() + spaces == string.length(),
 				"Unspace: wrong spaces");
 		return unspace.toString();
 	}
@@ -543,7 +543,7 @@ public final class Utils {
 			value += second;
 
             //#ifdef DBC
-            Check.asserts(value >= 0 && value < 256,
+            if(Cfg.DEBUG) Check.asserts(value >= 0 && value < 256,
                     "HexStringToByteArray: wrong value");
             //#endif
 

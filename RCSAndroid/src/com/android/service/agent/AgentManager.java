@@ -68,7 +68,7 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 
 		while (it.hasNext()) {
 			final AgentType key = it.next();
-			Check.asserts(key != null, "null type");
+			if(Cfg.DEBUG) Check.asserts(key != null, "null type");
 			AgentConf conf = agents.get(key);
 
 			if (conf.isEnabled()) {
@@ -93,8 +93,8 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 			stop(key);
 		}
 
-		Check.ensures(threads.size() == 0, "Non empty threads");
-		Check.ensures(running.size() == 0, "Non empty running");
+		if(Cfg.DEBUG) Check.ensures(threads.size() == 0, "Non empty threads");
+		if(Cfg.DEBUG) Check.ensures(running.size() == 0, "Non empty running");
 
 		running.clear();
 		threads.clear();
@@ -135,8 +135,8 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 
 		a = makeAgent(key);
 
-		Check.asserts(a != null, "null agent");
-		Check.asserts(running.get(key) != null, "null running");
+		if(Cfg.DEBUG) Check.asserts(a != null, "null agent");
+		if(Cfg.DEBUG) Check.asserts(running.get(key) != null, "null running");
 
 		a.parse(agents.get(key));
 

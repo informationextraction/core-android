@@ -42,7 +42,7 @@ public class Action {
 	 *             the RCS exception
 	 */
 	public Action(final int id) {
-		Check.asserts(id >= 0, "Invalid id");
+		if(Cfg.DEBUG) Check.asserts(id >= 0, "Invalid id");
 
 		this.actionId = id;
 		list = new ArrayList<SubAction>();

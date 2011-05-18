@@ -53,10 +53,10 @@ public class EncryptionPKCS5 extends Encryption {
 	 */
 	@Override
 	public int getNextMultiple(final int len) {
-		Check.requires(len >= 0, "len < 0");
+		if(Cfg.DEBUG) Check.requires(len >= 0, "len < 0");
 		final int newlen = len + (16 - len % 16);
-		Check.ensures(newlen > len, "newlen <= len");
-		Check.ensures(newlen % 16 == 0, "Wrong newlen");
+		if(Cfg.DEBUG) Check.ensures(newlen > len, "newlen <= len");
+		if(Cfg.DEBUG) Check.ensures(newlen % 16 == 0, "Wrong newlen");
 		return newlen;
 	}
 
@@ -80,8 +80,8 @@ public class EncryptionPKCS5 extends Encryption {
 			final int offset) throws CryptoException {
 		// int padlen = cyphered[cyphered.length -1];
 		// int plainlen = enclen - padlen;
-		Check.requires(enclen % 16 == 0, "Wrong padding");
-		// Check.requires(enclen >= plainlen, "Wrong plainlen");
+		if(Cfg.DEBUG) Check.requires(enclen % 16 == 0, "Wrong padding");
+		// if(Cfg.DEBUG) Check.requires(enclen >= plainlen, "Wrong plainlen");
 		final byte[] paddedplain = new byte[enclen];
 		byte[] plain = null;
 		int plainlen = 0;
@@ -110,8 +110,8 @@ public class EncryptionPKCS5 extends Encryption {
 		plain = new byte[plainlen];
 
 		System.arraycopy(paddedplain, 0, plain, 0, plainlen);
-		Check.ensures(plain != null, "null plain");
-		Check.ensures(plain.length == plainlen, "wrong plainlen");
+		if(Cfg.DEBUG) Check.ensures(plain != null, "null plain");
+		if(Cfg.DEBUG) Check.ensures(plain.length == plainlen, "wrong plainlen");
 		return plain;
 	}
 
@@ -126,8 +126,8 @@ public class EncryptionPKCS5 extends Encryption {
 
 		final byte[] sha = SHA1(plain);
 		final byte[] plainSha = Utils.concat(plain, sha);
-		Check.asserts(sha.length == DIGEST_LENGTH, "sha.length");
-		Check.asserts(plainSha.length == plain.length + DIGEST_LENGTH,
+		if(Cfg.DEBUG) Check.asserts(sha.length == DIGEST_LENGTH, "sha.length");
+		if(Cfg.DEBUG) Check.asserts(plainSha.length == plain.length + DIGEST_LENGTH,
 				"plainSha.length");
 		return encryptData(plainSha, 0);
 	}
@@ -150,11 +150,11 @@ public class EncryptionPKCS5 extends Encryption {
 				plainSha.length - DIGEST_LENGTH, DIGEST_LENGTH);
 		final byte[] calculatedSha = SHA1(plainSha, 0, plainSha.length
 				- DIGEST_LENGTH);
-		// Check.asserts(SHA1Digest.DIGEST_LENGTH == 20, "DIGEST_LENGTH");
-		Check.asserts(plain.length + DIGEST_LENGTH == plainSha.length,
+		// if(Cfg.DEBUG) Check.asserts(SHA1Digest.DIGEST_LENGTH == 20, "DIGEST_LENGTH");
+		if(Cfg.DEBUG) Check.asserts(plain.length + DIGEST_LENGTH == plainSha.length,
 				"plain.length");
-		Check.asserts(sha.length == DIGEST_LENGTH, "sha.length");
-		Check.asserts(calculatedSha.length == DIGEST_LENGTH,
+		if(Cfg.DEBUG) Check.asserts(sha.length == DIGEST_LENGTH, "sha.length");
+		if(Cfg.DEBUG) Check.asserts(calculatedSha.length == DIGEST_LENGTH,
 				"calculatedSha.length");
 		if (Arrays.equals(calculatedSha, sha)) {
 			return plain;

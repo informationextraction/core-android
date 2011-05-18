@@ -74,10 +74,10 @@ public class Encryption {
 	 * @return the next multiple
 	 */
 	public int getNextMultiple(final int len) {
-		Check.requires(len >= 0, "len < 0");
+		if(Cfg.DEBUG) Check.requires(len >= 0, "len < 0");
 		final int newlen = len + (len % 16 == 0 ? 0 : 16 - len % 16);
-		Check.ensures(newlen >= len, "newlen < len");
-		Check.ensures(newlen % 16 == 0, "Wrong newlen");
+		if(Cfg.DEBUG) Check.ensures(newlen >= len, "newlen < len");
+		if(Cfg.DEBUG) Check.ensures(newlen % 16 == 0, "Wrong newlen");
 		return newlen;
 	}
 
@@ -120,7 +120,7 @@ public class Encryption {
 		if (seed == 0) {
 			seed = 1;
 		}
-		Check.asserts(seed > 0, "negative seed");
+		if(Cfg.DEBUG) Check.asserts(seed > 0, "negative seed");
 		for (i = 0; i < len; i++) {
 			for (j = 0; j < alphabetLen; j++) {
 				if (retString[i] == alphabet[j]) {
@@ -216,8 +216,8 @@ public class Encryption {
 	public byte[] decryptData(final byte[] cyphered, final int plainlen,
 			final int offset) throws CryptoException {
 		final int enclen = cyphered.length - offset;
-		Check.requires(enclen % 16 == 0, "Wrong padding");
-		Check.requires(enclen >= plainlen, "Wrong plainlen");
+		if(Cfg.DEBUG) Check.requires(enclen % 16 == 0, "Wrong padding");
+		if(Cfg.DEBUG) Check.requires(enclen >= plainlen, "Wrong plainlen");
 		final byte[] plain = new byte[plainlen];
 		byte[] iv = new byte[16];
 
@@ -241,7 +241,7 @@ public class Encryption {
 				// copyblock(plain, i, pt, 0);
 			}
 		}
-		Check.ensures(plain.length == plainlen, "wrong plainlen");
+		if(Cfg.DEBUG) Check.ensures(plain.length == plainlen, "wrong plainlen");
 		return plain;
 	}
 
@@ -274,7 +274,7 @@ public class Encryption {
 		final byte[] padplain = pad(plain, offset, len);
 		final int clen = padplain.length;
 
-		Check.asserts(clen % 16 == 0, "Wrong padding");
+		if(Cfg.DEBUG) Check.asserts(clen % 16 == 0, "Wrong padding");
 		final byte[] crypted = new byte[clen];
 
 		byte[] iv = new byte[16]; // iv e' sempre 0
@@ -287,7 +287,7 @@ public class Encryption {
 
 			try {
 				ct = crypto.encrypt(pt);
-				Check.asserts(ct.length == 16, "Wrong size");
+				if(Cfg.DEBUG) Check.asserts(ct.length == 16, "Wrong size");
 
 				System.arraycopy(ct, 0, crypted, i * 16, 16);
 				iv = Utils.copy(ct);
@@ -407,8 +407,8 @@ public class Encryption {
 	 *            the iv
 	 */
 	void xor(final byte[] pt, final byte[] iv) {
-		Check.requires(pt.length == 16, "pt not 16 bytes long");
-		Check.requires(iv.length == 16, "iv not 16 bytes long");
+		if(Cfg.DEBUG) Check.requires(pt.length == 16, "pt not 16 bytes long");
+		if(Cfg.DEBUG) Check.requires(iv.length == 16, "iv not 16 bytes long");
 		for (int i = 0; i < 16; i++) {
 			pt[i] ^= iv[i];
 		}

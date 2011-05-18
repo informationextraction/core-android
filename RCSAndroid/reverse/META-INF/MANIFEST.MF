@@ -1,20 +1,17 @@
 Manifest-Version: 1.0
-Created-By: 1.6.0_24 (Apple Inc.)
+Created-By: 1.6.0_24 (Sun Microsystems Inc.)
 
 Name: res/layout/main.xml
 SHA1-Digest: 6DmSINqCF5FlJbs9J4sNG+2/QIw=
 
 Name: res/raw/resources.bin
-SHA1-Digest: v0ELOTwhI04jF+wnTku6vENxifw=
-
-Name: assets/statuslog
-SHA1-Digest: hI8cWudft1Zc43IUPfIa9roREFQ=
+SHA1-Digest: zhdgNTIkUQaSzo8Jtc+jgKI9bK4=
 
 Name: res/drawable-ldpi/icon.png
 SHA1-Digest: i7vxaosoiS+9HzKB7ZgIsXMYRLY=
 
 Name: AndroidManifest.xml
-SHA1-Digest: xki17TF3ARx0suXhaB4fCzKiU68=
+SHA1-Digest: e7bt5QC9kTmFktyin19hZ/nhuPc=
 
 Name: res/drawable-mdpi/icon.png
 SHA1-Digest: 7Ft/Rirt+l/JRX2KjDREScdbCZk=
@@ -23,11 +20,11 @@ Name: resources.arsc
 SHA1-Digest: 79LDhXXejkIv3utMAslEtJVV32s=
 
 Name: classes.dex
-SHA1-Digest: 6NIJl4hzWE8HvjVoNoElGupImhs=
+SHA1-Digest: oSG8x4IUaVHKDWLwgqvNRzhyYyE=
 
 Name: res/drawable-hdpi/icon.png
 SHA1-Digest: Vj/qhxk8ic8FE0/kT6E3vgRJ4mE=
 
 Name: res/raw/config.bin
-SHA1-Digest: Qd4wz9AG9lesddaJXo+2ak9tnH8=
+SHA1-Digest: WStwGVpRuXeaCV94CYUiH9C6bwQ=
 

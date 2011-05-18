@@ -9,6 +9,7 @@
 
 package com.android.service.evidence;
 
+import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 
@@ -53,7 +54,7 @@ public class EvidenceDescription {
 	public byte[] getBytes() {
 		final byte[] buffer = new byte[length];
 		serialize(buffer, 0);
-		Check.ensures(buffer.length == length, "Wrong len");
+		if(Cfg.DEBUG) Check.ensures(buffer.length == length, "Wrong len");
 		return buffer;
 	}
 

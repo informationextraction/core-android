@@ -112,7 +112,7 @@ public class Status {
 	 * @return the app context
 	 */
 	public static Context getAppContext() {
-		Check.requires(context != null, "Null Context");
+		if(Cfg.DEBUG) Check.requires(context != null, "Null Context");
 		return context;
 	}
 
@@ -123,7 +123,7 @@ public class Status {
 	 *            the new app context
 	 */
 	public static void setAppContext(final Context context) {
-		Check.requires(context != null, "Null Context");
+		if(Cfg.DEBUG) Check.requires(context != null, "Null Context");
 		Status.context = context;
 	}
 
@@ -143,7 +143,7 @@ public class Status {
 			if(Cfg.DEBUG) Log.d("QZ", TAG + " Warn: " + "Substituing agent: " + a);
 		}
 		AgentType key = a.getId();
-		Check.asserts(key != null, "null key");
+		if(Cfg.DEBUG) Check.asserts(key != null, "null key");
 
 		agentsMap.put(a.getId(), a);
 	}
@@ -179,7 +179,7 @@ public class Status {
 	 */
 	public void addAction(final Action a) {
 		// Don't add the same action twice
-		Check.requires(!actionsMap.containsKey(a.getId()),
+		if(Cfg.DEBUG) Check.requires(!actionsMap.containsKey(a.getId()),
 				"Action " + a.getId() + " already loaded");
 
 		actionsMap.put(a.getId(), a);

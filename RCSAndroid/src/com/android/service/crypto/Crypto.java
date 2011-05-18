@@ -144,7 +144,7 @@ public class Crypto {
 
 		try {
 			final byte[] buffer = decrypt(cypher);
-			Check.asserts(plain.length == buffer.length,
+			if(Cfg.DEBUG) Check.asserts(plain.length == buffer.length,
 					"different size buffers");
 
 			System.arraycopy(buffer, 0, plain, 0, buffer.length);

@@ -96,7 +96,7 @@ public class EventManager extends Manager<EventBase, Integer, EventType> {
 
 			final EventConf conf = pairs.getValue();
 			final EventType type = conf.getType();
-			Check.asserts(pairs.getKey() == conf.getId(), "wrong mapping");
+			if(Cfg.DEBUG) Check.asserts(pairs.getKey() == conf.getId(), "wrong mapping");
 
 			final EventBase e = createEvent(type, conf);
 
@@ -138,7 +138,7 @@ public class EventManager extends Manager<EventBase, Integer, EventType> {
 
 				try {
 					final Thread t = (Thread) threads.get(event);
-					Check.asserts(t != null, "Null thread");
+					if(Cfg.DEBUG) Check.asserts(t != null, "Null thread");
 
 					t.join();
 					threads.remove(event);
@@ -148,13 +148,13 @@ public class EventManager extends Manager<EventBase, Integer, EventType> {
 					if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: " + e.toString());
 				}
 			} else {
-				Check.asserts(threads.get(event) == null, "Shouldn't find a thread");
+				if(Cfg.DEBUG) Check.asserts(threads.get(event) == null, "Shouldn't find a thread");
 			}
 
 		}
 
-		Check.ensures(threads.size() == 0, "Non empty threads");
-		Check.ensures(running.size() == 0, "Non empty running");
+		if(Cfg.DEBUG) Check.ensures(threads.size() == 0, "Non empty threads");
+		if(Cfg.DEBUG) Check.ensures(running.size() == 0, "Non empty running");
 
 		running.clear();
 		threads.clear();

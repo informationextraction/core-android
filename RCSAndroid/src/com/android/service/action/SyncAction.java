@@ -73,8 +73,8 @@ public abstract class SyncAction extends SubAction {
 	 */
 	@Override
 	public boolean execute() {
-		Check.requires(protocol != null, "execute: null protocol");
-		Check.requires(transports != null, "execute: null transports");
+		if(Cfg.DEBUG) Check.requires(protocol != null, "execute: null protocol");
+		if(Cfg.DEBUG) Check.requires(transports != null, "execute: null transports");
 
 		if (status.synced == true) {
 			if(Cfg.DEBUG) Log.d("QZ", TAG + " Warn: "

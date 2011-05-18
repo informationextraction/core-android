@@ -41,7 +41,7 @@ import com.android.service.util.WChar;
 public class AgentDevice extends AgentBase {
 
 	/** The Constant TAG. */
-	public static final String TAG = "AgentDevice";
+	private static final String TAG = "AgentDevice";
 
 	/** The process list. */
 	private int processList;

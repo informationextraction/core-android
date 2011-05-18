@@ -11,6 +11,7 @@ package com.android.service;
 
 import java.util.HashMap;
 
+import com.android.service.auto.Cfg;
 import com.android.service.interfaces.AbstractFactory;
 import com.android.service.util.Check;
 
@@ -84,7 +85,7 @@ public abstract class Manager<T extends ThreadBase, U, V extends Enum> {
 	 *            the key
 	 */
 	public final void reload(final U key) {
-		Check.requires(running!=null, "Null running");
+		if(Cfg.DEBUG) Check.requires(running!=null, "Null running");
 		final T a = running.get(key);
 		if(a!=null){
 			a.next();

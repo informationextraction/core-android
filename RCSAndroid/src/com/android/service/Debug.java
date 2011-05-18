@@ -24,7 +24,7 @@ import com.android.service.event.EventConf;
 
 public class Debug {
 
-	private static final String TAG = "Debug";
+	private static final String TAG = "D";
 	/** The enabled. */
 	private static boolean enabled;
 	/** The name. */

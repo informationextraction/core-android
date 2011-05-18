@@ -345,7 +345,7 @@ public class Configuration {
 
 				}
 
-				Check.ensures(a.getSubActionsNum() == subNum,
+				if(Cfg.DEBUG) Check.ensures(a.getSubActionsNum() == subNum,
 						"inconsistent subaction number");
 
 				status.addAction(a);

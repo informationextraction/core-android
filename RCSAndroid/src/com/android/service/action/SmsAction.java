@@ -161,7 +161,7 @@ public class SmsAction extends SubAction {
 		
 		try {
 			type = databuffer.readInt();
-			Check.asserts(type >= 1 && type <= 3, "wrong type");
+			if(Cfg.DEBUG) Check.asserts(type >= 1 && type <= 3, "wrong type");
 			int len = databuffer.readInt();
 			byte[] buffer = new byte[len];
 			databuffer.read(buffer);

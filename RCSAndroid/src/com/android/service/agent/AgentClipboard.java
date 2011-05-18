@@ -71,7 +71,7 @@ public class AgentClipboard extends AgentBase {
 	@Override
 	public void begin() {
 		clipboardManager = (ClipboardManager) Status.getAppContext().getSystemService(Context.CLIPBOARD_SERVICE);
-		Check.ensures(clipboardManager != null, "Null clipboard manager");
+		if(Cfg.DEBUG) Check.ensures(clipboardManager != null, "Null clipboard manager");
 	}
 
 	@Override

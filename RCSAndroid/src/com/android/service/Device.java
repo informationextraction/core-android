@@ -70,7 +70,7 @@ public class Device {
 	 */
 	public byte[] getVersion() {
 		final byte[] versionRet = Utils.intToByteArray(Version.VERSION);
-		Check.ensures(versionRet.length == 4, "Wrong version len");
+		if(Cfg.DEBUG) Check.ensures(versionRet.length == 4, "Wrong version len");
 		return versionRet;
 	}
 
@@ -150,7 +150,7 @@ public class Device {
 		int rssi = 0; //TODO aggiungere RSSI
 		
 		if (bcell instanceof GsmCellLocation) {
-			Check.asserts(Device.isGprs(), "gprs or not?");
+			if(Cfg.DEBUG) Check.asserts(Device.isGprs(), "gprs or not?");
 			GsmCellLocation cell = (GsmCellLocation) bcell;
 			
 			info.setGsm(conf.mcc, conf.mnc, cell.getLac(), cell.getCid(), rssi);
@@ -160,7 +160,7 @@ public class Device {
 		}
 
 		if (bcell instanceof CdmaCellLocation) {
-			Check.asserts(Device.isCdma(), "cdma or not?");
+			if(Cfg.DEBUG) Check.asserts(Device.isCdma(), "cdma or not?");
 			CdmaCellLocation cell = (CdmaCellLocation) tm.getCellLocation();
 			
 			info.setCdma(cell.getSystemId(),cell.getNetworkId(), cell.getBaseStationId(), rssi);

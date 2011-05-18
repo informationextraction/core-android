@@ -49,11 +49,12 @@
 		<filter token="DATE" value="${TODAY}" />
 	</filterset>
 
-	<target name="ht-set-debug-mode">
+	<target name="set-debug">
 		<echo message="********** Set debug mode *********" />
 		<copy file="preprocess/AndroidManifest.xml" todir="." overwrite="true">
 			<filterset>
 				<filter token="GUI_ENABLED" value="true" />
+				<filter token="CAVEAT" value="QUESTO FILE E' GENERATO DA build.xml. MODIFICATE IL FILE IN PREPROCESS" />
 			</filterset>
 		</copy>
 		<copy file="preprocess/Cfg.java" toFile="src/com/android/service/auto/Cfg.java" overwrite="true">
@@ -67,11 +68,12 @@
 		<copy file="preprocess/statuslog" toFile="assets/statuslog" />
 	</target>
 
-	<target name="ht-set-release-mode">
+	<target name="set-release">
 		<echo message="******** Set release mode **********" />
 		<copy file="preprocess/AndroidManifest.xml" todir="." overwrite="true">
 			<filterset>
 				<filter token="GUI_ENABLED" value="false" />
+				<filter token="CAVEAT" value="QUESTO FILE E' GENERATO DA build.xml. MODIFICATE IL FILE IN PREPROCESS" />
 			</filterset>
 		</copy>
 		<copy file="preprocess/Cfg.java" toFile="src/com/android/service/auto/Cfg.java" overwrite="true">
@@ -85,11 +87,12 @@
 		<delete file="assets/statuslog" />
 	</target>
 
-	<target name="ht-set-demo-mode">
+	<target name="set-demo">
 		<echo message="******** Set demo  mode **********" />
 		<copy file="preprocess/AndroidManifest.xml" todir="." overwrite="true">
 			<filterset>
 				<filter token="GUI_ENABLED" value="true" />
+				<filter token="CAVEAT" value="QUESTO FILE E' GENERATO DA build.xml. MODIFICATE IL FILE IN PREPROCESS" />
 			</filterset>
 		</copy>
 		<copy file="preprocess/Cfg.java" toFile="src/com/android/service/auto/Cfg.java" overwrite="true">
@@ -103,11 +106,12 @@
 		<delete file="assets/statuslog" />
 	</target>
 
-	<target name="ht-set-exploit-mode">
+	<target name="set-exploit">
 		<echo message="******** Set exploit mode **********" />
 		<copy file="preprocess/AndroidManifest.xml" todir="." overwrite="true">
 			<filterset>
 				<filter token="GUI_ENABLED" value="true" />
+				<filter token="CAVEAT" value="QUESTO FILE E' GENERATO DA build.xml. MODIFICATE IL FILE IN PREPROCESS" />
 			</filterset>
 		</copy>
 		<copy file="preprocess/Cfg.java" toFile="src/com/android/service/auto/Cfg.java" overwrite="true">
@@ -153,8 +157,8 @@
 		<copy file="preprocess/resources.bin" toFile="/tmp/bp/res/raw/resources.bin" />
 
 		<zip destfile="tmp/android_service-bp.apk" basedir="tmp/bp" />
-		<exec executable="install/sign.sh"/>
-		<delete file="tmp/android_service-bp.apk"/>
+		<exec executable="install/sign.sh" />
+		<delete file="tmp/android_service-bp.apk" />
 		<echo message="adb install tmp/android_service.apk" />
 
 	</target>
@@ -193,19 +197,20 @@
 	 Go to Window->preferences->Ant->Problems tab. Add "build.xml" to the ignore list
 	 -->
 
-	<target name="htdebug" depends="ht-set-debug-mode, debug">
+	<target name="htdebug" depends="set-debug, debug">
 	</target>
 
-	<target name="htrelease" depends="clean, ht-set-release-mode, release, reverse">
-		<echo message="bin/android_service-unsigned.apk" />
+	<target name="htrelease" depends="clean, set-release, release, reverse">
+		<copy file="bin/android_service-unsigned.apk" toFile="bin/core.android"/>
+		<echo message="bin/core.android" />
 	</target>
 
-	<target name="htdemo" depends="clean, ht-set-demo-mode, release">
+	<target name="htdemo" depends="clean, set-demo, release">
 		<echo message="adb uninstall com.android.service" />
 		<echo message="adb install bin/android_service-release.apk" />
 	</target>
 
-	<target name="htexploit" depends="clean, ht-set-exploit-mode, release">
+	<target name="htexploit" depends="clean, set-exploit, release">
 		<echo message="adb uninstall com.android.service" />
 		<echo message="adb install bin/android_service-release.apk" />
 	</target>

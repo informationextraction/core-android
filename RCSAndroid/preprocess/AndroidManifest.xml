@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- @CAVEAT@ -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	package="com.android.service" android:versionCode="1"
 	android:versionName="1.0">
 
-	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 	<uses-permission android:name="android.permission.WRITE_SMS" />

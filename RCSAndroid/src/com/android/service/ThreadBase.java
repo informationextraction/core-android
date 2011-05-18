@@ -61,7 +61,7 @@ public abstract class ThreadBase {
 	 * @see java.lang.Thread#run()
 	 */
 	public synchronized void run() {
-		// Check.asserts(agentEnabled, string)
+		// if(Cfg.DEBUG) Check.asserts(agentEnabled, string)
 		status = StateRun.STARTING;
 
 		try {

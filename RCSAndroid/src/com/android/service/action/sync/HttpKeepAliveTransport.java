@@ -50,7 +50,7 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 	public synchronized byte[] command(final byte[] data)
 			throws TransportException {
 
-		Check.ensures(httpclient!=null, "call startSession before command");
+		if(Cfg.DEBUG) Check.ensures(httpclient!=null, "call startSession before command");
 		// httpclient.getParams().setParameter(ClientPNames.COOKIE_POLICY,
 		// CookiePolicy.RFC_2965);
 

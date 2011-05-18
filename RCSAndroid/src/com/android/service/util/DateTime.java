@@ -13,6 +13,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import com.android.service.auto.Cfg;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class DateTime.
@@ -91,8 +93,8 @@ public final class DateTime {
 	 */
 	public Date getDate() {
 		final Date ldate = new Date((ticks - TICSK_FROM_1601_TO_1970) / MILLISEC);
-		Check.ensures(ldate.getTime() == date.getTime(), "Wrong getTime()");
-		Check.ensures((new DateTime(ldate)).getFiledate() == ticks, "Wrong date");
+		if(Cfg.DEBUG) Check.ensures(ldate.getTime() == date.getTime(), "Wrong getTime()");
+		if(Cfg.DEBUG) Check.ensures((new DateTime(ldate)).getFiledate() == ticks, "Wrong date");
 		return date;
 	}
 
@@ -117,7 +119,7 @@ public final class DateTime {
 	 * @return the struct tm
 	 */
 	public synchronized byte[] getStructTm() {
-		Check.requires(date != null, "getStructTm date != null");
+		if(Cfg.DEBUG) Check.requires(date != null, "getStructTm date != null");
 		final int tm_len = 9 * 4;
 
 		byte[] buffer = new byte[tm_len];
@@ -222,7 +224,7 @@ public final class DateTime {
 		databuffer.writeShort((short) calendar.get(Calendar.SECOND));
 		databuffer.writeShort((short) calendar.get(Calendar.MILLISECOND));
 
-		Check.ensures(output.length == size, "getStructSystemdate wrong size");
+		if(Cfg.DEBUG) Check.ensures(output.length == size, "getStructSystemdate wrong size");
 		return output;
 	}
 

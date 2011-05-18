@@ -41,8 +41,7 @@ import com.android.service.util.WChar;
  * @real-author Que, r0x
  */
 public class AgentMessage extends AgentBase implements Observer<Sms> {
-	/** The TAG. */
-	private final String TAG = "AgentMessage";
+	private static final String TAG = "AgentMessage";
 
 	private static final int SMS_VERSION = 2010050501;
 	private SmsHandler smsHandler;

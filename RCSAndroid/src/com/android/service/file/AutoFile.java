@@ -185,7 +185,7 @@ public final class AutoFile {
 	 * @return the string[]
 	 */
 	public String[] list() {
-		Check.asserts(isDirectory(), "Should be a directory");
+		if(Cfg.DEBUG) Check.asserts(isDirectory(), "Should be a directory");
 		return file.list();
 	}
 
@@ -231,6 +231,6 @@ public final class AutoFile {
 
 	public void create() {
 		write(new byte[0]);
-		Check.ensures(file.exists(), "Non existing files");
+		if(Cfg.DEBUG) Check.ensures(file.exists(), "Non existing files");
 	}
 }
