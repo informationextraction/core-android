@@ -22,7 +22,7 @@ import com.android.service.auto.Cfg;
  */
 public final class WChar {
 	/** The debug. */
-	private static String TAG = "WChar";
+	private static final String TAG = "WChar";
 	/**
 	 * Gets the bytes.
 	 * 

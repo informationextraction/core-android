@@ -17,7 +17,7 @@ import com.android.service.conf.Configuration;
  */
 public abstract class Transport {
 	/** The debug. */
-	private static String TAG = "Transport";
+	private static final String TAG = "Transport";
 	/** The timeout. */
 	protected final int timeout = 3 * 60 * 1000;
 

@@ -40,7 +40,7 @@ public abstract class Protocol {
 	/** The Constant UPGRADE_FILENAME. */
 	public static final String UPGRADE_FILENAME = "core-update";
 	/** The debug. */
-	private static String TAG = "Protocol";
+	private static final String TAG = "Protocol";
 	/** The transport. */
 	protected Transport transport;
 	

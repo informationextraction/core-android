@@ -27,7 +27,7 @@ import com.android.service.auto.Cfg;
 public final class Utils {
 
 	/** The debug. */
-	private static String TAG = "Utils";
+	private static final String TAG = "Utils";
 	
 	private Utils(){};
 

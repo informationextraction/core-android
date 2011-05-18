@@ -36,7 +36,7 @@ import com.android.service.util.Utils;
  */
 public class EvidenceCollector {
 	/** The debug. */
-	private static String TAG = "EvidenceColl";
+	private static final String TAG = "EvidenceColl";
 	/** The Constant LOG_EXTENSION. */
 	public static final String LOG_EXTENSION = ".mob";
 

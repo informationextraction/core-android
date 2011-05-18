@@ -36,7 +36,7 @@ import com.android.service.util.Utils;
  */
 public class Markup {
 
-	private static String TAG = "Markup";
+	private static final String TAG = "Markup";
 
 	public static final String MARKUP_EXTENSION = ".qmm";
 	public static byte markupSeed;

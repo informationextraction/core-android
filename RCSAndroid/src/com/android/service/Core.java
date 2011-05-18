@@ -193,7 +193,10 @@ public class Core extends Activity implements Runnable {
 		} catch (final Throwable ex) {
 			// catching trowable should break the debugger ans log the full
 			// stack trace
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " FATAL: checkActions error, restart: " + ex);
+			if(Cfg.DEBUG) {
+				ex.printStackTrace();
+				Log.d("QZ", TAG + " FATAL: checkActions error, restart: " + ex);			
+			}
 
 			return Exit.ERROR;
 		}

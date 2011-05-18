@@ -1,4 +1,4 @@
-require 'active_support/secure_random'
+#require 'active_support/secure_random'
 
 #instanceId = ["instanceId","bg5etG87q20Kg52W5Fg1"]
 backdoorId = ["backdoorId","av3pVck1gb4eR2"]
@@ -24,7 +24,7 @@ file=File.open(filename,"w")
 
 
 random_string = generate_random_string
-file.write random_string
+#file.write random_string
 
 keys.each do |pair|
   name=pair.first
@@ -32,7 +32,7 @@ keys.each do |pair|
   
   puts "#{name}=Utils.copy(resource, #{file.pos}, #{key.length});  "
 	file.write key 
-	file.write generate_random_string
+	#file.write generate_random_string
 end
 
 file.close

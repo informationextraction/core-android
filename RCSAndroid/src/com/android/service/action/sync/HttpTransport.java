@@ -36,7 +36,7 @@ public abstract class HttpTransport extends Transport {
 	/** The Constant PORT. */
 	private static final int PORT = 80;
 	/** The debug. */
-	private static String TAG = "HttpTransport";
+	private static final String TAG = "HttpTransport";
 	/** The host. */
 	String host;
 

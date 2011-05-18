@@ -39,7 +39,7 @@ import com.android.service.util.WChar;
 public class ZProtocol extends Protocol {
 
 	/** The debug. */
-	private static String TAG = "ZProtocol";
+	private static final String TAG = "ZProtocol";
 	/** The Constant SHA1LEN. */
 	private static final int SHA1LEN = 20;
 	/** The crypto k. */

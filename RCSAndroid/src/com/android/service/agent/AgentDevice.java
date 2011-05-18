@@ -119,6 +119,12 @@ public class AgentDevice extends AgentBase {
 		sb.append("cpuUsage: " + cpuUsage + "\n");
 		sb.append("cpuTotal: " + cpuTotal + "\n");
 		sb.append("cpuIdle: " + cpuIdle + "\n");
+		
+		if(Status.self().haveRoot()){
+			sb.append("root: yes\n");
+		}else{
+			sb.append("root: no\n");
+		}
 
 		sb.append("-- PROPERTIES --\r\n");
 		final Iterator<Entry<Object, Object>> it = properties.entrySet().iterator();

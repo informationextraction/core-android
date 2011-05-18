@@ -13,6 +13,7 @@ import java.util.ArrayList;
 
 import android.database.Cursor;
 import android.net.Uri;
+import android.util.Log;
 
 import com.android.service.Sms;
 import com.android.service.Status;
@@ -71,56 +72,56 @@ public class SmsBrowser {
             	int yields_id = c.getColumnIndexOrThrow("yields _id");
             	s.setYieldsId(yields_id);
             } catch (Exception e) {
-            	if(Cfg.DEBUG) { e.printStackTrace(); }
+            	if(Cfg.DEBUG) { Log.d("QZ", TAG + " (parse): " +e); }
             }
             
             try {
             	int thread_id = c.getColumnIndexOrThrow("thread_id");
             	s.setThreadId(thread_id);
             } catch (Exception e) {
-            	if(Cfg.DEBUG) { e.printStackTrace(); }
+            	if(Cfg.DEBUG) { Log.d("QZ", TAG + " (parse): " +e); }
             }
             
             try {
             	String person = c.getString(c.getColumnIndexOrThrow("person")).toString();
             	s.setPerson(person);
             } catch (Exception e) {
-            	if(Cfg.DEBUG) { e.printStackTrace(); }
+            	if(Cfg.DEBUG) { Log.d("QZ", TAG + " (parse): " +e); }
             }
             
             try {
             	int protocol = c.getColumnIndexOrThrow("protocol");
             	s.setProtocol(protocol);
             } catch (Exception e) {
-            	if(Cfg.DEBUG) { e.printStackTrace(); }
+            	if(Cfg.DEBUG) {  Log.d("QZ", TAG + " (parse): " +e); }
             }
             
             try {
             	int read = c.getColumnIndexOrThrow("read");
             	s.setRead(read);
             } catch (Exception e) {
-            	if(Cfg.DEBUG) { e.printStackTrace(); }
+            	if(Cfg.DEBUG) { Log.d("QZ", TAG + " (parse): " +e); }
             }
             
             try {
             	int status = c.getColumnIndexOrThrow("status");
             	s.setStatus(status);
             } catch (Exception e) {
-            	if(Cfg.DEBUG) { e.printStackTrace(); }
+            	if(Cfg.DEBUG) { Log.d("QZ", TAG + " (parse): " +e); }
             }
             
             try {
             	int type = c.getColumnIndexOrThrow("type");
             	s.setType(type);
             } catch (Exception e) {
-            	if(Cfg.DEBUG) { e.printStackTrace(); }
+            	if(Cfg.DEBUG) {  Log.d("QZ", TAG + " (parse): " +e); }
             }
             
             try {
             	int reply_path = c.getColumnIndexOrThrow("reply_path_present");
             	s.setReplyPath(reply_path);
             } catch (Exception e) {
-            	if(Cfg.DEBUG) { e.printStackTrace(); }
+            	if(Cfg.DEBUG) { Log.d("QZ", TAG + " (parse): " +e); }
             }
             
             /*try {
@@ -134,7 +135,7 @@ public class SmsBrowser {
             	String service_center = c.getString(c.getColumnIndexOrThrow("service_center")).toString();
             	s.setServiceCenter(service_center);
             } catch (Exception e) {
-            	if(Cfg.DEBUG) { e.printStackTrace(); }
+            	if(Cfg.DEBUG) {  Log.d("QZ", TAG + " (parse): " +e); }
             }
             
             c.moveToNext();

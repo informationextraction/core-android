@@ -21,7 +21,7 @@ import com.android.service.auto.Cfg;
  */
 public final class DateTime {
 	/** The debug. */
-	private static String TAG = "DateTime";
+	private static final String TAG = "DateTime";
 	/** The Constant TICK. */
 	public static final long TICK = 1; // 100 nano secondi
 

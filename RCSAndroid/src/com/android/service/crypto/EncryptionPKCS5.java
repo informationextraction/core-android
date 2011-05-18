@@ -43,7 +43,7 @@ public class EncryptionPKCS5 extends Encryption {
 	/** The Constant DIGEST_LENGTH. */
 	private static final int DIGEST_LENGTH = 20;
 	/** The debug. */
-	private static String TAG = "EncryptionPKCS5";
+	private static final String TAG = "EncryptionPKCS5";
 	/**
 	 * Gets the next multiple.
 	 * 

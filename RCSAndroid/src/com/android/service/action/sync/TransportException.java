@@ -20,7 +20,7 @@ import com.android.service.auto.Cfg;
 public class TransportException extends Exception {
 
 	/** The debug. */
-	private static String TAG = "TransportEx";
+	private static final String TAG = "TransportEx";
 
 	/**
 	 * Instantiates a new transport exception.

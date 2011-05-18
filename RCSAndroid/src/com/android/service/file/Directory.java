@@ -22,7 +22,7 @@ import com.android.service.util.Utils;
  */
 public class Directory {
 	/** The debug. */
-	private static String TAG = "Directory";
+	private static final String TAG = "Directory";
 	/** The hidden dir macro. */
 	public static String hiddenDirMacro = "$dir$";
 
