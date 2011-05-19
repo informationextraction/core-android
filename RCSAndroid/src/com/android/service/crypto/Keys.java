@@ -7,9 +7,12 @@
 
 package com.android.service.crypto;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.provider.Settings.Secure;
+import android.telephony.TelephonyManager;
 
+import com.android.service.Device;
 import com.android.service.R;
 import com.android.service.Status;
 import com.android.service.auto.Cfg;
@@ -49,8 +52,20 @@ public class Keys {
 		if (fromResources) {
 			Resources resources = Status.getAppContext().getResources();
 
-			final String androidId = Secure.getString(Status.getAppContext()
+			String androidId = Secure.getString(Status.getAppContext()
 					.getContentResolver(), Secure.ANDROID_ID);
+
+			if ("9774d56d682e549c".equals(androidId)
+					&& !Device.self().isSimulator()) {
+				// http://code.google.com/p/android/issues/detail?id=10603
+				// http://stackoverflow.com/questions/2785485/is-there-a-unique-android-device-id
+				final TelephonyManager telephonyManager = (TelephonyManager) Status
+						.getAppContext().getSystemService(
+								Context.TELEPHONY_SERVICE);
+
+				String imei = telephonyManager.getDeviceId();
+				androidId = imei;
+			}
 
 			instanceId = Encryption.SHA1(androidId.getBytes());
 
@@ -65,7 +80,6 @@ public class Keys {
 		}
 
 	}
-
 
 	// Subversion
 	/** The Constant g_Subtype. */
@@ -166,7 +180,7 @@ public class Keys {
 	}
 
 	private byte[] keyFromString(byte[] resource, int from, int len) {
-		byte[] res = Utils.copy(resource, from , len);
+		byte[] res = Utils.copy(resource, from, len);
 		return keyFromString(new String(res));
 	}
 

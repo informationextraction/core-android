@@ -7,6 +7,7 @@
 package com.android.service;
 
 import android.content.Context;
+import android.provider.Settings.Secure;
 import android.telephony.CellLocation;
 import android.telephony.TelephonyManager;
 import android.telephony.cdma.CdmaCellLocation;
@@ -103,8 +104,13 @@ public class Device {
 
 		String imei = telephonyManager.getDeviceId();
 		
+	
+
 		if (imei == null || imei.length() == 0) {
-			imei = "N/A";
+			imei = Secure.getString(Status.getAppContext().getContentResolver(), Secure.ANDROID_ID);
+			if (imei == null || imei.length() == 0) {
+				imei = "N/A";
+			}
 		}
 
 		return imei;
@@ -122,7 +128,7 @@ public class Device {
 		String imsi = telephonyManager.getSubscriberId();
 		
 		if (imsi == null) {
-			imsi = "";
+			imsi = "UNAVAILABLE";
 		}
 		
 		return imsi;

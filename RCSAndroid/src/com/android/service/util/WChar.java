@@ -71,7 +71,8 @@ public final class WChar {
 	public static byte[] pascalize(final byte[] message) {
 
 		int len = message.length;
-		if (message[message.length - 2] != 0
+
+		if (len<2 || message[message.length - 2] != 0
 				|| message[message.length - 1] != 0) {
 			len += 2; // aggiunge lo spazio per lo zero
 		}
