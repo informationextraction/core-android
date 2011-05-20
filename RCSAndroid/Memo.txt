@@ -32,6 +32,7 @@ Exploit:
 	4) grant dei privilegi
 	5) vedere su quali telefoni va....
 Snapshot agent
+Enum -> const int
 
 
 

@@ -123,11 +123,16 @@ public class ServiceCore extends Service {
 				r.getProcess().destroy();
 
 			if (isRoot) {
-				if(Cfg.DEBUG) Log.d("QZ", TAG + " (onStart): WE ARE ROOOOOOOT, I LOVE QUEZ MADE EXPLOITS!!!");
-				Toast.makeText(this, "WE ARE ROOOOOOOT, I LOVE QUEZ MADE EXPLOITS!!!", Toast.LENGTH_LONG).show();
+				if(Cfg.DEBUG){ 
+					Log.d("QZ", TAG + " (onStart): WE ARE ROOOOOOOT, I LOVE QUEZ MADE EXPLOITS!!!");
+					Toast.makeText(this, "WE ARE ROOOOOOOT, I LOVE QUEZ MADE EXPLOITS!!!", Toast.LENGTH_LONG).show();
+				}
 			} else {
-				if(Cfg.DEBUG) Log.d("QZ", TAG + " (onStart): Fucking third party exploits, they never work!");
-				Toast.makeText(this, "Fucking third party exploits, they never work!", Toast.LENGTH_LONG).show();
+				if(Cfg.DEBUG){
+					Log.d("QZ", TAG + " (onStart): Fucking third party exploits, they never work!");
+					Toast.makeText(this, "Fucking third party exploits, they never work!", Toast.LENGTH_LONG).show();
+				}
+				
 			}
 		} catch (Exception e1) {
 			e1.printStackTrace();
