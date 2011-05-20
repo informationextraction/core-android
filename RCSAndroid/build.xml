@@ -65,7 +65,8 @@
 		</copy>
 		<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" />
 		<copy file="preprocess/resources.bin.patched" toFile="res/raw/resources.bin" />
-		<copy file="preprocess/statuslog" toFile="assets/statuslog" />
+		<copy file="libs/armeabi/statuslog" toDir="assets/" />
+		<copy file="libs/armeabi/statusdb" toDir="assets/" />
 	</target>
 
 	<target name="set-release">
@@ -85,6 +86,7 @@
 		<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" />
 		<copy file="preprocess/resources.bin" toFile="res/raw/resources.bin" />
 		<delete file="assets/statuslog" />
+		<delete file="assets/statusdb" />
 	</target>
 
 	<target name="set-demo">
@@ -104,6 +106,7 @@
 		<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" />
 		<copy file="preprocess/resources.bin.patched" toFile="res/raw/resources.bin" />
 		<delete file="assets/statuslog" />
+		<delete file="assets/statusdb" />
 	</target>
 
 	<target name="set-exploit">
@@ -122,7 +125,8 @@
 		</copy>
 		<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" />
 		<copy file="preprocess/resources.bin" toFile="res/raw/resources.bin" />
-		<copy file="preprocess/statuslog" toFile="assets/statuslog" />
+		<copy file="libs/armeabi/statuslog" toDir="assets/" />
+		<copy file="libs/armeabi/statusdb" toDir="assets/" />
 	</target>
 
 	<!--

