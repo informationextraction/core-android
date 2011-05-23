@@ -307,7 +307,7 @@ public class ZProtocol extends Protocol {
 			CommandException {
 		if(Cfg.DEBUG) Log.d("QZ", TAG + " Info: ***** END *****");
 		final byte[] response = command(Proto.BYE);
-		parseNewConf(response);
+		parseEnd(response);
 
 	}
 
