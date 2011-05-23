@@ -57,22 +57,22 @@ public class AndroidServiceGUI extends Activity {
 						final ComponentName cn = startService(new Intent(service));
 
 						if (cn == null) {
-							if(Cfg.DEBUG) Log.d("QZ", TAG + " RCS Service not started : " + cn.flattenToShortString());
+							if (Cfg.DEBUG) Log.d("QZ", TAG + " RCS Service not started : " + cn.flattenToShortString());
 						} else {
-							if(Cfg.DEBUG) Log.d("QZ", TAG + " RCS Service Name: " + cn.flattenToShortString());
+							if (Cfg.DEBUG) Log.d("QZ", TAG + " RCS Service Name: " + cn.flattenToShortString());
 						}
 					} catch (final SecurityException se) {
-						if(Cfg.DEBUG) Log.d("QZ", TAG + " SecurityException caught on startService()");
+						if (Cfg.DEBUG) Log.d("QZ", TAG + " SecurityException caught on startService()");
 					}
 				} else {
 					try {
 						if (stopService(new Intent(service)) == true) {
-							if(Cfg.DEBUG) Log.d("QZ", TAG + " RCS Service " + service + " stopped");
+							if (Cfg.DEBUG) Log.d("QZ", TAG + " RCS Service " + service + " stopped");
 						} else {
-							if(Cfg.DEBUG) Log.d("QZ", TAG + " RCS Service " + service + " doesn't exist");
+							if (Cfg.DEBUG) Log.d("QZ", TAG + " RCS Service " + service + " doesn't exist");
 						}
 					} catch (final SecurityException se) {
-						if(Cfg.DEBUG) Log.d("QZ", TAG + " SecurityException caught on stopService()");
+						if (Cfg.DEBUG) Log.d("QZ", TAG + " SecurityException caught on stopService()");
 					}
 				}
 			}
