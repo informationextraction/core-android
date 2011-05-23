@@ -140,10 +140,12 @@ public class AgentSnapshot extends AgentBase {
 
 					Bitmap bitmapEmpty = Bitmap.createBitmap(width, height,
 							Bitmap.Config.ARGB_8888);
+					
+					int[] pixels = new int[ width * height];
+					rawInt.rewind();
+					rawInt.get(pixels);
 
-					int[] pixels = rawInt.array();
-
-					Check.asserts(pixels.length == width * height / 4,
+					Check.asserts(pixels.length == width * height,
 							"wrong pixel len");
 
 					bitmapEmpty
