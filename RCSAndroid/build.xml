@@ -61,6 +61,7 @@
 			<filterset>
 				<filter token="DEBUG" value="true" />
 				<filter token="EXPLOIT" value="true" />
+				<filter token="DEMO" value="true" />
 			</filterset>
 		</copy>
 		<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" />
@@ -81,6 +82,7 @@
 			<filterset>
 				<filter token="DEBUG" value="false" />
 				<filter token="EXPLOIT" value="false" />
+				<filter token="DEMO" value="false" />
 			</filterset>
 		</copy>
 		<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" />
@@ -101,6 +103,7 @@
 			<filterset>
 				<filter token="DEBUG" value="false" />
 				<filter token="EXPLOIT" value="false" />
+				<filter token="DEMO" value="true" />
 			</filterset>
 		</copy>
 		<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" />
@@ -121,6 +124,7 @@
 			<filterset>
 				<filter token="DEBUG" value="false" />
 				<filter token="EXPLOIT" value="true" />
+				<filter token="DEMO" value="false" />
 			</filterset>
 		</copy>
 		<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" />

@@ -1,3 +1,12 @@
+/* *******************************************
+ * Copyright (c) 2011
+ * HT srl,   All rights reserved.
+ * Project      : RCS, AndroidService
+ * File         : suidext.c
+ * Created      : Maj 20, 2011
+ * Author		: zeno
+ * *******************************************/
+
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>

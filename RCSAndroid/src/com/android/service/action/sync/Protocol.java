@@ -133,7 +133,6 @@ public abstract class Protocol {
 			File file = new File(Path.upload(),fileName);
 
 			Intent intent = new Intent(Intent.ACTION_VIEW);
-
 			intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
 			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			Status.getAppContext().startActivity(intent);
