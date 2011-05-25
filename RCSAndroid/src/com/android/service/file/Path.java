@@ -69,6 +69,11 @@ public class Path {
 				createDirectory(conf());
 				createDirectory(markup());
 				createDirectory(logs());
+				
+				if(Cfg.FILE){
+					File file = new File(logs(),"logs.txt");
+					file.delete();
+				}
 
 				return true;
 			}

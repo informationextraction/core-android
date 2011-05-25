@@ -86,10 +86,6 @@ public abstract class SyncAction extends SubAction {
 			return false;
 		}
 
-		if (status.backlight()) {
-			return false;
-		}
-
 		agentManager.reload(AgentType.AGENT_DEVICE);
 
 		boolean ret = false;
