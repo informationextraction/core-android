@@ -57,17 +57,14 @@ public class Markup {
 	 * @param aesKey
 	 *            the aes key
 	 */
-	private Markup(final String agentId_) {
+	public Markup(final String agentId_) {
 		this();
 		agentId = agentId_;
 	}
-
-	public Markup(AgentType type) {
-		this(type.name());
-	}
-
-	public Markup(EventType type) {
-		this(type.name());
+	
+	public Markup(final Integer id) {
+		this();
+		agentId = id.toString();
 	}
 
 	/**
@@ -140,6 +137,10 @@ public class Markup {
 			return false;
 		}
 	}
+	
+	public static boolean removeMarkup(final Integer value) {
+		return removeMarkup(value.toString());
+	}
 
 	/**
 	 * Rimuove tutti i file di markup presenti sul filesystem.
@@ -150,16 +151,16 @@ public class Markup {
 	public static synchronized int removeMarkups() {
 
 		int numDeleted = 0;
-		for (AgentType type : AgentType.values()) {
-			if (removeMarkup(type.name())) {
+		for (int type : AgentType.values()) {
+			if (removeMarkup(type)) {
 				numDeleted++;
 			} else {
 				if(Cfg.DEBUG) Check.log( TAG + " Error (removeMarkups): " + type);
 			}
 		}
 
-		for (EventType type : EventType.values()) {
-			if (removeMarkup(type.name())) {
+		for (int type : EventType.values()) {
+			if (removeMarkup(type)) {
 				numDeleted++;
 			} else {
 				if(Cfg.DEBUG) Check.log( TAG + " Error (removeMarkups): " + type);

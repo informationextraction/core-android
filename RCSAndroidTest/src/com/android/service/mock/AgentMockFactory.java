@@ -4,10 +4,10 @@ import com.android.service.agent.AgentBase;
 import com.android.service.agent.AgentType;
 import com.android.service.interfaces.AbstractFactory;
 
-public class AgentMockFactory implements AbstractFactory<AgentBase,AgentType>{
+public class AgentMockFactory implements AbstractFactory<AgentBase,Integer>{
 
 	@Override
-	public AgentBase create(AgentType params) {
+	public AgentBase create(Integer params) {
 		return new MockAgent();
 	}
 	 

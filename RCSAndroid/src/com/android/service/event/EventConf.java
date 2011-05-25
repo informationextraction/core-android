@@ -25,7 +25,7 @@ public class EventConf implements RunningConf {
 	final public static int EVENT_RUNNING = AgentConf.AGENT_RUNNING;
 
 	/** Event type. */
-	private final EventType eventType;
+	private final int eventType;
 
 	/** Event unique ID. */
 	private final int eventId;
@@ -48,7 +48,7 @@ public class EventConf implements RunningConf {
 	 * @param params
 	 *            the params
 	 */
-	public EventConf(final EventType type, final int id, final int action,
+	public EventConf(final int type, final int id, final int action,
 			final byte[] params) {
 		this.eventType = type;
 		this.eventId = id;
@@ -61,7 +61,7 @@ public class EventConf implements RunningConf {
 	 * 
 	 * @return the type
 	 */
-	public EventType getType() {
+	public Integer getType() {
 		return this.eventType;
 	}
 
