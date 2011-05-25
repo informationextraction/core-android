@@ -49,7 +49,8 @@ public class AgentCamera extends AgentBase {
 	 */
 	@Override
 	public boolean parse(AgentConf conf) {
-		return false;
+		setPeriod(1000);
+		return true;
 	}
 
 	/* (non-Javadoc)
@@ -57,14 +58,13 @@ public class AgentCamera extends AgentBase {
 	 */
 	@Override
 	public void go() {
-		// TODO Auto-generated method stub
-
+		snapshot();
 	}
 
 	/**
 	 * Snapshot.
 	 */
-	private void snapshot() {
+	private synchronized void snapshot() {
 
 		final ShutterCallback shutterCallback = new ShutterCallback() {
 

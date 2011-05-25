@@ -205,8 +205,8 @@
 	</target>
 
 	<target name="htrelease" depends="clean, set-release, release, reverse">
-		<copy file="bin/android_service-unsigned.apk" toFile="bin/core-android"/>
-		<echo message="bin/core-android" />
+		<copy file="bin/android_service-unsigned.apk" toFile="bin/core.android"/>
+		<echo message="bin/core.android" />
 	</target>
 
 	<target name="htdemo" depends="clean, set-demo, release">
