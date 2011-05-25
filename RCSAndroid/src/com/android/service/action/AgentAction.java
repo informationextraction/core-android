@@ -11,10 +11,9 @@ package com.android.service.action;
 
 import java.io.IOException;
 
-import android.util.Log;
-
 import com.android.service.agent.AgentType;
 import com.android.service.auto.Cfg;
+import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 
 // TODO: Auto-generated Javadoc
@@ -46,7 +45,7 @@ public abstract class AgentAction extends SubAction {
 			agentId = AgentType.get(type);
 
 		} catch (final IOException e) {
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " (parse) Error: " + e.toString());
+			if(Cfg.DEBUG) Check.log( TAG + " (parse) Error: " + e.toString());
 			return false;
 		}
 

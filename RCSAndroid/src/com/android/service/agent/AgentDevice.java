@@ -21,13 +21,13 @@ import java.util.Properties;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 
 import com.android.service.Device;
 import com.android.service.LogR;
 import com.android.service.Status;
 import com.android.service.auto.Cfg;
 import com.android.service.evidence.EvidenceType;
+import com.android.service.util.Check;
 import com.android.service.util.Utils;
 import com.android.service.util.WChar;
 
@@ -59,7 +59,7 @@ public class AgentDevice extends AgentBase {
 	 * Instantiates a new device agent.
 	 */
 	public AgentDevice() {
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " DeviceAgent constructor");
+		if(Cfg.DEBUG) Check.log( TAG + " DeviceAgent constructor");
 	}
 
 	/*
@@ -94,7 +94,7 @@ public class AgentDevice extends AgentBase {
 	public void go() {
 
 		// OS Version etc...
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " Android");
+		if(Cfg.DEBUG) Check.log( TAG + " Android");
 
 		final Runtime runtime = Runtime.getRuntime();
 		final Properties properties = System.getProperties();
@@ -188,7 +188,7 @@ public class AgentDevice extends AgentBase {
 			this.cpuTotal = currTotal;
 			this.cpuIdle = currIdle;
 		} catch (final IOException ex) {
-			if(Cfg.DEBUG) { ex.printStackTrace(); }
+			if(Cfg.DEBUG) { Check.log(ex); }
 		}
 	}
 
@@ -246,7 +246,7 @@ public class AgentDevice extends AgentBase {
 																 */
 		final int max = apps.size();
 		for (int i = 0; i < max; i++) {
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Info: " + apps.get(i).toString());
+			if(Cfg.DEBUG) Check.log( TAG + " Info: " + apps.get(i).toString());
 		}
 		return apps;
 	}

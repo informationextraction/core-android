@@ -16,7 +16,7 @@ package com.android.service;
 public class Version {
 
 	/** The Constant VERSION. */
-	public static final int VERSION = 2011032103; // 7.2.2
+	public static final int VERSION = 2011061301; // 7.3.0
 
 	/**
 	 * Instantiates a new version.

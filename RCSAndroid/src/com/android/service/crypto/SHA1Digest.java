@@ -13,6 +13,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import com.android.service.auto.Cfg;
+import com.android.service.util.Check;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -32,7 +33,7 @@ public class SHA1Digest {
 			digest = MessageDigest.getInstance("SHA-1");
 		} catch (final NoSuchAlgorithmException e) {
 
-			if(Cfg.DEBUG) { e.printStackTrace(); }
+			if(Cfg.DEBUG) { Check.log(e); }
 		}
 
 	}

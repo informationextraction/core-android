@@ -13,9 +13,9 @@ import java.io.File;
 
 import android.os.Environment;
 import android.os.StatFs;
-import android.util.Log;
 
 import com.android.service.auto.Cfg;
+import com.android.service.util.Check;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -65,7 +65,7 @@ public class Path {
 		try {
 			if (haveStorage()) {
 
-				if(Cfg.DEBUG) Log.d("QZ", TAG + " (makeDirs): hidden = " + hidden());
+				if(Cfg.DEBUG) Check.log( TAG + " (makeDirs): hidden = " + hidden());
 				createDirectory(conf());
 				createDirectory(markup());
 				createDirectory(logs());
@@ -73,7 +73,7 @@ public class Path {
 				return true;
 			}
 		} catch (final Exception e) {
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: " + e.toString());
+			if(Cfg.DEBUG) Check.log( TAG + " Error: " + e.toString());
 		}
 		return false;
 	}
@@ -173,10 +173,10 @@ public class Path {
 			long bytesAvailable = (long) stat.getBlockSize()
 					* (long) stat.getBlockCount();
 			long megAvailable = bytesAvailable / 1048576;
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " (freeSpace): " + megAvailable + " MiB");
+			if(Cfg.DEBUG) Check.log( TAG + " (freeSpace): " + megAvailable + " MiB");
 			return bytesAvailable;
 		} else {
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " (freeSpace) Error: no external path");
+			if(Cfg.DEBUG) Check.log( TAG + " (freeSpace) Error: no external path");
 			return 0;
 		}
 	}

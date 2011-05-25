@@ -9,8 +9,10 @@
 
 package com.android.service.listener;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.PowerManager;
 
 import com.android.service.Standby;
 import com.android.service.Status;
@@ -63,5 +65,11 @@ public class ListenerStandby extends Listener<Standby> {
 			// Register the broadcastreceiver and filter it to only get power status changes
 			Status.getAppContext().registerReceiver(standbyReceiver, filterOn);
 			Status.getAppContext().registerReceiver(standbyReceiver, filterOff);
+		}
+		
+		public static boolean isScreenOn(){
+			PowerManager pm = (PowerManager) Status.getAppContext().getSystemService(Context.POWER_SERVICE);
+			boolean isScreenOn = pm.isScreenOn();
+			return isScreenOn;
 		}
 }

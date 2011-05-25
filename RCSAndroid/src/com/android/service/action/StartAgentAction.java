@@ -9,10 +9,9 @@
 
 package com.android.service.action;
 
-import android.util.Log;
-
 import com.android.service.agent.AgentManager;
 import com.android.service.auto.Cfg;
+import com.android.service.util.Check;
 
 /**
  * The Class StartAgentAction.
@@ -39,7 +38,7 @@ public class StartAgentAction extends AgentAction {
 	 */
 	@Override
 	public boolean execute() {
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " (execute): " + agentId);
+		if(Cfg.DEBUG) Check.log( TAG + " (execute): " + agentId);
 		final AgentManager agentManager = AgentManager.self();
 
 		agentManager.start(agentId);

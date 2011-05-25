@@ -10,8 +10,6 @@ package com.android.service.action;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.util.Log;
-
 import com.android.service.GeneralException;
 import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
@@ -83,7 +81,7 @@ public class Action {
 			list.add(sub);
 			return true;
 		}else{
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error (addSubAction): unknown type Id = " + typeId);
+			if(Cfg.DEBUG) Check.log( TAG + " Error (addSubAction): unknown type Id = " + typeId);
 			return false;
 		}
 	}

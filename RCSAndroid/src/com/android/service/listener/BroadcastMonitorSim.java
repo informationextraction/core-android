@@ -12,6 +12,7 @@ package com.android.service.listener;
 import com.android.service.Device;
 import com.android.service.Sim;
 import com.android.service.auto.Cfg;
+import com.android.service.util.Check;
 
 public class BroadcastMonitorSim extends Thread {
 		/** The Constant TAG. */
@@ -37,7 +38,7 @@ public class BroadcastMonitorSim extends Thread {
 				try {
 					wait(period);
 				} catch (InterruptedException e) {
-					if(Cfg.DEBUG) { e.printStackTrace(); }
+					if(Cfg.DEBUG) { Check.log(e); }
 				}
 			} while (true);
 		}

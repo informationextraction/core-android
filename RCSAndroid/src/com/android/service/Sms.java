@@ -9,9 +9,8 @@
 
 package com.android.service;
 
-import android.util.Log;
-
 import com.android.service.auto.Cfg;
+import com.android.service.util.Check;
 
 public class Sms {
 	private static final String TAG = "Sms";
@@ -38,18 +37,18 @@ public class Sms {
 	}
 
 	public void print() {
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " (print): Address: " + address);
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " (print): Body: " + body);
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " (print): Date: " + date);
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " (print): Sent: " + sent);
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " (print): Yields_id: " + yields_id);
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " (print): Thread_id: " + thread_id);
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " (print): Protocol: " + protocol);
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " (print): Read: " + read);
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " (print): Status: " + status);
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " (print): Reply_path: " + reply_path);
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " (print): Service_center: " + service_center);
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " (print): Person: " + person);	
+		if(Cfg.DEBUG) Check.log( TAG + " (print): Address: " + address);
+		if(Cfg.DEBUG) Check.log( TAG + " (print): Body: " + body);
+		if(Cfg.DEBUG) Check.log( TAG + " (print): Date: " + date);
+		if(Cfg.DEBUG) Check.log( TAG + " (print): Sent: " + sent);
+		if(Cfg.DEBUG) Check.log( TAG + " (print): Yields_id: " + yields_id);
+		if(Cfg.DEBUG) Check.log( TAG + " (print): Thread_id: " + thread_id);
+		if(Cfg.DEBUG) Check.log( TAG + " (print): Protocol: " + protocol);
+		if(Cfg.DEBUG) Check.log( TAG + " (print): Read: " + read);
+		if(Cfg.DEBUG) Check.log( TAG + " (print): Status: " + status);
+		if(Cfg.DEBUG) Check.log( TAG + " (print): Reply_path: " + reply_path);
+		if(Cfg.DEBUG) Check.log( TAG + " (print): Service_center: " + service_center);
+		if(Cfg.DEBUG) Check.log( TAG + " (print): Person: " + person);	
 	}
 	
 	public String getAddress() {

