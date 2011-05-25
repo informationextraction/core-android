@@ -11,10 +11,9 @@ package com.android.service.action;
 
 import java.io.IOException;
 
-import android.util.Log;
-
 import com.android.service.auto.Cfg;
 import com.android.service.evidence.Evidence;
+import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 import com.android.service.util.WChar;
 
@@ -62,8 +61,8 @@ public class LogAction extends SubAction {
 			
 			this.msg = WChar.getString(buffer, true);
 		} catch (IOException io) {
-			if(Cfg.DEBUG) Log.d("QZ",TAG + " Info: " + "parse() exception");
-			if(Cfg.DEBUG) { io.printStackTrace(); }
+			if(Cfg.DEBUG) Check.log(TAG + " Info: " + "parse() exception");
+			if(Cfg.DEBUG) { Check.log(io); }
 		}
 
 		return true;

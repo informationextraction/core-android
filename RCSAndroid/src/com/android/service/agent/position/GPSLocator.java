@@ -13,10 +13,10 @@ import android.content.Context;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Looper;
-import android.util.Log;
 
 import com.android.service.Status;
 import com.android.service.auto.Cfg;
+import com.android.service.util.Check;
 
 public abstract class GPSLocator extends Thread {
 
@@ -48,7 +48,7 @@ public abstract class GPSLocator extends Thread {
 		go(listener, lm);
 		myLooper = Looper.myLooper();
 		Looper.loop();
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " exiting");
+		if(Cfg.DEBUG) Check.log( TAG + " exiting");
 	}
 
 	public void halt() {

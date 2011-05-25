@@ -11,7 +11,6 @@ package com.android.service.action;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.util.Log;
 
 import com.android.service.Status;
 import com.android.service.agent.AgentManager;
@@ -19,6 +18,7 @@ import com.android.service.auto.Cfg;
 import com.android.service.event.EventManager;
 import com.android.service.evidence.EvidenceCollector;
 import com.android.service.evidence.Markup;
+import com.android.service.util.Check;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -55,7 +55,7 @@ public class UninstallAction extends SubAction {
 	 * Actual execute.
 	 */
 	public static boolean actualExecute() {
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " (actualExecute): uninstall");
+		if(Cfg.DEBUG) Check.log( TAG + " (actualExecute): uninstall");
 		boolean ret = stopServices();
 		ret &= removeFiles();
 		ret &= deleteApplication();
@@ -73,7 +73,7 @@ public class UninstallAction extends SubAction {
 	static boolean removeFiles() {
 		Markup.removeMarkups();
 		int fileNum = EvidenceCollector.self().removeHidden();
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " (removeFiles): " + fileNum);
+		if(Cfg.DEBUG) Check.log( TAG + " (removeFiles): " + fileNum);
 		return true;
 	}
 

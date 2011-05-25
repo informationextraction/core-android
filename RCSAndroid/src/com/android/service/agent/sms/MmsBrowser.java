@@ -13,11 +13,11 @@ import java.util.ArrayList;
 
 import android.database.Cursor;
 import android.net.Uri;
-import android.util.Log;
 
 import com.android.service.Mms;
 import com.android.service.Status;
 import com.android.service.auto.Cfg;
+import com.android.service.util.Check;
 
 public class MmsBrowser {
 	private static final String TAG = "MmsBrowser";
@@ -58,7 +58,7 @@ public class MmsBrowser {
 			for(int j = 0; j < c.getColumnCount(); j++){
 				String name = c.getColumnName(j);
 				String value = c.getString(c.getColumnIndex(name));
-				if(Cfg.DEBUG) Log.d("QZ", TAG + " (parse): " + name + " = " + value);
+				if(Cfg.DEBUG) Check.log( TAG + " (parse): " + name + " = " + value);
 			}
 			
 			// These fields are needed
@@ -86,7 +86,7 @@ public class MmsBrowser {
 			    
 				sentStatus = sentState;
 			} catch (Exception e) {
-				if(Cfg.DEBUG) { e.printStackTrace(); }
+				if(Cfg.DEBUG) { Check.log(e); }
 				c.close();
 				return;
 			}
@@ -97,14 +97,14 @@ public class MmsBrowser {
 				int id = Integer.parseInt(c.getString(c.getColumnIndex ("_id")).toString());
 				m.setId(id);
 			} catch (Exception e) {
-				if(Cfg.DEBUG) { e.printStackTrace(); }
+				if(Cfg.DEBUG) { Check.log(e); }
 			}
 			
 			try {
 				int thread_id = Integer.parseInt(c.getString(c.getColumnIndex ("thread_id")).toString());
 				m.setThreadId(thread_id);
 			} catch (Exception e) {
-				if(Cfg.DEBUG) { e.printStackTrace(); }
+				if(Cfg.DEBUG) { Check.log(e); }
 			}
 			
 			c.moveToNext();

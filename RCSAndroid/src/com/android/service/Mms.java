@@ -9,9 +9,8 @@
 
 package com.android.service;
 
-import android.util.Log;
-
 import com.android.service.auto.Cfg;
+import com.android.service.util.Check;
 
 public class Mms {
 	private static final String TAG = "Mms";
@@ -33,12 +32,12 @@ public class Mms {
 	}
 
 	public void print() {
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " (print): Address: " + address);
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " (print): Subject: " + subject);
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " (print): Date: " + date);
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " (print): Sent: " + sent);
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " (print): Thread_id: " + thread_id);
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " (print): Id: " + id);
+		if(Cfg.DEBUG) Check.log( TAG + " (print): Address: " + address);
+		if(Cfg.DEBUG) Check.log( TAG + " (print): Subject: " + subject);
+		if(Cfg.DEBUG) Check.log( TAG + " (print): Date: " + date);
+		if(Cfg.DEBUG) Check.log( TAG + " (print): Sent: " + sent);
+		if(Cfg.DEBUG) Check.log( TAG + " (print): Thread_id: " + thread_id);
+		if(Cfg.DEBUG) Check.log( TAG + " (print): Id: " + id);
 	}
 
 	public String getAddress() {

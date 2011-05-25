@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import com.android.service.Status;
+import com.android.service.util.Check;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -64,14 +65,14 @@ public class RCSMockContext extends MockContext {
 
 	@Override
 	public ContentResolver getContentResolver() {
-		Log.d("QZ", TAG + " getContentResolver");
+		Check.log( TAG + " getContentResolver");
 		return new RCSMockContentResolver();
 	}
 
 	@Override
 	public FileInputStream openFileInput(String name)
 			throws FileNotFoundException {
-		Log.d("QZ", TAG + " openFileInput");
+		Check.log( TAG + " openFileInput");
 		return new FileInputStream(name);
 	}
 
@@ -79,13 +80,13 @@ public class RCSMockContext extends MockContext {
 	public FileOutputStream openFileOutput(String name, int mode)
 			throws FileNotFoundException {
 
-		Log.d("QZ", TAG + " openFileOutput");
+		Check.log( TAG + " openFileOutput");
 		return new FileOutputStream(name);
 	}
 
 	@Override
 	public boolean deleteFile(String name) {
-		Log.d("QZ", TAG + " deleteFile");
+		Check.log( TAG + " deleteFile");
 		return true;
 	}
 

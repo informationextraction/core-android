@@ -11,8 +11,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import android.util.Log;
-
 import com.android.service.Manager;
 import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
@@ -80,12 +78,12 @@ public class EventManager extends Manager<EventBase, Integer, EventType> {
 		events = status.getEventsMap();
 
 		if (events == null) {
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Events map null");
+			if(Cfg.DEBUG) Check.log( TAG + " Events map null");
 			return false;
 		}
 
 		if (running == null) {
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Running Events map null");
+			if(Cfg.DEBUG) Check.log( TAG + " Running Events map null");
 			return false;
 		}
 
@@ -109,10 +107,10 @@ public class EventManager extends Manager<EventBase, Integer, EventType> {
 						t.setName(e.getClass().getSimpleName());
 					}
 					t.start();
-					if(Cfg.DEBUG) Log.d("QZ", TAG + " (startAll): " + e);
+					if(Cfg.DEBUG) Check.log( TAG + " (startAll): " + e);
 					threads.put(e, t);
 				} else {
-					if(Cfg.DEBUG) Log.d("QZ", TAG + " Warn: event already running");
+					if(Cfg.DEBUG) Check.log( TAG + " Warn: event already running");
 				}
 			}
 		}
@@ -131,7 +129,7 @@ public class EventManager extends Manager<EventBase, Integer, EventType> {
 			final Map.Entry<Integer, EventBase> pairs = it.next();
 			final EventBase event = pairs.getValue();
 
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Stopping: " + event);
+			if(Cfg.DEBUG) Check.log( TAG + " Stopping: " + event);
 
 			if (event.isRunning()) {
 				event.stopThread();
@@ -144,8 +142,8 @@ public class EventManager extends Manager<EventBase, Integer, EventType> {
 					threads.remove(event);
 
 				} catch (final InterruptedException e) {
-					if(Cfg.DEBUG) { e.printStackTrace(); }
-					if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: " + e.toString());
+					if(Cfg.DEBUG) { Check.log(e); }
+					if(Cfg.DEBUG) Check.log( TAG + " Error: " + e.toString());
 				}
 			} else {
 				if(Cfg.DEBUG) Check.asserts(threads.get(event) == null, "Shouldn't find a thread");

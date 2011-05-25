@@ -14,11 +14,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.BatteryManager;
-import android.util.Log;
 
 import com.android.service.Battery;
 import com.android.service.Status;
 import com.android.service.auto.Cfg;
+import com.android.service.util.Check;
 
 public class ListenerBattery extends Listener<Battery> {
 	/** The Constant TAG. */
@@ -61,7 +61,7 @@ public class ListenerBattery extends Listener<Battery> {
 				temp = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1);
 				voltage = intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1);
 
-				if(Cfg.DEBUG) Log.d("QZ", TAG + " BatteryManager level is " + level + "/" + scale + ", temp is " + temp
+				if(Cfg.DEBUG) Check.log( TAG + " BatteryManager level is " + level + "/" + scale + ", temp is " + temp
 						+ ", voltage is " + voltage);
 
 				// Call batteryMonitor() in Status ever time we have a change of

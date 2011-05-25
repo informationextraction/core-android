@@ -12,10 +12,10 @@ package com.android.service.listener;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import com.android.service.Ac;
 import com.android.service.auto.Cfg;
+import com.android.service.util.Check;
 
 public class BroadcastMonitorAc extends BroadcastReceiver {
 	/** The Constant TAG. */
@@ -26,7 +26,7 @@ public class BroadcastMonitorAc extends BroadcastReceiver {
 	 */
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " power notification, action: " + intent.getAction());
+		if(Cfg.DEBUG) Check.log( TAG + " power notification, action: " + intent.getAction());
 		
 		boolean plugged = intent.getAction().equals(Intent.ACTION_POWER_CONNECTED);
 		

@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 import com.android.service.auto.Cfg;
 import com.android.service.conf.Configuration;
+import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 import com.android.service.util.WChar;
 
@@ -38,7 +39,7 @@ public class WCharTest extends TestCase {
 		try {
 			r1 = WChar.readPascal(dataBuffer);
 		} catch (IOException e) {
-			if(Cfg.DEBUG) { e.printStackTrace(); }
+			if(Cfg.DEBUG) { Check.log(e); }
 		}
 		assertEquals(r1, orig);
 	}

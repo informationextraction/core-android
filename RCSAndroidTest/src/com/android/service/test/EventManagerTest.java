@@ -14,6 +14,7 @@ import com.android.service.event.EventConf;
 import com.android.service.event.EventManager;
 import com.android.service.event.EventType;
 import com.android.service.mock.MockAction;
+import com.android.service.util.Check;
 import com.android.service.util.Utils;
 
 import android.test.AndroidTestCase;
@@ -126,7 +127,7 @@ public class EventManagerTest extends AndroidTestCase {
 				Utils.sleep(2000);
 			}
 		} catch (GeneralException e) {
-			if(Cfg.DEBUG) { e.printStackTrace(); }
+			if(Cfg.DEBUG) { Check.log(e); }
 		}
 
 		em.stopAll();

