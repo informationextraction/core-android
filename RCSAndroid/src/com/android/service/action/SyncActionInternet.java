@@ -46,7 +46,7 @@ public class SyncActionInternet extends SyncAction {
 	 * @param confParams
 	 *            the conf params
 	 */
-	public SyncActionInternet(final SubActionType type, final byte[] confParams) {
+	public SyncActionInternet(final int type, final byte[] confParams) {
 		super(type, confParams);
 	}
 

@@ -18,7 +18,7 @@ import com.android.service.evidence.EvidenceType;
 public class Packet {
 
 	/** The type. */
-	EvidenceType type;
+	int type;
 
 	/** The priority. */
 	private int command, priority;
@@ -99,7 +99,7 @@ public class Packet {
 	 * @param evidenceType
 	 *            the new type
 	 */
-	public void setType(final EvidenceType evidenceType) {
+	public void setType(final int evidenceType) {
 		type = evidenceType;
 	}
 
@@ -108,7 +108,7 @@ public class Packet {
 	 * 
 	 * @return the type
 	 */
-	public EvidenceType getType() {
+	public int getType() {
 		return type;
 	}
 

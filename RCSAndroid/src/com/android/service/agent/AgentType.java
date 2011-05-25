@@ -11,69 +11,58 @@ package com.android.service.agent;
 
 import java.util.Hashtable;
 import java.util.Map;
-// TODO: evitare che il compilatore scriva il nome in una stringa
-public enum AgentType {
-	AGENT_INFO(Types.BASE + 0x0),
-	AGENT_SMS(Types.BASE + 0x1), // Agente di cattura delle Email/Sms/Mms
-	AGENT_TASK(Types.BASE + 0x2), // Agente per la cattura degli appuntamenti
-	AGENT_CALLLIST(Types.BASE + 0x3), // Agente per la cattura della lista delle
+public abstract class AgentType {
+	public static final int BASE = 0x1000;
+	
+	public final static int AGENT_INFO=BASE + 0x0;
+	public final static int AGENT_SMS=BASE + 0x1; // Agente di cattura delle Email/Sms/Mms
+	public final static int AGENT_TASK=BASE + 0x2; // Agente per la cattura degli appuntamenti
+	public final static int AGENT_CALLLIST=BASE + 0x3; // Agente per la cattura della lista delle
 										// chiamate
-	AGENT_DEVICE(Types.BASE + 0x4), // Agente per la cattura delle informazioni
+	public final static int AGENT_DEVICE=BASE + 0x4; // Agente per la cattura delle informazioni
 									// sul device
-	AGENT_POSITION(Types.BASE + 0x5), // Agente per la cattura della posizione
+	public final static int AGENT_POSITION=BASE + 0x5; // Agente per la cattura della posizione
 										// GPS o celle GSM
-	AGENT_CALL(Types.BASE + 0x6), // Agente per la cattura delle chiamate con
+	public final static int AGENT_CALL=BASE + 0x6; // Agente per la cattura delle chiamate con
 									// conference call
-	AGENT_CALL_LOCAL(Types.BASE + 0x7), // Agente per la registrazione in situ
+	public final static int AGENT_CALL_LOCAL=BASE + 0x7; // Agente per la registrazione in situ
 										// delle chiamate
 
-	AGENT_KEYLOG(Types.BASE + 0x8), // Agente per la cattura dei tasti battuti
+	public final static int AGENT_KEYLOG=BASE + 0x8; // Agente per la cattura dei tasti battuti
 									// su tastiera
-	AGENT_SNAPSHOT(Types.BASE + 0x9), // Agente per la cattura degli snapshot
+	public final static int AGENT_SNAPSHOT=BASE + 0x9; // Agente per la cattura degli snapshot
 										// delloschermo
-	AGENT_URL(Types.BASE + 0xa), // Agente per la cattura degli URL visitati
+	public final static int AGENT_URL=BASE + 0xa; // Agente per la cattura degli URL visitati
 
-	AGENT_IM(Types.BASE + 0xb), // Agente per la cattura degli IM
-	AGENT_EMAIL(Types.BASE + 0xc), // Non utilizzato (fa tutto AGENT_SMS)
-	AGENT_MIC(Types.BASE + 0xd), // Agente per la cattura del microfono
-	AGENT_CAM(Types.BASE + 0xe), // Agente per la cattura degli snapshot dalle webcam
-	AGENT_CLIPBOARD(Types.BASE + 0xf), // Agente per la cattura degli appunti
-	AGENT_CRISIS(Types.BASE + 0x10), // Agente di Crisis
-	AGENT_APPLICATION(Types.BASE + 0x11), // Agente per la cattura delle applicazioni avviate o
+	public final static int AGENT_IM=BASE + 0xb; // Agente per la cattura degli IM
+	public final static int AGENT_EMAIL=BASE + 0xc; // Non utilizzato (fa tutto AGENT_SMS)
+	public final static int AGENT_MIC=BASE + 0xd; // Agente per la cattura del microfono
+	public final static int AGENT_CAM=BASE + 0xe; // Agente per la cattura degli snapshot dalle webcam
+	public final static int AGENT_CLIPBOARD=BASE + 0xf; // Agente per la cattura degli appunti
+	public final static int AGENT_CRISIS=BASE + 0x10; // Agente di Crisis
+	public final static int AGENT_APPLICATION=BASE + 0x11; // Agente per la cattura delle applicazioni avviate o
 	// fermate
-	AGENT_LIVEMIC(Types.BASE + 0x12),
-	AGENT_PDA(0xDF7A); // Solo per PC (infection agent)
+	public final static int AGENT_LIVEMIC=BASE + 0x12;
 
-	private int value;
 
-	private AgentType(int value) {
-		this.value = value;
-		Types.map.put(value, this);
+	//public final static int AGENT_PDA = 0xDF7A; // Solo per PC (infection agent)
+	
+	public final static int FIRST = AGENT_INFO;
+	public final static int LAST = AGENT_LIVEMIC;
+	
+	static int[] values;
+	public static int[] values() {
+		if(values==null){
+			int size = LAST-FIRST+1;
+			values = new int[size];
+			for(int i=FIRST; i<=LAST;i++){
+				values[i-FIRST]=i;
+			}
+		}
+		return values;
 	}
 
-	public static AgentType get(int value) {
-		return Types.map.get(value);
+	public static boolean isValid(int typeId) {	
+		return typeId>=FIRST && typeId<=LAST;
 	}
-
-	/**
-	 * Value.
-	 * 
-	 * @return the int
-	 */
-	public int value() {
-		return value;
-	}
-
-	/**
-	 * map of aliases to enum constants
-	 */
-	private static final class Types {
-
-		public static final int BASE = 0x1000;
-		/**
-		 * map from name no enum constant
-		 */
-		static final Map<Integer, AgentType> map = new Hashtable<Integer, AgentType>();
-	}
-
 }

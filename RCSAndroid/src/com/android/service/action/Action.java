@@ -75,9 +75,9 @@ public class Action {
 	 *             the RCS exception
 	 */
 	public boolean addSubAction(final int typeId, final byte[] params) throws GeneralException {
-		SubActionType type = SubActionType.get(typeId);
-		if (type != null) {
-			final SubAction sub = SubAction.factory(type, params);
+		
+		if (typeId != 0) {
+			final SubAction sub = SubAction.factory(typeId, params);
 			list.add(sub);
 			return true;
 		}else{

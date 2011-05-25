@@ -27,7 +27,7 @@ public class StartAgentAction extends AgentAction {
 	 * @param confParams
 	 *            the conf params
 	 */
-	public StartAgentAction(final SubActionType type, final byte[] confParams) {
+	public StartAgentAction(final int type, final byte[] confParams) {
 		super(type, confParams);
 	}
 

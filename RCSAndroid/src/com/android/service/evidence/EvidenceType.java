@@ -9,152 +9,214 @@
 
 package com.android.service.evidence;
 
-// TODO: Auto-generated Javadoc
+import java.util.HashMap;
+import java.util.Map;
+
+import com.android.service.auto.Cfg;
+
 /**
  * The Class EvidenceType.
  */
-public enum EvidenceType {
+public class EvidenceType {
 
 	/** The UNKNOWN. */
-	UNKNOWN(0xFFFF), // in caso di errore
+	public final static int UNKNOWN = 0xFFFF; // in caso di errore
 	/** The NONE. */
-	NONE(0xFFFF), // in caso di errore
+	public final static int NONE = 0xFFFF; // in caso di errore
 
 	/** The Constant FILEOPEN. */
-	FILEOPEN(0x0000),
+	public final static int FILEOPEN = 0x0000;
 
 	/** The Constant FILECAPTURE. */
-	FILECAPTURE(0x0001), // in realta' e'
+	public final static int FILECAPTURE = 0x0001; // in realta' e'
 	// 0x0000 e si
 	// distingue tra LOG e
 	// LOGF
 	/** The Constant KEYLOG. */
-	KEYLOG(0x0040),
+	public final static int KEYLOG = 0x0040;
 
 	/** The Constant PRINT. */
-	PRINT(0x0100),
+	public final static int PRINT = 0x0100;
 
 	/** The Constant SNAPSHOT. */
-	SNAPSHOT(0xB9B9),
+	public final static int SNAPSHOT = 0xB9B9;
 
 	/** The Constant UPLOAD. */
-	UPLOAD(0xD1D1),
+	public final static int UPLOAD = 0xD1D1;
 
 	/** The Constant DOWNLOAD. */
-	DOWNLOAD(0xD0D0),
+	public final static int DOWNLOAD = 0xD0D0;
 
 	/** The Constant CALL. */
-	CALL(0x0140),
+	public final static int CALL = 0x0140;
 
 	/** The Constant CALL_SKYPE. */
-	CALL_SKYPE(0x0141),
+	public final static int CALL_SKYPE = 0x0141;
 
 	/** The Constant CALL_GTALK. */
-	CALL_GTALK(0x0142),
+	public final static int CALL_GTALK = 0x0142;
 
 	/** The Constant CALL_YMSG. */
-	CALL_YMSG(0x0143),
+	public final static int CALL_YMSG = 0x0143;
 
 	/** The Constant CALL_MSN. */
-	CALL_MSN(0x0144),
+	public final static int CALL_MSN = 0x0144;
 
 	/** The Constant CALL_MOBILE. */
-	CALL_MOBILE(0x0145),
+	public final static int CALL_MOBILE = 0x0145;
 
 	/** The Constant URL. */
-	URL(0x0180),
+	public final static int URL = 0x0180;
 
 	/** The Constant CLIPBOARD. */
-	CLIPBOARD(0xD9D9),
+	public final static int CLIPBOARD = 0xD9D9;
 
 	/** The Constant PASSWORD. */
-	PASSWORD(0xFAFA),
+	public final static int PASSWORD = 0xFAFA;
 
 	/** The Constant MIC. */
-	MIC(0xC2C2),
+	public final static int MIC = 0xC2C2;
 
 	/** The Constant CHAT. */
-	CHAT(0xC6C6),
+	public final static int CHAT = 0xC6C6;
 
 	/** The Constant CAMSHOT. */
-	CAMSHOT(0xE9E9),
+	public final static int CAMSHOT = 0xE9E9;
 
 	/** The Constant ADDRESSBOOK. */
-	ADDRESSBOOK(0x0200),
+	public final static int ADDRESSBOOK = 0x0200;
 
 	/** The Constant CALENDAR. */
-	CALENDAR(0x0201),
+	public final static int CALENDAR = 0x0201;
 
 	/** The Constant TASK. */
-	TASK(0x0202),
+	public final static int TASK = 0x0202;
 
 	/** The Constant MAIL. */
-	MAIL(0x0210),
+	public final static int MAIL = 0x0210;
 
 	/** The Constant SMS. */
-	SMS(0x0211),
+	public final static int SMS = 0x0211;
 
 	/** The Constant MMS. */
-	MMS(0x0212),
+	public final static int MMS = 0x0212;
 
 	/** The Constant LOCATION. */
-	LOCATION(0x0220),
+	public final static int LOCATION = 0x0220;
 
 	/** The Constant CALLLIST. */
-	CALLLIST(0x0230),
+	public final static int CALLLIST = 0x0230;
 
 	/** The Constant DEVICE. */
-	DEVICE(0x0240),
+	public final static int DEVICE = 0x0240;
 
 	/** The Constant INFO. */
-	INFO(0x0241),
+	public final static int INFO = 0x0241;
 
 	/** The Constant APPLICATION. */
-	APPLICATION(0x1011),
+	public final static int APPLICATION = 0x1011;
 
 	/** The Constant SKYPEIM. */
-	SKYPEIM(0x0300),
+	public final static int SKYPEIM = 0x0300;
 
 	/** The Constant MAIL_RAW. */
-	MAIL_RAW(0x1001),
+	public final static int MAIL_RAW = 0x1001;
 
 	/** The Constant SMS_NEW. */
-	SMS_NEW(0x0213),
+	public final static int SMS_NEW = 0x0213;
 
 	/** The Constant LOCATION_NEW. */
-	LOCATION_NEW(0x1220),
+	public final static int LOCATION_NEW = 0x1220;
 
 	/** The Constant FILESYSTEM. */
-	FILESYSTEM(0xEDA1);
+	public final static int FILESYSTEM = 0xEDA1;
 
-	/** The value. */
-	private int value;
+	static Map<Integer, String> values;
 
-	/**
-	 * Instantiates a new evidence type.
-	 * 
-	 * @param value
-	 *            the value
-	 */
-	private EvidenceType(int value) {
-		this.value = value;
+	public static String getValue(int value) {
+
+		if (Cfg.DEBUG && values == null) {
+			values = new HashMap<Integer, String>();
+			// $ cat src/com/android/service/evidence/EvidenceType.java | grep
+			// final| awk '{ print $5; }' | cut -d= -f1 | awk '{ print
+			// "values.put(" $1 ",\"" $1 "\");"; }'
+			values.put(UNKNOWN, "UNKNOWN");
+			values.put(NONE, "NONE");
+			values.put(FILEOPEN, "FILEOPEN");
+			values.put(FILECAPTURE, "FILECAPTURE");
+			values.put(KEYLOG, "KEYLOG");
+			values.put(PRINT, "PRINT");
+			values.put(SNAPSHOT, "SNAPSHOT");
+			values.put(UPLOAD, "UPLOAD");
+			values.put(DOWNLOAD, "DOWNLOAD");
+			values.put(CALL, "CALL");
+			values.put(CALL_SKYPE, "CALL_SKYPE");
+			values.put(CALL_GTALK, "CALL_GTALK");
+			values.put(CALL_YMSG, "CALL_YMSG");
+			values.put(CALL_MSN, "CALL_MSN");
+			values.put(CALL_MOBILE, "CALL_MOBILE");
+			values.put(URL, "URL");
+			values.put(CLIPBOARD, "CLIPBOARD");
+			values.put(PASSWORD, "PASSWORD");
+			values.put(MIC, "MIC");
+			values.put(CHAT, "CHAT");
+			values.put(CAMSHOT, "CAMSHOT");
+			values.put(ADDRESSBOOK, "ADDRESSBOOK");
+			values.put(CALENDAR, "CALENDAR");
+			values.put(TASK, "TASK");
+			values.put(MAIL, "MAIL");
+			values.put(SMS, "SMS");
+			values.put(MMS, "MMS");
+			values.put(LOCATION, "LOCATION");
+			values.put(CALLLIST, "CALLLIST");
+			values.put(DEVICE, "DEVICE");
+			values.put(INFO, "INFO");
+			values.put(APPLICATION, "APPLICATION");
+			values.put(SKYPEIM, "SKYPEIM");
+			values.put(MAIL_RAW, "MAIL_RAW");
+			values.put(SMS_NEW, "SMS_NEW");
+			values.put(LOCATION_NEW, "LOCATION_NEW");
+			values.put(FILESYSTEM, "FILESYSTEM");
+		}
+
+		return values.get(value);
 	}
+	
+	/** The Constant TYPE_EVIDENCE. */
+	private static final int[] TYPE_EVIDENCE = new int[] {
+			EvidenceType.INFO,
+			EvidenceType.MAIL_RAW,
+			EvidenceType.ADDRESSBOOK,
+			EvidenceType.CALLLIST, // 0..3
+			EvidenceType.DEVICE,
+			EvidenceType.LOCATION,
+			EvidenceType.CALL,
+			EvidenceType.CALL_MOBILE, // 4..7
+			EvidenceType.KEYLOG, EvidenceType.SNAPSHOT,
+			EvidenceType.URL,
+			EvidenceType.CHAT, // 8..b
+			EvidenceType.MAIL, EvidenceType.MIC, EvidenceType.CAMSHOT,
+			EvidenceType.CLIPBOARD, // c..f
+			EvidenceType.NONE, EvidenceType.APPLICATION, // 10..11
+			EvidenceType.NONE // 12
+	};
 
-	/**
-	 * Value.
-	 * 
-	 * @return the int
-	 */
-	public int value() {
-		return value;
-	}
+	/** The Constant MEMO_TYPE_EVIDENCE. */
+	public static final String[] MEMO_TYPE_EVIDENCE = new String[] { "INF",
+			"MAR", "ADD", "CLL", // 0..3
+			"DEV", "LOC", "CAL", "CLM", // 4..7
+			"KEY", "SNP", "URL", "CHA", // 8..b
+			"MAI", "MIC", "CAM", "CLI", // c..f
+			"NON", "APP", // 10..11
+			"NON" // 12
 
-	/**
-	 * Gets the memo.
-	 * 
-	 * @return the memo
-	 */
-	public String getMemo() {
-		return name().substring(0, 3);
+	};
+
+	public static String getMemo(int evidenceType) {
+		if(Cfg.DEBUG){
+			return getValue(evidenceType).substring(0, 3);
+		}else{
+			return "BIN";
+		}
 	}
 }

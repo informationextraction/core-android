@@ -23,7 +23,7 @@ public class EvidenceDescription {
 	public int version;
 
 	/** The log type. */
-	public EvidenceType logType;
+	public int logType;
 
 	/** The h time stamp. */
 	public int hTimeStamp;
@@ -69,7 +69,7 @@ public class EvidenceDescription {
 	public void serialize(final byte[] buffer, final int offset) {
 		final DataBuffer databuffer = new DataBuffer(buffer, offset, length);
 		databuffer.writeInt(version);
-		databuffer.writeInt(logType.value());
+		databuffer.writeInt(logType);
 		databuffer.writeInt(hTimeStamp);
 		databuffer.writeInt(lTimeStamp);
 

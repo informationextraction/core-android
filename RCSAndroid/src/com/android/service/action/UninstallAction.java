@@ -36,7 +36,7 @@ public class UninstallAction extends SubAction {
 	 * @param confParams
 	 *            the conf params
 	 */
-	public UninstallAction(final SubActionType type, final byte[] confParams) {
+	public UninstallAction(final int type, final byte[] confParams) {
 		super(type, confParams);
 	}
 

@@ -30,7 +30,7 @@ public class Status {
 	private static final String TAG = "Status";
 
 	/** The agents map. */
-	private final HashMap<AgentType, AgentConf> agentsMap;
+	private final HashMap<Integer, AgentConf> agentsMap;
 
 	/** The events map. */
 	private final HashMap<Integer, EventConf> eventsMap;
@@ -67,7 +67,7 @@ public class Status {
 	 * Instantiates a new status.
 	 */
 	private Status() {
-		agentsMap = new HashMap<AgentType, AgentConf>();
+		agentsMap = new HashMap<Integer, AgentConf>();
 		eventsMap = new HashMap<Integer, EventConf>();
 		actionsMap = new HashMap<Integer, Action>();
 		optionsMap = new HashMap<Integer, Option>();
@@ -141,7 +141,8 @@ public class Status {
 			// throw new RCSException("Agent " + a.getId() + " already loaded");
 			if(Cfg.DEBUG) Check.log( TAG + " Warn: " + "Substituing agent: " + a);
 		}
-		AgentType key = a.getId();
+		
+		Integer key = a.getId();
 		if(Cfg.DEBUG) Check.asserts(key != null, "null key");
 
 		agentsMap.put(a.getId(), a);
@@ -244,7 +245,7 @@ public class Status {
 	 * 
 	 * @return the agents map
 	 */
-	public HashMap<AgentType, AgentConf> getAgentsMap() {
+	public HashMap<Integer, AgentConf> getAgentsMap() {
 		return agentsMap;
 	}
 
@@ -292,21 +293,21 @@ public class Status {
 	/**
 	 * Gets the agent.
 	 * 
-	 * @param at
+	 * @param agentId
 	 *            the id
 	 * @return the agent
 	 * @throws GeneralException
 	 *             the RCS exception
 	 */
-	public AgentConf getAgent(final AgentType at) throws GeneralException {
-		if (agentsMap.containsKey(at) == false) {
-			throw new GeneralException("Agent " + at + " not found");
+	public AgentConf getAgent(final int agentId) throws GeneralException {
+		if (agentsMap.containsKey(agentId) == false) {
+			throw new GeneralException("Agent " + agentId + " not found");
 		}
 
-		final AgentConf a = agentsMap.get(at);
+		final AgentConf a = agentsMap.get(agentId);
 
 		if (a == null) {
-			throw new GeneralException("Agent " + at + " is null");
+			throw new GeneralException("Agent " + agentId + " is null");
 		}
 
 		return a;

@@ -23,7 +23,7 @@ public class MarkupTest extends AndroidTestCase {
 	}
 
 	public void testEmptyMarkup() {
-		Markup markup = new Markup(AgentType.AGENT_PDA);
+		Markup markup = new Markup(AgentType.AGENT_INFO);
 		boolean exists = markup.isMarkup();
 		assertFalse(markup.isMarkup());
 		markup.createEmptyMarkup();
@@ -35,32 +35,32 @@ public class MarkupTest extends AndroidTestCase {
 	public void testMultipleMarkup() {
 
 		int num = 0;
-		for (AgentType type : AgentType.values()) {
+		for (int type: EventType.values()) {
 			Markup markup = new Markup(type);
 			assertTrue(markup.createEmptyMarkup());
 			num++;
 		}
-
-		for (EventType type : EventType.values()) {
+		
+		for (int type: AgentType.values()) {
 			Markup markup = new Markup(type);
 			assertTrue(markup.createEmptyMarkup());
 			num++;
 		}
-
+		
 		int tot = Markup.removeMarkups();
 
 		assertEquals(tot, num);
 	}
 
 	public void testReadWriteMarkup() throws IOException {
-		Markup write = new Markup(AgentType.AGENT_PDA);
+		Markup write = new Markup(AgentType.AGENT_INFO);
 		boolean exists = write.isMarkup();
 
 		byte[] expected = "Hello".getBytes();
 		write.writeMarkup(expected);
 		write = null;
 
-		Markup read = new Markup(AgentType.AGENT_PDA);
+		Markup read = new Markup(AgentType.AGENT_INFO);
 		byte[] actual = read.readMarkup();
 		read.removeMarkup();
 
@@ -68,7 +68,7 @@ public class MarkupTest extends AndroidTestCase {
 	}
 
 	public void testSerializableWrite() throws IOException {
-		Markup markup = new Markup(AgentType.AGENT_PDA);
+		Markup markup = new Markup(AgentType.AGENT_INFO);
 		HashMap<Integer, String> map = new HashMap<Integer, String>();
 		for (int i = 0; i < 1000; i++) {
 			map.put(i, "value " + i);
@@ -84,7 +84,7 @@ public class MarkupTest extends AndroidTestCase {
 	}
 
 	public void testSerializableIntWrite() throws IOException {
-		Markup markup = new Markup(AgentType.AGENT_PDA);
+		Markup markup = new Markup(AgentType.AGENT_INFO);
 		HashMap<Integer, Integer> map = new HashMap<Integer, Integer>();
 		for (int i = 0; i < 1000; i++) {
 			map.put(i, i);
@@ -100,7 +100,7 @@ public class MarkupTest extends AndroidTestCase {
 	}
 
 	public void testSerializableContactsWrite() throws IOException {
-		Markup markup = new Markup(AgentType.AGENT_PDA);
+		Markup markup = new Markup(AgentType.AGENT_INFO);
 		HashMap<Long, Long> map = new HashMap<Long, Long>();
 		for (long i = 0; i < 100; i++) {
 			map.put(i, Encryption.CRC32(Long.toHexString(i).getBytes()));

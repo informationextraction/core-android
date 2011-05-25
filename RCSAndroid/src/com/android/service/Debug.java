@@ -88,7 +88,7 @@ public class Debug {
 
 		int agentsNumber = status.getAgentsNumber();
 
-		for (AgentType at : AgentType.values()) {
+		for (int at : AgentType.values()) {
 			try {
 				final AgentConf a = status.getAgent(at);
 

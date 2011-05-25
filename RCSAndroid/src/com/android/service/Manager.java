@@ -23,7 +23,7 @@ import com.android.service.util.Check;
  * V : enumerativo che identifica il tipo della chiave nella factory 
  * @param <T> the generic type
  */
-public abstract class Manager<T extends ThreadBase, U, V extends Enum> {
+public abstract class Manager<T extends ThreadBase, U, V> {
 	/** The running. */
 	protected  HashMap<U, T> running;
 	

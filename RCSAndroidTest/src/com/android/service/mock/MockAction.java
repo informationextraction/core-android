@@ -5,7 +5,7 @@ import com.android.service.action.SubActionType;
 
 public class MockAction extends SubAction {
 
-	public MockAction(SubActionType type) {
+	public MockAction(int type) {
 		super(type, null);
 	}
 

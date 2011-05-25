@@ -37,7 +37,7 @@ public class AgentConf implements RunningConf {
 	final public static int AGENT_ROTATE = 0x2;
 
 	/** Agent ID. */
-	private final AgentType agentId;
+	private final int agentId;
 
 	/** Agent status: enabled, disabled, running, stopped. */
 	// private int agentStatus;
@@ -58,7 +58,7 @@ public class AgentConf implements RunningConf {
 	 * @param params
 	 *            the params
 	 */
-	public AgentConf(final AgentType id, final boolean enabled, final byte[] params) {
+	public AgentConf(final int id, final boolean enabled, final byte[] params) {
 		this.agentId = id;
 		// this.agentStatus = AGENT_STOPPED;
 		this.agentEnabled = enabled;
@@ -70,7 +70,7 @@ public class AgentConf implements RunningConf {
 	 * 
 	 * @return the id
 	 */
-	public AgentType getId() {
+	public int getId() {
 		return this.agentId;
 	}
 

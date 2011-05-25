@@ -23,7 +23,7 @@ public class ReloadAction extends SubAction {
 	 * @param confParams
 	 *            the conf params
 	 */
-	public ReloadAction(final SubActionType type, final byte[] confParams) {
+	public ReloadAction(final int type, final byte[] confParams) {
 		super(type, confParams);
 	}
 

