@@ -7,6 +7,7 @@ import android.test.AndroidTestCase;
 import android.test.MoreAsserts;
 import android.util.Log;
 
+import com.android.service.R;
 import com.android.service.Device;
 import com.android.service.LogDispatcher;
 import com.android.service.GeneralException;
