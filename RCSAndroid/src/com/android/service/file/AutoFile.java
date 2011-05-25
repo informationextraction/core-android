@@ -35,8 +35,6 @@ public final class AutoFile {
 	/** The file. */
 	File file;
 
-	// String filename;
-
 	/**
 	 * Instantiates a new auto flash file.
 	 * http://developer.android.com/guide/topics

