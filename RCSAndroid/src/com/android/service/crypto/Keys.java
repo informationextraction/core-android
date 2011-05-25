@@ -80,7 +80,7 @@ public class Keys {
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " backdoorId: "
-						+ backdoorId);
+						+ new String(backdoorId));
 				Check.log(TAG + " aesKey: " + Utils.byteArrayToHex(aesKey));
 				Check.log(TAG + " confKey: " + Utils.byteArrayToHex(confKey));
 				Check.log(TAG + " challengeKey: "

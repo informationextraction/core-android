@@ -22,7 +22,7 @@ import com.android.service.util.Utils;
 public class LogR {
 
 	/** The type. */
-	private final EvidenceType type;
+	private final int type;
 
 	/** The unique. */
 	private final long unique;
@@ -62,7 +62,7 @@ public class LogR {
 	 * @param priority
 	 *            the priority
 	 */
-	public LogR(final EvidenceType evidence, final int priority) {
+	public LogR(final int evidence, final int priority) {
 		unique = Utils.getRandom();
 		disp = LogDispatcher.self();
 		type = evidence;
@@ -86,7 +86,7 @@ public class LogR {
 	 * @param additional
 	 *            the additional
 	 */
-	public LogR(final EvidenceType evidenceType, final int priority, final byte[] additional) {
+	public LogR(final int evidenceType, final int priority, final byte[] additional) {
 		unique = Utils.getRandom();
 		disp = LogDispatcher.self();
 		type = evidenceType;
@@ -110,7 +110,7 @@ public class LogR {
 	 * @param additional the additional
 	 * @param data the data
 	 */
-	public LogR(final EvidenceType evidenceType, final int priority, final byte[] additional,
+	public LogR(final int evidenceType, final int priority, final byte[] additional,
 			final byte[] data) {
 		unique = Utils.getRandom();
 		disp = LogDispatcher.self();
@@ -127,13 +127,13 @@ public class LogR {
 		send(p);
 	}
 	
-	public LogR(final EvidenceType evidenceType,  final byte[] additional,
+	public LogR(final int evidenceType,  final byte[] additional,
 			final byte[] data) {
 		this(evidenceType, LOG_PRI_STD, additional, data);
 	}
 
-	public LogR(EvidenceType evidence) {
-		this(evidence, LOG_PRI_STD);
+	public LogR(int evidenceType) {
+		this(evidenceType, LOG_PRI_STD);
 	}
 
 	// Send data to dispatcher

