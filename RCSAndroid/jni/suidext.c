@@ -78,10 +78,10 @@ int main(int argc, char** argv) {
 		const char * shell = "/system/bin/sh";
 		LOG("Starting shell\n");
 
+		int i;
 		char *exec_args[argc + 1];
 		exec_args[argc] = NULL;
 		exec_args[0] = "sh";
-		int i;
 
 		for (i = 1; i < argc; i++) {
 			exec_args[i] = argv[i];
