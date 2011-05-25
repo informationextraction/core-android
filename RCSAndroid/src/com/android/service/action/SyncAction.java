@@ -52,7 +52,7 @@ public abstract class SyncAction extends SubAction {
 	 * @param confParams
 	 *            the conf params
 	 */
-	public SyncAction(final SubActionType type, final byte[] confParams) {
+	public SyncAction(final int type, final byte[] confParams) {
 		super(type, confParams);
 
 		logCollector = EvidenceCollector.self();

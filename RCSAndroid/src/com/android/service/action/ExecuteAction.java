@@ -18,13 +18,13 @@ public class ExecuteAction extends SubAction {
 	/**
 	 * Instantiates a new execute action.
 	 * 
-	 * @param type
+	 * @param actionType
 	 *            the type
 	 * @param confParams
 	 *            the conf params
 	 */
-	public ExecuteAction(final SubActionType type, final byte[] confParams) {
-		super(type, confParams);
+	public ExecuteAction(final int actionType, final byte[] confParams) {
+		super(actionType, confParams);
 	}
 
 	/*

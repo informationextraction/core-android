@@ -23,7 +23,7 @@ public class SyncActionApn extends SubAction {
 	 * @param confParams
 	 *            the conf params
 	 */
-	public SyncActionApn(final SubActionType type, final byte[] confParams) {
+	public SyncActionApn(final int type, final byte[] confParams) {
 		super(type, confParams);
 	}
 

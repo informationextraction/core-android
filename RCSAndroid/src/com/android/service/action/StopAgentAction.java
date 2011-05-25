@@ -14,7 +14,7 @@ import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
 
 public class StopAgentAction extends AgentAction {
-	public StopAgentAction(SubActionType type, byte[] confParams) {
+	public StopAgentAction(int type, byte[] confParams) {
 		super(type, confParams);
 	}
 

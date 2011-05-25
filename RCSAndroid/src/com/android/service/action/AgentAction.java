@@ -33,7 +33,7 @@ public abstract class AgentAction extends SubAction {
 	 * @param confParams
 	 *            the conf params
 	 */
-	public AgentAction(final SubActionType type, final byte[] confParams) {
+	public AgentAction(final int type, final byte[] confParams) {
 		super(type, confParams);
 	}
 
