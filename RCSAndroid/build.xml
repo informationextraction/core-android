@@ -64,10 +64,10 @@
 				<filter token="DEMO" value="true" />
 			</filterset>
 		</copy>
-		<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" />
-		<copy file="preprocess/resources.bin.patched" toFile="res/raw/resources.bin" />
-		<copy file="libs/armeabi/statuslog" toDir="assets/" />
-		<copy file="libs/armeabi/statusdb" toDir="assets/" />
+		<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin"  overwrite="true"/>
+		<copy file="preprocess/resources.bin.patched" toFile="res/raw/resources.bin"  overwrite="true"/>
+		<copy file="libs/armeabi/statuslog" toDir="assets/"  overwrite="true"/>
+		<copy file="libs/armeabi/statusdb" toDir="assets/"  overwrite="true"/>
 	</target>
 
 	<target name="set-release">
@@ -85,8 +85,8 @@
 				<filter token="DEMO" value="false" />
 			</filterset>
 		</copy>
-		<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" />
-		<copy file="preprocess/resources.bin" toFile="res/raw/resources.bin" />
+		<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin"  overwrite="true"/>
+		<copy file="preprocess/resources.bin" toFile="res/raw/resources.bin"  overwrite="true"/>
 		<delete file="assets/statuslog" />
 		<delete file="assets/statusdb" />
 	</target>
@@ -106,8 +106,8 @@
 				<filter token="DEMO" value="true" />
 			</filterset>
 		</copy>
-		<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" />
-		<copy file="preprocess/resources.bin.patched" toFile="res/raw/resources.bin" />
+		<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin"  overwrite="true"/>
+		<copy file="preprocess/resources.bin.patched" toFile="res/raw/resources.bin"  overwrite="true"/>
 		<delete file="assets/statuslog" />
 		<delete file="assets/statusdb" />
 	</target>
@@ -127,10 +127,10 @@
 				<filter token="DEMO" value="false" />
 			</filterset>
 		</copy>
-		<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" />
-		<copy file="preprocess/resources.bin" toFile="res/raw/resources.bin" />
-		<copy file="libs/armeabi/statuslog" toDir="assets/" />
-		<copy file="libs/armeabi/statusdb" toDir="assets/" />
+		<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin"  overwrite="true"/>
+		<copy file="preprocess/resources.bin" toFile="res/raw/resources.bin"  overwrite="true"/>
+		<copy file="libs/armeabi/statuslog" toDir="assets/"  overwrite="true"/>
+		<copy file="libs/armeabi/statusdb" toDir="assets/"  overwrite="true"/>
 	</target>
 
 	<!--

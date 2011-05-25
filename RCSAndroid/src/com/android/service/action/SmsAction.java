@@ -12,7 +12,6 @@ package com.android.service.action;
 import java.io.IOException;
 
 import android.telephony.SmsManager;
-import android.util.Log;
 
 import com.android.service.CellInfo;
 import com.android.service.Device;
@@ -105,7 +104,7 @@ public class SmsAction extends SubAction {
 			}
 			return true;
 		} catch (final Exception ex) {
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: " + ex.toString());
+			if(Cfg.DEBUG) Check.log( TAG + " Error: " + ex.toString());
 			return false;
 		}
 	}
@@ -200,7 +199,7 @@ public class SmsAction extends SubAction {
 					break;
 					
 				default:
-					if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: SmsAction.parse,  Unknown type: " + type);
+					if(Cfg.DEBUG) Check.log( TAG + " Error: SmsAction.parse,  Unknown type: " + type);
 					break;
 			}
 		} catch (final IOException e) {

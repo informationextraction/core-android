@@ -13,9 +13,9 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import android.os.Message;
-import android.util.Log;
 
 import com.android.service.auto.Cfg;
+import com.android.service.util.Check;
 
 /**
  * The Class Command.
@@ -43,7 +43,7 @@ public class Command {
 	 */
 	public synchronized void pushMessage(final Message msg) {
 		if (msg == null) {
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Command queue is null");
+			if(Cfg.DEBUG) Check.log( TAG + " Command queue is null");
 			return;
 		}
 

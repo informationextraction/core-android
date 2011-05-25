@@ -17,8 +17,6 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import android.util.Log;
-
 import com.android.service.auto.Cfg;
 import com.android.service.evidence.Evidence;
 import com.android.service.file.Path;
@@ -83,7 +81,7 @@ public class LogDispatcher extends Thread implements Runnable {
 	 */
 	private void processQueue() {
 		Packet p;
-		// if(AutoConfig.DEBUG) Log.d("QZ", TAG +
+		// if(AutoConfig.DEBUG) Check.log( TAG +
 		// " processQueue() Packets in Queue: " + q.size());
 
 		if (queue.size() == 0) {
@@ -94,7 +92,7 @@ public class LogDispatcher extends Thread implements Runnable {
 			p = queue.take();
 		} catch (final InterruptedException e) {
 			if (Cfg.DEBUG) {
-				e.printStackTrace();
+				Check.log(e);
 			}
 			return;
 		}
@@ -118,7 +116,7 @@ public class LogDispatcher extends Thread implements Runnable {
 
 		default:
 			if (Cfg.DEBUG)
-				Log.d("QZ", TAG + " Error: " + "processQueue() got LOG_UNKNOWN");
+				Check.log( TAG + " Error: " + "processQueue() got LOG_UNKNOWN");
 			break;
 		}
 
@@ -150,7 +148,7 @@ public class LogDispatcher extends Thread implements Runnable {
 	@Override
 	public void run() {
 		if (Cfg.DEBUG)
-			Log.d("QZ", TAG + " LogDispatcher started");
+			Check.log( TAG + " LogDispatcher started");
 
 		// Create log directory
 		sdDir = new File(Path.logs());
@@ -172,14 +170,14 @@ public class LogDispatcher extends Thread implements Runnable {
 					queue.clear();
 					evidences.clear();
 					if (Cfg.DEBUG)
-						Log.d("QZ", TAG + " LogDispatcher closing");
+						Check.log( TAG + " LogDispatcher closing");
 					return;
 				}
 
 				processQueue();
 			} catch (final InterruptedException e) {
 				if (Cfg.DEBUG) {
-					e.printStackTrace();
+					Check.log(e);
 				}
 			} finally {
 				lock.unlock();
@@ -206,7 +204,7 @@ public class LogDispatcher extends Thread implements Runnable {
 			}
 		} catch (final Exception e) {
 			if (Cfg.DEBUG) {
-				e.printStackTrace();
+				Check.log(e);
 			}
 		} finally {
 			lock.unlock();
@@ -279,7 +277,7 @@ public class LogDispatcher extends Thread implements Runnable {
 	private boolean writeLog(final Packet p) {
 		if (evidences.containsKey(p.getId()) == false) {
 			if (Cfg.DEBUG)
-				Log.d("QZ", TAG + " Requested log not found");
+				Check.log( TAG + " Requested log not found");
 			return false;
 		}
 
@@ -299,7 +297,7 @@ public class LogDispatcher extends Thread implements Runnable {
 	private boolean closeLog(final Packet p) {
 		if (evidences.containsKey(p.getId()) == false) {
 			if (Cfg.DEBUG)
-				Log.d("QZ", TAG + " Requested log not found");
+				Check.log( TAG + " Requested log not found");
 			return false;
 		}
 

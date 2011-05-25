@@ -10,6 +10,7 @@ import com.android.service.agent.AgentConf;
 import com.android.service.evidence.Evidence;
 import com.android.service.evidence.EvidenceType;
 import com.android.service.mock.RCSMockContext;
+import com.android.service.util.Check;
 import com.android.service.util.Utils;
 import com.android.service.util.WChar;
 
@@ -41,7 +42,7 @@ public class EvidenceTest extends AndroidTestCase {
 				.hexStringToByteArray("6f245cab61d26d01f514cbea5ae234c2");
 		final byte[] encData = evidence.getEncData();
 
-		Log.d("QZ", TAG + Utils.byteArrayToHex(encData));
+		Check.log( TAG + Utils.byteArrayToHex(encData));
 		assertTrue(Arrays.equals(encData, expected));
 
 	}

@@ -10,8 +10,6 @@ package com.android.service.agent;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import android.util.Log;
-
 import com.android.service.Manager;
 import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
@@ -55,12 +53,12 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 		agents = status.getAgentsMap();
 
 		if (agents == null) {
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Agents map null");
+			if(Cfg.DEBUG) Check.log( TAG + " Agents map null");
 			return false;
 		}
 
 		if (running == null) {
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Running Agents map null");
+			if(Cfg.DEBUG) Check.log( TAG + " Running Agents map null");
 			return false;
 		}
 
@@ -112,12 +110,12 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 		agents = status.getAgentsMap();
 
 		if (agents == null) {
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Agents map null");
+			if(Cfg.DEBUG) Check.log( TAG + " Agents map null");
 			return;
 		}
 
 		if (running == null) {
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Running Agents map null");
+			if(Cfg.DEBUG) Check.log( TAG + " Running Agents map null");
 			return;
 		}
 
@@ -129,7 +127,7 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 
 		// Agent mapped and running
 		if (a.isRunning() || a.isSuspended()) {
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Agent " + key + " is already running or suspended");
+			if(Cfg.DEBUG) Check.log( TAG + " Agent " + key + " is already running or suspended");
 			return;
 		}
 
@@ -172,7 +170,7 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 		final AgentBase a = running.get(key);
 		
 		if (a == null) {
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Agent " + key + " not present");
+			if(Cfg.DEBUG) Check.log( TAG + " Agent " + key + " not present");
 			return;
 		}
 
@@ -185,7 +183,7 @@ public class AgentManager extends Manager<AgentBase, AgentType, AgentType> {
 				t.join();
 			} catch (final InterruptedException e) {
 				// TODO Auto-generated catch block
-				if(Cfg.DEBUG) { e.printStackTrace(); }
+				if(Cfg.DEBUG) { Check.log(e); }
 			}
 		}
 		threads.remove(a);

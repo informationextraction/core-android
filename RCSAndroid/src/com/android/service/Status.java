@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.android.service.action.Action;
 import com.android.service.agent.AgentConf;
@@ -140,7 +139,7 @@ public class Status {
 
 		if (agentsMap.containsKey(a.getId()) == true) {
 			// throw new RCSException("Agent " + a.getId() + " already loaded");
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Warn: " + "Substituing agent: " + a);
+			if(Cfg.DEBUG) Check.log( TAG + " Warn: " + "Substituing agent: " + a);
 		}
 		AgentType key = a.getId();
 		if(Cfg.DEBUG) Check.asserts(key != null, "null key");
@@ -158,11 +157,11 @@ public class Status {
 	 *             the RCS exception
 	 */
 	public void addEvent(final EventConf e) {
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " addEvent ");
+		if(Cfg.DEBUG) Check.log( TAG + " addEvent ");
 		// Don't add the same event twice
 		if (eventsMap.containsKey(e.getId()) == true) {
 			// throw new RCSException("Event " + e.getId() + " already loaded");
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Warn: " + "Substituing event: " + e);
+			if(Cfg.DEBUG) Check.log( TAG + " Warn: " + "Substituing event: " + e);
 		}
 
 		eventsMap.put(e.getId(), e);
@@ -386,7 +385,7 @@ public class Status {
 				triggeredSemaphore.notifyAll();
 			} catch (Exception ex) {
 				if (Cfg.DEBUG) {
-					ex.printStackTrace();
+					Check.log(ex);
 				}
 			}
 		}
@@ -403,7 +402,7 @@ public class Status {
 				triggeredSemaphore.wait();
 			}
 		} catch (Exception e) {
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: " + " getActionIdTriggered: " + e);
+			if(Cfg.DEBUG) Check.log( TAG + " Error: " + " getActionIdTriggered: " + e);
 		}
 
 		synchronized (triggeredActions) {
@@ -435,7 +434,7 @@ public class Status {
 				triggeredSemaphore.notifyAll();
 			} catch (Exception ex) {
 				if (Cfg.DEBUG) {
-					ex.printStackTrace();
+					Check.log(ex);
 				}
 			}
 		}
@@ -453,7 +452,7 @@ public class Status {
 				triggeredSemaphore.notifyAll();
 			} catch (Exception ex) {
 				if (Cfg.DEBUG) {
-					ex.printStackTrace();
+					Check.log(ex);
 				}
 			}
 		}
@@ -464,7 +463,7 @@ public class Status {
 			crisisType = type;
 		}
 
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " setCrisis: " + type);
+		if(Cfg.DEBUG) Check.log( TAG + " setCrisis: " + type);
 
 		AgentConf agent;
 		try {
@@ -476,7 +475,7 @@ public class Status {
 		} catch (GeneralException e) {
 			// TODO Auto-generated catch block
 			if (Cfg.DEBUG) {
-				e.printStackTrace();
+				Check.log(e);
 			}
 		}
 

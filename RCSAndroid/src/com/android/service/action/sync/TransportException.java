@@ -9,9 +9,8 @@
 
 package com.android.service.action.sync;
 
-import android.util.Log;
-
 import com.android.service.auto.Cfg;
+import com.android.service.util.Check;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -29,6 +28,6 @@ public class TransportException extends Exception {
 	 *            the i
 	 */
 	public TransportException(final int i) {
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " TransportException: " + i);
+		if(Cfg.DEBUG) Check.log( TAG + " TransportException: " + i);
 	}
 }

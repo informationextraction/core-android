@@ -9,10 +9,9 @@
 
 package com.android.service.action;
 
-import android.util.Log;
-
 import com.android.service.agent.AgentManager;
 import com.android.service.auto.Cfg;
+import com.android.service.util.Check;
 
 public class StopAgentAction extends AgentAction {
 	public StopAgentAction(SubActionType type, byte[] confParams) {
@@ -23,7 +22,7 @@ public class StopAgentAction extends AgentAction {
 
 	@Override
 	public boolean execute() {
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " (execute): " + agentId);
+		if(Cfg.DEBUG) Check.log( TAG + " (execute): " + agentId);
 		final AgentManager agentManager = AgentManager.self();
 
 		agentManager.stop(agentId);

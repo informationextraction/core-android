@@ -6,4 +6,5 @@ public class Cfg {
 	public static final boolean EXP = false;
 	public static final boolean DEMO = true;
 	public static final boolean KEYS = false;
+	public static final boolean FILE = true;
 }

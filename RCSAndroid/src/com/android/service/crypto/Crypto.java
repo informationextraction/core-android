@@ -16,8 +16,6 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import android.util.Log;
-
 import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
 
@@ -149,7 +147,7 @@ public class Crypto {
 
 			System.arraycopy(buffer, 0, plain, 0, buffer.length);
 		} catch (final Exception e) {
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: " + e.toString());
+			if(Cfg.DEBUG) Check.log( TAG + " Error: " + e.toString());
 		}
 
 	}

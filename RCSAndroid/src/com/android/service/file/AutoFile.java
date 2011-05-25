@@ -19,8 +19,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
 
-import android.util.Log;
-
 import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
 import com.android.service.util.Utils;
@@ -78,15 +76,14 @@ public final class AutoFile {
 			in.read(buffer, 0, length);
 			return buffer;
 		} catch (final IOException e) {
-			if(Cfg.DEBUG) { e.printStackTrace(); }
+			if(Cfg.DEBUG) { Check.log(e); }
 
 		} finally {
 			if (in != null) {
 				try {
 					in.close();
 				} catch (final IOException e) {
-					// TODO Auto-generated catch block
-					if(Cfg.DEBUG) { e.printStackTrace(); }
+					if(Cfg.DEBUG) { Check.log(e); }
 				}
 			}
 		}
@@ -130,7 +127,7 @@ public final class AutoFile {
 				try {
 					out.close();
 				} catch (final IOException e) {
-					if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: " + e.toString());
+					if(Cfg.DEBUG) Check.log( TAG + " Error: " + e.toString());
 				}
 			}
 		}
@@ -208,8 +205,9 @@ public final class AutoFile {
 	/**
 	 * Flush.
 	 */
+	@Deprecated
 	public void flush() {
-
+	
 	}
 
 	/**
@@ -230,5 +228,13 @@ public final class AutoFile {
 	public void create() {
 		write(new byte[0]);
 		if(Cfg.DEBUG) Check.ensures(file.exists(), "Non existing files");
+	}
+
+	public void write(String string) {
+		write(string.getBytes());	
+	}
+
+	public void append(String string) {
+		append(string.getBytes());
 	}
 }

