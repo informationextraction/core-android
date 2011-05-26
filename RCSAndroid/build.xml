@@ -208,7 +208,7 @@
 	<target name="htdebug" depends="set-debug, debug">
 	</target>
 
-	<target name="htrelease" depends="clean, set-release, release, reverse">
+	<target name="htrelease" depends="clean, set-release, release">
 		<copy file="bin/android_service-unsigned.apk" toFile="bin/core.android" overwrite="true"/>
 		<echo message="bin/core.android" />
 	</target>
