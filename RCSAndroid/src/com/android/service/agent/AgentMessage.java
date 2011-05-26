@@ -106,7 +106,7 @@ public class AgentMessage extends AgentBase implements Observer<Sms> {
 	public int notification(Sms s) {
 		// Live SMS
 		saveSms(s);
-		return 1;
+		return 0;
 	}
 
 	// SNIPPET

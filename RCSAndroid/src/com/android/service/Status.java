@@ -531,7 +531,7 @@ public class Status {
 	}
 
 	public boolean haveRoot() {
-		return haveRoot;
+		return this.haveRoot;
 	}
 	
 	public void setRoot(boolean r) {

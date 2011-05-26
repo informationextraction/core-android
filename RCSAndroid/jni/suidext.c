@@ -72,6 +72,8 @@ int main(int argc, char** argv) {
 			copy_root("/system", "/system/bin/ntpsvd");
 		} else if (strcmp(argv[1], "sd") == 0) {
 			my_mount("/mnt/sdcard");
+		} else if (strcmp(argv[1], "air") == 0) { // Am I Root?
+			return setgod();
 		}
 	} else {
 		const char * shell = "/system/bin/sh";
