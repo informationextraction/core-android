@@ -23,6 +23,7 @@ import com.android.service.crypto.Crypto;
 import com.android.service.crypto.Keys;
 import com.android.service.event.EventConf;
 import com.android.service.event.EventType;
+import com.android.service.evidence.Evidence;
 import com.android.service.util.Check;
 import com.android.service.util.Utils;
 
@@ -112,7 +113,7 @@ public class Configuration {
 
 			// Parse and load configuration
 			parseConfiguration();
-		} catch (final Exception rcse) {
+		} catch (final Exception rcse) {			
 			return false;
 		}
 

