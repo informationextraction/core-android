@@ -28,11 +28,11 @@ public class AgentClipboard extends AgentBase {
 	private static final String TAG = "AgentClipboard";
 
 	ClipboardManager clipboardManager;
-	String lastClip = "";
+	static String lastClip = "";
 
 	@Override
 	public boolean parse(AgentConf conf) {
-		setPeriod(1000);
+		setPeriod(5000);
 		return true;
 	}
 

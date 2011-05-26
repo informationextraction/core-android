@@ -76,14 +76,18 @@ public final class AutoFile {
 			in.read(buffer, 0, length);
 			return buffer;
 		} catch (final IOException e) {
-			if(Cfg.DEBUG) { Check.log(e); }
+			if (Cfg.DEBUG) {
+				Check.log(e);
+			}
 
 		} finally {
 			if (in != null) {
 				try {
 					in.close();
 				} catch (final IOException e) {
-					if(Cfg.DEBUG) { Check.log(e); }
+					if (Cfg.DEBUG) {
+						Check.log(e);
+					}
 				}
 			}
 		}
@@ -127,7 +131,8 @@ public final class AutoFile {
 				try {
 					out.close();
 				} catch (final IOException e) {
-					if(Cfg.DEBUG) Check.log( TAG + " Error: " + e.toString());
+					if (Cfg.DEBUG)
+						Check.log(TAG + " Error: " + e.toString());
 				}
 			}
 		}
@@ -180,7 +185,8 @@ public final class AutoFile {
 	 * @return the string[]
 	 */
 	public String[] list() {
-		if(Cfg.DEBUG) Check.asserts(isDirectory(), "Should be a directory");
+		if (Cfg.DEBUG)
+			Check.asserts(isDirectory(), "Should be a directory");
 		return file.list();
 	}
 
@@ -207,7 +213,7 @@ public final class AutoFile {
 	 */
 	@Deprecated
 	public void flush() {
-	
+
 	}
 
 	/**
@@ -227,14 +233,31 @@ public final class AutoFile {
 
 	public void create() {
 		write(new byte[0]);
-		if(Cfg.DEBUG) Check.ensures(file.exists(), "Non existing files");
+		if (Cfg.DEBUG)
+			Check.ensures(file.exists(), "Non existing files");
 	}
 
 	public void write(String string) {
-		write(string.getBytes());	
+		write(string.getBytes());
 	}
 
 	public void append(String string) {
 		append(string.getBytes());
+	}
+
+	public boolean rename(String string) {
+		try {
+			File file = new File(string);
+			if (file.exists()) {
+				file.delete();
+			}
+
+			file.renameTo(file);
+		} catch (Exception ex) {
+			if(Cfg.DEBUG) Check.log(ex);
+			return false;
+		}
+
+		return true;
 	}
 }

