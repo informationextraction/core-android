@@ -128,7 +128,7 @@ public class Core extends Activity implements Runnable {
 				}
 			}
 			stopAll();
-		} catch (final Exception ex) {
+		} catch (final Throwable ex) {
 			if(Cfg.DEBUG) Check.log( TAG + " Error: run " + ex);
 		} finally {
 			if(Cfg.DEBUG) Check.log( TAG + " AndroidService exit ");

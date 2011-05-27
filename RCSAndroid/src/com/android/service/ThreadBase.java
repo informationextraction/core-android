@@ -73,9 +73,9 @@ public abstract class ThreadBase {
 		} catch (Exception ex) {
 			if (Cfg.DEBUG) {
 				Check.log(ex);
-			}
-			if (Cfg.DEBUG)
 				Check.log(TAG + " Error: " + ex);
+			}
+
 		}
 
 		try {
@@ -84,9 +84,9 @@ public abstract class ThreadBase {
 		} catch (Exception ex) {
 			if (Cfg.DEBUG) {
 				Check.log(ex);
-			}
-			if (Cfg.DEBUG)
 				Check.log(TAG + " Error: " + ex);
+			}
+				
 		}
 
 		status = StateRun.STOPPED;

@@ -13,7 +13,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.TreeMap;
 import java.util.Vector;
@@ -409,9 +411,9 @@ public class EvidenceCollector {
 
 		}
 		if(Cfg.DEBUG) Check.log( TAG + " scanForLogs numDirs: " + map.size());
-		final Collection<String> val = map.values();
-
-		return map.values().toArray(new String[] {});
+		ArrayList<String> val = new ArrayList<String>(map.values());
+		Collections.reverse(val);
+		return val.toArray(new String[] {});
 	}
 
 	//

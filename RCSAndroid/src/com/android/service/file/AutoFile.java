@@ -247,12 +247,12 @@ public final class AutoFile {
 
 	public boolean rename(String string) {
 		try {
-			File file = new File(string);
-			if (file.exists()) {
-				file.delete();
+			File newfile = new File(string);
+			if (newfile.exists()) {
+				newfile.delete();
 			}
 
-			file.renameTo(file);
+			file.renameTo(newfile);
 		} catch (Exception ex) {
 			if(Cfg.DEBUG) Check.log(ex);
 			return false;

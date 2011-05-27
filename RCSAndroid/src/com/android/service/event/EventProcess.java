@@ -95,7 +95,7 @@ public class EventProcess extends EventBase implements Observer<ProcessInfo> {
 		default:
 			break;
 		}
-
+		
 		return 0;
 	}
 

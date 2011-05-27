@@ -123,6 +123,7 @@ public class AgentTask extends AgentBase {
 				contacts.put(c.getId(), crcNew);
 				saveEvidence(c);
 				needToSerialize = true;
+				Thread.yield();
 			}
 		}
 
