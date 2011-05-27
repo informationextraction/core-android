@@ -9,17 +9,22 @@ package com.android.service;
 
 import java.nio.ByteBuffer;
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import android.os.Handler;
+import android.os.Handler.Callback;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 
 import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class ThreadBase.
  */
-public abstract class ThreadBase {
+public abstract class ThreadBase implements Runnable {
 
 	/** The Constant NEVER. */
 	protected static final long NEVER = Long.MAX_VALUE;
@@ -41,12 +46,16 @@ public abstract class ThreadBase {
 	/** The status. */
 	protected StateRun status;
 
+	public ThreadBase() {
+
+	}
+
+	// Gli eredi devono implementare i seguenti metodi astratti
 	/**
 	 * Go.
 	 */
 	public abstract void go();
 
-	// Gli eredi devono implementare i seguenti metodi astratti
 	/**
 	 * Begin.
 	 */
@@ -86,7 +95,7 @@ public abstract class ThreadBase {
 				Check.log(ex);
 				Check.log(TAG + " Error: " + ex);
 			}
-				
+
 		}
 
 		status = StateRun.STOPPED;
@@ -104,11 +113,12 @@ public abstract class ThreadBase {
 				if (!stopRequest) {
 					if (delay > 0) {
 						Date before, after;
-						
-						if (Cfg.DEBUG) before = new Date();
-						
+
+						if (Cfg.DEBUG)
+							before = new Date();
+
 						wait(delay);
-						
+
 						if (Cfg.DEBUG) {
 							after = new Date();
 							long elapsed = after.getTime() - before.getTime();
@@ -130,14 +140,30 @@ public abstract class ThreadBase {
 					go();
 				}
 
-				// stopThread e' sincronizzato, questo garantisce che la notify
-				// non vada perduta
+				Date before, after;
+
+				if (Cfg.DEBUG)
+					before = new Date();
+
 				synchronized (this) {
+					// stopThread e' sincronizzato, questo garantisce che la
+					// notify
+					// non vada perduta
+
 					if (stopRequest) {
 						break;
 					}
 					wait(period);
 				}
+
+				if (Cfg.DEBUG) {
+					after = new Date();
+					long elapsed = after.getTime() - before.getTime();
+					if (elapsed > period * 1.5) {
+						Log.d("QZ", TAG + " (loop) Error: period=" + period + " elapsed=" + elapsed + "s " + this);
+					}
+				}
+
 			}
 		} catch (Exception ex) {
 			if (Cfg.DEBUG)
@@ -221,4 +247,5 @@ public abstract class ThreadBase {
 	public synchronized boolean isSuspended() {
 		return suspended;
 	}
+
 }

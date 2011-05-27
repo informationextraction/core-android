@@ -17,7 +17,7 @@ import com.android.service.util.Check;
 /**
  * The Class EventBase.
  */
-public abstract class EventBase extends ThreadBase implements Runnable {
+public abstract class EventBase extends ThreadBase {
  
 	/** The Constant TAG. */
 	private static final String TAG = "EventBase";

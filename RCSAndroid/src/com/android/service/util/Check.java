@@ -73,9 +73,11 @@ public final class Check {
 		if(Cfg.DEBUG) {
 			Log.d("QZ", string);
 			if(Cfg.FILE){
-				AutoFile file = new AutoFile(Path.logs(), Path.LOG_FILE);
-				DateTime date = new DateTime();
-				file.append(date.getOrderedString() + " - " + string + "\n");
+				AutoFile file = new AutoFile(Path.logs(), Path.LOG_FILE);		
+				if(file.exists()){
+					DateTime date = new DateTime();
+					file.append(date.getOrderedString() + " - " + string + "\n");
+				}
 			}
 		}
 	}

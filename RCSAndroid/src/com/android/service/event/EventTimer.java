@@ -14,7 +14,6 @@ import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class TimerEvent.
  */
@@ -48,7 +47,6 @@ public class EventTimer extends EventBase {
 	 */
 	public EventTimer() {
 		if(Cfg.DEBUG) Check.log( TAG + " TimerEvent constructor");
-		
 	}
 
 	/*
@@ -95,7 +93,6 @@ public class EventTimer extends EventBase {
 				
 			case CONF_TIMER_REPEAT:
 				if(Cfg.DEBUG) Check.log( TAG + " Info: TIMER_REPEAT period: " + loDelay);
-				// TODO: decidere se lasciarlo a 1000 o a loDelay
 				setDelay(loDelay);
 				setPeriod(loDelay);
 				break;

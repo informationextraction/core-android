@@ -75,6 +75,7 @@ public class Path {
 				if(Cfg.FILE){
 					File file = new File(logs(),LOG_FILE);
 					file.delete();
+					file.createNewFile();
 				}
 
 				return true;

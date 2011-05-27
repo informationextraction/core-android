@@ -10,6 +10,8 @@ package com.android.service;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.res.Resources;
+import android.os.Handler;
+import android.os.Message;
 
 import com.android.service.action.Action;
 import com.android.service.action.SubAction;
@@ -244,11 +246,16 @@ public class Core extends Activity implements Runnable {
 			return true;
 
 		} catch (final GeneralException rcse) {
-			if(Cfg.DEBUG) { Check.log(rcse); }
-			if(Cfg.DEBUG) Check.log( TAG + " RCSException() detected");
+			if(Cfg.DEBUG) { 
+				Check.log(rcse);
+				Check.log( TAG + " RCSException() detected");
+			}
+			 
 		} catch (final Exception e) {
-			if(Cfg.DEBUG) { Check.log(e); }
-			if(Cfg.DEBUG) Check.log( TAG + " Exception() detected");
+			if(Cfg.DEBUG) { 
+				Check.log(e); 
+				Check.log( TAG + " Exception() detected");
+			}
 		}
 
 		return false;

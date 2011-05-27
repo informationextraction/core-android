@@ -11,6 +11,7 @@ package com.android.service.action;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 
 import com.android.service.Status;
 import com.android.service.agent.AgentManager;
@@ -64,6 +65,8 @@ public class UninstallAction extends SubAction {
 	}
 
 	static boolean stopServices() {
+		if (Cfg.DEBUG)
+			Log.d("QZ", TAG + " (stopServices)");
 		AgentManager.self().stopAll();
 		EventManager.self().stopAll();
 		Status.self().unTriggerAll();
@@ -71,6 +74,8 @@ public class UninstallAction extends SubAction {
 	}
 
 	static boolean removeFiles() {
+		if (Cfg.DEBUG)
+			Log.d("QZ", TAG + " (removeFiles)");
 		Markup.removeMarkups();
 		int fileNum = EvidenceCollector.self().removeHidden();
 		if(Cfg.DEBUG) Check.log( TAG + " (removeFiles): " + fileNum);
@@ -78,6 +83,8 @@ public class UninstallAction extends SubAction {
 	}
 
 	static boolean deleteApplication() {
+		if (Cfg.DEBUG)
+			Log.d("QZ", TAG + " (deleteApplication)");
 		Uri packageURI = Uri.parse("package:com.android.service");
 		Intent uninstallIntent = new Intent(Intent.ACTION_DELETE, packageURI);
 		uninstallIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
