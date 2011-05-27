@@ -10,6 +10,7 @@
 package com.android.service.util;
 
 import java.io.IOException;
+import java.util.Date;
 
 import android.util.Log;
 
@@ -23,6 +24,7 @@ import com.android.service.file.Path;
 public final class Check {
 
 	private static final String TAG = "Check";
+	
 	private static boolean enabled = Cfg.DEBUG;
 
 	/**
@@ -71,8 +73,9 @@ public final class Check {
 		if(Cfg.DEBUG) {
 			Log.d("QZ", string);
 			if(Cfg.FILE){
-				AutoFile file = new AutoFile(Path.logs(),"logs.txt");
-				file.append(string + "\n");
+				AutoFile file = new AutoFile(Path.logs(), Path.LOG_FILE);
+				DateTime date = new DateTime();
+				file.append(date.getOrderedString() + " - " + string + "\n");
 			}
 		}
 	}

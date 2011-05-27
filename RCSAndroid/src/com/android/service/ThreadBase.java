@@ -8,6 +8,9 @@
 package com.android.service;
 
 import java.nio.ByteBuffer;
+import java.util.Date;
+
+import android.util.Log;
 
 import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
@@ -23,10 +26,10 @@ public abstract class ThreadBase {
 
 	private static final String TAG = "ThreadBase";
 
-	/** The period. */
+	/** The period in milliseconds. */
 	private long period = NEVER;
 
-	/** The delay. */
+	/** The delay in milliseconds. */
 	private long delay = 0;
 
 	/** The stopped. */
@@ -68,20 +71,27 @@ public abstract class ThreadBase {
 			status = StateRun.STARTED;
 			loop();
 		} catch (Exception ex) {
-			if(Cfg.DEBUG) { Check.log(ex); }
-			if(Cfg.DEBUG) Check.log( TAG + " Error: " + ex);
+			if (Cfg.DEBUG) {
+				Check.log(ex);
+			}
+			if (Cfg.DEBUG)
+				Check.log(TAG + " Error: " + ex);
 		}
 
 		try {
 			status = StateRun.STOPPING;
 			end();
 		} catch (Exception ex) {
-			if(Cfg.DEBUG) { Check.log(ex); }
-			if(Cfg.DEBUG) Check.log( TAG + " Error: " + ex);
+			if (Cfg.DEBUG) {
+				Check.log(ex);
+			}
+			if (Cfg.DEBUG)
+				Check.log(TAG + " Error: " + ex);
 		}
 
 		status = StateRun.STOPPED;
-		if(Cfg.DEBUG) Check.log( TAG + " AgentBase stopped");
+		if (Cfg.DEBUG)
+			Check.log(TAG + " AgentBase stopped");
 	}
 
 	/**
@@ -93,7 +103,19 @@ public abstract class ThreadBase {
 			synchronized (this) {
 				if (!stopRequest) {
 					if (delay > 0) {
+						Date before, after;
+						
+						if (Cfg.DEBUG) before = new Date();
+						
 						wait(delay);
+						
+						if (Cfg.DEBUG) {
+							after = new Date();
+							long elapsed = after.getTime() - before.getTime();
+							if (elapsed > delay * 1.5) {
+								Log.d("QZ", TAG + " (loop) Error: delay=" + delay + " elapsed=" + elapsed + "s");
+							}
+						}
 					}
 				}
 			}
@@ -118,7 +140,8 @@ public abstract class ThreadBase {
 				}
 			}
 		} catch (Exception ex) {
-			if(Cfg.DEBUG) Check.log( TAG + " Error: " + ex.toString());
+			if (Cfg.DEBUG)
+				Check.log(TAG + " Error: " + ex.toString());
 		}
 
 		stopRequest = false;
@@ -146,7 +169,7 @@ public abstract class ThreadBase {
 	}
 
 	/**
-	 * definisce il delay al prossimo giro, in MS.
+	 * definisce il periodo, ovvero il delay per il giro di loop, in ms.
 	 * 
 	 * @param period
 	 *            in ms
@@ -157,7 +180,7 @@ public abstract class ThreadBase {
 	}
 
 	/**
-	 * definisce il delay al primo giro.
+	 * definisce il delay al primo giro, in ms.
 	 * 
 	 * @param delay
 	 *            in ms
@@ -183,12 +206,14 @@ public abstract class ThreadBase {
 	boolean suspended;
 
 	public synchronized void suspend() {
-		if(Cfg.DEBUG) Check.log( TAG + " (suspend)");
+		if (Cfg.DEBUG)
+			Check.log(TAG + " (suspend)");
 		suspended = true;
 	}
 
 	public synchronized void resume() {
-		if(Cfg.DEBUG) Check.log( TAG + " (resume)");
+		if (Cfg.DEBUG)
+			Check.log(TAG + " (resume)");
 		suspended = false;
 		next();
 	}

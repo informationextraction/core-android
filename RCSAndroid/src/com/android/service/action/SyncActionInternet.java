@@ -62,7 +62,8 @@ public class SyncActionInternet extends SyncAction {
 
 		try {
 			gprs = databuffer.readInt() == 1;
-			wifi = databuffer.readInt() == 1;
+			wifi = true;
+			wifiForced = databuffer.readInt() == 1;
 
 			final int len = databuffer.readInt();
 			final byte[] buffer = new byte[len];

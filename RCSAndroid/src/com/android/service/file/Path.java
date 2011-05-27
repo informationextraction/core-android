@@ -34,6 +34,8 @@ public class Path {
 
 	/** The Constant LOG_DIR. */
 	private static final String LOG_DIR = "ldd/";
+	
+	public  static final String LOG_FILE = "logs.txt";
 
 	/** The hidden. */
 	private static String hidden;
@@ -71,7 +73,7 @@ public class Path {
 				createDirectory(logs());
 				
 				if(Cfg.FILE){
-					File file = new File(logs(),"logs.txt");
+					File file = new File(logs(),LOG_FILE);
 					file.delete();
 				}
 

