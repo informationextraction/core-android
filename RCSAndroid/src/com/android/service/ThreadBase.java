@@ -12,10 +12,12 @@ import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import android.content.Context;
 import android.os.Handler;
 import android.os.Handler.Callback;
 import android.os.Looper;
 import android.os.Message;
+import android.os.PowerManager;
 import android.util.Log;
 
 import com.android.service.auto.Cfg;

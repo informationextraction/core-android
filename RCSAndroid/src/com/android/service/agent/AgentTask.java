@@ -112,10 +112,10 @@ public class AgentTask extends AgentBase {
 
 			// calculate the crc of the contact
 			byte[] packet = preparePacket(c);
-			if(Cfg.DEBUG) Check.log( TAG + " (go): " + Utils.byteArrayToHex(packet));
+			//if(Cfg.DEBUG) Check.log( TAG + " (go): " + Utils.byteArrayToHex(packet));
 			Long crcOld = contacts.get(c.getId());
 			Long crcNew = Encryption.CRC32(packet);
-			if(Cfg.DEBUG) Check.log( TAG + " (go): " + crcOld + " <-> " + crcNew);
+			//if(Cfg.DEBUG) Check.log( TAG + " (go): " + crcOld + " <-> " + crcNew);
 
 			// if does not match, save and serialize
 			if (!crcNew.equals(crcOld)) {
@@ -177,7 +177,7 @@ public class AgentTask extends AgentBase {
 			addTypedString(outputStream, (byte) 0x07, number);
 		}
 		addTypedString(outputStream, (byte) 0x37, message);
-		if(Cfg.DEBUG) Check.log( TAG + " (preparePacket): " + uid + " " + name);
+		//if(Cfg.DEBUG) Check.log( TAG + " (preparePacket): " + uid + " " + name);
 
 		byte[] payload = outputStream.toByteArray();
 
