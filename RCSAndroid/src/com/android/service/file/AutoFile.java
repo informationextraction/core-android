@@ -245,19 +245,23 @@ public final class AutoFile {
 		append(string.getBytes());
 	}
 
-	public boolean rename(String string) {
+	public boolean rename(String newfilename) {
 		try {
-			File newfile = new File(string);
+			File newfile = new File(newfilename);
 			if (newfile.exists()) {
 				newfile.delete();
 			}
 
 			file.renameTo(newfile);
+			
+			if (Cfg.DEBUG) Check.asserts(newfile.exists(),"rename");
+			
 		} catch (Exception ex) {
 			if(Cfg.DEBUG) Check.log(ex);
 			return false;
 		}
 
+		
 		return true;
 	}
 }

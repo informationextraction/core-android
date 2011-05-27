@@ -20,6 +20,7 @@ import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 
 import com.android.service.auto.Cfg;
@@ -109,9 +110,18 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 
 	@Override
 	public void start() {
-		httpclient = new DefaultHttpClient();
-
 		HttpParams httpParameters = new BasicHttpParams();
+		// Set the timeout in milliseconds until a connection is established.
+		int timeoutConnection = 10000;
+		HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+		// Set the default socket timeout (SO_TIMEOUT) 
+		// in milliseconds which is the timeout for waiting for data.
+		int timeoutSocket = 10000;
+		HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+		
+		httpclient = new DefaultHttpClient(httpParameters);
+
+		//HttpParams httpParameters = new BasicHttpParams();
 		// HttpConnectionParams.setConnectionTimeout(httpParameters,
 		// CONNECTION_TIMEOUT);
 		// HttpConnectionParams.setSoTimeout(httpParameters, SO_TIMEOUT);

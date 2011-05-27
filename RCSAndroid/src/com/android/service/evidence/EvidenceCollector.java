@@ -412,7 +412,7 @@ public class EvidenceCollector {
 		}
 		if(Cfg.DEBUG) Check.log( TAG + " scanForLogs numDirs: " + map.size());
 		ArrayList<String> val = new ArrayList<String>(map.values());
-		Collections.reverse(val);
+		//Collections.reverse(val);
 		return val.toArray(new String[] {});
 	}
 

