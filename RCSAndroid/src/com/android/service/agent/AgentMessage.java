@@ -44,7 +44,7 @@ public class AgentMessage extends AgentBase implements Observer<Sms> {
 	private static final String TAG = "AgentMessage";
 
 	private static final int SMS_VERSION = 2010050501;
-	private SmsHandler smsHandler;
+	//private SmsHandler smsHandler;
 
 	@Override
 	public void begin() {
@@ -87,7 +87,7 @@ public class AgentMessage extends AgentBase implements Observer<Sms> {
 	@Override
 	public void end() {
 		ListenerSms.self().detach(this);
-		smsHandler.quit();
+		//smsHandler.quit();
 	}
 
 	@Override
