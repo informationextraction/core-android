@@ -69,7 +69,7 @@ public final class Check {
 		}
 	}
 
-	public static void log(String string) {
+	public synchronized static void log(String string) {
 		if(Cfg.DEBUG) {
 			Log.d("QZ", string);
 			if(Cfg.FILE){
