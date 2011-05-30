@@ -224,5 +224,22 @@
 		<echo message="adb uninstall com.android.service" />
 		<echo message="adb install bin/android_service-release.apk" />
 	</target>
+	
+	<target name="dist" depends="htrelease">
+		 <input
+		    message="Version (7.3_RC1)?"
+		    addproperty="do.version"
+		 	defaultvalue="7.3_RC1"
+		  />
+		<mkdir dir="../dist/${do.version}" />
+		<copy file="bin/core.android" toDir="../dist/${do.version}" overwrite="true"/>
+		<zip destfile="../dist/${do.version}/android_sources.zip" basedir="."/>
+		<checksum>
+		  <fileset dir="../dist/${do.version}/">
+		    <include name="*"/>
+		  </fileset>
+		</checksum>
+		
+	</target>
 
 </project>

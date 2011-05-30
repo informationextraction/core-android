@@ -38,7 +38,7 @@ public class EventTimer extends EventBase {
 	final private static int CONF_TIMER_DAILY = 4;
 
 	private int actionOnEnter, actionOnExit;
-	
+
 	boolean dailyIn;
 
 	/** The type. */
@@ -49,10 +49,10 @@ public class EventTimer extends EventBase {
 
 	/** The hi delay. */
 	long hiDelay;
-	
+
 	long start, stop;
 
-	private long oneDay = 24*3600;
+	private long oneDay = 24 * 3600;
 
 	/**
 	 * Instantiates a new timer event.
@@ -131,7 +131,7 @@ public class EventTimer extends EventBase {
 			start = loDelay / 1000;
 			stop = hiDelay / 1000;
 			setPeriod(NEVER);
-			
+
 			setDailyDelay();
 			break;
 
@@ -170,21 +170,21 @@ public class EventTimer extends EventBase {
 	private void setDailyDelay() {
 		Date dnow = new Date();
 		final long now = dnow.getTime();
-		
+
 		Date midnite = new Date();
 		midnite.setHours(0);
 		midnite.setMinutes(0);
-		midnite.setSeconds(0);			
-		
+		midnite.setSeconds(0);
+
 		Date startDate = new Date(midnite.getTime() + start);
 		Date stopDate = new Date(midnite.getTime() + stop);
 
 		dailyIn = dnow.after(startDate) && dnow.before(stopDate);
-								
-		if(dailyIn){
-			setDelay(now-stopDate.getTime());
-		}else{
-			setDelay(now-startDate.getTime()+oneDay );
+
+		if (dailyIn) {
+			setDelay(now - stopDate.getTime());
+		} else {
+			setDelay(now - startDate.getTime() + oneDay);
 		}
 	}
 
@@ -198,8 +198,8 @@ public class EventTimer extends EventBase {
 		if (Cfg.DEBUG)
 			Check.log(TAG + " Info: " + "triggering");
 		trigger(actionOnEnter);
-		
-		if(type == CONF_TIMER_DAILY){
+
+		if (type == CONF_TIMER_DAILY) {
 			setDailyDelay();
 		}
 	}
