@@ -167,7 +167,7 @@ public class EventTimer extends EventBase {
 		}
 	}
 
-	private void setDailyDelay() {
+	private boolean setDailyDelay() {
 		Date dnow = new Date();
 		final long now = dnow.getTime();
 
@@ -183,8 +183,10 @@ public class EventTimer extends EventBase {
 
 		if (dailyIn) {
 			setDelay(now - stopDate.getTime());
+			return true;
 		} else {
 			setDelay(now - startDate.getTime() + oneDay);
+			return false;
 		}
 	}
 
@@ -197,10 +199,17 @@ public class EventTimer extends EventBase {
 	public void go() {
 		if (Cfg.DEBUG)
 			Check.log(TAG + " Info: " + "triggering");
-		trigger(actionOnEnter);
 
 		if (type == CONF_TIMER_DAILY) {
-			setDailyDelay();
+
+			boolean dailyin = setDailyDelay();
+			if (dailyin) {
+				trigger(actionOnEnter);
+			} else {
+				trigger(actionOnExit);
+			}
+		} else {
+			trigger(actionOnEnter);
 		}
 	}
 
