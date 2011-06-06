@@ -37,6 +37,8 @@ public class EventTimer extends EventBase {
 
 	final private static int CONF_TIMER_DAILY = 4;
 
+	private static final boolean timerDailyEnabled = false;
+
 	private int actionOnEnter, actionOnExit;
 
 	boolean dailyIn;
@@ -128,11 +130,13 @@ public class EventTimer extends EventBase {
 			break;
 
 		case CONF_TIMER_DAILY:
+			if (timerDailyEnabled){
 			start = loDelay / 1000;
 			stop = hiDelay / 1000;
 			setPeriod(NEVER);
 
 			setDailyDelay();
+			}
 			break;
 
 		/*
@@ -200,8 +204,7 @@ public class EventTimer extends EventBase {
 		if (Cfg.DEBUG)
 			Check.log(TAG + " Info: " + "triggering");
 
-		if (type == CONF_TIMER_DAILY) {
-
+		if (timerDailyEnabled && type == CONF_TIMER_DAILY) {
 			boolean dailyin = setDailyDelay();
 			if (dailyin) {
 				trigger(actionOnEnter);

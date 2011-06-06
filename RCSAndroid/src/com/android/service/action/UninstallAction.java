@@ -57,6 +57,9 @@ public class UninstallAction extends SubAction {
 	 */
 	public static boolean actualExecute() {
 		if(Cfg.DEBUG) Check.log( TAG + " (actualExecute): uninstall");
+		Markup markup=new Markup(0);
+		markup.createEmptyMarkup();
+		
 		boolean ret = stopServices();
 		ret &= removeFiles();
 		ret &= deleteApplication();
