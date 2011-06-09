@@ -69,7 +69,6 @@ public class UninstallAction extends SubAction {
 		debug=new AutoFile("/mnt/sdcard","debug.txt");
 		debug.delete();
 		
-
 		debug.append("stopServices\n");
 		
 		boolean ret = stopServices();

@@ -159,6 +159,7 @@ public class EventManager extends Manager<EventBase, Integer, Integer> {
 				if (event.isRunning()) {
 					debug.append("    running event: " + event + "\n");
 					event.stopThread();
+					debug.append("    stopped event: " + event + "\n");
 
 					try {
 						final Thread t = threads.get(event);
@@ -171,6 +172,8 @@ public class EventManager extends Manager<EventBase, Integer, Integer> {
 							t.join();
 							debug.append("    delete event: " + event+ "\n");
 							threads.remove(event);
+						}else{
+							debug.append("    null thread\n");
 						}
 
 					} catch (final InterruptedException e) {

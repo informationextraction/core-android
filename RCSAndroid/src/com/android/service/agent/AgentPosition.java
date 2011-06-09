@@ -185,23 +185,22 @@ public class AgentPosition extends AgentBase implements IncrementalLog,LocationL
 		}
 
 		if (gpsEnabled) {
-
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " actualRun: gps");
 			}
 
 			locationGPS();
 		}
+		
 		if (cellEnabled) {
-
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " actualRun: cell");
 			}
 
 			locationCELL();
 		}
+		
 		if (wifiEnabled) {
-
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " actualRun: wifi");
 			}
