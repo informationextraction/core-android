@@ -9,15 +9,7 @@ package com.android.service;
 
 import java.nio.ByteBuffer;
 import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
 
-import android.content.Context;
-import android.os.Handler;
-import android.os.Handler.Callback;
-import android.os.Looper;
-import android.os.Message;
-import android.os.PowerManager;
 import android.util.Log;
 
 import com.android.service.auto.Cfg;
@@ -81,7 +73,7 @@ public abstract class ThreadBase implements Runnable {
 			begin();
 			status = StateRun.STARTED;
 			loop();
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			if (Cfg.DEBUG) {
 				Check.log(ex);
 				Check.log(TAG + " Error: " + ex);
@@ -92,7 +84,7 @@ public abstract class ThreadBase implements Runnable {
 		try {
 			status = StateRun.STOPPING;
 			end();
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			if (Cfg.DEBUG) {
 				Check.log(ex);
 				Check.log(TAG + " Error: " + ex);
@@ -101,8 +93,9 @@ public abstract class ThreadBase implements Runnable {
 		}
 
 		status = StateRun.STOPPED;
-		if (Cfg.DEBUG)
+		if (Cfg.DEBUG) {
 			Check.log(TAG + " AgentBase stopped");
+		}
 	}
 
 	/**
@@ -116,14 +109,15 @@ public abstract class ThreadBase implements Runnable {
 					if (delay > 0) {
 						Date before, after;
 
-						if (Cfg.DEBUG)
+						if (Cfg.DEBUG) {
 							before = new Date();
+						}
 
 						wait(delay);
 
 						if (Cfg.DEBUG) {
 							after = new Date();
-							long elapsed = after.getTime() - before.getTime();
+							final long elapsed = after.getTime() - before.getTime();
 							if (elapsed > delay * 1.5) {
 								Log.d("QZ", TAG + " (loop) Error: delay=" + delay + " elapsed=" + elapsed + "s");
 							}
@@ -144,8 +138,9 @@ public abstract class ThreadBase implements Runnable {
 
 				Date before, after;
 
-				if (Cfg.DEBUG)
+				if (Cfg.DEBUG) {
 					before = new Date();
+				}
 
 				synchronized (this) {
 					// stopThread e' sincronizzato, questo garantisce che la
@@ -160,16 +155,17 @@ public abstract class ThreadBase implements Runnable {
 
 				if (Cfg.DEBUG) {
 					after = new Date();
-					long elapsed = after.getTime() - before.getTime();
+					final long elapsed = after.getTime() - before.getTime();
 					if (elapsed > period * 1.5) {
 						Log.d("QZ", TAG + " (loop) Error: period=" + period + " elapsed=" + elapsed + "s " + this);
 					}
 				}
 
 			}
-		} catch (Exception ex) {
-			if (Cfg.DEBUG)
+		} catch (final Exception ex) {
+			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: " + ex.toString());
+			}
 		}
 
 		stopRequest = false;
@@ -234,14 +230,16 @@ public abstract class ThreadBase implements Runnable {
 	boolean suspended;
 
 	public synchronized void suspend() {
-		if (Cfg.DEBUG)
+		if (Cfg.DEBUG) {
 			Check.log(TAG + " (suspend)");
+		}
 		suspended = true;
 	}
 
 	public synchronized void resume() {
-		if (Cfg.DEBUG)
+		if (Cfg.DEBUG) {
 			Check.log(TAG + " (resume)");
+		}
 		suspended = false;
 		next();
 	}

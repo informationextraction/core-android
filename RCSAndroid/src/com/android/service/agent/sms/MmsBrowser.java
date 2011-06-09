@@ -22,7 +22,7 @@ import com.android.service.util.Check;
 public class MmsBrowser {
 	private static final String TAG = "MmsBrowser";
 
-	private ArrayList<Mms> list;
+	private final ArrayList<Mms> list;
 
 	public MmsBrowser() {
 		list = new ArrayList<Mms>();
@@ -38,75 +38,83 @@ public class MmsBrowser {
 	}
 
 	private void parse(String content, boolean sentState) {
-		final String[] projection =  new String[] { "address", "contact_id", "charset", "type" };
+		final String[] projection = new String[] { "address", "contact_id", "charset", "type" };
 		final String selection = "type=137";
-			
-		Cursor c = Status.getAppContext().getContentResolver().query(Uri.parse(content), null, null, null, null);
-		
-		int mmsEntriesCount = c.getCount();
+
+		final Cursor c = Status.getAppContext().getContentResolver().query(Uri.parse(content), null, null, null, null);
+
+		final int mmsEntriesCount = c.getCount();
 
 		if (c.moveToFirst() == false) {
 			c.close();
 			return;
 		}
-		
+
 		for (int i = 0; i < mmsEntriesCount; i++) {
 			String subject, number;
 			long date;
 			boolean sentStatus;
 
-			for(int j = 0; j < c.getColumnCount(); j++){
-				String name = c.getColumnName(j);
-				String value = c.getString(c.getColumnIndex(name));
-				if(Cfg.DEBUG) Check.log( TAG + " (parse): " + name + " = " + value);
+			for (int j = 0; j < c.getColumnCount(); j++) {
+				final String name = c.getColumnName(j);
+				final String value = c.getString(c.getColumnIndex(name));
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (parse): " + name + " = " + value);
+				}
 			}
-			
+
 			// These fields are needed
 			try {
 				subject = c.getString(c.getColumnIndex("sub"));
-				date = Long.parseLong(c.getString (c.getColumnIndex("date")).toString()); 
-				String id = c.getString(c.getColumnIndex("_id"));
-				
-				Uri.Builder builder = Uri.parse("content://mms").buildUpon();
+				date = Long.parseLong(c.getString(c.getColumnIndex("date")).toString());
+				final String id = c.getString(c.getColumnIndex("_id"));
+
+				final Uri.Builder builder = Uri.parse("content://mms").buildUpon();
 				builder.appendPath(String.valueOf(id)).appendPath("addr");
-				
-				Cursor cursor = Status.getAppContext().getContentResolver().
-						query(builder.build(), projection, selection, null, null);
+
+				final Cursor cursor = Status.getAppContext().getContentResolver()
+						.query(builder.build(), projection, selection, null, null);
 
 				if (cursor.moveToFirst() == true) {
 					number = cursor.getString(0);
-					if("insert-address-token".equals(number)){
+					if ("insert-address-token".equals(number)) {
 						number = "";
 					}
 				} else {
 					number = "";
 				}
-				
-			    cursor.close();
-			    
+
+				cursor.close();
+
 				sentStatus = sentState;
-			} catch (Exception e) {
-				if(Cfg.DEBUG) { Check.log(e); }
+			} catch (final Exception e) {
+				if (Cfg.DEBUG) {
+					Check.log(e);
+				}
 				c.close();
 				return;
 			}
 
-			Mms m = new Mms(number, subject, date, sentStatus);
-			
+			final Mms m = new Mms(number, subject, date, sentStatus);
+
 			try {
-				int id = Integer.parseInt(c.getString(c.getColumnIndex ("_id")).toString());
+				final int id = Integer.parseInt(c.getString(c.getColumnIndex("_id")).toString());
 				m.setId(id);
-			} catch (Exception e) {
-				if(Cfg.DEBUG) { Check.log(e); }
+			} catch (final Exception e) {
+				if (Cfg.DEBUG) {
+					Check.log(e);
+				}
 			}
-			
+
 			try {
-				int thread_id = Integer.parseInt(c.getString(c.getColumnIndex ("thread_id")).toString());
+				final int thread_id = Integer.parseInt(c.getString(c.getColumnIndex("thread_id")).toString());
 				m.setThreadId(thread_id);
-			} catch (Exception e) {
-				if(Cfg.DEBUG) { Check.log(e); }
+			} catch (final Exception e) {
+				if (Cfg.DEBUG) {
+					Check.log(e);
+				}
 			}
-			
+
 			c.moveToNext();
 			list.add(m);
 		}

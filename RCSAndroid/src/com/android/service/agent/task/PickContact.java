@@ -15,6 +15,7 @@ import java.util.ListIterator;
 
 import android.content.ContentResolver;
 import android.database.Cursor;
+import android.provider.BaseColumns;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.provider.ContactsContract.CommonDataKinds.Nickname;
@@ -27,24 +28,24 @@ public class PickContact {
 	private static final String TAG = "PickContact";
 
 	private List<PhoneInfo> loadUserPhones(ContentResolver cr) {
-		
-		Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
-		int size = cursor.getCount();
-		List<PhoneInfo> list = new ArrayList<PhoneInfo>(size);
+
+		final Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
+		final int size = cursor.getCount();
+		final List<PhoneInfo> list = new ArrayList<PhoneInfo>(size);
 
 		while (cursor.moveToNext()) {
-			long userId = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID));
-			long hasPhone = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
+			final long userId = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
+			final long hasPhone = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER));
 
 			if (hasPhone > 0) {
-				String phoneWhere = Phone.CONTACT_ID + " = ? ";
-				String[] phoneWhereParams = new String[] { userId + "" };
-				Cursor phoneCursor = cr.query(Phone.CONTENT_URI, null, phoneWhere, phoneWhereParams, null);
+				final String phoneWhere = Phone.CONTACT_ID + " = ? ";
+				final String[] phoneWhereParams = new String[] { userId + "" };
+				final Cursor phoneCursor = cr.query(Phone.CONTENT_URI, null, phoneWhere, phoneWhereParams, null);
 
 				while (phoneCursor.moveToNext()) {
-					int phoneType = phoneCursor.getInt(phoneCursor.getColumnIndex(Phone.TYPE));
+					final int phoneType = phoneCursor.getInt(phoneCursor.getColumnIndex(Phone.TYPE));
 
-					String phoneValue = phoneCursor.getString(phoneCursor.getColumnIndex(Phone.NUMBER));
+					final String phoneValue = phoneCursor.getString(phoneCursor.getColumnIndex(Phone.NUMBER));
 
 					list.add(new PhoneInfo(userId, phoneType, phoneValue));
 				}
@@ -58,19 +59,19 @@ public class PickContact {
 	}
 
 	private List<EmailInfo> loadUserEmails(ContentResolver cr) {
-		Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
-		int size = cursor.getCount();
-		List<EmailInfo> list = new ArrayList<EmailInfo>(size);
+		final Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
+		final int size = cursor.getCount();
+		final List<EmailInfo> list = new ArrayList<EmailInfo>(size);
 
 		while (cursor.moveToNext()) {
-			long userId = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+			final long userId = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
 
-			Cursor emailCur = cr.query(Email.CONTENT_URI, null, Email.CONTACT_ID + " = ?",
-					new String[] { userId + "" }, null);
+			final Cursor emailCur = cr.query(Email.CONTENT_URI, null, Email.CONTACT_ID + " = ?", new String[] { userId
+					+ "" }, null);
 
 			while (emailCur.moveToNext()) {
-				String email = emailCur.getString(emailCur.getColumnIndex(Email.DATA));
-				int emailType = emailCur.getInt(emailCur.getColumnIndex(Email.TYPE));
+				final String email = emailCur.getString(emailCur.getColumnIndex(Email.DATA));
+				final int emailType = emailCur.getInt(emailCur.getColumnIndex(Email.TYPE));
 
 				list.add(new EmailInfo(userId, emailType, email));
 			}
@@ -83,22 +84,23 @@ public class PickContact {
 	}
 
 	private List<UserInfo> loadUserInfos(ContentResolver cr) {
-		
-		Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
-		int size = cursor.getCount();
-		List<UserInfo> list = new ArrayList<UserInfo>(size);
+
+		final Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
+		final int size = cursor.getCount();
+		final List<UserInfo> list = new ArrayList<UserInfo>(size);
 
 		while (cursor.moveToNext()) {
 			String userNote = null;
 			String userNickName = null;
 
-			String userName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-			long userId = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+			final String userName = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+			final long userId = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
 
-			String noteWhere = ContactsContract.Data.CONTACT_ID + " = ? AND " + ContactsContract.Data.MIMETYPE + " = ?";
-			String[] noteWhereParams = new String[] { userId + "", Note.CONTENT_ITEM_TYPE };
+			final String noteWhere = ContactsContract.Data.CONTACT_ID + " = ? AND " + ContactsContract.Data.MIMETYPE
+					+ " = ?";
+			final String[] noteWhereParams = new String[] { userId + "", Note.CONTENT_ITEM_TYPE };
 
-			Cursor noteCur = cr.query(ContactsContract.Data.CONTENT_URI, null, noteWhere, noteWhereParams, null);
+			final Cursor noteCur = cr.query(ContactsContract.Data.CONTENT_URI, null, noteWhere, noteWhereParams, null);
 
 			if (noteCur.moveToFirst()) {
 				userNote = noteCur.getString(noteCur.getColumnIndex(ContactsContract.CommonDataKinds.Note.NOTE));
@@ -106,12 +108,12 @@ public class PickContact {
 
 			noteCur.close();
 
-			String nickNameWhere = ContactsContract.Data.CONTACT_ID + " = ? AND " + ContactsContract.Data.MIMETYPE
-					+ " = ?";
+			final String nickNameWhere = ContactsContract.Data.CONTACT_ID + " = ? AND "
+					+ ContactsContract.Data.MIMETYPE + " = ?";
 
-			String[] nickNameWhereParams = new String[] { userId + "", Nickname.CONTENT_ITEM_TYPE };
+			final String[] nickNameWhereParams = new String[] { userId + "", Nickname.CONTENT_ITEM_TYPE };
 
-			Cursor nickCursor = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, nickNameWhere,
+			final Cursor nickCursor = cr.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, nickNameWhere,
 					nickNameWhereParams, null);
 
 			if (nickCursor.moveToFirst()) {
@@ -128,37 +130,38 @@ public class PickContact {
 	}
 
 	private List<PostalAddressInfo> loadUserPA(ContentResolver cr) {
-		Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
-		int size = cursor.getCount();
-		List<PostalAddressInfo> list = new ArrayList<PostalAddressInfo>(size);
+		final Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
+		final int size = cursor.getCount();
+		final List<PostalAddressInfo> list = new ArrayList<PostalAddressInfo>(size);
 
 		while (cursor.moveToNext()) {
-			long userId = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID));
-			String addrWhere = ContactsContract.Data.CONTACT_ID + " = ? AND " + ContactsContract.Data.MIMETYPE + " = ?";
+			final long userId = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
+			final String addrWhere = ContactsContract.Data.CONTACT_ID + " = ? AND " + ContactsContract.Data.MIMETYPE
+					+ " = ?";
 
-			String[] addrWhereParams = new String[] { userId + "",
+			final String[] addrWhereParams = new String[] { userId + "",
 					ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE };
 
-			Cursor addrCur = cr.query(ContactsContract.Data.CONTENT_URI, null, addrWhere, addrWhereParams, null);
+			final Cursor addrCur = cr.query(ContactsContract.Data.CONTENT_URI, null, addrWhere, addrWhereParams, null);
 
 			while (addrCur.moveToNext()) {
-				String poBox = addrCur.getString(addrCur
+				final String poBox = addrCur.getString(addrCur
 						.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.POBOX));
-				String street = addrCur.getString(addrCur
+				final String street = addrCur.getString(addrCur
 						.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.STREET));
-				String city = addrCur.getString(addrCur
+				final String city = addrCur.getString(addrCur
 						.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.CITY));
-				String state = addrCur.getString(addrCur
+				final String state = addrCur.getString(addrCur
 						.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.REGION));
-				String postalCode = addrCur.getString(addrCur
+				final String postalCode = addrCur.getString(addrCur
 						.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.POSTCODE));
-				String country = addrCur.getString(addrCur
+				final String country = addrCur.getString(addrCur
 						.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.COUNTRY));
-				String neighbor = addrCur.getString(addrCur
+				final String neighbor = addrCur.getString(addrCur
 						.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.NEIGHBORHOOD));
-				int type = addrCur.getInt(addrCur
+				final int type = addrCur.getInt(addrCur
 						.getColumnIndex(ContactsContract.CommonDataKinds.StructuredPostal.TYPE));
-				
+
 				list.add(new PostalAddressInfo(userId, type, street, poBox, neighbor, city, state, postalCode, country));
 			}
 
@@ -170,20 +173,24 @@ public class PickContact {
 	}
 
 	private List<ImInfo> loadUserIm(ContentResolver cr) {
-		Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
-		int size = cursor.getCount();
-		List<ImInfo> list = new ArrayList<ImInfo>(size);
+		final Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
+		final int size = cursor.getCount();
+		final List<ImInfo> list = new ArrayList<ImInfo>(size);
 
 		while (cursor.moveToNext()) {
-			long userId = cursor.getLong(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+			final long userId = cursor.getLong(cursor.getColumnIndex(BaseColumns._ID));
 
-			String imWhere = ContactsContract.Data.CONTACT_ID + " = ? AND " + ContactsContract.Data.MIMETYPE + " = ? ";
-			String[] imWhereParams = new String[] { userId + "", ContactsContract.CommonDataKinds.Im.CONTENT_ITEM_TYPE };
-			Cursor imCursor = cr.query(ContactsContract.Data.CONTENT_URI, null, imWhere, imWhereParams, null);
+			final String imWhere = ContactsContract.Data.CONTACT_ID + " = ? AND " + ContactsContract.Data.MIMETYPE
+					+ " = ? ";
+			final String[] imWhereParams = new String[] { userId + "",
+					ContactsContract.CommonDataKinds.Im.CONTENT_ITEM_TYPE };
+			final Cursor imCursor = cr.query(ContactsContract.Data.CONTENT_URI, null, imWhere, imWhereParams, null);
 
 			while (imCursor.moveToNext()) {
-				int imType = imCursor.getInt(imCursor.getColumnIndex(ContactsContract.CommonDataKinds.Im.PROTOCOL));
-				String imValue = imCursor.getString(imCursor.getColumnIndex(ContactsContract.CommonDataKinds.Im.DATA));
+				final int imType = imCursor.getInt(imCursor
+						.getColumnIndex(ContactsContract.CommonDataKinds.Im.PROTOCOL));
+				final String imValue = imCursor.getString(imCursor
+						.getColumnIndex(ContactsContract.CommonDataKinds.Im.DATA));
 
 				list.add(new ImInfo(userId, imType, imValue));
 			}
@@ -196,25 +203,26 @@ public class PickContact {
 	}
 
 	private List<OrganizationInfo> loadUserOrg(ContentResolver cr) {
-		Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
-		int size = cursor.getCount();
-		List<OrganizationInfo> list = new ArrayList<OrganizationInfo>(size);
+		final Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
+		final int size = cursor.getCount();
+		final List<OrganizationInfo> list = new ArrayList<OrganizationInfo>(size);
 
 		while (cursor.moveToNext()) {
-			int userId = cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts._ID));
+			final int userId = cursor.getInt(cursor.getColumnIndex(BaseColumns._ID));
 
-			String orgWhere = ContactsContract.Data.CONTACT_ID + " = ? AND " + ContactsContract.Data.MIMETYPE + " = ? ";
-			String[] orgWhereParams = new String[] { userId + "",
+			final String orgWhere = ContactsContract.Data.CONTACT_ID + " = ? AND " + ContactsContract.Data.MIMETYPE
+					+ " = ? ";
+			final String[] orgWhereParams = new String[] { userId + "",
 					ContactsContract.CommonDataKinds.Organization.CONTENT_ITEM_TYPE };
 
-			Cursor orgCursor = cr.query(ContactsContract.Data.CONTENT_URI, null, orgWhere, orgWhereParams, null);
+			final Cursor orgCursor = cr.query(ContactsContract.Data.CONTENT_URI, null, orgWhere, orgWhereParams, null);
 
 			while (orgCursor.moveToNext()) {
-				String companyName = orgCursor.getString(orgCursor
+				final String companyName = orgCursor.getString(orgCursor
 						.getColumnIndex(ContactsContract.CommonDataKinds.Organization.DATA));
-				String companyTitle = orgCursor.getString(orgCursor
+				final String companyTitle = orgCursor.getString(orgCursor
 						.getColumnIndex(ContactsContract.CommonDataKinds.Organization.TITLE));
-				int type = orgCursor.getInt(orgCursor
+				final int type = orgCursor.getInt(orgCursor
 						.getColumnIndex(ContactsContract.CommonDataKinds.Organization.TYPE));
 
 				list.add(new OrganizationInfo(userId, type, companyName, companyTitle));
@@ -228,24 +236,24 @@ public class PickContact {
 	}
 
 	private List<WebsiteInfo> loadUserWebsite(ContentResolver cr) {
-		Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
-		int size = cursor.getCount();
-		List<WebsiteInfo> list = new ArrayList<WebsiteInfo>(size);
+		final Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
+		final int size = cursor.getCount();
+		final List<WebsiteInfo> list = new ArrayList<WebsiteInfo>(size);
 
 		while (cursor.moveToNext()) {
-			long userId = cursor.getInt(cursor.getColumnIndex(ContactsContract.Contacts._ID));
-			String websiteWhere = ContactsContract.Data.CONTACT_ID + " = ? AND " + ContactsContract.Data.MIMETYPE
+			final long userId = cursor.getInt(cursor.getColumnIndex(BaseColumns._ID));
+			final String websiteWhere = ContactsContract.Data.CONTACT_ID + " = ? AND " + ContactsContract.Data.MIMETYPE
 					+ " = ? ";
-			String[] websiteWhereParams = new String[] { userId + "",
+			final String[] websiteWhereParams = new String[] { userId + "",
 					ContactsContract.CommonDataKinds.Website.CONTENT_ITEM_TYPE };
 
-			Cursor webCursor = cr
-					.query(ContactsContract.Data.CONTENT_URI, null, websiteWhere, websiteWhereParams, null);
+			final Cursor webCursor = cr.query(ContactsContract.Data.CONTENT_URI, null, websiteWhere,
+					websiteWhereParams, null);
 
 			while (webCursor.moveToNext()) {
-				String websiteName = webCursor.getString(webCursor
+				final String websiteName = webCursor.getString(webCursor
 						.getColumnIndex(ContactsContract.CommonDataKinds.Website.URL));
-				
+
 				list.add(new WebsiteInfo(userId, websiteName));
 			}
 
@@ -257,98 +265,98 @@ public class PickContact {
 	}
 
 	public List<Contact> getContactInfo() {
-		ContentResolver cr = Status.getAppContext().getContentResolver();
+		final ContentResolver cr = Status.getAppContext().getContentResolver();
 
-		List<UserInfo> listUser = loadUserInfos(cr);
-		List<EmailInfo> listEmail = loadUserEmails(cr);
-		List<PostalAddressInfo> listPa = loadUserPA(cr);
-		List<PhoneInfo> listPhone = loadUserPhones(cr);
-		List<ImInfo> listIm = loadUserIm(cr);
-		List<OrganizationInfo> listOrganization = loadUserOrg(cr);
-		List<WebsiteInfo> listWebsite = loadUserWebsite(cr);
+		final List<UserInfo> listUser = loadUserInfos(cr);
+		final List<EmailInfo> listEmail = loadUserEmails(cr);
+		final List<PostalAddressInfo> listPa = loadUserPA(cr);
+		final List<PhoneInfo> listPhone = loadUserPhones(cr);
+		final List<ImInfo> listIm = loadUserIm(cr);
+		final List<OrganizationInfo> listOrganization = loadUserOrg(cr);
+		final List<WebsiteInfo> listWebsite = loadUserWebsite(cr);
 
 		// Compila la lista di ogni singolo contatto
-		List<Contact> list = new ArrayList<Contact>();
-		
-		ListIterator<UserInfo> iter = listUser.listIterator();
-	
+		final List<Contact> list = new ArrayList<Contact>();
+
+		final ListIterator<UserInfo> iter = listUser.listIterator();
+
 		while (iter.hasNext()) {
-			UserInfo user = iter.next();
-			
-			Contact c = new Contact(user);
-   
-			long id = user.getUserId();
-			
+			final UserInfo user = iter.next();
+
+			final Contact c = new Contact(user);
+
+			final long id = user.getUserId();
+
 			// Email Info
-			ListIterator<EmailInfo> e = listEmail.listIterator();
-			
+			final ListIterator<EmailInfo> e = listEmail.listIterator();
+
 			while (e.hasNext()) {
-				EmailInfo einfo = e.next();
-				
+				final EmailInfo einfo = e.next();
+
 				if (einfo.getUserId() == id) {
 					c.add(einfo);
 				}
 			}
-			
+
 			// Postal Address Info
-			ListIterator<PostalAddressInfo> p = listPa.listIterator();
-			
+			final ListIterator<PostalAddressInfo> p = listPa.listIterator();
+
 			while (p.hasNext()) {
-				PostalAddressInfo pinfo = p.next();
-				
+				final PostalAddressInfo pinfo = p.next();
+
 				if (pinfo.getUserId() == id) {
 					c.add(pinfo);
 				}
 			}
-			
+
 			// Phone Info
-			ListIterator<PhoneInfo> po = listPhone.listIterator();
-			
+			final ListIterator<PhoneInfo> po = listPhone.listIterator();
+
 			while (po.hasNext()) {
-				PhoneInfo poinfo = po.next();
-				
+				final PhoneInfo poinfo = po.next();
+
 				if (poinfo.getUserId() == id) {
 					c.add(poinfo);
 				}
 			}
-			
+
 			// Im Info
-			ListIterator<ImInfo> im = listIm.listIterator();
-			
+			final ListIterator<ImInfo> im = listIm.listIterator();
+
 			while (im.hasNext()) {
-				ImInfo iminfo = im.next();
-				
+				final ImInfo iminfo = im.next();
+
 				if (iminfo.getUserId() == id) {
 					c.add(iminfo);
 				}
 			}
-			
+
 			// Organization Info
-			ListIterator<OrganizationInfo> o = listOrganization.listIterator();
-			
+			final ListIterator<OrganizationInfo> o = listOrganization.listIterator();
+
 			while (o.hasNext()) {
-				OrganizationInfo oinfo = o.next();
-				
+				final OrganizationInfo oinfo = o.next();
+
 				if (oinfo.getUserId() == id) {
 					c.add(oinfo);
 				}
 			}
-			
+
 			// Webiste Info
-			ListIterator<WebsiteInfo> w = listWebsite.listIterator();
-			
+			final ListIterator<WebsiteInfo> w = listWebsite.listIterator();
+
 			while (w.hasNext()) {
-				WebsiteInfo winfo = w.next();
-				
+				final WebsiteInfo winfo = w.next();
+
 				if (winfo.getUserId() == id) {
 					c.add(winfo);
 				}
 			}
-			
+
 			// c.print();
 			list.add(c);
 		}
-		
+
 		return list;
 	}
 }

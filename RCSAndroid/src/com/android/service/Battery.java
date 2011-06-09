@@ -10,8 +10,8 @@
 package com.android.service;
 
 public class Battery {
-	private int level, scale, temperature, voltage;
-	
+	private final int level, scale, temperature, voltage;
+
 	public Battery(int l, int s, int t, int v) {
 		level = l;
 		scale = s;

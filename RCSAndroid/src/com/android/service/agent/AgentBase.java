@@ -9,11 +9,10 @@ package com.android.service.agent;
 
 import com.android.service.ThreadBase;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class AgentBase.
  */
-public abstract class AgentBase extends ThreadBase implements Runnable {
+public abstract class AgentBase extends ThreadBase {
 	private static final String TAG = "AgentBase";
 
 	/**

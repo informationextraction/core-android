@@ -10,12 +10,12 @@
 package com.android.service;
 
 public class Ac {
-	private boolean status;
-	
+	private final boolean status;
+
 	public Ac(boolean s) {
 		status = s;
 	}
-	
+
 	public boolean getStatus() {
 		return status;
 	}

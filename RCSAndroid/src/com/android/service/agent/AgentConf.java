@@ -76,7 +76,7 @@ public class AgentConf implements RunningConf {
 
 	/**
 	 * Checks if is enabled.
-	 *
+	 * 
 	 * @return true, if is enabled
 	 */
 	public boolean isEnabled() {
