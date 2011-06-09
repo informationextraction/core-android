@@ -89,10 +89,10 @@ public abstract class ThreadBase implements Runnable {
 				Check.log(ex);
 				Check.log(TAG + " Error: " + ex);
 			}
-
 		}
 
 		status = StateRun.STOPPED;
+		
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " AgentBase stopped");
 		}
