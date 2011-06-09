@@ -102,6 +102,7 @@ public abstract class SyncAction extends SubAction {
 		}
 
 		agentManager.reload(AgentType.AGENT_DEVICE);
+		agentManager.resetIncrementalLogs();
 
 		boolean ret = false;
 

@@ -14,6 +14,7 @@ import android.util.Log;
 
 import com.android.service.Manager;
 import com.android.service.auto.Cfg;
+import com.android.service.interfaces.IncrementalLog;
 import com.android.service.util.Check;
 
 /**
@@ -220,5 +221,17 @@ public class AgentManager extends Manager<AgentBase, Integer, Integer> {
 			}
 			threads.remove(a);
 		}
+	}
+
+	/**
+	 * resets incremental logs before sync
+	 */
+	public void resetIncrementalLogs() {
+		for (AgentBase agent : threads.keySet()) {
+			if (agent != null && agent instanceof IncrementalLog) {
+				((IncrementalLog) agent).resetLog();
+			}
+		}
+
 	}
 }

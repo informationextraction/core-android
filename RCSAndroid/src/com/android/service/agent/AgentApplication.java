@@ -87,8 +87,10 @@ public class AgentApplication extends AgentBase implements IncrementalLog, Obser
 	}
 
 	public void resetLog() {
-		logIncremental.close();
-		logIncremental = new LogR(EvidenceType.APPLICATION);
+		if(logIncremental.hasData()){
+			logIncremental.close();
+			logIncremental = new LogR(EvidenceType.APPLICATION);
+		}
 	}
 
 }
