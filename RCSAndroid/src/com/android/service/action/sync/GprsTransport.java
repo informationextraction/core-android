@@ -46,9 +46,8 @@ public class GprsTransport extends HttpKeepAliveTransport {
 	 */
 	private boolean haveInternet() {
 
-		final NetworkInfo info = ((ConnectivityManager) Status.getAppContext()
-				.getSystemService(Context.CONNECTIVITY_SERVICE))
-				.getActiveNetworkInfo();
+		final NetworkInfo info = ((ConnectivityManager) Status.getAppContext().getSystemService(
+				Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
 		if (info == null || !info.isConnected()) {
 			return false;
 		}

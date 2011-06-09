@@ -28,6 +28,8 @@ public class TransportException extends Exception {
 	 *            the i
 	 */
 	public TransportException(final int i) {
-		if(Cfg.DEBUG) Check.log( TAG + " TransportException: " + i);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " TransportException: " + i);
+		}
 	}
 }

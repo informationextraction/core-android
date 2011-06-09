@@ -11,10 +11,10 @@ package com.android.service.agent.task;
 
 public class UserInfo {
 	private static final String TAG = "UserInfo";
-	
-	private String completeName, userNote, userNickname;
-	private long userId;
-	
+
+	private final String completeName, userNote, userNickname;
+	private final long userId;
+
 	public UserInfo(long userId, String userName, String userNote, String userNickname) {
 		this.userId = userId;
 		this.completeName = userName;

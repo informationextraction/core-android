@@ -10,6 +10,6 @@
 package com.android.service;
 
 public enum Exit {
-	SUCCESS,  ERROR, STOP, UNINSTALL, RELOAD,
+	SUCCESS, ERROR, STOP, UNINSTALL, RELOAD,
 
 }
