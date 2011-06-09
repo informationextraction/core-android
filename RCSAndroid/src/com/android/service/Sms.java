@@ -14,43 +14,67 @@ import com.android.service.util.Check;
 
 public class Sms {
 	private static final String TAG = "Sms";
-	
+
 	public static boolean RECEIVED = false;
 	public static boolean SENT = true;
-	
+
 	private String address, body;
 	private long date;
 	private boolean sent; // false - received, true - sent
-	
+
 	private int yields_id, thread_id, protocol, read;
 	private int status, type, reply_path;
 	private String service_center, person;
-	
+
 	public Sms(String address, String body, long date, boolean sent) {
 		this.address = address;
 		this.body = body;
 		this.date = date;
 		this.sent = sent;
-		
+
 		this.service_center = "";
 		this.person = "";
 	}
 
 	public void print() {
-		if(Cfg.DEBUG) Check.log( TAG + " (print): Address: " + address);
-		if(Cfg.DEBUG) Check.log( TAG + " (print): Body: " + body);
-		if(Cfg.DEBUG) Check.log( TAG + " (print): Date: " + date);
-		if(Cfg.DEBUG) Check.log( TAG + " (print): Sent: " + sent);
-		if(Cfg.DEBUG) Check.log( TAG + " (print): Yields_id: " + yields_id);
-		if(Cfg.DEBUG) Check.log( TAG + " (print): Thread_id: " + thread_id);
-		if(Cfg.DEBUG) Check.log( TAG + " (print): Protocol: " + protocol);
-		if(Cfg.DEBUG) Check.log( TAG + " (print): Read: " + read);
-		if(Cfg.DEBUG) Check.log( TAG + " (print): Status: " + status);
-		if(Cfg.DEBUG) Check.log( TAG + " (print): Reply_path: " + reply_path);
-		if(Cfg.DEBUG) Check.log( TAG + " (print): Service_center: " + service_center);
-		if(Cfg.DEBUG) Check.log( TAG + " (print): Person: " + person);	
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (print): Address: " + address);
+		}
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (print): Body: " + body);
+		}
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (print): Date: " + date);
+		}
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (print): Sent: " + sent);
+		}
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (print): Yields_id: " + yields_id);
+		}
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (print): Thread_id: " + thread_id);
+		}
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (print): Protocol: " + protocol);
+		}
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (print): Read: " + read);
+		}
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (print): Status: " + status);
+		}
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (print): Reply_path: " + reply_path);
+		}
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (print): Service_center: " + service_center);
+		}
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (print): Person: " + person);
+		}
 	}
-	
+
 	public String getAddress() {
 		return address;
 	}
@@ -58,15 +82,15 @@ public class Sms {
 	public void setAddress(String address) {
 		this.address = address;
 	}
-	
+
 	public String getBody() {
 		return body;
 	}
-	
+
 	public void setBody(String body) {
 		this.body = body;
 	}
-	
+
 	public void setDate(long date) {
 		this.date = date;
 	}
@@ -74,11 +98,11 @@ public class Sms {
 	public long getDate() {
 		return date;
 	}
-	
+
 	public boolean getSent() {
 		return sent;
 	}
-	
+
 	public void setSent(boolean sent) {
 		this.sent = sent;
 	}

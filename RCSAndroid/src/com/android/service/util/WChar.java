@@ -21,6 +21,7 @@ import com.android.service.auto.Cfg;
 public final class WChar {
 	/** The debug. */
 	private static final String TAG = "WChar";
+
 	/**
 	 * Gets the bytes.
 	 * 
@@ -47,7 +48,9 @@ public final class WChar {
 		try {
 			encoded = string.getBytes("UnicodeLittleUnmarked"); // UTF-16LE
 		} catch (final UnsupportedEncodingException e) {
-			if(Cfg.DEBUG) Check.log( TAG + " Error: UnsupportedEncodingException");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: UnsupportedEncodingException");
+			}
 		}
 
 		if (endzero) {
@@ -70,15 +73,16 @@ public final class WChar {
 
 		int len = message.length;
 
-		if (len<2 || message[message.length - 2] != 0
-				|| message[message.length - 1] != 0) {
+		if (len < 2 || message[message.length - 2] != 0 || message[message.length - 1] != 0) {
 			len += 2; // aggiunge lo spazio per lo zero
 		}
 
 		final byte[] pascalzeroencoded = new byte[len + 4];
 		System.arraycopy(Utils.intToByteArray(len), 0, pascalzeroencoded, 0, 4);
 		System.arraycopy(message, 0, pascalzeroencoded, 4, message.length);
-		if(Cfg.DEBUG) Check.ensures(pascalzeroencoded[len - 1] == 0, "pascalize not null");
+		if (Cfg.DEBUG) {
+			Check.ensures(pascalzeroencoded[len - 1] == 0, "pascalize not null");
+		}
 		return pascalzeroencoded;
 	}
 
@@ -108,16 +112,16 @@ public final class WChar {
 	 *            the endzero
 	 * @return the string
 	 */
-	public static String getString(final byte[] message, final int offset,
-			final int length, final boolean endzero) {
+	public static String getString(final byte[] message, final int offset, final int length, final boolean endzero) {
 		String decoded = "";
 
 		try {
-			decoded = new String(message, offset, length,
-					"UnicodeLittleUnmarked");
+			decoded = new String(message, offset, length, "UnicodeLittleUnmarked");
 
 		} catch (final UnsupportedEncodingException e) {
-			if(Cfg.DEBUG) Check.log( TAG + " Error: UnsupportedEncodingException");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: UnsupportedEncodingException");
+			}
 		}
 
 		if (endzero) {
@@ -145,8 +149,7 @@ public final class WChar {
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	public static String readPascal(final DataBuffer dataBuffer)
-			throws IOException {
+	public static String readPascal(final DataBuffer dataBuffer) throws IOException {
 		final int len = dataBuffer.readInt();
 		if (len < 0 || len > 65536) {
 			return null;

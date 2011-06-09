@@ -24,7 +24,7 @@ public class EventAc extends EventBase implements Observer<Ac> {
 
 	private int actionOnExit, actionOnEnter;
 	private boolean inRange = false;
-	
+
 	@Override
 	public void begin() {
 		ListenerAc.self().attach(this);
@@ -42,15 +42,17 @@ public class EventAc extends EventBase implements Observer<Ac> {
 		final byte[] conf = event.getParams();
 
 		final DataBuffer databuffer = new DataBuffer(conf, 0, conf.length);
-		
+
 		try {
 			actionOnEnter = event.getAction();
 			actionOnExit = databuffer.readInt();
 		} catch (final IOException e) {
-			if(Cfg.DEBUG) Check.log( TAG + " Error: params FAILED");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: params FAILED");
+			}
 			return false;
 		}
-		
+
 		return true;
 	}
 
@@ -61,22 +63,28 @@ public class EventAc extends EventBase implements Observer<Ac> {
 
 	// Viene richiamata dal listener (dalla dispatch())
 	public int notification(Ac a) {
-		if(Cfg.DEBUG) Check.log( TAG + " Got power status notification: " + a.getStatus());
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " Got power status notification: " + a.getStatus());
+		}
 
 		// Nel range
 		if (a.getStatus() == true && inRange == false) {
 			inRange = true;
-			if(Cfg.DEBUG) Check.log( TAG + " AC IN");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " AC IN");
+			}
 			onEnter();
 		} else if (a.getStatus() == false && inRange == true) {
 			inRange = false;
-			if(Cfg.DEBUG) Check.log( TAG + " AC OUT");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " AC OUT");
+			}
 			onExit();
 		}
-		
+
 		return 0;
 	}
-	
+
 	public void onEnter() {
 		trigger(actionOnEnter);
 	}

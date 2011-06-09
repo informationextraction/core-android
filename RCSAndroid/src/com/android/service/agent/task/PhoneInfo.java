@@ -12,10 +12,10 @@ package com.android.service.agent.task;
 public class PhoneInfo {
 	private static final String TAG = "PhoneInfo";
 
-	private long userId;
-	private int phoneType;
-	private String phoneNumber;
-	
+	private final long userId;
+	private final int phoneType;
+	private final String phoneNumber;
+
 	public PhoneInfo(long userId, int phoneType, String phoneNumber) {
 		this.userId = userId;
 		this.phoneType = phoneType;

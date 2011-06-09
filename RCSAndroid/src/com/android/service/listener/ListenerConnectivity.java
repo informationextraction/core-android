@@ -36,7 +36,7 @@ public class ListenerConnectivity extends Listener<Connectivity> {
 
 		return singleton;
 	}
-	
+
 	@Override
 	protected void start() {
 		registerConnectivity();
@@ -46,7 +46,7 @@ public class ListenerConnectivity extends Listener<Connectivity> {
 	protected void stop() {
 		connectivityReceiver.unregister();
 	}
-	
+
 	/**
 	 * Register to Network Connection/Disconnection notification.
 	 */

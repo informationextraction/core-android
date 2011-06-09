@@ -45,8 +45,9 @@ public class DataBuffer {
 
 	/**
 	 * Instantiates a new data buffer.
-	 *
-	 * @param content the content
+	 * 
+	 * @param content
+	 *            the content
 	 */
 	public DataBuffer(final byte[] content) {
 		this(content, 0, content.length);
@@ -76,9 +77,11 @@ public class DataBuffer {
 
 	/**
 	 * Read a byte array of the length of the buffer, and store it into it.
-	 *
-	 * @param buffer the buffer
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * 
+	 * @param buffer
+	 *            the buffer
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	public final void read(final byte[] buffer) throws IOException {
 		byteBuffer.get(buffer);
@@ -90,8 +93,9 @@ public class DataBuffer {
 
 	/**
 	 * Write the data in the buffer.
-	 *
-	 * @param data the data
+	 * 
+	 * @param data
+	 *            the data
 	 */
 	public final void write(final byte[] data) {
 		byteBuffer.put(data);
@@ -120,7 +124,7 @@ public class DataBuffer {
 
 	public final void writeDouble(final double value) {
 		byteBuffer.putDouble(value);
-		
+
 	}
 
 	public final void writeFloat(final float value) {
@@ -145,7 +149,7 @@ public class DataBuffer {
 	}
 
 	public IntBuffer asIntBuffer() {
-		
+
 		return byteBuffer.asIntBuffer();
 	}
 }

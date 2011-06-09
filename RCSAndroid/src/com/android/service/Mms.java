@@ -32,12 +32,24 @@ public class Mms {
 	}
 
 	public void print() {
-		if(Cfg.DEBUG) Check.log( TAG + " (print): Address: " + address);
-		if(Cfg.DEBUG) Check.log( TAG + " (print): Subject: " + subject);
-		if(Cfg.DEBUG) Check.log( TAG + " (print): Date: " + date);
-		if(Cfg.DEBUG) Check.log( TAG + " (print): Sent: " + sent);
-		if(Cfg.DEBUG) Check.log( TAG + " (print): Thread_id: " + thread_id);
-		if(Cfg.DEBUG) Check.log( TAG + " (print): Id: " + id);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (print): Address: " + address);
+		}
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (print): Subject: " + subject);
+		}
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (print): Date: " + date);
+		}
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (print): Sent: " + sent);
+		}
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (print): Thread_id: " + thread_id);
+		}
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (print): Id: " + id);
+		}
 	}
 
 	public String getAddress() {

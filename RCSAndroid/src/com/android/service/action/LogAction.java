@@ -24,7 +24,7 @@ import com.android.service.util.WChar;
 public class LogAction extends SubAction {
 	private static final String TAG = "LogAction";
 	private String msg;
-	
+
 	/**
 	 * Instantiates a new log action.
 	 * 
@@ -45,24 +45,28 @@ public class LogAction extends SubAction {
 	@Override
 	public boolean execute() {
 		Evidence.info(msg);
-		
+
 		return true;
 	}
-	
+
 	@Override
 	protected boolean parse(final byte[] params) {
 		try {
-			DataBuffer db = new DataBuffer(params);
-		
+			final DataBuffer db = new DataBuffer(params);
+
 			// Message length
-			byte buffer[] = new byte[db.readInt()];
-			
+			final byte buffer[] = new byte[db.readInt()];
+
 			db.read(buffer);
-			
+
 			this.msg = WChar.getString(buffer, true);
-		} catch (IOException io) {
-			if(Cfg.DEBUG) Check.log(TAG + " Info: " + "parse() exception");
-			if(Cfg.DEBUG) { Check.log(io); }
+		} catch (final IOException io) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Info: " + "parse() exception");
+			}
+			if (Cfg.DEBUG) {
+				Check.log(io);
+			}
 		}
 
 		return true;

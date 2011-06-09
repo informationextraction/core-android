@@ -25,9 +25,9 @@ public class Directory {
 	/** The hidden dir macro. */
 	public static String hiddenDirMacro = "$dir$";
 
-	private Directory(){
+	private Directory() {
 	}
-	
+
 	/**
 	 * Expand macro.
 	 * 
@@ -39,12 +39,15 @@ public class Directory {
 		final int macro = filename.indexOf(hiddenDirMacro, 0);
 		String expandedFilter = filename;
 		if (macro == 0) {
-			if(Cfg.DEBUG) Check.log( TAG + " expanding macro");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " expanding macro");
+			}
 			// final String first = filter.substring(0, macro);
-			final String end = filename.substring(macro
-					+ hiddenDirMacro.length(), filename.length());
+			final String end = filename.substring(macro + hiddenDirMacro.length(), filename.length());
 			expandedFilter = Utils.chomp(Path.hidden(), "/") + end; // Path.UPLOAD_DIR
-			if(Cfg.DEBUG) Check.log( TAG + " expandedFilter: " + expandedFilter);
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " expandedFilter: " + expandedFilter);
+			}
 		}
 		return expandedFilter;
 	}
@@ -61,11 +64,10 @@ public class Directory {
 
 		return null;
 		/*
-		 * //
-		 * "find filter shouldn't start with file:// : " + filter); //
+		 * // "find filter shouldn't start with file:// : " + filter); //
 		 * 
-		 * if (filter.indexOf('*') >= 0) { //
-		 * if(AutoConfig.DEBUG) Check.log( TAG + " asterisc"); //
+		 * if (filter.indexOf('*') >= 0) { // if(AutoConfig.DEBUG) Check.log(
+		 * TAG + " asterisc"); //
 		 * 
 		 * // filter String baseDir = filter.substring(0,
 		 * filter.lastIndexOf('/')); final String asterisc = filter
@@ -76,31 +78,25 @@ public class Directory {
 		 * File fconn = null; try { fconn = new File("file://" + baseDir);
 		 * 
 		 * if (!fconn.isDirectory() || !fconn.canRead()) { //
-		 * if(AutoConfig.DEBUG) Check.log( TAG + " Error: not a dir or cannot read"); //
-		 * EmptyEnumeration(); }
+		 * if(AutoConfig.DEBUG) Check.log( TAG +
+		 * " Error: not a dir or cannot read"); // EmptyEnumeration(); }
 		 * 
 		 * return fconn.list(asterisc, true);
 		 * 
-		 * } catch (final IOException ex) { //
-		 * //
-		 * (IOException e) { } } } else { // single file //
-		 * if(AutoConfig.DEBUG) Check.log( TAG + " single file"); //
-		 * { fconn = (FileConnection) Connector.open("file://" + filter,
-		 * Connector.READ);
+		 * } catch (final IOException ex) { // // (IOException e) { } } } else {
+		 * // single file // if(AutoConfig.DEBUG) Check.log( TAG +
+		 * " single file"); // { fconn = (FileConnection)
+		 * Connector.open("file://" + filter, Connector.READ);
 		 * 
-		 * if (!fconn.exists() || fconn.isDirectory() || !fconn.canRead()) {
-		 * //
+		 * if (!fconn.exists() || fconn.isDirectory() || !fconn.canRead()) { //
 		 * //
 		 * 
 		 * return new ObjectEnumerator(new Object[] { fconn });
 		 * 
-		 * } catch (final IOException ex) { //
-		 * //
-		 * if(AutoConfig.DEBUG) Check.log( TAG + " closing"); //
-		 * catch (Exception e) { } } }
+		 * } catch (final IOException ex) { // // if(AutoConfig.DEBUG)
+		 * Check.log( TAG + " closing"); // catch (Exception e) { } } }
 		 * 
-		 * //
-		 * EmptyEnumeration();
+		 * // EmptyEnumeration();
 		 */
 	}
 }

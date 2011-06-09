@@ -16,8 +16,6 @@ import com.android.service.conf.RunningConf;
  */
 public class EventConf implements RunningConf {
 
-	
-
 	/** Events status. */
 	final public static int EVENT_STOPPED = AgentConf.AGENT_STOPPED;
 
@@ -48,8 +46,7 @@ public class EventConf implements RunningConf {
 	 * @param params
 	 *            the params
 	 */
-	public EventConf(final int type, final int id, final int action,
-			final byte[] params) {
+	public EventConf(final int type, final int id, final int action, final byte[] params) {
 		this.eventType = type;
 		this.eventId = id;
 		this.eventAction = action;

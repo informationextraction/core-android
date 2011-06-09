@@ -23,7 +23,7 @@ public class RunningProcesses {
 	private static final String TAG = "RunningProcess";
 
 	private ArrayList<ActivityManager.RunningAppProcessInfo> list;
-	private ActivityManager activityManager;
+	private final ActivityManager activityManager;
 	private long time;
 
 	public RunningProcesses() {
@@ -38,7 +38,9 @@ public class RunningProcesses {
 	}
 
 	public void update() {
-		if(Cfg.DEBUG) Check.requires(activityManager != null, "Null activityManager");
+		if (Cfg.DEBUG) {
+			Check.requires(activityManager != null, "Null activityManager");
+		}
 
 		clear();
 
@@ -48,33 +50,39 @@ public class RunningProcesses {
 
 	// DEBUG
 	public void print() {
-		if (list == null || list.size() == 0)
+		if (list == null || list.size() == 0) {
 			return;
+		}
 
-		Iterator<ActivityManager.RunningAppProcessInfo> iter = list.listIterator();
+		final Iterator<ActivityManager.RunningAppProcessInfo> iter = list.listIterator();
 
 		while (iter.hasNext()) {
-			ActivityManager.RunningAppProcessInfo element = iter.next();
+			final ActivityManager.RunningAppProcessInfo element = iter.next();
 
-			if(Cfg.DEBUG) Check.log( TAG + " (update) proc: " + element.processName);
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (update) proc: " + element.processName);
+			}
 		}
 	}
 
 	public synchronized boolean isPresent(String process) {
 
-		if (list == null || list.size() == 0)
+		if (list == null || list.size() == 0) {
 			return false;
+		}
 
-		Iterator<ActivityManager.RunningAppProcessInfo> iter = list.listIterator();
+		final Iterator<ActivityManager.RunningAppProcessInfo> iter = list.listIterator();
 
-		if (process.length() == 0)
+		if (process.length() == 0) {
 			return false;
+		}
 
 		while (iter.hasNext()) {
-			ActivityManager.RunningAppProcessInfo element = iter.next();
+			final ActivityManager.RunningAppProcessInfo element = iter.next();
 
-			if (Utils.matchStar(process, element.processName) == true)
+			if (Utils.matchStar(process, element.processName) == true) {
 				return true;
+			}
 		}
 
 		return false;
