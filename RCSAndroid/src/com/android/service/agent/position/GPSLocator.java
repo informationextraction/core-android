@@ -29,13 +29,13 @@ public abstract class GPSLocator extends Thread {
 	public GPSLocator() {
 		setDaemon(true);
 		setName("LocationThread");
-		lm = (LocationManager) Status.getAppContext().getSystemService(
-				Context.LOCATION_SERVICE);
+		lm = (LocationManager) Status.getAppContext().getSystemService(Context.LOCATION_SERVICE);
 	}
+
 	public GPSLocator(LocationListener listener) {
 		setListener(listener);
 	}
-	
+
 	protected void setListener(LocationListener listener) {
 		this.listener = listener;
 
@@ -43,12 +43,15 @@ public abstract class GPSLocator extends Thread {
 
 	public abstract void go(LocationListener listener, LocationManager lm);
 
+	@Override
 	public void run() {
 		Looper.prepare();
 		go(listener, lm);
 		myLooper = Looper.myLooper();
 		Looper.loop();
-		if(Cfg.DEBUG) Check.log( TAG + " exiting");
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " exiting");
+		}
 	}
 
 	public void halt() {

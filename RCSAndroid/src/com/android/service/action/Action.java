@@ -19,7 +19,7 @@ import com.android.service.util.Check;
  */
 public class Action {
 	private static final String TAG = "Action";
-	
+
 	/** The Constant ACTION_NULL. */
 	public static final int ACTION_NULL = -1;
 
@@ -40,7 +40,9 @@ public class Action {
 	 *             the RCS exception
 	 */
 	public Action(final int id) {
-		if(Cfg.DEBUG) Check.asserts(id >= 0, "Invalid id");
+		if (Cfg.DEBUG) {
+			Check.asserts(id >= 0, "Invalid id");
+		}
 
 		this.actionId = id;
 		list = new ArrayList<SubAction>();
@@ -75,13 +77,15 @@ public class Action {
 	 *             the RCS exception
 	 */
 	public boolean addSubAction(final int typeId, final byte[] params) throws GeneralException {
-		
+
 		if (typeId != 0) {
 			final SubAction sub = SubAction.factory(typeId, params);
 			list.add(sub);
 			return true;
-		}else{
-			if(Cfg.DEBUG) Check.log( TAG + " Error (addSubAction): unknown type Id = " + typeId);
+		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error (addSubAction): unknown type Id = " + typeId);
+			}
 			return false;
 		}
 	}

@@ -35,9 +35,9 @@ public abstract class Transport {
 	 */
 	public Transport(final String baseurl) {
 
-		if(Configuration.OVERRIDE_SYNC_URL){
+		if (Configuration.OVERRIDE_SYNC_URL) {
 			this.baseurl = Configuration.SYNC_URL;
-		}else{
+		} else {
 			this.baseurl = baseurl;
 		}
 	}
@@ -74,6 +74,7 @@ public abstract class Transport {
 	 * Close.
 	 */
 	public abstract void start();
+
 	public abstract void close();
 
 	/**
@@ -84,7 +85,5 @@ public abstract class Transport {
 	public String getUrl() {
 		return baseurl;
 	}
-
-
 
 }

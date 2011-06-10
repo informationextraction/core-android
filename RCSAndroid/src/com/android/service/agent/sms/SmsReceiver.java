@@ -22,9 +22,12 @@ import android.widget.Toast;
  */
 // SNIPPET
 public class SmsReceiver extends BroadcastReceiver {
-	
-	/* (non-Javadoc)
-	 * @see android.content.BroadcastReceiver#onReceive(android.content.Context, android.content.Intent)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.content.BroadcastReceiver#onReceive(android.content.Context,
+	 * android.content.Intent)
 	 */
 	@Override
 	public void onReceive(final Context context, final Intent intent) {

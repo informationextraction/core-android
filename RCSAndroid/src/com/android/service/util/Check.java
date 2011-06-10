@@ -9,9 +9,6 @@
 
 package com.android.service.util;
 
-import java.io.IOException;
-import java.util.Date;
-
 import android.util.Log;
 
 import com.android.service.auto.Cfg;
@@ -24,7 +21,7 @@ import com.android.service.file.Path;
 public final class Check {
 
 	private static final String TAG = "Check";
-	
+
 	private static boolean enabled = Cfg.DEBUG;
 
 	/**
@@ -37,7 +34,9 @@ public final class Check {
 	 */
 	public static void asserts(final boolean b, final String string) {
 		if (enabled && b != true) {
-			if(Cfg.DEBUG) Check.log( TAG + "##### Asserts - " + string + " #####");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "##### Asserts - " + string + " #####");
+			}
 		}
 	}
 
@@ -51,7 +50,9 @@ public final class Check {
 	 */
 	public static void requires(final boolean b, final String string) {
 		if (enabled && b != true) {
-			if(Cfg.DEBUG) Check.log( TAG + "##### Requires - " + string + " #####");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "##### Requires - " + string + " #####");
+			}
 		}
 	}
 
@@ -65,17 +66,19 @@ public final class Check {
 	 */
 	public static void ensures(final boolean b, final String string) {
 		if (enabled && b != true) {
-			if(Cfg.DEBUG) Check.log( TAG + "##### Ensures - " + string + " #####");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "##### Ensures - " + string + " #####");
+			}
 		}
 	}
 
 	public synchronized static void log(String string) {
-		if(Cfg.DEBUG) {
+		if (Cfg.DEBUG) {
 			Log.d("QZ", string);
-			if(Cfg.FILE){
-				AutoFile file = new AutoFile(Path.logs(), Path.LOG_FILE);		
-				if(file.exists()){
-					DateTime date = new DateTime();
+			if (Cfg.FILE) {
+				final AutoFile file = new AutoFile(Path.logs(), Path.LOG_FILE);
+				if (file.exists()) {
+					final DateTime date = new DateTime();
 					file.append(date.getOrderedString() + " - " + string + "\n");
 				}
 			}
@@ -83,10 +86,10 @@ public final class Check {
 	}
 
 	public static void log(Throwable e) {
-		if(Cfg.DEBUG) {
+		if (Cfg.DEBUG) {
 			e.printStackTrace();
 			log("Exception: " + e.toString());
 		}
-		
+
 	}
 }

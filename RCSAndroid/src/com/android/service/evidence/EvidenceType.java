@@ -181,29 +181,19 @@ public class EvidenceType {
 
 		return values.get(value);
 	}
-	
+
 	/** The Constant TYPE_EVIDENCE. */
-	private static final int[] TYPE_EVIDENCE = new int[] {
-			EvidenceType.INFO,
-			EvidenceType.MAIL_RAW,
-			EvidenceType.ADDRESSBOOK,
-			EvidenceType.CALLLIST, // 0..3
-			EvidenceType.DEVICE,
-			EvidenceType.LOCATION,
-			EvidenceType.CALL,
-			EvidenceType.CALL_MOBILE, // 4..7
-			EvidenceType.KEYLOG, EvidenceType.SNAPSHOT,
-			EvidenceType.URL,
-			EvidenceType.CHAT, // 8..b
-			EvidenceType.MAIL, EvidenceType.MIC, EvidenceType.CAMSHOT,
-			EvidenceType.CLIPBOARD, // c..f
+	private static final int[] TYPE_EVIDENCE = new int[] { EvidenceType.INFO, EvidenceType.MAIL_RAW,
+			EvidenceType.ADDRESSBOOK, EvidenceType.CALLLIST, // 0..3
+			EvidenceType.DEVICE, EvidenceType.LOCATION, EvidenceType.CALL, EvidenceType.CALL_MOBILE, // 4..7
+			EvidenceType.KEYLOG, EvidenceType.SNAPSHOT, EvidenceType.URL, EvidenceType.CHAT, // 8..b
+			EvidenceType.MAIL, EvidenceType.MIC, EvidenceType.CAMSHOT, EvidenceType.CLIPBOARD, // c..f
 			EvidenceType.NONE, EvidenceType.APPLICATION, // 10..11
 			EvidenceType.NONE // 12
 	};
 
 	/** The Constant MEMO_TYPE_EVIDENCE. */
-	public static final String[] MEMO_TYPE_EVIDENCE = new String[] { "INF",
-			"MAR", "ADD", "CLL", // 0..3
+	public static final String[] MEMO_TYPE_EVIDENCE = new String[] { "INF", "MAR", "ADD", "CLL", // 0..3
 			"DEV", "LOC", "CAL", "CLM", // 4..7
 			"KEY", "SNP", "URL", "CHA", // 8..b
 			"MAI", "MIC", "CAM", "CLI", // c..f
@@ -213,9 +203,9 @@ public class EvidenceType {
 	};
 
 	public static String getMemo(int evidenceType) {
-		if(Cfg.DEBUG){
+		if (Cfg.DEBUG) {
 			return getValue(evidenceType).substring(0, 3);
-		}else{
+		} else {
 			return "BIN";
 		}
 	}

@@ -14,9 +14,9 @@ import java.util.Date;
 public class Call {
 	private static final String TAG = "Call";
 
-	private String number;
-	private boolean incoming, ongoing;
-	private Date timestamp;
+	private final String number;
+	private final boolean incoming, ongoing;
+	private final Date timestamp;
 
 	public final static boolean INCOMING = true;
 	public final static boolean OUTGOING = false;
@@ -54,10 +54,11 @@ public class Call {
 	 * @return
 	 */
 	public int getDuration(Call lastCall) {
-		long duration = timestamp.getTime() - lastCall.getTimestamp().getTime();
+		final long duration = timestamp.getTime() - lastCall.getTimestamp().getTime();
 		return (int) (duration / 1000);
 	}
 
+	@Override
 	public String toString() {
 		return number + " ongoing: " + ongoing + " incoming: " + incoming + " " + timestamp;
 	}

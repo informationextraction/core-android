@@ -22,7 +22,9 @@ public class StopAgentAction extends AgentAction {
 
 	@Override
 	public boolean execute() {
-		if(Cfg.DEBUG) Check.log( TAG + " (execute): " + agentId);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (execute): " + agentId);
+		}
 		final AgentManager agentManager = AgentManager.self();
 
 		agentManager.stop(agentId);

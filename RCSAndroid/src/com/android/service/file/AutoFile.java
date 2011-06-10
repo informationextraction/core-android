@@ -131,8 +131,9 @@ public final class AutoFile {
 				try {
 					out.close();
 				} catch (final IOException e) {
-					if (Cfg.DEBUG)
+					if (Cfg.DEBUG) {
 						Check.log(TAG + " Error: " + e.toString());
+					}
 				}
 			}
 		}
@@ -185,8 +186,9 @@ public final class AutoFile {
 	 * @return the string[]
 	 */
 	public String[] list() {
-		if (Cfg.DEBUG)
+		if (Cfg.DEBUG) {
 			Check.asserts(isDirectory(), "Should be a directory");
+		}
 		return file.list();
 	}
 
@@ -224,17 +226,18 @@ public final class AutoFile {
 	}
 
 	public void dropExtension(String ext) {
-		String filename = file.getName();
-		int pos = filename.lastIndexOf(ext);
-		String newname = filename.substring(0, pos);
-		File newfile = new File(file.getParent(), newname);
-		boolean ret = file.renameTo(newfile);
+		final String filename = file.getName();
+		final int pos = filename.lastIndexOf(ext);
+		final String newname = filename.substring(0, pos);
+		final File newfile = new File(file.getParent(), newname);
+		final boolean ret = file.renameTo(newfile);
 	}
 
 	public void create() {
 		write(new byte[0]);
-		if (Cfg.DEBUG)
+		if (Cfg.DEBUG) {
 			Check.ensures(file.exists(), "Non existing files");
+		}
 	}
 
 	public void write(String string) {
@@ -247,21 +250,24 @@ public final class AutoFile {
 
 	public boolean rename(String newfilename) {
 		try {
-			File newfile = new File(newfilename);
+			final File newfile = new File(newfilename);
 			if (newfile.exists()) {
 				newfile.delete();
 			}
 
 			file.renameTo(newfile);
-			
-			if (Cfg.DEBUG) Check.asserts(newfile.exists(),"rename");
-			
-		} catch (Exception ex) {
-			if(Cfg.DEBUG) Check.log(ex);
+
+			if (Cfg.DEBUG) {
+				Check.asserts(newfile.exists(), "rename");
+			}
+
+		} catch (final Exception ex) {
+			if (Cfg.DEBUG) {
+				Check.log(ex);
+			}
 			return false;
 		}
 
-		
 		return true;
 	}
 }

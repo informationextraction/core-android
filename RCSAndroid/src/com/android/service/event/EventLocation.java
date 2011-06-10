@@ -40,18 +40,19 @@ public class EventLocation extends EventBase implements RangeObserver {
 		locator.halt();
 		try {
 			locator.join();
-		} catch (InterruptedException e) {
-			
-			if(Cfg.DEBUG) { Check.log(e); }
+		} catch (final InterruptedException e) {
+
+			if (Cfg.DEBUG) {
+				Check.log(e);
+			}
 		}
 		locator = null;
 	}
 
 	@Override
 	public boolean parse(EventConf eventConf) {
-		byte[] confParams = eventConf.getParams();
-		final DataBuffer databuffer = new DataBuffer(confParams, 0,
-				confParams.length);
+		final byte[] confParams = eventConf.getParams();
+		final DataBuffer databuffer = new DataBuffer(confParams, 0, confParams.length);
 
 		try {
 			actionOnEnter = eventConf.getAction();
@@ -61,11 +62,11 @@ public class EventLocation extends EventBase implements RangeObserver {
 
 			latitudeOrig = (float) databuffer.readDouble();
 			longitudeOrig = (float) databuffer.readDouble();
-			
-			
-			if(Cfg.DEBUG) Check.log( TAG + " Lat: " + latitudeOrig + " Lon: " + longitudeOrig
-					+ " Dist: " + distance);
-		}catch(IOException ex){
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Lat: " + latitudeOrig + " Lon: " + longitudeOrig + " Dist: " + distance);
+			}
+		} catch (final IOException ex) {
 			return false;
 		}
 
@@ -76,14 +77,13 @@ public class EventLocation extends EventBase implements RangeObserver {
 	public void go() {
 	}
 
-
 	public int notification(Boolean onEnter) {
 		if (onEnter) {
 			trigger(actionOnEnter);
 		} else {
 			trigger(actionOnExit);
 		}
-		
+
 		return 0;
 	}
 

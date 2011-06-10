@@ -18,7 +18,7 @@ import com.android.service.util.Check;
  */
 public class StartAgentAction extends AgentAction {
 	private static final String TAG = "StartAgentAction";
-	
+
 	/**
 	 * Instantiates a new start agent action.
 	 * 
@@ -38,7 +38,9 @@ public class StartAgentAction extends AgentAction {
 	 */
 	@Override
 	public boolean execute() {
-		if(Cfg.DEBUG) Check.log( TAG + " (execute): " + agentId);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (execute): " + agentId);
+		}
 		final AgentManager agentManager = AgentManager.self();
 
 		agentManager.start(agentId);

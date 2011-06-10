@@ -21,15 +21,20 @@ public class BroadcastMonitorAc extends BroadcastReceiver {
 	/** The Constant TAG. */
 	private static final String TAG = "BroadcastMonitorAc";
 
-	/* (non-Javadoc)
-	 * @see android.content.BroadcastReceiver#onReceive(android.content.Context, android.content.Intent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.content.BroadcastReceiver#onReceive(android.content.Context,
+	 * android.content.Intent)
 	 */
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		if(Cfg.DEBUG) Check.log( TAG + " power notification, action: " + intent.getAction());
-		
-		boolean plugged = intent.getAction().equals(Intent.ACTION_POWER_CONNECTED);
-		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " power notification, action: " + intent.getAction());
+		}
+
+		final boolean plugged = intent.getAction().equals(Intent.ACTION_POWER_CONNECTED);
+
 		ListenerAc.self().dispatch(new Ac(plugged));
 	}
 }
