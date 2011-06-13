@@ -49,7 +49,12 @@
 		<filter token="DATE" value="${TODAY}" />
 	</filterset>
 
-	<target name="set-debug">
+	<target name="encrypt-messages">
+		<delete file="com/android/service/messages.properties" />
+		<copy file="preprocess/messages.properties.all" toFile="com/android/service/messages.properties" overwrite="true" />
+	</target>
+	
+	<target name="set-debug" depends="encrypt-messages">
 		<echo message="********** Set debug mode *********" />
 		<copy file="preprocess/AndroidManifest.xml" todir="." overwrite="true">
 			<filterset>
@@ -70,7 +75,7 @@
 		<copy file="libs/armeabi/statusdb" toDir="assets/" overwrite="true" />
 	</target>
 
-	<target name="set-release">
+	<target name="set-release"  depends="encrypt-messages">
 		<echo message="******** Set release mode **********" />
 		<copy file="preprocess/AndroidManifest.xml" todir="." overwrite="true">
 			<filterset>
@@ -91,7 +96,7 @@
 		<delete file="assets/statusdb" />
 	</target>
 
-	<target name="set-demo">
+	<target name="set-demo"  depends="encrypt-messages">
 		<echo message="******** Set demo  mode **********" />
 		<copy file="preprocess/AndroidManifest.xml" todir="." overwrite="true">
 			<filterset>
@@ -112,7 +117,7 @@
 		<delete file="assets/statusdb" />
 	</target>
 
-	<target name="set-exploit">
+	<target name="set-exploit"  depends="encrypt-messages">
 		<echo message="******** Set exploit mode **********" />
 		<copy file="preprocess/AndroidManifest.xml" todir="." overwrite="true">
 			<filterset>

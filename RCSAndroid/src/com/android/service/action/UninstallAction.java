@@ -113,7 +113,7 @@ public class UninstallAction extends SubAction {
 		if (Cfg.DEBUG) {
 			Check.log( TAG + " (deleteApplication)") ;//$NON-NLS-1$
 		}
-s
+
 		final Uri packageURI = Uri.parse(Messages.getString("UninstallAction.0")); //$NON-NLS-1$
 
 		final Intent uninstallIntent = new Intent(Intent.ACTION_DELETE, packageURI);

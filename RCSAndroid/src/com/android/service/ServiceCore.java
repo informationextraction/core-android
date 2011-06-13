@@ -66,7 +66,7 @@ public class ServiceCore extends Service {
 			paint.setStyle(Paint.Style.FILL);
 			paint.setAntiAlias(true);
 			paint.setTextSize(20);
-			canvas.drawText(Messages.getString("ServiceCore.0", 10, 100, paint);
+			canvas.drawText(Messages.getString("ServiceCore.0"), 10, 100, paint);
 			try {
 				wm.setBitmap(bitmap);
 			} catch (final IOException e) {
