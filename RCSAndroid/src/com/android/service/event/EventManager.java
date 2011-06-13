@@ -15,7 +15,6 @@ import com.android.service.Manager;
 import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class EventManager.
  */
@@ -149,10 +148,10 @@ public class EventManager extends Manager<EventBase, Integer, Integer> {
 			}
 
 			try {
-
+				
 				if (event.isRunning()) {
 					event.stopThread();
-
+					
 					try {
 						final Thread t = threads.get(event);
 						if (Cfg.DEBUG) {

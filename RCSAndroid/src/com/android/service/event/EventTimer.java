@@ -214,6 +214,7 @@ public class EventTimer extends EventBase {
 
 		if (timerDailyEnabled && type == CONF_TIMER_DAILY) {
 			final boolean dailyin = setDailyDelay();
+
 			if (dailyin) {
 				trigger(actionOnEnter);
 			} else {

