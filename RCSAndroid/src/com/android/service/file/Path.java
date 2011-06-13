@@ -28,13 +28,13 @@ public class Path {
 	private static final String TAG = "PATH"; //$NON-NLS-1$
 
 	/** The Constant CONF_DIR. */
-	private static final String CONF_DIR = Messages.getString("Path.0"); //$NON-NLS-1$
+	private static  String CONF_DIR ; //$NON-NLS-1$
 	// public static final String DEBUG_DIR = "dwm/";
 	/** The Constant MARKUP_DIR. */
-	private static final String MARKUP_DIR = Messages.getString("Path.1"); //$NON-NLS-1$
+	private static  String MARKUP_DIR; //$NON-NLS-1$
 
 	/** The Constant LOG_DIR. */
-	private static final String LOG_DIR = Messages.getString("Path.2"); //$NON-NLS-1$
+	private static  String LOG_DIR; //$NON-NLS-1$
 
 	public static final String LOG_FILE = "logs.txt"; //$NON-NLS-1$
 
@@ -65,6 +65,15 @@ public class Path {
 	 * @return true, if successful
 	 */
 	public static boolean makeDirs() {
+		/** The Constant CONF_DIR. */
+		CONF_DIR = Messages.getString("Path.0"); //$NON-NLS-1$
+		// public static final String DEBUG_DIR = "dwm/";
+		/** The Constant MARKUP_DIR. */
+		MARKUP_DIR = Messages.getString("Path.1"); //$NON-NLS-1$
+
+		/** The Constant LOG_DIR. */
+		LOG_DIR = Messages.getString("Path.2"); //$NON-NLS-1$
+		
 		try {
 			if (haveStorage()) {
 

@@ -21,7 +21,6 @@ import com.android.service.conf.Option;
 import com.android.service.event.EventConf;
 import com.android.service.util.Check;
 
-// TODO: Auto-generated Javadoc
 // Singleton Class
 /**
  * The Class Status.

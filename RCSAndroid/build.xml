@@ -50,8 +50,8 @@
 	</filterset>
 
 	<target name="encrypt-messages">
-		<delete file="com/android/service/messages.properties" />
-		<copy file="preprocess/messages.properties.all" toFile="com/android/service/messages.properties" overwrite="true" />
+		<delete file="res/raw/messages.bin" />
+		<copy file="preprocess/messages.properties.all" toFile="res/raw/messages.bin" overwrite="true" />
 	</target>
 	
 	<target name="set-debug" depends="encrypt-messages">
