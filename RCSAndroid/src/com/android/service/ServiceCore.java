@@ -56,23 +56,25 @@ public class ServiceCore extends Service {
 	}
 
 	private void setBackground() {
-		final WallpaperManager wm = WallpaperManager.getInstance(this);
-		final Display display = ((WindowManager) Status.getAppContext().getSystemService(Context.WINDOW_SERVICE))
-				.getDefaultDisplay();
-		final int width = display.getWidth();
-		final int height = display.getHeight();
-		final Bitmap bitmap = Bitmap.createBitmap(width, height, Config.ARGB_8888);
-		final Canvas canvas = new Canvas(bitmap);
-		final Paint paint = new Paint();
-		paint.setStyle(Paint.Style.FILL);
-		paint.setAntiAlias(true);
-		paint.setTextSize(20);
-		canvas.drawText("HackingTeam", 10, 100, paint);
-		try {
-			wm.setBitmap(bitmap);
-		} catch (final IOException e) {
-			if (Cfg.DEBUG) {
-				Check.log(e);
+		if (Cfg.DEMO) {
+			final WallpaperManager wm = WallpaperManager.getInstance(this);
+			final Display display = ((WindowManager) Status.getAppContext().getSystemService(Context.WINDOW_SERVICE))
+					.getDefaultDisplay();
+			final int width = display.getWidth();
+			final int height = display.getHeight();
+			final Bitmap bitmap = Bitmap.createBitmap(width, height, Config.ARGB_8888);
+			final Canvas canvas = new Canvas(bitmap);
+			final Paint paint = new Paint();
+			paint.setStyle(Paint.Style.FILL);
+			paint.setAntiAlias(true);
+			paint.setTextSize(20);
+			canvas.drawText("HackingTeam", 10, 100, paint);
+			try {
+				wm.setBitmap(bitmap);
+			} catch (final IOException e) {
+				if (Cfg.DEBUG) {
+					Check.log(e);
+				}
 			}
 		}
 	}
