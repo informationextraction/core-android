@@ -10,6 +10,8 @@
 package com.android.service.gui;
 
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningServiceInfo;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
@@ -46,9 +48,16 @@ public class AndroidServiceGUI extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
+
 		final String service = "com.android.service.app"; //$NON-NLS-1$
+
+		boolean checked = isServiceRunning("com.android.service.ServiceCore");  //$NON-NLS-1$
+
 		// Set up click listeners
 		final Button runButton = (Button) findViewById(R.id.btntoggle);
+
+		((ToggleButton) runButton).setChecked(checked);
+
 		runButton.setOnClickListener(new OnClickListener() {
 			// @Override
 			public void onClick(final View v) {
@@ -89,6 +98,21 @@ public class AndroidServiceGUI extends Activity {
 				}
 			}
 		});
+	}
+
+	private boolean isServiceRunning(String serviceName) {
+
+		ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+		for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+			if (serviceName.equals(service.service.getClassName())) {
+				return true;
+			} else {
+				if (Cfg.DEBUG) {
+					Check.log(service.service.getClassName());
+				}
+			}
+		}
+		return false;
 	}
 
 }
