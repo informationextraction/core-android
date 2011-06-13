@@ -94,6 +94,8 @@ public class SyncActionInternet extends SyncAction {
 	 */
 	@Override
 	protected boolean initTransport() {
+		transports.clear();
+		
 		if (wifi) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " initTransport adding WifiTransport");
