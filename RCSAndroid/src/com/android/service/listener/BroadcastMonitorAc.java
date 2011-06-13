@@ -19,7 +19,7 @@ import com.android.service.util.Check;
 
 public class BroadcastMonitorAc extends BroadcastReceiver {
 	/** The Constant TAG. */
-	private static final String TAG = "BroadcastMonitorAc";
+	private static final String TAG = "BroadcastMonitorAc"; //$NON-NLS-1$
 
 	/*
 	 * (non-Javadoc)
@@ -30,7 +30,7 @@ public class BroadcastMonitorAc extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " power notification, action: " + intent.getAction());
+			Check.log(TAG + " power notification, action: " + intent.getAction()) ;//$NON-NLS-1$
 		}
 
 		final boolean plugged = intent.getAction().equals(Intent.ACTION_POWER_CONNECTED);

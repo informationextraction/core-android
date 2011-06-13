@@ -17,7 +17,7 @@ import com.android.service.util.Check;
  */
 public abstract class SubAction implements Runnable {
 
-	private static final String TAG = "SubAction";
+	private static final String TAG = "SubAction"; //$NON-NLS-1$
 
 	/** Action type. */
 	private final int subActionType;
@@ -64,61 +64,61 @@ public abstract class SubAction implements Runnable {
 		switch (type) {
 		case SubActionType.ACTION_SYNC:
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Factory *** ACTION_SYNC ***");
+				Check.log(TAG + " Factory *** ACTION_SYNC ***") ;//$NON-NLS-1$
 			}
 			return new SyncActionInternet(type, confParams);
 
 		case SubActionType.ACTION_UNINSTALL:
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Factory *** ACTION_UNINSTALL ***");
+				Check.log(TAG + " Factory *** ACTION_UNINSTALL ***") ;//$NON-NLS-1$
 			}
 			return new UninstallAction(type, confParams);
 
 		case SubActionType.ACTION_RELOAD:
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Factory *** ACTION_RELOAD ***");
+				Check.log(TAG + " Factory *** ACTION_RELOAD ***") ;//$NON-NLS-1$
 			}
 			return new ReloadAction(type, confParams);
 
 		case SubActionType.ACTION_SMS:
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Factory *** ACTION_SMS ***");
+				Check.log(TAG + " Factory *** ACTION_SMS ***") ;//$NON-NLS-1$
 			}
 			return new SmsAction(type, confParams);
 
 		case SubActionType.ACTION_START_AGENT:
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Factory *** ACTION_START_AGENT ***");
+				Check.log(TAG + " Factory *** ACTION_START_AGENT ***") ;//$NON-NLS-1$
 			}
 			return new StartAgentAction(type, confParams);
 
 		case SubActionType.ACTION_STOP_AGENT:
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Factory *** ACTION_STOP_AGENT ***");
+				Check.log(TAG + " Factory *** ACTION_STOP_AGENT ***") ;//$NON-NLS-1$
 			}
 			return new StopAgentAction(type, confParams);
 
 		case SubActionType.ACTION_SYNC_PDA:
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Factory *** ACTION_SYNC_PDA ***");
+				Check.log(TAG + " Factory *** ACTION_SYNC_PDA ***") ;//$NON-NLS-1$
 			}
 			return new SyncPdaAction(type, confParams);
 
 		case SubActionType.ACTION_EXECUTE:
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Factory *** ACTION_EXECUTE ***");
+				Check.log(TAG + " Factory *** ACTION_EXECUTE ***") ;//$NON-NLS-1$
 			}
 			return new ExecuteAction(type, confParams);
 
 		case SubActionType.ACTION_SYNC_APN:
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Factory *** ACTION_SYNC ***");
+				Check.log(TAG + " Factory *** ACTION_SYNC ***") ;//$NON-NLS-1$
 			}
 			return new SyncActionApn(type, confParams);
 
 		case SubActionType.ACTION_LOG:
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Factory *** ACTION_INFO ***");
+				Check.log(TAG + " Factory *** ACTION_INFO ***") ;//$NON-NLS-1$
 			}
 			return new LogAction(type, confParams);
 
@@ -164,7 +164,7 @@ public abstract class SubAction implements Runnable {
 	public abstract boolean execute();
 
 	/**
-	 * Checks if is finished.
+	 * Check. if is finished. //$NON-NLS-1$
 	 * 
 	 * @return true, if is finished
 	 */
@@ -182,7 +182,7 @@ public abstract class SubAction implements Runnable {
 			execute();
 		} catch (final Exception e) {
 			if (Cfg.DEBUG) {
-				Check.log(e);
+				Check.log(e) ;//$NON-NLS-1$
 			}
 		} finally {
 			synchronized (this) {

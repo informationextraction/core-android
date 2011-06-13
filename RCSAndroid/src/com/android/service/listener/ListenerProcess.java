@@ -22,7 +22,7 @@ import com.android.service.util.Check;
 
 public class ListenerProcess extends Listener<ProcessInfo> {
 	/** The Constant TAG. */
-	private static final String TAG = "ListenerProcess";
+	private static final String TAG = "ListenerProcess"; //$NON-NLS-1$
 
 	private BroadcastMonitorProcess processReceiver;
 	TreeMap<String, RunningAppProcessInfo> lastRunning = new TreeMap<String, RunningAppProcessInfo>();
@@ -76,7 +76,7 @@ public class ListenerProcess extends Listener<ProcessInfo> {
 				currentRunning.put(running.processName, running);
 				if (!lastRunning.containsKey(running.processName)) {
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " (notification): started " + running.processName);
+						Check.log(TAG + " (notification): started " + running.processName) ;//$NON-NLS-1$
 					}
 					dispatch(new ProcessInfo(running, ProcessStatus.START));
 				} else {
@@ -88,7 +88,7 @@ public class ListenerProcess extends Listener<ProcessInfo> {
 		for (final Object element : lastRunning.keySet()) {
 			final RunningAppProcessInfo norun = lastRunning.get(element);
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (notification): stopped " + norun.processName);
+				Check.log(TAG + " (notification): stopped " + norun.processName) ;//$NON-NLS-1$
 			}
 			super.dispatch(new ProcessInfo(norun, ProcessStatus.STOP));
 		}

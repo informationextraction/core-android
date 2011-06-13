@@ -10,7 +10,7 @@
 package com.android.service.agent.task;
 
 public class PhoneInfo {
-	private static final String TAG = "PhoneInfo";
+	private static final String TAG = "PhoneInfo"; //$NON-NLS-1$
 
 	private final long userId;
 	private final int phoneType;

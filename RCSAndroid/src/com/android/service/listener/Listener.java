@@ -14,7 +14,7 @@ import com.android.service.interfaces.Observer;
 
 public abstract class Listener<U> {
 	/** The Constant TAG. */
-	private static final String TAG = "Listener";
+	private static final String TAG = "Listener"; //$NON-NLS-1$
 
 	protected List<Observer<U>> observers;
 

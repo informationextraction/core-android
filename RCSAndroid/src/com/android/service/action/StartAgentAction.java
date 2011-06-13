@@ -17,7 +17,7 @@ import com.android.service.util.Check;
  * The Class StartAgentAction.
  */
 public class StartAgentAction extends AgentAction {
-	private static final String TAG = "StartAgentAction";
+	private static final String TAG = "StartAgentAction"; //$NON-NLS-1$
 
 	/**
 	 * Instantiates a new start agent action.
@@ -39,7 +39,7 @@ public class StartAgentAction extends AgentAction {
 	@Override
 	public boolean execute() {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (execute): " + agentId);
+			Check.log(TAG + " (execute): " + agentId) ;//$NON-NLS-1$
 		}
 		final AgentManager agentManager = AgentManager.self();
 

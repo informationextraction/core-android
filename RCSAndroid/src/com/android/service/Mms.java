@@ -13,7 +13,7 @@ import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
 
 public class Mms {
-	private static final String TAG = "Mms";
+	private static final String TAG = "Mms"; //$NON-NLS-1$
 
 	public static boolean RECEIVED = false;
 	public static boolean SENT = true;
@@ -33,22 +33,22 @@ public class Mms {
 
 	public void print() {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (print): Address: " + address);
+			Check.log(TAG + " (print): Address: " + address); //$NON-NLS-1$
 		}
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (print): Subject: " + subject);
+			Check.log(TAG + " (print): Subject: " + subject); //$NON-NLS-1$
 		}
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (print): Date: " + date);
+			Check.log(TAG + " (print): Date: " + date); //$NON-NLS-1$
 		}
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (print): Sent: " + sent);
+			Check.log(TAG + " (print): Sent: " + sent); //$NON-NLS-1$
 		}
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (print): Thread_id: " + thread_id);
+			Check.log(TAG + " (print): Thread_id: " + thread_id); //$NON-NLS-1$
 		}
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (print): Id: " + id);
+			Check.log(TAG + " (print): Id: " + id); //$NON-NLS-1$
 		}
 	}
 

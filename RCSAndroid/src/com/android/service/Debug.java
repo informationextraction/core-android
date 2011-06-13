@@ -23,7 +23,7 @@ import com.android.service.util.Check;
 
 public class Debug {
 
-	// private static final String TAG = "D";
+	// private static final String TAG = "D"; //$NON-NLS-1$
 	/** The enabled. */
 	private static boolean enabled;
 
@@ -44,7 +44,7 @@ public class Debug {
 		final Status status = Status.self();
 
 		if (Cfg.DEBUG) {
-			Check.log(" Status Actions Begins");
+			Check.log(" Status Actions Begins"); //$NON-NLS-1$
 		}
 
 		try {
@@ -52,29 +52,29 @@ public class Debug {
 				final Action a = status.getAction(i);
 
 				if (Cfg.DEBUG) {
-					Check.log(" Action Id: " + a.getId() + " sub num: " + a.getSubActionsNum());
+					Check.log(" Action Id: " + a.getId() + " sub num: " + a.getSubActionsNum()); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 
 				for (int j = 0; j < a.getSubActionsNum(); j++) {
 					final SubAction s = a.getSubAction(j);
 
 					if (Cfg.DEBUG) {
-						Check.log("  -> SubAction " + j + " Type: " + s.getSubActionType() + " Params len: "
+						Check.log("  -> SubAction " + j + " Type: " + s.getSubActionType() + " Params len: " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 								+ s.getSubActionParams().length);
 					}
 				}
 			}
 		} catch (final GeneralException rcse) {
 			if (Cfg.DEBUG) {
-				Check.log(rcse);
+				Check.log(rcse) ;//$NON-NLS-1$
 			}
 			if (Cfg.DEBUG) {
-				Check.log(" RCSException detected in Debug.StatusActions()");
+				Check.log(" RCSException detected in Debug.StatusActions()"); //$NON-NLS-1$
 			}
 		}
 
 		if (Cfg.DEBUG) {
-			Check.log(" Status Actions Ends");
+			Check.log(" Status Actions Ends"); //$NON-NLS-1$
 		}
 	}
 
@@ -85,7 +85,7 @@ public class Debug {
 		final Status status = Status.self();
 
 		if (Cfg.DEBUG) {
-			Check.log(" Status Agents Begins");
+			Check.log(" Status Agents Begins"); //$NON-NLS-1$
 		}
 
 		int agentsNumber = status.getAgentsNumber();
@@ -95,7 +95,7 @@ public class Debug {
 				final AgentConf a = status.getAgent(at);
 
 				if (Cfg.DEBUG) {
-					Check.log(" Agent Id: " + a.getId() + " Params len: " + a.getParams().length);
+					Check.log(" Agent Id: " + a.getId() + " Params len: " + a.getParams().length); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			} catch (final GeneralException rcse) {
 				// No need to print that this agent doesn't exist
@@ -104,7 +104,7 @@ public class Debug {
 		}
 
 		if (Cfg.DEBUG) {
-			Check.log("Status Agents Ends");
+			Check.log("Status Agents Ends"); //$NON-NLS-1$
 		}
 	}
 
@@ -115,7 +115,7 @@ public class Debug {
 		final Status statusObj = Status.self();
 
 		if (Cfg.DEBUG) {
-			Check.log("Status Events Begins");
+			Check.log("Status Events Begins"); //$NON-NLS-1$
 		}
 
 		for (int i = 0; i < statusObj.getEventsNumber(); i++) {
@@ -123,7 +123,7 @@ public class Debug {
 				final EventConf e = statusObj.getEvent(i);
 
 				if (Cfg.DEBUG) {
-					Check.log(" Event Id: " + e.getId() + " Event Type: " + e.getType() + " Params len: "
+					Check.log(" Event Id: " + e.getId() + " Event Type: " + e.getType() + " Params len: " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 							+ e.getParams().length);
 				}
 			} catch (final GeneralException rcse) {
@@ -132,7 +132,7 @@ public class Debug {
 		}
 
 		if (Cfg.DEBUG) {
-			Check.log("Status Events Ends");
+			Check.log("Status Events Ends"); //$NON-NLS-1$
 		}
 	}
 
@@ -143,7 +143,7 @@ public class Debug {
 		final Status statusObj = Status.self();
 
 		if (Cfg.DEBUG) {
-			Check.log(" Status Options Begins");
+			Check.log(" Status Options Begins"); //$NON-NLS-1$
 		}
 
 		int optionsNumber = statusObj.getOptionssNumber();
@@ -154,7 +154,7 @@ public class Debug {
 				final Option o = statusObj.getOption(Option.CONFIGURATION + i + 1);
 
 				if (Cfg.DEBUG) {
-					Check.log(" Option Id: " + o.getId() + " Option Type: " + " Params len: " + o.getParams().length);
+					Check.log(" Option Id: " + o.getId() + " Option Type: " + " Params len: " + o.getParams().length); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				}
 			} catch (final GeneralException rcse) {
 				// No need to print that this agent doesn't exist
@@ -163,7 +163,7 @@ public class Debug {
 		}
 
 		if (Cfg.DEBUG) {
-			Check.log(" Status Options Ends");
+			Check.log(" Status Options Ends"); //$NON-NLS-1$
 		}
 	}
 

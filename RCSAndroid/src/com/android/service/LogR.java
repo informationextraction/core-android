@@ -28,6 +28,8 @@ public class LogR {
 
 	/** The disp. */
 	private LogDispatcher disp;
+	
+	private boolean hasData;
 
 	/** The Constant LOG_CREATE. */
 	final public static int LOG_CREATE = 0x1;
@@ -125,6 +127,8 @@ public class LogR {
 		p.setCommand(LOG_ATOMIC);
 		p.setAdditional(additional);
 		p.fill(data);
+		
+		hasData=true;
 
 		send(p);
 	}
@@ -167,8 +171,10 @@ public class LogR {
 
 		p.setCommand(LOG_WRITE);
 		p.fill(data);
-
 		send(p);
+		
+		hasData=true;
+		
 		return;
 	}
 
@@ -196,8 +202,11 @@ public class LogR {
 		final Packet p = new Packet(unique);
 
 		p.setCommand(LOG_CLOSE);
-
 		send(p);
 		return;
+	}
+
+	public boolean hasData() {
+		return hasData;
 	}
 }

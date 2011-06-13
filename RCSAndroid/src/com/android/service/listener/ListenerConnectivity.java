@@ -13,7 +13,7 @@ import com.android.service.Connectivity;
 
 public class ListenerConnectivity extends Listener<Connectivity> {
 	/** The Constant TAG. */
-	private static final String TAG = "ListenerConnectivity";
+	private static final String TAG = "ListenerConnectivity"; //$NON-NLS-1$
 
 	private BroadcastMonitorConnectivity connectivityReceiver;
 

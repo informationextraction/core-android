@@ -20,7 +20,7 @@ import com.android.service.util.Check;
 
 public class BroadcastMonitorCall extends BroadcastReceiver {
 	/** The Constant TAG. */
-	private static final String TAG = "BroadcastMonitorCall";
+	private static final String TAG = "BroadcastMonitorCall"; //$NON-NLS-1$
 
 	/*
 	 * (non-Javadoc)
@@ -37,7 +37,7 @@ public class BroadcastMonitorCall extends BroadcastReceiver {
 
 			// Outgoing phone call
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (onReceive): 1");
+				Check.log(TAG + " (onReceive): 1") ;//$NON-NLS-1$
 			}
 			call = new Call(number, Call.OUTGOING, Call.START);
 		} else if (intent.getStringExtra(TelephonyManager.EXTRA_STATE).equals(TelephonyManager.EXTRA_STATE_RINGING)) {
@@ -45,26 +45,26 @@ public class BroadcastMonitorCall extends BroadcastReceiver {
 
 			// Phone is ringing
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (onReceive): 2");
+				Check.log(TAG + " (onReceive): 2") ;//$NON-NLS-1$
 			}
 			call = new Call(number, Call.INCOMING, Call.START);
 		} else if (intent.getStringExtra(TelephonyManager.EXTRA_STATE).equals(TelephonyManager.EXTRA_STATE_IDLE)) {
 			// Call disconnected
-			call = new Call("", Call.INCOMING, Call.END);
+			call = new Call("", Call.INCOMING, Call.END); //$NON-NLS-1$
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (onReceive): 3");
+				Check.log(TAG + " (onReceive): 3") ;//$NON-NLS-1$
 			}
 		} else if (intent.getStringExtra(TelephonyManager.EXTRA_STATE).equals(TelephonyManager.EXTRA_STATE_OFFHOOK)) {
 			// Call answered, or issuing new outgoing call
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (onReceive): 4");
+				Check.log(TAG + " (onReceive): 4") ;//$NON-NLS-1$
 			}
-			call = new Call("", Call.OUTGOING, Call.START);
+			call = new Call("", Call.OUTGOING, Call.START); //$NON-NLS-1$
 		} else {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (onReceive): default");
+				Check.log(TAG + " (onReceive): default") ;//$NON-NLS-1$
 			}
-			call = new Call("", Call.OUTGOING, Call.END);
+			call = new Call("", Call.OUTGOING, Call.END); //$NON-NLS-1$
 		}
 
 		// Caller/Callee number, incoming?/outgoing, in progress?/disconnected

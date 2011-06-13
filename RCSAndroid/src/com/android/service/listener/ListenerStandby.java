@@ -19,7 +19,7 @@ import com.android.service.Status;
 
 public class ListenerStandby extends Listener<Standby> {
 	/** The Constant TAG. */
-	private static final String TAG = "ListenerStandby";
+	private static final String TAG = "ListenerStandby"; //$NON-NLS-1$
 
 	private BroadcastMonitorStandby standbyReceiver;
 

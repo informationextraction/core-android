@@ -32,7 +32,7 @@ public class KeysFake extends Keys {
 			(byte) 0x0d, (byte) 0x99 };
 
 	/** The Build id. */
-	String BuildId = "RCS_0000000179";
+	String BuildId = "RCS_0000000179"; //$NON-NLS-1$
 
 	public KeysFake() {
 		super(false);

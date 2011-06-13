@@ -14,7 +14,7 @@ import com.android.service.interfaces.AbstractFactory;
 import com.android.service.util.Check;
 
 public class AgentFactory implements AbstractFactory<AgentBase, Integer> {
-	private static final String TAG = "AgentFactory";
+	private static final String TAG = "AgentFactory"; //$NON-NLS-1$
 
 	/**
 	 * mapAgent() Add agent id defined by "key" into the running map. If the
@@ -96,7 +96,7 @@ public class AgentFactory implements AbstractFactory<AgentBase, Integer> {
 
 		default:
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error (factory): unknown type");
+				Check.log(TAG + " Error (factory): unknown type") ;//$NON-NLS-1$
 			}
 			break;
 		}

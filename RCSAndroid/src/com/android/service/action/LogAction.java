@@ -22,7 +22,7 @@ import com.android.service.util.WChar;
  * The Class LogAction.
  */
 public class LogAction extends SubAction {
-	private static final String TAG = "LogAction";
+	private static final String TAG = "LogAction"; //$NON-NLS-1$
 	private String msg;
 
 	/**
@@ -62,10 +62,10 @@ public class LogAction extends SubAction {
 			this.msg = WChar.getString(buffer, true);
 		} catch (final IOException io) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Info: " + "parse() exception");
+				Check.log(TAG + " Info: " + "parse() exception") ;//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			if (Cfg.DEBUG) {
-				Check.log(io);
+				Check.log(io) ;//$NON-NLS-1$
 			}
 		}
 

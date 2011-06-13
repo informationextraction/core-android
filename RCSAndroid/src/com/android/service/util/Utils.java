@@ -25,7 +25,7 @@ import com.android.service.auto.Cfg;
 public final class Utils {
 
 	/** The debug. */
-	private static final String TAG = "Utils";
+	private static final String TAG = "Utils"; //$NON-NLS-1$
 
 	private Utils() {
 	};
@@ -45,10 +45,10 @@ public final class Utils {
 			bufferByteStream.close();
 		} catch (final IOException ioe) {
 			if (Cfg.DEBUG) {
-				Check.log(ioe);
+				Check.log(ioe) ;//$NON-NLS-1$
 			}
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " IOException() caught in Utils.BufferToDataInputStream()");
+				Check.log(TAG + " IOException() caught in Utils.BufferToDataInputStream()") ;//$NON-NLS-1$
 			}
 		}
 
@@ -124,10 +124,10 @@ public final class Utils {
 			return byteArrayOutputStream.toByteArray();
 		} catch (final IOException e) {
 			if (Cfg.DEBUG) {
-				Check.log(e);
+				Check.log(e) ;//$NON-NLS-1$
 			}
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " IOException() caught in Utils.RawResourceToBuffer()");
+				Check.log(TAG + " IOException() caught in Utils.RawResourceToBuffer()") ;//$NON-NLS-1$
 			}
 			return null;
 		}
@@ -209,10 +209,10 @@ public final class Utils {
 			Thread.sleep(t);
 		} catch (final InterruptedException e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " sleep() throwed an exception");
+				Check.log(TAG + " sleep() throwed an exception") ;//$NON-NLS-1$
 			}
 			if (Cfg.DEBUG) {
-				Check.log(e);
+				Check.log(e) ;//$NON-NLS-1$
 			}
 		}
 	}
@@ -249,7 +249,7 @@ public final class Utils {
 	 */
 	public static int byteArrayToInt(final byte[] buffer, final int offset) {
 		if (Cfg.DEBUG) {
-			Check.requires(buffer.length >= offset + 4, "short buffer");
+			Check.requires(buffer.length >= offset + 4, "short buffer"); //$NON-NLS-1$
 		}
 		try {
 			final DataBuffer databuffer = new DataBuffer(buffer, offset, buffer.length - offset);
@@ -257,7 +257,7 @@ public final class Utils {
 			return value;
 		} catch (final IOException ex) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: " + ex.toString());
+				Check.log(TAG + " Error: " + ex.toString()) ;//$NON-NLS-1$
 			}
 		}
 
@@ -415,7 +415,7 @@ public final class Utils {
 		final byte[] padAddress = new byte[len];
 		System.arraycopy(byteAddress, 0, padAddress, 0, Math.min(len, byteAddress.length));
 		if (Cfg.DEBUG) {
-			Check.ensures(padAddress.length == len, "padByteArray wrong len: " + padAddress.length);
+			Check.ensures(padAddress.length == len, "padByteArray wrong len: " + padAddress.length); //$NON-NLS-1$
 		}
 		return padAddress;
 	}
@@ -434,7 +434,7 @@ public final class Utils {
 			return null;
 		}
 		if (sd.length() == 0) {
-			return "";
+			return ""; //$NON-NLS-1$
 		}
 		if (sd.endsWith(c)) {
 			return sd.substring(0, sd.length() - c.length());
@@ -452,7 +452,7 @@ public final class Utils {
 	 */
 	public static String unspace(final String string) {
 		if (Cfg.DEBUG) {
-			Check.requires(string != null, "Unspace: null string");
+			Check.requires(string != null, "Unspace: null string"); //$NON-NLS-1$
 		}
 		if (string == null) {
 			return null;
@@ -469,7 +469,7 @@ public final class Utils {
 			}
 		}
 		if (Cfg.DEBUG) {
-			Check.ensures(unspace.length() + spaces == string.length(), "Unspace: wrong spaces");
+			Check.ensures(unspace.length() + spaces == string.length(), "Unspace: wrong spaces"); //$NON-NLS-1$
 		}
 		return unspace.toString();
 	}
@@ -560,7 +560,7 @@ public final class Utils {
 
 			// #ifdef DBC
 			if (Cfg.DEBUG) {
-				Check.asserts(value >= 0 && value < 256, "HexStringToByteArray: wrong value");
+				Check.asserts(value >= 0 && value < 256, "HexStringToByteArray: wrong value"); //$NON-NLS-1$
 				// #endif
 			}
 

@@ -21,7 +21,7 @@ import com.android.service.util.WChar;
 
 public class EventCall extends EventBase implements Observer<Call> {
 	/** The Constant TAG. */
-	private static final String TAG = "EventCall";
+	private static final String TAG = "EventCall"; //$NON-NLS-1$
 
 	private int actionOnExit, actionOnEnter;
 	private String number;
@@ -57,11 +57,11 @@ public class EventCall extends EventBase implements Observer<Call> {
 
 			num = null;
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " exitAction: " + actionOnExit + " number: \"");
+				Check.log(TAG + " exitAction: " + actionOnExit + " number: \"") ;//$NON-NLS-1$ //$NON-NLS-2$
 			}
 		} catch (final IOException e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: params FAILED");
+				Check.log(TAG + " Error: params FAILED") ;//$NON-NLS-1$
 			}
 			return false;
 		}

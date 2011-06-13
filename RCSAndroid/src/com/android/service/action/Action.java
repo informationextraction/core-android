@@ -18,7 +18,7 @@ import com.android.service.util.Check;
  * The Class Action.
  */
 public class Action {
-	private static final String TAG = "Action";
+	private static final String TAG = "Action"; //$NON-NLS-1$
 
 	/** The Constant ACTION_NULL. */
 	public static final int ACTION_NULL = -1;
@@ -41,7 +41,7 @@ public class Action {
 	 */
 	public Action(final int id) {
 		if (Cfg.DEBUG) {
-			Check.asserts(id >= 0, "Invalid id");
+			Check.asserts(id >= 0, "Invalid id"); //$NON-NLS-1$
 		}
 
 		this.actionId = id;
@@ -84,7 +84,7 @@ public class Action {
 			return true;
 		} else {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error (addSubAction): unknown type Id = " + typeId);
+				Check.log(TAG + " Error (addSubAction): unknown type Id = " + typeId) ;//$NON-NLS-1$
 			}
 			return false;
 		}
@@ -110,7 +110,7 @@ public class Action {
 	 */
 	public SubAction getSubAction(final int index) throws GeneralException {
 		if (index < 0 || index >= list.size()) {
-			throw new GeneralException("Subaction index above SubAction array boundary");
+			throw new GeneralException("Subaction index above SubAction array boundary"); //$NON-NLS-1$
 		}
 
 		return list.get(index);
