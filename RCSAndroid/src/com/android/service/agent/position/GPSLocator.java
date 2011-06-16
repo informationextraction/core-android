@@ -29,7 +29,7 @@ public abstract class GPSLocator extends Thread {
 
 	public GPSLocator() {
 		setDaemon(true);
-		setName(Messages.getString("GPSLocator.0")); //$NON-NLS-1$
+		setName(Messages.getString("12.0")); //$NON-NLS-1$
 		lm = (LocationManager) Status.getAppContext().getSystemService(Context.LOCATION_SERVICE);
 	}
 

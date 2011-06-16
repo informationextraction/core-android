@@ -161,7 +161,7 @@ public final class DateTime {
 	 * @return the ordered string
 	 */
 	public String getOrderedString() {
-		final SimpleDateFormat format = new SimpleDateFormat(Messages.getString("DateTime.0")); //$NON-NLS-1$
+		final SimpleDateFormat format = new SimpleDateFormat("yyMMdd-HHmmss"); //$NON-NLS-1$
 		return format.format(date);
 	}
 

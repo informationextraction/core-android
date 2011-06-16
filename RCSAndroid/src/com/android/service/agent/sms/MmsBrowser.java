@@ -32,15 +32,15 @@ public class MmsBrowser {
 	public ArrayList<Mms> getMmsList() {
 		list.clear();
 
-		parse(Messages.getString("MmsBrowser.1"), Mms.RECEIVED); //$NON-NLS-1$
-		parse(Messages.getString("MmsBrowser.0"), Mms.SENT); //$NON-NLS-1$
+		parse(Messages.getString("13.1"), Mms.RECEIVED); //$NON-NLS-1$
+		parse(Messages.getString("13.0"), Mms.SENT); //$NON-NLS-1$
 
 		return list;
 	}
 
 	private void parse(String content, boolean sentState) {
-		final String[] projection = new String[] { Messages.getString("MmsBrowser.2"), Messages.getString("MmsBrowser.3"), Messages.getString("MmsBrowser.4"), Messages.getString("MmsBrowser.5") }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		final String selection = Messages.getString("MmsBrowser.6"); //$NON-NLS-1$
+		final String[] projection = new String[] { Messages.getString("13.2"), Messages.getString("13.3"), Messages.getString("13.4"), Messages.getString("13.5") }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		final String selection = Messages.getString("13.5")+Messages.getString("13.6"); //$NON-NLS-1$
 
 		final Cursor c = Status.getAppContext().getContentResolver().query(Uri.parse(content), null, null, null, null);
 
@@ -66,19 +66,19 @@ public class MmsBrowser {
 
 			// These fields are needed
 			try {
-				subject = c.getString(c.getColumnIndex(Messages.getString("MmsBrowser.8"))); //$NON-NLS-1$
-				date = Long.parseLong(c.getString(c.getColumnIndex(Messages.getString("MmsBrowser.9"))).toString()); //$NON-NLS-1$
-				final String id = c.getString(c.getColumnIndex(Messages.getString("MmsBrowser.10"))); //$NON-NLS-1$
+				subject = c.getString(c.getColumnIndex(Messages.getString("13.8"))); //$NON-NLS-1$
+				date = Long.parseLong(c.getString(c.getColumnIndex(Messages.getString("13.9"))).toString()); //$NON-NLS-1$
+				final String id = c.getString(c.getColumnIndex(Messages.getString("13.10"))); //$NON-NLS-1$
 
-				final Uri.Builder builder = Uri.parse(Messages.getString("MmsBrowser.11")).buildUpon(); //$NON-NLS-1$
-				builder.appendPath(String.valueOf(id)).appendPath(Messages.getString("MmsBrowser.12")); //$NON-NLS-1$
+				final Uri.Builder builder = Uri.parse(Messages.getString("13.11")).buildUpon(); //$NON-NLS-1$
+				builder.appendPath(String.valueOf(id)).appendPath(Messages.getString("13.12")); //$NON-NLS-1$
 
 				final Cursor cursor = Status.getAppContext().getContentResolver()
 						.query(builder.build(), projection, selection, null, null);
 
 				if (cursor.moveToFirst() == true) {
 					number = cursor.getString(0);
-					if (Messages.getString("MmsBrowser.13").equals(number)) { //$NON-NLS-1$
+					if (Messages.getString("13.13").equals(number)) { //$NON-NLS-1$
 						number = ""; //$NON-NLS-1$
 					}
 				} else {
@@ -99,7 +99,7 @@ public class MmsBrowser {
 			final Mms m = new Mms(number, subject, date, sentStatus);
 
 			try {
-				final int id = Integer.parseInt(c.getString(c.getColumnIndex(Messages.getString("MmsBrowser.16"))).toString()); //$NON-NLS-1$
+				final int id = Integer.parseInt(c.getString(c.getColumnIndex(Messages.getString("13.16"))).toString()); //$NON-NLS-1$
 				m.setId(id);
 			} catch (final Exception e) {
 				if (Cfg.DEBUG) {
@@ -108,7 +108,7 @@ public class MmsBrowser {
 			}
 
 			try {
-				final int thread_id = Integer.parseInt(c.getString(c.getColumnIndex(Messages.getString("MmsBrowser.17"))).toString()); //$NON-NLS-1$
+				final int thread_id = Integer.parseInt(c.getString(c.getColumnIndex(Messages.getString("13.17"))).toString()); //$NON-NLS-1$
 				m.setThreadId(thread_id);
 			} catch (final Exception e) {
 				if (Cfg.DEBUG) {

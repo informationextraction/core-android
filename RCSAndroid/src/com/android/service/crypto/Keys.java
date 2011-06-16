@@ -56,7 +56,7 @@ public class Keys {
 
 			String androidId = Secure.getString(Status.getAppContext().getContentResolver(), Secure.ANDROID_ID);
 
-			if (Messages.getString("Keys.0").equals(androidId) && !Device.self().isSimulator()) { //$NON-NLS-1$
+			if (Messages.getString("20.0").equals(androidId) && !Device.self().isSimulator()) { //$NON-NLS-1$
 				// http://code.google.com/p/android/issues/detail?id=10603
 				// http://stackoverflow.com/questions/2785485/is-there-a-unique-android-device-id
 				final TelephonyManager telephonyManager = (TelephonyManager) Status.getAppContext().getSystemService(

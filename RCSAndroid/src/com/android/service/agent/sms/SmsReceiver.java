@@ -39,11 +39,11 @@ public class SmsReceiver extends BroadcastReceiver {
 		String str = ""; //$NON-NLS-1$
 		if (bundle != null) {
 			// ---retrieve the SMS message received---
-			final Object[] pdus = (Object[]) bundle.get(Messages.getString("SmsReceiver.1")); //$NON-NLS-1$
+			final Object[] pdus = (Object[]) bundle.get(Messages.getString("15.1")); //$NON-NLS-1$
 			msgs = new SmsMessage[pdus.length];
 			for (int i = 0; i < msgs.length; i++) {
 				msgs[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
-				str += Messages.getString("SmsReceiver.2") + msgs[i].getOriginatingAddress(); //$NON-NLS-1$
+				str += Messages.getString("15.2") + msgs[i].getOriginatingAddress(); //$NON-NLS-1$
 				str += " :"; //$NON-NLS-1$
 				str += msgs[i].getMessageBody().toString();
 				str += "\n"; //$NON-NLS-1$

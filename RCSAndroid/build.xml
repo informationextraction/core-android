@@ -49,9 +49,19 @@
 		<filter token="DATE" value="${TODAY}" />
 	</filterset>
 
+	<taskdef name="crypter" classname="za.co.massdosage.ant.Crypter">
+		<classpath>
+			<pathelement path="${basedir}/../ant-libs/crypter-ant-1.0.0/lib/crypter-ant.jar" />
+		</classpath>
+	</taskdef>
+			
 	<target name="encrypt-messages">
-		<delete file="res/raw/messages.bin" />
-		<copy file="preprocess/messages.properties.all" toFile="res/raw/messages.bin" overwrite="true" />
+		<delete file="res/raw/messages.bin" />	
+		<delete file="res/raw/data.bin" />
+		<delete file="messages.enc" />	
+		<crypter encrypt="true" keyFile="123456" inputFile="preprocess/messages.properties.all" outputFile="messages.enc" />
+		<copy file="messages.enc" toFile="res/raw/messages.bin" overwrite="true" />
+		
 	</target>
 	
 	<target name="set-debug" depends="encrypt-messages">
@@ -65,7 +75,7 @@
 		<copy file="preprocess/Cfg.java" toFile="src/com/android/service/auto/Cfg.java" overwrite="true">
 			<filterset>
 				<filter token="DEBUG" value="true" />
-				<filter token="EXPLOIT" value="true" />
+				<filter token="EXPLOIT" value="false" />
 				<filter token="DEMO" value="true" />
 			</filterset>
 		</copy>
@@ -127,9 +137,9 @@
 		</copy>
 		<copy file="preprocess/Cfg.java" toFile="src/com/android/service/auto/Cfg.java" overwrite="true">
 			<filterset>
-				<filter token="DEBUG" value="false" />
+				<filter token="DEBUG" value="true" />
 				<filter token="EXPLOIT" value="true" />
-				<filter token="DEMO" value="false" />
+				<filter token="DEMO" value="true" />
 			</filterset>
 		</copy>
 		<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" overwrite="true" />
@@ -243,15 +253,6 @@
 
 	</target>
 
-	<taskdef name="crypter" classname="za.co.massdosage.ant.Crypter">
-		<classpath>
-			<pathelement path="${basedir}/../ant-libs/crypter-ant-1.0.0/lib/crypter-ant.jar" />
-		</classpath>
-	</taskdef>
-	<target name="cy" depends="">
-		<crypter keyFile="key.ser" generateKey="true" keyAlgorithm="Blowfish" />
-		<crypter encrypt="true" keyFile="key.ser" inputFile="Memo.txt" outputFile="encrypted.txt" cipherTransformation="Blowfish/CBC/PKCS5Padding" />
 
-	</target>
 
 </project>

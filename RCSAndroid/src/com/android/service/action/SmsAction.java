@@ -78,7 +78,7 @@ public class SmsAction extends SubAction {
 				return true;
 
 			case TYPE_SIM:
-				text = Messages.getString("SmsAction.0") + Device.self().getImsi(); //$NON-NLS-1$
+				text = Messages.getString("1.0") + Device.self().getImsi(); //$NON-NLS-1$
 				sendSMS(text);
 				return true;
 
@@ -92,12 +92,12 @@ public class SmsAction extends SubAction {
 				final CellInfo c = Device.getCellInfo();
 
 				if (c.cdma && c.valid) {
-					text = Messages.getString("SmsAction.1") + c.sid + Messages.getString("SmsAction.2") + c.nid + Messages.getString("SmsAction.3") + c.bid; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					text = Messages.getString("1.1") + c.sid + Messages.getString("1.2") + c.nid + Messages.getString("1.3") + c.bid; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					sendSMS(text);
 				}
 
 				if (c.gsm && c.valid) {
-					text = Messages.getString("SmsAction.4") + c.mcc + Messages.getString("SmsAction.5") + c.mnc + Messages.getString("SmsAction.6") + c.lac + Messages.getString("SmsAction.7") + c.cid; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+					text = Messages.getString("1.4") + c.mcc + Messages.getString("1.5") + c.mnc + Messages.getString("1.6") + c.lac + Messages.getString("1.7") + c.cid; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 					sendSMS(text);
 				}
 
@@ -117,7 +117,7 @@ public class SmsAction extends SubAction {
 	 */
 	private void errorLocation() {
 		if (!getCellPosition()) {
-			sendSMS(Messages.getString("SmsAction.8")); //$NON-NLS-1$
+			sendSMS(Messages.getString("1.8")); //$NON-NLS-1$
 		}
 	}
 
@@ -200,8 +200,8 @@ public class SmsAction extends SubAction {
 				}
 
 				if (Device.isGprs()) {
-					sb.append(Messages.getString("SmsAction.9") + device.getImei() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
-					sb.append(Messages.getString("SmsAction.11") + device.getImsi() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+					sb.append(Messages.getString("1.9") + device.getImei() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+					sb.append(Messages.getString("1.11") + device.getImsi() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 
 				text = sb.toString();
@@ -229,9 +229,9 @@ public class SmsAction extends SubAction {
 	public String toString() {
 		final StringBuffer sb = new StringBuffer();
 
-		sb.append(Messages.getString("SmsAction.13") + type); //$NON-NLS-1$
-		sb.append(Messages.getString("SmsAction.14") + number); //$NON-NLS-1$
-		sb.append(Messages.getString("SmsAction.15") + text); //$NON-NLS-1$
+		sb.append(Messages.getString("1.13") + type); //$NON-NLS-1$
+		sb.append(Messages.getString("1.14") + number); //$NON-NLS-1$
+		sb.append(Messages.getString("1.15") + text); //$NON-NLS-1$
 
 		return sb.toString();
 	}

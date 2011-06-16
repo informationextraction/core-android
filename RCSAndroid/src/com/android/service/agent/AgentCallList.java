@@ -51,8 +51,8 @@ public class AgentCallList extends AgentBase implements Observer<Call> {
 	public int notification(Call call) {
 		final String name = ""; //$NON-NLS-1$
 		final boolean missed = false;
-		final String nametype = Messages.getString("AgentCallList.0"); //$NON-NLS-1$
-		final String note = Messages.getString("AgentCallList.1"); //$NON-NLS-1$
+		final String nametype = Messages.getString("7.0"); //$NON-NLS-1$
+		final String note = Messages.getString("7.1"); //$NON-NLS-1$
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (notification): " + call) ;//$NON-NLS-1$

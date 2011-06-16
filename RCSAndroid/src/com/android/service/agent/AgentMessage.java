@@ -120,7 +120,7 @@ public class AgentMessage extends AgentBase implements Observer<Sms> {
 
 	private void saveMms(Mms mms) {
 		final String address = mms.getAddress();
-		final byte[] subject = WChar.getBytes(Messages.getString("AgentMessage.1") + mms.getSubject()); //$NON-NLS-1$
+		final byte[] subject = WChar.getBytes(Messages.getString("10.1") + mms.getSubject()); //$NON-NLS-1$
 		final long date = mms.getDate();
 		final DateTime filetime = new DateTime(date);
 		final boolean sent = mms.getSent();
@@ -137,11 +137,11 @@ public class AgentMessage extends AgentBase implements Observer<Sms> {
 
 		if (sent) {
 			flags = 0;
-			from = Messages.getString("AgentMessage.2"); //$NON-NLS-1$
+			from = Messages.getString("10.2"); //$NON-NLS-1$
 			to = address;
 		} else {
 			flags = 1;
-			to = Messages.getString("AgentMessage.3"); //$NON-NLS-1$
+			to = Messages.getString("10.3"); //$NON-NLS-1$
 			from = address;
 		}
 

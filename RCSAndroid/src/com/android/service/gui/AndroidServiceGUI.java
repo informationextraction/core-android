@@ -48,9 +48,7 @@ public class AndroidServiceGUI extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-
 		final String service = "com.android.service.app"; //$NON-NLS-1$
-
 		boolean checked = isServiceRunning("com.android.service.ServiceCore");  //$NON-NLS-1$
 
 		// Set up click listeners

@@ -47,25 +47,25 @@ public class Configuration {
 	 * Configuration file tags (ASCII format, NULL-terminated in binary
 	 * configuration).
 	 */
-	public static final String AGENT_CONF_DELIMITER = Messages.getString("Configuration.0"); //$NON-NLS-1$
+	public static final String AGENT_CONF_DELIMITER = Messages.getString("17.0"); //$NON-NLS-1$
 
 	/** The Constant EVENT_CONF_DELIMITER. */
-	public static final String EVENT_CONF_DELIMITER = Messages.getString("Configuration.1"); //$NON-NLS-1$
+	public static final String EVENT_CONF_DELIMITER = Messages.getString("17.1"); //$NON-NLS-1$
 
 	/** The Constant MOBIL_CONF_DELIMITER. */
-	public static final String MOBIL_CONF_DELIMITER = Messages.getString("Configuration.2"); //$NON-NLS-1$
+	public static final String MOBIL_CONF_DELIMITER = Messages.getString("17.2"); //$NON-NLS-1$
 
 	/** This one is _not_ NULL-terminated into the binary configuration. */
-	public static final String ENDOF_CONF_DELIMITER = Messages.getString("Configuration.3"); //$NON-NLS-1$
+	public static final String ENDOF_CONF_DELIMITER = Messages.getString("17.3"); //$NON-NLS-1$
 
 	/** The Constant NEW_CONF. */
-	public static final String NEW_CONF = Messages.getString("Configuration.4"); //$NON-NLS-1$
+	public static final String NEW_CONF = Messages.getString("17.4"); //$NON-NLS-1$
 
 	/** The Constant ACTUAL_CONF. */
-	public static final String ACTUAL_CONF = Messages.getString("Configuration.5");; //$NON-NLS-1$
+	public static final String ACTUAL_CONF = Messages.getString("17.5");; //$NON-NLS-1$
 
 	/** The Constant FORCED_CONF. */
-	private static final String FORCED_CONF = Messages.getString("Configuration.6"); //$NON-NLS-1$
+	private static final String FORCED_CONF = Messages.getString("17.6"); //$NON-NLS-1$
 
 	/** The Constant TASK_ACTION_TIMEOUT. */
 	public static final long TASK_ACTION_TIMEOUT = 600000;

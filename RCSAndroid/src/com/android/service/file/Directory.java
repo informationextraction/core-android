@@ -24,7 +24,7 @@ public class Directory {
 	/** The debug. */
 	private static final String TAG = "Directory"; //$NON-NLS-1$
 	/** The hidden dir macro. */
-	public static String hiddenDirMacro = Messages.getString("Directory.0"); //$NON-NLS-1$
+	public static String hiddenDirMacro = Messages.getString("23.0"); //$NON-NLS-1$
 
 	private Directory() {
 	}

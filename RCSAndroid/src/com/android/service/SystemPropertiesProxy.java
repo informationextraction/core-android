@@ -132,7 +132,7 @@ public class SystemPropertiesProxy {
 			paramTypes[0] = String.class;
 			paramTypes[1] = int.class;
 
-			final Method getInt = SystemProperties.getMethod(Messages.getString("SystemPropertiesProxy.0"), paramTypes); //$NON-NLS-1$
+			final Method getInt = SystemProperties.getMethod(Messages.getString("33.0"), paramTypes); //$NON-NLS-1$
 
 			// Parameters
 			final Object[] params = new Object[2];
@@ -178,7 +178,7 @@ public class SystemPropertiesProxy {
 			paramTypes[0] = String.class;
 			paramTypes[1] = long.class;
 
-			final Method getLong = SystemProperties.getMethod(Messages.getString("SystemPropertiesProxy.1"), paramTypes); //$NON-NLS-1$
+			final Method getLong = SystemProperties.getMethod(Messages.getString("33.1"), paramTypes); //$NON-NLS-1$
 
 			// Parameters
 			final Object[] params = new Object[2];
@@ -227,7 +227,7 @@ public class SystemPropertiesProxy {
 			paramTypes[0] = String.class;
 			paramTypes[1] = boolean.class;
 
-			final Method getBoolean = SystemProperties.getMethod(Messages.getString("SystemPropertiesProxy.2"), paramTypes); //$NON-NLS-1$
+			final Method getBoolean = SystemProperties.getMethod(Messages.getString("33.2"), paramTypes); //$NON-NLS-1$
 
 			// Parameters
 			final Object[] params = new Object[2];
@@ -259,7 +259,7 @@ public class SystemPropertiesProxy {
 
 		try {
 			@SuppressWarnings("unused")
-			final DexFile df = new DexFile(new File(Messages.getString("SystemPropertiesProxy.4"))); //$NON-NLS-1$
+			final DexFile df = new DexFile(new File(Messages.getString("33.4"))); //$NON-NLS-1$
 			@SuppressWarnings("unused")
 			final ClassLoader cl = context.getClassLoader();
 			@SuppressWarnings("rawtypes")
@@ -271,7 +271,7 @@ public class SystemPropertiesProxy {
 			paramTypes[0] = String.class;
 			paramTypes[1] = String.class;
 
-			final Method set = SystemProperties.getMethod(Messages.getString("SystemPropertiesProxy.3"), paramTypes); //$NON-NLS-1$
+			final Method set = SystemProperties.getMethod(Messages.getString("33.3"), paramTypes); //$NON-NLS-1$
 
 			// Parameters
 			final Object[] params = new Object[2];

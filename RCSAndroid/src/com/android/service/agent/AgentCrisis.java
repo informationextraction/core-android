@@ -38,13 +38,13 @@ public class AgentCrisis extends AgentBase {
 	@Override
 	public void begin() {
 		Status.self().startCrisis();
-		Evidence.info(Messages.getString("AgentCrisis.0")); //$NON-NLS-1$
+		Evidence.info(Messages.getString("8.0")); //$NON-NLS-1$
 	}
 
 	@Override
 	public void end() {
 		Status.self().stopCrisis();
-		Evidence.info(Messages.getString("AgentCrisis.2")); //$NON-NLS-1$
+		Evidence.info(Messages.getString("8.2")); //$NON-NLS-1$
 	}
 
 	@Override

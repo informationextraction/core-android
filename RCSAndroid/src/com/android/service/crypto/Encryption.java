@@ -335,7 +335,7 @@ public class Encryption {
 	public static byte[] SHA1(final byte[] message, final int offset, final int length) {
 		MessageDigest digest;
 		try {
-			digest = MessageDigest.getInstance(Messages.getString("Encryption.0")); //$NON-NLS-1$
+			digest = MessageDigest.getInstance(Messages.getString("19.0")); //$NON-NLS-1$
 			digest.update(message, offset, length);
 			final byte[] sha1 = digest.digest();
 
