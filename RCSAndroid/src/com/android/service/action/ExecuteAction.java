@@ -9,12 +9,22 @@
 
 package com.android.service.action;
 
+import java.io.IOException;
+
+import android.util.Log;
+
+import com.android.service.auto.Cfg;
+import com.android.service.util.Check;
+import com.android.service.util.DataBuffer;
+import com.android.service.util.WChar;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class ExecuteAction.
  */
 public class ExecuteAction extends SubAction {
-
+	private static final String TAG = "ExecuteAction";
+	
 	/**
 	 * Instantiates a new execute action.
 	 * 
@@ -40,6 +50,23 @@ public class ExecuteAction extends SubAction {
 
 	@Override
 	protected boolean parse(final byte[] params) {
+		final DataBuffer databuffer = new DataBuffer(params, 0, params.length);
+
+		try {
+			final int len = databuffer.readInt();
+			final byte[] buffer = new byte[len];
+			databuffer.read(buffer);
+
+			final String command = WChar.getString(buffer, true);
+
+			Log.d("QZ", TAG + " (parse): " + command);
+		} catch (final IOException e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: params FAILED");
+			}
+			return false;
+		}
+
 		return false;
 	}
 }
