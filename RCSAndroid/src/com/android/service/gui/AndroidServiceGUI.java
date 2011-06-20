@@ -106,7 +106,7 @@ public class AndroidServiceGUI extends Activity {
 				return true;
 			} else {
 				if (Cfg.DEBUG) {
-					Check.log(service.service.getClassName());
+					//Check.log(service.service.getClassName());
 				}
 			}
 		}

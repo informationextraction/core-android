@@ -108,6 +108,7 @@
 			<zipfileset dir="${doc.dir}" includes="documentation.html" prefix="${crypter.name}-${crypter.version.string}/doc" />
 			<zipfileset dir="${etc.dir}" includes="${apache.license.file}" prefix="${crypter.name}-${crypter.version.string}" />
 		</zip>
+		<copy file="${archive.dir}/${crypter.archive.name}" toDir="..\..\crypter-ant-1.0.0\lib" overwrite="true"/>
 	</target>
 
 	<!-- builds the source zip file -->

