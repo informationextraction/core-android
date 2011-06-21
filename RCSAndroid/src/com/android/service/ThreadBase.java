@@ -10,8 +10,6 @@ package com.android.service;
 import java.nio.ByteBuffer;
 import java.util.Date;
 
-import android.util.Log;
-
 import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
 
@@ -23,7 +21,7 @@ public abstract class ThreadBase implements Runnable {
 	/** The Constant NEVER. */
 	protected static final long NEVER = Long.MAX_VALUE;
 
-	private static final String TAG = "ThreadBase";
+	private static final String TAG = "ThreadBase"; //$NON-NLS-1$
 
 	/** The period in milliseconds. */
 	private long period = NEVER;
@@ -66,7 +64,7 @@ public abstract class ThreadBase implements Runnable {
 	 * @see java.lang.Thread#run()
 	 */
 	public synchronized void run() {
-		// if(Cfg.DEBUG) Check.asserts(agentEnabled, string)
+		// if(Cfg.DEBUG) Check.asserts(agentEnabled, string) //$NON-NLS-1$
 		status = StateRun.STARTING;
 
 		try {
@@ -75,8 +73,8 @@ public abstract class ThreadBase implements Runnable {
 			loop();
 		} catch (final Exception ex) {
 			if (Cfg.DEBUG) {
-				Check.log(ex);
-				Check.log(TAG + " Error: " + ex);
+				Check.log(ex) ;//$NON-NLS-1$
+				Check.log(TAG + " Error: " + ex); //$NON-NLS-1$
 			}
 
 		}
@@ -86,15 +84,15 @@ public abstract class ThreadBase implements Runnable {
 			end();
 		} catch (final Exception ex) {
 			if (Cfg.DEBUG) {
-				Check.log(ex);
-				Check.log(TAG + " Error: " + ex);
+				Check.log(ex) ;//$NON-NLS-1$
+				Check.log(TAG + " Error: " + ex); //$NON-NLS-1$
 			}
 		}
 
 		status = StateRun.STOPPED;
 		
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " AgentBase stopped");
+			Check.log(TAG + " AgentBase stopped"); //$NON-NLS-1$
 		}
 	}
 
@@ -119,7 +117,7 @@ public abstract class ThreadBase implements Runnable {
 							after = new Date();
 							final long elapsed = after.getTime() - before.getTime();
 							if (elapsed > delay * 1.5) {
-								Log.d("QZ", TAG + " (loop) Error: delay=" + delay + " elapsed=" + elapsed + "s");
+								Check.log( TAG + " (loop) Error: delay=" + delay + " elapsed=" + elapsed + "s"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 							}
 						}
 					}
@@ -157,14 +155,14 @@ public abstract class ThreadBase implements Runnable {
 					after = new Date();
 					final long elapsed = after.getTime() - before.getTime();
 					if (elapsed > period * 1.5) {
-						Log.d("QZ", TAG + " (loop) Error: period=" + period + " elapsed=" + elapsed + "s " + this);
+						Check.log( TAG + " (loop) Error: period=" + period + " elapsed=" + elapsed + "s " + this); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 					}
 				}
 
 			}
 		} catch (final Exception ex) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: " + ex.toString());
+				Check.log(TAG + " Error: " + ex.toString()); //$NON-NLS-1$
 			}
 		}
 
@@ -231,14 +229,14 @@ public abstract class ThreadBase implements Runnable {
 
 	public synchronized void suspend() {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (suspend)");
+			Check.log(TAG + " (suspend)"); //$NON-NLS-1$
 		}
 		suspended = true;
 	}
 
 	public synchronized void resume() {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (resume)");
+			Check.log(TAG + " (resume)"); //$NON-NLS-1$
 		}
 		suspended = false;
 		next();

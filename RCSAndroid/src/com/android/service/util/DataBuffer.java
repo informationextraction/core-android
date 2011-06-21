@@ -21,7 +21,7 @@ import java.nio.IntBuffer;
 public class DataBuffer {
 
 	/** The Constant TAG. */
-	private static final String TAG = "DataReadBuffer";
+	private static final String TAG = "DataReadBuffer"; //$NON-NLS-1$
 	// ByteArrayInputStream input;
 	// DataInputStream databuffer;
 	/** The byte buffer. */

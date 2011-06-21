@@ -13,7 +13,7 @@ import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
 
 public class Sms {
-	private static final String TAG = "Sms";
+	private static final String TAG = "Sms"; //$NON-NLS-1$
 
 	public static boolean RECEIVED = false;
 	public static boolean SENT = true;
@@ -32,46 +32,46 @@ public class Sms {
 		this.date = date;
 		this.sent = sent;
 
-		this.service_center = "";
-		this.person = "";
+		this.service_center = ""; //$NON-NLS-1$
+		this.person = ""; //$NON-NLS-1$
 	}
 
 	public void print() {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (print): Address: " + address);
+			Check.log(TAG + " (print): Address: " + address); //$NON-NLS-1$
 		}
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (print): Body: " + body);
+			Check.log(TAG + " (print): Body: " + body); //$NON-NLS-1$
 		}
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (print): Date: " + date);
+			Check.log(TAG + " (print): Date: " + date); //$NON-NLS-1$
 		}
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (print): Sent: " + sent);
+			Check.log(TAG + " (print): Sent: " + sent); //$NON-NLS-1$
 		}
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (print): Yields_id: " + yields_id);
+			Check.log(TAG + " (print): Yields_id: " + yields_id); //$NON-NLS-1$
 		}
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (print): Thread_id: " + thread_id);
+			Check.log(TAG + " (print): Thread_id: " + thread_id); //$NON-NLS-1$
 		}
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (print): Protocol: " + protocol);
+			Check.log(TAG + " (print): Protocol: " + protocol); //$NON-NLS-1$
 		}
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (print): Read: " + read);
+			Check.log(TAG + " (print): Read: " + read); //$NON-NLS-1$
 		}
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (print): Status: " + status);
+			Check.log(TAG + " (print): Status: " + status); //$NON-NLS-1$
 		}
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (print): Reply_path: " + reply_path);
+			Check.log(TAG + " (print): Reply_path: " + reply_path); //$NON-NLS-1$
 		}
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (print): Service_center: " + service_center);
+			Check.log(TAG + " (print): Service_center: " + service_center); //$NON-NLS-1$
 		}
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (print): Person: " + person);
+			Check.log(TAG + " (print): Person: " + person); //$NON-NLS-1$
 		}
 	}
 

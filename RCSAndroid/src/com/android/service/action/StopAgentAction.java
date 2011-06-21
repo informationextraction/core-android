@@ -18,12 +18,12 @@ public class StopAgentAction extends AgentAction {
 		super(type, confParams);
 	}
 
-	private static final String TAG = "StopAgentAction";
+	private static final String TAG = "StopAgentAction"; //$NON-NLS-1$
 
 	@Override
 	public boolean execute() {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (execute): " + agentId);
+			Check.log(TAG + " (execute): " + agentId) ;//$NON-NLS-1$
 		}
 		final AgentManager agentManager = AgentManager.self();
 

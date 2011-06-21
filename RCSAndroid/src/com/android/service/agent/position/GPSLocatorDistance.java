@@ -20,7 +20,7 @@ import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
 
 public class GPSLocatorDistance extends GPSLocator implements LocationListener {
-	private static final String TAG = "GPSLocDist";
+	private static final String TAG = "GPSLocDist"; //$NON-NLS-1$
 	private final float latitude;
 	private final float longitude;
 	private final float distance;
@@ -62,7 +62,7 @@ public class GPSLocatorDistance extends GPSLocator implements LocationListener {
 				entered = true;
 			} else {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " Already entered");
+					Check.log(TAG + " Already entered") ;//$NON-NLS-1$
 				}
 
 			}
@@ -73,7 +73,7 @@ public class GPSLocatorDistance extends GPSLocator implements LocationListener {
 				entered = false;
 			} else {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " Already exited");
+					Check.log(TAG + " Already exited") ;//$NON-NLS-1$
 				}
 			}
 
@@ -82,20 +82,20 @@ public class GPSLocatorDistance extends GPSLocator implements LocationListener {
 
 	public void onProviderDisabled(String arg0) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " onProviderDisabled: " + arg0);
+			Check.log(TAG + " onProviderDisabled: " + arg0) ;//$NON-NLS-1$
 		}
 
 	}
 
 	public void onProviderEnabled(String arg0) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " onProviderEnabled: " + arg0);
+			Check.log(TAG + " onProviderEnabled: " + arg0) ;//$NON-NLS-1$
 		}
 	}
 
 	public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " onStatusChanged: " + arg0 + "," + arg1);
+			Check.log(TAG + " onStatusChanged: " + arg0 + "," + arg1) ;//$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 	}

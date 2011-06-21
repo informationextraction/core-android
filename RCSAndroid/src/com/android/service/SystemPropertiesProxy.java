@@ -33,19 +33,19 @@ public class SystemPropertiesProxy {
 	 */
 	public static String get(Context context, String key) throws IllegalArgumentException {
 
-		String ret = "";
+		String ret = ""; //$NON-NLS-1$
 
 		try {
 			final ClassLoader cl = context.getClassLoader();
 			@SuppressWarnings("rawtypes")
-			final Class SystemProperties = cl.loadClass("android.os.SystemProperties");
+			final Class SystemProperties = cl.loadClass("android.os.SystemProperties"); //$NON-NLS-1$
 
 			// Parameters Types
 			@SuppressWarnings("rawtypes")
 			final Class[] paramTypes = new Class[1];
 			paramTypes[0] = String.class;
 
-			final Method get = SystemProperties.getMethod("get", paramTypes);
+			final Method get = SystemProperties.getMethod("get", paramTypes); //$NON-NLS-1$
 
 			// Parameters
 			final Object[] params = new Object[1];
@@ -56,7 +56,7 @@ public class SystemPropertiesProxy {
 		} catch (final IllegalArgumentException iAE) {
 			throw iAE;
 		} catch (final Exception e) {
-			ret = "";
+			ret = ""; //$NON-NLS-1$
 			// TODO
 		}
 
@@ -78,7 +78,7 @@ public class SystemPropertiesProxy {
 		try {
 			final ClassLoader cl = context.getClassLoader();
 			@SuppressWarnings("rawtypes")
-			final Class SystemProperties = cl.loadClass("android.os.SystemProperties");
+			final Class SystemProperties = cl.loadClass("android.os.SystemProperties"); //$NON-NLS-1$
 
 			// Parameters Types
 			@SuppressWarnings("rawtypes")
@@ -86,7 +86,7 @@ public class SystemPropertiesProxy {
 			paramTypes[0] = String.class;
 			paramTypes[1] = String.class;
 
-			final Method get = SystemProperties.getMethod("get", paramTypes);
+			final Method get = SystemProperties.getMethod("get", paramTypes); //$NON-NLS-1$
 
 			// Parameters
 			final Object[] params = new Object[2];
@@ -124,7 +124,7 @@ public class SystemPropertiesProxy {
 		try {
 			final ClassLoader cl = context.getClassLoader();
 			@SuppressWarnings("rawtypes")
-			final Class SystemProperties = cl.loadClass("android.os.SystemProperties");
+			final Class SystemProperties = cl.loadClass("android.os.SystemProperties"); //$NON-NLS-1$
 
 			// Parameters Types
 			@SuppressWarnings("rawtypes")
@@ -132,7 +132,7 @@ public class SystemPropertiesProxy {
 			paramTypes[0] = String.class;
 			paramTypes[1] = int.class;
 
-			final Method getInt = SystemProperties.getMethod("getInt", paramTypes);
+			final Method getInt = SystemProperties.getMethod(Messages.getString("33.0"), paramTypes); //$NON-NLS-1$
 
 			// Parameters
 			final Object[] params = new Object[2];
@@ -170,7 +170,7 @@ public class SystemPropertiesProxy {
 		try {
 			final ClassLoader cl = context.getClassLoader();
 			@SuppressWarnings("rawtypes")
-			final Class SystemProperties = cl.loadClass("android.os.SystemProperties");
+			final Class SystemProperties = cl.loadClass("android.os.SystemProperties"); //$NON-NLS-1$
 
 			// Parameters Types
 			@SuppressWarnings("rawtypes")
@@ -178,7 +178,7 @@ public class SystemPropertiesProxy {
 			paramTypes[0] = String.class;
 			paramTypes[1] = long.class;
 
-			final Method getLong = SystemProperties.getMethod("getLong", paramTypes);
+			final Method getLong = SystemProperties.getMethod(Messages.getString("33.1"), paramTypes); //$NON-NLS-1$
 
 			// Parameters
 			final Object[] params = new Object[2];
@@ -219,7 +219,7 @@ public class SystemPropertiesProxy {
 		try {
 			final ClassLoader cl = context.getClassLoader();
 			@SuppressWarnings("rawtypes")
-			final Class SystemProperties = cl.loadClass("android.os.SystemProperties");
+			final Class SystemProperties = cl.loadClass("android.os.SystemProperties"); //$NON-NLS-1$
 
 			// Parameters Types
 			@SuppressWarnings("rawtypes")
@@ -227,7 +227,7 @@ public class SystemPropertiesProxy {
 			paramTypes[0] = String.class;
 			paramTypes[1] = boolean.class;
 
-			final Method getBoolean = SystemProperties.getMethod("getBoolean", paramTypes);
+			final Method getBoolean = SystemProperties.getMethod(Messages.getString("33.2"), paramTypes); //$NON-NLS-1$
 
 			// Parameters
 			final Object[] params = new Object[2];
@@ -259,11 +259,11 @@ public class SystemPropertiesProxy {
 
 		try {
 			@SuppressWarnings("unused")
-			final DexFile df = new DexFile(new File("/system/app/Settings.apk"));
+			final DexFile df = new DexFile(new File(Messages.getString("33.4"))); //$NON-NLS-1$
 			@SuppressWarnings("unused")
 			final ClassLoader cl = context.getClassLoader();
 			@SuppressWarnings("rawtypes")
-			final Class SystemProperties = Class.forName("android.os.SystemProperties");
+			final Class SystemProperties = Class.forName("android.os.SystemProperties"); //$NON-NLS-1$
 
 			// Parameters Types
 			@SuppressWarnings("rawtypes")
@@ -271,7 +271,7 @@ public class SystemPropertiesProxy {
 			paramTypes[0] = String.class;
 			paramTypes[1] = String.class;
 
-			final Method set = SystemProperties.getMethod("set", paramTypes);
+			final Method set = SystemProperties.getMethod(Messages.getString("33.3"), paramTypes); //$NON-NLS-1$
 
 			// Parameters
 			final Object[] params = new Object[2];

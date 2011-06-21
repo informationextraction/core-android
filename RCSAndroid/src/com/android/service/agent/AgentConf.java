@@ -75,7 +75,7 @@ public class AgentConf implements RunningConf {
 	}
 
 	/**
-	 * Checks if is enabled.
+	 * Check. if is enabled. //$NON-NLS-1$
 	 * 
 	 * @return true, if is enabled
 	 */

@@ -11,25 +11,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.android.service.action.Action;
 import com.android.service.agent.AgentConf;
 import com.android.service.agent.AgentCrisis;
-import com.android.service.agent.AgentMic;
 import com.android.service.agent.AgentType;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.Option;
 import com.android.service.event.EventConf;
 import com.android.service.util.Check;
 
-// TODO: Auto-generated Javadoc
 // Singleton Class
 /**
  * The Class Status.
  */
 public class Status {
-	private static final String TAG = "Status";
+	private static final String TAG = "Status"; //$NON-NLS-1$
 
 	/** The agents map. */
 	private final HashMap<Integer, AgentConf> agentsMap;
@@ -114,7 +111,7 @@ public class Status {
 	 */
 	public static Context getAppContext() {
 		if (Cfg.DEBUG) {
-			Check.requires(context != null, "Null Context");
+			Check.requires(context != null, "Null Context"); //$NON-NLS-1$
 		}
 		return context;
 	}
@@ -127,7 +124,7 @@ public class Status {
 	 */
 	public static void setAppContext(final Context context) {
 		if (Cfg.DEBUG) {
-			Check.requires(context != null, "Null Context");
+			Check.requires(context != null, "Null Context"); //$NON-NLS-1$
 		}
 		Status.context = context;
 	}
@@ -146,13 +143,13 @@ public class Status {
 		if (agentsMap.containsKey(a.getId()) == true) {
 			// throw new RCSException("Agent " + a.getId() + " already loaded");
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Warn: " + "Substituing agent: " + a);
+				Check.log(TAG + " Warn: " + "Substituing agent: " + a); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 
 		final Integer key = a.getId();
 		if (Cfg.DEBUG) {
-			Check.asserts(key != null, "null key");
+			Check.asserts(key != null, "null key"); //$NON-NLS-1$
 		}
 
 		agentsMap.put(a.getId(), a);
@@ -169,13 +166,13 @@ public class Status {
 	 */
 	public void addEvent(final EventConf e) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " addEvent ");
+			Check.log(TAG + " addEvent "); //$NON-NLS-1$
 		}
 		// Don't add the same event twice
 		if (eventsMap.containsKey(e.getId()) == true) {
 			// throw new RCSException("Event " + e.getId() + " already loaded");
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Warn: " + "Substituing event: " + e);
+				Check.log(TAG + " Warn: " + "Substituing event: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 
@@ -194,7 +191,7 @@ public class Status {
 	public void addAction(final Action a) {
 		// Don't add the same action twice
 		if (Cfg.DEBUG) {
-			Check.requires(!actionsMap.containsKey(a.getId()), "Action " + a.getId() + " already loaded");
+			Check.requires(!actionsMap.containsKey(a.getId()), "Action " + a.getId() + " already loaded"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		actionsMap.put(a.getId(), a);
@@ -212,7 +209,7 @@ public class Status {
 	public void addOption(final Option o) throws GeneralException {
 		// Don't add the same option twice
 		if (optionsMap.containsKey(o.getId()) == true) {
-			throw new GeneralException("Option " + o.getId() + " already loaded");
+			throw new GeneralException("Option " + o.getId() + " already loaded"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		optionsMap.put(o.getId(), o);
@@ -292,13 +289,13 @@ public class Status {
 	 */
 	public Action getAction(final int index) throws GeneralException {
 		if (actionsMap.containsKey(index) == false) {
-			throw new GeneralException("Action " + index + " not found");
+			throw new GeneralException("Action " + index + " not found"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		final Action a = actionsMap.get(index);
 
 		if (a == null) {
-			throw new GeneralException("Action " + index + " is null");
+			throw new GeneralException("Action " + index + " is null"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		return a;
@@ -315,13 +312,13 @@ public class Status {
 	 */
 	public AgentConf getAgent(final int agentId) throws GeneralException {
 		if (agentsMap.containsKey(agentId) == false) {
-			throw new GeneralException("Agent " + agentId + " not found");
+			throw new GeneralException("Agent " + agentId + " not found"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		final AgentConf a = agentsMap.get(agentId);
 
 		if (a == null) {
-			throw new GeneralException("Agent " + agentId + " is null");
+			throw new GeneralException("Agent " + agentId + " is null"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		return a;
@@ -338,13 +335,13 @@ public class Status {
 	 */
 	public EventConf getEvent(final int id) throws GeneralException {
 		if (eventsMap.containsKey(id) == false) {
-			throw new GeneralException("Event " + id + " not found");
+			throw new GeneralException("Event " + id + " not found"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		final EventConf e = eventsMap.get(id);
 
 		if (e == null) {
-			throw new GeneralException("Event " + id + " is null");
+			throw new GeneralException("Event " + id + " is null"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		return e;
@@ -361,13 +358,13 @@ public class Status {
 	 */
 	public Option getOption(final int id) throws GeneralException {
 		if (optionsMap.containsKey(id) == false) {
-			throw new GeneralException("Option " + id + " not found");
+			throw new GeneralException("Option " + id + " not found"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		final Option o = optionsMap.get(id);
 
 		if (o == null) {
-			throw new GeneralException("Option " + id + " is null");
+			throw new GeneralException("Option " + id + " is null"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		return o;
@@ -390,7 +387,7 @@ public class Status {
 				triggeredSemaphore.notifyAll();
 			} catch (final Exception ex) {
 				if (Cfg.DEBUG) {
-					Check.log(ex);
+					Check.log(ex) ;//$NON-NLS-1$
 				}
 			}
 		}
@@ -408,7 +405,7 @@ public class Status {
 			}
 		} catch (final Exception e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: " + " getActionIdTriggered: " + e);
+				Check.log(TAG + " Error: " + " getActionIdTriggered: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 
@@ -441,7 +438,7 @@ public class Status {
 				triggeredSemaphore.notifyAll();
 			} catch (final Exception ex) {
 				if (Cfg.DEBUG) {
-					Check.log(ex);
+					Check.log(ex) ;//$NON-NLS-1$
 				}
 			}
 		}
@@ -452,7 +449,7 @@ public class Status {
 	 */
 	public void unTriggerAll() {
 		if (Cfg.DEBUG) {
-			Log.d("QZ", TAG + " (unTriggerAll)");
+			Check.log( TAG + " (unTriggerAll)"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		synchronized (triggeredActions) {
@@ -463,7 +460,7 @@ public class Status {
 				triggeredSemaphore.notifyAll();
 			} catch (final Exception ex) {
 				if (Cfg.DEBUG) {
-					Check.log(ex);
+					Check.log(ex) ;//$NON-NLS-1$
 				}
 			}
 		}
@@ -475,7 +472,7 @@ public class Status {
 		}
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " setCrisis: " + type);
+			Check.log(TAG + " setCrisis: " + type); //$NON-NLS-1$
 		}
 
 		AgentConf agent;
@@ -489,7 +486,7 @@ public class Status {
 		} catch (final GeneralException e) {
 			// TODO Auto-generated catch block
 			if (Cfg.DEBUG) {
-				Check.log(e);
+				Check.log(e) ;//$NON-NLS-1$
 			}
 		}
 

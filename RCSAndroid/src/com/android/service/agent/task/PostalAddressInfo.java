@@ -10,7 +10,7 @@
 package com.android.service.agent.task;
 
 public class PostalAddressInfo {
-	private static final String TAG = "PostalAddressInfo";
+	private static final String TAG = "PostalAddressInfo"; //$NON-NLS-1$
 
 	private final long userId;
 	private final int type;

@@ -26,8 +26,8 @@ import com.android.service.util.Check;
  */
 public class AgentCamera extends AgentBase {
 
-	private static final String TAG = "AgentCamera";
-
+	private static final String TAG = "AgentCamera"; //$NON-NLS-1$
+ //$NON-NLS-1$
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -82,21 +82,21 @@ public class AgentCamera extends AgentBase {
 
 			public void onShutter() {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " onShutter");
+					Check.log(TAG + " onShutter") ;//$NON-NLS-1$
 				}
 			}
 		};
 		final PictureCallback rawCallback = new PictureCallback() {
 			public void onPictureTaken(final byte[] _data, final Camera _camera) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " onPictureTaken RAW");
+					Check.log(TAG + " onPictureTaken RAW") ;//$NON-NLS-1$
 				}
 			}
 		};
 		final PictureCallback jpegCallback = new PictureCallback() {
 			public void onPictureTaken(final byte[] _data, final Camera _camera) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " onPictureTaken JPEG");
+					Check.log(TAG + " onPictureTaken JPEG") ;//$NON-NLS-1$
 				}
 			}
 		};

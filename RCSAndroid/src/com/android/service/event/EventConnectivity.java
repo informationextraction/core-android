@@ -20,7 +20,7 @@ import com.android.service.util.DataBuffer;
 
 public class EventConnectivity extends EventBase implements Observer<Connectivity> {
 	/** The Constant TAG. */
-	private static final String TAG = "EventConnectivity";
+	private static final String TAG = "EventConnectivity"; //$NON-NLS-1$
 
 	private int actionOnExit, actionOnEnter;
 	private boolean inRange = false;
@@ -48,7 +48,7 @@ public class EventConnectivity extends EventBase implements Observer<Connectivit
 			actionOnExit = databuffer.readInt();
 		} catch (final IOException e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: params FAILED");
+				Check.log(TAG + " Error: params FAILED") ;//$NON-NLS-1$
 			}
 			return false;
 		}
@@ -64,20 +64,20 @@ public class EventConnectivity extends EventBase implements Observer<Connectivit
 	// Viene richiamata dal listener (dalla dispatch())
 	public int notification(Connectivity c) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " Got connectivity status notification: " + c.isConnected());
+			Check.log(TAG + " Got connectivity status notification: " + c.isConnected()) ;//$NON-NLS-1$
 		}
 
 		// Nel range
 		if (c.isConnected() == true && inRange == false) {
 			inRange = true;
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Connectivity IN");
+				Check.log(TAG + " Connectivity IN") ;//$NON-NLS-1$
 			}
 			onEnter();
 		} else if (c.isConnected() == false && inRange == true) {
 			inRange = false;
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Connectivity OUT");
+				Check.log(TAG + " Connectivity OUT") ;//$NON-NLS-1$
 			}
 			onExit();
 		}

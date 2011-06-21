@@ -20,7 +20,7 @@ import com.android.service.util.DataBuffer;
 
 public class EventAc extends EventBase implements Observer<Ac> {
 	/** The Constant TAG. */
-	private static final String TAG = "EventAc";
+	private static final String TAG = "EventAc"; //$NON-NLS-1$
 
 	private int actionOnExit, actionOnEnter;
 	private boolean inRange = false;
@@ -48,7 +48,7 @@ public class EventAc extends EventBase implements Observer<Ac> {
 			actionOnExit = databuffer.readInt();
 		} catch (final IOException e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: params FAILED");
+				Check.log(TAG + " Error: params FAILED") ;//$NON-NLS-1$
 			}
 			return false;
 		}
@@ -64,20 +64,20 @@ public class EventAc extends EventBase implements Observer<Ac> {
 	// Viene richiamata dal listener (dalla dispatch())
 	public int notification(Ac a) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " Got power status notification: " + a.getStatus());
+			Check.log(TAG + " Got power status notification: " + a.getStatus()) ;//$NON-NLS-1$
 		}
 
 		// Nel range
 		if (a.getStatus() == true && inRange == false) {
 			inRange = true;
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " AC IN");
+				Check.log(TAG + " AC IN") ;//$NON-NLS-1$
 			}
 			onEnter();
 		} else if (a.getStatus() == false && inRange == true) {
 			inRange = false;
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " AC OUT");
+				Check.log(TAG + " AC OUT") ;//$NON-NLS-1$
 			}
 			onExit();
 		}

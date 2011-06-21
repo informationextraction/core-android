@@ -13,7 +13,7 @@ import com.android.service.ThreadBase;
  * The Class AgentBase.
  */
 public abstract class AgentBase extends ThreadBase {
-	private static final String TAG = "AgentBase";
+	private static final String TAG = "AgentBase"; //$NON-NLS-1$
 
 	/**
 	 * Parses the.

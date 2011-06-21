@@ -60,16 +60,16 @@ public class CellInfo {
 		final StringBuffer mb = new StringBuffer();
 
 		if (gsm) {
-			mb.append("MCC: " + mcc);
-			mb.append(" MNC: " + mnc);
-			mb.append(" LAC: " + lac);
-			mb.append(" CID: " + cid);
+			mb.append(Messages.getString("29.0") + mcc); //$NON-NLS-1$
+			mb.append(Messages.getString("29.1") + mnc); //$NON-NLS-1$
+			mb.append(Messages.getString("29.2") + lac); //$NON-NLS-1$
+			mb.append(Messages.getString("29.3") + cid); //$NON-NLS-1$
 		}
 
 		if (cdma) {
-			mb.append("SID: " + sid);
-			mb.append(" NID: " + nid);
-			mb.append(" BID: " + bid);
+			mb.append(Messages.getString("29.4") + sid); //$NON-NLS-1$
+			mb.append(Messages.getString("29.5") + nid); //$NON-NLS-1$
+			mb.append(Messages.getString("29.6") + bid); //$NON-NLS-1$
 		}
 
 		return mb.toString();

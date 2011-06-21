@@ -20,7 +20,7 @@ import com.android.service.util.DataBuffer;
 
 public class EventLocation extends EventBase implements RangeObserver {
 
-	private static final String TAG = "EventLocation";
+	private static final String TAG = "EventLocation"; //$NON-NLS-1$
 	int actionOnEnter;
 	int actionOnExit;
 
@@ -43,7 +43,7 @@ public class EventLocation extends EventBase implements RangeObserver {
 		} catch (final InterruptedException e) {
 
 			if (Cfg.DEBUG) {
-				Check.log(e);
+				Check.log(e) ;//$NON-NLS-1$
 			}
 		}
 		locator = null;
@@ -64,7 +64,7 @@ public class EventLocation extends EventBase implements RangeObserver {
 			longitudeOrig = (float) databuffer.readDouble();
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Lat: " + latitudeOrig + " Lon: " + longitudeOrig + " Dist: " + distance);
+				Check.log(TAG + " Lat: " + latitudeOrig + " Lon: " + longitudeOrig + " Dist: " + distance) ;//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 		} catch (final IOException ex) {
 			return false;

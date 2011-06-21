@@ -10,7 +10,7 @@
 package com.android.service.agent.task;
 
 public class OrganizationInfo {
-	private static final String TAG = "OrganizationInfo";
+	private static final String TAG = "OrganizationInfo"; //$NON-NLS-1$
 
 	private final int userId;
 	private final int type;

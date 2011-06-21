@@ -20,7 +20,7 @@ import com.android.service.util.Check;
 import com.android.service.util.Utils;
 
 public class RunningProcesses {
-	private static final String TAG = "RunningProcess";
+	private static final String TAG = "RunningProcess"; //$NON-NLS-1$
 
 	private ArrayList<ActivityManager.RunningAppProcessInfo> list;
 	private final ActivityManager activityManager;
@@ -39,7 +39,7 @@ public class RunningProcesses {
 
 	public void update() {
 		if (Cfg.DEBUG) {
-			Check.requires(activityManager != null, "Null activityManager");
+			Check.requires(activityManager != null, "Null activityManager"); //$NON-NLS-1$
 		}
 
 		clear();
@@ -60,7 +60,7 @@ public class RunningProcesses {
 			final ActivityManager.RunningAppProcessInfo element = iter.next();
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (update) proc: " + element.processName);
+				Check.log(TAG + " (update) proc: " + element.processName); //$NON-NLS-1$
 			}
 		}
 	}

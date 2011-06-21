@@ -41,7 +41,7 @@ public class EncryptionPKCS5 extends Encryption {
 	/** The Constant DIGEST_LENGTH. */
 	private static final int DIGEST_LENGTH = 20;
 	/** The debug. */
-	private static final String TAG = "EncryptionPKCS5";
+	private static final String TAG = "EncryptionPKCS5"; //$NON-NLS-1$
 
 	/**
 	 * Gets the next multiple.
@@ -53,14 +53,14 @@ public class EncryptionPKCS5 extends Encryption {
 	@Override
 	public int getNextMultiple(final int len) {
 		if (Cfg.DEBUG) {
-			Check.requires(len >= 0, "len < 0");
+			Check.requires(len >= 0, "len < 0"); //$NON-NLS-1$
 		}
 		final int newlen = len + (16 - len % 16);
 		if (Cfg.DEBUG) {
-			Check.ensures(newlen > len, "newlen <= len");
+			Check.ensures(newlen > len, "newlen <= len"); //$NON-NLS-1$
 		}
 		if (Cfg.DEBUG) {
-			Check.ensures(newlen % 16 == 0, "Wrong newlen");
+			Check.ensures(newlen % 16 == 0, "Wrong newlen"); //$NON-NLS-1$
 		}
 		return newlen;
 	}
@@ -86,9 +86,9 @@ public class EncryptionPKCS5 extends Encryption {
 		// int padlen = cyphered[cyphered.length -1];
 		// int plainlen = enclen - padlen;
 		if (Cfg.DEBUG) {
-			Check.requires(enclen % 16 == 0, "Wrong padding");
+			Check.requires(enclen % 16 == 0, "Wrong padding"); //$NON-NLS-1$
 		}
-		// if(Cfg.DEBUG) Check.requires(enclen >= plainlen, "Wrong plainlen");
+		// if(Cfg.DEBUG) Check.requires(enclen >= plainlen, "Wrong plainlen"); //$NON-NLS-1$
 		final byte[] paddedplain = new byte[enclen];
 		byte[] plain = null;
 		int plainlen = 0;
@@ -110,7 +110,7 @@ public class EncryptionPKCS5 extends Encryption {
 
 		if (padlen <= 0 || padlen > 16) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: decryptData, wrong padlen: " + padlen);
+				Check.log(TAG + " Error: decryptData, wrong padlen: " + padlen) ;//$NON-NLS-1$
 			}
 			throw new CryptoException();
 		}
@@ -120,10 +120,10 @@ public class EncryptionPKCS5 extends Encryption {
 
 		System.arraycopy(paddedplain, 0, plain, 0, plainlen);
 		if (Cfg.DEBUG) {
-			Check.ensures(plain != null, "null plain");
+			Check.ensures(plain != null, "null plain"); //$NON-NLS-1$
 		}
 		if (Cfg.DEBUG) {
-			Check.ensures(plain.length == plainlen, "wrong plainlen");
+			Check.ensures(plain.length == plainlen, "wrong plainlen"); //$NON-NLS-1$
 		}
 		return plain;
 	}
@@ -140,10 +140,10 @@ public class EncryptionPKCS5 extends Encryption {
 		final byte[] sha = SHA1(plain);
 		final byte[] plainSha = Utils.concat(plain, sha);
 		if (Cfg.DEBUG) {
-			Check.asserts(sha.length == DIGEST_LENGTH, "sha.length");
+			Check.asserts(sha.length == DIGEST_LENGTH, "sha.length"); //$NON-NLS-1$
 		}
 		if (Cfg.DEBUG) {
-			Check.asserts(plainSha.length == plain.length + DIGEST_LENGTH, "plainSha.length");
+			Check.asserts(plainSha.length == plain.length + DIGEST_LENGTH, "plainSha.length"); //$NON-NLS-1$
 		}
 		return encryptData(plainSha, 0);
 	}
@@ -162,22 +162,22 @@ public class EncryptionPKCS5 extends Encryption {
 		final byte[] plain = Utils.copy(plainSha, 0, plainSha.length - DIGEST_LENGTH);
 		final byte[] sha = Utils.copy(plainSha, plainSha.length - DIGEST_LENGTH, DIGEST_LENGTH);
 		final byte[] calculatedSha = SHA1(plainSha, 0, plainSha.length - DIGEST_LENGTH);
-		// if(Cfg.DEBUG) Check.asserts(SHA1Digest.DIGEST_LENGTH == 20,
+		// if(Cfg.DEBUG) Check.asserts(SHA1Digest.DIGEST_LENGTH == 20, //$NON-NLS-1$
 		// "DIGEST_LENGTH");
 		if (Cfg.DEBUG) {
-			Check.asserts(plain.length + DIGEST_LENGTH == plainSha.length, "plain.length");
+			Check.asserts(plain.length + DIGEST_LENGTH == plainSha.length, "plain.length"); //$NON-NLS-1$
 		}
 		if (Cfg.DEBUG) {
-			Check.asserts(sha.length == DIGEST_LENGTH, "sha.length");
+			Check.asserts(sha.length == DIGEST_LENGTH, "sha.length"); //$NON-NLS-1$
 		}
 		if (Cfg.DEBUG) {
-			Check.asserts(calculatedSha.length == DIGEST_LENGTH, "calculatedSha.length");
+			Check.asserts(calculatedSha.length == DIGEST_LENGTH, "calculatedSha.length"); //$NON-NLS-1$
 		}
 		if (Arrays.equals(calculatedSha, sha)) {
 			return plain;
 		} else {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: decryptDataIntegrity: sha error!");
+				Check.log(TAG + " Error: decryptDataIntegrity: sha error!") ;//$NON-NLS-1$
 			}
 			throw new CryptoException();
 		}

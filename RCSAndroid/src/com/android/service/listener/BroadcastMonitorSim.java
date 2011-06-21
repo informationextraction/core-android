@@ -16,7 +16,7 @@ import com.android.service.util.Check;
 
 public class BroadcastMonitorSim extends Thread {
 	/** The Constant TAG. */
-	private static final String TAG = "BroadcastMonitorSim";
+	private static final String TAG = "BroadcastMonitorSim"; //$NON-NLS-1$
 
 	private boolean stop;
 	private final int period;
@@ -40,7 +40,7 @@ public class BroadcastMonitorSim extends Thread {
 				wait(period);
 			} catch (final InterruptedException e) {
 				if (Cfg.DEBUG) {
-					Check.log(e);
+					Check.log(e) ;//$NON-NLS-1$
 				}
 			}
 		} while (true);

@@ -19,7 +19,7 @@ import com.android.service.util.DataBuffer;
  */
 public class EventTimer extends EventBase {
 	/** The Constant TAG. */
-	private static final String TAG = "EventTimer";
+	private static final String TAG = "EventTimer"; //$NON-NLS-1$
 
 	/** The Constant SLEEP_TIME. */
 	private static final int SLEEP_TIME = 1000;
@@ -61,7 +61,7 @@ public class EventTimer extends EventBase {
 	 */
 	public EventTimer() {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " TimerEvent constructor");
+			Check.log(TAG + " TimerEvent constructor") ;//$NON-NLS-1$
 		}
 	}
 
@@ -87,11 +87,11 @@ public class EventTimer extends EventBase {
 			actionOnEnter = event.getAction();
 			actionOnExit = databuffer.readInt();
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " type: " + type + " lo:" + loDelay + " hi:" + hiDelay);
+				Check.log(TAG + " type: " + type + " lo:" + loDelay + " hi:" + hiDelay) ;//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 		} catch (final IOException e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: params FAILED");
+				Check.log(TAG + " Error: params FAILED") ;//$NON-NLS-1$
 			}
 			return false;
 		}
@@ -110,7 +110,7 @@ public class EventTimer extends EventBase {
 		switch (type) {
 		case CONF_TIMER_SINGLE:
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Info: TIMER_SINGLE delay: " + loDelay);
+				Check.log(TAG + " Info: TIMER_SINGLE delay: " + loDelay) ;//$NON-NLS-1$
 			}
 			setDelay(loDelay);
 			setPeriod(NEVER);
@@ -118,7 +118,7 @@ public class EventTimer extends EventBase {
 
 		case CONF_TIMER_REPEAT:
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Info: TIMER_REPEAT period: " + loDelay);
+				Check.log(TAG + " Info: TIMER_REPEAT period: " + loDelay) ;//$NON-NLS-1$
 			}
 			setDelay(loDelay);
 			setPeriod(loDelay);
@@ -129,7 +129,7 @@ public class EventTimer extends EventBase {
 			tmpTime += loDelay;
 			final Date date = new Date(tmpTime);
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Info: TIMER_DATE: " + date);
+				Check.log(TAG + " Info: TIMER_DATE: " + date) ;//$NON-NLS-1$
 			}
 			setPeriod(NEVER);
 			setDelay(tmpTime - now);
@@ -163,7 +163,7 @@ public class EventTimer extends EventBase {
 		 * (delay > 0) { setDelay(timeInst + deltaTime - now); } else { //
 		 * 
 		 * DEBUG date = new Date(timeInst + deltaTime - now);
-		 * if(AutoConfig.DEBUG) Check.log( TAG + " Info: DELTA_DATE: " + date);
+		 * if(AutoConfig.DEBUG) Check.log( TAG + " Info: DELTA_DATE: " + date) ;//$NON-NLS-1$
 		 * 
 		 * } catch (final IOException e) {
 		 * 
@@ -172,7 +172,7 @@ public class EventTimer extends EventBase {
 		 */
 		default:
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: shouldn't be here");
+				Check.log(TAG + " Error: shouldn't be here") ;//$NON-NLS-1$
 			}
 			break;
 		}
@@ -209,7 +209,7 @@ public class EventTimer extends EventBase {
 	@Override
 	public void go() {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " Info: " + "triggering");
+			Check.log(TAG + " Info: " + "triggering") ;//$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		if (timerDailyEnabled && type == CONF_TIMER_DAILY) {

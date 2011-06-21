@@ -21,7 +21,7 @@ import com.android.service.util.WChar;
 
 public class EventSms extends EventBase implements Observer<Sms> {
 	/** The Constant TAG. */
-	private static final String TAG = "EventSms";
+	private static final String TAG = "EventSms"; //$NON-NLS-1$
 
 	private int actionOnEnter;
 	private String number, msg;
@@ -62,7 +62,7 @@ public class EventSms extends EventBase implements Observer<Sms> {
 			num = text = null;
 		} catch (final IOException e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: params FAILED");
+				Check.log(TAG + " Error: params FAILED") ;//$NON-NLS-1$
 			}
 			return false;
 		}
@@ -78,7 +78,7 @@ public class EventSms extends EventBase implements Observer<Sms> {
 	// Viene richiamata dal listener (dalla dispatch())
 	public int notification(Sms s) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " Got SMS notification from: " + s.getAddress() + " Body: " + s.getBody());
+			Check.log(TAG + " Got SMS notification from: " + s.getAddress() + " Body: " + s.getBody()) ;//$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		if (s.getAddress().equalsIgnoreCase(this.number) == false) {

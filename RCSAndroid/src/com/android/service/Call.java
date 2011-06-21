@@ -12,7 +12,7 @@ package com.android.service;
 import java.util.Date;
 
 public class Call {
-	private static final String TAG = "Call";
+	private static final String TAG = "Call"; //$NON-NLS-1$
 
 	private final String number;
 	private final boolean incoming, ongoing;
@@ -60,6 +60,6 @@ public class Call {
 
 	@Override
 	public String toString() {
-		return number + " ongoing: " + ongoing + " incoming: " + incoming + " " + timestamp;
+		return number + Messages.getString("28.1") + ongoing + Messages.getString("28.0") + incoming + Messages.getString("28.2") + timestamp; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 }

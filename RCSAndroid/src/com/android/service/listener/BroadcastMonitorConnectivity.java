@@ -21,7 +21,7 @@ import com.android.service.util.Check;
 // Falso broadcast, e' generato da noi
 public class BroadcastMonitorConnectivity extends Thread {
 	/** The Constant TAG. */
-	private static final String TAG = "BroadcastMonitorConnectivity";
+	private static final String TAG = "BroadcastMonitorConnectivity"; //$NON-NLS-1$
 
 	private boolean stop;
 	private final int period;
@@ -53,7 +53,7 @@ public class BroadcastMonitorConnectivity extends Thread {
 				wait(period);
 			} catch (final InterruptedException e) {
 				if (Cfg.DEBUG) {
-					Check.log(e);
+					Check.log(e) ;//$NON-NLS-1$
 				}
 			}
 		} while (true);

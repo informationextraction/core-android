@@ -20,7 +20,7 @@ import com.android.service.util.DataBuffer;
  * The Class StopAgentAction.
  */
 public abstract class AgentAction extends SubAction {
-	private static final String TAG = "AgentAction";
+	private static final String TAG = "AgentAction"; //$NON-NLS-1$
 
 	protected int agentId;
 
@@ -44,7 +44,7 @@ public abstract class AgentAction extends SubAction {
 
 		} catch (final IOException e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (parse) Error: " + e.toString());
+				Check.log(TAG + " (parse) Error: " + e.toString()) ;//$NON-NLS-1$
 			}
 			return false;
 		}

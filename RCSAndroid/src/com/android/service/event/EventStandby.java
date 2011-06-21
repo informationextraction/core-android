@@ -20,7 +20,7 @@ import com.android.service.util.DataBuffer;
 
 public class EventStandby extends EventBase implements Observer<Standby> {
 	/** The Constant TAG. */
-	private static final String TAG = "EventStandby";
+	private static final String TAG = "EventStandby"; //$NON-NLS-1$
 
 	private int actionOnEnter, actionOnExit;
 
@@ -47,11 +47,11 @@ public class EventStandby extends EventBase implements Observer<Standby> {
 			actionOnExit = databuffer.readInt();
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " exitAction: " + actionOnExit);
+				Check.log(TAG + " exitAction: " + actionOnExit) ;//$NON-NLS-1$
 			}
 		} catch (final IOException e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: params FAILED");
+				Check.log(TAG + " Error: params FAILED") ;//$NON-NLS-1$
 			}
 			return false;
 		}

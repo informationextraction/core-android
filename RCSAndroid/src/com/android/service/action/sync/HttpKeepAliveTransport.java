@@ -23,11 +23,12 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 
+import com.android.service.Messages;
 import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
 
 public abstract class HttpKeepAliveTransport extends HttpTransport {
-	private static final String TAG = "HttpKeepAliveTransport";
+	private static final String TAG = "HttpKeepAliveTransport"; //$NON-NLS-1$
 	DefaultHttpClient httpclient;
 
 	public HttpKeepAliveTransport(String host) {
@@ -49,15 +50,15 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 	public synchronized byte[] command(final byte[] data) throws TransportException {
 
 		if (Cfg.DEBUG) {
-			Check.ensures(httpclient != null, "call startSession before command");
+			Check.ensures(httpclient != null, "call startSession before command"); //$NON-NLS-1$
 			// httpclient.getParams().setParameter(ClientPNames.COOKIE_POLICY,
 			// CookiePolicy.RFC_2965);
 		}
 
 		final HttpPost httppost = new HttpPost(baseurl);
-		httppost.setHeader("User-Agent",
-				"Mozilla/5.0 (Linux; U; Android 0.5; en-us) AppleWebKit/522+ (KHTML, like Gecko) Safari/419.3");
-		httppost.setHeader("Content-Type", "application/octet-stream");
+		httppost.setHeader(Messages.getString("3.0"), //$NON-NLS-1$
+				Messages.getString("3.1")); //$NON-NLS-1$
+		httppost.setHeader(Messages.getString("3.2"), Messages.getString("3.3")); //$NON-NLS-1$ //$NON-NLS-2$
 
 		if (cookies != null) {
 			for (final Cookie cookie : cookies) {
@@ -92,7 +93,7 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 			}
 		} catch (final Exception ex) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: " + ex.toString());
+				Check.log(TAG + " Error: " + ex.toString()) ;//$NON-NLS-1$
 			}
 			throw new TransportException(1);
 		} finally {
@@ -101,7 +102,7 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 					in.close();
 				} catch (final IOException e) {
 					if (Cfg.DEBUG) {
-						Check.log(e);
+						Check.log(e) ;//$NON-NLS-1$
 					}
 				}
 			}

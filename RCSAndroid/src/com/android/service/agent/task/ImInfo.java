@@ -10,7 +10,7 @@
 package com.android.service.agent.task;
 
 public class ImInfo {
-	private static final String TAG = "ImInfo";
+	private static final String TAG = "ImInfo"; //$NON-NLS-1$
 
 	private final long userId;
 	private final int imType;
