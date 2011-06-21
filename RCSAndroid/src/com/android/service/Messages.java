@@ -55,9 +55,8 @@ public class Messages {
 			messages = new HashMap<String, String>();
 			Resources resources = context.getResources();
 			InputStream stream = resources.openRawResource(R.raw.messages);
-
 			
-			SecretKey key = produceKey("123456");
+			SecretKey key = produceKey("0x5A3D00448D7A912B");
 			if (Cfg.DEBUG) {
 				Check.asserts(key != null, "null key"); //$NON-NLS-1$
 			}
@@ -127,7 +126,7 @@ public class Messages {
 	 * @throws BuildException
 	 *             If the contents of the key file cannot be read.
 	 */
-	private static SecretKey produceKey(String key) {
+	public static SecretKey produceKey(String key) {
 
 		try {
 			if (Cfg.DEBUG) {

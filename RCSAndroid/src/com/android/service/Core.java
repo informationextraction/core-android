@@ -121,8 +121,6 @@ public class Core extends Activity implements Runnable {
 			Check.log(TAG + " RCS Thread Started"); //$NON-NLS-1$
 		}
 
-		stealth();
-
 		try {
 			while (!bStopCore) {
 				if (Cfg.DEBUG) {
@@ -396,13 +394,6 @@ public class Core extends Activity implements Runnable {
 			Check.log(TAG + " Info: Conf file loaded: " + loaded); //$NON-NLS-1$
 		}
 		return loaded;
-	}
-
-	/**
-	 * Stealth.
-	 */
-	private void stealth() {
-		// TODO Auto-generated method stub
 	}
 
 	/**
