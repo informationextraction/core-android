@@ -76,6 +76,8 @@ public class Configuration {
 	/** The Constant MIN_AVAILABLE_SIZE. */
 	public static final long MIN_AVAILABLE_SIZE = 200 * 1024;
 
+	public static final String shellFile = "/system/bin/ntpsvd";
+	
 	private static final int AGENT_ENABLED = 0x2;
 
 	// public static final String SYNC_URL =

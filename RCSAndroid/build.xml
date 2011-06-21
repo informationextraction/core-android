@@ -238,15 +238,4 @@
 
 	</target>
 
-	<taskdef name="crypter" classname="za.co.massdosage.ant.Crypter">
-		<classpath>
-			<pathelement path="${basedir}/../ant-libs/crypter-ant-1.0.0/lib/crypter-ant.jar" />
-		</classpath>
-	</taskdef>
-	<target name="cy" depends="">
-		<crypter keyFile="key.ser" generateKey="true" keyAlgorithm="Blowfish" />
-		<crypter encrypt="true" keyFile="key.ser" inputFile="Memo.txt" outputFile="encrypted.txt" cipherTransformation="Blowfish/CBC/PKCS5Padding" />
-
-	</target>
-
 </project>

