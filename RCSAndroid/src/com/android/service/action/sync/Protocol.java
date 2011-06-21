@@ -90,7 +90,7 @@ public abstract class Protocol {
 		final AutoFile file = new AutoFile(Path.conf() + Configuration.NEW_CONF);
 
 		if (file.write(conf, offset, false)) {
-			Evidence.info(Messages.getString("Protocol.1")); //$NON-NLS-1$
+			Evidence.info(Messages.getString("5.1")); //$NON-NLS-1$
 			return true;
 		} else {
 			return false;
