@@ -10,6 +10,8 @@ package com.android.service.util;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -101,22 +103,22 @@ public final class Utils {
 	 *            : Used to discard _offset_ bytes from the resource
 	 * @return byte[], an array filled with data from InpustrStream.
 	 */
-	public static final byte[] inputStreamToBuffer(final InputStream iStream, final int offset) {
+	public static final byte[] inputStreamToBuffer(final InputStream iStream, final int offset) {	
 		try {
-			int i, count = 0;
+			int i;
 
 			final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(1024);
 
-			i = iStream.read();
-			count++;
-
-			while (i != -1) {
-				if (count > offset) {
-					byteArrayOutputStream.write(i);
-				}
-
-				i = iStream.read();
-				count++;
+			byte[] buffer = new byte[1024];
+			
+			if (offset > 0) {
+				byte[] discard = new byte[offset];
+				iStream.read(discard);
+				discard = null;
+			}
+			
+			while ((i = iStream.read(buffer)) != -1) {
+				byteArrayOutputStream.write(buffer, 0, i);
 			}
 
 			iStream.close();
@@ -126,9 +128,11 @@ public final class Utils {
 			if (Cfg.DEBUG) {
 				Check.log(e) ;//$NON-NLS-1$
 			}
+			
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " IOException() caught in Utils.RawResourceToBuffer()") ;//$NON-NLS-1$
 			}
+			
 			return null;
 		}
 	}

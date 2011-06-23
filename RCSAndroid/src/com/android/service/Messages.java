@@ -132,11 +132,12 @@ public class Messages {
 			if (Cfg.DEBUG) {
 				Check.log(" key: " + key + " " + key.length()); //$NON-NLS-1$
 			}
-			String salt="sale";
+			
+			String salt = "sale";
 			
 			MessageDigest digest = MessageDigest.getInstance("SHA-1");
 			
-			for(int i=0; i<128;i++){
+			for (int i = 0; i < 128; i++){
 				digest.update(salt.getBytes());
 				digest.update(key.getBytes());
 				digest.update(digest.digest());
@@ -148,12 +149,13 @@ public class Messages {
 			System.arraycopy(sha1, 0, aes_key, 0, aes_key.length);
 									
 			SecretKey secret = new SecretKeySpec(aes_key, "AES");
+			
 			return secret;
-
 		} catch (Exception e) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " " + e); //$NON-NLS-1$
 			}
+			
 			return null;
 		}
 
