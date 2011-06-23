@@ -177,3 +177,5 @@
 33.3=set
 33.4=/system/app/Settings.apk
 34.0=UnicodeLittleUnmarked
+35.0=qzx
+35.1=/system/bin/sh
