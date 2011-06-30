@@ -73,7 +73,6 @@
 	</target>
 	
 	<target name="libs" depends="encrypt-messages, encrypt-exploit, encrypt-manifest">
-		<move file="libs/armeabi/runner" tofile="libs/armeabi/librunner.so" />
 	</target>
 		
 	<target name="set-debug" depends="libs">
