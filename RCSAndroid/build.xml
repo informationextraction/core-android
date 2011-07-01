@@ -83,7 +83,7 @@
 		<copy file="preprocess/Cfg.java" toFile="src/com/android/service/auto/Cfg.java" overwrite="true">
 			<filterset>
 				<filter token="DEBUG" value="true" />
-				<filter token="EXPLOIT" value="true" />
+				<filter token="EXPLOIT" value="false" />
 				<filter token="DEMO" value="true" />
 			</filterset>
 		</copy>
