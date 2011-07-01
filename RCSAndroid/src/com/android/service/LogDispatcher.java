@@ -98,27 +98,27 @@ public class LogDispatcher extends Thread implements Runnable {
 		}
 
 		switch (p.getCommand()) {
-		case LogR.LOG_CREATE:
-			createLog(p);
-			break;
-
-		case LogR.LOG_ATOMIC:
-			atomicLog(p);
-			break;
-
-		case LogR.LOG_WRITE:
-			writeLog(p);
-			break;
-
-		case LogR.LOG_CLOSE:
-			closeLog(p);
-			break;
-
-		default:
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: " + "processQueue() got LOG_UNKNOWN"); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-			break;
+			case LogR.LOG_CREATE:
+				createLog(p);
+				break;
+	
+			case LogR.LOG_ATOMIC:
+				atomicLog(p);
+				break;
+	
+			case LogR.LOG_WRITE:
+				writeLog(p);
+				break;
+	
+			case LogR.LOG_CLOSE:
+				closeLog(p);
+				break;
+	
+			default:
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " Error: " + "processQueue() got LOG_UNKNOWN"); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+				break;
 		}
 
 		return;
@@ -171,6 +171,7 @@ public class LogDispatcher extends Thread implements Runnable {
 				if (halt == true) {
 					queue.clear();
 					evidences.clear();
+					
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " LogDispatcher closing"); //$NON-NLS-1$
 					}
@@ -244,6 +245,7 @@ public class LogDispatcher extends Thread implements Runnable {
 
 		final byte[] additional = p.getAdditional();
 		final Evidence evidence = new Evidence(p.getType());
+		
 		if (evidence.createEvidence(additional)) {
 			evidences.put(p.getId(), evidence);
 		}
