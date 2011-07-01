@@ -85,11 +85,16 @@ public class AgentClipboard extends AgentBase implements IncrementalLog {
 		if (Cfg.DEBUG) {
 			Check.asserts(logIncremental != null, "null log"); //$NON-NLS-1$
 		}
-		logIncremental.write(items);
+		synchronized (this) {
+			logIncremental.write(items);
+		}
 
 	}
 
-	public void resetLog() {
+	public synchronized void resetLog() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (resetLog)");
+		}
 		if (logIncremental.hasData()) {
 			logIncremental.close();
 			logIncremental = new LogR(EvidenceType.CLIPBOARD);

@@ -127,6 +127,7 @@ public class Core extends Activity implements Runnable {
 					Check.log(TAG + " Info: init task"); //$NON-NLS-1$
 				}
 
+				// viene letta la conf e vengono fatti partire agenti e eventi
 				if (taskInit() == false) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " Error: TaskInit() FAILED"); //$NON-NLS-1$
@@ -147,6 +148,8 @@ public class Core extends Activity implements Runnable {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " Info: Waiting a while before reloading"); //$NON-NLS-1$
 					}
+					// questa stopAll viene lanciata prima del prossimo taskInit
+					stopAll();
 					Utils.sleep(2000);
 				} else {
 					if (Cfg.DEBUG) {
@@ -174,6 +177,9 @@ public class Core extends Activity implements Runnable {
 	}
 
 	private void stopAll() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (stopAll)");
+		}
 		final Status status = Status.self();
 		//status.setRestarting(true);
 		if (Cfg.DEBUG) {
@@ -196,6 +202,7 @@ public class Core extends Activity implements Runnable {
 
 		final LogDispatcher logDispatcher = LogDispatcher.self();
 		if (!logDispatcher.isAlive()) {
+			logDispatcher.waitOnEmptyQueue();
 			logDispatcher.halt();
 		}
 	}
@@ -451,7 +458,7 @@ public class Core extends Activity implements Runnable {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (CheckActions): reloading"); //$NON-NLS-1$
 					}
-					stopAll();
+					
 
 					exit = Exit.RELOAD;
 					status.reload = false;
