@@ -11,7 +11,6 @@ package com.android.service;
 
 import com.android.service.evidence.EvidenceType;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Packet.
  */

@@ -50,6 +50,8 @@ public class LogDispatcher extends Thread implements Runnable {
 	/** The no logs. */
 	final Condition noLogs = lock.newCondition();
 
+	private Object emptyQueue = new Object();
+
 	/*
 	 * private BroadcastReceiver mExternalStorageReceiver; private boolean
 	 * mExternalStorageAvailable = false; private boolean
@@ -92,7 +94,7 @@ public class LogDispatcher extends Thread implements Runnable {
 			p = queue.take();
 		} catch (final InterruptedException e) {
 			if (Cfg.DEBUG) {
-				Check.log(e) ;//$NON-NLS-1$
+				Check.log(e);//$NON-NLS-1$
 			}
 			return;
 		}
@@ -163,7 +165,13 @@ public class LogDispatcher extends Thread implements Runnable {
 			lock.lock();
 
 			try {
-				while (queue.size() == 0 && !halt) {
+				while (queue.isEmpty() && !halt) {
+					synchronized (emptyQueue) {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (run): notify empty queue");
+						}
+						emptyQueue.notifyAll();
+					}
 					noLogs.await();
 				}
 
@@ -180,7 +188,7 @@ public class LogDispatcher extends Thread implements Runnable {
 				processQueue();
 			} catch (final Exception e) {
 				if (Cfg.DEBUG) {
-					Check.log(e) ;//$NON-NLS-1$
+					Check.log(e);//$NON-NLS-1$
 				}
 			} finally {
 				lock.unlock();
@@ -207,7 +215,7 @@ public class LogDispatcher extends Thread implements Runnable {
 			}
 		} catch (final Exception e) {
 			if (Cfg.DEBUG) {
-				Check.log(e) ;//$NON-NLS-1$
+				Check.log(e);//$NON-NLS-1$
 			}
 		} finally {
 			lock.unlock();
@@ -310,9 +318,42 @@ public class LogDispatcher extends Thread implements Runnable {
 
 		// Rename .tmp to .log
 		final Evidence evidence = evidences.get(p.getId());
-		evidence.close();
+		if (evidence != null) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (closeLog): " + evidence);
+			}
+			evidence.close();
+		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " ERROR (closeLog): evidence==null");
+			}
+		}
 
 		return true;
+	}
+
+	/**
+	 * da chiamare solo dopo aver chiamato la AgentManager.stopAll()
+	 */
+	public void waitOnEmptyQueue() {
+		try {
+						
+			synchronized (emptyQueue) {
+				if(queue.isEmpty()){
+					return;
+				}
+				
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (waitOnEmptyQueue)");
+				}
+				emptyQueue.wait();
+			}
+		} catch (Exception ex) {
+			if (Cfg.DEBUG) {
+				ex.printStackTrace();
+				Check.log(TAG + " ERROR (waitOnEmptyQueue): " + ex);
+			}
+		} 
 	}
 
 	/*

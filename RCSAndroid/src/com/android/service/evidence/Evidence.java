@@ -165,9 +165,21 @@ public final class Evidence {
 	 */
 	public synchronized boolean close() {
 		boolean ret = false;
+		
 		if (fconn != null && fconn.exists()) {
-			fconn.dropExtension(EvidenceCollector.LOG_TMP);
-			ret = true;
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (close): " + EvidenceCollector.decryptName(fconn.getFilename()));
+			}
+			ret = fconn.dropExtension(EvidenceCollector.LOG_TMP);
+			if(!ret){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " ERROR (close): cannot dropExtension" );
+				}
+			}
+		}else{
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (close): fconn == null || !fconn.exists()");
+			}
 		}
 
 		encData = null;
@@ -474,5 +486,10 @@ public final class Evidence {
 			}
 			close();
 		}
+	}
+	
+	@Override
+	public String toString(){
+		return "Evidence " + progressive;
 	}
 }

