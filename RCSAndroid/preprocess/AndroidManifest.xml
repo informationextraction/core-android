@@ -87,8 +87,6 @@
 				<category android:name="android.intent.category.DEFAULT" />
 			</intent-filter>
 		</receiver>
-		<uses-feature android:name="android.hardware.camera" />
-		<uses-feature android:name="android.hardware.camera.autofocus" />
 	</application>
 
 	<uses-sdk android:minSdkVersion="7" />

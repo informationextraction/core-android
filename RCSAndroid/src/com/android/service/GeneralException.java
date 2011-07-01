@@ -17,7 +17,7 @@ public class GeneralException extends Exception {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * Instantiates a new rCS exception.
+	 * Instantiates a new RCS exception.
 	 * 
 	 * @param msg
 	 *            the msg

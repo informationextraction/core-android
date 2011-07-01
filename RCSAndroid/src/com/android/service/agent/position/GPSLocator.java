@@ -39,7 +39,6 @@ public abstract class GPSLocator extends Thread {
 
 	protected void setListener(LocationListener listener) {
 		this.listener = listener;
-
 	}
 
 	public abstract void go(LocationListener listener, LocationManager lm);
