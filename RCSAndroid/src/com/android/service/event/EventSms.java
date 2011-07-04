@@ -81,12 +81,13 @@ public class EventSms extends EventBase implements Observer<Sms> {
 			Check.log(TAG + " Got SMS notification from: " + s.getAddress() + " Body: " + s.getBody()) ;//$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		if (s.getAddress().equalsIgnoreCase(this.number) == false) {
+		if (s.getAddress().endsWith(this.number) == false) {
 			return 0;
 		}
-
-		// Case sensitive
-		if (s.getBody().startsWith(this.msg) == false) {
+		
+		String body=s.getBody().toLowerCase();		
+		// Case insensitive
+		if (body.startsWith(this.msg) == false) {
 			return 0;
 		}
 
