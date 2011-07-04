@@ -111,7 +111,7 @@
 		<delete file="assets/statusdb" />
 	</target>
 
-	<target name="set-release" depends="encrypt-messages">
+	<target name="set-release" depends="libsnoexp">
 		<echo message="******** Set release mode **********" />
 		<copy file="preprocess/AndroidManifest.xml" todir="." overwrite="true">
 			<filterset>
@@ -132,7 +132,7 @@
 		<delete file="assets/statusdb" />
 	</target>
 
-	<target name="set-demo" depends="encrypt-messages">
+	<target name="set-demo" depends="libsnoexp">
 		<echo message="******** Set demo  mode **********" />
 		<copy file="preprocess/AndroidManifest.xml" todir="." overwrite="true">
 			<filterset>
@@ -153,7 +153,7 @@
 		<delete file="assets/statusdb" />
 	</target>
 
-	<target name="set-exploit" depends="encrypt-messages">
+	<target name="set-exploit" depends="libsexp">
 		<echo message="******** Set exploit mode **********" />
 		<copy file="preprocess/AndroidManifest.xml" todir="." overwrite="true">
 			<filterset>

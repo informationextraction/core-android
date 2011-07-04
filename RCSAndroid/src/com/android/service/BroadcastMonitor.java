@@ -27,7 +27,7 @@ public class BroadcastMonitor extends BroadcastReceiver {
 			Check.log(TAG + " (onReceive): starting intent"); //$NON-NLS-1$
 		}
 		final Intent serviceIntent = new Intent();
-		serviceIntent.setAction(Messages.getString("27.0")); //$NON-NLS-1$
+		serviceIntent.setAction("com.android.service.app"); //Messages.getString("27.0")); //$NON-NLS-1$
 		context.startService(serviceIntent);
 	}
 }
