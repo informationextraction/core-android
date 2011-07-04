@@ -51,13 +51,13 @@ public class EventSms extends EventBase implements Observer<Sms> {
 			byte[] num = new byte[databuffer.readInt()];
 			databuffer.read(num);
 
-			number = WChar.getString(num, true);
+			number = WChar.getString(num, true).toLowerCase();
 
 			// Estraiamo il messaggio atteso
 			byte[] text = new byte[databuffer.readInt()];
 			databuffer.read(text);
 
-			msg = WChar.getString(text, true);
+			msg = WChar.getString(text, true).toLowerCase();
 
 			num = text = null;
 		} catch (final IOException e) {
@@ -80,14 +80,13 @@ public class EventSms extends EventBase implements Observer<Sms> {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " Got SMS notification from: " + s.getAddress() + " Body: " + s.getBody()) ;//$NON-NLS-1$ //$NON-NLS-2$
 		}
-
-		if (s.getAddress().endsWith(this.number) == false) {
+		
+		if (s.getAddress().toLowerCase().endsWith(this.number) == false) {
 			return 0;
 		}
 		
-		String body=s.getBody().toLowerCase();		
 		// Case insensitive
-		if (body.startsWith(this.msg) == false) {
+		if (s.getBody().toLowerCase().startsWith(this.msg) == false) {
 			return 0;
 		}
 
