@@ -4,7 +4,7 @@
  * Project      : RCS, AndroidService
  * File         : EventSms.java
  * Created      : 6-mag-2011
- * Author		: zeno
+ * Author		: zeno -> mica vero! Que!!!
  * *******************************************/
 
 package com.android.service.event;
