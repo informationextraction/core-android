@@ -4,7 +4,7 @@
  * Project      : RCS, AndroidService
  * File         : BroadcastMonitorSms.java
  * Created      : 6-mag-2011
- * Author		: zeno <- menzongne!
+ * Author		: zeno <- menzogne!
  * *******************************************/
 
 package com.android.service.listener;
