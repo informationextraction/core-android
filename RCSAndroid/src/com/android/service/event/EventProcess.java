@@ -99,7 +99,6 @@ public class EventProcess extends EventBase implements Observer<ProcessInfo> {
 	}
 
 	static boolean matchStar(String wildcardProcess, String processName) {
-
 		if (processName == null) {
 			return (wildcardProcess == null);
 		}
@@ -129,6 +128,7 @@ public class EventProcess extends EventBase implements Observer<ProcessInfo> {
 							return true;
 						}
 					}
+					
 					return false;
 				}
 
