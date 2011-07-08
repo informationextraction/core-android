@@ -24,6 +24,10 @@ public class BroadcastMonitorSms extends BroadcastReceiver {
 	// Apparentemente la notifica di SMS inviato non viene inviata di proposito
 	@Override
 	public void onReceive(Context context, Intent intent) {
+		if (intent == null) {
+			return;
+		}
+		
 		final Bundle bundle = intent.getExtras();
 
 		if (bundle == null) {

