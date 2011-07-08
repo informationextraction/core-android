@@ -41,6 +41,10 @@ public class BroadcastMonitorConnectivity extends Thread {
 			final ConnectivityManager connectivityManager = (ConnectivityManager) Status.getAppContext()
 					.getSystemService(Context.CONNECTIVITY_SERVICE);
 
+			if (connectivityManager == null) {
+				return;
+			}
+			
 			final NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
 
 			if (activeNetworkInfo != null) {

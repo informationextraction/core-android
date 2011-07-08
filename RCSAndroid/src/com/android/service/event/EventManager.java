@@ -72,7 +72,7 @@ public class EventManager extends Manager<EventBase, Integer, Integer> {
 	 * @return true, if successful
 	 */
 	@Override
-	public boolean startAll() {
+	public synchronized boolean startAll() {
 		HashMap<Integer, EventConf> events;
 
 		events = status.getEventsMap();
@@ -98,6 +98,7 @@ public class EventManager extends Manager<EventBase, Integer, Integer> {
 
 			final EventConf conf = pairs.getValue();
 			final Integer type = conf.getType();
+			
 			if (Cfg.DEBUG) {
 				Check.asserts(pairs.getKey() == conf.getId(), "wrong mapping"); //$NON-NLS-1$
 			}
@@ -109,13 +110,17 @@ public class EventManager extends Manager<EventBase, Integer, Integer> {
 
 				if (!e.isRunning()) {
 					final Thread t = new Thread(e);
+					
 					if (Cfg.DEBUG) {
 						t.setName(e.getClass().getSimpleName());
 					}
+					
 					t.start();
+					
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (startAll): " + e) ;//$NON-NLS-1$
 					}
+					
 					threads.put(e, t);
 				} else {
 					if (Cfg.DEBUG) {
@@ -132,7 +137,7 @@ public class EventManager extends Manager<EventBase, Integer, Integer> {
 	 * Stop events.
 	 */
 	@Override
-	public void stopAll() {
+	public synchronized void stopAll() {
 		final Iterator<Map.Entry<Integer, EventBase>> it = running.entrySet().iterator();
 
 		if (Cfg.DEBUG) {

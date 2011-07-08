@@ -29,6 +29,10 @@ public class BroadcastMonitorAc extends BroadcastReceiver {
 	 */
 	@Override
 	public void onReceive(Context context, Intent intent) {
+		if (intent == null) {
+			return;
+		}
+		
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " power notification, action: " + intent.getAction()) ;//$NON-NLS-1$
 		}
