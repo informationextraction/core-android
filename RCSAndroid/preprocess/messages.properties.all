@@ -41,6 +41,11 @@
 9.16=root: no
 9.17=-- PROPERTIES --
 9.21=/proc/stat
+9.22=Board: 
+9.23=Brand: 
+9.24=Device: 
+9.25=Display: 
+9.26=Model:
 9.3=-- SYSTEM --
 9.4=IMEI: 
 9.6=IMSI: SIM not present

