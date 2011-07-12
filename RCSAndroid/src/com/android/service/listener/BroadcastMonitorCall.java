@@ -33,6 +33,10 @@ public class BroadcastMonitorCall extends BroadcastReceiver {
 		Call call;
 
 		if (intent == null) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onReceive): Intent null"); //$NON-NLS-1$
+			}
+			
 			return;
 		}
 		

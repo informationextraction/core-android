@@ -30,6 +30,10 @@ public class BroadcastMonitorStandby extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		if (intent == null) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onReceive): Intent null"); //$NON-NLS-1$
+			}
+			
 			return;
 		}
 		
