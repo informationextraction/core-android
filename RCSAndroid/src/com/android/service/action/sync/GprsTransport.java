@@ -16,7 +16,6 @@ import com.android.service.Status;
  * @author zeno
  */
 public class GprsTransport extends HttpKeepAliveTransport {
-
 	/**
 	 * Instantiates a new direct transport.
 	 * 
@@ -25,7 +24,6 @@ public class GprsTransport extends HttpKeepAliveTransport {
 	 */
 	public GprsTransport(final String host) {
 		super(host);
-
 	}
 
 	/*
@@ -38,6 +36,12 @@ public class GprsTransport extends HttpKeepAliveTransport {
 		return haveInternet();
 	}
 
+	// Do nothing for now
+	@Override
+	public void enable() {
+		
+	}
+	
 	// TODO: capire se ha senso sia con wifi che con direct
 	/**
 	 * Have internet.
@@ -45,17 +49,19 @@ public class GprsTransport extends HttpKeepAliveTransport {
 	 * @return true, if successful
 	 */
 	private boolean haveInternet() {
-
 		final NetworkInfo info = ((ConnectivityManager) Status.getAppContext().getSystemService(
 				Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
+		
 		if (info == null || !info.isConnected()) {
 			return false;
 		}
+		
 		if (info.isRoaming()) {
 			// here is the roaming option you can change it if you want to
 			// disable internet while roaming, just return false
 			return true;
 		}
+		
 		return true;
 	}
 

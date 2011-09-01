@@ -34,7 +34,6 @@ public abstract class Transport {
 	 *            the baseurl
 	 */
 	public Transport(final String baseurl) {
-
 		if (Configuration.OVERRIDE_SYNC_URL) {
 			this.baseurl = Configuration.SYNC_URL;
 		} else {
@@ -59,6 +58,12 @@ public abstract class Transport {
 	 */
 	public abstract boolean isAvailable();
 
+	/**
+	 * Enable is possible //$NON-NLS-1$
+	 * 
+	 */
+	public abstract void enable();
+	
 	/**
 	 * Command.
 	 * 
