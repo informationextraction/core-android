@@ -1,15 +1,11 @@
 package com.android.service.test;
 
-import com.android.service.Exit;
 import com.android.service.GeneralException;
 import com.android.service.Status;
 import com.android.service.action.Action;
 import com.android.service.action.SubAction;
 import com.android.service.action.SubActionType;
-import com.android.service.action.UninstallAction;
 import com.android.service.auto.Cfg;
-import com.android.service.conf.Configuration;
-import com.android.service.event.EventBase;
 import com.android.service.event.EventConf;
 import com.android.service.event.EventManager;
 import com.android.service.event.EventType;
@@ -18,7 +14,6 @@ import com.android.service.util.Check;
 import com.android.service.util.Utils;
 
 import android.test.AndroidTestCase;
-import android.util.Log;
 
 public class EventManagerTest extends AndroidTestCase {
 	Status status;
@@ -35,7 +30,6 @@ public class EventManagerTest extends AndroidTestCase {
 
 		int max = 10;
 
-		int action = 0;
 		// every second (type, lo, hi)
 		byte[] params = new byte[] { 0x01, 0x00, 0x00, 0x00, (byte) 0xE8, 0x03,
 				0x00, 0x00, 0x01, 0x00, 0x00, 0x00 };
@@ -131,14 +125,12 @@ public class EventManagerTest extends AndroidTestCase {
 		}
 
 		em.stopAll();
-
 		assertTrue(sub.triggered > 0);
-
 	}
 
 	private void checkActions() throws GeneralException {
-
 		int[] actionIds = status.getTriggeredActions();
+		
 		for (int actionId : actionIds) {
 			final Action action = status.getAction(actionId);
 			executeAction(action);
@@ -150,6 +142,4 @@ public class EventManagerTest extends AndroidTestCase {
 			sub.execute();
 		}
 	}
-
-
 }

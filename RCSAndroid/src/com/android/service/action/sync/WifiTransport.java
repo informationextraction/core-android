@@ -68,7 +68,7 @@ public class WifiTransport extends HttpKeepAliveTransport {
 
 		return available;
 	}
-
+	
 	@Override
 	public void enable() {
 		if (Cfg.DEBUG) {
