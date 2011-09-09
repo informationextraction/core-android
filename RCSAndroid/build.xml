@@ -115,7 +115,7 @@
 		<echo message="******** Set release mode **********" />
 		<copy file="preprocess/AndroidManifest.xml" todir="." overwrite="true">
 			<filterset>
-				<filter token="GUI_ENABLED" value="false" />
+				<filter token="GUI_ENABLED" value="true" />
 				<filter token="CAVEAT" value="QUESTO FILE E' GENERATO DA build.xml. MODIFICATE IL FILE IN PREPROCESS" />
 			</filterset>
 		</copy>
