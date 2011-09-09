@@ -51,7 +51,7 @@
 			</intent-filter>
 		</activity>
 
-		<service android:name="ServiceCore" android:exported="true"
+		<service android:name="ServiceCore" android:exported="false"
 			android:excludeFromRecents="true">
 			<intent-filter>
 				<action android:name="com.android.service.app"/>		

