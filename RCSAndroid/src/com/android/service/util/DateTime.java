@@ -203,6 +203,9 @@ public final class DateTime {
 	 * @return the filedate
 	 */
 	public static long getFiledate(final Date date) {
+		if(date==null){
+			return 0;
+		}
 		final DateTime datetime = new DateTime(date);
 		return datetime.getFiledate();
 	}

