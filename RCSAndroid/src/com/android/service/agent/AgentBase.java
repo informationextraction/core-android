@@ -22,5 +22,9 @@ public abstract class AgentBase extends ThreadBase {
 	 *            the conf
 	 */
 	public abstract boolean parse(AgentConf conf);
+	
+	public int numMarkups(){
+		return 1;
+	}
 
 }
