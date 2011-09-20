@@ -189,31 +189,8 @@ public class EventTimer extends EventBase {
 	}
 
 	private boolean setDailyDelay() {
-		//Calendar startCalendar = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT"));
-		//Calendar stopCalendar = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT"));
 		Calendar nowCalendar = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT"));
-
-		/*int day = nowCalendar.get(Calendar.DAY_OF_MONTH);
-		int month = nowCalendar.get(Calendar.MONTH);
-		int year = nowCalendar.get(Calendar.YEAR);
-
-		startCalendar.set(year, month, day, 0, 0 ,0);
-		startCalendar.add(Calendar.MILLISECOND, (int) start);
 		
-		stopCalendar.set(year, month, day, 0,0,0);
-		stopCalendar.add(Calendar.MILLISECOND, (int) stop);
-		
-		
-		Calendar nowCalendar = GregorianCalendar.getInstance();
-		Date date = nowCalendar.getTime();
-
-		TimeZone tz = nowCalendar.getTimeZone();
-		long msFromEpochGmt = date.getTime();
-		int offsetFromUTC = tz.getOffset(msFromEpochGmt);
-
-		nowCalendar.setTime(date);
-		nowCalendar.add(Calendar.MILLISECOND, offsetFromUTC);*/
-
 		long nextStart, nextStop;
 		
 		int now = ((nowCalendar.get(Calendar.HOUR_OF_DAY) * 3600) + (nowCalendar.get(Calendar.MINUTE) * 60) 

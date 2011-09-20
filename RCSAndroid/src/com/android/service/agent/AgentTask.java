@@ -459,6 +459,9 @@ public class AgentTask extends AgentBase {
 			final DataBuffer databuffer = new DataBuffer(packet);
 			databuffer.writeInt(size);
 
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (preparePacket): " + Utils.byteArrayToHex(packet));
+			}
 			return packet;
 
 		} catch (IOException ex) {
