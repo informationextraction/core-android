@@ -107,6 +107,8 @@ public final class Proto {
 			"NEW_CONF", "LOG_NUM", "LOG", "UNINSTALL", "RESUME", "DOWNLOAD", "UPLOAD", "FILE", "ID", "INSTANCE", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$
 			"USERID", "DEVICEID", "SOURCEID", "VERSION", "LOG_END", "UPGRADE", "ENDFILE", "SUBTYPE", "FILESYSTEM" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$
 
+	public static final int ERROR = 0;
+
 	/**
 	 * Instantiates a new proto.
 	 */

