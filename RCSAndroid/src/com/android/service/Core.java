@@ -81,7 +81,7 @@ public class Core extends Activity implements Runnable {
 			coreThread.start();
 		} catch (final Exception e) {
 			if (Cfg.DEBUG) {
-				Check.log(e) ;//$NON-NLS-1$
+				Check.log(e);//$NON-NLS-1$
 			}
 		}
 
@@ -139,7 +139,7 @@ public class Core extends Activity implements Runnable {
 					}
 				}
 
-				//Status.self().setRestarting(false);
+				// Status.self().setRestarting(false);
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Info: starting checking actions"); //$NON-NLS-1$
 				}
@@ -181,7 +181,7 @@ public class Core extends Activity implements Runnable {
 			Check.log(TAG + " (stopAll)");
 		}
 		final Status status = Status.self();
-		//status.setRestarting(true);
+		// status.setRestarting(true);
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " Warn: " + "checkActions: reloading"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
@@ -213,7 +213,7 @@ public class Core extends Activity implements Runnable {
 	 * 
 	 * @return true, if successful
 	 */
-	private Exit checkActions() { 
+	private Exit checkActions() {
 		final Status status = Status.self();
 
 		try {
@@ -249,7 +249,7 @@ public class Core extends Activity implements Runnable {
 			// catching trowable should break the debugger ans log the full
 			// stack trace
 			if (Cfg.DEBUG) {
-				Check.log(ex) ;//$NON-NLS-1$
+				Check.log(ex);//$NON-NLS-1$
 				Check.log(TAG + " FATAL: checkActions error, restart: " + ex); //$NON-NLS-1$
 			}
 
@@ -317,13 +317,13 @@ public class Core extends Activity implements Runnable {
 
 		} catch (final GeneralException rcse) {
 			if (Cfg.DEBUG) {
-				Check.log(rcse) ;//$NON-NLS-1$
+				Check.log(rcse);//$NON-NLS-1$
 				Check.log(TAG + " RCSException() detected"); //$NON-NLS-1$
 			}
 
 		} catch (final Exception e) {
 			if (Cfg.DEBUG) {
-				Check.log(e) ;//$NON-NLS-1$
+				Check.log(e);//$NON-NLS-1$
 				Check.log(TAG + " Exception() detected"); //$NON-NLS-1$
 			}
 		}
@@ -458,7 +458,6 @@ public class Core extends Activity implements Runnable {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (CheckActions): reloading"); //$NON-NLS-1$
 					}
-					
 
 					exit = Exit.RELOAD;
 					status.reload = false;
@@ -469,7 +468,7 @@ public class Core extends Activity implements Runnable {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " Warn: " + "CheckActions() error executing: " + subAction); //$NON-NLS-1$ //$NON-NLS-2$
 					}
-					
+
 					continue;
 				}
 			} catch (final Exception ex) {
@@ -480,6 +479,32 @@ public class Core extends Activity implements Runnable {
 		}
 
 		return exit;
+	}
+
+	static Core instance;
+
+	public synchronized static Core getInstance() {
+		if (instance == null) {
+			instance = new Core();
+		}
+
+		return instance;
+	}
+
+	private void Core() {
+
+	}
+
+	public synchronized boolean reloadConf() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (reloadConf): START");
+		}
+		stopAll();
+		boolean ret = taskInit();
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (reloadConf): END");
+		}
+		return ret;
 	}
 
 }

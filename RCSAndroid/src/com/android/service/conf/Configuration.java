@@ -467,6 +467,18 @@ public class Configuration {
 			// Verify CRC
 			final int confCrc = this.wrappedClearConf.getInt(confClearLen - 4);
 
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (decryptConfiguration): confClearLen" + confClearLen);
+			}
+			
+			if( confClearLen - 4 <= 0){
+				throw new GeneralException("Wrong length");
+			}
+			
+			if(clearConf.length < confClearLen - 4){
+				throw new GeneralException("Wrong length");
+			}
+			
 			if (confCrc != crc(clearConf, 0, confClearLen - 4)) {
 				throw new GeneralException("CRC mismatch, stored CRC = " + confCrc + " calculated CRC = " //$NON-NLS-1$ //$NON-NLS-2$
 						+ crc(clearConf, 0, confClearLen));
