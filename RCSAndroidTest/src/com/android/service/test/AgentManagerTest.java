@@ -55,7 +55,7 @@ public class AgentManagerTest extends AndroidTestCase {
 		final Device device = Device.self();
 
 		// Load the configuration
-		conf.LoadConfiguration();
+		conf.loadConfiguration(true);
 
 		// Start log dispatcher
 		final LogDispatcher logDispatcher = LogDispatcher.self();
