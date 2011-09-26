@@ -80,8 +80,8 @@ public class AgentTask extends AgentBase {
 		setPeriod(180 * 60 * 1000);
 		setDelay(200);
 
-		markupContacts = new Markup(AgentType.AGENT_TASK, 0);
-		markupCalendar = new Markup(AgentType.AGENT_TASK, 1);
+		markupContacts = new Markup(getType(), 0);
+		markupCalendar = new Markup(getType(), 1);
 
 		// the markup exists, try to read it
 		if (markupContacts.isMarkup()) {

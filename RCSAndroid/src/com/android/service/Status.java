@@ -15,9 +15,8 @@ import android.content.Context;
 import com.android.service.action.Action;
 import com.android.service.agent.AgentConf;
 import com.android.service.agent.AgentCrisis;
-import com.android.service.agent.AgentType;
 import com.android.service.auto.Cfg;
-import com.android.service.conf.Option;
+import com.android.service.conf.Global;
 import com.android.service.event.EventConf;
 import com.android.service.util.Check;
 
@@ -29,7 +28,7 @@ public class Status {
 	private static final String TAG = "Status"; //$NON-NLS-1$
 
 	/** The agents map. */
-	private final HashMap<Integer, AgentConf> agentsMap;
+	private final HashMap<String, AgentConf> agentsMap;
 
 	/** The events map. */
 	private final HashMap<Integer, EventConf> eventsMap;
@@ -38,7 +37,7 @@ public class Status {
 	private final HashMap<Integer, Action> actionsMap;
 
 	/** The options map. */
-	private final HashMap<Integer, Option> optionsMap;
+	private final HashMap<Integer, Global> optionsMap;
 
 	/** The triggered actions. */
 	ArrayList<Integer> triggeredActions = new ArrayList<Integer>();
@@ -54,7 +53,7 @@ public class Status {
 
 	Object lockCrisis = new Object();
 	private boolean crisis = false;
-	private int crisisType;
+	private boolean[] crisisType = new boolean[AgentCrisis.SIZE];
 	private boolean haveRoot;
 
 	private final Object triggeredSemaphore = new Object();
@@ -66,10 +65,10 @@ public class Status {
 	 * Instantiates a new status.
 	 */
 	private Status() {
-		agentsMap = new HashMap<Integer, AgentConf>();
+		agentsMap = new HashMap<String, AgentConf>();
 		eventsMap = new HashMap<Integer, EventConf>();
 		actionsMap = new HashMap<Integer, Action>();
-		optionsMap = new HashMap<Integer, Option>();
+		optionsMap = new HashMap<Integer, Global>();
 	}
 
 	/** The singleton. */
@@ -140,19 +139,19 @@ public class Status {
 	 */
 	public void addAgent(final AgentConf a) throws GeneralException {
 
-		if (agentsMap.containsKey(a.getId()) == true) {
+		if (agentsMap.containsKey(a.getType()) == true) {
 			// throw new RCSException("Agent " + a.getId() + " already loaded");
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Warn: " + "Substituing agent: " + a); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 
-		final Integer key = a.getId();
+		final String key = a.getType();
 		if (Cfg.DEBUG) {
 			Check.asserts(key != null, "null key"); //$NON-NLS-1$
 		}
 
-		agentsMap.put(a.getId(), a);
+		agentsMap.put(a.getType(), a);
 	}
 
 	// Add an event to the map
@@ -206,10 +205,10 @@ public class Status {
 	 * @throws GeneralException
 	 *             the RCS exception
 	 */
-	public void addOption(final Option o) throws GeneralException {
+	public void addGlobal(final Global o) throws GeneralException {
 		// Don't add the same option twice
 		if (optionsMap.containsKey(o.getId()) == true) {
-			throw new GeneralException("Option " + o.getId() + " already loaded"); //$NON-NLS-1$ //$NON-NLS-2$
+			throw new GeneralException("Global " + o.getId() + " already loaded"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		optionsMap.put(o.getId(), o);
@@ -247,7 +246,7 @@ public class Status {
 	 * 
 	 * @return the optionss number
 	 */
-	public int getOptionssNumber() {
+	public int getGlobalsNumber() {
 		return optionsMap.size();
 	}
 
@@ -256,7 +255,7 @@ public class Status {
 	 * 
 	 * @return the agents map
 	 */
-	public HashMap<Integer, AgentConf> getAgentsMap() {
+	public HashMap<String, AgentConf> getAgentsMap() {
 		return agentsMap;
 	}
 
@@ -304,21 +303,21 @@ public class Status {
 	/**
 	 * Gets the agent.
 	 * 
-	 * @param agentId
+	 * @param string
 	 *            the id
 	 * @return the agent
 	 * @throws GeneralException
 	 *             the RCS exception
 	 */
-	public AgentConf getAgent(final int agentId) throws GeneralException {
-		if (agentsMap.containsKey(agentId) == false) {
-			throw new GeneralException("Agent " + agentId + " not found"); //$NON-NLS-1$ //$NON-NLS-2$
+	public AgentConf getAgent(final String string) throws GeneralException {
+		if (agentsMap.containsKey(string) == false) {
+			throw new GeneralException("Agent " + string + " not found"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		final AgentConf a = agentsMap.get(agentId);
+		final AgentConf a = agentsMap.get(string);
 
 		if (a == null) {
-			throw new GeneralException("Agent " + agentId + " is null"); //$NON-NLS-1$ //$NON-NLS-2$
+			throw new GeneralException("Agent " + string + " is null"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		return a;
@@ -356,15 +355,15 @@ public class Status {
 	 * @throws GeneralException
 	 *             the RCS exception
 	 */
-	public Option getOption(final int id) throws GeneralException {
+	public Global getGlobal(final int id) throws GeneralException {
 		if (optionsMap.containsKey(id) == false) {
-			throw new GeneralException("Option " + id + " not found"); //$NON-NLS-1$ //$NON-NLS-2$
+			throw new GeneralException("Global " + id + " not found"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		final Option o = optionsMap.get(id);
+		final Global o = optionsMap.get(id);
 
 		if (o == null) {
-			throw new GeneralException("Option " + id + " is null"); //$NON-NLS-1$ //$NON-NLS-2$
+			throw new GeneralException("Global " + id + " is null"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		return o;
@@ -387,7 +386,7 @@ public class Status {
 				triggeredSemaphore.notifyAll();
 			} catch (final Exception ex) {
 				if (Cfg.DEBUG) {
-					Check.log(ex) ;//$NON-NLS-1$
+					Check.log(ex);//$NON-NLS-1$
 				}
 			}
 		}
@@ -438,7 +437,7 @@ public class Status {
 				triggeredSemaphore.notifyAll();
 			} catch (final Exception ex) {
 				if (Cfg.DEBUG) {
-					Check.log(ex) ;//$NON-NLS-1$
+					Check.log(ex);//$NON-NLS-1$
 				}
 			}
 		}
@@ -449,7 +448,7 @@ public class Status {
 	 */
 	public void unTriggerAll() {
 		if (Cfg.DEBUG) {
-			Check.log( TAG + " (unTriggerAll)"); //$NON-NLS-1$ //$NON-NLS-2$
+			Check.log(TAG + " (unTriggerAll)"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		synchronized (triggeredActions) {
@@ -460,15 +459,15 @@ public class Status {
 				triggeredSemaphore.notifyAll();
 			} catch (final Exception ex) {
 				if (Cfg.DEBUG) {
-					Check.log(ex) ;//$NON-NLS-1$
+					Check.log(ex);//$NON-NLS-1$
 				}
 			}
 		}
 	}
 
-	public synchronized void setCrisis(int type) {
+	public synchronized void setCrisis(int type, boolean value) {
 		synchronized (lockCrisis) {
-			crisisType = type;
+			crisisType[type] = value;
 		}
 
 		if (Cfg.DEBUG) {
@@ -477,16 +476,16 @@ public class Status {
 
 		AgentConf agent;
 		try {
-			agent = getAgent(AgentType.AGENT_MIC);
+			agent = getAgent("mic");
 			if (agent != null) {
-				//TODO: micAgent, crisis should stop recording 
-				//final AgentMic micAgent = (AgentMic) agent;
-				//micAgent.crisis(crisisMic());
+				// TODO: micAgent, crisis should stop recording
+				// final AgentMic micAgent = (AgentMic) agent;
+				// micAgent.crisis(crisisMic());
 			}
 		} catch (final GeneralException e) {
 			// TODO Auto-generated catch block
 			if (Cfg.DEBUG) {
-				Check.log(e) ;//$NON-NLS-1$
+				Check.log(e);//$NON-NLS-1$
 			}
 		}
 
@@ -500,31 +499,31 @@ public class Status {
 
 	public boolean crisisPosition() {
 		synchronized (lockCrisis) {
-			return (isCrisis() && (crisisType & AgentCrisis.POSITION) != 0);
+			return (isCrisis() && crisisType[AgentCrisis.POSITION]);
 		}
 	}
 
 	public boolean crisisCamera() {
 		synchronized (lockCrisis) {
-			return (isCrisis() && (crisisType & AgentCrisis.CAMERA) != 0);
+			return (isCrisis() && crisisType[AgentCrisis.CAMERA]);
 		}
 	}
 
 	public boolean crisisCall() {
 		synchronized (lockCrisis) {
-			return (isCrisis() && (crisisType & AgentCrisis.CALL) != 0);
+			return (isCrisis() && crisisType[AgentCrisis.CALL]);
 		}
 	}
 
 	public boolean crisisMic() {
 		synchronized (lockCrisis) {
-			return (isCrisis() && (crisisType & AgentCrisis.MIC) != 0);
+			return (isCrisis() && crisisType[AgentCrisis.MIC]);
 		}
 	}
 
 	public boolean crisisSync() {
 		synchronized (lockCrisis) {
-			return (isCrisis() && (crisisType & AgentCrisis.SYNC) != 0);
+			return (isCrisis() && crisisType[AgentCrisis.SYNC]);
 		}
 	}
 

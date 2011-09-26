@@ -9,6 +9,8 @@
 
 package com.android.service.action;
 
+import org.json.JSONObject;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class SyncActionApn.
@@ -18,13 +20,11 @@ public class SyncActionApn extends SubAction {
 	/**
 	 * Instantiates a new sync action apn.
 	 * 
-	 * @param type
-	 *            the type
-	 * @param confParams
+	 * @param params
 	 *            the conf params
 	 */
-	public SyncActionApn(final int type, final byte[] confParams) {
-		super(type, confParams);
+	public SyncActionApn(final ActionConf params) {
+		super(params);
 	}
 
 	/*
@@ -39,7 +39,7 @@ public class SyncActionApn extends SubAction {
 	}
 
 	@Override
-	protected boolean parse(byte[] params) {
+	protected boolean parse(ActionConf params) {
 		// TODO Auto-generated method stub
 		return false;
 	}

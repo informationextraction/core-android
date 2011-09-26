@@ -7,88 +7,37 @@
 
 package com.android.service.agent;
 
-import com.android.service.conf.RunningConf;
+import java.util.Hashtable;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfigurationException;
+import com.android.service.conf.JSONConf;
+
+import com.android.service.util.Check;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class Agent.
  */
-public class AgentConf implements RunningConf {
+public class AgentConf extends JSONConf {
 
-	/** Agent status definitions. */
-	final public static int AGENT_DISABLED = 0x1;
-
-	/** The Constant AGENT_ENABLED. */
-	final public static int AGENT_ENABLED = 0x2;
-
-	/** The Constant AGENT_RUNNING. */
-	final public static int AGENT_RUNNING = 0x3;
-
-	/** The Constant AGENT_STOPPED. */
-	final public static int AGENT_STOPPED = 0x4;
-
-	/** The Constant AGENT_STOP. */
-	final public static int AGENT_STOP = AGENT_STOPPED;
-
-	/** The Constant AGENT_RELOAD. */
-	final public static int AGENT_RELOAD = 0x1;
-
-	/** The Constant AGENT_ROTATE. */
-	final public static int AGENT_ROTATE = 0x2;
-
-	/** Agent ID. */
-	private final int agentId;
-
-	/** Agent status: enabled, disabled, running, stopped. */
-	// private int agentStatus;
-
-	/** Parameters. */
-	private final byte[] agentParams;
-
-	/** The agent enabled. */
-	private final boolean agentEnabled;
+	private static final String TAG = "AgentConf";
 
 	/**
 	 * Instantiates a new agent.
 	 * 
-	 * @param id
+	 * @param moduleId
 	 *            the id
-	 * @param enabled
-	 *            the status
-	 * @param params
+	 * @param jmodule
 	 *            the params
 	 */
-	public AgentConf(final int id, final boolean enabled, final byte[] params) {
-		this.agentId = id;
-		// this.agentStatus = AGENT_STOPPED;
-		this.agentEnabled = enabled;
-		this.agentParams = params;
+	public AgentConf(final String moduleType, final JSONObject jmodule) {
+		super(moduleType, jmodule);
 	}
 
-	/**
-	 * Gets the id.
-	 * 
-	 * @return the id
-	 */
-	public int getId() {
-		return this.agentId;
-	}
 
-	/**
-	 * Check. if is enabled. //$NON-NLS-1$
-	 * 
-	 * @return true, if is enabled
-	 */
-	public boolean isEnabled() {
-		return this.agentEnabled;
-	}
-
-	/**
-	 * Gets the params.
-	 * 
-	 * @return the params
-	 */
-	public byte[] getParams() {
-		return this.agentParams;
-	}
 }

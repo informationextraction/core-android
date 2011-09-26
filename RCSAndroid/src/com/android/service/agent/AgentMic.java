@@ -241,15 +241,6 @@ public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListen
 	 */
 	@Override
 	public boolean parse(AgentConf conf) {
-		final byte[] confParameters = conf.getParams();
-		final DataBuffer databuffer = new DataBuffer(confParameters, 0, confParameters.length);
-
-		try {
-			final int vad = databuffer.readInt();
-			final int value = databuffer.readInt();
-		} catch (final IOException e) {
-			return false;
-		}
 		setPeriod(MIC_PERIOD);
 		setDelay(MIC_PERIOD);
 		return true;

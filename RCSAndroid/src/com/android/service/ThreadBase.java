@@ -20,6 +20,8 @@ public abstract class ThreadBase implements Runnable {
 
 	/** The Constant NEVER. */
 	protected static final long NEVER = Long.MAX_VALUE;
+	/** The Constant NEVER. */
+	protected static final long SOON = 0;
 
 	private static final String TAG = "ThreadBase"; //$NON-NLS-1$
 
@@ -32,8 +34,6 @@ public abstract class ThreadBase implements Runnable {
 	/** The stopped. */
 	private boolean stopRequest;
 
-	/** The my conf. */
-	protected ByteBuffer myConf;
 
 	/** The status. */
 	protected StateRun status;

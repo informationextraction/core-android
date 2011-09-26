@@ -10,8 +10,12 @@ package com.android.service.action;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.android.service.GeneralException;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfigurationException;
 import com.android.service.util.Check;
 
 /**
@@ -29,22 +33,26 @@ public class Action {
 	/** Action ID. */
 	private final int actionId;
 
+	private final String desc;
+
 	/**
 	 * Action constructor.
 	 * 
 	 * @param id
 	 *            : action id
+	 * @param desc
 	 * @param num
 	 *            : number of subactions
 	 * @throws GeneralException
 	 *             the RCS exception
 	 */
-	public Action(final int id) {
+	public Action(final int id, String desc) {
 		if (Cfg.DEBUG) {
 			Check.asserts(id >= 0, "Invalid id"); //$NON-NLS-1$
 		}
 
 		this.actionId = id;
+		this.desc = desc;
 		list = new ArrayList<SubAction>();
 	}
 
@@ -71,20 +79,28 @@ public class Action {
 	 * 
 	 * @param type
 	 *            the type
-	 * @param params
+	 * @param jsubaction
 	 *            the params
 	 * @throws GeneralException
 	 *             the RCS exception
+	 * @throws JSONException 
+	 * @throws ConfigurationException 
 	 */
-	public boolean addSubAction(final int typeId, final byte[] params) throws GeneralException {
+	public boolean addSubAction(final ActionConf actionConf) throws GeneralException, ConfigurationException {
 
-		if (typeId != 0) {
-			final SubAction sub = SubAction.factory(typeId, params);
+		if (actionConf.getType() != null) {
+			final SubAction sub = SubAction.factory(actionConf.getType(), actionConf);
+			if(sub==null){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " Error (addSubAction): unknown type: " + actionConf.getType());//$NON-NLS-1$
+				}
+				return false;
+			}
 			list.add(sub);
 			return true;
 		} else {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error (addSubAction): unknown type Id = " + typeId) ;//$NON-NLS-1$
+				Check.log(TAG + " Error (addSubAction): null type " );//$NON-NLS-1$
 			}
 			return false;
 		}

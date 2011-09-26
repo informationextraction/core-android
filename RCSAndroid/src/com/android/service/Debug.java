@@ -7,12 +7,14 @@
 
 package com.android.service;
 
+import java.util.HashMap;
+import java.util.Iterator;
+
 import com.android.service.action.Action;
 import com.android.service.action.SubAction;
 import com.android.service.agent.AgentConf;
-import com.android.service.agent.AgentType;
 import com.android.service.auto.Cfg;
-import com.android.service.conf.Option;
+import com.android.service.conf.Global;
 import com.android.service.event.EventConf;
 import com.android.service.util.Check;
 
@@ -59,14 +61,13 @@ public class Debug {
 					final SubAction s = a.getSubAction(j);
 
 					if (Cfg.DEBUG) {
-						Check.log("  -> SubAction " + j + " Type: " + s.getSubActionType() + " Params len: " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-								+ s.getSubActionParams().length);
+						Check.log("  -> SubAction " + j + " Type: " + s.getType()); //$NON-NLS-1$ //$NON-NLS-2$ 
 					}
 				}
 			}
 		} catch (final GeneralException rcse) {
 			if (Cfg.DEBUG) {
-				Check.log(rcse) ;//$NON-NLS-1$
+				Check.log(rcse);//$NON-NLS-1$
 			}
 			if (Cfg.DEBUG) {
 				Check.log(" RCSException detected in Debug.StatusActions()"); //$NON-NLS-1$
@@ -87,21 +88,21 @@ public class Debug {
 		if (Cfg.DEBUG) {
 			Check.log(" Status Agents Begins"); //$NON-NLS-1$
 		}
+		
+		HashMap<String, AgentConf> agents = status.getAgentsMap();
+		final Iterator<String> it = agents.keySet().iterator();
 
-		int agentsNumber = status.getAgentsNumber();
-
-		for (final int at : AgentType.values()) {
-			try {
-				final AgentConf a = status.getAgent(at);
-
-				if (Cfg.DEBUG) {
-					Check.log(" Agent Id: " + a.getId() + " Params len: " + a.getParams().length); //$NON-NLS-1$ //$NON-NLS-2$
-				}
-			} catch (final GeneralException rcse) {
-				// No need to print that this agent doesn't exist
-				agentsNumber++;
+		while (it.hasNext()) {
+			final String key = it.next();
+			if (Cfg.DEBUG) {
+				Check.asserts(key != null, "null type"); //$NON-NLS-1$
 			}
-		}
+			final AgentConf conf = agents.get(key);
+			if (Cfg.DEBUG) {
+				Check.log(" Agent Type: " + conf.getType()); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+
+		}		
 
 		if (Cfg.DEBUG) {
 			Check.log("Status Agents Ends"); //$NON-NLS-1$
@@ -123,8 +124,7 @@ public class Debug {
 				final EventConf e = statusObj.getEvent(i);
 
 				if (Cfg.DEBUG) {
-					Check.log(" Event Id: " + e.getId() + " Event Type: " + e.getType() + " Params len: " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-							+ e.getParams().length);
+					Check.log(" Event Id: " + e.getId() + " Event Type: " + e.getType() ); //$NON-NLS-1$ //$NON-NLS-2$ 							
 				}
 			} catch (final GeneralException rcse) {
 				// No need to print that this agent doesn't exist
@@ -140,21 +140,21 @@ public class Debug {
 	 * Status options.
 	 */
 	public static void StatusOptions() {
-		final Status statusObj = Status.self();
+		final Status status = Status.self();
 
 		if (Cfg.DEBUG) {
 			Check.log(" Status Options Begins"); //$NON-NLS-1$
 		}
 
-		int optionsNumber = statusObj.getOptionssNumber();
+		int optionsNumber = status.getGlobalsNumber();
 
 		// CONFIGURATION_WIFIIP is the actual last option
-		for (int i = 0; i < optionsNumber && i < Option.CONFIGURATION_WIFIIP + 2; i++) {
+		for (int i = 0; i < optionsNumber; i++) {
 			try {
-				final Option o = statusObj.getOption(Option.CONFIGURATION + i + 1);
+				final Global o = status.getGlobal(i);
 
 				if (Cfg.DEBUG) {
-					Check.log(" Option Id: " + o.getId() + " Option Type: " + " Params len: " + o.getParams().length); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					Check.log(" Option Id: " + o.getId() ); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				}
 			} catch (final GeneralException rcse) {
 				// No need to print that this agent doesn't exist

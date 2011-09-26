@@ -48,7 +48,7 @@ public class AgentMessage extends AgentBase implements Observer<Sms> {
 	public void begin() {
 		ListenerSms.self().attach(this);
 
-		final Markup storedImsi = new Markup(AgentType.AGENT_SMS);
+		final Markup storedImsi = new Markup(getType());
 
 		// Abbiamo gia' catturato lo storico
 		if (storedImsi.isMarkup() == false) {

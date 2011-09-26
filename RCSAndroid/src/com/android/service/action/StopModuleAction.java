@@ -9,13 +9,15 @@
 
 package com.android.service.action;
 
+import org.json.JSONObject;
+
 import com.android.service.agent.AgentManager;
 import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
 
-public class StopAgentAction extends AgentAction {
-	public StopAgentAction(int type, byte[] confParams) {
-		super(type, confParams);
+public class StopModuleAction extends ModuleAction {
+	public StopModuleAction(ActionConf params) {
+		super(params);
 	}
 
 	private static final String TAG = "StopAgentAction"; //$NON-NLS-1$
@@ -23,11 +25,11 @@ public class StopAgentAction extends AgentAction {
 	@Override
 	public boolean execute() {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (execute): " + agentId) ;//$NON-NLS-1$
+			Check.log(TAG + " (execute): " + moduleId) ;//$NON-NLS-1$
 		}
 		final AgentManager agentManager = AgentManager.self();
 
-		agentManager.stop(agentId);
+		agentManager.stop(moduleId);
 		return true;
 	}
 

@@ -13,101 +13,86 @@ import com.android.service.auto.Cfg;
 import com.android.service.interfaces.AbstractFactory;
 import com.android.service.util.Check;
 
-public class EventFactory implements AbstractFactory<EventBase, Integer> {
+public class EventFactory implements AbstractFactory<EventBase, String> {
 	private static final String TAG = "EventFactory"; //$NON-NLS-1$
 
-	public EventBase create(Integer eventType) {
+	public EventBase create(String type) {
 		EventBase e = null;
-		final int type = eventType.intValue();
-		switch (type) {
-		case EventType.EVENT_TIMER:
+		if("timer".equals(type)){
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: " + "") ;//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			e = new EventTimer();
-			break;
+		}else if("date".equals(type)){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Info: " + "") ;//$NON-NLS-1$ //$NON-NLS-2$
+			}
+			e = new EventTimer();
+		}else if("afterinst".equals(type)){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Info: " + "") ;//$NON-NLS-1$ //$NON-NLS-2$
+			}
+			e = new EventTimer();
+		}else if("sms".equals(type)){
 
-		case EventType.EVENT_SMS:
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: " + "EVENT_SMS") ;//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			e = new EventSms();
-			break;
-
-		case EventType.EVENT_CALL:
+		}else if("call".equals(type)){
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: " + "EVENT_CALL") ;//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			e = new EventCall();
-			break;
-
-		case EventType.EVENT_CONNECTION:
+		}else if("connection".equals(type)){
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: " + "EVENT_CONNECTION") ;//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			e = new EventConnectivity();
-			break;
-
-		case EventType.EVENT_PROCESS:
+		}else if("process".equals(type)){
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: " + "EVENT_PROCESS") ;//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			e = new EventProcess();
-			break;
-
-		case EventType.EVENT_CELLID:
+		}else if("position cell".equals(type)){
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: " + "EVENT_CELLID") ;//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			e = new EventCellId();
-			break;
-
-		case EventType.EVENT_QUOTA:
+		}else if("quota".equals(type)){
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: " + "EVENT_QUOTA") ;//$NON-NLS-1$ //$NON-NLS-2$
 			}
-			break;
-
-		case EventType.EVENT_SIM_CHANGE:
+			e = new EventQuota();
+		}else if("sim".equals(type)){
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: " + "EVENT_SIM_CHANGE") ;//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			e = new EventSim();
-			break;
-
-		case EventType.EVENT_LOCATION:
+		}else if("position gps".equals(type)){
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: " + "EVENT_LOCATION") ;//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			e = new EventLocation();
-			break;
-
-		case EventType.EVENT_AC:
+		}else if("ac".equals(type)){
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: " + "EVENT_AC") ;//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			e = new EventAc();
-			break;
-
-		case EventType.EVENT_BATTERY:
+		}else if("battery".equals(type)){
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: " + "EVENT_BATTERY") ;//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			e = new EventBattery();
-			break;
-
-		case EventType.EVENT_STANDBY:
+		}else if("standby".equals(type)){
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: " + "EVENT_STANDBY") ;//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			e = new EventStandby();
-			break;
-
-		default:
+		}else{
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: " + "Unknown: " + eventType) ;//$NON-NLS-1$ //$NON-NLS-2$
+				Check.log(TAG + " Error: " + "Unknown: " + type) ;//$NON-NLS-1$ //$NON-NLS-2$
 			}
-			break;
 		}
 		return e;
 	}

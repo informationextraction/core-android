@@ -23,7 +23,7 @@ public class SmsObserver extends ContentObserver {
 	public void onChange(boolean bSelfChange) {
 		super.onChange(bSelfChange);
 
-		final AgentMessage a = (AgentMessage) AgentManager.self().get(AgentType.AGENT_SMS);
+		final AgentMessage a = (AgentMessage) AgentManager.self().get("sms");
 
 		if (a == null) {
 			return;
