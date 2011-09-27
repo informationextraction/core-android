@@ -568,7 +568,4 @@ public class AgentTask extends AgentBase {
 
 	}
 
-	public int numMarkups() {
-		return 2;
-	}
 }

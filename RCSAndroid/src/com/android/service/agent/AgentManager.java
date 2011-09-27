@@ -164,19 +164,18 @@ public class AgentManager extends Manager<AgentBase, String, String> {
 		if (Cfg.DEBUG) {
 			Check.asserts(running.get(key) != null, "null running"); //$NON-NLS-1$
 		}
-
-		try {
-			a.parse(agents.get(key));
-			a.setType(key);
+		
+		if(	a.setConf(agents.get(key)) ){
 			final Thread t = new Thread(a);
 			if (Cfg.DEBUG) {
 				t.setName(a.getClass().getSimpleName());
 			}
 			threads.put(a, t);
 			t.start();
-		} catch (ConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		}else{
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (start) Error: Cannot set Configuration");
+			}
 		}
 
 	}

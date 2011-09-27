@@ -14,10 +14,11 @@ import java.io.IOException;
 import com.android.service.CellInfo;
 import com.android.service.Device;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfigurationException;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 
-public class EventCellId extends EventBase {
+public class EventCellId extends BaseEvent {
 	private static final String TAG = "EventCellId"; //$NON-NLS-1$
 
 	private static final long CELLID_PERIOD = 60000;
@@ -42,27 +43,21 @@ public class EventCellId extends EventBase {
 	}
 
 	@Override
-	public boolean parse(EventConf event) {
-		final byte[] confParams = event.getParams();
-		final DataBuffer databuffer = new DataBuffer(confParams, 0, confParams.length);
-
+	public boolean parse(EventConf conf) {
 		try {
-			actionOnEnter = event.getAction();
-			actionOnExit = databuffer.readInt();
-
-			mccOrig = databuffer.readInt();
-			mncOrig = databuffer.readInt();
-			lacOrig = databuffer.readInt();
-			cidOrig = databuffer.readInt();
+			mccOrig = conf.getInt("country");
+			mncOrig = conf.getInt("network");
+			lacOrig = conf.getInt("area");
+			cidOrig = conf.getInt("id");
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Mcc: " + mccOrig + " Mnc: " + mncOrig + " Lac: " + lacOrig + " Cid: " + cidOrig) ;//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+				Check.log(TAG + " Mcc: " + mccOrig + " Mnc: " + mncOrig + " Lac: " + lacOrig + " Cid: " + cidOrig);//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			}
 
 			setPeriod(CELLID_PERIOD);
 			setDelay(CELLID_DELAY);
 
-		} catch (final IOException e) {
+		} catch (final ConfigurationException e) {
 			return false;
 		}
 
@@ -74,7 +69,7 @@ public class EventCellId extends EventBase {
 		final CellInfo info = Device.getCellInfo();
 		if (!info.valid) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: " + "invalid cell info") ;//$NON-NLS-1$ //$NON-NLS-2$
+				Check.log(TAG + " Error: " + "invalid cell info");//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			return;
 		}
@@ -83,26 +78,26 @@ public class EventCellId extends EventBase {
 				&& (lacOrig == -1 || lacOrig == info.lac) && (cidOrig == -1 || cidOrig == info.cid)) {
 			if (!entered) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " Enter") ;//$NON-NLS-1$
+					Check.log(TAG + " Enter");//$NON-NLS-1$
 				}
 				entered = true;
-				trigger(actionOnEnter);
+				triggerStartAction();
 			} else {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " already entered") ;//$NON-NLS-1$
+					Check.log(TAG + " already entered");//$NON-NLS-1$
 				}
 			}
 
 		} else {
 			if (entered) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " Exit") ;//$NON-NLS-1$
+					Check.log(TAG + " Exit");//$NON-NLS-1$
 				}
 				entered = false;
-				trigger(actionOnExit);
+				triggerStopAction();
 			} else {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " already exited") ;//$NON-NLS-1$
+					Check.log(TAG + " already exited");//$NON-NLS-1$
 				}
 			}
 		}

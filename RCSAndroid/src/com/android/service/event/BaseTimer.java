@@ -1,9 +1,9 @@
 package com.android.service.event;
 
-public class EventQuota extends BaseEvent {
+public abstract class BaseTimer extends BaseEvent {
 
 	@Override
-	public boolean parse(EventConf event) {
+	protected boolean parse(EventConf event) {
 		// TODO Auto-generated method stub
 		return false;
 	}

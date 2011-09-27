@@ -9,7 +9,7 @@ import com.android.service.action.SubActionType;
 import com.android.service.action.UninstallAction;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.Configuration;
-import com.android.service.event.EventBase;
+import com.android.service.event.BaseEvent;
 import com.android.service.event.EventConf;
 import com.android.service.event.EventManager;
 import com.android.service.event.EventType;

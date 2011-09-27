@@ -18,7 +18,7 @@ import com.android.service.listener.ListenerConnectivity;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 
-public class EventConnectivity extends EventBase implements Observer<Connectivity> {
+public class EventConnectivity extends BaseEvent implements Observer<Connectivity> {
 	/** The Constant TAG. */
 	private static final String TAG = "EventConnectivity"; //$NON-NLS-1$
 
@@ -37,22 +37,6 @@ public class EventConnectivity extends EventBase implements Observer<Connectivit
 
 	@Override
 	public boolean parse(EventConf event) {
-		super.setEvent(event);
-
-		final byte[] conf = event.getParams();
-
-		final DataBuffer databuffer = new DataBuffer(conf, 0, conf.length);
-
-		try {
-			actionOnEnter = event.getAction();
-			actionOnExit = databuffer.readInt();
-		} catch (final IOException e) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: params FAILED") ;//$NON-NLS-1$
-			}
-			return false;
-		}
-
 		return true;
 	}
 
@@ -86,10 +70,10 @@ public class EventConnectivity extends EventBase implements Observer<Connectivit
 	}
 
 	public void onEnter() {
-		trigger(actionOnEnter);
+		triggerStartAction();
 	}
 
 	public void onExit() {
-		trigger(actionOnExit);
+		triggerStopAction();
 	}
 }

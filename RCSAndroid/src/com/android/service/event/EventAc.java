@@ -18,7 +18,7 @@ import com.android.service.listener.ListenerAc;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 
-public class EventAc extends EventBase implements Observer<Ac> {
+public class EventAc extends BaseEvent implements Observer<Ac> {
 	/** The Constant TAG. */
 	private static final String TAG = "EventAc"; //$NON-NLS-1$
 
@@ -36,23 +36,8 @@ public class EventAc extends EventBase implements Observer<Ac> {
 	}
 
 	@Override
-	public boolean parse(EventConf event) {
-		super.setEvent(event);
-
-		final byte[] conf = event.getParams();
-
-		final DataBuffer databuffer = new DataBuffer(conf, 0, conf.length);
-
-		try {
-			actionOnEnter = event.getAction();
-			actionOnExit = databuffer.readInt();
-		} catch (final IOException e) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: params FAILED") ;//$NON-NLS-1$
-			}
-			return false;
-		}
-
+	protected boolean parse(EventConf conf) {
+				
 		return true;
 	}
 
@@ -86,10 +71,10 @@ public class EventAc extends EventBase implements Observer<Ac> {
 	}
 
 	public void onEnter() {
-		trigger(actionOnEnter);
+		triggerStartAction();
 	}
 
 	public void onExit() {
-		trigger(actionOnExit);
+		triggerStopAction();
 	}
 }

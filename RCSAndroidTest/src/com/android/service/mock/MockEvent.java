@@ -1,9 +1,9 @@
 package com.android.service.mock;
 
-import com.android.service.event.EventBase;
+import com.android.service.event.BaseEvent;
 import com.android.service.event.EventConf;
 
-public class MockEvent extends EventBase {
+public class MockEvent extends BaseEvent {
 
 	public int initialiazed=0;
 	public int ended=0;

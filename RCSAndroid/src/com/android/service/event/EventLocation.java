@@ -15,10 +15,11 @@ import com.android.service.agent.position.GPSLocator;
 import com.android.service.agent.position.GPSLocatorDistance;
 import com.android.service.agent.position.RangeObserver;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfigurationException;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 
-public class EventLocation extends EventBase implements RangeObserver {
+public class EventLocation extends BaseEvent implements RangeObserver {
 
 	private static final String TAG = "EventLocation"; //$NON-NLS-1$
 	int actionOnEnter;
@@ -43,30 +44,24 @@ public class EventLocation extends EventBase implements RangeObserver {
 		} catch (final InterruptedException e) {
 
 			if (Cfg.DEBUG) {
-				Check.log(e) ;//$NON-NLS-1$
+				Check.log(e);//$NON-NLS-1$
 			}
 		}
 		locator = null;
 	}
 
 	@Override
-	public boolean parse(EventConf eventConf) {
-		final byte[] confParams = eventConf.getParams();
-		final DataBuffer databuffer = new DataBuffer(confParams, 0, confParams.length);
-
+	public boolean parse(EventConf conf) {
 		try {
-			actionOnEnter = eventConf.getAction();
-			actionOnExit = databuffer.readInt();
+			distance = conf.getInt("distance");
 
-			distance = databuffer.readInt();
-
-			latitudeOrig = (float) databuffer.readDouble();
-			longitudeOrig = (float) databuffer.readDouble();
+			latitudeOrig = (float) conf.getDouble("latitude");
+			longitudeOrig = (float) conf.getDouble("longitude");
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Lat: " + latitudeOrig + " Lon: " + longitudeOrig + " Dist: " + distance) ;//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				Check.log(TAG + " Lat: " + latitudeOrig + " Lon: " + longitudeOrig + " Dist: " + distance);//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
-		} catch (final IOException ex) {
+		} catch (final ConfigurationException ex) {
 			return false;
 		}
 
@@ -79,9 +74,9 @@ public class EventLocation extends EventBase implements RangeObserver {
 
 	public int notification(Boolean onEnter) {
 		if (onEnter) {
-			trigger(actionOnEnter);
+			triggerStartAction();
 		} else {
-			trigger(actionOnExit);
+			triggerStopAction();
 		}
 
 		return 0;

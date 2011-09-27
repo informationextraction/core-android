@@ -10,7 +10,6 @@ import com.android.service.Sms;
 import com.android.service.Status;
 import com.android.service.agent.AgentManager;
 import com.android.service.agent.AgentMessage;
-import com.android.service.agent.AgentType;
 
 public class SmsObserver extends ContentObserver {
 	private static final String TAG = "SmsObserver"; //$NON-NLS-1$
