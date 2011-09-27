@@ -40,7 +40,7 @@ import com.android.service.util.WChar;
  * @author zeno
  * 
  */
-public class AgentDevice extends AgentBase {
+public class AgentDevice extends BaseAgent {
 
 	/** The Constant TAG. */
 	private static final String TAG = "AgentDevice"; //$NON-NLS-1$

@@ -24,7 +24,7 @@ import com.android.service.util.Check;
 /**
  * The Class CameraAgent.
  */
-public class AgentCamera extends AgentBase {
+public class AgentCamera extends BaseAgent {
 
 	private static final String TAG = "AgentCamera"; //$NON-NLS-1$
  //$NON-NLS-1$

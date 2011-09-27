@@ -56,7 +56,7 @@ public class EventSim extends BaseEvent implements Observer<Sim> {
 			return 0;
 		}
 
-		Markup storedImsi = new Markup(getType());
+		Markup storedImsi = new Markup(this);
 
 		// Vediamo se gia' c'e' un markup
 		if (storedImsi.isMarkup() == true) {

@@ -247,7 +247,7 @@ public final class AutoFile {
 	public void create() {
 		write(new byte[0]);
 		if (Cfg.DEBUG) {
-			Check.ensures(file.exists(), "Non existing files"); //$NON-NLS-1$
+			Check.ensures(file.exists(), "Non existing file"); //$NON-NLS-1$
 		}
 	}
 

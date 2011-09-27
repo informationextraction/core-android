@@ -36,6 +36,10 @@ public abstract class BaseEvent extends ThreadBase {
 	protected EventConf conf;
 	private int iterCounter;
 
+	public int getId() {		
+		return conf.getId();
+	}
+
 	public String getType(){
 		return conf.getType();
 	}
@@ -103,5 +107,7 @@ public abstract class BaseEvent extends ThreadBase {
 	public String toString() {
 		return "Event " + conf.getId() + " " + conf.desc + " type:" + conf.getType() + " s: " + getStatus(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
+	
+
 
 }

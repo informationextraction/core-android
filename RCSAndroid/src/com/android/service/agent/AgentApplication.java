@@ -27,7 +27,7 @@ import com.android.service.util.DateTime;
 import com.android.service.util.Utils;
 import com.android.service.util.WChar;
 
-public class AgentApplication extends AgentBase implements IncrementalLog, Observer<ProcessInfo> {
+public class AgentApplication extends BaseAgent implements IncrementalLog, Observer<ProcessInfo> {
 	private static final String TAG = "AgentApplication"; //$NON-NLS-1$
 
 	@Override

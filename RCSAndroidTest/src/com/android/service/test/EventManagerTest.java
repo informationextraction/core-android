@@ -30,6 +30,7 @@ public class EventManagerTest extends AndroidTestCase {
 
 	@Override
 	public void setUp() {
+		Status.setAppContext(getContext());
 		status = Status.self();
 		status.clean();
 		status.unTriggerAll();
@@ -41,7 +42,7 @@ public class EventManagerTest extends AndroidTestCase {
 		int max = 10;
 		int action = 0;
 
-		String jsonConf = "{\"event\"=>\"timer\",\"_mig\"=>true,\"desc\"=>\"position loop\",\"enabled\"=>true,\"ts\"=>\"00:00:00\",\"te\"=>\"23:59:59\",\"repeat\"=>8,\"delay\"=>300}";
+		String jsonConf = "{\"event\":\"timer\",\"_mig\":true,\"desc\":\"position loop\",\"enabled\":true,\"ts\":\"00:00:00\",\"te\":\"23:59:59\",\"repeat\":8,\"delay\":300}";
 
 		JSONObject conf = (JSONObject) new JSONTokener(jsonConf).nextValue();
 		for (int i = 0; i < max; i++) {
@@ -55,7 +56,7 @@ public class EventManagerTest extends AndroidTestCase {
 	}
 
 	public void testTrigger() throws JSONException {
-
+		assertTrue(false);
 		addTimerEvent(1);
 
 		EventManager em = EventManager.self();
@@ -78,19 +79,21 @@ public class EventManagerTest extends AndroidTestCase {
 
 	public void testManyTriggers() throws JSONException {
 
-		int num = 100;
+		assertTrue(false);
+		
+		int num = 10;
 		addTimerEvent(100);
 
 		EventManager em = EventManager.self();
 
 		em.startAll();
-		Utils.sleep(5000);
+		Utils.sleep(1000);
 
 		int[] triggered = status.getTriggeredActions();
 		status.unTriggerAll();
 		assertTrue(triggered.length == num);
 
-		Utils.sleep(5000);
+		Utils.sleep(1000);
 
 		triggered = status.getTriggeredActions();
 		status.unTriggerAll();
@@ -111,6 +114,9 @@ public class EventManagerTest extends AndroidTestCase {
 	}
 
 	public void testSingleMockAction() throws JSONException {
+		
+		assertTrue(false);
+		
 		Action action = new Action(0, "action0");
 		String jsonConf = "{\"desc\"=>\"Destroy Me !\", \"subactions\"=>[{\"action\"=>\"uninstall\"}]}";
 		JSONObject conf = (JSONObject) new JSONTokener(jsonConf).nextValue();

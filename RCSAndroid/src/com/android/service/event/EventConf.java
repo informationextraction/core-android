@@ -28,16 +28,18 @@ public class EventConf extends JSONConf {
 	public int repeatAction = Action.ACTION_NULL;
 	public int iter = Integer.MAX_VALUE;
 	public int delay = 0;
-	
+
 	final public String desc;
 
 	public boolean enabled;
-	
+
 	public EventConf(int eventId, String eventType, JSONObject params) throws JSONException {
 		super(eventType, params);
 
 		this.eventId = eventId;
-		startAction = params.getInt("start");
+		if (params.has("start")) {
+			startAction = params.getInt("start");
+		}
 
 		if (params.has("stop")) {
 			stopAction = params.getInt("stop");
@@ -45,16 +47,20 @@ public class EventConf extends JSONConf {
 		if (params.has("repeat")) {
 			repeatAction = params.getInt("repeat");
 		}
-		
+
 		if (params.has("iter")) {
-			iter=params.getInt("iter");
+			iter = params.getInt("iter");
 		}
 		if (params.has("delay")) {
-			delay=params.getInt("delay");
+			delay = params.getInt("delay");
 		}
-				
+
 		desc = params.getString("desc");
 		enabled = params.getBoolean("enabled");
+	}
+
+	public EventConf(int id, JSONObject conf) throws JSONException {
+		this(id, conf.getString("event"), conf);
 	}
 
 	/**
@@ -65,6 +71,5 @@ public class EventConf extends JSONConf {
 	public int getId() {
 		return this.eventId;
 	}
-
 
 }

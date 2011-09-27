@@ -16,7 +16,7 @@ import com.android.service.action.Action;
 import com.android.service.agent.AgentConf;
 import com.android.service.agent.AgentCrisis;
 import com.android.service.auto.Cfg;
-import com.android.service.conf.Global;
+import com.android.service.conf.Globals;
 import com.android.service.event.EventConf;
 import com.android.service.util.Check;
 
@@ -36,8 +36,7 @@ public class Status {
 	/** The actions map. */
 	private final HashMap<Integer, Action> actionsMap;
 
-	/** The options map. */
-	private final HashMap<Integer, Global> optionsMap;
+	Globals globals;
 
 	/** The triggered actions. */
 	ArrayList<Integer> triggeredActions = new ArrayList<Integer>();
@@ -68,7 +67,6 @@ public class Status {
 		agentsMap = new HashMap<String, AgentConf>();
 		eventsMap = new HashMap<Integer, EventConf>();
 		actionsMap = new HashMap<Integer, Action>();
-		optionsMap = new HashMap<Integer, Global>();
 	}
 
 	/** The singleton. */
@@ -98,7 +96,7 @@ public class Status {
 		agentsMap.clear();
 		eventsMap.clear();
 		actionsMap.clear();
-		optionsMap.clear();
+		globals=null;
 		uninstall = false;
 		reload = false;
 	}
@@ -196,22 +194,9 @@ public class Status {
 		actionsMap.put(a.getId(), a);
 	}
 
-	// Add an option to the map
-	/**
-	 * Adds the option.
-	 * 
-	 * @param o
-	 *            the o
-	 * @throws GeneralException
-	 *             the RCS exception
-	 */
-	public void addGlobal(final Global o) throws GeneralException {
-		// Don't add the same option twice
-		if (optionsMap.containsKey(o.getId()) == true) {
-			throw new GeneralException("Global " + o.getId() + " already loaded"); //$NON-NLS-1$ //$NON-NLS-2$
-		}
 
-		optionsMap.put(o.getId(), o);
+	public void setGlobal(Globals g) {
+		this.globals=g;
 	}
 
 	/**
@@ -239,15 +224,6 @@ public class Status {
 	 */
 	public int getEventsNumber() {
 		return eventsMap.size();
-	}
-
-	/**
-	 * Gets the optionss number.
-	 * 
-	 * @return the optionss number
-	 */
-	public int getGlobalsNumber() {
-		return optionsMap.size();
 	}
 
 	/**
@@ -355,18 +331,8 @@ public class Status {
 	 * @throws GeneralException
 	 *             the RCS exception
 	 */
-	public Global getGlobal(final int id) throws GeneralException {
-		if (optionsMap.containsKey(id) == false) {
-			throw new GeneralException("Global " + id + " not found"); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-
-		final Global o = optionsMap.get(id);
-
-		if (o == null) {
-			throw new GeneralException("Global " + id + " is null"); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-
-		return o;
+	public Globals getGlobals()  {		
+		return globals;
 	}
 
 	/**
@@ -552,4 +518,5 @@ public class Status {
 	public void setRoot(boolean r) {
 		this.haveRoot = r;
 	}
+
 }

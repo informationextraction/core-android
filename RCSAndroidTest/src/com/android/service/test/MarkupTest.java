@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import org.apache.http.util.ByteArrayBuffer;
 
+import com.android.service.Status;
 import com.android.service.crypto.Encryption;
 import com.android.service.evidence.Markup;
 import com.android.service.file.Path;
@@ -16,15 +17,16 @@ import android.test.MoreAsserts;
 public class MarkupTest extends AndroidTestCase {
 
 	public void setUp() {
-		Path.makeDirs();
+		Status.setAppContext(getContext());
+		assertTrue(Path.makeDirs());
 		Markup.removeMarkups();
 	}
 
 	public void testEmptyMarkup() {
-		Markup markup = new Markup("info");
+		Markup markup = new Markup(123);
 		boolean exists = markup.isMarkup();
 		assertFalse(markup.isMarkup());
-		markup.createEmptyMarkup();
+		assertTrue(markup.createEmptyMarkup());
 		assertTrue(markup.isMarkup());
 		markup.removeMarkup();
 		assertFalse(markup.isMarkup());
@@ -44,14 +46,14 @@ public class MarkupTest extends AndroidTestCase {
 	}
 
 	public void testReadWriteMarkup() throws IOException {
-		Markup write = new Markup("info");
+		Markup write = new Markup(123);
 		boolean exists = write.isMarkup();
 
 		byte[] expected = "Hello".getBytes();
 		write.writeMarkup(expected);
 		write = null;
 
-		Markup read = new Markup("info");
+		Markup read = new Markup(123);
 		byte[] actual = read.readMarkup();
 		read.removeMarkup();
 
@@ -59,7 +61,7 @@ public class MarkupTest extends AndroidTestCase {
 	}
 
 	public void testSerializableWrite() throws IOException {
-		Markup markup = new Markup("info");
+		Markup markup = new Markup(123);
 		HashMap<Integer, String> map = new HashMap<Integer, String>();
 		for (int i = 0; i < 1000; i++) {
 			map.put(i, "value " + i);
@@ -75,7 +77,7 @@ public class MarkupTest extends AndroidTestCase {
 	}
 
 	public void testSerializableIntWrite() throws IOException {
-		Markup markup = new Markup("info");
+		Markup markup = new Markup(123);
 		HashMap<Integer, Integer> map = new HashMap<Integer, Integer>();
 		for (int i = 0; i < 1000; i++) {
 			map.put(i, i);
@@ -91,7 +93,7 @@ public class MarkupTest extends AndroidTestCase {
 	}
 
 	public void testSerializableContactsWrite() throws IOException {
-		Markup markup = new Markup("info");
+		Markup markup = new Markup(123);
 		HashMap<Long, Long> map = new HashMap<Long, Long>();
 		for (long i = 0; i < 100; i++) {
 			map.put(i, Encryption.CRC32(Long.toHexString(i).getBytes()));

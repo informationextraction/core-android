@@ -3,6 +3,9 @@ package com.android.service.test;
 import java.io.IOException;
 import java.util.Arrays;
 
+import android.test.AndroidTestCase;
+
+import com.android.service.Status;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.Configuration;
 import com.android.service.util.Check;
@@ -11,7 +14,7 @@ import com.android.service.util.WChar;
 
 import junit.framework.TestCase;
 
-public class WCharTest extends TestCase {
+public class WCharTest extends AndroidTestCase {
 
 	String orig = "hello world";
 	byte[] wchar = new byte[]{0x68, 0x0, 0x65, 0x0, 0x6c, 0x0, 0x6c, 0x0, 0x6f, 0x0, 0x20, 0x0, 0x77, 0x0, 0x6f, 0x0, 0x72, 0x0, 0x6c, 0x0, 0x64, 0x0};
@@ -20,11 +23,12 @@ public class WCharTest extends TestCase {
 	
 	protected void setUp() throws Exception {
 		super.setUp();
+		Status.setAppContext(getContext());
 	}
 
 	public final void testGetBytesString() {
 		byte[] res = WChar.getBytes(orig);
-		assertTrue( Arrays.equals(res, wchar) );
+		assertTrue(Arrays.equals(res, wchar));
 	}
 
 	public final void testGetBytesStringBoolean() {

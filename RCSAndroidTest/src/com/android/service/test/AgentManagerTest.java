@@ -11,7 +11,7 @@ import com.android.service.Device;
 import com.android.service.LogDispatcher;
 import com.android.service.GeneralException;
 import com.android.service.Status;
-import com.android.service.agent.AgentBase;
+import com.android.service.agent.BaseAgent;
 import com.android.service.agent.AgentConf;
 import com.android.service.agent.AgentFactory;
 import com.android.service.agent.AgentManager;
@@ -60,8 +60,8 @@ public class AgentManagerTest extends AndroidTestCase {
 		final LogDispatcher logDispatcher = LogDispatcher.self();
 		logDispatcher.start();
 
-		HashMap<String, AgentBase> agentsMap = agentManager.getRunning();
-		AgentBase[] agentsList = agentsMap.values().toArray(new AgentBase[] {});
+		HashMap<String, BaseAgent> agentsMap = agentManager.getRunning();
+		BaseAgent[] agentsList = agentsMap.values().toArray(new BaseAgent[] {});
 		MoreAsserts.assertEmpty(agentsMap);
 
 		agentManager.startAll();
@@ -69,8 +69,8 @@ public class AgentManagerTest extends AndroidTestCase {
 
 		agentsMap = agentManager.getRunning();
 		MoreAsserts.assertNotEmpty(agentsMap);
-		agentsList = agentsMap.values().toArray(new AgentBase[] {});
-		for (AgentBase agent : agentsList) {
+		agentsList = agentsMap.values().toArray(new BaseAgent[] {});
+		for (BaseAgent agent : agentsList) {
 			assertTrue(agent.isRunning());
 		}
 		assertEquals(1, agentsList.length);
@@ -83,7 +83,7 @@ public class AgentManagerTest extends AndroidTestCase {
 		agentManager.stopAll();
 		Utils.sleep(2000);
 
-		for (AgentBase agent : agentsList) {
+		for (BaseAgent agent : agentsList) {
 			assertTrue(!agent.isRunning());
 		}
 

