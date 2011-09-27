@@ -15,7 +15,6 @@ import com.android.service.agent.AgentBase;
 import com.android.service.agent.AgentConf;
 import com.android.service.agent.AgentFactory;
 import com.android.service.agent.AgentManager;
-import com.android.service.agent.AgentType;
 import com.android.service.conf.Configuration;
 import com.android.service.mock.AgentMockFactory;
 import com.android.service.mock.MockAgent;
@@ -61,7 +60,7 @@ public class AgentManagerTest extends AndroidTestCase {
 		final LogDispatcher logDispatcher = LogDispatcher.self();
 		logDispatcher.start();
 
-		HashMap<Integer, AgentBase> agentsMap = agentManager.getRunning();
+		HashMap<String, AgentBase> agentsMap = agentManager.getRunning();
 		AgentBase[] agentsList = agentsMap.values().toArray(new AgentBase[] {});
 		MoreAsserts.assertEmpty(agentsMap);
 
@@ -97,12 +96,11 @@ public class AgentManagerTest extends AndroidTestCase {
 
 	public void testAgentSuspend() throws GeneralException {
 		MockAgent agent;
-		int type = AgentType.AGENT_INFO;
+		String type= "log";
 		AgentManager manager = AgentManager.self();
 		manager.setFactory(new AgentMockFactory());
-		byte[] params = null;
-
-		AgentConf conf = new AgentConf(type, true, params);
+		
+		AgentConf conf = new AgentConf(type, null);
 		status.addAgent(conf);
 
 		manager.startAll();

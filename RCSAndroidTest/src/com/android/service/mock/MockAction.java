@@ -1,25 +1,27 @@
 package com.android.service.mock;
 
+import com.android.service.action.ActionConf;
 import com.android.service.action.SubAction;
-import com.android.service.action.SubActionType;
 
 public class MockAction extends SubAction {
 
-	public MockAction(int type) {
-		super(type, null);
+	public MockAction(ActionConf conf) {
+		super(conf);
 	}
 
 	public int triggered = 0;
 
-	@Override
-	protected boolean parse(byte[] params) {
-		return true;
-	}
 
 	@Override
 	public boolean execute() {
 		triggered++;
 		return true;
+	}
+
+	@Override
+	protected boolean parse(ActionConf jsubaction) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

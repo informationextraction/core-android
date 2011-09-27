@@ -1,18 +1,23 @@
 package com.android.service.test;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
 import com.android.service.Exit;
 import com.android.service.GeneralException;
 import com.android.service.Status;
 import com.android.service.action.Action;
+import com.android.service.action.ActionConf;
 import com.android.service.action.SubAction;
-import com.android.service.action.SubActionType;
+
 import com.android.service.action.UninstallAction;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.Configuration;
 import com.android.service.event.BaseEvent;
 import com.android.service.event.EventConf;
 import com.android.service.event.EventManager;
-import com.android.service.event.EventType;
+
 import com.android.service.mock.MockAction;
 import com.android.service.util.Check;
 import com.android.service.util.Utils;
@@ -30,19 +35,17 @@ public class EventManagerTest extends AndroidTestCase {
 		status.unTriggerAll();
 	}
 
-	public void testStart() throws GeneralException {
+	public void testStart() throws GeneralException, JSONException {
 		EventManager em = EventManager.self();
 
 		int max = 10;
-
 		int action = 0;
-		// every second (type, lo, hi)
-		byte[] params = new byte[] { 0x01, 0x00, 0x00, 0x00, (byte) 0xE8, 0x03,
-				0x00, 0x00, 0x01, 0x00, 0x00, 0x00 };
 
+		String jsonConf = "{\"event\"=>\"timer\",\"_mig\"=>true,\"desc\"=>\"position loop\",\"enabled\"=>true,\"ts\"=>\"00:00:00\",\"te\"=>\"23:59:59\",\"repeat\"=>8,\"delay\"=>300}";
+
+		JSONObject conf = (JSONObject) new JSONTokener(jsonConf).nextValue();
 		for (int i = 0; i < max; i++) {
-			final EventConf e = new EventConf(EventType.EVENT_TIMER, i, 0,
-					params);
+			final EventConf e = new EventConf(i, "timer", conf);
 			status.addEvent(e);
 		}
 
@@ -51,7 +54,7 @@ public class EventManagerTest extends AndroidTestCase {
 		em.stopAll();
 	}
 
-	public void testTrigger() {
+	public void testTrigger() throws JSONException {
 
 		addTimerEvent(1);
 
@@ -73,7 +76,7 @@ public class EventManagerTest extends AndroidTestCase {
 		em.stopAll();
 	}
 
-	public void testManyTriggers() {
+	public void testManyTriggers() throws JSONException {
 
 		int num = 100;
 		addTimerEvent(100);
@@ -96,22 +99,23 @@ public class EventManagerTest extends AndroidTestCase {
 		em.stopAll();
 	}
 
-	private void addTimerEvent(int num) {
-		byte[] params = new byte[] { 0x01, 0x00, 0x00, 0x00, (byte) 0xE8, 0x03,
-				0x00, 0x00, 0x01, 0x00, 0x00, 0x00 };
-
+	private void addTimerEvent(int num) throws JSONException {
+		String jsonConf = "{\"event\"=>\"timer\",\"_mig\"=>true,\"desc\"=>\"position loop\",\"enabled\"=>true,\"ts\"=>\"00:00:00\",\"te\"=>\"23:59:59\",\"repeat\"=>8,\"delay\"=>300}";
+		JSONObject conf = (JSONObject) new JSONTokener(jsonConf).nextValue();
 		for (int i = 0; i < num; i++) {
 			int id = i;
 			int action = i;
-			EventConf e = new EventConf(EventType.EVENT_TIMER, id, action,
-					params);
+			EventConf e = new EventConf(i, "timer", conf);
 			Status.self().addEvent(e);
 		}
 	}
 
-	public void testSingleMockAction() {
-		Action action = new Action(0);
-		MockAction sub = new MockAction(SubActionType.ACTION_LOG);
+	public void testSingleMockAction() throws JSONException {
+		Action action = new Action(0, "action0");
+		String jsonConf = "{\"desc\"=>\"Destroy Me !\", \"subactions\"=>[{\"action\"=>\"uninstall\"}]}";
+		JSONObject conf = (JSONObject) new JSONTokener(jsonConf).nextValue();
+		
+		MockAction sub = new MockAction(new ActionConf(0,0,"uninstall", conf ));
 		action.addSubAction(sub);
 		status.addAction(action);
 
@@ -127,7 +131,9 @@ public class EventManagerTest extends AndroidTestCase {
 				Utils.sleep(2000);
 			}
 		} catch (GeneralException e) {
-			if(Cfg.DEBUG) { Check.log(e); }
+			if (Cfg.DEBUG) {
+				Check.log(e);
+			}
 		}
 
 		em.stopAll();
@@ -150,6 +156,5 @@ public class EventManagerTest extends AndroidTestCase {
 			sub.execute();
 		}
 	}
-
 
 }
