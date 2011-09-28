@@ -92,11 +92,5 @@ public class EventCall extends BaseEvent implements Observer<Call> {
 		return 0;
 	}
 
-	public void onEnter() {
-		triggerStartAction();
-	}
 
-	public void onExit() {
-		triggerStopAction();
-	}
 }

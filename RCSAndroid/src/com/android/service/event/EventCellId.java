@@ -82,7 +82,7 @@ public class EventCellId extends BaseEvent {
 					Check.log(TAG + " Enter");//$NON-NLS-1$
 				}
 				entered = true;
-				triggerStartAction();
+				onEnter();
 			} else {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " already entered");//$NON-NLS-1$
@@ -95,7 +95,7 @@ public class EventCellId extends BaseEvent {
 					Check.log(TAG + " Exit");//$NON-NLS-1$
 				}
 				entered = false;
-				triggerStopAction();
+				onExit();
 			} else {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " already exited");//$NON-NLS-1$
@@ -103,5 +103,6 @@ public class EventCellId extends BaseEvent {
 			}
 		}
 	}
+
 
 }

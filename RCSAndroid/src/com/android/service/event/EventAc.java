@@ -27,13 +27,19 @@ public class EventAc extends BaseEvent implements Observer<Ac> {
 	private boolean inRange = false;
 
 	@Override
-	public void actualEnable() {
+	public void actualStart() {
 		ListenerAc.self().attach(this);
 	}
 
 	@Override
-	public void actualDisable() {
+	public void actualStop() {
 		ListenerAc.self().detach(this);
+	}
+
+	@Override
+	public void actualGo() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
@@ -66,11 +72,5 @@ public class EventAc extends BaseEvent implements Observer<Ac> {
 		return 0;
 	}
 
-	public void onEnter() {
-		startCondition();
-	}
 
-	public void onExit() {
-		stopCondition();
-	}
 }

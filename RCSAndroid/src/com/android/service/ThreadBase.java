@@ -35,6 +35,7 @@ public abstract class ThreadBase implements Runnable {
 	private boolean stopRequest;
 
 
+	private boolean suspended;
 	/** The status. */
 	protected StateRun status;
 
@@ -46,17 +47,17 @@ public abstract class ThreadBase implements Runnable {
 	/**
 	 * Go.
 	 */
-	public abstract void actualGo();
+	protected abstract void actualGo();
 
 	/**
 	 * Begin.
 	 */
-	public abstract void actualStart();
+	protected abstract void actualStart();
 
 	/**
 	 * End.
 	 */
-	public abstract void actualStop();
+	protected abstract void actualStop();
 
 	/*
 	 * (non-Javadoc)
@@ -174,7 +175,7 @@ public abstract class ThreadBase implements Runnable {
 	/**
 	 * Next.
 	 */
-	public synchronized void next() {
+	protected synchronized void next() {
 		if (!stopRequest) {
 			notifyAll();
 		}
@@ -197,7 +198,7 @@ public abstract class ThreadBase implements Runnable {
 	 * @param period
 	 *            in ms
 	 */
-	public void setPeriod(final long period) {
+	protected void setPeriod(final long period) {
 		this.period = period;
 		next();
 	}
@@ -208,7 +209,7 @@ public abstract class ThreadBase implements Runnable {
 	 * @param delay
 	 *            in ms
 	 */
-	public void setDelay(final long delay) {
+	protected void setDelay(final long delay) {
 		this.delay = delay;
 		next();
 	}
@@ -225,8 +226,6 @@ public abstract class ThreadBase implements Runnable {
 	public boolean isRunning() {
 		return status == StateRun.STARTED || status == StateRun.STARTING;
 	}
-
-	boolean suspended;
 
 	public synchronized void suspend() {
 		if (Cfg.DEBUG) {

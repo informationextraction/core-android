@@ -143,19 +143,5 @@ public class EventProcess extends BaseEvent implements Observer<ProcessInfo> {
 		// NOTREACHED
 	}
 
-	public void onEnter() {
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (onEnter): triggering " + actionOnEnter + " " + starname);//$NON-NLS-1$ //$NON-NLS-2$
-		}
 
-		triggerStartAction();
-	}
-
-	public void onExit() {
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (onExit): triggering " + actionOnExit + " " + starname);//$NON-NLS-1$ //$NON-NLS-2$
-		}
-
-		triggerStopAction();
-	}
 }

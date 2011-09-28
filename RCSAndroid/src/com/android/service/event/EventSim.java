@@ -89,7 +89,5 @@ public class EventSim extends BaseEvent implements Observer<Sim> {
 		return 0;
 	}
 
-	public void onEnter() {
-		triggerStartAction();
-	}
+
 }

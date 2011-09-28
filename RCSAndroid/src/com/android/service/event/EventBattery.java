@@ -91,11 +91,5 @@ public class EventBattery extends BaseEvent implements Observer<Battery> {
 		return 0;
 	}
 
-	public void onEnter() {
-		triggerStartAction();
-	}
 
-	public void onExit() {
-		triggerStopAction();
-	}
 }

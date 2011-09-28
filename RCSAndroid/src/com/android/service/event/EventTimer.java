@@ -111,10 +111,7 @@ public class EventTimer extends BaseTimer {
 				.get(Calendar.SECOND)) * 1000;
 
 		nextDailyIn = setDailyDelay();
-		if (!nextDailyIn) {
-			triggerStartAction();
-			setPeriod(getDelay());
-		}
+
 
 	}
 
@@ -171,12 +168,12 @@ public class EventTimer extends BaseTimer {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (go): DAILY TIMER: action enter"); //$NON-NLS-1$
 			}
-			triggerStartAction();
+			onEnter();
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (go): DAILY TIMER: action exit"); //$NON-NLS-1$
 			}
-			triggerStopAction();
+			onExit();
 		}
 
 		if (Cfg.DEBUG) {
@@ -187,6 +184,7 @@ public class EventTimer extends BaseTimer {
 			Check.log(TAG + " (go): daily IN AFTER: " + nextDailyIn); //$NON-NLS-1$
 		}
 
+		
 	}
 
 	/*

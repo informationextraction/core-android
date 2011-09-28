@@ -59,11 +59,5 @@ public class EventStandby extends BaseEvent implements Observer<Standby> {
 		return 0;
 	}
 
-	public void onEnter() {
-		triggerStartAction();
-	}
 
-	public void onExit() {
-		triggerStopAction();
-	}
 }

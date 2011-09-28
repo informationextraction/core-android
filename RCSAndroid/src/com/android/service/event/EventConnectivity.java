@@ -70,11 +70,6 @@ public class EventConnectivity extends BaseEvent implements Observer<Connectivit
 		return 0;
 	}
 
-	public void onEnter() {
-		triggerStartAction();
-	}
+	
 
-	public void onExit() {
-		triggerStopAction();
-	}
 }

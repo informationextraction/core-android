@@ -75,9 +75,9 @@ public class EventLocation extends BaseEvent implements RangeObserver {
 
 	public int notification(Boolean onEnter) {
 		if (onEnter) {
-			triggerStartAction();
+			onEnter();
 		} else {
-			triggerStopAction();
+			onExit();
 		}
 
 		return 0;

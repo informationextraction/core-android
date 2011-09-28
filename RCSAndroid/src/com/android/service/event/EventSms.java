@@ -78,7 +78,5 @@ public class EventSms extends BaseEvent implements Observer<Sms> {
 		return 1;
 	}
 
-	public void onEnter() {
-		triggerStartAction();
-	}
+
 }
