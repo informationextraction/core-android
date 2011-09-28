@@ -1,27 +1,29 @@
 package com.android.service.event;
 
+import com.android.service.conf.ConfEvent;
+
 public class EventQuota extends BaseEvent {
 
 	@Override
-	public boolean parse(EventConf event) {
+	public boolean parse(ConfEvent event) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public void go() {
+	public void actualGo() {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void begin() {
+	public void actualStart() {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void end() {
+	public void actualStop() {
 		// TODO Auto-generated method stub
 
 	}

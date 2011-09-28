@@ -1,11 +1,11 @@
 package com.android.service.mock;
 
-import com.android.service.action.ActionConf;
 import com.android.service.action.SubAction;
+import com.android.service.conf.ConfAction;
 
 public class MockAction extends SubAction {
 
-	public MockAction(ActionConf conf) {
+	public MockAction(ConfAction conf) {
 		super(conf);
 	}
 
@@ -19,7 +19,7 @@ public class MockAction extends SubAction {
 	}
 
 	@Override
-	protected boolean parse(ActionConf jsubaction) {
+	protected boolean parse(ConfAction jsubaction) {
 		// TODO Auto-generated method stub
 		return false;
 	}

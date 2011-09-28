@@ -46,17 +46,17 @@ public abstract class ThreadBase implements Runnable {
 	/**
 	 * Go.
 	 */
-	public abstract void go();
+	public abstract void actualGo();
 
 	/**
 	 * Begin.
 	 */
-	public abstract void begin();
+	public abstract void actualStart();
 
 	/**
 	 * End.
 	 */
-	public abstract void end();
+	public abstract void actualStop();
 
 	/*
 	 * (non-Javadoc)
@@ -68,7 +68,7 @@ public abstract class ThreadBase implements Runnable {
 		status = StateRun.STARTING;
 
 		try {
-			begin();
+			actualStart();
 			status = StateRun.STARTED;
 			loop();
 		} catch (final Exception ex) {
@@ -80,7 +80,7 @@ public abstract class ThreadBase implements Runnable {
 
 		try {
 			status = StateRun.STOPPING;
-			end();
+			actualStop();
 		} catch (final Exception ex) {
 			if (Cfg.DEBUG) {
 				Check.log(ex) ;//$NON-NLS-1$
@@ -131,7 +131,7 @@ public abstract class ThreadBase implements Runnable {
 				}
 
 				if (!isSuspended()) {
-					go();
+					actualGo();
 				}
 
 				Date before, after;

@@ -5,7 +5,7 @@
  * Created   : 01-dec-2010
  **********************************************/
 
-package com.android.service.agent;
+package com.android.service.conf;
 
 import java.util.Hashtable;
 
@@ -14,8 +14,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.android.service.auto.Cfg;
-import com.android.service.conf.ConfigurationException;
-import com.android.service.conf.JSONConf;
 
 import com.android.service.util.Check;
 
@@ -23,7 +21,7 @@ import com.android.service.util.Check;
 /**
  * The Class Agent.
  */
-public class AgentConf extends JSONConf {
+public class ConfAgent extends JSONConf {
 
 	private static final String TAG = "AgentConf";
 
@@ -35,7 +33,7 @@ public class AgentConf extends JSONConf {
 	 * @param jmodule
 	 *            the params
 	 */
-	public AgentConf(final String moduleType, final JSONObject jmodule) {
+	public ConfAgent(final String moduleType, final JSONObject jmodule) {
 		super(moduleType, jmodule);
 	}
 

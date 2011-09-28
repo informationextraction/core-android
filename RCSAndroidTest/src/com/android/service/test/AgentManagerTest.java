@@ -12,9 +12,9 @@ import com.android.service.LogDispatcher;
 import com.android.service.GeneralException;
 import com.android.service.Status;
 import com.android.service.agent.BaseAgent;
-import com.android.service.agent.AgentConf;
-import com.android.service.agent.AgentFactory;
-import com.android.service.agent.AgentManager;
+import com.android.service.agent.FactoryAgent;
+import com.android.service.agent.ManagerAgent;
+import com.android.service.conf.ConfAgent;
 import com.android.service.conf.Configuration;
 import com.android.service.mock.AgentMockFactory;
 import com.android.service.mock.MockAgent;
@@ -30,7 +30,7 @@ public class AgentManagerTest extends AndroidTestCase {
 		status = Status.self();
 		status.clean();
 		status.unTriggerAll();
-		AgentManager agentManager = AgentManager.self();
+		ManagerAgent agentManager = ManagerAgent.self();
 		agentManager.stopAll();
 	}
 
@@ -41,8 +41,8 @@ public class AgentManagerTest extends AndroidTestCase {
 	public void testAgentsStart() throws InterruptedException, GeneralException {
 		Resources resources = getContext().getResources();
 		// Start agents
-		AgentManager agentManager = AgentManager.self();
-		agentManager.setFactory(new AgentFactory());
+		ManagerAgent agentManager = ManagerAgent.self();
+		agentManager.setFactory(new FactoryAgent());
 
 		final byte[] resource = Utils.inputStreamToBuffer(
 				resources.openRawResource(R.raw.config), 8); // config.bin
@@ -97,10 +97,10 @@ public class AgentManagerTest extends AndroidTestCase {
 	public void testAgentSuspend() throws GeneralException {
 		MockAgent agent;
 		String type= "log";
-		AgentManager manager = AgentManager.self();
+		ManagerAgent manager = ManagerAgent.self();
 		manager.setFactory(new AgentMockFactory());
 		
-		AgentConf conf = new AgentConf(type, null);
+		ConfAgent conf = new ConfAgent(type, null);
 		status.addAgent(conf);
 
 		manager.startAll();

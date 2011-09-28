@@ -13,6 +13,7 @@ import java.io.IOException;
 
 import com.android.service.Call;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfEvent;
 import com.android.service.conf.ConfigurationException;
 import com.android.service.interfaces.Observer;
 import com.android.service.listener.ListenerCall;
@@ -29,17 +30,17 @@ public class EventCall extends BaseEvent implements Observer<Call> {
 	private boolean inCall = false;
 
 	@Override
-	public void begin() {
+	public void actualStart() {
 		ListenerCall.self().attach(this);
 	}
 
 	@Override
-	public void end() {
+	public void actualStop() {
 		ListenerCall.self().detach(this);
 	}
 
 	@Override
-	public boolean parse(EventConf conf) {
+	public boolean parse(ConfEvent conf) {
 		try {
 			number = conf.getString("number");
 
@@ -57,7 +58,7 @@ public class EventCall extends BaseEvent implements Observer<Call> {
 	}
 
 	@Override
-	public void go() {
+	public void actualGo() {
 		// TODO Auto-generated method stub
 	}
 

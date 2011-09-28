@@ -9,6 +9,7 @@ package com.android.service.agent;
 
 import com.android.service.ThreadBase;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfAgent;
 import com.android.service.conf.ConfigurationException;
 import com.android.service.util.Check;
 
@@ -17,7 +18,7 @@ import com.android.service.util.Check;
  */
 public abstract class BaseAgent extends ThreadBase {
 	private static final String TAG = "AgentBase"; //$NON-NLS-1$
-	private AgentConf conf;
+	private ConfAgent conf;
 
 	/**
 	 * Parses the.
@@ -26,7 +27,7 @@ public abstract class BaseAgent extends ThreadBase {
 	 *            the conf
 	 * @throws ConfigurationException 
 	 */
-	protected abstract boolean parse(AgentConf conf);
+	protected abstract boolean parse(ConfAgent conf);
 	
 	public String getType(){
 		if (Cfg.DEBUG) {
@@ -35,7 +36,7 @@ public abstract class BaseAgent extends ThreadBase {
 		return conf.getType();
 	}
 
-	public boolean setConf(AgentConf conf) {
+	public boolean setConf(ConfAgent conf) {
 		if (Cfg.DEBUG) {
 			Check.requires(conf != null, "null conf");
 		}

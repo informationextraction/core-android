@@ -11,8 +11,9 @@ package com.android.service.action;
 
 import org.json.JSONObject;
 
-import com.android.service.agent.AgentManager;
+import com.android.service.agent.ManagerAgent;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfAction;
 import com.android.service.util.Check;
 
 /**
@@ -27,7 +28,7 @@ public class StartModuleAction extends ModuleAction {
 	 * @param params
 	 *            the conf params
 	 */
-	public StartModuleAction(final ActionConf params) {
+	public StartModuleAction(final ConfAction params) {
 		super( params);
 	}
 
@@ -41,7 +42,7 @@ public class StartModuleAction extends ModuleAction {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (execute): " + moduleId) ;//$NON-NLS-1$
 		}
-		final AgentManager agentManager = AgentManager.self();
+		final ManagerAgent agentManager = ManagerAgent.self();
 
 		agentManager.start(moduleId);
 		return true;

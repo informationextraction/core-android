@@ -13,7 +13,7 @@ import com.android.service.auto.Cfg;
 import com.android.service.interfaces.AbstractFactory;
 import com.android.service.util.Check;
 
-public class AgentFactory implements AbstractFactory<BaseAgent, String> {
+public class FactoryAgent implements AbstractFactory<BaseAgent, String> {
 	private static final String TAG = "AgentFactory"; //$NON-NLS-1$
 
 	/**
@@ -30,9 +30,9 @@ public class AgentFactory implements AbstractFactory<BaseAgent, String> {
 		if("sms".equals(type)){
 			a = new AgentMessage();
 		}else if("addressbook".equals(type)){
-			//a = new AgentAddressBook();
+			a = new AgentAddressBook();
 		}else if("calendar".equals(type)){
-			//a = new AgentCalendar();
+			a = new AgentCalendar();
 		}else if("callist".equals(type)){
 			a = new AgentCallList();
 		}else if("device".equals(type)){

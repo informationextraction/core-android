@@ -12,10 +12,10 @@ import java.util.Iterator;
 
 import com.android.service.action.Action;
 import com.android.service.action.SubAction;
-import com.android.service.agent.AgentConf;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfAgent;
+import com.android.service.conf.ConfEvent;
 import com.android.service.conf.Globals;
-import com.android.service.event.EventConf;
 import com.android.service.util.Check;
 
 // Debugging class
@@ -89,7 +89,7 @@ public class Debug {
 			Check.log(" Status Agents Begins"); //$NON-NLS-1$
 		}
 
-		HashMap<String, AgentConf> agents = status.getAgentsMap();
+		HashMap<String, ConfAgent> agents = status.getAgentsMap();
 		final Iterator<String> it = agents.keySet().iterator();
 
 		while (it.hasNext()) {
@@ -97,7 +97,7 @@ public class Debug {
 			if (Cfg.DEBUG) {
 				Check.asserts(key != null, "null type"); //$NON-NLS-1$
 			}
-			final AgentConf conf = agents.get(key);
+			final ConfAgent conf = agents.get(key);
 			if (Cfg.DEBUG) {
 				Check.log(" Agent Type: " + conf.getType()); //$NON-NLS-1$ //$NON-NLS-2$
 			}
@@ -121,7 +121,7 @@ public class Debug {
 
 		for (int i = 0; i < statusObj.getEventsNumber(); i++) {
 			try {
-				final EventConf e = statusObj.getEvent(i);
+				final ConfEvent e = statusObj.getEvent(i);
 
 				if (Cfg.DEBUG) {
 					Check.log(" Event Id: " + e.getId() + " Event Type: " + e.getType()); //$NON-NLS-1$ //$NON-NLS-2$ 							

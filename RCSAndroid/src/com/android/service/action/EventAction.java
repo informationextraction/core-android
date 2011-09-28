@@ -4,6 +4,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfAction;
 import com.android.service.conf.ConfigurationException;
 import com.android.service.util.Check;
 
@@ -11,12 +12,12 @@ abstract class EventAction extends SubAction {
 	private static final String TAG = "EventAction";
 	protected int eventId;
 
-	public EventAction(ActionConf params) {
+	public EventAction(ConfAction params) {
 		super(params);
 	}
 
 	@Override
-	protected boolean parse(ActionConf params) {
+	protected boolean parse(ConfAction params) {
 		try {
 			this.eventId = params.getInt("event");
 

