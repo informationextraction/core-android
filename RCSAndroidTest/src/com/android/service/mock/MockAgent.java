@@ -1,9 +1,9 @@
 package com.android.service.mock;
 
-import com.android.service.agent.BaseAgent;
-import com.android.service.conf.ConfAgent;
+import com.android.service.conf.ConfModule;
+import com.android.service.module.BaseModule;
 
-public class MockAgent extends BaseAgent {
+public class MockAgent extends BaseModule {
 
 	public int initialiazed;
 	public int ended;
@@ -21,7 +21,7 @@ public class MockAgent extends BaseAgent {
 	}
 
 	@Override
-	public boolean parse(ConfAgent conf) {
+	public boolean parse(ConfModule conf) {
 		parsed ++;
 		return true;
 	}

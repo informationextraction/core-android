@@ -6,7 +6,7 @@ import android.test.AndroidTestCase;
 import android.util.Log;
 
 import com.android.service.Status;
-import com.android.service.conf.ConfAgent;
+import com.android.service.conf.ConfModule;
 import com.android.service.evidence.Evidence;
 import com.android.service.evidence.EvidenceType;
 import com.android.service.mock.RCSMockContext;

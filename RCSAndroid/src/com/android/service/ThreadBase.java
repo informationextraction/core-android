@@ -175,7 +175,7 @@ public abstract class ThreadBase implements Runnable {
 	/**
 	 * Next.
 	 */
-	protected synchronized void next() {
+	public synchronized void next() {
 		if (!stopRequest) {
 			notifyAll();
 		}

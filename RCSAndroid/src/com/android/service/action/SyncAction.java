@@ -18,10 +18,10 @@ import com.android.service.action.sync.Protocol;
 import com.android.service.action.sync.ProtocolException;
 import com.android.service.action.sync.Transport;
 import com.android.service.action.sync.ZProtocol;
-import com.android.service.agent.ManagerAgent;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.ConfAction;
 import com.android.service.evidence.EvidenceCollector;
+import com.android.service.manager.ManagerAgent;
 import com.android.service.util.Check;
 
 // TODO: Auto-generated Javadoc

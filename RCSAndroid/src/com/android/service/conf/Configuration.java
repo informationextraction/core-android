@@ -166,7 +166,7 @@ public class Configuration {
 			}
 
 			if (instantiate) {
-				final ConfAgent a = new ConfAgent(moduleType, params);
+				final ConfModule a = new ConfModule(moduleType, params);
 				Status.self().addAgent(a);
 			}
 		}
@@ -184,7 +184,7 @@ public class Configuration {
 			}
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Event: " + eventId + "type: " + eventType + " Params size: " + jmodule.length());//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				Check.log(TAG + " Event: " + eventId + " type: " + eventType + " Params size: " + jmodule.length());//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 
 			if (instantiate) {
@@ -256,10 +256,10 @@ public class Configuration {
 			loadGlobals(jglobals, instantiate);
 
 			// Debug Check. start //$NON-NLS-1$
-			Debug.StatusActions();
-			Debug.StatusAgents();
-			Debug.StatusEvents();
-			Debug.StatusGlobals();
+			Debug.statusActions();
+			Debug.statusModules();
+			Debug.statusEvents();
+			Debug.statusGlobals();
 			// Debug Check. end //$NON-NLS-1$
 
 			return true;

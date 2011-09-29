@@ -8,8 +8,8 @@ import com.android.service.util.Check;
 
 public class ConfAction extends JSONConf {
 	private static final String TAG = "ActionConf";
-	private int subActionId;
-	private int actionId;
+	public int subActionId;
+	public int actionId;
 	
 	public ConfAction(int actionId, int subActionId, String type, JSONObject params) {		
 		super(type, params);

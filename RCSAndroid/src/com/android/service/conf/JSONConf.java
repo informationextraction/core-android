@@ -106,7 +106,20 @@ public abstract class JSONConf {
 		}
 	}
 	
+	public String getSafeString(String key) {
+		try {
+			return params.getString(key);
+		} catch (JSONException e) {
+			return null;
+		}
+	}
+	
 	public boolean has(String name) {		
 		return params.has(name);
+	}
+	
+	@Override
+	public String toString(){
+		return params.toString();
 	}
 }

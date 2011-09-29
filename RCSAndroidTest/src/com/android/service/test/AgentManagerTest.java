@@ -11,13 +11,13 @@ import com.android.service.Device;
 import com.android.service.LogDispatcher;
 import com.android.service.GeneralException;
 import com.android.service.Status;
-import com.android.service.agent.BaseAgent;
-import com.android.service.agent.FactoryAgent;
-import com.android.service.agent.ManagerAgent;
-import com.android.service.conf.ConfAgent;
+import com.android.service.conf.ConfModule;
 import com.android.service.conf.Configuration;
+import com.android.service.manager.ManagerAgent;
 import com.android.service.mock.AgentMockFactory;
 import com.android.service.mock.MockAgent;
+import com.android.service.module.BaseModule;
+import com.android.service.module.FactoryAgent;
 import com.android.service.util.Utils;
 
 public class AgentManagerTest extends AndroidTestCase {
@@ -60,17 +60,18 @@ public class AgentManagerTest extends AndroidTestCase {
 		final LogDispatcher logDispatcher = LogDispatcher.self();
 		logDispatcher.start();
 
-		HashMap<String, BaseAgent> agentsMap = agentManager.getRunning();
-		BaseAgent[] agentsList = agentsMap.values().toArray(new BaseAgent[] {});
+		HashMap<String, BaseModule> agentsMap = agentManager.getRunning();
+		BaseModule[] agentsList = agentsMap.values().toArray(new BaseModule[] {});
 		MoreAsserts.assertEmpty(agentsMap);
 
-		agentManager.startAll();
+		boolean ret=agentManager.startAll();
+		assertTrue(ret);
 		Utils.sleep(2000);
 
 		agentsMap = agentManager.getRunning();
 		MoreAsserts.assertNotEmpty(agentsMap);
-		agentsList = agentsMap.values().toArray(new BaseAgent[] {});
-		for (BaseAgent agent : agentsList) {
+		agentsList = agentsMap.values().toArray(new BaseModule[] {});
+		for (BaseModule agent : agentsList) {
 			assertTrue(agent.isRunning());
 		}
 		assertEquals(1, agentsList.length);
@@ -83,7 +84,7 @@ public class AgentManagerTest extends AndroidTestCase {
 		agentManager.stopAll();
 		Utils.sleep(2000);
 
-		for (BaseAgent agent : agentsList) {
+		for (BaseModule agent : agentsList) {
 			assertTrue(!agent.isRunning());
 		}
 
@@ -100,7 +101,7 @@ public class AgentManagerTest extends AndroidTestCase {
 		ManagerAgent manager = ManagerAgent.self();
 		manager.setFactory(new AgentMockFactory());
 		
-		ConfAgent conf = new ConfAgent(type, null);
+		ConfModule conf = new ConfModule(type, null);
 		status.addAgent(conf);
 
 		manager.startAll();

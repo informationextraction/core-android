@@ -28,7 +28,7 @@ import com.android.service.util.Check;
 public abstract class BaseEvent extends ThreadBase {
 
 	/** The Constant TAG. */
-	private static final String TAG = "EventBase"; //$NON-NLS-1$
+	private static final String TAG = "BaseEvent"; //$NON-NLS-1$
 
 	// Gli eredi devono implementare i seguenti metodi astratti
 
@@ -91,12 +91,17 @@ public abstract class BaseEvent extends ThreadBase {
 	private ScheduledFuture<?> future;
 
 	protected synchronized void onEnter() {
-		if (Cfg.DEBUG) Check.asserts(!active,"stopSchedulerFuture");
-		
+		//if (Cfg.DEBUG) Check.asserts(!active,"stopSchedulerFuture");		
 		if(active){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onEnter): already active, return");
+			}
 			return;
 		}
 		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (onEnter): " +this);
+		}
 		int delay = getConfDelay();
 		int period = getConfDelay();
 
@@ -128,15 +133,18 @@ public abstract class BaseEvent extends ThreadBase {
 
 	private void stopSchedulerFuture() {
 		if (Cfg.DEBUG) Check.asserts(active,"stopSchedulerFuture");
-		if (active) {
+		if (active && future!=null) {
 			future.cancel(true);
 			future = null;
 		}
 	}
 
 	protected synchronized void onExit() {
-		if (Cfg.DEBUG) Check.asserts(active,"stopSchedulerFuture");
-		if (active) {			
+		//if (Cfg.DEBUG) Check.asserts(active,"stopSchedulerFuture");
+		if (active) {	
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onExit): " + this);
+			}
 			stopSchedulerFuture();
 			active = false;
 		}
@@ -149,12 +157,18 @@ public abstract class BaseEvent extends ThreadBase {
 
 	private boolean triggerStartAction() {
 		if (Cfg.DEBUG) {
+			Check.log(TAG + " (triggerStartAction)");
+		}
+		if (Cfg.DEBUG) {
 			Check.requires(conf != null, "null conf");
 		}
 		return trigger(conf.startAction);
 	}
 
 	private boolean triggerStopAction() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (triggerStopAction)");
+		}
 		if (Cfg.DEBUG) {
 			Check.requires(conf != null, "null conf");
 		}
@@ -163,6 +177,9 @@ public abstract class BaseEvent extends ThreadBase {
 
 	private boolean triggerRepeatAction() {
 		if (Cfg.DEBUG) {
+			Check.log(TAG + " (triggerRepeatAction)");
+		}
+		if (Cfg.DEBUG) {
 			Check.requires(conf != null, "null conf");
 		}
 		return trigger(conf.repeatAction);
@@ -170,7 +187,11 @@ public abstract class BaseEvent extends ThreadBase {
 
 	@Override
 	public String toString() {
-		return "Event " + conf.getId() + " " + conf.desc + " type:" + conf.getType() + " s: " + getStatus(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		return "Event (" + conf.getId() + ") " +conf.getType() +" : " + conf.desc + " " + (isEnabled()?"ENABLED":"DISABLED"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+	}
+
+	public boolean isEnabled() {		
+		return conf.enabled;
 	}
 
 }
