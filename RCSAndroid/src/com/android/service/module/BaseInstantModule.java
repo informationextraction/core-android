@@ -4,7 +4,7 @@ import com.android.service.StateRun;
 import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
 
-public abstract class BaseInstantAgent extends BaseModule {
+public abstract class BaseInstantModule extends BaseModule {
 	private static final String TAG = "BaseInstantAgent";
 
 	public synchronized void run() {

