@@ -208,6 +208,7 @@ public class ZProtocol extends Protocol {
 					Check.log(TAG + " (newConf): sending conf answer: " + ret);
 				}
 				command(Proto.NEW_CONF, data);
+
 			}else{
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (newConf): no conf, no need to write another message");
@@ -590,7 +591,11 @@ public class ZProtocol extends Protocol {
 					}
 					// status.reload = true;
 					ret = Core.getInstance().reloadConf();					
-				}								
+				}else{
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (parseNewConf): ERROR RELOADING"); //$NON-NLS-1$
+					}
+				}
 				
 			} else {
 				if (Cfg.DEBUG) {
