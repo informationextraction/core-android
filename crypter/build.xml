@@ -85,14 +85,14 @@
 	</target>
 
 	<!-- compiles all the sources -->
-	<target name="compile" depends="compile-source,compile-test"/>
+	<target name="compile" depends="compile-source"/>
 
 	<!-- builds the crypter library -->
 	<target name="build" depends="compile-source">
 		<jar jarfile="${archive.dir}/${crypter.archive.name}">
 			<fileset dir="${compile.dir}">
-				<include name="za/co/massdosage/ant/Crypter*" />
-				<exclude name="za/co/massdosage/ant/*Test" />
+				<include name="**/Crypter*" />
+				<exclude name="**/*Test" />
 			</fileset>
 			<manifest>
 				<attribute name="Build-Version" value="${crypter.version.string}" />

@@ -1,5 +1,6 @@
 package com.android.service.mock;
 
+import com.android.service.Trigger;
 import com.android.service.action.SubAction;
 import com.android.service.conf.ConfAction;
 
@@ -13,13 +14,13 @@ public class MockSubAction extends SubAction {
 
 
 	@Override
-	public boolean execute() {
-		triggered++;
+	protected boolean parse(ConfAction jsubaction) {
 		return true;
 	}
 
 	@Override
-	protected boolean parse(ConfAction jsubaction) {
+	public boolean execute(Trigger trigger) {
+		triggered++;
 		return true;
 	}
 

@@ -7,6 +7,7 @@ import org.json.JSONTokener;
 import com.android.service.Exit;
 import com.android.service.GeneralException;
 import com.android.service.Status;
+import com.android.service.Trigger;
 import com.android.service.action.Action;
 import com.android.service.action.SubAction;
 
@@ -69,7 +70,7 @@ public class EventManagerTest extends AndroidTestCase {
 
 		em.startAll();
 		Utils.sleep(1000);
-		int[] triggeredFast = status.getTriggeredActions(Action.FAST_QUEUE);
+		Trigger[] triggeredFast = status.getTriggeredActions(Action.FAST_QUEUE);
 		//int[] triggeredSlow = status.getTriggeredActions(Action.SLOW_QUEUE);
 		status.unTriggerAll();
 		assertTrue(triggeredFast.length == num);
@@ -134,16 +135,18 @@ public class EventManagerTest extends AndroidTestCase {
 
 	private void checkActionsFast() throws GeneralException {
 
-		int[] actionIds = status.getTriggeredActions(Action.FAST_QUEUE);
-		for (int actionId : actionIds) {
-			final Action action = status.getAction(actionId);
+		Trigger[] actionIds = status.getTriggeredActions(Action.FAST_QUEUE);
+		for (int i = 0; i < actionIds.length; i++) {
+			Trigger trigger = actionIds[i];
+			final Action action = status.getAction(trigger.getActionId());
 			executeAction(action);
 		}
+		
 	}
 
 	private void executeAction(Action action) {
 		for (SubAction sub : action.getSubActions()) {
-			sub.execute();
+			sub.execute(new Trigger(0,null));
 		}
 	}
 

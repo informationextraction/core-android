@@ -6,6 +6,7 @@ import org.json.JSONTokener;
 
 import com.android.service.GeneralException;
 import com.android.service.Status;
+import com.android.service.Trigger;
 import com.android.service.action.Action;
 import com.android.service.action.SubAction;
 import com.android.service.auto.Cfg;
@@ -51,7 +52,7 @@ public class TimerTest extends AndroidTestCase {
 		Utils.sleep(1000);
 		em.stopAll();
 		
-		int[] triggeredFast = status.getNonBlockingTriggeredActions(Action.FAST_QUEUE);
+		Trigger[] triggeredFast = status.getNonBlockingTriggeredActions(Action.FAST_QUEUE);
 		//int[] triggeredSlow = status.getTriggeredActions(Action.SLOW_QUEUE);
 		status.unTriggerAll();
 		assertTrue(triggeredFast.length == max);
@@ -68,7 +69,7 @@ public class TimerTest extends AndroidTestCase {
 
 		em.startAll();
 		Utils.sleep(1000);
-		int[] triggeredFast = status.getTriggeredActions(Action.FAST_QUEUE);
+		Trigger[] triggeredFast = status.getTriggeredActions(Action.FAST_QUEUE);
 		//int[] triggeredSlow = status.getTriggeredActions(Action.SLOW_QUEUE);
 		status.unTriggerAll();
 		assertTrue(triggeredFast.length == 1);
@@ -107,7 +108,7 @@ public class TimerTest extends AndroidTestCase {
 		
 		Utils.sleep(1000);
 		
-		int[] triggeredFast = status.getNonBlockingTriggeredActions(Action.FAST_QUEUE);
+		Trigger[] triggeredFast = status.getNonBlockingTriggeredActions(Action.FAST_QUEUE);
 		assertTrue(triggeredFast.length == 0);
 
 		em.stopAll();
@@ -129,16 +130,17 @@ public class TimerTest extends AndroidTestCase {
 
 	private void checkActionsFast() throws GeneralException {
 
-		int[] actionIds = status.getTriggeredActions(Action.SLOW_QUEUE);
-		for (int actionId : actionIds) {
-			final Action action = status.getAction(actionId);
+		Trigger[] actionIds = status.getTriggeredActions(Action.SLOW_QUEUE);
+		for (int i = 0; i < actionIds.length; i++) {
+			final Action action = status.getAction(actionIds[i].getActionId());
 			executeAction(action);
 		}
+
 	}
 
 	private void executeAction(Action action) {
 		for (SubAction sub : action.getSubActions()) {
-			sub.execute();
+			sub.execute(new Trigger(0, null));
 		}
 	}
 

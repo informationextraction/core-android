@@ -35,17 +35,16 @@ public class ConfEvent extends JSONConf {
 		super(eventType, params);
 
 		this.eventId = eventId;
+		
 		if (params.has("start")) {
 			startAction = params.getInt("start");
 		}
-
 		if (params.has("stop")) {
 			stopAction = params.getInt("stop");
 		}
 		if (params.has("repeat")) {
 			repeatAction = params.getInt("repeat");
 		}
-
 		if (params.has("iter")) {
 			iter = params.getInt("iter");
 		}
