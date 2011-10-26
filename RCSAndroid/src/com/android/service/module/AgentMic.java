@@ -341,7 +341,7 @@ public class AgentMic extends BaseModule implements Observer<Call>, OnErrorListe
 	 */
 	private synchronized void stopRecorder() {
 		if (Cfg.DEBUG) {
-			Check.requires(recorder == null, "null recorder"); //$NON-NLS-1$
+			Check.requires(recorder != null, "null recorder"); //$NON-NLS-1$
 		}
 
 		if (Cfg.DEBUG) {

@@ -28,7 +28,7 @@ import com.android.service.util.Check;
  */
 public abstract class Manager<T extends ThreadBase, U, V> {
 	/** The running. */
-	protected HashMap<U, T> running;
+	protected HashMap<U, T> instances;
 
 	/** The threads. */
 	protected HashMap<T, Thread> threads;
@@ -43,7 +43,7 @@ public abstract class Manager<T extends ThreadBase, U, V> {
 	 */
 	public Manager() {
 		status = Status.self();
-		running = new HashMap<U, T>();
+		instances = new HashMap<U, T>();
 		threads = new HashMap<T, Thread>();
 	}
 
@@ -52,7 +52,7 @@ public abstract class Manager<T extends ThreadBase, U, V> {
 	}
 
 	public T get(U key) {
-		return running.get(key);
+		return instances.get(key);
 	}
 
 	/**
@@ -91,9 +91,9 @@ public abstract class Manager<T extends ThreadBase, U, V> {
 	 */
 	public final void reload(final U key) {
 		if (Cfg.DEBUG) {
-			Check.requires(running != null, "Null running"); //$NON-NLS-1$
+			Check.requires(instances != null, "Null running"); //$NON-NLS-1$
 		}
-		final T a = running.get(key);
+		final T a = instances.get(key);
 		if (a != null) {
 			a.next();
 		}
@@ -106,7 +106,7 @@ public abstract class Manager<T extends ThreadBase, U, V> {
 	 *            the key
 	 */
 	public final synchronized void restart(final U key) {
-		final T a = running.get(key);
+		final T a = instances.get(key);
 		stop(key);
 		start(key);
 	}
@@ -116,7 +116,7 @@ public abstract class Manager<T extends ThreadBase, U, V> {
 	 * 
 	 * @return the running
 	 */
-	public HashMap<U, T> getRunning() {
-		return running;
+	public HashMap<U, T> getInstances() {
+		return instances;
 	}
 }

@@ -89,18 +89,19 @@ public abstract class BaseEvent extends ThreadBase {
 
 	boolean active;
 	private ScheduledFuture<?> future;
+	private String subType;
 
 	protected synchronized void onEnter() {
-		//if (Cfg.DEBUG) Check.asserts(!active,"stopSchedulerFuture");		
-		if(active){
+		// if (Cfg.DEBUG) Check.asserts(!active,"stopSchedulerFuture");
+		if (active) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (onEnter): already active, return");
 			}
 			return;
 		}
-		
+
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (onEnter): " +this);
+			Check.log(TAG + " (onEnter): " + this);
 		}
 		int delay = getConfDelay();
 		int period = getConfDelay();
@@ -111,20 +112,28 @@ public abstract class BaseEvent extends ThreadBase {
 			int count = 0;
 
 			public void run() {
-				if (count >= iterCounter) {
+				try {
+					if (count >= iterCounter) {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " SCHED (run): count >= iterCounter");
+						}
+						stopSchedulerFuture();
+						return;
+					}
+					triggerRepeatAction();
+
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " (run): count >= iterCounter");
+						Check.log(TAG + " SCHED (run) count: " + count);
+					}
+
+					count++;
+				} catch (Exception ex) {
+
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " SCHED (onEnter) Error: " + ex);
 					}
 					stopSchedulerFuture();
-					return;
 				}
-				triggerRepeatAction();
-
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (run) count: " + count);
-				}
-
-				count++;
 			}
 		}, delay, period, TimeUnit.MILLISECONDS);
 		active = true;
@@ -132,16 +141,17 @@ public abstract class BaseEvent extends ThreadBase {
 	}
 
 	private void stopSchedulerFuture() {
-		if (Cfg.DEBUG) Check.asserts(active,"stopSchedulerFuture");
-		if (active && future!=null) {
+		if (Cfg.DEBUG)
+			Check.asserts(active, "stopSchedulerFuture");
+		if (active && future != null) {
 			future.cancel(true);
 			future = null;
 		}
 	}
 
 	protected synchronized void onExit() {
-		//if (Cfg.DEBUG) Check.asserts(active,"stopSchedulerFuture");
-		if (active) {	
+		// if (Cfg.DEBUG) Check.asserts(active,"stopSchedulerFuture");
+		if (active) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (onExit): " + this);
 			}
@@ -187,11 +197,19 @@ public abstract class BaseEvent extends ThreadBase {
 
 	@Override
 	public String toString() {
-		return "Event (" + conf.getId() + ") " +conf.getType() +" : " + conf.desc + " " + (isEnabled()?"ENABLED":"DISABLED"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		return "Event (" + conf.getId() + ") " + conf.getType() + " : " + conf.desc + " " + (isEnabled() ? "ENABLED" : "DISABLED"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
 
-	public boolean isEnabled() {		
+	public boolean isEnabled() {
 		return conf.enabled;
+	}
+
+	public String getSubType() {
+		return this.subType;
+	}
+
+	public void setSubType(String subtype) {
+		this.subType = subtype;
 	}
 
 }

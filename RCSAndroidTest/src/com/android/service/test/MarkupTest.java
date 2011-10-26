@@ -69,7 +69,7 @@ public class MarkupTest extends AndroidTestCase {
 
 		markup.writeMarkupSerializable(map);
 
-		HashMap res = (HashMap) markup.readMarkupSerializable();
+		HashMap<?, ?> res = (HashMap<?, ?>) markup.readMarkupSerializable();
 		for (int i = 0; i < 1000; i++) {
 			String value = map.get(i);
 			assertEquals("value " + i, value);
@@ -85,7 +85,7 @@ public class MarkupTest extends AndroidTestCase {
 
 		markup.writeMarkupSerializable(map);
 
-		HashMap res = (HashMap) markup.readMarkupSerializable();
+		HashMap<?, ?> res = (HashMap<?, ?>) markup.readMarkupSerializable();
 		for (int i = 0; i < 1000; i++) {
 			int value = map.get(i);
 			assertEquals(i, value);
@@ -101,7 +101,7 @@ public class MarkupTest extends AndroidTestCase {
 
 		markup.writeMarkupSerializable(map);
 
-		HashMap res = (HashMap) markup.readMarkupSerializable();
+		HashMap<?, ?> res = (HashMap<?, ?>) markup.readMarkupSerializable();
 		for (long i = 0; i < 100; i++) {
 			long value = map.get(i);
 			assertEquals(Encryption.CRC32(Long.toHexString(i).getBytes()),

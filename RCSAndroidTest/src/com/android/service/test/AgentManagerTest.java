@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import android.content.res.Resources;
 import android.test.AndroidTestCase;
+import android.test.InstrumentationTestCase;
 import android.test.MoreAsserts;
 import android.util.Log;
 
@@ -16,17 +17,18 @@ import com.android.service.conf.Configuration;
 import com.android.service.manager.ManagerAgent;
 import com.android.service.mock.AgentMockFactory;
 import com.android.service.mock.MockAgent;
+import com.android.service.module.BaseInstantModule;
 import com.android.service.module.BaseModule;
 import com.android.service.module.FactoryAgent;
 import com.android.service.util.Utils;
 
-public class AgentManagerTest extends AndroidTestCase {
+public class AgentManagerTest extends InstrumentationTestCase {
 	Status status;
 
 	protected void setUp() throws Exception {
-		super.setUp();
+		//super.setUp();
 		status = Status.self();
-		Status.setAppContext(getContext());
+		Status.setAppContext(getInstrumentation().getTargetContext());
 		status = Status.self();
 		status.clean();
 		status.unTriggerAll();
@@ -39,7 +41,7 @@ public class AgentManagerTest extends AndroidTestCase {
 	}
 
 	public void testAgentsStart() throws InterruptedException, GeneralException {
-		Resources resources = getContext().getResources();
+		Resources resources = getInstrumentation().getContext().getResources();
 		// Start agents
 		ManagerAgent agentManager = ManagerAgent.self();
 		agentManager.setFactory(new FactoryAgent());
@@ -60,21 +62,26 @@ public class AgentManagerTest extends AndroidTestCase {
 		final LogDispatcher logDispatcher = LogDispatcher.self();
 		logDispatcher.start();
 
-		HashMap<String, BaseModule> agentsMap = agentManager.getRunning();
+		HashMap<String, BaseModule> agentsMap = agentManager.getInstances();
 		BaseModule[] agentsList = agentsMap.values().toArray(new BaseModule[] {});
 		MoreAsserts.assertEmpty(agentsMap);
 
 		boolean ret=agentManager.startAll();
 		assertTrue(ret);
-		Utils.sleep(2000);
+		Utils.sleep(10000);
 
-		agentsMap = agentManager.getRunning();
+		agentsMap = agentManager.getInstances();
 		MoreAsserts.assertNotEmpty(agentsMap);
+		
 		agentsList = agentsMap.values().toArray(new BaseModule[] {});
 		for (BaseModule agent : agentsList) {
-			assertTrue(agent.isRunning());
+			if(agent instanceof BaseInstantModule){
+				assertFalse(agent.isRunning());
+			}else{
+				assertTrue(agent.isRunning());
+			}
 		}
-		assertEquals(1, agentsList.length);
+		assertEquals(10, agentsList.length);
 		/*
 		 * agentManager.stopAgent(Agent.AGENT_DEVICE); Utils.sleep(2000);
 		 * agentManager.startAgent(Agent.AGENT_DEVICE); Utils.sleep(2000);
@@ -85,7 +92,7 @@ public class AgentManagerTest extends AndroidTestCase {
 		Utils.sleep(2000);
 
 		for (BaseModule agent : agentsList) {
-			assertTrue(!agent.isRunning());
+			assertFalse(agent.isRunning());
 		}
 
 		// Ci stiamo chiudendo

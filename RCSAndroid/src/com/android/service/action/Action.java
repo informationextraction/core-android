@@ -28,9 +28,11 @@ public class Action {
 	/** The Constant ACTION_NULL. */
 	public static final int ACTION_NULL = -1;
 
+	/** Coda per tutte le action che non interagiscono con il core */
 	public static final int FAST_QUEUE = 0;
 
-	public static final int SLOW_QUEUE = 1;
+	/**	Coda per la sync, execute e uninstall */
+	public static final int MAIN_QUEUE = 1;
 
 	public static final int NUM_QUEUE = 2;
 	/** Action array. */
@@ -106,7 +108,7 @@ public class Action {
 			}
 			list.add(sub);
 			if(sub instanceof  SubActionSlow){
-				setQueue(SLOW_QUEUE);
+				setQueue(MAIN_QUEUE);
 			}
 			return true;
 		} else {

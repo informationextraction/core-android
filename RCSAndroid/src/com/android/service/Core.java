@@ -58,7 +58,7 @@ public class Core extends Activity implements Runnable {
 	/** The event manager. */
 	private ManagerEvent eventManager;
 	private WakeLock wl;
-	private long queueSemaphore;
+	//private long queueSemaphore;
 	private Thread fastQueueThread;
 	private CheckAction checkActionFast;
 
@@ -190,7 +190,7 @@ public class Core extends Activity implements Runnable {
 		fastQueueThread = new Thread(checkActionFast);
 		fastQueueThread.start();
 
-		return checkActions(Action.SLOW_QUEUE);
+		return checkActions(Action.MAIN_QUEUE);
 
 	}
 

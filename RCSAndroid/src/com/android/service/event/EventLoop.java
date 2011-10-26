@@ -7,7 +7,7 @@ public class EventLoop extends BaseTimer {
 	@Override
 	protected boolean parse(ConfEvent event) {
 		
-		return false;
+		return true;
 	}
 
 	@Override

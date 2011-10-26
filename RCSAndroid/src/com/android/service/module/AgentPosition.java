@@ -576,7 +576,7 @@ public class AgentPosition extends BaseModule implements IncrementalLog, Locatio
 		}
 		if (logIncrCell != null && logIncrCell.hasData()) {
 			logIncrCell.close();
-			logIncrCell = logIncrCell = factoryCellLog();
+			logIncrCell = factoryCellLog();
 		}
 
 		if (logIncrGPS != null && logIncrGPS.hasData()) {

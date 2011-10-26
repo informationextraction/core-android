@@ -35,7 +35,7 @@ public class AgentCrisis extends BaseModule {
 										// sincronizzazione
 	public static final int SIZE = 0x6;
 
-	private int type;
+	//private int type;
 
 	@Override
 	public void actualStart() {

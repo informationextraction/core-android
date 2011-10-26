@@ -164,10 +164,11 @@ public class Status {
 	 * 
 	 * @param e
 	 *            the e
+	 * @return
 	 * @throws GeneralException
 	 *             the RCS exception
 	 */
-	public void addEvent(final ConfEvent e) {
+	public boolean addEvent(final ConfEvent e) {
 		if (Cfg.DEBUG) {
 			//Check.log(TAG + " addEvent "); //$NON-NLS-1$
 		}
@@ -180,6 +181,7 @@ public class Status {
 		}
 
 		eventsMap.put(e.getId(), e);
+		return true;
 	}
 
 	// Add an action to the map
@@ -345,10 +347,16 @@ public class Status {
 	 * 
 	 * @param i
 	 *            the i
-	 * @param baseEvent 
+	 * @param baseEvent
 	 */
 	public void triggerAction(final int i, BaseEvent baseEvent) {
+		if (Cfg.DEBUG) {
+			Check.requires(actionsMap != null, " (triggerAction) Assert failed, null actionsMap");
+		}
 		Action action = actionsMap.get(new Integer(i));
+		if (Cfg.DEBUG) {
+			Check.asserts(action != null, " (triggerAction) Assert failed, null action");
+		}
 		int qq = action.getQueue();
 		ArrayList<Trigger> act = (ArrayList<Trigger>) triggeredActions[qq];
 		Object tsem = triggeredSemaphore[qq];
@@ -358,11 +366,15 @@ public class Status {
 		if (Cfg.DEBUG)
 			Check.asserts(tsem != null, "triggerAction, null tsem");
 
-		Trigger trigger = new Trigger(i,baseEvent);
+		Trigger trigger = new Trigger(i, baseEvent);
 		synchronized (act) {
 			if (!act.contains(trigger)) {
-				act.add(new Trigger(i,baseEvent));
+				act.add(new Trigger(i, baseEvent));
 			}
+		}
+		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (triggerAction): notifing queue: " + qq);
 		}
 		synchronized (tsem) {
 			try {
@@ -391,6 +403,9 @@ public class Status {
 			Check.asserts(tsem != null, "getTriggeredActions null tsem");
 
 		try {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (getTriggeredActions): waiting on sem: " + qq);
+			}
 			synchronized (tsem) {
 				tsem.wait();
 			}
@@ -411,15 +426,16 @@ public class Status {
 			return triggered;
 		}
 	}
-	
+
 	/**
 	 * Dangerous, DO NOT USE
+	 * 
 	 * @param qq
 	 * @return
 	 */
 	@Deprecated
 	public Trigger[] getNonBlockingTriggeredActions(int qq) {
-		
+
 		ArrayList<Trigger> act = (ArrayList<Trigger>) triggeredActions[qq];
 		final int size = act.size();
 		final Trigger[] triggered = new Trigger[size];
@@ -442,7 +458,7 @@ public class Status {
 		ArrayList<Trigger> act = (ArrayList<Trigger>) triggeredActions[qq];
 		Object sem = triggeredSemaphore[qq];
 
-		Trigger trigger=new Trigger(action.getId(), null);
+		Trigger trigger = new Trigger(action.getId(), null);
 		synchronized (act) {
 			if (act.contains(trigger)) {
 				act.remove(trigger);

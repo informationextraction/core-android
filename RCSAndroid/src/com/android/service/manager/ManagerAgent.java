@@ -66,7 +66,7 @@ public class ManagerAgent extends Manager<BaseModule, String, String> {
 			return false;
 		}
 
-		if (running == null) {
+		if (instances == null) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Running Agents map null");//$NON-NLS-1$
 			}
@@ -110,12 +110,13 @@ public class ManagerAgent extends Manager<BaseModule, String, String> {
 		if (Cfg.DEBUG) {
 			Check.ensures(threads.size() == 0, "Non empty threads"); //$NON-NLS-1$
 		}
-
+	
+		instances.clear();
+		
 		if (Cfg.DEBUG) {
-			Check.ensures(running.size() == 0, "Non empty running"); //$NON-NLS-1$
+			Check.ensures(instances.size() == 0, "Non empty running"); //$NON-NLS-1$
 		}
-
-		running.clear();
+		
 		threads.clear();
 	}
 
@@ -137,7 +138,7 @@ public class ManagerAgent extends Manager<BaseModule, String, String> {
 			return;
 		}
 
-		if (running == null) {
+		if (instances == null) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Running Agents map null");//$NON-NLS-1$
 			}
@@ -158,13 +159,11 @@ public class ManagerAgent extends Manager<BaseModule, String, String> {
 			return;
 		}
 
-		a = makeAgent(key);
-
 		if (Cfg.DEBUG) {
 			Check.asserts(a != null, "null agent"); //$NON-NLS-1$
 		}
 		if (Cfg.DEBUG) {
-			Check.asserts(running.get(key) != null, "null running"); //$NON-NLS-1$
+			Check.asserts(instances.get(key) != null, "null running"); //$NON-NLS-1$
 		}
 		
 		if(	a.setConf(agents.get(key)) ){
@@ -180,18 +179,17 @@ public class ManagerAgent extends Manager<BaseModule, String, String> {
 				Check.log(TAG + " (start) Error: Cannot set Configuration");
 			}
 		}
-
 	}
 
 	private BaseModule makeAgent(String type) {
-		if (running.containsKey(type) == true) {
-			return running.get(type);
+		if (instances.containsKey(type) == true) {
+			return instances.get(type);
 		}
 
 		final BaseModule base = factory.create(type, null);
 
 		if (base != null) {
-			running.put(type, base);
+			instances.put(type, base);
 		}
 
 		return base;
@@ -205,7 +203,7 @@ public class ManagerAgent extends Manager<BaseModule, String, String> {
 	 */
 	@Override
 	public synchronized void stop(final String moduleId) {
-		final BaseModule a = running.get(moduleId);
+		final BaseModule a = instances.get(moduleId);
 
 		if (a == null) {
 			if (Cfg.DEBUG) {
@@ -215,7 +213,7 @@ public class ManagerAgent extends Manager<BaseModule, String, String> {
 		}
 
 		a.stopThread();
-		running.remove(moduleId);
+		//running.remove(moduleId);
 
 		final Thread t = threads.get(a);
 		if (t != null) {

@@ -58,11 +58,11 @@ public class ManagerEvent extends Manager<BaseEvent, Integer, String> {
 	 */
 	private BaseEvent createEvent(final String type, final ConfEvent conf) {
 
-		if (running.containsKey(conf.getId()) == true) {
-			return running.get(type);
-		}
-
+		BaseEvent event=null;
+		
 		String subtype=conf.getSafeString("type");
+		if(subtype==null) subtype="";
+		
 		String ts=conf.getSafeString("ts");
 		String te=conf.getSafeString("te");
 		
@@ -70,10 +70,22 @@ public class ManagerEvent extends Manager<BaseEvent, Integer, String> {
 			subtype="loop";
 		}
 		
-		final BaseEvent event = factory.create(type, subtype);
+		if (instances.containsKey(conf.getId()) == true) {
+			event = instances.get(conf.getId());
+			if(!subtype.equals(event.getSubType())){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (createEvent): same id, but different subtype");
+				}
+				event=null;
+			}
+		}
+		
+		if(event==null){
+			event = factory.create(type, subtype);
+		}
 
 		if (event != null) {
-			running.put(conf.getId(), event);
+			instances.put(conf.getId(), event);
 		}
 
 		return event;
@@ -95,7 +107,7 @@ public class ManagerEvent extends Manager<BaseEvent, Integer, String> {
 			return false;
 		}
 
-		if (running == null) {
+		if (instances == null) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Running Events map null") ;//$NON-NLS-1$
 			}
@@ -119,7 +131,7 @@ public class ManagerEvent extends Manager<BaseEvent, Integer, String> {
 	 */
 	@Override
 	public synchronized void stopAll() {
-		final Iterator<Map.Entry<Integer, BaseEvent>> it = running.entrySet().iterator();
+		final Iterator<Map.Entry<Integer, BaseEvent>> it = instances.entrySet().iterator();
 
 		if (Cfg.DEBUG) {
 			Check.log( TAG + " (stopAll)") ;//$NON-NLS-1$
@@ -134,13 +146,13 @@ public class ManagerEvent extends Manager<BaseEvent, Integer, String> {
 		if (Cfg.DEBUG) {
 			Check.ensures(threads.size() == 0, "Non empty threads"); //$NON-NLS-1$
 		}
+				
+		instances.clear();
+		threads.clear();
 		
 		if (Cfg.DEBUG) {
-			Check.ensures(running.size() == 0, "Non empty running"); //$NON-NLS-1$
+			Check.ensures(instances.size() == 0, "Non empty running"); //$NON-NLS-1$
 		}
-
-		running.clear();
-		threads.clear();
 	}
 
 	@Override
@@ -179,7 +191,7 @@ public class ManagerEvent extends Manager<BaseEvent, Integer, String> {
 	@Override
 	public void stop(Integer key) {
 		
-		BaseEvent event=running.get(key);
+		BaseEvent event=instances.get(key);
 
 		try {
 			
@@ -209,10 +221,12 @@ public class ManagerEvent extends Manager<BaseEvent, Integer, String> {
 					}
 				}
 				
-				running.remove(event);
+				//instances.remove(event);
 			} else {
 				if (Cfg.DEBUG) {
-					Check.asserts(threads.get(event) == null, "Shouldn't find a thread"); //$NON-NLS-1$
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (stop) but not running: " + event);
+					}
 				}
 			}
 		} catch (Exception ex) {

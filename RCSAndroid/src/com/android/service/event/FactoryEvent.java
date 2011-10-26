@@ -36,12 +36,12 @@ public class FactoryEvent implements AbstractFactory<BaseEvent, String> {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: " + "");//$NON-NLS-1$ //$NON-NLS-2$
 			}
-			e = new EventTimer();
+			e = new EventDate();
 		} else if ("afterinst".equals(type)) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: " + "");//$NON-NLS-1$ //$NON-NLS-2$
 			}
-			e = new EventTimer();
+			e = new EventAfterinst();
 		} else if ("sms".equals(type)) {
 
 			if (Cfg.DEBUG) {
@@ -102,6 +102,10 @@ public class FactoryEvent implements AbstractFactory<BaseEvent, String> {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: " + "Unknown: " + type);//$NON-NLS-1$ //$NON-NLS-2$
 			}
+		}
+		
+		if(e!=null){
+			e.setSubType(subtype);
 		}
 		return e;
 	}

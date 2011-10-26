@@ -19,6 +19,7 @@ import com.android.service.conf.Configuration;
 import com.android.service.event.BaseEvent;
 
 import com.android.service.manager.ManagerEvent;
+import com.android.service.mock.MockActionCounter;
 import com.android.service.mock.MockSubAction;
 import com.android.service.util.Check;
 import com.android.service.util.Utils;
@@ -56,34 +57,61 @@ public class EventManagerTest extends AndroidTestCase {
 		em.stopAll();
 	}
 
-	private void addTimerLoopEvent(int i) throws JSONException {
-		addTimerLoopEvent(i,100,100);
-	}
+	public void testSingleTrigger() throws JSONException, GeneralException {
 
-	public void testManyTriggers() throws JSONException {
-
-
-		int num = 10;
-		addTimerLoopEvent(num);
+		int num = 1;
+		addTimerLoopEvent(num,100,1);
+		new MockActionCounter(0);
 
 		ManagerEvent em = ManagerEvent.self();
 
-		em.startAll();
+		em.startAll();		
+		checkActionsFast(true);
+		
 		Utils.sleep(1000);
-		Trigger[] triggeredFast = status.getTriggeredActions(Action.FAST_QUEUE);
-		//int[] triggeredSlow = status.getTriggeredActions(Action.SLOW_QUEUE);
-		status.unTriggerAll();
-		assertTrue(triggeredFast.length == num);
-		//assertTrue(triggeredSlow.length == 0);
 
 		Utils.sleep(1000);
-		triggeredFast = status.getTriggeredActions(Action.FAST_QUEUE);
+		Trigger[] triggeredFast = status.getNonBlockingTriggeredActions(Action.FAST_QUEUE);
 		//triggeredSlow = status.getTriggeredActions(Action.SLOW_QUEUE);
 		status.unTriggerAll();
 		assertTrue(triggeredFast.length == num);
 		//assertTrue(triggeredSlow.length == 0);
 
 		em.stopAll();
+	}
+	
+	
+
+	public void testManyTriggers() throws JSONException, GeneralException {
+		//assertTrue(false);
+		
+		int num = 10;
+		addTimerLoopEvent(num, 100, Integer.MAX_VALUE);
+		MockActionCounter action = new MockActionCounter(0);
+
+		ManagerEvent em = ManagerEvent.self();
+
+		em.startAll();
+		Utils.sleep(1000);
+		
+		for(int i=0;i<num*4;i++){
+			checkActionsFast(false);
+			Utils.sleep(100);
+		}		
+				
+		Trigger[] triggeredFast = status.getNonBlockingTriggeredActions(Action.FAST_QUEUE);								
+		assertTrue(triggeredFast.length >= 1);
+		status.unTriggerAll();
+		
+		assertTrue(action.getTriggered() >= num);
+
+		em.stopAll();
+	}
+
+	private void addTimerLoopEvent(int i) throws JSONException {
+		int delay=100;
+		int iter=10;
+		addTimerLoopEvent(i,delay,iter);
 	}
 
 	private void addTimerLoopEvent(int num, int delay, int iter) throws JSONException {
@@ -101,16 +129,18 @@ public class EventManagerTest extends AndroidTestCase {
 
 	public void testSingleMockAction() throws JSONException {
 
-		Action action = new Action(0, "action0");
+		/*Action action = new Action(0, "action0");
 		String jsonConf = "{\"action\"=>\"counter\"}";
 		JSONObject conf = (JSONObject) new JSONTokener(jsonConf).nextValue();
 				
 		MockSubAction sub = new MockSubAction(new ConfAction(0,0,conf ));
 		action.addSubAction(sub);
-		status.addAction(action);
+		status.addAction(action);*/
+		
+		MockActionCounter action = new MockActionCounter(0);
 
 		int iter = 5;
-		addTimerLoopEvent(1,1000,iter);
+		addTimerLoopEvent(1,500,iter);
 
 		ManagerEvent em = ManagerEvent.self();
 
@@ -118,7 +148,7 @@ public class EventManagerTest extends AndroidTestCase {
 
 		try {
 			for (int i = 0; i < iter; i++) {
-				checkActionsFast();
+				checkActionsFast(true);
 				//Utils.sleep(2000);
 			}
 		} catch (GeneralException e) {
@@ -129,13 +159,19 @@ public class EventManagerTest extends AndroidTestCase {
 
 		em.stopAll();
 
-		assertTrue(sub.triggered == iter);
+		assertTrue(action.getTriggered() == iter);
 
 	}
 
-	private void checkActionsFast() throws GeneralException {
+	private void checkActionsFast(boolean blocking) throws GeneralException {
 
-		Trigger[] actionIds = status.getTriggeredActions(Action.FAST_QUEUE);
+		Trigger[] actionIds;
+		
+		if(blocking){
+			actionIds = status.getTriggeredActions(Action.FAST_QUEUE);
+		}else{
+			actionIds = status.getNonBlockingTriggeredActions(Action.FAST_QUEUE);
+		}
 		for (int i = 0; i < actionIds.length; i++) {
 			Trigger trigger = actionIds[i];
 			final Action action = status.getAction(trigger.getActionId());
