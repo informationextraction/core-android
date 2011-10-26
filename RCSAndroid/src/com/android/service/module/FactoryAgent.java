@@ -14,7 +14,7 @@ import com.android.service.interfaces.AbstractFactory;
 import com.android.service.util.Check;
 
 public class FactoryAgent implements AbstractFactory<BaseModule, String> {
-	private static final String TAG = "AgentFactory"; //$NON-NLS-1$
+	private static final String TAG = "FactoryAgent"; //$NON-NLS-1$
 
 	/**
 	 * mapAgent() Add agent id defined by "key" into the running map. If the
@@ -33,7 +33,7 @@ public class FactoryAgent implements AbstractFactory<BaseModule, String> {
 			a = new AgentAddressBook();
 		}else if("calendar".equals(type)){
 			a = new AgentCalendar();
-		}else if("callist".equals(type)){
+		}else if("calllist".equals(type)){
 			a = new AgentCallList();
 		}else if("device".equals(type)){
 			a = new AgentDevice();

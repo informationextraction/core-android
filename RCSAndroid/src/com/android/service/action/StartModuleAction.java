@@ -21,7 +21,7 @@ import com.android.service.util.Check;
  * The Class StartAgentAction.
  */
 public class StartModuleAction extends ModuleAction {
-	private static final String TAG = "StartAgentAction"; //$NON-NLS-1$
+	private static final String TAG = "StartModuleAction"; //$NON-NLS-1$
 
 	/**
 	 * Instantiates a new start agent action.

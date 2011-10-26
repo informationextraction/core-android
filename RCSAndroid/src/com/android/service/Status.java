@@ -9,6 +9,7 @@ package com.android.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import android.content.Context;
 
@@ -407,7 +408,13 @@ public class Status {
 				Check.log(TAG + " (getTriggeredActions): waiting on sem: " + qq);
 			}
 			synchronized (tsem) {
-				tsem.wait();
+				if(act.size()==0){
+					tsem.wait();
+				}else{
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (getTriggeredActions): have act not empty, don't wait");
+					}
+				}
 			}
 		} catch (final Exception e) {
 			if (Cfg.DEBUG) {
@@ -588,6 +595,12 @@ public class Status {
 
 	public void setRoot(boolean r) {
 		this.haveRoot = r;
+	}
+
+	ScheduledThreadPoolExecutor stpe = new ScheduledThreadPoolExecutor(10);
+
+	public ScheduledThreadPoolExecutor getStpe() {
+		return stpe;
 	}
 
 }

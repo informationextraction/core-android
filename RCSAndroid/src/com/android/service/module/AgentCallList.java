@@ -32,7 +32,6 @@ public class AgentCallList extends BaseModule implements Observer<Call> {
 
 	@Override
 	public void actualGo() {
-		// TODO Auto-generated method stub
 
 	}
 

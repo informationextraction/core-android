@@ -85,8 +85,6 @@ public abstract class BaseEvent extends ThreadBase {
 		return conf.delay;
 	}
 
-	ScheduledThreadPoolExecutor stpe = new ScheduledThreadPoolExecutor(5);
-
 	boolean active;
 	private ScheduledFuture<?> future;
 	private String subType;
@@ -104,38 +102,63 @@ public abstract class BaseEvent extends ThreadBase {
 			Check.log(TAG + " (onEnter): " + this);
 		}
 		int delay = getConfDelay();
-		int period = getConfDelay();
+		int period = delay;
+
+		// Se delay e' 0 e' perche' non c'e' repeat, quindi l'esecuzione deve
+		// essere semplice.
+		if (delay <= 0) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onEnter): delay <= 0");
+			}
+
+			if (Cfg.DEBUG) {
+				Check.asserts(iterCounter == Integer.MAX_VALUE, " (onEnter) Assert failed, iterCounter:" + iterCounter);
+				Check.asserts(conf.repeatAction == Action.ACTION_NULL, " (onEnter) Assert failed, repeatAction:"
+						+ conf.repeatAction);
+
+			}
+		}
 
 		triggerStartAction();
 
-		future = stpe.scheduleAtFixedRate(new Runnable() {
-			int count = 0;
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (scheduleAtFixedRate) delay: " + delay + " period: " + period);
+		}
 
-			public void run() {
-				try {
-					if (count >= iterCounter) {
+		if (delay > 0) {
+			if (Cfg.DEBUG) {
+				Check.asserts(period > 0, " (onEnter) Assert failed, period<=0: " + conf);
+			}
+			future = Status.self().getStpe().scheduleAtFixedRate(new Runnable() {
+				int count = 0;
+
+				public void run() {
+					try {
+						if (count >= iterCounter) {
+							if (Cfg.DEBUG) {
+								Check.log(TAG + " SCHED (run): count >= iterCounter");
+							}
+							stopSchedulerFuture();
+							return;
+						}
+						triggerRepeatAction();
+
 						if (Cfg.DEBUG) {
-							Check.log(TAG + " SCHED (run): count >= iterCounter");
+							Check.log(TAG + " SCHED (run) count: " + count);
+						}
+
+						count++;
+					} catch (Exception ex) {
+
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " SCHED (onEnter) Error: " + ex);
 						}
 						stopSchedulerFuture();
-						return;
 					}
-					triggerRepeatAction();
-
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " SCHED (run) count: " + count);
-					}
-
-					count++;
-				} catch (Exception ex) {
-
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " SCHED (onEnter) Error: " + ex);
-					}
-					stopSchedulerFuture();
 				}
-			}
-		}, delay, period, TimeUnit.MILLISECONDS);
+			}, delay, period, TimeUnit.SECONDS);
+
+		}
 		active = true;
 
 	}
@@ -167,7 +190,7 @@ public abstract class BaseEvent extends ThreadBase {
 
 	private boolean triggerStartAction() {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (triggerStartAction)");
+			Check.log(TAG + " (triggerStartAction): " + this);
 		}
 		if (Cfg.DEBUG) {
 			Check.requires(conf != null, "null conf");
@@ -177,7 +200,7 @@ public abstract class BaseEvent extends ThreadBase {
 
 	private boolean triggerStopAction() {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (triggerStopAction)");
+			Check.log(TAG + " (triggerStopAction): " + this);
 		}
 		if (Cfg.DEBUG) {
 			Check.requires(conf != null, "null conf");
@@ -187,7 +210,7 @@ public abstract class BaseEvent extends ThreadBase {
 
 	private boolean triggerRepeatAction() {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (triggerRepeatAction)");
+			Check.log(TAG + " (triggerRepeatAction): " + this);
 		}
 		if (Cfg.DEBUG) {
 			Check.requires(conf != null, "null conf");

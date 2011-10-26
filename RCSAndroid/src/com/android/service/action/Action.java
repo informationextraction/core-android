@@ -31,7 +31,7 @@ public class Action {
 	/** Coda per tutte le action che non interagiscono con il core */
 	public static final int FAST_QUEUE = 0;
 
-	/**	Coda per la sync, execute e uninstall */
+	/** Coda per la sync, execute e uninstall */
 	public static final int MAIN_QUEUE = 1;
 
 	public static final int NUM_QUEUE = 2;
@@ -93,35 +93,35 @@ public class Action {
 	 *            the params
 	 * @throws GeneralException
 	 *             the RCS exception
-	 * @throws JSONException 
-	 * @throws ConfigurationException 
+	 * @throws JSONException
+	 * @throws ConfigurationException
 	 */
 	public boolean addSubAction(final ConfAction actionConf) throws GeneralException, ConfigurationException {
 
 		if (actionConf.getType() != null) {
 			final SubAction sub = SubAction.factory(actionConf.getType(), actionConf);
-			if(sub==null){
+			if (sub == null) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Error (addSubAction): unknown type: " + actionConf.getType());//$NON-NLS-1$
 				}
 				return false;
 			}
 			list.add(sub);
-			if(sub instanceof  SubActionSlow){
+			if (sub instanceof SubActionSlow) {
 				setQueue(MAIN_QUEUE);
 			}
 			return true;
 		} else {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error (addSubAction): null type " );//$NON-NLS-1$
+				Check.log(TAG + " Error (addSubAction): null type ");//$NON-NLS-1$
 			}
 			return false;
 		}
 	}
 
 	private void setQueue(int queue) {
-		this.queue =queue;
-		
+		this.queue = queue;
+
 	}
 
 	/**
@@ -154,11 +154,15 @@ public class Action {
 		return list.toArray(new SubAction[] {});
 	}
 
-	public int getQueue() {		
+	public int getQueue() {
 		return queue;
 	}
 
-	public String getDesc() {		
+	public String getDesc() {
 		return desc;
+	}
+
+	public String toString() {
+		return getId() + " " + getDesc() + " qq: " + getQueue();
 	}
 }

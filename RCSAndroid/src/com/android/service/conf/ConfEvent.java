@@ -25,6 +25,7 @@ public class ConfEvent extends JSONConf {
 	public int stopAction = Action.ACTION_NULL;
 	public int repeatAction = Action.ACTION_NULL;
 	public int iter = Integer.MAX_VALUE;
+	/** delay in seconds */
 	public int delay = 0;
 
 	final public String desc;

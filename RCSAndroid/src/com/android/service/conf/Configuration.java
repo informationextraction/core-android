@@ -132,6 +132,9 @@ public class Configuration {
 				JSONObject jobject;
 				try {
 					jobject = jmodules.getJSONObject(i);
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (load): "+jobject);
+					}
 					visitor.call(i, jobject);
 				} catch (JSONException e1) {
 					if (Cfg.DEBUG) {
@@ -178,7 +181,12 @@ public class Configuration {
 		}
 
 		public void call(int eventId, JSONObject jmodule) throws JSONException, GeneralException {
+			if (Cfg.DEBUG) {
+				Check.requires(jmodule != null, " (call) Assert failed, null jmodule");
+			}
+			
 			String eventType = jmodule.getString("event");
+			if (Cfg.DEBUG) { Check.asserts(eventType!=null, " (call) Assert failed, null eventType"); }
 			if (jmodule.has("type")) {
 				eventType += " " + jmodule.getString("type");
 			}
@@ -284,7 +292,7 @@ public class Configuration {
 		g.type = jglobals.getString("type");
 		g.migrated = jglobals.getBoolean("migrated");
 		g.version = jglobals.getInt("version");
-		
+
 		status.setGlobal(g);
 	}
 
@@ -324,9 +332,9 @@ public class Configuration {
 
 			// Crypto crypto = new Crypto(Keys.g_ConfKey);
 			final byte[] confKey = Keys.self().getConfKey();
-			
+
 			EncryptionPKCS5 crypto = new EncryptionPKCS5(confKey);
-			//final Crypto crypto = new Crypto(confKey);
+			// final Crypto crypto = new Crypto(confKey);
 			final byte[] clearConf = crypto.decryptDataIntegrity(rawConf);
 
 			String json = new String(clearConf);
@@ -340,7 +348,7 @@ public class Configuration {
 				return json;
 			}
 			return null;
-		
+
 		} catch (final SecurityException se) {
 			if (Cfg.DEBUG) {
 				Check.log(se);//$NON-NLS-1$

@@ -69,6 +69,9 @@ public abstract class ThreadBase implements Runnable {
 		status = StateRun.STARTING;
 
 		try {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (run) starting "+this);
+			}
 			actualStart();
 			status = StateRun.STARTED;
 			loop();
@@ -81,6 +84,9 @@ public abstract class ThreadBase implements Runnable {
 
 		try {
 			status = StateRun.STOPPING;
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (run) stopping "+this);
+			}
 			actualStop();
 		} catch (final Exception ex) {
 			if (Cfg.DEBUG) {
