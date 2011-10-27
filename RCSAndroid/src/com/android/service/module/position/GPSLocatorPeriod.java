@@ -24,7 +24,9 @@ public class GPSLocatorPeriod extends GPSLocator {
 
 	@Override
 	public void go(LocationListener listener, LocationManager lm) {
-		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, period, 0L, listener, Looper.getMainLooper());
+		lm.requestLocationUpdates(provider, period, 0L, listener, Looper.getMainLooper());
 	}
+	
+
 
 }

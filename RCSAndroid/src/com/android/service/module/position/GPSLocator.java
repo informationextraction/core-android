@@ -10,6 +10,7 @@
 package com.android.service.module.position;
 
 import android.content.Context;
+import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Looper;
@@ -26,6 +27,7 @@ public abstract class GPSLocator extends Thread {
 	private LocationListener listener;
 
 	Looper myLooper;
+	protected String provider=LocationManager.GPS_PROVIDER;
 
 	public GPSLocator() {
 		setDaemon(true);
@@ -43,6 +45,10 @@ public abstract class GPSLocator extends Thread {
 
 	public abstract void go(LocationListener listener, LocationManager lm);
 
+	public Location getLastKnownPosition(){		
+		return lm.getLastKnownLocation(provider);
+	}
+	
 	@Override
 	public void run() {
 		Looper.prepare();

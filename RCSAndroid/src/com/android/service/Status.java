@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import android.content.Context;
+import android.os.Handler;
 
 import com.android.service.action.Action;
 import com.android.service.auto.Cfg;
@@ -601,6 +602,11 @@ public class Status {
 
 	public ScheduledThreadPoolExecutor getStpe() {
 		return stpe;
+	}
+
+	Handler deafultHandler=new Handler();
+	public Handler getDefaultHandler() {
+		return deafultHandler;
 	}
 
 }
