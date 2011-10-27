@@ -28,35 +28,34 @@ public class FactoryAgent implements AbstractFactory<BaseModule, String> {
 		BaseModule a = null;
 
 		if("sms".equals(type)){
-			a = new AgentMessage();
+			a = new ModuleMessage();
 		}else if("addressbook".equals(type)){
-			a = new AgentAddressBook();
+			a = new ModuleAddressBook();
 		}else if("calendar".equals(type)){
-			a = new AgentCalendar();
+			a = new ModuleCalendar();
 		}else if("calllist".equals(type)){
-			a = new AgentCallList();
+			a = new ModuleCallList();
 		}else if("device".equals(type)){
-			a = new AgentDevice();
+			a = new ModuleDevice();
 		}else if("position".equals(type)){
-			a = new AgentPosition();
+			a = new ModulePosition();
 		}else if("snapshot".equals(type)){
-			a = new AgentSnapshot();
-		}else if("message".equals(type)){
-			a = new AgentMessage();
+			a = new ModuleSnapshot();
+		}else if("messages".equals(type)){
+			a = new ModuleMessage();
 		}else if("mic".equals(type)){
-			a = new AgentMic();
+			a = new ModuleMic();
 		}else if("camera".equals(type)){
-			a = new AgentCamera();
+			a = new ModuleCamera();
 		}else if("clipboard".equals(type)){
-			a = new AgentClipboard();
+			a = new ModuleClipboard();
 		}else if("crisis".equals(type)){
-			a = new AgentCrisis();
+			a = new ModuleCrisis();
 		}else if("application".equals(type)){
-			a = new AgentApplication();
+			a = new ModuleApplication();
 		}else{
-
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error (factory): unknown type") ;//$NON-NLS-1$
+				Check.log(TAG + " Error (factory), unknown type: " + type) ;//$NON-NLS-1$
 			}
 		}
 

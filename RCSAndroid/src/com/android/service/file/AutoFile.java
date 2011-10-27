@@ -72,6 +72,11 @@ public final class AutoFile {
 	public byte[] read(final int offset) {
 		final int length = (int) file.length() - offset;
 		InputStream in = null;
+		if (Cfg.DEBUG) { Check.asserts(file!=null, " (read) Assert failed, null file"); }
+		
+		if(length==0){
+			return null;
+		}
 		try {
 			in = new BufferedInputStream(new FileInputStream(file), length);
 			final byte[] buffer = new byte[length];

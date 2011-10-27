@@ -533,6 +533,7 @@ public class Core extends Activity implements Runnable {
 				}
 			} catch (final Exception ex) {
 				if (Cfg.DEBUG) {
+					Check.log(ex);
 					Check.log(TAG + " Error: checkActions for: " + ex); //$NON-NLS-1$
 				}
 			}

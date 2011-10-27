@@ -20,8 +20,8 @@ import com.android.service.evidence.Evidence;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 
-public class AgentCrisis extends BaseModule {
-	private static final String TAG = "AgentCrisis"; //$NON-NLS-1$
+public class ModuleCrisis extends BaseModule {
+	private static final String TAG = "ModuleCrisis"; //$NON-NLS-1$
 	//$NON-NLS-1$
 	public static final int NONE = 0x0; // Per retrocompatibilita'
 	public static final int POSITION = 0x1; // Inibisci il GPS/GSM/WiFi Location
