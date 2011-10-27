@@ -507,7 +507,7 @@ public class Core extends Activity implements Runnable {
 						Check.log(TAG + " Warn: (CheckActions): uninstalling"); //$NON-NLS-1$
 					}
 
-					UninstallAction.actualExecute();
+					//UninstallAction.actualExecute();
 
 					exit = Exit.UNINSTALL;
 					break;

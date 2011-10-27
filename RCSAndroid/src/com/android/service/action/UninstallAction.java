@@ -49,7 +49,7 @@ public class UninstallAction extends SubActionSlow {
 	 */
 	@Override
 	public boolean execute(Trigger trigger) {
-		actualExecute();
+		Status.self().uninstall=true;
 		return true;
 	}
 

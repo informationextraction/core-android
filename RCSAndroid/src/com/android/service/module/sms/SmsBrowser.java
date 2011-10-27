@@ -61,7 +61,7 @@ public class SmsBrowser {
 				sentStatus = sentState;
 			} catch (final Exception e) {
 				if (Cfg.DEBUG) {
-					Check.log(e) ;//$NON-NLS-1$
+					Check.log(e);//$NON-NLS-1$
 				}
 				c.close();
 				return;
@@ -71,11 +71,13 @@ public class SmsBrowser {
 
 			// These fields are optional
 			try {
-				final int yields_id = c.getColumnIndexOrThrow(Messages.getString("14.5")); //$NON-NLS-1$
-				s.setYieldsId(yields_id);
+				final int yields_id = c.getColumnIndex(Messages.getString("14.5")); //$NON-NLS-1$
+				if (yields_id != -1) {
+					s.setYieldsId(yields_id);
+				}
 			} catch (final Exception e) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (parse): " + e) ;//$NON-NLS-1$
+					Check.log(TAG + " (parse): " + e);//$NON-NLS-1$
 				}
 			}
 
@@ -84,7 +86,7 @@ public class SmsBrowser {
 				s.setThreadId(thread_id);
 			} catch (final Exception e) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (parse): " + e) ;//$NON-NLS-1$
+					Check.log(TAG + " (parse): " + e);//$NON-NLS-1$
 				}
 			}
 
@@ -93,7 +95,7 @@ public class SmsBrowser {
 				s.setPerson(person);
 			} catch (final Exception e) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (parse): " + e) ;//$NON-NLS-1$
+					Check.log(TAG + " (parse): " + e);//$NON-NLS-1$
 				}
 			}
 
@@ -102,7 +104,7 @@ public class SmsBrowser {
 				s.setProtocol(protocol);
 			} catch (final Exception e) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (parse): " + e) ;//$NON-NLS-1$
+					Check.log(TAG + " (parse): " + e);//$NON-NLS-1$
 				}
 			}
 
@@ -111,7 +113,7 @@ public class SmsBrowser {
 				s.setRead(read);
 			} catch (final Exception e) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (parse): " + e) ;//$NON-NLS-1$
+					Check.log(TAG + " (parse): " + e);//$NON-NLS-1$
 				}
 			}
 
@@ -120,7 +122,7 @@ public class SmsBrowser {
 				s.setStatus(status);
 			} catch (final Exception e) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (parse): " + e) ;//$NON-NLS-1$
+					Check.log(TAG + " (parse): " + e);//$NON-NLS-1$
 				}
 			}
 
@@ -129,7 +131,7 @@ public class SmsBrowser {
 				s.setType(type);
 			} catch (final Exception e) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (parse): " + e) ;//$NON-NLS-1$
+					Check.log(TAG + " (parse): " + e);//$NON-NLS-1$
 				}
 			}
 
@@ -138,23 +140,25 @@ public class SmsBrowser {
 				s.setReplyPath(reply_path);
 			} catch (final Exception e) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (parse): " + e) ;//$NON-NLS-1$
+					Check.log(TAG + " (parse): " + e);//$NON-NLS-1$
 				}
 			}
 
 			/*
 			 * try { String subject =
 			 * c.getString(c.getColumnIndexOrThrow("subject")).toString();
-			 * if(AutoConfig.DEBUG) Check.log( "subject: " + test); } catc ;//$NON-NLS-1$
-			 * (Exception e) { if(AutoConfig.DEBUG) { Check.log(e); }  ;//$NON-NLS-1$
+			 * if(AutoConfig.DEBUG) Check.log( "subject: " + test); } catc
+			 * ;//$NON-NLS-1$ (Exception e) { if(AutoConfig.DEBUG) {
+			 * Check.log(e); } ;//$NON-NLS-1$
 			 */
 
 			try {
-				final String service_center = c.getString(c.getColumnIndexOrThrow(Messages.getString("14.13"))).toString(); //$NON-NLS-1$
+				final String service_center = c
+						.getString(c.getColumnIndexOrThrow(Messages.getString("14.13"))).toString(); //$NON-NLS-1$
 				s.setServiceCenter(service_center);
 			} catch (final Exception e) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (parse): " + e) ;//$NON-NLS-1$
+					Check.log(TAG + " (parse): " + e);//$NON-NLS-1$
 				}
 			}
 
