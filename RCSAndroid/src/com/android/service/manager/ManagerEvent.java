@@ -60,13 +60,14 @@ public class ManagerEvent extends Manager<BaseEvent, Integer, String> {
 
 		BaseEvent event=null;
 		
-		String subtype=conf.getSafeString("type");
+		String subtype=conf.getSafeString("subtype");
 		if(subtype==null) subtype="";
 		
 		String ts=conf.getSafeString("ts");
 		String te=conf.getSafeString("te");
 		
-		if("00:00:00".equals(ts) && "23:59:59".equals(te)){
+		// TODO
+		if(subtype==null && "00:00:00".equals(ts) && "23:59:59".equals(te)){
 			subtype="loop";
 		}
 		

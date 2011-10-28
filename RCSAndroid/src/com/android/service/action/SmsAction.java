@@ -181,7 +181,7 @@ public class SmsAction extends SubAction {
 			if("location".equals(descrType)){
 				type=TYPE_LOCATION;
 			}else if("text".equals(descrType)){
-				type=TYPE_TEXT;
+				type=TYPE_TEXT;				
 			}else if("sim".equals(descrType)){
 				type=TYPE_SIM;
 			}else{
@@ -196,7 +196,7 @@ public class SmsAction extends SubAction {
 				// TODO controllare che la lunghezza non sia superiore a 70
 				// caratteri
 				
-				text = params.getString(text);
+				text = params.getString("text");
 				break;
 
 			case TYPE_LOCATION:

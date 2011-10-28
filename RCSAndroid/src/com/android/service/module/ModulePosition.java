@@ -199,7 +199,6 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 				logIncrCell.write(payload);
 			}
 		}
-
 	}
 
 	private void locationGPS() {

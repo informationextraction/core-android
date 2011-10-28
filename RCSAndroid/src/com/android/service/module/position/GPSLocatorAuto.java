@@ -81,14 +81,9 @@ public class GPSLocatorAuto implements LocationListener, Runnable {
 				listeners.add(listener);
 			}
 		}
-
 	}
-
-	/** executed by handler postDelayed, 5 minutes after the last start */
-	public synchronized void run() {
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (run) passed without start: " + stopDelay);
-		}
+	
+	public synchronized void stop(){
 		if (started) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (run): stopping locator");
@@ -98,6 +93,14 @@ public class GPSLocatorAuto implements LocationListener, Runnable {
 			locator = null;
 			gotValidPosition = false;
 		}
+	}
+
+	/** executed by handler postDelayed, 5 minutes after the last start */
+	public synchronized void run() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (run) passed without start: " + stopDelay);
+		}
+		stop();
 	}
 
 	/**

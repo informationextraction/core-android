@@ -129,6 +129,7 @@ public abstract class BaseEvent extends ThreadBase {
 			if (Cfg.DEBUG) {
 				Check.asserts(period > 0, " (onEnter) Assert failed, period<=0: " + conf);
 			}
+			
 			future = Status.self().getStpe().scheduleAtFixedRate(new Runnable() {
 				int count = 0;
 
