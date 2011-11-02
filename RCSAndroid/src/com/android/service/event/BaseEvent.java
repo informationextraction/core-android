@@ -31,7 +31,6 @@ public abstract class BaseEvent extends ThreadBase {
 	private static final String TAG = "BaseEvent"; //$NON-NLS-1$
 
 	// Gli eredi devono implementare i seguenti metodi astratti
-
 	/**
 	 * Parses the.
 	 * 

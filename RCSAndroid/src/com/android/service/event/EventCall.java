@@ -37,6 +37,7 @@ public class EventCall extends BaseEvent implements Observer<Call> {
 	@Override
 	public void actualStop() {
 		ListenerCall.self().detach(this);
+		onExit(); // di sicurezza
 	}
 
 	@Override

@@ -99,7 +99,6 @@ public class EventTimer extends BaseTimer {
 	@Override
 	public void actualStart() {
 		final long now = System.currentTimeMillis();
-
 		Calendar calendar = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT"));
 
 		long nextStart, nextStop;
@@ -126,22 +125,26 @@ public class EventTimer extends BaseTimer {
 
 		// Estriamo il prossimo evento e determiniamo il delay sulla base del
 		// tipo
-		if (start > now)
+		if (now < start)
 			nextStart = start;
 		else
 			nextStart = start + (3600 * 24 * 1000); // 1 Day
 
-		if (stop > now)
+		if (now < stop)
 			nextStop = stop;
 		else
 			nextStop = stop + (3600 * 24 * 1000); // 1 Day
 
-		if (nextStop > nextStart) {
+		
+
+		boolean ret;
+		// stabilisce quale sara' il prossimo evento.
+		if (nextStart < nextStop) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (setDailyDelay): Delay (next start): " + (nextStart - now)); //$NON-NLS-1$
 			}
 			setPeriod(nextStart - now);
-			return true;
+			ret= true;
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (setDailyDelay): Delay (next stop): " + (nextStop - now)); //$NON-NLS-1$
@@ -150,8 +153,33 @@ public class EventTimer extends BaseTimer {
 			long delay = nextStop - now;
 
 			setPeriod(nextStop - now);
-			return false;
+			ret= false;
 		}
+		
+		// verifica se al primo giro occorre chiamare OnEnter
+		if (start < stop) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (setDailyDelay): start < stop ");
+			}
+			if (now > start && now < stop) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (setDailyDelay): we are already in the brackets");
+				}
+				onEnter();
+			}
+		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (setDailyDelay): start > stop ");
+			}
+			if (now < stop || now > start) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (setDailyDelay): we are already in the inverted brackets");
+				}
+				onEnter();
+			}
+		}
+		
+		return ret;
 	}
 
 	/*
@@ -194,6 +222,6 @@ public class EventTimer extends BaseTimer {
 	 */
 	@Override
 	public void actualStop() {
-
+		onExit(); // di sicurezza
 	}
 }

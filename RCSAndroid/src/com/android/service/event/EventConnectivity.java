@@ -34,6 +34,7 @@ public class EventConnectivity extends BaseEvent implements Observer<Connectivit
 	@Override
 	public void actualStop() {
 		ListenerConnectivity.self().detach(this);
+		onExit(); // di sicurezza
 	}
 
 	@Override

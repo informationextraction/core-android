@@ -23,7 +23,7 @@ public class EventStartup extends BaseTimer {
 
 	@Override
 	protected void actualStop() {
-
+		onExit(); // di sicurezza
 	}
 
 }

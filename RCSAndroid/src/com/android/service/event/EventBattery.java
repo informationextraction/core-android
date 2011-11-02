@@ -35,6 +35,7 @@ public class EventBattery extends BaseEvent implements Observer<Battery> {
 	@Override
 	public void actualStop() {
 		ListenerBattery.self().detach(this);
+		onExit(); // di sicurezza
 	}
 
 	@Override

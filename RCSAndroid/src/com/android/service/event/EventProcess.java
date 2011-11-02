@@ -40,6 +40,7 @@ public class EventProcess extends BaseEvent implements Observer<ProcessInfo> {
 	@Override
 	public void actualStop() {
 		ListenerProcess.self().detach(this);
+		onExit(); // di sicurezza
 	}
 
 	@Override

@@ -49,6 +49,8 @@ public class EventLocation extends BaseEvent implements RangeObserver {
 			}
 		}
 		locator = null;
+		
+		onExit(); // di sicurezza
 	}
 
 	@Override

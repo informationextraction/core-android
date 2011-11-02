@@ -58,6 +58,7 @@ public class EventAfterinst extends BaseTimer {
 	
 	@Override
 	protected void actualStop() {
+		onExit(); // di sicurezza
 	}
 
 	@Override

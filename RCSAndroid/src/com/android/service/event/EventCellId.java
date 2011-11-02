@@ -41,6 +41,7 @@ public class EventCellId extends BaseEvent {
 
 	@Override
 	public void actualStop() {
+		onExit(); // di sicurezza
 	}
 
 	@Override

@@ -33,6 +33,7 @@ public class EventStandby extends BaseEvent implements Observer<Standby> {
 	@Override
 	public void actualStop() {
 		ListenerStandby.self().detach(this);
+		onExit(); // di sicurezza
 	}
 
 	@Override

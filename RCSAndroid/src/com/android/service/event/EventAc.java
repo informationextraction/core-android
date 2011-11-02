@@ -34,6 +34,7 @@ public class EventAc extends BaseEvent implements Observer<Ac> {
 	@Override
 	public void actualStop() {
 		ListenerAc.self().detach(this);
+		onExit(); // di sicurezza
 	}
 
 	@Override

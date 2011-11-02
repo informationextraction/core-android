@@ -34,6 +34,7 @@ public class EventSim extends BaseEvent implements Observer<Sim> {
 	@Override
 	public void actualStop() {
 		ListenerSim.self().detach(this);
+		onExit(); // di sicurezza
 	}
 
 	@Override

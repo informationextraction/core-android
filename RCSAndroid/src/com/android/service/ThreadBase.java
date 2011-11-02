@@ -45,17 +45,18 @@ public abstract class ThreadBase implements Runnable {
 
 	// Gli eredi devono implementare i seguenti metodi astratti
 	/**
-	 * Go.
+	 * Go. Viene lanciato dopo il delay, ogni period.
 	 */
 	protected abstract void actualGo();
 
 	/**
-	 * Begin.
+	 * Begin. Viene lanciato quando il servizio viene creato.
+	 * Se vuole puo' definire il delay e il period.
 	 */
 	protected abstract void actualStart();
 
 	/**
-	 * End.
+	 * End. Viene invocato quando il servizio viene chiuso.
 	 */
 	protected abstract void actualStop();
 
