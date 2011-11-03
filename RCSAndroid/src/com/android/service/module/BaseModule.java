@@ -48,7 +48,7 @@ public abstract class BaseModule extends ThreadBase {
 	
 	@Override
 	public String toString() {
-		return "Module " +conf.getType() +" " + (isRunning()?"RUNNING":""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		return "Module <" + conf.getType().toUpperCase() +"> " + (isRunning()?"running":""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
 
 	public void setTrigger(Trigger trigger) {

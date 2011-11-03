@@ -519,21 +519,6 @@ public class Status {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " setCrisis: " + type); //$NON-NLS-1$
 		}
-
-		ConfModule agent;
-		try {
-			agent = getAgent("mic");
-			if (agent != null) {
-				// TODO: micAgent, crisis should stop recording
-				// final AgentMic micAgent = (AgentMic) agent;
-				// micAgent.crisis(crisisMic());
-			}
-		} catch (final GeneralException e) {
-			if (Cfg.DEBUG) {
-				Check.log(e);//$NON-NLS-1$
-			}
-		}
-
 	}
 
 	private boolean isCrisis() {

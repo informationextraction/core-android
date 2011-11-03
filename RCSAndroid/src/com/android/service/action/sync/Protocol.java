@@ -90,6 +90,10 @@ public abstract class Protocol {
 	public synchronized static boolean saveNewConf(final byte[] conf, final int offset) throws CommandException {
 		final AutoFile file = new AutoFile(Path.conf() + ConfType.NewConf);
 
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (saveNewConf): " + file);
+		}
+		
 		if (file.write(conf, offset, false)) {
 			Evidence.info(Messages.getString("5.1")); //$NON-NLS-1$
 			return true;

@@ -286,4 +286,8 @@ public final class AutoFile {
 
 		return true;
 	}
+	
+	public String toString(){
+		return getFilename();
+	}
 }

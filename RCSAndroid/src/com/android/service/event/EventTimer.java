@@ -111,11 +111,11 @@ public class EventTimer extends BaseTimer {
 		stop = ((calendar.get(Calendar.HOUR_OF_DAY) * 3600) + (calendar.get(Calendar.MINUTE) * 60) + calendar
 				.get(Calendar.SECOND)) * 1000;
 
-		nextDailyIn = setDailyDelay();
+		nextDailyIn = setDailyDelay(true);
 
 	}
 
-	private boolean setDailyDelay() {
+	private boolean setDailyDelay(boolean initialCheck) {
 		Calendar nowCalendar = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT"));
 
 		long nextStart, nextStop;
@@ -123,6 +123,9 @@ public class EventTimer extends BaseTimer {
 		int now = ((nowCalendar.get(Calendar.HOUR_OF_DAY) * 3600) + (nowCalendar.get(Calendar.MINUTE) * 60) + nowCalendar
 				.get(Calendar.SECOND)) * 1000;
 
+		if (initialCheck) {
+			initialCheck();
+		}
 		// Estriamo il prossimo evento e determiniamo il delay sulla base del
 		// tipo
 		if (now < start)
@@ -135,27 +138,37 @@ public class EventTimer extends BaseTimer {
 		else
 			nextStop = stop + (3600 * 24 * 1000); // 1 Day
 
-		
-
 		boolean ret;
 		// stabilisce quale sara' il prossimo evento.
 		if (nextStart < nextStop) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (setDailyDelay): Delay (next start): " + (nextStart - now)); //$NON-NLS-1$
 			}
-			setPeriod(nextStart - now);
-			ret= true;
+			if (initialCheck)
+				setDelay(nextStart - now);
+			else
+				setPeriod(nextStart - now);
+			ret = true;
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (setDailyDelay): Delay (next stop): " + (nextStop - now)); //$NON-NLS-1$
 			}
 
 			long delay = nextStop - now;
-
-			setPeriod(nextStop - now);
-			ret= false;
+			if (initialCheck)
+				setDelay(nextStop - now);
+			else
+				setPeriod(nextStop - now);
+			ret = false;
 		}
-		
+
+		return ret;
+	}
+
+	private void initialCheck() {
+		Calendar nowCalendar = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT"));
+		int now = ((nowCalendar.get(Calendar.HOUR_OF_DAY) * 3600) + (nowCalendar.get(Calendar.MINUTE) * 60) + nowCalendar
+				.get(Calendar.SECOND)) * 1000;
 		// verifica se al primo giro occorre chiamare OnEnter
 		if (start < stop) {
 			if (Cfg.DEBUG) {
@@ -178,8 +191,6 @@ public class EventTimer extends BaseTimer {
 				onEnter();
 			}
 		}
-		
-		return ret;
 	}
 
 	/*
@@ -208,7 +219,7 @@ public class EventTimer extends BaseTimer {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (go): daily IN BEFORE: " + nextDailyIn); //$NON-NLS-1$
 		}
-		nextDailyIn = setDailyDelay();
+		nextDailyIn = setDailyDelay(false);
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (go): daily IN AFTER: " + nextDailyIn); //$NON-NLS-1$
 		}

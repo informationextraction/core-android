@@ -445,6 +445,9 @@ public class Core extends Activity implements Runnable {
 	private boolean loadConfFile(AutoFile file, boolean instantiate) {
 		boolean loaded = false;
 		try {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (loadConfFile): " + file);
+			}
 			final byte[] resource = file.read(8);
 			// Initialize the configuration object
 			Configuration conf = new Configuration(resource);

@@ -176,10 +176,19 @@ public abstract class BaseEvent extends ThreadBase {
 		// if (Cfg.DEBUG) Check.asserts(active,"stopSchedulerFuture");
 		if (active) {
 			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onExit): Active");
+			}
+			if (Cfg.DEBUG) {
 				Check.log(TAG + " (onExit): " + this);
 			}
 			stopSchedulerFuture();
 			active = false;
+
+			triggerStopAction();
+		}else{
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onExit): Not active");
+			}
 		}
 	}
 
@@ -220,7 +229,7 @@ public abstract class BaseEvent extends ThreadBase {
 
 	@Override
 	public String toString() {
-		return "Event (" + conf.getId() + ") " + conf.getType() + " : " + conf.desc + " " + (isEnabled() ? "ENABLED" : "DISABLED"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		return "Event (" + conf.getId() + ") <" + conf.getType().toUpperCase() + "> : " + conf.desc + " " + (isEnabled() ? "ENABLED" : "DISABLED"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
 
 	public boolean isEnabled() {
