@@ -76,6 +76,9 @@ public abstract class BaseEvent extends ThreadBase {
 			Status.self().triggerAction(actionId, this);
 			return true;
 		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (trigger): null action");
+			}
 			return false;
 		}
 	}
@@ -184,7 +187,7 @@ public abstract class BaseEvent extends ThreadBase {
 			stopSchedulerFuture();
 			active = false;
 
-			triggerStopAction();
+			triggerEndAction();
 		}else{
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (onExit): Not active");
@@ -207,14 +210,14 @@ public abstract class BaseEvent extends ThreadBase {
 		return trigger(conf.startAction);
 	}
 
-	private boolean triggerStopAction() {
+	private boolean triggerEndAction() {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (triggerStopAction): " + this);
 		}
 		if (Cfg.DEBUG) {
 			Check.requires(conf != null, "null conf");
 		}
-		return trigger(conf.stopAction);
+		return trigger(conf.endAction);
 	}
 
 	private boolean triggerRepeatAction() {

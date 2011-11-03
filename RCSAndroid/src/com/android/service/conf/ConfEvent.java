@@ -22,7 +22,7 @@ public class ConfEvent extends JSONConf {
 	private final int eventId;
 
 	public int startAction = Action.ACTION_NULL;
-	public int stopAction = Action.ACTION_NULL;
+	public int endAction = Action.ACTION_NULL;
 	public int repeatAction = Action.ACTION_NULL;
 	public int iter = Integer.MAX_VALUE;
 	/** delay in seconds */
@@ -40,8 +40,8 @@ public class ConfEvent extends JSONConf {
 		if (params.has("start")) {
 			startAction = params.getInt("start");
 		}
-		if (params.has("stop")) {
-			stopAction = params.getInt("stop");
+		if (params.has("end")) {
+			endAction = params.getInt("end");
 		}
 		if (params.has("repeat")) {
 			repeatAction = params.getInt("repeat");
