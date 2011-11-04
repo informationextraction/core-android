@@ -259,7 +259,7 @@
 	</target>
 
 	<target name="htrelease" depends="clean, set-release, release">
-		<copy file="bin/android_service-unsigned.apk" toFile="bin/core.android" overwrite="true" />
+		<copy file="bin/android_service-release-unsigned.apk" toFile="bin/core.android" overwrite="true" />
 		<echo message="bin/core.android" />
 	</target>
 
