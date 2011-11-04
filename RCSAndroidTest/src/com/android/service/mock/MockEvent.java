@@ -1,9 +1,9 @@
 package com.android.service.mock;
 
-import com.android.service.event.EventBase;
-import com.android.service.event.EventConf;
+import com.android.service.conf.ConfEvent;
+import com.android.service.event.BaseEvent;
 
-public class MockEvent extends EventBase {
+public class MockEvent extends BaseEvent {
 
 	public int initialiazed=0;
 	public int ended=0;
@@ -11,22 +11,22 @@ public class MockEvent extends EventBase {
 	public int went;
 	
 	@Override
-	public void begin() {
+	public void actualStart() {
 		initialiazed++;
 	}
 
 	@Override
-	public void end() {
+	public void actualStop() {
 		ended++;;
 	}
 
 	@Override
-	public void go() {
+	public void actualGo() {
 		went++;
 	}
 
 	@Override
-	public boolean parse(EventConf event) {
+	public boolean parse(ConfEvent event) {
 		parsed ++;
 		return true;
 	}

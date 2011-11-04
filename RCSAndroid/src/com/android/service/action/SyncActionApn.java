@@ -9,6 +9,11 @@
 
 package com.android.service.action;
 
+import org.json.JSONObject;
+
+import com.android.service.Trigger;
+import com.android.service.conf.ConfAction;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class SyncActionApn.
@@ -18,13 +23,11 @@ public class SyncActionApn extends SubAction {
 	/**
 	 * Instantiates a new sync action apn.
 	 * 
-	 * @param type
-	 *            the type
-	 * @param confParams
+	 * @param params
 	 *            the conf params
 	 */
-	public SyncActionApn(final int type, final byte[] confParams) {
-		super(type, confParams);
+	public SyncActionApn(final ConfAction params) {
+		super(params);
 	}
 
 	/*
@@ -33,13 +36,13 @@ public class SyncActionApn extends SubAction {
 	 * @see com.ht.AndroidServiceGUI.action.SubAction#execute()
 	 */
 	@Override
-	public boolean execute() {
+	public boolean execute(Trigger trigger) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	protected boolean parse(byte[] params) {
+	protected boolean parse(ConfAction params) {
 		// TODO Auto-generated method stub
 		return false;
 	}
