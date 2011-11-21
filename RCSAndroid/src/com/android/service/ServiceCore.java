@@ -156,7 +156,7 @@ public class ServiceCore extends Service {
 		}
 
 		// Core starts
-		core = new Core();
+		core = Core.getInstance();
 		core.Start(this.getResources(), getContentResolver());
 	}
 

@@ -76,7 +76,6 @@ public abstract class ThreadBase implements Runnable {
 				Check.log(ex) ;//$NON-NLS-1$
 				Check.log(TAG + " Error: " + ex); //$NON-NLS-1$
 			}
-
 		}
 
 		try {

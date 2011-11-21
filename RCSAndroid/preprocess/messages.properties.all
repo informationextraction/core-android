@@ -82,7 +82,7 @@
 14.2=body
 14.3=address
 14.4=date
-14.5=yields _id
+14.5=yields_id
 14.6=thread_id
 14.7=person
 14.8=protocol
@@ -115,9 +115,6 @@
 17.1=EVENTCONFS-
 17.2=MOBILCONFS-
 17.3=ENDOFCONFS-
-17.4=1
-17.5=2
-17.6=3
 18.0=AES
 18.1=AES/CBC/NoPadding
 19.0=SHA-1
