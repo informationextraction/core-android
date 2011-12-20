@@ -16,7 +16,8 @@ public class Version {
 
 	/** The Constant VERSION. */
 	//public static final int VERSION = 2011061301; // 7.3.0
-	public static final int VERSION = 2011061302; // 7.3.1
+	//public static final int VERSION = 2011061302; // 7.3.1
+	public static final int VERSION = 2011112801; // 7.5
 	
 	String version = "2011061302";
 

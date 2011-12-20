@@ -71,3 +71,9 @@ none /dev/cpuctl cgroup rw,relatime,cpu 0 0
 /sys/kernel/debug /sys/kernel/debug debugfs rw,relatime 0 0
 $
 
+
+Samsung glaxy s2:
+mount -o remount,ro -t ext4 /dev/block/mmcblk0p9 /system
+GT-I9100_XXKI3_insecure
+
+
