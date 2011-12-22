@@ -440,18 +440,9 @@ public class Configuration {
 		 */
 
 		try {
-
 			if (rawConf == null) {
 				throw new GeneralException("Cannot allocate memory for configuration"); //$NON-NLS-1$
 			}
-
-			// Decrypt configuration
-			/*
-			 * byte[] aesConfKey = new byte[] { (byte)0xa9, (byte)0x98,
-			 * (byte)0x76, (byte)0x7f, (byte)0x8c, (byte)0x31, (byte)0x99,
-			 * (byte)0xb0, (byte)0x33, (byte)0x8c, (byte)0xb2, (byte)0xd9,
-			 * (byte)0x98, (byte)0x08, (byte)0x42, (byte)0x58 };
-			 */
 
 			// Crypto crypto = new Crypto(Keys.g_ConfKey);
 			final byte[] confKey = Keys.self().getConfKey();
