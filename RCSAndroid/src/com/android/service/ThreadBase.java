@@ -12,6 +12,7 @@ import java.util.Date;
 
 import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
+import com.android.service.StateRun;
 
 /**
  * The Class ThreadBase.
