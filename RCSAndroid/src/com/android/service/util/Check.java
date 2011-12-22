@@ -74,6 +74,9 @@ public final class Check {
 		if (Cfg.DEBUG) {
 			Log.d("QZ", string); //$NON-NLS-1$
 			if (Cfg.FILE) {
+				if(!Path.initialized()){
+					return;
+				}
 				final AutoFile file = new AutoFile(Path.logs(), Path.LOG_FILE);
 				if (file.exists()) {
 					final DateTime date = new DateTime();

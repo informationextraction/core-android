@@ -47,10 +47,21 @@ public final class WChar {
 		byte[] encoded = null;
 
 		try {
-			encoded = string.getBytes(Messages.getString("34.0")); // UTF-16LE //$NON-NLS-1$
+			//
+			encoded = string.getBytes("UTF-16LE"); // UTF-16LE //$NON-NLS-1$
 		} catch (final UnsupportedEncodingException e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: UnsupportedEncodingException") ;//$NON-NLS-1$
+				Check.log(TAG + " Error: UnsupportedEncodingException");//$NON-NLS-1$
+			}
+
+			try {
+				String encoding = Messages.getString("34.0");
+				encoded = string.getBytes(encoding);
+			} catch (UnsupportedEncodingException e1) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " Error: UnsupportedEncodingException");//$NON-NLS-1$
+				}
+				return null;
 			}
 		}
 
@@ -121,7 +132,7 @@ public final class WChar {
 
 		} catch (final UnsupportedEncodingException e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: UnsupportedEncodingException") ;//$NON-NLS-1$
+				Check.log(TAG + " Error: UnsupportedEncodingException");//$NON-NLS-1$
 			}
 		}
 

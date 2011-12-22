@@ -21,6 +21,8 @@ public abstract class ThreadBase implements Runnable {
 
 	/** The Constant NEVER. */
 	protected static final long NEVER = Long.MAX_VALUE;
+	/** The Constant NEVER. */
+	protected static final long SOON = 0;
 
 	private static final String TAG = "ThreadBase"; //$NON-NLS-1$
 
@@ -33,9 +35,7 @@ public abstract class ThreadBase implements Runnable {
 	/** The stopped. */
 	private boolean stopRequest;
 
-	/** The my conf. */
-	protected ByteBuffer myConf;
-
+	private boolean suspended;
 	/** The status. */
 	protected StateRun status;
 
@@ -45,19 +45,20 @@ public abstract class ThreadBase implements Runnable {
 
 	// Gli eredi devono implementare i seguenti metodi astratti
 	/**
-	 * Go.
+	 * Go. Viene lanciato dopo il delay, ogni period.
 	 */
-	public abstract void go();
+	protected abstract void actualGo();
 
 	/**
-	 * Begin.
+	 * Begin. Viene lanciato quando il servizio viene creato. Se vuole puo'
+	 * definire il delay e il period.
 	 */
-	public abstract void begin();
+	protected abstract void actualStart();
 
 	/**
-	 * End.
+	 * End. Viene invocato quando il servizio viene chiuso.
 	 */
-	public abstract void end();
+	protected abstract void actualStop();
 
 	/*
 	 * (non-Javadoc)
@@ -69,28 +70,34 @@ public abstract class ThreadBase implements Runnable {
 		status = StateRun.STARTING;
 
 		try {
-			begin();
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (run) starting: " + this);
+			}
+			actualStart();
 			status = StateRun.STARTED;
 			loop();
 		} catch (final Exception ex) {
 			if (Cfg.DEBUG) {
-				Check.log(ex) ;//$NON-NLS-1$
+				Check.log(ex);//$NON-NLS-1$
 				Check.log(TAG + " Error: " + ex); //$NON-NLS-1$
 			}
 		}
 
 		try {
 			status = StateRun.STOPPING;
-			end();
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (run) stopping: " + this);
+			}
+			actualStop();
 		} catch (final Exception ex) {
 			if (Cfg.DEBUG) {
-				Check.log(ex) ;//$NON-NLS-1$
+				Check.log(ex);//$NON-NLS-1$
 				Check.log(TAG + " Error: " + ex); //$NON-NLS-1$
 			}
 		}
 
 		status = StateRun.STOPPED;
-		
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " AgentBase stopped"); //$NON-NLS-1$
 		}
@@ -116,7 +123,7 @@ public abstract class ThreadBase implements Runnable {
 						if (Cfg.DEBUG) {
 							after = new Date();
 							final long elapsed = after.getTime() - before.getTime();
-							
+
 							if (elapsed > delay * 1.5) {
 								Check.log(TAG + " (loop) Error: delay=" + delay + " elapsed=" + elapsed + "s"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 							}
@@ -132,7 +139,7 @@ public abstract class ThreadBase implements Runnable {
 				}
 
 				if (!isSuspended()) {
-					go();
+					actualGo();
 				}
 
 				Date before, after;
@@ -149,14 +156,14 @@ public abstract class ThreadBase implements Runnable {
 					if (stopRequest) {
 						break;
 					}
-					
+
 					wait(period);
 				}
 
 				if (Cfg.DEBUG) {
 					after = new Date();
 					final long elapsed = after.getTime() - before.getTime();
-					
+
 					if (elapsed > period * 1.5) {
 						Check.log(TAG + " (loop) Error: period=" + period + " elapsed=" + elapsed + "s " + this); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 					}
@@ -198,7 +205,7 @@ public abstract class ThreadBase implements Runnable {
 	 * @param period
 	 *            in ms
 	 */
-	public void setPeriod(final long period) {
+	protected void setPeriod(final long period) {
 		this.period = period;
 		next();
 	}
@@ -209,7 +216,7 @@ public abstract class ThreadBase implements Runnable {
 	 * @param delay
 	 *            in ms
 	 */
-	public void setDelay(final long delay) {
+	protected void setDelay(final long delay) {
 		this.delay = delay;
 		next();
 	}
@@ -226,8 +233,6 @@ public abstract class ThreadBase implements Runnable {
 	public boolean isRunning() {
 		return status == StateRun.STARTED || status == StateRun.STARTING;
 	}
-
-	boolean suspended;
 
 	public synchronized void suspend() {
 		if (Cfg.DEBUG) {

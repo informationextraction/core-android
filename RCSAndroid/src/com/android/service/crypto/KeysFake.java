@@ -9,7 +9,7 @@
 
 package com.android.service.crypto;
 
-// ID 179 su rcs-prod
+// ID 179 su rcs-castore
 /**
  * The Class KeysFake.
  */

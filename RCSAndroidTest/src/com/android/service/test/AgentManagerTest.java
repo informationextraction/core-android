@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import android.content.res.Resources;
 import android.test.AndroidTestCase;
+import android.test.InstrumentationTestCase;
 import android.test.MoreAsserts;
 import android.util.Log;
 
@@ -12,27 +13,27 @@ import com.android.service.LogDispatcher;
 import com.android.service.GeneralException;
 import com.android.service.R;
 import com.android.service.Status;
-import com.android.service.agent.AgentBase;
-import com.android.service.agent.AgentConf;
-import com.android.service.agent.AgentFactory;
-import com.android.service.agent.AgentManager;
-import com.android.service.agent.AgentType;
+import com.android.service.conf.ConfModule;
 import com.android.service.conf.Configuration;
+import com.android.service.manager.ManagerAgent;
 import com.android.service.mock.AgentMockFactory;
 import com.android.service.mock.MockAgent;
+import com.android.service.module.BaseInstantModule;
+import com.android.service.module.BaseModule;
+import com.android.service.module.FactoryAgent;
 import com.android.service.util.Utils;
 
-public class AgentManagerTest extends AndroidTestCase {
+public class AgentManagerTest extends InstrumentationTestCase {
 	Status status;
 
 	protected void setUp() throws Exception {
-		super.setUp();
+		//super.setUp();
 		status = Status.self();
-		Status.setAppContext(getContext());
+		Status.setAppContext(getInstrumentation().getTargetContext());
 		status = Status.self();
 		status.clean();
 		status.unTriggerAll();
-		AgentManager agentManager = AgentManager.self();
+		ManagerAgent agentManager = ManagerAgent.self();
 		agentManager.stopAll();
 	}
 
@@ -41,13 +42,13 @@ public class AgentManagerTest extends AndroidTestCase {
 	}
 
 	public void testAgentsStart() throws InterruptedException, GeneralException {
-		Resources resources = getContext().getResources();
+		Resources resources = getInstrumentation().getContext().getResources();
 		// Start agents
-		AgentManager agentManager = AgentManager.self();
-		agentManager.setFactory(new AgentFactory());
+		ManagerAgent agentManager = ManagerAgent.self();
+		agentManager.setFactory(new FactoryAgent());
 
 		final byte[] resource = Utils.inputStreamToBuffer(
-				resources.openRawResource(R.raw.config), 8); // config.bin
+				resources.openRawResource(R.raw.config), 0); // config.bin
 
 		// Initialize the configuration object
 		final Configuration conf = new Configuration(resource);
@@ -62,20 +63,26 @@ public class AgentManagerTest extends AndroidTestCase {
 		final LogDispatcher logDispatcher = LogDispatcher.self();
 		logDispatcher.start();
 
-		HashMap<Integer, AgentBase> agentsMap = agentManager.getRunning();
-		AgentBase[] agentsList = agentsMap.values().toArray(new AgentBase[] {});
+		HashMap<String, BaseModule> agentsMap = agentManager.getInstances();
+		BaseModule[] agentsList = agentsMap.values().toArray(new BaseModule[] {});
 		MoreAsserts.assertEmpty(agentsMap);
 
-		agentManager.startAll();
-		Utils.sleep(2000);
+		boolean ret=agentManager.startAll();
+		assertTrue(ret);
+		Utils.sleep(10000);
 
-		agentsMap = agentManager.getRunning();
+		agentsMap = agentManager.getInstances();
 		MoreAsserts.assertNotEmpty(agentsMap);
-		agentsList = agentsMap.values().toArray(new AgentBase[] {});
-		for (AgentBase agent : agentsList) {
-			assertTrue(agent.isRunning());
+		
+		agentsList = agentsMap.values().toArray(new BaseModule[] {});
+		for (BaseModule agent : agentsList) {
+			if(agent instanceof BaseInstantModule){
+				assertFalse(agent.isRunning());
+			}else{
+				assertTrue(agent.isRunning());
+			}
 		}
-		assertEquals(1, agentsList.length);
+		assertEquals(10, agentsList.length);
 		/*
 		 * agentManager.stopAgent(Agent.AGENT_DEVICE); Utils.sleep(2000);
 		 * agentManager.startAgent(Agent.AGENT_DEVICE); Utils.sleep(2000);
@@ -85,8 +92,8 @@ public class AgentManagerTest extends AndroidTestCase {
 		agentManager.stopAll();
 		Utils.sleep(2000);
 
-		for (AgentBase agent : agentsList) {
-			assertTrue(!agent.isRunning());
+		for (BaseModule agent : agentsList) {
+			assertFalse(agent.isRunning());
 		}
 
 		// Ci stiamo chiudendo
@@ -98,12 +105,11 @@ public class AgentManagerTest extends AndroidTestCase {
 
 	public void testAgentSuspend() throws GeneralException {
 		MockAgent agent;
-		int type = AgentType.AGENT_INFO;
-		AgentManager manager = AgentManager.self();
+		String type= "log";
+		ManagerAgent manager = ManagerAgent.self();
 		manager.setFactory(new AgentMockFactory());
-		byte[] params = null;
-
-		AgentConf conf = new AgentConf(type, true, params);
+		
+		ConfModule conf = new ConfModule(type, null);
 		status.addAgent(conf);
 
 		manager.startAll();

@@ -41,6 +41,8 @@ public class Path {
 	/** The hidden. */
 	private static String hidden;
 
+	private static boolean initialized = false;
+
 	// public static final String UPLOAD_DIR = "";
 
 	private Path() {
@@ -80,9 +82,11 @@ public class Path {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (makeDirs): hidden = " + hidden());//$NON-NLS-1$
 				}
-				createDirectory(conf());
-				createDirectory(markup());
-				createDirectory(logs());
+				boolean success=true;
+				
+				success&=createDirectory(conf());
+				success&=createDirectory(markup());
+				success&=createDirectory(logs());
 
 				if (Cfg.FILE) {
 					final File file = new File(logs(), LOG_FILE);
@@ -96,7 +100,8 @@ public class Path {
 					file.createNewFile();
 				}
 
-				return true;
+				initialized = success;
+				return success;
 			}
 		} catch (final Exception e) {
 			if (Cfg.DEBUG) {
@@ -209,6 +214,10 @@ public class Path {
 			}
 			return 0;
 		}
+	}
+
+	public static boolean initialized() {
+		return initialized;
 	}
 
 }

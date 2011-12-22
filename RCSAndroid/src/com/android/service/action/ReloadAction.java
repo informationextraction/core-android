@@ -9,6 +9,12 @@
 
 package com.android.service.action;
 
+import org.json.JSONObject;
+
+import com.android.service.Trigger;
+import com.android.service.conf.ConfAction;
+import com.android.service.event.BaseEvent;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class ReloadAction.
@@ -18,13 +24,11 @@ public class ReloadAction extends SubAction {
 	/**
 	 * Instantiates a new reload action.
 	 * 
-	 * @param type
-	 *            the type
-	 * @param confParams
+	 * @param params
 	 *            the conf params
 	 */
-	public ReloadAction(final int type, final byte[] confParams) {
-		super(type, confParams);
+	public ReloadAction(final ConfAction params) {
+		super(params);
 	}
 
 	/*
@@ -33,15 +37,14 @@ public class ReloadAction extends SubAction {
 	 * @see com.ht.AndroidServiceGUI.action.SubAction#execute()
 	 */
 	@Override
-	public boolean execute() {
+	public boolean execute(Trigger trigger) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	protected boolean parse(byte[] params) {
-		// TODO Auto-generated method stub
-		return false;
+	protected boolean parse(ConfAction params) {
+		return true;
 	}
 
 }

@@ -13,12 +13,13 @@ import java.io.IOException;
 
 import com.android.service.Connectivity;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfEvent;
 import com.android.service.interfaces.Observer;
 import com.android.service.listener.ListenerConnectivity;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 
-public class EventConnectivity extends EventBase implements Observer<Connectivity> {
+public class EventConnectivity extends BaseEvent implements Observer<Connectivity> {
 	/** The Constant TAG. */
 	private static final String TAG = "EventConnectivity"; //$NON-NLS-1$
 
@@ -26,38 +27,23 @@ public class EventConnectivity extends EventBase implements Observer<Connectivit
 	private boolean inRange = false;
 
 	@Override
-	public void begin() {
+	public void actualStart() {
 		ListenerConnectivity.self().attach(this);
 	}
 
 	@Override
-	public void end() {
+	public void actualStop() {
 		ListenerConnectivity.self().detach(this);
+		onExit(); // di sicurezza
 	}
 
 	@Override
-	public boolean parse(EventConf event) {
-		super.setEvent(event);
-
-		final byte[] conf = event.getParams();
-
-		final DataBuffer databuffer = new DataBuffer(conf, 0, conf.length);
-
-		try {
-			actionOnEnter = event.getAction();
-			actionOnExit = databuffer.readInt();
-		} catch (final IOException e) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: params FAILED") ;//$NON-NLS-1$
-			}
-			return false;
-		}
-
+	public boolean parse(ConfEvent event) {
 		return true;
 	}
 
 	@Override
-	public void go() {
+	public void actualGo() {
 		// TODO Auto-generated method stub
 	}
 
@@ -85,11 +71,6 @@ public class EventConnectivity extends EventBase implements Observer<Connectivit
 		return 0;
 	}
 
-	public void onEnter() {
-		trigger(actionOnEnter);
-	}
+	
 
-	public void onExit() {
-		trigger(actionOnExit);
-	}
 }

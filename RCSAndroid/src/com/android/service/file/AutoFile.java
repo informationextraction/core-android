@@ -72,6 +72,11 @@ public final class AutoFile {
 	public byte[] read(final int offset) {
 		final int length = (int) file.length() - offset;
 		InputStream in = null;
+		if (Cfg.DEBUG) { Check.asserts(file!=null, " (read) Assert failed, null file"); }
+		
+		if(length==0){
+			return null;
+		}
 		try {
 			in = new BufferedInputStream(new FileInputStream(file), length);
 			final byte[] buffer = new byte[length];
@@ -247,7 +252,7 @@ public final class AutoFile {
 	public void create() {
 		write(new byte[0]);
 		if (Cfg.DEBUG) {
-			Check.ensures(file.exists(), "Non existing files"); //$NON-NLS-1$
+			Check.ensures(file.exists(), "Non existing file"); //$NON-NLS-1$
 		}
 	}
 
@@ -280,5 +285,9 @@ public final class AutoFile {
 		}
 
 		return true;
+	}
+	
+	public String toString(){
+		return getFilename();
 	}
 }

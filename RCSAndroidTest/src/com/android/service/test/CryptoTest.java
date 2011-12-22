@@ -2,9 +2,11 @@ package com.android.service.test;
 
 import java.util.Arrays;
 
+import android.test.AndroidTestCase;
 import android.util.Log;
 
 import com.android.service.Debug;
+import com.android.service.Status;
 import com.android.service.crypto.Crypto;
 import com.android.service.crypto.CryptoException;
 import com.android.service.crypto.Encryption;
@@ -14,12 +16,13 @@ import com.android.service.util.Utils;
 
 import junit.framework.TestCase;
 
-public class CryptoTest extends TestCase {
+public class CryptoTest extends AndroidTestCase {
 	private static final String TAG = "CryptoTest";
 
 	protected void setUp() throws Exception {
 		//Debug.disable();
 		super.setUp();
+		Status.setAppContext(getContext());
 	}
 
 	protected void tearDown() throws Exception {

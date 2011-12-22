@@ -13,6 +13,7 @@ import android.test.suitebuilder.annotation.SmallTest;
 
 
 import com.android.service.ServiceCore;
+import com.android.service.Status;
 import com.android.service.mock.RCSMockApplication;
 import com.android.service.mock.RCSMockContext;
 
@@ -29,6 +30,7 @@ public class AndroidServiceTest extends ServiceTestCase<ServiceCore> {
 	
 	public AndroidServiceTest(Class<ServiceCore> serviceClass) {
 		super(serviceClass);
+		Status.setAppContext(getContext());
 	}
 
 	/* (non-Javadoc)

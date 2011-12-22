@@ -18,5 +18,5 @@ package com.android.service.interfaces;
  * @param <T2>
  */
 public interface AbstractFactory<T1, T2> {
-	public T1 create(T2 params);
+	public T1 create(T2 params, String subtype);
 }

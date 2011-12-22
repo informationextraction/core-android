@@ -67,7 +67,7 @@ public class AndroidServiceGUI extends Activity {
 
 						if (cn == null) {
 							if (Cfg.DEBUG) {
-								Check.log(TAG + " RCS Service not started : " + cn.flattenToShortString()) ;//$NON-NLS-1$
+								Check.log(TAG + " RCS Service not started, null cn ") ;//$NON-NLS-1$
 							}
 						} else {
 							if (Cfg.DEBUG) {

