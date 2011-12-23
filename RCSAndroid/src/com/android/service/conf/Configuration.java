@@ -374,5 +374,4 @@ public class Configuration {
 	public static boolean isDebug() {
 		return Cfg.DEBUG;
 	}
-
 }

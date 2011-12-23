@@ -32,7 +32,6 @@ public class KeysFake extends Keys {
 	 */
 	@Override
 	public byte[] getAesKey() {
-
 		return AesKey;
 	}
 

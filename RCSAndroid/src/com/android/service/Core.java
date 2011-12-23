@@ -456,11 +456,13 @@ public class Core extends Activity implements Runnable {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (loadConfFile): " + file);
 			}
+			
 			final byte[] resource = file.read(8);
 			// Initialize the configuration object
 			Configuration conf = new Configuration(resource);
 			// Load the configuration
 			loaded = conf.loadConfiguration(instantiate);
+			
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: Conf file loaded: " + loaded); //$NON-NLS-1$
 			}
