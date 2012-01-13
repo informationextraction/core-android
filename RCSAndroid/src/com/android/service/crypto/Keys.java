@@ -40,8 +40,16 @@ public class Keys {
 				if (singleton == null) {
 					if (Cfg.KEYS) {
 						singleton = new KeysFake();
+						
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " Using hardcoded keys");
+						}
 					} else {
 						singleton = new Keys(true);
+						
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " Using binary patched keys");
+						}
 					}
 				}
 			}
@@ -81,9 +89,7 @@ public class Keys {
 				Check.log(TAG + " confKey: " + Utils.byteArrayToHex(confKey)) ;//$NON-NLS-1$
 				Check.log(TAG + " challengeKey: " + Utils.byteArrayToHex(challengeKey)) ;//$NON-NLS-1$
 			}
-
 		}
-
 	}
 
 	// Subversion

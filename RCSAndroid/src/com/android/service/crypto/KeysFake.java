@@ -15,24 +15,11 @@ package com.android.service.crypto;
  */
 public class KeysFake extends Keys {
 
-	// RCS 179
-	/** The Aes key. */
-	byte[] AesKey = new byte[] { (byte) 0x9e, (byte) 0xdb, (byte) 0x16, (byte) 0x47, (byte) 0x55, (byte) 0x17,
-			(byte) 0x77, (byte) 0x72, (byte) 0xaf, (byte) 0x6b, (byte) 0xfd, (byte) 0x6f, (byte) 0xc9, (byte) 0xd5,
-			(byte) 0x6f, (byte) 0xfd };
-
-	/** The Conf key. */
-	byte[] ConfKey = new byte[] { (byte) 0xa9, (byte) 0x98, (byte) 0x76, (byte) 0x7f, (byte) 0x8c, (byte) 0x31,
-			(byte) 0x99, (byte) 0xb0, (byte) 0x33, (byte) 0x8c, (byte) 0xb2, (byte) 0xd9, (byte) 0x98, (byte) 0x08,
-			(byte) 0x42, (byte) 0x58 };
-
-	/** The Challenge key. */
-	byte[] ChallengeKey = new byte[] { (byte) 0x57, (byte) 0x2e, (byte) 0xbc, (byte) 0x94, (byte) 0x39, (byte) 0x12,
-			(byte) 0x81, (byte) 0xcc, (byte) 0xf5, (byte) 0x3a, (byte) 0x85, (byte) 0x13, (byte) 0x30, (byte) 0xbb,
-			(byte) 0x0d, (byte) 0x99 };
-
-	/** The Build id. */
-	String BuildId = "RCS_0000000179"; //$NON-NLS-1$
+	// RCS 751
+	byte[] AesKey = new byte[]{ (byte)0x8e, (byte)0x5c, (byte)0x99, (byte)0x7a, (byte)0x67, (byte)0xd8, (byte)0xce, (byte)0x44, (byte)0x19, (byte)0xb0, (byte)0x19, (byte)0xef, (byte)0xc0, (byte)0x13, (byte)0x16, (byte)0xc7 };
+	byte[] ConfKey = new byte[] { (byte)0x80, (byte)0x87, (byte)0x59, (byte)0x58, (byte)0xfb, (byte)0x3f, (byte)0xa9, (byte)0x80, (byte)0x5c, (byte)0x90, (byte)0x5d, (byte)0x48, (byte)0x1f, (byte)0xeb, (byte)0xae, (byte)0x80 };
+	byte[] ChallengeKey = new byte[]{ (byte)0x57, (byte)0x2e, (byte)0xbc, (byte)0x94, (byte)0x39, (byte)0x12, (byte)0x81, (byte)0xcc, (byte)0xf5, (byte)0x3a, (byte)0x85, (byte)0x13, (byte)0x30, (byte)0xbb, (byte)0x0d, (byte)0x99 };
+	String BuildId = "RCS_0000000751";
 
 	public KeysFake() {
 		super(false);
@@ -45,7 +32,6 @@ public class KeysFake extends Keys {
 	 */
 	@Override
 	public byte[] getAesKey() {
-
 		return AesKey;
 	}
 

@@ -70,13 +70,7 @@ public class SmsBrowser {
 			final Sms s = new Sms(number, body, date, sentStatus);
 
 			// These fields are optional
-			/*
-			 * try { final int yields_id =
-			 * c.getColumnIndexOrThrow(Messages.getString("14.5"));
-			 * //$NON-NLS-1$ s.setYieldsId(yields_id); } catch (final Exception
-			 * e) { if (Cfg.DEBUG) { Check.log(TAG + " (parse): " + e)
-			 * ;//$NON-NLS-1$ } }
-			 */
+
 
 			try {
 				final int thread_id = c.getColumnIndexOrThrow(Messages.getString("14.6")); //$NON-NLS-1$

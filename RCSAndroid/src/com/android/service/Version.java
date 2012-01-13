@@ -16,11 +16,10 @@ public class Version {
 
 	/** The Constant VERSION. */
 	//public static final int VERSION = 2011061301; // 7.3.0
-	// public static final int VERSION = 2011061302; // 7.3.1
-	
-	public static final int VERSION = 2011111101; //7.5.0beta
-	
-	//String version = "2011061302";
+	//public static final int VERSION = 2011061302; // 7.3.1
+	//public static final int VERSION = 2011112801; // 7.5
+	//public static final int VERSION = 2011111101; //7.5.0beta
+	public static final int VERSION = 2012010101; //7.6.0beta
 
 	/**
 	 * Instantiates a new version.

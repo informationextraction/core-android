@@ -25,7 +25,6 @@ import com.android.service.util.Check;
 import com.android.service.util.Utils;
 
 import android.test.AndroidTestCase;
-import android.util.Log;
 
 public class EventManagerTest extends AndroidTestCase {
 	Status status;
