@@ -13,7 +13,7 @@ import com.android.service.Sim;
 
 public class ListenerSim extends Listener<Sim> {
 	/** The Constant TAG. */
-	private static final String TAG = "ListenerSim";
+	private static final String TAG = "ListenerSim"; //$NON-NLS-1$
 
 	private BroadcastMonitorSim simReceiver;
 

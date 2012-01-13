@@ -19,17 +19,30 @@ import com.android.service.util.Check;
 
 public class BroadcastMonitorAc extends BroadcastReceiver {
 	/** The Constant TAG. */
-	private static final String TAG = "BroadcastMonitorAc";
+	private static final String TAG = "BroadcastMonitorAc"; //$NON-NLS-1$
 
-	/* (non-Javadoc)
-	 * @see android.content.BroadcastReceiver#onReceive(android.content.Context, android.content.Intent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.content.BroadcastReceiver#onReceive(android.content.Context,
+	 * android.content.Intent)
 	 */
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		if(Cfg.DEBUG) Check.log( TAG + " power notification, action: " + intent.getAction());
+		if (intent == null) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onReceive): Intent null"); //$NON-NLS-1$
+			}
+			
+			return;
+		}
 		
-		boolean plugged = intent.getAction().equals(Intent.ACTION_POWER_CONNECTED);
-		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " power notification, action: " + intent.getAction()) ;//$NON-NLS-1$
+		}
+
+		final boolean plugged = intent.getAction().equals(Intent.ACTION_POWER_CONNECTED);
+
 		ListenerAc.self().dispatch(new Ac(plugged));
 	}
 }

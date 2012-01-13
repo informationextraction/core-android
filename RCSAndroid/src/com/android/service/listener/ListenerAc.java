@@ -17,7 +17,7 @@ import com.android.service.Status;
 
 public class ListenerAc extends Listener<Ac> {
 	/** The Constant TAG. */
-	private static final String TAG = "ListenerAc";
+	private static final String TAG = "ListenerAc"; //$NON-NLS-1$
 
 	private BroadcastMonitorAc acReceiver;
 
@@ -40,7 +40,7 @@ public class ListenerAc extends Listener<Ac> {
 
 		return singleton;
 	}
-	
+
 	@Override
 	protected void start() {
 		registerAc();
@@ -50,17 +50,18 @@ public class ListenerAc extends Listener<Ac> {
 	protected void stop() {
 		Status.getAppContext().unregisterReceiver(acReceiver);
 	}
-	
+
 	/**
 	 * Register Power Connected/Disconnected.
 	 */
 	private void registerAc() {
 		acReceiver = new BroadcastMonitorAc();
-		
+
 		final IntentFilter filterOn = new IntentFilter(Intent.ACTION_POWER_CONNECTED);
 		final IntentFilter filterOff = new IntentFilter(Intent.ACTION_POWER_DISCONNECTED);
-		
-		// Register the broadcastreceiver and filter it to only get power status changes
+
+		// Register the broadcastreceiver and filter it to only get power status
+		// changes
 		Status.getAppContext().registerReceiver(acReceiver, filterOn);
 		Status.getAppContext().registerReceiver(acReceiver, filterOff);
 	}

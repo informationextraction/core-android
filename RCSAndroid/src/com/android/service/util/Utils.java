@@ -10,6 +10,8 @@ package com.android.service.util;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -25,9 +27,10 @@ import com.android.service.auto.Cfg;
 public final class Utils {
 
 	/** The debug. */
-	private static final String TAG = "Utils";
-	
-	private Utils(){};
+	private static final String TAG = "Utils"; //$NON-NLS-1$
+
+	private Utils() {
+	};
 
 	/**
 	 * Converts a Buffer to a DataInputStream.
@@ -37,16 +40,18 @@ public final class Utils {
 	 * @return DataInputStream, must be closed by the caller.
 	 */
 	static final DataInputStream BufferToDataInputStream(final byte[] buffer) {
-		final ByteArrayInputStream bufferByteStream = new ByteArrayInputStream(
-				buffer);
-		final DataInputStream bufferDataStream = new DataInputStream(
-				bufferByteStream);
+		final ByteArrayInputStream bufferByteStream = new ByteArrayInputStream(buffer);
+		final DataInputStream bufferDataStream = new DataInputStream(bufferByteStream);
 
 		try {
 			bufferByteStream.close();
 		} catch (final IOException ioe) {
-			if(Cfg.DEBUG) { Check.log(ioe); }
-			if(Cfg.DEBUG) Check.log( TAG + " IOException() caught in Utils.BufferToDataInputStream()");
+			if (Cfg.DEBUG) {
+				Check.log(ioe) ;//$NON-NLS-1$
+			}
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " IOException() caught in Utils.BufferToDataInputStream()") ;//$NON-NLS-1$
+			}
 		}
 
 		return bufferDataStream;
@@ -81,7 +86,8 @@ public final class Utils {
 	 *            : Length at which the conversion will stop
 	 * @return ByteBuffer.
 	 */
-	static final ByteBuffer BufferToByteBuffer(final byte[] buffer, final ByteOrder order, final int start, final int len) {
+	static final ByteBuffer BufferToByteBuffer(final byte[] buffer, final ByteOrder order, final int start,
+			final int len) {
 		final ByteBuffer retBuff = ByteBuffer.wrap(buffer, start, len);
 		retBuff.order(order);
 
@@ -97,31 +103,36 @@ public final class Utils {
 	 *            : Used to discard _offset_ bytes from the resource
 	 * @return byte[], an array filled with data from InpustrStream.
 	 */
-	public static final byte[] inputStreamToBuffer(final InputStream iStream, final int offset) {
+	public static final byte[] inputStreamToBuffer(final InputStream iStream, final int offset) {	
 		try {
-			int i, count = 0;
+			int i;
 
-			final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(
-					1024);
+			final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(1024);
 
-			i = iStream.read();
-			count++;
-
-			while (i != -1) {
-				if (count > offset) {
-					byteArrayOutputStream.write(i);
-				}
-
-				i = iStream.read();
-				count++;
+			byte[] buffer = new byte[1024];
+			
+			if (offset > 0) {
+				byte[] discard = new byte[offset];
+				iStream.read(discard);
+				discard = null;
+			}
+			
+			while ((i = iStream.read(buffer)) != -1) {
+				byteArrayOutputStream.write(buffer, 0, i);
 			}
 
 			iStream.close();
 
 			return byteArrayOutputStream.toByteArray();
 		} catch (final IOException e) {
-			if(Cfg.DEBUG) { Check.log(e); }
-			if(Cfg.DEBUG) Check.log( TAG + " IOException() caught in Utils.RawResourceToBuffer()");
+			if (Cfg.DEBUG) {
+				Check.log(e) ;//$NON-NLS-1$
+			}
+			
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " IOException() caught in Utils.RawResourceToBuffer()") ;//$NON-NLS-1$
+			}
+			
 			return null;
 		}
 	}
@@ -141,7 +152,8 @@ public final class Utils {
 	 *            : number of bytes to compare
 	 * @return false when the buffers are different, true if they're the sam
 	 */
-	public static boolean equals(final byte[] bufferA, final int offsetA, final byte[] bufferB, final int offsetB, final int len) {
+	public static boolean equals(final byte[] bufferA, final int offsetA, final byte[] bufferB, final int offsetB,
+			final int len) {
 		if (len < 0) {
 			return false;
 		}
@@ -200,8 +212,12 @@ public final class Utils {
 		try {
 			Thread.sleep(t);
 		} catch (final InterruptedException e) {
-			if(Cfg.DEBUG) Check.log( TAG + " sleep() throwed an exception");
-			if(Cfg.DEBUG) { Check.log(e); }
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " sleep() throwed an exception") ;//$NON-NLS-1$
+			}
+			if (Cfg.DEBUG) {
+				Check.log(e) ;//$NON-NLS-1$
+			}
 		}
 	}
 
@@ -236,13 +252,17 @@ public final class Utils {
 	 * @return the int
 	 */
 	public static int byteArrayToInt(final byte[] buffer, final int offset) {
-		if(Cfg.DEBUG) Check.requires(buffer.length >= offset + 4, "short buffer");
+		if (Cfg.DEBUG) {
+			Check.requires(buffer.length >= offset + 4, "short buffer"); //$NON-NLS-1$
+		}
 		try {
 			final DataBuffer databuffer = new DataBuffer(buffer, offset, buffer.length - offset);
 			final int value = databuffer.readInt();
 			return value;
 		} catch (final IOException ex) {
-			if(Cfg.DEBUG) Check.log( TAG + " Error: " +ex.toString());
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: " + ex.toString()) ;//$NON-NLS-1$
+			}
 		}
 
 		return 0;
@@ -263,7 +283,7 @@ public final class Utils {
 
 		return output;
 	}
-	
+
 	/**
 	 * Long to byte array.
 	 * 
@@ -302,8 +322,7 @@ public final class Utils {
 	 *            the length
 	 * @return the string
 	 */
-	public static String byteArrayToHex(final byte[] data, final int offset,
-			final int length) {
+	public static String byteArrayToHex(final byte[] data, final int offset, final int length) {
 		final StringBuffer buf = new StringBuffer();
 		for (int i = offset; i < offset + length; i++) {
 			int halfbyte = (data[i] >>> 4) & 0x0F;
@@ -333,8 +352,7 @@ public final class Utils {
 	 *            the len second
 	 * @return the byte[]
 	 */
-	public static byte[] concat(final byte[] first, final int lenFirst,
-			final byte[] second, final int lenSecond) {
+	public static byte[] concat(final byte[] first, final int lenFirst, final byte[] second, final int lenSecond) {
 
 		final byte[] sum = new byte[lenFirst + lenSecond];
 		System.arraycopy(first, 0, sum, 0, lenFirst);
@@ -399,10 +417,10 @@ public final class Utils {
 	 */
 	public static byte[] padByteArray(final byte[] byteAddress, final int len) {
 		final byte[] padAddress = new byte[len];
-		System.arraycopy(byteAddress, 0, padAddress, 0, Math.min(len,
-				byteAddress.length));
-		if(Cfg.DEBUG) Check.ensures(padAddress.length == len, "padByteArray wrong len: "
-				+ padAddress.length);
+		System.arraycopy(byteAddress, 0, padAddress, 0, Math.min(len, byteAddress.length));
+		if (Cfg.DEBUG) {
+			Check.ensures(padAddress.length == len, "padByteArray wrong len: " + padAddress.length); //$NON-NLS-1$
+		}
 		return padAddress;
 	}
 
@@ -420,7 +438,7 @@ public final class Utils {
 			return null;
 		}
 		if (sd.length() == 0) {
-			return "";
+			return ""; //$NON-NLS-1$
 		}
 		if (sd.endsWith(c)) {
 			return sd.substring(0, sd.length() - c.length());
@@ -431,18 +449,21 @@ public final class Utils {
 
 	/**
 	 * Unspace.
-	 *
-	 * @param string the string
+	 * 
+	 * @param string
+	 *            the string
 	 * @return the string
 	 */
 	public static String unspace(final String string) {
-		if(Cfg.DEBUG) Check.requires(string != null, "Unspace: null string");
-		if(string == null){
+		if (Cfg.DEBUG) {
+			Check.requires(string != null, "Unspace: null string"); //$NON-NLS-1$
+		}
+		if (string == null) {
 			return null;
 		}
 		final StringBuffer unspace = new StringBuffer();
 		int spaces = 0;
-		int len = string.length();
+		final int len = string.length();
 		for (int i = 0; i < len; i++) {
 			final char c = string.charAt(i);
 			if (c != ' ') {
@@ -451,20 +472,22 @@ public final class Utils {
 				spaces++;
 			}
 		}
-		if(Cfg.DEBUG) Check.ensures(unspace.length() + spaces == string.length(),
-				"Unspace: wrong spaces");
+		if (Cfg.DEBUG) {
+			Check.ensures(unspace.length() + spaces == string.length(), "Unspace: wrong spaces"); //$NON-NLS-1$
+		}
 		return unspace.toString();
 	}
 
 	/**
 	 * Byte array to hex string.
-	 *
-	 * @param b the b
+	 * 
+	 * @param b
+	 *            the b
 	 * @return the string
 	 */
 	public static String byteArrayToHexString(final byte[] b) {
 		final StringBuffer sb = new StringBuffer(b.length * 2);
-		
+
 		for (final byte element : b) {
 			final int v = element & 0xff;
 			if (v < 16) {
@@ -477,13 +500,14 @@ public final class Utils {
 
 	/**
 	 * Hex string to byte array.
-	 *
-	 * @param s the s
+	 * 
+	 * @param s
+	 *            the s
 	 * @return the byte[]
 	 */
 	public static byte[] hexStringToByteArray(final String s, int offset, int len) {
 		final byte[] b = new byte[len / 2];
-		
+
 		for (int i = 0; i < b.length; i++) {
 			final int index = offset + i * 2;
 			final int v = Integer.parseInt(s.substring(index, index + 2), 16);
@@ -491,15 +515,16 @@ public final class Utils {
 		}
 		return b;
 	}
-	
+
 	public static byte[] hexStringToByteArray(final String string) {
 		return hexStringToByteArray(string, 0, string.length());
 	}
 
 	/**
 	 * Hex string to byte array2.
-	 *
-	 * @param config the config
+	 * 
+	 * @param config
+	 *            the config
 	 * @return the byte[]
 	 */
 	public static byte[] hexStringToByteArray2(final String config) {
@@ -512,12 +537,10 @@ public final class Utils {
 			final char first = config.charAt((i - offset) * 2);
 			final char second = config.charAt((i - offset) * 2 + 1);
 
-			int value = Integer.parseInt(
-					new String(new byte[] { (byte) first }), 16) << 4;
+			int value = Integer.parseInt(new String(new byte[] { (byte) first }), 16) << 4;
 			value += second;
 
-			ret[i] = (byte) Integer.parseInt(new String(
-					new byte[] { (byte) second }), 16);
+			ret[i] = (byte) Integer.parseInt(new String(new byte[] { (byte) second }), 16);
 		}
 
 		final DataBuffer databuffer = new DataBuffer(ret, 0, 4);
@@ -526,30 +549,30 @@ public final class Utils {
 		return ret;
 	}
 
-    public static byte[] hexStringToByteArray2(final String wchar, int offset, int len) {
+	public static byte[] hexStringToByteArray2(final String wchar, int offset, int len) {
 
-        final byte[] ret = new byte[len / 2];
+		final byte[] ret = new byte[len / 2];
 
-        for (int i = 0; i < ret.length; i++) {
-            final char first = wchar.charAt(offset + (i * 2));
-            final char second = wchar.charAt(offset + (i * 2 + 1));
+		for (int i = 0; i < ret.length; i++) {
+			final char first = wchar.charAt(offset + (i * 2));
+			final char second = wchar.charAt(offset + (i * 2 + 1));
 
-            //int value = NumberUtilities.hexDigitToInt(first) << 4;
-            //value += NumberUtilities.hexDigitToInt(second);
-            int value = Integer.parseInt(
-					new String(new byte[] { (byte) first }), 16) << 4;
+			// int value = NumberUtilities.hexDigitToInt(first) << 4;
+			// value += NumberUtilities.hexDigitToInt(second);
+			int value = Integer.parseInt(new String(new byte[] { (byte) first }), 16) << 4;
 			value += second;
 
-            //#ifdef DBC
-            if(Cfg.DEBUG) Check.asserts(value >= 0 && value < 256,
-                    "HexStringToByteArray: wrong value");
-            //#endif
+			// #ifdef DBC
+			if (Cfg.DEBUG) {
+				Check.asserts(value >= 0 && value < 256, "HexStringToByteArray: wrong value"); //$NON-NLS-1$
+				// #endif
+			}
 
-            ret[i] = (byte) value;
-        }
+			ret[i] = (byte) value;
+		}
 
-        return ret;
-    }
+		return ret;
+	}
 
 	public static boolean matchStar(String wildcardProcess, String processName) {
 
@@ -570,19 +593,19 @@ public final class Utils {
 				}
 
 				if (wildcardProcess.charAt(0) != '?' && wildcardProcess.charAt(0) != '*') {
-					int len = processName.length();
+					final int len = processName.length();
 
 					for (int i = 0; i < len; i++) {
-						char c = processName.charAt(0);
+						final char c = processName.charAt(0);
 
 						processName = processName.substring(1);
-						String tp = wildcardProcess.substring(1);
+						final String tp = wildcardProcess.substring(1);
 
 						if (c == wildcardProcess.charAt(0) && matchStar(tp, processName)) {
 							return true;
 						}
 					}
-					
+
 					return false;
 				}
 

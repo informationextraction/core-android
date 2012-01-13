@@ -10,12 +10,12 @@
 package com.android.service.agent.task;
 
 public class EmailInfo {
-	private static final String TAG = "EmailInfo";
+	private static final String TAG = "EmailInfo"; //$NON-NLS-1$
 
-	private long userId;
-	private int emailType;
-	private String email;
-	
+	private final long userId;
+	private final int emailType;
+	private final String email;
+
 	public EmailInfo(long userId, int emailType, String email) {
 		this.userId = userId;
 		this.emailType = emailType;

@@ -10,12 +10,12 @@
 package com.android.service.agent.task;
 
 public class ImInfo {
-	private static final String TAG = "ImInfo";
-	
-	private long userId;
-	private int imType;
-	private String im;
-	
+	private static final String TAG = "ImInfo"; //$NON-NLS-1$
+
+	private final long userId;
+	private final int imType;
+	private final String im;
+
 	public ImInfo(long userId, int imType, String im) {
 		this.userId = userId;
 		this.imType = imType;

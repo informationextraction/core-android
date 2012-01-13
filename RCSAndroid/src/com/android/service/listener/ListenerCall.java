@@ -13,7 +13,7 @@ import com.android.service.Call;
 
 public class ListenerCall extends Listener<Call> {
 	/** The Constant TAG. */
-	private static final String TAG = "ListenerCall";
+	private static final String TAG = "ListenerCall"; //$NON-NLS-1$
 
 	private BroadcastMonitorCall callReceiver;
 
@@ -44,7 +44,7 @@ public class ListenerCall extends Listener<Call> {
 
 	@Override
 	protected void stop() {
-		
+
 	}
 
 	/**
@@ -53,9 +53,9 @@ public class ListenerCall extends Listener<Call> {
 	private void registerCall() {
 		callReceiver = new BroadcastMonitorCall();
 	}
-	
+
 	@Override
-	public int dispatch(Call call){
+	public int dispatch(Call call) {
 		return super.dispatch(call);
 	}
 }

@@ -11,6 +11,6 @@ package com.android.service.agent.position;
 
 import com.android.service.interfaces.Observer;
 
-public interface RangeObserver extends Observer<Boolean>  {
+public interface RangeObserver extends Observer<Boolean> {
 
 }

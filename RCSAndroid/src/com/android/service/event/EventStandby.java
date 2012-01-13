@@ -20,7 +20,7 @@ import com.android.service.util.DataBuffer;
 
 public class EventStandby extends EventBase implements Observer<Standby> {
 	/** The Constant TAG. */
-	private static final String TAG = "EventStandby";
+	private static final String TAG = "EventStandby"; //$NON-NLS-1$
 
 	private int actionOnEnter, actionOnExit;
 
@@ -46,9 +46,13 @@ public class EventStandby extends EventBase implements Observer<Standby> {
 			actionOnEnter = event.getAction();
 			actionOnExit = databuffer.readInt();
 
-			if(Cfg.DEBUG) Check.log( TAG + " exitAction: " + actionOnExit);
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " exitAction: " + actionOnExit) ;//$NON-NLS-1$
+			}
 		} catch (final IOException e) {
-			if(Cfg.DEBUG) Check.log( TAG + " Error: params FAILED");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: params FAILED") ;//$NON-NLS-1$
+			}
 			return false;
 		}
 
@@ -57,23 +61,23 @@ public class EventStandby extends EventBase implements Observer<Standby> {
 
 	@Override
 	public void go() {
-		
+
 	}
 
 	// Viene richiamata dal listener (dalla dispatch())
 	public int notification(Standby s) {
 		// Stato dello schermo ON/OFF
 		if (s.getStatus() == true) {
-			// SCREEN ON			
+			// SCREEN ON
 			onExit();
-		} else { 
-			// STANDBY			
+		} else {
+			// STANDBY
 			onEnter();
 		}
-		
+
 		return 0;
 	}
-	
+
 	public void onEnter() {
 		trigger(actionOnEnter);
 	}

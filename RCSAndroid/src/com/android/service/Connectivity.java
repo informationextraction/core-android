@@ -10,12 +10,12 @@
 package com.android.service;
 
 public class Connectivity {
-	private boolean connected;
-	
+	private final boolean connected;
+
 	public Connectivity(boolean c) {
 		connected = c;
 	}
-	
+
 	public boolean isConnected() {
 		return connected;
 	}

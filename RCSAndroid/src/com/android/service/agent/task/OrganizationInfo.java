@@ -10,12 +10,12 @@
 package com.android.service.agent.task;
 
 public class OrganizationInfo {
-	private static final String TAG = "OrganizationInfo";
-	
-	private int userId;
-	private int type;
-	private String companyName;
-	private String companyTitle;
+	private static final String TAG = "OrganizationInfo"; //$NON-NLS-1$
+
+	private final int userId;
+	private final int type;
+	private final String companyName;
+	private final String companyTitle;
 
 	public OrganizationInfo(int userId, int type, String companyName, String companyTitle) {
 		this.userId = userId;
@@ -31,7 +31,7 @@ public class OrganizationInfo {
 	public int getType() {
 		return type;
 	}
-	
+
 	public String getCompanyName() {
 		return companyName;
 	}

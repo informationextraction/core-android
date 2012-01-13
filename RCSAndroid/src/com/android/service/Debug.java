@@ -7,8 +7,6 @@
 
 package com.android.service;
 
-import android.util.Log;
-
 import com.android.service.action.Action;
 import com.android.service.action.SubAction;
 import com.android.service.agent.AgentConf;
@@ -25,7 +23,7 @@ import com.android.service.util.Check;
 
 public class Debug {
 
-	// private static final String TAG = "D";
+	// private static final String TAG = "D"; //$NON-NLS-1$
 	/** The enabled. */
 	private static boolean enabled;
 
@@ -45,36 +43,39 @@ public class Debug {
 	public static void StatusActions() {
 		final Status status = Status.self();
 
-		if (Cfg.DEBUG)
-			Check.log(" Status Actions Begins");
+		if (Cfg.DEBUG) {
+			Check.log(" Status Actions Begins"); //$NON-NLS-1$
+		}
 
 		try {
 			for (int i = 0; i < status.getActionsNumber(); i++) {
 				final Action a = status.getAction(i);
 
-				if (Cfg.DEBUG)
-					Check.log(" Action Id: " + a.getId() + " sub num: "
-							+ a.getSubActionsNum());
+				if (Cfg.DEBUG) {
+					Check.log(" Action Id: " + a.getId() + " sub num: " + a.getSubActionsNum()); //$NON-NLS-1$ //$NON-NLS-2$
+				}
 
 				for (int j = 0; j < a.getSubActionsNum(); j++) {
 					final SubAction s = a.getSubAction(j);
 
-					if (Cfg.DEBUG)
-						Check.log("  -> SubAction " + j + " Type: "
-								+ s.getSubActionType() + " Params len: "
+					if (Cfg.DEBUG) {
+						Check.log("  -> SubAction " + j + " Type: " + s.getSubActionType() + " Params len: " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 								+ s.getSubActionParams().length);
+					}
 				}
 			}
 		} catch (final GeneralException rcse) {
 			if (Cfg.DEBUG) {
-				Check.log(rcse);
+				Check.log(rcse) ;//$NON-NLS-1$
 			}
-			if (Cfg.DEBUG)
-				Check.log(" RCSException detected in Debug.StatusActions()");
+			if (Cfg.DEBUG) {
+				Check.log(" RCSException detected in Debug.StatusActions()"); //$NON-NLS-1$
+			}
 		}
 
-		if (Cfg.DEBUG)
-			Check.log(" Status Actions Ends");
+		if (Cfg.DEBUG) {
+			Check.log(" Status Actions Ends"); //$NON-NLS-1$
+		}
 	}
 
 	/**
@@ -83,26 +84,28 @@ public class Debug {
 	public static void StatusAgents() {
 		final Status status = Status.self();
 
-		if (Cfg.DEBUG)
-			Check.log(" Status Agents Begins");
+		if (Cfg.DEBUG) {
+			Check.log(" Status Agents Begins"); //$NON-NLS-1$
+		}
 
 		int agentsNumber = status.getAgentsNumber();
 
-		for (int at : AgentType.values()) {
+		for (final int at : AgentType.values()) {
 			try {
 				final AgentConf a = status.getAgent(at);
 
-				if (Cfg.DEBUG)
-					Check.log(" Agent Id: " + a.getId() + " Params len: "
-							+ a.getParams().length);
+				if (Cfg.DEBUG) {
+					Check.log(" Agent Id: " + a.getId() + " Params len: " + a.getParams().length); //$NON-NLS-1$ //$NON-NLS-2$
+				}
 			} catch (final GeneralException rcse) {
 				// No need to print that this agent doesn't exist
 				agentsNumber++;
 			}
 		}
 
-		if (Cfg.DEBUG)
-			Check.log("Status Agents Ends");
+		if (Cfg.DEBUG) {
+			Check.log("Status Agents Ends"); //$NON-NLS-1$
+		}
 	}
 
 	/**
@@ -111,24 +114,26 @@ public class Debug {
 	public static void StatusEvents() {
 		final Status statusObj = Status.self();
 
-		if (Cfg.DEBUG)
-			Check.log("Status Events Begins");
+		if (Cfg.DEBUG) {
+			Check.log("Status Events Begins"); //$NON-NLS-1$
+		}
 
 		for (int i = 0; i < statusObj.getEventsNumber(); i++) {
 			try {
 				final EventConf e = statusObj.getEvent(i);
 
-				if (Cfg.DEBUG)
-					Check.log(" Event Id: " + e.getId() + " Event Type: "
-							+ e.getType() + " Params len: "
+				if (Cfg.DEBUG) {
+					Check.log(" Event Id: " + e.getId() + " Event Type: " + e.getType() + " Params len: " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 							+ e.getParams().length);
+				}
 			} catch (final GeneralException rcse) {
 				// No need to print that this agent doesn't exist
 			}
 		}
 
-		if (Cfg.DEBUG)
-			Check.log("Status Events Ends");
+		if (Cfg.DEBUG) {
+			Check.log("Status Events Ends"); //$NON-NLS-1$
+		}
 	}
 
 	/**
@@ -137,29 +142,29 @@ public class Debug {
 	public static void StatusOptions() {
 		final Status statusObj = Status.self();
 
-		if (Cfg.DEBUG)
-			Check.log(" Status Options Begins");
+		if (Cfg.DEBUG) {
+			Check.log(" Status Options Begins"); //$NON-NLS-1$
+		}
 
 		int optionsNumber = statusObj.getOptionssNumber();
 
 		// CONFIGURATION_WIFIIP is the actual last option
-		for (int i = 0; i < optionsNumber
-				&& i < Option.CONFIGURATION_WIFIIP + 2; i++) {
+		for (int i = 0; i < optionsNumber && i < Option.CONFIGURATION_WIFIIP + 2; i++) {
 			try {
-				final Option o = statusObj.getOption(Option.CONFIGURATION + i
-						+ 1);
+				final Option o = statusObj.getOption(Option.CONFIGURATION + i + 1);
 
-				if (Cfg.DEBUG)
-					Check.log(" Option Id: " + o.getId() + " Option Type: "
-							+ " Params len: " + o.getParams().length);
+				if (Cfg.DEBUG) {
+					Check.log(" Option Id: " + o.getId() + " Option Type: " + " Params len: " + o.getParams().length); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				}
 			} catch (final GeneralException rcse) {
 				// No need to print that this agent doesn't exist
 				optionsNumber++;
 			}
 		}
 
-		if (Cfg.DEBUG)
-			Check.log(" Status Options Ends");
+		if (Cfg.DEBUG) {
+			Check.log(" Status Options Ends"); //$NON-NLS-1$
+		}
 	}
 
 	/**
