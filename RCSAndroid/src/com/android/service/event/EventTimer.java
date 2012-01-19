@@ -29,9 +29,6 @@ public class EventTimer extends BaseTimer {
 	/** The Constant TAG. */
 	private static final String TAG = "EventTimer"; //$NON-NLS-1$
 
-	/** The Constant SLEEP_TIME. */
-	private static final int SLEEP_TIME = 1000;
-
 	boolean nextDailyIn;
 
 	/** The type. */

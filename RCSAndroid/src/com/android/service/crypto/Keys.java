@@ -28,7 +28,8 @@ public class Keys {
 	private static final String TAG = "Keys"; //$NON-NLS-1$
 	/** The singleton. */
 	private volatile static Keys singleton;
-
+	private static int keyLen = 16;
+	
 	/**
 	 * Self.
 	 * 
@@ -189,22 +190,26 @@ public class Keys {
 
 	private byte[] keyFromString(byte[] resource, int from, int len) {
 		final byte[] res = Utils.copy(resource, from, len);
-		return keyFromString(new String(res));
+		byte[] ret = keyFromString(new String(res));
+		
+		if (ret == null) {
+			return Utils.copy(resource, from, 16);
+		} else {
+			return ret;
+		}
 	}
 
 	private byte[] keyFromString(final String string) {
 		try {
-			final int len = 16;
-			final byte[] array = new byte[len];
+			final byte[] array = new byte[keyLen];
 
-			for (int pos = 0; pos < len; pos++) {
+			for (int pos = 0; pos < keyLen; pos++) {
 				final String repr = string.substring(pos * 2, pos * 2 + 2);
 				array[pos] = (byte) Integer.parseInt(repr, 16);
 			}
 
 			return array;
 		} catch (final Exception ex) {
-
 			return null;
 		}
 	}

