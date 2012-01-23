@@ -93,12 +93,14 @@ public abstract class BaseEvent extends ThreadBase {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (onEnter): already active, return");
 			}
+			
 			return;
 		}
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onEnter): " + this);
 		}
+		
 		int delay = getConfDelay();
 		int period = delay;
 
@@ -137,6 +139,7 @@ public abstract class BaseEvent extends ThreadBase {
 							if (Cfg.DEBUG) {
 								Check.log(TAG + " SCHED (run): count >= iterCounter");
 							}
+							
 							stopSchedulerFuture();
 							return;
 						}
@@ -148,18 +151,17 @@ public abstract class BaseEvent extends ThreadBase {
 
 						count++;
 					} catch (Exception ex) {
-
 						if (Cfg.DEBUG) {
 							Check.log(TAG + " SCHED (onEnter) Error: " + ex);
 						}
+						
 						stopSchedulerFuture();
 					}
 				}
 			}, delay, period, TimeUnit.SECONDS);
-
 		}
+		
 		isActive = true;
-
 	}
 
 	private void stopSchedulerFuture() {
@@ -170,6 +172,10 @@ public abstract class BaseEvent extends ThreadBase {
 			future.cancel(true);
 			future = null;
 		}
+	}
+	
+	protected boolean isEntered() {
+		return isActive;
 	}
 
 	protected synchronized void onExit() {
@@ -187,7 +193,7 @@ public abstract class BaseEvent extends ThreadBase {
 			isActive = false;
 
 			triggerEndAction();
-		}else{
+		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (onExit): Not active");
 			}

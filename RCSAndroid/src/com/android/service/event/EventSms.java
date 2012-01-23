@@ -36,7 +36,6 @@ public class EventSms extends BaseEvent implements Observer<Sms> {
 	@Override
 	public void actualStop() {
 		ListenerSms.self().detach(this);
-		onExit(); // di sicurezza
 	}
 
 	@Override
@@ -76,8 +75,8 @@ public class EventSms extends BaseEvent implements Observer<Sms> {
 		}
 
 		onEnter();
+		onExit();
+		
 		return 1;
 	}
-
-
 }

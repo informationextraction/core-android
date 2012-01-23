@@ -34,7 +34,6 @@ public class EventSim extends BaseEvent implements Observer<Sim> {
 	@Override
 	public void actualStop() {
 		ListenerSim.self().detach(this);
-		onExit(); // di sicurezza
 	}
 
 	@Override
@@ -72,6 +71,7 @@ public class EventSim extends BaseEvent implements Observer<Sim> {
 					storedImsi.writeMarkup(value);
 
 					onEnter();
+					onExit();
 				}
 			} catch (final IOException e) {
 				if (Cfg.DEBUG) {

@@ -41,7 +41,6 @@ public class EventBattery extends BaseEvent implements Observer<Battery> {
 	@Override
 	public boolean parse(ConfEvent conf) {
 		try {
-
 			minLevel = conf.getInt("min");
 			maxLevel = conf.getInt("max");
 

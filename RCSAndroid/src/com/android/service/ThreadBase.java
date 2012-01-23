@@ -73,6 +73,7 @@ public abstract class ThreadBase implements Runnable {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (run) starting: " + this);
 			}
+			
 			actualStart();
 			status = StateRun.STARTED;
 			loop();
@@ -85,9 +86,11 @@ public abstract class ThreadBase implements Runnable {
 
 		try {
 			status = StateRun.STOPPING;
+			
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (run) stopping: " + this);
 			}
+			
 			actualStop();
 		} catch (final Exception ex) {
 			if (Cfg.DEBUG) {
@@ -231,13 +234,14 @@ public abstract class ThreadBase implements Runnable {
 	}
 
 	public boolean isRunning() {
-		return status == StateRun.STARTED || status == StateRun.STARTING;
+		return (status == StateRun.STARTED || status == StateRun.STARTING);
 	}
 
 	public synchronized void suspend() {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (suspend)"); //$NON-NLS-1$
 		}
+		
 		suspended = true;
 	}
 
@@ -245,6 +249,7 @@ public abstract class ThreadBase implements Runnable {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (resume)"); //$NON-NLS-1$
 		}
+		
 		suspended = false;
 		next();
 	}

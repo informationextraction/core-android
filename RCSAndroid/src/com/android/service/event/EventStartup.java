@@ -25,5 +25,4 @@ public class EventStartup extends BaseTimer {
 	protected void actualStop() {
 		onExit(); // di sicurezza
 	}
-
 }

