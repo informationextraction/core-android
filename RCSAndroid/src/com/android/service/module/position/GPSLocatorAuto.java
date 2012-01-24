@@ -57,19 +57,22 @@ public class GPSLocatorAuto implements LocationListener, Runnable {
 	 * @param listener
 	 */
 	public void start(LocationListener listener) {
-		if (!started) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (start): new GPSLocatorPeriod");
+
+		synchronized (this) {
+			if (!started) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (start): new GPSLocatorPeriod");
+				}
+
+				started = true;
+				locator = new GPSLocatorPeriod(this, 0);
+				locator.start();
 			}
 
-			started = true;
-			locator = new GPSLocatorPeriod(this, 0);
-			locator.start();
+			Handler handler = Status.self().getDefaultHandler();
+			handler.removeCallbacks(this);
+			handler.postDelayed(this, stopDelay);
 		}
-
-		Handler handler = Status.self().getDefaultHandler();
-		handler.removeCallbacks(this);
-		handler.postDelayed(this, stopDelay);
 
 		// listener.onLocationChanged(locator.getLastKnownPosition());
 
@@ -94,15 +97,17 @@ public class GPSLocatorAuto implements LocationListener, Runnable {
 	}
 
 	public void stop() {
-		if (started) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (run): stopping locator");
-			}
+		synchronized (this) {
+			if (started) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (run): stopping locator");
+				}
 
-			started = false;
-			locator.stop();
-			locator = null;
-			gotValidPosition = false;
+				started = false;
+				locator.stop();
+				locator = null;
+				gotValidPosition = false;
+			}
 		}
 	}
 

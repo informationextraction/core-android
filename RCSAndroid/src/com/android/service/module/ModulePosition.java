@@ -56,6 +56,8 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 	int period;
 
 	LogR logIncrGPS, logIncrCell;
+	Object logGPSlock = new Object();
+	Object logCelllock = new Object();
 
 	@Override
 	public void actualStart() {
@@ -68,15 +70,18 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 		}
 
 		if (gpsEnabled) {
-			if (logIncrGPS == null) {
-				logIncrGPS = new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD, getAdditionalData(0, LOG_TYPE_GPS));
+			synchronized (logGPSlock) {
+				if (logIncrGPS == null) {
+					logIncrGPS = new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD, getAdditionalData(0,
+							LOG_TYPE_GPS));
+				}
 			}
 
 			locationGPS();
 		}
 
 		if (cellEnabled) {
-			synchronized (this) {
+			synchronized (logCelllock) {
 				if (logIncrCell == null) {
 					logIncrCell = factoryCellLog();
 				}
@@ -104,7 +109,6 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 			logCell = new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD, getAdditionalData(0, LOG_TYPE_GSM));
 		} else if (info.cdma) {
 			logCell = new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD, getAdditionalData(0, LOG_TYPE_CDMA));
-
 		}
 
 		return logCell;
@@ -169,9 +173,7 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Warn: " + "Wifi disabled");//$NON-NLS-1$ //$NON-NLS-2$
 			}
-
 		}
-
 	}
 
 	/**
@@ -193,13 +195,13 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 		byte[] payload = null;
 		if (info.gsm) {
 			payload = getCellPayload(info, LOG_TYPE_GSM);
-			synchronized (logIncrCell) {
+			synchronized (logCelllock) {
 				logIncrCell.write(payload);
 			}
 
 		} else if (info.cdma) {
 			payload = getCellPayload(info, LOG_TYPE_CDMA);
-			synchronized (logIncrCell) {
+			synchronized (logCelllock) {
 				logIncrCell.write(payload);
 			}
 		}
@@ -236,7 +238,7 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 		}
 
 		byte[] payload = getGPSPayload(location, timestamp);
-		synchronized (logIncrGPS) {
+		synchronized (logGPSlock) {
 			logIncrGPS.write(payload);
 		}
 	}
@@ -355,9 +357,7 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 		}
 
 		databuffer.writeInt(ssidcontent.length);
-
 		databuffer.write(place);
-
 		databuffer.writeInt(signalLevel);
 
 		if (Cfg.DEBUG) {
@@ -509,12 +509,14 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (resetLog)");
 		}
-		if (logIncrCell != null && logIncrCell.hasData()) {
-			logIncrCell.close();
-			logIncrCell = null;
+		synchronized (logCelllock) {
+			if (logIncrCell != null && logIncrCell.hasData()) {
+				logIncrCell.close();
+				logIncrCell = null;
+			}
 		}
 
-		synchronized (logIncrGPS) {
+		synchronized (logGPSlock) {
 			if (logIncrGPS != null && logIncrGPS.hasData()) {
 				logIncrGPS.close();
 				logIncrGPS = null;
