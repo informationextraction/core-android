@@ -80,6 +80,9 @@ public class EventLocation extends BaseEvent implements RangeObserver {
 	}
 
 	public int notification(Boolean onEnter) {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + "  " + (onEnter?"Entered":"Exited"));
+		}
 		if (onEnter) {
 			onEnter();
 		} else {
