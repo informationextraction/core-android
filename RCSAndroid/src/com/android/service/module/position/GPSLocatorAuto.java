@@ -28,6 +28,9 @@ public class GPSLocatorAuto implements LocationListener, Runnable {
 	private boolean gotValidPosition;
 
 	private GPSLocatorAuto() {
+		if (Cfg.DEBUG) {
+			stopDelay = 60 * 1000;
+		}
 		listeners = new ArrayList<LocationListener>();
 	}
 
@@ -97,17 +100,28 @@ public class GPSLocatorAuto implements LocationListener, Runnable {
 	}
 
 	public void stop() {
-		synchronized (this) {
-			if (started) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (run): stopping locator");
-				}
+		try {
+			synchronized (this) {
+				if (started) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (run): stopping locator");
+					}
 
-				started = false;
-				locator.stop();
-				locator = null;
-				gotValidPosition = false;
+					if (locator != null) {
+						locator.halt();
+					}
+
+				}
 			}
+		} catch (Exception ex) {
+			if (Cfg.DEBUG) {
+				ex.printStackTrace();
+				Check.log(TAG + " " + ex);
+			}
+		} finally {
+			started = false;
+			locator = null;
+			gotValidPosition = false;
 		}
 	}
 

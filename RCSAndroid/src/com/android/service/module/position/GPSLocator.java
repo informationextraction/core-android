@@ -57,7 +57,7 @@ public abstract class GPSLocator extends Thread {
 
 	public void halt() {
 		lm.removeUpdates(listener);
-
+		
 		lm = null;
 	}
 }

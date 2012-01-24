@@ -43,17 +43,20 @@ public class GPSLocatorDistance extends GPSLocator implements LocationListener {
 	}
 
 	public void initLocationUpdates() {
-		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1L, this);
+		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 1L, this);
 	}
 
 	public void onLocationChanged(Location location) {
-		if (this.location == null) {
-			this.location = new Location(location);
-			this.location.setLatitude(latitude);
-			this.location.setLongitude(longitude);
-		}
+		float actualDistance = 0;
+		synchronized (this) {
+			if (this.location == null) {
+				this.location = new Location(location);
+				this.location.setLatitude(latitude);
+				this.location.setLongitude(longitude);
+			}
 
-		final float actualDistance = this.location.distanceTo(location);
+			actualDistance = this.location.distanceTo(location);
+		}
 
 		if (actualDistance < distance) {
 			if (!entered) {
