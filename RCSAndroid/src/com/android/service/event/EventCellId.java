@@ -69,10 +69,12 @@ public class EventCellId extends BaseEvent {
 	@Override
 	public void actualGo() {
 		final CellInfo info = Device.getCellInfo();
+		
 		if (!info.valid) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: " + "invalid cell info");//$NON-NLS-1$ //$NON-NLS-2$
 			}
+			
 			return;
 		}
 
@@ -82,6 +84,7 @@ public class EventCellId extends BaseEvent {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Enter");//$NON-NLS-1$
 				}
+				
 				entered = true;
 				onEnter();
 			} else {
@@ -95,6 +98,7 @@ public class EventCellId extends BaseEvent {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Exit");//$NON-NLS-1$
 				}
+				
 				entered = false;
 				onExit();
 			} else {
@@ -104,6 +108,4 @@ public class EventCellId extends BaseEvent {
 			}
 		}
 	}
-
-
 }

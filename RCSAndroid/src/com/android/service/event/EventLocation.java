@@ -42,6 +42,7 @@ public class EventLocation extends BaseEvent implements RangeObserver {
 	@Override
 	public void actualStop() {
 		locator.halt();
+		
 		try {
 			locator.join();
 		} catch (final InterruptedException e) {

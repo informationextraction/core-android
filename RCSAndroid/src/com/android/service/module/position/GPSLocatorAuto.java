@@ -23,7 +23,7 @@ public class GPSLocatorAuto implements LocationListener, Runnable {
 	private boolean started = false;
 	private List<LocationListener> listeners;
 	private GPSLocatorPeriod locator;
-	
+
 	private long stopDelay = 5 * 60 * 1000;
 	private boolean gotValidPosition;
 
@@ -43,6 +43,7 @@ public class GPSLocatorAuto implements LocationListener, Runnable {
 				Check.log(TAG + " (self): new instance");
 			}
 		}
+
 		return instance;
 	}
 
@@ -55,39 +56,49 @@ public class GPSLocatorAuto implements LocationListener, Runnable {
 	 * 
 	 * @param listener
 	 */
-	public synchronized void start(LocationListener listener) {
+	public void start(LocationListener listener) {
 		if (!started) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (start): new GPSLocatorPeriod");
 			}
+
 			started = true;
-			locator = new GPSLocatorPeriod(this, 1000);
+			locator = new GPSLocatorPeriod(this, 0);
+			locator.start();
 		}
 
 		Handler handler = Status.self().getDefaultHandler();
 		handler.removeCallbacks(this);
 		handler.postDelayed(this, stopDelay);
 
-		if (gotValidPosition) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (start): got Valid position, return it");
-			}
-			listener.onLocationChanged(locator.getLastKnownPosition());
-		} else {
-			if (!listeners.contains(listener)) {
+		// listener.onLocationChanged(locator.getLastKnownPosition());
+
+		synchronized (listeners) {
+			if (gotValidPosition) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (start): adding to listeners");
+					Check.log(TAG + " (start): got Valid position, return it");
 				}
-				listeners.add(listener);
+
+				listener.onLocationChanged(locator.getLastKnownPosition());
+				gotValidPosition = false;
+			} else {
+				if (!listeners.contains(listener)) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (start): adding to listeners");
+					}
+
+					listeners.add(listener);
+				}
 			}
 		}
 	}
-	
-	public synchronized void stop(){
+
+	public void stop() {
 		if (started) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (run): stopping locator");
 			}
+
 			started = false;
 			locator.stop();
 			locator = null;
@@ -96,28 +107,35 @@ public class GPSLocatorAuto implements LocationListener, Runnable {
 	}
 
 	/** executed by handler postDelayed, 5 minutes after the last start */
-	public synchronized void run() {
+	public void run() {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (run) passed without start: " + stopDelay);
 		}
+
 		stop();
 	}
 
 	/**
 	 * This method is called by the GPSLocator the first time it fixes
 	 */
-	public synchronized void onLocationChanged(Location location) {
+	public void onLocationChanged(Location location) {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onLocationChanged): new location: " + location);
 		}
-		gotValidPosition = true;
-		for (LocationListener listener : listeners) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (onLocationChanged): send location to: " + listener);
+
+		synchronized (listeners) {
+			gotValidPosition = true;
+
+			for (LocationListener listener : listeners) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (onLocationChanged): send location to: " + listener);
+				}
+
+				listener.onLocationChanged(location);
 			}
-			listener.onLocationChanged(location);
+
+			listeners.clear();
 		}
-		listeners.clear();
 	}
 
 	public void onProviderDisabled(String provider) {
@@ -137,5 +155,4 @@ public class GPSLocatorAuto implements LocationListener, Runnable {
 			Check.log(TAG + " (onStatusChanged)");
 		}
 	}
-
 }
