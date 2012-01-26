@@ -53,6 +53,9 @@ public class Status {
 	/** The context. */
 	private static Context context;
 
+	/** For forward compatibility versus 8.0 */
+	public static boolean calllistCreated = false;
+	
 	Object lockCrisis = new Object();
 	private boolean crisis = false;
 	private boolean[] crisisType = new boolean[ModuleCrisis.SIZE];
@@ -107,6 +110,9 @@ public class Status {
 		globals = null;
 		uninstall = false;
 		reload = false;
+		
+		// Forward compatibility
+		calllistCreated = false;
 	}
 
 	/**
@@ -118,6 +124,7 @@ public class Status {
 		if (Cfg.DEBUG) {
 			Check.requires(context != null, "Null Context"); //$NON-NLS-1$
 		}
+		
 		return context;
 	}
 
@@ -131,6 +138,7 @@ public class Status {
 		if (Cfg.DEBUG) {
 			Check.requires(context != null, "Null Context"); //$NON-NLS-1$
 		}
+		
 		Status.context = context;
 	}
 
@@ -144,7 +152,6 @@ public class Status {
 	 *             the RCS exception
 	 */
 	public void addAgent(final ConfModule a) throws GeneralException {
-
 		if (agentsMap.containsKey(a.getType()) == true) {
 			// throw new RCSException("Agent " + a.getId() + " already loaded");
 			if (Cfg.DEBUG) {
@@ -593,5 +600,4 @@ public class Status {
 	public Handler getDefaultHandler() {
 		return deafultHandler;
 	}
-
 }

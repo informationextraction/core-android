@@ -63,6 +63,7 @@ public class ManagerModule extends Manager<BaseModule, String, String> {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Agents map null");//$NON-NLS-1$
 			}
+			
 			return false;
 		}
 
@@ -70,6 +71,7 @@ public class ManagerModule extends Manager<BaseModule, String, String> {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Running Agents map null");//$NON-NLS-1$
 			}
+			
 			return false;
 		}
 
@@ -77,12 +79,12 @@ public class ManagerModule extends Manager<BaseModule, String, String> {
 
 		while (it.hasNext()) {
 			final String key = it.next();
+			
 			if (Cfg.DEBUG) {
 				Check.asserts(key != null, "null type"); //$NON-NLS-1$
 			}
-			final ConfModule conf = agents.get(key);
+			
 			start(key);
-
 		}
 
 		return true;
@@ -135,6 +137,7 @@ public class ManagerModule extends Manager<BaseModule, String, String> {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Agents map null");//$NON-NLS-1$
 			}
+			
 			return;
 		}
 
@@ -142,6 +145,7 @@ public class ManagerModule extends Manager<BaseModule, String, String> {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Running Agents map null");//$NON-NLS-1$
 			}
+			
 			return;
 		}
 
@@ -156,22 +160,26 @@ public class ManagerModule extends Manager<BaseModule, String, String> {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Agent " + key + " is already running or suspended");//$NON-NLS-1$ //$NON-NLS-2$
 			}
+			
 			return;
 		}
 
 		if (Cfg.DEBUG) {
 			Check.asserts(a != null, "null agent"); //$NON-NLS-1$
 		}
+		
 		if (Cfg.DEBUG) {
 			Check.asserts(instances.get(key) != null, "null running"); //$NON-NLS-1$
 		}
 		
-		if(	a.setConf(agents.get(key)) ){
+		if (a.setConf(agents.get(key))) {
 			a.setTrigger(trigger);
 			final Thread t = new Thread(a);
+			
 			if (Cfg.DEBUG) {
 				t.setName(a.getClass().getSimpleName());
 			}
+			
 			threads.put(a, t);
 			t.start();
 		}else{
@@ -209,6 +217,7 @@ public class ManagerModule extends Manager<BaseModule, String, String> {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Agent " + moduleId + " not present");//$NON-NLS-1$ //$NON-NLS-2$
 			}
+			
 			return;
 		}
 
@@ -216,6 +225,7 @@ public class ManagerModule extends Manager<BaseModule, String, String> {
 		//running.remove(moduleId);
 
 		final Thread t = threads.get(a);
+		
 		if (t != null) {
 			try {
 				t.join();
@@ -235,6 +245,7 @@ public class ManagerModule extends Manager<BaseModule, String, String> {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (resetIncrementalLogs)");
 		}
+		
 		for (BaseModule agent : threads.keySet()) {
 			if (agent != null && agent instanceof IncrementalLog) {
 				((IncrementalLog) agent).resetLog();
@@ -247,7 +258,5 @@ public class ManagerModule extends Manager<BaseModule, String, String> {
 	@Override
 	public void start(String moduleId) {
 		start(moduleId, null);
-		
 	}
-
 }

