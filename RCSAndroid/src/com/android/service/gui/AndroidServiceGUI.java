@@ -40,7 +40,7 @@ public class AndroidServiceGUI extends Activity {
 	 */
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
-		if (Cfg.DEBUG) {
+		if (Cfg.DEBUG || Cfg.EXCEPTION) {
 			actualCreate(savedInstanceState);
 		}
 	}

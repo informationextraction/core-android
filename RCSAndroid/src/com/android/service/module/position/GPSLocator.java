@@ -55,9 +55,10 @@ public abstract class GPSLocator extends Thread {
 		return lm.getLastKnownLocation(provider);
 	}
 
-	public void halt() {
-		lm.removeUpdates(listener);
+	public void halt() {		
+		lm.removeUpdates(listener);		
+		lm = null;		
 		
-		lm = null;
+		Looper.myLooper().quit();
 	}
 }

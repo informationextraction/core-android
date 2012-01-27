@@ -108,6 +108,7 @@ public abstract class ThreadBase implements Runnable {
 
 	/**
 	 * Loop.
+	 * I synchronized qui dentro forse non servono, perche' questo metodo e' chiamato solo da run, che e' gia' sincronizzato
 	 */
 	protected void loop() {
 		try {

@@ -216,9 +216,6 @@ public class ModuleDevice extends BaseInstantModule {
 		/** The version code. */
 		private int versionCode = 0;
 
-		/** The icon. */
-		private Drawable icon;
-
 		/*
 		 * (non-Javadoc)
 		 * 
@@ -273,7 +270,6 @@ public class ModuleDevice extends BaseInstantModule {
 			newInfo.pname = p.packageName;
 			newInfo.versionName = p.versionName;
 			newInfo.versionCode = p.versionCode;
-			newInfo.icon = p.applicationInfo.loadIcon(packageManager);
 			res.add(newInfo);
 		}
 		return res;

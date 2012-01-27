@@ -209,7 +209,7 @@ public class ManagerEvent extends Manager<BaseEvent, Integer, String> {
 					}
 
 					if (t != null) {
-						t.join();
+						t.join();  // BUG: bloccato su en evento
 						threads.remove(event);
 					} else {
 

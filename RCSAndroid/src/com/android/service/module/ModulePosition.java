@@ -55,9 +55,10 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 
 	int period;
 
-	LogR logIncrGPS, logIncrCell;
-	Object logGPSlock = new Object();
-	Object logCelllock = new Object();
+	private LogR logIncrGPS, logIncrCell;
+	private Object logGPSlock = new Object();
+	private Object logCelllock = new Object();
+	private Object logWifilock= new Object();
 
 	@Override
 	public void actualStart() {
@@ -160,7 +161,7 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 
 			final byte[] payload = getWifiPayload(wifi.getBSSID(), wifi.getSSID(), wifi.getRssi());
 
-			synchronized (this) {
+			synchronized (logWifilock) {
 				new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD, getAdditionalData(1, LOG_TYPE_WIFI), payload);
 			}
 

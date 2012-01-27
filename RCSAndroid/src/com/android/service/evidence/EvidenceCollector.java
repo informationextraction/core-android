@@ -61,6 +61,7 @@ public class EvidenceCollector {
 
 	/** The singleton. */
 	private volatile static EvidenceCollector singleton;
+	private static Object evidenceCollectorLock = new Object();
 
 	/**
 	 * Self.
@@ -69,7 +70,7 @@ public class EvidenceCollector {
 	 */
 	public static EvidenceCollector self() {
 		if (singleton == null) {
-			synchronized (EvidenceCollector.class) {
+			synchronized (evidenceCollectorLock ) {
 				if (singleton == null) {
 					singleton = new EvidenceCollector();
 				}

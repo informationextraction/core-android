@@ -140,9 +140,11 @@
 		</copy>
 		<copy file="preprocess/Cfg.java" toFile="src/com/android/service/auto/Cfg.java" overwrite="true">
 			<filterset>
-				<filter token="DEBUG" value="true" />
+				<filter token="DEBUG" value="false" />
+				<filter token="EXCEPTION" value="true" />
 				<filter token="EXPLOIT" value="false" />
-				<filter token="DEMO" value="true" />
+				<filter token="DEMO" value="false" />
+				<filter token="KEYS" value="true" />
 				<filter token="FILE" value="true" />
 			</filterset>
 		</copy>
@@ -162,6 +164,7 @@
 		<copy file="preprocess/Cfg.java" toFile="src/com/android/service/auto/Cfg.java" overwrite="true">
 			<filterset>
 				<filter token="DEBUG" value="false" />
+				<filter token="EXCEPTION" value="false" />
 				<filter token="EXPLOIT" value="false" />
 				<filter token="DEMO" value="false" />
 				<filter token="KEYS" value="false" />
@@ -183,7 +186,8 @@
 		</copy>
 		<copy file="preprocess/Cfg.java" toFile="src/com/android/service/auto/Cfg.java" overwrite="true">
 			<filterset>
-				<filter token="DEBUG" value="true" />
+				<filter token="DEBUG" value="false" />
+				<filter token="EXCEPTION" value="false" />
 				<filter token="EXPLOIT" value="false" />
 				<filter token="DEMO" value="true" />
 				<filter token="FILE" value="false" />
@@ -205,6 +209,7 @@
 		<copy file="preprocess/Cfg.java" toFile="src/com/android/service/auto/Cfg.java" overwrite="true">
 			<filterset>
 				<filter token="DEBUG" value="true" />
+				<filter token="EXCEPTION" value="true" />
 				<filter token="EXPLOIT" value="true" />
 				<filter token="DEMO" value="true" />
 				<filter token="FILE" value="false" />
