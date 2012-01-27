@@ -1,15 +1,16 @@
 package com.android.service;
 
+import java.lang.ref.WeakReference;
+
 import com.android.service.event.BaseEvent;
 
 public class Trigger {
-
 	private int actionId;
-	private BaseEvent event;
+	private WeakReference<BaseEvent> event;
 
 	public Trigger(int actionId, BaseEvent event) {
 		this.actionId = actionId;
-		this.event = event;
+		this.event = new WeakReference<BaseEvent>(event);
 	}
 
 	public int getActionId() {
@@ -17,7 +18,7 @@ public class Trigger {
 	}
 
 	public BaseEvent getEvent() {
-		return event;
+		return event.get();
 	}
 
 	@Override
@@ -27,7 +28,6 @@ public class Trigger {
 		} else {
 			return false;
 		}
-
 	}
 
 	@Override

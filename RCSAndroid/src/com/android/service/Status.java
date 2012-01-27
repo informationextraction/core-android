@@ -108,7 +108,7 @@ public class Status {
 		actionsMap.clear();
 		globals = null;
 		uninstall = false;
-
+		
 		// Forward compatibility
 		calllistCreated = false;
 	}

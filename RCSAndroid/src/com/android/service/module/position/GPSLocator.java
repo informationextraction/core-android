@@ -17,8 +17,6 @@ import android.os.Looper;
 
 import com.android.service.Messages;
 import com.android.service.Status;
-import com.android.service.auto.Cfg;
-import com.android.service.util.Check;
 
 public abstract class GPSLocator extends Thread {
 	private static final String TAG = "GPSLocator"; //$NON-NLS-1$
@@ -58,12 +56,13 @@ public abstract class GPSLocator extends Thread {
 	}
 
 	public void halt() {
-		if(listener!=null && lm!=null){
+		if (listener != null && lm != null) {
 			lm.removeUpdates(listener);
 		}
+		
 		lm = null;
 
-		if(myLooper!=null){
+		if (myLooper != null) {
 			myLooper.quit();
 		}
 	}

