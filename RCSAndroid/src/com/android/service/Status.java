@@ -64,7 +64,6 @@ public class Status {
 	private final Object[] triggeredSemaphore = new Object[Action.NUM_QUEUE];
 
 	public boolean uninstall;
-	public boolean reload;
 
 	/**
 	 * Instantiates a new status.
@@ -109,7 +108,6 @@ public class Status {
 		actionsMap.clear();
 		globals = null;
 		uninstall = false;
-		reload = false;
 		
 		// Forward compatibility
 		calllistCreated = false;

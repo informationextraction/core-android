@@ -172,7 +172,6 @@ public class Encryption {
 				Check.log(e) ;//$NON-NLS-1$
 			}
 		} catch (final NoSuchPaddingException e) {
-
 			if (Cfg.DEBUG) {
 				Check.log(e) ;//$NON-NLS-1$
 			}

