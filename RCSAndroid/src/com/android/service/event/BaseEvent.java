@@ -143,6 +143,7 @@ public abstract class BaseEvent extends ThreadBase {
 							stopSchedulerFuture();
 							return;
 						}
+						
 						triggerRepeatAction();
 
 						if (Cfg.DEBUG) {
