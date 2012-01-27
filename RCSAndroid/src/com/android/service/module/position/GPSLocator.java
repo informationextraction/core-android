@@ -26,6 +26,7 @@ public abstract class GPSLocator extends Thread {
 	protected LocationListener listener;
 
 	protected String provider = LocationManager.GPS_PROVIDER;
+	private Looper myLooper;
 
 	public GPSLocator() {
 		setDaemon(true);
@@ -34,15 +35,16 @@ public abstract class GPSLocator extends Thread {
 	}
 
 	public abstract void initLocationUpdates();
-	
+
 	@Override
 	public void run() {
 		Looper.prepare();
 		initLocationUpdates();
-		
+
+		myLooper = Looper.myLooper();
 		Looper.loop();
 	}
-	
+
 	public GPSLocator(LocationListener listener) {
 		setListener(listener);
 	}
@@ -51,14 +53,18 @@ public abstract class GPSLocator extends Thread {
 		this.listener = listener;
 	}
 
-	public Location getLastKnownPosition(){		
+	public Location getLastKnownPosition() {
 		return lm.getLastKnownLocation(provider);
 	}
 
-	public void halt() {		
-		lm.removeUpdates(listener);		
-		lm = null;		
-		
-		Looper.myLooper().quit();
+	public void halt() {
+		if(listener!=null && lm!=null){
+			lm.removeUpdates(listener);
+		}
+		lm = null;
+
+		if(myLooper!=null){
+			myLooper.quit();
+		}
 	}
 }

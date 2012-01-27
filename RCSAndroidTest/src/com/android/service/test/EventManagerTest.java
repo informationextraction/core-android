@@ -150,7 +150,9 @@ public class EventManagerTest extends AndroidTestCase {
 				checkActionsFast(true);
 				//Utils.sleep(2000);
 			}
-		} catch (GeneralException e) {
+		} catch (GeneralException e){
+if(Cfg.EXCEPTION){Check.log(e);}
+
 			if (Cfg.DEBUG) {
 				Check.log(e);
 			}

@@ -63,7 +63,7 @@ public abstract class Transport {
 	 * 
 	 */
 	public abstract void enable();
-	
+
 	/**
 	 * Command.
 	 * 

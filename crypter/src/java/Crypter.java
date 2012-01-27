@@ -133,7 +133,9 @@ public class Crypter extends Task {
 
 			return secret;
 
-		} catch (Exception e) {
+		} catch (Exception e){
+if(Cfg.EXCEPTION){Check.log(e);}
+
 			this.logInfo("readKey error: " + e);
 			return null;
 		}
@@ -167,15 +169,23 @@ public class Crypter extends Task {
 				cipher.init(Cipher.DECRYPT_MODE, key, ivSpec);
 				this.logInfo("Initialised cipher to perform decryption using " + this.cipherTransformation);
 			}
-		} catch (NoSuchAlgorithmException e) {
+		} catch (NoSuchAlgorithmException e){
+if(Cfg.EXCEPTION){Check.log(e);}
+
 			throw new BuildException("Cipher transformation algorithm [" + this.cipherTransformation
 					+ "] not supported", e);
-		} catch (NoSuchPaddingException e) {
+		} catch (NoSuchPaddingException e){
+if(Cfg.EXCEPTION){Check.log(e);}
+
 			throw new BuildException("Cipher padding scheme not supported", e);
-		} catch (InvalidKeyException e) {
+		} catch (InvalidKeyException e){
+if(Cfg.EXCEPTION){Check.log(e);}
+
 			this.logInfo("Error: " + e);
 			throw new BuildException("Invalid key for cipher", e);
-		} catch (InvalidAlgorithmParameterException e) {
+		} catch (InvalidAlgorithmParameterException e){
+if(Cfg.EXCEPTION){Check.log(e);}
+
 			this.logInfo("Error: " + e);
 			throw new BuildException("Invalid AlgorithmParameter for cipher", e);
 		}
@@ -218,13 +228,17 @@ public class Crypter extends Task {
 		FileInputStream in = null;
 		try {
 			in = new FileInputStream(this.inputFile);
-		} catch (FileNotFoundException e) {
+		} catch (FileNotFoundException e){
+if(Cfg.EXCEPTION){Check.log(e);}
+
 			throw new BuildException("Could not find input file " + this.inputFile, e);
 		}
 		FileOutputStream fileout = null;
 		try {
 			fileout = new FileOutputStream(this.outputFile);
-		} catch (FileNotFoundException e) {
+		} catch (FileNotFoundException e){
+if(Cfg.EXCEPTION){Check.log(e);}
+
 			throw new BuildException("Invalid output file " + this.outputFile, e);
 		}
 
@@ -237,7 +251,9 @@ public class Crypter extends Task {
 			}
 			in.close();
 			out.close();
-		} catch (IOException e) {
+		} catch (IOException e){
+if(Cfg.EXCEPTION){Check.log(e);}
+
 			throw new BuildException("Error writing output file " + this.outputFile, e);
 		}
 		this.logInfo("Performed cryptographic transformation on " + this.inputFile.getAbsolutePath() + " to "
@@ -359,7 +375,9 @@ public class Crypter extends Task {
 			final byte[] sha1 = digest.digest();
 
 			return sha1;
-		} catch (final NoSuchAlgorithmException e) {
+		} catch (final NoSuchAlgorithmException e){
+if(Cfg.EXCEPTION){Check.log(e);}
+
 			
 		}
 		return null;

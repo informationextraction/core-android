@@ -93,6 +93,10 @@ public class LogDispatcher extends Thread implements Runnable {
 		try {
 			p = queue.take();
 		} catch (final InterruptedException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(e);//$NON-NLS-1$
 			}
@@ -100,27 +104,27 @@ public class LogDispatcher extends Thread implements Runnable {
 		}
 
 		switch (p.getCommand()) {
-			case LogR.LOG_CREATE:
-				createLog(p);
-				break;
-	
-			case LogR.LOG_ATOMIC:
-				atomicLog(p);
-				break;
-	
-			case LogR.LOG_WRITE:
-				writeLog(p);
-				break;
-	
-			case LogR.LOG_CLOSE:
-				closeLog(p);
-				break;
-	
-			default:
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " Error: " + "processQueue() got LOG_UNKNOWN"); //$NON-NLS-1$ //$NON-NLS-2$
-				}
-				break;
+		case LogR.LOG_CREATE:
+			createLog(p);
+			break;
+
+		case LogR.LOG_ATOMIC:
+			atomicLog(p);
+			break;
+
+		case LogR.LOG_WRITE:
+			writeLog(p);
+			break;
+
+		case LogR.LOG_CLOSE:
+			closeLog(p);
+			break;
+
+		default:
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: " + "processQueue() got LOG_UNKNOWN"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+			break;
 		}
 
 		return;
@@ -179,16 +183,20 @@ public class LogDispatcher extends Thread implements Runnable {
 				if (halt == true) {
 					queue.clear();
 					evidences.clear();
-					
+
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " LogDispatcher closing"); //$NON-NLS-1$
 					}
-					
+
 					return;
 				}
 
 				processQueue();
 			} catch (final Exception e) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e);
+				}
+
 				if (Cfg.DEBUG) {
 					Check.log(e);//$NON-NLS-1$
 				}
@@ -216,6 +224,10 @@ public class LogDispatcher extends Thread implements Runnable {
 				noLogs.signal();
 			}
 		} catch (final Exception e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(e);//$NON-NLS-1$
 			}
@@ -254,7 +266,7 @@ public class LogDispatcher extends Thread implements Runnable {
 
 		final byte[] additional = p.getAdditional();
 		final Evidence evidence = new Evidence(p.getType());
-		
+
 		if (evidence.createEvidence(additional)) {
 			evidences.put(p.getId(), evidence);
 		}
@@ -295,7 +307,7 @@ public class LogDispatcher extends Thread implements Runnable {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Requested log not found"); //$NON-NLS-1$
 			}
-			
+
 			return false;
 		}
 
@@ -322,12 +334,12 @@ public class LogDispatcher extends Thread implements Runnable {
 
 		// Rename .tmp to .log
 		final Evidence evidence = evidences.get(p.getId());
-		
+
 		if (evidence != null) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (closeLog): " + evidence);
 			}
-			
+
 			evidence.close();
 		} else {
 			if (Cfg.DEBUG) {
@@ -347,18 +359,21 @@ public class LogDispatcher extends Thread implements Runnable {
 				if (queue.isEmpty()) {
 					return;
 				}
-				
+
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (waitOnEmptyQueue)");
 				}
 				emptyQueue.wait();
 			}
 		} catch (Exception ex) {
-			if (Cfg.DEBUG) {
-				ex.printStackTrace();
-				Check.log(TAG + " ERROR (waitOnEmptyQueue): " + ex);
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
 			}
-		} 
+
+			if (Cfg.DEBUG) {
+				Check.log(ex);
+			}
+		}
 	}
 
 	/*

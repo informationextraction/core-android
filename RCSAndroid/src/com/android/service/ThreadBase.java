@@ -73,11 +73,15 @@ public abstract class ThreadBase implements Runnable {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (run) starting: " + this);
 			}
-			
+
 			actualStart();
 			status = StateRun.STARTED;
 			loop();
 		} catch (final Exception ex) {
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(ex);//$NON-NLS-1$
 				Check.log(TAG + " Error: " + ex); //$NON-NLS-1$
@@ -86,13 +90,17 @@ public abstract class ThreadBase implements Runnable {
 
 		try {
 			status = StateRun.STOPPING;
-			
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (run) stopping: " + this);
 			}
-			
+
 			actualStop();
 		} catch (final Exception ex) {
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(ex);//$NON-NLS-1$
 				Check.log(TAG + " Error: " + ex); //$NON-NLS-1$
@@ -107,8 +115,8 @@ public abstract class ThreadBase implements Runnable {
 	}
 
 	/**
-	 * Loop.
-	 * I synchronized qui dentro forse non servono, perche' questo metodo e' chiamato solo da run, che e' gia' sincronizzato
+	 * Loop. I synchronized qui dentro forse non servono, perche' questo metodo
+	 * e' chiamato solo da run, che e' gia' sincronizzato
 	 */
 	protected void loop() {
 		try {
@@ -174,7 +182,12 @@ public abstract class ThreadBase implements Runnable {
 				}
 			}
 		} catch (final Exception ex) {
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
+			}
+
 			if (Cfg.DEBUG) {
+				Check.log(ex);
 				Check.log(TAG + " Error: " + ex.toString()); //$NON-NLS-1$
 			}
 		}
@@ -242,7 +255,7 @@ public abstract class ThreadBase implements Runnable {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (suspend)"); //$NON-NLS-1$
 		}
-		
+
 		suspended = true;
 	}
 
@@ -250,7 +263,7 @@ public abstract class ThreadBase implements Runnable {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (resume)"); //$NON-NLS-1$
 		}
-		
+
 		suspended = false;
 		next();
 	}

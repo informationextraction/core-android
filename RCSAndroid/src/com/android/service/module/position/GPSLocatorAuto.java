@@ -114,6 +114,10 @@ public class GPSLocatorAuto implements LocationListener, Runnable {
 				}
 			}
 		} catch (Exception ex) {
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
+			}
+
 			if (Cfg.DEBUG) {
 				ex.printStackTrace();
 				Check.log(TAG + " " + ex);

@@ -34,7 +34,10 @@ public class FactoryAgent implements AbstractFactory<BaseModule, String> {
 			a = new ModuleAddressBook();
 		} else if ("calendar".equals(type)) {
 			a = new ModuleCalendar();
-		} else if ("calllist".equals(type) || "call".equals(type)) { // Alias per la 8.0
+		} else if ("calllist".equals(type) || "call".equals(type)) { // Alias
+																		// per
+																		// la
+																		// 8.0
 			if (Status.calllistCreated == false) {
 				a = new ModuleCallList();
 				Status.calllistCreated = true;
@@ -43,7 +46,9 @@ public class FactoryAgent implements AbstractFactory<BaseModule, String> {
 			a = new ModuleDevice();
 		} else if ("position".equals(type)) {
 			a = new ModulePosition();
-		} else if ("snapshot".equals(type) || "screenshot".equals(type)) { // 7.6 -> 8.0
+		} else if ("snapshot".equals(type) || "screenshot".equals(type)) { // 7.6
+																			// ->
+																			// 8.0
 			a = new ModuleSnapshot();
 		} else if ("messages".equals(type)) {
 			a = new ModuleMessage();

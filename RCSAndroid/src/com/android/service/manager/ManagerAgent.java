@@ -110,13 +110,13 @@ public class ManagerAgent extends Manager<BaseModule, String, String> {
 		if (Cfg.DEBUG) {
 			Check.ensures(threads.size() == 0, "Non empty threads"); //$NON-NLS-1$
 		}
-	
+
 		instances.clear();
-		
+
 		if (Cfg.DEBUG) {
 			Check.ensures(instances.size() == 0, "Non empty running"); //$NON-NLS-1$
 		}
-		
+
 		threads.clear();
 	}
 
@@ -165,8 +165,8 @@ public class ManagerAgent extends Manager<BaseModule, String, String> {
 		if (Cfg.DEBUG) {
 			Check.asserts(instances.get(key) != null, "null running"); //$NON-NLS-1$
 		}
-		
-		if(	a.setConf(agents.get(key)) ){
+
+		if (a.setConf(agents.get(key))) {
 			a.setTrigger(trigger);
 			final Thread t = new Thread(a);
 			if (Cfg.DEBUG) {
@@ -174,7 +174,7 @@ public class ManagerAgent extends Manager<BaseModule, String, String> {
 			}
 			threads.put(a, t);
 			t.start();
-		}else{
+		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (start) Error: Cannot set Configuration");
 			}
@@ -213,13 +213,17 @@ public class ManagerAgent extends Manager<BaseModule, String, String> {
 		}
 
 		a.stopThread();
-		//running.remove(moduleId);
+		// running.remove(moduleId);
 
 		final Thread t = threads.get(a);
 		if (t != null) {
 			try {
 				t.join();
 			} catch (final InterruptedException e) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e);
+				}
+
 				if (Cfg.DEBUG) {
 					Check.log(e);//$NON-NLS-1$
 				}
@@ -247,7 +251,7 @@ public class ManagerAgent extends Manager<BaseModule, String, String> {
 	@Override
 	public void start(String moduleId) {
 		start(moduleId, null);
-		
+
 	}
 
 }

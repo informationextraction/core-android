@@ -33,9 +33,12 @@ public class SHA1Digest {
 		try {
 			digest = MessageDigest.getInstance(Messages.getString("21.0")); //$NON-NLS-1$
 		} catch (final NoSuchAlgorithmException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
 
 			if (Cfg.DEBUG) {
-				Check.log(e) ;//$NON-NLS-1$
+				Check.log(e);//$NON-NLS-1$
 			}
 		}
 

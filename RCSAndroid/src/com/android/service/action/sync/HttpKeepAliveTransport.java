@@ -57,7 +57,7 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 		httppost.setHeader(Messages.getString("3.0"), //$NON-NLS-1$
 				Messages.getString("3.1")); //$NON-NLS-1$
 		httppost.setHeader(Messages.getString("3.2"), Messages.getString("3.3")); //$NON-NLS-1$ //$NON-NLS-2$
-		
+
 		if (cookies != null) {
 			for (final Cookie cookie : cookies) {
 				httpclient.getCookieStore().addCookie(cookie);
@@ -90,18 +90,26 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 				return null;
 			}
 		} catch (final Exception ex) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: " + ex.toString()) ;//$NON-NLS-1$
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
 			}
-			
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: " + ex.toString());//$NON-NLS-1$
+			}
+
 			throw new TransportException(1);
 		} finally {
 			if (in != null) {
 				try {
 					in.close();
 				} catch (final IOException e) {
+					if (Cfg.EXCEPTION) {
+						Check.log(e);
+					}
+
 					if (Cfg.DEBUG) {
-						Check.log(e) ;//$NON-NLS-1$
+						Check.log(e);//$NON-NLS-1$
 					}
 				}
 			}

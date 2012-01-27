@@ -33,12 +33,12 @@ public class BroadcastMonitorStandby extends BroadcastReceiver {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (onReceive): Intent null"); //$NON-NLS-1$
 			}
-			
+
 			return;
 		}
-		
+
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " standby notification, action: " + intent.getAction()) ;//$NON-NLS-1$
+			Check.log(TAG + " standby notification, action: " + intent.getAction());//$NON-NLS-1$
 		}
 
 		final boolean on = intent.getAction().equals(Intent.ACTION_SCREEN_ON);

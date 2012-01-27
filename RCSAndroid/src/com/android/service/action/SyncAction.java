@@ -56,8 +56,8 @@ public abstract class SyncAction extends SubActionSlow {
 	 * @param jsubaction
 	 *            the conf params
 	 */
-	public SyncAction( final ConfAction jsubaction) {
-		super( jsubaction);
+	public SyncAction(final ConfAction jsubaction) {
+		super(jsubaction);
 
 		logCollector = EvidenceCollector.self();
 		agentManager = ManagerAgent.self();
@@ -78,7 +78,7 @@ public abstract class SyncAction extends SubActionSlow {
 		if (Cfg.DEBUG) {
 			Check.requires(protocol != null, "execute: null protocol"); //$NON-NLS-1$
 		}
-		
+
 		if (Cfg.DEBUG) {
 			Check.requires(transports != null, "execute: null transports"); //$NON-NLS-1$
 		}
@@ -87,7 +87,7 @@ public abstract class SyncAction extends SubActionSlow {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Warn: " + "Already synced in this action: skipping"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
-			
+
 			return false;
 		}
 
@@ -95,7 +95,7 @@ public abstract class SyncAction extends SubActionSlow {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Warn: " + "SyncAction - no sync, we are in crisis"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
-			
+
 			return false;
 		}
 
@@ -105,18 +105,18 @@ public abstract class SyncAction extends SubActionSlow {
 			// Toast.LENGTH_LONG).show();
 		}
 
-		//agentManager.reload(AgentType.AGENT_DEVICE);
+		// agentManager.reload(AgentType.AGENT_DEVICE);
 		agentManager.resetIncrementalLogs();
 
 		boolean ret = false;
 
 		for (int i = 0; i < transports.size(); i++) {
 			final Transport transport = (Transport) transports.elementAt(i);
-			
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " execute transport: " + transport); //$NON-NLS-1$
 			}
-			
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " transport Sync url: " + transport.getUrl()); //$NON-NLS-1$
 			}
@@ -125,22 +125,22 @@ public abstract class SyncAction extends SubActionSlow {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (execute): transport unavailable, enabling it..."); //$NON-NLS-1$
 				}
-				
+
 				// enable() should manage internally the "forced" state
 				transport.enable();
 			}
-			
+
 			// Now the transport should be available
 			if (transport.isAvailable() == true) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " execute: transport available"); //$NON-NLS-1$
 				}
-				
+
 				protocol.init(transport);
 
 				try {
 					Date before, after;
-					
+
 					if (Cfg.DEBUG) {
 						before = new Date();
 					}
@@ -152,13 +152,17 @@ public abstract class SyncAction extends SubActionSlow {
 					if (Cfg.DEBUG) {
 						after = new Date();
 						final long elapsed = after.getTime() - before.getTime();
-						Check.log( TAG + " (execute): elapsed=" + elapsed / 1000); //$NON-NLS-1$ //$NON-NLS-2$
+						Check.log(TAG + " (execute): elapsed=" + elapsed / 1000); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 				} catch (final ProtocolException e) {
+					if (Cfg.EXCEPTION) {
+						Check.log(e);
+					}
+
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " Error: " + e.toString()); //$NON-NLS-1$
 					}
-					
+
 					ret = false;
 				}
 
@@ -175,7 +179,7 @@ public abstract class SyncAction extends SubActionSlow {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Info: SyncAction OK"); //$NON-NLS-1$
 				}
-				
+
 				status.synced = true;
 				return true;
 			}

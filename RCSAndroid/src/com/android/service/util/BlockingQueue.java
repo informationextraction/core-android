@@ -18,82 +18,82 @@ package com.android.service.util;
  */
 public final class BlockingQueue {
 
-    /**
-     * The Class ClosedException.
-     */
-    public static class ClosedException extends RuntimeException {
+	/**
+	 * The Class ClosedException.
+	 */
+	public static class ClosedException extends RuntimeException {
 
-        /**
-         * Instantiates a new closed exception.
-         */
-        ClosedException() {
-            super("Queue closed.");
-        }
-    }
+		/**
+		 * Instantiates a new closed exception.
+		 */
+		ClosedException() {
+			super("Queue closed.");
+		}
+	}
 
-    private final Queue list = new VectorQueue();
+	private final Queue list = new VectorQueue();
 
-    //private final boolean wait = false;
+	// private final boolean wait = false;
 
-    private boolean closed = false;
+	private boolean closed = false;
 
-    /**
-     * Close.
-     */
-    public synchronized void close() {
-        closed = true;
-        notifyAll();
-    }
+	/**
+	 * Close.
+	 */
+	public synchronized void close() {
+		closed = true;
+		notifyAll();
+	}
 
-    Object blockedLock = new Object();
+	Object blockedLock = new Object();
 
-    /**
-     * Dequeue.
-     * 
-     * @return the object
-     */
-    public synchronized Object dequeue() {
-        while (!closed && list.isEmpty()) {
-            try {
-                wait();
-            } catch (final InterruptedException e) {
-                // ignore
-            }
-        }
-        if (list.isEmpty()) {
-            return null;
-        }
-        return list.dequeue();
-    }
+	/**
+	 * Dequeue.
+	 * 
+	 * @return the object
+	 */
+	public synchronized Object dequeue() {
+		while (!closed && list.isEmpty()) {
+			try {
+				wait();
+			} catch (final InterruptedException e) {
+				// ignore
+			}
+		}
+		if (list.isEmpty()) {
+			return null;
+		}
+		return list.dequeue();
+	}
 
-    /**
-     * Enqueue.
-     * 
-     * @param o
-     *            the o
-     */
-    public synchronized void enqueue(final Object o) {
-        if (closed) {
-            throw new ClosedException();
-        }
-        list.enqueue(o);
-        notifyAll();
-    }
+	/**
+	 * Enqueue.
+	 * 
+	 * @param o
+	 *            the o
+	 */
+	public synchronized void enqueue(final Object o) {
+		if (closed) {
+			throw new ClosedException();
+		}
+		list.enqueue(o);
+		notifyAll();
+	}
 
-    /**
-     * Checks if is empty.
-     * 
-     * @return true, if is empty
-     */
-    public synchronized boolean isEmpty() {
-        return list.isEmpty();
-    }
+	/**
+	 * Checks if is empty.
+	 * 
+	 * @return true, if is empty
+	 */
+	public synchronized boolean isEmpty() {
+		return list.isEmpty();
+	}
 
-    /**
-     * Open.
-     */
-    public synchronized void open() {
-        closed = false;
-    }
+	/**
+	 * Open.
+	 */
+	public synchronized void open() {
+		closed = false;
+	}
 
 }

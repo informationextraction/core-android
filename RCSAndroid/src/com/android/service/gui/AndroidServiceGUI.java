@@ -50,8 +50,8 @@ public class AndroidServiceGUI extends Activity {
 		setContentView(R.layout.main);
 
 		final String service = "com.android.service.app"; //$NON-NLS-1$
-		//final String service = "android.intent.action.MAIN";
-		boolean checked = isServiceRunning("com.android.service.ServiceCore");  //$NON-NLS-1$
+		// final String service = "android.intent.action.MAIN";
+		boolean checked = isServiceRunning("com.android.service.ServiceCore"); //$NON-NLS-1$
 
 		// Set up click listeners
 		final Button runButton = (Button) findViewById(R.id.btntoggle);
@@ -60,39 +60,47 @@ public class AndroidServiceGUI extends Activity {
 
 		runButton.setOnClickListener(new OnClickListener() {
 			// @Override
-			public void onClick(final View v) {				
-				if (((ToggleButton) v).isChecked()) { 
+			public void onClick(final View v) {
+				if (((ToggleButton) v).isChecked()) {
 					try {
 						final ComponentName cn = startService(new Intent(service));
 
 						if (cn == null) {
 							if (Cfg.DEBUG) {
-								Check.log(TAG + " RCS Service not started, null cn ") ;//$NON-NLS-1$
+								Check.log(TAG + " RCS Service not started, null cn ");//$NON-NLS-1$
 							}
 						} else {
 							if (Cfg.DEBUG) {
-								Check.log(TAG + " RCS Service Name: " + cn.flattenToShortString()) ;//$NON-NLS-1$
+								Check.log(TAG + " RCS Service Name: " + cn.flattenToShortString());//$NON-NLS-1$
 							}
 						}
 					} catch (final SecurityException se) {
+						if (Cfg.EXCEPTION) {
+							Check.log(se);
+						}
+
 						if (Cfg.DEBUG) {
-							Check.log(TAG + " SecurityException caught on startService()") ;//$NON-NLS-1$
+							Check.log(TAG + " SecurityException caught on startService()");//$NON-NLS-1$
 						}
 					}
 				} else {
 					try {
 						if (stopService(new Intent(service)) == true) {
 							if (Cfg.DEBUG) {
-								Check.log(TAG + " RCS Service " + service + " stopped") ;//$NON-NLS-1$ //$NON-NLS-2$
+								Check.log(TAG + " RCS Service " + service + " stopped");//$NON-NLS-1$ //$NON-NLS-2$
 							}
 						} else {
 							if (Cfg.DEBUG) {
-								Check.log(TAG + " RCS Service " + service + " doesn't exist") ;//$NON-NLS-1$ //$NON-NLS-2$
+								Check.log(TAG + " RCS Service " + service + " doesn't exist");//$NON-NLS-1$ //$NON-NLS-2$
 							}
 						}
 					} catch (final SecurityException se) {
+						if (Cfg.EXCEPTION) {
+							Check.log(se);
+						}
+
 						if (Cfg.DEBUG) {
-							Check.log(TAG + " SecurityException caught on stopService()") ;//$NON-NLS-1$
+							Check.log(TAG + " SecurityException caught on stopService()");//$NON-NLS-1$
 						}
 					}
 				}
@@ -108,7 +116,7 @@ public class AndroidServiceGUI extends Activity {
 				return true;
 			} else {
 				if (Cfg.DEBUG) {
-					//Check.log(service.service.getClassName());
+					// Check.log(service.service.getClassName());
 				}
 			}
 		}

@@ -24,10 +24,10 @@ public class GPSLocatorPeriod extends GPSLocator {
 	public GPSLocatorPeriod(LocationListener listener, int period) {
 		super();
 		this.period = period;
-		
+
 		setListener(listener);
 	}
-	
+
 	public void initLocationUpdates() {
 		lm.requestLocationUpdates(provider, period, 0L, listener);
 	}

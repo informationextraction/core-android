@@ -10,27 +10,25 @@ public class ConfAction extends JSONConf {
 	private static final String TAG = "ActionConf";
 	public int subActionId;
 	public int actionId;
-	
-	public ConfAction(int actionId, int subActionId, String type, JSONObject params) {		
+
+	public ConfAction(int actionId, int subActionId, String type, JSONObject params) {
 		super(type, params);
 		this.subActionId = subActionId;
 		this.actionId = actionId;
 	}
-	
-	public ConfAction(int actionId, int subActionId, JSONObject params) throws JSONException {		
+
+	public ConfAction(int actionId, int subActionId, JSONObject params) throws JSONException {
 		super(params.getString("action"), params);
 		this.subActionId = subActionId;
 		this.actionId = actionId;
 	}
 
-	int getId(){
+	int getId() {
 		return subActionId;
 	}
-	
-	int getActionId(){
+
+	int getActionId() {
 		return actionId;
 	}
-
-
 
 }

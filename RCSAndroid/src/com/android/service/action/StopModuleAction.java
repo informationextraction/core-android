@@ -27,7 +27,7 @@ public class StopModuleAction extends ModuleAction {
 	@Override
 	public boolean execute(Trigger trigger) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (execute): " + moduleId) ;//$NON-NLS-1$
+			Check.log(TAG + " (execute): " + moduleId);//$NON-NLS-1$
 		}
 		final ManagerAgent agentManager = ManagerAgent.self();
 

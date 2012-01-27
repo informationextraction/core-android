@@ -29,7 +29,7 @@ public abstract class BaseEvent extends ThreadBase {
 	boolean isActive = false;
 	private ScheduledFuture<?> future;
 	private String subType;
-	
+
 	// Gli eredi devono implementare i seguenti metodi astratti
 	/**
 	 * Parses the.
@@ -93,14 +93,14 @@ public abstract class BaseEvent extends ThreadBase {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (onEnter): already active, return");
 			}
-			
+
 			return;
 		}
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onEnter): " + this);
 		}
-		
+
 		int delay = getConfDelay();
 		int period = delay;
 
@@ -129,7 +129,7 @@ public abstract class BaseEvent extends ThreadBase {
 			if (Cfg.DEBUG) {
 				Check.asserts(period > 0, " (onEnter) Assert failed, period<=0: " + conf);
 			}
-			
+
 			future = Status.self().getStpe().scheduleAtFixedRate(new Runnable() {
 				int count = 0;
 
@@ -139,10 +139,11 @@ public abstract class BaseEvent extends ThreadBase {
 							if (Cfg.DEBUG) {
 								Check.log(TAG + " SCHED (run): count >= iterCounter");
 							}
-							
+
 							stopSchedulerFuture();
 							return;
 						}
+
 						triggerRepeatAction();
 
 						if (Cfg.DEBUG) {
@@ -151,29 +152,33 @@ public abstract class BaseEvent extends ThreadBase {
 
 						count++;
 					} catch (Exception ex) {
+						if (Cfg.EXCEPTION) {
+							Check.log(ex);
+						}
+
 						if (Cfg.DEBUG) {
 							Check.log(TAG + " SCHED (onEnter) Error: " + ex);
 						}
-						
+
 						stopSchedulerFuture();
 					}
 				}
 			}, delay, period, TimeUnit.SECONDS);
 		}
-		
+
 		isActive = true;
 	}
 
 	private void stopSchedulerFuture() {
 		if (Cfg.DEBUG)
 			Check.asserts(isActive, "stopSchedulerFuture");
-		
+
 		if (isActive && future != null) {
 			future.cancel(true);
 			future = null;
 		}
 	}
-	
+
 	protected boolean isEntered() {
 		return isActive;
 	}
@@ -184,11 +189,11 @@ public abstract class BaseEvent extends ThreadBase {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (onExit): Active");
 			}
-			
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (onExit): " + this);
 			}
-			
+
 			stopSchedulerFuture();
 			isActive = false;
 
@@ -209,7 +214,7 @@ public abstract class BaseEvent extends ThreadBase {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (triggerStartAction): " + this);
 		}
-		
+
 		if (Cfg.DEBUG) {
 			Check.requires(conf != null, "null conf");
 		}
@@ -230,11 +235,11 @@ public abstract class BaseEvent extends ThreadBase {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (triggerRepeatAction): " + this);
 		}
-		
+
 		if (Cfg.DEBUG) {
 			Check.requires(conf != null, "null conf");
 		}
-		
+
 		return trigger(conf.repeatAction);
 	}
 

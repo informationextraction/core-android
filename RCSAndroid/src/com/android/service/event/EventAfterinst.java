@@ -21,7 +21,7 @@ public class EventAfterinst extends BaseTimer {
 			days = conf.getInt("days");
 			Markup markup = new Markup(this);
 			Date now = new Date();
-			
+
 			if (markup.isMarkup()) {
 				date = (Date) markup.readMarkupSerializable();
 			} else {
@@ -30,8 +30,10 @@ public class EventAfterinst extends BaseTimer {
 			}
 
 		} catch (ConfigurationException e) {
+
 			return false;
 		} catch (IOException e) {
+
 			return false;
 		}
 		return true;
@@ -53,10 +55,9 @@ public class EventAfterinst extends BaseTimer {
 			setPeriod(NEVER);
 		} else {
 			setDelay(SOON);
-		}	
+		}
 	}
 
-	
 	@Override
 	protected void actualStop() {
 		onExit(); // di sicurezza

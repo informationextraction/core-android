@@ -54,8 +54,10 @@ public class SystemPropertiesProxy {
 			ret = (String) get.invoke(SystemProperties, params);
 
 		} catch (final IllegalArgumentException iAE) {
+
 			throw iAE;
 		} catch (final Exception e) {
+
 			ret = ""; //$NON-NLS-1$
 			// TODO
 		}
@@ -96,8 +98,10 @@ public class SystemPropertiesProxy {
 			ret = (String) get.invoke(SystemProperties, params);
 
 		} catch (final IllegalArgumentException iAE) {
+
 			throw iAE;
 		} catch (final Exception e) {
+
 			ret = def;
 			// TODO
 		}
@@ -142,8 +146,10 @@ public class SystemPropertiesProxy {
 			ret = (Integer) getInt.invoke(SystemProperties, params);
 
 		} catch (final IllegalArgumentException iAE) {
+
 			throw iAE;
 		} catch (final Exception e) {
+
 			ret = def;
 			// TODO
 		}
@@ -188,8 +194,10 @@ public class SystemPropertiesProxy {
 			ret = (Long) getLong.invoke(SystemProperties, params);
 
 		} catch (final IllegalArgumentException iAE) {
+
 			throw iAE;
 		} catch (final Exception e) {
+
 			ret = def;
 			// TODO
 		}
@@ -237,8 +245,10 @@ public class SystemPropertiesProxy {
 			ret = (Boolean) getBoolean.invoke(SystemProperties, params);
 
 		} catch (final IllegalArgumentException iAE) {
+
 			throw iAE;
 		} catch (final Exception e) {
+
 			ret = def;
 			// TODO
 		}
@@ -281,8 +291,10 @@ public class SystemPropertiesProxy {
 			set.invoke(SystemProperties, params);
 
 		} catch (final IllegalArgumentException iAE) {
+
 			throw iAE;
 		} catch (final Exception e) {
+
 			// TODO
 		}
 	}

