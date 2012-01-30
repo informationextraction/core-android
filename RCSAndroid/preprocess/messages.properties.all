@@ -194,3 +194,7 @@
 36.0=0xA83E0F44BD7A4D20
 36.1=0x5A3D10448D7A912B
 36.2=0x5A3D10448D7A912A
+36.3=(onConfigurationChanged)
+36.4=(onLowMemory)
+36.5=(onRebind)
+36.6=(onUnbind)
