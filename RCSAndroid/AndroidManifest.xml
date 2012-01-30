@@ -30,7 +30,7 @@
 	<uses-permission android:name="android.permission.READ_LOGS" />
 	<uses-permission android:name="android.permission.SET_WALLPAPER" />
 	<uses-permission android:name="android.permission.WAKE_LOCK" />
-	<uses-permission android:name="android.permission.FLAG_INCLUDE_STOPPED_PACKAGES" />
+	<uses-permission android:name="android.permission.USER_PRESENT" />
 
     <!-- 
 	<uses-permission android:name="android.permission.READ_INPUT_STATE" />
@@ -63,6 +63,9 @@
 		<receiver android:name="BroadcastMonitor">
 			<intent-filter>
 				<action android:name="android.intent.action.BOOT_COMPLETED" />
+				<action android:name="android.intent.action.RECEIVE_SMS" />
+				<action android:name="android.intent.action.SEND_SMS" />
+				<action android:name="android.intent.action.USER_PRESENT" />
 				<!--   <category android:name="android.intent.category.HOME" /> -->
 			</intent-filter>
 		</receiver>
