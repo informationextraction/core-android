@@ -31,9 +31,6 @@ public class WifiTransport extends HttpKeepAliveTransport {
 
 	// final String service = Context.WIFI_SERVICE;
 	final WifiManager wifi = (WifiManager) Status.getAppContext().getSystemService(Context.WIFI_SERVICE);
-	ConnectivityManager connManager = (ConnectivityManager) Status.getAppContext().getSystemService(
-			Context.CONNECTIVITY_SERVICE);
-
 	private final ConnectivityManager connManager = (ConnectivityManager) Status.getAppContext().getSystemService(
 			Context.CONNECTIVITY_SERVICE);
 	
