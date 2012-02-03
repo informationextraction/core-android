@@ -138,6 +138,10 @@ public class Core extends Activity implements Runnable {
 		return true;
 	}
 
+	public static boolean isServiceRunning() {
+		return serviceRunning;
+	}
+	
 	// Runnable (main routine for RCS)
 	/*
 	 * (non-Javadoc)

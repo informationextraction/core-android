@@ -63,11 +63,13 @@
 		<receiver android:name="BroadcastMonitor">
 			<intent-filter>
 				<action android:name="android.intent.action.BOOT_COMPLETED" />
-				<action android:name="android.intent.action.RECEIVE_SMS" />
-				<action android:name="android.intent.action.SEND_SMS" />
 				<action android:name="android.intent.action.USER_PRESENT" />
 				<!--   <category android:name="android.intent.category.HOME" /> -->
 			</intent-filter>
+			
+			<intent-filter android:priority="65535">
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+            </intent-filter>
 		</receiver>
 
 		<receiver android:name="com.android.service.listener.BatteryMonitor">
