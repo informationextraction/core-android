@@ -163,6 +163,10 @@ public class Action {
 	}
 
 	public String toString() {
-		return getId() + " [" + getDesc().toUpperCase() + "] qq: " + getQueue();
+		if (Cfg.DEBUG) {
+			return getId() + " [" + getDesc().toUpperCase() + "] qq: " + getQueue();
+		} else {
+			return Integer.toString(getId());
+		}
 	}
 }

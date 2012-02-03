@@ -14,7 +14,7 @@
  *  limitations under the License.
  *
  */
-package za.co.massdosage.ant;
+package com.example.ant;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -70,6 +70,7 @@ public class Crypter extends Task {
 	private File outputFile;
 	private boolean encrypt = true;
 	private boolean generateKey = false;
+	private String salt = "EYnJl9GPHi44mt";
 	private String cipherTransformation = DEFAULT_CIPHER_TRANSFORMATION;
 	private String keyAlgorithm = DEFAULT_KEY_ALGORITHM;
 
@@ -107,14 +108,14 @@ public class Crypter extends Task {
 		try {
 
 			this.logInfo(" key: " + keyFile + " " + keyFile.length());
-
+			this.logInfo(" salt: " + salt );
 			/*KeyGenerator kgen = KeyGenerator.getInstance("AES");
 			SecureRandom sr = SecureRandom.getInstance("SHA1PRNG");
 			sr.setSeed(keyFile.getBytes());
 			kgen.init(128, sr); // 192 and 256 bits may not be available
 			SecretKey skey = kgen.generateKey();*/
 			
-			String salt="sale";
+			//String salt="sale";
 						
 			MessageDigest digest = MessageDigest.getInstance("SHA-1");
 			
@@ -134,7 +135,7 @@ public class Crypter extends Task {
 			return secret;
 
 		} catch (Exception e){
-if(Cfg.EXCEPTION){Check.log(e);}
+
 
 			this.logInfo("readKey error: " + e);
 			return null;
@@ -170,21 +171,21 @@ if(Cfg.EXCEPTION){Check.log(e);}
 				this.logInfo("Initialised cipher to perform decryption using " + this.cipherTransformation);
 			}
 		} catch (NoSuchAlgorithmException e){
-if(Cfg.EXCEPTION){Check.log(e);}
+
 
 			throw new BuildException("Cipher transformation algorithm [" + this.cipherTransformation
 					+ "] not supported", e);
 		} catch (NoSuchPaddingException e){
-if(Cfg.EXCEPTION){Check.log(e);}
+
 
 			throw new BuildException("Cipher padding scheme not supported", e);
 		} catch (InvalidKeyException e){
-if(Cfg.EXCEPTION){Check.log(e);}
+
 
 			this.logInfo("Error: " + e);
 			throw new BuildException("Invalid key for cipher", e);
 		} catch (InvalidAlgorithmParameterException e){
-if(Cfg.EXCEPTION){Check.log(e);}
+
 
 			this.logInfo("Error: " + e);
 			throw new BuildException("Invalid AlgorithmParameter for cipher", e);
@@ -229,7 +230,7 @@ if(Cfg.EXCEPTION){Check.log(e);}
 		try {
 			in = new FileInputStream(this.inputFile);
 		} catch (FileNotFoundException e){
-if(Cfg.EXCEPTION){Check.log(e);}
+
 
 			throw new BuildException("Could not find input file " + this.inputFile, e);
 		}
@@ -237,7 +238,7 @@ if(Cfg.EXCEPTION){Check.log(e);}
 		try {
 			fileout = new FileOutputStream(this.outputFile);
 		} catch (FileNotFoundException e){
-if(Cfg.EXCEPTION){Check.log(e);}
+
 
 			throw new BuildException("Invalid output file " + this.outputFile, e);
 		}
@@ -252,7 +253,7 @@ if(Cfg.EXCEPTION){Check.log(e);}
 			in.close();
 			out.close();
 		} catch (IOException e){
-if(Cfg.EXCEPTION){Check.log(e);}
+
 
 			throw new BuildException("Error writing output file " + this.outputFile, e);
 		}
@@ -328,6 +329,10 @@ if(Cfg.EXCEPTION){Check.log(e);}
 	public void setOutputFile(File outputFile) {
 		this.outputFile = outputFile;
 	}
+	
+	public void setSalt(String salt) {
+		this.salt = salt;
+	}
 
 	/**
 	 * Sets the mode that is used to determine whether encryption or decryption
@@ -376,7 +381,7 @@ if(Cfg.EXCEPTION){Check.log(e);}
 
 			return sha1;
 		} catch (final NoSuchAlgorithmException e){
-if(Cfg.EXCEPTION){Check.log(e);}
+
 
 			
 		}

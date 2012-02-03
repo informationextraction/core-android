@@ -196,7 +196,11 @@ public abstract class SubAction {
 
 	@Override
 	public String toString() {
-		return "SubAction (" + conf.actionId + "/" + conf.subActionId + ") <" + conf.getType().toUpperCase() + "> " + conf; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		if(Cfg.DEBUG){
+			return "SubAction (" + conf.actionId + "/" + conf.subActionId + ") <" + conf.getType().toUpperCase() + "> " + conf; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		}else{
+			return conf.actionId + "/" + conf.subActionId;
+		}
 	}
 
 }

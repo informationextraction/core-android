@@ -502,6 +502,10 @@ public final class Evidence {
 
 	@Override
 	public String toString() {
-		return "Evidence " + progressive;
+		if (Cfg.DEBUG) {
+			return "Evidence " + progressive;
+		} else {
+			return Integer.toString(progressive);
+		}
 	}
 }

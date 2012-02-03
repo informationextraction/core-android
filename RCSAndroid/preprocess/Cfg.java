@@ -6,6 +6,7 @@ public class Cfg {
 	public static final boolean EXCEPTION = @EXCEPTION@;
 	public static final boolean EXP = @EXPLOIT@;
 	public static final boolean DEMO = @DEMO@;
-	public static final boolean KEYS = false;
+	public static final boolean KEYS = @KEYS@;
 	public static final boolean FILE = @FILE@;
+	public static final String RANDOM = "@RANDOM@";
 }
