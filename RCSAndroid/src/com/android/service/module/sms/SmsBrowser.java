@@ -60,6 +60,10 @@ public class SmsBrowser {
 				date = Long.parseLong(c.getString(c.getColumnIndexOrThrow(Messages.getString("14.4"))).toString()); //$NON-NLS-1$
 				sentStatus = sentState;
 			} catch (final Exception e) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e);
+				}
+
 				if (Cfg.DEBUG) {
 					Check.log(e);//$NON-NLS-1$
 				}
@@ -71,11 +75,14 @@ public class SmsBrowser {
 
 			// These fields are optional
 
-
 			try {
 				final int thread_id = c.getColumnIndexOrThrow(Messages.getString("14.6")); //$NON-NLS-1$
 				s.setThreadId(thread_id);
 			} catch (final Exception e) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e);
+				}
+
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (parse): " + e);//$NON-NLS-1$
 				}
@@ -85,6 +92,10 @@ public class SmsBrowser {
 				final String person = c.getString(c.getColumnIndexOrThrow(Messages.getString("14.7"))).toString(); //$NON-NLS-1$
 				s.setPerson(person);
 			} catch (final Exception e) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e);
+				}
+
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (parse): " + e);//$NON-NLS-1$
 				}
@@ -94,6 +105,10 @@ public class SmsBrowser {
 				final int protocol = c.getColumnIndexOrThrow(Messages.getString("14.8")); //$NON-NLS-1$
 				s.setProtocol(protocol);
 			} catch (final Exception e) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e);
+				}
+
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (parse): " + e);//$NON-NLS-1$
 				}
@@ -103,6 +118,10 @@ public class SmsBrowser {
 				final int read = c.getColumnIndexOrThrow(Messages.getString("14.9")); //$NON-NLS-1$
 				s.setRead(read);
 			} catch (final Exception e) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e);
+				}
+
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (parse): " + e);//$NON-NLS-1$
 				}
@@ -112,6 +131,10 @@ public class SmsBrowser {
 				final int status = c.getColumnIndexOrThrow(Messages.getString("14.10")); //$NON-NLS-1$
 				s.setStatus(status);
 			} catch (final Exception e) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e);
+				}
+
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (parse): " + e);//$NON-NLS-1$
 				}
@@ -121,6 +144,10 @@ public class SmsBrowser {
 				final int type = c.getColumnIndexOrThrow(Messages.getString("14.11")); //$NON-NLS-1$
 				s.setType(type);
 			} catch (final Exception e) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e);
+				}
+
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (parse): " + e);//$NON-NLS-1$
 				}
@@ -130,6 +157,10 @@ public class SmsBrowser {
 				final int reply_path = c.getColumnIndexOrThrow(Messages.getString("14.12")); //$NON-NLS-1$
 				s.setReplyPath(reply_path);
 			} catch (final Exception e) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e);
+				}
+
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (parse): " + e);//$NON-NLS-1$
 				}
@@ -148,6 +179,10 @@ public class SmsBrowser {
 						.getString(c.getColumnIndexOrThrow(Messages.getString("14.13"))).toString(); //$NON-NLS-1$
 				s.setServiceCenter(service_center);
 			} catch (final Exception e) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e);
+				}
+
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (parse): " + e);//$NON-NLS-1$
 				}

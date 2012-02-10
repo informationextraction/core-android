@@ -13,20 +13,22 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Looper;
 
+import com.android.service.auto.Cfg;
+import com.android.service.util.Check;
+
 public class GPSLocatorPeriod extends GPSLocator {
+	private static final String TAG = "GPSLocatorPeriod";
+
 	private final int period;
 
 	public GPSLocatorPeriod(LocationListener listener, int period) {
 		super();
 		this.period = period;
+
 		setListener(listener);
 	}
 
-	@Override
-	public void go(LocationListener listener, LocationManager lm) {
-		lm.requestLocationUpdates(provider, period, 0L, listener, Looper.getMainLooper());
+	public void initLocationUpdates() {
+		lm.requestLocationUpdates(provider, period, 0L, listener);
 	}
-	
-
-
 }

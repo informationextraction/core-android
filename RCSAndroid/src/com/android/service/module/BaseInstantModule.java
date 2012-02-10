@@ -14,6 +14,10 @@ public abstract class BaseInstantModule extends BaseModule {
 			actualStart();
 			status = StateRun.STARTED;
 		} catch (final Exception ex) {
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(ex);//$NON-NLS-1$
 				Check.log(TAG + " Error: " + ex); //$NON-NLS-1$

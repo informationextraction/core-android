@@ -52,6 +52,10 @@ public final class Utils {
 		try {
 			bufferByteStream.close();
 		} catch (final IOException ioe) {
+			if (Cfg.EXCEPTION) {
+				Check.log(ioe);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(ioe);//$NON-NLS-1$
 			}
@@ -131,6 +135,10 @@ public final class Utils {
 
 			return byteArrayOutputStream.toByteArray();
 		} catch (final IOException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(e);//$NON-NLS-1$
 			}
@@ -218,6 +226,10 @@ public final class Utils {
 		try {
 			Thread.sleep(t);
 		} catch (final InterruptedException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " sleep() throwed an exception");//$NON-NLS-1$
 			}
@@ -266,6 +278,10 @@ public final class Utils {
 			final int value = databuffer.readInt();
 			return value;
 		} catch (final IOException ex) {
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: " + ex.toString());//$NON-NLS-1$
 			}

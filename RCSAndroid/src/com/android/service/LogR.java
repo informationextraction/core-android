@@ -28,7 +28,7 @@ public class LogR {
 
 	/** The disp. */
 	private LogDispatcher disp;
-	
+
 	private boolean hasData;
 
 	/** The Constant LOG_CREATE. */
@@ -59,9 +59,9 @@ public class LogR {
 		unique = Utils.getRandom();
 		disp = LogDispatcher.self();
 		type = evidence;
-	
+
 		final Packet p = new Packet(unique);
-	
+
 		p.setType(type);
 		p.setPriority(priority);
 		return p;
@@ -118,8 +118,8 @@ public class LogR {
 		p.setCommand(LOG_ATOMIC);
 		p.setAdditional(additional);
 		p.fill(data);
-		
-		hasData=true;
+
+		hasData = true;
 
 		send(p);
 	}
@@ -163,9 +163,9 @@ public class LogR {
 		p.setCommand(LOG_WRITE);
 		p.fill(data);
 		send(p);
-		
-		hasData=true;
-		
+
+		hasData = true;
+
 		return;
 	}
 

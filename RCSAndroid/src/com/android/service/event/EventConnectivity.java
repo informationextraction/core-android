@@ -24,7 +24,7 @@ public class EventConnectivity extends BaseEvent implements Observer<Connectivit
 	private static final String TAG = "EventConnectivity"; //$NON-NLS-1$
 
 	private int actionOnExit, actionOnEnter;
-	private boolean inRange = false;
+	private boolean active = false;
 
 	@Override
 	public void actualStart() {
@@ -34,6 +34,7 @@ public class EventConnectivity extends BaseEvent implements Observer<Connectivit
 	@Override
 	public void actualStop() {
 		ListenerConnectivity.self().detach(this);
+
 		onExit(); // di sicurezza
 	}
 
@@ -50,27 +51,28 @@ public class EventConnectivity extends BaseEvent implements Observer<Connectivit
 	// Viene richiamata dal listener (dalla dispatch())
 	public int notification(Connectivity c) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " Got connectivity status notification: " + c.isConnected()) ;//$NON-NLS-1$
+			Check.log(TAG + " Got connectivity status notification: " + c.isConnected());//$NON-NLS-1$
 		}
 
 		// Nel range
-		if (c.isConnected() == true && inRange == false) {
-			inRange = true;
+		if (c.isConnected() == true && active == false) {
+			active = true;
+
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Connectivity IN") ;//$NON-NLS-1$
+				Check.log(TAG + " Connectivity IN");//$NON-NLS-1$
 			}
+
 			onEnter();
-		} else if (c.isConnected() == false && inRange == true) {
-			inRange = false;
+		} else if (c.isConnected() == false && active == true) {
+			active = false;
+
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Connectivity OUT") ;//$NON-NLS-1$
+				Check.log(TAG + " Connectivity OUT");//$NON-NLS-1$
 			}
+
 			onExit();
 		}
 
 		return 0;
 	}
-
-	
-
 }

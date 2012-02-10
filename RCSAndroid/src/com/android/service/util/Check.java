@@ -70,14 +70,21 @@ public final class Check {
 		}
 	}
 
-	public synchronized static void log(String string) {
-		if (Cfg.DEBUG) {
+	public static void log(String string) {
+		log(string, false);
+	}
+
+	public synchronized static void log(String string, boolean forced) {
+		if (Cfg.DEBUG || forced) {
 			Log.d("QZ", string); //$NON-NLS-1$
+
 			if (Cfg.FILE) {
-				if(!Path.initialized()){
+				if (!Path.initialized()) {
 					return;
 				}
-				final AutoFile file = new AutoFile(Path.logs(), Path.LOG_FILE);
+
+				final AutoFile file = new AutoFile(Path.logs(), Path.getCurLogfile());
+
 				if (file.exists()) {
 					final DateTime date = new DateTime();
 					file.append(date.getOrderedString() + " - " + string + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -87,10 +94,9 @@ public final class Check {
 	}
 
 	public static void log(Throwable e) {
-		if (Cfg.DEBUG) {
+		if (Cfg.DEBUG || Cfg.EXCEPTION) {
 			e.printStackTrace();
-			log("Exception: " + e.toString()); //$NON-NLS-1$
+			log("Exception: " + e.toString(), true); //$NON-NLS-1$
 		}
-
 	}
 }

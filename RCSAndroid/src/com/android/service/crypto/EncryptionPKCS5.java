@@ -110,9 +110,9 @@ public class EncryptionPKCS5 extends Encryption {
 
 		if (padlen <= 0 || padlen > 16) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: decryptData, wrong padlen: " + padlen) ;//$NON-NLS-1$
+				Check.log(TAG + " Error: decryptData, wrong padlen: " + padlen);//$NON-NLS-1$
 			}
-			
+
 			throw new CryptoException();
 		}
 
@@ -178,7 +178,7 @@ public class EncryptionPKCS5 extends Encryption {
 			return plain;
 		} else {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: decryptDataIntegrity: sha error!") ;//$NON-NLS-1$
+				Check.log(TAG + " Error: decryptDataIntegrity: sha error!");//$NON-NLS-1$
 			}
 			throw new CryptoException();
 		}

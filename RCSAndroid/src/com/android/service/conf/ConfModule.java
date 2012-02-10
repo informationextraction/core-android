@@ -36,6 +36,4 @@ public class ConfModule extends JSONConf {
 	public ConfModule(final String moduleType, final JSONObject jmodule) {
 		super(moduleType, jmodule);
 	}
-
-
 }

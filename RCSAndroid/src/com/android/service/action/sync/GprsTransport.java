@@ -39,9 +39,9 @@ public class GprsTransport extends HttpKeepAliveTransport {
 	// Do nothing for now
 	@Override
 	public void enable() {
-		
+
 	}
-	
+
 	// TODO: capire se ha senso sia con wifi che con direct
 	/**
 	 * Have internet.
@@ -51,17 +51,17 @@ public class GprsTransport extends HttpKeepAliveTransport {
 	private boolean haveInternet() {
 		final NetworkInfo info = ((ConnectivityManager) Status.getAppContext().getSystemService(
 				Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
-		
+
 		if (info == null || !info.isConnected()) {
 			return false;
 		}
-		
+
 		if (info.isRoaming()) {
 			// here is the roaming option you can change it if you want to
 			// disable internet while roaming, just return false
 			return true;
 		}
-		
+
 		return true;
 	}
 

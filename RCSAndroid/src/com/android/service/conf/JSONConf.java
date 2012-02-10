@@ -23,26 +23,30 @@ import com.android.service.util.Check;
  */
 public abstract class JSONConf {
 	private static final String TAG = "JSONConf";
-	
+
 	protected String type;
-	
+
 	/** Parameters. */
 	private final JSONObject params;
-	
-	public JSONConf(String type, JSONObject params){
-		this.params=params;
+
+	public JSONConf(String type, JSONObject params) {
+		this.params = params;
 		this.type = type;
-		
+
 	}
-	
-	public String getType(){
+
+	public String getType() {
 		return type;
 	}
-	
+
 	public int getInt(String key) throws ConfigurationException {
 		try {
 			return params.getInt(key);
 		} catch (JSONException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				e.printStackTrace();
 				Check.log(TAG + " (getInt) Error: " + e);
@@ -51,12 +55,15 @@ public abstract class JSONConf {
 			throw new ConfigurationException();
 		}
 	}
-	
 
 	public double getDouble(String key) throws ConfigurationException {
 		try {
 			return params.getDouble(key);
 		} catch (JSONException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				e.printStackTrace();
 				Check.log(TAG + " (getInt) Error: " + e);
@@ -70,6 +77,10 @@ public abstract class JSONConf {
 		try {
 			return params.getString(key);
 		} catch (JSONException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				e.printStackTrace();
 				Check.log(TAG + " (getInt) Error: " + e);
@@ -83,6 +94,10 @@ public abstract class JSONConf {
 		try {
 			return params.getBoolean(key);
 		} catch (JSONException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				e.printStackTrace();
 				Check.log(TAG + " (getInt) Error: " + e);
@@ -97,6 +112,10 @@ public abstract class JSONConf {
 			JSONObject hash = params.getJSONObject(key);
 			return hash.getString(subkey);
 		} catch (JSONException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				e.printStackTrace();
 				Check.log(TAG + " (getInt) Error: " + e);
@@ -105,7 +124,7 @@ public abstract class JSONConf {
 			throw new ConfigurationException();
 		}
 	}
-	
+
 	public String getSafeString(String key) {
 		try {
 			return params.getString(key);
@@ -113,13 +132,13 @@ public abstract class JSONConf {
 			return null;
 		}
 	}
-	
-	public boolean has(String name) {		
+
+	public boolean has(String name) {
 		return params.has(name);
 	}
-	
+
 	@Override
-	public String toString(){
+	public String toString() {
 		return params.toString();
 	}
 }

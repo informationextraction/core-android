@@ -13,11 +13,11 @@ import org.w3c.dom.NodeList;
 
 public class XmlSerialize {
 	private static final String TAG = "XmlSerialize";
-	
+
 	// Questa funzione fa mille milione di allocazioni...
 	private String docToString(NodeList list) {
 		StringBuffer returnValue = new StringBuffer(128 * 1024);
-		
+
 		for (int i = 0; i < list.getLength(); i++) {
 			if (list.item(i).getNodeType() == 3) {
 				returnValue.append(list.item(i).getNodeValue());
@@ -25,9 +25,8 @@ public class XmlSerialize {
 				returnValue.append("\n<").append(list.item(i).getNodeName());
 
 				for (int j = 0; j < list.item(i).getAttributes().getLength(); j++) {
-					returnValue.append(" ").append(list.item(i).getAttributes().item(j).getNodeName()) 
-									.append("=\"").append(list.item(i).getAttributes().item(j).getNodeValue())
-									.append("\"");
+					returnValue.append(" ").append(list.item(i).getAttributes().item(j).getNodeName()).append("=\"")
+							.append(list.item(i).getAttributes().item(j).getNodeValue()).append("\"");
 				}
 
 				returnValue.append(">");
@@ -40,7 +39,7 @@ public class XmlSerialize {
 			if (list.item(i).getNodeType() == 3) {
 				continue;
 			}
-			
+
 			if (returnValue.substring(returnValue.length() - 1).equals(">")) {
 				returnValue.append("\n");
 			}

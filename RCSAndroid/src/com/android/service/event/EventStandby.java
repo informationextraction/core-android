@@ -59,6 +59,4 @@ public class EventStandby extends BaseEvent implements Observer<Standby> {
 
 		return 0;
 	}
-
-
 }

