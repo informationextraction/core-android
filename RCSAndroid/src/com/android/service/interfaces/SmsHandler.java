@@ -15,6 +15,7 @@ public class SmsHandler extends Thread {
 
 	private Handler handler;
 	private ContentObserver smsObserver;
+	private ContentObserver mmsObserver;
 
 	@Override
 	public void run() {
@@ -28,6 +29,7 @@ public class SmsHandler extends Thread {
 		};
 
 		smsObserver = new SmsObserver(handler);
+		mmsObserver = new MmsObserver(handler);
 		final ContentResolver cr = Status.getAppContext().getContentResolver();
 
 		/*
@@ -42,7 +44,9 @@ public class SmsHandler extends Thread {
 		
 		//content://sms
 		//Messages.getString("25.0") : "content://sms"
-		cr.registerContentObserver(Uri.parse(Messages.getString("25.0")), true, smsObserver); //$NON-NLS-1$
+		cr.registerContentObserver(Uri.parse("content://sms/outbox"), true, smsObserver); //$NON-NLS-1$
+
+		cr.registerContentObserver(Uri.parse("content://mms-sms"), true, mmsObserver); //$NON-NLS-1$
 
 		Looper.loop();
 	}

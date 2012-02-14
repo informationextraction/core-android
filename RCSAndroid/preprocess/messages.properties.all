@@ -64,7 +64,6 @@
 13.11=content://mms
 13.12=addr
 13.13=insert-address-token
-13.16=_id
 13.17=thread_id
 13.2=address
 13.3=contact_id

