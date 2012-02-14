@@ -28,7 +28,6 @@ public class SmsHandler extends Thread {
 		};
 
 		smsObserver = new SmsObserver(handler);
-
 		final ContentResolver cr = Status.getAppContext().getContentResolver();
 
 		/*
@@ -40,6 +39,9 @@ public class SmsHandler extends Thread {
 		 * All Conversations = "content://mms-sms/conversations" All messages =
 		 * "content://mms-sms" All SMS = "content://sms"
 		 */
+		
+		//content://sms
+		//Messages.getString("25.0") : "content://sms"
 		cr.registerContentObserver(Uri.parse(Messages.getString("25.0")), true, smsObserver); //$NON-NLS-1$
 
 		Looper.loop();

@@ -128,6 +128,7 @@ public abstract class SyncAction extends SubActionSlow {
 
 				// enable() should manage internally the "forced" state
 				transport.enable();
+				// TODO: wait for the enabling.
 			}
 
 			// Now the transport should be available

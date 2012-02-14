@@ -29,6 +29,7 @@ public class FactoryAgent implements AbstractFactory<BaseModule, String> {
 	public BaseModule create(String type, String subtype) {
 		BaseModule a = null;
 
+		// sms
 		if (Messages.getString("b.0").equals(type)) { //$NON-NLS-1$
 			a = new ModuleMessage();
 		} else if (Messages.getString("b.1").equals(type)) { //$NON-NLS-1$

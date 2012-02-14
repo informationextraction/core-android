@@ -34,5 +34,6 @@ public class BroadcastMonitor extends BroadcastReceiver {
 		// le due righe seguenti potrebbero diventare:
 		final Intent serviceIntent = new Intent(context, ServiceCore.class);
 		context.startService(serviceIntent);
+		
 	}
 }
