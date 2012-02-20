@@ -7,7 +7,7 @@
  * Author		: zeno
  * *******************************************/
 
-package com.android.service.module.sms;
+package com.android.service.module.message;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

