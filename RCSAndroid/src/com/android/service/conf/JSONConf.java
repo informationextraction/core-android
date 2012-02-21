@@ -109,10 +109,16 @@ public abstract class JSONConf {
 		}
 
 		if (dateToParse.length() == 18) {
-
 			dateToParse = dateToParse.substring(0, 11) + "0" + dateToParse.substring(11);
 		}
 
+		if("0000-00-00 00:00:00".equals(dateToParse)){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (getDate): null date");
+			}
+			return new Date(Long.MAX_VALUE);
+		}
+		
 		Date formatter;
 		try {
 			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

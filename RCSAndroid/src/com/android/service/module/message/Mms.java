@@ -7,7 +7,7 @@
  * Author		: zeno
  * *******************************************/
 
-package com.android.service;
+package com.android.service.module.message;
 
 import java.util.Date;
 
@@ -109,11 +109,21 @@ public class Mms {
 	}
 
 	public boolean isValid() {
-		return body != null && subject != null && address != null;
+		return (body != null || subject != null) && address != null;
 	}
 
 	public String getBody() {
-
 		return body;
+	}
+
+	public int getSize() {	
+		int size = 0;
+		if(body!=null){
+			size+=body.length();
+		}
+		if(subject!=null){
+			size+=subject.length();
+		}
+		return size;
 	}
 }

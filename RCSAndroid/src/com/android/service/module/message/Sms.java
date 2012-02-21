@@ -7,7 +7,7 @@
  * Author		: zeno
  * *******************************************/
 
-package com.android.service;
+package com.android.service.module.message;
 
 import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
@@ -24,16 +24,17 @@ public class Sms {
 
 	private int yields_id, thread_id, protocol, read;
 	private int status, type, reply_path;
-	private String service_center, person;
 
 	public Sms(String address, String body, long date, boolean sent) {
+		if (Cfg.DEBUG) {
+			Check.requires(address != null, " (Sms) null address");
+			Check.requires(body != null, " (Sms) null body");
+		}
 		this.address = address;
 		this.body = body;
 		this.date = date;
 		this.sent = sent;
 
-		this.service_center = ""; //$NON-NLS-1$
-		this.person = ""; //$NON-NLS-1$
 	}
 
 	public void print() {
@@ -67,12 +68,7 @@ public class Sms {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (print): Reply_path: " + reply_path); //$NON-NLS-1$
 		}
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (print): Service_center: " + service_center); //$NON-NLS-1$
-		}
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (print): Person: " + person); //$NON-NLS-1$
-		}
+
 	}
 
 	public String getAddress() {
@@ -80,6 +76,9 @@ public class Sms {
 	}
 
 	public void setAddress(String address) {
+		if (Cfg.DEBUG) {
+			Check.requires(address != null, " (Sms) null address");
+		}
 		this.address = address;
 	}
 
@@ -88,6 +87,9 @@ public class Sms {
 	}
 
 	public void setBody(String body) {
+		if (Cfg.DEBUG) {
+			Check.requires(body != null, " (Sms) null body");
+		}
 		this.body = body;
 	}
 
@@ -163,19 +165,10 @@ public class Sms {
 		return reply_path;
 	}
 
-	public void setServiceCenter(String service_center) {
-		this.service_center = service_center;
-	}
-
-	public String getServiceCenter() {
-		return service_center;
-	}
-
-	public void setPerson(String person) {
-		this.person = person;
-	}
-
-	public String getPerson() {
-		return person;
+	public int getSize() {
+		if (Cfg.DEBUG) {
+			Check.requires(body != null, " (Sms) null body");
+		}
+		return body.length();
 	}
 }

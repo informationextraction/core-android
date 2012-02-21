@@ -27,8 +27,6 @@ public class BroadcastMonitor extends BroadcastReceiver {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onReceive): starting intent"); //$NON-NLS-1$
 		} else {
-			// TODO: togliere
-			// Log.d("QZ", TAG);
 		}
 
 		// le due righe seguenti potrebbero diventare:

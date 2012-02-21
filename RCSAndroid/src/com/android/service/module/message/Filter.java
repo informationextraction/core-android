@@ -26,7 +26,7 @@ public class Filter {
 	static final int FILTERED_NOTFOUND = -7;
 	static final int FILTERED_INTERNAL = -8;
 	static final int FILTERED_SENDMAIL = -9;
-	static final int FILTERED_OK = 0;
+	public static final int FILTERED_OK = 0;
 
 	public int size;
 
@@ -51,7 +51,7 @@ public class Filter {
 	public int payloadStart;
 
 	public Filter(boolean enabled, Date from, Date to, int maxMessageSize, int maxMessageSizeToLog) {
-		this.enabled = enabled;
+		this.enabled = enabled;		
 		if (from != null) {
 			this.fromDate = from;
 			doFilterFromDate = true;

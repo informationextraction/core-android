@@ -9,7 +9,7 @@
 
 package com.android.service.listener;
 
-import com.android.service.Sms;
+import com.android.service.module.message.Sms;
 
 public class ListenerSms extends Listener<Sms> {
 	/** The Constant TAG. */

