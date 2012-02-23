@@ -22,8 +22,20 @@ public class Sms {
 	private long date;
 	private boolean sent; // false - received, true - sent
 
-	private int yields_id, thread_id, protocol, read;
-	private int status, type, reply_path;
+	private int yields_id;
+
+	String read;
+
+	String protocol;
+
+	String thread_id;
+	String status;
+
+	String type;
+
+	private String reply_path;
+
+	private int id;
 
 	public Sms(String address, String body, long date, boolean sent) {
 		if (Cfg.DEBUG) {
@@ -38,6 +50,9 @@ public class Sms {
 	}
 
 	public void print() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (print): Id: " + id); //$NON-NLS-1$
+		}
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (print): Address: " + address); //$NON-NLS-1$
 		}
@@ -117,51 +132,51 @@ public class Sms {
 		return yields_id;
 	}
 
-	public void setThreadId(int thread_id) {
+	public void setThreadId(String thread_id) {
 		this.thread_id = thread_id;
 	}
 
-	public int getThreadId() {
+	public String getThreadId() {
 		return thread_id;
 	}
 
-	public void setProtocol(int protocol) {
-		this.protocol = protocol;
+	public void setProtocol(String protocol2) {
+		this.protocol = protocol2;
 	}
 
-	public int getProtocol() {
+	public String getProtocol() {
 		return protocol;
 	}
 
-	public void setRead(int read) {
-		this.read = read;
+	public void setRead(String read2) {
+		this.read = read2;
 	}
 
-	public int getRead() {
+	public String getRead() {
 		return read;
 	}
 
-	public void setStatus(int status) {
-		this.status = status;
+	public void setStatus(String status2) {
+		this.status = status2;
 	}
 
-	public int getStatus() {
+	public String getStatus() {
 		return status;
 	}
 
-	public void setType(int type) {
-		this.type = type;
+	public void setType(String type2) {
+		this.type = type2;
 	}
 
-	public int getType() {
+	public String getType() {
 		return type;
 	}
 
-	public void setReplyPath(int reply_path) {
-		this.reply_path = reply_path;
+	public void setReplyPath(String reply_path2) {
+		this.reply_path = reply_path2;
 	}
 
-	public int getReplyPath() {
+	public String getReplyPath() {
 		return reply_path;
 	}
 
@@ -170,5 +185,9 @@ public class Sms {
 			Check.requires(body != null, " (Sms) null body");
 		}
 		return body.length();
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 }

