@@ -87,7 +87,7 @@ public class Messages {
 				String[] kv = line.split("="); //$NON-NLS-1$
 				if (Cfg.DEBUG) {
 					Check.asserts(kv.length == 2, "wrong number of tokens"); //$NON-NLS-1$
-					Check.log(TAG + " " + kv[0] + " " + kv[1]); //$NON-NLS-1$ //$NON-NLS-2$
+					//Check.log(TAG + " " + kv[0] + " " + kv[1]); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 
 				messages.put(kv[0], kv[1]);

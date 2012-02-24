@@ -79,12 +79,12 @@ public class Markup {
 		this("EVT" + event.getType(), event.getId());
 	}
 
-	public Markup(BaseModule event) {
-		this("AGN" + event.getType());
+	public Markup(BaseModule module) {
+		this("AGN" + module.getType());
 	}
 
-	public Markup(BaseModule event, int id) {
-		this("EVT" + event.getType(), id);
+	public Markup(BaseModule module, int id) {
+		this("MOD" + module.getType(), id);
 	}
 
 	/**
@@ -232,6 +232,17 @@ public class Markup {
 			return null;
 		}
 	}
+	
+/*	public int readMarkupInt() throws IOException{
+		byte[] data = readMarkup();
+		int value = Utils.byteArrayToInt(data, 0);
+		return value;		
+	}
+	
+	public void writeMarkupInt(int value){
+		byte[] data = Utils.intToByteArray(value);
+		writeMarkup(data);
+	}*/
 
 	/**
 	 * Removes the markup.

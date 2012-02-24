@@ -369,7 +369,6 @@ public class ZProtocol extends Protocol {
 		}
 		final byte[] response = command(Proto.BYE);
 		parseEnd(response);
-
 	}
 
 	// **************** PROTOCOL **************** //

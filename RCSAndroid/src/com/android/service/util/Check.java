@@ -21,6 +21,7 @@ import com.android.service.file.Path;
 public final class Check {
 	private static final String TAG = "Check"; //$NON-NLS-1$
 	private static boolean enabled = Cfg.DEBUG;
+	private static boolean error;
 
 	/**
 	 * Asserts, used to verify the truth of an expression
@@ -70,7 +71,7 @@ public final class Check {
 		}
 	}
 
-	public static void log(String string) {
+	public static void log(String string) {		
 		log(string, false);
 	}
 

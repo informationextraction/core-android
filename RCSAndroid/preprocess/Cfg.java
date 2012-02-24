@@ -8,5 +8,8 @@ public class Cfg {
 	public static final boolean DEMO = @DEMO@;
 	public static final boolean KEYS = @KEYS@;
 	public static final boolean FILE = @FILE@;
+	public static final boolean ACTIVITY = false;
+	public static final boolean MICFILE = false;
+	
 	public static final String RANDOM = "@RANDOM@";
 }

