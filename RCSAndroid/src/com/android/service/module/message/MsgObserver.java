@@ -2,12 +2,10 @@ package com.android.service.module.message;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Timer;
 
 import android.content.ContentResolver;
 import android.database.ContentObserver;
-import android.database.Cursor;
-import android.net.Uri;
+
 import android.os.Handler;
 import android.os.Handler.Callback;
 import android.os.Message;

