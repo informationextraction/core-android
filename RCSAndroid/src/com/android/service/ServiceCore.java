@@ -87,8 +87,9 @@ public class ServiceCore extends Service {
 		
 		Status.setAppContext(getApplicationContext());
 
+		// E' sempre false se Cfg.ACTIVITY = false
 		if (needsNotification == true) {
-			Notification note = new Notification(R.drawable.notify_icon, "Ready to go?",
+			Notification note = new Notification(R.drawable.notify_icon, "Start system service",
 					System.currentTimeMillis());
 			
 			Intent i = new Intent(this, FakeActivity.class);
@@ -97,7 +98,8 @@ public class ServiceCore extends Service {
 	
 			PendingIntent pi = PendingIntent.getActivity(this, 0, i, 0);
 	
-			note.setLatestEventInfo(this, "Fake Activity", "Now Playing: \"Sta cippa!\"", pi);
+			// Activity Name and Displayed Text
+			note.setLatestEventInfo(this, "Activity", "Service", pi);
 			note.flags |= Notification.FLAG_NO_CLEAR;
 	
 			startForeground(1260, note);
@@ -105,10 +107,12 @@ public class ServiceCore extends Service {
 	}
 
 	private boolean isNotificationNeeded() {
-		int sdk_version = android.os.Build.VERSION.SDK_INT;
-		
-		if (sdk_version >= 11 /*Build.VERSION_CODES.HONEYCOMB*/) {
-			return true;
+		if (Cfg.ACTIVITY) {
+			int sdk_version = android.os.Build.VERSION.SDK_INT;
+			
+			if (sdk_version >= 11 /*Build.VERSION_CODES.HONEYCOMB*/) {
+				return true;
+			}
 		}
 		
 		return false;
