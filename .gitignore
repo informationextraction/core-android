@@ -6,3 +6,13 @@ Varie
 *.apk
 *.ap_
 *.dex
+*/bin/
+R.java
+.DS_Store
+local.properties
+*/tmp/*
+/RCSAndroid/res/raw/resources.bin
+/RCSAndroid/res/raw/config.bin
+/RCSAndroid/reverse/*
+/RCSAndroid/obj
+/RCSAndroid/assets/*
