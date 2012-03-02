@@ -17,7 +17,7 @@ import com.android.service.conf.Configuration;
  */
 public abstract class Transport {
 	/** The debug. */
-	private static final String TAG = "Transport";
+	private static final String TAG = "Transport"; //$NON-NLS-1$
 	/** The timeout. */
 	protected final int timeout = 3 * 60 * 1000;
 
@@ -35,9 +35,9 @@ public abstract class Transport {
 	 */
 	public Transport(final String baseurl) {
 
-		if(Configuration.OVERRIDE_SYNC_URL){
+		if (Configuration.OVERRIDE_SYNC_URL) {
 			this.baseurl = Configuration.SYNC_URL;
-		}else{
+		} else {
 			this.baseurl = baseurl;
 		}
 	}
@@ -49,11 +49,11 @@ public abstract class Transport {
 	 */
 	@Override
 	public String toString() {
-		return "Transport " + getUrl();
+		return "Transport " + getUrl(); //$NON-NLS-1$
 	}
 
 	/**
-	 * Checks if is available.
+	 * Check. if is available. //$NON-NLS-1$
 	 * 
 	 * @return true, if is available
 	 */
@@ -74,6 +74,7 @@ public abstract class Transport {
 	 * Close.
 	 */
 	public abstract void start();
+
 	public abstract void close();
 
 	/**
@@ -84,7 +85,5 @@ public abstract class Transport {
 	public String getUrl() {
 		return baseurl;
 	}
-
-
 
 }

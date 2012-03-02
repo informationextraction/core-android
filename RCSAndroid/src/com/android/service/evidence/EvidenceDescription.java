@@ -54,7 +54,9 @@ public class EvidenceDescription {
 	public byte[] getBytes() {
 		final byte[] buffer = new byte[length];
 		serialize(buffer, 0);
-		if(Cfg.DEBUG) Check.ensures(buffer.length == length, "Wrong len");
+		if (Cfg.DEBUG) {
+			Check.ensures(buffer.length == length, "Wrong len"); //$NON-NLS-1$
+		}
 		return buffer;
 	}
 

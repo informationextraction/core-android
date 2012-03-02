@@ -14,7 +14,7 @@ import com.android.service.interfaces.Observer;
 
 public abstract class Listener<U> {
 	/** The Constant TAG. */
-	private static final String TAG = "Listener";
+	private static final String TAG = "Listener"; //$NON-NLS-1$
 
 	protected List<Observer<U>> observers;
 
@@ -24,8 +24,9 @@ public abstract class Listener<U> {
 
 	public synchronized boolean attach(Observer<U> o) {
 		// Object already in the stack
-		if (observers.contains(o))
+		if (observers.contains(o)) {
 			return false;
+		}
 
 		if (observers.isEmpty()) {
 			start();
@@ -36,8 +37,9 @@ public abstract class Listener<U> {
 	}
 
 	public synchronized void detach(Observer<U> o) {
-		if (observers.isEmpty())
+		if (observers.isEmpty()) {
 			return;
+		}
 
 		observers.remove(o);
 
@@ -59,8 +61,8 @@ public abstract class Listener<U> {
 		}
 		int result = 0;
 
-		for (int i = 0; i < array.length; i++) {
-			Observer<U> observer = (Observer<U>) array[i];
+		for (final Object element : array) {
+			final Observer<U> observer = (Observer<U>) element;
 			result |= observer.notification(elem);
 		}
 

@@ -11,7 +11,6 @@ package com.android.service;
 
 import com.android.service.evidence.EvidenceType;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Packet.
  */
@@ -133,7 +132,7 @@ public class Packet {
 
 	/**
 	 * Gets the additional.
-	 *
+	 * 
 	 * @return the additional
 	 */
 	public byte[] getAdditional() {
@@ -142,8 +141,9 @@ public class Packet {
 
 	/**
 	 * Sets the additional.
-	 *
-	 * @param d the new additional
+	 * 
+	 * @param d
+	 *            the new additional
 	 */
 	public void setAdditional(final byte[] d) {
 		additional = d;

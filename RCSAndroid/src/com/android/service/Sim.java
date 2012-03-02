@@ -10,12 +10,12 @@
 package com.android.service;
 
 public class Sim {
-	private String imsi;
-	
+	private final String imsi;
+
 	public Sim(String imsi) {
 		this.imsi = imsi;
 	}
-	
+
 	public String getImsi() {
 		return imsi;
 	}

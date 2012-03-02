@@ -13,7 +13,7 @@ package com.android.service.interfaces;
  * http://en.wikipedia.org/wiki/Abstract_factory_pattern
  * 
  * @author zeno
- *
+ * 
  * @param <T1>
  * @param <T2>
  */

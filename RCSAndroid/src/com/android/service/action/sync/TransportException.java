@@ -19,7 +19,7 @@ import com.android.service.util.Check;
 public class TransportException extends Exception {
 
 	/** The debug. */
-	private static final String TAG = "TransportEx";
+	private static final String TAG = "TransportEx"; //$NON-NLS-1$
 
 	/**
 	 * Instantiates a new transport exception.
@@ -28,6 +28,8 @@ public class TransportException extends Exception {
 	 *            the i
 	 */
 	public TransportException(final int i) {
-		if(Cfg.DEBUG) Check.log( TAG + " TransportException: " + i);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " TransportException: " + i) ;//$NON-NLS-1$
+		}
 	}
 }

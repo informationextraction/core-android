@@ -19,7 +19,7 @@ import com.android.service.util.DataBuffer;
  */
 public class EventTimer extends EventBase {
 	/** The Constant TAG. */
-	private static final String TAG = "EventTimer";
+	private static final String TAG = "EventTimer"; //$NON-NLS-1$
 
 	/** The Constant SLEEP_TIME. */
 	private static final int SLEEP_TIME = 1000;
@@ -54,14 +54,15 @@ public class EventTimer extends EventBase {
 
 	long start, stop;
 
-	private long oneDay = 24 * 3600;
+	private final long oneDay = 24 * 3600;
 
 	/**
 	 * Instantiates a new timer event.
 	 */
 	public EventTimer() {
-		if (Cfg.DEBUG)
-			Check.log(TAG + " TimerEvent constructor");
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " TimerEvent constructor") ;//$NON-NLS-1$
+		}
 	}
 
 	/*
@@ -85,11 +86,13 @@ public class EventTimer extends EventBase {
 
 			actionOnEnter = event.getAction();
 			actionOnExit = databuffer.readInt();
-			if (Cfg.DEBUG)
-				Check.log(TAG + " type: " + type + " lo:" + loDelay + " hi:" + hiDelay);
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " type: " + type + " lo:" + loDelay + " hi:" + hiDelay) ;//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			}
 		} catch (final IOException e) {
-			if (Cfg.DEBUG)
-				Check.log(TAG + " Error: params FAILED");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: params FAILED") ;//$NON-NLS-1$
+			}
 			return false;
 		}
 		return true;
@@ -106,15 +109,17 @@ public class EventTimer extends EventBase {
 
 		switch (type) {
 		case CONF_TIMER_SINGLE:
-			if (Cfg.DEBUG)
-				Check.log(TAG + " Info: TIMER_SINGLE delay: " + loDelay);
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Info: TIMER_SINGLE delay: " + loDelay) ;//$NON-NLS-1$
+			}
 			setDelay(loDelay);
 			setPeriod(NEVER);
 			break;
 
 		case CONF_TIMER_REPEAT:
-			if (Cfg.DEBUG)
-				Check.log(TAG + " Info: TIMER_REPEAT period: " + loDelay);
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Info: TIMER_REPEAT period: " + loDelay) ;//$NON-NLS-1$
+			}
 			setDelay(loDelay);
 			setPeriod(loDelay);
 			break;
@@ -123,19 +128,20 @@ public class EventTimer extends EventBase {
 			long tmpTime = hiDelay << 32;
 			tmpTime += loDelay;
 			final Date date = new Date(tmpTime);
-			if (Cfg.DEBUG)
-				Check.log(TAG + " Info: TIMER_DATE: " + date);
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Info: TIMER_DATE: " + date) ;//$NON-NLS-1$
+			}
 			setPeriod(NEVER);
 			setDelay(tmpTime - now);
 			break;
 
 		case CONF_TIMER_DAILY:
-			if (timerDailyEnabled){
-			start = loDelay / 1000;
-			stop = hiDelay / 1000;
-			setPeriod(NEVER);
+			if (timerDailyEnabled) {
+				start = loDelay / 1000;
+				stop = hiDelay / 1000;
+				setPeriod(NEVER);
 
-			setDailyDelay();
+				setDailyDelay();
 			}
 			break;
 
@@ -157,7 +163,7 @@ public class EventTimer extends EventBase {
 		 * (delay > 0) { setDelay(timeInst + deltaTime - now); } else { //
 		 * 
 		 * DEBUG date = new Date(timeInst + deltaTime - now);
-		 * if(AutoConfig.DEBUG) Check.log( TAG + " Info: DELTA_DATE: " + date);
+		 * if(AutoConfig.DEBUG) Check.log( TAG + " Info: DELTA_DATE: " + date) ;//$NON-NLS-1$
 		 * 
 		 * } catch (final IOException e) {
 		 * 
@@ -165,23 +171,24 @@ public class EventTimer extends EventBase {
 		 * break;
 		 */
 		default:
-			if (Cfg.DEBUG)
-				Check.log(TAG + " Error: shouldn't be here");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: shouldn't be here") ;//$NON-NLS-1$
+			}
 			break;
 		}
 	}
 
 	private boolean setDailyDelay() {
-		Date dnow = new Date();
+		final Date dnow = new Date();
 		final long now = dnow.getTime();
 
-		Date midnite = new Date();
+		final Date midnite = new Date();
 		midnite.setHours(0);
 		midnite.setMinutes(0);
 		midnite.setSeconds(0);
 
-		Date startDate = new Date(midnite.getTime() + start);
-		Date stopDate = new Date(midnite.getTime() + stop);
+		final Date startDate = new Date(midnite.getTime() + start);
+		final Date stopDate = new Date(midnite.getTime() + stop);
 
 		dailyIn = dnow.after(startDate) && dnow.before(stopDate);
 
@@ -201,11 +208,13 @@ public class EventTimer extends EventBase {
 	 */
 	@Override
 	public void go() {
-		if (Cfg.DEBUG)
-			Check.log(TAG + " Info: " + "triggering");
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " Info: " + "triggering") ;//$NON-NLS-1$ //$NON-NLS-2$
+		}
 
 		if (timerDailyEnabled && type == CONF_TIMER_DAILY) {
-			boolean dailyin = setDailyDelay();
+			final boolean dailyin = setDailyDelay();
+
 			if (dailyin) {
 				trigger(actionOnEnter);
 			} else {

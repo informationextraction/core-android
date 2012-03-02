@@ -9,7 +9,6 @@
 
 package com.android.service.action.sync;
 
-
 // TODO: Auto-generated Javadoc
 /**
  * The Class ProtocolException.
