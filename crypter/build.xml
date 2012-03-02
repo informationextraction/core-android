@@ -14,7 +14,7 @@
 	<property name="junit.report.html.dir" value="${junit.report.dir}/html"/>
 
 	<property name="crypter.name" value="crypter-ant"/>
-	<property name="crypter.major.version" value="1"/>
+	<property name="crypter.major.version" value="2"/>
 	<property name="crypter.minor.version" value="1"/>
 	<property name="crypter.patch.version" value="0"/>
 	<property name="crypter.version.string" value="${crypter.major.version}.${crypter.minor.version}.${crypter.patch.version}"/>
@@ -22,8 +22,7 @@
 	<property name="crypter.archive.name" value="${crypter.name}.jar"/>
 	<property name="crypter.src.zip.name" value="${crypter.name}-${crypter.version.string}-src.zip"/>
 	<property name="crypter.bin.zip.name" value="${crypter.name}-${crypter.version.string}-bin.zip"/>
-	<property name="crypter.deploy.dir" value="/home/mass/projects/www/www.massdosage.co.za/tech/java/ant"/>
-
+	
 	
 	<target name="help">
 	        <echo message=""/>
@@ -79,6 +78,7 @@
 		<jar jarfile="${archive.dir}/${crypter.archive.name}">
 			<fileset dir="${compile.dir}">
 				<include name="**/Crypter*" />
+				<include name="**/*Random*" />
 				<exclude name="**/*Test" />
 			</fileset>
 			<manifest>
@@ -104,16 +104,6 @@
 		</zip>
 	</target>
 
-	<!-- deploys the documentation and zip files to a directory, which will typically be on a webserver -->
-	<target name="deploy" depends="build-bin, build-src">
-		<copy todir="${crypter.deploy.dir}" file="${archive.dir}/${crypter.src.zip.name}" overwrite="true"/>
-		<copy todir="${crypter.deploy.dir}" file="${archive.dir}/${crypter.bin.zip.name}" overwrite="true"/>
-		<copy todir="${crypter.deploy.dir}" overwrite="true">
-			<fileset dir="${doc.dir}">
-				<include name="*.html"/>
-			</fileset>
-		</copy>
-	</target>
 
 	<!-- default target for building everything -->
 	<target name="all" depends="clean, compile, build-bin, build-src"/>

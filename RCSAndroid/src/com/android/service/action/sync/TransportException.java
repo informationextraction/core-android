@@ -29,7 +29,7 @@ public class TransportException extends Exception {
 	 */
 	public TransportException(final int i) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " TransportException: " + i) ;//$NON-NLS-1$
+			Check.log(TAG + " TransportException: " + i);//$NON-NLS-1$
 		}
 	}
 }

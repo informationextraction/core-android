@@ -158,18 +158,26 @@ public abstract class HttpTransport extends Transport {
 				return null;
 			}
 		} catch (final Exception ex) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: " + ex.toString()) ;//$NON-NLS-1$
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
 			}
-			
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: " + ex.toString());//$NON-NLS-1$
+			}
+
 			throw new TransportException(1);
 		} finally {
 			if (in != null) {
 				try {
 					in.close();
 				} catch (final IOException e) {
+					if (Cfg.EXCEPTION) {
+						Check.log(e);
+					}
+
 					if (Cfg.DEBUG) {
-						Check.log(e) ;//$NON-NLS-1$
+						Check.log(e);//$NON-NLS-1$
 					}
 				}
 			}

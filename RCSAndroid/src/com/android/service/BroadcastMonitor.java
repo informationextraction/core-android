@@ -26,15 +26,12 @@ public class BroadcastMonitor extends BroadcastReceiver {
 		// Toast.LENGTH_LONG).show();
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onReceive): starting intent"); //$NON-NLS-1$
-		} else{
-			//TODO: togliere
-			//Log.d("QZ", TAG);
+		} else {
 		}
-		
-		// le due righe seguenti potrebbero diventare: 
+
+		// le due righe seguenti potrebbero diventare:
 		final Intent serviceIntent = new Intent(context, ServiceCore.class);
-		//final Intent serviceIntent = new Intent();
-		//serviceIntent.setAction("com.android.service.app");//Messages.getString("27.0")); //$NON-NLS-1$
 		context.startService(serviceIntent);
+		
 	}
 }

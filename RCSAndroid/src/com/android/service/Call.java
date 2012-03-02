@@ -60,6 +60,7 @@ public class Call {
 
 	@Override
 	public String toString() {
-		return number + Messages.getString("28.1") + ongoing + Messages.getString("28.0") + incoming + Messages.getString("28.2") + timestamp; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		return number
+				+ Messages.getString("28.1") + ongoing + Messages.getString("28.0") + incoming + Messages.getString("28.2") + timestamp; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 }

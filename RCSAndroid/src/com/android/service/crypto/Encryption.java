@@ -167,13 +167,20 @@ public class Encryption {
 		try {
 			crypto = new Crypto(key);
 		} catch (final NoSuchAlgorithmException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
 
 			if (Cfg.DEBUG) {
-				Check.log(e) ;//$NON-NLS-1$
+				Check.log(e);//$NON-NLS-1$
 			}
 		} catch (final NoSuchPaddingException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
-				Check.log(e) ;//$NON-NLS-1$
+				Check.log(e);//$NON-NLS-1$
 			}
 		}
 	}
@@ -244,7 +251,7 @@ public class Encryption {
 			if ((i + 1 >= numblock) && (lastBlockLen != 0)) { // last turn
 				// and remaind
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " lastBlockLen: " + lastBlockLen) ;//$NON-NLS-1$
+					Check.log(TAG + " lastBlockLen: " + lastBlockLen);//$NON-NLS-1$
 				}
 				System.arraycopy(pt, 0, plain, i * 16, lastBlockLen);
 			} else {
@@ -309,9 +316,13 @@ public class Encryption {
 				System.arraycopy(ct, 0, crypted, i * 16, 16);
 				iv = Utils.copy(ct);
 			} catch (final Exception e) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e);
+				}
+
 				// TODO Auto-generated catch block
 				if (Cfg.DEBUG) {
-					Check.log(e) ;//$NON-NLS-1$
+					Check.log(e);//$NON-NLS-1$
 				}
 			}
 
@@ -340,9 +351,13 @@ public class Encryption {
 
 			return sha1;
 		} catch (final NoSuchAlgorithmException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			// TODO Auto-generated catch block
 			if (Cfg.DEBUG) {
-				Check.log(e) ;//$NON-NLS-1$
+				Check.log(e);//$NON-NLS-1$
 			}
 		}
 		return null;

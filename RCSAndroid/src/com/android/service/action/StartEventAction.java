@@ -14,7 +14,7 @@ public class StartEventAction extends EventAction {
 	private static final String TAG = "StartEventAction";
 
 	public StartEventAction(ConfAction params) {
-		super( params);
+		super(params);
 	}
 
 	@Override

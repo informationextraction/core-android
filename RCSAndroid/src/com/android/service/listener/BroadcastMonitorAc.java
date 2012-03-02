@@ -33,12 +33,12 @@ public class BroadcastMonitorAc extends BroadcastReceiver {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (onReceive): Intent null"); //$NON-NLS-1$
 			}
-			
+
 			return;
 		}
-		
+
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " power notification, action: " + intent.getAction()) ;//$NON-NLS-1$
+			Check.log(TAG + " power notification, action: " + intent.getAction());//$NON-NLS-1$
 		}
 
 		final boolean plugged = intent.getAction().equals(Intent.ACTION_POWER_CONNECTED);

@@ -12,7 +12,7 @@ public class StopEventAction extends EventAction {
 	private static final String TAG = "StopEventAction";
 
 	public StopEventAction(ConfAction params) {
-		super( params);
+		super(params);
 	}
 
 	@Override

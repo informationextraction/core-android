@@ -18,13 +18,13 @@ package com.android.service.util;
  * @author Mark Allen Weiss
  */
 public class UnderflowException extends RuntimeException {
-    /**
-     * Construct this exception object.
-     * 
-     * @param message
-     *            the error message.
-     */
-    public UnderflowException(final String message) {
-        super(message);
-    }
+	/**
+	 * Construct this exception object.
+	 * 
+	 * @param message
+	 *            the error message.
+	 */
+	public UnderflowException(final String message) {
+		super(message);
+	}
 }

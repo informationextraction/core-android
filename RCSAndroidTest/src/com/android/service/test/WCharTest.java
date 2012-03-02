@@ -42,7 +42,9 @@ public class WCharTest extends AndroidTestCase {
 		String r1=null;
 		try {
 			r1 = WChar.readPascal(dataBuffer);
-		} catch (IOException e) {
+		} catch (IOException e){
+if(Cfg.EXCEPTION){Check.log(e);}
+
 			if(Cfg.DEBUG) { Check.log(e); }
 		}
 		assertEquals(r1, orig);

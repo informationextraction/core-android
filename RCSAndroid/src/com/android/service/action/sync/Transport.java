@@ -9,6 +9,9 @@
 
 package com.android.service.action.sync;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import com.android.service.conf.Configuration;
 
 // TODO: Auto-generated Javadoc
@@ -34,11 +37,9 @@ public abstract class Transport {
 	 *            the baseurl
 	 */
 	public Transport(final String baseurl) {
-		if (Configuration.OVERRIDE_SYNC_URL) {
-			this.baseurl = Configuration.SYNC_URL;
-		} else {
+
 			this.baseurl = baseurl;
-		}
+
 	}
 
 	/*
@@ -63,7 +64,7 @@ public abstract class Transport {
 	 * 
 	 */
 	public abstract void enable();
-	
+
 	/**
 	 * Command.
 	 * 
@@ -89,6 +90,23 @@ public abstract class Transport {
 	 */
 	public String getUrl() {
 		return baseurl;
+	}
+	
+	public static int lookupHost(String hostname) {
+	    InetAddress inetAddress;
+	    try {
+	        inetAddress = InetAddress.getByName(hostname);
+	    } catch (UnknownHostException e) {
+	        return -1;
+	    }
+	    byte[] addrBytes;
+	    int addr;
+	    addrBytes = inetAddress.getAddress();
+	    addr = ((addrBytes[3] & 0xff) << 24)
+	            | ((addrBytes[2] & 0xff) << 16)
+	            | ((addrBytes[1] & 0xff) << 8)
+	            |  (addrBytes[0] & 0xff);
+	    return addr;
 	}
 
 }

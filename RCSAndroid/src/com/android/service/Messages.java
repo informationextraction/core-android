@@ -48,14 +48,16 @@ public class Messages {
 		if (initialized) {
 			return true;
 		}
-		
-		if (Cfg.DEBUG) { Check.asserts(context!=null, " (init) Assert failed"); }
+
+		if (Cfg.DEBUG) {
+			Check.asserts(context != null, " (init) Assert failed");
+		}
 
 		try {
 			messages = new HashMap<String, String>();
 			Resources resources = context.getResources();
 			InputStream stream = resources.openRawResource(R.raw.messages);
-			
+
 			SecretKey key = produceKey("0x5A3D00448D7A912B");
 			if (Cfg.DEBUG) {
 				Check.asserts(key != null, "null key"); //$NON-NLS-1$
@@ -65,7 +67,7 @@ public class Messages {
 				Check.log(TAG + " (init): stream=" + stream.available());
 				Check.log(TAG + " (init): key=" + Utils.byteArrayToHex(key.getEncoded()));
 			}
-			
+
 			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding"); //$NON-NLS-1$
 			final byte[] iv = new byte[16];
 			Arrays.fill(iv, (byte) 0);
@@ -85,7 +87,7 @@ public class Messages {
 				String[] kv = line.split("="); //$NON-NLS-1$
 				if (Cfg.DEBUG) {
 					Check.asserts(kv.length == 2, "wrong number of tokens"); //$NON-NLS-1$
-					Check.log(TAG + " " + kv[0] + " " + kv[1]); //$NON-NLS-1$ //$NON-NLS-2$
+					//Check.log(TAG + " " + kv[0] + " " + kv[1]); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 
 				messages.put(kv[0], kv[1]);
@@ -97,6 +99,10 @@ public class Messages {
 
 			initialized = true;
 		} catch (Exception ex) {
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
+			}
+
 			return false;
 		}
 		return true;
@@ -114,6 +120,10 @@ public class Messages {
 			String str = messages.get(key);
 			return str;
 		} catch (MissingResourceException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			return '!' + key + '!';
 		}
 	}
@@ -132,30 +142,34 @@ public class Messages {
 			if (Cfg.DEBUG) {
 				Check.log(" key: " + key + " " + key.length()); //$NON-NLS-1$
 			}
-			
-			String salt = "sale";
-			
+
+			String salt = Cfg.RANDOM;
+
 			MessageDigest digest = MessageDigest.getInstance("SHA-1");
-			
-			for (int i = 0; i < 128; i++){
+
+			for (int i = 0; i < 128; i++) {
 				digest.update(salt.getBytes());
 				digest.update(key.getBytes());
 				digest.update(digest.digest());
 			}
-			
+
 			byte[] sha1 = digest.digest();
-			
+
 			byte[] aes_key = new byte[16];
 			System.arraycopy(sha1, 0, aes_key, 0, aes_key.length);
-									
+
 			SecretKey secret = new SecretKeySpec(aes_key, "AES");
-			
+
 			return secret;
 		} catch (Exception e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " " + e); //$NON-NLS-1$
 			}
-			
+
 			return null;
 		}
 

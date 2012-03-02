@@ -36,47 +36,47 @@ public class BroadcastMonitorCall extends BroadcastReceiver {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (onReceive): Intent null"); //$NON-NLS-1$
 			}
-			
+
 			return;
 		}
-		
+
 		if (intent.getAction().equals(Intent.ACTION_NEW_OUTGOING_CALL)) {
 			final String number = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
 
 			// Outgoing phone call
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (onReceive): 1") ;//$NON-NLS-1$
+				Check.log(TAG + " (onReceive): 1");//$NON-NLS-1$
 			}
-			
+
 			call = new Call(number, Call.OUTGOING, Call.START);
 		} else if (intent.getStringExtra(TelephonyManager.EXTRA_STATE).equals(TelephonyManager.EXTRA_STATE_RINGING)) {
 			final String number = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
 
 			// Phone is ringing
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (onReceive): 2") ;//$NON-NLS-1$
+				Check.log(TAG + " (onReceive): 2");//$NON-NLS-1$
 			}
-			
+
 			call = new Call(number, Call.INCOMING, Call.START);
 		} else if (intent.getStringExtra(TelephonyManager.EXTRA_STATE).equals(TelephonyManager.EXTRA_STATE_IDLE)) {
 			// Call disconnected
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (onReceive): 3") ;//$NON-NLS-1$
+				Check.log(TAG + " (onReceive): 3");//$NON-NLS-1$
 			}
-			
+
 			call = new Call("", Call.INCOMING, Call.END); //$NON-NLS-1$
 		} else if (intent.getStringExtra(TelephonyManager.EXTRA_STATE).equals(TelephonyManager.EXTRA_STATE_OFFHOOK)) {
 			// Call answered, or issuing new outgoing call
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (onReceive): 4") ;//$NON-NLS-1$
+				Check.log(TAG + " (onReceive): 4");//$NON-NLS-1$
 			}
-			
+
 			call = new Call("", Call.OUTGOING, Call.START); //$NON-NLS-1$
 		} else {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (onReceive): default") ;//$NON-NLS-1$
+				Check.log(TAG + " (onReceive): default");//$NON-NLS-1$
 			}
-			
+
 			call = new Call("", Call.OUTGOING, Call.END); //$NON-NLS-1$
 		}
 

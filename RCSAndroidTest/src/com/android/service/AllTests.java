@@ -12,10 +12,12 @@ public class AllTests {
 		//$JUnit-BEGIN$
 		
 		//suite.addTestSuite(AndroidServiceTest.class);
-		suite.addTestSuite(DeviceTest.class);
-		suite.addTestSuite(EvidenceTest.class);
-		suite.addTestSuite(CryptoTest.class);
-		suite.addTestSuite(WCharTest.class);
+		//suite.addTestSuite(DeviceTest.class);
+		//suite.addTestSuite(EvidenceTest.class);
+		//suite.addTestSuite(CryptoTest.class);
+		//suite.addTestSuite(WCharTest.class);
+		
+		suite.addTestSuite(BSONDocumentTest.class);
 		//$JUnit-END$
 		return suite;
 	}

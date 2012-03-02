@@ -27,11 +27,11 @@ public abstract class BaseModule extends ThreadBase {
 	 * 
 	 * @param conf
 	 *            the conf
-	 * @throws ConfigurationException 
+	 * @throws ConfigurationException
 	 */
 	protected abstract boolean parse(ConfModule conf);
-	
-	public String getType(){
+
+	public String getType() {
 		if (Cfg.DEBUG) {
 			Check.requires(conf != null, "null conf");
 		}
@@ -45,14 +45,14 @@ public abstract class BaseModule extends ThreadBase {
 		this.conf = conf;
 		return parse(conf);
 	}
-	
+
 	@Override
 	public String toString() {
-		return "Module <" + conf.getType().toUpperCase() +"> " + (isRunning()?"running":""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		return "Module <" + conf.getType().toUpperCase() + "> " + (isRunning() ? "running" : ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}
 
 	public void setTrigger(Trigger trigger) {
-		this.trigger=trigger;
+		this.trigger = trigger;
 	}
 
 }

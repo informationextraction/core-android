@@ -93,9 +93,9 @@ public class Contact {
 		final StringBuffer sb = new StringBuffer();
 
 		sb.append(Messages.getString("16.0") + userInfo.getUserId()); //$NON-NLS-1$
-		sb.append("\n"+Messages.getString("16.1") + userInfo.getCompleteName()); //$NON-NLS-1$
-		sb.append("\n"+Messages.getString("16.2") + userInfo.getUserNickname()); //$NON-NLS-1$
-		sb.append("\n"+Messages.getString("16.3") + userInfo.getUserNote() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append("\n" + Messages.getString("16.1") + userInfo.getCompleteName()); //$NON-NLS-1$
+		sb.append("\n" + Messages.getString("16.2") + userInfo.getUserNickname()); //$NON-NLS-1$
+		sb.append("\n" + Messages.getString("16.3") + userInfo.getUserNote() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		sb.append(getInfo());
 		return sb.toString();
@@ -111,7 +111,7 @@ public class Contact {
 			final PhoneInfo pinfo = pi.next();
 
 			sb.append(Messages.getString("16.5") + pinfo.getPhoneNumber()); //$NON-NLS-1$
-			sb.append("\n"+Messages.getString("16.6") + pinfo.getPhoneType() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append("\n" + Messages.getString("16.6") + pinfo.getPhoneType() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		// Email Info
@@ -121,7 +121,7 @@ public class Contact {
 			final EmailInfo einfo = e.next();
 
 			sb.append(Messages.getString("16.8") + einfo.getEmail()); //$NON-NLS-1$
-			sb.append("\n"+Messages.getString("16.9") + einfo.getEmailType() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append("\n" + Messages.getString("16.9") + einfo.getEmailType() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		// Postal Address Info
@@ -131,13 +131,13 @@ public class Contact {
 			final PostalAddressInfo painfo = pa.next();
 
 			sb.append(Messages.getString("16.11") + painfo.getState()); //$NON-NLS-1$
-			sb.append("\n"+Messages.getString("16.12") + painfo.getCountry()); //$NON-NLS-1$
-			sb.append("\n"+Messages.getString("16.13") + painfo.getCity()); //$NON-NLS-1$
-			sb.append("\n"+Messages.getString("16.14") + painfo.getStreet()); //$NON-NLS-1$
-			sb.append("\n"+Messages.getString("16.15") + painfo.getPoBox()); //$NON-NLS-1$
-			sb.append("\n"+Messages.getString("16.16") + painfo.getPostalCode()); //$NON-NLS-1$
-			sb.append("\n"+Messages.getString("16.17") + painfo.getNeighbor()); //$NON-NLS-1$
-			sb.append("\n"+Messages.getString("16.18") + painfo.getType() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append("\n" + Messages.getString("16.12") + painfo.getCountry()); //$NON-NLS-1$
+			sb.append("\n" + Messages.getString("16.13") + painfo.getCity()); //$NON-NLS-1$
+			sb.append("\n" + Messages.getString("16.14") + painfo.getStreet()); //$NON-NLS-1$
+			sb.append("\n" + Messages.getString("16.15") + painfo.getPoBox()); //$NON-NLS-1$
+			sb.append("\n" + Messages.getString("16.16") + painfo.getPostalCode()); //$NON-NLS-1$
+			sb.append("\n" + Messages.getString("16.17") + painfo.getNeighbor()); //$NON-NLS-1$
+			sb.append("\n" + Messages.getString("16.18") + painfo.getType() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		// Im Info
@@ -147,7 +147,7 @@ public class Contact {
 			final ImInfo iminfo = im.next();
 
 			sb.append(Messages.getString("16.20") + iminfo.getIm()); //$NON-NLS-1$
-			sb.append("\n"+Messages.getString("16.21") + iminfo.getImType() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append("\n" + Messages.getString("16.21") + iminfo.getImType() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		// Organization Info
@@ -157,8 +157,8 @@ public class Contact {
 			final OrganizationInfo oinfo = o.next();
 
 			sb.append(Messages.getString("16.23") + oinfo.getCompanyName()); //$NON-NLS-1$
-			sb.append("\n"+Messages.getString("16.24") + oinfo.getCompanyTitle()); //$NON-NLS-1$
-			sb.append("\n"+Messages.getString("16.25") + oinfo.getType() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append("\n" + Messages.getString("16.24") + oinfo.getCompanyTitle()); //$NON-NLS-1$
+			sb.append("\n" + Messages.getString("16.25") + oinfo.getType() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		// Website Info

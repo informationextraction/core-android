@@ -36,7 +36,7 @@ public class ConfEvent extends JSONConf {
 		super(eventType, params);
 
 		this.eventId = eventId;
-		
+
 		if (params.has("start")) {
 			startAction = params.getInt("start");
 		}

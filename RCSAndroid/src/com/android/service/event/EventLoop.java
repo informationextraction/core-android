@@ -6,13 +6,13 @@ public class EventLoop extends BaseTimer {
 
 	@Override
 	protected boolean parse(ConfEvent event) {
-		
+
 		return true;
 	}
 
 	@Override
 	protected void actualGo() {
-		
+
 	}
 
 	@Override
