@@ -61,6 +61,7 @@ public class ManagerEvent extends Manager<BaseEvent, Integer, String> {
 		BaseEvent event = null;
 
 		String subtype = conf.getSafeString("subtype");
+
 		if (subtype == null)
 			subtype = "";
 
@@ -68,7 +69,7 @@ public class ManagerEvent extends Manager<BaseEvent, Integer, String> {
 		String te = conf.getSafeString("te");
 
 		// TODO
-		if (subtype == null && "00:00:00".equals(ts) && "23:59:59".equals(te)) {
+		if (subtype == "" && "00:00:00".equals(ts) && "23:59:59".equals(te)) {
 			subtype = "loop";
 		}
 
@@ -192,7 +193,6 @@ public class ManagerEvent extends Manager<BaseEvent, Integer, String> {
 
 	@Override
 	public void stop(Integer key) {
-
 		BaseEvent event = instances.get(key);
 
 		try {
@@ -244,5 +244,27 @@ public class ManagerEvent extends Manager<BaseEvent, Integer, String> {
 				Check.log(TAG + " (stopAll): " + ex);//$NON-NLS-1$
 			}
 		}
+	}
+
+	public void enable(int eventId) {
+		HashMap<Integer, ConfEvent> events = status.getEventsMap();
+		ConfEvent event = events.get(eventId);
+		
+		if (event == null) {
+			return;
+		}
+		
+		event.enabled = true;
+	}
+	
+	public void disable(int eventId) {
+		HashMap<Integer, ConfEvent> events = status.getEventsMap();
+		ConfEvent event = events.get(eventId);
+		
+		if (event == null) {
+			return;
+		}
+		
+		event.enabled = false;
 	}
 }

