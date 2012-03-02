@@ -135,6 +135,7 @@ public abstract class BaseEvent extends ThreadBase {
 
 				public void run() {
 					try {
+						// verifica iter, se sono stati eseguiti i giusti repeat esce
 						if (count >= iterCounter) {
 							if (Cfg.DEBUG) {
 								Check.log(TAG + " SCHED (run): count >= iterCounter");

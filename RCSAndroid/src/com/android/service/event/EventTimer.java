@@ -112,21 +112,29 @@ public class EventTimer extends BaseTimer {
 		Calendar calendar = GregorianCalendar.getInstance(TimeZone.getTimeZone("UTC"));
 
 		calendar.setTime(timestart);
+		// numero di secondi a partire dalla mezzanotte
 		start = ((calendar.get(Calendar.HOUR_OF_DAY) * 3600) + (calendar.get(Calendar.MINUTE) * 60) + calendar
 				.get(Calendar.SECOND)) * 1000;
 
 		calendar.setTime(timestop);
+		// numero di secondi a partire dalla mezzanotte
 		stop = ((calendar.get(Calendar.HOUR_OF_DAY) * 3600) + (calendar.get(Calendar.MINUTE) * 60) + calendar
 				.get(Calendar.SECOND)) * 1000;
 
 		nextDailyIn = setDailyDelay(true);
 	}
 
+	/**
+	 * Calcola l'ora del prossimo evento
+	 * @param initialCheck
+	 * @return
+	 */
 	private boolean setDailyDelay(boolean initialCheck) {
 		Calendar nowCalendar = GregorianCalendar.getInstance(TimeZone.getTimeZone("UTC"));
 
 		long nextStart, nextStop;
 
+		// in secondi a partire dalla mezzanotte, in modo che sia connfrontabile con start e stop, definiti nella parse
 		int now = ((nowCalendar.get(Calendar.HOUR_OF_DAY) * 3600) + (nowCalendar.get(Calendar.MINUTE) * 60) + nowCalendar
 				.get(Calendar.SECOND)) * 1000;
 
