@@ -82,7 +82,7 @@
 14.2=body
 14.3=address
 14.4=date
-14.5=yields _id
+14.5=yields_id
 14.6=thread_id
 14.7=person
 14.8=protocol
@@ -111,13 +111,6 @@
 16.6=Phone Type: 
 16.8=Email: 
 16.9=Type: 
-17.0=AGENTCONFS-
-17.1=EVENTCONFS-
-17.2=MOBILCONFS-
-17.3=ENDOFCONFS-
-17.4=1
-17.5=2
-17.6=3
 18.0=AES
 18.1=AES/CBC/NoPadding
 19.0=SHA-1
@@ -201,3 +194,7 @@
 36.0=0xA83E0F44BD7A4D20
 36.1=0x5A3D10448D7A912B
 36.2=0x5A3D10448D7A912A
+36.3=(onConfigurationChanged)
+36.4=(onLowMemory)
+36.5=(onRebind)
+36.6=(onUnbind)

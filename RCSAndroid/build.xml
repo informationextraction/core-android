@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="android_service">
 
-	<!-- The local.properties file is created and updated by the 'android'
-     tool.
-     It contains the path to the SDK. It should *NOT* be checked into
-     Version Control Systems. -->
-	<property file="local.properties" />
+	<!-- The local.properties file is created and updated by the 'android' tool.
+         It contains the path to the SDK. It should *NOT* be checked into
+         Version Control Systems. -->
+	<loadproperties srcFile="local.properties" />
 
-	<!-- The build.properties file can be created by you and is never touched
-         by the 'android' tool. This is the place to change some of the
-         default property values used by the Ant rules.
+	<!-- The ant.properties file can be created by you. It is only edited by the
+         'android' tool to add properties to it.
+         This is the place to change some Ant specific build properties.
          Here are some properties you may want to change/update:
 
          source.dir
              The name of the source directory. Default is 'src'.
          out.dir
              The name of the output directory. Default is 'bin'.
+
+         For other overridable properties, look at the beginning of the rules
+         files in the SDK, at tools/ant/build.xml
 
          Properties related to the SDK location or the project target should
          be updated using the 'android' tool with the 'update' action.
@@ -24,34 +26,73 @@
          application and should be checked into Version Control Systems.
 
          -->
-	<property file="build.properties" />
+	<property file="ant.properties" />
 
-	<!-- The default.properties file is created and updated by the 'android'
+	<!-- The project.properties file is created and updated by the 'android'
          tool, as well as ADT.
+
+         This contains project specific properties such as project target, and library
+         dependencies. Lower level build properties are stored in ant.properties
+         (or in .classpath for Eclipse projects).
+
          This file is an integral part of the build system for your
          application and should be checked into Version Control Systems. -->
-	<property file="default.properties" />
+	<loadproperties srcFile="project.properties" />
 
-	<!-- Custom Android task to deal with the project target, and import the
-         proper rules.
-         This requires ant 1.6.0 or above. -->
+	<!-- quick check on sdk.dir -->
+	<fail message="sdk.dir is missing. Make sure to generate local.properties using 'android update project'" unless="sdk.dir" />
+
+
+	<!-- extension targets. Uncomment the ones where you want to do custom work
+     in between standard targets -->
+	<!--
+    <target name="-pre-build">
+    </target>
+    <target name="-pre-compile">
+    </target>
+
+    /* This is typically used for code obfuscation.
+       Compiled code location: ${out.classes.absolute.dir}
+       If this is not done in place, override ${out.dex.input.absolute.dir} */
+    <target name="-post-compile">
+    </target>
+-->
+
+	<!-- Import the actual build file.
+
+         To customize existing targets, there are two options:
+         - Customize only one target:
+             - copy/paste the target into this file, *before* the
+               <import> task.
+             - customize it to your needs.
+         - Customize the whole content of build.xml
+             - copy/paste the content of the rules files (minus the top node)
+               into this file, replacing the <import> task.
+             - customize to your needs.
+
+         ***********************
+         ****** IMPORTANT ******
+         ***********************
+         In all cases you must update the value of version-tag below to read 'custom' instead of an integer,
+         in order to avoid having your file be overridden by tools such as "android update project"
+    -->
+	<!-- version-tag: 2011102401 -->
+	<!-- import file="${sdk.dir}/tools/ant/build.xml" -->
 	<path id="android.antlibs">
 		<pathelement path="${sdk.dir}/tools/lib/anttasks.jar" />
 		<pathelement path="${sdk.dir}/tools/lib/sdklib.jar" />
 		<pathelement path="${sdk.dir}/tools/lib/androidprefs.jar" />
 	</path>
 
-	<taskdef name="setup" classname="com.android.ant.SetupTask" classpathref="android.antlibs" />
-
 	<!-- extension targets. Uncomment the ones where you want to do custom work
-     in between standard targets -->
+	     in between standard targets -->
 	<filterset id="dateFilterSet">
 		<filter token="DATE" value="${TODAY}" />
 	</filterset>
 
 	<taskdef name="crypter" classname="za.co.massdosage.ant.Crypter">
 		<classpath>
-			<pathelement path="${basedir}/../ant-libs/crypter-ant-1.0.0/lib/crypter-ant.jar" />
+			<pathelement path="${basedir}/../crypter/build/archive/crypter-ant.jar" />
 		</classpath>
 	</taskdef>
 
@@ -102,6 +143,7 @@
 				<filter token="DEBUG" value="true" />
 				<filter token="EXPLOIT" value="false" />
 				<filter token="DEMO" value="true" />
+				<filter token="FILE" value="true" />
 			</filterset>
 		</copy>
 		<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" overwrite="true" />
@@ -122,6 +164,8 @@
 				<filter token="DEBUG" value="false" />
 				<filter token="EXPLOIT" value="false" />
 				<filter token="DEMO" value="false" />
+				<filter token="KEYS" value="false" />
+				<filter token="FILE" value="false" />
 			</filterset>
 		</copy>
 		<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" overwrite="true" />
@@ -142,6 +186,7 @@
 				<filter token="DEBUG" value="true" />
 				<filter token="EXPLOIT" value="false" />
 				<filter token="DEMO" value="true" />
+				<filter token="FILE" value="false" />
 			</filterset>
 		</copy>
 		<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" overwrite="true" />
@@ -162,6 +207,7 @@
 				<filter token="DEBUG" value="true" />
 				<filter token="EXPLOIT" value="true" />
 				<filter token="DEMO" value="true" />
+				<filter token="FILE" value="false" />
 			</filterset>
 		</copy>
 		<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" overwrite="true" />
@@ -171,12 +217,12 @@
 	</target>
 
 	<!--
-	<target name="-pre-build">
-		<echo message="Pre building" />
-	</target>
-	<target name="-pre-compile">
-		<echo message="Pre compile" />
-	</target> -->
+		<target name="-pre-build">
+			<echo message="Pre building" />
+		</target>
+		<target name="-pre-compile">
+			<echo message="Pre compile" />
+		</target> -->
 
 	<target name="reverse">
 		<echo message="Reverse" />
@@ -208,39 +254,9 @@
 
 	</target>
 
-	<!--
-    [This is typically used for code obfuscation.
-     Compiled code location: ${out.classes.absolute.dir}
-     If this is not done in place, override ${out.dex.input.absolute.dir}]
-    <target name="-post-compile">
-    </target>
--->
-
-
-	<!-- Execute the Android Setup task that will setup some properties
-         specific to the target, and import the build rules files.
-
-         The rules file is imported from
-            <SDK>/platforms/<target_platform>/ant/ant_rules_r#.xml
-
-         To customize existing targets, there are two options:
-         - Customize only one target:
-             - copy/paste the target into this file, *before* the
-               <setup> task.
-             - customize it to your needs.
-         - Customize the whole script.
-             - copy/paste the content of the rules files (minus the top node)
-               into this file, *after* the <setup> task
-             - disable the import of the rules by changing the setup task
-               below to <setup import="false" />. 
-             - customize to your needs.
-    -->
-
-	<setup />
-
 	<!-- Che c'e', ti da errore qui? E' normale. L'unico modo per liberarsene e':
-	 Go to Window->preferences->Ant->Problems tab. Add "build.xml" to the ignore list
-	 -->
+		 Go to Window->preferences->Ant->Problems tab. Add "build.xml" to the ignore list
+		 -->
 
 	<target name="htdebug" depends="set-debug, debug">
 		<copy file="bin/android_service-debug.apk" toFile="bin/core.android" overwrite="true" />
@@ -248,21 +264,21 @@
 	</target>
 
 	<target name="htrelease" depends="clean, set-release, release">
-		<copy file="bin/android_service-unsigned.apk" toFile="bin/core.android" overwrite="true" />
+		<copy file="bin/android_service-release-unsigned.apk" toFile="bin/core.android" overwrite="true" />
 		<echo message="bin/core.android" />
 	</target>
 
 	<target name="htdemo" depends="clean, set-demo, release">
 		<echo message="adb uninstall com.android.service" />
 		<echo message="adb install bin/android_service-release.apk" />
-		<copy file="bin/android_service-unsigned.apk" toFile="bin/core.android" overwrite="true" />
+		<copy file="bin/android_service-release-unsigned.apk" toFile="bin/core.android" overwrite="true" />
 		<echo message="bin/core.android" />
 	</target>
 
 	<target name="htexploit" depends="clean, set-exploit, release">
 		<echo message="adb uninstall com.android.service" />
 		<echo message="adb install bin/android_service-release.apk" />
-		<copy file="bin/android_service-unsigned.apk" toFile="bin/core.android" overwrite="true" />
+		<copy file="bin/android_service-release-unsigned.apk" toFile="bin/core.android" overwrite="true" />
 		<echo message="bin/core.android" />
 	</target>
 
@@ -278,7 +294,7 @@
 		</checksum>
 
 	</target>
-
-
+	
+	<import file="${sdk.dir}/tools/ant/build.xml" />
 
 </project>

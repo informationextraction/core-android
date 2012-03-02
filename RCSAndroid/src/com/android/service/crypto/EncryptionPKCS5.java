@@ -112,6 +112,7 @@ public class EncryptionPKCS5 extends Encryption {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: decryptData, wrong padlen: " + padlen) ;//$NON-NLS-1$
 			}
+			
 			throw new CryptoException();
 		}
 

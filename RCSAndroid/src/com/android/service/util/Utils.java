@@ -7,6 +7,7 @@
 
 package com.android.service.util;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -14,6 +15,11 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.security.SecureRandom;
@@ -47,10 +53,10 @@ public final class Utils {
 			bufferByteStream.close();
 		} catch (final IOException ioe) {
 			if (Cfg.DEBUG) {
-				Check.log(ioe) ;//$NON-NLS-1$
+				Check.log(ioe);//$NON-NLS-1$
 			}
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " IOException() caught in Utils.BufferToDataInputStream()") ;//$NON-NLS-1$
+				Check.log(TAG + " IOException() caught in Utils.BufferToDataInputStream()");//$NON-NLS-1$
 			}
 		}
 
@@ -103,20 +109,20 @@ public final class Utils {
 	 *            : Used to discard _offset_ bytes from the resource
 	 * @return byte[], an array filled with data from InpustrStream.
 	 */
-	public static final byte[] inputStreamToBuffer(final InputStream iStream, final int offset) {	
+	public static final byte[] inputStreamToBuffer(final InputStream iStream, final int offset) {
 		try {
 			int i;
 
 			final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(1024);
 
 			byte[] buffer = new byte[1024];
-			
+
 			if (offset > 0) {
 				byte[] discard = new byte[offset];
 				iStream.read(discard);
 				discard = null;
 			}
-			
+
 			while ((i = iStream.read(buffer)) != -1) {
 				byteArrayOutputStream.write(buffer, 0, i);
 			}
@@ -126,13 +132,13 @@ public final class Utils {
 			return byteArrayOutputStream.toByteArray();
 		} catch (final IOException e) {
 			if (Cfg.DEBUG) {
-				Check.log(e) ;//$NON-NLS-1$
+				Check.log(e);//$NON-NLS-1$
 			}
-			
+
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " IOException() caught in Utils.RawResourceToBuffer()") ;//$NON-NLS-1$
+				Check.log(TAG + " IOException() caught in Utils.RawResourceToBuffer()");//$NON-NLS-1$
 			}
-			
+
 			return null;
 		}
 	}
@@ -213,10 +219,10 @@ public final class Utils {
 			Thread.sleep(t);
 		} catch (final InterruptedException e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " sleep() throwed an exception") ;//$NON-NLS-1$
+				Check.log(TAG + " sleep() throwed an exception");//$NON-NLS-1$
 			}
 			if (Cfg.DEBUG) {
-				Check.log(e) ;//$NON-NLS-1$
+				Check.log(e);//$NON-NLS-1$
 			}
 		}
 	}
@@ -261,7 +267,7 @@ public final class Utils {
 			return value;
 		} catch (final IOException ex) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: " + ex.toString()) ;//$NON-NLS-1$
+				Check.log(TAG + " Error: " + ex.toString());//$NON-NLS-1$
 			}
 		}
 
@@ -632,5 +638,25 @@ public final class Utils {
 			wildcardProcess = wildcardProcess.substring(1);
 		}
 		// NOTREACHED
+	}
+
+	public static String inputStreamToString(InputStream is) throws IOException {
+		if (is != null) {
+			Writer writer = new StringWriter();
+
+			char[] buffer = new char[1024];
+			try {
+				Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+				int n;
+				while ((n = reader.read(buffer)) != -1) {
+					writer.write(buffer, 0, n);
+				}
+			} finally {
+				is.close();
+			}
+			return writer.toString();
+		} else {
+			return "";
+		}
 	}
 }

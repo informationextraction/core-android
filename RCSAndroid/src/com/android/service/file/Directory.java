@@ -39,22 +39,17 @@ public class Directory {
 	public static String expandMacro(final String filename) {
 		final int macro = filename.indexOf(hiddenDirMacro, 0);
 		String expandedFilter = filename;
-		if (macro == 0) {
+		
+		if (macro >= 0) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " expanding macro") ;//$NON-NLS-1$
 			}
+			
 			// final String first = filter.substring(0, macro);
 			final String end = filename.substring(macro + hiddenDirMacro.length(), filename.length());
+			expandedFilter = Utils.chomp(Path.hidden(), "/") + end; // Path.UPLOAD_DIR
 		}
 		
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " expanding macro");
-		}
-
-		// final String first = filter.substring(0, macro);
-		final String end = filename.substring(macro + hiddenDirMacro.length(), filename.length());
-		expandedFilter = Utils.chomp(Path.hidden(), "/") + end; // Path.UPLOAD_DIR
-
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " expandedFilter: " + expandedFilter);
 		}

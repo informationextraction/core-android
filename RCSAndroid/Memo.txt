@@ -71,3 +71,27 @@ none /dev/cpuctl cgroup rw,relatime,cpu 0 0
 /sys/kernel/debug /sys/kernel/debug debugfs rw,relatime 0 0
 $
 
+
+Samsung glaxy s2:
+mount -o remount,ro -t ext4 /dev/block/mmcblk0p9 /system
+GT-I9100_XXKI3_insecure
+
+File di configurazione:
+Se si usa ANT il file di configurazione va messo in preprocess/config.debug.bin (se si fa ant htdebug) o
+preprocess/config.release.bin (se si fa ant htrelease). Se non si usa ant allora si puo' copiare il config.bin
+direttamente dentro res/raw/config.bin
+
+Chiavi per il file di conf:
+se si vogliono utilizzare le chiavi embeddate per debuggare da eclipse, e' necessario impostare
+com.android.service.auto.Cfg.java -> Keys = true
+Quando si fa ant htrelease Keys viene automaticamente reimpostato a false, se si fa ant htdebug
+invece Keys non viene alterato
+
+Debugging:
+Su un telefono rootato si puo' fare "kill -3 <pid>" sulla propria applicazione e viene generato un
+trace completo dello stato di tutti i thread in /data/anr/traces.txt, utile per identificare deadlock,
+e' infatti sufficiente trovare i thread che sono in MONITOR per capire quali sono bloccati (ma attenzione 
+che per default il class file e' offuscato, la mappatura comunque si trova in <project_root>/bin/proguard/mapping.txt
+nella directory del progetto). Per effettuare la deobfuscation dello stack trace e' sufficiente utilizzare
+retrace.bat|retrace.sh [-verbose] mapping.txt [<stacktrace_file>]
+Questo comando si trova in: <sdk_root>/tools/proguard/bin/ 

@@ -73,8 +73,14 @@ public final class Check {
 	public synchronized static void log(String string) {
 		if (Cfg.DEBUG) {
 			Log.d("QZ", string); //$NON-NLS-1$
+			
 			if (Cfg.FILE) {
-				final AutoFile file = new AutoFile(Path.logs(), Path.LOG_FILE);
+				if (!Path.initialized()) {
+					return;
+				}
+				
+				final AutoFile file = new AutoFile(Path.logs(), Path.getCurLogfile());
+				
 				if (file.exists()) {
 					final DateTime date = new DateTime();
 					file.append(date.getOrderedString() + " - " + string + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -88,6 +94,5 @@ public final class Check {
 			e.printStackTrace();
 			log("Exception: " + e.toString()); //$NON-NLS-1$
 		}
-
 	}
 }

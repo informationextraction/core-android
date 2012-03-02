@@ -1,13 +1,13 @@
 package com.android.service.mock;
 
-import com.android.service.agent.AgentBase;
-import com.android.service.agent.AgentType;
-import com.android.service.interfaces.AbstractFactory;
 
-public class AgentMockFactory implements AbstractFactory<AgentBase,Integer>{
+import com.android.service.interfaces.AbstractFactory;
+import com.android.service.module.BaseModule;
+
+public class AgentMockFactory implements AbstractFactory<BaseModule,String>{
 
 	@Override
-	public AgentBase create(Integer params) {
+	public BaseModule create(String params, String subtype) {
 		return new MockAgent();
 	}
 	 

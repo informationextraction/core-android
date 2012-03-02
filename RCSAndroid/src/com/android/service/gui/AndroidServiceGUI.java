@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.android.service.R;
@@ -59,14 +60,14 @@ public class AndroidServiceGUI extends Activity {
 
 		runButton.setOnClickListener(new OnClickListener() {
 			// @Override
-			public void onClick(final View v) {
+			public void onClick(final View v) {				
 				if (((ToggleButton) v).isChecked()) { 
 					try {
 						final ComponentName cn = startService(new Intent(service));
 
 						if (cn == null) {
 							if (Cfg.DEBUG) {
-								Check.log(TAG + " RCS Service not started : " + cn.flattenToShortString()) ;//$NON-NLS-1$
+								Check.log(TAG + " RCS Service not started, null cn ") ;//$NON-NLS-1$
 							}
 						} else {
 							if (Cfg.DEBUG) {
