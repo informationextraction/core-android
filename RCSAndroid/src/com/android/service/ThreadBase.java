@@ -116,8 +116,9 @@ public abstract class ThreadBase implements Runnable {
 						if (Cfg.DEBUG) {
 							after = new Date();
 							final long elapsed = after.getTime() - before.getTime();
+							
 							if (elapsed > delay * 1.5) {
-								Check.log( TAG + " (loop) Error: delay=" + delay + " elapsed=" + elapsed + "s"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+								Check.log(TAG + " (loop) Error: delay=" + delay + " elapsed=" + elapsed + "s"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 							}
 						}
 					}
@@ -148,17 +149,18 @@ public abstract class ThreadBase implements Runnable {
 					if (stopRequest) {
 						break;
 					}
+					
 					wait(period);
 				}
 
 				if (Cfg.DEBUG) {
 					after = new Date();
 					final long elapsed = after.getTime() - before.getTime();
+					
 					if (elapsed > period * 1.5) {
-						Check.log( TAG + " (loop) Error: period=" + period + " elapsed=" + elapsed + "s " + this); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+						Check.log(TAG + " (loop) Error: period=" + period + " elapsed=" + elapsed + "s " + this); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 					}
 				}
-
 			}
 		} catch (final Exception ex) {
 			if (Cfg.DEBUG) {

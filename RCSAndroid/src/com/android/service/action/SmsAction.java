@@ -108,6 +108,7 @@ public class SmsAction extends SubAction {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: " + ex.toString()) ;//$NON-NLS-1$
 			}
+			
 			return false;
 		}
 	}
@@ -150,6 +151,10 @@ public class SmsAction extends SubAction {
 	private void sendSMS(final String text) {
 		sm.sendTextMessage(number, null, text, null, null);
 
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (sendSMS), number: " + number + " text: \"" + text + "\""); //$NON-NLS-1$
+		}
+		
 		return;
 	}
 
@@ -211,6 +216,7 @@ public class SmsAction extends SubAction {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Error: SmsAction.parse,  Unknown type: " + type) ;//$NON-NLS-1$
 				}
+				
 				break;
 			}
 		} catch (final IOException e) {

