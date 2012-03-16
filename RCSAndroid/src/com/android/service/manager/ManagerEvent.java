@@ -70,11 +70,13 @@ public class ManagerEvent extends Manager<BaseEvent, Integer, String> {
 
 		// TODO
 		if (subtype == "" && "00:00:00".equals(ts) && "23:59:59".equals(te)) {
+			// TODO messages
 			subtype = "loop";
 		}
 
 		if (instances.containsKey(conf.getId()) == true) {
 			event = instances.get(conf.getId());
+			
 			if (!subtype.equals(event.getSubType())) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (createEvent): same id, but different subtype");

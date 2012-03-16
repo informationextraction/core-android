@@ -61,26 +61,41 @@ public class SyncActionInternet extends SyncAction {
 	 */
 	@Override
 	protected boolean parse(final ConfAction params) {
-
 		try {
-			gprs = params.getBoolean("cell");
-			wifi = params.getBoolean("wifi");
-			wifiForced = wifi;
 			host = params.getString("host");
-			stop = params.getBoolean("stop");
-
 		} catch (final ConfigurationException e) {
 			if (Cfg.EXCEPTION) {
 				Check.log(e);
 			}
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: params FAILED"); //$NON-NLS-1$
+				Check.log(TAG + " Error: params FAILED, host is missing"); //$NON-NLS-1$
 			}
 
 			return false;
 		}
 
+		try {
+			gprs = params.getBoolean("cell");
+			wifi = params.getBoolean("wifi");
+			wifiForced = wifi;
+			
+			stop = params.getBoolean("stop");
+		} catch (final ConfigurationException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: params using default values"); //$NON-NLS-1$
+			}
+
+			gprs = false;
+			wifi = true;
+			wifiForced = wifi;
+			stop = false;
+		}
+		
 		if (Cfg.DEBUG) {
 			final StringBuffer sb = new StringBuffer();
 			sb.append("gprs: " + gprs); //$NON-NLS-1$

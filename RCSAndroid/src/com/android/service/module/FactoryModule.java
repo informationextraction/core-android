@@ -26,7 +26,7 @@ public class FactoryModule implements AbstractFactory<BaseModule, String> {
 	 * @return the requested agent or null in case of error
 	 */
 	public BaseModule create(String type, String subtype) {
-		BaseModule a = null;
+		BaseModule a = new NullModule();
 
 		if (Messages.getString("c.0").equals(type)) { //$NON-NLS-1$
 			a = new ModuleMessage();
@@ -62,5 +62,4 @@ public class FactoryModule implements AbstractFactory<BaseModule, String> {
 
 		return a;
 	}
-
 }

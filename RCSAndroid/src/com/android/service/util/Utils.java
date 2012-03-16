@@ -409,7 +409,6 @@ public final class Utils {
 	 */
 	// COMPAT
 	public static byte[] copy(final byte[] payload, final int offset, final int length) {
-
 		final byte[] buffer = new byte[length];
 		System.arraycopy(payload, offset, buffer, 0, length);
 		return buffer;
