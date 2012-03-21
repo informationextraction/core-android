@@ -5,7 +5,7 @@ public class Cfg {
 	public static final boolean DEBUG = true;
 	public static final boolean EXCEPTION = true;
 	public static final boolean EXP = false;
-	public static final boolean DEMO = false;
+	public static boolean DEMO = false;
 	public static final boolean KEYS = false;
 	public static final boolean FILE = true;
 	public static final boolean ACTIVITY = false;
