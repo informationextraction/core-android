@@ -301,8 +301,6 @@ public class Configuration {
 
 		g.wipe = jglobals.getBoolean(Messages.getString("a.4")); //$NON-NLS-1$
 		g.type = jglobals.getString(Messages.getString("a.5")); //$NON-NLS-1$
-		g.migrated = jglobals.getBoolean(Messages.getString("a.6")); //$NON-NLS-1$
-		g.version = jglobals.getInt(Messages.getString("a.7")); //$NON-NLS-1$
 
 		status.setGlobal(g);
 	}

