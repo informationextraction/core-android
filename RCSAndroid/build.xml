@@ -166,13 +166,13 @@
 				<filter token="EXCEPTION" value="true" />
 				<filter token="EXPLOIT" value="false" />
 				<filter token="DEMO" value="false" />
-				<filter token="KEYS" value="true" />
+				<filter token="KEYS" value="false" />
 				<filter token="FILE" value="true" />
 				<filter token="RANDOM" value="${randomSalt}" />
 			</filterset>
 		</copy>
 		<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" overwrite="true" />
-		<copy file="preprocess/resources.bin.patched" toFile="res/raw/resources.bin" overwrite="true" />
+		<copy file="preprocess/resources.bin" toFile="res/raw/resources.bin" overwrite="true" />
 		<delete file="assets/statuslog" />
 		<delete file="assets/statusdb" />
 	</target>

