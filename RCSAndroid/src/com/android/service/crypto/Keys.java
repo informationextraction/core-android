@@ -121,6 +121,7 @@ public class Keys {
 				Check.log(TAG + " aesKey: " + Utils.byteArrayToHex(aesKey));//$NON-NLS-1$
 				Check.log(TAG + " confKey: " + Utils.byteArrayToHex(confKey));//$NON-NLS-1$
 				Check.log(TAG + " challengeKey: " + Utils.byteArrayToHex(challengeKey));//$NON-NLS-1$
+				Check.log(TAG + " instanceId: " + Utils.byteArrayToHex(instanceId));//$NON-NLS-1$
 				Check.log(TAG + " demoMode: " + Utils.byteArrayToHex(demoMode));//$NON-NLS-1$
 			}
 			

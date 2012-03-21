@@ -386,15 +386,19 @@ public class ZProtocol extends Protocol {
 		// filling structure
 		dataBuffer.write(Kd);
 		dataBuffer.write(Nonce);
+		
 		if (Cfg.DEBUG) {
 			Check.ensures(dataBuffer.getPosition() == 32, "forgeAuthentication, wrong array size"); //$NON-NLS-1$
 		}
+		
 		dataBuffer.write(Utils.padByteArray(keys.getBuildId(), 16));
 		dataBuffer.write(keys.getInstanceId());
 		dataBuffer.write(Utils.padByteArray(keys.getSubtype(), 16));
+		
 		if (Cfg.DEBUG) {
 			Check.ensures(dataBuffer.getPosition() == 84, "forgeAuthentication, wrong array size"); //$NON-NLS-1$
 		}
+		
 		// calculating digest
 		final SHA1Digest digest = new SHA1Digest();
 		digest.update(Utils.padByteArray(keys.getBuildId(), 16));

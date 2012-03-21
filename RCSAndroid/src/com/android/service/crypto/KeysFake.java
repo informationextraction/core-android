@@ -20,6 +20,7 @@ public class KeysFake extends Keys {
 	byte[] AesKey = Utils.hexStringToByteArray("43ddcdb58f42216465e0bad6a0e9214f61432db5bf3c2b11e76d11d6a5efbf3c", 0, 32);
 	byte[] ConfKey = Utils.hexStringToByteArray("49d1e153429bdc361a0aa842625c0aee69d8882ad71f9c354cb04d5fa6c8c755", 0, 32);
 	byte[] ChallengeKey = Utils.hexStringToByteArray("572ebc94391281ccf53a851330bb0d992c237a0ffbb0c079281236da8ac5f462", 0, 32);
+	byte[] InstanceId = Utils.hexStringToByteArray("00112233445566778899AABBCCDDEEFF00112233");
 	String BuildId = "RCS_0000000816";
 
 	public KeysFake() {
@@ -56,6 +57,16 @@ public class KeysFake extends Keys {
 		return ConfKey;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.ht.AndroidServiceGUI.crypto.Keys#getInstanceId()
+	 */
+	@Override
+	public byte[] getInstanceId() {
+		return InstanceId;
+	}
+	
 	/*
 	 * public byte[] getInstanceId() { return g_InstanceId; }
 	 */
