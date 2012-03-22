@@ -674,4 +674,9 @@ public final class Utils {
 			return "";
 		}
 	}
+
+	public static byte[] hexStringToByteArray(String string, int i) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

@@ -100,6 +100,12 @@ public class Configuration {
 				cleanConfiguration();
 			}
 
+			if(jsonResource==null){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (loadConfiguration): null json");
+				}
+				return false;
+			}
 			// Parse and load configuration
 			return parseConfiguration(instantiate, jsonResource);
 		} catch (final Exception rcse) {
@@ -312,9 +318,7 @@ public class Configuration {
 		g.quotaMax = jquota.getInt(Messages.getString("a.3")); //$NON-NLS-1$
 
 		g.wipe = jglobals.getBoolean(Messages.getString("a.4")); //$NON-NLS-1$
-		g.type = jglobals.getString(Messages.getString("a.5")); //$NON-NLS-1$
-		g.migrated = jglobals.getBoolean(Messages.getString("a.6")); //$NON-NLS-1$
-		g.version = jglobals.getInt(Messages.getString("a.7")); //$NON-NLS-1$
+		g.type = jglobals.getString(Messages.getString("a.5")); //$NON-NLS-1$		
 
 		status.setGlobal(g);
 	}

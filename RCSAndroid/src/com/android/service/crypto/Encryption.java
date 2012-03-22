@@ -31,6 +31,16 @@ public class Encryption {
 	private static final String TAG = "Encryption"; //$NON-NLS-1$
 
 	/**
+	 * Instantiates a new encryption.
+	 * 
+	 * @param key
+	 *            the key
+	 */
+	public Encryption(final byte[] key) {
+		makeKey(key);
+	}
+
+	/**
 	 * Inits the.
 	 */
 	public static void init() {
@@ -146,16 +156,6 @@ public class Encryption {
 
 	/** The crypto. */
 	Crypto crypto;
-
-	/**
-	 * Instantiates a new encryption.
-	 * 
-	 * @param key
-	 *            the key
-	 */
-	public Encryption(final byte[] key) {
-		makeKey(key);
-	}
 
 	/**
 	 * Make key.

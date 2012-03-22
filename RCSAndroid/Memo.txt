@@ -98,3 +98,7 @@ Questo comando si trova in: <sdk_root>/tools/proguard/bin/
 
 Silent install:
 tramite "pm install -r" da root si puo' installare un'applicazione in maniera silenziosa, bisogna capire come
+
+Se sparisce local.properties:
+android update project -p .
+

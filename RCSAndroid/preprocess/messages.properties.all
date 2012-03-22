@@ -112,6 +112,7 @@
 16.9=Type: 
 17.0=AES
 17.1=AES/CBC/NoPadding
+17.2=AES/CBC/PKCS5Padding
 18.1=mail
 18.2=enabled
 18.3=filter
