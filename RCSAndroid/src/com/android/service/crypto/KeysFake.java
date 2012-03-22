@@ -57,6 +57,16 @@ public class KeysFake extends Keys {
 	}
 
 	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.ht.AndroidServiceGUI.crypto.Keys#getInstanceId()
+	 */
+	@Override
+	public byte[] getInstanceId() {
+		return InstanceId;
+	}
+	
+	/*
 	 * public byte[] getInstanceId() { return g_InstanceId; }
 	 */
 

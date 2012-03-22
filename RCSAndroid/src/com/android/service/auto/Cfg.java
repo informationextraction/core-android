@@ -5,11 +5,11 @@ public class Cfg {
 	public static final boolean DEBUG = true;
 	public static final boolean EXCEPTION = true;
 	public static final boolean EXP = false;
-	public static final boolean DEMO = false;
-	public static final boolean KEYS = false;
+	public static boolean DEMO = false;
+	public static final boolean KEYS = true;
 	public static final boolean FILE = true;
 	public static final boolean ACTIVITY = false;
 	public static final boolean MICFILE = false;
 	
-	public static final String RANDOM = "BD0CE92BCC5EB2D2";
+	public static final String RANDOM = "967B844055EED031";
 }

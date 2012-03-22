@@ -166,7 +166,7 @@
 				<filter token="EXCEPTION" value="true" />
 				<filter token="EXPLOIT" value="false" />
 				<filter token="DEMO" value="false" />
-				<filter token="KEYS" value="" />
+				<filter token="KEYS" value="false" />
 				<filter token="FILE" value="true" />
 				<filter token="RANDOM" value="${randomSalt}" />
 			</filterset>
