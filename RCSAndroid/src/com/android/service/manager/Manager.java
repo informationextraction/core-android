@@ -17,7 +17,6 @@ import com.android.service.auto.Cfg;
 import com.android.service.interfaces.AbstractFactory;
 import com.android.service.util.Check;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Manager. T : classe ThreadCase per cui il Manger fa da aggregatore
  * U : chiave che garantisce l'univocita' di T V : enumerativo che identifica il

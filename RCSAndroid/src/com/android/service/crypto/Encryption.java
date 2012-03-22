@@ -319,11 +319,6 @@ public class Encryption {
 				if (Cfg.EXCEPTION) {
 					Check.log(e);
 				}
-
-				// TODO Auto-generated catch block
-				if (Cfg.DEBUG) {
-					Check.log(e);//$NON-NLS-1$
-				}
 			}
 
 		}

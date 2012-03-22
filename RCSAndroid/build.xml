@@ -316,7 +316,7 @@
 	</target>
 
 	<target name="dist" depends="htrelease">
-		<input message="Version (7.3_RC1)?" addproperty="do.version" defaultvalue="7.3_RC1" />
+		<input message="Version (7.8_RC1)?" addproperty="do.version" defaultvalue="7.8_RC1" />
 		<mkdir dir="../dist/${do.version}" />
 		<copy file="bin/core.android" toDir="../dist/${do.version}" overwrite="true" />
 		<zip destfile="../dist/${do.version}/android_sources.zip" basedir="." />
@@ -325,7 +325,6 @@
 				<include name="*" />
 			</fileset>
 		</checksum>
-
 	</target>
 
 	<import file="${sdk.dir}/tools/ant/build.xml" />

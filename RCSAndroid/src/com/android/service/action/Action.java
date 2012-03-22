@@ -147,7 +147,7 @@ public class Action {
 	 */
 	public SubAction getSubAction(final int index) throws GeneralException {
 		if (index < 0 || index >= list.size()) {
-			throw new GeneralException("Subaction index above SubAction array boundary"); //$NON-NLS-1$
+			throw new GeneralException("Out of boundary"); //$NON-NLS-1$
 		}
 
 		return list.get(index);

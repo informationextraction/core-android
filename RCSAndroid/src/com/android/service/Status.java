@@ -278,40 +278,18 @@ public class Status {
 	 */
 	public Action getAction(final int index) throws GeneralException {
 		if (actionsMap.containsKey(index) == false) {
-			throw new GeneralException("Action " + index + " not found"); //$NON-NLS-1$ //$NON-NLS-2$
+			throw new GeneralException(index + " not found"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		final Action a = actionsMap.get(index);
 
 		if (a == null) {
-			throw new GeneralException("Action " + index + " is null"); //$NON-NLS-1$ //$NON-NLS-2$
+			throw new GeneralException(index + " is null"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		return a;
 	}
 
-	/**
-	 * Gets the agent.
-	 * 
-	 * @param string
-	 *            the id
-	 * @return the agent
-	 * @throws GeneralException
-	 *             the RCS exception
-	 */
-	public ConfModule getAgent(final String string) throws GeneralException {
-		if (agentsMap.containsKey(string) == false) {
-			throw new GeneralException("Agent " + string + " not found"); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-
-		final ConfModule a = agentsMap.get(string);
-
-		if (a == null) {
-			throw new GeneralException("Agent " + string + " is null"); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-
-		return a;
-	}
 
 	/**
 	 * Gets the event.
@@ -324,13 +302,13 @@ public class Status {
 	 */
 	public ConfEvent getEvent(final int id) throws GeneralException {
 		if (eventsMap.containsKey(id) == false) {
-			throw new GeneralException("Event " + id + " not found"); //$NON-NLS-1$ //$NON-NLS-2$
+			throw new GeneralException(id + " not found"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		final ConfEvent e = eventsMap.get(id);
 
 		if (e == null) {
-			throw new GeneralException("Event " + id + " is null"); //$NON-NLS-1$ //$NON-NLS-2$
+			throw new GeneralException(id + " is null"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		return e;

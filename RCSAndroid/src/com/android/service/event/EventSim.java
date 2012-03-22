@@ -43,7 +43,6 @@ public class EventSim extends BaseEvent implements Observer<Sim> {
 
 	@Override
 	public void actualGo() {
-		// TODO Auto-generated method stub
 	}
 
 	// Viene richiamata dal listener (dalla dispatch())

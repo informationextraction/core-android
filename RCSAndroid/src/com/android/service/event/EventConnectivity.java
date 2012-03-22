@@ -45,7 +45,7 @@ public class EventConnectivity extends BaseEvent implements Observer<Connectivit
 
 	@Override
 	public void actualGo() {
-		// TODO Auto-generated method stub
+		
 	}
 
 	// Viene richiamata dal listener (dalla dispatch())

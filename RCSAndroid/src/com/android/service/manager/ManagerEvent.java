@@ -67,8 +67,7 @@ public class ManagerEvent extends Manager<BaseEvent, Integer, String> {
 
 		String ts = conf.getSafeString("ts");
 		String te = conf.getSafeString("te");
-
-		// TODO
+		
 		if (subtype == "" && "00:00:00".equals(ts) && "23:59:59".equals(te)) {
 			// TODO messages
 			subtype = "loop";

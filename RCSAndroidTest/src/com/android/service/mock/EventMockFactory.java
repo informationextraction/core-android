@@ -8,7 +8,7 @@ public class EventMockFactory implements AbstractFactory<BaseEvent,String>{
 
 	@Override
 	public BaseEvent create(String params, String subtype) {
-		// TODO Auto-generated method stub
+
 		return new MockEvent();
 	}
 

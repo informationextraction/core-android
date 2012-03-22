@@ -70,7 +70,7 @@ public class EventCall extends BaseEvent implements Observer<Call> {
 
 	@Override
 	public void actualGo() {
-		// TODO Auto-generated method stub
+
 	}
 
 	public int notification(Call c) {
@@ -99,11 +99,9 @@ public class EventCall extends BaseEvent implements Observer<Call> {
 		    try {
 				recorder.prepare();
 			} catch (IllegalStateException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+
 			}
 			
 		    recorder.start();*/

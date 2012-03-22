@@ -162,7 +162,7 @@ public abstract class Protocol {
 	 * @return true, if successful
 	 */
 	public static boolean deleteSelf() {
-		// TODO
+		// TODO deleteself
 		return false;
 
 	}

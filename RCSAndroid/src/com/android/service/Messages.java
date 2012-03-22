@@ -58,7 +58,10 @@ public class Messages {
 			Resources resources = context.getResources();
 			InputStream stream = resources.openRawResource(R.raw.messages);
 
-			SecretKey key = produceKey("0x5A3D00448D7A912B");
+			long p = 6502353731424260395L; //0x5A3D00448D7A912B;
+            String sp = Long.toString(p, 16);
+            
+			SecretKey key = produceKey(sp);
 			if (Cfg.DEBUG) {
 				Check.asserts(key != null, "null key"); //$NON-NLS-1$
 			}
@@ -68,7 +71,8 @@ public class Messages {
 				Check.log(TAG + " (init): key=" + Utils.byteArrayToHex(key.getEncoded()));
 			}
 
-			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding"); //$NON-NLS-1$
+			//17.3=AES/CBC/PKCS5Padding
+			Cipher cipher = Cipher.getInstance(Messages.getString("17.3")); //$NON-NLS-1$
 			final byte[] iv = new byte[16];
 			Arrays.fill(iv, (byte) 0);
 			IvParameterSpec ivSpec = new IvParameterSpec(iv);

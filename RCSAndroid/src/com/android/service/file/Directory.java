@@ -85,7 +85,6 @@ public class Directory {
 		return expandedFilter;
 	}
 
-	// TODO
 	/**
 	 * Find.
 	 * 

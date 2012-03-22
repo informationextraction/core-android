@@ -89,8 +89,6 @@ public class WifiTransport extends HttpKeepAliveTransport {
 
 		// wifi.reconnect();
 		// wifi.reassociate();
-
-		// TODO:
 		// ConnectivityManager.setNetworkPrefrence(ConnectivityManager.TYPE_WIFI)
 		if (forced && wifi.getWifiState() != WifiManager.WIFI_STATE_ENABLING) {
 			if (Cfg.DEBUG) {
