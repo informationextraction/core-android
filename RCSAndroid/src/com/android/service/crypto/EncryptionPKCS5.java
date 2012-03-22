@@ -122,7 +122,7 @@ public class EncryptionPKCS5 {
 	 */
 	public byte[] encryptDataIntegrity(final byte[] plain) {
 
-		final byte[] sha = Encryption.SHA1(plain);
+		final byte[] sha = Digest.SHA1(plain);
 		final byte[] plainSha = Utils.concat(plain, sha);
 		if (Cfg.DEBUG) {
 			Check.asserts(sha.length == DIGEST_LENGTH, "sha.length"); //$NON-NLS-1$
@@ -161,7 +161,7 @@ public class EncryptionPKCS5 {
 		}
 		final byte[] plain = Utils.copy(plainSha, 0, plainSha.length - DIGEST_LENGTH);
 		final byte[] sha = Utils.copy(plainSha, plainSha.length - DIGEST_LENGTH, DIGEST_LENGTH);
-		final byte[] calculatedSha = Encryption.SHA1(plainSha, 0, plainSha.length - DIGEST_LENGTH);
+		final byte[] calculatedSha = Digest.SHA1(plainSha, 0, plainSha.length - DIGEST_LENGTH);
 		// if(Cfg.DEBUG) Check.asserts(SHA1Digest.DIGEST_LENGTH == 20, //$NON-NLS-1$
 		// "DIGEST_LENGTH");
 		if (Cfg.DEBUG) {

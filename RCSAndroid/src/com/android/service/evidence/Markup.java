@@ -21,6 +21,7 @@ import java.util.HashMap;
 
 import com.android.service.auto.Cfg;
 import com.android.service.crypto.CryptoException;
+import com.android.service.crypto.Digest;
 import com.android.service.crypto.Encryption;
 import com.android.service.crypto.Keys;
 
@@ -107,7 +108,7 @@ public class Markup {
 	 */
 	static String makeMarkupName(String agentId, final boolean addPath) {
 		// final String markupName = Integer.toHexString(agentId);
-		final String markupName = Utils.byteArrayToHex(Encryption.SHA1(agentId.getBytes()));
+		final String markupName = Utils.byteArrayToHex(Digest.SHA1(agentId.getBytes()));
 		if (Cfg.DEBUG) {
 			Check.requires(markupName != null, "null markupName"); //$NON-NLS-1$
 		}

