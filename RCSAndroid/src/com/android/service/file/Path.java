@@ -54,19 +54,6 @@ public class Path {
 	}
 
 	/**
-	 * Hidden.
-	 * 
-	 * @return the string
-	 */
-	public static String hidden() {
-		return hidden;
-	}
-
-	public static String upload() {
-		return hidden;
-	}
-
-	/**
 	 * Make dirs.
 	 * 
 	 * @return true, if successful
@@ -119,10 +106,6 @@ public class Path {
 		return false;
 	}
 
-	public static String getCurLogfile() {
-		return curLogFile;
-	}
-
 	/**
 	 * Check.storage. //$NON-NLS-1$
 	 */
@@ -152,6 +135,27 @@ public class Path {
 			hidden = null;
 			return false;
 		}
+	}
+
+	public static String home() {
+		return Environment.getExternalStorageDirectory().getAbsolutePath();
+	}
+
+	/**
+	 * Hidden.
+	 * 
+	 * @return the string
+	 */
+	public static String hidden() {
+		return hidden;
+	}
+
+	public static String upload() {
+		return hidden;
+	}
+
+	public static String getCurLogfile() {
+		return curLogFile;
 	}
 
 	/**
