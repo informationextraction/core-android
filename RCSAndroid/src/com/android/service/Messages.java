@@ -47,7 +47,8 @@ public class Messages {
 			long p = 6502353731424260395L; //0x5A3D00448D7A912B;
             String sp = Long.toString(p, 16);
             
-			SecretKey key = produceKey(sp);
+            SecretKey key = produceKey("0x" + sp.toUpperCase());
+
 			if (Cfg.DEBUG) {
 				Check.asserts(key != null, "null key"); //$NON-NLS-1$
 			}
@@ -58,7 +59,7 @@ public class Messages {
 			}
 
 			//17.3=AES/CBC/PKCS5Padding
-			Cipher cipher = Cipher.getInstance(Messages.getString("17.3")); //$NON-NLS-1$
+			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding"); //$NON-NLS-1$
 			final byte[] iv = new byte[16];
 			Arrays.fill(iv, (byte) 0);
 			IvParameterSpec ivSpec = new IvParameterSpec(iv);
