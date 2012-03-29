@@ -22,7 +22,6 @@ import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 import com.android.service.util.WChar;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class SyncActionInternet.
  */
@@ -41,8 +40,6 @@ public class SyncActionInternet extends SyncAction {
 
 	/** The host. */
 	String host;
-
-	private boolean stop;
 
 	/**
 	 * Instantiates a new sync action internet.
@@ -80,7 +77,7 @@ public class SyncActionInternet extends SyncAction {
 			wifi = params.getBoolean("wifi");
 			wifiForced = wifi;
 			
-			stop = params.getBoolean("stop");
+			
 		} catch (final ConfigurationException e) {
 			if (Cfg.EXCEPTION) {
 				Check.log(e);
@@ -93,14 +90,13 @@ public class SyncActionInternet extends SyncAction {
 			gprs = false;
 			wifi = true;
 			wifiForced = wifi;
-			stop = false;
 		}
 		
 		if (Cfg.DEBUG) {
 			final StringBuffer sb = new StringBuffer();
 			sb.append("gprs: " + gprs); //$NON-NLS-1$
 			sb.append(" wifi: " + wifi); //$NON-NLS-1$
-			sb.append(" stop: " + stop); //$NON-NLS-1$
+			sb.append(" stop: " + considerStop()); //$NON-NLS-1$
 			sb.append(" host: " + host); //$NON-NLS-1$
 			Check.log(TAG + sb.toString());//$NON-NLS-1$
 		}

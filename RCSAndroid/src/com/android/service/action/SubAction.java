@@ -49,6 +49,8 @@ public abstract class SubAction {
 		this.status = Status.self();
 		this.conf = conf;
 
+		stop = conf.getBoolean(Messages.getString("d.2"), false); //$NON-NLS-1$
+        
 		parse(conf);
 	}
 
@@ -160,6 +162,8 @@ public abstract class SubAction {
 	/** The finished. */
 	private boolean finished;
 
+	private boolean stop;
+
 	/**
 	 * Parse
 	 * 
@@ -202,6 +206,10 @@ public abstract class SubAction {
 		}else{
 			return conf.actionId + "/" + conf.subActionId; //$NON-NLS-1$
 		}
+	}
+
+	public boolean considerStop() {
+		return stop;
 	}
 
 }

