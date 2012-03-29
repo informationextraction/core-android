@@ -58,7 +58,6 @@ public class Messages {
 				Check.log(TAG + " (init): key=" + Utils.byteArrayToHex(key.getEncoded()));
 			}
 
-			//17.3=AES/CBC/PKCS5Padding
 			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding"); //$NON-NLS-1$
 			final byte[] iv = new byte[16];
 			Arrays.fill(iv, (byte) 0);
