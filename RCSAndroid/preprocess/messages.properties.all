@@ -4,6 +4,7 @@ S.11=synchronize
 S.12=apn
 S.13=execute
 S.14=log
+S.15=stop
 S.2=sms
 S.3=module
 S.4=status

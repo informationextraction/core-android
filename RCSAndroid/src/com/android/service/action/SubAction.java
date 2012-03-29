@@ -49,7 +49,7 @@ public abstract class SubAction {
 		this.status = Status.self();
 		this.conf = conf;
 
-		stop = conf.getBoolean(Messages.getString("d.2"), false); //$NON-NLS-1$
+		stop = conf.getBoolean(Messages.getString("S.15"), false); //$NON-NLS-1$
         
 		parse(conf);
 	}

