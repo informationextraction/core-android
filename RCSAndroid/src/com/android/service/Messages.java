@@ -1,35 +1,21 @@
 package com.android.service;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.security.Key;
 import java.security.MessageDigest;
-import java.security.SecureRandom;
-import java.security.spec.KeySpec;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.MissingResourceException;
-import java.util.ResourceBundle;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
-import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.util.Log;
 
 import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
