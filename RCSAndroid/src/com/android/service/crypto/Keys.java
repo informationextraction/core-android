@@ -34,7 +34,7 @@ public class Keys {
 
 	// Subversion
 	/** The Constant g_Subtype. */
-	private static final byte[] subtype = { 'A', 'N', 'D', 'R', 'O', 'I', 'D' };
+	//private static final byte[] subtype = { 'A', 'N', 'D', 'R', 'O', 'I', 'D' };
 	// private static final byte[] g_Subtype = { 'A', 'N', 'D', 'R', 'O', 'I',
 	// 'D' };
 
@@ -215,7 +215,12 @@ public class Keys {
 	 * @return the subtype
 	 */
 	public byte[] getSubtype() {
-		return subtype;
+		if(Cfg.DEMO){
+			//20.1=DEMO
+			return ("ANDROID_" + Messages.getString("20.1")).getBytes();
+		}else{
+			return "ANDROID".getBytes();
+		}
 	}
 
 	private byte[] keyFromString(byte[] resource, int from, int len) {
