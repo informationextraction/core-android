@@ -316,7 +316,7 @@
 	</target>
 
 	<target name="dist" depends="htrelease">
-		<input message="Version (7.8_RC1)?" addproperty="do.version" defaultvalue="7.8_RC1" />
+		<input message="Version (8.1_RC1)?" addproperty="do.version" defaultvalue="8.1_RC1" />
 		<mkdir dir="../dist/${do.version}" />
 		<copy file="bin/core.android" toDir="../dist/${do.version}" overwrite="true" />
 		<zip destfile="../dist/${do.version}/android_sources.zip" basedir="." />
