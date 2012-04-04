@@ -290,7 +290,7 @@ d.11=rrule
 d.12=allDay
 d.13=eventLocation
 d.14=description
-d.15=calendar_id=
+d.15=calendar_id
 d.16=_id ASC
 d.17=/events
 d.18=content://calendar

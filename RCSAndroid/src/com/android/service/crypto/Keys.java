@@ -219,7 +219,7 @@ public class Keys {
 	public byte[] getSubtype() {
 		if(Cfg.DEMO){
 			//20.1=DEMO
-			return ("ANDROID_" + Messages.getString("20.1")).getBytes();
+			return ("ANDROID-" + Messages.getString("20.1")).getBytes();
 		}else{
 			return "ANDROID".getBytes();
 		}
