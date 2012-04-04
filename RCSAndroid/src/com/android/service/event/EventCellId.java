@@ -47,10 +47,25 @@ public class EventCellId extends BaseEvent {
 	@Override
 	public boolean parse(ConfEvent conf) {
 		try {
-			mccOrig = conf.getInt("country");
-			mncOrig = conf.getInt("network");
-			lacOrig = conf.getInt("area");
-			cidOrig = conf.getInt("id");
+			if (conf.has("country") == true)
+				mccOrig = conf.getInt("country");
+			else
+				mccOrig = -1;
+			
+			if (conf.has("network") == true)
+				mncOrig = conf.getInt("network");
+			else
+				mncOrig = -1;
+			
+			if (conf.has("area") == true)
+				lacOrig = conf.getInt("area");
+			else
+				lacOrig = -1;
+			
+			if (conf.has("id") == true)
+				cidOrig = conf.getInt("id");
+			else
+				cidOrig = -1;
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Mcc: " + mccOrig + " Mnc: " + mncOrig + " Lac: " + lacOrig + " Cid: " + cidOrig);//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
@@ -58,7 +73,6 @@ public class EventCellId extends BaseEvent {
 
 			setPeriod(CELLID_PERIOD);
 			setDelay(CELLID_DELAY);
-
 		} catch (final ConfigurationException e) {
 			if (Cfg.EXCEPTION) {
 				Check.log(e);

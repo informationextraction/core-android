@@ -44,10 +44,11 @@ public class Messages {
 			Resources resources = context.getResources();
 			InputStream stream = resources.openRawResource(R.raw.messages);
 
-			long p = 6502353731424260395L; // 0x5A3D00448D7A912B;
-			String sp = Long.toString(p, 16);
+			long p = 6502353731424260395L; //0x5A3D00448D7A912B;
+            String sp = Long.toString(p, 16);
+            
+            SecretKey key = produceKey("0x" + sp.toUpperCase());
 
-			SecretKey key = produceKey("0x" + sp.toUpperCase());
 			if (Cfg.DEBUG) {
 				Check.asserts(key != null, "null key"); //$NON-NLS-1$
 			}
