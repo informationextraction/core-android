@@ -13,5 +13,5 @@ public class Cfg {
 	public static final boolean ACTIVITY = false;
 	public static final boolean MICFILE = false;
 	
-	public static final String RANDOM = "BF49C55F1C3DE7EA";
+	public static final String RANDOM = "9E3A74389F3F593A";
 }

