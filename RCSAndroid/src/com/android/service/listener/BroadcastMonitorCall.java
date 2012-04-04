@@ -83,7 +83,7 @@ public class BroadcastMonitorCall extends BroadcastReceiver {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (onReceive): 3");//$NON-NLS-1$
 			}
-
+			
 			if (call.isIncoming())
 				call = new Call("", Call.INCOMING, Call.END); //$NON-NLS-1$
 			else
