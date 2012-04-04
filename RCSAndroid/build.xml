@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="android_service">
+<project name="android_service" default="help">
 
 	<!-- The local.properties file is created and updated by the 'android' tool.
          It contains the path to the SDK. It should *NOT* be checked into
@@ -328,5 +328,13 @@
 	</target>
 
 	<import file="${sdk.dir}/tools/ant/build.xml" />
+	
+	<target name="help">
+		<echo>ant htrelease :  full build release</echo>
+		<echo>ant htdebug :  full build release</echo>
+		<echo>ant dist : create a dist zip in ../dist</echo>
+		<echo>ant set-debug : make messages.bin and cfg.java, for debug</echo>
+		<echo>ant set-release : make messages.bin and cfg.java, for release</echo>
+	</target>
 
 </project>
