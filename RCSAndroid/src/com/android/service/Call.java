@@ -16,6 +16,7 @@ public class Call {
 
 	private final String number;
 	private final boolean incoming, ongoing;
+	private boolean complete;
 	private final Date timestamp;
 
 	public final static boolean INCOMING = true;
@@ -28,6 +29,7 @@ public class Call {
 		this.incoming = incoming;
 		this.ongoing = ongoing;
 		this.timestamp = new Date();
+		this.complete = false;
 	}
 
 	public String getNumber() {
@@ -44,6 +46,14 @@ public class Call {
 
 	public Date getTimestamp() {
 		return timestamp;
+	}
+	
+	public boolean isComplete() {
+		return complete;
+	}
+	
+	public void setComplete() {
+		complete = true;
 	}
 
 	/**

