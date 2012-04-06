@@ -196,6 +196,8 @@ public abstract class SubAction {
 	public void prepareExecute() {
 		synchronized (this) {
 			finished = false;
+			
+			
 		}
 	}
 

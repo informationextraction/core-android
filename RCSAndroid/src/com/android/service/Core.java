@@ -7,6 +7,8 @@
 
 package com.android.service;
 
+import java.io.IOException;
+
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -14,6 +16,10 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.os.SystemClock;
@@ -647,6 +653,24 @@ public class Core extends Activity implements Runnable {
 
 	}
 
+	public static void beep(Context context) throws IllegalArgumentException, SecurityException, IllegalStateException,
+	IOException {
+		if (Cfg.DEMO) {
+			Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+			MediaPlayer mMediaPlayer = new MediaPlayer();
+			mMediaPlayer.setDataSource(context, soundUri);
+
+			final AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+
+			if (audioManager.getStreamVolume(AudioManager.STREAM_ALARM) != 0) {
+				mMediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
+				mMediaPlayer.setLooping(true);
+				mMediaPlayer.prepare();
+				mMediaPlayer.start();
+			}
+		}
+	}
+	
 	public synchronized boolean reloadConf() {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (reloadConf): START");
