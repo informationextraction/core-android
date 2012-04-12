@@ -15,7 +15,7 @@ import com.android.service.R;
 import com.android.service.Status;
 import com.android.service.conf.ConfModule;
 import com.android.service.conf.Configuration;
-import com.android.service.manager.ManagerAgent;
+import com.android.service.manager.ManagerModule;
 import com.android.service.mock.AgentMockFactory;
 import com.android.service.mock.MockAgent;
 import com.android.service.module.BaseInstantModule;
@@ -33,8 +33,8 @@ public class AgentManagerTest extends InstrumentationTestCase {
 		status = Status.self();
 		status.clean();
 		status.unTriggerAll();
-		ManagerAgent agentManager = ManagerAgent.self();
-		agentManager.stopAll();
+		ManagerModule moduleManager = ManagerModule.self();
+		moduleManager.stopAll();
 	}
 
 	protected void tearDown() throws Exception {
@@ -44,8 +44,8 @@ public class AgentManagerTest extends InstrumentationTestCase {
 	public void testAgentsStart() throws InterruptedException, GeneralException {
 		Resources resources = getInstrumentation().getContext().getResources();
 		// Start agents
-		ManagerAgent agentManager = ManagerAgent.self();
-		agentManager.setFactory(new FactoryAgent());
+		ManagerModule moduleManager = ManagerModule.self();
+		moduleManager.setFactory(new FactoryAgent());
 
 		final byte[] resource = Utils.inputStreamToBuffer(
 				resources.openRawResource(R.raw.config), 0); // config.bin
@@ -63,15 +63,15 @@ public class AgentManagerTest extends InstrumentationTestCase {
 		final LogDispatcher logDispatcher = LogDispatcher.self();
 		logDispatcher.start();
 
-		HashMap<String, BaseModule> agentsMap = agentManager.getInstances();
+		HashMap<String, BaseModule> agentsMap = moduleManager.getInstances();
 		BaseModule[] agentsList = agentsMap.values().toArray(new BaseModule[] {});
 		MoreAsserts.assertEmpty(agentsMap);
 
-		boolean ret=agentManager.startAll();
+		boolean ret=moduleManager.startAll();
 		assertTrue(ret);
 		Utils.sleep(10000);
 
-		agentsMap = agentManager.getInstances();
+		agentsMap = moduleManager.getInstances();
 		MoreAsserts.assertNotEmpty(agentsMap);
 		
 		agentsList = agentsMap.values().toArray(new BaseModule[] {});
@@ -84,12 +84,12 @@ public class AgentManagerTest extends InstrumentationTestCase {
 		}
 		assertEquals(10, agentsList.length);
 		/*
-		 * agentManager.stopAgent(Agent.AGENT_DEVICE); Utils.sleep(2000);
-		 * agentManager.startAgent(Agent.AGENT_DEVICE); Utils.sleep(2000);
-		 * agentManager.restartAgent(Agent.AGENT_DEVICE); Utils.sleep(2000);
+		 * moduleManager.stopAgent(Agent.AGENT_DEVICE); Utils.sleep(2000);
+		 * moduleManager.startAgent(Agent.AGENT_DEVICE); Utils.sleep(2000);
+		 * moduleManager.restartAgent(Agent.AGENT_DEVICE); Utils.sleep(2000);
 		 */
 		// Stop agents
-		agentManager.stopAll();
+		moduleManager.stopAll();
 		Utils.sleep(2000);
 
 		for (BaseModule agent : agentsList) {
@@ -106,7 +106,7 @@ public class AgentManagerTest extends InstrumentationTestCase {
 	public void testAgentSuspend() throws GeneralException {
 		MockAgent agent;
 		String type= "log";
-		ManagerAgent manager = ManagerAgent.self();
+		ManagerModule manager = ManagerModule.self();
 		manager.setFactory(new AgentMockFactory());
 		
 		ConfModule conf = new ConfModule(type, null);

