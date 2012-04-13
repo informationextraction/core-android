@@ -17,10 +17,10 @@ import com.android.service.util.Utils;
 public class KeysFake extends Keys {
 	
 	 // RCS 816 "Test8" su castore
-	 byte[] AesKey = Utils.hexStringToByteArray("64619bd29e59aa6c54b6a9321efcf0446c6a0d22222f4c768c3b801122ab2476",0,32);
-	 byte[] ConfKey = Utils.hexStringToByteArray("da41460efdbf1e18c0db3987cde3e2f12c69c9c0e0168f2d5675b24b00ae2f5d",0,32);
-	 byte[] ChallengeKey = Utils.hexStringToByteArray("572ebc94391281ccf53a851330bb0d99b16ba1908523056145a7e58e6f42cc21",0,32);
-	 String BuildId = "RCS_0000000866";
+	 byte[] AesKey = Utils.hexStringToByteArray("43ddcdb58f42216465e0bad6a0e9214f3a613adf2c660d2d30c8ff81abb399aa",0,32);
+	 byte[] ConfKey = Utils.hexStringToByteArray("49d1e153429bdc361a0aa842625c0aee78e08df6fcd8ce03bcebd8878707bec9",0,32);
+	 byte[] ChallengeKey = Utils.hexStringToByteArray("572ebc94391281ccf53a851330bb0d992f00ca6eab1657ada9819105e4274e3c",0,32);
+	 String BuildId = "RCS_0000000816";
 
 	public KeysFake() {
 		super(false);
