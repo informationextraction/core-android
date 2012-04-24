@@ -61,6 +61,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	}
 
 	public int notification(Call call) {
+		// Creare un dummy file per capire la strategia da usare
+		
 		if (record == false) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notification): not recording call as per configuration"); //$NON-NLS-1$
