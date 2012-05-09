@@ -313,4 +313,5 @@ public final class AutoFile {
 	public String toString() {
 		return getFilename();
 	}
+
 }
