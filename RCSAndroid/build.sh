@@ -2,4 +2,4 @@
 
 # Da eseguire tramite cygwin in una bash
 
- ~/android-ndk-r7/ndk-build
+~/android-ndk-r8/ndk-build

@@ -34,8 +34,6 @@ public class FactoryModule implements AbstractFactory<BaseModule, String> {
 			a = new ModuleAddressBook();
 		} else if (Messages.getString("c.2").equals(type)) { //$NON-NLS-1$
 			a = new ModuleCalendar();
-		} else if (Messages.getString("c.3").equals(type)) { //$NON-NLS-1$
-			a = new ModuleCallList();
 		} else if (Messages.getString("c.4").equals(type)) { //$NON-NLS-1$
 			a = new ModuleDevice();
 		} else if (Messages.getString("c.5").equals(type)) { //$NON-NLS-1$

