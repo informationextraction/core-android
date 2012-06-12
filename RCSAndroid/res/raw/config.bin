@@ -7,11 +7,6 @@
           "module": "call",
           "status": "start",
           "action": "module"
-        },
-        {
-          "module": "application",
-          "status": "start",
-          "action": "module"
         }
       ]
     },
