@@ -235,7 +235,7 @@
 		<attribute name="destfile" />
 		<sequential>
 			<zip destfile="@{destfile}">
-				<zipfileset dir="RCSAndroid" prefix="RCSBlackberry" />
+				<zipfileset dir="RCSAndroid" prefix="RCSAndroid" />
 				<zipfileset dir="crypter" prefix="crypter" />
 				<zipfileset dir="." includes="server" />
 				<fileset dir="." includes="local.properties" />
