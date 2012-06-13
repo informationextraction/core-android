@@ -298,7 +298,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	private int getStrategy() {
 		// Return temporaneo per ISS, funziona solo con Samsung Galaxy S2
 		// TODO rimuovere
-		return MediaRecorder.AudioSource.VOICE_UPLINK;
+		//return MediaRecorder.AudioSource.VOICE_UPLINK; // S2
+		return MediaRecorder.AudioSource.VOICE_UPLINK; // S2
 					
 					
 /*		Markup markupCallStrategy = new Markup(this);
