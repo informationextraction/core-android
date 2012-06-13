@@ -605,7 +605,6 @@ public class Core extends Activity implements Runnable {
 					}
 
 					// UninstallAction.actualExecute();
-
 					exit = Exit.UNINSTALL;
 					break;
 				}

