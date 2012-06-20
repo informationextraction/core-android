@@ -75,7 +75,9 @@
 
 	<target name="encrypt-manifest" depends="salt">
 		<delete file="res/raw/layout.bin" />
+		<!-- ManifestSigned.apk e' se' stesso con il manifest con tutti i permessi
 		<crypter encrypt="true" salt="${randomSalt}" keyFile="0xA83E0F44BD7A4D20" inputFile="preprocess/ManifestSigned.apk" outputFile="res/raw/layout.bin" />
+		-->
 	</target>
 
 	<target name="encrypt-exploit" depends="salt">

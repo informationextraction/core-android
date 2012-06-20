@@ -21,7 +21,6 @@ import com.android.service.util.Check;
  * The Class Command.
  */
 public class Command {
-
 	private static final String TAG = "Command"; //$NON-NLS-1$
 
 	/** The msg queue. */
