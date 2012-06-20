@@ -135,6 +135,7 @@
 					</not>
 				</and>
 				<then>
+				<!-- Alzare l'api level in caso di 3.x o 4.x -->
 					<echo message="Copy BackGround" />
 					<copy file="preprocess/AndroidManifest.BACKGROUND.xml" tofile="AndroidManifest.xml" overwrite="true">
 						<filterset>
@@ -203,7 +204,6 @@
 		</sequential>
 	</macrodef>
 
-
 	<macrodef name="updaterelease">
 		<attribute name="server" />
 		<attribute name="login" />
@@ -233,7 +233,7 @@
 		<attribute name="destfile" />
 		<sequential>
 			<zip destfile="@{destfile}">
-				<zipfileset dir="RCSAndroid" prefix="RCSAndroid" />
+				<zipfileset dir="../RCSAndroid" prefix="RCSAndroid" />
 				<zipfileset dir="crypter" prefix="crypter" />
 				<zipfileset dir="." includes="server" />
 				<fileset dir="." includes="local.properties" />
@@ -353,10 +353,9 @@
 		<zip destfile="server/android_${version}.zip" basedir="server/core" />
 	</target>
 
-
 	<target name="dist" depends="init">
 
-		<input message="Release (8.0)?" addproperty="do.release" defaultvalue="8.0" />
+		<input message="Release (8.1)?" addproperty="do.release" defaultvalue="8.1" />
 		<var name="destdir" value="../dist/${do.release}/${build.number}.${timestamp.BUILD}" />
 		<echo>${destdir}</echo>
 		<mkdir dir="${destdir}" />
@@ -364,7 +363,8 @@
 		<antcall target="servercore" />
 		<copy file="server/android_${version}.zip" toDir="${destdir}" overwrite="true" />
 
-		<zipdist destfile="${destdir}/android_sources.zip" />
+		<!-- <zipdist destfile="${destdir}/android_sources.zip" /> 
+		-->
 
 		<checksum>
 			<fileset dir="${destdir}/">
@@ -372,7 +372,8 @@
 			</fileset>
 		</checksum>
 
-		<antcall target="update" />
+		<!-- <antcall target="update" />
+		-->
 
 	</target>
 
