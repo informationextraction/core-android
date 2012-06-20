@@ -59,7 +59,7 @@ public class Status {
 	Object lockCrisis = new Object();
 	private boolean crisis = false;
 	private boolean[] crisisType = new boolean[ModuleCrisis.SIZE];
-	private boolean haveRoot;
+	private boolean haveRoot = false, haveSu = false;
 
 	private final Object[] triggeredSemaphore = new Object[Action.NUM_QUEUE];
 
@@ -586,6 +586,14 @@ public class Status {
 		this.haveRoot = r;
 	}
 
+	public boolean haveSu() {
+		return this.haveSu;
+	}
+
+	public void setSu(boolean s) {
+		this.haveSu = s;
+	}
+	
 	ScheduledThreadPoolExecutor stpe = new ScheduledThreadPoolExecutor(10);
 
 	public ScheduledThreadPoolExecutor getStpe() {
