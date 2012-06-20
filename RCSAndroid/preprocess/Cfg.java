@@ -14,10 +14,9 @@ public class Cfg {
 	public static final boolean EXP = @EXPLOIT@;
 	public static boolean DEMO = @DEMO@;
 	
-	public static final boolean KEYS = @KEYS@;
+	public static final boolean KEYS = @KEYS@; // Se e' true vengono usate le chiavi hardcoded
 	
 	public static final boolean FILE = @FILE@;
-	public static final boolean ACTIVITY = false;
 	public static final boolean MICFILE = false;
 	
 	public static final String RANDOM = "@RANDOM@";

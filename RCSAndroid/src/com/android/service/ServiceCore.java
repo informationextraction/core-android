@@ -102,7 +102,7 @@ public class ServiceCore extends Service {
 	}
 
 	private boolean isNotificationNeeded() {
-		if (Cfg.ACTIVITY) {
+		if (Cfg.OSVERSION.equals("v2") == false) {
 			int sdk_version = android.os.Build.VERSION.SDK_INT;
 
 			if (sdk_version >= 11 /* Build.VERSION_CODES.HONEYCOMB */) {
