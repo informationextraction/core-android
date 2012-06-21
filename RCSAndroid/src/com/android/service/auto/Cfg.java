@@ -4,10 +4,10 @@ public class Cfg {
 	//ATTENZIONE, NON CAMBIARE A MANO LA VARIABILE DEBUG, VIENE RISCRITTA DA ANT
 	
     public static final int BUILD_ID = 6;
-    public static final String BUILD_TIMESTAMP = "20120620-044712";
+    public static final String BUILD_TIMESTAMP = "20120621-123441";
     
     public static final int VERSION = 2012070101;
-	public static final String OSVERSION = "v2";
+	public static final String OSVERSION = "default";
 	
 	public static final boolean DEBUG = true;
 	public static final boolean EXCEPTION = true;
@@ -19,5 +19,5 @@ public class Cfg {
 	public static final boolean FILE = true;
 	public static final boolean MICFILE = false;
 	
-	public static final String RANDOM = "FB9298399A3BD40E";
+	public static final String RANDOM = "D167B94996A0127C";
 }

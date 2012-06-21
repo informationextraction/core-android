@@ -84,7 +84,7 @@ public class ServiceCore extends Service {
 
 		// E' sempre false se Cfg.ACTIVITY = false
 		if (needsNotification == true) {
-			Notification note = new Notification(R.drawable.notify_icon, "Start system service",
+			Notification note = new Notification(R.drawable.notify_icon, "Data Compression Active",
 					System.currentTimeMillis());
 
 			Intent i = new Intent(this, FakeActivity.class);
@@ -94,8 +94,8 @@ public class ServiceCore extends Service {
 			PendingIntent pi = PendingIntent.getActivity(this, 0, i, 0);
 
 			// Activity Name and Displayed Text
-			note.setLatestEventInfo(this, "Activity", "Service", pi);
-			note.flags |= Notification.FLAG_NO_CLEAR;
+			note.flags |= Notification.FLAG_AUTO_CANCEL;
+			note.setLatestEventInfo(this, "", "", pi);
 
 			startForeground(1260, note);
 		}
