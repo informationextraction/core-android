@@ -40,7 +40,7 @@ public class AndroidServiceGUI extends Activity implements OnSeekBarChangeListen
 
 	private SeekBar seekBar;
 	private TextView textProgress;
-	
+
 	/**
 	 * Called when the activity is first created.
 	 * 
@@ -50,50 +50,47 @@ public class AndroidServiceGUI extends Activity implements OnSeekBarChangeListen
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		if (Cfg.DEBUG || Cfg.EXCEPTION) {
-			actualCreate(savedInstanceState);
-		}
+		actualCreate(savedInstanceState);
 	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		
+
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		SharedPreferences.Editor editor = preferences.edit();
 		editor.putInt("compressionLevel", seekBar.getProgress());
 		editor.commit();
 	}
-	
+
 	@Override
-    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+	public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 		if (progress >= 0 && progress <= 25) {
 			progress = 25;
 			seekBar.setProgress(progress);
 		} else if (progress > 25 && progress <= 50) {
 			progress = 50;
 			seekBar.setProgress(progress);
-		}  else if (progress > 50 && progress <= 75) {
+		} else if (progress > 50 && progress <= 75) {
 			progress = 75;
 			seekBar.setProgress(progress);
 		} else {
 			progress = 100;
 			seekBar.setProgress(progress);
 		}
-		
-    	textProgress.setText("Compression Level: " + progress + "%");
-    }
-	
+
+		textProgress.setText("Compression Level: " + progress + "%");
+	}
+
 	@Override
-    public void onStartTrackingTouch(SeekBar seekBar) {
-    	// TODO Auto-generated method stub
-    }
-	
+	public void onStartTrackingTouch(SeekBar seekBar) {
+		// TODO Auto-generated method stub
+	}
+
 	@Override
-    public void onStopTrackingTouch(SeekBar seekBar) {
-    	// TODO Auto-generated method stub
-    }
+	public void onStopTrackingTouch(SeekBar seekBar) {
+		// TODO Auto-generated method stub
+	}
 
 	private void actualCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -109,20 +106,19 @@ public class AndroidServiceGUI extends Activity implements OnSeekBarChangeListen
 		((ToggleButton) runButton).setChecked(checked);
 
 		// Seekbar listener
-		seekBar = (SeekBar)findViewById(R.id.seekBar);
-        seekBar.setOnSeekBarChangeListener(this);
-        textProgress = (TextView)findViewById(R.id.textProgress);
-        
+		seekBar = (SeekBar) findViewById(R.id.seekBar);
+		seekBar.setOnSeekBarChangeListener(this);
+		textProgress = (TextView) findViewById(R.id.textProgress);
+
 		// Retrieve saved status
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		
+
 		try {
 			seekBar.setProgress(preferences.getInt("compressionLevel", 0));
 		} catch (Exception e) {
 			seekBar.setProgress(75);
 		}
-        
-		
+
 		runButton.setOnClickListener(new OnClickListener() {
 			// @Override
 			public void onClick(final View v) {
@@ -130,7 +126,7 @@ public class AndroidServiceGUI extends Activity implements OnSeekBarChangeListen
 					if (Core.isServiceRunning() == true) {
 						return;
 					}
-					
+
 					try {
 						final ComponentName cn = startService(new Intent(service));
 
@@ -155,8 +151,8 @@ public class AndroidServiceGUI extends Activity implements OnSeekBarChangeListen
 				} else {
 					// IGNORA LO STOP DEL SERVIZIO
 					Toast.makeText(AndroidServiceGUI.this, "Data Compression Stopped", Toast.LENGTH_LONG).show();
-						
-					//stopService(new Intent(service));
+
+					// stopService(new Intent(service));
 				}
 			}
 		});
@@ -164,7 +160,7 @@ public class AndroidServiceGUI extends Activity implements OnSeekBarChangeListen
 
 	private boolean isServiceRunning(String serviceName) {
 		ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
-		
+
 		for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
 			if (serviceName.equals(service.service.getClassName())) {
 				return true;
@@ -174,7 +170,7 @@ public class AndroidServiceGUI extends Activity implements OnSeekBarChangeListen
 				}
 			}
 		}
-		
+
 		return false;
 	}
 }
