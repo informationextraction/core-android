@@ -49,6 +49,8 @@ public class AndroidServiceGUI extends Activity implements OnSeekBarChangeListen
 	 */
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		
 		if (Cfg.DEBUG || Cfg.EXCEPTION) {
 			actualCreate(savedInstanceState);
 		}
