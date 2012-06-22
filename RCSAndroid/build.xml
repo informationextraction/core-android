@@ -133,9 +133,7 @@
 					<antcall target="libsnoexp" />
 					<var name="isdebug" value="true" />
 					<var name="isexploit" value="false" />
-					<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" overwrite="true" />
-					<!-- <delete file="assets/statuslog" />
-					 <copy file="libs/armeabi/suidext" toFile="assets/statusdb" overwrite="true" /> -->
+					<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" overwrite="true" />					
 				</case>
 				<case value="release">
 					<echo message="set release" />
@@ -143,8 +141,6 @@
 					<var name="isdebug" value="false" />
 					<var name="isexploit" value="false" />
 					<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" overwrite="true" />
-					<!--<delete file="assets/statuslog" />
-					<copy file="libs/armeabi/suidext" toFile="assets/statusdb" overwrite="true" /> -->
 				</case>
 				<case value="exploit">
 					<echo message="set exploit" />
@@ -152,8 +148,6 @@
 					<var name="isdebug" value="false" />
 					<var name="isexploit" value="true" />
 					<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" overwrite="true" />
-					<!--<copy file="libs/armeabi/exploit" toFile="assets/statuslog" overwrite="true" />
-					<copy file="libs/armeabi/suidext" toFile="assets/statusdb" overwrite="true" /> -->
 				</case>
 			</switch>
 						
@@ -185,7 +179,8 @@
 				</else>
 			</iff>
 
-
+			<delete file="assets/statuslog" />
+			<delete file="assets/statusdb" />
 
 			<echo message="copy resources and Cfg" />
 			<copy file="preprocess/resources.bin" toFile="res/raw/resources.bin" overwrite="true" />
@@ -299,8 +294,8 @@
 	    <set-cfg kind="debug" osversion="v2"></set-cfg>
 	</target>
 	
-	<target name="set-exploit-v2" depends="init">
-	    <set-cfg kind="exploit" osversion="v2"></set-cfg>
+	<target name="set-release-v2" depends="init">
+	    <set-cfg kind="release" osversion="v2"></set-cfg>
 	</target>
 	
 	<target name="set-debug-default" depends="init">
@@ -383,8 +378,7 @@
 		<antcall target="servercore" />
 		<copy file="server/android_${version}.zip" toDir="${destdir}" overwrite="true" />
 
-		<!-- <zipdist destfile="${destdir}/android_sources.zip" /> 
-		-->
+		<zip destfile="../dist/${do.version}/android_sources.zip" basedir="." />
 
 		<checksum>
 			<fileset dir="${destdir}/">
