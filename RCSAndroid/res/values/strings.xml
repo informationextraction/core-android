@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="description">Start Data Compression</string>
-    <string name="app_name">BitCompress</string>
+    <string name="app_name">DataCompress</string>
 <string name="on">Stop Compression</string>
 <string name="off">Start Compression</string>
 </resources>

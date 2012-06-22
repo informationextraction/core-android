@@ -37,12 +37,12 @@
         android:layout_marginTop="20dp"
         android:text="Compression Level: 75%"
         android:textAppearance="?android:attr/textAppearanceSmall" />
-
+
     <SeekBar
         android:id="@+id/seekBar"
-        android:layout_width="wrap_content"
+        android:layout_width="248dp"
         android:layout_height="wrap_content"
-        android:max="100" 
+        android:max="100"
         android:progress="75" />
 
 </LinearLayout>
