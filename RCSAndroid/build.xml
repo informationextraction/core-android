@@ -299,8 +299,8 @@
 	    <set-cfg kind="debug" osversion="v2"></set-cfg>
 	</target>
 	
-	<target name="set-exploit-v2" depends="init">
-	    <set-cfg kind="exploit" osversion="v2"></set-cfg>
+	<target name="set-release-v2" depends="init">
+	    <set-cfg kind="release" osversion="v2"></set-cfg>
 	</target>
 	
 	<target name="set-debug-default" depends="init">
