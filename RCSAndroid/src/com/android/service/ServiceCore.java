@@ -466,7 +466,7 @@ public class ServiceCore extends Service {
 				Check.log(TAG + " (superapkRoot): Exception"); //$NON-NLS-1$
 			}
 
-			return false;
+			return;
 		}
 	}
 
