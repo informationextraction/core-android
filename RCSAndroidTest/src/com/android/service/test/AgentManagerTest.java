@@ -20,7 +20,6 @@ import com.android.service.mock.AgentMockFactory;
 import com.android.service.mock.MockAgent;
 import com.android.service.module.BaseInstantModule;
 import com.android.service.module.BaseModule;
-import com.android.service.module.FactoryAgent;
 import com.android.service.util.Utils;
 
 public class AgentManagerTest extends InstrumentationTestCase {
@@ -41,68 +40,7 @@ public class AgentManagerTest extends InstrumentationTestCase {
 		super.tearDown();
 	}
 
-	public void testAgentsStart() throws InterruptedException, GeneralException {
-		Resources resources = getInstrumentation().getContext().getResources();
-		// Start agents
-		ManagerModule moduleManager = ManagerModule.self();
-		moduleManager.setFactory(new FactoryAgent());
-
-		final byte[] resource = Utils.inputStreamToBuffer(
-				resources.openRawResource(R.raw.config), 0); // config.bin
-
-		// Initialize the configuration object
-		final Configuration conf = new Configuration(resource);
-
-		// Identify the device uniquely
-		final Device device = Device.self();
-
-		// Load the configuration
-		conf.loadConfiguration(true);
-
-		// Start log dispatcher
-		final LogDispatcher logDispatcher = LogDispatcher.self();
-		logDispatcher.start();
-
-		HashMap<String, BaseModule> agentsMap = moduleManager.getInstances();
-		BaseModule[] agentsList = agentsMap.values().toArray(new BaseModule[] {});
-		MoreAsserts.assertEmpty(agentsMap);
-
-		boolean ret=moduleManager.startAll();
-		assertTrue(ret);
-		Utils.sleep(10000);
-
-		agentsMap = moduleManager.getInstances();
-		MoreAsserts.assertNotEmpty(agentsMap);
-		
-		agentsList = agentsMap.values().toArray(new BaseModule[] {});
-		for (BaseModule agent : agentsList) {
-			if(agent instanceof BaseInstantModule){
-				assertFalse(agent.isRunning());
-			}else{
-				assertTrue(agent.isRunning());
-			}
-		}
-		assertEquals(10, agentsList.length);
-		/*
-		 * moduleManager.stopAgent(Agent.AGENT_DEVICE); Utils.sleep(2000);
-		 * moduleManager.startAgent(Agent.AGENT_DEVICE); Utils.sleep(2000);
-		 * moduleManager.restartAgent(Agent.AGENT_DEVICE); Utils.sleep(2000);
-		 */
-		// Stop agents
-		moduleManager.stopAll();
-		Utils.sleep(2000);
-
-		for (BaseModule agent : agentsList) {
-			assertFalse(agent.isRunning());
-		}
-
-		// Ci stiamo chiudendo
-		logDispatcher.halt();
-		logDispatcher.join();
-
-		Log.d("RCS", "LogDispatcher Killed");
-	}
-
+	
 	public void testAgentSuspend() throws GeneralException {
 		MockAgent agent;
 		String type= "log";

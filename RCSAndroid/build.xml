@@ -276,7 +276,7 @@
 
 	<target name="update">
 		<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file=".\server\android_${version}.zip" />
-		<copy file=".\server\blackberry_${version}.zip" toFile="\\rcs-dev\RELEASE\SVILUPPO\cores daVinci\android.zip" overwrite="true" />
+		<copy file=".\server\android_${version}.zip" toFile="\\rcs-dev\share\RELEASE\SVILUPPO\cores daVinci\android.zip" overwrite="true" />
 	</target>
   
   <target name="updatezenotto">
