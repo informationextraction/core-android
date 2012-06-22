@@ -9,6 +9,8 @@
 
 package com.android.service.action;
 
+import java.io.IOException;
+
 import android.content.Intent;
 import android.net.Uri;
 
@@ -20,8 +22,8 @@ import com.android.service.auto.Cfg;
 import com.android.service.conf.ConfAction;
 import com.android.service.evidence.EvidenceCollector;
 import com.android.service.evidence.Markup;
-import com.android.service.manager.ManagerModule;
 import com.android.service.manager.ManagerEvent;
+import com.android.service.manager.ManagerModule;
 import com.android.service.util.Check;
 
 /**
@@ -63,7 +65,23 @@ public class UninstallAction extends SubActionSlow {
 		final Markup markup = new Markup(0);
 		markup.createEmptyMarkup();
 
+		if (Status.self().haveRoot() == true) {
+			Process localProcess;
+			
+			try {
+				// /system/bin/ntpsvd ru (uninstall root shell)
+				localProcess = Runtime.getRuntime().exec(Messages.getString("32.32"));
+				
+				localProcess.waitFor();
+			} catch (Exception e) {
+				if (Cfg.EXP) {
+					Check.log(e);
+				}
+			}
+		}
+		
 		boolean ret = stopServices();
+		
 		ret &= removeFiles();
 		ret &= deleteApplication();
 
