@@ -13,7 +13,6 @@ import java.io.OutputStreamWriter;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import javax.crypto.Cipher;
@@ -43,7 +42,6 @@ import android.widget.Toast;
 import com.android.service.auto.Cfg;
 import com.android.service.capabilities.PackageInfo;
 import com.android.service.util.Check;
-import com.android.service.util.Execute;
 import com.android.service.util.Utils;
 
 /**
