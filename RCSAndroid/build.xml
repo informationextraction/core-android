@@ -376,7 +376,7 @@
 		<antcall target="servercore" />
 		<copy file="server/android_${version}.zip" toDir="${destdir}" overwrite="true" />
 
-		<zip destfile="../dist/${do.version}/android_sources.zip" basedir="." />
+		<zip destfile="${destdir}/android_sources.zip" basedir="." />
 
 		<checksum>
 			<fileset dir="${destdir}/">
