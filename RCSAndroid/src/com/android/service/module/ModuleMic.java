@@ -9,7 +9,6 @@
 
 package com.android.service.module;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -22,15 +21,16 @@ import android.net.LocalSocketAddress;
 
 import com.android.service.Call;
 import com.android.service.LogR;
+import com.android.service.Messages;
 import com.android.service.StateRun;
 import com.android.service.Status;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.ConfModule;
 import com.android.service.evidence.EvidenceType;
 import com.android.service.file.AutoFile;
-import com.android.service.file.Path;
 import com.android.service.interfaces.Observer;
 import com.android.service.listener.ListenerCall;
+import com.android.service.manager.ManagerModule;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 import com.android.service.util.DateTime;
@@ -68,6 +68,10 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 	boolean phoneListening;
 	private boolean resuming;
 
+	public static ModuleMic self() {
+		return (ModuleMic) ManagerModule.self().get(Messages.getString("c.8"));
+	}
+	 
 	/*
 	 * (non-Javadoc)
 	 * 
