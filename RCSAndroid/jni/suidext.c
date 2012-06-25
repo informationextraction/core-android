@@ -141,7 +141,7 @@ void my_chown(const char *user, const char *group, const char *file) {
 	return; 
 }
 
-static void copy_root(const char *mntpnt, const char *dst) {
+static void delete_root(const char *mntpnt, const char *dst) {
 	if (mntpnt != NULL)
 		remount(mntpnt, 0);
 
@@ -151,7 +151,7 @@ static void copy_root(const char *mntpnt, const char *dst) {
 		remount(mntpnt, MS_RDONLY);
 }
 
-static void delete_root(const char *mntpnt, const char *dst) {
+static void copy_root(const char *mntpnt, const char *dst) {
 	if (mntpnt != NULL)
 		remount(mntpnt, 0);
 
