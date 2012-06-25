@@ -171,7 +171,7 @@ public class Keys {
 
 		byte[] calculated = Digest.MD5(rootRequest);
 
-		boolean ret = Arrays.equals(calculated, rootRequest);
+		boolean ret = Arrays.equals(calculated, rootDigest);
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (wantsPrivilege MD5): " + Utils.byteArrayToHex(calculated)); //$NON-NLS-1$
