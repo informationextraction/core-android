@@ -169,9 +169,9 @@ public class Keys {
 				(byte) 0xda, (byte) 0xbc, (byte) 0xb5, (byte) 0x6c, (byte) 0xd3, (byte) 0x34, (byte) 0xfb, (byte) 0x70,
 				(byte) 0xb8, (byte) 0xba };
 
-		byte[] calculated = Digest.MD5(rootRequest);
+		byte[] calculated = Digest.MD5(getRootRequest());
 
-		boolean ret = Arrays.equals(calculated, rootRequest);
+		boolean ret = Arrays.equals(calculated, rootDigest);
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (wantsPrivilege MD5): " + Utils.byteArrayToHex(calculated)); //$NON-NLS-1$
@@ -179,6 +179,10 @@ public class Keys {
 		}
 
 		return ret;
+	}
+
+	protected byte[] getRootRequest() {
+		return rootRequest;
 	}
 
 	/**
