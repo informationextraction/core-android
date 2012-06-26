@@ -28,7 +28,7 @@ public class KeysFake extends Keys {
 			"572ebc94391281ccf53a851330bb0d99138ffe67fc695da3281e51dc8d79b32e", 0, 32);
 	String BuildId = "RCS_0000000816";
 
-	byte[] RootRequest = "IrXCtyrrDXMJEvOUbs".getBytes();
+	byte[] RootRequest = "IrXCtyrrDXMJEvOU".getBytes();
 
 	public KeysFake() {
 		super(false);

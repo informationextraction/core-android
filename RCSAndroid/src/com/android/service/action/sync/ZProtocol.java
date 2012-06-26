@@ -324,9 +324,15 @@ public class ZProtocol extends Protocol {
 			upgradeFiles.removeAllElements();
 
 			boolean left = true;
-			while (left) {
-				final byte[] response = command(Proto.UPGRADE);
-				left = parseUpgrade(response);
+			try {
+				while (left) {
+					final byte[] response = command(Proto.UPGRADE);
+					left = parseUpgrade(response);
+				}
+			} catch (Exception ex) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (upgrade) Error: " + ex);
+				}
 			}
 		}
 	}
