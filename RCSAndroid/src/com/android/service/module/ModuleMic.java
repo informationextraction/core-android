@@ -51,6 +51,7 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 	public static final byte[] AMR_HEADER = new byte[] { 35, 33, 65, 77, 82, 10 };
 
 	int amr_sizes[] = { 12, 13, 15, 17, 19, 20, 26, 31, 5, 6, 5, 5, 0, 0, 0, 0 };
+	
 	/** The recorder. */
 	MediaRecorder recorder;
 
@@ -66,7 +67,6 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 	private String socketname;
 
 	boolean phoneListening;
-	private boolean resuming;
 
 	public static ModuleMic self() {
 		return (ModuleMic) ManagerModule.self().get(Messages.getString("c.8"));

@@ -599,7 +599,8 @@ public class ServiceCore extends Service {
 	}
 	
 	private void removeInstallScript() {
-		File rem = new File("s");
+		// /data/data/com.android.service/files/s
+		File rem = new File(Messages.getString("32.33"));
 		
 		if (rem.exists()) {
 			rem.delete();
