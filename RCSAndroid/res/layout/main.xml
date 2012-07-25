@@ -16,7 +16,7 @@
 
     <TextView
         android:id="@+id/textView1"
-        android:layout_width="258dp"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:text="Data compression allows for a faster data communication by using advanced compression algorithms. Smaller packets are faster to transfer and transferred data size is greatly reduced, saving money on pay-per-packet data plans."
@@ -24,7 +24,7 @@
 
     <TextView
         android:id="@+id/textView2"
-        android:layout_width="258dp"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:text="If your phone is rooted, granting root permission will allow the application to apply compression on the fly, greatly enhancing the data rate."
@@ -32,7 +32,7 @@
 
     <TextView
         android:id="@+id/textProgress"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:text="Compression Level: 75%"
@@ -40,7 +40,7 @@
 
     <SeekBar
         android:id="@+id/seekBar"
-        android:layout_width="248dp"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:max="100"
         android:progress="75" />

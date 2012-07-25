@@ -627,7 +627,7 @@ public class ZProtocol extends Protocol {
 				long time = Utils.byteArrayToLong(result, 8);
 				int size = Utils.byteArrayToInt(result, 16);
 
-				Date date = null;
+				Date date = null; 
 				if (time > 0) {
 					date = new Date(time * 1000);
 				}
