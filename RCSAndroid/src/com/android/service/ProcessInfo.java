@@ -9,6 +9,8 @@
 
 package com.android.service;
 
+import com.android.service.auto.Cfg;
+
 import android.app.ActivityManager.RunningAppProcessInfo;
 
 public class ProcessInfo {
@@ -18,5 +20,13 @@ public class ProcessInfo {
 	public ProcessInfo(RunningAppProcessInfo processInfo, ProcessStatus status) {
 		this.processInfo = processInfo;
 		this.status = status;
+	}
+	@Override
+	public String toString(){
+		if(Cfg.DEBUG){
+			return processInfo + " : " + status;
+		}else{
+			return super.toString();
+		}
 	}
 }

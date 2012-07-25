@@ -308,7 +308,7 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 		databuffer.write(payload);
 
 		// delimiter
-		databuffer.writeInt(Evidence.EVIDENCE_DELIMITER);
+		databuffer.writeInt(Evidence.E_DELIMITER);
 
 		if (Cfg.DEBUG) {
 			Check.ensures(databuffer.getPosition() == size, "saveEvidence wrong size"); //$NON-NLS-1$

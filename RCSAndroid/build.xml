@@ -280,8 +280,8 @@
 	<target name="help">
 		<echo>ant build :  full build</echo>
 		<echo>ant dist : create a dist zip in ../dist</echo>
-		<echo>ant set-debug : make messages.bin and cfg.java, for debug</echo>
-		<echo>ant set-release : make messages.bin and cfg.java, for release</echo>
+		<echo>ant set-debug-default : make messages.bin and cfg.java, for debug</echo>
+		<echo>ant set-release-v2 : make messages.bin and cfg.java, for release</echo>
 		<echo>ant update : uploads the core to castore</echo>
 	</target>
 
@@ -341,8 +341,6 @@
 			</sequential>
 		</for>
 	</target>
-
-
 
 	<target name="servercore">
 		<delete dir="server/core" />

