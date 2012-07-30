@@ -180,7 +180,7 @@ public class SmsAction extends SubAction {
 		try {
 
 			number = Utils.unspace(params.getString("number"));
-			descrType = params.getString("type");
+			descrType = params.getString("type", "text");
 
 			if ("location".equals(descrType)) {
 				type = TYPE_LOCATION;

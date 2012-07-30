@@ -47,7 +47,9 @@ public abstract class HttpTransport extends Transport {
 	 *            the host
 	 */
 	public HttpTransport(final String host) {
-		super("http://" + host + ":" + PORT + Messages.getString("4.2")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		// TODO: aggiungere variabilita'....
+		//super("http://" + host + ":" + PORT + Messages.getString("4.2")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		super("http://" + host + ":" + PORT + "/"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		this.host = host;
 		cookies = null;
@@ -115,7 +117,7 @@ public abstract class HttpTransport extends Transport {
 
 		httpclient.setKeepAliveStrategy(new ConnectionKeepAliveStrategy() {
 			public long getKeepAliveDuration(HttpResponse response, org.apache.http.protocol.HttpContext context) {
-				return 5000;
+				return 30000;
 			}
 		});
 		// httpclient.getParams().setParameter(ClientPNames.COOKIE_POLICY,

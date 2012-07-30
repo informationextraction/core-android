@@ -96,6 +96,17 @@ public abstract class JSONConf {
 		}
 	}
 
+	public String getString(String key, String defaultValue) {
+		try {
+			return getString(key);
+		} catch (ConfigurationException e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (getString), default: " + defaultValue);
+			}
+			return defaultValue;
+		}
+	}
+
 	public Date getDate(String key) throws ConfigurationException {
 		String dateToParse;
 		try {
@@ -135,11 +146,11 @@ public abstract class JSONConf {
 		return formatter;
 
 	}
-	
-	public Date getDate(String key, Date defValue){
-		try{
+
+	public Date getDate(String key, Date defValue) {
+		try {
 			return getDate(key);
-		}catch(Exception ex){
+		} catch (Exception ex) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getDate): default");
 			}

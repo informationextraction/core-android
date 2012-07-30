@@ -23,6 +23,7 @@ import java.io.Writer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.security.SecureRandom;
+import java.util.Arrays;
 
 import com.android.service.auto.Cfg;
 
@@ -251,6 +252,18 @@ public final class Utils {
 		return rand.nextLong();
 	}
 
+	public static byte[] getRandomByteArray(int sizeMin, int sizeMax) {
+		int size = rand.nextInt(sizeMax - sizeMin) + sizeMin;
+
+		byte[] randData = new byte[size];
+		rand.nextBytes(randData);
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (getRandomByteArray), size: " + size);
+		}
+		return randData;
+	}
+
 	/**
 	 * Gets the time stamp.
 	 * 
@@ -289,7 +302,7 @@ public final class Utils {
 
 		return 0;
 	}
-	
+
 	public static long byteArrayToLong(final byte[] buffer, final int offset) {
 		if (Cfg.DEBUG) {
 			Check.requires(buffer.length >= offset + 8, "short buffer"); //$NON-NLS-1$
@@ -415,6 +428,7 @@ public final class Utils {
 	public static byte[] concat(final byte[] first, final byte[] second) {
 		return concat(first, first.length, second, second.length);
 	}
+
 
 	/**
 	 * Restituisce una copia della parte dell'array specificata.
