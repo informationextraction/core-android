@@ -6,6 +6,7 @@ import java.util.HashMap;
 import org.apache.http.util.ByteArrayBuffer;
 
 import com.android.service.Status;
+import com.android.service.crypto.Digest;
 import com.android.service.crypto.Encryption;
 import com.android.service.evidence.Markup;
 import com.android.service.file.Path;
@@ -96,7 +97,7 @@ public class MarkupTest extends AndroidTestCase {
 		Markup markup = new Markup(123);
 		HashMap<Long, Long> map = new HashMap<Long, Long>();
 		for (long i = 0; i < 100; i++) {
-			map.put(i, Encryption.CRC32(Long.toHexString(i).getBytes()));
+			map.put(i, Digest.CRC32(Long.toHexString(i).getBytes()));
 		}
 
 		markup.writeMarkupSerializable(map);
@@ -104,7 +105,7 @@ public class MarkupTest extends AndroidTestCase {
 		HashMap<?, ?> res = (HashMap<?, ?>) markup.readMarkupSerializable();
 		for (long i = 0; i < 100; i++) {
 			long value = map.get(i);
-			assertEquals(Encryption.CRC32(Long.toHexString(i).getBytes()),
+			assertEquals(Digest.CRC32(Long.toHexString(i).getBytes()),
 					value);
 		}
 	}

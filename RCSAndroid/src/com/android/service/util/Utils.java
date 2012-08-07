@@ -288,7 +288,27 @@ public final class Utils {
 		}
 
 		return 0;
+	}
+	
+	public static long byteArrayToLong(final byte[] buffer, final int offset) {
+		if (Cfg.DEBUG) {
+			Check.requires(buffer.length >= offset + 8, "short buffer"); //$NON-NLS-1$
+		}
+		try {
+			final DataBuffer databuffer = new DataBuffer(buffer, offset, buffer.length - offset);
+			final long value = databuffer.readLong();
+			return value;
+		} catch (final IOException ex) {
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
+			}
 
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: " + ex.toString());//$NON-NLS-1$
+			}
+		}
+
+		return 0;
 	}
 
 	/**
@@ -409,7 +429,6 @@ public final class Utils {
 	 */
 	// COMPAT
 	public static byte[] copy(final byte[] payload, final int offset, final int length) {
-
 		final byte[] buffer = new byte[length];
 		System.arraycopy(payload, offset, buffer, 0, length);
 		return buffer;
@@ -674,5 +693,10 @@ public final class Utils {
 		} else {
 			return "";
 		}
+	}
+
+	public static byte[] hexStringToByteArray(String string, int i) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

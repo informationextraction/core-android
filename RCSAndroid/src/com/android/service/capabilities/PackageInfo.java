@@ -7,10 +7,12 @@
 
 package com.android.service.capabilities;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.parsers.ParserConfigurationException;
@@ -25,6 +27,7 @@ import com.android.service.auto.Cfg;
 import com.android.service.conf.Configuration;
 import com.android.service.file.AutoFile;
 import com.android.service.util.Check;
+import com.android.service.util.Execute;
 
 public class PackageInfo {
 	private static final String TAG = "PackageInfo";
@@ -148,5 +151,77 @@ public class PackageInfo {
 		}
 
 		return isRoot;
+	}
+	
+	static public boolean hasSu() {
+		if (checkDebugBuild() == true) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (hasSu): checkDebugBuild true"); //$NON-NLS-1$
+			}
+			
+			return true;
+		}
+		
+		if (checkRootPackages() == true) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (hasSu): checkRootPackages true"); //$NON-NLS-1$
+			}
+			
+			return true;
+		}
+		
+		
+		return false;
+	}
+
+	// Non dovrebbe servire usarla
+	private static boolean checkSuBinary() {
+		Execute exec = new Execute();
+		ArrayList<String> output = exec.execute("ls -l");
+		Iterator<String> i = output.iterator();
+
+		if (i == null) {
+			return false;
+		}
+		
+		while (i.hasNext()) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (checkSuBinary): " + i.next()); //$NON-NLS-1$
+			}
+		}
+
+		return false;
+	}
+
+	private static boolean checkRootPackages() {
+		try {
+            File file = new File("/system/app/Superuser.apk");
+            
+            if (file.exists()) {
+                return true;
+            }
+            
+            file = new File("/data/app/com.noshufou.android.su-1.apk");
+
+            if (file.exists()) {
+                return true;
+            }
+		} catch (Exception e) { 
+        	if (Cfg.EXP) {
+        		Check.log(e);
+        	}
+        }
+
+        return false;
+	}
+
+	private static boolean checkDebugBuild() {
+		String buildTags = android.os.Build.TAGS;
+
+        if (buildTags != null && buildTags.contains("test-keys")) {
+            return true;
+        }
+        
+        return false;
 	}
 }

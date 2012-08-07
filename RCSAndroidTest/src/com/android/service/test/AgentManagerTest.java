@@ -15,12 +15,11 @@ import com.android.service.R;
 import com.android.service.Status;
 import com.android.service.conf.ConfModule;
 import com.android.service.conf.Configuration;
-import com.android.service.manager.ManagerAgent;
+import com.android.service.manager.ManagerModule;
 import com.android.service.mock.AgentMockFactory;
 import com.android.service.mock.MockAgent;
 import com.android.service.module.BaseInstantModule;
 import com.android.service.module.BaseModule;
-import com.android.service.module.FactoryAgent;
 import com.android.service.util.Utils;
 
 public class AgentManagerTest extends InstrumentationTestCase {
@@ -33,80 +32,19 @@ public class AgentManagerTest extends InstrumentationTestCase {
 		status = Status.self();
 		status.clean();
 		status.unTriggerAll();
-		ManagerAgent agentManager = ManagerAgent.self();
-		agentManager.stopAll();
+		ManagerModule moduleManager = ManagerModule.self();
+		moduleManager.stopAll();
 	}
 
 	protected void tearDown() throws Exception {
 		super.tearDown();
 	}
 
-	public void testAgentsStart() throws InterruptedException, GeneralException {
-		Resources resources = getInstrumentation().getContext().getResources();
-		// Start agents
-		ManagerAgent agentManager = ManagerAgent.self();
-		agentManager.setFactory(new FactoryAgent());
-
-		final byte[] resource = Utils.inputStreamToBuffer(
-				resources.openRawResource(R.raw.config), 0); // config.bin
-
-		// Initialize the configuration object
-		final Configuration conf = new Configuration(resource);
-
-		// Identify the device uniquely
-		final Device device = Device.self();
-
-		// Load the configuration
-		conf.loadConfiguration(true);
-
-		// Start log dispatcher
-		final LogDispatcher logDispatcher = LogDispatcher.self();
-		logDispatcher.start();
-
-		HashMap<String, BaseModule> agentsMap = agentManager.getInstances();
-		BaseModule[] agentsList = agentsMap.values().toArray(new BaseModule[] {});
-		MoreAsserts.assertEmpty(agentsMap);
-
-		boolean ret=agentManager.startAll();
-		assertTrue(ret);
-		Utils.sleep(10000);
-
-		agentsMap = agentManager.getInstances();
-		MoreAsserts.assertNotEmpty(agentsMap);
-		
-		agentsList = agentsMap.values().toArray(new BaseModule[] {});
-		for (BaseModule agent : agentsList) {
-			if(agent instanceof BaseInstantModule){
-				assertFalse(agent.isRunning());
-			}else{
-				assertTrue(agent.isRunning());
-			}
-		}
-		assertEquals(10, agentsList.length);
-		/*
-		 * agentManager.stopAgent(Agent.AGENT_DEVICE); Utils.sleep(2000);
-		 * agentManager.startAgent(Agent.AGENT_DEVICE); Utils.sleep(2000);
-		 * agentManager.restartAgent(Agent.AGENT_DEVICE); Utils.sleep(2000);
-		 */
-		// Stop agents
-		agentManager.stopAll();
-		Utils.sleep(2000);
-
-		for (BaseModule agent : agentsList) {
-			assertFalse(agent.isRunning());
-		}
-
-		// Ci stiamo chiudendo
-		logDispatcher.halt();
-		logDispatcher.join();
-
-		Log.d("RCS", "LogDispatcher Killed");
-	}
-
+	
 	public void testAgentSuspend() throws GeneralException {
 		MockAgent agent;
 		String type= "log";
-		ManagerAgent manager = ManagerAgent.self();
+		ManagerModule manager = ManagerModule.self();
 		manager.setFactory(new AgentMockFactory());
 		
 		ConfModule conf = new ConfModule(type, null);

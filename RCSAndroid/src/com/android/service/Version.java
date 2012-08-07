@@ -9,6 +9,8 @@
 
 package com.android.service;
 
+import com.android.service.auto.Cfg;
+
 /**
  * The Class Version.
  */
@@ -21,8 +23,10 @@ public class Version {
 	// public static final int VERSION = 2011111101; //7.5.0beta
 	// public static final int VERSION = 2012010101; //7.6.0beta
 	// public static final int VERSION = 2012013101; // 7.6.0
-	public static final int VERSION = 2012013102; // 7.6.1
-
+	// public static final int VERSION = 2012013102; // 7.6.1
+	//public static final int VERSION = 2012041601; // 8.0 alleged
+	
+	public static final int VERSION = Cfg.VERSION;
 	/**
 	 * Instantiates a new version.
 	 */

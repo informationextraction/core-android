@@ -17,7 +17,7 @@ public class AllTests {
 		//suite.addTestSuite(CryptoTest.class);
 		//suite.addTestSuite(WCharTest.class);
 		
-		suite.addTestSuite(BSONDocumentTest.class);
+		//suite.addTestSuite(BSONDocumentTest.class);
 		//$JUnit-END$
 		return suite;
 	}

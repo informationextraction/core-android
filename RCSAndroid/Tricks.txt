@@ -1,0 +1,80 @@
+ // Per evitare che un'app venga killata se usa troppe risorse
+ private void startOomAdj()
+  {
+    if (!(this.rootNiceValue));
+    while (true)
+    {
+      return;
+      long l1 = PreferenceManager.getDefaultSharedPreferences(getApplication()).getLong("next_oom_adj", -1L);
+      long l2 = System.currentTimeMillis();
+      if (l1 < l2)
+      {
+        long l3 = l2 + 3600000L;
+        SharedPreferences.Editor localEditor = PreferenceManager.getDefaultSharedPreferences(getApplication()).edit();
+        localEditor.putLong("next_oom_adj", l3);
+        localEditor.commit();
+        new Timer().schedule(new TimerTask()
+        {
+          public void run()
+          {
+            TotalRecallService.this.startOomAdj();
+          }
+        }
+        , l3 - l2);
+        try
+        {
+          String[] arrayOfString = new String[7];
+          arrayOfString[0] = "counter=3600";
+          arrayOfString[1] = "while [ $counter -gt 0 ]";
+          arrayOfString[2] = "do";
+          arrayOfString[3] = "echo '-17' > /proc/`pidof " + this.packageName + "`/oom_adj";
+          arrayOfString[4] = "sleep 1";
+          arrayOfString[5] = "counter=`expr $counter - 1`";
+          arrayOfString[6] = "done;";
+          runAsRoot(arrayOfString);
+        }
+        catch (IOException localIOException)
+        {
+          localIOException.printStackTrace();
+        }
+      }
+      new Timer().schedule(new TimerTask()
+      {
+        public void run()
+        {
+          TotalRecallService.this.startOomAdj();
+        }
+      }
+      , l1 - l2);
+    }
+  }
+  
+  
+  // Vedere anche setApplicationEnabledSetting()
+  public void setAutoStart(boolean paramBoolean)
+  {
+    PackageManager localPackageManager = getPackageManager();
+    ComponentName localComponentName = new ComponentName(BootReceiver.class.getPackage().getName(), BootReceiver.class.getName());
+    if (paramBoolean);
+    for (int i = 1; ; i = 2)
+    {
+      localPackageManager.setComponentEnabledSetting(localComponentName, i, 1);
+      return;
+    }
+  }
+  
+  // Controlla lo stato dell'auricolare bluetooth
+  if (paramIntent.getAction().equals("android.bluetooth.device.action.ACL_CONNECTED"))
+      {
+        WizardState.attachedBTHeadsets = 1 + WizardState.attachedBTHeadsets;
+        continue;
+      }
+      if (!paramIntent.getAction().equals("android.bluetooth.device.action.ACL_DISCONNECTED"))
+        continue;
+      WizardState.attachedBTHeadsets = -1 + WizardState.attachedBTHeadsets;
+	  
+	  
+  // Model
+  String str = Build.MODEL.toLowerCase();
+    if (((str.contains("galaxy")) && (str.contains("note"))) || (str.contains("sgh-i717")) || (str.contains("gt-n7000")) || (str.contains("gt-n7003")) || (str.contains("i9220")))
+      SequenceStrategy.launch(paramContext, 4, 2, 10000L);

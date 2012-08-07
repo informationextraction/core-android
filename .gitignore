@@ -11,8 +11,7 @@ R.java
 .DS_Store
 local.properties
 */tmp/*
-/RCSAndroid/res/raw/resources.bin
-/RCSAndroid/res/raw/config.bin
+/RCSAndroid/res/raw/*
 /RCSAndroid/reverse/*
 /RCSAndroid/obj
 /RCSAndroid/assets/*

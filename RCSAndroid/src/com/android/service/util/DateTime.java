@@ -60,7 +60,10 @@ public final class DateTime {
 	 * Instantiates a new date time.
 	 */
 	public DateTime() {
-		this(new Date());
+		final long millisecs = System.currentTimeMillis();
+		this.date = new Date(millisecs);
+
+		ticks = millisecs * MILLISEC + TICSK_FROM_1601_TO_1970;
 	}
 
 	/**
@@ -70,6 +73,7 @@ public final class DateTime {
 	 *            the date
 	 */
 	public DateTime(final Date date) {
+		// millisec e' UTC
 		final long millisecs = date.getTime();
 		this.date = new Date(millisecs);
 
@@ -238,6 +242,10 @@ public final class DateTime {
 			Check.ensures(output.length == size, "getStructSystemdate wrong size"); //$NON-NLS-1$
 		}
 		return output;
+	}
+
+	public long getTicks() {
+		return ticks;
 	}
 
 }

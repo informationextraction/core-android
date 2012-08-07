@@ -31,7 +31,6 @@ public class ModuleCamera extends BaseInstantModule {
 
 	@Override
 	public void actualStart() {
-		// TODO Auto-generated method stub
 
 	}
 

