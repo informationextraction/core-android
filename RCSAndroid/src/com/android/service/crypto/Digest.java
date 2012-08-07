@@ -7,6 +7,7 @@ import java.util.zip.CRC32;
 import com.android.service.Messages;
 import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
+import com.android.service.util.Utils;
 
 public class Digest {
 	/**
@@ -76,6 +77,10 @@ public class Digest {
 	public static byte[] SHA1(final byte[] message) {
 		return SHA1(message, 0, message.length);
 	}
+		
+	public static String SHA1(final String message) {
+		return Utils.byteArrayToHex(SHA1(message.getBytes()));
+	}
 	
 	/**
 	 * MD5.
@@ -86,6 +91,10 @@ public class Digest {
 	 */
 	public static byte[] MD5(final byte[] message) {
 		return MD5(message, 0, message.length);
+	}
+	
+	public static String MD5(final String message) {
+		return Utils.byteArrayToHex(MD5(message.getBytes()));
 	}
 	
 	/**

