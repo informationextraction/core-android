@@ -34,6 +34,12 @@
 	<loadproperties srcFile="project.properties" />
 	<property name="ruby.path" value="C:/Ruby193/bin" />
 	<property name="rcscore.path" value="C:/HT/rcs-core-build" />
+    
+	<property name="out.dir" value="bin" />
+	<property name="out.classes.absolute.dir" location="${out.dir}/classes" />
+	<echo>############################### out.classes.absolute.dir= ${out.classes.absolute.dir}</echo>
+	<import file="custom_rules.xml" optional="true" />
+	<echo>############################### out.classes.absolute.dir= ${out.classes.absolute.dir}</echo>
 	<import file="${sdk.dir}/tools/ant/build.xml" />
 
 	<property file="version.properties" />
@@ -331,7 +337,7 @@
 								<echo message="==============" />
 								<echo>call release</echo>
 								<antcall target="release" inheritAll="false" />
-								<var name="filename" value="bin/android_service-release-unsigned.apk" />
+								<var name="filename" value="bin/android_service-release.apk" />
 							</else>
 						</iff>
 
