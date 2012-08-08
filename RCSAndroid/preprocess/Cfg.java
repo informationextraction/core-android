@@ -22,4 +22,8 @@ public class Cfg {
 	public static final boolean PROTOCOL_RANDBLOCK = false;
 	
 	public static final String RANDOM = "@RANDOM@";
+	
+	public static final String RNDMSG = "@RNDMSG@";
+	public static final String RNDDB = "@RNDDB@";
+	public static final String RNDLOG = "@RNDLOG@";
 }

