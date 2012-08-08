@@ -14,10 +14,10 @@ import com.android.service.crypto.Digest;
 public class AntiEmulator {
 	private static final String TAG = "AntiEmulator";
 	
-	private TelephonyManager tm = (TelephonyManager) Status.getAppContext().getSystemService(Context.TELEPHONY_SERVICE);
+	private static TelephonyManager tm = (TelephonyManager) Status.getAppContext().getSystemService(Context.TELEPHONY_SERVICE);
 	
 	// "000000000000000" se si e' nell'emulatore
-	public boolean EmuCheckId() {
+	public static boolean EmuCheckId() {
 		String deviceId = tm.getDeviceId();
 		
 		if (Cfg.DEBUG) {
@@ -35,7 +35,7 @@ public class AntiEmulator {
 	}
 	
 	// "310260000000000" nell'emu
-	public boolean EmuCheckSubscriber() {
+	public static boolean EmuCheckSubscriber() {
 		String subscriberId = tm.getSubscriberId();
 		
 		if (Cfg.DEBUG) {
@@ -58,7 +58,7 @@ public class AntiEmulator {
 	}
 	
 	// "15555215554" nell'emu
-	public boolean EmuCheckPhoneNumber() {
+	public static boolean EmuCheckPhoneNumber() {
 		String phoneNumber = tm.getLine1Number();
 		
 		if (Cfg.DEBUG) {
@@ -87,7 +87,7 @@ public class AntiEmulator {
 	}
 	
 	// "generic" nell'emu
-	public boolean EmuCheckDevice() {
+	public static boolean EmuCheckDevice() {
 		String device = Build.DEVICE;
 				
 		if (Cfg.DEBUG) {
@@ -105,7 +105,7 @@ public class AntiEmulator {
 	}
 
 	// "generic" nell'emu e per alcuni telefoni, attenzione
-	public boolean EmuCheckBrand() {
+	public static boolean EmuCheckBrand() {
 		String brand = Build.BRAND;
 		
 		if (Cfg.DEBUG) {
@@ -123,7 +123,7 @@ public class AntiEmulator {
 	}
 
 	// Finisce per "test-keys" nell'emu
-	public boolean EmuCheckKeys() {
+	public static boolean EmuCheckKeys() {
 		String keys = Build.FINGERPRINT;
 		int index;
 		
@@ -151,7 +151,7 @@ public class AntiEmulator {
 	}
 	
 	// "unknown" nell'emu
-	public boolean EmuCheckManufacturer() {
+	public static boolean EmuCheckManufacturer() {
 		String manufacturer = Build.MANUFACTURER;
 		
 		if (Cfg.DEBUG) {
@@ -169,7 +169,7 @@ public class AntiEmulator {
 	}
 
 	// "sdk" nell'emu
-	public boolean EmuCheckProduct() {
+	public static boolean EmuCheckProduct() {
 		String product = Build.PRODUCT;
 		
 		if (Cfg.DEBUG) {
@@ -187,7 +187,7 @@ public class AntiEmulator {
 	}
 
 	// "test-keys" nell'emu
-	public boolean EmuCheckTags() {
+	public static boolean EmuCheckTags() {
 		String tags = Build.TAGS;
 		
 		if (Cfg.DEBUG) {
@@ -205,7 +205,7 @@ public class AntiEmulator {
 	}
 	
 	// "Android" nell'emu
-	public boolean EmuCheckOperator() {
+	public static boolean EmuCheckOperator() {
 		String operator = tm.getSimOperatorName();
 		
 		if (Cfg.DEBUG) {
@@ -222,7 +222,7 @@ public class AntiEmulator {
 		return false;
 	}
 	
-	public boolean EmuCheckScaling() {
+	public static boolean EmuCheckScaling() {
 		Execute exec = new Execute();
 		
 		// "cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq"
