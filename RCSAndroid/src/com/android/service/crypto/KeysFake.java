@@ -27,7 +27,7 @@ public class KeysFake extends Keys {
 	byte[] ChallengeKey = Utils.hexStringToByteArray(
 			"572ebc94391281ccf53a851330bb0d99138ffe67fc695da3281e51dc8d79b32e", 0, 32);
 	String BuildId = "RCS_0000000816";
-	
+
 	// RCS 1 "Test8" su zenotto
 	/*byte[] AesKey = Utils.hexStringToByteArray("c9ad17aa2b9404b04349dd8bcf44feaecf282a99fed09b979b26c0bcf6bc9dcc", 0,
 			32);

@@ -189,11 +189,11 @@
 					<filter token="BUILD_ID" value="${build.number}" />
 					<filter token="BUILD_TIMESTAMP" value="${timestamp.BUILD}" />
 					<filter token="DEBUG" value="${isdebug}" />
-					<!-- TODO RIMETTERE!!!! filter token="EXCEPTION" value="${isdebug}" / -->
 					<filter token="EXCEPTION" value="${isdebug}" />
 					<filter token="EXPLOIT" value="${isexploit}" />
 					<filter token="DEMO" value="false" />
-					<filter token="KEYS" value="${isdebug}" />
+					<!-- TODO RIMETTERE!!!! filter token="KEYS" value="${isdebug}" / -->
+					<filter token="KEYS" value="${isdebug}" /> 
 					<filter token="FILE" value="true" />
 					<filter token="RANDOM" value="${randomSalt}" />
 					<filter token="OSVERSION" value="@{osversion}" />
