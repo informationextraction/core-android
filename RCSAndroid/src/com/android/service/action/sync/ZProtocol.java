@@ -467,7 +467,9 @@ public class ZProtocol extends Protocol {
 	 *             the protocol exception
 	 */
 	protected boolean parseAuthentication(final byte[] authResult) throws ProtocolException {
-
+		if(authResult == null){
+			throw new ProtocolException(100);
+		}
 		if (new String(authResult).contains(Messages.getString("6.0"))) { //$NON-NLS-1$
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: Fake answer"); //$NON-NLS-1$

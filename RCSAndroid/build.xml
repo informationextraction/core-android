@@ -37,9 +37,12 @@
     
 	<property name="out.dir" value="bin" />
 	<property name="out.classes.absolute.dir" location="${out.dir}/classes" />
-	<echo>############################### out.classes.absolute.dir= ${out.classes.absolute.dir}</echo>
+
 	<import file="custom_rules.xml" optional="true" />
-	<echo>############################### out.classes.absolute.dir= ${out.classes.absolute.dir}</echo>
+	<target name="release"    depends="-set-release-mode, -release-prompt-for-password, -package, -post-package, -post-build" />
+	<target name="debug"      depends="-set-debug-mode, -set-debug-files, -package, -post-package, -post-build" />
+	<target name="instrument" depends="-set-instrumented-mode, debug" />
+	
 	<import file="${sdk.dir}/tools/ant/build.xml" />
 
 	<property file="version.properties" />
