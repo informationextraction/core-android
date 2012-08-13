@@ -1,3 +1,4 @@
 #!/bin/sh
 # Da eseguire tramite cygwin in una bash
-~/android-ndk-r8/ndk-build
+chmod 755 ~/Developer/Android/android-ndk-r8b/ndk-build
+~/Developer/Android/android-ndk-r8b/ndk-build
