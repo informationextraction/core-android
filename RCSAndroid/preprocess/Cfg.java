@@ -1,4 +1,4 @@
-package com.android.service.auto;
+package com.android.networking.auto;
 
 public class Cfg {
 	//ATTENZIONE, NON CAMBIARE A MANO LA VARIABILE DEBUG, VIENE RISCRITTA DA ANT

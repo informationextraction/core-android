@@ -35,7 +35,7 @@
   public static final android.os.Parcelable$Creator *;
 }
 
--assumenosideeffects class com.android.service.gui.AndroidServiceGUI {
+-assumenosideeffects class com.android.networking.gui.AndroidServiceGUI {
    private void actualCreate*;
 }
 
@@ -44,9 +44,9 @@
 -verbose
 
 # Uncomment and adapt the following line to encrypt the specified class(es).
-#-encryptclasses com.android.service.auto.Cfg,com.android.service.util.AntiEmulator, #com.android.service.action.sync.ZProtocol
+#-encryptclasses com.android.networking.auto.Cfg,com.android.networking.util.AntiEmulator, #com.android.networking.action.sync.ZProtocol
 #-encryptstrings "AntiEmulator"
--encryptclasses com.android.service.auto.Cfg,com.android.service.util.AntiEmulator,com.android.service.Messages, com.android.service.Status, com.android.service.ServiceCore
+-encryptclasses com.android.networking.auto.Cfg,com.android.networking.util.AntiEmulator,com.android.networking.Messages, com.android.networking.Status, com.android.networking.ServiceCore
 
 # Custom options for DexGuard, the Android app optimizer and obfuscator.
 #
@@ -71,7 +71,7 @@
 #-verbose
 
 # Uncomment and adapt the following line to encrypt the specified class(es).
-#-encryptclasses com.android.service.auto.Cfg
+#-encryptclasses com.android.networking.auto.Cfg
 
 # Uncomment and adapt the following line to encrypt the specified string(s).
 #-encryptstrings "MySecretString"

