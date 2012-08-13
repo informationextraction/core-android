@@ -36,7 +36,8 @@ public class PackageInfo {
 	private FileInputStream fin;
 	private XmlParser xml;
 
-	private String requiredPerms[] = { "android.permission.READ_LOGS", "android.permission.READ_SMS",
+	private String requiredPerms[] = { 
+			"android.permission.READ_LOGS", "android.permission.READ_SMS",
 			"android.permission.SET_WALLPAPER", "android.permission.SEND_SMS",
 			"android.permission.PROCESS_OUTGOING_CALLS", "android.permission.WRITE_APN_SETTINGS",
 			"android.permission.WRITE_EXTERNAL_STORAGE", "android.permission.WRITE_SMS",
@@ -63,6 +64,10 @@ public class PackageInfo {
 		return this.xml.getPackagePath(this.packageName);
 	}
 
+	static public String getPackageName() {
+		return Status.getAppContext().getPackageName();
+	}
+	
 	private ArrayList<String> getPackagePermissions() {
 		return this.xml.getPackagePermissions(this.packageName);
 	}
