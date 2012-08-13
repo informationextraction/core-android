@@ -153,6 +153,9 @@ public class Messages {
 			System.arraycopy(sha1, 0, aes_key, 0, aes_key.length);
 
 			SecretKey secret = new SecretKeySpec(aes_key, "AES");
+			if (Cfg.DEBUG) {
+				Check.log(" produced key: " + Utils.byteArrayToHex(aes_key)); //$NON-NLS-1$
+			}
 
 			return secret;
 		} catch (Exception e) {
