@@ -228,7 +228,7 @@ public class Root {
 	static public InputStream decodeEnc(InputStream stream, String passphrase) throws IOException, NoSuchAlgorithmException,
 	NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
 
-		SecretKey key = Messages.produceKey(passphrase);
+		SecretKey key = MessagesDecrypt.produceKey(passphrase);
 
 		if (Cfg.DEBUG) {
 			Check.asserts(key != null, "null key"); //$NON-NLS-1$

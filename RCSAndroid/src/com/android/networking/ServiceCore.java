@@ -11,7 +11,6 @@ import android.widget.Toast;
 import com.android.networking.auto.Cfg;
 import com.android.networking.util.Check;
 
-
 /**
  * The Class ServiceCore.
  */
