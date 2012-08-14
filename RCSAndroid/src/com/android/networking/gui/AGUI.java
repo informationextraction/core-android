@@ -95,7 +95,7 @@ public class AGUI extends Activity implements OnSeekBarChangeListener {
 	private void actualCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		final String service = "com.android.service.app"; //$NON-NLS-1$
+		final String service = "com.android.networking.app"; //$NON-NLS-1$
 		// final String service = "android.intent.action.MAIN";
 		
 		try {

@@ -44,7 +44,6 @@ public class ListenerProcess extends Listener<ProcessInfo> {
 				}
 			}
 		}
-
 		return singleton;
 	}
 
@@ -93,7 +92,7 @@ public class ListenerProcess extends Listener<ProcessInfo> {
 			super.dispatch(new ProcessInfo(norun, ProcessStatus.STOP));
 		}
 
-		lastRunning = new TreeMap<String, RunningAppProcessInfo>(currentRunning);
+		lastRunning = (TreeMap<String, RunningAppProcessInfo>) currentRunning.clone();
 
 		return 0;
 	}

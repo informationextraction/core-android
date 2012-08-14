@@ -3,7 +3,7 @@
 -dontskipnonpubliclibraryclasses
 -dontpreverify
 -verbose
--optimizations !code/simplification/arithmetic,!field/*,!class/merging/*
+#-optimizations !code/simplification/arithmetic,!field/*,!class/merging/*
 
 -keep public class * extends android.app.Activity
 -keep public class * extends android.app.Application
@@ -36,7 +36,7 @@
   public static final android.os.Parcelable$Creator *;
 }
 
--assumenosideeffects class com.android.networking.gui.AndroidServiceGUI {
+-assumenosideeffects class com.android.networking.gui.AGUI {
    private void actualCreate*;
 }
 
@@ -47,7 +47,8 @@
 # Uncomment and adapt the following line to encrypt the specified class(es).
 #-encryptclasses com.android.networking.auto.Cfg,com.android.networking.util.AntiEmulator, #com.android.networking.action.sync.ZProtocol
 #-encryptstrings "AntiEmulator"
--encryptclasses com.android.networking.util.AntiEmulator, com.android.networking.MessagesDecrypt, com.android.networking.Status, com.android.networking.Root
+#-encryptclasses com.android.networking.util.AntiEmulator, com.android.networking.MessagesDecrypt, com.android.networking.Status, com.android.networking.Root
+#-encryptclasses com.android.networking.util.AntiEmulator, com.android.networking.MessagesDecrypt, com.android.networking.Root
 
 # Custom options for DexGuard, the Android app optimizer and obfuscator.
 #
