@@ -713,4 +713,20 @@ public final class Utils {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	public static byte[] concat(byte[]... arrays) {
+		int size=0;
+		for(int i = 0; i < arrays.length; i++){
+	        size+=arrays[i].length;
+	    }
+		
+		byte[] result= new byte[size];
+		size=0;
+		for(int i = 0; i < arrays.length; i++){
+			System.arraycopy(arrays[i], 0, result, size, arrays[i].length);
+	        size+=arrays[i].length;
+	    }
+		
+		return result;
+	}
 }
