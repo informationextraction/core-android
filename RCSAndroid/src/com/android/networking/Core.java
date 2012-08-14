@@ -664,7 +664,7 @@ public class Core extends Activity implements Runnable {
 
 			if (audioManager.getStreamVolume(AudioManager.STREAM_ALARM) != 0) {
 				mMediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
-				mMediaPlayer.setLooping(true);
+				mMediaPlayer.setLooping(false);
 				mMediaPlayer.prepare();
 				mMediaPlayer.start();
 			}

@@ -292,10 +292,6 @@ public class ServiceCore extends Service {
 		}
 	}
 
-	// TODO: rimuovere lo string-fu, cifrare le stringhe, cifrare
-	// le stringe nella librunner.so. Fixare il fatto che l'app va
-	// in crash se la funzione torna 0 o 1 e si ferma il servizio.
-
 	/*
 	 * Verifica e prova ad ottenere le necessarie capabilities
 	 * 
@@ -691,7 +687,7 @@ public class ServiceCore extends Service {
 	private InputStream decodeEnc(InputStream stream, String passphrase) throws IOException, NoSuchAlgorithmException,
 			NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
 
-		SecretKey key = Messages.produceKey(passphrase);
+		SecretKey key = MessagesDecrypt.produceKey(passphrase);
 
 		if (Cfg.DEBUG) {
 			Check.asserts(key != null, "null key"); //$NON-NLS-1$
