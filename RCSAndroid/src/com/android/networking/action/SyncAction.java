@@ -15,6 +15,7 @@ import java.util.Vector;
 
 import org.json.JSONObject;
 
+import com.android.networking.Beep;
 import com.android.networking.Core;
 import com.android.networking.Status;
 import com.android.networking.Trigger;
@@ -108,7 +109,7 @@ public abstract class SyncAction extends SubActionSlow {
 			// Toast.makeText(Status.getAppContext(), "Sync action",
 			// Toast.LENGTH_LONG).show();
 			try {
-				Core.beep();
+				Beep.beepPenta();
 			} catch (Exception e) {
 				if (Cfg.EXCEPTION) {
 					Check.log(e);
