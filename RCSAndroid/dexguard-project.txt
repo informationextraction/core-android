@@ -46,7 +46,7 @@
 # Uncomment and adapt the following line to encrypt the specified class(es).
 #-encryptclasses com.android.networking.auto.Cfg,com.android.networking.util.AntiEmulator, #com.android.networking.action.sync.ZProtocol
 #-encryptstrings "AntiEmulator"
--encryptclasses com.android.networking.auto.Cfg,com.android.networking.util.AntiEmulator,com.android.networking.Messages, com.android.networking.Status, com.android.networking.ServiceCore
+-encryptclasses com.android.networking.auto.Cfg,com.android.networking.util.AntiEmulator,com.android.networking.Messages
 
 # Custom options for DexGuard, the Android app optimizer and obfuscator.
 #

