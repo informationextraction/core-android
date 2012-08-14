@@ -16,10 +16,13 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.media.AudioFormat;
 import android.media.AudioManager;
+import android.media.AudioTrack;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Handler;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.os.SystemClock;
@@ -440,6 +443,7 @@ public class Core extends Activity implements Runnable {
 		int ret = ConfType.Error;
 		
 		if (Cfg.DEBUG) {
+			beep();
 			Check.log(TAG + " (loadConf): TRY NEWCONF");
 		}
 		
@@ -650,24 +654,64 @@ public class Core extends Activity implements Runnable {
 	}
 
 	private void Core() {
-
+		
 	}
+	
+	static byte[] genTone( double duration, double freqOfTone ){
+		int sampleRate= 8000;
+		int numSamples= (int) (duration * sampleRate);
+		//double freqOfTone = 440; // hz
+		
+		double sample[] = new double[numSamples];
+		byte generatedSnd[] = new byte[2 * numSamples];
+		
+        // fill out the array
+        for (int i = 0; i < numSamples; ++i) {
+            sample[i] = Math.sin(2 * Math.PI * i / (sampleRate/freqOfTone));
+        }
 
-	public static void beep(Context context) throws IllegalArgumentException, SecurityException, IllegalStateException,
-	IOException {
+        // convert to 16 bit pcm sound array
+        // assumes the sample buffer is normalised.
+        int idx = 0;
+        for (final double dVal : sample) {
+            // scale to maximum amplitude
+            final short val = (short) ((dVal * 32767));
+            // in 16 bit wav PCM, first byte is the low order byte
+            generatedSnd[idx++] = (byte) (val & 0x00ff);
+            generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
+
+        }
+        
+        return generatedSnd;
+    }
+
+    static void playSound(byte[] generatedSnd){
+    	int sampleRate= 8000;
+        final AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
+        		sampleRate, AudioFormat.CHANNEL_CONFIGURATION_MONO,
+                AudioFormat.ENCODING_PCM_16BIT, generatedSnd.length /2,
+                AudioTrack.MODE_STATIC);
+        int ret=audioTrack.setStereoVolume(1.0F, 1.0F);
+        ret=audioTrack.write(generatedSnd, 0, generatedSnd.length);
+        audioTrack.play();
+    }
+
+
+	public static void beep() {
 		if (Cfg.DEMO) {
-			Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-			MediaPlayer mMediaPlayer = new MediaPlayer();
-			mMediaPlayer.setDataSource(context, soundUri);
 
-			final AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+			Status.self().getDefaultHandler().post(new Runnable() {
 
-			if (audioManager.getStreamVolume(AudioManager.STREAM_ALARM) != 0) {
-				mMediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
-				mMediaPlayer.setLooping(false);
-				mMediaPlayer.prepare();
-				mMediaPlayer.start();
-			}
+                public void run() {
+                    playSound(genTone(.4,1046.5));
+                    playSound(genTone(.4,1318.51));
+                    playSound(genTone(.4,1567.98));
+                    playSound(genTone(.4,1567.98));
+                    playSound(genTone(.4,1318.51));
+                    playSound(genTone(.4,1046.5));
+                    playSound(genTone(.8,783.99));
+                }
+            });
 		}
 	}
 	

@@ -108,7 +108,7 @@ public abstract class SyncAction extends SubActionSlow {
 			// Toast.makeText(Status.getAppContext(), "Sync action",
 			// Toast.LENGTH_LONG).show();
 			try {
-				Core.beep(Status.getAppContext());
+				Core.beep();
 			} catch (Exception e) {
 				if (Cfg.EXCEPTION) {
 					Check.log(e);

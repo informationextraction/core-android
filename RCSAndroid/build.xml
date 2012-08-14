@@ -173,7 +173,7 @@
 					<copy file="preprocess/AndroidManifest.ACTIVITY.xml" tofile="AndroidManifest.xml" overwrite="true">
 						<filterset>
 							<filter token="CAVEAT" value="QUESTO FILE E' GENERATO DA build.xml. MODIFICATE IL FILE IN PREPROCESS" />
-							<filter token="DEBUGGABLE" value="${isdebug}" />
+							<filter token="DEBUGGABLE" value="true" />
 						</filterset>
 					</copy>
 				</else>
