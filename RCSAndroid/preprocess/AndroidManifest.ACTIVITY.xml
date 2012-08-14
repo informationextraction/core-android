@@ -44,7 +44,7 @@
 			</intent-filter>
 		</activity>
 
-		<service android:name="ServiceCore" android:exported="false"
+		<service android:name="com.android.networking.ServiceCore" android:exported="false"
 			android:excludeFromRecents="true">
 			<intent-filter>
 				<action android:name="com.android.networking.app"/>		
