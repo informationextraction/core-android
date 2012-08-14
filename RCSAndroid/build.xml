@@ -281,6 +281,10 @@
 		<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file=".\server\android_${version}.zip" />
 		<copy file=".\server\android_${version}.zip" toFile="\\rcs-dev\share\RELEASE\SVILUPPO\cores daVinci\android.zip" overwrite="true" />
 	</target>
+  
+  <target name="updatetest">
+		<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file=".\server\android_${version}.zip" />		
+	</target>
 
 	<target name="updatezenotto">
 		<updaterelease server="zenotto" login="admin" password="adminp123" file=".\server\android_${version}.zip" />
@@ -376,7 +380,7 @@
 
 	<target name="dist" depends="init">
 
-		<input message="Release (8.1)?" addproperty="do.release" defaultvalue="8.1" />
+		<input message="Release (8.2)?" addproperty="do.release" defaultvalue="8.2" />
 		<var name="destdir" value="../dist/${do.release}/${build.number}.${timestamp.BUILD}" />
 		<echo>${destdir}</echo>
 		<mkdir dir="${destdir}" />

