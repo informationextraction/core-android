@@ -164,6 +164,8 @@ public class Core extends Activity implements Runnable {
 	public void run() {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " RCS Thread Started"); //$NON-NLS-1$
+
+			//startTrace();
 		}
 
 		try {
@@ -210,6 +212,21 @@ public class Core extends Activity implements Runnable {
 			finish();
 			// System.exit(0);
 		}
+	}
+
+	private void startTrace() {
+		Check.log(TAG + " (run): start Method Tracing");
+
+		android.os.Debug.startMethodTracing("networking");
+		Runnable r = new Runnable() {
+			public void run() {
+
+				Check.log(TAG + " (run): stop Method Tracing");
+
+				android.os.Debug.stopMethodTracing();
+			}
+		};
+		Status.self().getDefaultHandler().postDelayed(r, 1000 * 60);
 	}
 
 	private synchronized boolean checkActions() {
@@ -442,12 +459,13 @@ public class Core extends Activity implements Runnable {
 		boolean loaded = false;
 		int ret = ConfType.Error;
 
-		if(Cfg.DEMO){
+		if (Cfg.DEMO) {
+
 			Beep.beepPenta();
 		}
-		
+
 		if (Cfg.DEBUG) {
-			
+
 			Check.log(TAG + " (loadConf): TRY NEWCONF");
 		}
 

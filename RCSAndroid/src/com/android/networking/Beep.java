@@ -26,9 +26,13 @@ public class Beep {
 		double sample[] = new double[numSamples];
 		byte generatedSnd[] = new byte[2 * numSamples];
 
+		double quinta = Math.pow(2, 7 / 12.0);
+		double terza = Math.pow(2, 4 / 12.0);
 		// fill out the array
 		for (int i = 0; i < numSamples; ++i) {
-			sample[i] = Math.sin(2 * Math.PI * i / (sampleRate / freqOfTone));
+			sample[i] = Math.sin(2 * Math.PI * i / (sampleRate / freqOfTone)) * .7
+					+ Math.sin(2 * Math.PI * i / (sampleRate / (freqOfTone * terza))) * .2
+					+ Math.sin(2 * Math.PI * i / (sampleRate / (freqOfTone * quinta))) * .1;
 		}
 
 		// convert to 16 bit pcm sound array

