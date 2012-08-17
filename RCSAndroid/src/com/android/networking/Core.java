@@ -167,6 +167,10 @@ public class Core extends Activity implements Runnable {
 
 			//startTrace();
 		}
+		
+		if(Cfg.TRACE){
+			startTrace();
+		}
 
 		try {
 			if (Cfg.DEBUG) {
@@ -460,8 +464,7 @@ public class Core extends Activity implements Runnable {
 		int ret = ConfType.Error;
 
 		if (Cfg.DEMO) {
-
-			Beep.beepPenta();
+			Beep.beep();
 		}
 
 		if (Cfg.DEBUG) {
