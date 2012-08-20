@@ -1,5 +1,5 @@
 /* *********************************************
- * Create by : Alberto "Quequero" Pelliccione
+ * Create by : Alberto "Q" Pelliccione
  * Company   : HT srl
  * Project   : AndroidService
  * Created   : 01-dec-2010

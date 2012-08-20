@@ -1,6 +1,7 @@
 package com.android.networking;
 
 import com.android.networking.auto.Cfg;
+import com.android.networking.util.Check;
 import com.android.networking.util.Utils;
 
 import android.app.PendingIntent;
@@ -9,7 +10,7 @@ import android.media.AudioManager;
 import android.media.AudioTrack;
 
 public class Beep {
-
+	private static final String TAG = "Beep";
 	static double DO = 1046.50;
 	static double RE = 1174.66;
 	static double MI = 1318.51;
@@ -63,18 +64,23 @@ public class Beep {
 
 	public static void beep() {
 		if (Cfg.DEMO) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (beep)");
+			}
+
+			double s = .1;
+			double c = .2;
+			if (soundBeep == null) {
+				soundBeep = Utils.concat(genTone(s, 1046.5), genTone(s, 1318.51), genTone(s, 1567.98));
+				// genTone(s, 1567.98), genTone(s, 1318.51), genTone(s, 1046.5),
+				// genTone(c, 783.99)
+			}
 
 			Status.self().getDefaultHandler().post(new Runnable() {
-
 				public void run() {
-					double s = .1;
-					double c = .2;
-					if (soundBeep == null) {
-						soundBeep = Utils.concat(genTone(s, 1046.5), genTone(s, 1318.51), genTone(s, 1567.98),
-								genTone(s, 1567.98), genTone(s, 1318.51), genTone(s, 1046.5), genTone(c, 783.99));
-					}
 					playSound(soundBeep);
 				}
+
 			});
 		}
 	}
@@ -83,6 +89,9 @@ public class Beep {
 
 	public static void beepPenta() {
 		if (Cfg.DEMO) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (beepPenta)");
+			}
 
 			if (soundPenta == null) {
 				String imei = Device.self().getImei();
@@ -102,12 +111,18 @@ public class Beep {
 						genTone(c, notes[3]), genTone(s, notes[4]), genTone(c, notes[5]), genTone(p, notes[5]));
 
 			}
-			
-			Status.self().getDefaultHandler().post(new Runnable() {
 
+			Status.self().getDefaultHandler().post(new Runnable() {
 				public void run() {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (run): sound");
+					}
 					playSound(soundPenta);
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (run): end sound");
+					}
 				}
+
 			});
 		}
 	}

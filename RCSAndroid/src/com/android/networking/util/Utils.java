@@ -1,5 +1,5 @@
 /* ******************************************************
- * Create by : Alberto "Quequero" Pelliccione
+ * Create by : Alberto "Q" Pelliccione
  * Company   : HT srl
  * Project   : AndroidService
  * Created   : 01-dec-2010
@@ -24,6 +24,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.security.SecureRandom;
 import java.util.Arrays;
+
+import android.content.res.AssetManager;
 
 import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
@@ -733,7 +735,12 @@ public final class Utils {
 
 	public static byte[] getAsset(String asset) {
 		try {
-			return Utils.inputStreamToBuffer(Status.getAppContext().getResources().getAssets().open(asset), 0);
+			AssetManager assetManager = Status.getAppContext().getResources().getAssets();
+			InputStream stream = assetManager.open(asset);
+			byte[] ret = Utils.inputStreamToBuffer(stream, 0);
+			stream.close();
+			
+			return ret;
 		} catch (IOException e) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getAsset): " +e);

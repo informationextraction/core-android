@@ -1,10 +1,18 @@
 
 -verbose
-#-optimizations !code/simplification/arithmetic,!field/*,!class/merging/*
+
+#  here:  !code/simplification/*
+-optimizations !code/simplification/*
+#!code/simplification/variable,!code/simplification/arithmetic,!code/simplification/cast
+#,!field/*,!method/*
+#-optimizations !method/*
+#-dontoptimize
 
 # Uncomment and adapt the following line to encrypt the specified class(es).
 #-encryptclasses com.android.networking.auto.Cfg,com.android.networking.util.AntiEmulator, #com.android.networking.action.sync.ZProtocol
 #-encryptstrings "AntiEmulator"
--encryptclasses com.android.networking.util.AntiEmulator, com.android.networking.MessagesDecrypt, com.android.networking.Status, com.android.networking.Root
+#-encryptclasses com.android.networking.util.AntiEmulator, com.android.networking.MessagesDecrypt, com.android.networking.Status, com.android.networking.Root
 #-encryptclasses com.android.networking.util.AntiEmulator, com.android.networking.MessagesDecrypt, com.android.networking.Root
 
+#-keep public class com.android.networking.crypto.Keys
+#-keep public class com.android.networking.crypto.KeysFake

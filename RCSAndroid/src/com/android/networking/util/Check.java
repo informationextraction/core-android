@@ -76,7 +76,7 @@ public final class Check {
 	}
 
 	public synchronized static void log(String string, boolean forced) {
-		if (Cfg.DEBUG || forced) {
+		if (Cfg.DEBUG || forced || Cfg.DEBUGKEYS) {
 			Log.d("QZ", string); //$NON-NLS-1$
 
 			if (Cfg.FILE) {

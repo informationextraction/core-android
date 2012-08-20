@@ -14,7 +14,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class DataBuffer.
  */

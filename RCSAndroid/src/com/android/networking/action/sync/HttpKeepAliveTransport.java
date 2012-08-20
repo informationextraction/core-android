@@ -72,7 +72,7 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 		try {
 			
 			if(Cfg.PROTOCOL_RANDBLOCK){
-				byte[] randBlock = Utils.getRandomByteArray(0, 16);				
+				byte[] randBlock = Utils.getRandomByteArray(1, 16);				
 				data = Utils.concat(data, randBlock);
 			}
 			

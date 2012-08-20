@@ -35,7 +35,8 @@
 	<property name="ruby.path" value="C:/Ruby193/bin" />
 	<property name="rcscore.path" value="C:/HT/rcs-core-build" />
     
-<!-- 
+  <!-- proguard o dexguard
+ -->
 	<property name="out.dir" value="bin" />
 	<property name="out.classes.absolute.dir" location="${out.dir}/classes" />
 
@@ -43,6 +44,7 @@
 	<target name="release"    depends="-set-release-mode, -release-prompt-for-password, -package, -post-package, -post-build" />
 	<target name="debug"      depends="-set-debug-mode, -set-debug-files, -package, -post-package, -post-build" />
 	<target name="instrument" depends="-set-instrumented-mode, debug" />
+ <!--
  -->
 	
 	<import file="${sdk.dir}/tools/ant/build.xml" />
@@ -198,7 +200,7 @@
 					<filter token="EXPLOIT" value="${isexploit}" />
 					<filter token="DEMO" value="false" />
 					<!-- TODO RIMETTERE!!!! filter token="KEYS" value="${isdebug}" / -->
-					<filter token="KEYS" value="${isdebug}" /> 
+					<filter token="KEYS" value="true" /> 
 					<filter token="FILE" value="true" />
 					<filter token="RANDOM" value="${randomSalt}" />
 					<filter token="OSVERSION" value="@{osversion}" />
@@ -313,6 +315,11 @@
 		<set-cfg kind="release" osversion="v2">
 		</set-cfg>
 	</target>
+	
+	<target name="set-release-default" depends="init">
+		<set-cfg kind="release" osversion="default">
+		</set-cfg>
+	</target>
 
 	<target name="set-debug-default" depends="init">
 		<set-cfg kind="debug" osversion="default">
@@ -322,14 +329,14 @@
 	<target name="build" depends="init">
 		<buildnumber />
 		<delete dir="output" />
-		<for list="v2,default" param="osversion">
+		<for list="default,v2" param="osversion">
 			<sequential>
 				<echo message="==============" />
 				<echo message="===  BUILD === ------------------------------------------------------------" />
 				<echo message="==============" />
 				<echo>Version @{osversion}</echo>
 
-				<for list="debug,release" param="kind">
+				<for list="release,debug" param="kind">
 					<sequential>
 						<antcall target="clean" />
 
