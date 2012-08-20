@@ -19,6 +19,16 @@ public class ServiceCore extends Service {
 	private boolean needsNotification = false;
 	private Core core;
 
+	static {
+        System.loadLibrary("runner");
+	}
+	
+	// Get PID
+	public native int gp(String process);
+	
+	// Get CRC
+	public native int gc(int p);
+	
 	@Override
 	public IBinder onBind(Intent intent) {
 		return null;
@@ -36,6 +46,9 @@ public class ServiceCore extends Service {
 		if (Cfg.DEMO) {
 			Toast.makeText(this, Messages.getString("32.1"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 		}
+		
+		int zygotePid = gp("zygote");
+		int crc = gc(zygotePid);
 		
 		needsNotification = Root.isNotificationNeeded();
 
