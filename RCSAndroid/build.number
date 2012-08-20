@@ -1,3 +1,8 @@
 #Build Number for ANT. Do not edit!
+<<<<<<< HEAD
 #Fri Aug 17 10:16:25 CEST 2012
 build.number=93
+=======
+#Fri Aug 17 17:53:17 CEST 2012
+build.number=109
+>>>>>>> b0c447340b56afa99a5712a9bd677bec6ed0703c

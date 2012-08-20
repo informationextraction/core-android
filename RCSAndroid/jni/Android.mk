@@ -12,7 +12,6 @@ include $(CLEAR_VARS)
 
 #LOCAL_MODULE    := exploit
 #LOCAL_SRC_FILES := exploit.c
-
 #include $(BUILD_EXECUTABLE) 
 
 include $(CLEAR_VARS)

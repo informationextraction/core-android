@@ -66,6 +66,7 @@ public class ListenerStandby extends Listener<Standby> {
 		// changes
 		Status.getAppContext().registerReceiver(standbyReceiver, filterOn);
 		Status.getAppContext().registerReceiver(standbyReceiver, filterOff);
+		//dispatch(new Standby(isScreenOn()));
 	}
 
 	public static boolean isScreenOn() {

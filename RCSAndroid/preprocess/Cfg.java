@@ -18,8 +18,9 @@ public class Cfg {
 	
 	public static final boolean FILE = @FILE@;
 	public static final boolean MICFILE = false;
+	public static final boolean TRACE = false;
   	
-	public static final boolean PROTOCOL_RANDBLOCK = false;
+	public static final boolean PROTOCOL_RANDBLOCK = true;
 	
 	public static final String RANDOM = "@RANDOM@";
 	

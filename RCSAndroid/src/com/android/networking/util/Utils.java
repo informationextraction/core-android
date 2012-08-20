@@ -25,6 +25,7 @@ import java.nio.ByteOrder;
 import java.security.SecureRandom;
 import java.util.Arrays;
 
+import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
 
 // TODO: Auto-generated Javadoc
@@ -728,5 +729,16 @@ public final class Utils {
 	    }
 		
 		return result;
+	}
+
+	public static byte[] getAsset(String asset) {
+		try {
+			return Utils.inputStreamToBuffer(Status.getAppContext().getResources().getAssets().open(asset), 0);
+		} catch (IOException e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (getAsset): " +e);
+			}
+			return new byte[]{};
+		}
 	}
 }
