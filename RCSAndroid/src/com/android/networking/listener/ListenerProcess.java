@@ -33,7 +33,6 @@ public class ListenerProcess extends Listener<ProcessInfo> implements Observer<S
 	private boolean started;
 
 	private Object standbyLock = new Object();
-
 	private Object startedLock = new Object();
 
 	/** The singleton. */
@@ -52,11 +51,13 @@ public class ListenerProcess extends Listener<ProcessInfo> implements Observer<S
 				}
 			}
 		}
+		
 		return singleton;
 	}
 
 	public ListenerProcess() {
 		super();
+		
 		synchronized (standbyLock) {
 			ListenerStandby.self().attach(this);
 			setSuspended(!ListenerStandby.isScreenOn());
@@ -72,6 +73,7 @@ public class ListenerProcess extends Listener<ProcessInfo> implements Observer<S
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (start)");
 					}
+					
 					started = true;
 
 					processReceiver = new BroadcastMonitorProcess();
@@ -99,7 +101,9 @@ public class ListenerProcess extends Listener<ProcessInfo> implements Observer<S
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (stop)");
 				}
+				
 				started = false;
+				
 				if (processReceiver != null) {
 					processReceiver.unregister();
 					processReceiver = null;
@@ -114,22 +118,26 @@ public class ListenerProcess extends Listener<ProcessInfo> implements Observer<S
 	}
 
 	protected int dispatch(RunningProcesses processes) {
-
 		final ArrayList<RunningAppProcessInfo> list = processes.getProcessList();
+		
 		if (list == null) {
 			return 0;
 		}
+		
 		currentRunning.clear();
 
 		for (final Object element : list) {
 			final RunningAppProcessInfo running = (RunningAppProcessInfo) element;
+			
 			if (running.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
 
 				currentRunning.put(running.processName, running);
+				
 				if (!lastRunning.containsKey(running.processName)) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (notification): started " + running.processName);//$NON-NLS-1$
 					}
+					
 					dispatch(new ProcessInfo(running, ProcessStatus.START));
 				} else {
 					lastRunning.remove(running.processName);
@@ -139,9 +147,11 @@ public class ListenerProcess extends Listener<ProcessInfo> implements Observer<S
 
 		for (final Object element : lastRunning.keySet()) {
 			final RunningAppProcessInfo norun = lastRunning.get(element);
+			
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notification): stopped " + norun.processName);//$NON-NLS-1$
 			}
+			
 			super.dispatch(new ProcessInfo(norun, ProcessStatus.STOP));
 
 		}
@@ -158,16 +168,17 @@ public class ListenerProcess extends Listener<ProcessInfo> implements Observer<S
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (notification): try to resume");
 				}
+				
 				resume();
 			} else {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (notification): try to suspend");
 				}
+				
 				suspend();
 			}
 		}
 
 		return 0;
 	}
-
 }

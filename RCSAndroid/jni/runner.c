@@ -106,7 +106,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
 }
 
 // Get Process PID
-JNIEXPORT jint JNICALL Java_com_android_networking_ServiceCore_gp (JNIEnv *env, jobject obj, jstring process) {
+JNIEXPORT jint JNICALL Java_com_android_networking_listener_BroadcastMonitorProcess_gp (JNIEnv *env, jobject obj, jstring process) {
     //__android_log_print(ANDROID_LOG_DEBUG, "QZ", "getpid");
 
 	DIR *d;
@@ -174,7 +174,7 @@ JNIEXPORT jint JNICALL Java_com_android_networking_ServiceCore_gp (JNIEnv *env, 
 }
 
 // Get Process List CRC, "p" is the ppid (we look for Zygote's children)
-JNIEXPORT jint JNICALL Java_com_android_networking_ServiceCore_gc (JNIEnv *env, jobject obj, jint p) {
+JNIEXPORT jint JNICALL Java_com_android_networking_listener_BroadcastMonitorProcess_gc (JNIEnv *env, jobject obj, jint p) {
     //__android_log_print(ANDROID_LOG_DEBUG, "QZ", "gc");  
 
 	DIR *d;
