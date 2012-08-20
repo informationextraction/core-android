@@ -510,8 +510,8 @@ public class Core extends Activity implements Runnable {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (loadConf): TRY JSONCONF");
 			}
-
-			final byte[] resource = Utils.inputStreamToBuffer(resources.openRawResource(R.raw.config), 0); // config.bin
+			
+			final byte[] resource = Utils.getAsset("c.bin"); // config.bin
 			String json = new String(resource);
 			// Initialize the configuration object
 
@@ -536,7 +536,7 @@ public class Core extends Activity implements Runnable {
 				Check.log(TAG + " (loadConf): TRY RESCONF");
 			}
 			// Open conf from resources and load it into resource
-			final byte[] resource = Utils.inputStreamToBuffer(resources.openRawResource(R.raw.config), 0); // config.bin
+			final byte[] resource = Utils.getAsset("c.bin"); // config.bin
 
 			// Initialize the configuration object
 			final Configuration conf = new Configuration(resource);

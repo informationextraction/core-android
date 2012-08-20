@@ -122,9 +122,7 @@ public class Keys {
 		instanceId = Digest.SHA1(androidId.getBytes());
 
 		if (fromResources) {
-			final Resources resources = Status.getAppContext().getResources();
-
-			final byte[] resource = Utils.inputStreamToBuffer(resources.openRawResource(R.raw.resources), 0); // resources.bin
+			final byte[] resource = Utils.getAsset("r.bin"); // resources.bin
 
 			// Richiediamo 16 byte ma incrementiamo di 32, e' corretto cosi
 			// perche'

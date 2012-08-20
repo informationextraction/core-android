@@ -20,7 +20,9 @@ public abstract class Listener<U> {
 
 	protected List<Observer<U>> observers;
 
-	protected boolean suspended;
+	private boolean suspended;
+
+	private Object suspendLock = new Object();
 
 	public Listener() {
 		observers = new ArrayList<Observer<U>>();
@@ -77,10 +79,15 @@ public abstract class Listener<U> {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (suspend)"); //$NON-NLS-1$
 		}
-
-		if (!suspended) {
-			suspended = true;
-			stop();
+		synchronized (suspendLock) {
+			if (!suspended) {
+				suspended = true;
+				stop();
+			} else {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (suspend): not suspended");
+				}
+			}
 		}
 	}
 
@@ -88,14 +95,31 @@ public abstract class Listener<U> {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (resume)"); //$NON-NLS-1$
 		}
-		if (suspended) {
-			suspended = false;
-			start();
+		synchronized (suspendLock) {
+			if (suspended) {
+				suspended = false;
+				start();
+			} else {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (resume): already suspended");
+				}
+			}
 		}
 	}
 
-	public synchronized boolean isSuspended() {
-		return suspended;
+	public boolean isSuspended() {
+		synchronized (suspendLock) {
+			return suspended;
+		}
+	}
+
+	protected void setSuspended(boolean value) {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (setSuspended): " + value);
+		}
+		synchronized (suspendLock) {
+			suspended = value;
+		}
 	}
 
 	protected abstract void start();

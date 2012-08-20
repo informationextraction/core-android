@@ -32,6 +32,10 @@ public class ListenerProcess extends Listener<ProcessInfo> implements Observer<S
 
 	private boolean started;
 
+	private Object standbyLock = new Object();
+
+	private Object startedLock = new Object();
+
 	/** The singleton. */
 	private volatile static ListenerProcess singleton;
 
@@ -53,25 +57,36 @@ public class ListenerProcess extends Listener<ProcessInfo> implements Observer<S
 
 	public ListenerProcess() {
 		super();
-		ListenerStandby.self().attach(this);
-		suspended = !ListenerStandby.isScreenOn();
+		synchronized (standbyLock) {
+			ListenerStandby.self().attach(this);
+			setSuspended(!ListenerStandby.isScreenOn());
+		}
 	}
 
 	@Override
 	protected void start() {
 
-		if (!started && ListenerStandby.isScreenOn()) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (start)");
-			}
-			started = true;
+		synchronized (startedLock) {
+			if (!started) {
+				if (ListenerStandby.isScreenOn()) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (start)");
+					}
+					started = true;
 
-			processReceiver = new BroadcastMonitorProcess();
-			processReceiver.start();
-			processReceiver.register(this);
-		} else {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (start): already started");
+					processReceiver = new BroadcastMonitorProcess();
+					processReceiver.start();
+					processReceiver.register(this);
+				}else{
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (start): screen off");
+						setSuspended(true);
+					}
+				}
+			} else {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (start): already started");
+				}
 			}
 		}
 
@@ -79,19 +94,20 @@ public class ListenerProcess extends Listener<ProcessInfo> implements Observer<S
 
 	@Override
 	protected void stop() {
-
-		if (started) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (stop)");
-			}
-			started = false;
-			if (processReceiver != null) {
-				processReceiver.unregister();
-				processReceiver = null;
-			}
-		} else {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (stop): already stopped");
+		synchronized (startedLock) {
+			if (started) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (stop)");
+				}
+				started = false;
+				if (processReceiver != null) {
+					processReceiver.unregister();
+					processReceiver = null;
+				}
+			} else {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (stop): already stopped");
+				}
 			}
 		}
 
@@ -137,16 +153,18 @@ public class ListenerProcess extends Listener<ProcessInfo> implements Observer<S
 
 	@Override
 	public int notification(Standby b) {
-		if (b.getStatus()) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (notification): try to resume");
+		synchronized (standbyLock) {
+			if (b.getStatus()) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (notification): try to resume");
+				}
+				resume();
+			} else {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (notification): try to suspend");
+				}
+				suspend();
 			}
-			resume();
-		} else {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (notification): try to suspend");
-			}
-			suspend();
 		}
 
 		return 0;
