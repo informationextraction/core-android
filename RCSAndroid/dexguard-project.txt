@@ -2,8 +2,9 @@
 -verbose
 
 #  here:  !code/simplification/*
--optimizations !code/simplification/*
-#!code/simplification/variable,!code/simplification/arithmetic,!code/simplification/cast
+# -optimizations !code/simplification/*
+# -optimizations !code/simplification/variable,!code/simplification/arithmetic,!code/simplification/cast
+-optimizations !code/simplification/cast
 #,!field/*,!method/*
 #-optimizations !method/*
 #-dontoptimize

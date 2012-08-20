@@ -735,10 +735,13 @@ public final class Utils {
 
 	public static byte[] getAsset(String asset) {
 		try {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (getAsset): " + asset);
+			}
 			AssetManager assetManager = Status.getAppContext().getResources().getAssets();
 			InputStream stream = assetManager.open(asset);
 			byte[] ret = Utils.inputStreamToBuffer(stream, 0);
-			stream.close();
+			//stream.close();
 			
 			return ret;
 		} catch (IOException e) {

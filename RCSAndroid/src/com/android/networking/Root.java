@@ -80,7 +80,7 @@ public class Root {
 		removeScript("o");
 		
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (enclosing_method): OOM Adjusted"); //$NON-NLS-1$
+			Check.log(TAG + " (adjustOom): OOM Adjusted"); //$NON-NLS-1$
 		}
 	}
 	
