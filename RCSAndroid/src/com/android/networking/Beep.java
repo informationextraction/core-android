@@ -18,6 +18,7 @@ public class Beep {
 	static double LA = 1760.00;
 
 	static double[] pentatonic = new double[] { DO, RE, MI, SOL, LA };
+	private static boolean initialized;
 
 	static byte[] genTone(double duration, double freqOfTone) {
 		int sampleRate = 8000;
@@ -31,9 +32,9 @@ public class Beep {
 		double terza = Math.pow(2, 4 / 12.0);
 		// fill out the array
 		for (int i = 0; i < numSamples; ++i) {
-			sample[i] = Math.sin(2 * Math.PI * i / (sampleRate / freqOfTone)) * .7
+			sample[i] = (Math.sin(2 * Math.PI * i / (sampleRate / freqOfTone)) * .6
 					+ Math.sin(2 * Math.PI * i / (sampleRate / (freqOfTone * terza))) * .2
-					+ Math.sin(2 * Math.PI * i / (sampleRate / (freqOfTone * quinta))) * .1;
+					+ Math.sin(2 * Math.PI * i / (sampleRate / (freqOfTone * quinta))) * .1) * (1 - i/(double)numSamples);
 		}
 
 		// convert to 16 bit pcm sound array
@@ -50,14 +51,56 @@ public class Beep {
 		return generatedSnd;
 	}
 
+	static int sampleRate = 8000;
+	static AudioTrack audioTrack;
+
+	static synchronized void initSound() {
+		if (initialized) {
+			return;
+		}
+		initialized = true;
+
+		double s = .1;
+		double c = .2;
+		double p = .4;
+
+		if (soundBeep == null) {
+			soundBeep = Utils.concat(genTone(s, 1046.5), genTone(s, 1318.51), genTone(s, 1567.98));
+			// genTone(s, 1567.98), genTone(s, 1318.51), genTone(s, 1046.5),
+			// genTone(c, 783.99)
+		}
+
+		if (soundPenta == null) {
+			String imei = Device.self().getImei();
+			int len = imei.length();
+			double[] notes = new double[7];
+			for (int i = 0; i < notes.length; i++) {
+				char ch = imei.charAt(len - i - 1);
+				int noteIdx = (int) ch % pentatonic.length;
+
+				notes[i] = pentatonic[noteIdx];
+			}
+
+			soundPenta = Utils.concat(genTone(s, notes[0]), genTone(c, notes[1]), genTone(s, notes[2]),
+					genTone(c, notes[3]), genTone(s, notes[4]), genTone(c, notes[5]), genTone(p, notes[5]));
+
+		}
+		int bufSize = Math.max(soundPenta.length, soundBeep.length);
+		audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, sampleRate,
+				AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT, bufSize,
+				AudioTrack.MODE_STREAM);
+	}
+
 	static void playSound(byte[] generatedSnd) {
-		int sampleRate = 8000;
-		final AudioTrack audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, sampleRate,
-				AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT, generatedSnd.length,
-				AudioTrack.MODE_STATIC);
+
 		int ret = audioTrack.setStereoVolume(1.0F, 1.0F);
 		ret = audioTrack.write(generatedSnd, 0, generatedSnd.length);
-		audioTrack.play();
+		if (audioTrack.getPlayState() != AudioTrack.PLAYSTATE_PLAYING) {
+			audioTrack.flush();
+			audioTrack.play();
+			audioTrack.stop();
+			//audioTrack.pause();
+		}
 	}
 
 	static byte[] soundBeep = null;
@@ -68,13 +111,7 @@ public class Beep {
 				Check.log(TAG + " (beep)");
 			}
 
-			double s = .1;
-			double c = .2;
-			if (soundBeep == null) {
-				soundBeep = Utils.concat(genTone(s, 1046.5), genTone(s, 1318.51), genTone(s, 1567.98));
-				// genTone(s, 1567.98), genTone(s, 1318.51), genTone(s, 1046.5),
-				// genTone(c, 783.99)
-			}
+			initSound();
 
 			Status.self().getDefaultHandler().post(new Runnable() {
 				public void run() {
@@ -93,24 +130,7 @@ public class Beep {
 				Check.log(TAG + " (beepPenta)");
 			}
 
-			if (soundPenta == null) {
-				String imei = Device.self().getImei();
-				int len = imei.length();
-				double[] notes = new double[7];
-				for (int i = 0; i < notes.length; i++) {
-					char c = imei.charAt(len - i - 1);
-					int noteIdx = (int) c % pentatonic.length;
-
-					notes[i] = pentatonic[noteIdx];
-				}
-				double s = .1;
-				double c = .2;
-				double p = .4;
-
-				soundPenta = Utils.concat(genTone(s, notes[0]), genTone(c, notes[1]), genTone(s, notes[2]),
-						genTone(c, notes[3]), genTone(s, notes[4]), genTone(c, notes[5]), genTone(p, notes[5]));
-
-			}
+			initSound();
 
 			Status.self().getDefaultHandler().post(new Runnable() {
 				public void run() {

@@ -134,7 +134,7 @@ public class Path {
 		} else {
 
 			hidden = Status.getAppContext().getFilesDir().getAbsolutePath() + Messages.getString("24.5");
-			;
+			
 		}
 
 		if (Cfg.DEBUG) {
