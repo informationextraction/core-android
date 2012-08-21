@@ -290,6 +290,10 @@ public final class AutoFile {
 	public String getFilename() {
 		return filename;
 	}
+	
+	public String getName() {
+		return file.getName();
+	}
 
 	/**
 	 * Flush.

