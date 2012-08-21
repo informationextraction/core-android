@@ -269,6 +269,10 @@ public class Core extends Activity implements Runnable {
 						Check.log(TAG + " (checkActions): triggered without actions: " + qq);
 					}
 				}
+				
+				if (Cfg.DEMO) {
+					Beep.beepPenta();
+				}
 
 				for (final Trigger trigger : actionIds) {
 					final Action action = status.getAction(trigger.getActionId());

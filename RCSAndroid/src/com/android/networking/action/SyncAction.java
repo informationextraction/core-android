@@ -110,7 +110,7 @@ public abstract class SyncAction extends SubActionSlow {
 		boolean ret = false;
 		
 		if (Cfg.DEMO) {
-			Beep.beep();
+			Beep.beepPenta();
 		}
 
 		for (int i = 0; i < transports.size(); i++) {

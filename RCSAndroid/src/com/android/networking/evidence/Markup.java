@@ -280,10 +280,7 @@ public class Markup {
 
 		if (Cfg.DEBUG) {
 			Check.asserts(markupName != "", "markupName empty"); //$NON-NLS-1$ //$NON-NLS-2$
-		}
-		if (!Path.haveStorage()) {
-			return false;
-		}
+		}		
 
 		final AutoFile fileRet = new AutoFile(markupName);
 

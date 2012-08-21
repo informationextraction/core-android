@@ -95,8 +95,7 @@ public class ZProtocol extends Protocol {
 
 		try {
 			transport.start();
-			haveStorage = Path.haveStorage();
-
+			
 			status.uninstall = authentication();
 
 			if (status.uninstall) {

