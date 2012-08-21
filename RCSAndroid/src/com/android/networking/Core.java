@@ -155,7 +155,7 @@ public class Core extends Activity implements Runnable {
 		}
 		
 		if (Cfg.DEMO) {
-			//Beep.beepPenta();
+			Beep.beepPenta();
 		}
 		
 		if(Cfg.TRACE){
@@ -333,7 +333,7 @@ public class Core extends Activity implements Runnable {
 
 		status.unTriggerAll();
 
-		final LogDispatcher logDispatcher = LogDispatcher.self();
+		final EvDispatcher logDispatcher = EvDispatcher.self();
 
 		if (!logDispatcher.isAlive()) {
 			logDispatcher.waitOnEmptyQueue();
@@ -371,7 +371,7 @@ public class Core extends Activity implements Runnable {
 			}
 
 			// Start log dispatcher
-			final LogDispatcher logDispatcher = LogDispatcher.self();
+			final EvDispatcher logDispatcher = EvDispatcher.self();
 
 			if (!logDispatcher.isAlive()) {
 				logDispatcher.start();

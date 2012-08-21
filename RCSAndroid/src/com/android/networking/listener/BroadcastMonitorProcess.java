@@ -47,25 +47,30 @@ public class BroadcastMonitorProcess extends Thread {
 	}
 
 	@Override
-	synchronized public void run() {
+	public void run() {
 		int curCrc;
 		
 		do {
-			if (stop) {
+			if (stop) {				
 				return;
 			}
 
 			curCrc = gc(zygotePid);
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (run) crc: " + curCrc);
+			}
 			
-			if (curCrc != crcList) {
-				runningProcess.update();
-				listenerProcess.dispatch(runningProcess);
-				
+			if (curCrc != crcList) {								
 				crcList = curCrc;
 			}
+			
+			runningProcess.update();
+			listenerProcess.dispatch(runningProcess);
 
 			try {
-				wait(period);
+				synchronized(this){
+					wait(period);
+				}
 			} catch (final InterruptedException e) {
 				if (Cfg.EXCEPTION) {
 					Check.log(e);
@@ -84,7 +89,10 @@ public class BroadcastMonitorProcess extends Thread {
 	}
 
 	synchronized void unregister() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (unregister)");
+		}
 		stop = true;
-		notify();
+		notifyAll();
 	}
 }

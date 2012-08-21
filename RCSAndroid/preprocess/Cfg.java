@@ -11,7 +11,7 @@ public class Cfg {
   public static final int VERSION = @VERSION@;
 	public static final String OSVERSION = "@OSVERSION@";
 	
-	public static final boolean DEBUG = true; //@DEBUG@
+	public static final boolean DEBUG = @DEBUG@;
 	public static final boolean EXCEPTION = @EXCEPTION@;
 	public static final boolean EXP = @EXPLOIT@;
 	public static boolean DEMO = @DEMO@; // @DEMO@
@@ -21,8 +21,7 @@ public class Cfg {
 	public static final boolean FILE = @FILE@;
 	public static final boolean MICFILE = false;
 	public static final boolean TRACE = false;
-	public static final boolean DEBUGKEYS = true;
-  	
+	public static final boolean DEBUGKEYS = false;
 	public static final boolean PROTOCOL_RANDBLOCK = true;
 	
 	public static final String RANDOM = "@RANDOM@";

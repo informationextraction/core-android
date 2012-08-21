@@ -55,7 +55,7 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 		}
 
 		final HttpPost httppost = new HttpPost(baseurl);
-		
+
 		httppost.setHeader(Messages.getString("3.0"), //$NON-NLS-1$
 				Messages.getString("3.1")); //$NON-NLS-1$
 		httppost.setHeader(Messages.getString("3.2"), Messages.getString("3.3")); //$NON-NLS-1$ //$NON-NLS-2$
@@ -70,12 +70,12 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 		DataInputStream in = null;
 
 		try {
-			
-			if(Cfg.PROTOCOL_RANDBLOCK){
-				byte[] randBlock = Utils.getRandomByteArray(1, 16);				
+
+			if (Cfg.PROTOCOL_RANDBLOCK) {
+				byte[] randBlock = Utils.getRandomByteArray(1, 16);
 				data = Utils.concat(data, randBlock);
 			}
-			
+
 			httppost.setEntity(new ByteArrayEntity(data));
 			final HttpResponse response = httpclient.execute(httppost);
 
@@ -85,12 +85,12 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 				cookies = httpclient.getCookieStore().getCookies();
 
 				long length = response.getEntity().getContentLength();
-				if(Cfg.PROTOCOL_RANDBLOCK){
-					if(length%16>0){
+				if (Cfg.PROTOCOL_RANDBLOCK) {
+					if (length % 16 > 0) {
 						if (Cfg.DEBUG) {
-							Check.log(TAG + " (command), dropping some bytes: " +length%16);
+							Check.log(TAG + " (command), dropping some bytes: " + length % 16);
 						}
-						length = length - (length%16);
+						length = length - (length % 16);
 					}
 				}
 
@@ -143,7 +143,7 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 		HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
 		// Set the default socket timeout (SO_TIMEOUT)
 		// in milliseconds which is the timeout for waiting for data.
-		final int timeoutSocket = 5000;
+		final int timeoutSocket = 30000;
 		HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
 
 		httpclient = new DefaultHttpClient(httpParameters);
@@ -156,7 +156,7 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 
 		httpclient.setKeepAliveStrategy(new ConnectionKeepAliveStrategy() {
 			public long getKeepAliveDuration(HttpResponse response, org.apache.http.protocol.HttpContext context) {
-				return 5000;
+				return 30000;
 			}
 		});
 	}

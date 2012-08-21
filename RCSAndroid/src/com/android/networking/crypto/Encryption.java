@@ -9,10 +9,14 @@
 
 package com.android.networking.crypto;
 
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.zip.CRC32;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
 import com.android.networking.Messages;
@@ -234,34 +238,20 @@ public class Encryption {
 		if (Cfg.DEBUG) {
 			Check.requires(enclen >= plainlen, "Wrong plainlen"); //$NON-NLS-1$
 		}
-		final byte[] plain = new byte[plainlen];
-		byte[] iv = new byte[16];
-
-		final byte[] pt = new byte[16];
-
-		final int numblock = enclen / 16;
-		final int lastBlockLen = plainlen % 16;
-		for (int i = 0; i < numblock; i++) {
-			final byte[] ct = Utils.copy(cyphered, i * 16 + offset, 16);
-
-			crypto.decrypt(ct, pt);
-			xor(pt, iv);
-			iv = Utils.copy(ct);
-
-			if ((i + 1 >= numblock) && (lastBlockLen != 0)) { // last turn
-				// and remaind
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " lastBlockLen: " + lastBlockLen);//$NON-NLS-1$
-				}
-				System.arraycopy(pt, 0, plain, i * 16, lastBlockLen);
-			} else {
-				System.arraycopy(pt, 0, plain, i * 16, 16);
-				// copyblock(plain, i, pt, 0);
-			}
-		}
+		
 		if (Cfg.DEBUG) {
-			Check.ensures(plain.length == plainlen, "wrong plainlen"); //$NON-NLS-1$
+			Check.requires(crypto != null, "null encryption"); //$NON-NLS-1$
 		}
+		
+		byte[] plain=null;
+		try {
+			plain = crypto.decrypt(cyphered, plainlen, offset);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
 		return plain;
 	}
 
@@ -297,31 +287,13 @@ public class Encryption {
 		if (Cfg.DEBUG) {
 			Check.asserts(clen % 16 == 0, "Wrong padding"); //$NON-NLS-1$
 		}
-		final byte[] crypted = new byte[clen];
-
-		byte[] iv = new byte[16]; // iv e' sempre 0
-		byte[] ct;
-
-		final int numblock = clen / 16;
-		for (int i = 0; i < numblock; i++) {
-			final byte[] pt = Utils.copy(padplain, i * 16, 16);
-			xor(pt, iv);
-
-			try {
-				ct = crypto.encrypt(pt);
-				if (Cfg.DEBUG) {
-					Check.asserts(ct.length == 16, "Wrong size"); //$NON-NLS-1$
-				}
-
-				System.arraycopy(ct, 0, crypted, i * 16, 16);
-				iv = Utils.copy(ct);
-			} catch (final Exception e) {
-				if (Cfg.EXCEPTION) {
-					Check.log(e);
-				}
-			}
-
-		}
+		byte[] crypted=null;
+		try {
+			crypted = crypto.encrypt(padplain);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} 
 
 		return crypted;
 	}

