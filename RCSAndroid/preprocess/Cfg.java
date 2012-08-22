@@ -23,7 +23,9 @@ public class Cfg {
 	public static final boolean TRACE = false;
 	public static final boolean DEBUGKEYS = false;
 	public static final boolean PROTOCOL_RANDBLOCK = true;
-	public static final boolean PROTOCOL_RESUME = false;
+	public static final boolean PROTOCOL_RESUME = true;
+	public static final boolean PROTOCOL_KEEPALIVE = true;
+	public static final boolean STATISTICS = @DEBUG@;
 	
 	public static final String RANDOM = "@RANDOM@";
 	

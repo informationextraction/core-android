@@ -14,14 +14,21 @@ import java.io.IOException;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.HttpVersion;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ConnectionKeepAliveStrategy;
+import org.apache.http.conn.params.ConnManagerParams;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
+import org.apache.http.params.HttpProtocolParams;
 
 import com.android.networking.Messages;
 import com.android.networking.auto.Cfg;
@@ -32,8 +39,14 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 	private static final String TAG = "HttpKeepAliveTransport"; //$NON-NLS-1$
 	DefaultHttpClient httpclient;
 
+	private Statistics statistics = new Statistics();
+
 	public HttpKeepAliveTransport(String host) {
 		super(host);
+		if (Cfg.STATISTICS) {
+			statistics = new Statistics();
+			statistics.start();
+		}
 	}
 
 	/**
@@ -48,6 +61,10 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 	 */
 	@Override
 	public synchronized byte[] command(byte[] data) throws TransportException {
+		if (Cfg.STATISTICS) {
+			statistics.addOut(data.length);
+		}
+
 		if (Cfg.DEBUG) {
 			Check.ensures(httpclient != null, "call startSession before command"); //$NON-NLS-1$
 			// httpclient.getParams().setParameter(ClientPNames.COOKIE_POLICY,
@@ -100,6 +117,9 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 				in.readFully(content);
 
 				in.close();
+				if (Cfg.STATISTICS) {
+					statistics.addIn(content.length);
+				}
 
 				return content;
 			} else {
@@ -137,7 +157,19 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 
 	@Override
 	public void start() {
-		final HttpParams httpParameters = new BasicHttpParams();
+
+		SchemeRegistry registry = new SchemeRegistry();
+		registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+
+		BasicHttpParams httpParameters = new BasicHttpParams();
+		ConnManagerParams.setMaxTotalConnections(httpParameters, 100);
+		// ConnManagerParams.setMaxConnectionsPerRoute(httpParameters, 10);
+		HttpProtocolParams.setVersion(httpParameters, HttpVersion.HTTP_1_1);
+		HttpProtocolParams.setUseExpectContinue(httpParameters, true);
+
+		ThreadSafeClientConnManager connManager = new ThreadSafeClientConnManager(httpParameters, registry);
+
+		// final HttpParams httpParameters = new BasicHttpParams();
 		// Set the timeout in milliseconds until a connection is established.
 		final int timeoutConnection = 30000;
 		HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
@@ -146,13 +178,11 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 		final int timeoutSocket = 30000;
 		HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
 
-		httpclient = new DefaultHttpClient(httpParameters);
-
-		// HttpParams httpParameters = new BasicHttpParams();
-		// HttpConnectionParams.setConnectionTimeout(httpParameters,
-		// CONNECTION_TIMEOUT);
-		// HttpConnectionParams.setSoTimeout(httpParameters, SO_TIMEOUT);
-		// httpclient.setParams(httpParameters);
+		if (Cfg.PROTOCOL_KEEPALIVE) {
+			httpclient = new DefaultHttpClient(connManager, httpParameters);
+		} else {
+			httpclient = new DefaultHttpClient(httpParameters);
+		}
 
 		httpclient.setKeepAliveStrategy(new ConnectionKeepAliveStrategy() {
 			public long getKeepAliveDuration(HttpResponse response, org.apache.http.protocol.HttpContext context) {
@@ -165,5 +195,8 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 	public void close() {
 		cookies = null;
 		httpclient = null;
+		if (Cfg.STATISTICS) {
+			statistics.stop();
+		}
 	}
 }
