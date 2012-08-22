@@ -169,7 +169,7 @@ public final class Evidence {
 
 		if (fconn != null && fconn.exists()) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (close): " + EvidenceCollector.decryptName(fconn.getFilename()));
+				Check.log(TAG + " (close): " + EvidenceCollector.decryptName(fconn.getName()));
 			}
 			ret = fconn.dropExtension(EvidenceCollector.LOG_TMP);
 			if (!ret) {
