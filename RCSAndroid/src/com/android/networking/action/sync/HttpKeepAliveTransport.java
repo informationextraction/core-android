@@ -39,7 +39,7 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 	private static final String TAG = "HttpKeepAliveTransport"; //$NON-NLS-1$
 	DefaultHttpClient httpclient;
 
-	private Statistics statistics = new Statistics();
+	private Statistics statistics;
 
 	public HttpKeepAliveTransport(String host) {
 		super(host);
