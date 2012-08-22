@@ -77,9 +77,9 @@ public class SHA1Digest {
 		digest.update(message, 0, message.length);
 	}
 	
-	public static byte[] get(final byte[] message, final int offset, final int length){
+	public static byte[] get(final byte[] message){
 		SHA1Digest digest = new SHA1Digest();
-		digest.update(message, offset, length);
+		digest.update(message);
 		return digest.getDigest();
 	}
 

