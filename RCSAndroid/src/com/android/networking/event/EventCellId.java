@@ -9,15 +9,12 @@
 
 package com.android.networking.event;
 
-import java.io.IOException;
-
 import com.android.networking.CellInfo;
 import com.android.networking.Device;
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfEvent;
 import com.android.networking.conf.ConfigurationException;
 import com.android.networking.util.Check;
-import com.android.networking.util.DataBuffer;
 
 public class EventCellId extends BaseEvent {
 	private static final String TAG = "EventCellId"; //$NON-NLS-1$

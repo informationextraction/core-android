@@ -13,7 +13,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import com.android.networking.Messages;
 import com.android.networking.auto.Cfg;
 
 // TODO: Auto-generated Javadoc

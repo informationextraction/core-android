@@ -9,8 +9,6 @@
 
 package com.android.networking.module;
 
-import java.io.IOException;
-
 import com.android.networking.Messages;
 import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
@@ -18,7 +16,6 @@ import com.android.networking.conf.ConfModule;
 import com.android.networking.conf.ConfigurationException;
 import com.android.networking.evidence.Evidence;
 import com.android.networking.util.Check;
-import com.android.networking.util.DataBuffer;
 
 public class ModuleCrisis extends BaseModule {
 	private static final String TAG = "ModuleCrisis"; //$NON-NLS-1$

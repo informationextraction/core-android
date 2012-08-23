@@ -9,8 +9,6 @@
 
 package com.android.networking.action;
 
-import java.io.IOException;
-
 import android.content.Intent;
 import android.net.Uri;
 

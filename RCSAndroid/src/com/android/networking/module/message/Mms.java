@@ -9,8 +9,6 @@
 
 package com.android.networking.module.message;
 
-import java.util.Date;
-
 import com.android.networking.auto.Cfg;
 import com.android.networking.util.Check;
 

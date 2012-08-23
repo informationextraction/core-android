@@ -29,6 +29,10 @@ public class BroadcastMonitorConnectivity extends Thread {
 	public BroadcastMonitorConnectivity() {
 		stop = false;
 		period = 60000; // Poll interval
+		
+		if (Cfg.DEBUG) {
+			setName(getClass().getSimpleName());
+		}
 	}
 
 	@Override

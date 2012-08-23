@@ -9,8 +9,6 @@
 
 package com.android.networking.action;
 
-import org.json.JSONObject;
-
 import com.android.networking.Trigger;
 import com.android.networking.conf.ConfAction;
 

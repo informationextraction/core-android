@@ -1,11 +1,9 @@
 package com.android.networking.db;
 
-import com.android.networking.Status;
-
-import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import com.android.networking.Status;
 
 public class GenericSqliteHelper  extends SQLiteOpenHelper{
 

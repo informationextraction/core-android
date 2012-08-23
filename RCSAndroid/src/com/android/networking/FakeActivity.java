@@ -1,7 +1,5 @@
 package com.android.networking;
 
-import com.android.networking.R;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;

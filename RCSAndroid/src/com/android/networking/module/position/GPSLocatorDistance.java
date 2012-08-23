@@ -14,7 +14,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Looper;
 
 import com.android.networking.auto.Cfg;
 import com.android.networking.util.Check;

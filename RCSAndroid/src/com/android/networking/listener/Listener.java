@@ -68,6 +68,7 @@ public abstract class Listener<U> {
 		int result = 0;
 
 		for (final Object element : array) {
+			@SuppressWarnings("unchecked")
 			final Observer<U> observer = (Observer<U>) element;
 			result |= observer.notification(elem);
 		}

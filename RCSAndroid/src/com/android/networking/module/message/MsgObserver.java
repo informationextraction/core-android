@@ -5,7 +5,6 @@ import java.util.Iterator;
 
 import android.content.ContentResolver;
 import android.database.ContentObserver;
-
 import android.os.Handler;
 import android.os.Handler.Callback;
 import android.os.Message;
@@ -45,7 +44,7 @@ public class MsgObserver extends ContentObserver implements Runnable {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onChange): preparing callback");
 		}
-		Handler handler = Status.self().getDefaultHandler();
+		Handler handler = Status.getDefaultHandler();
 		handler.removeCallbacks(this);
 		handler.postDelayed(this, changeDelay);
 

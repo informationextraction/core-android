@@ -6,8 +6,6 @@ import java.util.ArrayList;
 
 import com.android.networking.auto.Cfg;
 
-import android.util.Log;
-
 public class Execute {
     private static final String TAG = "Execute";
 

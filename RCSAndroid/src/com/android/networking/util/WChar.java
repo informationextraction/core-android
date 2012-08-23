@@ -100,7 +100,7 @@ public final class WChar {
 		}
 
 		final byte[] pascalzeroencoded = new byte[len + 4];
-		System.arraycopy(Utils.intToByteArray(len), 0, pascalzeroencoded, 0, 4);
+		System.arraycopy(ByteArray.intToByteArray(len), 0, pascalzeroencoded, 0, 4);
 		System.arraycopy(message, 0, pascalzeroencoded, 4, message.length);
 		if (Cfg.DEBUG) {
 			Check.ensures(pascalzeroencoded[len - 1] == 0, "pascalize not null"); //$NON-NLS-1$

@@ -7,7 +7,6 @@
 
 package com.android.networking.conf;
 
-import org.json.JSONObject;
 
 /**
  * The Class Option.

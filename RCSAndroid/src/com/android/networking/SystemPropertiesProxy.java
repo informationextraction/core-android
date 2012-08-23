@@ -268,11 +268,8 @@ public class SystemPropertiesProxy {
 	public static void set(Context context, String key, String val) throws IllegalArgumentException {
 
 		try {
-			@SuppressWarnings("unused")
 			final DexFile df = new DexFile(new File(Messages.getString("33.4"))); //$NON-NLS-1$
-			@SuppressWarnings("unused")
 			final ClassLoader cl = context.getClassLoader();
-			@SuppressWarnings("rawtypes")
 			final Class SystemProperties = Class.forName("android.os.SystemProperties"); //$NON-NLS-1$
 
 			// Parameters Types

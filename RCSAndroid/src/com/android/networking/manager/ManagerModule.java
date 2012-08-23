@@ -125,10 +125,8 @@ public class ManagerModule extends Manager<BaseModule, String, String> {
 	 * @param key
 	 *            the key
 	 */
-	public synchronized void start(final String key, Trigger trigger) {
-		HashMap<String, ConfModule> agents;
-
-		agents = status.getAgentsMap();
+	public void start(final String key, Trigger trigger) {
+		HashMap<String, ConfModule> agents = status.getAgentsMap();
 
 		if (agents == null) {
 			if (Cfg.DEBUG) {
@@ -201,7 +199,7 @@ public class ManagerModule extends Manager<BaseModule, String, String> {
 	 *            the key
 	 */
 	@Override
-	public synchronized void stop(final String moduleId) {
+	public void stop(final String moduleId) {
 		final BaseModule a = instances.get(moduleId);
 
 		if (a == null) {

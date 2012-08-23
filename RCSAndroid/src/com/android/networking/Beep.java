@@ -1,13 +1,12 @@
 package com.android.networking;
 
-import com.android.networking.auto.Cfg;
-import com.android.networking.util.Check;
-import com.android.networking.util.Utils;
-
-import android.app.PendingIntent;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
+
+import com.android.networking.auto.Cfg;
+import com.android.networking.util.Check;
+import com.android.networking.util.Utils;
 
 public class Beep {
 	private static final String TAG = "Beep";

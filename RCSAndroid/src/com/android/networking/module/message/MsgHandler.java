@@ -28,6 +28,9 @@ public class MsgHandler extends Thread {
 	public MsgHandler(boolean smsEnabled, boolean mmsEnabled) {
 		this.smsEnabled = smsEnabled;
 		this.mmsEnabled = mmsEnabled;
+		if (Cfg.DEBUG) {
+			setName(getClass().getSimpleName());
+		}
 	}
 
 	@Override

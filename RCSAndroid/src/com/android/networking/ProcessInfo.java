@@ -9,9 +9,9 @@
 
 package com.android.networking;
 
-import com.android.networking.auto.Cfg;
-
 import android.app.ActivityManager.RunningAppProcessInfo;
+
+import com.android.networking.auto.Cfg;
 
 public class ProcessInfo {
 	public RunningAppProcessInfo processInfo;

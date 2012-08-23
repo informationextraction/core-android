@@ -1,14 +1,10 @@
 package com.android.networking.event;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
-import com.android.networking.Exit;
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfEvent;
 import com.android.networking.conf.ConfigurationException;

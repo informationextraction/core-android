@@ -10,7 +10,6 @@ package com.android.networking.crypto;
 import java.util.Arrays;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
 
@@ -19,9 +18,9 @@ import com.android.networking.Messages;
 import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
 import com.android.networking.interfaces.iKeys;
+import com.android.networking.util.ByteArray;
 import com.android.networking.util.Check;
 import com.android.networking.util.Utils;
-import com.android.networking.R;
 
 // This class should only be read by Device
 /**
@@ -140,23 +139,23 @@ public class Keys implements iKeys{
 			// Richiediamo 16 byte ma incrementiamo di 32, e' corretto cosi
 			// perche'
 			// ci servono solo 16 byte
-			backdoorId = Utils.copy(resource, 0, 14); // 14 byte
-			aesKey = Utils.copy(resource, 14, 16); // 16 byte
-			confKey = Utils.copy(resource, 46, 16); // 16 byte
-			challengeKey = Utils.copy(resource, 78, 16); // 16 byte
-			demoMode = Utils.copy(resource, 110, 24); // 24 byte
-			rootRequest = Utils.copy(resource, 134, 16); // 16 byte
-			randomSeed = Utils.copy(resource, 150, 16); // 16 byte
+			backdoorId = ByteArray.copy(resource, 0, 14); // 14 byte
+			aesKey = ByteArray.copy(resource, 14, 16); // 16 byte
+			confKey = ByteArray.copy(resource, 46, 16); // 16 byte
+			challengeKey = ByteArray.copy(resource, 78, 16); // 16 byte
+			demoMode = ByteArray.copy(resource, 110, 24); // 24 byte
+			rootRequest = ByteArray.copy(resource, 134, 16); // 16 byte
+			randomSeed = ByteArray.copy(resource, 150, 16); // 16 byte
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " backdoorId: " + new String(backdoorId));//$NON-NLS-1$
-				Check.log(TAG + " aesKey: " + Utils.byteArrayToHex(aesKey));//$NON-NLS-1$
-				Check.log(TAG + " confKey: " + Utils.byteArrayToHex(confKey));//$NON-NLS-1$
-				Check.log(TAG + " challengeKey: " + Utils.byteArrayToHex(challengeKey));//$NON-NLS-1$
-				Check.log(TAG + " instanceId: " + Utils.byteArrayToHex(instanceId));//$NON-NLS-1$
-				Check.log(TAG + " demoMode: " + Utils.byteArrayToHex(demoMode));//$NON-NLS-1$
-				Check.log(TAG + " rootMode: " + Utils.byteArrayToHex(rootRequest));//$NON-NLS-1$
-				Check.log(TAG + " randomSeed: " + Utils.byteArrayToHex(randomSeed));//$NON-NLS-1$
+				Check.log(TAG + " aesKey: " + ByteArray.byteArrayToHex(aesKey));//$NON-NLS-1$
+				Check.log(TAG + " confKey: " + ByteArray.byteArrayToHex(confKey));//$NON-NLS-1$
+				Check.log(TAG + " challengeKey: " + ByteArray.byteArrayToHex(challengeKey));//$NON-NLS-1$
+				Check.log(TAG + " instanceId: " + ByteArray.byteArrayToHex(instanceId));//$NON-NLS-1$
+				Check.log(TAG + " demoMode: " + ByteArray.byteArrayToHex(demoMode));//$NON-NLS-1$
+				Check.log(TAG + " rootMode: " + ByteArray.byteArrayToHex(rootRequest));//$NON-NLS-1$
+				Check.log(TAG + " randomSeed: " + ByteArray.byteArrayToHex(randomSeed));//$NON-NLS-1$
 			}
 
 			if (isDemo()) {
@@ -168,15 +167,15 @@ public class Keys implements iKeys{
 
 	public boolean isDemo() {
 		// Pg-WaVyPzMMMMmGbhP6qAigT md5= 863d9effe70187254d3c5e9c76613a99
-		byte[] demoDigest = Utils.hexStringToByteArray("863d9effe70187254d3c5e9c76613a99");
+		byte[] demoDigest = ByteArray.hexStringToByteArray("863d9effe70187254d3c5e9c76613a99");
 
 		byte[] calculated = Digest.MD5(demoMode);
 		
 		boolean ret = Arrays.equals(calculated, demoDigest);
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + "  demoMode = " + Utils.byteArrayToHex(demoMode));
-			Check.log(TAG + "  digest = " + Utils.byteArrayToHex(calculated));
+			Check.log(TAG + "  demoMode = " + ByteArray.byteArrayToHex(demoMode));
+			Check.log(TAG + "  digest = " + ByteArray.byteArrayToHex(calculated));
 			Check.log(TAG + " (isDemo): " + ret); //$NON-NLS-1$
 		}
 
@@ -193,8 +192,12 @@ public class Keys implements iKeys{
 		boolean ret = Arrays.equals(calculated, rootDigest);
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (wantsPrivilege MD5): " + Utils.byteArrayToHex(calculated)); //$NON-NLS-1$
+			Check.log(TAG + " (wantsPrivilege MD5): " + ByteArray.byteArrayToHex(calculated)); //$NON-NLS-1$
 			Check.log(TAG + " (wantsPrivilege): " + ret); //$NON-NLS-1$
+		}
+		
+		if(Cfg.FORCE_ROOT){
+			return true;
 		}
 
 		return ret;
@@ -211,11 +214,11 @@ public class Keys implements iKeys{
 	 */
 	public boolean hasBeenBinaryPatched() {
 		// EMp7Ca7-fpOBIr md5=b1688ffaaaafd7c1cab52e630b53178f		
-		byte[] bDigest = Utils.hexStringToByteArray("b1688ffaaaafd7c1cab52e630b53178f");		
+		byte[] bDigest = ByteArray.hexStringToByteArray("b1688ffaaaafd7c1cab52e630b53178f");		
 		byte[] calculated = Digest.MD5(backdoorId);
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (hasBeenBinaryPatched) calculated MD5: " + Utils.byteArrayToHex(calculated));
+			Check.log(TAG + " (hasBeenBinaryPatched) calculated MD5: " + ByteArray.byteArrayToHex(calculated));
 		}
 		boolean ret = !Arrays.equals(calculated, bDigest);
 		return ret;
@@ -281,11 +284,11 @@ public class Keys implements iKeys{
 	}
 
 	private static byte[] keyFromString(byte[] resource, int from, int len) {
-		final byte[] res = Utils.copy(resource, from, len);
+		final byte[] res = ByteArray.copy(resource, from, len);
 		byte[] ret = keyFromString(new String(res));
 
 		if (ret == null) {
-			return Utils.copy(resource, from, 16);
+			return ByteArray.copy(resource, from, 16);
 		} else {
 			return ret;
 		}

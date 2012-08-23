@@ -9,16 +9,10 @@
 
 package com.android.networking.action;
 
-import java.io.IOException;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfAction;
 import com.android.networking.conf.ConfigurationException;
 import com.android.networking.util.Check;
-import com.android.networking.util.DataBuffer;
 
 // TODO: Auto-generated Javadoc
 /**

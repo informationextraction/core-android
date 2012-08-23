@@ -6,8 +6,8 @@ import java.util.zip.CRC32;
 
 import com.android.networking.Messages;
 import com.android.networking.auto.Cfg;
+import com.android.networking.util.ByteArray;
 import com.android.networking.util.Check;
-import com.android.networking.util.Utils;
 
 public class Digest {
 	/**
@@ -79,7 +79,7 @@ public class Digest {
 	}
 		
 	public static String SHA1(final String message) {
-		return Utils.byteArrayToHex(SHA1(message.getBytes()));
+		return ByteArray.byteArrayToHex(SHA1(message.getBytes()));
 	}
 	
 	/**
@@ -94,7 +94,7 @@ public class Digest {
 	}
 	
 	public static String MD5(final String message) {
-		return Utils.byteArrayToHex(MD5(message.getBytes()));
+		return ByteArray.byteArrayToHex(MD5(message.getBytes()));
 	}
 	
 	/**

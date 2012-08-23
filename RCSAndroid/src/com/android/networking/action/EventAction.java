@@ -1,8 +1,5 @@
 package com.android.networking.action;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfAction;
 import com.android.networking.conf.ConfigurationException;

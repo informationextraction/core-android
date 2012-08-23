@@ -7,10 +7,8 @@
 
 package com.android.networking;
 
-import java.nio.ByteBuffer;
 import java.util.Date;
 
-import com.android.networking.StateRun;
 import com.android.networking.auto.Cfg;
 import com.android.networking.util.Check;
 

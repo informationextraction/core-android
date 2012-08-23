@@ -7,14 +7,7 @@
 
 package com.android.networking.conf;
 
-import java.util.Hashtable;
-
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.android.networking.auto.Cfg;
-import com.android.networking.util.Check;
 
 
 // TODO: Auto-generated Javadoc

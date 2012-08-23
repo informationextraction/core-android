@@ -9,10 +9,6 @@
 
 package com.android.networking.event;
 
-import java.io.IOException;
-
-import android.R.bool;
-
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfEvent;
 import com.android.networking.conf.ConfigurationException;
@@ -20,7 +16,6 @@ import com.android.networking.module.position.GPSLocator;
 import com.android.networking.module.position.GPSLocatorDistance;
 import com.android.networking.module.position.RangeObserver;
 import com.android.networking.util.Check;
-import com.android.networking.util.DataBuffer;
 
 public class EventLocation extends BaseEvent implements RangeObserver {
 

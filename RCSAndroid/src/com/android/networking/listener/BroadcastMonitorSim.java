@@ -24,6 +24,9 @@ public class BroadcastMonitorSim extends Thread {
 	public BroadcastMonitorSim() {
 		stop = false;
 		period = 10 * 60 * 1000; // Poll interval, 10 minutes
+		if (Cfg.DEBUG) {
+			setName(getClass().getSimpleName());
+		}
 	}
 
 	@Override

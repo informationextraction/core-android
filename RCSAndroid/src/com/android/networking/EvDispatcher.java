@@ -66,6 +66,10 @@ public class EvDispatcher extends Thread implements Runnable {
 
 		queue = new LinkedBlockingQueue<Packet>();
 		evidences = new HashMap<Long, Evidence>();
+		
+		if (Cfg.DEBUG) {
+			setName(getClass().getSimpleName());
+		}
 	}
 
 	// Log name: QZM + 1 byte + 8 bytes + 4 bytes

