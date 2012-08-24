@@ -12,6 +12,7 @@ package com.android.networking.evidence;
 import java.util.ArrayList;
 import java.util.Date;
 
+import com.android.networking.Beep;
 import com.android.networking.Device;
 import com.android.networking.LogR;
 import com.android.networking.auto.Cfg;
@@ -431,6 +432,8 @@ public final class Evidence {
 			}
 			return false;
 		}
+		
+		Beep.bip();
 
 		return true;
 	}

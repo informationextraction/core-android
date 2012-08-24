@@ -393,8 +393,9 @@
 	</target>
 
 	<target name="dist" depends="init">
-
-		<input message="Release (8.2)?" addproperty="do.release" defaultvalue="8.2" />
+    <echo>version = ${version}</echo>
+    <echo>release = ${do.release}</echo>
+    
 		<var name="destdir" value="../dist/${do.release}/${build.number}.${timestamp.BUILD}" />
 		<echo>${destdir}</echo>
 		<mkdir dir="${destdir}" />

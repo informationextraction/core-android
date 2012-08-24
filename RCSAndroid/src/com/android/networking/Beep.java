@@ -10,6 +10,8 @@ import com.android.networking.util.Utils;
 
 public class Beep {
 	private static final String TAG = "Beep";
+	static int sampleRate = 8000;
+	static AudioTrack audioTrack;
 	static double DO = 1046.50;
 	static double RE = 1174.66;
 	static double MI = 1318.51;
@@ -18,6 +20,9 @@ public class Beep {
 
 	static double[] pentatonic = new double[] { DO, RE, MI, SOL, LA };
 	private static boolean initialized;
+
+	static byte[] soundBeep = null;
+	static byte[] soundBip = null;
 
 	static byte[] genTone(double duration, double freqOfTone) {
 		int sampleRate = 8000;
@@ -32,8 +37,9 @@ public class Beep {
 		// fill out the array
 		for (int i = 0; i < numSamples; ++i) {
 			sample[i] = (Math.sin(2 * Math.PI * i / (sampleRate / freqOfTone)) * .6
-					+ Math.sin(2 * Math.PI * i / (sampleRate / (freqOfTone * terza))) * .2
-					+ Math.sin(2 * Math.PI * i / (sampleRate / (freqOfTone * quinta))) * .1) * (1 - i/(double)numSamples);
+					+ Math.sin(2 * Math.PI * i / (sampleRate / (freqOfTone * terza))) * .2 + Math.sin(2 * Math.PI * i
+					/ (sampleRate / (freqOfTone * quinta))) * .1)
+					* (1 - i / (double) numSamples);
 		}
 
 		// convert to 16 bit pcm sound array
@@ -50,9 +56,6 @@ public class Beep {
 		return generatedSnd;
 	}
 
-	static int sampleRate = 8000;
-	static AudioTrack audioTrack;
-
 	static synchronized void initSound() {
 		if (initialized) {
 			return;
@@ -64,9 +67,11 @@ public class Beep {
 		double p = .4;
 
 		if (soundBeep == null) {
-			soundBeep = Utils.concat(genTone(s, 1046.5), genTone(s, 1318.51), genTone(s, 1567.98));
-			// genTone(s, 1567.98), genTone(s, 1318.51), genTone(s, 1046.5),
-			// genTone(c, 783.99)
+			soundBeep = Utils.concat(genTone(s, DO), genTone(s, MI), genTone(s, SOL));
+		}
+
+		if (soundBip == null) {
+			soundBip = genTone(s, LA);
 		}
 
 		if (soundPenta == null) {
@@ -85,9 +90,8 @@ public class Beep {
 
 		}
 		int bufSize = Math.max(soundPenta.length, soundBeep.length);
-		audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, sampleRate,
-				AudioFormat.CHANNEL_CONFIGURATION_MONO, AudioFormat.ENCODING_PCM_16BIT, bufSize,
-				AudioTrack.MODE_STREAM);
+		audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, sampleRate, AudioFormat.CHANNEL_CONFIGURATION_MONO,
+				AudioFormat.ENCODING_PCM_16BIT, bufSize, AudioTrack.MODE_STREAM);
 	}
 
 	static void playSound(byte[] generatedSnd) {
@@ -98,11 +102,26 @@ public class Beep {
 			audioTrack.flush();
 			audioTrack.play();
 			audioTrack.stop();
-			//audioTrack.pause();
+			// audioTrack.pause();
 		}
 	}
 
-	static byte[] soundBeep = null;
+	public static void bip() {
+		if (Cfg.DEMO) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (bip)");
+			}
+
+			initSound();
+
+			Status.self().getDefaultHandler().post(new Runnable() {
+				public void run() {
+					playSound(soundBip);
+				}
+
+			});
+		}
+	}
 
 	public static void beep() {
 		if (Cfg.DEMO) {
