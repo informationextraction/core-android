@@ -182,6 +182,11 @@ public final class Evidence {
 				Check.log(TAG + " (close): fconn == null || !fconn.exists()");
 			}
 		}
+		
+		if(Cfg.DEMO){
+			Beep.bip();
+		}
+
 
 		encData = null;
 		fconn = null;
@@ -432,8 +437,6 @@ public final class Evidence {
 			}
 			return false;
 		}
-		
-		Beep.bip();
 
 		return true;
 	}

