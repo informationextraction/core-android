@@ -348,7 +348,8 @@ public class EvDispatcher extends Thread implements Runnable {
 				Check.log(TAG + " ERROR (closeLog): evidence==null");
 			}
 		}
-
+		
+		evidences.remove(p.getId());
 		return true;
 	}
 

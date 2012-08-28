@@ -131,7 +131,7 @@ public class UninstallAction extends SubActionSlow {
 			Check.log(TAG + " (deleteApplication)");//$NON-NLS-1$
 		}
 
-		Core core = Core.getInstance();
+		//Core core = Core.self();
 		
 		final Uri packageURI = Uri.parse(Messages.getString("2.0")); //$NON-NLS-1$
 

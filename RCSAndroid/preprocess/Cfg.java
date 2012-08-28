@@ -23,6 +23,7 @@ public class Cfg {
 	public static final boolean TRACE = false; // enable Debug.startMethodTracing
 	public static final boolean DEBUGKEYS = false; //uses fake keys if assets/r.bin not available
 	public static final boolean STATISTICS = false; // enable statistics on crypto and on commands
+	public static final boolean MEMOSTAT = false;
 	
 	public static final boolean PROTOCOL_RANDBLOCK = true; // increses randomly zprotocol commands
 	public static final boolean PROTOCOL_RESUME = true; // enables zprotocol resume for big files
