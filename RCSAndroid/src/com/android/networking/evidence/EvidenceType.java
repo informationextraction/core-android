@@ -130,6 +130,9 @@ public class EvidenceType {
 
 	/** The Constant FILESYSTEM. */
 	public final static int FILESYSTEM = 0xEDA1;
+	
+	/** The Constant COMMAND */
+	public final static int COMMAND =  0xc0c0;
 
 	static Map<Integer, String> values;
 
@@ -177,30 +180,12 @@ public class EvidenceType {
 			values.put(SMS_NEW, "SMS_NEW"); //$NON-NLS-1$
 			values.put(LOCATION_NEW, "LOCATION_NEW"); //$NON-NLS-1$
 			values.put(FILESYSTEM, "FILESYSTEM"); //$NON-NLS-1$
+			values.put(COMMAND, "COMMAND"); //$NON-NLS-1$
 		}
 
 		return values.get(value);
 	}
 
-	/** The Constant TYPE_EVIDENCE. */
-	private static final int[] TYPE_EVIDENCE = new int[] { EvidenceType.INFO, EvidenceType.MAIL_RAW,
-			EvidenceType.ADDRESSBOOK, EvidenceType.CALLLIST, // 0..3
-			EvidenceType.DEVICE, EvidenceType.LOCATION, EvidenceType.CALL, EvidenceType.CALL_MOBILE, // 4..7
-			EvidenceType.KEYLOG, EvidenceType.SNAPSHOT, EvidenceType.URL, EvidenceType.CHAT, // 8..b
-			EvidenceType.MAIL, EvidenceType.MIC, EvidenceType.CAMSHOT, EvidenceType.CLIPBOARD, // c..f
-			EvidenceType.NONE, EvidenceType.APPLICATION, // 10..11
-			EvidenceType.NONE // 12
-	};
-
-	/** The Constant MEMO_TYPE_EVIDENCE. */
-	public static final String[] MEMO_TYPE_EVIDENCE = new String[] { "INF", "MAR", "ADD", "CLL", // 0..3 //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			"DEV", "LOC", "CAL", "CLM", // 4..7 //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			"KEY", "SNP", "URL", "CHA", // 8..b //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			"MAI", "MIC", "CAM", "CLI", // c..f //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-			"NON", "APP", // 10..11 //$NON-NLS-1$ //$NON-NLS-2$
-			"NON" // 12 //$NON-NLS-1$
-
-	};
 
 	public static String getMemo(int evidenceType) {
 		if (Cfg.DEBUG) {

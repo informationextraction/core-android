@@ -231,8 +231,9 @@ public class Encryption {
 		try {
 			plain = crypto.decrypt(cyphered, plainlen, offset);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (decryptData) Error: " + e);
+			}
 		}
 		
 		
@@ -275,8 +276,9 @@ public class Encryption {
 		try {
 			crypted = crypto.encrypt(padplain);
 		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (decryptData) Error: " + e1);
+			}
 		} 
 
 		return crypted;

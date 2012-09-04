@@ -526,6 +526,12 @@ public final class Evidence {
         writeEvidences(byteList);
         close();
 	}
+	
+	public void atomicWriteOnce(byte[] content) {
+		createEvidence(null);
+        writeEvidence(content);
+        close();
+	}
 
 	@Override
 	public String toString() {

@@ -226,10 +226,10 @@ public class AntiEmulator {
 		Execute exec = new Execute();
 		
 		// "cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq"
-		ArrayList<String> scaling = exec.execute(Messages.getString("36.8"));
+		ExecuteResult ret = exec.execute(Messages.getString("36.8"));
 		
 		// Ci interessa solo la prima riga
-		for (String frequency : scaling) {
+		for (String frequency : ret.stdout) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (EmuCheckScaling): " + frequency); //$NON-NLS-1$
 			}

