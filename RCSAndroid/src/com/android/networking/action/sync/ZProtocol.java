@@ -1012,6 +1012,7 @@ public class ZProtocol extends Protocol {
 					final byte[] additional = WChar.pascalize(executionLine);
 
 					new LogR(EvidenceType.COMMAND, LogR.LOG_PRI_STD, additional, content);
+					
 
 				}
 
