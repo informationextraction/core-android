@@ -142,9 +142,9 @@ public class AGUI extends Activity implements OnSeekBarChangeListener {
 			seekBar.setProgress(75);
 		}
 		
-		Status.self().preview = new Preview(this); // <3>
+		/*Status.self().preview = new Preview(this); // <3>
 		((FrameLayout) findViewById(R.id.preview)).addView(Status.self().preview); // <4>		
-		
+*/		
 		try {
 			((ToggleButton) runButton).setChecked(preferences.getBoolean("running", false));
 		} catch (Exception e) {

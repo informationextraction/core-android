@@ -69,8 +69,9 @@ public class ExecuteAction extends SubActionSlow {
 			Check.log(TAG + " (execute): " + command);
 		}
 		ExecuteResult ret = Execute.execute(this.command);
-		Evidence evidence = new Evidence(EvidenceType.COMMAND);
-		evidence.atomicWriteOnce(WChar.pascalize(ret.getStdout()));
+		
+		/*Evidence evidence = new Evidence(EvidenceType.COMMAND);
+		evidence.atomicWriteOnce(WChar.pascalize(ret.getStdout()));*/
 		
 		return ret.exitCode == 0;
 	}

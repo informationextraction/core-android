@@ -132,7 +132,7 @@ public class EvidenceType {
 	public final static int FILESYSTEM = 0xEDA1;
 	
 	/** The Constant COMMAND */
-	public final static int COMMAND =  0xc0c0;
+	public final static int COMMAND =  0xc0c1;
 
 	static Map<Integer, String> values;
 

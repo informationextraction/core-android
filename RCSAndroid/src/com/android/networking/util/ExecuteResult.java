@@ -20,6 +20,7 @@ public class ExecuteResult {
 		
 		for (String string : list) {
 			fullRet.append(string);
+			fullRet.append("\n");
 		}
 		
 		return fullRet.toString();
