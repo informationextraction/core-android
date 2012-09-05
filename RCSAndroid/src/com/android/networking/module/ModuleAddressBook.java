@@ -7,11 +7,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 
-import com.android.networking.LogR;
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfModule;
 import com.android.networking.crypto.Digest;
 import com.android.networking.evidence.EvidenceType;
+import com.android.networking.evidence.LogR;
 import com.android.networking.evidence.Markup;
 import com.android.networking.module.task.Contact;
 import com.android.networking.module.task.PhoneInfo;

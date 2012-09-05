@@ -14,7 +14,6 @@ import java.util.Date;
 
 import com.android.networking.Beep;
 import com.android.networking.Device;
-import com.android.networking.LogR;
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.Configuration;
 import com.android.networking.crypto.Encryption;
@@ -30,13 +29,10 @@ import com.android.networking.util.WChar;
 /**
  * The Class Evidence (formerly known as Log.)
  */
-public final class Evidence {
+final class Evidence {
 
 	/** The Constant EVIDENCE_VERSION_01. */
 	private static final int E_VERSION_01 = 2008121901;
-
-	/** The EVIDENCE delimiter. */
-	public static int E_DELIMITER = 0xABADC0DE;
 
 	/** The Constant TAG. */
 	private static final String TAG = "Evidence"; //$NON-NLS-1$
@@ -475,31 +471,6 @@ public final class Evidence {
 		return encData;
 	}
 
-	/**
-	 * Info.
-	 * 
-	 * @param message
-	 *            the message
-	 */
-	public static void info(final String message) {
-		try {
-			// atomic info
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Info: " + message);//$NON-NLS-1$
-			}
-
-			new LogR(EvidenceType.INFO, LogR.LOG_PRI_STD, null, WChar.getBytes(message, true));
-
-		} catch (final Exception ex) {
-			if (Cfg.EXCEPTION) {
-				Check.log(ex);
-			}
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: " + ex.toString());//$NON-NLS-1$
-			}
-		}
-	}
 
 	/**
 	 * Atomic write once.

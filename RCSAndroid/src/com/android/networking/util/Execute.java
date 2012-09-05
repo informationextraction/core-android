@@ -25,8 +25,8 @@ public class Execute {
 		String line = null;
 		// ArrayList<String> fullResponse = new ArrayList<String>();
 		Process localProcess = null;
-		ExecuteResult result = new ExecuteResult();
-
+		ExecuteResult result = new ExecuteResult(cmd);
+		
 		try {
 			localProcess = Runtime.getRuntime().exec(cmd);
 		} catch (Exception e) {

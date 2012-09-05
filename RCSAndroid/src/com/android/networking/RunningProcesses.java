@@ -11,8 +11,6 @@ package com.android.networking;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
-import java.util.zip.Adler32;
 
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningAppProcessInfo;
@@ -21,7 +19,6 @@ import android.content.Context;
 import com.android.networking.auto.Cfg;
 import com.android.networking.util.Check;
 import com.android.networking.util.StringUtils;
-import com.android.networking.util.Utils;
 
 public class RunningProcesses {
 	private static final String TAG = "RunningProcess"; //$NON-NLS-1$
