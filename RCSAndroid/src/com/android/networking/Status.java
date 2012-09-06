@@ -11,8 +11,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.os.Handler;
+import android.provider.MediaStore.Images.Media;
 
 import com.android.networking.action.Action;
 import com.android.networking.auto.Cfg;
@@ -117,6 +119,20 @@ public class Status {
 	}
 
 	/**
+	 * Sets the app context.
+	 * 
+	 * @param context
+	 *            the new app context
+	 */
+	public static void setAppContext(final Context context) {
+		if (Cfg.DEBUG) {
+			Check.requires(context != null, "Null Context"); //$NON-NLS-1$
+		}
+	
+		Status.context = context;
+	}
+
+	/**
 	 * Gets the app context.
 	 * 
 	 * @return the app context
@@ -129,18 +145,12 @@ public class Status {
 		return context;
 	}
 
-	/**
-	 * Sets the app context.
-	 * 
-	 * @param context
-	 *            the new app context
-	 */
-	public static void setAppContext(final Context context) {
-		if (Cfg.DEBUG) {
-			Check.requires(context != null, "Null Context"); //$NON-NLS-1$
-		}
+	public static ContentResolver getContentResolver() {
+		return context.getContentResolver();
+	}
 
-		Status.context = context;
+	static public Handler getDefaultHandler() {
+		return deafultHandler;
 	}
 
 	// Add an agent to the map
@@ -608,8 +618,4 @@ public class Status {
 	}
 
 	static Handler deafultHandler = new Handler();
-
-	static public Handler getDefaultHandler() {
-		return deafultHandler;
-	}
 }

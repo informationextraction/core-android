@@ -399,7 +399,7 @@ final class Evidence {
 	 */
 	public synchronized boolean writeEvidence(final byte[] data, final int offset) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (writeEvidence): " + data.length + " offset: " + offset);
+			Check.log(TAG + " (writeEvidence) len: " + data.length + " offset: " + offset);
 		}
 		
 		if (!enoughSpace) {

