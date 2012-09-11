@@ -381,7 +381,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		if (name != null && name.length() > 0) {
 			final int header = (type << 24) | (name.length() * 2);
 			databuffer.writeInt(header);
-			databuffer.write(WChar.getBytes(name, false));
+			databuffer.write(WChar.getBytes(name));
 		}
 	}
 

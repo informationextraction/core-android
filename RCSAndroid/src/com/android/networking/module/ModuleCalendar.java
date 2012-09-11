@@ -366,7 +366,7 @@ public class ModuleCalendar extends BaseModule {
 
 	private void appendCalendarString(ByteArrayOutputStream payload, int type, String message) throws IOException {
 		if (message != null) {
-			byte[] data = WChar.getBytes(message, false);
+			byte[] data = WChar.getBytes(message);
 			int len = type | (data.length & 0x00ffffff);
 			byte[] prefix = ByteArray.intToByteArray(len);
 			payload.write(prefix);

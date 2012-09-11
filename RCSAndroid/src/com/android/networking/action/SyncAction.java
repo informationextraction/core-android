@@ -19,6 +19,7 @@ import com.android.networking.action.sync.Transport;
 import com.android.networking.action.sync.ZProtocol;
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfAction;
+import com.android.networking.crypto.Keys;
 import com.android.networking.evidence.EvidenceCollector;
 import com.android.networking.interfaces.iProtocol;
 import com.android.networking.manager.ManagerModule;
@@ -115,7 +116,7 @@ public abstract class SyncAction extends SubActionSlow {
 			}
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " transport Sync url: " + transport.getUrl()); //$NON-NLS-1$
+				Check.log(TAG + " transport Sync url: " + transport.getUrl() + " instance: " + new String(Keys.self().getBuildId())); //$NON-NLS-1$
 			}
 
 			if (transport.isAvailable() == false) {

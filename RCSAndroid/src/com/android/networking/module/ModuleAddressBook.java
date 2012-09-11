@@ -252,7 +252,7 @@ public class ModuleAddressBook extends BaseModule {
 
 			try {
 				outputStream.write(ByteArray.intToByteArray(header));
-				outputStream.write(WChar.getBytes(name, false));
+				outputStream.write(WChar.getBytes(name));
 			} catch (final IOException e) {
 				if (Cfg.EXCEPTION) {
 					Check.log(e);

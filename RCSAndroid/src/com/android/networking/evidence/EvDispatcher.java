@@ -94,6 +94,7 @@ public class EvDispatcher extends Thread implements Runnable {
 
 		try {
 			p = queue.take();
+			Thread.yield();
 		} catch (final InterruptedException e) {
 			if (Cfg.EXCEPTION) {
 				Check.log(e);

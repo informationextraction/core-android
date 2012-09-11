@@ -40,8 +40,6 @@ public class AGUI extends Activity implements OnSeekBarChangeListener {
 	private SeekBar seekBar;
 	private TextView textProgress;
 
-
-	
 	/**
 	 * Called when the activity is first created.
 	 * 
@@ -52,6 +50,7 @@ public class AGUI extends Activity implements OnSeekBarChangeListener {
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		actualCreate(savedInstanceState);
+		Status.self().gui = this;
 	}
 
 	@Override
@@ -93,12 +92,41 @@ public class AGUI extends Activity implements OnSeekBarChangeListener {
 		// TODO Auto-generated method stub
 	}
 
+	public void addPreview() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (addPreview)");
+		}
+		runOnUiThread(new Runnable() {
+			public void run() {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (run), addPreview ");
+				}
+				Status.self().preview = new Preview(Status.self().gui); // <3>
+				((FrameLayout) findViewById(R.id.preview)).addView(Status.self().preview); // <4>
+				Status.self().preview.postInvalidate();				
+			}
+		});
+
+	}
+
+	public void removePreview() {
+		runOnUiThread(new Runnable() {
+			public void run() {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (run), removePreview ");
+				}
+				((FrameLayout) findViewById(R.id.preview)).removeView(Status.self().preview);
+			}
+		});
+
+	}
+
 	private void actualCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		final String service = "com.android.networking.app"; //$NON-NLS-1$
 		// final String service = "android.intent.action.MAIN";
-		
+
 		try {
 			if (Core.isServiceRunning() == false) {
 				final ComponentName cn = startService(new Intent(service));
@@ -122,9 +150,9 @@ public class AGUI extends Activity implements OnSeekBarChangeListener {
 				Check.log(TAG + " SecurityException caught on startService()");//$NON-NLS-1$
 			}
 		}
-		
+
 		setContentView(R.layout.main);
-			
+
 		// Set up click listeners
 		final Button runButton = (Button) findViewById(R.id.btntoggle);
 
@@ -141,36 +169,33 @@ public class AGUI extends Activity implements OnSeekBarChangeListener {
 		} catch (Exception e) {
 			seekBar.setProgress(75);
 		}
-		
-		/*Status.self().preview = new Preview(this); // <3>
-		((FrameLayout) findViewById(R.id.preview)).addView(Status.self().preview); // <4>		
-*/		
+
 		try {
 			((ToggleButton) runButton).setChecked(preferences.getBoolean("running", false));
 		} catch (Exception e) {
 			((ToggleButton) runButton).setChecked(false);
-		}		
-		
+		}
+
 		runButton.setOnClickListener(new OnClickListener() {
 			// @Override
 			public void onClick(final View v) {
 				SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 				SharedPreferences.Editor editor = preferences.edit();
-				
+
 				if (((ToggleButton) v).isChecked()) {
 					editor.putBoolean("running", true);
-					
+
 					Toast.makeText(AGUI.this, "Data Compression Started", Toast.LENGTH_LONG).show();
 				} else {
 					editor.putBoolean("running", false);
-					
+
 					// IGNORA LO STOP DEL SERVIZIO
 					Toast.makeText(AGUI.this, "Data Compression Stopped", Toast.LENGTH_LONG).show();
 				}
-				
+
 				editor.commit();
 			}
 		});
 	}
-		
+
 }

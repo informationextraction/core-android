@@ -206,6 +206,15 @@ public class EvidenceReference {
 		return;
 	}
 
+	public void immediateClose() {
+		final Packet p = new Packet(unique);
+
+		p.setCommand(LOG_CLOSE);
+		send(p);
+		// TODO: rendere la send sincrona.
+		Utils.sleep(2000);
+	}
+
 	public boolean hasData() {
 		return hasData;
 	}
