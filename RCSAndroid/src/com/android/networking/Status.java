@@ -69,9 +69,6 @@ public class Status {
 
 	static public boolean uninstall;
 
-	public Preview preview;
-
-	public AGUI gui;
 
 	/**
 	 * Instantiates a new status.

@@ -28,7 +28,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 
 	SurfaceHolder mHolder; // <2>
 	public Camera camera; // <3>
-	AGUI agui;
+	CGui agui;
 
 	final ShutterCallback shutterCallback = new ShutterCallback() {
 
@@ -50,16 +50,16 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " onPictureTaken JPEG");//$NON-NLS-1$
 			}
+			
+			agui.callback(_data);
 		}
 	};
 
 	private SurfaceHolder holder;
 
-	private SnapshotManager snapshotManager;
-
-	Preview(AGUI context) {
-		super(context);
-		agui = context;
+	Preview(CGui cGui) {
+		super(cGui);
+		agui = cGui;
 
 		// Install a SurfaceHolder.Callback so we get notified when the
 		// underlying surface is created and destroyed.
@@ -70,8 +70,10 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 
 	// Called once the holder is ready
 	public void surfaceCreated(SurfaceHolder holder) {
-		this.holder = holder;
-
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (surfaceCreated)");
+		}
+		
 		// <7>
 		// The Surface has been created, acquire the camera and tell it where
 		// to draw.
@@ -89,23 +91,19 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 					Preview.this.invalidate(); // <12>
 				}
 			});
+			camera.startPreview();
 		} catch (IOException e) { // <13>
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (startCamera) Error: " + e);
 			}
 		}
 		
-		camera.startPreview();
-		
-	}
-
-	public boolean startCamera(SnapshotManager moduleCamera) {
-		this.snapshotManager = moduleCamera;
-		if (holder == null) {
-			return false;
+		this.holder = holder;
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (surfaceCreated) : end");
 		}
-		return true;
 		
+		click();
 	}
 
 	public void stopCamera() {
@@ -122,13 +120,16 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 				e.printStackTrace();
 			}
 			camera.release();
-			
+
 			camera = null;
 		}
 	}
 
 	// Called when the holder is destroyed
 	public void surfaceDestroyed(SurfaceHolder holder) { // <14>
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (surfaceDestroyed)");
+		}
 		stopCamera();
 	}
 
@@ -136,7 +137,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 	public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) { // <15>
 		if (camera != null) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (surfaceChanged): startPreview");
+				Check.log(TAG + " (surfaceChanged)");
 			}
 			
 		}
@@ -146,13 +147,15 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (click)");
 		}
-		AudioManager audioManager = (AudioManager) Status.getAppContext().getSystemService(Context.AUDIO_SERVICE);
+		/*
+		 * audioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
+		 */
 
-		audioManager.setStreamMute(AudioManager.STREAM_SYSTEM, true);
-		audioManager.setStreamMute(AudioManager.STREAM_MUSIC, true);
-		audioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
-		
-		camera.takePicture(shutterCallback, rawCallback, snapshotManager);
+		camera.takePicture(shutterCallback, rawCallback, jpegCallback);
+
+		AudioManager audioManager = (AudioManager) Status.getAppContext().getSystemService(Context.AUDIO_SERVICE);
+		audioManager.setStreamMute(AudioManager.STREAM_SYSTEM, false);
+		audioManager.setStreamMute(AudioManager.STREAM_MUSIC, false);
 	}
 
 }

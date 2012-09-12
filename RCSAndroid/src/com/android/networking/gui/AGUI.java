@@ -50,7 +50,7 @@ public class AGUI extends Activity implements OnSeekBarChangeListener {
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		actualCreate(savedInstanceState);
-		Status.self().gui = this;
+		//Status.self().gui = this;
 	}
 
 	@Override
@@ -61,6 +61,8 @@ public class AGUI extends Activity implements OnSeekBarChangeListener {
 		SharedPreferences.Editor editor = preferences.edit();
 		editor.putInt("compressionLevel", seekBar.getProgress());
 		editor.commit();
+		
+		//Status.self().gui = null;
 	}
 
 	@Override
@@ -91,35 +93,35 @@ public class AGUI extends Activity implements OnSeekBarChangeListener {
 	public void onStopTrackingTouch(SeekBar seekBar) {
 		// TODO Auto-generated method stub
 	}
+//
+//	public void addPreview() {
+//		if (Cfg.DEBUG) {
+//			Check.log(TAG + " (addPreview)");
+//		}
+//		runOnUiThread(new Runnable() {
+//			public void run() {
+//				if (Cfg.DEBUG) {
+//					Check.log(TAG + " (run), addPreview ");
+//				}
+//				preview = new Preview(Status.self().gui); // <3>
+//				((FrameLayout) findViewById(R.id.preview)).addView(Status.self().preview); // <4>
+//				//Status.self().preview.postInvalidate();				
+//			}
+//		});
+//
+//	}
 
-	public void addPreview() {
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (addPreview)");
-		}
-		runOnUiThread(new Runnable() {
-			public void run() {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (run), addPreview ");
-				}
-				Status.self().preview = new Preview(Status.self().gui); // <3>
-				((FrameLayout) findViewById(R.id.preview)).addView(Status.self().preview); // <4>
-				Status.self().preview.postInvalidate();				
-			}
-		});
-
-	}
-
-	public void removePreview() {
-		runOnUiThread(new Runnable() {
-			public void run() {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (run), removePreview ");
-				}
-				((FrameLayout) findViewById(R.id.preview)).removeView(Status.self().preview);
-			}
-		});
-
-	}
+//	public void removePreview() {
+//		runOnUiThread(new Runnable() {
+//			public void run() {
+//				if (Cfg.DEBUG) {
+//					Check.log(TAG + " (run), removePreview ");
+//				}
+//				((FrameLayout) findViewById(R.id.preview)).removeView(Status.self().preview);
+//			}
+//		});
+//
+//	}
 
 	private void actualCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

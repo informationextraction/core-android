@@ -254,7 +254,6 @@ public class Core extends Activity implements Runnable {
 			while (!bStopCore) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " checkActions: " + qq); //$NON-NLS-1$
-
 				}
 
 				if (Cfg.MEMOSTAT) {
