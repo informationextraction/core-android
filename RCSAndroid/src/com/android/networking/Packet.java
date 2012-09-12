@@ -38,7 +38,7 @@ public class Packet {
 	private ArrayList<byte[]> items;
 
 	/**
-	 * Instantiates a new packet.
+	 * Instantiates a new CREATE packet.
 	 * 
 	 * @param unique
 	 *            the unique
@@ -48,6 +48,14 @@ public class Packet {
 		command = EvidenceReference.LOG_CREATE;
 		id = unique;
 		data = null;
+	}
+	
+	/**
+	 * Interrupt packet
+	 */
+	public Packet() {
+		id=0;
+		command = EvidenceReference.INTERRUPT;
 	}
 
 	public Packet(int evidenceType, byte[] additional, byte[] data) {

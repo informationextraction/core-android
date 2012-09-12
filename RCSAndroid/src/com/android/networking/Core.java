@@ -338,10 +338,10 @@ public class Core extends Activity implements Runnable {
 
 		final EvDispatcher logDispatcher = EvDispatcher.self();
 
-		if (!logDispatcher.isAlive()) {
-			logDispatcher.waitOnEmptyQueue();
-			logDispatcher.halt();
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (stopAll), stopping EvDispatcher");
 		}
+		logDispatcher.halt();
 
 	}
 
@@ -711,5 +711,4 @@ public class Core extends Activity implements Runnable {
 		}
 	}
 
-	
 }

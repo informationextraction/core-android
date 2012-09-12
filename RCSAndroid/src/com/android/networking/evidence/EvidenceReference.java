@@ -52,6 +52,8 @@ public class EvidenceReference {
 	
 	/** The Constant LOG_ITEMS. */
 	final public static int LOG_ITEMS = 0x6;
+
+	public static final int INTERRUPT = -1;
 	
 	/** The EVIDENCE delimiter. */
 	public static int E_DELIMITER = 0xABADC0DE;

