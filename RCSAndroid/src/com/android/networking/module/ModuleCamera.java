@@ -47,7 +47,7 @@ public class ModuleCamera extends BaseInstantModule {
 
 	
 	// camera whitelist, module enabled if Build.MODEL into this lits
-	// Sony XPERIA, Samsung S3, HTC Explorer A310e, Nexus
+	// Sony XPERIA, Samsung S3, Samsung S2, Nexus, HTC Desire Z
 	String[] whiteList=new String[]{"LT18i", 
 			"GT-I9300", "GT-I9100", "Galaxy Nexus", "HTC Vision" };
 
