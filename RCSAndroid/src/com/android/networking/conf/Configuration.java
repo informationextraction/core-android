@@ -343,7 +343,11 @@ public class Configuration {
 			// final Crypto crypto = new Crypto(confKey);
 			final byte[] clearConf = crypto.decryptDataIntegrity(rawConf);
 
-			String json = new String(clearConf);
+			
+			String json = null;
+			if(clearConf!=null){
+				json=new String(clearConf);
+			}
 
 			if (json != null && json.length() > 0) {
 				// Return decrypted conf

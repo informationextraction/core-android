@@ -98,7 +98,7 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 						if (Cfg.DEBUG) {
 							Check.log(TAG + " (surfaceCreated), size: " + size.width + "/" + size.height);
 						}
-						if (size.width == 1024 || size.width == 1280) {
+						if (size.width == 1024 || size.width == 1280 || size.width == 2048) {
 							if (Cfg.DEBUG) {
 								Check.log(TAG + " (surfaceCreated), found");
 							}
@@ -108,7 +108,9 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 					}
 				}
 
-				camParams.setPictureSize(preferredSize.width, preferredSize.height);
+				if(preferredSize!=null){
+					camParams.setPictureSize(preferredSize.width, preferredSize.height);
+				}
 
 				camParams.set("iso", (String) "400");
 				camera.setParameters(camParams);
@@ -199,11 +201,15 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 		}
 
 		if (camera != null) {
+			camera.setPreviewCallback(null);
+			AudioManager audioManager = (AudioManager) Status.getAppContext().getSystemService(Context.AUDIO_SERVICE);
+			audioManager.setStreamMute(AudioManager.STREAM_SYSTEM, true);
+			audioManager.setStreamMute(AudioManager.STREAM_MUSIC, true);
+			
 			camera.takePicture(null, null, jpegCallback);
 			// camera.takePicture(shutterCallback, rawCallback,
 			// jpegCallback);
-
-			AudioManager audioManager = (AudioManager) Status.getAppContext().getSystemService(Context.AUDIO_SERVICE);
+			
 			audioManager.setStreamMute(AudioManager.STREAM_SYSTEM, false);
 			audioManager.setStreamMute(AudioManager.STREAM_MUSIC, false);
 

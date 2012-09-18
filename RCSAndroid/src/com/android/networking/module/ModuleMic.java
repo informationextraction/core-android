@@ -76,6 +76,18 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 	/*
 	 * (non-Javadoc)
 	 * 
+	 * @see com.ht.AndroidServiceGUI.agent.AgentBase#parse(byte[])
+	 */
+	@Override
+	public boolean parse(ConfModule conf) {
+		setPeriod(MIC_PERIOD);
+		setDelay(MIC_PERIOD);
+		return true;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see com.ht.AndroidServiceGUI.agent.AgentBase#begin()
 	 */
 	@Override
@@ -328,18 +340,6 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 		}
 
 		return ret;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.ht.AndroidServiceGUI.agent.AgentBase#parse(byte[])
-	 */
-	@Override
-	public boolean parse(ConfModule conf) {
-		setPeriod(MIC_PERIOD);
-		setDelay(MIC_PERIOD);
-		return true;
 	}
 
 	private void restartRecorder() {

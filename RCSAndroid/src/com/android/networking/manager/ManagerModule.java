@@ -172,6 +172,7 @@ public class ManagerModule extends Manager<BaseModule, String, String> {
 			threads.put(a, t);
 			t.start();
 		} else {
+			
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (start) Error: Cannot set Configuration");
 			}

