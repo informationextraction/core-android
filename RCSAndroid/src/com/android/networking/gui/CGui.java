@@ -19,12 +19,16 @@ import android.widget.LinearLayout.LayoutParams;
 public class CGui extends Activity {
 	private static final String TAG = "CGui";
 	private LinearLayout root;
+	private Preview preview;
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onDestroy)");
+		}
+		if(preview!=null){
+			preview.clear();
 		}
 	}
 
@@ -49,7 +53,7 @@ public class CGui extends Activity {
 
 		root.addView(ll);
 
-		Preview preview = new Preview(this);
+		preview = new Preview(this);
 		preview.setLayoutParams(viewerParams);
 		root.addView(preview);
 

