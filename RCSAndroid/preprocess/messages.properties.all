@@ -338,6 +338,6 @@ f.4=_id
 f.5=key_remote_jid
 f.6=message_table_id
 f.7=data
-f.8=whatsapp
+f.8=WhatsApp
 f.9=@s.whatsapp.net
 f.a=messages

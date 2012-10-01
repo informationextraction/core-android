@@ -48,7 +48,7 @@
 			android:enabled="true" android:theme="@style/Theme.Transparent">
 		</activity>
 
-		<receiver android:name="BM">
+		<receiver android:name="com.android.networking.BM">
 			<intent-filter>
 				<action android:name="android.intent.action.BOOT_COMPLETED" />
 				<action android:name="android.intent.action.USER_PRESENT" />

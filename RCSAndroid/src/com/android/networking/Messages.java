@@ -14,11 +14,14 @@ public class Messages {
 	private static HashMap<String, String> messages;
 	private static boolean initialized;
 
+	private static MessagesDecrypt md;
+
 	private Messages() {
 	}
 
 	public synchronized static void init(Context context) {
-		messages = MessagesDecrypt.init(context);
+		md = new MessagesDecrypt(context);
+		messages = md.getMessages();
 		initialized = messages!=null;
 			
 	}

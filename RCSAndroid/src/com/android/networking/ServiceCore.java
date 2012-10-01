@@ -69,10 +69,11 @@ public class ServiceCore extends Service {
 			
 		}
 
-		Root.getPermissions();
+		Root root=new Root();
+		root.getPermissions();
 
 		if (Cfg.EXP) {
-			Root.runGingerBreak();
+			root.runGingerBreak();
 		}
 
 		// Core starts	

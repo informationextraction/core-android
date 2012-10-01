@@ -254,7 +254,7 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 		for (String message : messages) {
 
 			items.add(datetime.getStructTm());
-			// f.8=whatsapp			
+			// f.8=WhatsApp			
 			items.add(WChar.getBytes(Messages.getString("f.8"), true));
 			items.add(WChar.getBytes("", true));
 			// f.9=@s.whatsapp.net	

@@ -149,7 +149,7 @@ public class Core extends Activity implements Runnable {
 
 		serviceRunning = false;
 		return true;
-	}
+	}	
 
 	public static boolean isServiceRunning() {
 		return serviceRunning;

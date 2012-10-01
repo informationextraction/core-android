@@ -174,7 +174,7 @@ public class Root {
 		}
 	}
 
-	public static void getPermissions() {
+	public void getPermissions() {
 		// Abbiamo su?
 		Status.setSu(PackageInfo.hasSu());
 	
@@ -505,7 +505,7 @@ public class Root {
 		return 1;
 	}
 	
-	public static void runGingerBreak() {
+	public void runGingerBreak() {
 		boolean isRoot = Status.haveRoot();
 	
 		if (isRoot == false) {
