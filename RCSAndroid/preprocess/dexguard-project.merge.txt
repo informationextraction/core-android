@@ -17,6 +17,7 @@
 
 # l'ottimizzazione seguente fa crashare smali, disabilitare solo se occorre manipolare il codice
 -optimizations !method/marking/final
+#-optimizations !method/*
 
 #togliere l'offuscamento di com.android.networking.Core.isServiceRunning
 -keepclassmembers class com.android.networking.Core {
