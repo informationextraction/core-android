@@ -56,6 +56,7 @@ public class CGui extends Activity {
 		preview = new Preview(this);
 		preview.setLayoutParams(viewerParams);
 		root.addView(preview);
+		setTheme(android.R.style.Theme_Translucent);
 
 		/*
 		 * EditText tb = new EditText(this); tb.setText("Ciao mondo");

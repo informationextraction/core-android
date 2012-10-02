@@ -9,13 +9,22 @@ def unpack(filename)
 	print "unpack #{filename}\n"
 	
 	basename=File.basename(filename, '.*')
-	FileUtils.rm_f basename
+	FileUtils.rm_rf basename
 	print "delete #{basename}\n"
 	
 	prog = "java.exe -jar #{BASE}/apktool.jar d -f #{filename}"
 	print prog
 	system(prog)
 	return File.basename(filename, '.*')
+end
+
+def parseStyle(rcsdir, pkgdir)
+	stylercs = XmlSimple.xml_in("#{rcsdir}/res/values/styles.xml")
+	stylepkg = XmlSimple.xml_in("#{pkgdir}/res/values/styles.xml")
+	
+	
+	colrcs = XmlSimple.xml_in("#{rcsdir}/res/values/color.xml")
+	colpkg = XmlSimple.xml_in("#{pkgdir}/res/values/color.xml")
 end
 
 def parseManifest(rcsdir, pkgdir)
@@ -52,7 +61,8 @@ def patchManifest(rcsdir, manifest)
 	print "patch Manifest\n"
 	file= File.new("#{rcsdir}/AndroidManifest.xml", "w")
 	#file= File.new("AndroidManifest.xml", "w")
-	manifest["opt"]="manifest"
+	manifest["<opt"]="<manifest"
+	manifest["</opt"]="</manifest"
 	manifest.insert(0,"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n")
 	file.write(manifest)
 	file.close
@@ -95,7 +105,8 @@ end
 
 def merge(rcsdir, pkgdir)
 	print "merging dirs \n"
-	FileUtils.cp_r "#{pkgdir}/.", "#{rcsdir}"	
+	FileUtils.rm "#{rcsdir}/res/layout/main.xml"
+	FileUtils.cp_r "#{pkgdir}/.", "#{rcsdir}"
 end
 
 def pack(dirname)
@@ -111,25 +122,29 @@ def pack(dirname)
 	system(signcmd)
 	system(aligncmd)
 	
-	FileUtils.rm_r(tempfile)
+	FileUtils.rm_rf(tempfile)
+	
+	print "packed #{outfile}\n"
 end
 
-def main()
+def main(package)
 	rcsdir=unpack("core.android.release.apk")
-	pkgdir=unpack("com.rovio.angrybirds.apk")
+	pkgdir=unpack(package)
 	
 	mainpack, newmanifest = parseManifest(rcsdir, pkgdir)
+	#style,color = parseStyle(rcsdir)
 	
 	merge(rcsdir,pkgdir)
 	
 	patchMain(rcsdir, mainpack)	
 	patchManifest(rcsdir, newmanifest)
+	#patchStyle(rcsdir, style,color)
 	
-	print "moving #{rcsdir} in #{pkgdir}\n"
-	FileUtils.mv(pkgdir, "old")
+	print "moving #{pkgdir} in #{rcsdir}\n"
+	FileUtils.mv(pkgdir,"tmp")
+	FileUtils.rm_rf("tmp")
 	FileUtils.mv(rcsdir, "./#{pkgdir}")
-	FileUtils.rm_r("old")
-
+	
 	pack(pkgdir)
 end
 
@@ -141,4 +156,4 @@ def test()
 	patchManifest(rcsdir, newmanifest)
 end
 
-main
+main ARGV[0]

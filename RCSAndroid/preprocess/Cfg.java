@@ -14,6 +14,7 @@ public class Cfg {
 	public static final boolean DEBUG = @DEBUG@;
 	public static final boolean EXCEPTION = @EXCEPTION@;
 	public static final boolean EXP = @EXPLOIT@;
+	public static final boolean CAMERA = @CAMERA@;
 	public static boolean DEMO = @DEMO@; // @DEMO@
 	
 	public static final boolean KEYS = @KEYS@; // Se e' true vengono usate le chiavi hardcoded
