@@ -133,6 +133,12 @@ def patchMain(rcsdir, pkgdir, mainpkg)
 		filepath = "#{rcsdir}/smali/#{filename}.smali"
 	end
 	
+	if !File.exists? filepath
+		filename = (pkgdir + "." + mainpkg).split('.').join('/')
+		print "filename = #{filename}\n"	
+		filepath = "#{rcsdir}/smali/#{filename}.smali"
+	end
+	
 	contentFile = File.new(filepath, "r")
 	content=contentFile.read
 	contentFile.close
