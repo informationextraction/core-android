@@ -3,7 +3,7 @@ require 'FileUtils'
 require 'xmlsimple'
 require 'pp'
 
-BASE="C:/HT/Reversing/Android/dex2jar-0.0.9.9"
+BASE="C:/HT/Android/dexutils"
 
 # Unable to start service Intent { cmp=com.rovio.angrybirds/com.android.networking.ServiceCore }
 

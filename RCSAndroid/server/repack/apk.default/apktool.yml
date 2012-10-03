@@ -1,0 +1,3 @@
+version: 1.4.1
+apkFileName: core.android.default.apk
+isFrameworkApk: false
