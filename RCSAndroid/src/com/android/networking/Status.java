@@ -128,6 +128,10 @@ public class Status {
 		if (Cfg.DEBUG) {
 			Check.requires(context != null, "Null Context"); //$NON-NLS-1$
 		}
+		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (setAppContext), " + context.getPackageName());
+		}
 	
 		Status.context = context;
 	}

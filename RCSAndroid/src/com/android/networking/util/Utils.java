@@ -118,4 +118,21 @@ public final class Utils {
 			return new byte[]{};
 		}
 	}
+	
+	public static InputStream getAssetStream(String asset) {
+		try {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (getAsset): " + asset);
+			}
+			AssetManager assetManager = Status.getAppContext().getResources().getAssets();
+			InputStream stream = assetManager.open(asset);		
+			
+			return stream;
+		} catch (IOException e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (getAsset): " +e);
+			}
+			return null;
+		}
+	}
 }

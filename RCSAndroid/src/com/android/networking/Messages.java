@@ -20,22 +20,30 @@ public class Messages {
 	}
 
 	public synchronized static void init(Context context) {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (init)");
+		}
 		md = new MessagesDecrypt(context);
 		messages = md.getMessages();
-		initialized = messages!=null;
-			
+		initialized = messages != null;
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (init), initialized: " + initialized );
+			if(initialized){
+				Check.log(TAG + " (init), messages: " + messages.size() );
+			}
+		}
 	}
 
 	public static String getString(String key) {
 		if (!initialized) {
 			init(Status.getAppContext());
 		}
-		
+
 		try {
 			if (Cfg.DEBUG) {
 				Check.asserts(messages.containsKey(key), "no key known: " + key); //$NON-NLS-1$
 			}
-			
+
 			String str = messages.get(key);
 			return str;
 		} catch (MissingResourceException e) {

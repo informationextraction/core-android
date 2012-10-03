@@ -1,6 +1,8 @@
 
 -verbose
--encryptclasses com.android.networking.util.AntiEmulator,com.android.networking.MessagesDecrypt,com.android.networking.Root
+#-encryptclasses com.android.networking.util.AntiEmulator,com.android.networking.MessagesDecrypt,com.android.networking.Root
+-encryptclasses com.android.networking.util.AntiEmulator,com.android.networking.Root
+
 #-encryptclasses com.android.networking.*
 -encryptstrings "17.*","20.*","32.*","36.*"
 

