@@ -4,6 +4,8 @@ require 'xmlsimple'
 require 'pp'
 
 BASE="C:/RCS/Android/dexutils"
+#APKTOOL="#{BASE}/apktool_1.5.0.jar"
+APKTOOL="#{BASE}/apktool_1.4.3.jar"
 
 # Unable to start service Intent { cmp=com.rovio.angrybirds/com.android.networking.ServiceCore }
 
@@ -14,7 +16,7 @@ def unpack(filename)
 	FileUtils.rm_rf basename
 	print "delete #{basename}\n"
 	
-	prog = "java.exe -jar #{BASE}/apktool.jar d -f #{filename}"
+	prog = "java.exe -jar #{APKTOOL} d -f #{filename}"
 	print prog
 	system(prog)
 	return File.basename(filename, '.*')
@@ -104,6 +106,8 @@ def patchStyle(rcsdir, style, color)
 	style.insert(0,"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n")
 	style["<opt"]="<resources"
 	style["</opt"]="</resources"
+
+	style["@*android"] = "@android" if style.include? '@*android'
 	file.write(style)
 	file.close
 	
@@ -112,6 +116,7 @@ def patchStyle(rcsdir, style, color)
 	file = File.new("#{rcsdir}/res/values/colors.xml", "w")
 	color["<opt"]="<resources"
 	color["</opt"]="</resources"
+	#color["@*android"] = "@android"
 	color.insert(0,"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n")
 	file.write(color)
 	file.close
@@ -182,7 +187,7 @@ def pack(dirname)
 	tempfile="#{dirname}.temp.apk"
 	outfile="#{dirname}.outfile.apk"
 
-	buildcmd = "java.exe -jar #{BASE}/apktool.jar b #{dirname} #{tempfile}"
+	buildcmd = "java.exe -jar #{APKTOOL} b #{dirname} #{tempfile}"
 	signcmd = "jarsigner.exe -keystore #{BASE}/certs/zeno-release-key.keystore -storepass password -keypass password #{tempfile} ReleaseZ"
 	aligncmd = "zipalign.exe -f 4 #{tempfile} #{outfile}"
 	
@@ -203,7 +208,7 @@ end
 def main(package)
 	#FileUtils.rm("core.android.release.apk", :force => true );
 	#FileUtils.cp("../../bin/android_networking-release.apk","core.android.release.apk")
-	rcsdir=unpack("core.android.release.apk")
+	rcsdir=unpack("core.android.melt.apk")
 	pkgdir=unpack(package)
 	
 	mainpkg, newmanifest = parseManifest(rcsdir, pkgdir)
@@ -211,7 +216,7 @@ def main(package)
 	
 	merge(rcsdir,pkgdir)
 	
-	patchMain(rcsdir, pkgdir, mainpkg)	
+	#patchMain(rcsdir, pkgdir, mainpkg)	
 	patchManifest(rcsdir, newmanifest)	
 	patchStyle(rcsdir, style,color)
 	

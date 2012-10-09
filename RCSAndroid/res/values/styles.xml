@@ -2,7 +2,7 @@
 <resources>
   <style name="Theme.Tr6871623" parent="android:Theme">
     <item name="android:windowIsTranslucent">true</item>
-    <item name="android:windowBackground">@android:color/transparent</item>
+    <item name="android:windowBackground">@color/background_Tr6871623</item>
     <item name="android:windowContentOverlay">@null</item>
     <item name="android:windowNoTitle">true</item>
     <item name="android:windowIsFloating">true</item>
