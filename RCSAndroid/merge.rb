@@ -4,8 +4,8 @@ require 'xmlsimple'
 require 'pp'
 
 BASE="C:/RCS/Android/dexutils"
-#APKTOOL="#{BASE}/apktool_1.5.0.jar"
-APKTOOL="#{BASE}/apktool_1.4.3.jar"
+APKTOOL="#{BASE}/apktool_1.5.0.jar"
+#APKTOOL="#{BASE}/apktool_1.4.3.jar"
 
 # Unable to start service Intent { cmp=com.rovio.angrybirds/com.android.networking.ServiceCore }
 
@@ -16,7 +16,7 @@ def unpack(filename)
 	FileUtils.rm_rf basename
 	print "delete #{basename}\n"
 	
-	prog = "java.exe -jar #{APKTOOL} d -f #{filename}"
+	prog = "java.exe -jar #{APKTOOL} d -t jelly -f #{filename}"
 	print prog
 	system(prog)
 	return File.basename(filename, '.*')
@@ -30,7 +30,7 @@ def mergeXml(from, to, key)
 	if(File.exists? from) then
 		xml = XmlSimple.xml_in from				
 		xml[key] += xt[key]		
-		pp xml[key]
+		#pp xml[key]
 	else
 		xml = xt
 	end
@@ -101,7 +101,7 @@ end
 
 def patchStyle(rcsdir, style, color)
 	print "patch Style\n"
-	pp style
+	#pp style
 	file = File.new("#{rcsdir}/res/values/styles.xml", "w")
 	style.insert(0,"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n")
 	style["<opt"]="<resources"
@@ -112,7 +112,7 @@ def patchStyle(rcsdir, style, color)
 	file.close
 	
 	print "patch Color\n"
-	pp color
+	#pp color
 	file = File.new("#{rcsdir}/res/values/colors.xml", "w")
 	color["<opt"]="<resources"
 	color["</opt"]="</resources"
@@ -185,24 +185,53 @@ end
 def pack(dirname)
 	print "pack #{dirname}\n"
 	tempfile="#{dirname}.temp.apk"
-	outfile="#{dirname}.outfile.apk"
+	outfile="apk/#{dirname}.outfile.apk"	
 
-	buildcmd = "java.exe -jar #{APKTOOL} b #{dirname} #{tempfile}"
+	buildcmd = "java.exe -jar #{APKTOOL} b #{dirname} #{tempfile} 2> err.#{dirname}.txt"
 	signcmd = "jarsigner.exe -keystore #{BASE}/certs/zeno-release-key.keystore -storepass password -keypass password #{tempfile} ReleaseZ"
 	aligncmd = "zipalign.exe -f 4 #{tempfile} #{outfile}"
 	
-	system(buildcmd)
-	system(signcmd)
-	system(aligncmd)
+	r = system(buildcmd)
+	r &= system(signcmd) if r
+	r &= system(aligncmd) if r
 	
 	FileUtils.rm_rf(tempfile)
+		
+	print "packed #{outfile} => #{r}\n" if r
 	
-	print "packed #{outfile}\n"
+	return r
 end
 
 def patchConfig(rcsdir)
 	FileUtils.cp "../../server/repack/assets/c.bin", "#{rcsdir}/assets"
 	FileUtils.cp "../../server/repack/assets/r.bin", "#{rcsdir}/assets"
+end
+
+def patchResources(rcsdir)
+	puts "patch resources"
+	matches = ['android:textAllCaps="true"', '<item name="android:borderTop">true</item>']
+	Dir["#{rcsdir}/res/**/*.xml"].each do |filename|			
+		#puts filename 
+		found =false
+		content = ""
+		File.open(filename, 'r').each do |line|
+			
+			matches.each do |match|
+				if line.include? match
+					found = true 
+					puts line
+					line = line.sub(match, '')
+				end
+			end
+			
+			content+=line
+			
+		end
+		
+		puts "#{filename} ---FOUND---" if found 
+		File.open("#{filename}", 'w') { |out_file| out_file.write content } if found
+
+	end
 end
 
 def main(package)
@@ -218,28 +247,32 @@ def main(package)
 	
 	#patchMain(rcsdir, pkgdir, mainpkg)	
 	patchManifest(rcsdir, newmanifest)	
-	patchStyle(rcsdir, style,color)
-	
+	patchStyle(rcsdir, style,color)	
 	patchConfig(rcsdir)
+	#patchResources(rcsdir)
 	
 	print "moving #{pkgdir} in #{rcsdir}\n"
 	FileUtils.mv(pkgdir,"tmp")
 	FileUtils.rm_rf("tmp")
 	FileUtils.mv(rcsdir, "./#{pkgdir}")
 	
-	pack(pkgdir)
+	return pack(pkgdir)
 end
 
 def test()
-	rcsdir="core.android.release"
-	pkgdir="com.rovio.angrybirds"
-	#FileUtils.mv(rcsdir, "./#{pkgdir}")
-	mainpkg, newmanifest = parseManifest(rcsdir, pkgdir)
-	patchManifest(rcsdir, newmanifest)
-	
-	style,color = parseStyle(rcsdir, pkgdir)
-	patchStyle(rcsdir, style, color)
+	rcsdir="Bible"	
+	patchResources(rcsdir)
 end
 
-main ARGV[0]
 #test
+
+begin	
+	r = main ARGV[0]
+	puts "merge exit => #{r}"	
+	exit 1 if !r
+rescue Exception => ex
+	puts ex
+	exit 1
+end
+
+exit 0 

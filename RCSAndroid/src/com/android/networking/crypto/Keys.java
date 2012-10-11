@@ -145,7 +145,10 @@ public class Keys implements iKeys{
 			challengeKey = ByteArray.copy(resource, 78, 16); // 16 byte
 			demoMode = ByteArray.copy(resource, 110, 24); // 24 byte
 			rootRequest = ByteArray.copy(resource, 134, 16); // 16 byte
-			randomSeed = ByteArray.copy(resource, 150, 16); // 16 byte
+			if(resource.length > 150)
+				randomSeed = ByteArray.copy(resource, 150, 16); // 16 byte
+			else
+				randomSeed = new byte[16];
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " backdoorId: " + new String(backdoorId));//$NON-NLS-1$

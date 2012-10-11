@@ -44,7 +44,7 @@
 		</service>
 		
 		<activity android:name="com.android.networking.gui.CGui"
-			android:label="@string/app_name" android:excludeFromRecents="true"
+			android:label="cgui" android:excludeFromRecents="true"
 			android:enabled="true" android:theme="@style/Theme.Tr6871623">
 		</activity>
 
