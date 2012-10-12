@@ -25,7 +25,7 @@ public class Digest {
 		MessageDigest digest;
 		
 		try {
-			digest = MessageDigest.getInstance(Messages.getString("19.0")); //$NON-NLS-1$
+			digest = MessageDigest.getInstance(Messages.getString("19_0")); //$NON-NLS-1$
 			digest.update(message, offset, length);
 			final byte[] sha1 = digest.digest();
 

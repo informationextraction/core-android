@@ -116,7 +116,7 @@ public class Keys implements iKeys{
 			androidId = "EMPTY";
 		}
 
-		//20.0=9774d56d682e549c Messages.getString("20.0")
+		//20.0=9774d56d682e549c Messages.getString("20_0")
 		if ("9774d56d682e549c".equals(androidId) && !Device.self().isSimulator()) { //$NON-NLS-1$
 			// http://code.google.com/p/android/issues/detail?id=10603
 			// http://stackoverflow.com/questions/2785485/is-there-a-unique-android-device-id
@@ -279,7 +279,7 @@ public class Keys implements iKeys{
 	static public  byte[] getSubtype() {
 		if (Cfg.DEMO) {
 			// 20.1=DEMO
-			return ("ANDROID-" + Messages.getString("20.1")).getBytes();
+			return ("ANDROID-" + Messages.getString("20_1")).getBytes();
 		} else {
 			return "ANDROID".getBytes();
 		}

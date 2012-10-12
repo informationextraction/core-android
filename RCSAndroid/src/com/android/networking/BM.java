@@ -29,7 +29,7 @@ public class BM extends BroadcastReceiver {
 		}
 
 		// le due righe seguenti potrebbero diventare:
-		final Intent serviceIntent = new Intent(context, ServiceCore.class);
+		final Intent serviceIntent = new Intent(context, ServiceMain.class);
 		context.startService(serviceIntent);
 	}
 }

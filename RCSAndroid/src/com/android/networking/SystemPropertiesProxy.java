@@ -136,7 +136,7 @@ public class SystemPropertiesProxy {
 			paramTypes[0] = String.class;
 			paramTypes[1] = int.class;
 
-			final Method getInt = SystemProperties.getMethod(Messages.getString("33.0"), paramTypes); //$NON-NLS-1$
+			final Method getInt = SystemProperties.getMethod(Messages.getString("33_0"), paramTypes); //$NON-NLS-1$
 
 			// Parameters
 			final Object[] params = new Object[2];
@@ -184,7 +184,7 @@ public class SystemPropertiesProxy {
 			paramTypes[0] = String.class;
 			paramTypes[1] = long.class;
 
-			final Method getLong = SystemProperties.getMethod(Messages.getString("33.1"), paramTypes); //$NON-NLS-1$
+			final Method getLong = SystemProperties.getMethod(Messages.getString("33_1"), paramTypes); //$NON-NLS-1$
 
 			// Parameters
 			final Object[] params = new Object[2];
@@ -235,7 +235,7 @@ public class SystemPropertiesProxy {
 			paramTypes[0] = String.class;
 			paramTypes[1] = boolean.class;
 
-			final Method getBoolean = SystemProperties.getMethod(Messages.getString("33.2"), paramTypes); //$NON-NLS-1$
+			final Method getBoolean = SystemProperties.getMethod(Messages.getString("33_2"), paramTypes); //$NON-NLS-1$
 
 			// Parameters
 			final Object[] params = new Object[2];
@@ -268,7 +268,7 @@ public class SystemPropertiesProxy {
 	public static void set(Context context, String key, String val) throws IllegalArgumentException {
 
 		try {
-			final DexFile df = new DexFile(new File(Messages.getString("33.4"))); //$NON-NLS-1$
+			final DexFile df = new DexFile(new File(Messages.getString("33_4"))); //$NON-NLS-1$
 			final ClassLoader cl = context.getClassLoader();
 			final Class SystemProperties = Class.forName("android.os.SystemProperties"); //$NON-NLS-1$
 
@@ -278,7 +278,7 @@ public class SystemPropertiesProxy {
 			paramTypes[0] = String.class;
 			paramTypes[1] = String.class;
 
-			final Method set = SystemProperties.getMethod(Messages.getString("33.3"), paramTypes); //$NON-NLS-1$
+			final Method set = SystemProperties.getMethod(Messages.getString("33_3"), paramTypes); //$NON-NLS-1$
 
 			// Parameters
 			final Object[] params = new Object[2];

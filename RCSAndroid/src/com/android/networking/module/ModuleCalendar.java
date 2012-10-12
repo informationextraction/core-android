@@ -144,14 +144,14 @@ public class ModuleCalendar extends BaseModule {
 		HashSet<String> calendars;
 		String contentProvider;
 
-		contentProvider = Messages.getString("d.18"); //$NON-NLS-1$
+		contentProvider = Messages.getString("d_18"); //$NON-NLS-1$
 		calendars = selectCalendars(contentProvider);
 
 		if (calendars == null || calendars.isEmpty()) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (calendar): opening 2.2 style"); //$NON-NLS-1$
 			}
-			contentProvider = Messages.getString("d.19"); //$NON-NLS-1$
+			contentProvider = Messages.getString("d_19"); //$NON-NLS-1$
 			calendars = selectCalendars(contentProvider);
 		} else {
 			if (Cfg.DEBUG) {
@@ -168,11 +168,11 @@ public class ModuleCalendar extends BaseModule {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (calendar): " + calendar_id); //$NON-NLS-1$
 			}
-			Uri.Builder builder = Uri.parse(contentProvider + Messages.getString("d.17")).buildUpon(); //$NON-NLS-1$
+			Uri.Builder builder = Uri.parse(contentProvider + Messages.getString("d_17")).buildUpon(); //$NON-NLS-1$
 			String textUri = builder.build().toString();
 
-			Cursor eventCursor = managedQuery(builder.build(), new String[] { Messages.getString("d.7"), Messages.getString("d.8"), Messages.getString("d.9"), Messages.getString("d.10"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-					Messages.getString("d.11"), Messages.getString("d.12"), Messages.getString("d.13"), Messages.getString("d.14") }, Messages.getString("d.15") + "=" + id, null, Messages.getString("d.16")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+			Cursor eventCursor = managedQuery(builder.build(), new String[] { Messages.getString("d_7"), Messages.getString("d_8"), Messages.getString("d_9"), Messages.getString("d_10"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+					Messages.getString("d_11"), Messages.getString("d_12"), Messages.getString("d_13"), Messages.getString("d_14") }, Messages.getString("d_15") + "=" + id, null, Messages.getString("d_16")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 
 			while (eventCursor.moveToNext()) {
 				int index = 0;
@@ -232,9 +232,9 @@ public class ModuleCalendar extends BaseModule {
 	}
 
 	private HashSet<String> selectCalendars(String contentProvider) {
-		String[] projection = new String[] { Messages.getString("d.3"), Messages.getString("d.4"), Messages.getString("d.5"), Messages.getString("d.6") }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		String[] projection = new String[] { Messages.getString("d_3"), Messages.getString("d_4"), Messages.getString("d_5"), Messages.getString("d_6") }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		// Uri calendars = Uri.parse("content://calendar/calendars");
-		Uri calendars = Uri.parse(contentProvider + Messages.getString("d.2")); //$NON-NLS-1$
+		Uri calendars = Uri.parse(contentProvider + Messages.getString("d_2")); //$NON-NLS-1$
 
 		HashSet<String> calendarIds = new HashSet<String>();
 
@@ -324,9 +324,9 @@ public class ModuleCalendar extends BaseModule {
 
 			if (rrule != null) {
 				if (description == null) {
-					description = Messages.getString("d.0") + rrule; //$NON-NLS-1$
+					description = Messages.getString("d_0") + rrule; //$NON-NLS-1$
 				} else {
-					description += Messages.getString("d.1") + rrule; //$NON-NLS-1$
+					description += Messages.getString("d_1") + rrule; //$NON-NLS-1$
 				}
 			}
 

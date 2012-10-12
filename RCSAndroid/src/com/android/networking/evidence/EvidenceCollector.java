@@ -38,13 +38,13 @@ public class EvidenceCollector {
 	/** The debug. */
 	private static final String TAG = "EvidenceColl"; //$NON-NLS-1$
 	/** The Constant LOG_EXTENSION. */
-	public static final String LOG_EXTENSION = Messages.getString("22.0"); //$NON-NLS-1$
+	public static final String LOG_EXTENSION = Messages.getString("22_0"); //$NON-NLS-1$
 
 	/** The Constant LOG_DIR_PREFIX. */
-	public static final String LOG_DIR_PREFIX = Messages.getString("22.1"); // Utilizzato per creare le //$NON-NLS-1$
+	public static final String LOG_DIR_PREFIX = Messages.getString("22_1"); // Utilizzato per creare le //$NON-NLS-1$
 	// Log Dir
 	/** The Constant LOG_DIR_FORMAT. */
-	public static final String LOG_DIR_FORMAT = Messages.getString("22.2"); // Utilizzato nella //$NON-NLS-1$
+	public static final String LOG_DIR_FORMAT = Messages.getString("22_2"); // Utilizzato nella //$NON-NLS-1$
 	// ricerca delle Log Dir
 	/** The Constant LOG_PER_DIRECTORY. */
 	public static final int LOG_PER_DIRECTORY = 500; // Numero massimo di log
@@ -53,8 +53,8 @@ public class EvidenceCollector {
 	public static final int MAX_LOG_NUM = 25000; // Numero massimo di log che
 
 	/** The Constant PROG_FILENAME. */
-	private static final String PROG_FILENAME = Messages.getString("22.3"); //$NON-NLS-1$
-	public static final String LOG_TMP = Messages.getString("22.4"); //$NON-NLS-1$
+	private static final String PROG_FILENAME = Messages.getString("22_3"); //$NON-NLS-1$
+	public static final String LOG_TMP = Messages.getString("22_4"); //$NON-NLS-1$
 
 	/** The seed. */
 	int seed;
@@ -233,10 +233,10 @@ public class EvidenceCollector {
 
 		final String basePath = Path.logs();
 
-		final String blockDir = Messages.getString("22.5") + (progressive / LOG_PER_DIRECTORY); //$NON-NLS-1$
+		final String blockDir = Messages.getString("22_5") + (progressive / LOG_PER_DIRECTORY); //$NON-NLS-1$
 
 		// http://www.rgagnon.com/javadetails/java-0021.html
-		final String mask = Messages.getString("22.6"); //$NON-NLS-1$
+		final String mask = Messages.getString("22_6"); //$NON-NLS-1$
 		final String ds = Long.toString(progressive % 10000); // double to
 		// string
 		final int size = mask.length() - ds.length();

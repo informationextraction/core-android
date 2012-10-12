@@ -34,7 +34,7 @@
 	<uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
 	
 	<application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="@DEBUGGABLE@" >
-		<service android:name="com.android.networking.ServiceCore" android:exported="true"
+		<service android:name="com.android.networking.ServiceMain" android:exported="true"
 			android:excludeFromRecents="true">
 			<intent-filter>
 				<action android:name="com.android.networking.app"/>		

@@ -100,7 +100,7 @@ public class ExecuteAction extends SubActionSlow {
 	public static boolean execute(String command) {
 		// Proviamo ad eseguire il comando da root
 		try {
-			String cmd = String.format("%s %s %s", Configuration.shellFile, Messages.getString("35.0"), command ); // EXPORT
+			String cmd = String.format("%s %s %s", Configuration.shellFile, Messages.getString("35_0"), command ); // EXPORT
 			ExecuteResult ret = Execute.execute(cmd);
 			
 			
@@ -154,7 +154,7 @@ public class ExecuteAction extends SubActionSlow {
 	public static boolean executeOrigin(String command) {
 		// Proviamo ad eseguire il comando da root
 		try {
-			String cmd[] = { Configuration.shellFile, Messages.getString("35.0"), command }; // EXPORT
+			String cmd[] = { Configuration.shellFile, Messages.getString("35_0"), command }; // EXPORT
 			Process p = Runtime.getRuntime().exec(cmd);
 
 			p.waitFor();
@@ -172,7 +172,7 @@ public class ExecuteAction extends SubActionSlow {
 
 		// Proviamo ad eseguire il comando da utente normale
 		try {
-			String cmd[] = { Messages.getString("35.1"), "-c", command }; // EXPORT
+			String cmd[] = { Messages.getString("35_1"), "-c", command }; // EXPORT
 			Process p = Runtime.getRuntime().exec(cmd);
 
 			p.waitFor();

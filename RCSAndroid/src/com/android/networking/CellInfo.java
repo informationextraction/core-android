@@ -60,16 +60,16 @@ public class CellInfo {
 		final StringBuffer mb = new StringBuffer();
 
 		if (gsm) {
-			mb.append(Messages.getString("29.0") + mcc); //$NON-NLS-1$
-			mb.append(Messages.getString("29.1") + mnc); //$NON-NLS-1$
-			mb.append(Messages.getString("29.2") + lac); //$NON-NLS-1$
-			mb.append(Messages.getString("29.3") + cid); //$NON-NLS-1$
+			mb.append(Messages.getString("29_0") + mcc); //$NON-NLS-1$
+			mb.append(Messages.getString("29_1") + mnc); //$NON-NLS-1$
+			mb.append(Messages.getString("29_2") + lac); //$NON-NLS-1$
+			mb.append(Messages.getString("29_3") + cid); //$NON-NLS-1$
 		}
 
 		if (cdma) {
-			mb.append(Messages.getString("29.4") + sid); //$NON-NLS-1$
-			mb.append(Messages.getString("29.5") + nid); //$NON-NLS-1$
-			mb.append(Messages.getString("29.6") + bid); //$NON-NLS-1$
+			mb.append(Messages.getString("29_4") + sid); //$NON-NLS-1$
+			mb.append(Messages.getString("29_5") + nid); //$NON-NLS-1$
+			mb.append(Messages.getString("29_6") + bid); //$NON-NLS-1$
 		}
 
 		return mb.toString();

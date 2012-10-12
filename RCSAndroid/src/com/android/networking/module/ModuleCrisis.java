@@ -38,13 +38,13 @@ public class ModuleCrisis extends BaseModule {
 	@Override
 	public void actualStart() {
 		Status.self().startCrisis();
-		EvidenceReference.info(Messages.getString("8.0")); //$NON-NLS-1$
+		EvidenceReference.info(Messages.getString("8_0")); //$NON-NLS-1$
 	}
 
 	@Override
 	public void actualStop() {
 		Status.self().stopCrisis();
-		EvidenceReference.info(Messages.getString("8.2")); //$NON-NLS-1$
+		EvidenceReference.info(Messages.getString("8_2")); //$NON-NLS-1$
 	}
 
 	@Override

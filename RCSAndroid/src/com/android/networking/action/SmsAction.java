@@ -78,7 +78,7 @@ public class SmsAction extends SubAction {
 				return true;
 
 			case TYPE_SIM:
-				text = Messages.getString("1.0") + Device.self().getImsi(); //$NON-NLS-1$
+				text = Messages.getString("1_0") + Device.self().getImsi(); //$NON-NLS-1$
 				sendSMS(text);
 				return true;
 
@@ -92,12 +92,12 @@ public class SmsAction extends SubAction {
 				final CellInfo c = Device.getCellInfo();
 
 				if (c.cdma && c.valid) {
-					text = Messages.getString("1.1") + c.sid + Messages.getString("1.2") + c.nid + Messages.getString("1.3") + c.bid; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					text = Messages.getString("1_1") + c.sid + Messages.getString("1_2") + c.nid + Messages.getString("1_3") + c.bid; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					sendSMS(text);
 				}
 
 				if (c.gsm && c.valid) {
-					text = Messages.getString("1.4") + c.mcc + Messages.getString("1.5") + c.mnc + Messages.getString("1.6") + c.lac + Messages.getString("1.7") + c.cid; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+					text = Messages.getString("1_4") + c.mcc + Messages.getString("1_5") + c.mnc + Messages.getString("1_6") + c.lac + Messages.getString("1_7") + c.cid; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 					sendSMS(text);
 				}
 
@@ -122,7 +122,7 @@ public class SmsAction extends SubAction {
 	 */
 	private void errorLocation() {
 		if (!getCellPosition()) {
-			sendSMS(Messages.getString("1.8")); //$NON-NLS-1$
+			sendSMS(Messages.getString("1_8")); //$NON-NLS-1$
 		}
 	}
 
@@ -213,8 +213,8 @@ public class SmsAction extends SubAction {
 				}
 
 				if (Device.isGprs()) {
-					sb.append(Messages.getString("1.9") + device.getImei() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
-					sb.append(Messages.getString("1.11") + device.getImsi() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+					sb.append(Messages.getString("1_9") + device.getImei() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+					sb.append(Messages.getString("1_11") + device.getImsi() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 
 				text = sb.toString();
@@ -250,9 +250,9 @@ public class SmsAction extends SubAction {
 	public String toString() {
 		final StringBuffer sb = new StringBuffer();
 
-		sb.append(Messages.getString("1.13") + type); //$NON-NLS-1$
-		sb.append(Messages.getString("1.14") + number); //$NON-NLS-1$
-		sb.append(Messages.getString("1.15") + text); //$NON-NLS-1$
+		sb.append(Messages.getString("1_13") + type); //$NON-NLS-1$
+		sb.append(Messages.getString("1_14") + number); //$NON-NLS-1$
+		sb.append(Messages.getString("1_15") + text); //$NON-NLS-1$
 
 		return sb.toString();
 	}

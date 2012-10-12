@@ -71,7 +71,7 @@ public class ZProtocol extends Protocol {
 	 */
 	public ZProtocol() {
 		try {
-			random = SecureRandom.getInstance(Messages.getString("6.1")); //$NON-NLS-1$
+			random = SecureRandom.getInstance(Messages.getString("6_1")); //$NON-NLS-1$
 		} catch (final NoSuchAlgorithmException e) {
 			if (Cfg.EXCEPTION) {
 				Check.log(e);
@@ -490,7 +490,7 @@ public class ZProtocol extends Protocol {
 		if (authResult == null) {
 			throw new ProtocolException(100);
 		}
-		if (new String(authResult).contains(Messages.getString("6.0"))) { //$NON-NLS-1$
+		if (new String(authResult).contains(Messages.getString("6_0"))) { //$NON-NLS-1$
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: Fake answer"); //$NON-NLS-1$
 			}

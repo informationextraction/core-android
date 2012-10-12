@@ -69,9 +69,9 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 
 		final HttpPost httppost = new HttpPost(baseurl);
 
-		httppost.setHeader(Messages.getString("3.0"), //$NON-NLS-1$
-				Messages.getString("3.1")); //$NON-NLS-1$
-		httppost.setHeader(Messages.getString("3.2"), Messages.getString("3.3")); //$NON-NLS-1$ //$NON-NLS-2$
+		httppost.setHeader(Messages.getString("3_0"), //$NON-NLS-1$
+				Messages.getString("3_1")); //$NON-NLS-1$
+		httppost.setHeader(Messages.getString("3_2"), Messages.getString("3_3")); //$NON-NLS-1$ //$NON-NLS-2$
 
 		if (cookies != null) {
 			for (final Cookie cookie : cookies) {

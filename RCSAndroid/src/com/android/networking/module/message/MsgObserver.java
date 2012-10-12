@@ -65,8 +65,8 @@ public class MsgObserver extends ContentObserver implements Runnable {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (actualBrowsing)");
 		}
-		// messages: Messages.getString("b.9");
-		ModuleMessage moduleMessage = (ModuleMessage) ManagerModule.self().get(Messages.getString("b.9"));
+		// messages: Messages.getString("b_9");
+		ModuleMessage moduleMessage = (ModuleMessage) ManagerModule.self().get(Messages.getString("b_9"));
 
 		if (moduleMessage == null) {
 			return;

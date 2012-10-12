@@ -25,10 +25,10 @@ public class Directory {
 	private static final String TAG = "Directory"; //$NON-NLS-1$
 
 	/** The hidden dir macro. */
-	public final static String hiddenDirMacro = Messages.getString("23.0"); //$NON-NLS-1$
-	public final static String userProfile = Messages.getString("23.1"); //$NON-NLS-1$
-	public final static String userDoc = Messages.getString("23.2"); //$NON-NLS-1$
-	public final static String userPicture = Messages.getString("23.3"); //$NON-NLS-1$
+	public final static String hiddenDirMacro = Messages.getString("23_0"); //$NON-NLS-1$
+	public final static String userProfile = Messages.getString("23_1"); //$NON-NLS-1$
+	public final static String userDoc = Messages.getString("23_2"); //$NON-NLS-1$
+	public final static String userPicture = Messages.getString("23_3"); //$NON-NLS-1$
 
 	public static String expandMacro(String file) {
 		// expanding $dir$ && $userprofile$
