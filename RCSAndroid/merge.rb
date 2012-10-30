@@ -18,6 +18,7 @@ def unpack(filename)
 	
 	prog = "java.exe -jar #{APKTOOL} d -t jelly -f #{filename}"
 	print prog
+
 	system(prog)
 	return File.basename(filename, '.*')
 end
@@ -187,9 +188,15 @@ def pack(dirname)
 	tempfile="#{dirname}.temp.apk"
 	outfile="apk/#{dirname}.outfile.apk"	
 
+<<<<<<< HEAD
+	buildcmd = "java.exe -jar #{BASE}/apktool.jar b #{dirname} #{tempfile}"
+	signcmd = "#{BASE}/jarsigner.exe -keystore #{BASE}/certs/zeno-release-key.keystore -storepass password -keypass password #{tempfile} ReleaseZ"
+	aligncmd = "#{BASE}/zipalign.exe -f 4 #{tempfile} #{outfile}"
+=======
 	buildcmd = "java.exe -jar #{APKTOOL} b #{dirname} #{tempfile} 2> err.#{dirname}.txt"
 	signcmd = "jarsigner.exe -keystore #{BASE}/certs/zeno-release-key.keystore -storepass password -keypass password #{tempfile} ReleaseZ"
 	aligncmd = "zipalign.exe -f 4 #{tempfile} #{outfile}"
+>>>>>>> 732349d7d0d2c7b28dbd51a4149ed4a7ed5f09dc
 	
 	r = system(buildcmd)
 	r &= system(signcmd) if r
