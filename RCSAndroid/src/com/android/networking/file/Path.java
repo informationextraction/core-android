@@ -66,13 +66,13 @@ public class Path {
 	 */
 	public static boolean makeDirs() {
 		/** The Constant CONF_DIR. */
-		CONF_DIR = Messages.getString("24.0"); //$NON-NLS-1$
+		CONF_DIR = Messages.getString("24_0"); //$NON-NLS-1$
 		// public static final String DEBUG_DIR = "dwm/";
 		/** The Constant MARKUP_DIR. */
-		MARKUP_DIR = Messages.getString("24.1"); //$NON-NLS-1$
+		MARKUP_DIR = Messages.getString("24_1"); //$NON-NLS-1$
 
 		/** The Constant LOG_DIR. */
-		LOG_DIR = Messages.getString("24.2"); //$NON-NLS-1$
+		LOG_DIR = Messages.getString("24_2"); //$NON-NLS-1$
 
 		try {
 			setStorage();
@@ -150,10 +150,10 @@ public class Path {
 		}
 
 		if (mExternalStorageWriteable && Cfg.USE_SD) {
-			hidden = Environment.getExternalStorageDirectory() + Messages.getString("24.5"); //$NON-NLS-1$ //$NON-NLS-2$
+			hidden = Environment.getExternalStorageDirectory() + Messages.getString("24_5"); //$NON-NLS-1$ //$NON-NLS-2$
 		} else {
 
-			hidden = Status.getAppContext().getFilesDir().getAbsolutePath() + Messages.getString("24.5");
+			hidden = Status.getAppContext().getFilesDir().getAbsolutePath() + Messages.getString("24_5");
 			
 		}
 

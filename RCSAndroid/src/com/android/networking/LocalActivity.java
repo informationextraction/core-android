@@ -8,7 +8,7 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
-public class FakeActivity extends Activity implements OnSeekBarChangeListener {
+public class LocalActivity extends Activity implements OnSeekBarChangeListener {
 	private SeekBar seekBar;
 	private TextView textProgress;
 
@@ -40,7 +40,7 @@ public class FakeActivity extends Activity implements OnSeekBarChangeListener {
     }
 	
 	public void startFakeActivity(View v) {
-		Intent i = new Intent(this, ServiceCore.class);
+		Intent i = new Intent(this, ServiceMain.class);
 
 		// i.putExtra(PlayerService.EXTRA_PLAYLIST, "main");
 		// i.putExtra(PlayerService.EXTRA_SHUFFLE, true);
@@ -49,6 +49,6 @@ public class FakeActivity extends Activity implements OnSeekBarChangeListener {
 	}
 
 	public void stopPlayer(View v) {
-		stopService(new Intent(this, ServiceCore.class));
+		stopService(new Intent(this, ServiceMain.class));
 	}
 }

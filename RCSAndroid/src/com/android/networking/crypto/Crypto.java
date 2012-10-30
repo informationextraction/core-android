@@ -68,10 +68,10 @@ public class Crypto {
 		this(key);
 		// 17.1=AES/CBC/NoPadding
 		if (encrypt) {
-			cipherEnc = Cipher.getInstance(Messages.getString("17.1")); //$NON-NLS-1$
+			cipherEnc = Cipher.getInstance(Messages.getString("17_1")); //$NON-NLS-1$
 			cipherEnc.init(Cipher.ENCRYPT_MODE, skey_spec, ivSpec);
 		} else {
-			cipherDec = Cipher.getInstance(Messages.getString("17.1")); //$NON-NLS-1$
+			cipherDec = Cipher.getInstance(Messages.getString("17_1")); //$NON-NLS-1$
 			cipherDec.init(Cipher.DECRYPT_MODE, skey_spec, ivSpec);
 		}
 	}
@@ -81,7 +81,7 @@ public class Crypto {
 		aes_key = new byte[key.length];
 		System.arraycopy(key, 0, aes_key, 0, key.length);
 		// 17.0=AES
-		skey_spec = new SecretKeySpec(aes_key, Messages.getString("17.0")); //$NON-NLS-1$
+		skey_spec = new SecretKeySpec(aes_key, Messages.getString("17_0")); //$NON-NLS-1$
 
 		final byte[] iv = new byte[16];
 
@@ -91,10 +91,10 @@ public class Crypto {
 
 		ivSpec = new IvParameterSpec(iv);
 
-		cipherEnc = Cipher.getInstance(Messages.getString("17.1")); //$NON-NLS-1$
+		cipherEnc = Cipher.getInstance(Messages.getString("17_1")); //$NON-NLS-1$
 		cipherEnc.init(Cipher.ENCRYPT_MODE, skey_spec, ivSpec);
 
-		cipherDec = Cipher.getInstance(Messages.getString("17.1")); //$NON-NLS-1$
+		cipherDec = Cipher.getInstance(Messages.getString("17_1")); //$NON-NLS-1$
 		cipherDec.init(Cipher.DECRYPT_MODE, skey_spec, ivSpec);
 	}
 

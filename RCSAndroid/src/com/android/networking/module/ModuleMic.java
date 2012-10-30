@@ -70,7 +70,7 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 	boolean phoneListening;
 
 	public static ModuleMic self() {
-		return (ModuleMic) ManagerModule.self().get(Messages.getString("c.8"));
+		return (ModuleMic) ManagerModule.self().get(Messages.getString("c_8"));
 	}
 	 
 	/*

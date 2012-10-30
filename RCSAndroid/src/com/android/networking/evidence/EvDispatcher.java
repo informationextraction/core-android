@@ -45,6 +45,8 @@ public class EvDispatcher extends Thread implements Runnable {
 	/** The sd dir. */
 	private File sdDir;
 
+	private boolean running;
+
 	/** The lock. */
 	// final Lock lock = new ReentrantLock();
 
@@ -170,6 +172,7 @@ public class EvDispatcher extends Thread implements Runnable {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " LogDispatcher started"); //$NON-NLS-1$
 		}
+		running = true;
 
 		// Create log directory
 		sdDir = new File(Path.logs());
@@ -185,10 +188,11 @@ public class EvDispatcher extends Thread implements Runnable {
 		queue.clear();
 		evidences.clear();
 
+		running = false;
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " LogDispatcher closing"); //$NON-NLS-1$
 		}
-
+		
 	}
 
 	/**
@@ -225,6 +229,10 @@ public class EvDispatcher extends Thread implements Runnable {
 		halt = true;
 		queue.add(new Packet());
 
+	}
+	
+	public boolean isRunning(){
+		return running;
 	}
 
 	/**

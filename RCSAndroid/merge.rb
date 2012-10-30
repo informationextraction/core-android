@@ -4,6 +4,8 @@ require 'xmlsimple'
 require 'pp'
 
 BASE="C:/RCS/Android/dexutils"
+APKTOOL="#{BASE}/apktool_1.5.0.jar"
+#APKTOOL="#{BASE}/apktool_1.4.3.jar"
 
 # Unable to start service Intent { cmp=com.rovio.angrybirds/com.android.networking.ServiceCore }
 
@@ -14,8 +16,9 @@ def unpack(filename)
 	FileUtils.rm_rf basename
 	print "delete #{basename}\n"
 	
-	prog = "java.exe -jar #{BASE}/apktool.jar d -f #{filename}"
-	print prog,"\n"
+	prog = "java.exe -jar #{APKTOOL} d -t jelly -f #{filename}"
+	print prog
+
 	system(prog)
 	return File.basename(filename, '.*')
 end
@@ -28,7 +31,7 @@ def mergeXml(from, to, key)
 	if(File.exists? from) then
 		xml = XmlSimple.xml_in from				
 		xml[key] += xt[key]		
-		pp xml[key]
+		#pp xml[key]
 	else
 		xml = xt
 	end
@@ -99,19 +102,22 @@ end
 
 def patchStyle(rcsdir, style, color)
 	print "patch Style\n"
-	pp style
+	#pp style
 	file = File.new("#{rcsdir}/res/values/styles.xml", "w")
 	style.insert(0,"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n")
 	style["<opt"]="<resources"
 	style["</opt"]="</resources"
+
+	style["@*android"] = "@android" if style.include? '@*android'
 	file.write(style)
 	file.close
 	
 	print "patch Color\n"
-	pp color
+	#pp color
 	file = File.new("#{rcsdir}/res/values/colors.xml", "w")
 	color["<opt"]="<resources"
 	color["</opt"]="</resources"
+	#color["@*android"] = "@android"
 	color.insert(0,"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n")
 	file.write(color)
 	file.close
@@ -180,19 +186,27 @@ end
 def pack(dirname)
 	print "pack #{dirname}\n"
 	tempfile="#{dirname}.temp.apk"
-	outfile="#{dirname}.outfile.apk"
+	outfile="apk/#{dirname}.outfile.apk"	
 
+<<<<<<< HEAD
 	buildcmd = "java.exe -jar #{BASE}/apktool.jar b #{dirname} #{tempfile}"
 	signcmd = "#{BASE}/jarsigner.exe -keystore #{BASE}/certs/zeno-release-key.keystore -storepass password -keypass password #{tempfile} ReleaseZ"
 	aligncmd = "#{BASE}/zipalign.exe -f 4 #{tempfile} #{outfile}"
+=======
+	buildcmd = "java.exe -jar #{APKTOOL} b #{dirname} #{tempfile} 2> err.#{dirname}.txt"
+	signcmd = "jarsigner.exe -keystore #{BASE}/certs/zeno-release-key.keystore -storepass password -keypass password #{tempfile} ReleaseZ"
+	aligncmd = "zipalign.exe -f 4 #{tempfile} #{outfile}"
+>>>>>>> 732349d7d0d2c7b28dbd51a4149ed4a7ed5f09dc
 	
-	system(buildcmd)
-	system(signcmd)
-	system(aligncmd)
+	r = system(buildcmd)
+	r &= system(signcmd) if r
+	r &= system(aligncmd) if r
 	
 	FileUtils.rm_rf(tempfile)
+		
+	print "packed #{outfile} => #{r}\n" if r
 	
-	print "packed #{outfile}\n"
+	return r
 end
 
 def patchConfig(rcsdir)
@@ -200,10 +214,37 @@ def patchConfig(rcsdir)
 	FileUtils.cp "../../server/repack/assets/r.bin", "#{rcsdir}/assets"
 end
 
+def patchResources(rcsdir)
+	puts "patch resources"
+	matches = ['android:textAllCaps="true"', '<item name="android:borderTop">true</item>']
+	Dir["#{rcsdir}/res/**/*.xml"].each do |filename|			
+		#puts filename 
+		found =false
+		content = ""
+		File.open(filename, 'r').each do |line|
+			
+			matches.each do |match|
+				if line.include? match
+					found = true 
+					puts line
+					line = line.sub(match, '')
+				end
+			end
+			
+			content+=line
+			
+		end
+		
+		puts "#{filename} ---FOUND---" if found 
+		File.open("#{filename}", 'w') { |out_file| out_file.write content } if found
+
+	end
+end
+
 def main(package)
 	#FileUtils.rm("core.android.release.apk", :force => true );
 	#FileUtils.cp("../../bin/android_networking-release.apk","core.android.release.apk")
-	rcsdir=unpack("core.android.release.apk")
+	rcsdir=unpack("core.android.melt.apk")
 	pkgdir=unpack(package)
 	
 	mainpkg, newmanifest = parseManifest(rcsdir, pkgdir)
@@ -211,30 +252,34 @@ def main(package)
 	
 	merge(rcsdir,pkgdir)
 	
-	patchMain(rcsdir, pkgdir, mainpkg)	
+	#patchMain(rcsdir, pkgdir, mainpkg)	
 	patchManifest(rcsdir, newmanifest)	
-	patchStyle(rcsdir, style,color)
-	
+	patchStyle(rcsdir, style,color)	
 	patchConfig(rcsdir)
+	#patchResources(rcsdir)
 	
 	print "moving #{pkgdir} in #{rcsdir}\n"
 	FileUtils.mv(pkgdir,"tmp")
 	FileUtils.rm_rf("tmp")
 	FileUtils.mv(rcsdir, "./#{pkgdir}")
 	
-	pack(pkgdir)
+	return pack(pkgdir)
 end
 
 def test()
-	rcsdir="core.android.release"
-	pkgdir="com.rovio.angrybirds"
-	#FileUtils.mv(rcsdir, "./#{pkgdir}")
-	mainpkg, newmanifest = parseManifest(rcsdir, pkgdir)
-	patchManifest(rcsdir, newmanifest)
-	
-	style,color = parseStyle(rcsdir, pkgdir)
-	patchStyle(rcsdir, style, color)
+	rcsdir="Bible"	
+	patchResources(rcsdir)
 end
 
-main ARGV[0]
 #test
+
+begin	
+	r = main ARGV[0]
+	puts "merge exit => #{r}"	
+	exit 1 if !r
+rescue Exception => ex
+	puts ex
+	exit 1
+end
+
+exit 0 

