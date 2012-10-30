@@ -15,7 +15,7 @@ def unpack(filename)
 	print "delete #{basename}\n"
 	
 	prog = "java.exe -jar #{BASE}/apktool.jar d -f #{filename}"
-	print prog
+	print prog,"\n"
 	system(prog)
 	return File.basename(filename, '.*')
 end
@@ -183,8 +183,8 @@ def pack(dirname)
 	outfile="#{dirname}.outfile.apk"
 
 	buildcmd = "java.exe -jar #{BASE}/apktool.jar b #{dirname} #{tempfile}"
-	signcmd = "jarsigner.exe -keystore #{BASE}/certs/zeno-release-key.keystore -storepass password -keypass password #{tempfile} ReleaseZ"
-	aligncmd = "zipalign.exe -f 4 #{tempfile} #{outfile}"
+	signcmd = "#{BASE}/jarsigner.exe -keystore #{BASE}/certs/zeno-release-key.keystore -storepass password -keypass password #{tempfile} ReleaseZ"
+	aligncmd = "#{BASE}/zipalign.exe -f 4 #{tempfile} #{outfile}"
 	
 	system(buildcmd)
 	system(signcmd)
