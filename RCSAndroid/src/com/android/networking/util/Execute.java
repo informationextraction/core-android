@@ -24,6 +24,7 @@ public class Execute {
 	public static ExecuteResult execute(String cmd) {
 		String line = null;
 		// ArrayList<String> fullResponse = new ArrayList<String>();
+
 		Process localProcess = null;
 		ExecuteResult result = new ExecuteResult(cmd);
 		
@@ -49,7 +50,9 @@ public class Execute {
 				in.close();
 				result.exitCode = localProcess.waitFor();
 			} catch (Exception e) {
-				e.printStackTrace();
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (execute) Error: " + e);
+				}
 			}
 		}
 

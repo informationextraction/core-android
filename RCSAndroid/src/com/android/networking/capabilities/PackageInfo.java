@@ -131,6 +131,9 @@ public class PackageInfo {
 
 		try {
 			// Verifichiamo di essere root
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (checkRoot), " + Configuration.shellFile);
+			}
 			final AutoFile file = new AutoFile(Configuration.shellFile);
 
 			if (file.exists() && file.canRead()) {

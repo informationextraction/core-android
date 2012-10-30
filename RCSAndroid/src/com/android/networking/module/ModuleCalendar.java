@@ -326,7 +326,7 @@ public class ModuleCalendar extends BaseModule {
 				if (description == null) {
 					description = Messages.getString("d_0") + rrule; //$NON-NLS-1$
 				} else {
-					description += Messages.getString("d_1") + rrule; //$NON-NLS-1$
+					description += " \n"+  Messages.getString("d_0") + rrule; //$NON-NLS-1$
 				}
 			}
 

