@@ -17,7 +17,7 @@ M_1=content://mms-sms
 M_10=text
 M_11=content://mms/part/
 M_12=UTF-8
-M_13=msg_id=
+M_13=msg_id
 M_14=content://mms/{0}/addr
 M_15=address
 M_5=content://mms/part

@@ -88,14 +88,15 @@ public abstract class SubAction {
 			String status = params.getString(Messages.getString("S_4")); //$NON-NLS-1$
 			if (status.equals(Messages.getString("S_5"))) { //$NON-NLS-1$
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " Factory *** ACTION_START_AGENT ***");//$NON-NLS-1$
+					Check.log(TAG + " Factory *** ACTION_START_MODULE ***");//$NON-NLS-1$
+					Check.log(TAG + " params: " + params );
 				}
 				
 				return new StartModuleAction(params);
 			} else if (status.equals(Messages.getString("S_6"))) { //$NON-NLS-1$
 
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " Factory *** ACTION_STOP_AGENT ***");//$NON-NLS-1$
+					Check.log(TAG + " Factory *** ACTION_STOP_MODULE ***");//$NON-NLS-1$
 				}
 				
 				return new StopModuleAction(params);

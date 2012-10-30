@@ -207,7 +207,7 @@ public class MmsBrowser {
 	}
 
 	private String getAddressNumber(String id) {
-		String selectionAdd = new String(Messages.getString("M_13") + id); //$NON-NLS-1$
+		String selectionAdd = new String(Messages.getString("M_13")+"=" + id); //$NON-NLS-1$
 		String uriStr = MessageFormat.format(Messages.getString("M_14"), id); //$NON-NLS-1$
 		Uri uriAddress = Uri.parse(uriStr);
 		Cursor cAdd = Status.getAppContext().getContentResolver().query(uriAddress, null, selectionAdd, null, null);

