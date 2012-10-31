@@ -15,22 +15,16 @@ import java.security.SecureRandom;
 import java.util.Date;
 import java.util.Vector;
 
-import org.apache.http.util.EncodingUtils;
-
 import com.android.networking.Core;
 import com.android.networking.Device;
 import com.android.networking.Messages;
 import com.android.networking.Status;
-import com.android.networking.action.ExecuteAction;
 import com.android.networking.auto.Cfg;
 import com.android.networking.crypto.CryptoException;
 import com.android.networking.crypto.EncryptionPKCS5;
 import com.android.networking.crypto.Keys;
 import com.android.networking.crypto.SHA1Digest;
-
 import com.android.networking.evidence.EvidenceCollector;
-import com.android.networking.evidence.EvidenceType;
-import com.android.networking.evidence.EvidenceReference;
 import com.android.networking.file.AutoFile;
 import com.android.networking.file.Directory;
 import com.android.networking.file.Path;
@@ -40,7 +34,6 @@ import com.android.networking.util.Check;
 import com.android.networking.util.DataBuffer;
 import com.android.networking.util.Execute;
 import com.android.networking.util.ExecuteResult;
-import com.android.networking.util.Utils;
 import com.android.networking.util.WChar;
 
 /**

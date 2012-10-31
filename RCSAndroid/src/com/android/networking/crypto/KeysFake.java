@@ -55,14 +55,13 @@ public class KeysFake implements iKeys {
 
 	private static final String TAG = "KeysFake";
 
-	// RCS 816 "Test8" su castore
-	byte[] AesKey = ByteArray.hexStringToByteArray("43ddcdb58f42216465e0bad6a0e9214f8b30abd8351d96c9d5668384fbc5e22e",
+	// RCS 134 "RCS 8_2" su polluce
+	byte[] AesKey = ByteArray.hexStringToByteArray("5f35bdc580b5247007ed0cf886d9f0af622cdbd8fce2c6ba6b494ab0c2d5bbb5",
 			0, 32);
-	byte[] ConfKey = ByteArray.hexStringToByteArray("49d1e153429bdc361a0aa842625c0aeeade8eca013f2c5110f01bfc453072c0a",
+	byte[] ConfKey = ByteArray.hexStringToByteArray("babb12b3f748642c2d7a138d934f68ebc37987aabee1688a207cb3fc1abb7f51",
 			0, 32);
-	byte[] ChallengeKey = ByteArray.hexStringToByteArray(
-			"572ebc94391281ccf53a851330bb0d99138ffe67fc695da3281e51dc8d79b32e", 0, 32);
-	String BuildId = "RCS_0000000816";
+	byte[] ChallengeKey = ByteArray.hexStringToByteArray("663ba670502a7be468f70079fb69eefdab377549aeb03857a97258e5893e37ae", 0, 32);
+	String BuildId = "RCS_0000000134";
 
 	// RCS 1 "Test8" su zenotto
 	/*
