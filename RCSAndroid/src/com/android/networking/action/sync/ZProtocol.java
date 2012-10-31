@@ -174,7 +174,7 @@ public class ZProtocol extends Protocol {
 	 */
 	private boolean authentication() throws TransportException, ProtocolException {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " Info: ***** Authentication ***** " + Keys.self().getInstanceId()); //$NON-NLS-1$
+			Check.log(TAG + " Info: ***** Authentication ***** "); //$NON-NLS-1$
 		}
 
 		// key init
