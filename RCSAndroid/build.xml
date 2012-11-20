@@ -355,7 +355,7 @@
 		<for list="default,v2" param="osversion">
 			<sequential>
 				<echo message="==============" />
-				<echo message="===  BUILD === ------------------------------------------------------------" />
+				<echo message="===  BUILD ===" />
 				<echo message="==============" />
 				<echo>Version @{osversion}</echo>
 
@@ -456,6 +456,8 @@
 	</target>
     
     <target name="ci">        
+        <echo>target ci</echo>
+        <touch file="AndroidManifest.xml" />
         <antcall target="build" />
         <var name="destdir" value="../dist/${do.release}/${build.number}.${timestamp.BUILD}" />
 		<echo>${destdir}</echo>
