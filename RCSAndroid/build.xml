@@ -29,6 +29,7 @@
 		</classpath>
 	</taskdef>
 
+    <copy file="preprocess/local_properties.txt" tofile="local.properties" overwrite="false"/>
 	<loadproperties srcFile="local.properties" />
 	<property file="ant.properties" />
 	<loadproperties srcFile="project.properties" />
@@ -454,9 +455,14 @@
 
 	</target>
     
-    <target name="ci">
-        <copy file="preprocess/local_properties.txt" toFile="./local.properties" overwrite="false" failonerror="false"/>
+    <target name="ci">        
         <antcall target="build" />
+        <var name="destdir" value="../dist/${do.release}/${build.number}.${timestamp.BUILD}" />
+		<echo>${destdir}</echo>
+		<mkdir dir="${destdir}" />
+
+		<antcall target="servercore" />
+		<copy file="server/android_${version}.zip" toDir="${destdir}" overwrite="true" />
     </target>
 
 </project>
