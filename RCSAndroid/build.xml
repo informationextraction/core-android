@@ -77,8 +77,11 @@
 	</target>
 
 	<target name="encrypt-messages" depends="salt">
+        <mkdir dir="assets" />
+    
 		<delete file="res/raw/messages.bin" />
 		<delete file="assets/m.bin" />
+        
 		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyMessages}" inputFile="preprocess/messages.properties.all" outputFile="assets/m.bin" />
 		<delete file="res/raw/statusdb.bin" />
 		<delete file="assets/s.bin" />
