@@ -458,7 +458,7 @@
     
     <target name="ci">        
         <echo>target ci</echo>
-        <touch file="AndroidManifest.xml" />
+        <copy file="preprocess/AndroidManifest.ACTIVITY.xml" tofile="AndroidManifest.xml" overwrite="false"/>
         <antcall target="build" />
         <var name="destdir" value="../dist/${do.release}/${build.number}.${timestamp.BUILD}" />
 		<echo>${destdir}</echo>
