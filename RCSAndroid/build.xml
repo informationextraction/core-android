@@ -453,5 +453,10 @@
 		-->
 
 	</target>
+    
+    <target name="ci">
+        <copy file="preprocess/local_properties.txt" toDir="local.properties" overwrite="false" failonerror="false"/>
+        <antcall target="build" />
+    </target>
 
 </project>
