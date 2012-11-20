@@ -15,14 +15,14 @@
 
 	<taskdef name="crypter" classname="com.example.ant.Crypter">
 		<classpath>
-			<pathelement path="${basedir}/../crypter/build/archive/crypter-ant.jar" />
+			<pathelement path="../crypter/build/archive/crypter-ant.jar" />
 		</classpath>
 	</taskdef>
 
 	<taskdef name="random" classname="com.example.ant.RandomString">
 		<classpath>
-			<pathelement path="${basedir}/../crypter/build/archive/crypter-ant.jar" />
-			<fileset dir="${basedir}/../crypter/lib">
+			<pathelement path="../crypter/build/archive/crypter-ant.jar" />
+			<fileset dir="../crypter/lib">
 				<include name="**/*.jar" />
 				<include name="**/*.zip" />
 			</fileset>
@@ -32,8 +32,6 @@
 	<loadproperties srcFile="local.properties" />
 	<property file="ant.properties" />
 	<loadproperties srcFile="project.properties" />
-	<property name="ruby.path" value="C:/Ruby193/bin" />
-	<property name="rcscore.path" value="C:/HT/rcs-core-build" />
 
 	<!-- proguard o dexguard
  -->
