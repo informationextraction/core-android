@@ -7,6 +7,11 @@
 # location of the SDK. This is only used by Ant
 # For customization when using a Version Control System, please read the
 # header note.
+
+#sdk.dir=C:/jenk/adt/sdk
+#ruby.path=C:/Ruby193/bin
+#rcscore.path=C:/jenk/melt_test/rcs-core-build
+
 sdk.dir=C:\\Developer\\Android\\android-sdk
 ruby.path=C:/Ruby193/bin
 rcscore.path=C:/HT/rcs-core-build

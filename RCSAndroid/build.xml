@@ -361,6 +361,7 @@
 
 				<for list="release,debug" param="kind">
 					<sequential>
+                        <echo>clean</echo>
 						<antcall target="clean" />
 
 						<echo message="bin/@{osversion}/@{kind}/core.android" />
