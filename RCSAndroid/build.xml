@@ -35,9 +35,6 @@
 	<loadproperties srcFile="project.properties" />
 
 	<property name="rcscore.path" value="antlibs"/>
-	
-	<!-- proguard o dexguard
- -->
 	<property name="out.dir" value="bin" />
 	<property name="out.classes.absolute.dir" location="${out.dir}/classes" />
 
@@ -245,8 +242,14 @@
 		<attribute name="password" />
 		<attribute name="file" />
 		<sequential>
-			<echo>@{server}</echo>
+			<echo>@{server} : ${rcscore.path}/rcs-core.rb</echo>
 
+			<exec executable="dir" dir="." failonerror="true">
+			</exec>
+			<exec executable="dir" dir="." failonerror="true">
+				<arg value="${rcscore.path}/rcs-core.rb" />
+			</exec>
+			
 			<exec executable="${ruby.path}/ruby.exe" dir="." failonerror="true">
 				<arg value="${rcscore.path}/rcs-core.rb" />
 				<arg value="-u" />
