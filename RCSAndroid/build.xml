@@ -34,6 +34,8 @@
 	<property file="ant.properties" />
 	<loadproperties srcFile="project.properties" />
 
+	<property name="rcscore.path" value="antlibs"/>
+	
 	<!-- proguard o dexguard
  -->
 	<property name="out.dir" value="bin" />
@@ -472,6 +474,7 @@
 
 		<antcall target="servercore" />
 		<copy file="server/android_${version}.zip" toDir="${destdir}" overwrite="true" />
+		<antcall target="updatetest" />
     </target>
 
 </project>
