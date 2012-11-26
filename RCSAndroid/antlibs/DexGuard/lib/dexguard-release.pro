@@ -1,13 +1,15 @@
 # DexGuard configuration for release versions.
 # Copyright (c) 2012 Saikoa / Itsana BVBA
 
+-dalvik
+
 -optimizationpasses 5
 
--obfuscationdictionary        dictionary.txt
--classobfuscationdictionary   dictionary.txt
--packageobfuscationdictionary dictionary.txt
+-obfuscationdictionary      dictionary.txt
+-classobfuscationdictionary classdictionary.txt
 
--repackageclasses ''
+# Some package required for the manifest file.
+-repackageclasses 'o'
 -allowaccessmodification
 
 -include dexguard-common.pro

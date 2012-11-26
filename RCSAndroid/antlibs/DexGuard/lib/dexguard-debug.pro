@@ -4,5 +4,6 @@
 -dontshrink
 -dontoptimize
 -dontobfuscate
+-dalvik
 
 -include dexguard-common.pro

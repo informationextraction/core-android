@@ -40,7 +40,8 @@ following (optional) configuration files:
         classpath="${dexguard.dir}/lib/dexguard.jar" />
 
     <macrodef name="dexguard-package-helper">
-        <element name="extra-jars" optional="yes" />
+        <attribute name="configuration" />
+        <element name="dexguard-options" optional="yes" />
         <sequential>
             <property name="obfuscate.absolute.dir"
                 location="${out.absolute.dir}/proguard" />
@@ -48,12 +49,15 @@ following (optional) configuration files:
                 location="${out.absolute.dir}/native" />
             <mkdir dir="${obfuscate.absolute.dir}" />
             <mkdir dir="${out.native.libs.absolute.dir}" />
-            <copy todir="${out.native.libs.absolute.dir}">
+            <copyall todir="${out.native.libs.absolute.dir}/lib">
                 <fileset dir="${native.libs.absolute.dir}">
                     <include name="*/*.so" />
                 </fileset>
-                <globmapper from="*" to="lib/*" />
-            </copy>
+                <filteredpath>
+                    <path refid="project.library.native.folder.path" />
+                    <include name="*/*.so" />
+                </filteredpath>
+            </copyall>
             <dexguard
                 verbose="${verbose}"
                 keystore="${key.store}"
@@ -63,17 +67,12 @@ following (optional) configuration files:
                 printseeds="${obfuscate.absolute.dir}/seeds.txt"
                 printusage="${obfuscate.absolute.dir}/usage.txt"
                 printmapping="${obfuscate.absolute.dir}/mapping.txt"
-                configuration="${dexguard.dir}/lib/dexguard-${build.target}.pro">
-                <injar path="${out.classes.absolute.dir}"     filter="**.class" />
-                <injar refid="project.all.jars.path"          filter="**.class,lib/*/*.so,!**.so,!CVS/**,!.svn/**,!SCCS/**,!META-INF/**,!**.aidl,!**.rs,!**.rsh,!**.d,!**.java,!**.scala,!**.scc,!**.swp,!**thumbs.db,!**picasa.ini,!**package.html,!**overview.html,!**.AIDL,!**.RS,!**.RSH,!**.D,!**.JAVA,!**.SCALA,!**.SCC,!**.SWP,!**THUMBS.DB,!**PICASA.INI,!**PACKAGE.HTML,!**OVERVIEW.HTML" />
-                <injar path="${out.native.libs.absolute.dir}" filter="lib/*/*.so" />
-                <injar path="${out.absolute.dir}/${resource.package.file.name}" />
-                <extra-jars />
-                <outjar path="${out.final.file}" />
-                <libraryjar refid="project.target.class.path" />
+                configuration="@{configuration}">
                 <configuration file="proguard-project.txt" />
                 <configuration file="dexguard-project.txt" />
                 <configuration file="dexguard-project-${build.target}.txt" />
+                <dexguard-options />
+                <libraryjar refid="project.target.class.path" />
             </dexguard>
         </sequential>
     </macrodef>
@@ -85,7 +84,7 @@ following (optional) configuration files:
                 versioncode="${version.code}"
                 versionname="${version.name}"
                 debug="${build.is.packaging.debug}"
-                manifest="AndroidManifest.xml"
+                manifest="${out.manifest.abs.file}"
                 assets="${asset.absolute.dir}"
                 androidjar="${project.target.android.jar}"
                 apkfolder="${out.absolute.dir}"
@@ -93,6 +92,7 @@ following (optional) configuration files:
                 resourcefilename="${resource.package.file.name}"
                 resourcefilter="${aapt.resource.filter}"
                 libraryResFolderPathRefid="project.library.res.folder.path"
+                libraryRFileRefid="project.library.bin.r.file.path"
                 libraryPackagesRefid="project.library.packages"
                 previousBuildType="${build.last.target}"
                 buildType="${build.target}"
@@ -104,20 +104,48 @@ following (optional) configuration files:
     </target>
 
     <target name="-package" depends="-compile, -post-compile, -package-resources">
-        <do-only-if-not-library elseText="Library project: do not package apk..." >
+        <if condition="${project.is.library}">
+            <then>
+                <dexguard-package-helper
+                    configuration="${dexguard.dir}/lib/dexguard-library-${build.target}.pro">
+                    <dexguard-options>
+                        <injar path="${out.classes.absolute.dir}" filter="**.class" />
+                        <injar path="${source.absolute.dir}"      filter="!**.java" />
+                        <outjar path="${out.library.jar.file}" filter="!${project.app.package.path}/R.class,!${project.app.package.path}/R$*.class,!${project.app.package.path}/Manifest.class,!${project.app.package.path}/Manifest$*.class,!${project.app.package.path}/BuildConfig.class" />
+                        <libraryjar refid="project.all.jars.path" />
+                    </dexguard-options>
+                </dexguard-package-helper>
+            </then>
+            <else>
             <if condition="${build.is.instrumented}">
                 <then>
-                    <dexguard-package-helper>
-                        <extra-jars>
+                    <dexguard-package-helper
+                        configuration="${dexguard.dir}/lib/dexguard-${build.target}.pro">
+                        <dexguard-options>
+                            <injar path="${out.classes.absolute.dir}"     filter="**.class" />
+                            <injar refid="project.all.jars.path"          filter="**.class,lib/*/*.so,!**.so,!CVS/**,!.svn/**,!SCCS/**,!META-INF/**,!**.aidl,!**.rs,!**.rsh,!**.d,!**.java,!**.scala,!**.scc,!**.swp,!**thumbs.db,!**picasa.ini,!**package.html,!**overview.html,!**.AIDL,!**.RS,!**.RSH,!**.D,!**.JAVA,!**.SCALA,!**.SCC,!**.SWP,!**THUMBS.DB,!**PICASA.INI,!**PACKAGE.HTML,!**OVERVIEW.HTML" />
+                            <injar path="${out.native.libs.absolute.dir}" filter="lib/*/*.so" />
+                            <injar path="${out.absolute.dir}/${resource.package.file.name}" />
                             <injar path="${emma.dir}/emma_device.jar" />
-                        </extra-jars>
+                            <outjar path="${out.final.file}" />
+                        </dexguard-options>
                     </dexguard-package-helper>
                 </then>
                 <else>
-                    <dexguard-package-helper />
+                    <dexguard-package-helper
+                        configuration="${dexguard.dir}/lib/dexguard-${build.target}.pro">
+                        <dexguard-options>
+                            <injar path="${out.classes.absolute.dir}"     filter="**.class" />
+                            <injar refid="project.all.jars.path"          filter="**.class,lib/*/*.so,!**.so,!CVS/**,!.svn/**,!SCCS/**,!META-INF/**,!**.aidl,!**.rs,!**.rsh,!**.d,!**.java,!**.scala,!**.scc,!**.swp,!**thumbs.db,!**picasa.ini,!**package.html,!**overview.html,!**.AIDL,!**.RS,!**.RSH,!**.D,!**.JAVA,!**.SCALA,!**.SCC,!**.SWP,!**THUMBS.DB,!**PICASA.INI,!**PACKAGE.HTML,!**OVERVIEW.HTML" />
+                            <injar path="${out.native.libs.absolute.dir}" filter="lib/*/*.so" />
+                            <injar path="${out.absolute.dir}/${resource.package.file.name}" />
+                            <outjar path="${out.final.file}" />
+                        </dexguard-options>
+                    </dexguard-package-helper>
                 </else>
             </if>
-        </do-only-if-not-library>
+            </else>
+        </if>
     </target>
 
     <target name="release"    depends="-set-release-mode, -release-prompt-for-password, -package, -post-package, -post-build" />

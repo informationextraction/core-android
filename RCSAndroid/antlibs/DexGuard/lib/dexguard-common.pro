@@ -5,14 +5,14 @@
 -dontwarn sun.**
 -dontwarn javax.**
 -dontwarn org.apache.**
--dalvik
+-android
 
 -zipalign 4
 -dontcompress resources.arsc,**.jpg,**.jpeg,**.png,**.gif,**.wav,**.mp2,**.mp3,**.ogg,**.aac,**.mpg,**.mpeg,**.mid,**.midi,**.smf,**.jet,**.rtttl,**.imy,**.xmf,**.mp4,**.m4a,**.m4v,**.3gp,**.3gpp,**.3g2,**.3gpp2,**.amr,**.awb,**.wma,**.wmv
 -dontcompress RESOURCES.ARSC,**.JPG,**.JPEG,**.PNG,**.GIF,**.WAV,**.MP2,**.MP3,**.OGG,**.AAC,**.MPG,**.MPEG,**.MID,**.MIDI,**.SMF,**.JET,**.RTTTL,**.IMY,**.XMF,**.MP4,**.M4A,**.M4V,**.3GP,**.3GPP,**.3G2,**.3GPP2,**.AMR,**.AWB,**.WMA,**.WMV
 
 -keepattributes *Annotation*,Signature,InnerClasses,SourceFile,LineNumberTable
--renamesourcefileattribute DexGuard
+-renamesourcefileattribute ''
 
 # com.example.android.apis.animation.ShapeHolder,...
 -keepclassmembers class **Holder {
@@ -20,39 +20,23 @@
     public void set*(***);
 }
 
--keep public class * extends android.app.Activity
--keep public class * extends android.app.Application
--keep public class * extends android.app.Service
--keep public class !com.google.ads.** extends android.content.BroadcastReceiver
--keep public class * extends android.content.ContentProvider
+# The name may be stored and then used after an update.
+-keep,allowshrinking public !abstract class * extends android.app.backup.BackupAgent
 
--keep public class * extends android.app.backup.BackupAgent
-
--keep public class * extends android.preference.Preference
--keep public class * extends android.app.Fragment
-
--dontnote android.support.**
--dontwarn android.support.**
--keep public class * extends android.support.v4.app.Fragment
-
--keep public class !com.google.ads.** extends android.view.View {
+-keepclassmembers public !abstract class !com.google.ads.** extends android.view.View {
     public <init>(android.content.Context);
     public <init>(android.content.Context, android.util.AttributeSet);
     public <init>(android.content.Context, android.util.AttributeSet, int);
     public void set*(...);
 }
 
--keepclasseswithmembers class * {
+-keepclassmembers !abstract class * {
     public <init>(android.content.Context, android.util.AttributeSet);
-}
-
--keepclasseswithmembers class * {
     public <init>(android.content.Context, android.util.AttributeSet, int);
 }
 
 -keepclassmembers class * extends android.content.Context {
    public void *(android.view.View);
-   public void *(android.view.MenuItem);
 }
 
 -keepclassmembers class * implements android.os.Parcelable {

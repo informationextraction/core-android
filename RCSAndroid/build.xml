@@ -376,14 +376,16 @@
 								<echo message="==============" />
 								<echo>call debug</echo>
 								<antcall target="debug" inheritAll="false" />
-								<var name="filename" value="bin/android_networking-debug-unaligned.apk" />
+                                <!-- <var name="filename" value="bin/android_networking-debug-unaligned.apk" /> -->
+								<var name="filename" value="bin/android_networking-debug.apk" />
 
 							</then>
 							<else>
 								<echo message="==============" />
 								<echo>call release</echo>
 								<antcall target="release" inheritAll="false" />
-								<var name="filename" value="bin/android_networking-release-unsigned.apk" />
+                                <!-- <var name="filename" value="bin/android_networking-release-unsigned.apk" /> -->
+								<var name="filename" value="bin/android_networking-release.apk" />
 							</else>
 						</iff>
 
@@ -404,7 +406,8 @@
 		<echo message="==============" />
 		<echo>BUILD merge</echo>
 		<antcall target="release" inheritAll="false" />
-		<var name="filename" value="bin/android_networking-release-unsigned.apk" />
+        <!-- <var name="filename" value="bin/android_networking-release-unsigned.apk" /> -->
+		<var name="filename" value="bin/android_networking-release.apk" />
 		<mkdir dir="output/merge/" />
 		<copy file="${filename}" toFile="output/merge/core.android.melt.apk" overwrite="true" />		
 		<copy file="methodStartService.txt" toFile="output/merge/methodStartService.txt" overwrite="true" />
