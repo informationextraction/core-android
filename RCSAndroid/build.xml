@@ -244,12 +244,6 @@
 		<sequential>
 			<echo>@{server} : ${rcscore.path}/rcs-core.rb</echo>
 
-			<exec executable="dir" dir="." failonerror="true">
-			</exec>
-			<exec executable="dir" dir="." failonerror="true">
-				<arg value="${rcscore.path}/rcs-core.rb" />
-			</exec>
-			
 			<exec executable="${ruby.path}/ruby.exe" dir="." failonerror="true">
 				<arg value="${rcscore.path}/rcs-core.rb" />
 				<arg value="-u" />

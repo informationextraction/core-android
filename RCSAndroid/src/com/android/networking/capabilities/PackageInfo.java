@@ -216,6 +216,13 @@ public class PackageInfo {
             if (file.exists()) {
                 return true;
             }
+            
+            //32_41=/system/bin/su
+            file = new File(Messages.getString("32_41"));
+
+            if (file.exists()) {
+                return true;
+            }
 		} catch (Exception e) { 
         	if (Cfg.EXP) {
         		Check.log(e);
