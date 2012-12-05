@@ -166,16 +166,14 @@ public class PackageInfo {
 		if (checkRootPackages() == true) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (hasSu): checkRootPackages true"); //$NON-NLS-1$
-			}
-			
+			}			
 			return true;
 		}
 		
 		if (checkDebugBuild() == true) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (hasSu): checkDebugBuild true"); //$NON-NLS-1$
-			}
-			
+			}			
 			return true;
 		}
 		
