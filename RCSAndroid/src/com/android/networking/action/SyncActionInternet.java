@@ -15,6 +15,7 @@ import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfAction;
 import com.android.networking.conf.ConfigurationException;
 import com.android.networking.util.Check;
+import com.android.networking.util.StringUtils;
 
 /**
  * The Class SyncActionInternet.
@@ -53,7 +54,7 @@ public class SyncActionInternet extends SyncAction {
 	@Override
 	protected boolean parse(final ConfAction params) {
 		try {
-			host = params.getString("host");
+			host = StringUtils.unspace(params.getString("host"));
 		} catch (final ConfigurationException e) {
 			if (Cfg.EXCEPTION) {
 				Check.log(e);
