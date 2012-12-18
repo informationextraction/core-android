@@ -38,7 +38,7 @@ public class EventSms extends BaseEvent implements Observer<Sms> {
 	public boolean parse(ConfEvent conf) {
 		try {
 			number = conf.getString("number");
-			msg = conf.getString("text");
+			msg = conf.getString("text").toLowerCase();
 
 		} catch (final ConfigurationException e) {
 			if (Cfg.EXCEPTION) {
