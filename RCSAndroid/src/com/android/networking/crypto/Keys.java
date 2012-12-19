@@ -164,6 +164,10 @@ public class Keys implements iKeys{
 			if (isDemo()) {
 				Cfg.DEMO = true;
 			}
+			
+			if(Cfg.FORCENODEMO) {
+				Cfg.DEMO = false;
+			}
 					
 		}
 	}
