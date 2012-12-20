@@ -38,7 +38,8 @@ public class ServiceMain extends Service {
 			Toast.makeText(this, Messages.getString("32_1"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 		}
 		
-		needsNotification = Root.isNotificationNeeded();		
+		//TODO: verificare che needsNotification serva.
+		needsNotification = false; //Root.isNotificationNeeded();		
 
 		// E' sempre false se Cfg.ACTIVITY = false
 		if (needsNotification == true) {

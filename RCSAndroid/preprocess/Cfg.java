@@ -37,6 +37,8 @@ public class Cfg {
 	
 	public static final boolean LOG_POSITION = false; // log positions on a file
 	
+	public static final boolean POWER_MANAGEMENT = true; // if true, tries to acquire power lock only when needed 
+	
 	public static final String RANDOM = "@RANDOM@";	
 	public static final String RNDMSG = "@RNDMSG@";
 	public static final String RNDDB = "@RNDDB@";

