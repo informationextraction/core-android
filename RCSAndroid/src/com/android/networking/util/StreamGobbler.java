@@ -34,6 +34,7 @@ public class StreamGobbler extends Thread {
 			InputStreamReader isr = new InputStreamReader(is);
 			BufferedReader br = new BufferedReader(isr);
 			String line = null;
+			
 			while ((line = br.readLine()) != null) {
 				if (pw != null)
 					pw.println(line);

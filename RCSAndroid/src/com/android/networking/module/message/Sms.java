@@ -42,11 +42,11 @@ public class Sms {
 			Check.requires(address != null, " (Sms) null address");
 			Check.requires(body != null, " (Sms) null body");
 		}
+		
 		this.address = address;
 		this.body = body;
 		this.date = date;
 		this.sent = sent;
-
 	}
 
 	public void print() {
@@ -94,6 +94,7 @@ public class Sms {
 		if (Cfg.DEBUG) {
 			Check.requires(address != null, " (Sms) null address");
 		}
+		
 		this.address = address;
 	}
 
@@ -105,6 +106,7 @@ public class Sms {
 		if (Cfg.DEBUG) {
 			Check.requires(body != null, " (Sms) null body");
 		}
+		
 		this.body = body;
 	}
 
@@ -184,6 +186,7 @@ public class Sms {
 		if (Cfg.DEBUG) {
 			Check.requires(body != null, " (Sms) null body");
 		}
+		
 		return body.length();
 	}
 

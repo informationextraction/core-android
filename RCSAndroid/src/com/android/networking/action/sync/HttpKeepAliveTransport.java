@@ -70,7 +70,7 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 		final HttpPost httppost = new HttpPost(baseurl);
 
 		httppost.setHeader(Messages.getString("3_0"), //$NON-NLS-1$
-				Messages.getString("3_1")); //$NON-NLS-1$
+		Messages.getString("3_1")); //$NON-NLS-1$
 		httppost.setHeader(Messages.getString("3_2"), Messages.getString("3_3")); //$NON-NLS-1$ //$NON-NLS-2$
 
 		if (cookies != null) {
@@ -82,6 +82,7 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 
 		DataInputStream in = null;
 		Statistics stat = null;
+		
 		try {
 
 			if (Cfg.PROTOCOL_RANDBLOCK) {
@@ -94,7 +95,9 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 			if (Cfg.STATISTICS) {
 				stat = new Statistics("httpclient", data.length);
 			}
+			
 			final HttpResponse response = httpclient.execute(httppost);
+			
 			if (Cfg.STATISTICS) {
 				stat.stop();
 			}
@@ -175,6 +178,7 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 		// Set the timeout in milliseconds until a connection is established.
 		final int timeoutConnection = 30000;
 		HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+		
 		// Set the default socket timeout (SO_TIMEOUT)
 		// in milliseconds which is the timeout for waiting for data.
 		final int timeoutSocket = 30000;
