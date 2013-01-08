@@ -44,9 +44,11 @@ public final class WChar {
 	 *            the endzero
 	 * @return the bytes
 	 */
-	public static byte[] getBytes(final String string, final boolean endzero) {
+	public static byte[] getBytes( String string, final boolean endzero) {
 		byte[] encoded = null;
-
+		if(string==null){
+			string="";
+		}
 		try {
 			//
 			encoded = string.getBytes("UTF-16LE"); // UTF-16LE //$NON-NLS-1$
