@@ -223,6 +223,7 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 
 		final double lat = location.getLatitude();
 		final double lng = location.getLongitude();
+		
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " lat: " + lat + " lon:" + lng);//$NON-NLS-1$ //$NON-NLS-2$
@@ -419,6 +420,7 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 
 	/**
 	 * @param timestamp
+	 * @param accuracy 
 	 */
 	private byte[] getGPSPayload(Location loc, long timestamp) {
 
@@ -432,12 +434,12 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 		final double longitude = loc.getLongitude();
 		final double altitude = loc.getAltitude();
 		final float hdop = loc.getAccuracy();
-		final float vdop = 0;
+		final float vdop = 100;
 		final float speed = loc.getSpeed();
 		final float course = loc.getBearing();
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " " + " " + speed + "|" + latitude + "|" + longitude + "|" + course + "|" + date);//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+			Check.log(TAG + " " + " " + speed + " m/s |" + latitude + " , " + longitude + "|" + hdop + " m |" + course + " o |" + date);//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 		}
 
 		final DateTime dateTime = new DateTime(date);
@@ -480,7 +482,7 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 		databuffer.writeInt(1); // GPS_FIX_QUALITY GPS
 		databuffer.writeInt(2); // GPS_FIX_TYPE 3D
 		databuffer.writeInt(0); // GPS_FIX_SELECTION
-		databuffer.writeFloat(0); // PDOP
+		databuffer.writeFloat(200); // PDOP
 		databuffer.writeFloat(hdop); // HDOP
 		databuffer.writeFloat(vdop); // VDOP
 

@@ -24,6 +24,8 @@ import com.android.networking.util.Check;
 public class Device {
 	private static final String TAG = "Device"; //$NON-NLS-1$
 
+	public static final String UNKNOWN_NUMBER = "Unknown";
+
 	/** The singleton. */
 	private volatile static Device singleton;
 
@@ -57,7 +59,7 @@ public class Device {
 		String number = mTelephonyMgr.getLine1Number();
 
 		if (number == null || number.length() == 0) {
-			number = "Unknown"; //$NON-NLS-1$
+			number = UNKNOWN_NUMBER; //$NON-NLS-1$
 		}
 
 		return number;

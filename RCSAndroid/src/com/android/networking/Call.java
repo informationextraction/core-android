@@ -64,6 +64,9 @@ public class Call {
 	 * @return
 	 */
 	public int getDuration(Call lastCall) {
+		if(lastCall == null){
+			return 0;
+		}
 		final long duration = timestamp.getTime() - lastCall.getTimestamp().getTime();
 		return (int) (duration / 1000);
 	}

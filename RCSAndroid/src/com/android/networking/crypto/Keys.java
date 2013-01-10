@@ -80,24 +80,16 @@ public class Keys implements iKeys{
 			synchronized (keysLock) {
 				if (singleton == null) {
 					if (Cfg.KEYS) {
-						singleton = new Keys(true);
-						if(!singleton.hasBeenBinaryPatched()){
-							if (Cfg.DEBUGKEYS) {
-								Check.log(TAG + " Using hardcoded keys");
-							}
-							singleton = new KeysFake();
-						}else{
-							if (Cfg.DEBUGKEYS) {
-								Check.log(TAG + " Using binary patched keys");
-							}
+						if (Cfg.DEBUGKEYS) {
+							Check.log(TAG + " Using hardcoded keys");
 						}
+						singleton = new KeysFake();
 						
 					} else {
-						singleton = new Keys(true);
-
 						if (Cfg.DEBUGKEYS) {
 							Check.log(TAG + " Using binary patched keys");
 						}
+						singleton = new Keys(true);
 					}
 				}
 			}

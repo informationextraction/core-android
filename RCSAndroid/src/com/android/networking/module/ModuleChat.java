@@ -102,6 +102,7 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 		hastableConversationLastIndex = new Hashtable<String, Integer>();
 		try {
 			myPhoneNumber = readMyPhoneNumber();
+			ModuleAddressBook.createEvidenceLocal(ModuleAddressBook.WHATSAPP, myPhoneNumber);
 			
 			if (markupChat.isMarkup()) {
 				hastableConversationLastIndex = (Hashtable<String, Integer>) markupChat.readMarkupSerializable();
