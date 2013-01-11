@@ -245,7 +245,7 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (readChatMessages): can read DB");
 			}
-			GenericSqliteHelper helper = new GenericSqliteHelper(dbFile, 1);
+			GenericSqliteHelper helper = GenericSqliteHelper.openCopy(dbFile);
 			SQLiteDatabase db = helper.getReadableDatabase();
 
 			// retrieve a list of all the conversation changed from the last

