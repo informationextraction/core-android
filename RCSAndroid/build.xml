@@ -127,7 +127,7 @@
 	</target>
 
 	<!-- = = = = = = = = = = = = = = = = =
-          macrodef: set-cfg
+          macrodef: set-cfg0
           copies Cfg.java considering:
           - kind: debug, release
           - version: 2,3     

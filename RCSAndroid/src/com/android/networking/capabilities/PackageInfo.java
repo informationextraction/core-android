@@ -154,7 +154,6 @@ public class PackageInfo {
 			}
 
 			if (Cfg.DEBUG) {
-				e.printStackTrace();
 				Check.log(e);//$NON-NLS-1$
 			}
 		}

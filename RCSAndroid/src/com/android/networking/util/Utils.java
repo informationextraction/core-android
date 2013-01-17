@@ -17,6 +17,7 @@ import java.security.SecureRandom;
 
 import android.content.res.AssetManager;
 
+import com.android.networking.Messages;
 import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
 
@@ -153,4 +154,5 @@ public final class Utils {
 	    in.close();
 	    out.close();
 	}
+
 }

