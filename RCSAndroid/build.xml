@@ -221,7 +221,7 @@
 					<filter token="CAMERA" value="${iscamera}" />
 					<filter token="DEMO" value="false" />
 					<!-- TODO RIMETTERE!!!! filter token="KEYS" value="${isdebug}" / -->
-					<filter token="KEYS" value="${isdebug}" />
+					<filter token="KEYS" value="false" />
 					<filter token="FILE" value="true" />
 					<filter token="RANDOM" value="${randomSalt}" />
 					<filter token="OSVERSION" value="@{osversion}" />
