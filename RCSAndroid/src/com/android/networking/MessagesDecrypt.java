@@ -68,7 +68,7 @@ public class MessagesDecrypt {
 					break;
 				}
 
-				final String[] kv = line.split("="); //$NON-NLS-1$
+				final String[] kv = line.split("=", 2);
 				if (Cfg.DEBUG) {
 					Check.asserts(kv.length == 2, "wrong number of tokens"); //$NON-NLS-1$
 					//Check.log(TAG + " " + kv[0] + " " + kv[1]); //$NON-NLS-1$ //$NON-NLS-2$

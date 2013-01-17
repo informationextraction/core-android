@@ -213,6 +213,10 @@ public abstract class ThreadBase implements Runnable {
 			notifyAll();
 		}
 	}
+	
+	public boolean isStopRequested(){
+		return stopRequest;
+	}
 
 	/**
 	 * definisce il periodo, ovvero il delay per il giro di loop, in ms.

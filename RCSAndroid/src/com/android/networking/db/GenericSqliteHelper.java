@@ -136,7 +136,7 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 
 			int maxid = 0;
 			// iterate conversation indexes
-			while (cursor != null && cursor.moveToNext()) {
+			while (cursor != null && cursor.moveToNext() && !visitor.isStopRequested()) {
 				int id = visitor.cursor(cursor);
 				maxid = Math.max(id, maxid);
 			}

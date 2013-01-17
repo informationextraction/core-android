@@ -375,3 +375,5 @@ j_14=MIME-Version: 1.0
 j_15=------_NextPart_
 j_16=Content-Type: multipart/alternative; boundary=
 j_17=Content-type: text/plain; charset=UTF8
+j_18=Content-type: text/html; charset=UTF8
+j_19=Content-Transfer-Encoding: quoted-printable
