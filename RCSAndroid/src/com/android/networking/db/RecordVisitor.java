@@ -22,7 +22,7 @@ public abstract class RecordVisitor {
 
 	//public void visitRecord(String[] fields) { };
 
-	public abstract int cursor(Cursor cursor)  ;
+	public abstract long cursor(Cursor cursor)  ;
 
 	public final void init(String table, String[] columns, int count) {
 		this.table=table;

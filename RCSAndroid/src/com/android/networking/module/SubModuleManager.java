@@ -15,11 +15,17 @@ public class SubModuleManager {
 	private List<SubModule> submodules;
 
 	public SubModuleManager(BaseModule module) {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (SubModuleManager), module: ");
+		}
 		this.module = module;
 		submodules = new ArrayList<SubModule>();
 	}
 
 	public void add(SubModule subModule) {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (add), subModule: " + subModule);
+		}
 		subModule.init(module, new Markup(module, subModule.getClass().getName()));
 		submodules.add(subModule);
 	}

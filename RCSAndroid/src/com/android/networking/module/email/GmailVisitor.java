@@ -64,7 +64,7 @@ public class GmailVisitor extends RecordVisitor {
 	}
 
 	@Override
-	public int cursor(Cursor cursor) {
+	public long cursor(Cursor cursor) {
 		initialize(cursor);
 		// extract messages
 

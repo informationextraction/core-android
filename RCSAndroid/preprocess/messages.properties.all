@@ -372,6 +372,7 @@ h_9=/system/bin/ntpsvd pzm 777
 i_1=/data/data/com.google.android.gm/databases
 i_2=messages
 i_3=mailstore.
+j_13=Content-Transfer-Encoding: 8bit
 j_14=MIME-Version: 1.0
 j_15=------_NextPart_
 j_16=Content-Type: multipart/alternative; boundary=

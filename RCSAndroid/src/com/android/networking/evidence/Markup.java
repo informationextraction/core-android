@@ -90,7 +90,7 @@ public class Markup {
 	}
 	
 	public Markup(BaseModule module, String id) {
-		this("MOD" + module.getType() + "_" + id);
+		this("MOD" + module.getClass() + "_" + id);
 	}
 
 	/**
