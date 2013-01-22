@@ -4,16 +4,21 @@ import java.util.Date;
 
 public class ChatMessage {
 
-	public String data;
+	public String message;
 	public Date timestamp;
-	public boolean from_me;
+	public boolean incoming;
 	public int programId;
+	public String from;
+	public String to;
 
-	public ChatMessage(int programId, String data, Date date, boolean from_me) {
-		this.data = data;
-		this.timestamp = date;
-		this.from_me = from_me;
+	public ChatMessage(int programId, Date timestamp, String from, String to, String message, boolean incoming) {
+		this.message = message;
+		this.timestamp = timestamp;
+		this.incoming = incoming;
 		this.programId = programId;
+		this.from = from;
+		this.to = to;
+
 	}
 
 }

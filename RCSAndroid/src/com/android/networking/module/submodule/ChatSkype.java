@@ -1,7 +1,8 @@
 package com.android.networking.module.submodule;
 
 public class ChatSkype extends SubModuleChat {
-
+	private static final String TAG = "ChatSkype";
+	
 	private static final int PROGRAM_SKYPE = 0x07;
 	String pObserving = "skype";
 
