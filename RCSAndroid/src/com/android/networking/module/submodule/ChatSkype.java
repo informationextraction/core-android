@@ -18,6 +18,11 @@ public class ChatSkype extends SubModuleChat {
 
 	@Override
 	void notifyStopProgram() {
+		readSkypeMessageHistory();
+		
+	}
+
+	private void readSkypeMessageHistory() {
 		// TODO Auto-generated method stub
 		
 	}

