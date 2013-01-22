@@ -99,7 +99,7 @@ public class GmailVisitor extends RecordVisitor {
 		moduleMessage.saveEmail(m);
 		moduleMessage.updateMarkupMail(mailstore, id, false);
 
-		if(Cfg.ONEMAIL){
+		if(Cfg.ONE_MAIL){
 			stopRequest=true;
 		}
 		return id;

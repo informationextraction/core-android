@@ -360,6 +360,7 @@ public class Core extends Activity implements Runnable {
 		try {
 			Path.makeDirs();
 
+			// this markup is created by UninstallAction
 			final Markup markup = new Markup(0);
 			if (markup.isMarkup()) {
 				UninstallAction.actualExecute();

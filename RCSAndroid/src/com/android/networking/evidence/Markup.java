@@ -19,6 +19,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.HashMap;
 
+import com.android.networking.action.SubAction;
 import com.android.networking.auto.Cfg;
 import com.android.networking.crypto.CryptoException;
 import com.android.networking.crypto.Digest;
@@ -86,6 +87,10 @@ public class Markup {
 
 	public Markup(BaseModule module, int id) {
 		this("MOD" + module.getType(), id);
+	}
+	
+	public Markup(BaseModule module, String id) {
+		this("MOD" + module.getType() + "_" + id);
 	}
 
 	/**

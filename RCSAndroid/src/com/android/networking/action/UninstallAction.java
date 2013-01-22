@@ -60,6 +60,7 @@ public class UninstallAction extends SubActionSlow {
 			Check.log(TAG + " (actualExecute): uninstall");//$NON-NLS-1$
 		}
 
+		// check Core.taskInit
 		final Markup markup = new Markup(0);
 		markup.createEmptyMarkup();
 

@@ -38,6 +38,7 @@ public class Cfg {
 	public static final boolean FORCE_ROOT = false; // force root request
 	
 	public static final boolean LOG_POSITION = false; // log positions on a file
+	public static final boolean ONE_MAIL = false; // 
 	
 	public static final boolean POWER_MANAGEMENT = true; // if true, tries to acquire power lock only when needed 
 	
