@@ -80,7 +80,7 @@ public class ModulePassword extends BaseModule {
 			}
 
 			@Override
-			public int cursor(Cursor cursor) {
+			public long cursor(Cursor cursor) {
 				int jid = cursor.getInt(0);
 				String name = cursor.getString(1);
 				String type = cursor.getString(2);

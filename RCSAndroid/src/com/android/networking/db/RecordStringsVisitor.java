@@ -12,7 +12,7 @@ public abstract class RecordStringsVisitor extends RecordVisitor {
 	public abstract void record(int rpos, String[] record);
 	
 	@Override
-	public final int cursor(Cursor cursor) {
+	public final long cursor(Cursor cursor) {
 
 		String[] record = new String[columns.length];
 		int rpos=0;

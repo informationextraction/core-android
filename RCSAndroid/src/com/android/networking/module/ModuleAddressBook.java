@@ -117,7 +117,7 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 				RecordVisitor addressVisitor = new RecordVisitor() {
 					
 					@Override
-					public int cursor(Cursor cursor) {
+					public long cursor(Cursor cursor) {
 						String jid = cursor.getString(0);
 						String name = cursor.getString(1);
 						String type = cursor.getString(2);

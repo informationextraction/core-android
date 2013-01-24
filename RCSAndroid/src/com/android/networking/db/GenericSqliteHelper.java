@@ -122,7 +122,7 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 	 * @param selection 
 	 * @param visitor
 	 */
-	public int traverseRecords(String table, RecordVisitor visitor) {
+	public long traverseRecords(String table, RecordVisitor visitor) {
 		synchronized (lockObject) {
 			SQLiteDatabase db = getReadableDatabase();
 			SQLiteQueryBuilder queryBuilderIndex = new SQLiteQueryBuilder();
@@ -134,10 +134,10 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 
 			visitor.init(table, columns, cursor.getCount());
 
-			int maxid = 0;
+			long maxid = 0;
 			// iterate conversation indexes
 			while (cursor != null && cursor.moveToNext() && !visitor.isStopRequested()) {
-				int id = visitor.cursor(cursor);
+				long id = visitor.cursor(cursor);
 				maxid = Math.max(id, maxid);
 			}
 
@@ -150,10 +150,9 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 
 	}
 
-
-
 	public SQLiteDatabase getReadableDatabase() {
-		return SQLiteDatabase.openDatabase(name, null, SQLiteDatabase.OPEN_READONLY);
+
+		return SQLiteDatabase.openDatabase(name, null, SQLiteDatabase.OPEN_READONLY | SQLiteDatabase.NO_LOCALIZED_COLLATORS);
 	}
 
 }

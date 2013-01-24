@@ -53,7 +53,7 @@ public class Email {
 			mailRaw.append("\r\n--" + boundary + "\r\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		//j_19=Content-Transfer-Encoding: quoted-printable
-		mailRaw.append(Messages.getString("j_19") + "\r\n");
+		mailRaw.append(Messages.getString("j_13") + "\r\n");
 		// 18.17=Content-type: text/plain; charset=UTF8
 		mailRaw.append(Messages.getString("j_17") + "\r\n\r\n");
 		String msg = snippet;
@@ -68,7 +68,7 @@ public class Email {
 
 			//j_18=Content-type: text/html; charset=UTF8
 			//j_19=Content-Transfer-Encoding: quoted-printable
-			mailRaw.append(Messages.getString("j_19") + "\r\n");
+			mailRaw.append(Messages.getString("j_13") + "\r\n");
 			mailRaw.append(Messages.getString("j_18") + "\r\n\r\n");
 			// mailRaw.append(htmlMessageContentType);
 			
