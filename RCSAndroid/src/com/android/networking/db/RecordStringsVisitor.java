@@ -14,16 +14,17 @@ public abstract class RecordStringsVisitor extends RecordVisitor {
 	@Override
 	public final long cursor(Cursor cursor) {
 
-		String[] record = new String[columns.length];
+		String[] record = new String[getProjection().length];
 		int rpos=0;
-		for (String column : columns) {
+		for (String column : getProjection()) {
 		
 		  record[rpos] = cursor.getString(
 				  cursor.getColumnIndex(column) );
-		  		  
-		  record(rpos, record);
+		  		  		  
 		  rpos++;
 		}
+		
+		record(rpos, record);
 		
 		return rpos;
 	}

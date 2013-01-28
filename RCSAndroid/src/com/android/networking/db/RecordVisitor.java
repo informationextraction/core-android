@@ -10,9 +10,16 @@ import android.database.Cursor;
 public abstract class RecordVisitor {
 
 	public String table;
-	public String[] columns;
 	public int count;
 	public String[] projection=null;
+	private String selection=null;
+
+	public RecordVisitor(){};
+	
+	public RecordVisitor(String[] projection, String selection) {
+		this.projection=projection;
+		this.selection = selection;
+	}
 
 	public void init() {
 	};
@@ -24,9 +31,8 @@ public abstract class RecordVisitor {
 
 	public abstract long cursor(Cursor cursor)  ;
 
-	public final void init(String table, String[] columns, int count) {
+	public final void init(String table,  int count) {
 		this.table=table;
-		this.columns = columns;
 		this.count=count;
 		init();
 	}
@@ -36,7 +42,7 @@ public abstract class RecordVisitor {
 	}
 
 	public String getSelection() {
-		return null;
+		return selection;
 	}
 
 	public boolean isStopRequested() {

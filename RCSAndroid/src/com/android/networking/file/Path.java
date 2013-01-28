@@ -233,13 +233,23 @@ public class Path {
 			}else{
 				Runtime.getRuntime().exec(Messages.getString("h_3") + path);
 			}
-			return true;
+			File file=new File(path);
+					
+			return file.canRead();
 		} catch (IOException ex) {
 			Check.log(TAG + " Error (unprotect): " + ex);
 			return false;
 		}
 	}
 	
+	public static boolean unprotect(String dbDir, String fileName, boolean fullMode) {
+		unprotect(dbDir, fullMode);
+		File file=new File(dbDir,fileName);
+		unprotect(file.getAbsolutePath() , fullMode);
+
+		return (file.canRead()) ;
+	}
+
 	/**
 	 * Removes the directory.
 	 * 

