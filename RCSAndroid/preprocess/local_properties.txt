@@ -13,6 +13,6 @@
 #rcscore.path=C:/jenk/melt_test/rcs-core-build
 
 sdk.dir=C:\\Developer\\Android\\android-sdk
-ruby.path=C:/Ruby193/bin
+ruby.path=C:/Ruby193/bin/ruby.exe
 rcscore.path=C:/HT/rcs-core-build
-
+dexguard.dir=antlibs/DexGuard5.0.17
