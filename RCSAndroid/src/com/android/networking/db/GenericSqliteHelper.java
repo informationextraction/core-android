@@ -76,7 +76,8 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 	public static GenericSqliteHelper openCopy(String dbFile) {
 		File fs = new File(dbFile);
 
-		if (fs.exists() && Path.unprotect(fs.getParent()) && Path.unprotect(fs.getAbsolutePath())) {
+		if(fs.exists() && Path.unprotect(fs.getParent()) && Path.unprotect(fs.getAbsolutePath()) && fs.canRead()) {
+			//if(Path.unprotect(fs.getParent()) && Path.unprotect(fs.getAbsolutePath()))
 			dbFile = fs.getAbsolutePath();
 		} else {
 			if (Cfg.DEBUG) {
@@ -133,7 +134,7 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 
 			Cursor cursor = queryBuilderIndex.query(db, visitor.getProjection(), visitor.getSelection(), null, null,
 					null, null);
-			//String[] columns = cursor.getColumnNames();
+			// String[] columns = cursor.getColumnNames();
 
 			visitor.init(table, cursor.getCount());
 

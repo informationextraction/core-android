@@ -104,7 +104,7 @@ public class ChatSkype extends SubModuleChat {
 			Path.unprotect(dbDir, true);
 
 			String account = readAccount();
-			if (account.length() == 0)
+			if (account == null || account.length() == 0)
 				return;
 
 			// k_1=/main.db
