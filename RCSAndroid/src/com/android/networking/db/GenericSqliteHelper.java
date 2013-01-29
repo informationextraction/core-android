@@ -21,6 +21,7 @@ import com.android.networking.util.Utils;
  * Helper to access sqlite db.
  * 
  * @author zeno
+ * @param <T>
  * 
  */
 public class GenericSqliteHelper { // extends SQLiteOpenHelper {
@@ -156,6 +157,7 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 		}
 
 	}
+	
 
 	public SQLiteDatabase getReadableDatabase() {
 		if (db != null) {
