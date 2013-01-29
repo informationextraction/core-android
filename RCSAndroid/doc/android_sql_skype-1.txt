@@ -1,0 +1,62 @@
+1. Trova le conversazioni (per trovare le aggiornate inbox_timestamp > markup):
+
+	select id, identity, displayname, given_displayname, inbox_message_id from Conversations where inbox_timestamp > 0 and is_permanent == 1
+	
+	id	identity							displayname							inbox_message_id
+	23	alberto.ornaghi						Alberto Ornaghi						167
+	56	fabrizi0							Fabrizio							197
+	118	quequero_uic						Quequero							193
+	203	#androide.buono/$e35376d1bdb004ce	Alberto Ornaghi, Fabrizio, Quequero	219
+
+Displayname e' il "full name" scelto dall'utente e viene visualizzato di default nel client,
+given_displayname e' come noi scegliamo di rinominare l'utente dentro il nostro skype, se
+c'e' questo campo, viene visualizzato al posto di displayname
+
+2. Estrai gli id dei partecipanti, se non e' un gruppo torna un record vuoto, chatname e'
+   il campo identity tornato dalla query precedente (domanda: ora Conversations.displayname
+   e ChatMembers.identity sono in ordine alfabetico... Puo' succede che non siano ordinati?):
+   
+	select identity from ChatMembers where chatname == '#androide.buono/$e35376d1bdb004ce'
+	
+	identity
+	androide.buono
+	alberto.ornaghi
+	fabrizi0
+	quequero_uic
+
+	a questo punto si puo' fare il mapping id -> display_name
+	
+3. Estrai il testo delle chat aggiornate, convo_id deve essere l'id estratto dalla query 1., id
+   invece e' l'inbox_message_id della query 1.:
+   
+	select author, body_xml from Messages where convo_id == 118 and id >= 101 and body_xml != ''
+	
+	author			body_xml
+	quequero_uic	lkjhlkj
+	quequero_uic	Hi androide.buono! Iíd like to add you on Skype. Quequero
+	androide.buono	OK
+	androide.buono	So
+
+4. Estrai i dati dell'account: id e email, attenzione, potrebbero anche essere piu' d'uno:
+	select skypename, emails from Accounts
+	
+	skypename		emails
+	androide.buono	proc.test@gmail.com
+
+5. Retrieving delle chiamate:
+	select id, host_identity, duration from Calls where begin_timestamp > 0
+	
+	id	host_identity	duration
+	40	androide.buono	21
+	239	alberto.ornaghi	125
+
+	
+6. Retrieving dei partecipanti di una call, se sono piu' di uno, vengono ritornate piu' righe,
+   il call_db_id e' il campo id della query 5.
+   
+	select identity, dispname from CallMembers where call_db_id == 239
+	
+	identity		dispname
+	alberto.ornaghi	Alberto Ornaghi
+	quequero_uic	Quequero
+
