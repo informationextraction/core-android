@@ -1,37 +1,61 @@
 package com.android.networking.module.chat;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 
 import com.android.networking.auto.Cfg;
 import com.android.networking.util.Check;
 
 public abstract class ChatGroups {
 
-	final Hashtable<String, String> groups = new Hashtable<String, String>();
-	
-	 String groupTo(String peer) {
-		return groups.get(peer);
+	final Hashtable<String, List<String>> groups = new Hashtable<String, List<String>>();
+	final Hashtable<String, String> tos = new Hashtable<String, String>();
+
+	String getGroupTo(String author, String groupname) {
+		String key = author + groupname;
+		if (tos.contains(key)) {
+			return tos.get(key);
+		}
+
+		List<String> list = groups.get(groupname);
+		StringBuilder builder = new StringBuilder();
+		for (String p : list) {
+			if (!author.equals(p)) {
+				builder.append(p);
+				builder.append(",");
+			}
+		}
+
+		String value = builder.toString();
+		tos.put(key, value);
+		return value;
 	}
 
-	 void addGroup(String peer, String remote) {
+	void addPeerToGroup(String groupName, String remote) {
 		if (Cfg.DEBUG) {
-			Check.requires(isGroup(peer), "peer is not a group: " + peer);
-			Check.log("Adding group " + peer + " : " + remote);
+			Check.requires(isGroup(groupName), "peer is not a group: " + groupName);
+			Check.log("Adding group " + groupName + " : " + remote);
 		}
-		String value;
-		if (groups.containsKey(peer)) {
-			value = groups.get(peer);
-			if (!value.contains(remote)) {
-				value += "," + remote;
+		List<String> list;
+		if (groups.containsKey(groupName)) {
+			list = groups.get(groupName);
+			if (!list.contains(remote)) {
+				list.add(remote);
 			}
 
 		} else {
-			value = remote;
+			list = new ArrayList<String>();
+			list.add(remote);
 		}
 
-		groups.put(peer, value);
+		groups.put(groupName, list);
 	}
 
-	abstract boolean isGroup(String peer) ;
+	abstract boolean isGroup(String peer);
+
+	public boolean hasMemoizedGroup(String groupName) {
+		return groups.containsKey(groupName);
+	}
 
 }

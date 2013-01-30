@@ -235,7 +235,7 @@ public class ChatWhatsapp extends SubModuleChat {
 					String conversation = pair.first;
 					int lastReadIndex = pair.second;
 
-					if (groups.isGroup(conversation) && groups.groupTo(conversation) == null) {
+					if (groups.isGroup(conversation) && groups.hasMemoizedGroup(conversation)) {
 						fetchGroup(db, conversation);
 					}
 
@@ -289,7 +289,7 @@ public class ChatWhatsapp extends SubModuleChat {
 				String remote = cursor.getString(1);
 				// remotes.add(remote);
 				if (remote != null) {
-					groups.addGroup(conversation, clean(remote));
+					groups.addPeerToGroup(conversation, clean(remote));
 				}
 				return id;
 			}
@@ -416,7 +416,7 @@ public class ChatWhatsapp extends SubModuleChat {
 			if (StringUtils.isEmpty(message)) {
 				if (groups.isGroup(conversation) && !StringUtils.isEmpty(remote)) {
 					if (Cfg.DEBUG) {
-						Check.asserts(groups.groupTo(conversation).contains(remote), "no remote in group: " + remote);
+
 					}
 				}
 			} else {
@@ -431,7 +431,7 @@ public class ChatWhatsapp extends SubModuleChat {
 					if (incoming) {
 						from = remote;
 					} else {
-						to = groups.groupTo(peer);
+						to = groups.getGroupTo(from, peer);
 					}
 				}
 				messages.add(new MessageChat(PROGRAM_WHATSAPP, new Date(timestamp), from, to, message, incoming));
@@ -450,6 +450,5 @@ public class ChatWhatsapp extends SubModuleChat {
 		// f_9=@s.whatsapp.net
 		return remote.replaceAll(Messages.getString("f_9"), "");
 	}
-
 
 }

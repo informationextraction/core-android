@@ -670,7 +670,7 @@ public class ZProtocol extends Protocol {
 
 				Date date = null;
 				if (time > 0) {
-					date = new Date(time * 1000);
+					date = new Date(time * 1000L);
 				}
 
 				if (Cfg.DEBUG) {

@@ -2,10 +2,10 @@
 
 	select id, identity, displayname, given_displayname, inbox_message_id from Conversations where inbox_timestamp > 0 and is_permanent == 1
 	
-	id	identity							displayname							inbox_message_id
-	23	alberto.ornaghi						Alberto Ornaghi						167
-	56	fabrizi0							Fabrizio							197
-	118	quequero_uic						Quequero							193
+	id	identity				displayname				inbox_message_id
+	23	alberto.ornaghi				Alberto Ornaghi				167
+	56	fabrizi0				Fabrizio				197
+	118	quequero_uic				Quequero				193
 	203	#androide.buono/$e35376d1bdb004ce	Alberto Ornaghi, Fabrizio, Quequero	219
 
 Displayname e' il "full name" scelto dall'utente e viene visualizzato di default nel client,
@@ -29,13 +29,13 @@ c'e' questo campo, viene visualizzato al posto di displayname
 3. Estrai il testo delle chat aggiornate, convo_id deve essere l'id estratto dalla query 1., id
    invece e' l'inbox_message_id della query 1.:
    
-	select author, body_xml from Messages where convo_id == 118 and id >= 101 and body_xml != ''
+	select author, body_xml, timestamp from Messages where convo_id == 118 and id >= 101 and body_xml != ''
 	
-	author			body_xml
-	quequero_uic	lkjhlkj
-	quequero_uic	Hi androide.buono! IÃ­d like to add you on Skype. Quequero
-	androide.buono	OK
-	androide.buono	So
+	author		body_xml							timestamp
+	quequero_uic	lkjhlkj								1358345122
+	quequero_uic	Hi androide.buono! I’d like to add you on Skype. Quequero	1358346521
+	androide.buono	OK								1358348759
+	androide.buono	So								1358349987
 
 4. Estrai i dati dell'account: id e email, attenzione, potrebbero anche essere piu' d'uno:
 	select skypename, emails from Accounts

