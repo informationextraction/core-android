@@ -197,7 +197,7 @@ public class ChatSkype extends SubModuleChat {
 			final ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
 
 			String[] projection = new String[] { "id", "author", "body_xml", "timestamp" };
-			String selection = "convo_id = " + sc.id + " and body_xml != '' and id > " + lastConvId;
+			String selection = "type == 61 and convo_id = " + sc.id + " and body_xml != '' and id > " + lastConvId ;
 
 			RecordVisitor visitor = new RecordVisitor(projection, selection) {
 
