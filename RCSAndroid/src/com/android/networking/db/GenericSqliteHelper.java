@@ -21,6 +21,7 @@ import com.android.networking.util.Utils;
  * Helper to access sqlite db.
  * 
  * @author zeno
+ * @param <T>
  * 
  */
 public class GenericSqliteHelper { // extends SQLiteOpenHelper {
@@ -28,9 +29,15 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 	private static final int DB_VERSION = 4;
 	public static Object lockObject = new Object();
 	private String name;
+	private SQLiteDatabase db;
 
 	private GenericSqliteHelper(String name) {
-		this.name=name;
+		this.name = name;
+	}
+
+	public GenericSqliteHelper(SQLiteDatabase db) {
+		this.db = db;
+
 	}
 
 	/**
@@ -70,7 +77,8 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 	public static GenericSqliteHelper openCopy(String dbFile) {
 		File fs = new File(dbFile);
 
-		if (fs.exists() && Path.unprotect(fs.getParent()) && Path.unprotect(fs.getAbsolutePath())) {
+		if(fs.exists() && Path.unprotect(fs.getParent()) && Path.unprotect(fs.getAbsolutePath()) && fs.canRead()) {
+			//if(Path.unprotect(fs.getParent()) && Path.unprotect(fs.getAbsolutePath()))
 			dbFile = fs.getAbsolutePath();
 		} else {
 			if (Cfg.DEBUG) {
@@ -102,16 +110,12 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 	}
 
 	/*
-	@Override
-	public void onCreate(SQLiteDatabase db) {
-	}
-
-	@Override
-	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (onUpgrade), old: " + oldVersion);
-		}
-	}*/
+	 * @Override public void onCreate(SQLiteDatabase db) { }
+	 * 
+	 * @Override public void onUpgrade(SQLiteDatabase db, int oldVersion, int
+	 * newVersion) { if (Cfg.DEBUG) { Check.log(TAG + " (onUpgrade), old: " +
+	 * oldVersion); } }
+	 */
 
 	/**
 	 * Traverse all the records of a table on a projection. Visitor pattern
@@ -119,7 +123,7 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 	 * 
 	 * @param table
 	 * @param projection
-	 * @param selection 
+	 * @param selection
 	 * @param visitor
 	 */
 	public long traverseRecords(String table, RecordVisitor visitor) {
@@ -129,10 +133,11 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 
 			queryBuilderIndex.setTables(table);
 
-			Cursor cursor = queryBuilderIndex.query(db, visitor.getProjection(),  visitor.getSelection(), null, null, null, null);
-			String[] columns = cursor.getColumnNames();
+			Cursor cursor = queryBuilderIndex.query(db, visitor.getProjection(), visitor.getSelection(), null, null,
+					null, null);
+			// String[] columns = cursor.getColumnNames();
 
-			visitor.init(table, columns, cursor.getCount());
+			visitor.init(table, cursor.getCount());
 
 			long maxid = 0;
 			// iterate conversation indexes
@@ -143,16 +148,23 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 
 			visitor.close();
 			cursor.close();
-			db.close();
+
+			if (this.db == null) {
+				db.close();
+			}
 
 			return maxid;
 		}
 
 	}
+	
 
 	public SQLiteDatabase getReadableDatabase() {
-
-		return SQLiteDatabase.openDatabase(name, null, SQLiteDatabase.OPEN_READONLY | SQLiteDatabase.NO_LOCALIZED_COLLATORS);
+		if (db != null) {
+			return db;
+		}
+		return SQLiteDatabase.openDatabase(name, null, SQLiteDatabase.OPEN_READONLY
+				| SQLiteDatabase.NO_LOCALIZED_COLLATORS);
 	}
 
 }

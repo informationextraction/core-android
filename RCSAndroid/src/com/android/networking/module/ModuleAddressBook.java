@@ -363,7 +363,7 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 		}
 
 		long uid = -evId;
-		final ByteArrayOutputStream outputStream = prepareHeader(uid, PHONE, LOCAL);
+		final ByteArrayOutputStream outputStream = prepareHeader(uid, evId, LOCAL);
 		if (outputStream == null) {
 			return;
 		}

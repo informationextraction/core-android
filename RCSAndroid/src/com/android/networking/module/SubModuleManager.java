@@ -10,7 +10,7 @@ import com.android.networking.util.Check;
 
 public class SubModuleManager {
 	private static final String TAG = "SubModuleManager";
-	
+
 	private BaseModule module;
 	private List<SubModule> submodules;
 
@@ -27,26 +27,34 @@ public class SubModuleManager {
 			Check.log(TAG + " (add), subModule: " + subModule);
 		}
 		subModule.init(module, new Markup(module, subModule.getClass().getName()));
-		submodules.add(subModule);
+		if (subModule.enabled) {
+			submodules.add(subModule);
+		}
 	}
 
 	public boolean start() {
 		for (SubModule sub : submodules) {
-			sub.start();
+			if (sub.enabled) {
+				sub.start();
+			}
 		}
 		return false;
 	}
 
 	public boolean stop() {
 		for (SubModule sub : submodules) {
-			sub.stop();
+			if (sub.enabled) {
+				sub.stop();
+			}
 		}
 		return false;
 	}
 
 	public boolean go() {
 		for (SubModule sub : submodules) {
-			sub.go();
+			if (sub.enabled) {
+				sub.go();
+			}
 		}
 		return false;
 	}
@@ -57,7 +65,9 @@ public class SubModuleManager {
 			Check.log(TAG + " (notification): " + process);
 		}
 		for (SubModule sub : submodules) {
-			num += sub.notification(process);
+			if (sub.enabled) {
+				num += sub.notification(process);
+			}
 		}
 		return num;
 	}
