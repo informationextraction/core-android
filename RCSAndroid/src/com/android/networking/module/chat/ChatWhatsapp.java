@@ -94,7 +94,7 @@ public class ChatWhatsapp extends SubModuleChat {
 
 			ModuleAddressBook.createEvidenceLocal(ModuleAddressBook.WHATSAPP, myPhoneNumber);
 
-			if (!Cfg.REGETCHAT && markup.isMarkup()) {
+			if (markup.isMarkup()) {
 				hastableConversationLastIndex = (Hashtable<String, Integer>) markup.readMarkupSerializable();
 				Enumeration<String> keys = hastableConversationLastIndex.keys();
 
