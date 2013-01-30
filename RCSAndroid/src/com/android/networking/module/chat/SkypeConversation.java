@@ -6,13 +6,8 @@ public class SkypeConversation {
 	public long lastReadIndex;
 	protected String account;
 	protected int id;
-	protected String identity;
+	protected String peer;
 	protected String displayname;
 	protected String given;
 	
-	public boolean incoming;
-	public boolean isIncoming() {
-		return !account.equals(identity);
-	}
-
 }
