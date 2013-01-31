@@ -244,6 +244,7 @@ public class Core extends Activity implements Runnable {
 		private final int queue;
 
 		CheckAction(int queue) {
+			Thread.currentThread().setName("queue_" + queue);
 			this.queue = queue;
 		}
 
