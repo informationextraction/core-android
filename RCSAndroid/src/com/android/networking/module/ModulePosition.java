@@ -117,7 +117,7 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (actualStart): new logIncrGPS");
 					}
-					logIncrGPS = new EvidenceReference(EvidenceType.LOCATION_NEW, getAdditionalData(0, LOG_TYPE_GPS));
+					logIncrGPS = factoryGPSLog();
 				}
 			}
 
@@ -140,6 +140,10 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 		if (wifiEnabled) {
 			locationWIFI();
 		}
+	}
+
+	private EvidenceReference factoryGPSLog() {
+		return new EvidenceReference(EvidenceType.LOCATION_NEW, getAdditionalData(0, LOG_TYPE_GPS));
 	}
 
 	private EvidenceReference factoryCellLog() {
@@ -214,7 +218,8 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 					Check.log(TAG + " (onLocationChanged): logIncrCell size=" + logIncrCell.getSize());
 				}
 				logIncrCell.close();
-				logIncrCell = null;
+				logIncrCell = factoryCellLog();
+				;
 			}
 		}
 
@@ -262,7 +267,7 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 					Check.log(TAG + " (onLocationChanged): logIncrGPS size=" + logIncrGPS.getSize());
 				}
 				logIncrGPS.close();
-				logIncrGPS = null;
+				logIncrGPS = factoryGPSLog();
 			}
 		}
 
