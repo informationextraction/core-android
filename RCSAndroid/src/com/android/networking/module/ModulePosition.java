@@ -114,6 +114,9 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 		if (gpsEnabled) {
 			synchronized (logGPSlock) {
 				if (logIncrGPS == null) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (actualStart): new logIncrGPS");
+					}
 					logIncrGPS = new EvidenceReference(EvidenceType.LOCATION_NEW, getAdditionalData(0, LOG_TYPE_GPS));
 				}
 			}
@@ -124,6 +127,9 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 		if (cellEnabled) {
 			synchronized (logCelllock) {
 				if (logIncrCell == null) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (actualStart): new logIncrCell");
+					}
 					logIncrCell = factoryCellLog();
 				}
 			}
@@ -196,7 +202,19 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 		} else if (info.cdma) {
 			payload = getCellPayload(info, LOG_TYPE_CDMA);
 			synchronized (logCelllock) {
+
 				logIncrCell.write(payload);
+
+			}
+		}
+
+		synchronized (logCelllock) {
+			if (logIncrCell.getSize() > 2048) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (onLocationChanged): logIncrCell size=" + logIncrCell.getSize());
+				}
+				logIncrCell.close();
+				logIncrCell = null;
 			}
 		}
 
@@ -225,7 +243,6 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 
 		final double lat = location.getLatitude();
 		final double lng = location.getLongitude();
-		
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " lat: " + lat + " lon:" + lng);//$NON-NLS-1$ //$NON-NLS-2$
@@ -240,6 +257,13 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 		byte[] payload = getGPSPayload(location, timestamp);
 		synchronized (logGPSlock) {
 			logIncrGPS.write(payload);
+			if (logIncrGPS.getSize() > 2048) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (onLocationChanged): logIncrGPS size=" + logIncrGPS.getSize());
+				}
+				logIncrGPS.close();
+				logIncrGPS = null;
+			}
 		}
 
 		if (Cfg.LOG_POSITION) {
@@ -410,7 +434,7 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 
 	/**
 	 * @param timestamp
-	 * @param accuracy 
+	 * @param accuracy
 	 */
 	private byte[] getGPSPayload(Location loc, long timestamp) {
 
@@ -429,7 +453,8 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 		final float course = loc.getBearing();
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " " + " " + speed + " m/s |" + latitude + " , " + longitude + "|" + hdop + " m |" + course + " o |" + date);//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+			Check.log(TAG
+					+ " " + " " + speed + " m/s |" + latitude + " , " + longitude + "|" + hdop + " m |" + course + " o |" + date);//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 		}
 
 		final DateTime dateTime = new DateTime(date);
@@ -503,6 +528,9 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 		}
 		synchronized (logCelllock) {
 			if (logIncrCell != null && logIncrCell.hasData()) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (resetLog): CELL");
+				}
 				logIncrCell.close();
 				logIncrCell = null;
 			}
@@ -510,6 +538,9 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 
 		synchronized (logGPSlock) {
 			if (logIncrGPS != null && logIncrGPS.hasData()) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (resetLog): close GPS");
+				}
 				logIncrGPS.close();
 				logIncrGPS = null;
 			}

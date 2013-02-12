@@ -17,7 +17,7 @@ public class GPSLocatorAuto implements LocationListener, Runnable {
 	private static final String TAG = "GPSLocatorAuto";
 
 	private static GPSLocatorAuto instance;
-	private boolean started = false;
+	// private boolean started = false;
 	private List<GPSLocationListener> listeners;
 	private GPSLocatorPeriod locator;
 
@@ -61,12 +61,11 @@ public class GPSLocatorAuto implements LocationListener, Runnable {
 	public boolean start(GPSLocationListener listener) {
 		try {
 			synchronized (this) {
-				if (!started) {
+				if (locator == null) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (start): new GPSLocatorPeriod");
 					}
 
-					started = true;
 					locator = new GPSLocatorPeriod(this, 0);
 					if (!locator.isGPSEnabled()) {
 						if (locator.canToggleGPS()) {
@@ -113,7 +112,7 @@ public class GPSLocatorAuto implements LocationListener, Runnable {
 			listener.onLocationChanged(null);
 			return false;
 		}
-		
+
 		return true;
 	}
 
@@ -134,19 +133,14 @@ public class GPSLocatorAuto implements LocationListener, Runnable {
 	public void stop() {
 		try {
 			synchronized (this) {
-				if (started) {
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " (run): stopping locator");
-					}
 
-					if (locator != null) {
-						if (turnedOn) {
-							locator.turnGPSOff();
-						}
-						locator.halt();
+				if (locator != null) {
+					if (turnedOn) {
+						locator.turnGPSOff();
 					}
-
+					locator.halt();
 				}
+
 			}
 			synchronized (listeners) {
 				listeners.clear();
@@ -161,7 +155,7 @@ public class GPSLocatorAuto implements LocationListener, Runnable {
 				Check.log(TAG + " " + ex);
 			}
 		} finally {
-			started = false;
+
 			locator = null;
 			gotValidPosition = false;
 

