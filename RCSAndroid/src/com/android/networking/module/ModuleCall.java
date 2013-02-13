@@ -328,6 +328,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 		final String name = ""; //$NON-NLS-1$
 		final boolean missed = false;
+		// 7_0=u
+		// 7_1=no notes
 		final String nametype = Messages.getString("7_0"); //$NON-NLS-1$
 		final String note = Messages.getString("7_1"); //$NON-NLS-1$
 

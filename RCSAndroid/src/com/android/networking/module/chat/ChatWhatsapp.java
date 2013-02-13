@@ -40,7 +40,7 @@ public class ChatWhatsapp extends SubModuleChat {
 	ChatGroups groups = new ChatWhatsappGroups();
 
 	Hashtable<String, Integer> hastableConversationLastIndex = new Hashtable<String, Integer>();
-	private static final int PROGRAM_WHATSAPP = 0x06;
+	private static final int PROGRAM = 0x06;
 
 	private static final String DEFAULT_LOCAL_NUMBER = "local";
 	String pObserving = "whatsapp";
@@ -50,7 +50,7 @@ public class ChatWhatsapp extends SubModuleChat {
 
 	@Override
 	int getProgramId() {
-		return PROGRAM_WHATSAPP;
+		return PROGRAM;
 	}
 
 	@Override

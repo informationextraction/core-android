@@ -1,4 +1,4 @@
-Da users_db2
+Da /data/data/com.facebook.orca/databases/users_db2
 
 1. Lista degli amici (incluso il proprio account) e id degli utenti, il campo non ha indici quindi 
    non e' immediato capire quando la lista viene modificata:

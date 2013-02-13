@@ -28,7 +28,7 @@ import com.android.networking.util.StringUtils;
 public class ChatSkype extends SubModuleChat {
 	private static final String TAG = "ChatSkype";
 
-	private static final int PROGRAM_SKYPE = 0x01;
+	private static final int PROGRAM = 0x01;
 	String pObserving = "skype";
 
 	private Date lastTimestamp;
@@ -40,7 +40,7 @@ public class ChatSkype extends SubModuleChat {
 
 	@Override
 	public int getProgramId() {
-		return PROGRAM_SKYPE;
+		return PROGRAM;
 	}
 
 	@Override
