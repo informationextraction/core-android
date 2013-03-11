@@ -46,6 +46,8 @@ public class ChatFacebook extends SubModuleChat {
 		}
 	}
 
+
+
 	@Override
 	protected void start() {
 		lastFb = markup.unserialize(new Hashtable<String, Long>());
@@ -69,6 +71,12 @@ public class ChatFacebook extends SubModuleChat {
 		}
 	}
 
+	private void readFbMessageHistory() throws IOException{
+		// TODO Auto-generated method stub
+		
+	}
+	
+	/*
 	private void readFbMessageHistory() throws IOException{
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (readChatMessages)");
@@ -111,7 +119,9 @@ public class ChatFacebook extends SubModuleChat {
 				}
 
 				GenericSqliteHelper helper = GenericSqliteHelper.open(dbFile);
+				
+		}
 	}
-
+	 */
 
 }

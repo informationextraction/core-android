@@ -448,7 +448,7 @@ public class ChatWhatsapp extends SubModuleChat {
 			}
 
 			if (to != null && from != null && message != null) {
-				messages.add(new MessageChat(PROGRAM_WHATSAPP, new Date(timestamp), from, to, message, incoming));
+				messages.add(new MessageChat(PROGRAM, new Date(timestamp), from, to, message, incoming));
 			} else {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (fetchMessages) Error, null values");
