@@ -57,7 +57,9 @@ public class FactoryModule implements AbstractFactory<BaseModule, String> {
 		}else if (Messages.getString("c_14").equals(type)) { //$NON-NLS-1$
 			a = new ModuleChat();
 		}else if (Messages.getString("c_15").equals(type)) { //$NON-NLS-1$
-			a = new ModulePassword();
+			if(Cfg.ENABLE_PASSWORD_MODULE){
+				a = new ModulePassword();
+			}
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error (factory), unknown type: " + type);//$NON-NLS-1$

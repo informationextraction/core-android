@@ -571,6 +571,10 @@ public class Core extends Activity implements Runnable {
 				Check.log(TAG + " (loadConfFile): " + file);
 			}
 
+			if(file.getSize()<8){
+				return false;
+			}
+			
 			final byte[] resource = file.read(8);
 			// Initialize the configuration object
 			Configuration conf = new Configuration(resource);

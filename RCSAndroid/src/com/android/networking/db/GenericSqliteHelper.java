@@ -135,8 +135,10 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 
 			Cursor cursor = queryBuilderIndex.query(db, visitor.getProjection(), visitor.getSelection(), null, null,
 					null, null);
-			// String[] columns = cursor.getColumnNames();
 
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (traverseRecords)");
+			}
 			visitor.init(table, cursor.getCount());
 
 			long maxid = 0;
@@ -144,6 +146,10 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 			while (cursor != null && cursor.moveToNext() && !visitor.isStopRequested()) {
 				long id = visitor.cursor(cursor);
 				maxid = Math.max(id, maxid);
+			}
+			
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (traverseRecords) maxid: " + maxid);
 			}
 
 			visitor.close();
