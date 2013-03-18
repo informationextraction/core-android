@@ -6,7 +6,7 @@ public class SkypeConversation {
 	public long lastReadIndex;
 	protected String account;
 	protected int id;
-	protected String peer;
+	protected String remote;
 	protected String displayname;
 	protected String given;
 	

