@@ -39,7 +39,7 @@ Da /data/data/com.viber.voip/databases/viber_messages
 
 4. Estrarre le conversazioni e i partecipanti utilizzando una join:
 
-	select date, body, contact_name, display_name, M.[location_lat], M.[location_lng] number from messages as M left join participants as P on M.[person] = P.[contact_id]
+	select distinct date, body, contact_name, display_name, M.[location_lat], M.[location_lng] number from messages as M left join participants as P on M.[person] = P.[contact_id] where body != ''
 	
 	date			body			contact_name	display_name	location_lat	number
 	1359551427717	Chi sei?										0				0
