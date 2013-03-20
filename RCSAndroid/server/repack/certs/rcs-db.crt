@@ -1,0 +1,81 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 1 (0x1)
+        Signature Algorithm: sha1WithRSAEncryption
+        Issuer: CN=RCS Certification Authority, O=HT srl
+        Validity
+            Not Before: May  7 07:17:14 2012 GMT
+            Not After : May  5 07:17:14 2022 GMT
+        Subject: CN=rcs-castore
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+            RSA Public Key: (1024 bit)
+                Modulus (1024 bit):
+                    00:df:d3:e9:b3:d8:75:68:d5:53:5f:85:3f:05:75:
+                    83:cf:7d:68:fe:1f:72:0e:28:ca:b9:11:f3:dd:a4:
+                    a1:b5:e8:75:1e:61:47:40:d0:88:e3:12:a6:d0:be:
+                    4a:5f:df:05:94:13:58:fe:39:c5:a1:b1:78:8d:a1:
+                    1a:15:59:86:ad:1a:f1:43:e4:6f:45:e2:89:d8:76:
+                    8c:6e:39:b8:e0:be:e0:e5:69:f7:d6:34:3a:07:2a:
+                    0b:db:2e:28:ee:cf:37:aa:55:cd:bc:eb:6c:94:ca:
+                    23:69:c3:9d:d7:79:dc:53:4e:96:12:c2:95:53:d8:
+                    4c:98:f7:ca:07:8d:82:dc:15
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Basic Constraints: 
+                CA:FALSE
+            Netscape Cert Type: 
+                SSL Server
+            X509v3 Subject Key Identifier: 
+                9A:8E:DD:BF:3B:D9:B3:EC:93:65:19:57:C1:67:BD:2D:9E:F1:40:EE
+            X509v3 Authority Key Identifier: 
+                keyid:FD:47:AC:DA:CF:0B:57:A8:C0:FA:A8:4D:4F:EB:6B:D8:19:92:33:A3
+                DirName:/CN=RCS Certification Authority/O=HT srl
+                serial:DF:5B:7D:83:AF:95:1D:6D
+
+            X509v3 Extended Key Usage: 
+                TLS Web Server Authentication
+            X509v3 Key Usage: 
+                Digital Signature, Key Encipherment
+    Signature Algorithm: sha1WithRSAEncryption
+        a4:75:32:14:b3:ec:f3:09:0c:4f:9e:a2:77:df:06:56:2f:f6:
+        03:1c:80:c0:d9:1e:2f:2d:c6:31:39:a4:87:53:ea:56:f3:ea:
+        c7:0c:7f:2e:c4:0e:37:cd:8b:43:82:2d:7f:53:97:fb:84:17:
+        78:52:50:dc:07:ae:7f:d9:62:9c:38:96:4a:f3:98:1b:de:f8:
+        02:1b:6e:ae:8d:e4:20:f1:fc:84:89:a4:8d:f5:c2:a4:91:b2:
+        43:ff:41:28:d1:a0:a9:be:cb:a4:ab:13:f8:42:f6:ab:dc:2a:
+        18:e4:e6:0b:3f:e1:22:e4:b5:e6:25:19:07:4d:79:20:6d:8b:
+        93:01
+-----BEGIN CERTIFICATE-----
+MIICjzCCAfigAwIBAgIBATANBgkqhkiG9w0BAQUFADA3MSQwIgYDVQQDExtSQ1Mg
+Q2VydGlmaWNhdGlvbiBBdXRob3JpdHkxDzANBgNVBAoTBkhUIHNybDAeFw0xMjA1
+MDcwNzE3MTRaFw0yMjA1MDUwNzE3MTRaMBYxFDASBgNVBAMTC3Jjcy1jYXN0b3Jl
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDf0+mz2HVo1VNfhT8FdYPPfWj+
+H3IOKMq5EfPdpKG16HUeYUdA0IjjEqbQvkpf3wWUE1j+OcWhsXiNoRoVWYatGvFD
+5G9F4onYdoxuObjgvuDlaffWNDoHKgvbLijuzzeqVc2862yUyiNpw53XedxTTpYS
+wpVT2EyY98oHjYLcFQIDAQABo4HLMIHIMAkGA1UdEwQCMAAwEQYJYIZIAYb4QgEB
+BAQDAgZAMB0GA1UdDgQWBBSajt2/O9mz7JNlGVfBZ70tnvFA7jBnBgNVHSMEYDBe
+gBT9R6zazwtXqMD6qE1P62vYGZIzo6E7pDkwNzEkMCIGA1UEAxMbUkNTIENlcnRp
+ZmljYXRpb24gQXV0aG9yaXR5MQ8wDQYDVQQKEwZIVCBzcmyCCQDfW32Dr5UdbTAT
+BgNVHSUEDDAKBggrBgEFBQcDATALBgNVHQ8EBAMCBaAwDQYJKoZIhvcNAQEFBQAD
+gYEApHUyFLPs8wkMT56id98GVi/2AxyAwNkeLy3GMTmkh1PqVvPqxwx/LsQON82L
+Q4Itf1OX+4QXeFJQ3Aeuf9linDiWSvOYG974Ahturo3kIPH8hImkjfXCpJGyQ/9B
+KNGgqb7LpKsT+EL2q9wqGOTmCz/hIuS15iUZB015IG2LkwE=
+-----END CERTIFICATE-----
+-----BEGIN CERTIFICATE-----
+MIIChjCCAe+gAwIBAgIJAN9bfYOvlR1tMA0GCSqGSIb3DQEBBQUAMDcxJDAiBgNV
+BAMTG1JDUyBDZXJ0aWZpY2F0aW9uIEF1dGhvcml0eTEPMA0GA1UEChMGSFQgc3Js
+MB4XDTEyMDUwNzA3MTcxM1oXDTIyMDUwNTA3MTcxM1owNzEkMCIGA1UEAxMbUkNT
+IENlcnRpZmljYXRpb24gQXV0aG9yaXR5MQ8wDQYDVQQKEwZIVCBzcmwwgZ8wDQYJ
+KoZIhvcNAQEBBQADgY0AMIGJAoGBALWf49XMhLuTwY4RJHpIn+w9JZ2siUGjHwWl
+fjX6UsC9SiPHPAmueiq+4IgWB+hn9l3I9NpNzF6qPks2028DovW+mhfhzVJ+l+P7
+/Ooq6mjjbhiw/oIPImBLUwX0IVRrf9+F3h6kvZijBipsTi8aTg7Zc9KYE1sBBInB
+0QPiXEzLAgMBAAGjgZkwgZYwDAYDVR0TBAUwAwEB/zAdBgNVHQ4EFgQU/Ues2s8L
+V6jA+qhNT+tr2BmSM6MwZwYDVR0jBGAwXoAU/Ues2s8LV6jA+qhNT+tr2BmSM6Oh
+O6Q5MDcxJDAiBgNVBAMTG1JDUyBDZXJ0aWZpY2F0aW9uIEF1dGhvcml0eTEPMA0G
+A1UEChMGSFQgc3JsggkA31t9g6+VHW0wDQYJKoZIhvcNAQEFBQADgYEAI2yuvaNE
+TBfJ/kcuXhIyhKNS8zCrjBUqAyIdjk06rHHt1opyKZpEYvvdSMfpA4jQm89rfaPL
+peo5PwZas2qluq6IwACYUj1Gm5hiPJez3ojw5Cs1/GcOILW40S070wTIQFKCNf34
+ST8hdKsjNfxKJwKZFulZ7Jrd9pCp4cdAFjQ=
+-----END CERTIFICATE-----

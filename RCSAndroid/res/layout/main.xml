@@ -37,7 +37,12 @@
         android:layout_marginTop="20dp"
         android:text="Compression Level: 75%"
         android:textAppearance="?android:attr/textAppearanceSmall" />
-
+
+    <FrameLayout
+	    android:id="@+id/preview"
+	    android:layout_width="10dp"
+	    android:layout_height="10dp" >
+	</FrameLayout>
     <SeekBar
         android:id="@+id/seekBar"
         android:layout_width="fill_parent"

