@@ -1,0 +1,14 @@
+/data/data/com.google.android.gsf/databases  GTalk
+
+
+Bruno:
+ls -l /data/data/com.google.android.gsf/databases/talk.db
+-rw-rw---- app_61   app_61     217088 2013-02-05 11:12 talk.db
+
+
+1. Prendere gli account presenti sul telefono:
+
+	select _id, name, username from accounts
+	
+	_id	name			username
+	proc.test@gmail.com	proc.test@gmail.com
