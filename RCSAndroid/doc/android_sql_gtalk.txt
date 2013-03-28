@@ -6,9 +6,86 @@ ls -l /data/data/com.google.android.gsf/databases/talk.db
 -rw-rw---- app_61   app_61     217088 2013-02-05 11:12 talk.db
 
 
+messges.type:
+0: messaggio in uscita dall'utente verso un destinatario
+1: messaggio in ingresso
+2: un utente ha fatto il join in una chat multipla
+6: forse creazione di una chat multipla
+13: un utente ha cambiato stato ed e' andato, esempio, away (ma non sono sicurissimo)
+14: messaggio di stato dell'utente
+
+contacts.type:
+0: contatto gmail
+2: group chat
+4: contatto non gmail?
+
+Le chat dentro chats hanno groupchat = 1 se sono in gruppo, i contatti che partecipano si
+possono prendere joinando chats.contact_id con contacts._id (solo i nomei dei partecipanti)
+
+Prendere le chat gia' consolidate:
+select * from messages where consolidation_key is null
+Lista di partecipanti per thread:
+
+
 1. Prendere gli account presenti sul telefono:
 
 	select _id, name, username from accounts
 	
 	_id	name			username
 	proc.test@gmail.com	proc.test@gmail.com
+
+2. Prendere gli account che partecipano ad ogni thread ESCLUDENDO le group chat:
+
+	select distinct M.[thread_id], C.[username] from messages as M join contacts as C on M.[thread_id] = C.[_id] where C.[type] is 0
+
+	thread_id	username
+	6		alberto.ornaghi@gmail.com
+	1		fabrizio.cornelli@gmail.com
+	2		test.ardissimo@gmail.com
+
+3. Estrarre le chat singole se direction e' 0 il messaggio e' in uscita, 1 in entrata, il peer si ottiene
+dalla prima query pero' non c'e' modo di sapere quale degli account lo abbia mandato:
+
+	select  M.[thread_id], M.[real_date], M.[type] as 'direction', C.[username] as 'peer', M.[body] from messages as M join contacts as C 
+	on M.[thread_id] = C.[_id] where M.[consolidation_key] is null and M.[nickname] is null and (M.[type] is 0 or M.[type] is 1) 
+
+
+	thread_id	real_date	direction	body
+	6		1364226562108	0		"Ciao calorini
+Potresti scrivermi due cosine?
+Parlami del bigfoot"
+	1		1364226610549	0		"Zenzi
+Mi parli del bigfoot?
+Anche se so che sei esperto piu di bigcock eh biricchino"
+	6		1364226562962	1		"bla bla
+il bigfoot e' sfocato"
+	6		1364226622346	0		Ah e come mai?
+
+4.Prendere gli account che partecipano alle groupchat ESCLUDENDO le chat singole, si ottiene un hash della chat unico per conversazione
+e che NON include i partecipanti reali ai quali non e' possibile risalire:
+
+	select distinct M.[thread_id], C.[username] from messages as M join contacts as C on M.[thread_id] = C.[_id] where C.[type] is 2
+
+	thread_id	username
+	7		private-chat-bf5e4a70-5d95-43c2-9495-2b65cb32e41d@groupchat.google.com
+
+5. Estrarre le group chat, se direction e' 0 il messaggio e' in uscita, 1 in entrata, il peer si ottiene
+dalla prima query pero' non c'e' modo di sapere l'id effettivo del mittente, a volte compare solo il nome:
+
+	select  M.[thread_id], M.[nickname], M.[real_date], M.[type] as 'direction', M.[body] from messages as M join contacts as C 
+	on M.[thread_id] = C.[_id] where M.[consolidation_key] is null and C.[type] is 2 and (M.[type] is 0 or M.[type] is 1)
+
+	thread_id	nickname				real_date	direction	body
+	7		Valentino Minchialunga			1364381924577	1		"ciao
+mi scrivete qualcosa
+e poi NON abbandonate la chat finche non ve lo dico?"
+	7		proc.test@gmail.com			1364381986975	0		Prova dsl telefino
+	7		Fabrizio Cornelli			1364381956708	1		"prova
+ciao.
+non abbandono"
+	7		proc.test				1364382027047	0		"Calor ouoi scrivere snche tubsenza abbandinare ka chst?
+Tastiera di merda"
+	7		Valentino Minchialunga@a4a3bcd78165f8c6	1364382151898	1		ok potete uscire se volete, grazie
+	7		Fabrizio Cornelli@edb38b007da1486b	1364382159365	1		ciao
+
+Attenzione che le group chat scompaiono dal db quando l'applicazione viene chiusa!!!
