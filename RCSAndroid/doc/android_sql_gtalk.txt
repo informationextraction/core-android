@@ -44,7 +44,7 @@ Lista di partecipanti per thread:
 	2		test.ardissimo@gmail.com
 
 3. Estrarre le chat singole se direction e' 0 il messaggio e' in uscita, 1 in entrata, il peer si ottiene
-dalla prima query pero' non c'e' modo di sapere quale degli account lo abbia mandato:
+dalla prima query pero' non c'e' modo di sapere quale degli account (se ci sono account multipli) lo abbia mandato:
 
 	select  M.[thread_id], M.[real_date], M.[type] as 'direction', C.[username] as 'peer', M.[body] from messages as M join contacts as C 
 	on M.[thread_id] = C.[_id] where M.[consolidation_key] is null and M.[nickname] is null and (M.[type] is 0 or M.[type] is 1) 
@@ -89,3 +89,4 @@ Tastiera di merda"
 	7		Fabrizio Cornelli@edb38b007da1486b	1364382159365	1		ciao
 
 Attenzione che le group chat scompaiono dal db quando l'applicazione viene chiusa!!!
+A calor mandiamo from e to vuoti, inseriamo SOLO il display name.
