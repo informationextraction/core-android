@@ -66,13 +66,12 @@ public class Path {
 	 * @return true, if successful
 	 */
 	public static boolean makeDirs() {
-		/** The Constant CONF_DIR. */
+	
+		/** The Constant CONF_DIR. 24_0=cdd/*/
 		CONF_DIR = Messages.getString("24_0"); //$NON-NLS-1$
-		// public static final String DEBUG_DIR = "dwm/";
-		/** The Constant MARKUP_DIR. */
-		MARKUP_DIR = Messages.getString("24_1"); //$NON-NLS-1$
-
-		/** The Constant LOG_DIR. */
+		/** The Constant MARKUP_DIR. 24_1=msdd/ */
+		MARKUP_DIR = Messages.getString("24_1"); //$NON-NLS-1
+		/** The Constant LOG_DIR. 24_2=ldd/ */
 		LOG_DIR = Messages.getString("24_2"); //$NON-NLS-1$
 
 		try {
@@ -91,29 +90,9 @@ public class Path {
 				DateTime dt = new DateTime();
 
 				curLogFile = LOG_FILE + "-" + dt.getOrderedString() + ".txt";
-
 				final File file = new File(logs(), curLogFile);
-
 				file.createNewFile();
 			}
-
-			/*
-			 * String[] projection = new
-			 * String[]{MediaStore.Images.ImageColumns.
-			 * _ID,MediaStore.Images.ImageColumns
-			 * .DATA,MediaStore.Images.ImageColumns
-			 * .BUCKET_DISPLAY_NAME,MediaStore
-			 * .Images.ImageColumns.DATE_TAKEN,MediaStore
-			 * .Images.ImageColumns.MIME_TYPE}; final Cursor cursor =
-			 * Status.getContentResolver
-			 * ().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,projection,
-			 * null, null, MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC");
-			 * if(cursor != null){ cursor.moveToFirst(); picture=
-			 * cursor.getString(cursor.getColumnIndex("DESC")); // you will find
-			 * the last taken picture here // according to Bojan Radivojevic
-			 * Bomber comment do not close the cursor (he is right ^^)
-			 * cursor.close(); }
-			 */
 
 			// TODO: sistemare, sono
 			doc = Environment.getExternalStorageDirectory() + "/My Documents";

