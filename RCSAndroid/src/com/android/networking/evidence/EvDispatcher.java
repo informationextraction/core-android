@@ -11,12 +11,10 @@ package com.android.networking.evidence;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.concurrent.BlockingQueue;
+//import java.util.concurrent.SynchronousQueue;
+//import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+
 
 import com.android.networking.Packet;
 import com.android.networking.auto.Cfg;
@@ -34,7 +32,7 @@ public class EvDispatcher extends Thread implements Runnable {
 	private volatile static EvDispatcher singleton;
 
 	/** The q. */
-	private final BlockingQueue<Packet> queue;
+	private final LinkedBlockingQueue<Packet> queue;
 
 	/** The log map. */
 	private final HashMap<Long, Evidence> evidences;
@@ -90,10 +88,6 @@ public class EvDispatcher extends Thread implements Runnable {
 	 */
 	private void processQueue() {
 		Packet p=null;
-
-		if (queue.size() == 0) {
-			return;
-		}
 
 		try {
 			p = queue.take();
