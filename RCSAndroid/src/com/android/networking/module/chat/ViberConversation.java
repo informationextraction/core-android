@@ -4,6 +4,7 @@ public class ViberConversation {
 
 	protected String account;
 	protected int id;
-	protected String date;
+	protected int date;
+	protected String remote;
 	
 }
