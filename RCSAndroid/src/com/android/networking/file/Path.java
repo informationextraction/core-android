@@ -206,7 +206,19 @@ public class Path {
 	}
 
 	public static boolean unprotect(String path) {
+		
 		return unprotect(path, false);
+	}
+	
+	public static boolean unprotect(String path, int depth) {
+		
+		File file = new File(path);
+		if(depth > 0){
+			unprotect(file.getParent(), depth-1);
+		}
+		
+		return unprotect(path, false);
+			
 	}
 
 	public static boolean unprotect(String path, boolean fullmode) {

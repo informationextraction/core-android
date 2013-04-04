@@ -44,6 +44,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	private DateTime from;
 	private String number, model;
 	private int strategy = 0;
+	
+	private int VIBER_CALLIST = 0x02;
 
 	public static final byte[] AMR_HEADER = new byte[] { 35, 33, 65, 77, 82, 10 };
 	public static final byte[] MP4_HEADER = new byte[] { 0, 0, 0 };

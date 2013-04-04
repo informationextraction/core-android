@@ -4,7 +4,7 @@ Da /data/data/com.viber.voip/databases/viber_messages
 
 	select _id, recipient_number from threads where date > 0
 	
-	_id					recipient_number
+	_id					recipient_number   fate
 	1					+393386638609
 	2					+393349115149
 	4613805683010349730	groupEntity
@@ -18,7 +18,7 @@ Da /data/data/com.viber.voip/databases/viber_messages
 	
 	number			contact_name	display_name	contact_id
 	+393349115149	Chiods 4g		Chiods 4g		206
-	+393386638609	Easedue			Easedue			212
+	+393386638609	Easedue			Easedue			212 
 	owner							Androide Buono	-1
 
 	contact_name puo' essere null (come in questo caso)

