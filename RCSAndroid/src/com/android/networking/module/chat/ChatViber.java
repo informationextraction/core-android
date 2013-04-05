@@ -190,7 +190,7 @@ public class ChatViber extends SubModuleChat {
 		try {
 			final ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
 
-			String[] projection = new String[] { "_id", "person", "body", "date"  };
+			String[] projection = new String[] { "_id", "person", "body", "date", "address"  };
 			String selection = "thread_id = " + conversation.id + " and date > " + lastConvId;
 
 			RecordVisitor visitor = new RecordVisitor(projection, selection) {
@@ -205,7 +205,7 @@ public class ChatViber extends SubModuleChat {
 					Date date = new Date(timestamp * 1000L);
 
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " (cursor) sc.account: " + conversation.account + " conv.remote: " +conversation.remote + " peer: " + peer);
+						Check.log(TAG + " (cursor) peer: " + peer + " timestamp: " + timestamp);
 					}
 					
 					boolean incoming = !(peer.equals(conversation.account));
@@ -302,13 +302,13 @@ public class ChatViber extends SubModuleChat {
 
 			@Override
 			public long cursor(Cursor cursor) {
-				int id = cursor.getInt(0);
-				String remote = cursor.getString(1);
+				String number = cursor.getString(0);
+				String name = cursor.getString(1);
 				// remotes.add(remote);
-				if (remote != null) {
-					groups.addPeerToGroup(thread_id, remote);
+				if (number != null) {
+					groups.addPeerToGroup(thread_id, number);
 				}
-				return id;
+				return 0;
 			}
 		};
 

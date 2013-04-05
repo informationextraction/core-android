@@ -10,17 +10,20 @@ import com.android.networking.util.Check;
 /* Gestore di gruppi di utenti nelle chat */
 public abstract class ChatGroups {
 	private static final String TAG = "ChatGroups";
-
-	final Hashtable<String, List<String>> groups = new Hashtable<String, List<String>>();
+    Contact contact;
+	final Hashtable<String, List<Contact>> groups = new Hashtable<String, List<Contact>>();
 	final Hashtable<String, String> tos = new Hashtable<String, String>();
 
-	/* identificato un gruppo si aggiunge, uno alla volta con questo metodo, un peer */
 	void addPeerToGroup(String groupName, String remote) {
+		addPeerToGroup(groupName, new Contact(remote));
+	}
+	/* identificato un gruppo si aggiunge, uno alla volta con questo metodo, un peer */
+	void addPeerToGroup(String groupName, Contact remote) {
 		if (Cfg.DEBUG) {
 			Check.requires(isGroup(groupName), "peer is not a group: " + groupName);
 			Check.log("Adding group " + groupName + " : " + remote);
 		}
-		List<String> list;
+		List<Contact> list;
 		if (groups.containsKey(groupName)) {
 			list = groups.get(groupName);
 			if (!list.contains(remote)) {
@@ -28,7 +31,7 @@ public abstract class ChatGroups {
 			}
 	
 		} else {
-			list = new ArrayList<String>();
+			list = new ArrayList<Contact>();
 			list.add(remote);
 		}
 	
@@ -42,14 +45,14 @@ public abstract class ChatGroups {
 			return tos.get(key);
 		}
 
-		List<String> list = groups.get(groupname);
+		List<Contact> list = groups.get(groupname);
 		if(list==null){
 			return null;
 		}
 		StringBuilder builder = new StringBuilder();
-		for (String p : list) {
-			if (!author.equals(p)) {
-				builder.append(p);
+		for (Contact p : list) {
+			if (!author.equals(p.id)) {
+				builder.append(p.id);
 				builder.append(",");
 			}
 		}

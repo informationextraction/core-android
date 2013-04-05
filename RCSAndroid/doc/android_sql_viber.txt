@@ -1,5 +1,7 @@
 Da /data/data/com.viber.voip/databases/viber_messages
 
+select thread_id, recipient_number, number, participants.contact_name, display_name, contact_id, date from threads left join participants on threads._id = participants.thread_id where date > 0 order by thread_id
+
 1. Estrarre i thread, date e' il markup in epoch time:
 
 	select _id, recipient_number from threads where date > 0
