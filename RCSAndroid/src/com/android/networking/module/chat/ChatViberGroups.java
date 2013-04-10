@@ -7,4 +7,5 @@ public class ChatViberGroups extends ChatGroups {
 		return peer.length() > 8;
 	}
 
+	
 }
