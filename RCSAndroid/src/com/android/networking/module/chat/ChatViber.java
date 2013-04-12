@@ -260,7 +260,7 @@ public class ChatViber extends SubModuleChat {
 						Check.log(TAG + " (cursor) peer: " + peer + " timestamp: " + timestamp + " incoming: " + incoming);
 					}
 					
-					boolean isGroup = groups.isGroup(conversation.id);
+					boolean isGroup = groups.isGroup(Long.toString(conversation.id));
 					
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (cursor) incoming: " + incoming + " group: " + isGroup);
