@@ -153,10 +153,10 @@ public class ChatViber extends SubModuleChat {
 					
 					if (sc.date > lastConvId) {
 						if (groups.isGroup(thread) && !groups.hasMemoizedGroup(thread)) {
-							fetchGroup(helper, thread);
+							fetchParticipants(helper, thread);
 						}
 
-						int lastReadId = (int) fetchMessages(helper, sc, lastConvId);
+						long lastReadId = fetchMessages(helper, sc, lastConvId);
 						if (lastReadId > 0) {
 							updateMarkupViber(thread, lastReadId, true);
 						}
@@ -171,7 +171,68 @@ public class ChatViber extends SubModuleChat {
 			readChatSemaphore.release();
 		}
 	}
+
+	private List<ViberConversation> getViberConversations(GenericSqliteHelper helper, final String account) {
+
+		final List<ViberConversation> conversations = new ArrayList<ViberConversation>();
+
+		String[] projection = new String[] { "_id", "date", "recipient_number" };
+		String selection = "date > 0";
+
+		RecordVisitor visitor = new RecordVisitor(projection, selection) {
+
+			@Override
+			public long cursor(Cursor cursor) {
+				ViberConversation c = new ViberConversation();
+				c.account = account;
+
+				c.id = cursor.getLong(0);
+				c.date = cursor.getLong(1);
+				c.remote = cursor.getString(2);
+
+				conversations.add(c);
+				return c.id;
+			}
+		};
+
+		helper.traverseRecords("threads", visitor);
+		return conversations;
+	}
 	
+	// fetch participants.
+	private void fetchParticipants(GenericSqliteHelper helper, final String thread_id) {
+	
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (fetchGroup) : " + thread_id);
+		}
+	
+		String[] projection = { "contact_id", "number", "contact_name", "display_name" };
+		String selection = "thread_id" + "='" + thread_id + "' and contact_id >= 0" ;
+	
+		// final Set<String> remotes = new HashSet<String>();
+		//groups.addPeerToGroup(thread_id, "-1");
+		RecordVisitor visitor = new RecordVisitor(projection, selection) {
+	
+			@Override
+			public long cursor(Cursor cursor) {
+				String id = cursor.getString(0);
+				String number = cursor.getString(1);
+				String name = cursor.getString(2);
+				String display_name = cursor.getString(3);
+				
+				Contact contact = new Contact( id, number, name, display_name );
+				// remotes.add(remote);
+				if (number != null) {
+					groups.addPeerToGroup(thread_id, contact);
+				}
+				return 0;
+			}
+		};
+	
+		helper.traverseRecords("participants", visitor);
+	
+	}
+
 	private long fetchMessages(GenericSqliteHelper helper, final ViberConversation conversation, long lastConvId) {
 
 		// select author, body_xml from Messages where convo_id == 118 and id >=
@@ -179,7 +240,7 @@ public class ChatViber extends SubModuleChat {
 		try {
 			final ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
 
-			String[] projection = new String[] { "_id", "person", "body", "date", "address"  };
+			String[] projection = new String[] { "_id", "person", "body", "date", "address", "type"  };
 			String selection = "thread_id = " + conversation.id + " and date > " + lastConvId;
 
 			RecordVisitor visitor = new RecordVisitor(projection, selection) {
@@ -191,14 +252,15 @@ public class ChatViber extends SubModuleChat {
 					String peer = cursor.getString(1);
 					String body = cursor.getString(2);
 					long timestamp = cursor.getLong(3);
+					String address = cursor.getString(4);
+					boolean incoming = cursor.getInt(5) == 0;
 					Date date = new Date(timestamp);
 
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " (cursor) peer: " + peer + " timestamp: " + timestamp);
+						Check.log(TAG + " (cursor) peer: " + peer + " timestamp: " + timestamp + " incoming: " + incoming);
 					}
 					
-					boolean incoming = !(peer.equals(conversation.account));
-					boolean isGroup = groups.isGroup(conversation.remote);
+					boolean isGroup = groups.isGroup(conversation.id);
 					
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (cursor) incoming: " + incoming + " group: " + isGroup);
@@ -207,11 +269,13 @@ public class ChatViber extends SubModuleChat {
 					String from, to = null;
 					String fromDisplay, toDisplay = null;
 					
-					from = incoming? peer: conversation.account;
+					from = incoming? address: conversation.account;
 					fromDisplay = incoming? conversation.account : from;
 					
+					Contact contact = groups.getContact(peer);
+					String thread = Long.toString(conversation.id);
 					if (isGroup) {
-						to = groups.getGroupTo(peer, conversation.remote);
+						to = groups.getGroupTo(peer, thread);
 						toDisplay = to;
 					}else{
 						to = incoming? conversation.account : conversation.remote;
@@ -245,68 +309,6 @@ public class ChatViber extends SubModuleChat {
 			}
 			return -1;
 		}
-
-	}
-
-
-	private List<ViberConversation> getViberConversations(GenericSqliteHelper helper, final String account) {
-
-		final List<ViberConversation> conversations = new ArrayList<ViberConversation>();
-
-		String[] projection = new String[] { "_id", "date", "recipient_number" };
-		String selection = "date > 0";
-
-		RecordVisitor visitor = new RecordVisitor(projection, selection) {
-
-			@Override
-			public long cursor(Cursor cursor) {
-				ViberConversation c = new ViberConversation();
-				c.account = account;
-
-				c.id = cursor.getLong(0);
-				c.date = cursor.getLong(1);
-				c.remote = cursor.getString(2);
-
-				conversations.add(c);
-				return c.id;
-			}
-		};
-
-		helper.traverseRecords("threads", visitor);
-		return conversations;
-	}
-
-	// fetch participants.
-	private void fetchGroup(GenericSqliteHelper helper, final String thread_id) {
-
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (fetchGroup) : " + thread_id);
-		}
-
-		String[] projection = { "contact_id", "number", "contact_name", "display_name" };
-		String selection = "thread_id" + "='" + thread_id + "' and contact_id >= 0" ;
-
-		// final Set<String> remotes = new HashSet<String>();
-		//groups.addPeerToGroup(thread_id, "-1");
-		RecordVisitor visitor = new RecordVisitor(projection, selection) {
-
-			@Override
-			public long cursor(Cursor cursor) {
-				String id = cursor.getString(0);
-				String number = cursor.getString(1);
-				String name = cursor.getString(2);
-				String display_name = cursor.getString(3);
-				
-				Contact contact = new Contact( id, number, name, display_name );
-				// remotes.add(remote);
-				if (number != null) {
-					groups.addPeerToGroup(thread_id, contact);
-				}
-				return 0;
-			}
-		};
-
-		helper.traverseRecords("participants", visitor);
 
 	}
 
