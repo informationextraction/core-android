@@ -9,8 +9,6 @@ package com.android.networking.conf;
 
 import org.json.JSONObject;
 
-
-// TODO: Auto-generated Javadoc
 /**
  * The Class Agent.
  */
