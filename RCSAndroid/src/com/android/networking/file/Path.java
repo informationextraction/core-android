@@ -66,8 +66,8 @@ public class Path {
 	 * @return true, if successful
 	 */
 	public static boolean makeDirs() {
-	
-		/** The Constant CONF_DIR. 24_0=cdd/*/
+
+		/** The Constant CONF_DIR. 24_0=cdd/ */
 		CONF_DIR = Messages.getString("24_0"); //$NON-NLS-1$
 		/** The Constant MARKUP_DIR. 24_1=msdd/ */
 		MARKUP_DIR = Messages.getString("24_1"); //$NON-NLS-1
@@ -206,19 +206,26 @@ public class Path {
 	}
 
 	public static boolean unprotect(String path) {
-		
+
 		return unprotect(path, false);
 	}
-	
+
 	public static boolean unprotect(String path, int depth) {
-		
+
 		File file = new File(path);
-		if(depth > 0){
-			unprotect(file.getParent(), depth-1);
+		if (file.exists()) {
+			if (depth > 0) {
+				unprotect(file.getParent(), depth - 1);
+			}
+
+			return unprotect(path, false);
+		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (unprotect) File does not exists: " + path);
+			}
+			return false;
 		}
-		
-		return unprotect(path, false);
-			
+
 	}
 
 	public static boolean unprotect(String path, boolean fullmode) {

