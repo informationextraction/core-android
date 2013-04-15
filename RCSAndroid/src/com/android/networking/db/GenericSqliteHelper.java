@@ -134,7 +134,7 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 			queryBuilderIndex.setTables(table);
 
 			Cursor cursor = queryBuilderIndex.query(db, visitor.getProjection(), visitor.getSelection(), null, null,
-					null, null);
+					null, visitor.getOrder());
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (traverseRecords)");

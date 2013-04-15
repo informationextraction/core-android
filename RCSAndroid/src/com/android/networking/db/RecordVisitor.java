@@ -4,21 +4,30 @@ import android.database.Cursor;
 
 /**
  * Visitor that gets a cursor call for each record in the table
+ * 
  * @author zeno
- *
+ * 
  */
 public abstract class RecordVisitor {
 
 	public String table;
 	public int count;
-	public String[] projection=null;
-	private String selection=null;
+	public String[] projection = null;
+	private String selection = null;
+	private String order = null;
 
-	public RecordVisitor(){};
-	
+	public RecordVisitor() {
+	};
+
 	public RecordVisitor(String[] projection, String selection) {
-		this.projection=projection;
+		this.projection = projection;
 		this.selection = selection;
+	}
+
+	public RecordVisitor(String[] projection, String selection, String order) {
+		this.projection = projection;
+		this.selection = selection;
+		this.order = order;
 	}
 
 	public void init() {
@@ -27,13 +36,13 @@ public abstract class RecordVisitor {
 	public void close() {
 	};
 
-	//public void visitRecord(String[] fields) { };
+	// public void visitRecord(String[] fields) { };
 
-	public abstract long cursor(Cursor cursor)  ;
+	public abstract long cursor(Cursor cursor);
 
-	public final void init(String table,  int count) {
-		this.table=table;
-		this.count=count;
+	public final void init(String table, int count) {
+		this.table = table;
+		this.count = count;
 		init();
 	}
 
@@ -43,6 +52,10 @@ public abstract class RecordVisitor {
 
 	public String getSelection() {
 		return selection;
+	}
+
+	public String getOrder() {
+		return order;
 	}
 
 	public boolean isStopRequested() {

