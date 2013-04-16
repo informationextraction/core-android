@@ -167,7 +167,7 @@ public class ChatSkype extends SubModuleChat {
 	}
 
 	private void saveSkypeContacts(GenericSqliteHelper helper) {
-		String[] projection = new String[] { "id", "skypename", "fullname", "displayname","phone_home","phone_office","phone_mobile" };
+		String[] projection = new String[] { "id", "skypename", "fullname", "displayname","pstnnumber" };
 
 		RecordVisitor visitor = new RecordVisitor(projection, null) {
 
@@ -179,20 +179,9 @@ public class ChatSkype extends SubModuleChat {
 				String fullname = cursor.getString(2);
 				String displayname = cursor.getString(3);
 				
-				String phone_home = cursor.getString(4);
-				String phone_office = cursor.getString(5);
-				String phone_mobile = cursor.getString(6);
+				String phone = cursor.getString(4);
 				
-				String phone = "";
-				if(!StringUtils.isEmpty(phone_mobile)){
-					phone = phone_mobile;
-				}else if(!StringUtils.isEmpty(phone_home)){
-					phone = phone_mobile;
-				}else if(!StringUtils.isEmpty(phone_office)){
-					phone = phone_office;
-				}
-				
-				Contact c = new Contact(Long.toString(id),phone, skypename, "Display name: " + displayname);
+				Contact c = new Contact(Long.toString(id), phone, skypename, "Display name: " + displayname);
 			
 				ModuleAddressBook.createEvidenceRemote(ModuleAddressBook.SKYPE, c);
 				return id;
