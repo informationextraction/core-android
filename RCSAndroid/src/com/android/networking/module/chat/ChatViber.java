@@ -213,12 +213,12 @@ public class ChatViber extends SubModuleChat {
 
 			@Override
 			public long cursor(Cursor cursor) {
-				String id = cursor.getString(0);
+				Long id = cursor.getLong(0);
 				String number = cursor.getString(1);
 				String name = cursor.getString(2);
 				String display_name = cursor.getString(3);
 
-				Contact contact = new Contact(id, number, name, display_name);
+				Contact contact = new Contact(Long.toString(id), number, name, display_name);
 				// remotes.add(remote);
 				if (number != null) {
 					groups.addPeerToGroup(thread_id, contact);

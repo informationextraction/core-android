@@ -1,4 +1,5 @@
 Da /data/data/com.facebook.orca/databases/users_db2
+oppure /data/data/com.facebook.katana/databases/contacts_db2
 
 1. Lista degli amici (incluso il proprio account) e id degli utenti, il campo non ha indici quindi 
    non e' immediato capire quando la lista viene modificata:
@@ -10,8 +11,17 @@ Da /data/data/com.facebook.orca/databases/users_db2
 	100003727657439	Daniel		Paton			Daniel Paton			"[""dannyp1690@yahoo.co.uk""]"		[]
 	100003791528612	Jill		Jones			Jill Jones				"[""jillyj1212@hotmail.com""]"		[]
 	100004427018593	Gäjendra	Kumär			Gäjendra Kumär			[]									"[{""full_number"":""+918870723382"",""display_number"":""+918870723382"",""android_type"":2}]"
-
-2. Da threads_db Estrarre le conversazioni (timestamp = markup), se timestamp_ms non va si puo' provare con last_fetch_time_ms:
+	
+	{"contactId":"Y29udGFjdDoxMzk4MTI2MTEzOjgwMjg0MDExMw==","profileFbid":"802840113","graphApiWriteId":"contact_1398126113:802840113",
+	"name":{"firstName":"Alberto","lastName":"Paolo","displayName":"Alberto Paolo"},"phoneticName":{"firstName":null,"lastName":null,"displayName":null},
+	"smallPictureUrl":"https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash4/c0.4.123.123/s100x100/734834_10152513415670114_1465039918_s.jpg",
+	"bigPictureUrl":"https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash4/c0.20.800.800/s200x200/734834_10152513415670114_1465039918_n.jpg",
+	"hugePictureUrl":"https://fbcdn-profile-a.akamaihd.net/hprofile-ak-ash4/c0.20.800.800/s720x720/734834_10152513415670114_1465039918_n.jpg",
+	"communicationRank":0.10615152,"lookupKey":null,
+	"phones":[],"canMessage":true,"isMobilePushable":"YES","isMemorialized":false,"canViewerSendPokeMessage":true,"hasPokeAppInstalled":false,
+	"contactType":"USER","nameSearchTokens":["alberto","paolo","'q'","di"]}
+	
+2. Da threads_db o threads_db2 Estrarre le conversazioni (timestamp = markup), se timestamp_ms non va si puo' provare con last_fetch_time_ms:
 
 	select thread_id, participants from threads where timestamp_ms > 0
 	
@@ -22,6 +32,8 @@ Da /data/data/com.facebook.orca/databases/users_db2
 							{""email"":""100003663718866@facebook.com"",""user_key"":""FACEBOOK:100003663718866"",""name"":""Antroide Succhienmberg"",""mute"":0,""lastReadReceiptTimestampMs"":0},
 							{""email"":""1449558658@facebook.com"",""user_key"":""FACEBOOK:1449558658"",""name"":""Alberto Ornaghi"",""mute"":0,""lastReadReceiptTimestampMs"":1359459183374}]"
 
+    [{"email":"1398126113@facebook.com","user_key":"FACEBOOK:1398126113","name":"Faber O'Connell","mute":0,"lastReadReceiptTimestampMs":0},
+    {"email":"802840113@facebook.com","user_key":"FACEBOOK:802840113","name":"Alberto 'Q' Di Paolo","mute":0,"lastReadReceiptTimestampMs":1363787970464},{"email":"1449558658@facebook.com","user_key":"FACEBOOK:1449558658","name":"Alberto Ornaghi","mute":0,"lastReadReceiptTimestampMs":1363788003630}]
 	
 3. Estrarre il testo di ogni conversazione, essendo noti i partecipanti sappiamo il sender (dalla query) e quindi chi riceve i messaggi,
    il thread_id e' estratto dalla query 2.:

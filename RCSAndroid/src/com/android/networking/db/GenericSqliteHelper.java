@@ -158,6 +158,11 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 			if (this.db == null) {
 				db.close();
 			}
+			
+			if(this.name != null){
+				File file = new File(this.name);
+				file.delete();
+			}
 
 			return maxid;
 		}

@@ -6,15 +6,15 @@ public class Contact {
 		this.number = id;
 	}
 	
-	public Contact(String id, String number, String name, String display_name) {
+	public Contact(String id, String number, String name, String extra) {
 		this.id = id;
 		this.number = number;
 		this.name = name;
-		this.display_name = display_name;
+		this.extra = extra;
 	}
 	
 	public String id;
 	public String number;
 	public String name;
-	public String display_name;
+	public String extra;
 }
