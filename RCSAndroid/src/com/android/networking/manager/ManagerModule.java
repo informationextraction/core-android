@@ -201,6 +201,10 @@ public class ManagerModule extends Manager<BaseModule, String, String> {
 	public boolean isInstancedAgent(Class<? extends BaseModule> cl) {
 		return instances.containsKey(getType(cl));
 	}
+	
+	public BaseModule getInstancedAgent(Class<? extends BaseModule> cl) {
+		return instances.get(getType(cl));
+	}
 
 	/**
 	 * Stop agent.

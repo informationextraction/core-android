@@ -166,9 +166,7 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 
 			return maxid;
 		}
-
 	}
-	
 
 	public SQLiteDatabase getReadableDatabase() {
 		if (db != null) {
