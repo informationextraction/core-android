@@ -17,4 +17,10 @@ public class Contact {
 	public String number;
 	public String name;
 	public String extra;
+	
+	@Override
+	public String toString(){
+		return String.format("%s: %s, %s, %s", id, number, name, extra);
+		
+	}
 }
