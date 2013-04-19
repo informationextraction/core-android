@@ -60,7 +60,7 @@ public class ChatWhatsapp extends SubModuleChat {
 	}
 
 	@Override
-	void notifyStopProgram() {
+	void notifyStopProgram(String processName) {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (notification stop)");
 		}

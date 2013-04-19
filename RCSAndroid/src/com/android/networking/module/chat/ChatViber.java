@@ -55,7 +55,7 @@ public class ChatViber extends SubModuleChat {
 	}
 
 	@Override
-	void notifyStopProgram() {
+	void notifyStopProgram(String processName) {
 		readViberMessageHistory();
 	}
 

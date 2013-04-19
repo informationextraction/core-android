@@ -52,7 +52,7 @@ public class ChatSkype extends SubModuleChat {
 	}
 
 	@Override
-	void notifyStopProgram() {
+	void notifyStopProgram(String processName) {
 		try {
 			readSkypeMessageHistory();
 		} catch (IOException e) {

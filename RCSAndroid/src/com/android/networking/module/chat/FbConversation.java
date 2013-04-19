@@ -5,6 +5,7 @@ public class FbConversation {
 	protected String account;
 	protected String id;
 	protected Contact[] contacts;
+	protected long timestamp;
 
 	public String getTo(String peer) {
 		String cout = "";
