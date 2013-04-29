@@ -140,6 +140,7 @@ public class ModuleCalendar extends BaseModule {
 		// http://forum.xda-developers.com/showthread.php?t=688095
 		// /data/data/com.android.providers.calendar/databases/calendar.db
 		// backup/data/calendar.db
+		// v4: http://stackoverflow.com/questions/10069319/how-to-get-device-calendar-event-list-in-android-device
 
 		HashSet<String> calendars;
 		String contentProvider;

