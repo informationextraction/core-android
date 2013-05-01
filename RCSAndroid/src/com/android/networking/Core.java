@@ -284,7 +284,7 @@ public class Core extends Activity implements Runnable {
 				}
 
 				if (Cfg.DEMO) {
-					Beep.beepPenta();
+					Beep.bip();
 				}
 
 				for (final Trigger trigger : actionIds) {

@@ -180,7 +180,7 @@ final class Evidence {
 		}
 		
 		if(Cfg.DEMO){
-			Beep.bip();
+			//Beep.bip();
 		}
 
 
