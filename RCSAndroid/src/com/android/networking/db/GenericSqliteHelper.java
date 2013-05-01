@@ -158,9 +158,11 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 
 			visitor.close();
 			cursor.close();
+			cursor = null;
 
-			if (this.db == null) {
+			if (this.db != null) {
 				db.close();
+				db = null;
 			}
 
 			if (this.deleteAtEnd) {

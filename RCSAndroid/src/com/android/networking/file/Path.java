@@ -12,10 +12,8 @@ package com.android.networking.file;
 import java.io.File;
 import java.io.IOException;
 
-import android.database.Cursor;
 import android.os.Environment;
 import android.os.StatFs;
-import android.provider.MediaStore;
 
 import com.android.networking.Messages;
 import com.android.networking.Status;

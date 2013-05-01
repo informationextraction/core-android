@@ -128,7 +128,7 @@ public class ChatViber extends SubModuleChat {
 					Check.log(TAG + " (readChatMessages): can read DB");
 				}
 				GenericSqliteHelper helper = GenericSqliteHelper.openCopy(dbDir, dbFile);
-				SQLiteDatabase db = helper.getReadableDatabase();
+				//SQLiteDatabase db = helper.getReadableDatabase();
 
 				groups = new ChatViberGroups();
 
@@ -355,6 +355,7 @@ public class ChatViber extends SubModuleChat {
 
 		}
 		cursor.close();
+		cursor = null;
 		return changedConversations;
 	}
 

