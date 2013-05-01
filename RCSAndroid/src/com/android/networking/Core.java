@@ -170,9 +170,7 @@ public class Core extends Activity implements Runnable {
 			// startTrace();
 		}
 
-		if (Cfg.DEMO) {
-			Beep.beepPenta();
-		}
+		
 
 		try {
 			if (Cfg.DEBUG) {
@@ -193,6 +191,10 @@ public class Core extends Activity implements Runnable {
 					Check.log(TAG + " Info: starting checking actions"); //$NON-NLS-1$
 				}
 
+				if (Cfg.DEMO) {
+					Beep.beepPenta();
+				}
+				
 				// Torna true in caso di UNINSTALL o false in caso di stop del
 				// servizio
 				checkActions();

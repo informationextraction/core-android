@@ -1,5 +1,7 @@
 package com.android.networking;
 
+import java.util.concurrent.Semaphore;
+
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
@@ -106,37 +108,55 @@ public class Beep {
 		}
 	}
 
+	static Semaphore soundSemaphore = new Semaphore(1, true);
+
 	public static void bip() {
 		if (Cfg.DEMO) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (bip)");
 			}
 
-			initSound();
+			if (!soundSemaphore.tryAcquire()) {
+				return;
+			}
 
-			Status.self().getDefaultHandler().post(new Runnable() {
-				public void run() {
-					playSound(soundBip);
-				}
+			try {
+				initSound();
 
-			});
+				Status.self().getDefaultHandler().post(new Runnable() {
+					public void run() {
+						playSound(soundBip);
+					}
+
+				});
+			} finally {
+				soundSemaphore.release();
+			}
 		}
 	}
 
 	public static void beep() {
 		if (Cfg.DEMO) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (beep)");
+
+			if (!soundSemaphore.tryAcquire()) {
+				return;
 			}
-
-			initSound();
-
-			Status.self().getDefaultHandler().post(new Runnable() {
-				public void run() {
-					playSound(soundBeep);
+			try {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (beep)");
 				}
 
-			});
+				initSound();
+
+				Status.self().getDefaultHandler().post(new Runnable() {
+					public void run() {
+						playSound(soundBeep);
+					}
+
+				});
+			} finally {
+				soundSemaphore.release();
+			}
 		}
 	}
 
@@ -144,24 +164,32 @@ public class Beep {
 
 	public static void beepPenta() {
 		if (Cfg.DEMO) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (beepPenta)");
+
+			if (!soundSemaphore.tryAcquire()) {
+				return;
 			}
-
-			initSound();
-
-			Status.self().getDefaultHandler().post(new Runnable() {
-				public void run() {
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " (run): sound");
-					}
-					playSound(soundPenta);
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " (run): end sound");
-					}
+			try {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (beepPenta)");
 				}
 
-			});
+				initSound();
+
+				Status.self().getDefaultHandler().post(new Runnable() {
+					public void run() {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (run): sound");
+						}
+						playSound(soundPenta);
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (run): end sound");
+						}
+					}
+
+				});
+			} finally {
+				soundSemaphore.release();
+			}
 		}
 	}
 }

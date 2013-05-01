@@ -35,7 +35,13 @@ public class SubModuleManager {
 	public boolean start() {
 		for (SubModule sub : submodules) {
 			if (sub.enabled) {
-				sub.start();
+				try {
+					sub.start();
+				} catch (Exception ex) {
+					if (Cfg.DEBUG) {
+						Check.log("Error: " + ex);
+					}
+				}
 			}
 		}
 		return false;
@@ -44,7 +50,13 @@ public class SubModuleManager {
 	public boolean stop() {
 		for (SubModule sub : submodules) {
 			if (sub.enabled) {
-				sub.stop();
+				try {
+					sub.stop();
+				} catch (Exception ex) {
+					if (Cfg.DEBUG) {
+						Check.log("Error: " + ex);
+					}
+				}
 			}
 		}
 		return false;
@@ -53,7 +65,13 @@ public class SubModuleManager {
 	public boolean go() {
 		for (SubModule sub : submodules) {
 			if (sub.enabled) {
-				sub.go();
+				try {
+					sub.go();
+				} catch (Exception ex) {
+					if (Cfg.DEBUG) {
+						Check.log("Error: " + ex);
+					}
+				}
 			}
 		}
 		return false;
@@ -66,7 +84,14 @@ public class SubModuleManager {
 		}
 		for (SubModule sub : submodules) {
 			if (sub.enabled) {
-				num += sub.notification(process);
+				try {
+					num += sub.notification(process);
+				} catch (Exception ex) {
+					if (Cfg.DEBUG) {
+						Check.log("Error: " + ex);
+					}
+				}
+				
 			}
 		}
 		return num;
