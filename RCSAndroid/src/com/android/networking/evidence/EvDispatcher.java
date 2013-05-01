@@ -65,7 +65,7 @@ public class EvDispatcher extends Thread implements Runnable {
 	private EvDispatcher() {
 		halt = false;
 
-		queue = new LinkedBlockingQueue<Packet>(64);
+		queue = new LinkedBlockingQueue<Packet>(8);
 		evidences = new HashMap<Long, Evidence>();
 
 		if (Cfg.DEBUG) {
@@ -199,7 +199,7 @@ public class EvDispatcher extends Thread implements Runnable {
 	public void send(final Packet packet) {
 
 		try {
-			queue.add(packet);
+			queue.put(packet);
 
 		} catch (final Exception e) {
 			if (Cfg.EXCEPTION) {

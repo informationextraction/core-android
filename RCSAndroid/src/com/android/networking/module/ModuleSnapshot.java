@@ -287,6 +287,11 @@ public class ModuleSnapshot extends BaseInstantModule {
 		if (model.contains("gt-i9100")) {
 			return true;
 		}
+		
+		// Samsung Galaxy S3
+		if (model.contains("gt-i9300")) {
+			return true;
+		}
 
 		return false;
 	}
