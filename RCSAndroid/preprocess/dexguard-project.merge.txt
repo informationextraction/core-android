@@ -4,7 +4,7 @@
 -encryptclasses com.android.networking.util.AntiEmulator,com.android.networking.Root
 
 #-encryptclasses com.android.networking.*
--encryptstrings "17.*","20.*","32.*","36.*"
+-encryptstrings "17_*","20_*","32_*","36_*"
 
 #-dontobfuscate
 #-dontoptimize
@@ -20,6 +20,8 @@
 # l'ottimizzazione seguente fa crashare smali, disabilitare solo se occorre manipolare il codice
 -optimizations !method/marking/final
 #-optimizations !method/*
+
+#-classobfuscationdictionary classdictionary.txt
 
 #togliere l'offuscamento di com.android.networking.Core.isServiceRunning
 -keepclassmembers class com.android.networking.Core {

