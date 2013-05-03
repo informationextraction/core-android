@@ -99,7 +99,7 @@
 
 # Uncomment the following lines to remove Android logging code
 # (although you may want to keep error-level messages).
-#-assumenosideeffects class android.util.Log {
+#-assumenosideeffects class android.u/Users/zeno/HT/RCSAndroid/core-android/RCSAndroid/antlibs/DexGuard5.2.00/ant/custom_rules.xmltil.Log {
 #    public static boolean isLoggable(java.lang.String, int);
 #    public static int v(...);
 #    public static int i(...);

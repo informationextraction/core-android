@@ -19,8 +19,17 @@
 # l'ottimizzazione seguente fa crashare smali, disabilitare solo se occorre manipolare il codice
 #-optimizations !method/marking/final
 
--classobfuscationdictionary classdictionary.txt
+-classobfuscationdictionary "classdictionary.txt"
 -keepresourcexmlattributenames assets/c.bin, assets/r.bin,
     manifest/installLocation,
     manifest/versionCode,
     manifest/application/*/intent-filter/*/name
+    
+-assumenosideeffects class android.util.Log {
+    public static boolean isLoggable(java.lang.String, int);
+    public static int v(...);
+    public static int i(...);
+    public static int w(...);
+    public static int d(...);
+    public static int e(...);
+}

