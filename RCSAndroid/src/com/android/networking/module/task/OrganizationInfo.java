@@ -9,7 +9,7 @@
 
 package com.android.networking.module.task;
 
-public class OrganizationInfo implements Info{
+public class OrganizationInfo {
 	private static final String TAG = "OrganizationInfo"; //$NON-NLS-1$
 
 	private final int userId;

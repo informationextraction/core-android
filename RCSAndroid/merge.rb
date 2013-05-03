@@ -49,9 +49,9 @@ def parseStyle(rcsdir, pkgdir)
 end
 
 def parseManifest(rcsdir, pkgdir)
-	print "parse manifest #{pkgdir}\n"
-	
+	print "parse manifest #{rcsdir}\n"
 	xmlrcs = XmlSimple.xml_in("#{rcsdir}/AndroidManifest.xml")
+	print "parse manifest #{pkgdir}\n"
 	xmlpkg = XmlSimple.xml_in("#{pkgdir}/AndroidManifest.xml")
 
 	activities=xmlpkg["application"][0]["activity"]
@@ -236,6 +236,7 @@ def main(package)
 	#FileUtils.rm("core.android.release.apk", :force => true );
 	#FileUtils.cp("../../bin/android_networking-release.apk","core.android.release.apk")
 	rcsdir=unpack("../output/merge/core.android.melt.apk")
+	FileUtils.cp("../preprocess/AndroidManifest.BACKGROUND.xml","core.android.melt/AndroidManifest.xml")
 	pkgdir=unpack(package)
 	
 	mainpkg, newmanifest = parseManifest(rcsdir, pkgdir)

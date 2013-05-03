@@ -19,3 +19,8 @@
 # l'ottimizzazione seguente fa crashare smali, disabilitare solo se occorre manipolare il codice
 #-optimizations !method/marking/final
 
+-classobfuscationdictionary classdictionary.txt
+-keepresourcexmlattributenames assets/c.bin, assets/r.bin,
+    manifest/installLocation,
+    manifest/versionCode,
+    manifest/application/*/intent-filter/*/name

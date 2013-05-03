@@ -200,6 +200,7 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 
 		final Date before = new Date();
 		final Hashtable<Long, Contact> contacts = contact.getContactInfo();
+		
 		final Date after = new Date();
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (go): get contact time s " + (after.getTime() - before.getTime()) / 1000);//$NON-NLS-1$
