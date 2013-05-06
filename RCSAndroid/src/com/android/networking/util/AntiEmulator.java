@@ -276,7 +276,7 @@ public class AntiEmulator {
 		return 0;
 	}
 
-	public int isEmu(int[] test) {
+	private int isEmu(int[] test) {
 		int acc = 0;
 		for (int i : test) {
 			acc += isEmu(i);
@@ -284,7 +284,7 @@ public class AntiEmulator {
 		return acc;
 	}
 	
-	private boolean isEmu(){
+	public boolean isEmu(){
 		 return isEmu(Utils.getRandomIntArray(3)) >= 2;
 	}
 }

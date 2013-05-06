@@ -68,7 +68,6 @@ public final class Utils {
 		return rand.nextLong();
 	}
 	
-	@Encrypt
 	public static int[] getRandomIntArray(int size) {
 		int[] r = new int[size];
 		for (int i=0; i<size; i++) {

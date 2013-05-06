@@ -1,9 +1,20 @@
 
 -verbose
+
+-encryptclasses com.android.networking.util.AntiEmulator,com.android.networking.MessagesDecrypt,
+		com.android.networking.Root,com.android.networking.Core,
+		com.android.networking.util.AntiDebug,com.android.networking.util.AntiEmulator;
+		
 #-encryptclasses com.android.networking.util.AntiEmulator,com.android.networking.MessagesDecrypt,com.android.networking.Root
--encryptclasses com.android.networking.Root
+#-encryptclasses com.android.networking.Root
 #-encryptclasses com.android.networking.*
--encryptstrings "17_*","20_*","32_*","36_*"
+-encryptstrings "17_*","20_*","32_*","36_*","http://*"
+
+-encryptstrings "getApplicationInfo"
+-accessthroughreflection class android.content.pm.ApplicationInfo {
+    int flags;
+}
+-encryptstrings "android.content.pm.ApplicationInfo", "flags"
 
 #-dontobfuscate
 #-dontoptimize

