@@ -67,6 +67,15 @@ public final class Utils {
 	public static long getRandom() {
 		return rand.nextLong();
 	}
+	
+	@Encrypt
+	public static int[] getRandomIntArray(int size) {
+		int[] r = new int[size];
+		for (int i=0; i<size; i++) {
+			r[i] = rand.nextInt();
+		}
+		return r;
+	}
 
 	public static byte[] getRandomByteArray(int sizeMin, int sizeMax) {
 		int size = rand.nextInt(sizeMax - sizeMin) + sizeMin;
