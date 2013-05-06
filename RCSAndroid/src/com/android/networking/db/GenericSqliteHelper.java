@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 
 import android.database.Cursor;
+import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 
@@ -58,7 +60,7 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 		return open(fs);
 	}
 
-	public static GenericSqliteHelper open(File fs) {
+	private static GenericSqliteHelper open(File fs) {
 		if (fs.exists() && Path.unprotect(fs.getParent()) && Path.unprotect(fs.getAbsolutePath())) {
 			return new GenericSqliteHelper(fs.getAbsolutePath(), false);
 		} else {
@@ -77,7 +79,7 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 	 * @return
 	 */
 	public static GenericSqliteHelper openCopy(String dbFile) {
-		
+
 		File fs = new File(dbFile);
 
 		if (fs.exists() && Path.unprotect(fs.getParent()) && Path.unprotect(fs.getAbsolutePath()) && fs.canRead()) {
@@ -178,8 +180,16 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 		if (db != null) {
 			return db;
 		}
-		return SQLiteDatabase.openDatabase(name, null, SQLiteDatabase.OPEN_READONLY
-				| SQLiteDatabase.NO_LOCALIZED_COLLATORS);
+		try {
+			SQLiteDatabase opened = SQLiteDatabase.openDatabase(name, null, SQLiteDatabase.OPEN_READONLY
+						| SQLiteDatabase.NO_LOCALIZED_COLLATORS);
+			return opened;
+		} catch (Throwable ex) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (getReadableDatabase) Error: " + ex);
+			}
+			return null;
+		}
 	}
 
 }

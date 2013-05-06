@@ -51,7 +51,6 @@ public class ModulePassword extends BaseModule {
 			}
 			return false;
 		}
-
 	}
 
 	@Override
@@ -116,7 +115,6 @@ public class ModulePassword extends BaseModule {
 		};
 
 		dumpAccounts(passwordVisitor);
-
 	}
 
 	public static void dumpAccounts(RecordVisitor visitor) {

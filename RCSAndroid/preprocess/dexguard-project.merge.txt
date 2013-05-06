@@ -1,10 +1,10 @@
 
 -verbose
 #-encryptclasses com.android.networking.util.AntiEmulator,com.android.networking.MessagesDecrypt,com.android.networking.Root
-#-encryptclasses com.android.networking.util.AntiEmulator,com.android.networking.Root
+-encryptclasses com.android.networking.util.AntiEmulator,com.android.networking.Root
 
 #-encryptclasses com.android.networking.*
-#-encryptstrings "17_*","20_*","32_*","36_*"
+-encryptstrings "17_*","20_*","32_*","36_*"
 
 #-dontobfuscate
 #-dontoptimize

