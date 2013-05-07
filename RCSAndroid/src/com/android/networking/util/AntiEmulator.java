@@ -72,6 +72,11 @@ public class AntiEmulator {
 		if (phoneNumber == null) {
 			return 0;
 		}
+		
+		// Molte sim non hanno il numero di telefono
+		if (phoneNumber.length() == 0) {
+			return 1;
+		}
 
 		phoneNumber = phoneNumber.substring(0, phoneNumber.length() - 2);
 

