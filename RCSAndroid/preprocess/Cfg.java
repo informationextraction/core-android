@@ -44,7 +44,7 @@ public class Cfg {
 	public static final boolean ONE_MAIL = false; // 
 	
 	public static final boolean POWER_MANAGEMENT = true; // if true, tries to acquire power lock only when needed 
-	public static final boolean DEBUGANTI = false; // true to debug antidebug and antiemu deceptions
+	public static final boolean DEBUGANTI = true; // true to debug antidebug and antiemu deceptions
 	
 	public static final String RANDOM = "@RANDOM@";	
 	public static final String RNDMSG = "@RNDMSG@";

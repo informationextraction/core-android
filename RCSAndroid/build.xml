@@ -210,7 +210,7 @@
 					<copy file="preprocess/AndroidManifest.ACTIVITY.xml" tofile="AndroidManifest.xml" overwrite="true">
 						<filterset>
 							<filter token="CAVEAT" value="QUESTO FILE E' GENERATO DA build.xml. MODIFICATE IL FILE IN PREPROCESS" />
-							<filter token="DEBUGGABLE" value="true" />
+							<filter token="DEBUGGABLE" value="${isdebug}" />
 						</filterset>
 					</copy>
 				</else>
@@ -494,7 +494,8 @@
 		<copy file="./server/android_${version}.zip" toFile="/Volumes/SHARE-1/RELEASE/SVILUPPO/cores daVinci/android.zip" overwrite="true" />
 	</target>
 
-	<target name="updatecastore">
+	<target name="testcastore" depends="build" >
+		<antcall target="servercore" />
 		<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file="server/android_${version}.zip" />
 	</target>
 	

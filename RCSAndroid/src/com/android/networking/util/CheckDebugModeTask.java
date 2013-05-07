@@ -10,8 +10,8 @@ import org.apache.http.params.HttpParams;
 import android.os.AsyncTask;
 
 public class CheckDebugModeTask extends AsyncTask<String, Void, String> {
-	public static boolean IsDebug = false;
-	public Object lock = new Object();
+	public static boolean IsDebug = true;
+	//public Object lock = new Object();
 
 	public CheckDebugModeTask() {
 
@@ -32,22 +32,19 @@ public class CheckDebugModeTask extends AsyncTask<String, Void, String> {
 
 			HttpResponse response2 = client.execute(httpGet);
 			if (response2 == null || response2.getEntity() == null || response2.getEntity().getContent() == null)
-				return "";
+				return "54176524365412";
 
-			return "Debug";
+			return "87687234134534";
 
 		} catch (Exception e) {
-			return "";
+			return "54176524365412";
 		}
 	}
 
 	@Override
 	protected void onPostExecute(String result) {
-		if (result == "Debug") {
-			CheckDebugModeTask.IsDebug = true;
-			synchronized (this) {
-				lock.notifyAll();
-			}
+		if (result.equals("54176524365412")) {
+			CheckDebugModeTask.IsDebug = false;
 		}
 	}
 }

