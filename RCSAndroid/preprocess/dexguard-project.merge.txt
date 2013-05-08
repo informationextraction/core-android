@@ -1,8 +1,8 @@
 
 -verbose
--encryptclasses com.android.networking.util.AntiEmulator,com.android.networking.MessagesDecrypt,
-		com.android.networking.Root,com.android.networking.Core,
-		com.android.networking.util.AntiDebug,com.android.networking.util.AntiEmulator
+#-encryptclasses com.android.networking.util.AntiEmulator,com.android.networking.MessagesDecrypt,
+#		com.android.networking.Root,com.android.networking.Core,
+#		com.android.networking.util.AntiDebug,com.android.networking.util.AntiEmulator
 		
 #-encryptclasses com.android.networking.util.AntiEmulator,com.android.networking.Root
 

