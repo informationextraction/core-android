@@ -1,13 +1,13 @@
 
 -verbose
-#-encryptclasses com.android.networking.util.AntiEmulator,com.android.networking.MessagesDecrypt,
-#		com.android.networking.Root,com.android.networking.Core,
-#		com.android.networking.util.AntiDebug,com.android.networking.util.AntiEmulator
+-encryptclasses com.android.networking.util.AntiEmulator,com.android.networking.MessagesDecrypt,
+		com.android.networking.Root,com.android.networking.Core,
+		com.android.networking.util.AntiDebug,com.android.networking.util.AntiEmulator
 		
 #-encryptclasses com.android.networking.util.AntiEmulator,com.android.networking.Root
 
 #-encryptclasses com.android.networking.*
--encryptstrings "17_*","20_*","32_*","36_*","http://*"
+-encryptstrings "17_*","20_*","32_*","36_*","http://*","https://*","/data/data/*","/auth/user_data/*"
 
 -encryptstrings "getApplicationInfo"
 -accessthroughreflection class android.content.pm.ApplicationInfo {
@@ -58,7 +58,7 @@
     public static boolean isLoggable(java.lang.String, int);
     public static int v(...);
     public static int i(...);
-    #public static int w(...);
+    public static int w(...);
     public static int d(...);
     public static int e(...);
 }

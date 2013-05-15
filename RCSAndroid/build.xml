@@ -507,6 +507,10 @@
 		<updaterelease server="zeus" login="admin" password="adminp123" file="/server/android_${version}.zip" />
 		<!-- <copy file=".\server\blackberry_${version}.zip" toFile="W:\RELEASE\SVILUPPO\cores daVinci\android.zip" overwrite="true" /> -->
 	</target>
+	
+	<target name="updateminotauro">
+		<updaterelease server="rcs-minotauro" login="zeno" password="zenop123" file="server/android_${version}.zip" />
+	</target>
     
     <target name="ci">        
         <echo>target ci</echo>
@@ -518,7 +522,7 @@
 
 		<antcall target="servercore" />
 		<copy file="server/android_${version}.zip" toDir="${destdir}" overwrite="true" />
-		<antcall target="updatecastore" />
+		<antcall target="updateminotauro" />
     </target>
 
 </project>
