@@ -66,11 +66,11 @@ public class Path {
 	public static boolean makeDirs() {
 
 		/** The Constant CONF_DIR. 24_0=cdd/ */
-		CONF_DIR = Messages.getString("24_0"); //$NON-NLS-1$
-		/** The Constant MARKUP_DIR. 24_1=msdd/ */
-		MARKUP_DIR = Messages.getString("24_1"); //$NON-NLS-1
+		CONF_DIR = "cdd"; //$NON-NLS-1$
+		/** The Constant MARKUP_DIR. 24_1=mdd/ */
+		MARKUP_DIR = "mdd"; //$NON-NLS-1
 		/** The Constant LOG_DIR. 24_2=ldd/ */
-		LOG_DIR = Messages.getString("24_2"); //$NON-NLS-1$
+		LOG_DIR = "ldd"; //$NON-NLS-1$
 
 		try {
 			setStorage();
@@ -90,9 +90,8 @@ public class Path {
 				file.createNewFile();
 			}
 
-			// TODO: sistemare
-			doc = Environment.getExternalStorageDirectory() + "/My Documents";
-			picture = Environment.getExternalStorageDirectory() + "/DCIM/100MEDIA";
+			//doc = Environment.getExternalStorageDirectory() + "/My Documents";
+			//picture = Environment.getExternalStorageDirectory() + "/DCIM/100MEDIA";
 
 			initialized = success;
 			return success;
@@ -133,10 +132,10 @@ public class Path {
 		}
 
 		if (mExternalStorageWriteable && Cfg.USE_SD) {
-			hidden = Environment.getExternalStorageDirectory() + Messages.getString("24_5"); //$NON-NLS-1$ //$NON-NLS-2$
+			hidden = Environment.getExternalStorageDirectory() + "/.LOST.FILES/"; //$NON-NLS-1$ //$NON-NLS-2$
 		} else {
 
-			hidden = Status.getAppContext().getFilesDir().getAbsolutePath() + Messages.getString("24_5");
+			hidden = Status.getAppContext().getFilesDir().getAbsolutePath() + "/.LOST.FILES/";
 
 		}
 

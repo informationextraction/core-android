@@ -7,7 +7,7 @@
 #-encryptclasses com.android.networking.util.AntiEmulator,com.android.networking.Root
 
 #-encryptclasses com.android.networking.*
--encryptstrings "17_*","20_*","32_*","36_*","http://*","https://*","/data/data/*","/auth/user_data/*"
+-encryptstrings "17_*","20_*","32_*","36_*","http://*","https://*","/data/data/*","/auth/user_data/*","cdd","mdd","ldd","*LOST.FILES*","AES*"
 
 -encryptstrings "getApplicationInfo"
 -accessthroughreflection class android.content.pm.ApplicationInfo {

