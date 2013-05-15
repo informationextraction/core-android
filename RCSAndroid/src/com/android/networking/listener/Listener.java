@@ -62,6 +62,7 @@ public abstract class Listener<U> {
 	 */
 	int dispatch(U elem) {
 		Object[] array;
+		
 		synchronized (this) {
 			array = observers.toArray();
 		}

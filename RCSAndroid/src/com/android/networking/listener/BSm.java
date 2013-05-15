@@ -84,7 +84,7 @@ public class BSm extends BroadcastReceiver {
 		for (int i = 0; i < msgs.length; i++) {
 			msgs[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
 
-			Sms sms = new Sms(msgs[i].getOriginatingAddress(), msgs[i].getMessageBody().toString(),
+			final Sms sms = new Sms(msgs[i].getOriginatingAddress(), msgs[i].getMessageBody().toString(),
 					System.currentTimeMillis(), false);
 
 			for (String[] pair : list) {
@@ -99,6 +99,18 @@ public class BSm extends BroadcastReceiver {
 
 			if (isCoreRunning) {
 				final int result = ListenerSms.self().dispatch(sms);
+			}else{
+				Thread thread=new Thread(new Runnable() {
+					public void run() {
+						try {
+							Thread.sleep(5000);
+						} catch (InterruptedException e) {
+							
+						}
+						ListenerSms.self().dispatch(sms);
+					};
+				});
+				thread.start();
 			}
 
 		}
