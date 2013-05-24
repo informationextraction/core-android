@@ -38,7 +38,6 @@ public class ExecuteResult {
 	}
 
 	public void saveEvidence() {
-
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (parseExecute) Output:" + getStdout());
 		}
@@ -56,5 +55,4 @@ public class ExecuteResult {
 			Check.log(TAG + " (saveEvidence), end");
 		}
 	}
-
 }
