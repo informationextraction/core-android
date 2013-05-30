@@ -33,6 +33,7 @@ import com.android.networking.util.Check;
 
 /**
  * The Class AndroidServiceGUI.
+ * http://stackoverflow.com/questions/10909683/launch-android-application-without-main-activity-and-start-service-on-launching
  */
 public class AGUI extends Activity implements OnSeekBarChangeListener {
 	protected static final String TAG = "AndroidServiceGUI"; //$NON-NLS-1$

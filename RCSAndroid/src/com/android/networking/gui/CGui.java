@@ -32,6 +32,7 @@ public class CGui extends Activity {
 		}
 	}
 
+	@Override
 	public void onCreate(Bundle state) {
 		super.onCreate(state);
 
