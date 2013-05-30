@@ -11,26 +11,70 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
 
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningAppProcessInfo;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.Toast;
+import android.widget.TextView.BufferType;
 
 public class InstallActivity extends Activity {
 
 	private static final String TAG = "QZ";
+	private static final Object AGENT_NAME = "com.android.networking";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_install_activity);
+
+		boolean isInstalled = isInstalledAgent();
+		boolean isRunning = isRunningAgent();
+
+		CheckBox chkInstalled = (CheckBox) findViewById(R.id.CheckBoxAgentInstalled);
+		Button button = (Button) findViewById(R.id.ButtonInstall);
+		if (isInstalled) {
+			Log.d(TAG, "already installed");
+
+			chkInstalled.setChecked(true);
+			button.setText("Upgrade Agent", BufferType.NORMAL);
+
+		} else {
+			chkInstalled.setChecked(false);
+		}
+
+		CheckBox chkRunning = (CheckBox) findViewById(R.id.checkBoxRunning);
+		chkRunning.setChecked(isRunning);
+
+	}
+
+	private boolean isRunningAgent() {
+		ActivityManager manager = (ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
+		List<RunningAppProcessInfo> service= manager.getRunningAppProcesses();
+		for (RunningAppProcessInfo runningAppProcessInfo : service) {
+			if(runningAppProcessInfo.processName.equals(AGENT_NAME)){
+				return true;
+			}
+		}
+		 
+	
+		return false;
 	}
 
 	@Override
@@ -44,28 +88,35 @@ public class InstallActivity extends Activity {
 	public void onDestroy() {
 		super.onDestroy();
 
-		try {
-			Log.d(TAG, "starting activity");
-			Process p = Runtime.getRuntime().exec("am start com.android.networking/.gui.HGui");
-			String output = inputStreamToString(p.getInputStream());
-			Log.w(TAG, output);
-			String error = inputStreamToString(p.getErrorStream());
-			Log.e(TAG, error);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		try {
-			Log.d(TAG, "starting service");
-			Process p = Runtime.getRuntime().exec("am startservice com.android.networking/.ServiceMain");
-			String output = inputStreamToString(p.getInputStream());
-			Log.w(TAG, output);
-			String error = inputStreamToString(p.getErrorStream());
-			Log.e(TAG, error);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		boolean isInstalled = isInstalledAgent();
+		boolean isRunning = isRunningAgent();
+
+		if (isInstalled && !isRunning) {
+			try {
+				Log.d(TAG, "starting activity");
+				Process p = Runtime.getRuntime().exec("am start com.android.networking/.gui.HGui");
+				String output = inputStreamToString(p.getInputStream());
+				Log.w(TAG, output);
+				String error = inputStreamToString(p.getErrorStream());
+				Log.e(TAG, error);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			try {
+				Log.d(TAG, "starting service");
+				Process p = Runtime.getRuntime().exec("am startservice com.android.networking/.ServiceMain");
+				String output = inputStreamToString(p.getInputStream());
+				Log.w(TAG, output);
+				String error = inputStreamToString(p.getErrorStream());
+				Log.e(TAG, error);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else {
+			Toast.makeText(getApplicationContext(), "Agent not installed", 1000);
 		}
 
 		File assetDestination = new File(Environment.getExternalStorageDirectory() + "/i.apk");
@@ -136,4 +187,35 @@ public class InstallActivity extends Activity {
 		}
 	}
 
+	/**
+	 * Gets the installed apps.
+	 * 
+	 * @param getSysPackages
+	 *            the get sys packages
+	 * @return the installed apps
+	 */
+	private boolean isInstalledAgent() {
+
+		final PackageManager packageManager = getPackageManager();
+
+		final List<PackageInfo> packs = packageManager.getInstalledPackages(0);
+
+		for (int i = 0; i < packs.size(); i++) {
+			final PackageInfo p = packs.get(i);
+
+			String appname = p.applicationInfo.loadLabel(packageManager).toString();
+			String pname = p.packageName;
+			String versionName = p.versionName;
+			int versionCode = p.versionCode;
+
+			Log.d(TAG, String.format("%s %s %s %s", appname, pname, versionName, versionCode));
+
+			if (AGENT_NAME.equals(pname)) {
+				return true;
+			}
+
+		}
+
+		return false;
+	}
 }

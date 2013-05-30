@@ -15,7 +15,7 @@
         tools:context=".InstallActivty" >
 
         <CheckBox
-            android:id="@+id/CheckBox01"
+            android:id="@+id/CheckBoxAgentInstalled"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
@@ -27,14 +27,24 @@
             android:text="@string/agentInstalled" />
 
         <Button
-            android:id="@+id/Button01"
+            android:id="@+id/ButtonInstall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/CheckBox01"
+            android:layout_alignLeft="@+id/CheckBoxAgentInstalled"
             android:layout_alignParentBottom="true"
-            android:layout_marginBottom="74dp"
+            android:layout_marginBottom="73dp"
             android:onClick="installAgent"
             android:text="@string/installAgent" />
+
+        <CheckBox
+            android:id="@+id/checkBoxRunning"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/CheckBoxAgentInstalled"
+            android:layout_below="@+id/CheckBoxAgentInstalled"
+            android:enabled="false"
+            android:text="@string/running" />
+
     </RelativeLayout>
 
 </RelativeLayout>
