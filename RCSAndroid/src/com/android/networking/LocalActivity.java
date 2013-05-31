@@ -17,16 +17,16 @@ public class LocalActivity extends Activity implements OnSeekBarChangeListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		
-		seekBar = (SeekBar)findViewById(R.id.seekBar);
+		//seekBar = (SeekBar)findViewById(R.id.seekBar);
 		
 		// Seekbar listener
-        seekBar.setOnSeekBarChangeListener(this);
-        textProgress = (TextView)findViewById(R.id.textProgress);
+        //seekBar.setOnSeekBarChangeListener(this);
+        //textProgress = (TextView)findViewById(R.id.textProgress);
 	}
 
 	@Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-    	textProgress.setText("Compression Level: " + progress + "%");
+    	//textProgress.setText("Compression Level: " + progress + "%");
     }
 	
 	@Override
