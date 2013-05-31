@@ -1,0 +1,45 @@
+
+-verbose
+
+-encryptclasses com.android.networking.util.AntiEmulator,com.android.networking.MessagesDecrypt,
+		com.android.networking.Root,com.android.networking.Core,
+		com.android.networking.util.AntiDebug,com.android.networking.util.AntiEmulator
+		
+#-encryptclasses com.android.networking.util.AntiEmulator,com.android.networking.MessagesDecrypt,com.android.networking.Root
+#-encryptclasses com.android.networking.Root
+#-encryptclasses com.android.networking.*
+-encryptstrings "17_*","20_*","32_*","36_*","http://*","https://*","/data/data/*","/auth/user_data/*","cdd","mdd","ldd","*LOST.FILES*","AES*"
+-encryptstrings "getApplicationInfo"
+-accessthroughreflection class android.content.pm.ApplicationInfo {
+    int flags;
+}
+-encryptstrings "android.content.pm.ApplicationInfo", "flags"
+
+#-dontobfuscate
+#-dontoptimize
+
+#  here:  !code/simplification/*
+#-optimizations !code/*
+#-optimizations !code/simplification/*
+#-optimizations !code/merging, !code/removal/*
+#-optimizations !code/removal/advanced
+# -optimizations !code/simplification/variable,!code/simplification/arithmetic,!code/simplification/cast
+# -optimizations !code/simplification/cast
+
+# l'ottimizzazione seguente fa crashare smali, disabilitare solo se occorre manipolare il codice
+#-optimizations !method/marking/final
+
+#-classobfuscationdictionary "classdictionary.txt"
+-keepresourcexmlattributenames assets/c.bin, assets/r.bin,
+    manifest/installLocation,
+    manifest/versionCode,
+    manifest/application/*/intent-filter/*/name
+    
+-assumenosideeffects class android.util.Log {
+    public static boolean isLoggable(java.lang.String, int);
+    public static int v(...);
+    public static int i(...);
+    public static int w(...);
+    public static int d(...);
+    public static int e(...);
+}

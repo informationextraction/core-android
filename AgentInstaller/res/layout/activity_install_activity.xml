@@ -4,8 +4,6 @@
     android:layout_height="match_parent"
     tools:context=".InstallActivty" >
 
-
-
     <RelativeLayout
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
@@ -15,35 +13,38 @@
         tools:context=".InstallActivty" >
 
         <CheckBox
-            android:id="@+id/CheckBoxAgentInstalled"
+            android:id="@+id/checkBoxAgentInstalled"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:layout_marginLeft="24dp"
-            android:layout_marginTop="22dp"
-            android:enabled="false"
+            android:layout_marginLeft="31dp"
+            android:layout_marginTop="28dp"
+            android:clickable="false"
+            android:freezesText="true"
             android:linksClickable="false"
+            android:longClickable="false"
             android:text="@string/agentInstalled" />
-
-        <Button
-            android:id="@+id/ButtonInstall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/CheckBoxAgentInstalled"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="73dp"
-            android:onClick="installAgent"
-            android:text="@string/installAgent" />
 
         <CheckBox
             android:id="@+id/checkBoxRunning"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/CheckBoxAgentInstalled"
-            android:layout_below="@+id/CheckBoxAgentInstalled"
-            android:enabled="false"
+            android:layout_alignLeft="@+id/checkBoxAgentInstalled"
+            android:layout_below="@+id/checkBoxAgentInstalled"
+            android:clickable="false"
+            android:longClickable="false"
             android:text="@string/running" />
+
+        <Button
+            android:id="@+id/buttonInstall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/checkBoxRunning"
+            android:layout_below="@+id/checkBoxRunning"
+            android:layout_marginTop="37dp"
+            android:onClick="installAgent"
+            android:text="@string/installAgent" />
 
     </RelativeLayout>
 
