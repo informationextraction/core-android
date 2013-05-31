@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="android_networking" default="help">
+
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+		<classpath>
+			<pathelement location="antlibs/ant-contrib-1.0b3.jar" />
+		</classpath>
+	</taskdef>
+
+	<taskdef name="iff" classname="net.sf.antcontrib.logic.IfTask" onerror="ignore">
+		<classpath>
+			<pathelement location="antlibs/ant-contrib-1.0b3.jar" />
+		</classpath>
+	</taskdef>
+
+	<taskdef name="crypter" classname="com.example.ant.Crypter">
+		<classpath>
+			<pathelement path="../crypter/build/archive/crypter-ant.jar" />
+		</classpath>
+	</taskdef>
+
+	<taskdef name="random" classname="com.example.ant.RandomString">
+		<classpath>
+			<pathelement path="../crypter/build/archive/crypter-ant.jar" />
+			<fileset dir="../crypter/lib">
+				<include name="**/*.jar" />
+				<include name="**/*.zip" />
+			</fileset>
+		</classpath>
+	</taskdef>
+
+	
+	<loadproperties srcFile="local.properties" />
+	<property file="ant.properties" />
+	<loadproperties srcFile="project.properties" />
+
+	<property name="rcscore.path" value="../RCSAndroid/antlibs" />
+	<property name="out.dir" value="bin" />
+	<property name="out.classes.absolute.dir" location="${out.dir}/classes" />
+
+	<import file="custom_rules.xml" optional="true" />
+	<target name="release" depends="-set-release-mode, -release-prompt-for-password, -package, -post-package, -post-build" />
+	<target name="debug" depends="-set-debug-mode, -set-debug-files, -package, -post-package, -post-build" />
+	<target name="instrument" depends="-set-instrumented-mode, debug" />
+
+	<import file="${sdk.dir}/tools/ant/build.xml" />
+
+	<fail message="sdk.dir is missing. Make sure to generate local.properties using 'android update project'" unless="sdk.dir" />
+
+	<!-- version-tag: 2011102401 -->
+	<!-- import file="${sdk.dir}/tools/ant/build.xml" -->
+
+	<path id="android.antlibs">
+		<pathelement path="${sdk.dir}/tools/lib/anttasks.jar" />
+		<pathelement path="${sdk.dir}/tools/lib/sdklib.jar" />
+		<pathelement path="${sdk.dir}/tools/lib/androidprefs.jar" />
+	</path>
+
+	<!-- extension targets. Uncomment the ones where you want to do custom work
+	     in between standard targets -->
+	<filterset id="dateFilterSet">
+		<filter token="DATE" value="${TODAY}" />
+	</filterset>
+
+	<target name="salt" unless="randomSalt">
+		<random len="8" property="randomSalt" />
+		<echo>RandomSalt:${randomSalt}</echo>
+	</target>
+
+	<target name="init" depends="salt" unless="build.number">
+		<tstamp>
+			<format property="timestamp.BUILD" pattern="yyyyMMdd-hhmmss" />
+		</tstamp>
+		<property file="build.number" />
+		<echo message="timestamp ${timestamp.BUILD}" />
+		<echo message="build.number ${build.number}" />
+	</target>
+
+	<target name="help">
+		<echo>ant build :  full build</echo>
+	</target>
+
+	<target name="build" depends="init">
+		<buildnumber />
+		<delete dir="output" />
+
+		<echo message="==============" />
+		<echo message="===  BUILD ===" />
+		<echo message="==============" />
+		<echo>Version @{osversion}</echo>
+
+		<echo>clean</echo>
+		<antcall target="clean" />
+		<antcall target="release" inheritAll="false" />
+	</target>
+	
+</project>

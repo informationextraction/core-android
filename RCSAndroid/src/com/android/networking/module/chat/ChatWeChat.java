@@ -238,8 +238,8 @@ public class ChatWeChat extends SubModuleChat {
 
 				// for every conversation, fetch and save message and update
 				// markup
-				for (Pair<String, Integer> pair : changedConversations) {
-					String conversation = pair.first;
+				for (Pair<Integer, Integer> pair : changedConversations) {
+					String conversation = Integer.toString(pair.first);
 					int lastReadIndex = pair.second;
 
 					/*if (groups.isGroup(conversation) && !groups.hasMemoizedGroup(conversation)) {
