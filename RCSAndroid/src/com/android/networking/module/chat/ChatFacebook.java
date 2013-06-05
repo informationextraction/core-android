@@ -120,10 +120,10 @@ public class ChatFacebook extends SubModuleChat {
 		}
 		//SQLiteDatabase db = helper.getReadableDatabase();
 
-		String[] projection = new String[] { "key", "value" };
+		//String[] projection = new String[] { "key", "value" };
 		String selection = null;
 
-		RecordHashPairVisitor visitor = new RecordHashPairVisitor(projection);
+		RecordHashPairVisitor visitor = new RecordHashPairVisitor("key", "value");
 		helper.traverseRecords("preferences", visitor);
 
 		Hashtable<String, String> preferences = visitor.getMap();

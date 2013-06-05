@@ -10,6 +10,7 @@
 package com.android.networking.util;
 
 import java.io.File;
+import java.util.Date;
 
 import android.os.Environment;
 import android.util.Log;
@@ -74,7 +75,7 @@ public final class Check {
 		}
 	}
 
-	public static void log(String string) {		
+	public static void log(String string) {
 		log(string, false);
 	}
 
@@ -86,7 +87,7 @@ public final class Check {
 				final AutoFile file = new AutoFile(Path.getCurLogfile());
 				final DateTime date = new DateTime();
 				file.append(date.getOrderedString() + " - " + string + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
-			
+
 			}
 		}
 	}
@@ -96,5 +97,17 @@ public final class Check {
 			e.printStackTrace();
 			log("Exception: " + e.toString(), true); //$NON-NLS-1$
 		}
+	}
+
+	public static void log(String format, String... args) {
+		log(String.format(format, args));
+	}
+
+	public static void log(String string, Exception ex) {
+		if (Cfg.DEBUG || Cfg.EXCEPTION) {
+			ex.printStackTrace();
+			log(string + ex.toString(), true); //$NON-NLS-1$
+		}
+		
 	}
 }

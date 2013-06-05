@@ -10,10 +10,10 @@ import android.database.Cursor;
  */
 public abstract class RecordVisitor {
 
-	public String table;
+	public String[] tables;
 	public int count;
 	public String[] projection = null;
-	private String selection = null;
+	public String selection = null;
 	private String order = null;
 
 	public RecordVisitor() {
@@ -40,8 +40,8 @@ public abstract class RecordVisitor {
 
 	public abstract long cursor(Cursor cursor);
 
-	public final void init(String table, int count) {
-		this.table = table;
+	public final void init(String[] tables, int count) {
+		this.tables = tables;
 		this.count = count;
 		init();
 	}

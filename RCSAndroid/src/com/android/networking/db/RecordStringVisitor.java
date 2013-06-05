@@ -11,18 +11,22 @@ import android.database.Cursor;
  * @author zeno
  * 
  */
-public class RecordStringsVisitor extends RecordVisitor {
+public class RecordStringVisitor extends RecordVisitor {
 
 	// public abstract void record(int rpos, String[] record);
-	List<String[]> records = new ArrayList<String[]>();
+	List<String> records = new ArrayList<String>();
 
-	public List<String[]> getRecords() {
+	public RecordStringVisitor(String column) {
+		this.projection = new String[]{column};
+	}
+	
+	public List<String> getRecords() {
 		return records;
 	}
 
 	@Override
 	public final void init() {
-		records = new ArrayList<String[]>();
+		records = new ArrayList<String>();
 	}
 
 	@Override
@@ -33,17 +37,10 @@ public class RecordStringsVisitor extends RecordVisitor {
 	@Override
 	public final long cursor(Cursor cursor) {
 
-		String[] record = new String[getProjection().length];
-		int rpos = 0;
-		for (String column : getProjection()) {
-
-			record[rpos] = cursor.getString(cursor.getColumnIndex(column));
-			rpos++;
-		}
-
+		String record = cursor.getString(0);
 		records.add(record);
 
-		return rpos;
+		return 0;
 	}
 
 }

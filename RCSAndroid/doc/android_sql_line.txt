@@ -1,0 +1,23 @@
+Line
+/data/data/jp.naver.line.android/databases/naver_line
+
+select m_id, contact_id, name from contacts
+
+groups:
+select mid where chat_id = ...
+SELECT  name FROM "chat_member" join contacts on chat_member.mid = contacts.m_id where chat_id = ...;
+
+select chat_id, from_mid, content, created_time, sent_count from chat_history order by created_time
+
+
+select chat_id, from_mid, content, ch.created_time, sent_count , name
+from chat_history as ch  
+left join contacts as c 
+on ch.from_mid = c.m_id 
+order by ch.created_time
+
+
+Per trovare il proprio name, se ci sono delle chat gruppo, si trova nel content:
+select chat_id, content from chat_history where server_id is null and type > 1
+Il content e' una sequenza di tre linee (numero, mid, name)
+

