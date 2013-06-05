@@ -219,9 +219,12 @@ public class ChatLine extends SubModuleChat {
 				String mid = cursor.getString(1);
 				String name = cursor.getString(2);
 
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (getLineGroups) %s: %s,%s", key, mid, name);
+				if(mid.equals(account_mid)){
+					name = account;
 				}
+				//if (Cfg.DEBUG) {
+				//	Check.log(TAG + " (getLineGroups) %s: %s,%s", key, mid, name);
+				//}
 				if (name == null) {
 					groups.addPeerToGroup(key, mid);
 				} else {
@@ -236,10 +239,11 @@ public class ChatLine extends SubModuleChat {
 		helper.traverseRawQuery(sqlquery, null, visitor);
 
 		groups.addLocalToAllGroups(account);
+
 		if (Cfg.DEBUG) {
 			for(String group: groups.getAllGroups()){
 				String to = groups.getGroupTo(account, group);
-				Check.log(TAG + " (getLineGroups) %s : %s", group, to);
+				Check.log(TAG + " (getLineGroups group) %s : %s", group, to);
 			}
 			
 			

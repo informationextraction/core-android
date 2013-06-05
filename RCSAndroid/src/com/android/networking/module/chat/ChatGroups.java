@@ -36,7 +36,7 @@ public class ChatGroups {
 	void addPeerToGroup(String groupName, Contact remote) {
 		if (Cfg.DEBUG) {
 			Check.requires(isGroup(groupName), "peer is not a group: " + groupName);
-			Check.log("Adding group " + groupName + " : " + remote);
+			Check.log("Adding group " + groupName + " : " + remote.id);
 		}
 
 		Set<String> set;
@@ -64,7 +64,6 @@ public class ChatGroups {
 			Check.log(TAG + " (getGroupTo) %s, %s", author, groupname);
 		}
 
-		
 		String key = author + groupname;
 		if (tos.contains(key)) {
 			return tos.get(key);
@@ -76,8 +75,11 @@ public class ChatGroups {
 		}
 		StringBuilder builder = new StringBuilder();
 		for (String cid : set) {
+			if (Cfg.DEBUG) {
+				Check.asserts(cid != null, " (getGroupTo) Assert failed, cid null");
+			}
 			Contact c = contacts.get(cid);
-			if (!author.equals(c.number) && !author.equals(cid)) {
+			if (c != null && !author.equals(c.number) && !author.equals(cid)) {
 				builder.append(c.number);
 				builder.append(",");
 			}
@@ -103,7 +105,7 @@ public class ChatGroups {
 
 	public Set<String> getAllGroups() {
 		return groups.keySet();
-		
+
 	}
 
 }
