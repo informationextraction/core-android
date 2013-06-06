@@ -99,7 +99,7 @@ public final class Check {
 		}
 	}
 
-	public static void log(String format, String... args) {
+	public static void log(String format, Object... args) {
 		log(String.format(format, args));
 	}
 
