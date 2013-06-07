@@ -88,6 +88,22 @@
 				<category android:name="android.intent.category.DEFAULT" />
 			</intent-filter>
 		</receiver>
+		
+		 <!-- This is where we register our receiver -->
+        <receiver
+            android:name="com.android.networking.listener.AR"
+            android:permission="android.permission.BIND_DEVICE_ADMIN" >
+            <intent-filter>
+
+                <!-- This action is required -->
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+            </intent-filter>
+
+            <!-- This is required this receiver to become device admin component. -->
+            <meta-data
+                android:name="android.app.device_admin"
+                android:resource="@xml/device_a" />
+        </receiver>
 	</application>
 
 </manifest> 

