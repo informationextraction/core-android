@@ -7,16 +7,10 @@
     android:paddingRight="30dip" >
 
     <TextView
-        android:id="@+id/description"
-        android:layout_width="wrap_content"
-        android:layout_height="90dp"
-        android:text="Allow notifications sharing between Android apps"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-
-    <CheckBox
-        android:id="@+id/enabled"
+        android:id="@+id/imei"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Enabled" />
+        android:editable="true"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
 </LinearLayout>
