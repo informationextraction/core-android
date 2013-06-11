@@ -23,11 +23,9 @@ import android.util.Pair;
 import com.android.networking.Messages;
 import com.android.networking.auto.Cfg;
 import com.android.networking.db.GenericSqliteHelper;
-import com.android.networking.db.RecordVisitor;
 import com.android.networking.file.Path;
 import com.android.networking.module.ModuleAddressBook;
 import com.android.networking.util.Check;
-import com.android.networking.util.ExecuteResult;
 import com.android.networking.util.StringUtils;
 
 public class ChatWeChat extends SubModuleChat {
