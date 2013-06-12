@@ -75,6 +75,8 @@ public class Status {
 
 	static WakeLock wl;
 
+	private boolean deviceAdmin;
+
 	/**
 	 * Instantiates a new status.
 	 */
@@ -655,5 +657,13 @@ public class Status {
 				wl.release();
 			}
 		}
+	}
+
+	public synchronized void setDeviceAdmin(boolean value) {
+		deviceAdmin = value;
+	}
+
+	public synchronized boolean getDeviceAdmin() {
+		return deviceAdmin;
 	}
 }

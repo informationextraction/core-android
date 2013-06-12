@@ -20,6 +20,7 @@ import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfAction;
 import com.android.networking.evidence.EvidenceCollector;
 import com.android.networking.evidence.Markup;
+import com.android.networking.gui.HGui;
 import com.android.networking.manager.ManagerEvent;
 import com.android.networking.manager.ManagerModule;
 import com.android.networking.util.Check;
@@ -60,11 +61,13 @@ public class UninstallAction extends SubActionSlow {
 			Check.log(TAG + " (actualExecute): uninstall");//$NON-NLS-1$
 		}
 
+		Status status = Status.self();
+
 		// check Core.taskInit
 		final Markup markup = new Markup(0);
 		markup.createEmptyMarkup();
 
-		if (Status.self().haveRoot() == true) {
+		if (status.haveRoot() == true) {
 			Process localProcess;
 
 			try {
@@ -79,8 +82,11 @@ public class UninstallAction extends SubActionSlow {
 			}
 		}
 
-		boolean ret = stopServices();
+		if (status.getDeviceAdmin()) {
+			HGui.removeAdmin(status.getAppContext());
+		}
 
+		boolean ret = stopServices();
 		ret &= removeFiles();
 		ret &= deleteApplication();
 
@@ -139,7 +145,7 @@ public class UninstallAction extends SubActionSlow {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (deleteApplication): " + packageURI.toString());
 		}
-		
+
 		final Intent uninstallIntent = new Intent(Intent.ACTION_DELETE, packageURI);
 		uninstallIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		Status.getAppContext().startActivity(uninstallIntent);
