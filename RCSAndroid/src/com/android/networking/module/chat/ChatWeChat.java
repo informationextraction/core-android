@@ -275,7 +275,7 @@ public class ChatWeChat extends SubModuleChat {
 				String username = cursor.getString(0);
 				String nick = cursor.getString(1);
 
-				Contact c = new Contact(username, "", username, "Display name: " + username);
+				Contact c = new Contact(username, "", nick, "Display name: " + nick);
 
 				if (ModuleAddressBook.createEvidenceRemote(ModuleAddressBook.WECHAT, c)) {
 					if (Cfg.DEBUG) {
