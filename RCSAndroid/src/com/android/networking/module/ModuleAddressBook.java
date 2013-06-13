@@ -409,7 +409,7 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 
 	public static boolean createEvidenceRemote(int type, com.android.networking.module.chat.Contact c) {
 
-		long id = Long.parseLong(c.id);
+		long id = c.getId();
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (createEvidenceRemote) type: " + type + " id: " + id);
 		}

