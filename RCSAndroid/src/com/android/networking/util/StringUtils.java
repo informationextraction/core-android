@@ -7,11 +7,13 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.List;
 
 import com.android.networking.auto.Cfg;
 
 public class StringUtils {
 	private static final String TAG = "StringUtils";
+
 	/**
 	 * Byte array to hex string.
 	 * 
@@ -188,7 +190,6 @@ public class StringUtils {
 		}
 	}
 
-
 	/**
 	 * Chomp.
 	 * 
@@ -244,6 +245,23 @@ public class StringUtils {
 	}
 
 	public static boolean isEmpty(String string) {
-		return string==null || string.length() == 0;
+		return string == null || string.length() == 0;
+	}
+
+	public static String join(List<String> lines, String delimiter, int start) {
+		String listString = "";
+
+		int counter = 0;
+		for (String s : lines) {
+			if(counter++ < start)
+				continue;
+			listString += s + delimiter;
+		}
+
+		return listString;
+	}
+
+	public static String join(List<String> lines) {
+		return join(lines, "", 0);
 	}
 }

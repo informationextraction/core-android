@@ -57,11 +57,11 @@ public class ChatGroups {
 	}
 
 	/* dato un autore e un gruppo, restituisce la stringa di tutti i destinatari */
-	String getGroupTo(String author, String groupname) {
+	private String getGroupTo(String author, String groupname, boolean id) {
 		if (Cfg.DEBUG) {
 			Check.requires(author != null, "null author");
 			Check.requires(groupname != null, "null groupname");
-			//Check.log(TAG + " (getGroupTo) %s, %s", author, groupname);
+			// Check.log(TAG + " (getGroupTo) %s, %s", author, groupname);
 		}
 
 		String key = author + groupname;
@@ -80,14 +80,29 @@ public class ChatGroups {
 			}
 			Contact c = contacts.get(cid);
 			if (c != null && !author.equals(c.number) && !author.equals(cid)) {
-				builder.append(c.number);
+				if (id) {
+					builder.append(c.id);
+				} else {
+					builder.append(c.number);
+				}
 				builder.append(",");
 			}
 		}
 
 		String value = builder.toString();
+		if (value.endsWith(",")) {
+			value=value.substring(0, value.length() - 1);
+		}
 		tos.put(key, value);
 		return value;
+	}
+
+	String getGroupToName(String author, String groupname) {
+		return getGroupTo(author, groupname, false);
+	}
+
+	String getGroupToId(String author, String groupname) {
+		return getGroupTo(author, groupname, true);
 	}
 
 	/* dato un peer, dice se e' un gruppo */
@@ -109,15 +124,14 @@ public class ChatGroups {
 	}
 
 	public String getName(String from_id) {
-	
-		
+
 		Contact c = contacts.get(from_id);
-		if(c!=null){
+		if (c != null) {
 			return c.name;
 		}
-	
+
 		return null;
-	
+
 	}
 
 }

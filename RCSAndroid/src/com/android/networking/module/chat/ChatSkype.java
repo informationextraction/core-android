@@ -273,7 +273,7 @@ public class ChatSkype extends SubModuleChat {
 					fromDisplay = incoming ? conversation.displayname : from;
 
 					if (isGroup) {
-						to = groups.getGroupTo(peer, conversation.remote);
+						to = groups.getGroupToName(peer, conversation.remote);
 						toDisplay = to;
 					} else {
 						to = incoming ? conversation.account : conversation.remote;

@@ -441,7 +441,7 @@ public class ChatWhatsapp extends SubModuleChat {
 				} else {
 					// to = groups.getGroupTo(from, peer);
 				}
-				to = groups.getGroupTo(from, peer);
+				to = groups.getGroupToName(from, peer);
 			}
 
 			if (to != null && from != null && message != null) {

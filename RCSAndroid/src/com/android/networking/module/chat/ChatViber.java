@@ -276,7 +276,7 @@ public class ChatViber extends SubModuleChat {
 						if (peer.equals("0")) {
 							peer = conversation.account;
 						}
-						to = groups.getGroupTo(peer, thread);
+						to = groups.getGroupToName(peer, thread);
 						toDisplay = to;
 					} else {
 						to = incoming ? conversation.account : conversation.remote;

