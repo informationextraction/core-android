@@ -10,9 +10,39 @@
 #include <time.h>
 #include <stdlib.h>
 
-void obfuscate(unsigned char *s, unsigned char *d) {
+// <search string> <replace string> <string to search>
+unsigned char *str_replace(unsigned char *search , unsigned char *replace , unsigned char *subject) {
+    unsigned char *p = NULL , *old = NULL , *new_subject = NULL ;
+    int c = 0 , search_size;
+
+    search_size = strlen(search);
+
+    for (p = strstr(subject , search) ; p != NULL ; p = strstr(p + search_size , search)) {
+        c++;
+    }
+
+    c = (strlen(replace) - search_size )*c + strlen(subject);
+    new_subject = malloc(c);
+    strcpy(new_subject , "");
+    old = subject;
+
+    for (p = strstr(subject , search) ; p != NULL ; p = strstr(p + search_size , search)) {
+        strncpy(new_subject + strlen(new_subject) , old , p - old);
+        strcpy(new_subject + strlen(new_subject) , replace);
+        old = p + search_size;
+    }
+
+    strcpy(new_subject + strlen(new_subject) , old);
+    return new_subject;
+}
+
+int obfuscate(unsigned char *s, unsigned char *d) {
     unsigned int seed;
     unsigned char key, mod;
+    unsigned char *rep = NULL;
+    unsigned char nl[] = "\n";
+    unsigned char tb[] = "\t";
+    unsigned char cr[] = "\r";
     int i, j, len;
 
     srandom(time(0));
@@ -21,7 +51,11 @@ void obfuscate(unsigned char *s, unsigned char *d) {
     key = (unsigned char)(seed & 0x000000ff);
     mod = (unsigned char)((seed & 0x0000ff00) >> 8);
 
-    len = strlen(s);
+    rep = str_replace("\\n", nl, s);
+    rep = str_replace("\\t", tb, rep);
+    rep = str_replace("\\r", cr, rep);
+
+    len = strlen(rep);
 
     if (len > 255) {
         printf("String too long\n");
@@ -33,10 +67,12 @@ void obfuscate(unsigned char *s, unsigned char *d) {
     d[2] = (unsigned char)len ^ key ^ mod;
 
     for (i = 0, j = 3; i < len; i++, j++) {
-        d[j] = s[i] ^ key;
+        d[j] = rep[i] ^ key;
         d[j] += mod;
         d[j] ^= mod;
     }
+
+    return len;
 }
 
 unsigned char* deobfuscate(unsigned char *s) {
@@ -76,11 +112,12 @@ int main(int argc, char *argv[]) {
     }
 
     obf_len = strlen(argv[1]) + 3;
-    
+
     buf = (unsigned char *)malloc(obf_len);
     memset(buf, 0x00, obf_len);
 
-    obfuscate(argv[1], buf);
+    obf_len = obfuscate(argv[1], buf);
+    obf_len += 3;
 
     printf("unsigned char obf_string[] = \"");
 
@@ -96,5 +133,6 @@ int main(int argc, char *argv[]) {
     printf("Deobfuscated string: \"%s\"\n", test);
 
     free(buf);
-    return 0;     
+    return 0;
 }
+

