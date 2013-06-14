@@ -131,7 +131,8 @@ public class ChatFacebook extends SubModuleChat {
 		account_uid = preferences.get("/auth/user_data/fb_uid");
 		account_name = preferences.get("/auth/user_data/fb_username");
 
-		return true;
+		return (!StringUtils.isEmpty(account_name) && !StringUtils.isEmpty(account_uid));
+		
 	}
 
 	private void readFbMessageHistory(String dbDir) {

