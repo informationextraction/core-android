@@ -225,4 +225,11 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 		}
 	}
 
+	public void deleteDb() {
+
+		File file = new File(this.name);
+		file.delete();
+
+	}
+
 }

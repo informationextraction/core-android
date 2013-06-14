@@ -44,3 +44,7 @@ Ero nex1"
 
 	Ovviamente gli id @chatroom non hanno un nick associato visto che sono chat di gruppo.
 
+
+7. la lista dei membri delle conversazioni multiple sono in chatroom
+
+  select chatroomname, displayname, memberlist from chatroom
