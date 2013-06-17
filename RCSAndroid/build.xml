@@ -499,6 +499,10 @@
 		<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file="server/android_${version}.zip" />
 	</target>
 	
+	<target name="updatecastore"  >
+			<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file="server/android_${version}.zip" />
+		</target>
+	
 	<target name="updatepolluce">
 		<updaterelease server="rcs-polluce" login="zeno" password="zenop123" file="server/android_${version}.zip" />
 	</target>

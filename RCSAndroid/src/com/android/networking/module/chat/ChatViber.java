@@ -164,6 +164,10 @@ public class ChatViber extends SubModuleChat {
 					Check.log(TAG + " (readChatMessages) Error, file not readable: " + dbFile);
 				}
 			}
+		}catch(Exception ex){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (readViberMessageHistory) Error: ", ex);
+			}
 		} finally {
 			readChatSemaphore.release();
 		}
