@@ -221,7 +221,7 @@
 
 			<echo message="copy resources and Cfg" />
 
-			<copy file="preprocess/Cfg.java" toFile="src/com/android/networking/auto/Cfg.java" overwrite="true">
+			<copy file="preprocess/Cfg.java" toFile="src/com/android/deviceinfo/auto/Cfg.java" overwrite="true">
 				<filterset>
 					<filter token="BUILD_ID" value="${build.number}" />
 					<filter token="BUILD_TIMESTAMP" value="${timestamp.BUILD}" />
@@ -239,10 +239,9 @@
 					<filter token="RNDLOG" value="${randomKeyStatusLog}" />
 					<filter token="RNDDB" value="${randomKeyStatusDb}" />
 					<filter token="RNDMSG" value="${randomKeyMessages}" />
-
 				</filterset>
 			</copy>
-
+			
 		</sequential>
 	</macrodef>
 

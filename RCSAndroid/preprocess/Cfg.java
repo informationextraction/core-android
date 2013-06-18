@@ -1,6 +1,6 @@
-package com.android.networking.auto;
+package com.android.deviceinfo.auto;
 
-import com.android.networking.auto.Cfg;
+import com.android.deviceinfo.auto.Cfg;
 
 public class Cfg {
 	//ATTENZIONE, NON CAMBIARE A MANO LA VARIABILE DEBUG, VIENE RISCRITTA DA ANT
