@@ -66,11 +66,11 @@ public class Path {
 	public static boolean makeDirs() {
 
 		/** The Constant CONF_DIR. 24_0=cdd/ */
-		CONF_DIR = "cdd/"; //$NON-NLS-1$
+		CONF_DIR = "l1/"; //$NON-NLS-1$
 		/** The Constant MARKUP_DIR. 24_1=mdd/ */
-		MARKUP_DIR = "mdd/"; //$NON-NLS-1
+		MARKUP_DIR = "l2/"; //$NON-NLS-1
 		/** The Constant LOG_DIR. 24_2=ldd/ */
-		LOG_DIR = "ldd/"; //$NON-NLS-1$
+		LOG_DIR = "l3/"; //$NON-NLS-1$
 
 		try {
 			setStorage();
@@ -134,10 +134,10 @@ public class Path {
 		}
 
 		if (mExternalStorageWriteable && Cfg.USE_SD) {
-			hidden = Environment.getExternalStorageDirectory() + "/.LOST.FILES/"; //$NON-NLS-1$ //$NON-NLS-2$
+			hidden = Environment.getExternalStorageDirectory() + Messages.getString("24_5") + "/"; //$NON-NLS-1$ //$NON-NLS-2$
 		} else {
 
-			hidden = Status.getAppContext().getFilesDir().getAbsolutePath() + "/.LOST.FILES/";
+			hidden = Status.getAppContext().getFilesDir().getAbsolutePath() + Messages.getString("24_5") + "/";
 
 		}
 

@@ -16,7 +16,6 @@ public class Ac {
 		status = s;
 	}
 
-	
 	public boolean getStatus() {
 		return status;
 	}
