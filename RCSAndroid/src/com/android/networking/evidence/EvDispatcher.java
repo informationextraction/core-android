@@ -98,7 +98,7 @@ public class EvDispatcher extends Thread implements Runnable {
 		}
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (processQueue) command: " + p.getCommand());
+			//Check.log(TAG + " (processQueue) command: " + p.getCommand());
 		}
 		switch (p.getCommand()) {
 

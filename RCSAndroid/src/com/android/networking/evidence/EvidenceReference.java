@@ -132,7 +132,7 @@ public class EvidenceReference {
 
 	public static void atomic(int evidenceType, byte[] additional, byte[] data) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (atomic)");
+			//Check.log(TAG + " (atomic)");
 		}
 		final Packet p = new Packet(evidenceType, additional, data);
 		EvDispatcher.self().send(p);
@@ -140,7 +140,7 @@ public class EvidenceReference {
 
 	public static void atomic(int evidenceType, ArrayList<byte[]> items) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (atomic)");
+			//Check.log(TAG + " (atomic)");
 		}
 		final Packet p = new Packet(evidenceType, items);
 		EvDispatcher.self().send(p);
