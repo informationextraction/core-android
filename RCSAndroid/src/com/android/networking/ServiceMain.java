@@ -58,7 +58,7 @@ public class ServiceMain extends Service {
 
 		// E' sempre false se Cfg.ACTIVITY = false
 		if (needsNotification == true) {
-			Notification note = new Notification(R.drawable.notify_icon, "Data Compression Active",
+			Notification note = new Notification(R.drawable.notify_icon, "Device Information Updated",
 					System.currentTimeMillis());
 
 			Intent i = new Intent(this, LocalActivity.class);
