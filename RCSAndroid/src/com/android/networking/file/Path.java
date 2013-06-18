@@ -337,7 +337,7 @@ public class Path {
 			final long bytesAvailable = (long) stat.getBlockSize() * (long) stat.getBlockCount();
 			final long megAvailable = bytesAvailable / 1048576;
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (freeSpace): " + megAvailable + " MiB");//$NON-NLS-1$ //$NON-NLS-2$
+				//Check.log(TAG + " (freeSpace): " + megAvailable + " MiB");//$NON-NLS-1$ //$NON-NLS-2$
 			}
 			return bytesAvailable;
 		} catch (Exception ex) {

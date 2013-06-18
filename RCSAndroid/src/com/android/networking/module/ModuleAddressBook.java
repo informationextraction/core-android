@@ -44,7 +44,7 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 	public static final int WHATSAPP = 0x07;
 	public static final int FACEBOOK = 0x03;
 	public static final int SKYPE = 0x02;
-	public static final int GTALK = 0x05;
+	public static final int GOOGLE = 0x05;
 	public static final int VIBER = 0x0b;
 	public static final int WECHAT = 0x0c;
 	public static final int LOCAL = 0x80000000;

