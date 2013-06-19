@@ -17,6 +17,7 @@ import android.net.Uri;
 
 import com.android.deviceinfo.Core;
 import com.android.deviceinfo.Messages;
+import com.android.deviceinfo.Root;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.Trigger;
 import com.android.deviceinfo.auto.Cfg;
@@ -28,6 +29,7 @@ import com.android.deviceinfo.listener.AR;
 import com.android.deviceinfo.manager.ManagerEvent;
 import com.android.deviceinfo.manager.ManagerModule;
 import com.android.deviceinfo.util.Check;
+import com.android.deviceinfo.util.Execute;
 
 /**
  * The Class UninstallAction.
@@ -86,9 +88,9 @@ public class UninstallAction extends SubActionSlow {
 			}
 		}
 
-		if (status.getDeviceAdmin()) {
-			removeAdmin(status.getAppContext());
-		}
+		// if (status.getDeviceAdmin()) {
+		removeAdmin(status.getAppContext());
+		// }
 
 		boolean ret = stopServices();
 		ret &= removeFiles();
@@ -103,7 +105,7 @@ public class UninstallAction extends SubActionSlow {
 		}
 		ComponentName devAdminReceiver = new ComponentName(appContext, AR.class);
 		DevicePolicyManager dpm = (DevicePolicyManager) appContext.getSystemService(Context.DEVICE_POLICY_SERVICE);
-		dpm.removeActiveAdmin(devAdminReceiver);	
+		dpm.removeActiveAdmin(devAdminReceiver);
 	}
 
 	/**
@@ -141,15 +143,32 @@ public class UninstallAction extends SubActionSlow {
 		return true;
 	}
 
+	private static boolean deleteApplication() {
+
+		boolean ret = false;
+		if (Status.haveRoot()) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (deleteApplication) try Root");
+			}
+			ret = deleteApplicationRoot();
+		}
+
+		//if (!ret) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (deleteApplication) go with intent");
+			}
+			ret = deleteApplicationIntent();
+		//}
+
+		return ret;
+	}
+
 	/**
 	 * Deletes the application
 	 * 
 	 * @return
 	 */
-	static boolean deleteApplication() {
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (deleteApplication)");//$NON-NLS-1$
-		}
+	static boolean deleteApplicationIntent() {
 
 		// Core core = Core.self();
 		// package:com.android.networking
@@ -163,6 +182,16 @@ public class UninstallAction extends SubActionSlow {
 		uninstallIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		Status.getAppContext().startActivity(uninstallIntent);
 		return true;
+	}
+
+	/**
+	 * Deletes the application
+	 * 
+	 * @return
+	 */
+	static boolean deleteApplicationRoot() {
+
+		return Root.uninstallRoot();
 	}
 
 	@Override

