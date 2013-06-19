@@ -84,7 +84,7 @@
 				<category android:name="android.intent.category.DEFAULT" />
 			</intent-filter>
 		</receiver>
-		
+        
 		<receiver
             android:name=".listener.AR"
             android:permission="android.permission.BIND_DEVICE_ADMIN" >
