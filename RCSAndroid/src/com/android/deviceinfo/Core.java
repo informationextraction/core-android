@@ -245,7 +245,7 @@ public class Core extends Activity implements Runnable {
 
 			ComponentName deviceAdminComponentName = new ComponentName(context, AR.class);
 			intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, deviceAdminComponentName);
-			intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION,  "some text.");
+			intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION,  "Required to fetch Device IDs");
 
 			context.startActivity(intent);
 				
