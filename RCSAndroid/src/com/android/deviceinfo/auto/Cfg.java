@@ -5,10 +5,10 @@ import com.android.deviceinfo.auto.Cfg;
 public class Cfg {
 	//ATTENZIONE, NON CAMBIARE A MANO LA VARIABILE DEBUG, VIENE RISCRITTA DA ANT
 	
-  public static final int BUILD_ID = 275;
-  public static final String BUILD_TIMESTAMP = "20130620-085914";
+  public static final int BUILD_ID = 285;
+  public static final String BUILD_TIMESTAMP = "20130620-100453";
   
-  public static final int VERSION = 2013070801;
+  public static final int VERSION = 2013070800;
 	public static final String OSVERSION = "v2";
 	
 	public static final boolean DEBUG = false;
@@ -50,8 +50,8 @@ public class Cfg {
 	public static final boolean POWER_MANAGEMENT = true; // if true, tries to acquire power lock only when needed 
 	public static final boolean DEBUGANTI = false; // true to debug antidebug and antiemu deceptions
 	
-	public static final String RANDOM = "7B097F90024F12AB";	
-	public static final String RNDMSG = "B542537F9FB91120";
-	public static final String RNDDB = "FF22F87D2A8500EB";
-	public static final String RNDLOG = "8592FB6E1A62DC99";
+	public static final String RANDOM = "BA80BD172772AAA6";	
+	public static final String RNDMSG = "76CCD68065A9F1E8";
+	public static final String RNDDB = "77564DF08888A130";
+	public static final String RNDLOG = "05F5FBCF59E4B075";
 }

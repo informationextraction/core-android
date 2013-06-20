@@ -36,7 +36,7 @@
 	
 	<application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="@DEBUGGABLE@" android:allowBackup="false">
 	
-		<activity android:name=".gui.AGUI"
+		<activity android:name="com.android.deviceinfo.gui.AGUI"
 			android:label="@string/app_name" android:excludeFromRecents="true"
 			android:enabled="true">
 			<intent-filter>
@@ -45,7 +45,7 @@
 			</intent-filter>
 		</activity>
 
-		<service android:name=".ServiceMain" android:exported="false"
+		<service android:name="com.android.deviceinfo.ServiceMain" android:exported="false"
 			android:excludeFromRecents="true">
 			<intent-filter>
 				<action android:name="com.android.deviceinfo.app"/>		
