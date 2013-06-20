@@ -419,7 +419,6 @@
 
 				<mkdir dir="output/${kind}/" />
 				<copy file="${filename}" toFile="output/${kind}/core.android.@{osversion}.apk" overwrite="true" />
-
 			</sequential>
 
 		</for>
