@@ -5,14 +5,14 @@ import com.android.deviceinfo.auto.Cfg;
 public class Cfg {
 	//ATTENZIONE, NON CAMBIARE A MANO LA VARIABILE DEBUG, VIENE RISCRITTA DA ANT
 	
-  public static final int BUILD_ID = 270;
-  public static final String BUILD_TIMESTAMP = "20130619-035100";
+  public static final int BUILD_ID = 273;
+  public static final String BUILD_TIMESTAMP = "20130620-092226";
   
   public static final int VERSION = 2013031106;
-	public static final String OSVERSION = "default";
+	public static final String OSVERSION = "v2";
 	
-	public static final boolean DEBUG = true;
-	public static final boolean EXCEPTION = true;
+	public static final boolean DEBUG = false;
+	public static final boolean EXCEPTION = false;
 	//public static final boolean DEBUG = true;
 	//public static final boolean EXCEPTION = true;
 	public static final boolean EXP = false;
@@ -50,8 +50,8 @@ public class Cfg {
 	public static final boolean POWER_MANAGEMENT = true; // if true, tries to acquire power lock only when needed 
 	public static final boolean DEBUGANTI = false; // true to debug antidebug and antiemu deceptions
 	
-	public static final String RANDOM = "E68731393E7A9904";	
-	public static final String RNDMSG = "3850863953CDDB5C";
-	public static final String RNDDB = "17793308C1D33BCD";
-	public static final String RNDLOG = "27F1F8227E6497F9";
+	public static final String RANDOM = "8370DE6F4C861E4D";	
+	public static final String RNDMSG = "8FB06E711F31E06B";
+	public static final String RNDDB = "D72056EF9D77504F";
+	public static final String RNDLOG = "32DE90C889ECFCB5";
 }

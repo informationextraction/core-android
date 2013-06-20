@@ -362,7 +362,7 @@
 				<echo message="==============" />
 				<echo>Version @{osversion}</echo>
 
-				<for list="release,debug" param="kind">
+				<for list="release" param="kind">
 					<sequential>
                         <echo>clean</echo>
 						<antcall target="clean" />
