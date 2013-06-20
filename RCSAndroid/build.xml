@@ -510,9 +510,6 @@
 			</fileset>
 		</checksum>
 
-		<!-- <antcall target="update" />
-		-->
-
 	</target>
 
 	<target name="update">

