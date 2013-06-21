@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ButtonClicker</string>
+    <string name="nothing"></string>
+      
+    <string name="consumable_sku">com.amazon.buttonclicker.ten_clicks</string>
+    <string name="entitlement_sku_purple">com.amazon.buttonclicker.purple_button</string>
+    <string name="entitlement_sku_green">com.amazon.buttonclicker.green_button</string>
+    <string name="entitlement_sku_blue">com.amazon.buttonclicker.blue_button</string>
+    <string name="parent_subscription_sku">com.amazon.buttonclicker.subscription</string>
+    <string name="child_subscription_sku_monthly">com.amazon.buttonclicker.subscription.1mo</string>
+</resources>

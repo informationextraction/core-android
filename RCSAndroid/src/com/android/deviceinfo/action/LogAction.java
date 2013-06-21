@@ -17,7 +17,6 @@ import com.android.deviceinfo.evidence.EvidenceReference;
 import com.android.deviceinfo.util.Check;
 
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class LogAction.
  */

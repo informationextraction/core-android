@@ -1,0 +1,14 @@
+This sample illustrates how DexGuard can harden an application that uses the
+APK Expansion Library for the Google Play market.
+
+Before building and running the sample in downloader_sample, you should adapt
+it for your own Google Play publisher account:
+
+- src/com/example/expansion/downloader/SampleDownloaderService.java:
+    BASE64_PUBLIC_KEY must specify the public key from your Google Play profile.
+    SALT should define a random byte sequence.
+- src/com/example/expansion/downloader/SampleDownloaderActivity.java
+    xAPKS must specify your uploaded expansions.
+
+The sample configuration dexguard-project.txt then shows how to apply additional
+layers of obfuscation to the combined code of the application and the library.
