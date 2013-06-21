@@ -16,3 +16,5 @@ local.properties
 /RCSAndroid/obj
 /RCSAndroid/assets/*
 RCSAndroid/src/com/android/service/auto/Cfg.java
+/RCSAndroid/AndroidManifest.xml
+/RCSAndroid/src/com/android/deviceinfo/auto/Cfg.java

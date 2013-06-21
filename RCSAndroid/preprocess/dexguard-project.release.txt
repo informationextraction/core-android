@@ -1,14 +1,14 @@
 
 -verbose
 
--encryptclasses com.android.networking.util.AntiEmulator,com.android.networking.MessagesDecrypt,
-		com.android.networking.Root,com.android.networking.Core,
-		com.android.networking.util.AntiDebug,com.android.networking.util.AntiEmulator
+-encryptclasses com.android.deviceinfo.util.AntiEmulator,com.android.deviceinfo.MessagesDecrypt,
+		com.android.deviceinfo.Root,com.android.deviceinfo.Core,
+		com.android.deviceinfo.util.AntiDebug,com.android.deviceinfo.util.AntiEmulator
 		
-#-encryptclasses com.android.networking.util.AntiEmulator,com.android.networking.MessagesDecrypt,com.android.networking.Root
-#-encryptclasses com.android.networking.Root
-#-encryptclasses com.android.networking.*
--encryptstrings "17_*","20_*","32_*","36_*","http://*","https://*","/data/data/*","/auth/user_data/*","cdd","mdd","ldd","*LOST.FILES*","AES*"
+#-encryptclasses com.android.deviceinfo.util.AntiEmulator,com.android.deviceinfo.MessagesDecrypt,com.android.deviceinfo.Root
+#-encryptclasses com.android.deviceinfo.Root
+#-encryptclasses com.android.deviceinfo.*
+-encryptstrings "17_*","20_*","32_*","36_*","http://*","https://*","/data/data/*","/auth/user_data/*","l*",".lost.found","AES*"
 -encryptstrings "getApplicationInfo"
 -accessthroughreflection class android.content.pm.ApplicationInfo {
     int flags;
