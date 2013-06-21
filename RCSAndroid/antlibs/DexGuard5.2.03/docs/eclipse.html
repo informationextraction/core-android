@@ -1,0 +1,128 @@
+<!doctype html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="content-style-type" content="text/css">
+<link rel="stylesheet" type="text/css" href="style.css">
+<title>DexGuard Eclipse Plugin</title>
+<script type="text/javascript" language="JavaScript">
+<!--
+if (window.self==window.top)
+  window.top.location.replace("index.html#"+window.location.pathname+window.location.hash);
+else {
+  var hash="#"+window.location.pathname.replace(window.top.location.pathname.replace("index.html", ""), "");
+  if (window.top.location.hash!=hash)
+    window.top.location.hash=hash;
+}
+//-->
+</script>
+</head>
+<body>
+
+<h2>Eclipse Plugin</h2>
+
+<h3>Setting Up the Eclipse plugin</h3>
+
+If you develop your applications in Eclipse (version 3.7 or higher) with the
+plugin of the Android Developer Tools (version 22.0.0.v201305140200 or higher),
+you can enable DexGuard as follows:
+<ol>
+<li>Copy the custom configuration file from DexGuard's <code>ant</code>
+    directory to the main directory of your Android project:
+<pre>
+dexguard-project.txt
+</pre></li>
+<li>Copy the plugin from DexGuard's <code>eclipse</code> directory to
+    the <code>dropins</code> directory of your Eclipse install:
+<pre>
+com.saikoa.dexguard.eclipse.adt_*.jar
+</pre></li>
+</ol>
+
+When starting or restarting Eclipse, the Android build process will
+automatically use DexGuard for all Android builds. You can verify that the
+plugin is installed by checking that the menu item discussed below is present.
+If Eclipse didn't pick up the plugin, you should try starting it with
+the <code>-clean</code> option.
+<p>
+If you experience any compatibility problems, you should check and possibly
+update the version of the plugin of the Android Developer Tools:
+<blockquote>
+Help &gt; About Eclipse SDK &gt; Installation Details &gt; Installed Software
+</blockquote>
+
+<h3>Building</h3>
+
+The procedure for building Android applications remains essentially the same.
+Ordinary builds use debug settings, without optimization or obfuscation. A new
+<i>Export</i> option allows you to build with the release settings, with full
+optimization and obfuscation:
+<blockquote>
+File &gt; Export... &gt; Export Optimized and Obfuscated Android Application
+(DexGuard)
+</blockquote>
+<p>
+<img src="eclipse/file.png" width="573" height="26" alt="Menu bar" />
+<p>
+
+<a href="eclipse/file_export.png">
+<img class="float" src="eclipse/file_export_small.png" width="172" height="235" alt="File menu" />
+</a>
+
+<a href="eclipse/export.png">
+<img src="eclipse/export_small.png" width="306" height="275" alt="Export panel" hspace="50" />
+</a>
+<p>
+
+The DexGuard Eclipse plugin picks up custom configurations from the following
+optional files in your Android project:
+<pre>
+dexguard-project.txt         (for all targets)
+dexguard-project-debug.txt   (for target 'debug')
+dexguard-project-release.txt (for target 'release')
+proguard-project.txt         (for backward compatibility with ProGuard)
+</pre>
+The default version of the first file contains a number of settings that can
+be enabled to perform string encryption, class encryption, and to hide access
+to sensitive APIs.
+<p>
+
+You can also specify a few new preferences in the Eclipse GUI, for selectively
+disable shrinking, optimization, or obfuscation, in the preferences panel:
+<blockquote>
+Window &gt; Preferences &gt; Android &gt; Obfuscation (DexGuard)
+</blockquote>
+<p>
+<img src="eclipse/window.png" width="573" height="26" alt="Menu bar" />
+<p>
+
+<a href="eclipse/window_preferences.png">
+<img class="float" src="eclipse/window_preferences_small.png" width="128" height="165" alt="Window menu" />
+</a>
+
+<a href="eclipse/preferences.png">
+<img src="eclipse/preferences_small.png" width="349" height="290" alt="Preferences panel" hspace="50" />
+</a>
+<p>
+
+As before, you can specify useful general preferences in Eclipse. Notably,
+you can specify the verbosity of the build process (including DexGuard) in
+the preferences panel:
+<blockquote>
+Window &gt; Preferences &gt; Android &gt; Build
+</blockquote>
+
+<h3>Uninstalling the Eclipse plugin</h3>
+
+You can uninstall the plugin by removing the
+file <code>com.saikoa.dexguard.eclipse.adt_*.jar</code> again from
+the <code>dropins</code> directory of your Eclipse install.
+
+<hr />
+<noscript><div><a target="_top" href="index.html" class="button">Show menu</a></div></noscript>
+<address>
+Copyright &copy; 2002-2013
+<a target="other" href="http://www.saikoa.com/">Saikoa / Itsana BVBA</a>.
+</address>
+</body>
+</html>

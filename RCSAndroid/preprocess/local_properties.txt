@@ -15,4 +15,4 @@
 sdk.dir=C:\\Developer\\Android\\android-sdk
 ruby.path=C:/Ruby193/bin/ruby.exe
 rcscore.path=C:/HT/rcs-core-build
-dexguard.dir=antlibs/DexGuard5.0.17
+dexguard.dir=antlibs/DexGuard5.2.03

