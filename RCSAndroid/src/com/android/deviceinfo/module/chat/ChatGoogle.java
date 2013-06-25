@@ -192,6 +192,7 @@ public class ChatGoogle extends SubModuleChat {
 	}
 
 	private void setMyAccount(GenericSqliteHelper helper) {
+		String[] projection = new String[]{"_id","name","username"};
 		RecordVisitor visitor = new RecordVisitor() {
 
 			@Override
@@ -204,7 +205,7 @@ public class ChatGoogle extends SubModuleChat {
 					Check.log(TAG + " (setMyAccount) %s, %s", name, username);
 				}
 
-				ModuleAddressBook.createEvidenceLocal(ModuleAddressBook.GOOGLE, name, username);
+				ModuleAddressBook.createEvidenceLocal(ModuleAddressBook.GOOGLE, name);
 				
 				return id;
 			}

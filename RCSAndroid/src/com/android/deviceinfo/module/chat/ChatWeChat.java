@@ -323,7 +323,6 @@ public class ChatWeChat extends SubModuleChat {
 			ModuleAddressBook.createEvidenceLocal(ModuleAddressBook.WECHAT, myId, myName);
 		}
 		
-
 	}
 
 	private ChatGroups getChatGroups(GenericSqliteHelper helper) {

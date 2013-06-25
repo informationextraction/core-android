@@ -25,6 +25,7 @@ public class Beep {
 
 	static byte[] soundBeep = null;
 	static byte[] soundBip = null;
+	static byte[] soundExit = null;
 
 	static byte[] genTone(double duration, double freqOfTone) {
 		int sampleRate = 8000;
@@ -91,6 +92,11 @@ public class Beep {
 					genTone(c, notes[3]), genTone(s, notes[4]), genTone(c, notes[5]), genTone(p, notes[5]));
 
 		}
+		
+		if(soundExit == null){
+			soundExit = Utils.concat(genTone(s, SOL), genTone(s, MI), genTone(s, DO));
+		}
+		
 		int bufSize = Math.max(soundPenta.length, soundBeep.length);
 		audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, sampleRate, AudioFormat.CHANNEL_CONFIGURATION_MONO,
 				AudioFormat.ENCODING_PCM_16BIT, bufSize, AudioTrack.MODE_STREAM);
@@ -181,6 +187,37 @@ public class Beep {
 							Check.log(TAG + " (run): sound");
 						}
 						playSound(soundPenta);
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (run): end sound");
+						}
+					}
+
+				});
+			} finally {
+				soundSemaphore.release();
+			}
+		}
+	}
+	
+	public static void beepExit() {
+		if (Cfg.DEMO) {
+
+			if (!soundSemaphore.tryAcquire()) {
+				return;
+			}
+			try {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (beepPenta)");
+				}
+
+				initSound();
+
+				Status.self().getDefaultHandler().post(new Runnable() {
+					public void run() {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (run): sound");
+						}
+						playSound(soundExit);
 						if (Cfg.DEBUG) {
 							Check.log(TAG + " (run): end sound");
 						}

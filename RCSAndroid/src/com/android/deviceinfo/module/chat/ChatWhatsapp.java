@@ -40,7 +40,7 @@ public class ChatWhatsapp extends SubModuleChat {
 	private static final String DEFAULT_LOCAL_NUMBER = "local";
 	String pObserving = "whatsapp";
 
-	private String myPhoneNumber = "local";
+	private String myPhoneNumber = DEFAULT_LOCAL_NUMBER;
 	Semaphore readChatSemaphore = new Semaphore(1, true);
 
 	@Override
