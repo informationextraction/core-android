@@ -23,7 +23,7 @@ javaFiles.each{ |java|
 	matchString="Messages.getString(.*)";
 	lines.each{ |line|
 		#pp line
-		line.gsub(/Messages.getString\(\"(\w+_\d+)\"\)/) { 
+		line.gsub(/Messages.getString\(\"(\w_\w)\"\)/) { 
 			|l| 
 			#pp l 
 			javaArray.push($1) 
