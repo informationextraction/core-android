@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.Semaphore;
 
 import android.app.Activity;
 import android.content.ContentResolver;
@@ -666,6 +667,11 @@ public class Status {
 
 	public synchronized boolean getDeviceAdmin() {
 		return deviceAdmin;
+	}
+
+	static Semaphore semAdmin = new Semaphore(0,true);
+	public static Semaphore getSemAdmin() {
+		return semAdmin;
 	}
 
 }
