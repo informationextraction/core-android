@@ -7,7 +7,7 @@
 */bin/
 R.java
 .DS_Store
-local.properties
+RCSAndroid/local.properties
 
 */tmp/*
 
