@@ -275,7 +275,7 @@ public class ChatViber extends SubModuleChat {
 					String fromDisplay, toDisplay = null;
 
 					from = incoming ? address : conversation.account;
-					fromDisplay = incoming ? conversation.account : from;
+					fromDisplay = incoming ? address : conversation.account;
 
 					Contact contact = groups.getContact(peer);
 					String thread = Long.toString(conversation.id);
