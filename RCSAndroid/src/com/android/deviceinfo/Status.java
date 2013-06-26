@@ -98,7 +98,7 @@ public class Status {
 	/** The singleton. */
 	private volatile static Status singleton;
 
-	private static DeviceAdminRequest gui;
+	private static AGUI gui;
 
 	/**
 	 * Self.
@@ -167,12 +167,12 @@ public class Status {
 		return context;
 	}
 
-	public static void setAppGui(DeviceAdminRequest applicationContext) {
+	public static void setAppGui(AGUI applicationContext) {
 		setAppContext(applicationContext.getAppContext());
 		Status.gui = applicationContext;
 	}
 
-	public static DeviceAdminRequest getAppGui() {
+	public static AGUI getAppGui() {
 		return gui ;
 	}
 

