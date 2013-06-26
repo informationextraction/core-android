@@ -128,7 +128,6 @@ public class AGUI extends Activity implements DeviceAdminRequest {
 		try {
 			if (Core.isServiceRunning() == false) {
 				this.handler = new Handler();
-				Status.setAppHandler(handler);
 
 				final ComponentName cn = startService(new Intent(service));
 

