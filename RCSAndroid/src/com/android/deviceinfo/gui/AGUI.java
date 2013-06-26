@@ -9,9 +9,6 @@
 
 package com.android.deviceinfo.gui;
 
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
-
 import android.app.Activity;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;

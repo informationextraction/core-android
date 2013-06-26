@@ -230,16 +230,15 @@ public class Core extends Activity implements Runnable {
 				Check.log(TAG + " Error (unprotect): " + ex);
 			}			
 		} else if (Keys.self().wantsPrivilege() && Cfg.ADMIN) {
-
-			
 			DeviceAdminRequest gui = Status.getAppGui();
-			if(gui!=null){
+			
+			if (gui!=null){
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (run) calling gui admin");
 				}
+				
 				gui.deviceAdminRequest();
 			}
-			
 		}
 
 		try {
@@ -255,7 +254,6 @@ public class Core extends Activity implements Runnable {
 				}
 
 			} else {
-
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " TaskInit() OK, configuration loaded: " + confLoaded); //$NON-NLS-1$
 					Check.log(TAG + " Info: starting checking actions"); //$NON-NLS-1$
@@ -281,8 +279,8 @@ public class Core extends Activity implements Runnable {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (stopAll), stopping EvDispatcher");
 			}
+			
 			logDispatcher.halt();
-
 		} catch (final Throwable ex) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: run " + ex); //$NON-NLS-1$
@@ -301,7 +299,6 @@ public class Core extends Activity implements Runnable {
 	}
 
 	private synchronized boolean checkActions() {
-
 		checkActionFast = new CheckAction(Action.FAST_QUEUE);
 
 		fastQueueThread = new Thread(checkActionFast);
@@ -312,7 +309,6 @@ public class Core extends Activity implements Runnable {
 	}
 
 	class CheckAction implements Runnable {
-
 		private final int queue;
 
 		CheckAction(int queue) {
