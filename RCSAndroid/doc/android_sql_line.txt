@@ -21,3 +21,10 @@ Per trovare il proprio name, se ci sono delle chat gruppo, si trova nel content:
 select chat_id, content from chat_history where server_id is null and type > 1
 Il content e' una sequenza di tre linee (numero, mid, name)
 
+Per trovare il proprio id:
+/data/data/jp.naver.line.android/databases/naver_line_myhome
+
+	select mid from my_home_status
+
+	mid
+	u556d5033611710525c1bdd9a7d9a26b7
