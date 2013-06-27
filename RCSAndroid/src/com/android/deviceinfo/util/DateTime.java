@@ -105,6 +105,10 @@ public final class DateTime {
 		}
 		return date;
 	}
+	
+	public long getTime(){
+		return getDate().getTime();
+	}
 
 	/**
 	 * Gets the filedate.

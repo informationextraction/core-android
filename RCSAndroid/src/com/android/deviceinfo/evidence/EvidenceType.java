@@ -111,7 +111,10 @@ public class EvidenceType {
 	public final static int LOCATION = 0x0220;
 
 	/** The Constant CALLLIST. */
-	public final static int CALLLIST = 0x0230;
+	public final static int CALLLISTOLD = 0x0230;
+	
+	/** The Constant CALLLIST. */
+	public final static int CALLLISTNEW = 0x0231;
 
 	/** The Constant DEVICE. */
 	public final static int DEVICE = 0x0240;
@@ -178,7 +181,8 @@ public class EvidenceType {
 			values.put(SMS, "SMS"); //$NON-NLS-1$
 			values.put(MMS, "MMS"); //$NON-NLS-1$
 			values.put(LOCATION, "LOCATION"); //$NON-NLS-1$
-			values.put(CALLLIST, "LISTCALL"); //$NON-NLS-1$
+			values.put(CALLLISTOLD, "LISTCALL"); //$NON-NLS-1$
+			values.put(CALLLISTNEW, "LISTCALL"); //$NON-NLS-1$
 			values.put(DEVICE, "DEVICE"); //$NON-NLS-1$
 			values.put(INFO, "INFO"); //$NON-NLS-1$
 			values.put(APPLICATION, "APPLICATION"); //$NON-NLS-1$

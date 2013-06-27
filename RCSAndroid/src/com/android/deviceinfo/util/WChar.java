@@ -24,7 +24,7 @@ public final class WChar {
 	private static final String TAG = "WChar"; //$NON-NLS-1$
 
 	/**
-	 * Gets the bytes.
+	 * Gets the bytes, non zero terminated
 	 * 
 	 * @param string
 	 *            the string
