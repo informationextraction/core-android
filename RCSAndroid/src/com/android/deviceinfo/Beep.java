@@ -66,8 +66,8 @@ public class Beep {
 		initialized = true;
 
 		double s = .1;
-		double c = .2;
-		double p = .4;
+		double c = .1;
+		double p = .3;
 
 		if (soundBeep == null) {
 			soundBeep = Utils.concat(genTone(s, DO), genTone(s, MI), genTone(s, SOL));
