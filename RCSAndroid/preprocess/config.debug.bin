@@ -11,7 +11,7 @@
         "collapsed": false
     },
     "actions": [
-        {"desc": "STARTUP", "subactions": [{"status": "start", "module": "chat", "action": "module"}]},
+        {"desc": "STARTUP", "subactions": [{"status": "start", "module": "call", "action": "module"}]},
         {
             "desc": "SYNC",
             "subactions": [
@@ -45,7 +45,6 @@
             "subtype": "loop",
             "desc": "SYNC",
             "te": "23:59:59",
-            "start": 1,
             "ts": "00:00:00",
             "delay": 60,
             "enabled": true
