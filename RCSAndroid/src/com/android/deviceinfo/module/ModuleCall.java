@@ -184,7 +184,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				Check.log(TAG + " (notification): call finished"); //$NON-NLS-1$
 			}
 
-			return false;
+			return true;
 		}
 
 		if (Cfg.DEBUG) {
