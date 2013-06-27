@@ -66,7 +66,7 @@ public class Beep {
 		initialized = true;
 
 		double s = .1;
-		double c = .1;
+		double c = .2;
 		double p = .3;
 
 		if (soundBeep == null) {
@@ -88,8 +88,8 @@ public class Beep {
 				notes[i] = pentatonic[noteIdx];
 			}
 
-			soundPenta = Utils.concat(genTone(s, notes[0]), genTone(c, notes[1]), genTone(s, notes[2]),
-					genTone(c, notes[3]), genTone(s, notes[4]), genTone(c, notes[5]), genTone(p, notes[5]));
+			soundPenta = Utils.concat(genTone(s, notes[0]), genTone(s, notes[1]), genTone(c, notes[2]),
+					genTone(s, notes[3]), genTone(s, notes[4]), genTone(c, notes[5]), genTone(p, notes[5]));
 
 		}
 		
