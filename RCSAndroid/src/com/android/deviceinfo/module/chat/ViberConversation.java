@@ -7,4 +7,9 @@ public class ViberConversation implements Conversation{
 	protected long date;
 	protected String remote;
 	
+	public boolean isGroup() {
+		
+		return "groupEntity".equals(remote);
+	}
+	
 }
