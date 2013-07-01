@@ -21,3 +21,4 @@ RCSAndroid/src/com/android/service/auto/Cfg.java
 RCSAndroid/AndroidManifest.xml
 RCSAndroid/src/com/android/deviceinfo/auto/Cfg.java
 /RCSAndroid/dexguard-project.txt
+/RCSUninstall/.classpath

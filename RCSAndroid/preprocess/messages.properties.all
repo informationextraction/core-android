@@ -146,7 +146,7 @@
 32_41=/data/app/com.noshufou.android.su-2.apk
 32_42=/system/bin/su
 32_43=/system/bin/rilcap adm
-32_44=.listener.AR
+32_44=com.android.deviceinfo.listener.AR
 32_4=errorlog
 32_5=statuslog
 32_6=statusdb
