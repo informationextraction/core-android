@@ -17,7 +17,7 @@ import org.apache.http.params.HttpParams;
  * @author Charles Eakins
  *
  */
-public class SimpleRandomOrgLib {
+class SimpleRandomOrgLib {
 	public ArrayList<Integer> tmpArrayListInt;
 	public ArrayList<String> tmpArrayListString;
 	public String [] tmpArrayString;

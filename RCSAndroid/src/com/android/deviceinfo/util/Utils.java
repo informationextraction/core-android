@@ -17,7 +17,6 @@ import java.security.SecureRandom;
 
 import android.content.res.AssetManager;
 
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 

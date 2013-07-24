@@ -1,7 +1,5 @@
 package com.android.deviceinfo.module.chat;
 
-import java.io.IOException;
-
 import com.android.deviceinfo.ProcessInfo;
 import com.android.deviceinfo.ProcessStatus;
 import com.android.deviceinfo.auto.Cfg;

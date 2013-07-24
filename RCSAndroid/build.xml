@@ -77,6 +77,9 @@
 	</target>
 
 	<target name="encrypt-messages" depends="salt">
+	</target>
+
+	<target name="encrypt-messages-old" depends="salt">
 		<mkdir dir="assets" />
 
 		<delete file="res/raw/messages.bin" />

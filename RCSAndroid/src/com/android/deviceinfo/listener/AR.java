@@ -1,14 +1,11 @@
 package com.android.deviceinfo.listener;
 
+import android.content.Context;
+import android.content.Intent;
+
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.util.Check;
-
-import android.app.admin.DeviceAdminReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.util.Log;
-import android.widget.Toast;
 
 // http://marakana.com/s/post/1291/android_device_policy_administration_tutorial
 public class AR extends android.app.admin.DeviceAdminReceiver {

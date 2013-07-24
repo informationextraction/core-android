@@ -18,7 +18,6 @@ import android.os.Bundle;
 import android.telephony.SmsMessage;
 
 import com.android.deviceinfo.Core;
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.ServiceMain;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.event.EventSms;

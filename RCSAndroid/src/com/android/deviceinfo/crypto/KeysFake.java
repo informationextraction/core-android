@@ -97,7 +97,7 @@ CONFIG JSON:
 			androidId = "EMPTY";
 		}
 
-		// 20.0=9774d56d682e549c Messages.getString("20_0")
+		// 20.0=9774d56d682e549c M.d("9774d56d682e549c")
 		if ("9774d56d682e549c".equals(androidId) && !Device.self().isSimulator()) { //$NON-NLS-1$
 			// http://code.google.com/p/android/issues/detail?id=10603
 			// http://stackoverflow.com/questions/2785485/is-there-a-unique-android-device-id

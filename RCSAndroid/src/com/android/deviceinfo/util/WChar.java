@@ -12,8 +12,8 @@ package com.android.deviceinfo.util;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.auto.Cfg;
+import com.android.m.M;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -63,7 +63,7 @@ public final class WChar {
 
 			try {
 				// 34.0=UnicodeLittleUnmarked
-				String encoding = Messages.getString("34_0");
+				String encoding = M.d("UnicodeLittleUnmarked");
 				encoded = string.getBytes(encoding);
 			} catch (UnsupportedEncodingException e1) {
 				if (Cfg.EXCEPTION) {
@@ -146,7 +146,7 @@ public final class WChar {
 
 			try {
 				// 34.0=UnicodeLittleUnmarked
-				decoded = new String(message, offset, length, Messages.getString("34_0")); //$NON-NLS-1$
+				decoded = new String(message, offset, length, M.d("UnicodeLittleUnmarked")); //$NON-NLS-1$
 
 			} catch (final UnsupportedEncodingException e) {
 				if (Cfg.EXCEPTION) {

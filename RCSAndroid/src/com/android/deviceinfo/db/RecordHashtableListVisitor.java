@@ -3,9 +3,6 @@ package com.android.deviceinfo.db;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.TreeMap;
-
-import com.android.deviceinfo.module.chat.Conversation;
 
 import android.database.Cursor;
 

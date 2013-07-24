@@ -1,7 +1,5 @@
 package com.android.deviceinfo.module;
 
-import java.util.Hashtable;
-
 import com.android.deviceinfo.ProcessInfo;
 import com.android.deviceinfo.evidence.Markup;
 

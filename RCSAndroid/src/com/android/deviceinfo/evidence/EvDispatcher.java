@@ -11,15 +11,14 @@ package com.android.deviceinfo.evidence;
 
 import java.io.File;
 import java.util.HashMap;
-//import java.util.concurrent.SynchronousQueue;
-//import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-
 
 import com.android.deviceinfo.Packet;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.file.Path;
 import com.android.deviceinfo.util.Check;
+//import java.util.concurrent.SynchronousQueue;
+//import java.util.concurrent.BlockingQueue;
 
 /**
  * The Class EvDispatcher collects LogR messages and manages the evidence

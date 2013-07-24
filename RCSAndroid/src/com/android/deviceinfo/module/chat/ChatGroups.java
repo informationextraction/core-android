@@ -1,11 +1,8 @@
 package com.android.deviceinfo.module.chat;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.util.Check;
