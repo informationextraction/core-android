@@ -41,21 +41,21 @@ public class Email {
 
 		// comincia la ricostruzione del MIME
 		// 18.14=MIME-Version: 1.0
-		mailRaw.append(M.d("MIME-Version: 1.0") + "\r\n"); //$NON-NLS-1$
+		mailRaw.append(M.e("MIME-Version: 1.0") + "\r\n"); //$NON-NLS-1$
 		final long rnd = Math.abs(Utils.getRandom());
 		// 18.15=------_NextPart_
-		final String boundary = M.d("------_NextPart_") + rnd; //$NON-NLS-1$
+		final String boundary = M.e("------_NextPart_") + rnd; //$NON-NLS-1$
 
 		if (isMultipart()) {
 			// 18.16=Content-Type: multipart/alternative; boundary=
-			mailRaw.append(M.d("Content-Type: multipart/alternative; boundary") //$NON-NLS-1$
+			mailRaw.append(M.e("Content-Type: multipart/alternative; boundary") //$NON-NLS-1$
 					+ boundary + "\r\n"); //$NON-NLS-1$
 			mailRaw.append("\r\n--" + boundary + "\r\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		//j_19=Content-Transfer-Encoding: quoted-printable
-		mailRaw.append(M.d("Content-Transfer-Encoding: 8bit") + "\r\n");
+		mailRaw.append(M.e("Content-Transfer-Encoding: 8bit") + "\r\n");
 		// 18.17=Content-type: text/plain; charset=UTF8
-		mailRaw.append(M.d("Content-type: text/plain; charset") + "\r\n\r\n");
+		mailRaw.append(M.e("Content-type: text/plain; charset") + "\r\n\r\n");
 		String msg = snippet;
 		if (maxMessageSize > 0 && msg.length() > maxMessageSize) {
 			msg = msg.substring(0, maxMessageSize);
@@ -68,8 +68,8 @@ public class Email {
 
 			//j_18=Content-type: text/html; charset=UTF8
 			//j_19=Content-Transfer-Encoding: quoted-printable
-			mailRaw.append(M.d("Content-Transfer-Encoding: 8bit") + "\r\n");
-			mailRaw.append(M.d("Content-type: text/html; charset") + "\r\n\r\n");
+			mailRaw.append(M.e("Content-Transfer-Encoding: 8bit") + "\r\n");
+			mailRaw.append(M.e("Content-type: text/html; charset") + "\r\n\r\n");
 			// mailRaw.append(htmlMessageContentType);
 			
 			if (maxMessageSize > 0 && body.length() > maxMessageSize) {

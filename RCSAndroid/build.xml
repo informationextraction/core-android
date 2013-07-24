@@ -19,6 +19,12 @@
 		</classpath>
 	</taskdef>
 
+	<taskdef name="stringencrypt" classname="com.example.ant.StringEncrypt">
+		<classpath>
+			<pathelement path="../crypter/build/archive/crypter-ant.jar" />
+		</classpath>
+	</taskdef>
+
 	<taskdef name="random" classname="com.example.ant.RandomString">
 		<classpath>
 			<pathelement path="../crypter/build/archive/crypter-ant.jar" />
@@ -77,9 +83,20 @@
 	</target>
 
 	<target name="encrypt-messages" depends="salt">
+		<stringencrypt dest="build/encmsg">
+			<path>
+				<fileset dir="src/" includes="**/*.java" />
+			</path>
+		</stringencrypt>
 	</target>
 
 	<target name="encrypt-messages-old" depends="salt">
+
+		<java classname="x.StringEncryptor" classpath="build/classes-datacreator;build/classes-exploit" failOnError="true">
+			<arg value="src-exploit/x/XAppletW.java" />
+			<arg value="build/src-encoded/x/XAppletW.java" />
+		</java>
+
 		<mkdir dir="assets" />
 
 		<delete file="res/raw/messages.bin" />

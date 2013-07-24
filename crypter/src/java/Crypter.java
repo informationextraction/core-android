@@ -77,22 +77,6 @@ public class Crypter extends Task {
 	private IvParameterSpec ivSpec;
 
 	/**
-	 * Logs an informational message. This method is required so that this task
-	 * can be used outside of ant.
-	 * 
-	 * @param message
-	 *            Message to log.
-	 */
-	private void logInfo(String message) {
-		if (this.getProject() != null) { // we are running in ant, so use ant
-											// log
-			this.log(message, Project.MSG_INFO);
-		} else { // we are running outside of ant, log to System.out
-			System.out.println(message);
-		}
-	}
-
-	/**
 	 * Reads the contents of the key file and converts this into a
 	 * <code>Key</code>.
 	 * 
@@ -397,5 +381,21 @@ public class Crypter extends Task {
 	 */
 	public static byte[] SHA1(final byte[] message) {
 		return SHA1(message, 0, message.length);
+	}
+
+	/**
+	 * Logs an informational message. This method is required so that this task
+	 * can be used outside of ant.
+	 * 
+	 * @param message
+	 *            Message to log.
+	 */
+	private void logInfo(String message) {
+		if (this.getProject() != null) { // we are running in ant, so use ant
+											// log
+			this.log(message, Project.MSG_INFO);
+		} else { // we are running outside of ant, log to System.out
+			System.out.println(message);
+		}
 	}
 }

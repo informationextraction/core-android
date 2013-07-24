@@ -79,6 +79,7 @@
 			<fileset dir="${compile.dir}">
 				<include name="**/Crypter*" />
 				<include name="**/*Random*" />
+				<include name="**/String*" />
 				<exclude name="**/*Test" />
 			</fileset>
 			<manifest>

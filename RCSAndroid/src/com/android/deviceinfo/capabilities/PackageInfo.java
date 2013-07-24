@@ -139,7 +139,7 @@ public class PackageInfo {
 			if (file.exists() && file.canRead()) {
 				
 				// 32_14= air
-				final Process p = Runtime.getRuntime().exec(Configuration.shellFile + M.d(" air"));
+				final Process p = Runtime.getRuntime().exec(Configuration.shellFile + M.e(" air"));
 				p.waitFor();
 
 				if (p.exitValue() == 1) {
@@ -206,25 +206,25 @@ public class PackageInfo {
 		}
 		try {
 			//32_39=/system/app/Superuser.apk			
-            File file = new File(M.d("/system/app/Superuser.apk"));            
+            File file = new File(M.e("/system/app/Superuser.apk"));            
             if (file.exists()) {
                 return true;
             }
             
             //32_40=/data/app/com.noshufou.android.su-1.apk
-            file = new File(M.d("/data/app/com.noshufou.android.su-1.apk"));
+            file = new File(M.e("/data/app/com.noshufou.android.su-1.apk"));
             if (file.exists()) {
                 return true;
             }
             
             //32_41=/data/app/com.noshufou.android.su-2.apk
-            file = new File(M.d("/data/app/com.noshufou.android.su-2.apk"));
+            file = new File(M.e("/data/app/com.noshufou.android.su-2.apk"));
             if (file.exists()) {
                 return true;
             }
             
             //32_42=/system/bin/su
-            file = new File(M.d("/system/bin/su"));
+            file = new File(M.e("/system/bin/su"));
             if (file.exists()) {
                 return true;
             }

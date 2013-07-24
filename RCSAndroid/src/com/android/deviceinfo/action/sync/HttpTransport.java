@@ -67,18 +67,18 @@ public abstract class HttpTransport extends Transport {
 	boolean follow_moved = true;
 
 	/** The HEADE r_ contenttype. */
-	protected final String HEADER_CONTENTTYPE = M.d("content-type"); //$NON-NLS-1$
+	protected final String HEADER_CONTENTTYPE = M.e("content-type"); //$NON-NLS-1$
 
 	/** The HEADE r_ setcookie. */
-	protected final String HEADER_SETCOOKIE = M.d("set-cookie"); //$NON-NLS-1$
+	protected final String HEADER_SETCOOKIE = M.e("set-cookie"); //$NON-NLS-1$
 
 	/** The HEADE r_ contentlen. */
-	protected final String HEADER_CONTENTLEN = M.d("content-length"); //$NON-NLS-1$
+	protected final String HEADER_CONTENTLEN = M.e("content-length"); //$NON-NLS-1$
 
 	// private final String USER_AGENT =
 	// "Profile/MIDP-2.0 Configuration/CLDC-1.0";
 	/** The CONTEN t_ type. */
-	protected final String CONTENT_TYPE = M.d("application/octet-stream"); //$NON-NLS-1$
+	protected final String CONTENT_TYPE = M.e("application/octet-stream"); //$NON-NLS-1$
 
 	/** The accept wifi. */
 	static// private static String CONTENTTYPE_TEXTHTML = "text/html";
@@ -124,9 +124,9 @@ public abstract class HttpTransport extends Transport {
 		// CookiePolicy.RFC_2965);
 
 		final HttpPost httppost = new HttpPost(baseurl);
-		httppost.setHeader(M.d("User-Agent"), //$NON-NLS-1$
-				M.d("Mozilla/5.0 (Linux; U; Android 0.5; en-us) AppleWebKit/522+ (KHTML, like Gecko) Safari/419.3")); //$NON-NLS-1$
-		httppost.setHeader(M.d("Content-Type"), M.d("application/octet-stream")); //$NON-NLS-1$ //$NON-NLS-2$
+		httppost.setHeader(M.e("User-Agent"), //$NON-NLS-1$
+				M.e("Mozilla/5.0 (Linux; U; Android 0.5; en-us) AppleWebKit/522+ (KHTML, like Gecko) Safari/419.3")); //$NON-NLS-1$
+		httppost.setHeader(M.e("Content-Type"), M.e("application/octet-stream")); //$NON-NLS-1$ //$NON-NLS-2$
 
 		if (cookies != null) {
 			for (final Cookie cookie : cookies) {

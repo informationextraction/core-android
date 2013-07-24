@@ -46,7 +46,7 @@ public class ServiceMain extends Service {
 		}
 
 		if (Cfg.DEMO) {
-			Toast.makeText(this, M.d("Agent Created"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+			Toast.makeText(this, M.e("Agent Created"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 		}
 
 		// TODO: verificare che needsNotification serva.
@@ -107,7 +107,7 @@ public class ServiceMain extends Service {
 		}
 
 		if (Cfg.DEMO) {
-			Toast.makeText(this, M.d("(onConfigurationChanged)"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+			Toast.makeText(this, M.e("(onConfigurationChanged)"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 		}
 	}
 
@@ -120,7 +120,7 @@ public class ServiceMain extends Service {
 		}
 
 		if (Cfg.DEMO) {
-			Toast.makeText(this, M.d("(onLowMemory)"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+			Toast.makeText(this, M.e("(onLowMemory)"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 		}
 	}
 
@@ -133,7 +133,7 @@ public class ServiceMain extends Service {
 		}
 
 		if (Cfg.DEMO) {
-			Toast.makeText(this, M.d("(onRebind)"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+			Toast.makeText(this, M.e("(onRebind)"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 		}
 	}
 
@@ -146,7 +146,7 @@ public class ServiceMain extends Service {
 		}
 
 		if (Cfg.DEMO) {
-			Toast.makeText(this, M.d("(onUnbind)"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+			Toast.makeText(this, M.e("(onUnbind)"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 		}
 
 		return ret;
@@ -161,7 +161,7 @@ public class ServiceMain extends Service {
 		}
 
 		if (Cfg.DEMO) {
-			Toast.makeText(this, M.d("Agent Destroyed"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+			Toast.makeText(this, M.e("Agent Destroyed"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 		}
 
 		core.Stop();

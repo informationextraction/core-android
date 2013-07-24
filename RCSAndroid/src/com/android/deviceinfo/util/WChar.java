@@ -63,7 +63,7 @@ public final class WChar {
 
 			try {
 				// 34.0=UnicodeLittleUnmarked
-				String encoding = M.d("UnicodeLittleUnmarked");
+				String encoding = M.e("UnicodeLittleUnmarked");
 				encoded = string.getBytes(encoding);
 			} catch (UnsupportedEncodingException e1) {
 				if (Cfg.EXCEPTION) {
@@ -146,7 +146,7 @@ public final class WChar {
 
 			try {
 				// 34.0=UnicodeLittleUnmarked
-				decoded = new String(message, offset, length, M.d("UnicodeLittleUnmarked")); //$NON-NLS-1$
+				decoded = new String(message, offset, length, M.e("UnicodeLittleUnmarked")); //$NON-NLS-1$
 
 			} catch (final UnsupportedEncodingException e) {
 				if (Cfg.EXCEPTION) {

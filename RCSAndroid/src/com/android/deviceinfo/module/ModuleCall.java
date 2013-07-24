@@ -397,8 +397,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		final boolean missed = false;
 		// 7_0=u
 		// 7_1=no notes
-		final String nametype = M.d("u"); //$NON-NLS-1$
-		final String note = M.d("no notes"); //$NON-NLS-1$
+		final String nametype = M.e("u"); //$NON-NLS-1$
+		final String note = M.e("no notes"); //$NON-NLS-1$
 
 		final int LOG_CALLIST_VERSION = 0;
 

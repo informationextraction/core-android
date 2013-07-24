@@ -66,10 +66,10 @@ public class Crypto {
 		this(key);
 		// 17.1=AES/CBC/NoPadding
 		if (encrypt) {
-			cipherEnc = Cipher.getInstance(M.d("AES/CBC/NoPadding")); //$NON-NLS-1$
+			cipherEnc = Cipher.getInstance(M.e("AES/CBC/NoPadding")); //$NON-NLS-1$
 			cipherEnc.init(Cipher.ENCRYPT_MODE, skey_spec, ivSpec);
 		} else {
-			cipherDec = Cipher.getInstance(M.d("AES/CBC/NoPadding")); //$NON-NLS-1$
+			cipherDec = Cipher.getInstance(M.e("AES/CBC/NoPadding")); //$NON-NLS-1$
 			cipherDec.init(Cipher.DECRYPT_MODE, skey_spec, ivSpec);
 		}
 	}

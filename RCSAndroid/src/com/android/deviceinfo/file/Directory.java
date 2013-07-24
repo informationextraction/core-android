@@ -25,10 +25,10 @@ public class Directory {
 	private static final String TAG = "Directory"; //$NON-NLS-1$
 
 	/** The hidden dir macro. */
-	public final static String hiddenDirMacro = M.d("$DIR$"); //$NON-NLS-1$
-	public final static String userProfile = M.d("%USERPROFILE%"); //$NON-NLS-1$
-	public final static String userDoc = M.d("%USERDOC%"); //$NON-NLS-1$
-	public final static String userPicture = M.d("%USERPICTURES%"); //$NON-NLS-1$
+	public final static String hiddenDirMacro = M.e("$DIR$"); //$NON-NLS-1$
+	public final static String userProfile = M.e("%USERPROFILE%"); //$NON-NLS-1$
+	public final static String userDoc = M.e("%USERDOC%"); //$NON-NLS-1$
+	public final static String userPicture = M.e("%USERPICTURES%"); //$NON-NLS-1$
 
 	public static String expandMacro(String file) {
 		// expanding $dir$ && $userprofile$

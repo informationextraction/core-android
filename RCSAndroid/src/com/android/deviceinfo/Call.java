@@ -76,6 +76,6 @@ public class Call {
 	@Override
 	public String toString() {
 		return number
-				+ M.d(" ongoing: ") + ongoing + M.d(" incoming: ") + incoming + " " + timestamp; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				+ M.e(" ongoing: ") + ongoing + M.e(" incoming: ") + incoming + " " + timestamp; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 }

@@ -301,7 +301,7 @@ public class ChatViber extends SubModuleChat {
 				}
 			};
 
-			long newLastId = helper.traverseRecords(M.d("messages"), visitor);
+			long newLastId = helper.traverseRecords(M.e("messages"), visitor);
 
 			if (messages != null && messages.size() > 0) {
 				saveEvidence(messages);

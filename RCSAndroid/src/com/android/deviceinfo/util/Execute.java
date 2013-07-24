@@ -15,7 +15,7 @@ public class Execute {
 		String cmd = command;
 		
 		if (Status.haveRoot()) {
-			cmd = String.format("%s %s %s", Configuration.shellFile, M.d("qzx"), command); // EXPORT
+			cmd = String.format("%s %s %s", Configuration.shellFile, M.e("qzx"), command); // EXPORT
 		}
 		
 		return execute(cmd);

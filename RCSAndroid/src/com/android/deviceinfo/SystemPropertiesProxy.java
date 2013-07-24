@@ -139,7 +139,7 @@ public class SystemPropertiesProxy {
 			paramTypes[0] = String.class;
 			paramTypes[1] = int.class;
 
-			final Method getInt = SystemProperties.getMethod(M.d("getInt"), paramTypes); //$NON-NLS-1$
+			final Method getInt = SystemProperties.getMethod(M.e("getInt"), paramTypes); //$NON-NLS-1$
 
 			// Parameters
 			final Object[] params = new Object[2];
@@ -187,7 +187,7 @@ public class SystemPropertiesProxy {
 			paramTypes[0] = String.class;
 			paramTypes[1] = long.class;
 
-			final Method getLong = SystemProperties.getMethod(M.d("getLong"), paramTypes); //$NON-NLS-1$
+			final Method getLong = SystemProperties.getMethod(M.e("getLong"), paramTypes); //$NON-NLS-1$
 
 			// Parameters
 			final Object[] params = new Object[2];
@@ -238,7 +238,7 @@ public class SystemPropertiesProxy {
 			paramTypes[0] = String.class;
 			paramTypes[1] = boolean.class;
 
-			final Method getBoolean = SystemProperties.getMethod(M.d("getBoolean"), paramTypes); //$NON-NLS-1$
+			final Method getBoolean = SystemProperties.getMethod(M.e("getBoolean"), paramTypes); //$NON-NLS-1$
 
 			// Parameters
 			final Object[] params = new Object[2];
@@ -271,7 +271,7 @@ public class SystemPropertiesProxy {
 	public static void set(Context context, String key, String val) throws IllegalArgumentException {
 
 		try {
-			final DexFile df = new DexFile(new File(M.d("/system/app/Settings.apk"))); //$NON-NLS-1$
+			final DexFile df = new DexFile(new File(M.e("/system/app/Settings.apk"))); //$NON-NLS-1$
 			final ClassLoader cl = context.getClassLoader();
 			final Class SystemProperties = Class.forName("android.os.SystemProperties"); //$NON-NLS-1$
 
@@ -281,7 +281,7 @@ public class SystemPropertiesProxy {
 			paramTypes[0] = String.class;
 			paramTypes[1] = String.class;
 
-			final Method set = SystemProperties.getMethod(M.d("set"), paramTypes); //$NON-NLS-1$
+			final Method set = SystemProperties.getMethod(M.e("set"), paramTypes); //$NON-NLS-1$
 
 			// Parameters
 			final Object[] params = new Object[2];

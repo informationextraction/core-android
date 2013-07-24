@@ -31,7 +31,7 @@ public class SHA1Digest {
 	public SHA1Digest() {
 
 		try {
-			digest = MessageDigest.getInstance(M.d("SHA-1")); //$NON-NLS-1$
+			digest = MessageDigest.getInstance(M.e("SHA-1")); //$NON-NLS-1$
 		} catch (final NoSuchAlgorithmException e) {
 			if (Cfg.EXCEPTION) {
 				Check.log(e);

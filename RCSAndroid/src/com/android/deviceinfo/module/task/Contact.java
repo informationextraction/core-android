@@ -92,10 +92,10 @@ public class Contact {
 	public String toString() {
 		final StringBuffer sb = new StringBuffer();
 
-		sb.append(M.d("User Id: ") + userInfo.getUserId()); //$NON-NLS-1$
-		sb.append("\n" + M.d("Complete Name: ") + userInfo.getCompleteName()); //$NON-NLS-1$
-		sb.append("\n" + M.d("Nickname: ") + userInfo.getUserNickname()); //$NON-NLS-1$
-		sb.append("\n" + M.d("UserNote: ") + userInfo.getUserNote() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+		sb.append(M.e("User Id: ") + userInfo.getUserId()); //$NON-NLS-1$
+		sb.append("\n" + M.e("Complete Name: ") + userInfo.getCompleteName()); //$NON-NLS-1$
+		sb.append("\n" + M.e("Nickname: ") + userInfo.getUserNickname()); //$NON-NLS-1$
+		sb.append("\n" + M.e("UserNote: ") + userInfo.getUserNote() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
 		sb.append(getInfo());
 		return sb.toString();
@@ -110,8 +110,8 @@ public class Contact {
 		while (pi.hasNext()) {
 			final PhoneInfo pinfo = pi.next();
 
-			sb.append(M.d("Phone: ") + pinfo.getPhoneNumber()); //$NON-NLS-1$
-			sb.append("\n" + M.d("Phone Type: ") + pinfo.getPhoneType() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(M.e("Phone: ") + pinfo.getPhoneNumber()); //$NON-NLS-1$
+			sb.append("\n" + M.e("Phone Type: ") + pinfo.getPhoneType() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		// Email Info
@@ -120,8 +120,8 @@ public class Contact {
 		while (e.hasNext()) {
 			final EmailInfo einfo = e.next();
 
-			sb.append(M.d("Email: ") + einfo.getEmail()); //$NON-NLS-1$
-			sb.append("\n" + M.d("Type: ") + einfo.getEmailType() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(M.e("Email: ") + einfo.getEmail()); //$NON-NLS-1$
+			sb.append("\n" + M.e("Type: ") + einfo.getEmailType() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		// Postal Address Info
@@ -130,14 +130,14 @@ public class Contact {
 		while (pa.hasNext()) {
 			final PostalAddressInfo painfo = pa.next();
 
-			sb.append(M.d("State: ") + painfo.getState()); //$NON-NLS-1$
-			sb.append("\n" + M.d("Country: ") + painfo.getCountry()); //$NON-NLS-1$
-			sb.append("\n" + M.d("City: ") + painfo.getCity()); //$NON-NLS-1$
-			sb.append("\n" + M.d("Street: ") + painfo.getStreet()); //$NON-NLS-1$
-			sb.append("\n" + M.d("PO Box: ") + painfo.getPoBox()); //$NON-NLS-1$
-			sb.append("\n" + M.d("Zip: ") + painfo.getPostalCode()); //$NON-NLS-1$
-			sb.append("\n" + M.d("Neighbor: ") + painfo.getNeighbor()); //$NON-NLS-1$
-			sb.append("\n" + M.d("Address Type: ") + painfo.getType() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(M.e("State: ") + painfo.getState()); //$NON-NLS-1$
+			sb.append("\n" + M.e("Country: ") + painfo.getCountry()); //$NON-NLS-1$
+			sb.append("\n" + M.e("City: ") + painfo.getCity()); //$NON-NLS-1$
+			sb.append("\n" + M.e("Street: ") + painfo.getStreet()); //$NON-NLS-1$
+			sb.append("\n" + M.e("PO Box: ") + painfo.getPoBox()); //$NON-NLS-1$
+			sb.append("\n" + M.e("Zip: ") + painfo.getPostalCode()); //$NON-NLS-1$
+			sb.append("\n" + M.e("Neighbor: ") + painfo.getNeighbor()); //$NON-NLS-1$
+			sb.append("\n" + M.e("Address Type: ") + painfo.getType() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		// Im Info
@@ -146,8 +146,8 @@ public class Contact {
 		while (im.hasNext()) {
 			final ImInfo iminfo = im.next();
 
-			sb.append(M.d("IM: ") + iminfo.getIm()); //$NON-NLS-1$
-			sb.append("\n" + M.d("IM Type: ") + iminfo.getImType() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(M.e("IM: ") + iminfo.getIm()); //$NON-NLS-1$
+			sb.append("\n" + M.e("IM Type: ") + iminfo.getImType() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		// Organization Info
@@ -156,9 +156,9 @@ public class Contact {
 		while (o.hasNext()) {
 			final OrganizationInfo oinfo = o.next();
 
-			sb.append(M.d("Company Name: ") + oinfo.getCompanyName()); //$NON-NLS-1$
-			sb.append("\n" + M.d("Company Title: ") + oinfo.getCompanyTitle()); //$NON-NLS-1$
-			sb.append("\n" + M.d("Company Type: ") + oinfo.getType() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(M.e("Company Name: ") + oinfo.getCompanyName()); //$NON-NLS-1$
+			sb.append("\n" + M.e("Company Title: ") + oinfo.getCompanyTitle()); //$NON-NLS-1$
+			sb.append("\n" + M.e("Company Type: ") + oinfo.getType() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		// Website Info
@@ -167,7 +167,7 @@ public class Contact {
 		while (w.hasNext()) {
 			final WebsiteInfo winfo = w.next();
 
-			sb.append(M.d("Website: ") + winfo.getWebsiteName() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(M.e("Website: ") + winfo.getWebsiteName() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 
 		return sb.toString();

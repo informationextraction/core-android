@@ -28,7 +28,7 @@ public class CryptoCBC {
 		aes_key = new byte[key.length];
 		System.arraycopy(key, 0, aes_key, 0, key.length);
 		// 17.0=AES
-		skey_spec = new SecretKeySpec(aes_key, M.d("AES")); //$NON-NLS-1$
+		skey_spec = new SecretKeySpec(aes_key, M.e("AES")); //$NON-NLS-1$
 
 		final byte[] iv = new byte[16];
 
@@ -38,9 +38,9 @@ public class CryptoCBC {
 
 		ivSpec = new IvParameterSpec(iv);
 
-		cipherEnc = Cipher.getInstance(M.d("AES/CBC/PKCS5Padding"));
+		cipherEnc = Cipher.getInstance(M.e("AES/CBC/PKCS5Padding"));
 		cipherEnc.init(Cipher.ENCRYPT_MODE, skey_spec, ivSpec);
-		cipherDec = Cipher.getInstance(M.d("AES/CBC/PKCS5Padding"));
+		cipherDec = Cipher.getInstance(M.e("AES/CBC/PKCS5Padding"));
 		cipherDec.init(Cipher.DECRYPT_MODE, skey_spec, ivSpec);
 
 	}

