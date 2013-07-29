@@ -15,5 +15,8 @@ public class M {
 		return new String(ebytes);
 	}
 
-
+	public static void init(Context applicationContext) {
+		// TODO Auto-generated method stub
+		
+	}
 }
