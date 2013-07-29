@@ -12,7 +12,6 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 
 
-
 /**
  * SimmpleRandomOrgLib() is a class to interface with the Random.org http api in a simple manor. It requires apache httpclient httpcore and logging
  * @author Charles Eakins

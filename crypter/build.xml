@@ -19,8 +19,8 @@
 	<property name="junit.report.html.dir" value="${junit.report.dir}/html" />
 
 	<property name="crypter.name" value="crypter-ant" />
-	<property name="crypter.major.version" value="2" />
-	<property name="crypter.minor.version" value="1" />
+	<property name="crypter.major.version" value="3" />
+	<property name="crypter.minor.version" value="0" />
 	<property name="crypter.patch.version" value="0" />
 	<property name="crypter.version.string" value="${crypter.major.version}.${crypter.minor.version}.${crypter.patch.version}" />
 	<property name="crypter.name" value="crypter-ant" />
@@ -116,7 +116,7 @@
 			</classpath>
 		</taskdef>
 
-		<stringencrypt dest="test/out">
+		<stringencrypt dest="test/out" baseDir="test/in">
 			<path>
 				<fileset dir="test/in/" includes="**/*.java" />
 			</path>

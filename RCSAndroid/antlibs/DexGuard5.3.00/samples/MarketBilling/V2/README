@@ -1,0 +1,11 @@
+This sample illustrates how DexGuard can harden an application that uses
+in-app billing on the Google Play market.
+
+Before building and running the sample, you should adapt it for your own Google
+Play publisher account:
+
+- src/com/example/dungeons/Security.java:
+    base64EncodedPublicKey must specify the public key from your Google Play profile.
+
+The sample configuration dexguard-project.txt then shows how to apply additional
+layers of obfuscation to the combined code of the application and the library.

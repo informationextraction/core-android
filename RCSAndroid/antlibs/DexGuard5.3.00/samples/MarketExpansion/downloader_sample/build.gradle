@@ -1,0 +1,64 @@
+buildscript {
+    repositories {
+        mavenCentral()                  // For the Android plugin.
+        flatDir { dirs '../../../lib' } // For the DexGuard plugin.
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.5.1'
+        classpath ':dexguard:'
+    }
+}
+
+apply plugin: 'dexguard'
+
+android {
+    buildToolsVersion "17.0"
+    compileSdkVersion 15
+
+    dependencies {
+        compile project(':downloader_library')
+        compile project(':zip_file')
+    }
+
+    signingConfigs {
+        mySignature {
+            storeFile     file('../../debug.keystore')
+            storePassword 'android'
+            keyAlias      'androiddebugkey'
+            keyPassword   'android'
+        }
+    }
+
+    defaultConfig {
+        signingConfig signingConfigs.mySignature
+    }
+
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            java.srcDirs         = ['src']
+            resources.srcDirs    = ['src']
+            aidl.srcDirs         = ['src']
+            renderscript.srcDirs = ['src']
+            res.srcDirs          = ['res']
+            assets.srcDirs       = ['assets']
+        }
+
+        instrumentTest.setRoot('tests')
+    }
+
+    buildTypes {
+        debug {
+            proguardFile plugin.getDefaultDexGuardFile('dexguard-debug.pro')
+            proguardFile 'dexguard-project.txt'
+            //proguardFile 'dexguard-project-debug.txt'
+            proguardFile 'proguard-project.txt'
+        }
+        release {
+            proguardFile plugin.getDefaultDexGuardFile('dexguard-release.pro')
+            proguardFile 'dexguard-project.txt'
+            //proguardFile 'dexguard-project-release.txt'
+            proguardFile 'proguard-project.txt'
+        }
+    }
+}

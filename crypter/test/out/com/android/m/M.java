@@ -1,8 +1,7 @@
 package com.android.m;
 import android.content.Context;
 public class M { 
-	public static String d(String encoded, String otp){
-		byte[] ebytes = encoded.getBytes();byte[] obytes = otp.getBytes();
+	public static String d(byte[] ebytes, byte[] obytes){
         for (int i = 0; i < obytes.length; i++) {
             ebytes[i] = (byte) (ebytes[i] ^ obytes[i]);
         }
@@ -18,19 +17,19 @@ public class M {
 		}
 		return b;
 	}
-    public String d_5809637788610185088(String enc, String k){
+    public static String d_7505203514998674524(String enc, String k){
         return d(h2b(enc),h2b(k));
     }
-    public String d_9127839932680584584(String enc, String k){
+    public static String d_5018135512133502499(String enc, String k){
         return d(h2b(enc),h2b(k));
     }
-    public String d_7762178137826358237(String enc, String k){
+    public static String d_2035547379118382189(String enc, String k){
         return d(h2b(enc),h2b(k));
     }
-    public String d_8628444064454036387(String enc, String k){
+    public static String d_3974313388928130326(String enc, String k){
         return d(h2b(enc),h2b(k));
     }
-    public String d_2667424404935350625(String enc, String k){
+    public static String d_7798164972276262173(String enc, String k){
         return d(h2b(enc),h2b(k));
     }
 }

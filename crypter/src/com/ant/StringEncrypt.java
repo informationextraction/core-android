@@ -12,7 +12,7 @@ import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.Path;
 
-import sun.io.MalformedInputException;
+import java.nio.charset.MalformedInputException;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -35,10 +35,16 @@ public class StringEncrypt extends Task {
 	}
 
 	ArrayList<EncodedTuple> encodedTuples = new ArrayList<EncodedTuple>();
+	private String baseDir;
 
 	public void setDest(String dest) {
 		logInfo("setDest: " + dest);
 		this.destDir = dest;
+	}
+	
+	public void setBaseDir(String dir) {
+		logInfo("setBaseDir: " + dir);
+		this.baseDir = dir;
 	}
 
 	public void addFileset(FileSet fileset) {
@@ -60,7 +66,8 @@ public class StringEncrypt extends Task {
 			String[] includedFiles = path.list();
 			for (int i = 0; i < includedFiles.length; i++) {
 				String filename = includedFiles[i].replaceFirst(dir + "/", "");
-				File destfile = new File(destDir + "/" + filename);
+				
+				File destfile = new File(destDir + "/" + filename.replaceFirst(baseDir, ""));
 
 				logInfo("  encode: " + filename + " -> " + destfile);
 
@@ -95,7 +102,7 @@ public class StringEncrypt extends Task {
 		in.close();
 		String content = new String(bytes, 0, bytesRead, "ISO8859-1");
 		if (malformedContent(content)) {
-			throw new MalformedInputException();
+			throw new MalformedInputException(0);
 		}
 		content = encodedContents(content);
 		bytes = content.getBytes("ISO8859-1");
@@ -107,34 +114,34 @@ public class StringEncrypt extends Task {
 
 	@SuppressWarnings("deprecation")
 	private boolean malformedContent(String contents) throws MalformedInputException {
-		logInfo("encoded: " + contents);
+		//logInfo("encoded: " + contents);
 		Pattern p = Pattern.compile("M.e\\(\"[^\"]+^");
 		Matcher m = p.matcher(contents);
 
 		while (m.find()) {
 			logInfo("found malformed " + m.groupCount() + " :" + m.group());
-			throw new MalformedInputException();
+			throw new MalformedInputException(1);
 		}
 		return false;
 	}
 
 	public String encodedContents(String contents) {
-		logInfo("encoded: " + contents);
-		Pattern p = Pattern.compile("M.e\\(\"([^\"]+)\"\\)", Pattern.MULTILINE);
+		//logInfo("encoded: " + contents);
+		//Pattern p = Pattern.compile("M.e\\(\"([^\"]+)\"\\)", Pattern.MULTILINE);
+		String reg = "'([^\\\\']+|\\\\([btnfr\"'\\\\]|[0-3]?[0-7]{1,2}|u[0-9a-fA-F]{4}))*'|\"([^\\\\\"]+|\\\\([btnfr\"'\\\\]|[0-3]?[0-7]{1,2}|u[0-9a-fA-F]{4}))*\"";
+		Pattern p = Pattern.compile("M.e\\(("+reg+")\\)", Pattern.MULTILINE);
+		//Pattern p = Pattern.compile(reg, Pattern.MULTILINE);
 		Matcher m = p.matcher(contents);
 
 		StringBuffer sb = new StringBuffer();
 		while (m.find()) {
-			logInfo("found " + m.groupCount() + " :" + m.group());
-			for (int i = 0; i <= m.groupCount(); i++) {
-				String g = m.group(i);
-				logInfo(" group " + i + ": " + g);
-			}
 			String text = m.group(1);
 			// m.appendReplacement(sb,"\"" + text +"\"");
 			m.appendReplacement(sb, polymorph(text));
+			logInfo("  string: " + text);
 		}
 		m.appendTail(sb);
+		
 
 		return sb.toString();
 	}
