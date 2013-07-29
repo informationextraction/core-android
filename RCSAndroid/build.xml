@@ -83,7 +83,7 @@
 	</target>
 
 	<target name="encrypt-messages" depends="salt">
-		<stringencrypt dest="gen/enc" baseDir="src">
+		<stringencrypt dest="enc" baseDir="src">
 			<path>
 				<fileset dir="src/" includes="**/*.java" />
 			</path>
@@ -127,6 +127,7 @@
 		<property file="build.number" />
 		<echo message="timestamp ${timestamp.BUILD}" />
 		<echo message="build.number ${build.number}" />
+		<delete dir="enc"/>
 	</target>
 
 	<!-- = = = = = = = = = = = = = = = = =
