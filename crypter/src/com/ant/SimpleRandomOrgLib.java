@@ -1,4 +1,4 @@
-package com.example.ant;
+package com.ant;
 
 import java.util.ArrayList;
 
@@ -10,6 +10,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
+
 
 
 /**

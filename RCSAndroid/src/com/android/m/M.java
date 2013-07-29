@@ -1,7 +1,5 @@
 package com.android.m;
-
 import android.content.Context;
-
 public class M {
 	public static String e(String message){
 		return message;

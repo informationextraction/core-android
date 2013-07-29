@@ -14,7 +14,7 @@
  *  limitations under the License.
  *
  */
-package com.example.ant;
+package com.ant;
 
 import java.io.BufferedInputStream;
 import java.io.File;

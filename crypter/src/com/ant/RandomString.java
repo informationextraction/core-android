@@ -1,4 +1,4 @@
-package com.example.ant;
+package com.ant;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
