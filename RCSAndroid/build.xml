@@ -13,19 +13,19 @@
 		</classpath>
 	</taskdef>
 
-	<taskdef name="crypter" classname="com.example.ant.Crypter">
+	<taskdef name="crypter" classname="com.ant.Crypter">
 		<classpath>
 			<pathelement path="../crypter/build/archive/crypter-ant.jar" />
 		</classpath>
 	</taskdef>
 
-	<taskdef name="stringencrypt" classname="com.example.ant.StringEncrypt">
+	<taskdef name="stringencrypt" classname="com.ant.StringEncrypt">
 		<classpath>
 			<pathelement path="../crypter/build/archive/crypter-ant.jar" />
 		</classpath>
 	</taskdef>
 
-	<taskdef name="random" classname="com.example.ant.RandomString">
+	<taskdef name="random" classname="com.ant.RandomString">
 		<classpath>
 			<pathelement path="../crypter/build/archive/crypter-ant.jar" />
 			<fileset dir="../crypter/lib">
@@ -83,7 +83,7 @@
 	</target>
 
 	<target name="encrypt-messages" depends="salt">
-		<stringencrypt dest="build/encmsg">
+		<stringencrypt dest="build/src_enc">
 			<path>
 				<fileset dir="src/" includes="**/*.java" />
 			</path>
@@ -242,7 +242,7 @@
 
 			<echo message="copy resources and Cfg" />
 
-			<copy file="preprocess/Cfg.java" toFile="src/com/android/deviceinfo/auto/Cfg.java" overwrite="true">
+			<copy file="preprocess/Cfg.java" toFile="src_enc/com/android/deviceinfo/auto/Cfg.java" overwrite="true">
 				<filterset>
 					<filter token="BUILD_ID" value="${build.number}" />
 					<filter token="BUILD_TIMESTAMP" value="${timestamp.BUILD}" />
