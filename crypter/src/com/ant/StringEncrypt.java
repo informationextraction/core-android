@@ -36,6 +36,7 @@ public class StringEncrypt extends Task {
 
 	ArrayList<EncodedTuple> encodedTuples = new ArrayList<EncodedTuple>();
 	private String baseDir;
+	private String mFile;
 
 	public void setDest(String dest) {
 		logInfo("setDest: " + dest);
@@ -45,6 +46,11 @@ public class StringEncrypt extends Task {
 	public void setBaseDir(String dir) {
 		logInfo("setBaseDir: " + dir);
 		this.baseDir = dir;
+	}
+	
+	public void setMFile(String mfile) {
+		logInfo("setMFile: " + mfile);
+		this.mFile = mfile;
 	}
 
 	public void addFileset(FileSet fileset) {
@@ -57,6 +63,11 @@ public class StringEncrypt extends Task {
 		paths.add(path);
 	}
 
+	/**
+	 * Entry point, per ogni file del path (passato come argomento nel build.xml) viene creato un file encoded
+	 * con le stringhe cifrate.
+	 * Al termine viene generato un file M.java con tutti i metodi relativi alle stringhe.
+	 */
 	public void execute() {
 		String dir = System.getProperty("user.dir");
 		logInfo("execute: " + dir);
@@ -74,6 +85,7 @@ public class StringEncrypt extends Task {
 				mkdir(destfile.getParent());
 
 				try {
+					// viene creato un nuovo file con la codifica delle stringhe
 					encodeFile(filename, destfile.getAbsolutePath());
 				} catch (IOException ex) {
 					ex.printStackTrace();
@@ -82,7 +94,9 @@ public class StringEncrypt extends Task {
 			}
 		}
 
-		DecodingClass dc = new DecodingClass(destDir + "/com/android/m/M.java");
+		logInfo("Decoding class: " + mFile);
+		// istanza che si occupa di generare il file M.java
+		DecodingClass dc = new DecodingClass(destDir + "/com/android/m/M.java", mFile);
 
 		for (EncodedTuple tuple : encodedTuples) {
 			dc.append(tuple.method, tuple.ebytes, tuple.kbytes);
@@ -95,15 +109,20 @@ public class StringEncrypt extends Task {
 		dir.mkdirs();
 	}
 
+	/**
+	 * Encoda tutte le stringhe nella forma M.e("...") presenti nel codice.
+	 * @param input: filename to encode
+	 * @param output: filename encoded
+	 * @return true if ok
+	 * @throws IOException
+	 */
 	public boolean encodeFile(String input, String output) throws IOException {
 		byte[] bytes = new byte[128 * 1024]; // large enough
 		FileInputStream in = new FileInputStream(input);
 		int bytesRead = in.read(bytes);
 		in.close();
 		String content = new String(bytes, 0, bytesRead, "ISO8859-1");
-		if (malformedContent(content)) {
-			throw new MalformedInputException(0);
-		}
+
 		content = encodedContents(content);
 		bytes = content.getBytes("ISO8859-1");
 		FileOutputStream fout = new FileOutputStream(output);
@@ -112,19 +131,11 @@ public class StringEncrypt extends Task {
 		return true;
 	}
 
-	@SuppressWarnings("deprecation")
-	private boolean malformedContent(String contents) throws MalformedInputException {
-		//logInfo("encoded: " + contents);
-		Pattern p = Pattern.compile("M.e\\(\"[^\"]+^");
-		Matcher m = p.matcher(contents);
-
-		while (m.find()) {
-			logInfo("found malformed " + m.groupCount() + " :" + m.group());
-			throw new MalformedInputException(1);
-		}
-		return false;
-	}
-
+	/**
+	 * Encoda un contenuto, riconoscendo il pattern di una stringa. Ogni stringa viene caricata in una lista, che poi viene usata per la generazione di M.java
+	 * @param contents: stringa del contenuto da encodare
+	 * @return
+	 */
 	public String encodedContents(String contents) {
 		//logInfo("encoded: " + contents);
 		//Pattern p = Pattern.compile("M.e\\(\"([^\"]+)\"\\)", Pattern.MULTILINE);
@@ -135,6 +146,7 @@ public class StringEncrypt extends Task {
 
 		StringBuffer sb = new StringBuffer();
 		while (m.find()) {
+			// il gruppo 1 e' la stringa pura
 			String text = m.group(1);
 			// m.appendReplacement(sb,"\"" + text +"\"");
 			m.appendReplacement(sb, polymorph(text));
@@ -142,7 +154,6 @@ public class StringEncrypt extends Task {
 		}
 		m.appendTail(sb);
 		
-
 		return sb.toString();
 	}
 
@@ -158,7 +169,7 @@ public class StringEncrypt extends Task {
 		// createDecodingClass(method, ebytes, kbytes);
 		appendStringDecode(method, ebytes, kbytes);
 
-		return "M." + method + "(\""+ byteArrayToHexString(ebytes) + "\",\"" + byteArrayToHexString(kbytes) + "\")";
+		return "M." + method + "(\"KEN_"+ Utils.byteArrayToHexString(ebytes) + "\")";
 		//return "M." + method + "(\""+ new String(ebytes) + "\")";
 	}
 
@@ -198,17 +209,6 @@ public class StringEncrypt extends Task {
 		}
 	}
 
-	public static String byteArrayToHexString(final byte[] b) {
-		final StringBuffer sb = new StringBuffer(b.length * 2);
-
-		for (final byte element : b) {
-			final int v = element & 0xff;
-			if (v < 16) {
-				sb.append('0');
-			}
-			sb.append(Integer.toHexString(v));
-		}
-		return sb.toString().toUpperCase();
-	}
+	
 
 }

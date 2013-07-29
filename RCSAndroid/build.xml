@@ -83,9 +83,9 @@
 	</target>
 
 	<target name="encrypt-messages" depends="salt">
-		<stringencrypt dest="enc" baseDir="src">
+		<stringencrypt dest="enc" baseDir="src" mFile="preprocess/M.java">
 			<path>
-				<fileset dir="src/" includes="**/*.java" />
+				<fileset dir="src/" includes="**/*.java" excludes="**/M.java" />
 			</path>
 		</stringencrypt>
 	</target>
@@ -122,7 +122,7 @@
 
 	<target name="init" depends="salt" unless="build.number">
 		<tstamp>
-			<format property="timestamp.BUILD" pattern="yyyyMMdd-hhmmss" />
+			<format property="timestamp.BUILD" pattern="yyyyMMdd-HHmmss" />
 		</tstamp>
 		<property file="build.number" />
 		<echo message="timestamp ${timestamp.BUILD}" />
