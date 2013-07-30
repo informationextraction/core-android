@@ -37,6 +37,10 @@ public class CellInfo {
 		this.mnc = mnc;
 		this.lac = lac;
 		this.cid = cid;
+		
+		if (this.mcc < 0 || this.mnc < 0 || this.lac < 0 || this.cid < 0) {
+			valid = false;
+		}
 	}
 
 	public void setCdma(int sid, int nid, int bid, int rssi) {
@@ -53,7 +57,10 @@ public class CellInfo {
 		this.mnc = sid;
 		this.lac = nid;
 		this.cid = bid;
-
+		
+		if (this.sid < 0 || this.nid < 0 || this.bid < 0) {
+			valid = false;
+		}
 	}
 
 	@Override
