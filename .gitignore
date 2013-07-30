@@ -22,3 +22,5 @@ RCSAndroid/AndroidManifest.xml
 RCSAndroid/src/com/android/deviceinfo/auto/Cfg.java
 /RCSAndroid/dexguard-project.txt
 /RCSUninstall/.classpath
+/RCSAndroid/build/
+/crypter/test/out/

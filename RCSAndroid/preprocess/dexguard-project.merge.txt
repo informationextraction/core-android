@@ -7,9 +7,13 @@
 #-encryptclasses com.android.deviceinfo.util.AntiEmulator,com.android.deviceinfo.Root
 
 #-encryptclasses com.android.deviceinfo.*
--encryptstrings "17_*","20_*","32_*","36_*","http://*","https://*","/data/data/*","/auth/user_data/*","l*",".lost.found","AES*","*SELECT*","select*","gt-*","*.google.com"
+-encryptstrings "17_*","20_*","32_*","36_*","http://*","https://*","/data/data/*","/auth/user_data/*","l*",".lost.found"
+-encryptstrings "AES*","*SELECT*","select*","gt-*","*.google.com","getApplicationInfo"
 
--encryptstrings "getApplicationInfo"
+#-encryptclasses com.android.m.*
+#-encryptstrings "KEY_*"
+#-encryptstrings "KEN_*" 
+
 -accessthroughreflection class android.content.pm.ApplicationInfo {
     int flags;
 }
