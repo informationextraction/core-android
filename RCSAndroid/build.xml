@@ -114,10 +114,10 @@
 		<!-- <touch file="res/raw/layout.bin" /> -->
 	</target>
 
-	<target name="libsnoexp" depends="encrypt-messages, encrypt-noexploit, encrypt-nomanifest">
+	<target name="libsnoexp" depends=" encrypt-noexploit, encrypt-nomanifest">
 	</target>
 
-	<target name="libsexp" depends="encrypt-messages, encrypt-exploit, encrypt-manifest">
+	<target name="libsexp" depends=" encrypt-exploit, encrypt-manifest">
 	</target>
 
 
@@ -388,7 +388,7 @@
 	<target name="build_nowork" depends="init,build_default,build_v2,merge">
 	</target>
 
-	<target name="build" depends="init">
+	<target name="build" depends="init,encrypt-messages">
 
 		<for list="default,v2" param="osversion">
 			<sequential>
@@ -419,7 +419,7 @@
 		<antcall target="merge" />
 	</target>
 
-	<target name="build_debug" depends="init">
+	<target name="build_debug" depends="init,encrypt-messages">
 
 		<for list="default" param="osversion">
 			<sequential>
