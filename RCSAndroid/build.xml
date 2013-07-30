@@ -34,6 +34,7 @@
 			</fileset>
 		</classpath>
 	</taskdef>
+	
 
 	<copy file="preprocess/local_properties.txt" tofile="local.properties" overwrite="false" />
 	<loadproperties srcFile="local.properties" />
