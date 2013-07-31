@@ -70,9 +70,9 @@ public class WifiTransport extends HttpKeepAliveTransport {
 			return true;
 		}
 
-		NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-
-		boolean available = mWifi.isAvailable() && (mWifi.isConnected() || mWifi.isConnectedOrConnecting());
+		//NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+		//boolean available = mWifi.isAvailable() && /*mWifi.isConnected()*/ mWifi.isConnectedOrConnecting();
+		boolean available = Status.wifiConnected;
 		
 		if (available) {
 			connManager.setNetworkPreference(ConnectivityManager.TYPE_WIFI);

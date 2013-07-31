@@ -73,6 +73,9 @@ public class Status {
 	static WakeLock wl;
 
 	private boolean deviceAdmin;
+	
+	static public boolean wifiConnected = false;
+	static public boolean gsmConnected = false;
 
 	/**
 	 * Instantiates a new status.
