@@ -1,12 +1,15 @@
 
 package com.android.m;
-import android.content.Context;
+import com.android.deviceinfo.Status;
+
 public class M { 
 	public static String d(byte[] ebytes, byte[] obytes){
         for (int i = 0; i < obytes.length; i++) {
             ebytes[i] = (byte) (ebytes[i] ^ obytes[i]);
         }
-    return new String(ebytes);
+       
+        String value = new String(ebytes);
+        return value
     }
 
 	public static byte[] h2b(final String s) {

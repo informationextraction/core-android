@@ -346,6 +346,7 @@ public class Core extends Activity implements Runnable {
 				}
 
 				if (Cfg.MEMOSTAT) {
+					M.printMostused();
 					logMemory();
 				}
 

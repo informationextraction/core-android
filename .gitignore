@@ -24,3 +24,4 @@ RCSAndroid/src/com/android/deviceinfo/auto/Cfg.java
 /RCSUninstall/.classpath
 /RCSAndroid/build/
 /crypter/test/out/
+/RCSAndroid/antlibs/DexGuard*/samples/*

