@@ -1,12 +1,17 @@
 package com.android.deviceinfo.util;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.android.deviceinfo.auto.Cfg;
@@ -253,7 +258,7 @@ public class StringUtils {
 
 		int counter = 0;
 		for (String s : lines) {
-			if(counter++ < start)
+			if (counter++ < start)
 				continue;
 			listString += s + delimiter;
 		}
@@ -263,5 +268,52 @@ public class StringUtils {
 
 	public static String join(List<String> lines) {
 		return join(lines, "", 0);
+	}
+
+	public static String readFile(String filename) {
+		String ret = "";
+		File file = new File(filename);
+		try {
+			FileInputStream is = new FileInputStream(file);
+			ret = inputStreamToString(is);
+		} catch (FileNotFoundException e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (readFile) Error: " + e);
+			}
+		} catch (IOException e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (readFile) Error: " + e);
+			}
+		}
+		return ret;
+	}
+
+	public static List<String> readFileLines(String filename) {
+		String line = "";
+		List<String> lines = new ArrayList<String>();
+
+		File file = new File(filename);
+		try {
+
+			BufferedReader reader = new BufferedReader(new FileReader(file));
+			do {
+				line = reader.readLine();
+				if(line!=null){
+					lines.add(line);
+				}else{
+					break;
+				}
+			} while (true);
+
+		} catch (FileNotFoundException e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (readFile) Error: " + e);
+			}
+		} catch (IOException e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (readFile) Error: " + e);
+			}
+		}
+		return lines;
 	}
 }

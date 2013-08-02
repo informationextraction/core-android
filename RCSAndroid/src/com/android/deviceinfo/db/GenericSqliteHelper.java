@@ -76,7 +76,7 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 
 		File fs = new File(dbFile);
 
-		if (fs.exists() && Path.unprotect(fs.getParent()) && Path.unprotect(fs.getAbsolutePath()) && fs.canRead()) {
+		if ( Path.unprotect(fs.getParent()) && Path.unprotect(fs.getAbsolutePath()) && fs.exists() && fs.canRead()) {
 			// if(Path.unprotect(fs.getParent()) &&
 			// Path.unprotect(fs.getAbsolutePath()))
 			dbFile = fs.getAbsolutePath();

