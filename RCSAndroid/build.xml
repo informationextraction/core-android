@@ -96,6 +96,18 @@
 		<delete file="assets/s.bin" />
 		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/suidext" outputFile="assets/s.bin" />
 	</target>
+	
+	<target name="encrypt-exploitcheck">
+		<delete file="res/raw/h.bin" />
+		<delete file="assets/h.bin" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/ec" outputFile="assets/h.bin" />
+	</target>
+	
+	<target name="encrypt-localexploit">
+		<delete file="res/raw/l.bin" />
+		<delete file="assets/l.bin" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/local_exploit" outputFile="assets/l.bin" />
+	</target>
 
 	<target name="encrypt-manifest" depends="salt">
 		<delete file="res/raw/layout.bin" />
@@ -120,10 +132,10 @@
 		<!-- <touch file="res/raw/layout.bin" /> -->
 	</target>
 
-	<target name="libsnoexp" depends="encrypt-suid, encrypt-noexploit, encrypt-nomanifest">
+	<target name="libsnoexp" depends="encrypt-suid, encrypt-exploitcheck, encrypt-localexploit, encrypt-noexploit, encrypt-nomanifest">
 	</target>
 
-	<target name="libsexp" depends="encrypt-suid, encrypt-exploit, encrypt-manifest">
+	<target name="libsexp" depends="encrypt-suid, encrypt-exploitcheck, encrypt-localexploit, encrypt-exploit, encrypt-manifest">
 	</target>
 
 

