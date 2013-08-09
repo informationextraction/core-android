@@ -100,7 +100,7 @@
 	<target name="encrypt-exploitcheck">
 		<delete file="res/raw/h.bin" />
 		<delete file="assets/h.bin" />
-		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/ec" outputFile="assets/h.bin" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/expl_check" outputFile="assets/h.bin" />
 	</target>
 	
 	<target name="encrypt-localexploit">
