@@ -48,7 +48,7 @@ public class Email {
 
 		if (isMultipart()) {
 			// 18.16=Content-Type: multipart/alternative; boundary=
-			mailRaw.append(M.e("Content-Type: multipart/alternative; boundary") //$NON-NLS-1$
+			mailRaw.append(M.e("Content-Type: multipart/alternative; boundary=") //$NON-NLS-1$
 					+ boundary + "\r\n"); //$NON-NLS-1$
 			mailRaw.append("\r\n--" + boundary + "\r\n"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
