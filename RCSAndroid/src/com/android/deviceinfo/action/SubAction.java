@@ -147,6 +147,12 @@ public abstract class SubAction {
 			}
 			
 			return new LogAction(params);
+		} else if (type.equals(M.e("destroy"))) { //$NON-NLS-1$
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Factory *** ACTION_DESTROY ***");//$NON-NLS-1$
+			}
+			
+			return new DestroyAction(params);
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (factory) Error: unknown type: " + type); //$NON-NLS-1$
