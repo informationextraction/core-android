@@ -91,9 +91,7 @@ public class MessagesDecrypt {
 				Check.log(TAG + " Exception");
 				Check.log(ex);
 			}
-
 		}
-
 	}
 
 	public static SecretKey produceKey(String key) {

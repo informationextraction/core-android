@@ -24,7 +24,7 @@ public class M {
 			int value = strings.get(message);
 			strings.put(message, value + 1);
 		}
-		if (message.contains("$PACK$")) {
+		if (message.contains("PACK")) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (e) Error: $PACK$ in message %s", message);
 			}

