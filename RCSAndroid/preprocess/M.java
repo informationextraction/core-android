@@ -26,10 +26,6 @@ public class M {
 	}
 	
 	public static void printMostused() {
-		if(Cfg.DEBUG){
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (printMostused) Warn: DEBUG enabled in DIST M");
-			}
-		}
+		
 	}
 }

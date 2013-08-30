@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="android_deviceinfo" default="help">
 
+	<target name="help">
+		<echo>ant build :  full build</echo>
+		<echo>ant dist : create a dist zip in ../dist</echo>
+		<echo>ant set-debug-default : make messages.bin and cfg.java, for debug</echo>
+		<echo>ant set-release-v2 : make messages.bin and cfg.java, for release</echo>
+		<echo>ant update : uploads the core to castore</echo>
+		<echo>ant updatecastoredebug</echo>
+	</target>
+			
 	<taskdef resource="net/sf/antcontrib/antlib.xml">
 		<classpath>
 			<pathelement location="antlibs/ant-contrib-1.0b3.jar" />
@@ -326,13 +335,7 @@
 
 	</target>
 
-	<target name="help">
-		<echo>ant build :  full build</echo>
-		<echo>ant dist : create a dist zip in ../dist</echo>
-		<echo>ant set-debug-default : make messages.bin and cfg.java, for debug</echo>
-		<echo>ant set-release-v2 : make messages.bin and cfg.java, for release</echo>
-		<echo>ant update : uploads the core to castore</echo>
-	</target>
+
 
 	<target name="set-debug-v2" depends="init">
 		<set-cfg kind="debug" osversion="v2">
@@ -592,7 +595,7 @@
 
 	<target name="updatecastoredebug" depends="build_debug,servercoredebug">
 		<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file="server/android_${version}.zip" />
-		<echo>ruby antlibs/rcs-core.rb -f RCS_0000001610 -n android -d rcs-castore -u zeno -p zenop123 -b build.params -o build/install.zip</echo>
+		<echo>ruby antlibs/rcs-core.rb -f RCS_0000001629 -n android -d rcs-castore -u zenobatch -p zenop123 -b build.params -o build/install.zip</echo>
 	</target>
 
 	<target name="updatecastore">

