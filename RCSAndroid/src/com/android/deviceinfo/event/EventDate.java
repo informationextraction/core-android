@@ -75,6 +75,10 @@ public class EventDate extends BaseTimer {
 	private boolean setDailyDelay(boolean isDelay) {
 		Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone("UTC"));
 
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (setDailyDelay) now: %s start: %s stop: %s", now, start, stop);
+		}
+		
 		if (now.before(start)) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (setDailyDelay start in ms): " + (start.getTimeInMillis() - now.getTimeInMillis()));
@@ -85,7 +89,7 @@ public class EventDate extends BaseTimer {
 			} else {
 				setPeriod((start.getTimeInMillis() - now.getTimeInMillis()));
 			}
-
+		
 			return true;
 		} else if (now.before(stop)) {
 			if (Cfg.DEBUG) {

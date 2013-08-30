@@ -195,7 +195,14 @@ public class ChatViber extends SubModuleChat {
 			}
 		};
 
-		helper.traverseRecords("threads", visitor);
+		try{
+			helper.traverseRecords("threads", visitor);
+		}catch(Exception ex){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (getViberConversations) ", ex);
+			}
+			helper.traverseRecords("conversations", visitor);
+		}
 		return conversations;
 	}
 
