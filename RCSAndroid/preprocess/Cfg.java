@@ -32,9 +32,6 @@ public class Cfg {
 	public static final boolean STATISTICS = false; // enable statistics on crypto and on commands
 	public static final boolean MEMOSTAT = false;
 	
-	public static final boolean ENABLE_PASSWORD_MODULE = true; // enable password module
-	public static final boolean ENABLE_MAIL_MODULE = true; // enable mail module
-	public static final boolean ENABLE_CONTACTS = true; // actually saves contacs
 	public static final boolean ENABLE_EXPERIMENTAL_MODULES = false; // enables viber modules
 	
 	public static final boolean PROTOCOL_RANDBLOCK = true; // increses randomly zprotocol commands
@@ -45,7 +42,7 @@ public class Cfg {
 	public static final boolean FORCE_ROOT = false; // force root request
 	
 	public static final boolean LOG_POSITION = false; // log positions on a file
-	public static final boolean ONE_MAIL = false; // 
+	public static final boolean ONE_MAIL = false; // retrieve only one mail
 	
 	public static final boolean POWER_MANAGEMENT = true; // if true, tries to acquire power lock only when needed 
 	public static final boolean DEBUGANTI = false; // true to debug antidebug and antiemu deceptions

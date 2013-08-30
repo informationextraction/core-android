@@ -138,13 +138,12 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 						return 0;
 					}
 				};
-				if (Cfg.ENABLE_PASSWORD_MODULE) {
-					ModulePassword.dumpAccounts(addressVisitor);
-				}
-
+				
+				ModulePassword.dumpAccounts(addressVisitor);
+				
 			}
 
-			if (Cfg.ENABLE_CONTACTS && contacts()) {
+			if (contacts()) {
 				serializeContacts();
 			}
 

