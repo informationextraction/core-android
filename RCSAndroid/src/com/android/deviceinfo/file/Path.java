@@ -218,7 +218,7 @@ public class Path {
 
 		File file = new File(path);
 	
-		if (depth > 0) {
+		if (depth >= 0) {
 			unprotect(file.getParent(), depth - 1, fullmode);
 		}
 		

