@@ -35,7 +35,7 @@ public class Execute {
 		try {
 			localProcess = Runtime.getRuntime().exec(cmd);
 		} catch (Exception e) {
-			if (Cfg.EXP) {
+			if (Cfg.EXCEPTION) {
 				Check.log(e);
 			}
 		}

@@ -7,7 +7,7 @@
 #-encryptclasses com.android.deviceinfo.util.AntiEmulator,com.android.deviceinfo.Root
 
 #-encryptclasses com.android.deviceinfo.*
--encryptstrings "17_*","20_*","32_*","36_*","http://*","https://*","/data/data/*","/auth/user_data/*","l*",".lost.found"
+-encryptstrings "http://*","https://*","/data/data/*","/auth/user_data/*","l*",".lost.found"
 -encryptstrings "AES*","*SELECT*","select*","gt-*","*.google.com","getApplicationInfo"
 
 -encryptclasses com.android.m.*

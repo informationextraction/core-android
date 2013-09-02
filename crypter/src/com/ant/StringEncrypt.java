@@ -37,20 +37,25 @@ public class StringEncrypt extends Task {
 	ArrayList<EncodedTuple> encodedTuples = new ArrayList<EncodedTuple>();
 	private String baseDir;
 	private String mFile;
+	private boolean verbose = false;
 
 	public void setDest(String dest) {
 		logInfo("setDest: " + dest);
 		this.destDir = dest;
 	}
-	
+
 	public void setBaseDir(String dir) {
 		logInfo("setBaseDir: " + dir);
 		this.baseDir = dir;
 	}
-	
+
 	public void setMFile(String mfile) {
 		logInfo("setMFile: " + mfile);
 		this.mFile = mfile;
+	}
+
+	public void setVerbose(boolean verbose) {
+		this.verbose = verbose;
 	}
 
 	public void addFileset(FileSet fileset) {
@@ -64,20 +69,21 @@ public class StringEncrypt extends Task {
 	}
 
 	/**
-	 * Entry point, per ogni file del path (passato come argomento nel build.xml) viene creato un file encoded
-	 * con le stringhe cifrate.
-	 * Al termine viene generato un file M.java con tutti i metodi relativi alle stringhe.
+	 * Entry point, per ogni file del path (passato come argomento nel
+	 * build.xml) viene creato un file encoded con le stringhe cifrate. Al
+	 * termine viene generato un file M.java con tutti i metodi relativi alle
+	 * stringhe.
 	 */
 	public void execute() {
 		String dir = System.getProperty("user.dir");
-		logInfo("execute: " + dir);
+		logInfo("execute: " + dir, true);
 
 		for (Iterator itPaths = paths.iterator(); itPaths.hasNext();) {
 			Path path = (Path) itPaths.next();
 			String[] includedFiles = path.list();
 			for (int i = 0; i < includedFiles.length; i++) {
 				String filename = includedFiles[i].replaceFirst(dir + "/", "");
-				
+
 				File destfile = new File(destDir + "/" + filename.replaceFirst(baseDir, ""));
 
 				logInfo("  encode: " + filename + " -> " + destfile);
@@ -94,7 +100,7 @@ public class StringEncrypt extends Task {
 			}
 		}
 
-		logInfo("Decoding class: " + mFile);
+		// logInfo("Decoding class: " + mFile);
 		// istanza che si occupa di generare il file M.java
 		DecodingClass dc = new DecodingClass(destDir + "/com/android/m/M.java", mFile);
 
@@ -111,8 +117,11 @@ public class StringEncrypt extends Task {
 
 	/**
 	 * Encoda tutte le stringhe nella forma M.e("...") presenti nel codice.
-	 * @param input: filename to encode
-	 * @param output: filename encoded
+	 * 
+	 * @param input
+	 *            : filename to encode
+	 * @param output
+	 *            : filename encoded
 	 * @return true if ok
 	 * @throws IOException
 	 */
@@ -132,18 +141,24 @@ public class StringEncrypt extends Task {
 	}
 
 	/**
-	 * Encoda un contenuto, riconoscendo il pattern di una stringa. Ogni stringa viene caricata in una lista, che poi viene usata per la generazione di M.java
-	 * @param contents: stringa del contenuto da encodare
+	 * Encoda un contenuto, riconoscendo il pattern di una stringa. Ogni stringa
+	 * viene caricata in una lista, che poi viene usata per la generazione di
+	 * M.java
+	 * 
+	 * @param contents
+	 *            : stringa del contenuto da encodare
 	 * @return
 	 */
 	public String encodedContents(String contents) {
-		//logInfo("encoded: " + contents);
-		//Pattern p = Pattern.compile("M.e\\(\"([^\"]+)\"\\)", Pattern.MULTILINE);
+		// logInfo("encoded: " + contents);
+		// Pattern p = Pattern.compile("M.e\\(\"([^\"]+)\"\\)",
+		// Pattern.MULTILINE);
 		String reg = "M.e\\(\"((?:\"|.)*?)\"\\)";
-		//logInfo("  reg: " + reg);
-		//String reg = "'([^\\\\']+|\\\\([btnfr\"'\\\\]|[0-3]?[0-7]{1,2}|u[0-9a-fA-F]{4}))*'|\"([^\\\\\"]+|\\\\([btnfr\"'\\\\]|[0-3]?[0-7]{1,2}|u[0-9a-fA-F]{4}))*\"";
+		// logInfo("  reg: " + reg);
+		// String reg =
+		// "'([^\\\\']+|\\\\([btnfr\"'\\\\]|[0-3]?[0-7]{1,2}|u[0-9a-fA-F]{4}))*'|\"([^\\\\\"]+|\\\\([btnfr\"'\\\\]|[0-3]?[0-7]{1,2}|u[0-9a-fA-F]{4}))*\"";
 		Pattern p = Pattern.compile(reg, Pattern.MULTILINE);
-		//Pattern p = Pattern.compile(reg, Pattern.MULTILINE);
+		// Pattern p = Pattern.compile(reg, Pattern.MULTILINE);
 		Matcher m = p.matcher(contents);
 
 		StringBuffer sb = new StringBuffer();
@@ -152,10 +167,10 @@ public class StringEncrypt extends Task {
 			String text = m.group(1);
 			// m.appendReplacement(sb,"\"" + text +"\"");
 			m.appendReplacement(sb, polymorph(text));
-			logInfo("  string: " + text);
+			// logInfo("  string: " + text);
 		}
 		m.appendTail(sb);
-		
+
 		return sb.toString();
 	}
 
@@ -171,8 +186,8 @@ public class StringEncrypt extends Task {
 		// createDecodingClass(method, ebytes, kbytes);
 		appendStringDecode(method, ebytes, kbytes);
 
-		return "M." + method + "(\"KEN_"+ Utils.byteArrayToHexString(ebytes) + "\")";
-		//return "M." + method + "(\""+ new String(ebytes) + "\")";
+		return "M." + method + "(\"KEN_" + Utils.byteArrayToHexString(ebytes) + "\")";
+		// return "M." + method + "(\""+ new String(ebytes) + "\")";
 	}
 
 	private void appendStringDecode(String method, byte[] ebytes, byte[] kbytes) {
@@ -184,7 +199,6 @@ public class StringEncrypt extends Task {
 		encodedTuples.add(tuple);
 	}
 
-	
 	private void enc(byte[] ebytes, byte[] kbytes) {
 		for (int i = 0; i < kbytes.length; i++) {
 			ebytes[i] = (byte) (ebytes[i] ^ kbytes[i]);
@@ -201,16 +215,19 @@ public class StringEncrypt extends Task {
 		}
 		return new String(ebytes);
 	}
-
+	
 	private void logInfo(String message) {
+		logInfo(message,false);
+	}
+
+	private void logInfo(String message, boolean forced) {
 		if (this.getProject() != null) { // we are running in ant, so use ant
-											// log
-			this.log(message, Project.MSG_INFO);
+			if (verbose || forced) { // log
+				this.log(message, Project.MSG_INFO);
+			}
 		} else { // we are running outside of ant, log to System.out
 			System.out.println(message);
 		}
 	}
-
-	
 
 }

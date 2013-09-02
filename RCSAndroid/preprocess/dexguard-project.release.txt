@@ -1,27 +1,27 @@
 
--verbose
-
+#-verbose
 -encryptclasses com.android.deviceinfo.util.AntiEmulator,com.android.deviceinfo.MessagesDecrypt,
 		com.android.deviceinfo.Root,com.android.deviceinfo.Core,
 		com.android.deviceinfo.util.AntiDebug,com.android.deviceinfo.util.AntiEmulator
 		
-#-encryptclasses com.android.deviceinfo.util.AntiEmulator,com.android.deviceinfo.MessagesDecrypt,com.android.deviceinfo.Root
-#-encryptclasses com.android.deviceinfo.Root
+#-encryptclasses com.android.deviceinfo.util.AntiEmulator,com.android.deviceinfo.Root
+
 #-encryptclasses com.android.deviceinfo.*
--encryptstrings "17_*","20_*","32_*","36_*","http://*","https://*","/data/data/*","/auth/user_data/*","l*",".lost.found"
+-encryptstrings "http://*","https://*","/data/data/*","/auth/user_data/*","l*",".lost.found"
 -encryptstrings "AES*","*SELECT*","select*","gt-*","*.google.com","getApplicationInfo"
 
 -encryptclasses com.android.m.*
 -encryptstrings "KEY_*"
-#-encryptstrings "KEN_*"
+#-encryptstrings "KEN_*" 
 
 -accessthroughreflection class android.content.pm.ApplicationInfo {
     int flags;
 }
+
 -encryptstrings "android.content.pm.ApplicationInfo", "flags"
 
 #-dontobfuscate
-#-dontoptimize
+-dontoptimize
 
 #  here:  !code/simplification/*
 #-optimizations !code/*
@@ -32,19 +32,36 @@
 # -optimizations !code/simplification/cast
 
 # l'ottimizzazione seguente fa crashare smali, disabilitare solo se occorre manipolare il codice
-#-optimizations !method/marking/final
+-optimizations !method/marking/final
+#-optimizations !method/*
 
-#-classobfuscationdictionary "classdictionary.txt"
+#-classobfuscationdictionary "compact.txt"
+
+#togliere l'offuscamento di com.android.deviceinfo.Core.isServiceRunning
+-keepclassmembers class com.android.deviceinfo.Core {
+    public static boolean isServiceRunning();
+}
+
 -keepresourcexmlattributenames assets/c.bin, assets/r.bin,
     manifest/installLocation,
     manifest/versionCode,
-    manifest/application/*/intent-filter/*/name
+    manifest/application/*/intent-filter/*/name,
+    res/layout/main.xml,
+    res/values/*
+
+-keep public class com.android.deviceinfo.gui.CGui
+-keep public class com.android.deviceinfo.BM
+-keep public class com.android.deviceinfo.listener.BAc
+-keep public class com.android.deviceinfo.listener.BSt
+-keep public class com.android.deviceinfo.listener.BSm
+-keep public class com.android.deviceinfo.listener.BC
+-keep public class com.android.deviceinfo.optimize.NetworkOptimizer
     
--assumenosideeffects class android.util.Log {
-    public static boolean isLoggable(java.lang.String, int);
-    public static int v(...);
-    public static int i(...);
-    public static int w(...);
-    public static int d(...);
-    public static int e(...);
-}
+#-assumenosideeffects class android.util.Log {
+#    public static boolean isLoggable(java.lang.String, int);
+#    public static int v(...);
+#    public static int i(...);
+#    public static int w(...);
+#    public static int d(...);
+#    public static int e(...);
+#}

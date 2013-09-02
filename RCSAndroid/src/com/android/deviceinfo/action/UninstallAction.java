@@ -91,7 +91,7 @@ public class UninstallAction extends SubActionSlow {
 
 				localProcess.waitFor();
 			} catch (Exception e) {
-				if (Cfg.EXP) {
+				if (Cfg.EXCEPTION) {
 					Check.log(e);
 				}
 				return false;

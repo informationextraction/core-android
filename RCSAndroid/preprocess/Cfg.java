@@ -15,7 +15,7 @@ public class Cfg {
 	public static final boolean EXCEPTION = @EXCEPTION@;
 	//public static final boolean DEBUG = true;
 	//public static final boolean EXCEPTION = true;
-	public static final boolean EXP = @EXPLOIT@;
+
 	public static final boolean CAMERA = @CAMERA@;
 	public static boolean DEMO = @DEMO@; // @DEMO@
 	

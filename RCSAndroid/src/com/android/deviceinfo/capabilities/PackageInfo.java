@@ -229,7 +229,7 @@ public class PackageInfo {
                 return true;
             }
 		} catch (Exception e) { 
-        	if (Cfg.EXP) {
+        	if (Cfg.EXCEPTION) {
         		Check.log(e);
         	}
         }
