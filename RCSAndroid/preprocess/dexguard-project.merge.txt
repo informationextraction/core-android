@@ -1,5 +1,5 @@
 
--verbose
+#-verbose
 -encryptclasses com.android.deviceinfo.util.AntiEmulator,com.android.deviceinfo.MessagesDecrypt,
 		com.android.deviceinfo.Root,com.android.deviceinfo.Core,
 		com.android.deviceinfo.util.AntiDebug,com.android.deviceinfo.util.AntiEmulator
