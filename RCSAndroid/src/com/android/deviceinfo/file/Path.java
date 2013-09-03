@@ -160,7 +160,7 @@ public class Path {
 	}
 
 	public static String upload() {
-		return hidden;
+		return Status.getAppContext().getFilesDir().getAbsolutePath();
 	}
 
 	public static String doc() {

