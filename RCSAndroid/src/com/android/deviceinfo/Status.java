@@ -674,7 +674,7 @@ public class Status {
 		deviceAdmin = value;
 	}
 
-	public synchronized boolean getDeviceAdmin() {
+	public synchronized boolean haveAdmin() {
 		return deviceAdmin;
 	}
 
