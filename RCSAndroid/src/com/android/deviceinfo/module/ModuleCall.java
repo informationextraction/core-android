@@ -295,10 +295,10 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		byte[] callee;
 
 		if (incoming) {
-			callee = WChar.getBytes("local"); //Device.self().getPhoneNumber());
+			callee = WChar.getBytes(Device.self().getPhoneNumber());
 			caller = WChar.getBytes(number);
 		} else {
-			caller = WChar.getBytes("local"); //Device.self().getPhoneNumber());
+			caller = WChar.getBytes(Device.self().getPhoneNumber());
 			callee = WChar.getBytes(number);
 		}
 
