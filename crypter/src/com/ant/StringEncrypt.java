@@ -60,7 +60,7 @@ public class StringEncrypt extends Task {
 	}
 	
 	public void setMFile(String mfile) {
-		String cleanDir = normalizePath(dir);
+		String cleanDir = normalizePath(mfile);
 		logInfo("setMFile: " + cleanDir);
 		this.mFile = cleanDir;
 	}
