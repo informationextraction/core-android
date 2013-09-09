@@ -174,6 +174,11 @@ public class Core extends Activity implements Runnable {
 		EvidenceReference.info(M.e("Started")); //$NON-NLS-1$
 
 		serviceRunning = true;
+		
+		if (Cfg.DEMO) {
+			Toast.makeText(Status.getAppContext().getApplicationContext(), M.e("Agent started!"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+		}
+		
 		return true;
 	}
 
@@ -271,7 +276,6 @@ public class Core extends Activity implements Runnable {
 
 				if (Cfg.DEMO && Cfg.DEMO_INITSOUND) {
 					//Beep.beepPenta();
-					//Toast.makeText(Status.getAppContext().getApplicationContext(), M.e("Agent started!"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 				}
 
 				// Torna true in caso di UNINSTALL o false in caso di stop del
