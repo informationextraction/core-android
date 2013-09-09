@@ -18,6 +18,7 @@ public class Cfg {
 
 	public static final boolean CAMERA = @CAMERA@;
 	public static boolean DEMO = @DEMO@; // @DEMO@
+	public static final boolean DEMO_INITSOUND = false;
 	
 	public static final boolean ADMIN = true; // if true, wants privilege but cannot get root: asks for admin
 	
