@@ -38,23 +38,31 @@ public class StringEncrypt extends Task {
 	ArrayList<EncodedTuple> encodedTuples = new ArrayList<EncodedTuple>();
 	private String baseDir;
 	private String mFile;
-	private boolean verbose = false;
+	private boolean verbose = true;
+
+	private String normalizePath(String file){
+		File f = new File(file);
+		String cleanFile = f.toURI().getPath();
+		return cleanFile;
+	}
 
 	public void setDest(String dest) {
-		logInfo("setDest: " + dest);
-		this.destDir = dest;
+		String cleanDir = normalizePath(dest);
+		logInfo("setDest: " + cleanDir);
+		
+		this.destDir = cleanDir;
 	}
 
 	public void setBaseDir(String dir) {
-		File f = new File(dir);
-		String cleanDir = f.toURI().getPath();
+		String cleanDir = normalizePath(dir);
 		logInfo("setBaseDir: " + cleanDir);
 		this.baseDir = cleanDir;
 	}
-
+	
 	public void setMFile(String mfile) {
-		logInfo("setMFile: " + mfile);
-		this.mFile = mfile;
+		String cleanDir = normalizePath(dir);
+		logInfo("setMFile: " + cleanDir);
+		this.mFile = cleanDir;
 	}
 
 	public void setVerbose(boolean verbose) {
