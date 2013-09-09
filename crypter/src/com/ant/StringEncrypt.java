@@ -12,6 +12,7 @@ import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.Path;
 
+import java.net.URI;
 import java.nio.charset.MalformedInputException;
 
 import java.util.*;
@@ -45,8 +46,10 @@ public class StringEncrypt extends Task {
 	}
 
 	public void setBaseDir(String dir) {
-		logInfo("setBaseDir: " + dir);
-		this.baseDir = dir;
+		File f = new File(dir);
+		String cleanDir = f.toURI().getPath();
+		logInfo("setBaseDir: " + cleanDir);
+		this.baseDir = cleanDir;
 	}
 
 	public void setMFile(String mfile) {
@@ -75,14 +78,18 @@ public class StringEncrypt extends Task {
 	 * stringhe.
 	 */
 	public void execute() {
-		String dir = System.getProperty("user.dir");
+		File userdir = new File(System.getProperty("user.dir"));
+		String dir = userdir.toURI().getPath();
+		
 		logInfo("execute: " + dir, true);
 
 		for (Iterator itPaths = paths.iterator(); itPaths.hasNext();) {
 			Path path = (Path) itPaths.next();
 			String[] includedFiles = path.list();
 			for (int i = 0; i < includedFiles.length; i++) {
-				String filename = includedFiles[i].replace(dir + "/", "");
+				URI fileUri = (new File(includedFiles[i])).toURI();
+				
+				String filename = fileUri.getPath().replace(dir + "/", "");
 
 				File destfile = new File(destDir + "/" + filename.replace(baseDir, ""));
 
