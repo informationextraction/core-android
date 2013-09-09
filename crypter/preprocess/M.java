@@ -24,5 +24,4 @@ public class M {
 	public static String e(String text){
 		return text;
 	}
-
 }

@@ -25,8 +25,14 @@ public class DecodingClass {
 		try {
 			FileInputStream fin = new FileInputStream(headerFile);
 			String mIn = new String(inputStreamToBuffer(fin, 0));
-			if(mIn.endsWith("}\n")){
+			if(mIn.endsWith("\n}\n")){
 				mIn=mIn.substring(0, mIn.length() -2);
+			}
+			if(mIn.endsWith("\n}\r\n")){
+				mIn=mIn.substring(0, mIn.length() -3);
+			}
+			if(mIn.endsWith("\n}")){
+				mIn=mIn.substring(0, mIn.length() -1);
 			}
 			
 			fout = new FileOutputStream(classFile);
