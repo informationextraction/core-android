@@ -275,7 +275,7 @@ public class Core extends Activity implements Runnable {
 				}
 
 				if (Cfg.DEMO && Cfg.DEMO_INITSOUND) {
-					//Beep.beepPenta();
+					Beep.beepPenta();
 				}
 
 				// Torna true in caso di UNINSTALL o false in caso di stop del

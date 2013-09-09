@@ -82,9 +82,9 @@ public class StringEncrypt extends Task {
 			Path path = (Path) itPaths.next();
 			String[] includedFiles = path.list();
 			for (int i = 0; i < includedFiles.length; i++) {
-				String filename = includedFiles[i].replaceFirst(dir + "/", "");
+				String filename = includedFiles[i].replace(dir + "/", "");
 
-				File destfile = new File(destDir + "/" + filename.replaceFirst(baseDir, ""));
+				File destfile = new File(destDir + "/" + filename.replace(baseDir, ""));
 
 				logInfo("  encode: " + filename + " -> " + destfile);
 
@@ -150,15 +150,9 @@ public class StringEncrypt extends Task {
 	 * @return
 	 */
 	public String encodedContents(String contents) {
-		// logInfo("encoded: " + contents);
-		// Pattern p = Pattern.compile("M.e\\(\"([^\"]+)\"\\)",
-		// Pattern.MULTILINE);
 		String reg = "M.e\\(\"((?:\"|.)*?)\"\\)";
-		// logInfo("  reg: " + reg);
-		// String reg =
-		// "'([^\\\\']+|\\\\([btnfr\"'\\\\]|[0-3]?[0-7]{1,2}|u[0-9a-fA-F]{4}))*'|\"([^\\\\\"]+|\\\\([btnfr\"'\\\\]|[0-3]?[0-7]{1,2}|u[0-9a-fA-F]{4}))*\"";
 		Pattern p = Pattern.compile(reg, Pattern.MULTILINE);
-		// Pattern p = Pattern.compile(reg, Pattern.MULTILINE);
+		
 		Matcher m = p.matcher(contents);
 
 		StringBuffer sb = new StringBuffer();
