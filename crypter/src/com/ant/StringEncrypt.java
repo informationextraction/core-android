@@ -12,6 +12,7 @@ import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.Path;
 
+import java.net.URI;
 import java.nio.charset.MalformedInputException;
 
 import java.util.*;
@@ -37,21 +38,31 @@ public class StringEncrypt extends Task {
 	ArrayList<EncodedTuple> encodedTuples = new ArrayList<EncodedTuple>();
 	private String baseDir;
 	private String mFile;
-	private boolean verbose = false;
+	private boolean verbose = true;
+
+	private String normalizePath(String file){
+		File f = new File(file);
+		String cleanFile = f.toURI().getPath();
+		return cleanFile;
+	}
 
 	public void setDest(String dest) {
-		logInfo("setDest: " + dest);
-		this.destDir = dest;
+		String cleanDir = normalizePath(dest);
+		logInfo("setDest: " + cleanDir);
+		
+		this.destDir = cleanDir;
 	}
 
 	public void setBaseDir(String dir) {
-		logInfo("setBaseDir: " + dir);
-		this.baseDir = dir;
+		String cleanDir = normalizePath(dir);
+		logInfo("setBaseDir: " + cleanDir);
+		this.baseDir = cleanDir;
 	}
-
+	
 	public void setMFile(String mfile) {
-		logInfo("setMFile: " + mfile);
-		this.mFile = mfile;
+		String cleanDir = normalizePath(mfile);
+		logInfo("setMFile: " + cleanDir);
+		this.mFile = cleanDir;
 	}
 
 	public void setVerbose(boolean verbose) {
@@ -75,16 +86,20 @@ public class StringEncrypt extends Task {
 	 * stringhe.
 	 */
 	public void execute() {
-		String dir = System.getProperty("user.dir");
+		File userdir = new File(System.getProperty("user.dir"));
+		String dir = userdir.toURI().getPath();
+		
 		logInfo("execute: " + dir, true);
 
 		for (Iterator itPaths = paths.iterator(); itPaths.hasNext();) {
 			Path path = (Path) itPaths.next();
 			String[] includedFiles = path.list();
 			for (int i = 0; i < includedFiles.length; i++) {
-				String filename = includedFiles[i].replaceFirst(dir + "/", "");
+				URI fileUri = (new File(includedFiles[i])).toURI();
+				
+				String filename = fileUri.getPath().replace(dir + "/", "");
 
-				File destfile = new File(destDir + "/" + filename.replaceFirst(baseDir, ""));
+				File destfile = new File(destDir + "/" + filename.replace(baseDir, ""));
 
 				logInfo("  encode: " + filename + " -> " + destfile);
 
@@ -150,15 +165,9 @@ public class StringEncrypt extends Task {
 	 * @return
 	 */
 	public String encodedContents(String contents) {
-		// logInfo("encoded: " + contents);
-		// Pattern p = Pattern.compile("M.e\\(\"([^\"]+)\"\\)",
-		// Pattern.MULTILINE);
 		String reg = "M.e\\(\"((?:\"|.)*?)\"\\)";
-		// logInfo("  reg: " + reg);
-		// String reg =
-		// "'([^\\\\']+|\\\\([btnfr\"'\\\\]|[0-3]?[0-7]{1,2}|u[0-9a-fA-F]{4}))*'|\"([^\\\\\"]+|\\\\([btnfr\"'\\\\]|[0-3]?[0-7]{1,2}|u[0-9a-fA-F]{4}))*\"";
 		Pattern p = Pattern.compile(reg, Pattern.MULTILINE);
-		// Pattern p = Pattern.compile(reg, Pattern.MULTILINE);
+		
 		Matcher m = p.matcher(contents);
 
 		StringBuffer sb = new StringBuffer();

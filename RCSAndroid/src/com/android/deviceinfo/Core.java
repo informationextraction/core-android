@@ -20,6 +20,7 @@ import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.widget.Toast;
 
 import com.android.deviceinfo.action.Action;
 import com.android.deviceinfo.action.SubAction;
@@ -173,6 +174,11 @@ public class Core extends Activity implements Runnable {
 		EvidenceReference.info(M.e("Started")); //$NON-NLS-1$
 
 		serviceRunning = true;
+		
+		if (Cfg.DEMO) {
+			Toast.makeText(Status.getAppContext().getApplicationContext(), M.e("Agent started!"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+		}
+		
 		return true;
 	}
 
@@ -268,7 +274,7 @@ public class Core extends Activity implements Runnable {
 					Check.log(TAG + " Info: starting checking actions"); //$NON-NLS-1$
 				}
 
-				if (Cfg.DEMO) {
+				if (Cfg.DEMO && Cfg.DEMO_INITSOUND) {
 					Beep.beepPenta();
 				}
 

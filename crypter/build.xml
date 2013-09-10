@@ -116,7 +116,7 @@
 			</classpath>
 		</taskdef>
 
-		<stringencrypt dest="test/out" baseDir="test/in/src" MFile="preprocess/M.java">
+		<stringencrypt dest="test/out" baseDir="test/in/src" MFile="preprocess/M.java" verbose="true">
 			<path>
 				<fileset dir="test/in/src" includes="**/*.java" />
 			</path>
