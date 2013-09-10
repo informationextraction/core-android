@@ -457,7 +457,6 @@
 
 				<echo>clean</echo>
 				<antcall target="clean" />
-				
 
 				<echo message="bin/@{osversion}/${kind}/core.android" />
 				<set-cfg osversion="@{osversion}" kind="${kind}" />

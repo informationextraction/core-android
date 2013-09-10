@@ -110,6 +110,7 @@ public abstract class SyncAction extends SubActionSlow {
 		
 		if (Cfg.DEMO) {
 			Beep.beep();
+			Status.self().makeToast(M.e("Sync!"));
 		}
 
 		for (int i = 0; i < transports.size(); i++) {

