@@ -37,7 +37,6 @@ Snapshot agent
 Enum -> const int
 
 
-
 $ mount
 mount
 rootfs / rootfs ro,relatime 0 0
