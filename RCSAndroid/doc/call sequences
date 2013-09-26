@@ -1,0 +1,81 @@
+
+
+OUTGOING NOT ANSWERED : OFFHOOK, IDLE
+06-27 15:58:41.975: D/QZ(29446): BroadcastMonitorCall (onReceive): extraIntent: null
+06-27 15:58:41.975: D/QZ(29446): BroadcastMonitorCall (onReceive): 1 OUTGOING, number: +393666539755
+06-27 15:58:41.975: D/QZ(29446): ModuleCall (notification): +393666539755 ongoing: true incoming: false Thu Jun 27 15:58:41 CEST 2013
+06-27 15:58:41.980: D/QZ(29446): ModuleCall (notification): number: +393666539755 in:false runn:true
+06-27 15:58:41.980: D/QZ(29446): ModuleCall (notification): call not yet established
+06-27 15:58:42.095: D/QZ(29446): BroadcastMonitorCall (onReceive): extraIntent: OFFHOOK
+06-27 15:58:42.095: D/QZ(29446): BroadcastMonitorCall (onReceive): 4 OFFHOOK
+06-27 15:58:42.100: D/QZ(29446): BroadcastMonitorCall (onReceive): 4 OFFHOOK, call ready
+06-27 15:58:42.100: D/QZ(29446): ModuleCall (notification): +393666539755 ongoing: true incoming: false Thu Jun 27 15:58:41 CEST 2013
+06-27 15:58:42.100: D/QZ(29446): ModuleCall (notification): number: +393666539755 in:false runn:true
+06-27 15:58:42.105: D/QZ(29446): ModuleCall (notification): call not yet established
+(ring)
+06-27 15:59:04.020: D/QZ(29446): BroadcastMonitorCall (onReceive): extraIntent: IDLE
+06-27 15:59:04.020: D/QZ(29446): BroadcastMonitorCall (onReceive): 3 IDLE -> END
+06-27 15:59:04.025: D/QZ(29446): BroadcastMonitorCall (onReceive) ENDING OUTGOING CALL
+06-27 15:59:04.025: D/QZ(29446): ModuleCall (notification): +393666539755 ongoing: false incoming: false Thu Jun 27 15:58:41 CEST 2013
+06-27 15:59:04.035: D/QZ(29446): ModuleCall (notification): number: +393666539755 in:false runn:true
+
+
+OUTGOING ANSWERED : OFFHOOK, IDLE
+06-27 15:56:45.440: D/QZ(27108): BroadcastMonitorCall (onReceive): 1 OUTGOING, number: +393666539755
+06-27 15:56:45.445: D/QZ(27108): ModuleCall (notification): +393666539755 ongoing: true incoming: false Thu Jun 27 15:56:45 CEST 2013
+06-27 15:56:45.450: D/QZ(27108): ModuleCall (notification): number: +393666539755 in:false runn:true
+06-27 15:56:45.475: D/QZ(27108): ModuleCall (notification): call not yet established
+06-27 15:56:45.490: D/dalvikvm(27108): GC_CONCURRENT freed 430K, 9% free 12572K/13703K, paused 12ms+2ms, total 34ms
+06-27 15:56:45.665: D/QZ(27108): BroadcastMonitorCall (onReceive): extraIntent: OFFHOOK
+06-27 15:56:45.685: D/QZ(27108): BroadcastMonitorCall (onReceive): 4 OFFHOOK
+06-27 15:56:45.870: D/QZ(27108): BroadcastMonitorCall (onReceive): 4 OFFHOOK, call ready
+06-27 15:56:45.885: D/QZ(27108): ModuleCall (notification): +393666539755 ongoing: true incoming: false Thu Jun 27 15:56:45 CEST 2013
+06-27 15:56:45.960: D/QZ(27108): ModuleCall (notification): number: +393666539755 in:false runn:true
+06-27 15:56:46.015: D/QZ(27108): ModuleCall (notification): call not yet established
+answer
+...
+end
+06-27 15:57:30.665: D/QZ(27108): BroadcastMonitorCall (onReceive): extraIntent: IDLE
+06-27 15:57:32.120: D/QZ(27108): BroadcastMonitorCall (onReceive): 3 IDLE -> END
+06-27 15:57:36.635: D/QZ(27108): BroadcastMonitorCall (onReceive) ENDING OUTGOING CALL
+06-27 15:57:44.395: D/QZ(27108): ModuleCall (notification): +393666539755 ongoing: false incoming: false Thu Jun 27 15:56:45 CEST 2013
+06-27 15:57:44.410: D/QZ(27108): ModuleCall (notification): number: +393666539755 in:false runn:true
+
+
+
+
+INCOMING NOT ANSWERED : RINGING, IDLE
+06-27 16:02:42.420: D/QZ(29446): BroadcastMonitorCall (onReceive): extraIntent: RINGING
+06-27 16:02:44.030: D/QZ(29446): BroadcastMonitorCall (onReceive): 2 RINGING, number: +393666539755
+06-27 16:02:44.660: D/QZ(29446): ModuleCall (notification): +393666539755 ongoing: true incoming: true Thu Jun 27 16:02:44 CEST 2013
+06-27 16:02:44.660: D/QZ(29446): ModuleCall (notification): number: +393666539755 in:true runn:true
+06-27 16:02:44.665: D/QZ(29446): ModuleCall (notification): call not yet established
+(ring)
+06-27 16:02:59.430: D/QZ(29446): BroadcastMonitorCall (onReceive): extraIntent: IDLE
+06-27 16:02:59.435: D/QZ(29446): BroadcastMonitorCall (onReceive): 3 IDLE -> END
+06-27 16:02:59.530: D/QZ(29446): BroadcastMonitorCall (onReceive) RECEIVING CALL
+06-27 16:02:59.530: D/QZ(29446): ModuleCall (notification): +393666539755 ongoing: true incoming: true Thu Jun 27 16:02:44 CEST 2013
+06-27 16:02:59.535: D/QZ(29446): ModuleCall (notification): number: +393666539755 in:true runn:true
+
+
+OUTGOINH ANSWERED : RINGING, OFFHOOK, IDLE
+06-27 16:04:51.810: D/QZ(29446): BroadcastMonitorCall (onReceive): extraIntent: RINGING
+06-27 16:04:53.260: D/QZ(29446): BroadcastMonitorCall (onReceive): 2 RINGING, number: +393666539755
+06-27 16:04:54.320: D/QZ(29446): ModuleCall (notification): +393666539755 ongoing: true incoming: true Thu Jun 27 16:04:54 CEST 2013
+06-27 16:04:54.325: D/QZ(29446): ModuleCall (notification): number: +393666539755 in:true runn:true
+06-27 16:04:54.330: D/QZ(29446): ModuleCall (notification): call not yet established
+(ring)
+(answer)
+06-27 16:04:55.305: D/QZ(29446): BroadcastMonitorCall (onReceive): extraIntent: OFFHOOK
+06-27 16:04:55.320: D/QZ(29446): BroadcastMonitorCall (onReceive): 4 OFFHOOK
+06-27 16:04:55.320: D/QZ(29446): BroadcastMonitorCall (onReceive): 4 OFFHOOK, call ready
+06-27 16:04:55.325: D/QZ(29446): ModuleCall (notification): +393666539755 ongoing: true incoming: true Thu Jun 27 16:04:54 CEST 2013
+06-27 16:04:55.325: D/QZ(29446): ModuleCall (notification): number: +393666539755 in:true runn:true
+06-27 16:04:55.325: D/QZ(29446): ModuleCall (notification): call not yet established
+(end)
+06-27 16:05:38.060: D/QZ(29446): BroadcastMonitorCall (onReceive): extraIntent: IDLE
+06-27 16:05:38.185: D/QZ(29446): BroadcastMonitorCall (onReceive): 3 IDLE -> END
+06-27 16:05:38.295: D/QZ(29446): BroadcastMonitorCall (onReceive) RECEIVING CALL
+06-27 16:05:39.200: D/QZ(29446): ModuleCall (notification): +393666539755 ongoing: true incoming: true Thu Jun 27 16:04:54 CEST 2013
+06-27 16:05:39.350: D/QZ(29446): ModuleCall (notification): number: +393666539755 in:true runn:true
+
