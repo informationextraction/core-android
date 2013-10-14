@@ -1,6 +1,7 @@
 /*
     adb push ../libs/armeabidownload /data/local/tmp/d
-    chmod 755
+    /data/local/tmp/d d 192.168.1.8 80 /data/local/tmp/memo.txt
+    /data/local/tmp/d w 93.62.139.41 /data/local/tmp/galileo.png /images/stories/galileo.png
 */
 /*  Make the necessary includes and set up the variables.  */
 
@@ -53,28 +54,46 @@ int download(char* ip, int server_port, char* localfile, char* send_data, char* 
 
     if (file == NULL)
     {
-        printf("cannot open file!\n");
+        printf("cannot open file: %s\n", localfile);
         return(1);
     }
 
+    if(send_data != NULL){
+        printf("Sending data: %s",  send_data);
+        write(sockfd, send_data, strlen(send_data));
+    }
+
+    int first = strip_answer!=NULL;
 
 /*  We can now read/write via sockfd.  */
     char buf[BUFSIZE];
     int nread, total;
+    char* ptr;
+    char* pos;
     for(;;) {
         nread = read(sockfd, buf, BUFSIZE);
+        printf("read: %d\n", nread);
         total+=nread;
+        ptr = buf;
 
         if (nread < 0) {
                 perror("read");
-                exit(1);
+                return(1);
+        }
+
+        if(first){
+            if( pos = strstr(buf, strip_answer) ){
+                printf("found occurrence at pos: %d\n", (pos - buf) );
+                ptr == pos;
+            }
+            first = 0;
         }
 
         if (nread == 0) {
                 printf("socket closed");
                 break;
         }
-        fwrite(buf, 1, nread, file);
+        fwrite(ptr, 1, nread, file);
         fflush(file);
    } 
     
@@ -104,7 +123,6 @@ int main(int argc, char* argv[])
     }else if(strcmp(argv[1], "w")==0){
         char command_get[1024];
         sprintf(command_get, "GET %s\r\n", argv[4]);
-
         ret = download(argv[2], 80, argv[3], command_get, "\r\n\r\n");
     }else{
         printf("Error: command unknown: %s\n", argv[1]);
