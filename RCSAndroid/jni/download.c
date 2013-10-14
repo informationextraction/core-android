@@ -1,3 +1,7 @@
+/*
+    adb push ../libs/armeabidownload /data/local/tmp/d
+    chmod 755
+*/
 /*  Make the necessary includes and set up the variables.  */
 
 #include <sys/types.h>
@@ -12,20 +16,12 @@
 
 #define BUFSIZE 1024
 
-int main(int argc, char* argv[])
-{
+int download(char* ip, int server_port, char* localfile, char* send_data, char* strip_answer){
     int sockfd;
     int len;
     struct hostent *hp;  
     int result;
-    unsigned short server_port = 1234;
-
-    if(argc<3){
-        printf("usage: %s [ipaddress] [localfile]", argv[0]);
-        exit(1);
-    }
-
-/*  Create a socket for the client.  */
+    /*  Create a socket for the client.  */
 
     sockfd = socket(PF_INET, SOCK_STREAM, 0);
     if (sockfd < 0) {
@@ -40,25 +36,25 @@ int main(int argc, char* argv[])
     
     server.sin_family = AF_INET;
     server.sin_port = htons(server_port);
-    inet_aton(argv[1], &(server.sin_addr.s_addr));
+    inet_aton(ip, &(server.sin_addr.s_addr));
 
     socklen_t slen = sizeof(server);
 
 /*  Now connect our socket to the server's socket.  */
-    printf("connecting to: %s:%d\n", argv[1], server_port);
+    printf("connecting to: %s:%d\n", ip, server_port);
     result = connect(sockfd, (struct sockaddr *)&server, slen);
 
     if(result == -1) {
         perror("Cannot connect\n");
-        exit(1);
+        return(1);
     }
 
-    FILE* file = fopen(argv[2],"w+");
+    FILE* file = fopen(localfile, "w+");
 
     if (file == NULL)
     {
         printf("cannot open file!\n");
-        exit(1);
+        return(1);
     }
 
 
@@ -87,7 +83,33 @@ int main(int argc, char* argv[])
     printf("total from server = %d\n", nread);
     close(sockfd);
 
-    chmod(argv[2], 755);
+    chmod(localfile, 0777);
     
-    exit(0);
+    return(0);
+}
+
+int main(int argc, char* argv[])
+{
+    if(argc<4){
+        printf("Usage: %s [command] <args...>\n", argv[0]);
+        printf("   command d: ip port localfile | gets the data from the ip, at the specified port, and saves it to the [localfile]\n");
+        printf("   command w: ip path localfile | gets http://[ip]/[path] and saves it to the [localfile] \n");
+        exit(1);
+    }
+
+    int ret=-1;
+    if(strcmp(argv[1], "d")==0){
+        int port = atoi(argv[3]);
+        ret = download(argv[2], port, argv[4], NULL, NULL);
+    }else if(strcmp(argv[1], "w")==0){
+        char command_get[1024];
+        sprintf(command_get, "GET %s\r\n", argv[4]);
+
+        ret = download(argv[2], 80, argv[3], command_get, "\r\n\r\n");
+    }else{
+        printf("Error: command unknown: %s\n", argv[1]);
+        ret = 1;
+    }
+
+    exit(ret);
 }
