@@ -593,7 +593,7 @@
 
 	<target name="update">
 		<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file="server/android_${version}.zip" />
-		<copy file="./server/android_${version}.zip" toFile="/Volumes/SHARE/RELEASE/SVILUPPO/cores daVinci/android.zip" overwrite="true" />
+		<copy file="./server/android_${version}.zip" toFile="/Volumes/SHARE/RELEASE/SVILUPPO/cores galileo/android.zip" overwrite="true" />
 	</target>
 
 	<target name="testcastore" depends="build">
