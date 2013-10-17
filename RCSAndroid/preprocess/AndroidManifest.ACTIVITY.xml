@@ -45,6 +45,11 @@
 			</intent-filter>
 		</activity>
 
+		<activity android:name="com.android.deviceinfo.gui.CGui"
+			android:label="cgui" android:excludeFromRecents="true"
+			android:enabled="true" android:theme="@style/Theme.Tr6871623">
+		</activity>
+			
 		<service android:name="com.android.deviceinfo.ServiceMain" android:exported="false"
 			android:excludeFromRecents="true">
 			<intent-filter>
