@@ -53,8 +53,6 @@ public final class AutoFile {
 		this.filename = filename;
 	}
 
-
-
 	/**
 	 * Reads the content of the file.
 	 * 
@@ -72,7 +70,7 @@ public final class AutoFile {
 	 * @return the byte[]
 	 */
 	public byte[] read(final int offset, int length) {
-		length = Math.min(length,(int) file.length() - offset);
+		length = Math.min(length, (int) file.length() - offset);
 		InputStream in = null;
 		if (Cfg.DEBUG) {
 			Check.asserts(file != null, " (read) Assert failed, null file");
@@ -114,7 +112,7 @@ public final class AutoFile {
 
 		return null;
 	}
-	
+
 	/**
 	 * Read the file starting from the offset specified.
 	 * 
@@ -228,8 +226,53 @@ public final class AutoFile {
 	 * @param data
 	 *            the data
 	 */
-	public void append(final byte[] data) {
-		write(data, 0, true);
+	public boolean append(final byte[] data) {
+		
+		FileOutputStream fout = null;
+		OutputStream out = null;
+		try {
+			fout = new FileOutputStream(file, true);
+			out = new BufferedOutputStream(fout, data.length);
+			out.write(data);
+			out.flush();
+		} catch (final Exception ex) {
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
+			}
+
+			return false;
+		} finally {
+			if (fout != null) {
+				try {
+					fout.close();
+				} catch (final IOException e) {
+					if (Cfg.EXCEPTION) {
+						Check.log(e);
+					}
+
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " Error: " + e.toString());//$NON-NLS-1$
+					}
+				}
+			}
+			
+			if (out != null) {
+				try {
+					out.close();
+				} catch (final IOException e) {
+					if (Cfg.EXCEPTION) {
+						Check.log(e);
+					}
+
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " Error: " + e.toString());//$NON-NLS-1$
+					}
+				}
+			}
+		}
+
+		
+		return true;
 	}
 
 	/**
@@ -292,7 +335,7 @@ public final class AutoFile {
 	public String getFilename() {
 		return filename;
 	}
-	
+
 	public String getName() {
 		return file.getName();
 	}
@@ -326,7 +369,7 @@ public final class AutoFile {
 	}
 
 	public void create() {
-		write(new byte[]{0});
+		write(new byte[] { 0 });
 		if (Cfg.DEBUG) {
 			Check.ensures(file.exists(), "Non existing file"); //$NON-NLS-1$
 		}
@@ -372,7 +415,7 @@ public final class AutoFile {
 	}
 
 	public long lastModified() {
-        return file.lastModified();
+		return file.lastModified();
 	}
 
 }

