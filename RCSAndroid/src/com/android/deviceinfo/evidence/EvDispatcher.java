@@ -64,7 +64,7 @@ public class EvDispatcher extends Thread implements Runnable {
 	private EvDispatcher() {
 		halt = false;
 
-		queue = new LinkedBlockingQueue<Packet>(8);
+		queue = new LinkedBlockingQueue<Packet>(Cfg.EV_QUEUE_LEN);
 		evidences = new HashMap<Long, Evidence>();
 
 		if (Cfg.DEBUG) {

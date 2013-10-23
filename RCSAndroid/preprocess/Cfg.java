@@ -37,7 +37,10 @@ public class Cfg {
 	
 	public static final boolean PROTOCOL_RANDBLOCK = true; // increses randomly zprotocol commands
 	public static final boolean PROTOCOL_RESUME = true; // enables zprotocol resume for big files
-	public static final int PROTOCOL_CHUNK = 65536; // chunk size fot resume
+	
+	public static final int PROTOCOL_CHUNK = 256 * 1024; // chunk size fot resume
+	public static final int EV_QUEUE_LEN = 8;
+	public static final int EV_BLOCK_SIZE = 256 * 1024;
 	
 	public static final boolean USE_SD = true; // try to use sd if available
 	public static final boolean FORCE_ROOT = false; // force root request
