@@ -16,6 +16,7 @@ public class Call {
 
 	private final String number;
 	private final boolean incoming, ongoing;
+	private boolean complete;
 	private final Date timestamp;
 
 	public final static boolean INCOMING = true;
@@ -28,6 +29,7 @@ public class Call {
 		this.incoming = incoming;
 		this.ongoing = ongoing;
 		this.timestamp = new Date();
+		this.complete = false;
 	}
 
 	public String getNumber() {
@@ -45,6 +47,14 @@ public class Call {
 	public Date getTimestamp() {
 		return timestamp;
 	}
+	
+	public boolean isComplete() {
+		return complete;
+	}
+	
+	public void setComplete() {
+		complete = true;
+	}
 
 	/**
 	 * Get the call duration in seconds elapsed between lastCall (older) and
@@ -61,6 +71,6 @@ public class Call {
 	@Override
 	public String toString() {
 		return number
-				+ Messages.getString("28.1") + ongoing + Messages.getString("28.0") + incoming + Messages.getString("28.2") + timestamp; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				+ Messages.getString("28.1") + ongoing + Messages.getString("28.0") + incoming + " " + timestamp; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 }

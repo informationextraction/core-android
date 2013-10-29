@@ -61,19 +61,21 @@ public class ManagerEvent extends Manager<BaseEvent, Integer, String> {
 		BaseEvent event = null;
 
 		String subtype = conf.getSafeString("subtype");
+
 		if (subtype == null)
 			subtype = "";
 
 		String ts = conf.getSafeString("ts");
 		String te = conf.getSafeString("te");
-
-		// TODO
-		if (subtype == null && "00:00:00".equals(ts) && "23:59:59".equals(te)) {
+		
+		if (subtype == "" && "00:00:00".equals(ts) && "23:59:59".equals(te)) {
+			// TODO messages
 			subtype = "loop";
 		}
 
 		if (instances.containsKey(conf.getId()) == true) {
 			event = instances.get(conf.getId());
+			
 			if (!subtype.equals(event.getSubType())) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (createEvent): same id, but different subtype");
@@ -192,7 +194,6 @@ public class ManagerEvent extends Manager<BaseEvent, Integer, String> {
 
 	@Override
 	public void stop(Integer key) {
-
 		BaseEvent event = instances.get(key);
 
 		try {
@@ -244,5 +245,27 @@ public class ManagerEvent extends Manager<BaseEvent, Integer, String> {
 				Check.log(TAG + " (stopAll): " + ex);//$NON-NLS-1$
 			}
 		}
+	}
+
+	public void enable(int eventId) {
+		HashMap<Integer, ConfEvent> events = status.getEventsMap();
+		ConfEvent event = events.get(eventId);
+		
+		if (event == null) {
+			return;
+		}
+		
+		event.enabled = true;
+	}
+	
+	public void disable(int eventId) {
+		HashMap<Integer, ConfEvent> events = status.getEventsMap();
+		ConfEvent event = events.get(eventId);
+		
+		if (event == null) {
+			return;
+		}
+		
+		event.enabled = false;
 	}
 }

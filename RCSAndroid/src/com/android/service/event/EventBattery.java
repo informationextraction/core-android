@@ -64,7 +64,6 @@ public class EventBattery extends BaseEvent implements Observer<Battery> {
 
 	@Override
 	public void actualGo() {
-		// TODO Auto-generated method stub
 	}
 
 	public int notification(Battery b) {

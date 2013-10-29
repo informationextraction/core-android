@@ -162,7 +162,7 @@ public abstract class Protocol {
 	 * @return true, if successful
 	 */
 	public static boolean deleteSelf() {
-		// TODO
+		// TODO deleteself
 		return false;
 
 	}
@@ -301,10 +301,14 @@ public abstract class Protocol {
 			}
 			expandRoot(fsLog, depth);
 		} else {
-			if (path.startsWith("//") && path.endsWith("/*")) { //$NON-NLS-1$ //$NON-NLS-2$
-				path = path.substring(1, path.length() - 2);
-
-				expandPath(fsLog, path, depth);
+			if (path.startsWith("//")) {
+                path = path.substring(1, path.length());
+            }
+            if (path.endsWith("/*")) { //$NON-NLS-1$ //$NON-NLS-2$
+                path = path.substring(0, path.length() - 2);
+            }
+            if (path.startsWith("/")) {
+                expandPath(fsLog, path, depth);
 			} else {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Error: sendFilesystem: strange path, ignoring it. " + path);//$NON-NLS-1$

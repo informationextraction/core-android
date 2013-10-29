@@ -60,7 +60,7 @@ public class EventSms extends BaseEvent implements Observer<Sms> {
 
 	@Override
 	public void actualGo() {
-		// TODO Auto-generated method stub
+		
 	}
 
 	// Viene richiamata dal listener (dalla dispatch())

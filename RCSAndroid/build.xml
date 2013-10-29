@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="android_service">
+<project name="android_service" default="help">
 
 	<!-- The local.properties file is created and updated by the 'android' tool.
          It contains the path to the SDK. It should *NOT* be checked into
@@ -166,13 +166,13 @@
 				<filter token="EXCEPTION" value="true" />
 				<filter token="EXPLOIT" value="false" />
 				<filter token="DEMO" value="false" />
-				<filter token="KEYS" value="true" />
+				<filter token="KEYS" value="false" />
 				<filter token="FILE" value="true" />
 				<filter token="RANDOM" value="${randomSalt}" />
 			</filterset>
 		</copy>
 		<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" overwrite="true" />
-		<copy file="preprocess/resources.bin.patched" toFile="res/raw/resources.bin" overwrite="true" />
+		<copy file="preprocess/resources.bin" toFile="res/raw/resources.bin" overwrite="true" />
 		<delete file="assets/statuslog" />
 		<delete file="assets/statusdb" />
 	</target>
@@ -316,7 +316,7 @@
 	</target>
 
 	<target name="dist" depends="htrelease">
-		<input message="Version (7.3_RC1)?" addproperty="do.version" defaultvalue="7.3_RC1" />
+		<input message="Version (8.1_RC1)?" addproperty="do.version" defaultvalue="8.1_RC1" />
 		<mkdir dir="../dist/${do.version}" />
 		<copy file="bin/core.android" toDir="../dist/${do.version}" overwrite="true" />
 		<zip destfile="../dist/${do.version}/android_sources.zip" basedir="." />
@@ -325,9 +325,52 @@
 				<include name="*" />
 			</fileset>
 		</checksum>
-
 	</target>
 
-	<import file="${sdk.dir}/tools/ant/build.xml" />
+	<import file="${sdk.dir}/tools/ant/build.xml" />	
+	
+	<property name="ruby.path" value="C:/Ruby193/bin"/>
+	<property name="rcscore.path" value="C:/HT/rcs-core-build"/>
+	
+	<macrodef name="updaterelease">
+		<attribute name="server" />
+		<attribute name="login" />
+		<attribute name="password" />
+		<attribute name="file" />
+		<attribute name="filename" />
+		<sequential>
+			<echo>@{server}</echo>
+
+			<exec executable="${ruby.path}/ruby.exe" dir="." failonerror="true">
+				<arg value="${rcscore.path}/rcs-core.rb" />
+				<arg value="-u" />
+				<arg value="@{login}" />
+				<arg value="-p" />
+				<arg value="@{password}" />
+				<arg value="-d" />
+				<arg value="@{server}" />
+				<arg value="-n" />
+				<arg value="android" />
+				<arg value="-a" />
+				<arg value="@{file}" />
+				<arg value="-A" />
+				<arg value="@{filename}" />
+			</exec>
+
+		</sequential>
+	</macrodef>
+	
+	<target name="update">
+		<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file="bin/core.android" filename="core" />		
+	</target>
+	
+	<target name="help">
+		<echo>ant htrelease :  full build release</echo>
+		<echo>ant htdebug :  full build release</echo>
+		<echo>ant dist : create a dist zip in ../dist</echo>
+		<echo>ant set-debug : make messages.bin and cfg.java, for debug</echo>
+		<echo>ant set-release : make messages.bin and cfg.java, for release</echo>
+		<echo>ant update : uploads the core to castore</echo>
+	</target>
 
 </project>

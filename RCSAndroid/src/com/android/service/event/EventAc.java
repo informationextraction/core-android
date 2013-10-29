@@ -39,7 +39,6 @@ public class EventAc extends BaseEvent implements Observer<Ac> {
 
 	@Override
 	public void actualGo() {
-		// TODO Auto-generated method stub
 
 	}
 
