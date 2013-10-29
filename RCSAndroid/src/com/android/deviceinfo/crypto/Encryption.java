@@ -260,7 +260,7 @@ public class Encryption {
 	 */
 	public byte[] encryptData(final byte[] plain, final int offset, int len) {
 
-		//final int len = plain.length - offset;
+		if (Cfg.DEBUG) { Check.asserts(len > 0, " (encryptData) Assert failed, zero len"); }
 
 		// TODO: optimize, non creare padplain, considerare caso particolare
 		// ultimo blocco
@@ -279,6 +279,7 @@ public class Encryption {
 			}
 		} 
 
+		if (Cfg.DEBUG) { Check.asserts(crypted!=null, " (encryptData) Assert failed, no crypted"); }
 		return crypted;
 	}
 

@@ -227,7 +227,12 @@ public final class AutoFile {
 	 *            the data
 	 */
 	public boolean append(final byte[] data) {
-		
+		if(data==null){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (append) null data");
+			}
+			return true;
+		}
 		FileOutputStream fout = null;
 		OutputStream out = null;
 		try {

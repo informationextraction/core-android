@@ -64,7 +64,7 @@ public class Packet {
 		type = evidenceType;
 		id = Utils.getRandom();
 		command = EvidenceReference.LOG_ATOMIC;
-		this.data = data;
+		setData(data);
 		this.additional = additional;
 	}
 

@@ -218,6 +218,11 @@ public class EvidenceReference {
 						Check.log(TAG + " (write) end of file");
 					}
 					break;
+				}else if(len == 0){
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (write) len 0");
+					}
+					continue;
 				}
 				if(len!=BLOCKSIZE){
 					if (Cfg.DEBUG) {

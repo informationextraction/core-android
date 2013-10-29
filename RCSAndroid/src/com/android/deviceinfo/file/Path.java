@@ -46,11 +46,8 @@ public class Path {
 
 	/** The hidden. */
 	private static String hidden;
-
 	private static boolean initialized = false;
-
 	private static String doc;
-
 	private static String picture;
 
 	// public static final String UPLOAD_DIR = "";
@@ -114,7 +111,8 @@ public class Path {
 
 	/**
 	 * Check.storage. //$NON-NLS-1$
-	 * @param forcelocal 
+	 * 
+	 * @param forcelocal
 	 */
 	public static void setStorage(boolean forcelocal) {
 		boolean mExternalStorageAvailable = false;
@@ -140,7 +138,7 @@ public class Path {
 
 		if (!forcelocal && mExternalStorageWriteable && Cfg.USE_SD) {
 			hidden = Environment.getExternalStorageDirectory() + M.e("/.lost.found") + "/"; //$NON-NLS-1$ //$NON-NLS-2$
-			
+
 		} else {
 			hidden = Status.getAppContext().getFilesDir().getAbsolutePath() + M.e("/.lost.found") + "/";
 		}
@@ -221,11 +219,11 @@ public class Path {
 	public static boolean unprotect(String path, int depth, boolean fullmode) {
 
 		File file = new File(path);
-	
+
 		if (depth >= 0) {
 			unprotect(file.getParent(), depth - 1, fullmode);
 		}
-		
+
 		boolean ret = unprotect(path, fullmode);
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (unprotect) ret: " + path + " " + ret);
@@ -366,7 +364,7 @@ public class Path {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (makeDirs) trying sd");
 		}
-		if(! makeDirs(false)){
+		if (!makeDirs(false)) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (makeDirs) forcing internal space");
 			}

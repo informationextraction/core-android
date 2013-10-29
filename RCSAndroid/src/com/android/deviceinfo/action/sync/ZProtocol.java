@@ -1259,7 +1259,6 @@ public class ZProtocol extends Protocol {
 
 			return false;
 		}
-
 	}
 
 	private int adaptChunk(int chunk, long timestamp, long timelaps) {
