@@ -18,7 +18,7 @@ public class ServiceMain extends Service {
 	private static final String TAG = "ServiceCore"; //$NON-NLS-1$
 	private boolean needsNotification = false;
 	private Core core;
-	
+	  
 	@Override
 	public IBinder onBind(Intent intent) {
 		return null;

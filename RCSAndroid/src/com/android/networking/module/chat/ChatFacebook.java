@@ -46,8 +46,6 @@ public class ChatFacebook extends SubModuleChat {
 		}
 	}
 
-
-
 	@Override
 	protected void start() {
 		lastFb = markup.unserialize(new Hashtable<String, Long>());

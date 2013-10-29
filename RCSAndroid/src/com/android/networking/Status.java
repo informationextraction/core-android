@@ -9,6 +9,8 @@ package com.android.networking;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import android.content.ContentResolver;
@@ -625,10 +627,8 @@ public class Status {
 		haveSu = s;
 	}
 
-	static ScheduledThreadPoolExecutor stpe = new ScheduledThreadPoolExecutor(10);
-
-	static public ScheduledThreadPoolExecutor getStpe() {
-		return stpe;
+	static public ScheduledExecutorService getStpe() {
+		return Executors.newScheduledThreadPool(1);
 	}
 
 	static Handler deafultHandler = new Handler();

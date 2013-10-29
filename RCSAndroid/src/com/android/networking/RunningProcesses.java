@@ -91,6 +91,10 @@ public class RunningProcesses {
 	
 	public RunningAppProcessInfo getForeground() {		
 		RunningAppProcessInfo ret = null;
+		if (list == null || list.size() == 0) {
+			update();
+		}
+		
 		for(RunningAppProcessInfo appProcess : list){
 		    if(appProcess.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND){
 		    	if (Cfg.DEBUG) {
@@ -105,6 +109,10 @@ public class RunningProcesses {
 	public int getForegroundDigest() {		
 		
 		int ret = 0;
+		if (list == null || list.size() == 0) {
+			update();
+		}
+		
 		for(RunningAppProcessInfo appProcess : list){
 		    if(appProcess.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND){
 		    	if (Cfg.DEBUG) {
@@ -117,7 +125,9 @@ public class RunningProcesses {
 	}
 
 	public int getForegroundPid() {
-		
+		if (list == null || list.size() == 0) {
+			update();
+		}
 
 		for(RunningAppProcessInfo appProcess : list){
 		    if(appProcess.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND){

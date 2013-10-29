@@ -127,6 +127,9 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 
 				return content;
 			} else {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (command) error: " + returnCode);
+				}
 				return null;
 			}
 		} catch (final Exception ex) {

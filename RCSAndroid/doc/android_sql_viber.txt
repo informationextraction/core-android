@@ -1,10 +1,12 @@
 Da /data/data/com.viber.voip/databases/viber_messages
 
+select thread_id, recipient_number, number, participants.contact_name, display_name, contact_id, date from threads left join participants on threads._id = participants.thread_id where date > 0 order by thread_id
+
 1. Estrarre i thread, date e' il markup in epoch time:
 
 	select _id, recipient_number from threads where date > 0
 	
-	_id					recipient_number
+	_id					recipient_number   fate
 	1					+393386638609
 	2					+393349115149
 	4613805683010349730	groupEntity
@@ -18,7 +20,7 @@ Da /data/data/com.viber.voip/databases/viber_messages
 	
 	number			contact_name	display_name	contact_id
 	+393349115149	Chiods 4g		Chiods 4g		206
-	+393386638609	Easedue			Easedue			212
+	+393386638609	Easedue			Easedue			212 
 	owner							Androide Buono	-1
 
 	contact_name puo' essere null (come in questo caso)
@@ -39,7 +41,7 @@ Da /data/data/com.viber.voip/databases/viber_messages
 
 4. Estrarre le conversazioni e i partecipanti utilizzando una join:
 
-	select date, body, contact_name, display_name, M.[location_lat], M.[location_lng] number from messages as M left join participants as P on M.[person] = P.[contact_id]
+	select distinct date, body, contact_name, display_name, M.[location_lat], M.[location_lng] number from messages as M left join participants as P on M.[person] = P.[contact_id] where body != ''
 	
 	date			body			contact_name	display_name	location_lat	number
 	1359551427717	Chi sei?										0				0

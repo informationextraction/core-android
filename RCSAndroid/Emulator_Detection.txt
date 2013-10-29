@@ -1,0 +1,139 @@
+** Simulator Android 2.3
+DeviceId: 000000000000000
+SubscriberId: 310260000000000
+LineNumber: 15555215554
+Device: generic
+Board: unknown
+Brand: generic
+Fingerprint: generic/sdk/generic:2.3.3/GRI34/101070:eng/test-keys
+ID: GRI34
+Manufacturer: unknown
+Product: sdk
+Tags: test-keys
+Operator: Android
+
+** Simulator Android 3.2
+DeviceId: 000000000000000
+SubscriberId: 310260000000000
+LineNumber: 15555215554
+Device: generic
+Board: unknown
+Brand: generic
+Fingerprint: generic/sdk/generic:3.2/HTJ85B/140714:eng/test-keys
+ID: HTJ85B
+Manufacturer: unknown
+Product: sdk
+Tags: test-keys
+Operator: Android
+
+** Simulator Android 4.1
+DeviceId: 000000000000000
+SubscriberId: 310260000000000
+LineNumber: 15555215554
+Device: generic
+Board: unknown
+Brand: generic
+Fingerprint: generic/sdk/generic:4.1.1/JRO03E/403059:eng/test-keys
+ID: JRO03E
+Manufacturer: unknown
+Product: sdk
+Tags: test-keys
+Operator: Android
+
+** Samsung S5570 NO SIM
+DeviceId: 359234041807068
+SubscriberId: null
+LineNumber: null
+Device: GT-S5570
+Board: GT-S5570
+Brand: samsung
+Fingerprint: samsung/GT-S5570/GT-S5570:2.3.4/GINGERBREAD/AIKQ3:user/release-keys
+ID: GINGERBREAD
+Manufacturer: samsung
+Product: GT-S5570
+Tags: release-keys
+Operator: 
+
+** Samsung S5570 with SIM
+DeviceId: 359234041807068
+SubscriberId: 222019603081603
+LineNumber: 
+Device: GT-S5570
+Board: GT-S5570
+Brand: samsung
+Fingerprint: samsung/GT-S5570/GT-S5570:2.3.4/GINGERBREAD/AIKQ3:user/release-keys
+ID: GINGERBREAD
+Manufacturer: samsung
+Product: GT-S5570
+Tags: release-keys
+Operator: 
+
+** Samsung Galaxy S3 with SIM
+DeviceId: 351869050522096
+SubscriberId: 222014302118965
+LineNumber: 
+Device: m0
+Board: smdk4x12
+Brand: samsung
+Fingerprint: samsung/m0xx/m0:4.0.4/IMM76D/I9300XXALE8:user/release-keys
+ID: IMM76D
+Manufacturer: samsung
+Product: m0xx
+Tags: release-keys
+Operator: 
+
+** Google Nexus One NO SIM
+DeviceId: 354957032342654
+SubscriberId: null
+LineNumber: null
+Device: passion
+Board: mahimahi
+Brand: google
+Fingerprint: google/passion/passion:2.3.3/GRI40/102588:user/release-keys
+ID: GRI40
+Manufacturer: HTC
+Product: passion
+Tags: release-keys
+Operator: 
+
+** Sony Ericsson Xperia NO SIM
+DeviceId: 351870051377100
+SubscriberId: null
+LineNumber: null
+Device: LT18i
+Board: unknown
+Brand: SEMC
+Fingerprint: SEMC/LT18i_1254-5982/LT18i:2.3.4/4.0.2.A.0.62/wf_v3w:user/release-keys
+ID: 4.0.2.A.0.62
+Manufacturer: Sony Ericsson
+Product: LT18i_1254-5982
+Tags: release-keys
+Operator: 
+
+** Samsung Galaxy S2
+DeviceId: 359585044604160
+SubscriberId: null
+LineNumber: null
+Device: GT-I9100
+Board: GT-I9100
+Brand: samsung
+Fingerprint: samsung/GT-I9100/GT-I9100:2.3.5/GINGERBREAD/XXKI3:user/release-keys
+ID: GINGERBREAD
+Manufacturer: samsung
+Product: GT-I9100
+Tags: release-keys
+Operator: 
+
+** Samsung Galaxy Nexus
+DeviceId: 351554050449165
+SubscriberId: null
+LineNumber: null
+Device: maguro
+Board: tuna
+Brand: google
+Fingerprint: google/yakju/maguro:4.0.2/ICL53F/235179:user/release-keys
+ID: ICL53F
+Manufacturer: samsung
+Product: yakju
+Tags: release-keys
+Operator: 

