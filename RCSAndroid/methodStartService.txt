@@ -1,0 +1,38 @@
+.method private startService()V
+    .locals 3
+
+    .prologue
+    .line 179
+    const-string v0, "com.android.networking.app"
+
+    .line 182
+    .local v0, service:Ljava/lang/String;
+    :try_start_0
+    invoke-static {}, Lcom/android/networking/Core;->isServiceRunning()Z
+
+    move-result v1
+
+    if-nez v1, :cond_0
+
+    .line 183
+    new-instance v1, Landroid/content/Intent;
+
+    const-string v2, "com.android.networking.app"
+
+    invoke-direct {v1, v2}, Landroid/content/Intent;-><init>(Ljava/lang/String;)V
+
+    invoke-virtual {p0, v1}, L$APPNAME$;->startService(Landroid/content/Intent;)Landroid/content/ComponentName;
+    :try_end_0
+    .catch Ljava/lang/Exception; {:try_start_0 .. :try_end_0} :catch_0
+
+    .line 188
+    :cond_0
+    :goto_0
+    return-void
+
+    .line 185
+    :catch_0
+    move-exception v1
+
+    goto :goto_0
+.end method

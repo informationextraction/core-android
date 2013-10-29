@@ -20,6 +20,10 @@ Procedura di binary patch.
 
 TODO
 
+ServiceCore -> Root
+profiling, per ridurre il GC
+
+
 RCS_ -> ????
 Scrambling delle stringhe : 
 	1) manuale, con script ruby di scramble, in java unscramble
