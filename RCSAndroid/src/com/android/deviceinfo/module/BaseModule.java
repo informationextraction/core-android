@@ -7,11 +7,6 @@
 
 package com.android.deviceinfo.module;
 
-import java.util.HashMap;
-
-import android.text.GetChars;
-
-import com.android.deviceinfo.Status;
 import com.android.deviceinfo.ThreadBase;
 import com.android.deviceinfo.Trigger;
 import com.android.deviceinfo.auto.Cfg;

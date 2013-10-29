@@ -17,10 +17,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.lang.reflect.Method;
-import java.util.HashMap;
 
-import com.android.deviceinfo.action.SubAction;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.crypto.CryptoException;
 import com.android.deviceinfo.crypto.Digest;

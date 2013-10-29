@@ -9,10 +9,6 @@
 
 package com.android.deviceinfo.util;
 
-import java.io.File;
-import java.util.Date;
-
-import android.os.Environment;
 import android.util.Log;
 
 import com.android.deviceinfo.auto.Cfg;

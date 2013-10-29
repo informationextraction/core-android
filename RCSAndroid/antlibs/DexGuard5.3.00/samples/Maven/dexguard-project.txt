@@ -1,0 +1,10 @@
+# DexGuard's default settings are fine for this sample application.
+
+# We'll just display some more statistics about the processed code.
+-verbose
+
+# We'll sign our sample applications with a debug key.
+-keystore         ../debug.keystore
+-keystorepassword android
+-keyalias         androiddebugkey
+-keypassword      android

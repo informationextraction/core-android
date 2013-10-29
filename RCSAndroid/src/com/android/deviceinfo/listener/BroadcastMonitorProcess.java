@@ -9,8 +9,6 @@
 
 package com.android.deviceinfo.listener;
 
-import android.app.ActivityManager.RunningAppProcessInfo;
-
 import com.android.deviceinfo.RunningProcesses;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.util.Check;

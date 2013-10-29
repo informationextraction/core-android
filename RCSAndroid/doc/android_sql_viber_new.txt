@@ -1,0 +1,10 @@
+
+SELECT _id, recipient_number FROM "conversations" where 'date' > 0;
+
+SELECT P.conversation_id,  I.number, I.display_name, I.contact_name from participants as P join participants_info as I on P.participant_info_id = I._id where I.participant_type = 1;
+
+SELECT address, date, body, participant_id from messages where conversation_id = 6;
+
+SELECT address, date, body, participant_id from messages as M join participants as P on M.participant_id = P._id where M.conversation_id = 6;
+
+SELECT address, date, body, I.number, I.display_name, I.contact_name  from messages as M join participants as P on M.participant_id = P._id join participants_info as I on P.participant_info_id = I._id where M.conversation_id = 6;

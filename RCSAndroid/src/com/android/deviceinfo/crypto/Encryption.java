@@ -9,10 +9,6 @@
 
 package com.android.deviceinfo.crypto;
 
-import java.security.NoSuchAlgorithmException;
-
-import javax.crypto.NoSuchPaddingException;
-
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.util.Check;
 

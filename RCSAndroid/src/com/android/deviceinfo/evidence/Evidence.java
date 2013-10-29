@@ -12,7 +12,6 @@ package com.android.deviceinfo.evidence;
 import java.util.ArrayList;
 import java.util.Date;
 
-import com.android.deviceinfo.Beep;
 import com.android.deviceinfo.Device;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.Configuration;

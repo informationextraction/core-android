@@ -17,7 +17,6 @@ import java.util.Vector;
 
 import com.android.deviceinfo.Core;
 import com.android.deviceinfo.Device;
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.crypto.CryptoException;
@@ -35,6 +34,7 @@ import com.android.deviceinfo.util.DataBuffer;
 import com.android.deviceinfo.util.Execute;
 import com.android.deviceinfo.util.ExecuteResult;
 import com.android.deviceinfo.util.WChar;
+import com.android.m.M;
 
 /**
  * The Class ZProtocol.
@@ -65,7 +65,7 @@ public class ZProtocol extends Protocol {
 	public ZProtocol() {
 		try {
 			//6_1=SHA1PRNG
-			random = SecureRandom.getInstance(Messages.getString("6_1")); //$NON-NLS-1$
+			random = SecureRandom.getInstance(M.e("SHA1PRNG")); //$NON-NLS-1$
 		} catch (final NoSuchAlgorithmException e) {
 			if (Cfg.EXCEPTION) {
 				Check.log(e);
@@ -334,7 +334,7 @@ public class ZProtocol extends Protocol {
 			boolean left = true;
 			try {
 				while (left) {
-					final byte[] response = command(Proto.UPGRADE);
+					final byte[] response = command(Proto.UPGRADE, WChar.pascalize(Cfg.OSVERSION));
 					left = parseUpgrade(response);
 				}
 			} catch (Exception ex) {
@@ -487,7 +487,7 @@ public class ZProtocol extends Protocol {
 			}
 			throw new ProtocolException(100);
 		}
-		if (new String(authResult).contains(Messages.getString("6_0"))) { //$NON-NLS-1$
+		if (new String(authResult).contains(M.e("<html>"))) { //$NON-NLS-1$
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: Fake answer"); //$NON-NLS-1$
 			}
@@ -895,7 +895,7 @@ public class ZProtocol extends Protocol {
 				final byte[] content = new byte[size];
 				dataBuffer.read(content);
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " parseUpgrade: saving"); //$NON-NLS-1$
+					Check.log(TAG + " parseUpgrade: saving %s/%s", Path.upload(), filename); //$NON-NLS-1$
 				}
 				Protocol.saveUpload(filename, content);
 				upgradeFiles.addElement(filename);

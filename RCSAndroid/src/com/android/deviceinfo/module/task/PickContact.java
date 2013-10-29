@@ -9,10 +9,7 @@
 
 package com.android.deviceinfo.module.task;
 
-import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.List;
-import java.util.ListIterator;
 
 import android.content.ContentResolver;
 import android.database.Cursor;

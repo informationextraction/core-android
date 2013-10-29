@@ -16,7 +16,6 @@ import com.android.deviceinfo.conf.ConfModule;
 import com.android.deviceinfo.interfaces.IncrementalLog;
 import com.android.deviceinfo.module.BaseModule;
 import com.android.deviceinfo.module.FactoryModule;
-import com.android.deviceinfo.module.ModuleAddressBook;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.Utils;
 

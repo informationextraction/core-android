@@ -1,12 +1,8 @@
 package com.android.deviceinfo.db;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
+import android.database.Cursor;
 
 import com.android.deviceinfo.module.chat.ChatGroups;
-
-import android.database.Cursor;
 
 public class RecordGroupsVisitor extends RecordVisitor {
 

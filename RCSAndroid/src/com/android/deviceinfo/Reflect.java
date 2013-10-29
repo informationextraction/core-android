@@ -2,11 +2,11 @@ package com.android.deviceinfo;
 
 import java.lang.reflect.Method;
 
-import com.android.deviceinfo.auto.Cfg;
-import com.android.deviceinfo.util.Check;
-
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
+
+import com.android.deviceinfo.auto.Cfg;
+import com.android.deviceinfo.util.Check;
 
 public class Reflect {
 	private static final String TAG = "Reflect";

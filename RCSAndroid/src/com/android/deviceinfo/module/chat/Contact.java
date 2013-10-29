@@ -1,7 +1,5 @@
 package com.android.deviceinfo.module.chat;
 
-import java.util.zip.CRC32;
-
 import com.android.deviceinfo.crypto.Digest;
 
 public class Contact {

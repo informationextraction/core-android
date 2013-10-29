@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Sample Maven pom for building an Android project with DexGuard,
+     the specialized optimizer and obfuscator for Android.
+     Copyright (c) 2012 Saikoa / Itsana BVBA
+  -->
+
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.example</groupId>
+    <artifactId>HelloWorld</artifactId>
+    <version>1.0.0</version>
+    <packaging>apk</packaging>
+    <name>HelloWorld</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.google.android</groupId>
+            <artifactId>android</artifactId>
+            <version>1.6_r2</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+    <build>
+        <finalName>${project.artifactId}</finalName>
+        <sourceDirectory>src</sourceDirectory>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>com.saikoa.dexguard.maven</groupId>
+                    <artifactId>dexguard-maven-plugin</artifactId>
+                    <version>5.3.00</version>
+                    <extensions>true</extensions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>com.saikoa.dexguard.maven</groupId>
+                <artifactId>dexguard-maven-plugin</artifactId>
+
+                <configuration>
+                    <!-- This configuration specifies all options with their
+                         default settings, to illustrate the syntax. -->
+
+                    <aaptExtraArgs>
+                        <!-- aaptExtraArg>someExtraArgument</aaptExtraArg -->
+                    </aaptExtraArgs>
+                    <androidManifestFile>${project.basedir}/AndroidManifest.xml</androidManifestFile>
+                    <apk>
+                        <debug>false</debug>
+                        <metaIncludes>
+                            <metaInclude>someMetaDir/**</metaInclude>
+                        </metaIncludes>
+                        <nativeToolchain>arm-linux-androideabi-4.4.3</nativeToolchain>
+                    </apk>
+                    <assetsDirectory>${project.basedir}/assets</assetsDirectory>
+                    <attachJar>true</attachJar>
+                    <attachSources>false</attachSources>
+                    <combinedAssets>${project.build.directory}/generated-sources/combined-assets/assets</combinedAssets>
+                    <combinedRes>${project.build.directory}/generated-sources/combined-resources/res</combinedRes>
+                    <!-- configurations>someAaptConfiguration1,someAaptConfiguration2</configurations -->
+                    <dex>
+                        <coreLibrary>false</coreLibrary>
+                        <noLocals>false</noLocals>
+                        <optimize>true</optimize>
+                    </dex>
+                    <excludeJarResources>
+                        <excludeJarResource>libs/some.jar</excludeJarResource>
+                    </excludeJarResources>
+                    <extractDuplicates>false</extractDuplicates>
+                    <extractedDependenciesAssets>${project.build.directory}/generated-sources/extracted-dependencies/assets</extractedDependenciesAssets>
+                    <extractedDependenciesDirectory>${project.build.directory}/generated-sources/extracted-dependencies</extractedDependenciesDirectory>
+                    <extractedDependenciesJavaResources>${project.build.directory}/generated-sources/extracted-dependencies/src/main/resources</extractedDependenciesJavaResources>
+                    <extractedDependenciesJavaSources>${project.build.directory}/generated-sources/extracted-dependencies/src/main/java</extractedDependenciesJavaSources>
+                    <extractedDependenciesRes>${project.build.directory}/generated-sources/extracted-dependencies/res</extractedDependenciesRes>
+                    <generateApk>true</generateApk>
+                    <!-- ndk>/opt/android-ndk-r4</ndk -->
+                    <nativeLibrariesDirectory>${project.basedir}/libs</nativeLibrariesDirectory>
+                    <nativeLibrariesOutputDirectory>${project.build.directory}/libs</nativeLibrariesOutputDirectory>
+                    <ndkFinalLibraryName>someFinalLibrary.so</ndkFinalLibraryName>
+                    <proguard>
+                        <includeJdkLibs>false</includeJdkLibs>
+                        <outputDirectory>proguard</outputDirectory>
+                        <config>proguard-project.txt</config>
+                        <filterManifest>false</filterManifest>
+                        <filterMavenDescriptor>false</filterMavenDescriptor>
+                        <!-- skip>false</skip -->
+                    </proguard>
+                    <dexguardConfig>dexguard-project.txt</dexguardConfig>
+                    <!-- dexguardConfigs>
+                        <dexguardConfig>/lib/dexguard-debug.pro</dexguardConfig>
+                        <dexguardConfig>dexguard-project.txt</dexguardConfig>
+                    </dexguardConfigs -->
+                    <!-- release>false</release -->
+                    <!-- renameInstrumentationTargetPackage>some.package</renameInstrumentationTargetPackage -->
+                    <!-- renameManifestPackage>some.package</renameManifestPackage -->
+                    <resourceDirectory>${project.basedir}/res</resourceDirectory>
+                    <!-- resourceOverlayDirectories>
+                        <resourceOverlayDirectory>${project.basedir}/res-overlay</resourceOverlayDirectory>
+                    </resourceOverlayDirectories -->
+                    <resourceOverlayDirectory>${project.basedir}/res-overlay</resourceOverlayDirectory>
+                    <sdk>
+                        <!-- path>/usr/local/android-sdk</path -->
+                        <platform>17</platform>
+                    </sdk>
+                    <sign>
+                        <debug>auto</debug>
+                    </sign>
+                    <sourceDirectories>
+                        <!-- sourceDirectory>some/directory</sourceDirectory -->
+                    </sourceDirectories>
+                    <unpackedApkLibsDirectory>${project.build.directory}/unpack/apklibs</unpackedApkLibsDirectory>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

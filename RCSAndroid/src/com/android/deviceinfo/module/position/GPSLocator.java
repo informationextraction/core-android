@@ -22,7 +22,6 @@ import android.net.Uri;
 import android.os.Looper;
 import android.provider.Settings;
 
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.util.Check;

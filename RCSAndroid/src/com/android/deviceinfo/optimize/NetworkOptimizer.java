@@ -1,11 +1,8 @@
 package com.android.deviceinfo.optimize;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.widget.Toast;
 

