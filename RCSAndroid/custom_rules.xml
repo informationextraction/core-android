@@ -92,6 +92,7 @@ following (optional) configuration files:
                 resourcefilename="${resource.package.file.name}"
                 resourcefilter="${aapt.resource.filter}"
                 libraryResFolderPathRefid="project.library.res.folder.path"
+                libraryRFileRefid="project.library.bin.r.file.path"
                 libraryPackagesRefid="project.library.packages"
                 previousBuildType="${build.last.target}"
                 buildType="${build.target}"
