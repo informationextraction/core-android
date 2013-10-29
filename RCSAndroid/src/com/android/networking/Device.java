@@ -157,6 +157,7 @@ public class Device {
 				Check.asserts(Device.isGprs(), Messages.getString("31_8")); //$NON-NLS-1$
 			}
 			final GsmCellLocation cell = (GsmCellLocation) bcell;
+			
 
 			info.setGsm(conf.mcc, conf.mnc, cell.getLac(), cell.getCid(), rssi);
 

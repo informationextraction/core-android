@@ -17,6 +17,8 @@ public class Cfg {
 	public static final boolean CAMERA = @CAMERA@;
 	public static boolean DEMO = @DEMO@; // @DEMO@
 	
+	public static final boolean FORCENODEMO = false; // if true, force no demo
+	
 	public static final boolean KEYS = @KEYS@; // Se e' true vengono usate le chiavi hardcoded
 	
 	public static final boolean FILE = @FILE@;
@@ -32,6 +34,10 @@ public class Cfg {
 	
 	public static final boolean USE_SD = true; // try to use sd if available
 	public static final boolean FORCE_ROOT = false; // force root request
+	
+	public static final boolean LOG_POSITION = false; // log positions on a file
+	
+	public static final boolean POWER_MANAGEMENT = true; // if true, tries to acquire power lock only when needed 
 	
 	public static final String RANDOM = "@RANDOM@";	
 	public static final String RNDMSG = "@RNDMSG@";

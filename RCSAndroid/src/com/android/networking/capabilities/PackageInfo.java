@@ -163,22 +163,19 @@ public class PackageInfo {
 	}
 	
 	static public boolean hasSu() {
-		if (checkDebugBuild() == true) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (hasSu): checkDebugBuild true"); //$NON-NLS-1$
-			}
-			
-			return true;
-		}
-		
 		if (checkRootPackages() == true) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (hasSu): checkRootPackages true"); //$NON-NLS-1$
-			}
-			
+			}			
 			return true;
 		}
 		
+		if (checkDebugBuild() == true) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (hasSu): checkDebugBuild true"); //$NON-NLS-1$
+			}			
+			return true;
+		}
 		
 		return false;
 	}
@@ -203,16 +200,30 @@ public class PackageInfo {
 	}
 
 	private static boolean checkRootPackages() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (checkRootPackages)");
+		}
 		try {
 			//32_39=/system/app/Superuser.apk			
-            File file = new File(Messages.getString("32_39"));
-            
+            File file = new File(Messages.getString("32_39"));            
             if (file.exists()) {
                 return true;
             }
+            
             //32_40=/data/app/com.noshufou.android.su-1.apk
             file = new File(Messages.getString("32_40"));
-
+            if (file.exists()) {
+                return true;
+            }
+            
+            //32_41=/data/app/com.noshufou.android.su-2.apk
+            file = new File(Messages.getString("32_41"));
+            if (file.exists()) {
+                return true;
+            }
+            
+            //32_42=/system/bin/su
+            file = new File(Messages.getString("32_42"));
             if (file.exists()) {
                 return true;
             }
@@ -222,10 +233,16 @@ public class PackageInfo {
         	}
         }
 
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (checkRootPackages), no root found");
+		}
         return false;
 	}
 
 	private static boolean checkDebugBuild() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (checkDebugBuild)");
+		}
 		String buildTags = android.os.Build.TAGS;
 
         if (buildTags != null && buildTags.contains("test-keys")) {

