@@ -1,0 +1,33 @@
+Da /data/data/com.facebook.orca/databases/users_db2
+
+1. Lista degli amici (incluso il proprio account) e id degli utenti, il campo non ha indici quindi 
+   non e' immediato capire quando la lista viene modificata:
+
+	select fbid, first_name, last_name, name, email_addresses, phone_numbers from facebook_users
+	
+	fbid			first_name	last_name		name					email_addresses						phone_numbers
+	100003663718866	Antroide	Succhienmberg	Antroide Succhienmberg	"[""test.ardissimo@gmail.com""]"	[]
+	100003727657439	Daniel		Paton			Daniel Paton			"[""dannyp1690@yahoo.co.uk""]"		[]
+	100003791528612	Jill		Jones			Jill Jones				"[""jillyj1212@hotmail.com""]"		[]
+	100004427018593	Gäjendra	Kumär			Gäjendra Kumär			[]									"[{""full_number"":""+918870723382"",""display_number"":""+918870723382"",""android_type"":2}]"
+
+2. Estrarre le conversazioni (timestamp = markup), se timestamp_ms non va si puo' provare con last_fetch_time_ms:
+
+	select thread_id, participants from threads where timestamp_ms > 0
+	
+	thread_id				participants
+	t_id.392941390796027	"[{""email"":""1398126113@facebook.com"",""user_key"":""FACEBOOK:1398126113"",""name"":""Faber O'Connell"",""mute"":0,""lastReadReceiptTimestampMs"":1359458980898},
+							{""email"":""100003663718866@facebook.com"",""user_key"":""FACEBOOK:100003663718866"",""name"":""Antroide Succhienmberg"",""mute"":0,""lastReadReceiptTimestampMs"":0}]"
+	t_id.326617500782882	"[{""email"":""1398126113@facebook.com"",""user_key"":""FACEBOOK:1398126113"",""name"":""Faber O'Connell"",""mute"":0,""lastReadReceiptTimestampMs"":1359459240118},
+							{""email"":""100003663718866@facebook.com"",""user_key"":""FACEBOOK:100003663718866"",""name"":""Antroide Succhienmberg"",""mute"":0,""lastReadReceiptTimestampMs"":0},
+							{""email"":""1449558658@facebook.com"",""user_key"":""FACEBOOK:1449558658"",""name"":""Alberto Ornaghi"",""mute"":0,""lastReadReceiptTimestampMs"":1359459183374}]"
+
+	
+3. Estrarre il testo di ogni conversazione, essendo noti i partecipanti sappiamo il sender (dalla query) e quindi chi riceve i messaggi,
+   il thread_id e' estratto dalla query 2.:
+
+	select text, sender, coordinates from messages where thread_id == t_id.392941390796027 and text != ''
+	
+	text		sender																															coordinates
+	Pistola!	"{""email"":""1398126113@facebook.com"",""user_key"":""FACEBOOK:1398126113"",""name"":""Faber O'Connell""}"	
+	Frocismo	"{""email"":""100003663718866@facebook.com"",""user_key"":""FACEBOOK:100003663718866"",""name"":""Antroide Succhienmberg""}"	"{""latitude"":45.4764059,""longitude"":9.1911257,""accuracy"":40.0,""altitude"":0.0,""heading"":0.0,""speed"":0.0}"

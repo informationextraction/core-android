@@ -72,6 +72,16 @@ public class KeysFake implements iKeys {
 	 * 32); byte[] ChallengeKey = ByteArray.hexStringToByteArray(
 	 * "60fa683c112b78050dc6fd190d0214a8384dfdba594b31a2aa61ce6bfb33f6af", 0,
 	 * 32); String BuildId = "RCS_0000000001";
+	 * 
+	 * 
+	 * 
+	 * Using factory: RCS_0000001312 TestCalor
+
+	-> LOGKEY   : 0bc1d2a637b46e64c47bec3b50491e372ec91dabec08317ee00fdcca3cf6e700
+	-> CONFKEY  : e5f6955f4d62e70d978c7ceb164acf8bf1ac8fed689c442958f8af8430d346bb
+	-> SIGNATURE: 572ebc94391281ccf53a851330bb0d996fbdbf803c194cbf0b1058928b9929d2
+
+CONFIG JSON:
 	 */
 
 	// Get root

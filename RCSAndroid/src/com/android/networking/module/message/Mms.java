@@ -41,18 +41,23 @@ public class Mms {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (print): Address: " + address); //$NON-NLS-1$
 		}
+		
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (print): Subject: " + subject); //$NON-NLS-1$
 		}
+		
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (print): Date: " + date); //$NON-NLS-1$
 		}
+		
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (print): Sent: " + sent); //$NON-NLS-1$
 		}
+		
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (print): Thread_id: " + thread_id); //$NON-NLS-1$
 		}
+		
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (print): Body: " + body); //$NON-NLS-1$
 		}
@@ -116,12 +121,15 @@ public class Mms {
 
 	public int getSize() {	
 		int size = 0;
-		if(body!=null){
+		
+		if (body!=null) {
 			size+=body.length();
 		}
-		if(subject!=null){
+		
+		if (subject!=null) {
 			size+=subject.length();
 		}
+		
 		return size;
 	}
 }

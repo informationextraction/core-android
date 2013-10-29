@@ -27,8 +27,10 @@ public class ServiceMain extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		
 		Status.setAppContext(getApplicationContext());
 		Messages.init(getApplicationContext());
+		
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onCreate)"); //$NON-NLS-1$

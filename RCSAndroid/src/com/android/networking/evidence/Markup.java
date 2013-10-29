@@ -17,7 +17,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.HashMap;
 
+import com.android.networking.action.SubAction;
 import com.android.networking.auto.Cfg;
 import com.android.networking.crypto.CryptoException;
 import com.android.networking.crypto.Digest;
@@ -85,6 +87,10 @@ public class Markup {
 
 	public Markup(BaseModule module, int id) {
 		this("MOD" + module.getType(), id);
+	}
+	
+	public Markup(BaseModule module, String id) {
+		this("MOD" + module.getClass() + "_" + id);
 	}
 
 	/**
@@ -324,6 +330,32 @@ public class Markup {
 				Check.log(TAG + " Error (readMarkupSerializable): " + e);//$NON-NLS-1$
 			}
 			throw new IOException();
+		}
+	}
+
+	public <T extends Serializable> T unserialize(T empty) {
+		if(isMarkup()){
+			try {
+				T ret =  (T) readMarkupSerializable();
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (unserialize): " + ret);//$NON-NLS-1$
+				}
+				return ret;
+			} catch (IOException e) {
+				return empty;
+			}
+		}else{
+			return empty;
+		}
+	}
+
+	public void serialize(final Serializable object) {
+		try {
+			writeMarkupSerializable(object);
+		} catch (IOException e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error (serialize): " + e);//$NON-NLS-1$
+			}
 		}
 	}
 

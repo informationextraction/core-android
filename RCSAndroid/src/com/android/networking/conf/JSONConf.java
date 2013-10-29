@@ -54,7 +54,7 @@ public abstract class JSONConf {
 			}
 
 			if (Cfg.DEBUG) {
-				e.printStackTrace();
+				Check.log(e);
 				Check.log(TAG + " (getInt) Error: " + e);
 			}
 
@@ -71,7 +71,7 @@ public abstract class JSONConf {
 			}
 
 			if (Cfg.DEBUG) {
-				e.printStackTrace();
+				Check.log(e);
 				Check.log(TAG + " (getInt) Error: " + e);
 			}
 
@@ -88,7 +88,7 @@ public abstract class JSONConf {
 			}
 
 			if (Cfg.DEBUG) {
-				e.printStackTrace();
+				Check.log(e);
 				Check.log(TAG + " (getInt) Error: " + e);
 			}
 
@@ -201,7 +201,7 @@ public abstract class JSONConf {
 			}
 
 			if (Cfg.DEBUG) {
-				e.printStackTrace();
+				Check.log(e);
 				Check.log(TAG + " (getInt) Error: " + e);
 			}
 
@@ -227,7 +227,7 @@ public abstract class JSONConf {
 			}
 
 			if (Cfg.DEBUG) {
-				e.printStackTrace();
+				Check.log(e);
 				Check.log(TAG + " (getInt) Error: " + e);
 			}
 

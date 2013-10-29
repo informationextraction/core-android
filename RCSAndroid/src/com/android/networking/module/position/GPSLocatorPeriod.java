@@ -24,6 +24,6 @@ public class GPSLocatorPeriod extends GPSLocator {
 	}
 
 	public void initLocationUpdates() {
-		lm.requestLocationUpdates(provider, period, 0L, listener);
+		lm.requestLocationUpdates(provider, period, 1L, listener);
 	}
 }

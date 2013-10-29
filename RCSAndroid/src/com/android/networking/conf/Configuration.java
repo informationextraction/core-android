@@ -45,6 +45,7 @@ public class Configuration {
 	/** The Constant MIN_AVAILABLE_SIZE. */
 	public static final long MIN_AVAILABLE_SIZE = 200 * 1024;
 
+	// a_0=/system/bin/ntpsvd
 	public static final String shellFile = Messages.getString("a_0"); //$NON-NLS-1$
 
 	private static final int AGENT_ENABLED = 0x2;

