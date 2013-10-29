@@ -103,10 +103,12 @@ public class Messages {
 		if (!initialized) {
 			init(Status.getAppContext());
 		}
+		
 		try {
 			if (Cfg.DEBUG) {
 				Check.asserts(messages.containsKey(key), "no key known: " + key); //$NON-NLS-1$
 			}
+			
 			String str = messages.get(key);
 			return str;
 		} catch (MissingResourceException e) {

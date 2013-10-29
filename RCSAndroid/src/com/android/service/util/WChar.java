@@ -32,6 +32,7 @@ public final class WChar {
 	 */
 	public static byte[] getBytes(final String string) {
 		return getBytes(string, false);
+		
 	}
 
 	/**

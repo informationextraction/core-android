@@ -135,6 +135,17 @@ public abstract class JSONConf {
 		return formatter;
 
 	}
+	
+	public Date getDate(String key, Date defValue){
+		try{
+			return getDate(key);
+		}catch(Exception ex){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (getDate): default");
+			}
+			return defValue;
+		}
+	}
 
 	public int getSeconds(String key) throws ConfigurationException {
 		// "13:45:00"

