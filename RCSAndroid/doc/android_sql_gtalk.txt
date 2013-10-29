@@ -89,4 +89,27 @@ Tastiera di merda"
 	7		Fabrizio Cornelli@edb38b007da1486b	1364382159365	1		ciao
 
 Attenzione che le group chat scompaiono dal db quando l'applicazione viene chiusa!!!
-A calor mandiamo from e to vuoti, inseriamo SOLO il display name.
+A calor mandiamo from e to vuoti, inseriamo SOLO il display name
+
+
+
+select m.nickname, co.username, co.nickname, body, m.date, m.type  from messages as m
+    inner join chats as ch on m.thread_id = ch._id
+    inner join contacts as co on ch.contact_id = co._id
+where consolidation_key is null and body is not null
+
+
+select * from chats as ch  inner join contacts as co on ch.contact_id = co._id
+   join accounts as ac on ch.account_id = ac._id
+   
+
+
+select m.nickname, co.username, co.nickname, ac.name, body, m.date, m.type
+     from messages as m
+    join  contacts as co on m.thread_id = co._id
+    join accounts as ac on co.account = ac._id
+    where m.consolidation_key is null and m.type<=1
+order by date
+    
+select m.nickname, co.username, co.nickname, ac.name, body, m.date, m.type from messages as m join  contacts as co on m.thread_id = co._id join accounts as ac on co.account = ac._id where m.consolidation_key is null and m.type<=1 and m.date>?
+order by date

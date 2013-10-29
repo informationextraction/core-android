@@ -19,14 +19,15 @@ javaArray = []
 javaFiles = Dir["**/*.java"]
 
 javaFiles.each{ |java|
-	lines = File.open(java).readlines();
+	lines = File.open(java, :encoding => "BINARY").readlines();
 	matchString="Messages.getString(.*)";
 	lines.each{ |line|
 		#pp line
-		line.gsub(/Messages.getString\(\"(\w+\.\d+)\"\)/) { |l|
-			#pp l
+		line.gsub(/Messages.getString\(\"(\w_\w)\"\)/) { 
+			|l| 
+			#pp l 
 			javaArray.push($1) 
-		}
+		}		
 	}
 }
 
@@ -34,10 +35,22 @@ javaFiles.each{ |java|
 
 javaArray.each{ |j|
 	if ! refSet.include?(j) 
-		print "error #{j} not referenced\n"
+		print "error #{j} not mapped\n"
+		#javaArray.delete(j)
 	else
-		refSet.delete(j)
+		#refSet.delete(j)
  	end
 }
 
-pp refSet
+outlist = []
+refSet.each{ |k,v|
+	if ! javaArray.include?(k)
+		#print "warning #{k} not used\n"
+	else
+		outlist.push "#{k}=#{v}"
+	end
+}
+
+outlist.sort.each{ |l|
+	print l
+}

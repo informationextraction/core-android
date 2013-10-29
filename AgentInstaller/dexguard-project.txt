@@ -1,0 +1,18 @@
+
+-verbose
+-encryptclasses com.android.agentinstaller.Installer
+-encryptstrings "am*","Upgrade*"
+
+# l'ottimizzazione seguente fa crashare smali, disabilitare solo se occorre manipolare il codice
+#-optimizations !method/marking/final
+
+-classobfuscationdictionary "classdictionary.txt"
+    
+-assumenosideeffects class android.util.Log {
+    public static boolean isLoggable(java.lang.String, int);
+    public static int v(...);
+    public static int i(...);
+    public static int w(...);
+    public static int d(...);
+    public static int e(...);
+}

@@ -1,0 +1,50 @@
+Il db si trova in: /data/data/com.tencent.mm/MicroMsg/<md5>/MicroMsg.db e MicroMsg.db-journal
+
+Gli step da seguire sono i seguenti:
+
+1. Si fa chmod 000 su /data/data/com.tencent.mm/MicroMsg/<md5>/EnMicroMsg.*
+2. Si fa chown root:root su /data/data/com.tencent.mm/MicroMsg/<md5>/EnMicroMsg.*
+3. Da questo momento i messaggi verranno scritto nel DB in chiaro (MicroMsg.db)
+
+4. Estrarre i thread e date:
+
+	select distinct talker from message where talker != 'weixin' and type = 1 ORDER BY createTime ASC
+
+	?talker
+	wxid_5z9hmwyvq7fk22
+	wxid_bh86gxn8gooq22
+	3257403315@chatroom
+	3277404895@chatroom
+
+5. Prendere tutti i messaggi di un dato thread
+
+	select createTime, talker, isSend, content from message where talker = '3257403315@chatroom' and type = 1
+	
+	createTime	talker			isSend	content
+	1368782508001	3257403315@chatroom	0	"wxid_5z9hmwyvq7fk22:
+Chat di gruppo jbixiata ds nex1"
+	1368782510725	3257403315@chatroom	1	Fiiiici s3
+	1368782537000	3257403315@chatroom	0	"wxid_bh86gxn8gooq22:
+Nice nex2"
+	1368782590000	3257403315@chatroom	0	"wxid_5z9hmwyvq7fk22:
+Ciao s3"
+	1368782618000	3257403315@chatroom	0	"wxid_bh86gxn8gooq22:
+Ciao da nexa2"
+	1368782624000	3257403315@chatroom	0	"wxid_5z9hmwyvq7fk22:
+Ero nex1"
+	
+	I messaggi ricevuti hanno l'id del sender prima del messaggio: "wxid_xxxxxxxxxxxxxx:"
+
+6. Ottenere il nome degli utenti a partire dall'id trovato precedentemente:
+
+	select nickname from rcontact where username = 'wxid_5z9hmwyvq7fk22'
+
+	nickname
+	nex 1
+
+	Ovviamente gli id @chatroom non hanno un nick associato visto che sono chat di gruppo.
+
+
+7. la lista dei membri delle conversazioni multiple sono in chatroom
+
+  select chatroomname, displayname, memberlist from chatroom

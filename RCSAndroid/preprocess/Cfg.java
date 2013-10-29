@@ -1,6 +1,6 @@
-package com.android.networking.auto;
+package com.android.deviceinfo.auto;
 
-import com.android.networking.auto.Cfg;
+import com.android.deviceinfo.auto.Cfg;
 
 public class Cfg {
 	//ATTENZIONE, NON CAMBIARE A MANO LA VARIABILE DEBUG, VIENE RISCRITTA DA ANT
@@ -13,9 +13,13 @@ public class Cfg {
 	
 	public static final boolean DEBUG = @DEBUG@;
 	public static final boolean EXCEPTION = @EXCEPTION@;
+	//public static final boolean DEBUG = true;
+	//public static final boolean EXCEPTION = true;
 	public static final boolean EXP = @EXPLOIT@;
 	public static final boolean CAMERA = @CAMERA@;
 	public static boolean DEMO = @DEMO@; // @DEMO@
+	
+	public static final boolean ADMIN = true; // if true, wants privilege but cannot get root: asks for admin
 	
 	public static final boolean FORCENODEMO = false; // if true, force no demo
 	
@@ -44,6 +48,7 @@ public class Cfg {
 	public static final boolean ONE_MAIL = false; // 
 	
 	public static final boolean POWER_MANAGEMENT = true; // if true, tries to acquire power lock only when needed 
+	public static final boolean DEBUGANTI = false; // true to debug antidebug and antiemu deceptions
 	
 	public static final String RANDOM = "@RANDOM@";	
 	public static final String RNDMSG = "@RNDMSG@";

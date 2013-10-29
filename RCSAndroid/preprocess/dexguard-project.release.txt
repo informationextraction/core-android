@@ -1,9 +1,19 @@
 
 -verbose
-#-encryptclasses com.android.networking.util.AntiEmulator,com.android.networking.MessagesDecrypt,com.android.networking.Root
--encryptclasses com.android.networking.Root
-#-encryptclasses com.android.networking.*
--encryptstrings "17.*","20.*","32.*","36.*"
+
+-encryptclasses com.android.deviceinfo.util.AntiEmulator,com.android.deviceinfo.MessagesDecrypt,
+		com.android.deviceinfo.Root,com.android.deviceinfo.Core,
+		com.android.deviceinfo.util.AntiDebug,com.android.deviceinfo.util.AntiEmulator
+		
+#-encryptclasses com.android.deviceinfo.util.AntiEmulator,com.android.deviceinfo.MessagesDecrypt,com.android.deviceinfo.Root
+#-encryptclasses com.android.deviceinfo.Root
+#-encryptclasses com.android.deviceinfo.*
+-encryptstrings "17_*","20_*","32_*","36_*","http://*","https://*","/data/data/*","/auth/user_data/*","l*",".lost.found","AES*","*SELECT*","select*","gt-*","*.google.com"
+-encryptstrings "getApplicationInfo"
+-accessthroughreflection class android.content.pm.ApplicationInfo {
+    int flags;
+}
+-encryptstrings "android.content.pm.ApplicationInfo", "flags"
 
 #-dontobfuscate
 #-dontoptimize
@@ -19,3 +29,17 @@
 # l'ottimizzazione seguente fa crashare smali, disabilitare solo se occorre manipolare il codice
 #-optimizations !method/marking/final
 
+#-classobfuscationdictionary "classdictionary.txt"
+-keepresourcexmlattributenames assets/c.bin, assets/r.bin,
+    manifest/installLocation,
+    manifest/versionCode,
+    manifest/application/*/intent-filter/*/name
+    
+-assumenosideeffects class android.util.Log {
+    public static boolean isLoggable(java.lang.String, int);
+    public static int v(...);
+    public static int i(...);
+    public static int w(...);
+    public static int d(...);
+    public static int e(...);
+}

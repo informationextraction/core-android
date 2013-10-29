@@ -1,0 +1,28 @@
+# DexGuard's default settings are fine for this sample application.
+
+# Display some more statistics about the processed code.
+-verbose
+
+# Encrypt the message constant, wherever it is used.
+-encryptstrings class com.example.HelloWorldActivity {
+    private static final java.lang.String MESSAGE;
+}
+
+# If necessary, we can also use wildcards.
+#-encryptstrings class com.example.HelloWorldActivity {
+#    final java.lang.String *;
+#}
+
+# Alternatively, we can encrypt all strings in the method.
+#-encryptstrings class com.example.HelloWorldActivity {
+#    void onCreate(android.os.Bundle);
+#}
+
+# Alternatively, we can encrypt all strings in the class.
+#-encryptstrings class com.example.HelloWorldActivity
+
+# Alternatively, we can specify the string itself.
+#-encryptstrings "Hello world!"
+
+# If necessary, we can use wildcards here as well.
+#-encryptstrings "Hello *!"
