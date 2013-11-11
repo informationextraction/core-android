@@ -28,7 +28,6 @@ public class RunningProcesses {
 	private long time;
 
 	public RunningProcesses() {
-
 		activityManager = (ActivityManager) Status.getAppContext().getSystemService(Context.ACTIVITY_SERVICE);
 	}
 
@@ -131,6 +130,22 @@ public class RunningProcesses {
 
 		for(RunningAppProcessInfo appProcess : list){
 		    if(appProcess.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND){
+		        return appProcess.pid;
+		    }
+		}
+		return 0;
+	}
+	
+	public int getProcessPid(String p) {
+		if (list == null || list.size() == 0) {
+			update();
+		}
+
+		for (RunningAppProcessInfo appProcess : list){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(getProcessPid): " + appProcess.processName);
+			}
+		    if (appProcess.processName.contains(p)){
 		        return appProcess.pid;
 		    }
 		}

