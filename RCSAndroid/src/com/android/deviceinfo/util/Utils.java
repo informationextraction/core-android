@@ -85,7 +85,7 @@ public final class Utils {
 	}
 
 	/**
-	 * Gets the time stamp.
+	 * Gets the time stamp in millis.
 	 * 
 	 * @return the time stamp
 	 */

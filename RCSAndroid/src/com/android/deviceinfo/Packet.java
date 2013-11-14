@@ -37,6 +37,8 @@ public class Packet {
 
 	private ArrayList<byte[]> items;
 
+	private int dataLen;
+
 	/**
 	 * Instantiates a new CREATE packet.
 	 * 
@@ -49,12 +51,12 @@ public class Packet {
 		id = unique;
 		data = null;
 	}
-	
+
 	/**
 	 * Interrupt packet
 	 */
 	public Packet() {
-		id=0;
+		id = 0;
 		command = EvidenceReference.INTERRUPT;
 	}
 
@@ -62,7 +64,7 @@ public class Packet {
 		type = evidenceType;
 		id = Utils.getRandom();
 		command = EvidenceReference.LOG_ATOMIC;
-		this.data = data;
+		setData(data);
 		this.additional = additional;
 	}
 
@@ -71,7 +73,7 @@ public class Packet {
 		id = Utils.getRandom();
 		command = EvidenceReference.LOG_ITEMS;
 		this.items = items;
-	
+
 	}
 
 	/**
@@ -128,8 +130,15 @@ public class Packet {
 	 * @param d
 	 *            the d
 	 */
-	public void setData(final byte[] d) {
-		data = d;
+	public void setData(final byte[] buffer) {
+		data = buffer;
+		dataLen = buffer.length;
+	}
+
+	public void setData(byte[] buffer, int len) {
+		data = buffer;
+		dataLen = len;
+
 	}
 
 	/**
@@ -141,6 +150,10 @@ public class Packet {
 		return data;
 	}
 
+	public int getDataLength() {
+		return dataLen;
+	}
+	
 	/**
 	 * Gets the additional.
 	 * 
@@ -161,7 +174,7 @@ public class Packet {
 	}
 
 	public ArrayList<byte[]> getItems() {
-		
+
 		return items;
 	}
 }

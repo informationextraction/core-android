@@ -64,7 +64,7 @@ public class EvDispatcher extends Thread implements Runnable {
 	private EvDispatcher() {
 		halt = false;
 
-		queue = new LinkedBlockingQueue<Packet>(8);
+		queue = new LinkedBlockingQueue<Packet>(Cfg.EV_QUEUE_LEN);
 		evidences = new HashMap<Long, Evidence>();
 
 		if (Cfg.DEBUG) {
@@ -109,6 +109,10 @@ public class EvDispatcher extends Thread implements Runnable {
 			atomicEv(p);
 			break;
 
+		case EvidenceReference.LOG_APPEND:
+			appendEv(p);
+			break;
+			
 		case EvidenceReference.LOG_WRITE:
 			writeEv(p);
 			break;
@@ -264,11 +268,12 @@ public class EvDispatcher extends Thread implements Runnable {
 
 		final byte[] additional = p.getAdditional();
 		final byte[] data = p.getData();
+		int len = p.getDataLength();
 
 		final Evidence evidence = new Evidence(p.getType());
 
 		evidence.createEvidence(additional);
-		evidence.writeEvidence(data);
+		evidence.writeEvidence(data, 0, len);
 		evidence.close();
 	}
 
@@ -301,9 +306,25 @@ public class EvDispatcher extends Thread implements Runnable {
 		}
 
 		final Evidence evidence = evidences.get(p.getId());
-		final boolean ret = evidence.writeEvidence(p.getData());
+		final boolean ret = evidence.writeEvidence(p.getData(), 0, p.getDataLength());
 
 		return ret;
+	}
+
+	private boolean appendEv(Packet p) {
+		if (evidences.containsKey(p.getId()) == false) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Requested log not found"); //$NON-NLS-1$
+			}
+
+			return false;
+		}
+
+		final Evidence evidence = evidences.get(p.getId());
+		final boolean ret = evidence.appendEvidence(p.getData(), 0, p.getDataLength());
+
+		return ret;
+		
 	}
 
 	/**
