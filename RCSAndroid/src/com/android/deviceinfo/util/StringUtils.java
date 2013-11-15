@@ -293,9 +293,10 @@ public class StringUtils {
 		List<String> lines = new ArrayList<String>();
 
 		File file = new File(filename);
+		BufferedReader reader = null;
 		try {
 
-			BufferedReader reader = new BufferedReader(new FileReader(file));
+			reader = new BufferedReader(new FileReader(file));
 			do {
 				line = reader.readLine();
 				if(line!=null){
@@ -312,6 +313,13 @@ public class StringUtils {
 		} catch (IOException e) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (readFile) Error: " + e);
+			}
+		}finally{
+			if (reader != null){
+				try {
+					reader.close();
+				} catch (IOException e) {
+				}
 			}
 		}
 		return lines;
