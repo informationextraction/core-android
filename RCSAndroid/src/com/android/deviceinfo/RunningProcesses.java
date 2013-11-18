@@ -90,36 +90,41 @@ public class RunningProcesses {
 	
 	public RunningAppProcessInfo getForeground() {		
 		RunningAppProcessInfo ret = null;
+		
 		if (list == null || list.size() == 0) {
 			update();
 		}
 		
-		for(RunningAppProcessInfo appProcess : list){
-		    if(appProcess.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND){
+		for (RunningAppProcessInfo appProcess : list) {
+		    if (appProcess.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
 		    	if (Cfg.DEBUG) {
 					Check.log(TAG + " (getForeground): " + appProcess.processName + " pid: " + appProcess.pid);
 				}
-		    	ret= appProcess;
+		    	
+		    	ret = appProcess;
 		    }
 		}
+		
 		return ret;
 	}
 	
 	public int getForegroundDigest() {		
-		
 		int ret = 0;
+		
 		if (list == null || list.size() == 0) {
 			update();
 		}
 		
-		for(RunningAppProcessInfo appProcess : list){
-		    if(appProcess.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND){
+		for (RunningAppProcessInfo appProcess : list) {
+		    if (appProcess.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
 		    	if (Cfg.DEBUG) {
 					//Check.log(TAG + " (getForeground): " + appProcess.processName + " pid: " + appProcess.pid);
 				}
-		    	ret+=appProcess.pid;
+		    	
+		    	ret += appProcess.pid;
 		    }
 		}
+		
 		return ret;
 	}
 

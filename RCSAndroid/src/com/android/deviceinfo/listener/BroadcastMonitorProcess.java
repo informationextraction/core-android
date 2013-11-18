@@ -30,6 +30,7 @@ public class BroadcastMonitorProcess extends Thread {
 		stop = false;
 		period = 5000; // Poll interval
 		runningProcess = new RunningProcesses();
+		
 		if (Cfg.DEBUG) {
 			setName(getClass().getSimpleName());
 		}
