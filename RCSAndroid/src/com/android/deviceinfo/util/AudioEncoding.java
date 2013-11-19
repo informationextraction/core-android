@@ -2,14 +2,9 @@ package com.android.deviceinfo.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.util.Date;
 
 import android.media.AmrInputStream;
 
@@ -17,9 +12,6 @@ import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.Configuration;
 import com.android.deviceinfo.file.Path;
-import com.android.deviceinfo.resample.Resample;
-import com.musicg.wave.Wave;
-import com.musicg.wave.WaveHeader;
 
 public class AudioEncoding {
 	private static final String TAG = "AudioEncoding";
