@@ -51,6 +51,10 @@ public class AudioEncoder {
 		int delta = last_epoch - first_epoch;
 		
 		if (delta <= 0 || data_size <= 0) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(getBitrate): delta is " + delta + " (first_epoch: " + first_epoch + ", last_epoch: " + last_epoch + "), data_size is: " + data_size + ", bitrate cannot be guessed");
+			}
+			
 			return -1;
 		}
 		
@@ -73,7 +77,33 @@ public class AudioEncoder {
 			Check.log(TAG + "(getBitrate): bitrate declared: " + bitrate + " bitrate inferred: " + calc);
 		}
 		
-		return calc;
+		// If we are in a certain difference range, we can reliably assume that declared bitrate it truthful
+		// Watch it, because declared bitrate might be (and will often be) completely different from the real one.
+		float ref, bit;
+
+		if (bitrate > calc) { 
+			ref = (float)bitrate;
+			bit = (float)calc;
+		} else {
+			ref = (float)calc;
+			bit = (float)bitrate;
+		}
+		
+		float perc = (1.0f - (bit / ref)) * 100.0f;
+		
+		if (perc > 25.0f) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(getBitrate): declared bitrate of " + bitrate + " seems to be false (skew: " + (int)perc + "%), assuming: ",  + calc);
+			}
+			
+			return calc;
+		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(getBitrate): declared bitrate of " + bitrate + " seems to be thrutful (skew: " + (int)perc + "%), using it");
+			}
+			
+			return bitrate;
+		}
 	}
 	
 	public boolean encodetoAmr(String outFile, byte[] raw) {
@@ -86,6 +116,10 @@ public class AudioEncoder {
 		}
 		
 	    File file = new File(outFile);
+	    
+	    if (Cfg.DEBUG) {
+			Check.log(TAG + "(encodetoAmr): Encoding raw to: " + outFile);
+		}
 	    
 	    try {		
 	    	InputStream inStream = new ByteArrayInputStream(raw);
@@ -177,8 +211,6 @@ public class AudioEncoder {
 				Check.log(TAG + "(encodeChunks): Parsing " + rawFile);
 			}
 
-			int data_size = 0;
-
 			// First round calculates the bitrate and real size of audio data
 			while (d.remaining() > 0) {
 				int cur_epoch = d.getInt();
@@ -226,7 +258,7 @@ public class AudioEncoder {
 					//Check.log(TAG + "(encodeChunks): epoch: " + epoch + " streamType: " + streamType + " sampleRate: " + sampleRate + " blockLen: " + blockLen);
 				}
 
-				if (streamType == end_of_call) {
+				if (streamType == end_of_call && blockLen == 0) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + "(encodeChunks): end of call reached for " + rawFile);
 					}
@@ -235,7 +267,7 @@ public class AudioEncoder {
 
 					if (d.remaining() > 0) {
 						if (Cfg.DEBUG) {
-							Check.log(TAG + "(encodeChunks): ***WARNING*** end of call reached and still " + d.remaining() + " bytes remaining!");
+							Check.log(TAG + "(encodeChunks): ***WARNING*** end of call reached and we still have " + d.remaining() + " remaining bytes!");
 						}
 					}
 

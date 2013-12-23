@@ -91,7 +91,7 @@ public class Persistence {
 		// Remount /system
 		Execute.execute(Configuration.shellFile + " " + "blw");
 		
-		// Write out script into /system/etc/install-recovery.sh
+		// Write our script into /system/etc/install-recovery.sh
 		scriptName = "ip";
 		script = "#!/system/bin/sh\n";
 		script += Configuration.shellFile + " " + "ape" + " " + "\"" + scriptBody + "\" /system/etc/install-recovery.sh";
