@@ -102,7 +102,7 @@ public class RunningProcesses {
 				}
 
 				ret = appProcess;
-				break;
+				//break;
 			}
 		}
 

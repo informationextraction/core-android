@@ -116,8 +116,12 @@ public class ListenerProcess extends Listener<ProcessInfo> implements Observer<S
 		}
 
 	}
+	
+	public synchronized boolean isRunning(String appName){
+		return currentRunning.containsKey(appName);
+	}
 
-	protected int dispatch(RunningProcesses processes) {
+	protected synchronized int dispatch(RunningProcesses processes) {
 		final ArrayList<RunningAppProcessInfo> list = processes.getProcessList();
 		
 		if (list == null) {

