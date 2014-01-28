@@ -13,6 +13,21 @@ public class CallInfo {
 	public String processName;
 	public int programId;
 	public Date timestamp;
+	public boolean delay;
+	
+	public String getCaller() {
+		if(!incoming){
+			return account;
+		}
+		return peer;
+	}
+	public String getCallee() {
+		if(incoming){
+			return account;
+		}
+		return peer;
+	}
+
 	
 
 }

