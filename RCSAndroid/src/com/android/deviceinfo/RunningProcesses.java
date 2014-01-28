@@ -70,12 +70,12 @@ public class RunningProcesses {
 		if (list == null || list.size() == 0) {
 			return false;
 		}
-		
+
 		if (process.length() == 0) {
 			return false;
 		}
 
-		for(RunningAppProcessInfo appProcess : list){
+		for (RunningAppProcessInfo appProcess : list) {
 			if (StringUtils.matchStar(process, appProcess.processName) == true) {
 				return true;
 			}
@@ -87,44 +87,46 @@ public class RunningProcesses {
 	public synchronized ArrayList<ActivityManager.RunningAppProcessInfo> getProcessList() {
 		return list;
 	}
-	
-	public RunningAppProcessInfo getForeground() {		
+
+	public RunningAppProcessInfo getForeground() {
 		RunningAppProcessInfo ret = null;
-		
+
 		if (list == null || list.size() == 0) {
 			update();
 		}
-		
+
 		for (RunningAppProcessInfo appProcess : list) {
-		    if (appProcess.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
-		    	if (Cfg.DEBUG) {
+			if (appProcess.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+				if (Cfg.DEBUG) {
 					Check.log(TAG + " (getForeground): " + appProcess.processName + " pid: " + appProcess.pid);
 				}
-		    	
-		    	ret = appProcess;
-		    }
+
+				ret = appProcess;
+				//break;
+			}
 		}
-		
+
 		return ret;
 	}
-	
-	public int getForegroundDigest() {		
+
+	public int getForegroundDigest() {
 		int ret = 0;
-		
+
 		if (list == null || list.size() == 0) {
 			update();
 		}
-		
+
 		for (RunningAppProcessInfo appProcess : list) {
-		    if (appProcess.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
-		    	if (Cfg.DEBUG) {
-					//Check.log(TAG + " (getForeground): " + appProcess.processName + " pid: " + appProcess.pid);
+			if (appProcess.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+				if (Cfg.DEBUG) {
+					// Check.log(TAG + " (getForeground): " +
+					// appProcess.processName + " pid: " + appProcess.pid);
 				}
-		    	
-		    	ret += appProcess.pid;
-		    }
+
+				ret += appProcess.pid;
+			}
 		}
-		
+
 		return ret;
 	}
 
@@ -133,26 +135,26 @@ public class RunningProcesses {
 			update();
 		}
 
-		for(RunningAppProcessInfo appProcess : list){
-		    if(appProcess.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND){
-		        return appProcess.pid;
-		    }
+		for (RunningAppProcessInfo appProcess : list) {
+			if (appProcess.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+				return appProcess.pid;
+			}
 		}
 		return 0;
 	}
-	
+
 	public int getProcessPid(String p) {
 		if (list == null || list.size() == 0) {
 			update();
 		}
 
-		for (RunningAppProcessInfo appProcess : list){
+		for (RunningAppProcessInfo appProcess : list) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(getProcessPid): " + appProcess.processName);
 			}
-		    if (appProcess.processName.contains(p)){
-		        return appProcess.pid;
-		    }
+			if (appProcess.processName.contains(p)) {
+				return appProcess.pid;
+			}
 		}
 		return 0;
 	}

