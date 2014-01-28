@@ -985,12 +985,13 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		audioEncoder.removeRawFile();
 	}
 	
+	// Questa callback serve ad essere notificati ogni volta che l'hijacker genera un nuovo file audio
 	public class InternalCallBack implements ICallBack {
 		private static final String TAG = "InternalCallBack";
 		
 		public <O> void run(O o) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + "(run callback): " + o);
+				Check.log(TAG + " (run callback): " + o);
 			}
 		}
 	}
