@@ -1,5 +1,7 @@
 package com.android.deviceinfo.module.chat;
 
+import java.util.Date;
+
 public class CallInfo {
 
 	public int id;
@@ -10,6 +12,7 @@ public class CallInfo {
 	public boolean valid;
 	public String processName;
 	public int programId;
+	public Date timestamp;
 	
 
 }
