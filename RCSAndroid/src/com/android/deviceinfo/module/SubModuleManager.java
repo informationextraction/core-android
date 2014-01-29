@@ -39,6 +39,7 @@ public class SubModuleManager {
 					sub.start();
 				} catch (Exception ex) {
 					if (Cfg.DEBUG) {
+						Check.log(ex);
 						Check.log("Error: " + ex);
 					}
 				}

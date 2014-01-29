@@ -271,7 +271,7 @@ public class Path {
 	}
 
 	public static boolean unprotect(String dbDir, String fileName, boolean fullMode) {
-		unprotect(dbDir, 2, fullMode);
+		unprotect(dbDir, 3, fullMode);
 		File file = new File(dbDir, fileName);
 		unprotect(file.getAbsolutePath(), fullMode);
 

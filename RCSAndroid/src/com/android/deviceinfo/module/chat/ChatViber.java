@@ -208,7 +208,7 @@ public class ChatViber extends SubModuleChat {
 	private void fetchParticipants(GenericSqliteHelper helper, final String thread_id) {
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (fetchGroup) : " + thread_id);
+			Check.log(TAG + " (fetchParticipants) : " + thread_id);
 		}
 
 		RecordVisitor visitor = new RecordVisitor() {

