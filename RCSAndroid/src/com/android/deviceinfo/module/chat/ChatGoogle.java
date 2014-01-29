@@ -73,7 +73,7 @@ public class ChatGoogle extends SubModuleChat {
 		long[] lastLines = markup.unserialize(new long[2]);
 
 		readHangoutMessages(lastLines);
-		//readGoogleTalkMessages(lastLines);
+		readGoogleTalkMessages(lastLines);
 
 		serializeMarkup(lastLines);
 	}
