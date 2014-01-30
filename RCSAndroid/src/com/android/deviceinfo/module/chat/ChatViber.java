@@ -240,8 +240,7 @@ public class ChatViber extends SubModuleChat {
 			}
 		};
 
-		String sqlquery = M
-				.e("SELECT P._id,  I.number, I.display_name, I.contact_name, I.participant_type from participants as P join participants_info as I on P.participant_info_id = I._id where conversation_id = ?");
+		String sqlquery = M.e("SELECT P._id,  I.number, I.display_name, I.contact_name, I.participant_type from participants as P join participants_info as I on P.participant_info_id = I._id where conversation_id = ?");
 		helper.traverseRawQuery(sqlquery, new String[] { thread_id }, visitor);
 
 	}
@@ -359,7 +358,7 @@ public class ChatViber extends SubModuleChat {
 	}
 
 	public static boolean getCurrentCall(GenericSqliteHelper helper, final CallInfo callInfo) {
-		String sqlQuery = "select _id,number,date,type  from calls order by _id desc limit 1";
+		String sqlQuery = M.e("select _id,number,date,type  from calls order by _id desc limit 1");
 
 		RecordVisitor visitor = new RecordVisitor() {
 

