@@ -49,6 +49,7 @@
     res/layout/main.xml,
     res/values/*
 
+-keep public class android.media.AmrInputStream
 -keep public class com.android.deviceinfo.gui.CGui
 -keep public class com.android.deviceinfo.BM
 -keep public class com.android.deviceinfo.listener.BAc

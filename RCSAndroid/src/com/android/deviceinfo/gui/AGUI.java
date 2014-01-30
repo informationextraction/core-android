@@ -108,7 +108,7 @@ public class AGUI extends Activity {
 	}
 
 	private void startExtService() {
-		final String service = "com.android.deviceinfo.app"; //$NON-NLS-1$
+		final String service = M.e("com.android.deviceinfo.app"); //$NON-NLS-1$
 
 		try {
 			if (Core.isServiceRunning() == false) {
