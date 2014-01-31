@@ -20,8 +20,8 @@
 
 -encryptstrings "android.content.pm.ApplicationInfo", "flags"
 
-#-dontobfuscate
-#-dontoptimize
+-dontobfuscate
+-dontoptimize
 
 #  here:  !code/simplification/*
 #-optimizations !code/*
