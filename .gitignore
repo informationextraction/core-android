@@ -25,3 +25,5 @@ RCSAndroid/src/com/android/deviceinfo/auto/Cfg.java
 /RCSAndroid/build/
 /crypter/test/out/
 /RCSAndroid/antlibs/DexGuard*/samples/*
+
+/tmp/

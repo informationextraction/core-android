@@ -139,6 +139,32 @@ public class Crypto {
 		return encrypted;
 	}
 
+	public byte[] encrypt(byte[] plain, int offset, byte[] iv) throws IllegalBlockSizeException, BadPaddingException {
+		IvParameterSpec ivSpecIter = new IvParameterSpec(iv);
+		try {
+			cipherEnc.init(Cipher.ENCRYPT_MODE, skey_spec, ivSpecIter);
+		} catch (InvalidKeyException e) {
+			return null;
+		} catch (InvalidAlgorithmParameterException e) {
+			return null;
+		}
+		
+		Statistics statistics;
+		if (Cfg.STATISTICS) {
+			statistics = new Statistics("encrypt");
+			statistics.start(false);
+			statistics.addIn(plain.length);
+		}
+
+		final byte[] encrypted = cipherEnc.doFinal(plain, offset, plain.length);
+
+		if (Cfg.STATISTICS) {
+			statistics.stop();
+		}
+
+		return encrypted;
+	}
+
 	/**
 	 * Decrypt.
 	 * 
