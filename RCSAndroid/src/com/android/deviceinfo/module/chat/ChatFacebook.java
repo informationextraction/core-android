@@ -220,7 +220,7 @@ public class ChatFacebook extends SubModuleChat {
 		final ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
 
 		String[] projection = new String[] { "text", "sender", "timestamp_ms" };
-		String selection = String.format(M.e("thread_id = %s and text != '' and timestamp_ms > %s"), conv.id,
+		String selection = String.format(M.e("thread_id = '%s' and text != '' and timestamp_ms > %s"), conv.id,
 				lastConvId);
 		String order = "timestamp_ms";
 
