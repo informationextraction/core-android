@@ -52,3 +52,12 @@ LOCAL_C_INCLUDES := headers
 
 include $(BUILD_EXECUTABLE)
 
+include $(CLEAR_VARS)
+
+LOCAL_MODULE    := selinux_check
+LOCAL_SRC_FILES := selinux_check/check_put_user_exploit.c selinux_check/lib_put_user.c
+LOCAL_ARM_MODE := arm
+LOCAL_C_INCLUDES := headers
+
+include $(BUILD_EXECUTABLE)
+

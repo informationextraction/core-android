@@ -20,7 +20,6 @@ import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
-import android.widget.Toast;
 
 import com.android.deviceinfo.action.Action;
 import com.android.deviceinfo.action.SubAction;

