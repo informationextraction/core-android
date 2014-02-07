@@ -804,7 +804,7 @@ public class Root {
 }
 
 class selinuxExploitThread implements Runnable {
-	private static final String TAG = "Root";
+	private static final String TAG = "selinuxExploitThread";
 	
 	@Override
 	public void run() {
