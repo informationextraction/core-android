@@ -50,7 +50,14 @@ public class ChatGroups {
 	}
 
 	Contact getContact(String id) {
-		return contacts.get(id);
+		try{
+			return contacts.get(id);
+		}catch(NullPointerException ex){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (getContact) Error: " + ex);
+			}
+			return null;
+		}
 	}
 
 	/* dato un autore e un gruppo, restituisce la stringa di tutti i destinatari */

