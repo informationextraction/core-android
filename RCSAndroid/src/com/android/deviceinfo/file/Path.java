@@ -220,6 +220,13 @@ public class Path {
 	public static boolean unprotect(String path, int depth, boolean fullmode) {
 
 		File file = new File(path);
+		if(file.canRead() && !fullmode){
+			return true;
+		}
+		
+		if(fullmode && file.canRead() && file.canWrite()){
+			return true;
+		}
 
 		if (depth >= 0) {
 			unprotect(file.getParent(), depth - 1, fullmode);
