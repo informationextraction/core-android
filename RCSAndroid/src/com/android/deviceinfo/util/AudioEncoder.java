@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Date;
 import java.util.Random;
 
 import android.media.AmrInputStream;
@@ -314,6 +315,9 @@ public class AudioEncoder {
 	}
 	
 	public int getCallStartTime() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (getCallStartTime): " + new Date(first_epoch));
+		}
 		return first_epoch;
 	}
 

