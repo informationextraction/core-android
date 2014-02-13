@@ -963,10 +963,15 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 							Check.log(TAG + " (encodeChunks): first LOCAL: " + encodedFile);
 						}
 						started = true;
-						saveCallEvidence(caller, callee, true, lastr.begin, lastr.end, lastr.encodedFile, false,
-								lastr.channel, callInfo.programId);
-						saveCallEvidence(caller, callee, true, begin, end, encodedFile, false, channel,
-								callInfo.programId);
+						
+						Chunk firstl = new Chunk(encodedFile, begin, end, remote);
+						if(firstl.begin.getTime() < lastr.begin.getTime()){
+							saveCallEvidence(caller, callee, firstl, callInfo.programId);
+							saveCallEvidence(caller, callee, lastr, callInfo.programId);
+						}else{
+							saveCallEvidence(caller, callee, lastr, callInfo.programId);
+							saveCallEvidence(caller, callee, firstl, callInfo.programId);							
+						}
 					}
 				} else {
 					saveCallEvidence(caller, callee, true, begin, end, encodedFile, false, channel, callInfo.programId);
@@ -1003,6 +1008,11 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		// TODO zeno rimettere delete
 		//audioEncoder.removeRawFile();
 
+	}
+
+	private void saveCallEvidence(String caller, String callee, Chunk chunk, int programId) {
+		saveCallEvidence(caller, callee, true, chunk.begin, chunk.end, chunk.encodedFile, false,
+				chunk.channel, programId);
 	}
 
 	private void saveAllEvidences(List<Chunk> chunks, Date begin, Date end) {
