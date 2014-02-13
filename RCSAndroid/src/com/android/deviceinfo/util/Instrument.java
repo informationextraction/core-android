@@ -166,7 +166,7 @@ public class Instrument {
 		@Override
 		public void run() {
 			while (true) {
-				Utils.sleep(5000);
+				Utils.sleep(10000);
 	
 				if (stopMonitor) {
 					if (Cfg.DEBUG) {
