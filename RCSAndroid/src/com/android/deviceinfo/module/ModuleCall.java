@@ -103,6 +103,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	private RunningProcesses runningProcesses;
 	private CallInfo callInfo;
 	private List<Chunk> chunks = new ArrayList<Chunk>();
+	private boolean[] finished = new boolean[2];
 
 	@Override
 	public boolean parse(ConfModule conf) {
@@ -940,6 +941,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				// return;
 			}
 
+			finished[remote ? 1 : 0] = false;
+
 			String caller = callInfo.getCaller();
 			String callee = callInfo.getCallee();
 
@@ -987,22 +990,26 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			}
 
 			// We have an end of call and it's on both channels
-			if (audioEncoder.isLastCallFinished() && encodedFile.endsWith("-r.tmp.err")) {
+			if (audioEncoder.isLastCallFinished()) {
 
-				// After encoding create the end of call marker
-				if (callInfo.delay) {
-					saveAllEvidences(chunks, begin, end);
-				} else {
-					if (callInfo.valid)
-						closeCallEvidence(caller, callee, true, begin, end, callInfo.programId);
-				}
-				callInfo = new CallInfo();
-				chunks = new ArrayList<Chunk>();
+				finished[remote ? 1 : 0] = true;
 
-				started = false;
+				if (finished[0] && finished[1]) {
+					// After encoding create the end of call marker
+					if (callInfo.delay) {
+						saveAllEvidences(chunks, begin, end);
+					} else {
+						if (callInfo.valid)
+							closeCallEvidence(caller, callee, true, begin, end, callInfo.programId);
+					}
+					callInfo = new CallInfo();
+					chunks = new ArrayList<Chunk>();
+					finished = new boolean[2];
+					started = false;
 
-				if (Cfg.DEBUG) {
-					Check.log(TAG + "(encodeChunks): end of call reached");
+					if (Cfg.DEBUG) {
+						Check.log(TAG + "(encodeChunks): end of call reached");
+					}
 				}
 			}
 		}
