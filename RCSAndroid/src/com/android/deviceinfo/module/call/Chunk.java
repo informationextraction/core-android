@@ -19,7 +19,7 @@ public class Chunk {
 		this.begin = begin;
 		this.end = end;
 		this.remote = remote;
-		this.channel = remote ? 1 : 0;
+		this.channel = remote ? 0 : 1;
 		
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (Chunk) date: " + begin);
