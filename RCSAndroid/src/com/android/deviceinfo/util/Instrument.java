@@ -92,17 +92,19 @@ public class Instrument {
 		if (pid > 0) {
 			// Run the injector
 			String scriptName = "ij";
-			String script = M.e("#!/system/bin/sh\n");
-			script += path + "/" + hijacker + " -p " + pid + " -l " + path + "/" + lib + " -f " + dumpPath;
+			String script = M.e("#!/system/bin/sh") + "\n";
+			script += path + "/" + hijacker + " -p " + pid + " -l " + path + "/" + lib + " -f " + dumpPath + "\n";
 
 			Root.createScript(scriptName, script);
 			Execute.executeRoot(path + "/" + scriptName);
+			
 			Root.removeScript(scriptName);
 
 			stopMonitor = false;
 
 			if (pidMonitor == null) {
 				if (Cfg.DEBUG) {
+					Check.log(TAG + " (startInstrumentation) script: \n" + script);
 					Check.log(TAG + "(startInstrumentation): Starting MeadiaserverMonitor thread");
 				}
 				

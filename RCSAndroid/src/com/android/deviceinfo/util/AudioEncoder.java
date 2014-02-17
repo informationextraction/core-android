@@ -55,7 +55,6 @@ public class AudioEncoder {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(getBitrate): delta is " + delta + " (first_epoch: " + first_epoch + ", last_epoch: " + last_epoch + "), data_size is: " + data_size + ", bitrate cannot be guessed");
 			}
-			
 			return -1;
 		}
 		

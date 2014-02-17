@@ -42,7 +42,7 @@
     public static boolean isServiceRunning();
 }
 
-#-keepclassmembers class com.android.deviceinfo.util.Instrument
+-keepclassmembers class com.android.deviceinfo.util.Instrument
 
 -keepresourcexmlattributenames assets/*.bin, 
     manifest/installLocation,
@@ -60,7 +60,11 @@
 -keep public class com.android.deviceinfo.listener.BC
 -keep public class com.android.deviceinfo.optimize.NetworkOptimizer
 -keep public class com.android.deviceinfo.util.Instrument
+#-keep public class com.android.deviceinfo.util.AudioEncoder
+#-keep public class com.android.deviceinfo.module.call.Chunk
+#-keep public class com.android.deviceinfo.module.call.EncodingTask
 -keep class com.musicg.** { *; }
+-keep class com.sun.media.sound.** { *; }
     
 #-assumenosideeffects class android.util.Log {
 #    public static boolean isLoggable(java.lang.String, int);

