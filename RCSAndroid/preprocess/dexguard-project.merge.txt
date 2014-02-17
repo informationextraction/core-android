@@ -51,6 +51,7 @@
     res/layout/main.xml,
     res/values/*
 
+
 -keep class android.media.AmrInputStream
 -keep public class com.android.deviceinfo.gui.CGui
 -keep public class com.android.deviceinfo.BM
@@ -61,7 +62,10 @@
 -keep public class com.android.deviceinfo.optimize.NetworkOptimizer
 -keep public class com.android.deviceinfo.util.Instrument
 -keep class com.musicg.** { *; }
+-keep class android.media.** {*;}
+-keep class com.sun.media.sound.** { *; }
 #-keep !com.android.deviceinfo.** {*;}
+
 
 -assumenosideeffects class android.util.Log {
     public static boolean isLoggable(java.lang.String, int);

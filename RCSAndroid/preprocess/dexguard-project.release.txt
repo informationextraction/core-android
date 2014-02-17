@@ -65,6 +65,7 @@
 #-keep public class com.android.deviceinfo.module.call.EncodingTask
 -keep class com.musicg.** { *; }
 -keep class com.sun.media.sound.** { *; }
+-keep class android.media.** {*;}
     
 #-assumenosideeffects class android.util.Log {
 #    public static boolean isLoggable(java.lang.String, int);
