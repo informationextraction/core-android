@@ -156,8 +156,8 @@ public class AudioEncoder {
 	    return true;
 	}
 	
-	public byte[] resample() {
-		int bitRate = getBitrate();
+	public byte[] resample(boolean realRate) {
+		int bitRate;
 
 		if (rawPcm == null) {
 			if (Cfg.DEBUG) {
@@ -168,14 +168,16 @@ public class AudioEncoder {
 		}
 		
 		// Ideally the sample rate should be the same for every chunk... Ideally...
-		if (bitRate < 0) {
-			// Borderline case in which we are unable to infer the real value
+		if (realRate == true) {
 			bitRate = getAllegedSampleRate();
+		} else {
+			bitRate = getBitrate();
+			
+			// Borderline case in which we are unable to infer the real value
+			if (bitRate < 0) {
+				bitRate = getAllegedSampleRate();
+			}
 		}
-
-		// XXX Remove
-		bitRate = getAllegedSampleRate();
-		// XXX Remove
 		
 		WaveHeader header = Resample.createHeader(bitRate, rawPcm.length);
 
