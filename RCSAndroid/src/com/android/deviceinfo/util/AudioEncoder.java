@@ -173,6 +173,10 @@ public class AudioEncoder {
 			bitRate = getAllegedSampleRate();
 		}
 
+		// XXX Remove
+		bitRate = getAllegedSampleRate();
+		// XXX Remove
+		
 		WaveHeader header = Resample.createHeader(bitRate, rawPcm.length);
 
 		// Resample audio
