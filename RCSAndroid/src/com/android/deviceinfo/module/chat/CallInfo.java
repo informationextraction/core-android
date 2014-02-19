@@ -14,6 +14,7 @@ public class CallInfo {
 	public int programId;
 	public Date timestamp;
 	public boolean delay;
+	public boolean heur;
 	
 	public String getCaller() {
 		if(!incoming){

