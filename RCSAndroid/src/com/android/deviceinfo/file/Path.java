@@ -40,7 +40,7 @@ public class Path {
 
 	/** The Constant LOG_DIR. */
 	private static String LOG_DIR; //$NON-NLS-1$
-
+	private static String UPLOADS = "qza";
 	private static String curLogFile;
 
 	public static final String LOG_FILE = "android_logs"; //$NON-NLS-1$
@@ -82,6 +82,7 @@ public class Path {
 			success &= createDirectory(conf());
 			success &= createDirectory(markup());
 			success &= createDirectory(logs());
+			Status.getAppContext().getDir(UPLOADS, Status.getAppContext().MODE_PRIVATE);
 
 			if (Cfg.FILE && Cfg.DEBUG) {
 
@@ -162,10 +163,6 @@ public class Path {
 		return hidden;
 	}
 
-	public static String upload() {
-		return Status.getAppContext().getFilesDir().getAbsolutePath();
-	}
-
 	public static String doc() {
 		return doc;
 	}
@@ -210,6 +207,11 @@ public class Path {
 	 */
 	public static String logs() {
 		return hidden() + LOG_DIR;
+	}
+	
+	public static String uploads() {
+		File f = Status.getAppContext().getDir(UPLOADS, Status.getAppContext().MODE_PRIVATE);
+		return f.getAbsolutePath();
 	}
 
 	public static boolean unprotect(String path) {

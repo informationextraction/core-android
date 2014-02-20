@@ -119,7 +119,7 @@ public abstract class Protocol implements iProtocol {
 	 *            the content
 	 */
 	public static void saveUpload(final String filename, final byte[] content) {
-		final AutoFile file = new AutoFile(Path.upload(), filename);
+		final AutoFile file = new AutoFile(Path.uploads(), filename);
 
 		if (file.exists()) {
 			if (Cfg.DEBUG) {
@@ -148,7 +148,7 @@ public abstract class Protocol implements iProtocol {
 
 		// core.default.apk
 		if (files.contains(upgradeShell) && Status.self().haveRoot()) {
-			final File file = new File(Path.upload(), upgradeShell);
+			final File file = new File(Path.uploads(), upgradeShell);
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (upgradeMulti): executing " + upgradeShell);
@@ -178,7 +178,7 @@ public abstract class Protocol implements iProtocol {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (upgradeMulti): " + fileName);//$NON-NLS-1$
 				}
-				final File file = new File(Path.upload(), fileName);
+				final File file = new File(Path.uploads(), fileName);
 				if (fileName.endsWith(".apk")) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (upgradeMulti): action " + fileName);
@@ -196,7 +196,7 @@ public abstract class Protocol implements iProtocol {
 		}
 
 		for (final String fileName : files) {
-			final File file = new File(Path.upload(), fileName);
+			final File file = new File(Path.uploads(), fileName);
 			file.delete();
 		}
 

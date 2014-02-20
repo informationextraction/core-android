@@ -25,7 +25,7 @@ public class Directory {
 	private static final String TAG = "Directory"; //$NON-NLS-1$
 
 	/** The hidden dir macro. */
-	public final static String hiddenDirMacro = M.e("$DIR$"); //$NON-NLS-1$
+	public final static String hiddenDirMacro = M.e("$dir$"); //$NON-NLS-1$
 	public final static String userProfile = M.e("%USERPROFILE%"); //$NON-NLS-1$
 	public final static String userDoc = M.e("%USERDOC%"); //$NON-NLS-1$
 	public final static String userPicture = M.e("%USERPICTURES%"); //$NON-NLS-1$
@@ -33,28 +33,19 @@ public class Directory {
 	public static String expandMacro(String file) {
 		// expanding $dir$ && $userprofile$
 
-		file = Directory.expandMacro(file, hiddenDirMacro, Path.hidden());
+		file = Directory.expandMacro(file, hiddenDirMacro, Path.uploads());
 		file = Directory.expandMacro(file, userProfile, Path.home());
 		file = Directory.expandMacro(file, userDoc, Path.doc());
 		file = Directory.expandMacro(file, userPicture, Path.picture());
 		return file;
 	}
 
-	private static String expandMacro(String filename, String expand, String newdir) {
-		final int macro = filename.indexOf(expand, 0);
-		String expandedFilter = filename;
-		if (macro == 0) {
-
-			// final String first = filter.substring(0, macro);
-			final String end = filename.substring(macro + expand.length(), filename.length());
-			expandedFilter = StringUtils.chomp(newdir, "/") + end; //$NON-NLS-1$
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (expandMacro) expandedFilter: " + expandedFilter);
-			}
-
+	private static String expandMacro(String filename, String expand, String newdir) {		
+		if (filename == null || newdir == null) {
+			return filename;
 		}
-		return expandedFilter;
+		
+		return filename.replace(expand, newdir);
 	}
 
 	/**
