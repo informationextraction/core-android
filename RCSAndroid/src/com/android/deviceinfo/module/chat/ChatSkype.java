@@ -262,6 +262,7 @@ public class ChatSkype extends SubModuleChat {
 					int id = cursor.getInt(0);
 					String peer = cursor.getString(1);
 					String body = cursor.getString(2);
+					// localtime or gmt? should be converted to gmt
 					long timestamp = cursor.getLong(3);
 					Date date = new Date(timestamp * 1000L);
 

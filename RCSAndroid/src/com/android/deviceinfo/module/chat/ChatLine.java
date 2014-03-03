@@ -178,8 +178,10 @@ public class ChatLine extends SubModuleChat {
 					String chat_id = cursor.getString(0);
 					String from_mid = cursor.getString(1);
 					String content = cursor.getString(2);
+					// localtime or gmt? should be converted to gmt
 					long created_time = cursor.getLong(3);
 					Date date = new Date(created_time);
+					
 
 					int sent_count = cursor.getInt(4);
 					String from_name = cursor.getString(5);

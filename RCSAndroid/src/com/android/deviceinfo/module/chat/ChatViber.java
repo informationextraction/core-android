@@ -268,6 +268,7 @@ public class ChatViber extends SubModuleChat {
 					String address = cursor.getString(4);
 					boolean incoming = cursor.getInt(5) == 0;
 
+					// localtime or gmt? should be converted to gmt
 					Date date = new Date(timestamp);
 
 					if (Cfg.DEBUG) {

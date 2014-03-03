@@ -12,6 +12,7 @@ package com.android.deviceinfo.util;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 
 import com.android.deviceinfo.auto.Cfg;
 
@@ -139,9 +140,16 @@ public final class DateTime {
 		final byte[] buffer = new byte[tm_len];
 		final DataBuffer databuffer = new DataBuffer(buffer, 0, tm_len);
 
-		final Calendar calendar = Calendar.getInstance();
+		final Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
 		calendar.setTime(date);
+		
+		int timezoneOffset = ((calendar.get(Calendar.ZONE_OFFSET) + calendar.get(Calendar.DST_OFFSET)) / 60000) /60;
+		int dst =  calendar.get(Calendar.DST_OFFSET);
 
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (getStructTm) " + calendar.getTimeZone().getDisplayName() + " offset: " + timezoneOffset + " DST: " + dst +" Hour:" + calendar.get(Calendar.HOUR_OF_DAY));
+		}
+		
 		databuffer.writeInt(calendar.get(Calendar.SECOND));
 
 		databuffer.writeInt(calendar.get(Calendar.MINUTE));
@@ -162,6 +170,7 @@ public final class DateTime {
 
 	}
 
+	
 	/**
 	 * Gets the ordered string.
 	 * 

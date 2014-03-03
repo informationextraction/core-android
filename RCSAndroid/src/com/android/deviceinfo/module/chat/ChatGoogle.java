@@ -158,6 +158,7 @@ public class ChatGoogle extends SubModuleChat {
 				if (fallback_name!=null)
 					peer = fallback_name;
 
+				// localtime or gmt? should be converted to gmt
 				Date date = new Date(timestamp/1000);
 
 				if (Cfg.DEBUG) {
@@ -384,6 +385,7 @@ public class ChatGoogle extends SubModuleChat {
 			@Override
 			public long cursor(Cursor cursor) {
 				long createTime = cursor.getLong(0);
+				// localtime or gmt? should be converted to gmt
 				Date date = new Date(createTime);
 				String account = cursor.getString(1);
 				int isSend = cursor.getInt(2);

