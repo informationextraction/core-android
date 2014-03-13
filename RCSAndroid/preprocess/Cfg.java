@@ -21,7 +21,7 @@ public class Cfg {
 	public static final boolean DEMO_INITSOUND = false;
 	
 	public static final boolean ADMIN = true; // if true, wants privilege but cannot get root: asks for admin
-	
+	public static final boolean DEBUG_AUDIO = false;
 	public static final boolean FORCENODEMO = false; // if true, force no demo
 	
 	public static final boolean KEYS = @KEYS@; // Se e' true vengono usate le chiavi hardcoded

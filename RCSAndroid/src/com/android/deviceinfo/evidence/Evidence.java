@@ -343,7 +343,7 @@ final class Evidence {
 			final DateTime dt = new DateTime(datetime.getDate());
 			boolean hitest = dt.hiDateTime() == datetime.hiDateTime();
 			boolean lowtest = dt.lowDateTime() == datetime.lowDateTime();
-			Check.log(dt + " ticks: " + dt.getTicks());
+			//Check.log(dt + " ticks: " + dt.getTicks());
 			Check.asserts(hitest, "hi test");
 			Check.asserts(lowtest, "low test");
 		}
