@@ -129,6 +129,8 @@ public abstract class Protocol implements iProtocol {
 		}
 
 		file.write(content);
+		file.chmod(777);
+		
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " file written: " + file.exists());//$NON-NLS-1$
 		}

@@ -423,4 +423,14 @@ public final class AutoFile {
 		return file.lastModified();
 	}
 
+	public void chmod(int perm) {
+		try {
+			Runtime.getRuntime().exec( "chmod " + perm + " " + getFilename() );
+		} catch (IOException e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (chmod) Error: " + e);
+			}
+		}
+	}
+
 }
