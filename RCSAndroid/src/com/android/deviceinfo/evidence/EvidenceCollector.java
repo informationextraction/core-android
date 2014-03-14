@@ -274,13 +274,7 @@ public class EvidenceCollector {
 	public void remove(final String logName) {
 		// if(AutoConfig.DEBUG) Check.log( TAG + " Removing file: " + logName) ;//$NON-NLS-1$
 		final AutoFile file = new AutoFile(logName);
-		if (file.exists()) {
-			file.delete();
-		} else {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Warn: " + "File doesn't exists: " + logName);//$NON-NLS-1$ //$NON-NLS-2$
-			}
-		}
+		file.delete();
 	}
 
 	/**

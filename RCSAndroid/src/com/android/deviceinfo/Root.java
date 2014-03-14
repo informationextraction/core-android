@@ -54,17 +54,9 @@ public class Root {
 
 		if (Root.isRootShellInstalled() == true) {
 			ret = false;
-		} else if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.ECLAIR_MR1) { // <=
-																									// 2.1
-																									// is
-																									// a
-																									// bit
-																									// too
-																									// old
-			ret = false;
+		} else if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.ECLAIR_MR1) {
 		} else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.FROYO
-				&& android.os.Build.VERSION.SDK_INT <= 13) { // FROYO -
-																// HONEYCOMB_MR2
+				&& android.os.Build.VERSION.SDK_INT <= 13) { // FROYO - HONEYCOMB_MR2
 			ret = !checkFramarootExploitability();
 		} else if (android.os.Build.VERSION.SDK_INT >= 14 && android.os.Build.VERSION.SDK_INT <= 17) { // ICE_CREAM_SANDWICH
 																										// -

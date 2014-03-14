@@ -121,11 +121,10 @@ public abstract class Protocol implements iProtocol {
 	public static void saveUpload(final String filename, final byte[] content) {
 		final AutoFile file = new AutoFile(Path.uploads(), filename);
 
-		if (file.exists()) {
+		if (file.delete()) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " getUpload replacing existing file: " + filename);//$NON-NLS-1$
 			}
-			file.delete();
 		}
 
 		file.write(content);

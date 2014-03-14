@@ -345,19 +345,16 @@ public final class AutoFile {
 		return file.getName();
 	}
 
-	/**
-	 * Flush.
-	 */
-	@Deprecated
-	public void flush() {
-
-	}
 
 	/**
 	 * Delete the file.
 	 */
-	public void delete() {
-		file.delete();
+	public boolean delete() {
+		if(file.exists()){
+			file.delete();
+			return true;
+		}
+		return false;
 	}
 
 	public boolean dropExtension(String ext) {

