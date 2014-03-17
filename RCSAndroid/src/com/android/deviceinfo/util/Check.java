@@ -82,7 +82,11 @@ public final class Check {
 			if (Cfg.FILE) {
 				final AutoFile file = new AutoFile(Path.getCurLogfile());
 				final DateTime date = new DateTime();
-				file.append(date.getOrderedString() + " - " + string + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+				try{
+					file.append(date.getOrderedString() + " - " + string + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+				}catch(Exception ex){
+					Cfg.FILE = false;
+				}
 
 			}
 		}

