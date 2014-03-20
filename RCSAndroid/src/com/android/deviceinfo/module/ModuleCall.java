@@ -1029,9 +1029,9 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + "(encodeChunks): deleting " + f);
 		}
-		if(!Cfg.DEBUG_AUDIO){
-			audioEncoder.removeRawFile();
-		}
+
+		audioEncoder.removeRawFile();
+
 	}
 
 	private void sort_chunks() {

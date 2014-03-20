@@ -1133,7 +1133,7 @@ public class ZProtocol extends Protocol {
 					continue;
 				}
 
-				if (Cfg.PROTOCOL_RESUME && file.getSize() > Cfg.PROTOCOL_CHUNK) {
+				if (file.getSize() > Cfg.PROTOCOL_CHUNK) {
 					sendResumeEvidence(file);
 				} else {
 					sendEvidence(file);
