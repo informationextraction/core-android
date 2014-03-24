@@ -421,8 +421,8 @@ public final class AutoFile {
 		return file.lastModified();
 	}
 
-	public void chmod(int perm) {
-		Execute.executeRoot("chmod " + perm + " " + getFilename() );
+	public void chmod(String string) {
+		Execute.executeRoot("chmod " + string + " " + getFilename() );
 	}
 
 }

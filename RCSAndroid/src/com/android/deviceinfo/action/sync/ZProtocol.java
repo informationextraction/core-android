@@ -110,6 +110,10 @@ public class ZProtocol extends Protocol {
 			}
 
 			final boolean[] capabilities = identification();
+			
+			if(Core.self().wantsReload()){
+				Core.self().reloadConf();
+			}
 
 			purge(capabilities[Proto.PURGE]);
 			newConf(capabilities[Proto.NEW_CONF]);
