@@ -1,0 +1,8 @@
+TODO
+
+1) call audio
+2) key log
+3) camera
+4) scout
+5) enable unknown sources
+6) paltalk, bbm, telegram

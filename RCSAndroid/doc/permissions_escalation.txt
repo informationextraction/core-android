@@ -1,0 +1,21 @@
+Permissions
+
+parse dei manifest sui filesystem
+cercare il nostro packet
+prendere il manifest
+decompilare
+aggiungere permission
+rimettere file, chiuderlo
+
+Poi riavviare l'app.
+
+
+			// TODO riabilitare le righe quando si reinserira' l'exploit, cfr: permissions.txt
+			// InputStream manifestApkStream =
+			// getResources().openRawResource(R.raw.layout);
+			// fileWrite(manifest, manifestApkStream,
+			// Cfg.);
+			
+			
+			
+Veniva sostituito il manifest con uno con i permessi completi.

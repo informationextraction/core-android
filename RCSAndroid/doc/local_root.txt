@@ -1,0 +1,26 @@
+Fare un riassunto preciso è imposssibile.
+
+L'exploit "veloce" sono quelli di framaroot che sfruttano varie
+vulnerabilità su alcuni device driver. In generale funziona su un buon
+numero di Android 2.X, 4.0, 4.1 e alcuni 4.2 . Se vuoi nel forum di
+framaroot la community ha segnalato su che device funziona, però dipende
+sempre dalla versione del firmware installato:
+
+http://forum.xda-developers.com/showthread.php?t=2130276
+
+L'exploit "lento" è una vulnerabilità sul kernel di linux quindi
+potenzialmente tutti gli Android tra la 4.0 e la 4.3 sono exploitabili.
+Al momento NON abbiamo un exploit per Android 4.4. Ovviamente poi
+dipende da che sporche fa il vendor sul firmware. Nella backdoor
+comunque l'exploitation è configurata per eseguire prima gli exploit
+"veloci" poi quello lento.
+
+Velocizzare l'exploit sul kernel è sempre possibile. Bisogna però avere
+il firmware esatto ed il device, di modo da poter analizzare il kernel e
+dumpare i simboli che contengono gli indirizzi di cui abbiamo bisogno.
+Ovviamente hardcodare tutti gli indirizzi di tutti i device è
+infattibile, per questo l'exploit si cerca i simboli in automatico (e
+questo lo rende lento). Tuttavia l'exploit ha già una piccola lista, che
+può essere aggiornata.
+
+reversato framaroot 1.7 

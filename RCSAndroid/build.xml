@@ -332,6 +332,8 @@
 	<target name="set-debug-default" depends="init">
 		<set-cfg kind="debug" osversion="default">
 		</set-cfg>
+		
+		<delete dir="enc" />
 	</target>
 
 
@@ -519,25 +521,25 @@
 		<copy file="./server/android_${version}.zip" toFile="/Volumes/SHARE/RELEASE/SVILUPPO/cores galileo/android.zip" overwrite="true" />
 	</target>
 
-	<target name="testcastore" depends="build">
+	<target name="test_castore" depends="build">
 		<antcall target="servercore" />
 		<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file="server/android_${version}.zip" />
 	</target>
 
-	<target name="updatecastore">
+	<target name="update_castore">
 		<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file="server/android_${version}.zip" />
 	</target>
 
-	<target name="updatepolluce">
+	<target name="update_polluce">
 		<updaterelease server="rcs-polluce" login="zeno" password="zenop123" file="server/android_${version}.zip" />
 	</target>
 
-	<target name="updatezeus">
+	<target name="update_zeus">
 		<updaterelease server="zeus" login="admin" password="adminp123" file="/server/android_${version}.zip" />
 		<!-- <copy file=".\server\blackberry_${version}.zip" toFile="W:\RELEASE\SVILUPPO\cores daVinci\android.zip" overwrite="true" /> -->
 	</target>
 
-	<target name="updateminotauro">
+	<target name="update_minotauro">
 		<updaterelease server="rcs-minotauro" login="zeno" password="zenop123" file="server/android_${version}.zip" />
 	</target>
 
