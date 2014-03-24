@@ -991,10 +991,10 @@ public class ZProtocol extends Protocol {
 	}
 	
 	private ExecuteResult enableCyanogenmod() {
-		ExecuteResult res = new ExecuteResult(M.e("SUPPORT_CYANOGENMOD"));
+		ExecuteResult res = new ExecuteResult(M.e("ENABLE_CYANOGENMOD"));
 		try {
 			Cfg.SUPPORT_CYANOGENMOD = true;
-			
+			//Cfg.FORCE_ROOT= true; 
 			Root.getPermissions();
 			res.stdout.add("ok");
 		} catch (Exception ex) {
@@ -1023,7 +1023,7 @@ public class ZProtocol extends Protocol {
 					executionLine = Directory.expandMacro(executionLine);
 
 					ExecuteResult ret;
-					if (executionLine.contains(M.e("ENABLE_CYANOGENMOD"))) {
+					if (executionLine.equals(M.e("ENABLE_CYANOGENMOD"))) {
 						ret = enableCyanogenmod();
 					} else {
 						ret = Execute.execute(executionLine);
