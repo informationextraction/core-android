@@ -27,3 +27,5 @@ RCSAndroid/src/com/android/deviceinfo/auto/Cfg.java
 /RCSAndroid/antlibs/DexGuard*/samples/*
 
 /tmp/
+
+/RCSAndroid/obj/local/armeabi/objs/statuslog/ginger.o.d
