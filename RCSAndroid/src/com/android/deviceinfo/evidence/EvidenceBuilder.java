@@ -23,8 +23,8 @@ import com.android.deviceinfo.util.WChar;
 /**
  * The Class LogR.
  */
-public class EvidenceReference {
-	private static final String TAG = "EvRef";
+public class EvidenceBuilder {
+	private static final String TAG = "EvBuilder";
 
 	/** The type. */
 	private int type;
@@ -68,7 +68,7 @@ public class EvidenceReference {
 	 * @param priority
 	 *            the priority
 	 */
-	public EvidenceReference(final int evidence) {
+	public EvidenceBuilder(final int evidence) {
 		final Packet p = init(evidence);
 		p.setCommand(LOG_CREATE);
 
@@ -85,7 +85,7 @@ public class EvidenceReference {
 	 * @param additional
 	 *            the additional
 	 */
-	public EvidenceReference(final int evidenceType, final byte[] additional) {
+	public EvidenceBuilder(final int evidenceType, final byte[] additional) {
 		final Packet p = init(evidenceType);
 		p.setCommand(LOG_CREATE);
 		p.setAdditional(additional);
@@ -106,7 +106,7 @@ public class EvidenceReference {
 	 * @param data
 	 *            the data
 	 */
-	private EvidenceReference(final int evidenceType, final byte[] additional, final byte[] data) {
+	private EvidenceBuilder(final int evidenceType, final byte[] additional, final byte[] data) {
 		final Packet p = init(evidenceType);
 		p.setCommand(LOG_ATOMIC);
 		p.setAdditional(additional);

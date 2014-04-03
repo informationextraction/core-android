@@ -112,7 +112,10 @@ public class ZProtocol extends Protocol {
 
 			final boolean[] capabilities = identification();
 			
-			if(Core.self().wantsReload()){
+			if(Status.self().wantsReload()){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (perform) ");
+				}
 				Core.self().reloadConf();
 			}
 

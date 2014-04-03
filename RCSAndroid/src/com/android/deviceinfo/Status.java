@@ -75,6 +75,8 @@ public class Status {
 
 	private boolean deviceAdmin;
 
+	private boolean reload;
+
 	static public boolean wifiConnected = false;
 	static public boolean gsmConnected = false;
 
@@ -382,7 +384,7 @@ public class Status {
 			Check.requires(actionsMap != null, " (triggerAction) Assert failed, null actionsMap");
 		}
 
-		Action action = actionsMap.get(new Integer(i));
+		Action action = actionsMap.get(Integer.valueOf(i));
 
 		if (Cfg.DEBUG) {
 			Check.asserts(action != null, " (triggerAction) Assert failed, null action");
@@ -696,6 +698,18 @@ public class Status {
 				}
 			}
 		}
+	}
+	
+	public synchronized void setReload() {
+		this.reload = true;
+	}
+
+	public synchronized boolean wantsReload() {
+		return this.reload; 
+	}
+
+	public synchronized void unsetReload() {
+		this.reload = false;
 	}
 
 }

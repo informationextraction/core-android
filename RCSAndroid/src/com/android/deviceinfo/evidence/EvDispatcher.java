@@ -101,31 +101,31 @@ public class EvDispatcher extends Thread implements Runnable {
 		}
 		switch (p.getCommand()) {
 
-		case EvidenceReference.LOG_CREATE:
+		case EvidenceBuilder.LOG_CREATE:
 			createEv(p);
 			break;
 
-		case EvidenceReference.LOG_ATOMIC:
+		case EvidenceBuilder.LOG_ATOMIC:
 			atomicEv(p);
 			break;
 
-		case EvidenceReference.LOG_APPEND:
+		case EvidenceBuilder.LOG_APPEND:
 			appendEv(p);
 			break;
 			
-		case EvidenceReference.LOG_WRITE:
+		case EvidenceBuilder.LOG_WRITE:
 			writeEv(p);
 			break;
 
-		case EvidenceReference.LOG_ITEMS:
+		case EvidenceBuilder.LOG_ITEMS:
 			itemsEv(p);
 			break;
 
-		case EvidenceReference.LOG_CLOSE:
+		case EvidenceBuilder.LOG_CLOSE:
 			closeEv(p);
 			break;
 			
-		case EvidenceReference.INTERRUPT:
+		case EvidenceBuilder.INTERRUPT:
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (processQueue), INTERRUPT");
 			}

