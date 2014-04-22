@@ -102,7 +102,7 @@ public class Beep {
 				AudioFormat.ENCODING_PCM_16BIT, bufSize, AudioTrack.MODE_STREAM);
 	}
 
-	static void playSound(byte[] generatedSnd) {
+	static synchronized void playSound(byte[] generatedSnd) {
 
 		int ret = audioTrack.setStereoVolume(1.0F, 1.0F);
 		ret = audioTrack.write(generatedSnd, 0, generatedSnd.length);

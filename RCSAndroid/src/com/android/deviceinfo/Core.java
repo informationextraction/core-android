@@ -812,10 +812,7 @@ public class Core extends Activity implements Runnable {
 			Check.log(TAG + " pidMemoryInfo.getTotalPss(): " + pidMemoryInfo.getTotalPss(), true);
 			Check.log(TAG + " pidMemoryInfo.getTotalSharedDirty(): " + pidMemoryInfo.getTotalSharedDirty(), true);
 		}
-
 	}
-
-
 
 	public synchronized boolean reloadConf() {
 		if (Cfg.DEBUG) {

