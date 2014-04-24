@@ -9,6 +9,8 @@
 
 package com.android.deviceinfo;
 
+import java.util.Collection;
+
 import android.app.ActivityManager.RunningAppProcessInfo;
 
 import com.android.deviceinfo.auto.Cfg;
@@ -21,6 +23,7 @@ public class ProcessInfo {
 		this.processInfo = processInfo;
 		this.status = status;
 	}
+	
 	@Override
 	public String toString(){
 		if(Cfg.DEBUG){

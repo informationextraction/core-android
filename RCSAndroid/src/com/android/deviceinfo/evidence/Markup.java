@@ -135,7 +135,7 @@ public class Markup {
 		if (Cfg.DEBUG) {
 			Check.asserts(markupInit, "makeMarkupName: " + markupInit); //$NON-NLS-1$
 		}
-		
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (makeMarkupName): " + encName);
 		}
@@ -344,12 +344,20 @@ public class Markup {
 	public <T extends Serializable> T unserialize(T empty) {
 		if (isMarkup()) {
 			try {
-				T ret = (T) readMarkupSerializable();
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (unserialize): " + ret);//$NON-NLS-1$
+				Object obj = readMarkupSerializable();
+				if (obj instanceof Serializable) {
+					T ret = (T) obj;
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (unserialize): " + ret);//$NON-NLS-1$
+					}
+					return ret;
+				}else{
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (unserialize) Error, unserializable object.");
+					}
+					return empty;
 				}
-				return ret;
-			} catch (IOException e) {
+			} catch (Exception e) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (unserialize) Error: " + e);
 				}

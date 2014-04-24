@@ -11,6 +11,7 @@
 # Uncomment if working on MAC
 #ruby.path=ruby
 #sdk.dir=/Users/zeno/Developer/adt-bundle-mac/sdk
+#sdk.dir=/Users/alberto/Documents/Devel/Android/adt-bundle-mac/sdk
 
 # Uncomment if working on Windows
 #ruby.path=C:\\Program Files (x86)\\Ruby193\\bin

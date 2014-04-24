@@ -897,7 +897,7 @@ public class ZProtocol extends Protocol {
 				final byte[] content = new byte[size];
 				dataBuffer.read(content);
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " parseUpgrade: saving %s/%s", Path.upload(), filename); //$NON-NLS-1$
+					Check.log(TAG + " parseUpgrade: saving %s/%s", Path.uploads(), filename); //$NON-NLS-1$
 				}
 				Protocol.saveUpload(filename, content);
 				upgradeFiles.addElement(filename);

