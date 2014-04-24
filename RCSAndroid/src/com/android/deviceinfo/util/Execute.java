@@ -24,9 +24,12 @@ public class Execute {
 		String cmd = Directory.expandMacro(command);
 
 		if (Status.haveRoot()) {
-			cmd = String.format("%s %s %s", Configuration.shellFile, M.e("qzx"), command); // EXPORT
+			cmd = String.format("%s %s '%s'", Configuration.shellFile, M.e("qzx"), command); // EXPORT
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (executeRoot) " + cmd);
+			}	
 		}
-
+		
 		return execute(cmd);
 	}
 

