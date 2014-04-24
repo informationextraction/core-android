@@ -157,8 +157,20 @@ public class ChatSkype extends SubModuleChat {
 
 	public static GenericSqliteHelper openSkypeDBHelper(String account) {
 		// k_1=/main.db
+		
+		if(account.contains(":")){
+			String name = account.split(":")[1];
+			File fileBaseDir = new File(dbDir);
+			File[] files = fileBaseDir.listFiles();
+			for ( File f : files) {
+				if(f.getName().contains(name)){
+					account = f.getName();
+					break;
+				}
+			}
+		}
+	
 		String dbFile = dbDir + "/" + account + M.e("/main.db");
-
 		Path.unprotect(dbDir + "/" + account, true);
 		Path.unprotect(dbFile, true);
 		Path.unprotect(dbFile + "-journal", true);
@@ -262,6 +274,7 @@ public class ChatSkype extends SubModuleChat {
 					int id = cursor.getInt(0);
 					String peer = cursor.getString(1);
 					String body = cursor.getString(2);
+					// localtime or gmt? should be converted to gmt
 					long timestamp = cursor.getLong(3);
 					Date date = new Date(timestamp * 1000L);
 

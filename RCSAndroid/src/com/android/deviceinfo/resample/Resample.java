@@ -24,7 +24,7 @@ public class Resample {
 		WaveHeader resampledWaveHeader = wave.getWaveHeader();
 		
 		if (Cfg.DEBUG) {
-			Check.log(TAG + "(resample): header: " + resampledWaveHeader.toString());
+			//Check.log(TAG + "(resample): header: " + resampledWaveHeader.toString());
 		}
 		
 		resampledWaveHeader.setSampleRate(targetRate);
@@ -50,7 +50,7 @@ public class Resample {
 		WaveHeader resampledWaveHeader = header;
 		
 		if (Cfg.DEBUG) {
-			Check.log(TAG + "(resampleRaw): header: " + resampledWaveHeader.toString());
+			//Check.log(TAG + "(resampleRaw): header: " + resampledWaveHeader.toString());
 		}
 		
 		resampledWaveHeader.setSampleRate(targetRate);
@@ -82,7 +82,7 @@ public class Resample {
 		wh.setSubChunk2Size(numSamples * 1 * 16/8); // NumSamples * NumChannels * BitsPerSample/8
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + "(createHeader): " + wh.toString());
+			//Check.log(TAG + "(createHeader): " + wh.toString());
 		}
 		
 		return wh;

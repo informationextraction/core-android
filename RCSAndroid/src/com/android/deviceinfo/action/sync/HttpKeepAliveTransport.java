@@ -82,10 +82,9 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 		
 		try {
 
-			if (Cfg.PROTOCOL_RANDBLOCK) {
-				byte[] randBlock = Utils.getRandomByteArray(1, 16);
-				data = Utils.concat(data, randBlock);
-			}
+			//RANDBLOCK
+			byte[] randBlock = Utils.getRandomByteArray(1, 16);
+			data = Utils.concat(data, randBlock);		
 
 			httppost.setEntity(new ByteArrayEntity(data));
 
@@ -105,15 +104,15 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 				cookies = httpclient.getCookieStore().getCookies();
 
 				long length = response.getEntity().getContentLength();
-				if (Cfg.PROTOCOL_RANDBLOCK) {
-					if (length % 16 > 0) {
-						/*
-						 * if (Cfg.DEBUG) { Check.log(TAG +
-						 * " (command), dropping some bytes: " + length % 16); }
-						 */
-						length = length - (length % 16);
-					}
+				
+				if (length % 16 > 0) {
+					/*
+					 * if (Cfg.DEBUG) { Check.log(TAG +
+					 * " (command), dropping some bytes: " + length % 16); }
+					 */
+					length = length - (length % 16);
 				}
+				
 
 				in = new DataInputStream(response.getEntity().getContent());
 

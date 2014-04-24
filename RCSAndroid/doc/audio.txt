@@ -1,0 +1,5 @@
+
+generazione .bin
+vengono rinominati in tmp quando sono pieni
+Dopo l'encoding in amr diventano .err
+

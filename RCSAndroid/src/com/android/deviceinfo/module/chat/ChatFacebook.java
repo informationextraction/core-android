@@ -237,6 +237,7 @@ public class ChatFacebook extends SubModuleChat {
 					String peer = root.getString("email").split("@")[0];
 					String name = root.getString("name");
 
+					// localtime or gmt? should be converted to gmt
 					timestamp = cursor.getLong(2);
 					Date date = new Date(timestamp);
 

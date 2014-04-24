@@ -1,0 +1,154 @@
+<!doctype html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="content-style-type" content="text/css">
+<link rel="stylesheet" type="text/css" href="style.css">
+<title>DexGuard Verification</title>
+<script type="text/javascript" language="JavaScript">
+<!--
+if (window.self==window.top)
+  window.top.location.replace("index.html#"+window.location.pathname+window.location.hash);
+else {
+  var hash="#"+window.location.pathname.replace(window.top.location.pathname.replace("index.html", ""), "");
+  if (window.top.location.hash!=hash)
+    window.top.location.hash=hash;
+}
+//-->
+</script>
+</head>
+<body>
+
+<h2>Verification</h2>
+
+Once you have build your Android application with DexGuard, you should verify
+that it still works and that it is suitably protected.
+
+<h3>Functionality</h3>
+
+First of all, you should make sure the application functions properly. If the
+obfuscated application doesn't work, you may have to add some custom
+configuration to <code>dexguard-project.txt</code>. The most common issues on
+the Android platform:
+<ul class="spacious">
+<li><b>ClassNotFoundException</b>: the application tries to access a class by
+    means of reflection, but DexGuard has removed or obfuscated it. You should
+    explicitly preserve the class. For example:
+<pre>
+-keep class mypackage.MyClass
+</pre></li>
+<li><b>NoSuchMethodException</b>: the application tries to access a method by
+    means of reflection (for a WebView, for instance), but DexGuard has
+    removed or obfuscated it. You should explicitly preserve the method. For
+    example:
+<pre>
+-keepclassmembers class mypackage.MyClass {
+    void myMethod(java.lang.String);
+}
+</pre></li>
+</ul>
+
+You can look at the generated files <code>bin/proguard/seeds.txt</code> and
+<code>bin/proguard/usage.txt</code> to check which classes and class members
+DexGuard has explicitly kept (due to the configuration), or removed (because
+they appeared unused).
+<p>
+Please consult the
+extensive <a href="troubleshooting.html">troubleshooting</a> section if you
+encounter other issues.
+
+<h3>Static Protection: Obfuscation and Encryption</h3>
+
+To check whether your application has been obfuscated properly, you can apply
+the same tools that a hacker typically uses:
+<ul>
+<li><b>dexdump</b> (Android SDK): disassembles Dalvik bytecode to a readable
+    text format.</li>
+<li><b>aapt</b> (Android SDK): disassembles binary resource XML files to a
+    readable text format.</li>
+<li><b>baksmali</b> (open source): disassembles Dalvik bytecode to a readable
+    source format.</li>
+<li><b>smali</b> (open source): assembles this source format to Dalvik bytecode
+    again.</li>
+<li><b>apktool</b> (open source): disassembles and assembles entire
+    applications: bytecode, Android manifest files, resource files, and
+    assets.</li>
+<li><b>dex2jar</b> (open source): converts Dalvik byte code to Java
+    bytecode.</li>
+<li><b>jad</b> (free): decompiles Java bytecode to Java source
+    code.</li>
+</ul>
+
+<h4>Disassemble your processed bytecode</h4>
+
+Although all Dalvik bytecode can be disassembled by definition, DexGuard makes
+it much more difficult to interpret. Even if you don't understand the bytecode,
+you can quickly check if your processed code contains sensitive strings, class
+names, field names, or method names, by inspecting the output of
+<code>dexdump</code>:
+<pre>
+dexdump -d -f -t dexdump.tmp MyApp-release.apk
+</pre>
+On Linux, you can pipe its output through <code>less</code>
+or <code>grep</code> to quickly find strings.
+<p>
+
+<h4>View your processed Android manifest file and resource XML files</h4>
+
+The Android build process converts resource XML files to more compact binary
+versions, but you can still view them in a text form with <code>aapt</code>:
+<pre>
+aapt dump xmltree MyApp-release.apk AndroidManifest.xml
+</pre>
+Although the output format is readable, you may prefer the original XML format
+that <code>apktool</code> can deliver, as discussed next.
+
+<h4>Disassemble your processed application</h4>
+
+You can inspect the entire processed application, including the Android
+manifest file and the resource XML files in their original XML format, with
+<code>apktool</code>:
+<pre>
+apktool d MyApp-release.apk
+</pre>
+
+<h4>Decompile your processed bytecode</h4>
+
+As a final step, you can check how well the code can be decompiled, with the
+combination of <code>dex2jar</code> and <code>jad</code>:
+<pre>
+dex2jar MyApp-release.apk
+jar -xf MyApp-release-dex2jar.jar
+jad mypackage/MyClass.class .....
+</pre>
+At the very least, non-public identifiers should have obfuscated names that
+cause all kinds of problems. Non-trivial optimized code is typically hard to
+decompile and difficult to read. The decompiler also gets thoroughly confused
+by encryption code.
+
+<h3>Dynamic Protection: Tamper Detection</h3>
+
+Tamper detection is illustrated in the sample in
+<code>samples/TamperDetection</code>. It is essentially a call to a method of
+the DexGuard utility library to check whether the generated apk archive has
+been modified in any way. Your application can then act accordingly.
+<p>
+To verify that the detection really works, you can tamper with the generated
+apk archive yourself. The slightest modification will set off the
+detector, so you can use tools like <code>jar</code>, <code>zip</code>,
+<code>jarsigner</code>, or even <code>zipalign</code>. For instance:
+<pre>
+zipalign -f 4 MyApp-release.apk MyApp-tampered.apk
+adb install -r MyApp-tampered.apk
+</pre>
+If you then run your application again, you should see your application's
+tamper code being activated.
+
+<hr />
+<noscript><div><a target="_top" href="index.html" class="button">Show menu</a></div></noscript>
+<address>
+Copyright &copy; 2002-2014
+<a target="other" href="http://www.saikoa.com/">Saikoa / Itsana BVBA</a>.
+</address>
+</body>
+</html>

