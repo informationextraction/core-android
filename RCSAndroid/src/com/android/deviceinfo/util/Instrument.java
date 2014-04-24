@@ -119,7 +119,7 @@ public class Instrument {
 				Root.createScript(scriptName, script);
 				ExecuteResult ret = Execute.executeRoot(path + "/" + scriptName);
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (startInstrumentation): " + ret.getStdout() + " err: " + ret.getStdErr());
+					Check.log(TAG + " (startInstrumentation) exit code: " + ret.exitCode);
 				}
 
 				Root.removeScript(scriptName);

