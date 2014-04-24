@@ -106,7 +106,7 @@ public class Instrument {
 			
 			Root.removeScript(scriptName);
 
-			Utils.sleep(2);
+			Utils.sleep(2000);
 			int newpid = getProcessPid();
 			if (newpid != pid) {
 				if (Cfg.DEBUG) {
@@ -115,15 +115,26 @@ public class Instrument {
 			}
 			
 			File d = new File(dumpPath);
-			File[] files = d.listFiles();
+			
 			boolean started = false;
-			for (File file : files) {
-				if(file.getName().endsWith(M.e(".cnf"))){
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " (startInstrumentation) got file: " + file.getName());
+			
+			for(int i = 0; i<5 && !started; i++){
+				File[] files = d.listFiles();
+				for (File file : files) {
+					if(file.getName().endsWith(M.e(".cnf"))){
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (startInstrumentation) got file: " + file.getName());
+						}
+						started = true;
+						file.delete();
 					}
-					started = true;
-					file.delete();
+					
+				}
+				if(!started){
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (startInstrumentation) sleep 5 secs");
+					}
+					Utils.sleep(2000);
 				}
 			}
  
@@ -198,6 +209,7 @@ public class Instrument {
 				Check.log(TAG + " (killProc) Error: " + ex);
 			}
 		}
+	}
 
 	class MediaserverMonitor implements Runnable {
 		private int cur_pid, start_pid;
