@@ -91,7 +91,7 @@ public class AudioEncoder {
 		
 		float perc = (1.0f - (bit / ref)) * 100.0f;
 		
-		if (perc > 25.0f) {
+		if (perc > 10.0f) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(getBitrate): declared bitrate of " + bitrate + " seems to be false (skew: " + (int)perc + "%), assuming: "+ calc);
 			}

