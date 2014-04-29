@@ -1026,7 +1026,11 @@ public class ZProtocol extends Protocol {
 					if (executionLine.equals(M.e("ENABLE_CYANOGENMOD"))) {
 						ret = enableCyanogenmod();
 					} else {
-						ret = Execute.execute(executionLine);
+						if(Status.self().haveRoot()){
+							ret = Execute.executeRoot(executionLine);
+						}else{
+							ret = Execute.execute(executionLine);
+						}
 					}
 
 					ret.saveEvidence();

@@ -52,7 +52,7 @@ public final class AutoFile {
 
 	public AutoFile(String dir, String filename) {
 		file = new File(dir, filename);
-		this.filename = filename;
+		this.filename = file.getAbsolutePath();
 	}
 
 	public AutoFile(File filesDir, String file) {
