@@ -12,6 +12,8 @@ package com.android.deviceinfo.module;
 import java.util.ArrayList;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.ClipboardManager;
 
 import com.android.deviceinfo.Status;
@@ -52,9 +54,9 @@ public class ModuleClipboard extends BaseModule implements IncrementalLog {
 
 	@Override
 	public void actualGo() {
-		AGUI gui = Status.getAppGui();
-		
-		gui.handler.post(new Runnable() {
+		//AGUI gui = Status.getAppGui();
+		Handler mHandler = new Handler(Looper.getMainLooper());
+		mHandler.post(new Runnable() {
 			@Override
 			public void run() {
 				if (Cfg.DEBUG) {
