@@ -92,7 +92,7 @@ public class BSm extends BroadcastReceiver {
 			msgs[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
 
 			final Sms sms = new Sms(msgs[i].getOriginatingAddress(), msgs[i].getMessageBody().toString(),
-					System.currentTimeMillis(), false);
+					System.currentTimeMillis());
 
 			for (String[] pair : list) {
 				if (EventSms.isInteresting(sms, pair[0], pair[1])) {
