@@ -92,7 +92,7 @@ public class ChatLine extends SubModuleChat {
 
 			helper.deleteDb();
 
-		} catch (IOException e) {
+		} catch (Exception e) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notifyStopProgram) Error: " + e);
 			}
