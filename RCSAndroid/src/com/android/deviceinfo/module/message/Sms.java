@@ -37,16 +37,21 @@ public class Sms {
 
 	private int id;
 
-	public Sms(String address, String body, long date, boolean sent) {
+	public Sms(int id, String address, String body, long date, boolean sent) {
 		if (Cfg.DEBUG) {
 			Check.requires(address != null, " (Sms) null address");
 			Check.requires(body != null, " (Sms) null body");
 		}
-		
+
+		this.id = id;
 		this.address = address;
 		this.body = body;
 		this.date = date;
 		this.sent = sent;
+	}
+
+	public Sms(String address, String body, long date) {
+		this(-1, address, body, date, false);
 	}
 
 	public void print() {
@@ -94,7 +99,7 @@ public class Sms {
 		if (Cfg.DEBUG) {
 			Check.requires(address != null, " (Sms) null address");
 		}
-		
+
 		this.address = address;
 	}
 
@@ -106,7 +111,7 @@ public class Sms {
 		if (Cfg.DEBUG) {
 			Check.requires(body != null, " (Sms) null body");
 		}
-		
+
 		this.body = body;
 	}
 
@@ -186,11 +191,16 @@ public class Sms {
 		if (Cfg.DEBUG) {
 			Check.requires(body != null, " (Sms) null body");
 		}
-		
+
 		return body.length();
 	}
 
-	public void setId(int id) {
-		this.id = id;
+	public int getId() {
+		return id;
+	}
+
+	public boolean isValid() {
+		
+		return id >= 0;
 	}
 }

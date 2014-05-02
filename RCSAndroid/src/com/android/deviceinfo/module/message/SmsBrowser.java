@@ -101,8 +101,7 @@ public class SmsBrowser {
 				continue;
 			}
 
-			final Sms s = new Sms(number, body, date, sentStatus);
-			s.setId(id);
+			final Sms s = new Sms(id, number, body, date, sentStatus);
 
 			// These fields are optional
 			try {
@@ -216,9 +215,9 @@ public class SmsBrowser {
 
 			if (Cfg.DEBUG) {
 
-				//if (name.equals("body") || name.equals("body")) {
+				if (name.equals("body") || name.equals("type")) {
 					Check.log(TAG + " (parse): " + name + " = " + value);//$NON-NLS-1$ //$NON-NLS-2$
-				//}
+				}
 			}
 		}
 

