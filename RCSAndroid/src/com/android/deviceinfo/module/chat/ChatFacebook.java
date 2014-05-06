@@ -186,24 +186,25 @@ public class ChatFacebook extends SubModuleChat {
 				helper = GenericSqliteHelper.open(dbDir, dbFile2);
 			}
 			if (helper != null) {
-				List<FbConversation> conversations = getFbConversations(helper, account_uid);
-				for (FbConversation conv : conversations) {
+				try {
+					readFB(helper, "thread_id");
+					return;
+				} catch (Exception ex) {
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " (readFbMessageHistory) conversation: " + conv.id);
-					}
-					long lastConvId = lastFb.containsKey(conv.id) ? lastFb.get(conv.id) : 0;
-					if (lastConvId < conv.timestamp) {
-						if (Cfg.DEBUG) {
-							Check.log(TAG + " (readFbMessageHistory) lastConvId(" + lastConvId + ") < conv.timestamp("
-									+ conv.timestamp + ")");
-						}
-						long lastReadId = (long) fetchMessages(helper, conv, lastConvId);
-
-						if (lastReadId > 0) {
-							updateMarkupFb(conv.id, lastReadId, true);
-						}
+						Check.log(TAG + " (readFbMessageHistory) Error: " + ex);
 					}
 				}
+				
+				try {
+					readFB(helper, "thread_key");
+					return;
+					
+				} catch (Exception ex) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (readFbMessageHistory) Error: " + ex);
+					}
+				}
+		
 			} else {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (getFbConversations) Error: null helper");
@@ -216,11 +217,32 @@ public class ChatFacebook extends SubModuleChat {
 
 	}
 
-	private long fetchMessages(GenericSqliteHelper helper, final FbConversation conv, long lastConvId) {
+	private void readFB(GenericSqliteHelper helper, String field_id) {
+		List<FbConversation> conversations = getFbConversations(field_id, helper, account_uid);
+		for (FbConversation conv : conversations) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (readFbMessageHistory) conversation: " + conv.id);
+			}
+			long lastConvId = lastFb.containsKey(conv.id) ? lastFb.get(conv.id) : 0;
+			if (lastConvId < conv.timestamp) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (readFbMessageHistory) lastConvId(" + lastConvId + ") < conv.timestamp("
+							+ conv.timestamp + ")");
+				}
+				long lastReadId = (long) fetchMessages("thread_key", helper, conv, lastConvId);
+
+				if (lastReadId > 0) {
+					updateMarkupFb(conv.id, lastReadId, true);
+				}
+			}
+		}
+	}
+
+	private long fetchMessages(String id_field, GenericSqliteHelper helper, final FbConversation conv, long lastConvId) {
 		final ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
 
 		String[] projection = new String[] { "text", "sender", "timestamp_ms" };
-		String selection = String.format(M.e("thread_id = '%s' and text != '' and timestamp_ms > %s"), conv.id,
+		String selection = String.format(id_field + M.e(" = '%s' and text != '' and timestamp_ms > %s"), conv.id,
 				lastConvId);
 		String order = "timestamp_ms";
 
@@ -311,7 +333,7 @@ public class ChatFacebook extends SubModuleChat {
 		getModule().saveEvidence(messages);
 	}
 
-	private List<FbConversation> getFbConversations(GenericSqliteHelper helper, final String account) {
+	private List<FbConversation> getFbConversations(String id_field, GenericSqliteHelper helper, final String account) {
 		if (helper == null) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getFbConversations) Error: null helper");
@@ -321,7 +343,8 @@ public class ChatFacebook extends SubModuleChat {
 
 		final List<FbConversation> conversations = new ArrayList<FbConversation>();
 
-		String[] projection = new String[] { "thread_id", "participants", "timestamp_ms" };
+		// "thread_id"
+		String[] projection = new String[] { id_field, "participants", "timestamp_ms" };
 		String selection = "timestamp_ms > 0 ";
 
 		RecordVisitor visitor = new RecordVisitor(projection, selection) {
