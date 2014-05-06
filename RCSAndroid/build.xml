@@ -517,7 +517,7 @@
 	</target>
 
 	<target name="update">
-		<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file="server/android_${version}.zip" />
+		<updaterelease server="rcs-castore" login="zenobatch" password="castoreP123" file="server/android_${version}.zip" />
 		<copy file="./server/android_${version}.zip" toFile="/Volumes/SHARE/RELEASE/SVILUPPO/cores galileo/android.zip" overwrite="true" />
 	</target>
 
@@ -527,11 +527,11 @@
 	</target>
 
 	<target name="update_castore">
-		<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file="server/android_${version}.zip" />
+		<updaterelease server="rcs-castore" login="zenobatch" password="castoreP123" file="server/android_${version}.zip" />
 	</target>
 
 	<target name="update_polluce">
-		<updaterelease server="rcs-polluce" login="zeno" password="zenop123" file="server/android_${version}.zip" />
+		<updaterelease server="rcs-polluce" login="zeno" password="Pollucep123" file="server/android_${version}.zip" />
 	</target>
 
 	<target name="update_zeus">

