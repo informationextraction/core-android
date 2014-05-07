@@ -77,7 +77,6 @@ public class ChatFacebook extends SubModuleChat {
 		if (!fetchFb(dirOrca)) {
 			fetchFb(dirKatana);
 		}
-
 	}
 
 	private boolean fetchFb(String dir) {
@@ -229,7 +228,7 @@ public class ChatFacebook extends SubModuleChat {
 					Check.log(TAG + " (readFbMessageHistory) lastConvId(" + lastConvId + ") < conv.timestamp("
 							+ conv.timestamp + ")");
 				}
-				long lastReadId = (long) fetchMessages("thread_key", helper, conv, lastConvId);
+				long lastReadId = (long) fetchMessages(field_id, helper, conv, lastConvId);
 
 				if (lastReadId > 0) {
 					updateMarkupFb(conv.id, lastReadId, true);
