@@ -31,7 +31,7 @@ public class ChatLine extends SubModuleChat {
 	private long lastLine;
 	Semaphore readChatSemaphore = new Semaphore(1, true);
 
-	private String account = "local";
+	private String account = "";
 	private String account_mid = "mid";
 
 	private GenericSqliteHelper helper;

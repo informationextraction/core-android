@@ -153,7 +153,7 @@
 	</target>
 
 	<target name="libs-debug" depends="encrypt-suid, encrypt-selinuxsuid, encrypt-exploitcheck, encrypt-localexploit, encrypt-selinuxexploitcheck, 
-	    encrypt-hijacklibrary-debug, encrypt-hijacker, encrypt-selinuxexploit">
+	    encrypt-hijacklibrary, encrypt-hijacker, encrypt-selinuxexploit">
 	</target>
 
 	<target name="init" depends="salt" unless="build.number">

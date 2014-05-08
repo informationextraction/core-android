@@ -24,16 +24,11 @@ public class Execute {
 		String cmdExpanded = Directory.expandMacro(command);
 		String[] cmd = null;
 		if (Status.haveRoot()) {
-<<<<<<< HEAD
-			cmd = String.format("%s %s '%s'", Configuration.shellFile, M.e("qzx"), command); // EXPORT
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (executeRoot) " + cmd);
-=======
+
 			cmd = new String[] { Configuration.shellFile, M.e("qzx"), cmdExpanded };
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (executeRoot) " + cmdExpanded);
->>>>>>> refs/heads/9.2.x
 			}
 		}
 
