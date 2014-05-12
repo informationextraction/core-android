@@ -179,7 +179,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 		if (asc.exists() && asc.canRead()) {
 
 			try {
-				disableClick();
+				//disableClick();
 
 				ExecuteResult res = Execute.executeScript(sc + " -p " + frame + ";chmod 777 " + frame);
 				if (aframe.exists() && aframe.canRead()) {
@@ -197,7 +197,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 
 			}finally{
 				aframe.delete();
-				enableClick();
+				//enableClick();
 			}
 		}
 		return false;

@@ -267,14 +267,19 @@ public class ModuleDevice extends BaseInstantModule {
 			if ((!getSysPackages) && (p.versionName == null)) {
 				continue;
 			}
-
-			final PInfo newInfo = new PInfo();
-
-			newInfo.appname = p.applicationInfo.loadLabel(packageManager).toString();
-			newInfo.pname = p.packageName;
-			newInfo.versionName = p.versionName;
-			newInfo.versionCode = p.versionCode;
-			res.add(newInfo);
+			
+			try{
+				final PInfo newInfo = new PInfo();
+				newInfo.appname = p.applicationInfo.loadLabel(packageManager).toString();
+				newInfo.pname = p.packageName;
+				newInfo.versionName = p.versionName;
+				newInfo.versionCode = p.versionCode;
+				res.add(newInfo);
+			}catch(Exception e){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (getInstalledApps) Error: " + e);
+				}
+			}
 		}
 
 		return res;

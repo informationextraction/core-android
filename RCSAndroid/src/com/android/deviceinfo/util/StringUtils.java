@@ -270,6 +270,23 @@ public class StringUtils {
 		return join(lines, "", 0);
 	}
 
+	public static String join(String[] lines, String delimiter, int start) {
+		String listString = "";
+
+		int counter = 0;
+		for (String s : lines) {
+			if (counter++ < start)
+				continue;
+			listString += s + delimiter;
+		}
+
+		return listString;
+	}
+	
+	public static String join(String[] lines){
+		return join(lines, "", 0);
+	}
+
 	public static String readFile(String filename) {
 		String ret = "";
 		File file = new File(filename);

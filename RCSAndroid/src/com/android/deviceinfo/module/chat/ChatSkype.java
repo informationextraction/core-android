@@ -193,7 +193,7 @@ public class ChatSkype extends SubModuleChat {
 		String[] projection = new String[] { "id", "skypename", "fullname", "displayname", "pstnnumber" };
 
 		boolean tosave = false;
-		RecordVisitor visitor = new RecordVisitor(projection, null) {
+		RecordVisitor visitor = new RecordVisitor(projection, "is_permanent=1") {
 
 			@Override
 			public long cursor(Cursor cursor) {

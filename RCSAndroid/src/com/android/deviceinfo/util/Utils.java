@@ -36,10 +36,15 @@ public final class Utils {
 	 * Sleep.
 	 * 
 	 * @param t
-	 *            the t
+	 *            ms to sleep
 	 */
 	public static void sleep(final int t) {
 		try {
+			if (Cfg.DEBUG) {
+				if(t<50){
+					Check.log(TAG + " (sleep) do you mean s? it's ms");
+				}
+			}
 			Thread.sleep(t);
 		} catch (final InterruptedException e) {
 			if (Cfg.EXCEPTION) {
