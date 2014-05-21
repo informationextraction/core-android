@@ -91,10 +91,10 @@ public class ModuleCalendar extends BaseModule implements Observer<ProcessInfo> 
 
 	@Override
 	public int notification(ProcessInfo process) {
-		if (process.processInfo.processName.contains("android.calendar")) {
+		if (process.processInfo.contains("android.calendar")) {
 			if (process.status == ProcessStatus.STOP) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (notification), observing found: " + process.processInfo.processName);
+					Check.log(TAG + " (notification), observing found: " + process.processInfo);
 				}
 				actualGo();
 			}

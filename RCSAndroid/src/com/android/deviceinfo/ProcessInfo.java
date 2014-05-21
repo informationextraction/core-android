@@ -16,11 +16,11 @@ import android.app.ActivityManager.RunningAppProcessInfo;
 import com.android.deviceinfo.auto.Cfg;
 
 public class ProcessInfo {
-	public RunningAppProcessInfo processInfo;
+	public String processInfo;
 	public ProcessStatus status;
 
-	public ProcessInfo(RunningAppProcessInfo processInfo, ProcessStatus status) {
-		this.processInfo = processInfo;
+	public ProcessInfo(String currentForeground, ProcessStatus status) {
+		this.processInfo = currentForeground;
 		this.status = status;
 	}
 	

