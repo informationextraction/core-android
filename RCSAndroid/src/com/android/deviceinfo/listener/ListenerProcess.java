@@ -133,7 +133,7 @@ public class ListenerProcess extends Listener<ProcessInfo> implements Observer<S
 		for (final Object element : list) {
 			final RunningAppProcessInfo running = (RunningAppProcessInfo) element;
 			
-			if (running.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+			if (running.importance == RunningAppProcessInfo.IMPORTANCE_VISIBLE) {
 
 				currentRunning.put(running.processName, running);
 				

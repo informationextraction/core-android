@@ -1,26 +1,56 @@
-Fare un riassunto preciso è imposssibile.
+Fare un riassunto preciso ÔøΩ imposssibile.
 
 L'exploit "veloce" sono quelli di framaroot che sfruttano varie
-vulnerabilità su alcuni device driver. In generale funziona su un buon
+vulnerabilitÔøΩ su alcuni device driver. In generale funziona su un buon
 numero di Android 2.X, 4.0, 4.1 e alcuni 4.2 . Se vuoi nel forum di
-framaroot la community ha segnalato su che device funziona, però dipende
+framaroot la community ha segnalato su che device funziona, perÔøΩ dipende
 sempre dalla versione del firmware installato:
 
 http://forum.xda-developers.com/showthread.php?t=2130276
 
-L'exploit "lento" è una vulnerabilità sul kernel di linux quindi
+L'exploit "lento" ÔøΩ una vulnerabilitÔøΩ sul kernel di linux quindi
 potenzialmente tutti gli Android tra la 4.0 e la 4.3 sono exploitabili.
 Al momento NON abbiamo un exploit per Android 4.4. Ovviamente poi
 dipende da che sporche fa il vendor sul firmware. Nella backdoor
-comunque l'exploitation è configurata per eseguire prima gli exploit
+comunque l'exploitation ÔøΩ configurata per eseguire prima gli exploit
 "veloci" poi quello lento.
 
-Velocizzare l'exploit sul kernel è sempre possibile. Bisogna però avere
+Velocizzare l'exploit sul kernel ÔøΩ sempre possibile. Bisogna perÔøΩ avere
 il firmware esatto ed il device, di modo da poter analizzare il kernel e
 dumpare i simboli che contengono gli indirizzi di cui abbiamo bisogno.
-Ovviamente hardcodare tutti gli indirizzi di tutti i device è
+Ovviamente hardcodare tutti gli indirizzi di tutti i device ÔøΩ
 infattibile, per questo l'exploit si cerca i simboli in automatico (e
-questo lo rende lento). Tuttavia l'exploit ha già una piccola lista, che
-può essere aggiornata.
+questo lo rende lento). Tuttavia l'exploit ha giÔøΩ una piccola lista, che
+puÔøΩ essere aggiornata.
 
 reversato framaroot 1.7 
+
+
+selinux_suidext:
+
+	if(argc < 2) {
+	  LOG("Usage: ");
+	  LOG("%s", argv[0]);
+	  LOG(" <command>\n");
+	  LOG("fb - try to capture a screen snapshot\n");
+	  LOG("vol - kill VOLD twice\n");
+	  LOG("reb - reboot the phone\n");
+	  LOG("blr - mount /system in READ_ONLY\n");
+	  LOG("blw - mount /system in READ_WRITE\n");
+	  LOG("rt - install the root shell in /system/bin/rilcap\n");
+	  LOG("ru - remove the root shell from /system/bin/rilcap\n");
+	  LOG("rf <mntpoint> <file> - remove <file> from <mntpoint>");
+	  LOG("sd - mount /sdcard\n");
+	  LOG("air - check if the shell has root privileges\n");
+	  LOG("qzx \"command\" - execute the given commandline\n");
+	  LOG("fhc <src> <dest> - copy <src> to <dst>\n");
+	  LOG("fhs <mntpoint> <src> <dest> - copy <src> to <dst> on mountpoint <mntpoint>\n");
+	  LOG("fho <user> <group> <file> - chown <file> to <user>:<group>\n");
+	  LOG("pzm <newmode> <file> - chmod <file> to <newmode>\n");
+	  LOG("adm <package name/receiver>\n");
+	  LOG("qzs - start a root shell\n");
+	  LOG("lid <proc> <dest file> - return process id for <proc> write it to <dest file>\n");
+	  LOG("ape <content> <dest file> - append text <content> to <dest files> if not yet present\n");
+	  LOG("srh <content> <file> - search for <content> in <file>\n");
+	  
+	  

