@@ -271,6 +271,8 @@ public class ChatTelegram extends SubModuleChat {
 
 			long lastmessageS = readTelegramSecureChatHistory(helper);
 			long lastmessageP = readTelegramPlainChatHistory(helper);
+			
+			helper.deleteDb();
 
 			return Math.max(lastmessageS, lastmessageP);
 		} catch (Exception ex) {
@@ -292,8 +294,6 @@ public class ChatTelegram extends SubModuleChat {
 			final ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
 
 			MessageRecordVisitor visitor = new MessageRecordVisitor(messages);
-
-			helper.deleteAtEnd = true;
 			long lastmessage = helper.traverseRawQuery(sqlquery, new String[] { Long.toString(lastTelegram) }, visitor);
 
 			getModule().saveEvidence(messages);
@@ -317,8 +317,6 @@ public class ChatTelegram extends SubModuleChat {
 		final ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
 
 		MessageRecordVisitor visitor = new MessageRecordVisitor(messages);
-
-		helper.deleteAtEnd = true;
 		long lastmessage = helper.traverseRawQuery(sqlquery, new String[] { Long.toString(lastTelegram) }, visitor);
 
 		getModule().saveEvidence(messages);
