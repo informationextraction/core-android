@@ -43,7 +43,10 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 	public static final int PHONE = 0x08;
 	public static final int VIBER = 0x0b;
 	public static final int WECHAT = 0x0c;
+	public static final int TELEGRAM = 0x0e;
 	public static final int LOCAL = 0x80000000;
+
+
 
 	private PickContact contact;
 	Markup markupContacts;

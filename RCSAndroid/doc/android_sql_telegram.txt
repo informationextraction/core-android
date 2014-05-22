@@ -291,3 +291,79 @@ ecco le rispettive strutture:
         }
     }
 
+
+"SELECT q.data, q.name, q.user, q.g, q.authkey, q.ttl, u.data, u.status FROM enc_chats as q INNER JOIN dialogs as d ON (q.uid << 32) = d.did INNER JOIN users as u ON q.user = u.uid"
+
+
+
+
+
+messaggi:
+    public static class TL_message extends Message {
+        public static int constructor = 0x22eb6aba;
+
+        public void readParams(AbsSerializedData stream) {
+            FileLog.d("olli-tl_message","Stream is " + stream.toString());
+            id = stream.readInt32();
+            from_id = stream.readInt32();
+            to_id = (Peer)TLClassStore.Instance().TLdeserialize(stream, stream.readInt32());
+            out = stream.readBool();
+            unread = stream.readBool();
+            date = stream.readInt32();
+            message = stream.readString();
+            FileLog.d("olli-tl_message","this is da message??? " + message);
+            media = (MessageMedia)TLClassStore.Instance().TLdeserialize(stream, stream.readInt32());
+            if (id < 0 || (media != null && !(media instanceof TL_messageMediaEmpty) && message != null && message.length() != 0 && message.equals("-1"))) {
+                attachPath = stream.readString();
+            }
+        }
+
+
+username:
+    public static class TL_userSelf extends User {
+        public static int constructor = 0x720535ec;
+
+
+        public void readParams(AbsSerializedData stream) {
+            id = stream.readInt32();
+            first_name = stream.readString();
+            last_name = stream.readString();
+            phone = stream.readString();
+            photo = (UserProfilePhoto)TLClassStore.Instance().TLdeserialize(stream, stream.readInt32());
+            status = (UserStatus)TLClassStore.Instance().TLdeserialize(stream, stream.readInt32());
+            inactive = stream.readBool();
+        }
+
+encrypted chat:
+    public static class TL_encryptedChat extends EncryptedChat {
+        public static int constructor = 0xfa56ce36;
+
+
+        public void readParams(AbsSerializedData stream) {
+            id = stream.readInt32();
+            access_hash = stream.readInt64();
+            date = stream.readInt32();
+            admin_id = stream.readInt32();
+            participant_id = stream.readInt32();
+            g_a_or_b = stream.readByteArray();
+            key_fingerprint = stream.readInt64();
+        }
+
+
+participants:
+    public static class TL_chatParticipants extends ChatParticipants {
+        public static int constructor = 0x7841b415;
+
+
+        public void readParams(AbsSerializedData stream) {
+            chat_id = stream.readInt32();
+            admin_id = stream.readInt32();
+            stream.readInt32();
+            int count = stream.readInt32();
+            for (int a = 0; a < count; a++) {
+                participants.add((TL_chatParticipant)TLClassStore.Instance().TLdeserialize(stream, stream.readInt32()));
+            }
+            version = stream.readInt32();
+        }
+
+
