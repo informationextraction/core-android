@@ -271,6 +271,7 @@ public class ChatTelegram extends SubModuleChat {
 
 			long lastmessageS = readTelegramSecureChatHistory(helper);
 			long lastmessageP = readTelegramPlainChatHistory(helper);
+			long lastmessageG = readTelegramGroupChatHistory(helper);
 			
 			helper.deleteDb();
 
@@ -323,6 +324,11 @@ public class ChatTelegram extends SubModuleChat {
 		return lastmessage;
 	}
 
+	private long readTelegramGroupChatHistory(GenericSqliteHelper helper2) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 	class MessageRecordVisitor extends RecordVisitor {
 		private ArrayList<MessageChat> messages;
 
@@ -373,9 +379,10 @@ public class ChatTelegram extends SubModuleChat {
 	};
 
 	private ChatGroups getTelegramGroups(GenericSqliteHelper helper) {
-		// SQLiteDatabase db = helper.getReadableDatabase();
+
+		
 		final ChatGroups groups = new ChatGroups();
-		RecordVisitor visitor = new RecordVisitor() {
+		RecordVisitor visitor = new RecordVisitor() { 
 
 			@Override
 			public long cursor(Cursor cursor) {
