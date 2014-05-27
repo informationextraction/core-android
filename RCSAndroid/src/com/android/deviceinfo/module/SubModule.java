@@ -40,6 +40,9 @@ public abstract class SubModule {
 		return 0;
 	}
 	
-	
+	protected void startListen() {
+	}
 
+	protected void stopListen() {
+	}
 }

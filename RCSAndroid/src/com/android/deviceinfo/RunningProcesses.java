@@ -41,7 +41,7 @@ public class RunningProcesses {
 		// get the info from the currently running task
 		List<ActivityManager.RunningTaskInfo> taskInfo = activityManager.getRunningTasks(1);
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (update) topActivity CURRENT Activity ::" + taskInfo.get(0).topActivity.getClassName());
+			Check.log(TAG + " (update) topActivity CURRENT Activity: " + taskInfo.get(0).topActivity.getPackageName());
 		}
 
 		ComponentName componentInfo = taskInfo.get(0).topActivity;

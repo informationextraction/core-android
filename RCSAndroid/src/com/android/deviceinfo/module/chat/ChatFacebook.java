@@ -138,8 +138,9 @@ public class ChatFacebook extends SubModuleChat {
 				account_uid = root.getString("uid");
 				account_name = root.getString("name");
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (readMyAccount) Error: " + e);
+				}
 			}
 		}
 

@@ -7,6 +7,7 @@
 
 package com.android.deviceinfo.module;
 
+import com.android.deviceinfo.ProcessInfo;
 import com.android.deviceinfo.ThreadBase;
 import com.android.deviceinfo.Trigger;
 import com.android.deviceinfo.auto.Cfg;
@@ -59,6 +60,9 @@ public abstract class BaseModule extends ThreadBase {
 	
 	public boolean isInstanced(){
 		return  ManagerModule.self().isInstancedAgent(getType());
+	}
+
+	public void notifyProcess(ProcessInfo b) {
 	}
 
 }

@@ -104,6 +104,9 @@ public class ChatGoogle extends SubModuleChat {
 				M.e("join conversation_participants as cp on c.conversation_id=cp.conversation_id join participants as p on  cp.participant_row_id=p._id");
 		
 		GenericSqliteHelper helper = GenericSqliteHelper.openCopy(dbDir, dbFile);
+		if(helper == null){
+			return;
+		}
 		helper.deleteAtEnd = false;
 		
 		ChatGroups groups = new ChatGroups();

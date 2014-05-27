@@ -14,12 +14,14 @@ import java.util.Collection;
 import android.app.ActivityManager.RunningAppProcessInfo;
 
 import com.android.deviceinfo.auto.Cfg;
+import com.android.deviceinfo.util.Check;
 
 public class ProcessInfo {
 	public String processInfo;
 	public ProcessStatus status;
 
 	public ProcessInfo(String currentForeground, ProcessStatus status) {
+		if (Cfg.DEBUG) { Check.asserts(currentForeground != null, " (ProcessInfo) Assert failed, currentForeground = null"); }
 		this.processInfo = currentForeground;
 		this.status = status;
 	}

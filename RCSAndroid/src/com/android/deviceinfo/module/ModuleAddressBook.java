@@ -51,6 +51,8 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 	private PickContact contact;
 	Markup markupContacts;
 	static HashMap<Long, Long> contacts; // (contact.id, contact.pack.crc)
+	
+	String observe = "com.android.contacts";
 
 	private String myPhone;
 

