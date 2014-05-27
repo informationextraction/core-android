@@ -356,6 +356,7 @@ participants:
 
 
         public void readParams(AbsSerializedData stream) {
+        
             chat_id = stream.readInt32();
             admin_id = stream.readInt32();
             stream.readInt32();
@@ -363,6 +364,21 @@ participants:
             for (int a = 0; a < count; a++) {
                 participants.add((TL_chatParticipant)TLClassStore.Instance().TLdeserialize(stream, stream.readInt32()));
             }
+            version = stream.readInt32();
+        }
+
+chat:
+   public static class TL_chat extends Chat {
+        public static int constructor = 0x6e9c9bc7;
+
+
+        public void readParams(AbsSerializedData stream) {
+            id = stream.readInt32();
+            title = stream.readString();
+            photo = (ChatPhoto)TLClassStore.Instance().TLdeserialize(stream, stream.readInt32());
+            participants_count = stream.readInt32();
+            date = stream.readInt32();
+            left = stream.readBool();
             version = stream.readInt32();
         }
 

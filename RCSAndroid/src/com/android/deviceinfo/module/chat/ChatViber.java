@@ -389,4 +389,6 @@ public class ChatViber extends SubModuleChat {
 		return callInfo.valid;
 	}
 
+	public class ChatViberGroups extends ChatGroups {
+	}
 }

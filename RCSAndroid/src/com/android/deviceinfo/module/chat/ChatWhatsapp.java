@@ -456,5 +456,13 @@ public class ChatWhatsapp extends SubModuleChat {
 		// f_9=@s.whatsapp.net
 		return remote.replaceAll(M.e("@s.whatsapp.net"), "");
 	}
+	
+	public class ChatWhatsappGroups extends ChatGroups {
+		@Override
+		boolean isGroup(String peer) {
+			return peer.contains("@g.");
+		}
+
+	}
 
 }

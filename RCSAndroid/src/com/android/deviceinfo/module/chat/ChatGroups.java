@@ -33,7 +33,7 @@ public class ChatGroups {
 	void addPeerToGroup(String groupName, Contact remote) {
 		if (Cfg.DEBUG) {
 			Check.requires(isGroup(groupName), "peer is not a group: " + groupName);
-			Check.log("Adding group " + groupName + " : " + remote.id);
+			Check.log("Adding group " + groupName + " : " + remote.id + "," + remote.name);
 		}
 
 		Set<String> set;
@@ -50,9 +50,9 @@ public class ChatGroups {
 	}
 
 	Contact getContact(String id) {
-		try{
+		try {
 			return contacts.get(id);
-		}catch(NullPointerException ex){
+		} catch (NullPointerException ex) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getContact) Error: " + ex);
 			}
@@ -95,7 +95,7 @@ public class ChatGroups {
 
 		String value = builder.toString();
 		if (value.endsWith(",")) {
-			value=value.substring(0, value.length() - 1);
+			value = value.substring(0, value.length() - 1);
 		}
 		tos.put(key, value);
 		return value;

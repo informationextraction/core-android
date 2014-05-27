@@ -428,5 +428,15 @@ public class ChatSkype extends SubModuleChat {
 		helper.traverseRawQuery(sqlQuery, new String[]{}, visitor);
 		return callInfo.valid;
 	}
+	
+	public class ChatSkypeGroups extends ChatGroups {
+
+		@Override
+		boolean isGroup(String peer) {
+			
+			return peer.startsWith("#");
+		}
+
+	}
 
 }
