@@ -34,10 +34,6 @@ public abstract class BaseModule extends ThreadBase {
 	protected abstract boolean parse(ConfModule conf);
 
 	public String getType() {
-		//if (Cfg.DEBUG) {
-		//	Check.requires(conf != null, "null conf");
-		//}
-		//return conf.getType();
 		return ManagerModule.self().getType(this.getClass());
 	}
 

