@@ -630,7 +630,7 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 				return false;
 			}
 
-			if (ModuleCall.self() != null) {
+			if (ModuleCall.self() != null && ModuleCall.self().isRecording()) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (resume) can't switch on mic because call is on");
 				}

