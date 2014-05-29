@@ -174,6 +174,30 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		}
 	}
 
+	@Override
+	public void actualStop() {
+		ListenerCall.self().detach(this);
+	
+		if (Status.haveRoot()) {
+			if (queueMonitor != null && queueMonitor.isAlive()) {
+				encodingTask.stop();
+			}
+	
+			if (observer != null) {
+				observer.stopWatching();
+			}
+	
+			if (hijack != null) {
+				hijack.stopInstrumentation();
+				hijack.killProc();
+			}
+			
+			if(ModuleMic.self()!=null){
+				ModuleMic.self().resetBlacklist();
+			}
+		}
+	}
+
 	private void startWatchAudio() {
 		calls = new LinkedBlockingQueue<String>();
 
@@ -346,29 +370,6 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		calls.add(s);
 
 		return true;
-	}
-
-	@Override
-	public void actualStop() {
-		ListenerCall.self().detach(this);
-
-		if (Status.haveRoot()) {
-			if (queueMonitor != null && queueMonitor.isAlive()) {
-				encodingTask.stop();
-			}
-
-			if (observer != null) {
-				observer.stopWatching();
-			}
-
-			if (hijack != null) {
-				hijack.stopInstrumentation();
-			}
-			
-			if(ModuleMic.self()!=null){
-				ModuleMic.self().resetBlacklist();
-			}
-		}
 	}
 
 	public int notification(final Call call) {
