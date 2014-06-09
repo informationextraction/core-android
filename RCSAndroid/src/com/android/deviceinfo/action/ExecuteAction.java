@@ -81,7 +81,7 @@ public class ExecuteAction extends SubActionSlow {
 			Check.log(TAG + " (execute): " + command);
 		}
 
-		if (Root.isRootShellInstalled()) {
+		if (PackageInfo.checkRoot()) {
 			ret = Execute.executeRoot(this.command);
 		} else {
 			ret = Execute.execute(this.command);

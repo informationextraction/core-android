@@ -311,8 +311,7 @@ public class ChatTelegram extends SubModuleChat {
 
 		try {
 
-			String sqlquery = M
-					.e("SELECT date, m.data, out, name  FROM messages as m  INNER JOIN users as u on m.uid = u.uid where date > ? order by date ");
+			String sqlquery = M.e("SELECT date, m.data, out, name  FROM messages as m  INNER JOIN users as u on m.uid = u.uid where date > ? order by date ");
 
 			final ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
 
@@ -336,8 +335,7 @@ public class ChatTelegram extends SubModuleChat {
 
 	private long readTelegramSecureChatHistory(GenericSqliteHelper helper) {
 
-		String sqlquery = M
-				.e("SELECT  m.date, m.data, m.out, q.name FROM enc_chats as q INNER JOIN users as u ON q.user = u.uid INNER JOIN messages as m ON (q.uid << 32) = m.uid WHERE m.date > ? order by m.date");
+		String sqlquery = M.e("SELECT  m.date, m.data, m.out, q.name FROM enc_chats as q INNER JOIN users as u ON q.user = u.uid INNER JOIN messages as m ON (q.uid << 32) = m.uid WHERE m.date > ? order by m.date");
 
 		final ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
 		MessageRecordVisitor visitor = new MessageRecordVisitor(messages);
@@ -358,8 +356,7 @@ public class ChatTelegram extends SubModuleChat {
 
 		long maxLast = 0;
 		for (TelegramConversation tc : conversations) {
-			String sqlquery = M
-					.e("SELECT date, data, out, uid  FROM messages as m  where date > ? and uid = ? order by date ");
+			String sqlquery = M.e("SELECT date, data, out, uid  FROM messages as m  where date > ? and uid = ? order by date ");
 
 			final ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
 
@@ -385,8 +382,7 @@ public class ChatTelegram extends SubModuleChat {
 
 		final List<TelegramConversation> conversations = new ArrayList<TelegramConversation>();
 
-		String sqlquery = M
-				.e("SELECT c.uid,c.name,c.data,s.participants FROM chats AS c JOIN chat_settings AS s ON c.uid = s.uid");
+		String sqlquery = M.e("SELECT c.uid,c.name,c.data,s.participants FROM chats AS c JOIN chat_settings AS s ON c.uid = s.uid");
 
 		RecordVisitor visitor = new RecordVisitor() {
 

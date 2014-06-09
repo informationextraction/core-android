@@ -527,7 +527,7 @@
 
 	<target name="test_castore" depends="build">
 		<antcall target="servercore" />
-		<updaterelease server="rcs-castore" login="zenobatch" password="zenop123" file="server/android_${version}.zip" />
+		<antcall target="update_castore" />
 	</target>
 
 	<target name="update_castore">
