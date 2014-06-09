@@ -45,7 +45,7 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 			subModuleManager.add(new ChatLine());
 			subModuleManager.add(new ChatWeChat());
 			subModuleManager.add(new ChatGoogle());
-			
+			subModuleManager.add(new ChatTelegram());	
 		}
 	}
 

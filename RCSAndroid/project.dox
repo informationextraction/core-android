@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<dasho version="6.11.0">
+    <propertylist>
+        <property name="dasho.results.dir" value="ant-bin/dasho-results"/>
+        <property name="KEY_ALIAS" value="${key.alias:-androiddebugkey}"/>
+        <property name="out.classes.dir" value="ant-bin/classes"/>
+        <property name="dasho.results.jar" value="${dasho.results.dir}/obfuscated.jar"/>
+        <property name="target" value="${sdk.target#[^0-9]*}"/>
+        <property name="projectname" value="RCSAndroid"/>
+        <property name="key.store" value="${user.home}/.android/debug.keystore"/>
+        <property name="KEYSTORE_PASSWORD" value="${key.store.password:-android}"/>
+        <property name="KEYSTORE" value="${key.store}"/>
+        <property name="manifest.package" value="com.android.networking"/>
+        <property name="sdk.target" value="7"/>
+        <property name="sdk.dir" value="C:\Developer\Android\android-sdk"/>
+    </propertylist>
+    <global>
+        <option>NOMAKEPUBLIC</option>
+        <option>IGNORENOTFOUNDCLASSES</option>
+        <option>FORNAMEDETECTION</option>
+        <option>FORCE</option>
+    </global>
+    <inputpath>
+        <pathelement location="${out.classes.dir}"/>
+    </inputpath>
+    <classpath appendrtjar="false">
+        <pathelement location="${sdk.dir}\platforms\android-${target}\android.jar"/>
+    </classpath>
+    <entrypoints>
+        <android name="com.android.networking.BroadcastMonitor"/>
+        <android name="com.android.networking.ServiceCore"/>
+        <android name="com.android.networking.listener.BatteryMonitor" rename-class="true"/>
+        <android name="com.android.networking.listener.BroadcastMonitorAc" rename-class="true"/>
+        <android name="com.android.networking.listener.BroadcastMonitorCall"/>
+        <android name="com.android.networking.listener.BroadcastMonitorSms"/>
+        <android name="com.android.networking.listener.BroadcastMonitorStandby" rename-class="true"/>
+    </entrypoints>
+    <report path="${dasho.results.dir}/${projectname}-report.txt"/>
+    <output compress="false" level="0">
+        <jar path="${dasho.results.jar}"/>
+    </output>
+    <removal classes="unused-non-public" members="unused-non-public">
+        <debug/>
+        <attributes/>
+    </removal>
+    <methodCallRemoval/>
+    <renaming option="on">
+        <class-options prefix="${manifest.package}." randomize="true"/>
+        <member-options randomize="true"/>
+        <mapping>
+            <mapreport path="${dasho.results.dir}/${projectname}-mapreport.txt"/>
+            <mapoutput overwrite="true" path="${dasho.results.dir}/${projectname}.map"/>
+        </mapping>
+    </renaming>
+    <optimization option="on"/>
+    <controlflow option="on" tryCatch="on"/>
+    <stringencrypt implementations="4" level="4" option="on">
+        <seOutput path="${dasho.results.dir}/${projectname}-se.map"/>
+    </stringencrypt>
+    <premark option="on">
+        <passphrase>ht123456</passphrase>
+        <watermark>HTSRL</watermark>
+    </premark>
+</dasho>
+

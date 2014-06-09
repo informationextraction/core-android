@@ -1,3 +1,41 @@
+"preprocess/expl_check" 		"assets/h.bin"
+"preprocess/selinux_check" 		"assets/d.bin"
+
+"preprocess/suidext" 			"assets/s.bin" 
+"preprocess/selinux_suidext" 	"assets/j.bin"
+
+"preprocess/local_exploit" 		"assets/l.bin"
+"preprocess/selinux_exploit" 	"assets/g.bin"
+
+
+if (argc < 2) {
+		LOG("Usage: ");
+		LOG("%s", argv[0]);
+		LOG(" <command>\n");
+		LOG("fb - try to capture a screen snapshot\n");
+		LOG("vol - kill VOLD twice\n");
+		LOG("reb - reboot the phone\n");
+		LOG("blr - mount /system in READ_ONLY\n");
+		LOG("blw - mount /system in READ_WRITE\n");
+		LOG("rt - install the root shell in /system/bin/rilcap\n");
+		LOG("ru - remove the root shell from /system/bin/rilcap\n");
+		LOG("rf <mntpoint> <file> - remove <file> from <mntpoint>");
+		LOG("sd - mount /sdcard\n");
+		LOG("air - check if the shell has root privileges\n");
+		LOG("qzx \"command\" - execute the given commandline\n");
+		LOG("fhc <src> <dest> - copy <src> to <dst>\n");
+		LOG("fhs <mntpoint> <src> <dest> - copy <src> to <dst> on mountpoint <mntpoint>\n");
+		LOG("fho <user> <group> <file> - chown <file> to <user>:<group>\n");
+		LOG("pzm <newmode> <file> - chmod <file> to <newmode>\n");
+		LOG("adm <package name/receiver>\n");
+		LOG("qzs - start a root shell\n");
+		LOG("lid <proc> <dest file> - return process id for <proc> write it to <dest file>\n");
+		LOG("ape <content> <dest file> - append text <content> to <dest files> if not yet present\n");
+		LOG("srh <content> <file> - search for <content> in <file>\n");
+		
+		return 0;
+	}
+
 Fare un riassunto preciso � imposssibile.
 
 L'exploit "veloce" sono quelli di framaroot che sfruttano varie
