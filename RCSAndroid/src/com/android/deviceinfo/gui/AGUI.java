@@ -164,7 +164,7 @@ public class AGUI extends Activity {
 	}
 
 	public void fireAdminIntent() {
-		Context context = getApplicationContext();
+		Context context = Status.getAppContext();
 
 		Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
 		// intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

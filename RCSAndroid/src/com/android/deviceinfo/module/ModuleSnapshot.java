@@ -262,6 +262,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 			}
 
 			Bitmap bitmap = null;
+			System.gc();
 
 			// 0: invertito blu e rosso
 			// 1: perdita info
