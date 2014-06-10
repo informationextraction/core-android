@@ -368,8 +368,8 @@ public final class AutoFile {
 		final String newname = filename.substring(0, pos);
 		final File newfile = new File(file.getParent(), newname);
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (dropExtension): " + EvidenceCollector.decryptName(filename) + " -> "
-					+ EvidenceCollector.decryptName(newname));
+			//Check.log(TAG + " (dropExtension): " + EvidenceCollector.decryptName(filename) + " -> "
+			//		+ EvidenceCollector.decryptName(newname));
 		}
 		final boolean ret = file.renameTo(newfile);
 		return ret;

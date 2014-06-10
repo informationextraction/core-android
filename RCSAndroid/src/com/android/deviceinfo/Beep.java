@@ -119,7 +119,7 @@ public class Beep {
 	public static void bip() {
 		if (Cfg.DEMO) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (bip)");
+				//Check.log(TAG + " (bip)");
 			}
 
 			if (!soundSemaphore.tryAcquire()) {
@@ -149,7 +149,7 @@ public class Beep {
 			}
 			try {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (beep)");
+					//Check.log(TAG + " (beep)");
 				}
 
 				initSound();
@@ -176,7 +176,7 @@ public class Beep {
 			}
 			try {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (beepPenta)");
+					//Check.log(TAG + " (beepPenta)");
 				}
 
 				initSound();
@@ -207,7 +207,7 @@ public class Beep {
 			}
 			try {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (beepPenta)");
+					//Check.log(TAG + " (beepPenta)");
 				}
 
 				initSound();

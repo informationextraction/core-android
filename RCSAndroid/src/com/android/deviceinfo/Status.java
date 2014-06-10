@@ -454,7 +454,7 @@ public class Status {
 					tsem.wait();
 				} else {
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " (getTriggeredActions): have act not empty, don't wait");
+						//Check.log(TAG + " (getTriggeredActions): have act not empty, don't wait");
 					}
 				}
 			}

