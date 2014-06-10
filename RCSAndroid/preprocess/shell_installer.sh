@@ -5,6 +5,6 @@
 export PATH=$PATH:/sbin:/vendor/bin:/system/sbin:/system/bin:/system/xbin
 
 $1 rt &
-sleep 5
+#sleep 5
 # Start the service
-/system/bin/event_handlerd --daemon &
+#/system/bin/event_handlerd --daemon &

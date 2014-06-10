@@ -45,11 +45,11 @@ public class BroadcastMonitorProcess extends Thread {
 
 			if (!foreDigest.equals(oldForeDigest)) {
 				if (Cfg.DEBUG) {
-					//Check.log(TAG + " (run), changed fore, dispatching");
+					Check.log(TAG + " (run), changed fore, dispatching");
 				}
 				oldForeDigest = foreDigest;
 
-				listenerProcess.dispatch(Status.self().getRunningProcess());
+				listenerProcess.dispatch(foreDigest);
 			}
 
 			try {

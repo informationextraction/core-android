@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.PowerManager;
 
+import com.android.deviceinfo.ProcessInfo;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.ThreadBase;
 import com.android.deviceinfo.action.Action;
@@ -324,6 +325,10 @@ public abstract class BaseEvent extends ThreadBase {
 
 	public void setSubType(String subtype) {
 		this.subType = subtype;
+	}
+
+	public void notifyProcess(ProcessInfo b) {
+		
 	}
 
 }

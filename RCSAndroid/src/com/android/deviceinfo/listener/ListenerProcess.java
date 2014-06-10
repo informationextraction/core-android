@@ -126,8 +126,8 @@ public class ListenerProcess extends Listener<ProcessInfo> implements Observer<S
 		return currentForeground.equals(appName);
 	}
 
-	protected synchronized int dispatch(RunningProcesses processes) {
-		currentForeground = processes.getForeground();
+	protected synchronized int dispatch(String currentForeground) {
+	
 		if(!currentForeground.equals(lastForeground)){
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notification): started " + currentForeground);//$NON-NLS-1$
