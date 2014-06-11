@@ -1,0 +1,198 @@
+<!doctype html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="content-style-type" content="text/css">
+<link rel="stylesheet" type="text/css" href="style.css">
+<title>DexGuard Eclipse Plugin</title>
+</head>
+<body>
+
+<script type="text/javascript" language="JavaScript">
+<!--
+if (window.self==window.top)
+  document.write('<a target="_top" href="index.html#eclipse.html" class="largebutton">DexGuard index</a>')
+//-->
+</script>
+
+<h2>Eclipse Plugin</h2>
+
+<b>DexGuard</b> can be integrated in the Eclipse build process of the Android
+Developer Tools (version 22.0.0.v201305140200 or higher).
+
+<h3>Setting up the Eclipse plugin</h3>
+
+You can enable DexGuard in the Android Eclipse build as follows:
+<ol>
+<li>Optionally copy the configuration file from DexGuard's <code>ant</code>
+    directory to the main directory of your Android project:
+<pre>
+dexguard-project.txt
+</pre></li>
+<li>Copy the plugin from DexGuard's <code>eclipse</code> directory to
+    the <code>dropins</code> directory of your Eclipse install:
+<pre>
+com.saikoa.dexguard.eclipse.adt_*.jar
+</pre></li>
+</ol>
+
+When starting or restarting Eclipse, the Android build process will
+automatically use DexGuard for all Android builds. You can verify that the
+plugin is installed by checking that the menu item discussed below is present.
+If Eclipse didn't pick up the plugin, you should try starting it with
+the <code>-clean</code> option.
+<p>
+If you experience any compatibility problems, you should check and possibly
+update the version of the plugin of the Android Developer Tools:
+<blockquote>
+Help &gt; About Eclipse SDK &gt; Installation Details &gt; Installed Software
+</blockquote>
+
+<h3>Building</h3>
+
+The procedure for building Android applications remains essentially the same.
+Ordinary builds use debug settings, without optimization or obfuscation. A new
+<i>Export</i> option allows you to build with the release settings, with full
+optimization and obfuscation:
+<blockquote>
+File &gt; Export... &gt; Export Optimized and Obfuscated Android Application
+(DexGuard)
+</blockquote>
+<p>
+<img src="eclipse/file.png" width="573" height="26" alt="Menu bar" />
+<p>
+
+<a href="eclipse/file_export.png">
+<img class="float" src="eclipse/file_export_small.png" width="172" height="235" alt="File menu" />
+</a>
+
+<a href="eclipse/export.png">
+<img src="eclipse/export_small.png" width="306" height="275" alt="Export panel" hspace="50" />
+</a>
+<p>
+
+The DexGuard Eclipse plugin picks up custom configurations from the following
+optional files in your Android project:
+<pre>
+dexguard-project.txt         (for all builds)
+dexguard-project-debug.txt   (for debug builds)
+dexguard-project-release.txt (for release builds)
+proguard-project.txt         (for backward compatibility with ProGuard)
+</pre>
+The default version of the first file contains a number of settings that can
+be enabled to perform string encryption, class encryption, and to hide access
+to sensitive APIs.
+<p>
+
+The logs for debug builds and export builds are sent to the Android console
+panel.
+
+<h3>Settings</h3>
+
+You can selectively override settings from the configuration files in the
+preferences panel:
+<blockquote>
+Window &gt; Preferences &gt; Android &gt; Obfuscation (DexGuard)
+</blockquote>
+<p>
+<img src="eclipse/window.png" width="573" height="26" alt="Menu bar" />
+<p>
+
+<a href="eclipse/window_preferences.png">
+<img class="float" src="eclipse/window_preferences_small.png" width="128" height="165" alt="Window menu" />
+</a>
+
+<a href="eclipse/preferences.png">
+<img src="eclipse/preferences_small.png" width="348" height="290" alt="Preferences panel" hspace="50" />
+</a>
+<p>
+
+By default, debug builds don't shrink, optimize, or obfuscate the application.
+You can enable shrinking if your application is otherwise too large for the
+size constraints of the Dalvik format. Make sure that you have suitable
+configuration files for your project, so DexGuard doesn't inadvertedly remove
+code that is only accessed through reflection. If you only enable shrinking,
+you can still debug the processed application interactively. If you enable
+optimization or obfuscation, it's generally no longer possible to debug the
+processed application interactively, since the bytecode no longer corresponds
+closely to the source code.
+<p>
+
+On the other hand, export builds generally do shrink, optimize, and obfuscate
+the application. You can interactively disable any of these steps if ever
+needed.
+
+<h3>Settings for regular builds</h3>
+
+You can specify the same general preferences as before. Notably, you can
+specify the verbosity of the build process (including DexGuard) in the
+preferences panel:
+<blockquote>
+Window &gt; Preferences &gt; Android &gt; Build
+</blockquote>
+<p>
+
+You can also disable the DexGuard builder for regular builds, in the properties
+panel of each project:
+<blockquote>
+Project &gt; Properties &gt; Builders &gt; Android Optimizer and Obfuscator (DexGuard)
+</blockquote>
+<p>
+<img src="eclipse/project.png" width="573" height="26" alt="Menu bar" />
+<p>
+
+<a href="eclipse/project_properties.png">
+<img class="float" src="eclipse/project_properties_small.png" width="123" height="110" alt="Project menu" />
+</a>
+<p>
+
+<a href="eclipse/properties.png">
+<img src="eclipse/properties_small.png" width="445" height="271" alt="Properties panel" hspace="50" />
+</a>
+<p>
+
+After having disabled the builder, you currently need to restart the project
+to properly reinitialize the builders.
+
+<h3>Quick troubleshooting</h3>
+
+If you are having problems running the Eclipse plugin:
+<ul>
+<li><b>NoClassDefFoundError, AbstractMethodError,...</b>: make sure that you
+    are using the DexGuard plugin with the proper version of the Android
+    plugins in Eclipse. Even minor version differences can cause compatibility
+    problems. Feel free to check with us if you think the DexGuard plugin is
+    incompatible with a recent Android plugin.</li>
+<li>If the plugin doesn't seem to be active, you can get more information by
+    starting Eclipse with the options <code>-clean -console -consoleLog
+    -debug</code>. The separate console window then provides more information
+    about the inner workings of Eclipse and its plugins.</li>
+<li>If the plugin does work, the Android tab of the Console panel (Window &gt;
+    Show View &gt; Console) contains log output for debug builds and export
+    builds. You should check if it contains any information about the
+    problem.</li>
+<li><b>Invalid resource directory name: .../bin/res/crunch</b>: try clearing
+    your application project and any library projects in Eclipse. Some internal
+    tool has created this directory, confusing another tool later on.
+<li>If exported applications are not optimized or obfuscated, make sure that
+    the checkboxes in the preferences panel to disable optimization and
+    obfuscation are unchecked.</li>
+</ul>
+<p>
+Please consult the more extensive
+<a href="troubleshooting.html">troubleshooting</a> section if you encounter
+other issues building or running your application.
+
+<h3>Uninstalling the Eclipse plugin</h3>
+
+You can uninstall the plugin by removing the
+file <code>com.saikoa.dexguard.eclipse.adt_*.jar</code> again from
+the <code>dropins</code> directory of your Eclipse install.
+
+<hr />
+<address>
+Copyright &copy; 2002-2014
+<a target="other" href="http://www.saikoa.com/">Saikoa BVBA</a>.
+</address>
+</body>
+</html>
