@@ -132,7 +132,7 @@ public class WifiTransport extends HttpKeepAliveTransport implements Observer<St
 			
 			if(switchedOn && !ListenerStandby.self().isScreenOn()){
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (enable) ");
+					Check.log(TAG + " (enable) ListenerStandby start");
 				}
 				ListenerStandby.self().attach(this);
 			}

