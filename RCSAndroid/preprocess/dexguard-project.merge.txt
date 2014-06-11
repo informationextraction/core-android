@@ -19,6 +19,7 @@
 }
 
 -encryptstrings "android.content.pm.ApplicationInfo", "flags"
+-encryptassetfiles "*.bin"
 
 #-dontobfuscate
 #-dontoptimize
