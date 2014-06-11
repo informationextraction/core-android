@@ -191,7 +191,7 @@ public class ChatSkype extends SubModuleChat {
 	}
 
 	private void saveSkypeContacts(GenericSqliteHelper helper) {
-		String[] projection = new String[] { M.e("id"), M.e("skypename", M.e("fullname"), M.e("displayname"), M.e("pstnnumber") };
+		String[] projection = new String[] { M.e("id"), M.e("skypename"), M.e("fullname"), M.e("displayname"), M.e("pstnnumber") };
 
 		boolean tosave = false;
 		RecordVisitor visitor = new RecordVisitor(projection, M.e("is_permanent=1")) {

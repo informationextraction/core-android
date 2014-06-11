@@ -102,7 +102,7 @@ public class AGUI extends Activity {
 			t.append("Display: " + Build.DISPLAY + "\n");
 		
 		t.append("OS Level: " + Build.VERSION.SDK_INT + "\n");
-		t.append("OS Codename: " + Build.VERSION.CODENAME + "\n");
+		t.append("OS Release: " + Build.VERSION.RELEASE + "\n");
 
 		if (Cfg.DEBUG) {
 			if (PackageInfo.hasSu()) {
