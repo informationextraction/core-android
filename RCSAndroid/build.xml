@@ -469,7 +469,7 @@
 		<var name="filename" value="bin/android_deviceinfo-release.apk" />
 		<mkdir dir="output/merge/" />
 		<copy file="${filename}" toFile="output/merge/core.android.melt.apk" overwrite="true" />
-		<copy file="methodStartService.txt" toFile="output/merge/methodStartService.txt" overwrite="true" />
+		<!-- <copy file="methodStartService.txt" toFile="output/merge/methodStartService.txt" overwrite="true" /> -->
 
 		<echo>../../merge.rb C:\HT\Reversing\Android\CleanPackages\</echo>
 	</target>
