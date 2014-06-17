@@ -301,7 +301,7 @@ public class Root {
 				}
 			});
 			thread.start();
-			Utils.sleep(10000);
+			Utils.sleep(5000);
 
 			if (PackageInfo.checkRoot()) {
 				Status.setRoot(true);
