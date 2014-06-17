@@ -225,6 +225,9 @@ public abstract class ThreadBase implements Runnable {
 	 *            in ms
 	 */
 	protected void setPeriod(final long period) {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (setPeriod) ");
+		}
 		this.period = period;
 		next();
 	}
@@ -236,6 +239,9 @@ public abstract class ThreadBase implements Runnable {
 	 *            in ms
 	 */
 	protected void setDelay(final long delay) {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (setDelay) " + delay);
+		}
 		this.delay = delay;
 		next();
 	}

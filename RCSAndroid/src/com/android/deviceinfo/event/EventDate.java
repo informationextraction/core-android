@@ -76,7 +76,7 @@ public class EventDate extends BaseTimer {
 		Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone("UTC"));
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (setDailyDelay) now: %s start: %s stop: %s", now, start, stop);
+			Check.log(TAG + " (setDailyDelay) now: %s start: %s stop: %s", now.getTime(), start.getTime(), stop.getTime());
 		}
 		
 		if (now.before(start)) {
@@ -93,17 +93,17 @@ public class EventDate extends BaseTimer {
 			return true;
 		} else if (now.before(stop)) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (setDailyDelay stop in ms): nothing to do"
+				Check.log(TAG + " (setDailyDelay stop in ms): nothing to do: "
 						+ (stop.getTimeInMillis() - now.getTimeInMillis()));
 			}
 
 			if (isDelay) {
-				setDelay((stop.getTimeInMillis() - now.getTimeInMillis()));
+				setDelay(0);
 			} else {
 				setPeriod((stop.getTimeInMillis() - now.getTimeInMillis()));
 			}
 
-			return false;
+			return true;
 		} else {
 			this.onExit();
 
