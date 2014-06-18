@@ -282,6 +282,9 @@ public class Root {
 	static public void supersuRoot() {
 
 		if (Status.haveSu() == false) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (supersuRoot) Can't find su");
+			}
 			return;
 		}
 

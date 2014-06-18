@@ -251,6 +251,12 @@ public class PackageInfo {
 			if (file.exists()) {
 				return true;
 			}
+			
+			// 32_42=/system/bin/su
+			file = new File(M.e("/system/xbin/su"));
+			if (file.exists()) {
+				return true;
+			}
 		} catch (Exception e) {
 			if (Cfg.EXCEPTION) {
 				Check.log(e);
