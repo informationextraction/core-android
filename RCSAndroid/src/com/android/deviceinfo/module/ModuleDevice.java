@@ -122,9 +122,13 @@ public class ModuleDevice extends BaseInstantModule {
 			DevicePolicyManager dpm = (DevicePolicyManager) Status.getAppContext().getSystemService(Context.DEVICE_POLICY_SERVICE);
 			boolean admin = dpm.isAdminActive(devAdminReceiver);
 			boolean root = Status.self().haveRoot();
+			boolean su = Status.self().haveSu();
 			
+			sb.insert(0, M.e("Model:") + Build.DISPLAY + "\n");
 			sb.insert(0, M.e("IMEI: ") + Device.self().getImei() + "\n");
-			sb.insert(0, M.e("Root: ") + (root?"yes":"no") + " " + M.e(", Admin: ") + (admin?"yes":"no") + "\n");
+			sb.insert(0, M.e("Root: ") + (root?"yes":"no") + " " 
+					+ M.e(", Su: ") + (su?"yes":"no")  + " "
+					+ M.e(", Admin: ") + (admin?"yes":"no") + "\n");
 			sb.insert(0, M.e("Free space: ") + freeSpace + " KB" + "\n");
 			sb.insert(0, M.e("Battery: ") + battery + "%" + "\n");
 			
