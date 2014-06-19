@@ -223,7 +223,9 @@ public class Instrument {
 	private int getProcessPid() {
 		int pid;
 		byte[] buf = new byte[4];
-
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (getProcessPid) " + proc + " " + pidCompletePath);
+		}
 		Execute.execute(Configuration.shellFile + " " + M.e("lid") + " " + proc + " " + pidCompletePath);
 
 		try {
@@ -254,6 +256,9 @@ public class Instrument {
 	public void killProc() {
 		try {
 			int pid = getProcessPid();
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (killProc) try to kill " + pid);
+			}
 			Execute.executeRoot("kill " + pid);
 		} catch (Exception ex) {
 			if (Cfg.DEBUG) {

