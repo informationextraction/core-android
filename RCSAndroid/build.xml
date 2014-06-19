@@ -518,7 +518,6 @@
 				<include name="*" />
 			</fileset>
 		</checksum>
-
 	</target>
 
 	<target name="update">
@@ -540,7 +539,7 @@
 	</target>
 
 	<target name="update_zeus">
-		<updaterelease server="zeus" login="admin" password="adminp123" file="/server/android_${version}.zip" />
+		<updaterelease server="rcs-zeus-master.hackingteam.local" login="zeno" password="zeusP123456" file="server/android_${version}.zip" />
 		<!-- <copy file=".\server\blackberry_${version}.zip" toFile="W:\RELEASE\SVILUPPO\cores daVinci\android.zip" overwrite="true" /> -->
 	</target>
 
