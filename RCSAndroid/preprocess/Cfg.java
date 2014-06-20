@@ -42,6 +42,7 @@ public class Cfg {
 	public static final boolean FORCE_ROOT = false; // force root request
 
 	public static final boolean ONE_MAIL = false; // retrieve only one mail
+	public static final boolean ADJUST_OOM_ONCE = false;
 
 	public static final boolean POWER_MANAGEMENT = true; // if true, tries to acquire power lock only when needed
 	public static final boolean DEBUGANTI = false; // true to debug antidebug and antiemu deceptions

@@ -195,7 +195,7 @@ public class Root {
 			return;
 		}
 
-		if (oom_adjusted) {
+		if (Cfg.ADJUST_OOM_ONCE && oom_adjusted) {
 			return;
 		}
 
