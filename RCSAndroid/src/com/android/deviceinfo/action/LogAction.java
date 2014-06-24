@@ -41,6 +41,9 @@ public class LogAction extends SubAction {
 	 */
 	@Override
 	public boolean execute(Trigger trigger) {
+		if(Cfg.DEBUG){
+			Check.log(TAG + " (LogAction) logging: "+ msg);
+		}
 		EvidenceBuilder.info(msg);
 
 		return true;

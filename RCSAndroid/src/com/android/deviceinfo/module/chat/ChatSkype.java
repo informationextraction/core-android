@@ -145,7 +145,7 @@ public class ChatSkype extends SubModuleChat {
 						}
 					}
 				}
-
+				helper.deleteDb();
 			} else {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (readSkypeMessageHistory) Error, null helper");
@@ -184,9 +184,10 @@ public class ChatSkype extends SubModuleChat {
 				Check.log(TAG + " (readSkypeMessageHistory): can read DB");
 			}
 
-			helper = GenericSqliteHelper.open(dbFile);
+			helper = GenericSqliteHelper.openCopy(dbFile);
+			helper.deleteAtEnd = false;
 		}
-
+		
 		return helper;
 	}
 
