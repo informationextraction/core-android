@@ -341,12 +341,13 @@ public class Markup {
 		}
 	}
 
+
 	public <T extends Serializable> T unserialize(T empty) {
 		if (isMarkup()) {
 			try {
 				Object obj = readMarkupSerializable();
 				if (obj instanceof Serializable) {
-					T ret = (T) obj;
+					T ret = (T) empty.getClass().cast(obj);
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (unserialize): " + ret);//$NON-NLS-1$
 					}
@@ -357,7 +358,7 @@ public class Markup {
 					}
 					return empty;
 				}
-			} catch (Exception e) {
+			} catch (Throwable e) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (unserialize) Error: " + e);
 				}
