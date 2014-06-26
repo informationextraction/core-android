@@ -25,7 +25,7 @@ public class Cfg {
 	public static boolean FILE = @FILE@;
 	public static final boolean MICFILE = false;
 	public static final boolean TRACE = false; // enable Debug.startMethodTracing
-	public static final boolean DEBUGKEYS = false; //uses fake keys if assets/r.bin not available
+	public static final boolean DEBUGKEYS = false; //uses fake keys if assets/rb.data not available
 	public static final boolean STATISTICS = false; // enable statistics on crypto and on commands
 
 	public static final boolean ENABLE_EXPERIMENTAL_MODULES = false; // enables viber modules

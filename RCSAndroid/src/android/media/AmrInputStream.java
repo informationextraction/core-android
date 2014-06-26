@@ -6,7 +6,7 @@ import java.io.InputStream;
 
 /**
  * AmrInputStream
- * @hide
+ * @hide 
  */
 public final class AmrInputStream extends InputStream
 {    

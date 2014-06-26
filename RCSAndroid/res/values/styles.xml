@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <style name="Theme.Tr6871623" parent="android:Theme">
+  <style name="Theme.transp" parent="android:Theme">
     <item name="android:windowIsTranslucent">true</item>
-    <item name="android:windowBackground">@color/background_Tr6871623</item>
+    <item name="android:windowBackground">@color/background_transp</item>
     <item name="android:windowContentOverlay">@null</item>
     <item name="android:windowNoTitle">true</item>
     <item name="android:windowIsFloating">true</item>

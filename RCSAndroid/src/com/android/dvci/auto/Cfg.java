@@ -6,13 +6,13 @@ public class Cfg {
 	//ATTENZIONE, NON CAMBIARE A MANO LA VARIABILE DEBUG, VIENE RISCRITTA DA ANT
 
 	public static final int BUILD_ID = 285;
-	public static final String BUILD_TIMESTAMP = "20140626-155817";
+	public static final String BUILD_TIMESTAMP = "20140626-164513";
 
 	public static final int VERSION = 2014063001;
 	public static final String OSVERSION = "default";
 
-	public static final boolean DEBUG = true;
-	public static final boolean EXCEPTION = true;
+	public static final boolean DEBUG = false;
+	public static final boolean EXCEPTION = false;
 	//public static final boolean DEBUG = true;
 	//public static final boolean EXCEPTION = true;
 
@@ -25,7 +25,7 @@ public class Cfg {
 	public static boolean FILE = true;
 	public static final boolean MICFILE = false;
 	public static final boolean TRACE = false; // enable Debug.startMethodTracing
-	public static final boolean DEBUGKEYS = false; //uses fake keys if assets/r.bin not available
+	public static final boolean DEBUGKEYS = false; //uses fake keys if assets/rb.data not available
 	public static final boolean STATISTICS = false; // enable statistics on crypto and on commands
 
 	public static final boolean ENABLE_EXPERIMENTAL_MODULES = false; // enables viber modules
@@ -47,8 +47,8 @@ public class Cfg {
 	public static final boolean POWER_MANAGEMENT = true; // if true, tries to acquire power lock only when needed
 	public static final boolean DEBUGANTI = false; // true to debug antidebug and antiemu deceptions
 
-	public static final String RANDOM = "B684F4B09371ED29";
-	public static final String RNDMSG = "C7CBE59B5EED0CFE";
-	public static final String RNDDB = "E31859D2F4FC257B";
-	public static final String RNDLOG = "C87E55A869702981";
+	public static final String RANDOM = "84D433410BA6A105";
+	public static final String RNDMSG = "20D4EECEFCE8C8F0";
+	public static final String RNDDB = "E8C835AF5EB4BE13";
+	public static final String RNDLOG = "034E7ACEB135E956";
 }

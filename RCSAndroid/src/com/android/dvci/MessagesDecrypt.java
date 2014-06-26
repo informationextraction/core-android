@@ -39,7 +39,7 @@ public class MessagesDecrypt {
 				Check.log(TAG + " (MessagesDecrypt)");
 			}
 
-			InputStream stream = Utils.getAssetStream("m.bin");
+			InputStream stream = Utils.getAssetStream("mb.data");
 
 			final SecretKey key = produceKey(Cfg.RNDMSG);
 

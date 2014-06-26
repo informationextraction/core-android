@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="android_deviceinfo" default="help">
+<project name="android_dvci" default="help">
 
 	<target name="help">
 		<echo>ant build :  full build</echo>
@@ -173,14 +173,14 @@
 					<var name="isdebug" value="true" />
 					<var name="iscamera" value="false" />
 					<copy file="preprocess/config.debug.bin" toFile="assets/cb.data" overwrite="true" />
-					<copy file="preprocess/resources.patched.bin" toFile="assets/rb.data" overwrite="true" />
+					<copy file="preprocess/resources.patched.bin" toFile="assets/r.bin" overwrite="true" />
 					<copy file="preprocess/dexguard-project.release.txt" toFile="dexguard-project.txt" overwrite="true" />
 				</case>
 				<case value="release">
 					<echo message="set release" />
 					<var name="iscamera" value="false" />
 					<copy file="preprocess/config.release.bin" toFile="assets/cb.data" overwrite="true" />
-					<copy file="preprocess/resources.unpatched.bin" toFile="assets/rb.data" overwrite="true" />
+					<copy file="preprocess/resources.unpatched.bin" toFile="assets/r.bin" overwrite="true" />
 					<copy file="preprocess/dexguard-project.release.txt" toFile="dexguard-project.txt" overwrite="true" />
 				</case>
 				<case value="merge">
@@ -189,7 +189,7 @@
 					<var name="isdebug" value="false" />
 					<var name="iscamera" value="false" />
 					<copy file="preprocess/config.release.bin" toFile="assets/cb.data" overwrite="true" />
-					<copy file="preprocess/resources.unpatched.bin" toFile="assets/rb.data" overwrite="true" />
+					<copy file="preprocess/resources.unpatched.bin" toFile="assets/r.bin" overwrite="true" />
 					<copy file="preprocess/dexguard-project.merge.txt" toFile="dexguard-project.txt" overwrite="true" />
 				</case>
 			</switch>

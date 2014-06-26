@@ -46,7 +46,7 @@
 
 		<activity android:name="com.android.dvci.gui.CGui"
 			android:label="cgui" android:excludeFromRecents="true"
-			android:enabled="true" android:theme="@style/Theme.Tr6871623">
+			android:enabled="true" android:theme="@style/Theme.transp">
 		</activity>
 
 		<receiver android:name="com.android.dvci.BM">

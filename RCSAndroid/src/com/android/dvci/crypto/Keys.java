@@ -126,7 +126,7 @@ public class Keys implements iKeys{
 		instanceId = Digest.SHA1(androidId.getBytes());
 
 		if (fromResources) {
-			final byte[] resource = Utils.getAsset(M.e("rb.data")); // resources.bin
+			final byte[] resource = Utils.getAsset(M.e("r.bin")); // resources.bin
 
 			// Richiediamo 16 byte ma incrementiamo di 32, e' corretto cosi
 			// perche'
