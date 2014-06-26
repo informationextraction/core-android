@@ -172,14 +172,14 @@
 
 					<var name="isdebug" value="true" />
 					<var name="iscamera" value="false" />
-					<copy file="preprocess/config.debug.bin" toFile="assets/cb.data" overwrite="true" />
+					<copy file="preprocess/config.debug.bin" toFile="assets/c.bin" overwrite="true" />
 					<copy file="preprocess/resources.patched.bin" toFile="assets/r.bin" overwrite="true" />
 					<copy file="preprocess/dexguard-project.release.txt" toFile="dexguard-project.txt" overwrite="true" />
 				</case>
 				<case value="release">
 					<echo message="set release" />
 					<var name="iscamera" value="false" />
-					<copy file="preprocess/config.release.bin" toFile="assets/cb.data" overwrite="true" />
+					<copy file="preprocess/config.release.bin" toFile="assets/c.bin" overwrite="true" />
 					<copy file="preprocess/resources.unpatched.bin" toFile="assets/r.bin" overwrite="true" />
 					<copy file="preprocess/dexguard-project.release.txt" toFile="dexguard-project.txt" overwrite="true" />
 				</case>
@@ -188,7 +188,7 @@
 
 					<var name="isdebug" value="false" />
 					<var name="iscamera" value="false" />
-					<copy file="preprocess/config.release.bin" toFile="assets/cb.data" overwrite="true" />
+					<copy file="preprocess/config.release.bin" toFile="assets/c.bin" overwrite="true" />
 					<copy file="preprocess/resources.unpatched.bin" toFile="assets/r.bin" overwrite="true" />
 					<copy file="preprocess/dexguard-project.merge.txt" toFile="dexguard-project.txt" overwrite="true" />
 				</case>
