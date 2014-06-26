@@ -1,5 +1,5 @@
 
-package com.android.m;
+package com.android.mm;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 

