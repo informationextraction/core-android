@@ -68,7 +68,7 @@ public class EventProcess extends BaseEvent implements Observer<ProcessInfo> {
 
 	// Viene richiamata dal listener (dalla dispatch())
 	public int notification(ProcessInfo process) {
-		final String processName = process.processInfo.processName;
+		final String processName = process.processInfo;
 
 		if (!matchStar(starname.toLowerCase(), processName.toLowerCase())) {
 			return 0;

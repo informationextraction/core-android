@@ -341,4 +341,8 @@ public class StringUtils {
 		}
 		return lines;
 	}
+
+	public static String[] split(String e) {
+		return e.split(",");
+	}
 }

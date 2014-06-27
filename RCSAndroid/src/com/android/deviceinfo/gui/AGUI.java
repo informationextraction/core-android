@@ -100,9 +100,17 @@ public class AGUI extends Activity {
 
 		if (Build.DISPLAY.length() > 0)
 			t.append("Display: " + Build.DISPLAY + "\n");
+		
+		t.append("OS Level: " + Build.VERSION.SDK_INT + "\n");
+		t.append("OS Release: " + Build.VERSION.RELEASE + "\n");
 
 		if (Cfg.DEBUG) {
 			if (PackageInfo.hasSu()) {
+				t.append("Su: yes, ");
+			} else {
+				t.append("Su: no, ");
+			}
+			if (PackageInfo.checkRoot()) {
 				t.append("Root: yes");
 			} else {
 				t.append("Root: no");
@@ -164,7 +172,7 @@ public class AGUI extends Activity {
 	}
 
 	public void fireAdminIntent() {
-		Context context = getApplicationContext();
+		Context context = Status.getAppContext();
 
 		Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
 		// intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

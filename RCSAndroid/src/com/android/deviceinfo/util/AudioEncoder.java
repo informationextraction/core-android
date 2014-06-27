@@ -121,10 +121,11 @@ public class AudioEncoder {
 			return false;
 		}
 
-		File file = new File(outFile);
+	    File file = new File(outFile);
+	    
+	    if (Cfg.DEBUG) {
+			Check.log(TAG + "(encodetoAmr): Encoding raw to: " + file.getName());
 
-		if (Cfg.DEBUG) {
-			Check.log(TAG + "(encodetoAmr): Encoding raw to: " + outFile);
 		}
 
 		try {
@@ -221,7 +222,7 @@ public class AudioEncoder {
 			data = null;
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + "(encodeChunks): Parsing " + rawFile);
+				Check.log(TAG + "(encodeChunks): Parsing " + raw.getName());
 			}
 
 			// First round calculates the bitrate and real size of audio data
@@ -258,6 +259,7 @@ public class AudioEncoder {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(encodeChunks): raw data size: " + data_size + " bytes, file length: "
 						+ (last_epoch - first_epoch) + " seconds");
+
 			}
 
 			rawPcm = new byte[data_size];
@@ -280,7 +282,7 @@ public class AudioEncoder {
 
 				if (streamType == end_of_call && blockLen == 0) {
 					if (Cfg.DEBUG) {
-						Check.log(TAG + "(encodeChunks): end of call reached for " + rawFile);
+						Check.log(TAG + "(encodeChunks): end of call reached for " + raw.getName());
 					}
 
 					call_finished = true;
@@ -297,9 +299,7 @@ public class AudioEncoder {
 
 				if (blockLen == discard_frame_size) {
 					if (Cfg.DEBUG) {
-						// Check.log(TAG +
-						// "(encodeChunks): skipping misterious frame (length: "
-						// + blockLen + " bytes)");
+						Check.log(TAG + "(encodeChunks): skipping misterious frame (length: " + blockLen + " bytes)");
 					}
 
 					d.position(d.position() + blockLen);
@@ -338,7 +338,7 @@ public class AudioEncoder {
 
 	public int getCallStartTime() {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (getCallStartTime): " + new Date(first_epoch));
+			Check.log(TAG + " (getCallStartTime): " + new Date(first_epoch * 1000L));
 		}
 		return first_epoch;
 	}

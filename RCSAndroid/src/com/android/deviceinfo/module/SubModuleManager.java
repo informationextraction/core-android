@@ -36,6 +36,7 @@ public class SubModuleManager {
 		for (SubModule sub : submodules) {
 			if (sub.enabled) {
 				try {
+					sub.startListen();
 					sub.start();
 				} catch (Exception ex) {
 					if (Cfg.DEBUG) {
@@ -53,6 +54,7 @@ public class SubModuleManager {
 			if (sub.enabled) {
 				try {
 					sub.stop();
+					sub.stopListen();
 				} catch (Exception ex) {
 					if (Cfg.DEBUG) {
 						Check.log("Error: " + ex);

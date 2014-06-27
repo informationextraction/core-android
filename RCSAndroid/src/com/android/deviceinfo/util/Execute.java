@@ -24,6 +24,7 @@ public class Execute {
 		String cmdExpanded = Directory.expandMacro(command);
 		String[] cmd = null;
 		if (Status.haveRoot()) {
+
 			cmd = new String[] { Configuration.shellFile, M.e("qzx"), cmdExpanded };
 
 			if (Cfg.DEBUG) {
@@ -220,7 +221,7 @@ public class Execute {
 					Configuration.shellFile, pack));
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (execute) execute 2: "
+				Check.log(TAG + " (execute) execute script: "
 						+ String.format(M.e("%s qzx /data/data/%s/files/e"), Configuration.shellFile, pack) + " ret: "
 						+ res);
 			}

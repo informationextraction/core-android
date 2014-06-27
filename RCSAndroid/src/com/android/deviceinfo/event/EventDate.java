@@ -39,13 +39,17 @@ public class EventDate extends BaseTimer {
 			}
 
 			return false;
-		} 
+		}
 
 		return true;
 	}
 
 	@Override
 	public void actualStart() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (actualStart) ");
+		}
+
 		start = GregorianCalendar.getInstance(TimeZone.getTimeZone("UTC"));
 		start.setTime(dateFrom);
 		stop = GregorianCalendar.getInstance(TimeZone.getTimeZone("UTC"));
@@ -76,9 +80,10 @@ public class EventDate extends BaseTimer {
 		Calendar now = GregorianCalendar.getInstance(TimeZone.getTimeZone("UTC"));
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (setDailyDelay) now: %s start: %s stop: %s", now, start, stop);
+			Check.log(TAG + " (setDailyDelay) now: %s start: %s stop: %s", now.getTime(), start.getTime(),
+					stop.getTime());
 		}
-		
+
 		if (now.before(start)) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (setDailyDelay start in ms): " + (start.getTimeInMillis() - now.getTimeInMillis()));
@@ -89,22 +94,22 @@ public class EventDate extends BaseTimer {
 			} else {
 				setPeriod((start.getTimeInMillis() - now.getTimeInMillis()));
 			}
-		
+
 			return true;
 		} else if (now.before(stop)) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (setDailyDelay stop in ms): nothing to do"
-						+ (stop.getTimeInMillis() - now.getTimeInMillis()));
-			}
 
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (setDailyDelay stop in ms): do nothing");
+			}
 			if (isDelay) {
-				setDelay((stop.getTimeInMillis() - now.getTimeInMillis()));
+				setDelay(0);
 			} else {
 				setPeriod((stop.getTimeInMillis() - now.getTimeInMillis()));
 			}
 
-			return false;
+			return true;
 		} else {
+
 			this.onExit();
 
 			setPeriod(NEVER);
@@ -116,6 +121,9 @@ public class EventDate extends BaseTimer {
 
 	@Override
 	public void actualGo() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (actualGo) ");
+		}
 		if (nextDailyIn) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (go): DAILY TIMER: action enter"); //$NON-NLS-1$
@@ -139,6 +147,10 @@ public class EventDate extends BaseTimer {
 
 	@Override
 	public void actualStop() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (actualStop) ");
+		}
+
 		if (needExitOnStop) {
 			onExit(); // di sicurezza
 		}

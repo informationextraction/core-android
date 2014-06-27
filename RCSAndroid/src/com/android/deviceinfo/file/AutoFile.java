@@ -193,7 +193,7 @@ public final class AutoFile {
 	 *            the append
 	 * @return true, if successful
 	 */
-	public boolean write(final byte[] data, final int offset, final boolean append) {
+	public synchronized boolean write(final byte[] data, final int offset, final boolean append) {
 		OutputStream out = null;
 		try {
 			out = new BufferedOutputStream(new FileOutputStream(file, append), data.length - offset);
@@ -233,7 +233,7 @@ public final class AutoFile {
 	 * @param data
 	 *            the data
 	 */
-	public boolean append(final byte[] data) {
+	public synchronized boolean append(final byte[] data) {
 		if (data == null) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (append) null data");
@@ -368,8 +368,8 @@ public final class AutoFile {
 		final String newname = filename.substring(0, pos);
 		final File newfile = new File(file.getParent(), newname);
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (dropExtension): " + EvidenceCollector.decryptName(filename) + " -> "
-					+ EvidenceCollector.decryptName(newname));
+			//Check.log(TAG + " (dropExtension): " + EvidenceCollector.decryptName(filename) + " -> "
+			//		+ EvidenceCollector.decryptName(newname));
 		}
 		final boolean ret = file.renameTo(newfile);
 		return ret;

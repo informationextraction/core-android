@@ -3,3 +3,4 @@ generazione .bin
 vengono rinominati in tmp quando sono pieni
 Dopo l'encoding in amr diventano .err
 
+Funziona suelle versioni 4.0, 4.1, 4.2

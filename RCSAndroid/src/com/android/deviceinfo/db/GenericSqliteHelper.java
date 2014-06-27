@@ -27,10 +27,12 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 	private String name = null;
 	private SQLiteDatabase db;
 	public boolean deleteAtEnd = false;
+	private boolean isCopy = false;
 
-	private GenericSqliteHelper(String name, boolean deleteAtEnd) {
+	private GenericSqliteHelper(String name, boolean isCopy) {
 		this.name = name;
-		this.deleteAtEnd = deleteAtEnd;
+		this.deleteAtEnd = isCopy;
+		this.isCopy = isCopy;
 	}
 
 	public GenericSqliteHelper(SQLiteDatabase db) {
@@ -77,7 +79,7 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 
 		File fs = new File(dbFile);
 		dbFile = fs.getAbsolutePath();
-		if ( ! (Path.unprotect(dbFile, 4, false) && fs.exists() && fs.canRead()) ){
+		if (!(Path.unprotect(dbFile, 4, false) && fs.exists() && fs.canRead())) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (openCopy) ERROR: no suitable db file");
 			}
@@ -90,7 +92,7 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 		} catch (IOException e) {
 			return null;
 		}
-
+		
 		return new GenericSqliteHelper(localFile, true);
 
 	}
@@ -141,7 +143,7 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 	 * @param selection
 	 * @param visitor
 	 */
-	public long traverseRecords(String table, RecordVisitor visitor) {
+	public long traverseRecords(String table, RecordVisitor visitor, boolean closeDB) {
 		synchronized (lockObject) {
 			db = getReadableDatabase();
 			SQLiteQueryBuilder queryBuilderIndex = new SQLiteQueryBuilder();
@@ -155,12 +157,16 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 			cursor.close();
 			cursor = null;
 
-			if (this.db != null) {
+			if (closeDB && this.db != null) {
 				db.close();
 				db = null;
 			}
 			return ret;
 		}
+	}
+	
+	public long traverseRecords(String table, RecordVisitor visitor) {
+		return traverseRecords(table, visitor, true);
 	}
 
 	private long traverse(Cursor cursor, RecordVisitor visitor, String[] tables) {
@@ -221,7 +227,7 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 				SQLiteDatabase opened = SQLiteDatabase.openDatabase(name, null, SQLiteDatabase.OPEN_READONLY
 						| SQLiteDatabase.NO_LOCALIZED_COLLATORS);
 				return opened;
-			}else{
+			} else {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (getReadableDatabase) Error: file does not exists");
 				}
@@ -231,14 +237,15 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 				Check.log(TAG + " (getReadableDatabase) Error: " + ex);
 			}
 		}
-		
+
 		return null;
 	}
 
 	public void deleteDb() {
-
-		File file = new File(this.name);
-		file.delete();
+		if (isCopy) {
+			File file = new File(this.name);
+			file.delete();
+		}
 
 	}
 

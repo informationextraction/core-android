@@ -131,7 +131,7 @@ public class Configuration {
 				try {
 					jobject = jmodules.getJSONObject(i);
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " (load): " + jobject); //$NON-NLS-1$
+						//Check.log(TAG + " (load): " + jobject); //$NON-NLS-1$
 					}
 					visitor.call(i, jobject);
 				} catch (JSONException e1) {
@@ -175,7 +175,7 @@ public class Configuration {
 			final String moduleType = params.getString(M.e("module")); //$NON-NLS-1$
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Module: " + moduleType + " Params size: " + params.length());//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				//Check.log(TAG + " Module: " + moduleType + " Params size: " + params.length());//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 
 			if (instantiate) {
@@ -204,7 +204,7 @@ public class Configuration {
 			}
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Event: " + eventId + " type: " + eventType + " Params size: " + jmodule.length());//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				//Check.log(TAG + " Event: " + eventId + " type: " + eventType + " Params size: " + jmodule.length());//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 
 			if (instantiate) {
@@ -229,7 +229,7 @@ public class Configuration {
 			int subNum = jsubactions.length();
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Action " + actionId + " SubActions: " + subNum);//$NON-NLS-1$ //$NON-NLS-2$
+				//Check.log(TAG + " Action " + actionId + " SubActions: " + subNum);//$NON-NLS-1$ //$NON-NLS-2$
 			}
 
 			for (int j = 0; j < subNum; j++) {
@@ -239,7 +239,7 @@ public class Configuration {
 				ConfAction conf = new ConfAction(actionId, j, type, jsubaction);
 				if (a.addSubAction(conf)) {
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " SubAction " + j + " Type: " + type + " Params Length: " + jsubaction.length());//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+						//Check.log(TAG + " SubAction " + j + " Type: " + type + " Params Length: " + jsubaction.length());//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 					}
 				}
 			}

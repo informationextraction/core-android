@@ -1,0 +1,13 @@
+ adb -s 001964365bcf8e shell "rilcap qzx 'cat /data/data/com.google.android.talk/shared_prefs/smsmms.xml'"
+<?xml version='1.0' encoding='utf-8' standalone='yes' ?>
+<map>
+<boolean name="enable_smsmms_key" value="false" />
+<boolean name="Enable merged conversations" value="true" />
+<null name="smsmms_last_toast_account_key" />
+<boolean name="sms_notification_vibrate_bool_key" value="true" />
+<boolean name="group_mms_key" value="true" />
+<boolean name="smsmms_oob_dismissed_key" value="true" />
+<boolean name="enable_auto_retrieve_key" value="true" />
+<boolean name="sms_notification_enabled_key" value="true" />
+<long name="smsmms_oob_dismissed_time_key" value="1398686776032" />
+</map>

