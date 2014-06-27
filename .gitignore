@@ -36,3 +36,5 @@ RCSAndroid/src/com/android/deviceinfo/auto/Cfg.java
 
 .gradle/
 .idea/
+
+/local.properties
