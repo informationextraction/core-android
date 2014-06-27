@@ -32,3 +32,9 @@ RCSAndroid/src/com/android/deviceinfo/auto/Cfg.java
 /tmp/
 /RCSAndroid/obj/local/armeabi/objs/statuslog/ginger.o.d
 /RCSAndroid/src/com/android/dvci/auto/Cfg.java
+
+.gradle/
+.idea/
+core-android.iml
+local.properties
+
