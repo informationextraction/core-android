@@ -8,14 +8,11 @@
 R.java
 .DS_Store
 RCSAndroid/local.properties
-
 */tmp/*
-
 RCSAndroid/res/raw/*
-
 RCSAndroid/reverse/*
-
 RCSAndroid/obj/*
+RCSAndroid/gen
 RCSAndroid/assets/*
 RCSAndroid/src/com/android/service/auto/Cfg.java
 RCSAndroid/AndroidManifest.xml
@@ -25,9 +22,6 @@ RCSAndroid/src/com/android/deviceinfo/auto/Cfg.java
 /RCSAndroid/build/
 /crypter/test/out/
 /RCSAndroid/antlibs/DexGuard*/samples/*
-
 /tmp/
-
 /RCSAndroid/obj/local/armeabi/objs/statuslog/ginger.o.d
-
 /RCSAndroid/src/com/android/dvci/auto/Cfg.java
