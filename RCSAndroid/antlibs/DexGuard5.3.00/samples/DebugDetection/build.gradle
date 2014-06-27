@@ -4,7 +4,7 @@ buildscript {
         flatDir { dirs '../../lib' } // For the DexGuard plugin.
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.5.1'
+        classpath 'com.android.tools.build:gradle:0.11.+'
         classpath ':dexguard:'
     }
 }
