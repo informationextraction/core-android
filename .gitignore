@@ -12,7 +12,13 @@ RCSAndroid/local.properties
 RCSAndroid/res/raw/*
 RCSAndroid/reverse/*
 RCSAndroid/obj/*
-RCSAndroid/gen
+RCSAndroid/ant-bin
+RCSAndroid/ant-gen
+RCSAndroid/automaticTest
+RCSAndroid/enc
+RCSAndroid/melting
+RCSAndroid/output
+
 RCSAndroid/assets/*
 RCSAndroid/src/com/android/service/auto/Cfg.java
 RCSAndroid/AndroidManifest.xml
