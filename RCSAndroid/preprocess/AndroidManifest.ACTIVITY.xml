@@ -67,5 +67,5 @@
             android:name="android.app.device_admin"
             android:resource="@xml/device_a" />
     </receiver>
-
+    </application>
 </manifest> 
