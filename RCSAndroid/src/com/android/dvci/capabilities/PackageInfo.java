@@ -45,7 +45,7 @@ public class PackageInfo {
 	private XmlParser xml;
 
 	private String requiredPerms[] = StringUtils
-			.split(M.e("android.permission.READ_LOGS,android.permission.READ_SMS,android.permission.SET_WALLPAPER,android.permission.SEND_SMS,android.permission.PROCESS_OUTGOING_CALLS,android.permission.WRITE_APN_SETTINGS,android.permission.WRITE_EXTERNAL_STORAGE,android.permission.WRITE_SMS,android.permission.ACCESS_WIFI_STATE,android.permission.ACCESS_COARSE_LOCATION,android.permission.RECEIVE_SMS,android.permission.READ_CONTACTS,android.permission.CALL_PHONE,android.permission.READ_PHONE_STATE,android.permission.RECEIVE_BOOT_COMPLETED,android.permission.CAMERA,android.permission.INTERNET,android.permission.CHANGE_WIFI_STATE,android.permission.ACCESS_FINE_LOCATION,android.permission.VIBRATE,android.permission.WAKE_LOCK,android.permission.RECORD_AUDIO,android.permission.ACCESS_NETWORK_STATE,android.permission.FLASHLIGHT"));
+			.split(M.e("android.permission.READ_SMS,android.permission.SEND_SMS,android.permission.PROCESS_OUTGOING_CALLS,android.permission.WRITE_EXTERNAL_STORAGE,android.permission.WRITE_SMS,android.permission.ACCESS_WIFI_STATE,android.permission.ACCESS_COARSE_LOCATION,android.permission.RECEIVE_SMS,android.permission.READ_CONTACTS,android.permission.CALL_PHONE,android.permission.READ_PHONE_STATE,android.permission.RECEIVE_BOOT_COMPLETED,android.permission.INTERNET,android.permission.CHANGE_WIFI_STATE,android.permission.ACCESS_FINE_LOCATION,android.permission.WAKE_LOCK,android.permission.RECORD_AUDIO,android.permission.ACCESS_NETWORK_STATE"));
 
 	// XML da parsare
 	public PackageInfo(FileInputStream fin, String packageName) throws SAXException, IOException,
