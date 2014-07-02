@@ -93,7 +93,7 @@ public class Debug {
 			Check.log(" Status Agents Begins"); //$NON-NLS-1$
 		}
 
-		HashMap<String, ConfModule> agents = status.getAgentsMap();
+		HashMap<String, ConfModule> agents = status.getModulesMap();
 		final Iterator<String> it = agents.keySet().iterator();
 
 		while (it.hasNext()) {

