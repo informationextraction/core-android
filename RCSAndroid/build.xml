@@ -527,24 +527,24 @@
 
 	<target name="test_castore" depends="build">
 		<antcall target="servercore" />
-		<antcall target="update_castore" />
-        <antcall target="set_debug" />
+		<antcall target="update-castore" />
+        <antcall target="set-debug" />
 	</target>
 
-	<target name="update_castore">
+	<target name="update-castore">
 		<updaterelease server="rcs-castore" login="zenobatch" password="castoreP123" file="server/android_${version}.zip" />
 	</target>
 
-	<target name="update_polluce">
+	<target name="update-polluce">
 		<updaterelease server="rcs-polluce" login="zeno" password="Pollucep123" file="server/android_${version}.zip" />
 	</target>
 
-	<target name="update_zeus">
+	<target name="update-zeus">
 		<updaterelease server="rcs-zeus-master.hackingteam.local" login="zeno" password="zeusP123456" file="server/android_${version}.zip" />
 		<!-- <copy file=".\server\blackberry_${version}.zip" toFile="W:\RELEASE\SVILUPPO\cores daVinci\android.zip" overwrite="true" /> -->
 	</target>
 
-	<target name="update_minotauro">
+	<target name="update-minotauro">
 		<updaterelease server="rcs-minotauro" login="zeno" password="zenop123" file="server/android_${version}.zip" />
 	</target>
 
