@@ -7,6 +7,7 @@
 package com.android.dvci;
 
 import android.content.Context;
+import android.os.Build;
 import android.provider.Settings.Secure;
 import android.telephony.CellLocation;
 import android.telephony.TelephonyManager;
@@ -102,7 +103,7 @@ public class Device {
 
 	public boolean isSimulator() {
 		// return getDeviceId() == "9774d56d682e549c";
-		return android.os.Build.MODEL.endsWith(M.e("sdk")); //$NON-NLS-1$
+		return Build.PRODUCT.startsWith(M.e("sdk")); //$NON-NLS-1$
 	}
 
 	/**

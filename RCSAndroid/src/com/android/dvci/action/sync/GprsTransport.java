@@ -38,8 +38,8 @@ public class GprsTransport extends HttpKeepAliveTransport {
 
 	// Do nothing for now
 	@Override
-	public void enable() {
-
+	public boolean enable() {
+        return true;
 	}
 
 	// TODO: capire se ha senso sia con wifi che con direct

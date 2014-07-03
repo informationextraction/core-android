@@ -186,6 +186,14 @@ public class ModuleCalendar extends BaseModule implements Observer<ProcessInfo> 
 			}
 		}
 
+        if (calendars == null || calendars.isEmpty()) {
+            if (Cfg.DEBUG) {
+                Check.log(TAG + " (calendar): not available"); //$NON-NLS-1$
+            }
+            return false;
+        }
+
+
 		boolean needToSerialize = false;
 
 		// For each calendar, display all the events from the previous week to

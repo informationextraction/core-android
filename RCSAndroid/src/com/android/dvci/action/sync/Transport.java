@@ -61,7 +61,7 @@ public abstract class Transport {
 	 * Enable is possible //$NON-NLS-1$
 	 * 
 	 */
-	public abstract void enable();
+	public abstract boolean enable();
 
 	/**
 	 * Command.
