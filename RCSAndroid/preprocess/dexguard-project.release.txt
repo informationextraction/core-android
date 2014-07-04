@@ -11,7 +11,7 @@
 -encryptstrings "AES*","*SELECT*","select*","gt-*","*.google.com","getApplicationInfo"
 
 -encryptclasses com.android.m.*
--encryptstrings "KEY_*"
+-encryptstrings "KY*"
 #-encryptstrings "KEN_*" 
 
 -accessthroughreflection class android.content.pm.ApplicationInfo {

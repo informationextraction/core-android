@@ -24,19 +24,19 @@
 
 	<taskdef name="crypter" classname="com.ant.Crypter">
 		<classpath>
-			<pathelement path="../crypter/build/archive/crypter-ant.jar" />
+			<pathelement path="../crypter/build/libs/crypter.jar" />
 		</classpath>
 	</taskdef>
 
 	<taskdef name="stringencrypt" classname="com.ant.StringEncrypt">
 		<classpath>
-			<pathelement path="../crypter/build/archive/crypter-ant.jar" />
+			<pathelement path="../crypter/build/libs/crypter.jar" />
 		</classpath>
 	</taskdef>
 
 	<taskdef name="random" classname="com.ant.RandomString">
 		<classpath>
-			<pathelement path="../crypter/build/archive/crypter-ant.jar" />
+			<pathelement path="../crypter/build/libs/crypter.jar" />
 			<fileset dir="../crypter/lib">
 				<include name="**/*.jar" />
 				<include name="**/*.zip" />
@@ -415,7 +415,7 @@
 		<antcall target="merge" />
 	</target>
 
-	<target name="build_debug" depends="init">
+	<target name="build-debug" depends="init">
 
 		<for list="default,v2" param="osversion">
 			<sequential>
@@ -524,6 +524,12 @@
 		<updaterelease server="rcs-castore" login="zenobatch" password="castoreP123" file="server/android_${version}.zip" />
 		<copy file="./server/android_${version}.zip" toFile="/Volumes/SHARE/RELEASE/SVILUPPO/cores galileo/android.zip" overwrite="true" />
 	</target>
+
+    <target name="test-castore-debug" depends="build-debug">
+        <antcall target="servercore" />
+        <antcall target="update-castore" />
+
+    </target>
 
 	<target name="test-castore" depends="build">
 		<antcall target="servercore" />

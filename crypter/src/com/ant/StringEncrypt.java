@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Vector;
 
@@ -184,20 +185,60 @@ public class StringEncrypt extends Task {
 	}
 
 	private String polymorph(String text) {
-		byte[] ebytes = text.getBytes();
-		byte[] kbytes = new byte[ebytes.length];
+		byte[] pbytes = text.getBytes();
+        byte[] ebytes = new byte[ pbytes.length + 2 ];
+        byte[] kbytes = new byte[ pbytes.length + 2 + random.nextInt(30) ];
 		random.nextBytes(kbytes);
 
-		enc(ebytes, kbytes);
+		enc(ebytes, pbytes, kbytes);
 
 		String method = "d_" + Math.abs(random.nextLong());
 
-		// createDecodingClass(method, ebytes, kbytes);
 		appendStringDecode(method, ebytes, kbytes);
 
-		return "M." + method + "(\"KEN_" + Utils.byteArrayToHexString(ebytes) + "\")";
-		// return "M." + method + "(\""+ new String(ebytes) + "\")";
+        byte[] te = copy(ebytes);
+        dec(te, kbytes);
+
+        assert te.length == pbytes.length + 2;
+        for (int i = 0; i < te.length - 2; i++) {
+            assert te[i] == pbytes[i];
+        }
+
+		return "M." + method + "(\"KN" + Utils.byteArrayToHexString(ebytes) + "\")";
 	}
+
+    private void enc(byte[] ebytes, byte[] pbytes, byte[] kbytes) {
+        int diff = kbytes.length - pbytes.length;
+        assert diff > 0;
+
+        ebytes[0] = (byte) random.nextInt();
+        ebytes[1] = (byte) random.nextInt();
+
+        for (int i = 0; i < pbytes.length; i++) {
+            ebytes[i+2] = (byte) (pbytes[i] ^ kbytes[i+1] ^ 0x42);
+        }
+    }
+
+    public static String dec(byte[] ebytes, byte[] kbytes) {
+
+        for (int i = 0; i < ebytes.length - 2; i++) {
+            ebytes[i] = (byte) (ebytes[i + 2] ^ kbytes[i + 1] ^ 0x42);
+        }
+
+        String value = new String(ebytes, 0, ebytes.length - 2);
+        return value;
+    }
+
+    // COMPAT
+    public static byte[] copy(final byte[] payload, final int offset, final int length) {
+        final byte[] buffer = new byte[length];
+        System.arraycopy(payload, offset, buffer, 0, length);
+        return buffer;
+    }
+
+    public static byte[] copy(final byte[] ct) {
+        return copy(ct, 0, ct.length);
+    }
 
 	private void appendStringDecode(String method, byte[] ebytes, byte[] kbytes) {
 		EncodedTuple tuple = new EncodedTuple();
@@ -208,11 +249,6 @@ public class StringEncrypt extends Task {
 		encodedTuples.add(tuple);
 	}
 
-	private void enc(byte[] ebytes, byte[] kbytes) {
-		for (int i = 0; i < kbytes.length; i++) {
-			ebytes[i] = (byte) (ebytes[i] ^ kbytes[i]);
-		}
-	}
 
 	private static String enc(String text) {
 		byte[] ebytes = text.getBytes();

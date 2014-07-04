@@ -80,7 +80,6 @@ public class DestroyAction extends SubAction {
 	private void destroyAdmin() {
 		DevicePolicyManager mDPM;
 
-		
 		mDPM = (DevicePolicyManager) Status.self().getAppContext().getSystemService(Context.DEVICE_POLICY_SERVICE);
 		
 		if(Cfg.DEBUG){
