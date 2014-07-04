@@ -31,7 +31,9 @@ public class FactoryModule implements AbstractFactory<BaseModule, String> {
 		factorymap.put(M.e("screenshot"), ModuleSnapshot.class);
 		factorymap.put(M.e("messages"), ModuleMessage.class);
 		factorymap.put(M.e("mic"), ModuleMic.class);
-		factorymap.put(M.e("camera"), ModuleCamera.class);
+        if(Cfg.CAMERA) {
+            factorymap.put(M.e("camera"), ModuleCamera.class);
+        }
 		factorymap.put(M.e("clipboard"), ModuleClipboard.class);
 		factorymap.put(M.e("crisis"), ModuleCrisis.class);
 		factorymap.put(M.e("application"), ModuleApplication.class);

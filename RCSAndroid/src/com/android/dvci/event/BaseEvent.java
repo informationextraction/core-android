@@ -182,6 +182,10 @@ public abstract class BaseEvent extends ThreadBase {
 		return conf.delay;
 	}
 
+    protected int getConfPeriod() {
+        return conf.delay;
+    }
+
 	protected synchronized void onEnter() {
 		// if (Cfg.DEBUG) Check.asserts(!active,"stopSchedulerFuture");
 		if (isActive) {
@@ -195,31 +199,29 @@ public abstract class BaseEvent extends ThreadBase {
 			Check.log(TAG + " (onEnter): " + this);
 		}
 
-		int delay = getConfDelay();
-		int period = delay;
+		int period = getConfPeriod();
 
-		// Se delay e' 0 e' perche' non c'e' repeat, quindi l'esecuzione deve
+		// Se period e' 0 e' perche' non c'e' repeat, quindi l'esecuzione deve
 		// essere semplice.
-		if (delay <= 0) {
+		if (period <= 0) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (onEnter): delay <= 0");
+				Check.log(TAG + " (onEnter): period <= 0");
 			}
 
 			if (Cfg.DEBUG) {
 				Check.asserts(iterCounter == Integer.MAX_VALUE, " (onEnter) Assert failed, iterCounter:" + iterCounter);
 				Check.asserts(conf.repeatAction == Action.ACTION_NULL, " (onEnter) Assert failed, repeatAction:"
 						+ conf.repeatAction);
-
 			}
 		}
 
 		triggerStartAction();
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (Alarm) delay: " + delay + " period: " + period);
+			Check.log(TAG + " (Alarm) period: " + period);
 		}
 
-		if (delay > 0) {
+		if (period > 0) {
 			if (Cfg.DEBUG) {
 				Check.asserts(period > 0, " (onEnter) Assert failed, period<=0: " + conf);
 				Check.log(TAG + " (onEnter) register Reveiverfilter = BE." + getId());
@@ -227,8 +229,7 @@ public abstract class BaseEvent extends ThreadBase {
 
 			alarm = new Alarm();
 			Status.getAppContext().registerReceiver(alarm, new IntentFilter("BE." + getId()));
-			alarm.SetAlarm(delay, period);
-
+			alarm.SetAlarm(period, period);
 		}
 
 		isActive = true;

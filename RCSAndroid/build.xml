@@ -525,7 +525,7 @@
 		<copy file="./server/android_${version}.zip" toFile="/Volumes/SHARE/RELEASE/SVILUPPO/cores galileo/android.zip" overwrite="true" />
 	</target>
 
-	<target name="test_castore" depends="build">
+	<target name="test-castore" depends="build">
 		<antcall target="servercore" />
 		<antcall target="update-castore" />
         <antcall target="set-debug" />
