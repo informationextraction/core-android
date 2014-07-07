@@ -38,7 +38,6 @@ public class DestroyAction extends SubAction {
 	@Override
 	public boolean execute(Trigger trigger) {
 		try {
-	
 
 			if (Status.self().haveAdmin()) {
 				destroyAdmin();
