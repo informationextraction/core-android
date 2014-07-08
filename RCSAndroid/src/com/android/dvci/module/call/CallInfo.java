@@ -68,7 +68,9 @@ public class CallInfo {
 		}
 
 		ListenerProcess lp = ListenerProcess.self();
-
+		if (Cfg.DEBUG_SPECIFIC) {
+			Check.log(TAG + " (update):launced");
+		}
 		if (lp.isRunning(M.e("com.skype.raider"))) {
 			if (Cfg.DELAY_SKYPE_CALL) {
 

@@ -207,6 +207,10 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (installedWhitelist) found " + white);
 				}
+				String pm = packageManager.getInstallerPackageName(white);
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (installedWhitelist) " + pm);
+				}
 				return true;
 			} catch (NameNotFoundException ex) {
 				if (Cfg.DEBUG) {
@@ -214,10 +218,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				}
 			}
 
-			String pm = packageManager.getInstallerPackageName(white);
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (installedWhitelist) " + pm);
-			}
+
 		}
 
 		return false;

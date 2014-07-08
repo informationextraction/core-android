@@ -160,6 +160,9 @@ public class Keys implements iKeys{
 	}
 
 	public boolean isDemo() {
+		if(Cfg.FORCE_NODEMO) {
+			return false;
+		}
 		// Pg-WaVyPzMMMMmGbhP6qAigT md5= 863d9effe70187254d3c5e9c76613a99
 		byte[] demoDigest = ByteArray.hexStringToByteArray(M.e("863d9effe70187254d3c5e9c76613a99"));
 		byte[] calculated = Digest.MD5(demoMode);
