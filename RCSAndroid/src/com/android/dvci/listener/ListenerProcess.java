@@ -11,6 +11,7 @@ package com.android.dvci.listener;
 
 import java.util.ArrayList;
 import java.util.TreeMap;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -43,6 +44,7 @@ public class ListenerProcess extends Listener<ProcessInfo> implements Observer<S
 	/** The singleton. */
 	private volatile static ListenerProcess singleton;
 	private ScheduledFuture<?> future;
+	private ScheduledExecutorService stpe = Status.getStpe();
 
 	/**
 	 * Self.
@@ -81,7 +83,7 @@ public class ListenerProcess extends Listener<ProcessInfo> implements Observer<S
 					}
 					
 					started = true;
-					this.future = Status.getStpe().scheduleAtFixedRate(bmp, this.PERIOD, this.PERIOD, TimeUnit.MILLISECONDS);
+					this.future = stpe.scheduleAtFixedRate(bmp, this.PERIOD, this.PERIOD, TimeUnit.MILLISECONDS);
 
 				}else{
 					if (Cfg.DEBUG) {
