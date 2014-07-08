@@ -12,12 +12,15 @@ public class Cfg {
 	public static final String OSVERSION = "@OSVERSION@";
 
 	public static final boolean DEBUG = @DEBUG@;
+	public static final boolean DEBUG_SPECIFIC = @DEBUG@; // @DEBUG@
+	public static final boolean CHECK_ANTI_DEBUG = !@DEBUG@;
 	public static final boolean EXCEPTION = @EXCEPTION@;
 	//public static final boolean DEBUG = true;
 	//public static final boolean EXCEPTION = true;
 
 	public static final boolean CAMERA = @CAMERA@;
 	public static boolean DEMO = @DEMO@; // @DEMO@
+	public static final boolean FORCE_NODEMO = false;
 	public static final boolean DEMO_INITSOUND = false;
 
 	public static final boolean KEYS = @KEYS@; // Se e' true vengono usate le chiavi hardcoded
