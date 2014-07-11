@@ -106,7 +106,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	private CallInfo callInfo;
 	private List<Chunk> chunks = new ArrayList<Chunk>();
 	private boolean[] finished = new boolean[2];
-	private boolean recording;
+	private boolean record;
 	private Object recordingLock = new Object();
 
 	public static ModuleCall self() {
@@ -182,7 +182,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 						ModuleMic.self().stop();
 					}
 					startWatchAudio();
-					recording = true;
+					record = true;
 
 				}
 			} else {
@@ -927,7 +927,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		}
 	}
 
-	public boolean isRecording() {
-		return recording;
+	public boolean canRecord() {
+		return record;
 	}
 }
