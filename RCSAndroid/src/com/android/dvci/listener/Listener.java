@@ -46,9 +46,9 @@ public abstract class Listener<U> {
 		if (observers.isEmpty()) {
 			return;
 		}
-
-		observers.remove(o);
-
+		if (observers.contains(o)) {
+			observers.remove(o);
+		}
 		if (observers.isEmpty()) {
 			stop();
 		}
