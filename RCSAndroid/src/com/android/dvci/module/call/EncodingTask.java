@@ -37,7 +37,13 @@ public class EncodingTask implements Runnable, Observer<ProcessInfo> {
 
 	public void wake() {
 		synchronized (sync) {
-			sync.notify();
+			try {
+				sync.notify();
+			} catch (IllegalMonitorStateException e){
+				if (Cfg.EXCEPTION) {
+					Check.log(e);
+				}
+			}
 		}
 	}
 
@@ -47,6 +53,10 @@ public class EncodingTask implements Runnable, Observer<ProcessInfo> {
 				try {
 					sync.wait();
 				} catch (InterruptedException e) {
+					if (Cfg.EXCEPTION) {
+						Check.log(e);
+					}
+				} catch (IllegalMonitorStateException e){
 					if (Cfg.EXCEPTION) {
 						Check.log(e);
 					}

