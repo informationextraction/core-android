@@ -204,10 +204,17 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 			Check.requires(status == StateRun.STARTED, "inconsistent status"); //$NON-NLS-1$
 		}
 
+		if (recorder == null) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (actualGo), recorder not ready");
+			}
+			return;
+		}
+
 		final int amp = recorder.getMaxAmplitude();
 		if (amp != 0) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (go): max amplitude=" + amp);//$NON-NLS-1$
+				Check.log(TAG + " (actualGo): max amplitude=" + amp);//$NON-NLS-1$
 			}
 		}
 
@@ -219,7 +226,6 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 					Check.log(TAG + " (actualGo) Error: " + ex);
 				}
 			}
-
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "numFailures: " + numFailures);//$NON-NLS-1$
