@@ -23,7 +23,7 @@ public class CallInfo {
 	public int programId;
 	public Date timestamp;
 	public boolean delay;
-	public boolean heuristic;
+	public boolean realRate;
 	private long[] streamId = new long[2];
 
 	public String getCaller() {
@@ -79,7 +79,7 @@ public class CallInfo {
 
 				this.programId = 0x0146;
 				this.delay = true;
-				this.heuristic = false;
+				this.realRate = false;
 
 				boolean ret = false;
 				if (end) {
@@ -111,7 +111,7 @@ public class CallInfo {
 				this.account = account;
 				this.programId = 0x0146;
 				this.delay = false;
-				this.heuristic = false;
+				this.realRate = false;
 
 				GenericSqliteHelper helper = ChatSkype.openSkypeDBHelper(account);
 
@@ -129,7 +129,7 @@ public class CallInfo {
 			boolean ret = false;
 			this.processName = M.e("com.viber.voip");
 			this.delay = true;
-			this.heuristic = true;
+			this.realRate = true;
 
 			// open DB
 			this.programId = 0x0148;

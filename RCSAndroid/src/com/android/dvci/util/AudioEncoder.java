@@ -10,7 +10,6 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Date;
-import java.util.Random;
 
 import android.media.AmrInputStream;
 
@@ -45,7 +44,7 @@ public class AudioEncoder {
 		}
 	}
 
-	public int getBitrate() {
+	public int getInferredSampleRate() {
 		float min = Float.MAX_VALUE;
 		int bitrates[] = { 8000, 11025, 16000, 22050, 32000, 44100, 48000, 88200, 96000, 176400, 192000, 352800, 384000 };
 		int calc = -1;
@@ -54,7 +53,7 @@ public class AudioEncoder {
 
 		if (delta <= 0 || data_size <= 0) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + "(getBitrate): delta is " + delta + " (first_epoch: " + first_epoch + ", last_epoch: "
+				Check.log(TAG + "(getInferredSampleRate): delta is " + delta + " (first_epoch: " + first_epoch + ", last_epoch: "
 						+ last_epoch + "), data_size is: " + data_size + ", bitrate cannot be guessed");
 			}
 			return -1;
@@ -76,7 +75,7 @@ public class AudioEncoder {
 		}
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + "(getBitrate): bitrate declared: " + bitrate + " bitrate inferred: " + calc);
+			Check.log(TAG + "(getInferredSampleRate): bitrate declared: " + bitrate + " bitrate inferred: " + calc);
 		}
 
 		// If we are in a certain difference range, we can reliably assume that
@@ -97,14 +96,14 @@ public class AudioEncoder {
 
 		if (perc > 10.0f) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + "(getBitrate): declared bitrate of " + bitrate + " seems to be false (skew: "
+				Check.log(TAG + "(getInferredSampleRate): declared bitrate of " + bitrate + " seems to be false (skew: "
 						+ (int) perc + "%), assuming: " + calc);
 			}
 
 			return calc;
 		} else {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + "(getBitrate): declared bitrate of " + bitrate + " seems to be thrutful (skew: "
+				Check.log(TAG + "(getInferredSampleRate): declared bitrate of " + bitrate + " seems to be thrutful (skew: "
 						+ (int) perc + "%), using it");
 			}
 
@@ -179,7 +178,7 @@ public class AudioEncoder {
 		if (realRate == true) {
 			bitRate = getAllegedSampleRate();
 		} else {
-			bitRate = getBitrate();
+			bitRate = getInferredSampleRate();
 
 			// Borderline case in which we are unable to infer the real value
 			if (bitRate < 0) {
