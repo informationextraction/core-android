@@ -228,7 +228,7 @@ public class AudioEncoder {
 			while (d.remaining() > 0) {
 				int cur_epoch = d.getInt();
 
-				d.position(d.position() + 8); // Discard streamType and
+				d.position(d.position() + discard_frame_size); // Discard streamType and
 												// sampleRate
 				blockLen = d.getInt();
 
@@ -271,6 +271,7 @@ public class AudioEncoder {
 				epoch = d.getInt();
 				streamType = d.getInt();
 				sampleRate = d.getInt();
+				//pid = d.getInt();
 				blockLen = d.getInt();
 
 				if (Cfg.DEBUG) {

