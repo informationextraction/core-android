@@ -25,6 +25,7 @@ public class CallInfo {
 	public boolean delay;
 	public boolean realRate;
 	private long[] streamId = new long[2];
+	private int[] streamPid = new int[2];
 
 	public String getCaller() {
 		if (!incoming) {
@@ -59,7 +60,25 @@ public class CallInfo {
 
 		return true;
 	}
+	public boolean setStreamPid(boolean remote, int pid) {
 
+		int pos = remote ? 1 : 0;
+		if (pid != this.streamPid[pos]) {
+
+			if (this.streamPid[pos] != 0) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (setStreamPid): Wrong pid: " + this.streamPid[pos] + " <- " + pid + " "
+							+ (remote ? "remote" : "local"));
+				}
+				this.streamPid[pos] = pid;
+				return false;
+			}
+
+			this.streamPid[pos] = pid;
+		}
+
+		return true;
+	}
 	public boolean update(boolean end) {
 
 		// RunningAppProcessInfo fore = runningProcesses.getForeground();
