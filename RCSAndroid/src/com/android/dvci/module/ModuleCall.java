@@ -684,7 +684,9 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		boolean remote = encodedFile.endsWith(M.e("-r.tmp.err"));
 
 		long streamId = getStreamId(encodedFile);
+		int pid = getStreamPid(encodedFile);
 		boolean ret = callInfo.setStreamId(remote, streamId);
+		ret = callInfo.setStreamPid(remote, pid);
 
 		if (!callInfo.update(false)) {
 			if (Cfg.DEBUG) {
@@ -810,6 +812,19 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			Check.log(TAG + " (getStreamId): " + streamId);
 		}
 		return streamId;
+	}
+	private int getStreamPid(String fullName) {
+
+		// Stored filetime (unix epoch() is in seconds not ms)
+		String split[] = fullName.split("-");
+		int streamPid =0;
+		if(split.length>4) {
+			streamPid = Integer.parseInt(split[3]);
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (getStreamPid): " + streamPid);
+			}
+		}
+		return streamPid;
 	}
 
 	private void sort_chunks() {
