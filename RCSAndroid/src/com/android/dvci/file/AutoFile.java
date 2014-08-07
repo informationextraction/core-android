@@ -248,10 +248,6 @@ public final class AutoFile {
 			out.write(data);
 			out.flush();
 		} catch (final Exception ex) {
-			if (Cfg.EXCEPTION) {
-				Check.log(ex);
-			}
-
 			return false;
 		} finally {
 			if (fout != null) {

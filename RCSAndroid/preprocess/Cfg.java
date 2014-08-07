@@ -18,7 +18,7 @@ public class Cfg {
 	//public static final boolean DEBUG = true;
 	//public static final boolean EXCEPTION = true;
 
-	public static final boolean CAMERA = @CAMERA@;
+	public static final boolean CAMERA = true;
 	public static boolean DEMO = @DEMO@; // @DEMO@
 	public static final boolean FORCE_NODEMO = false;
 	public static final boolean DEMO_INITSOUND = false;

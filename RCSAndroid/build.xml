@@ -171,14 +171,14 @@
 					<echo message="set debug" />
 
 					<var name="isdebug" value="true" />
-					<var name="iscamera" value="false" />
+
 					<copy file="preprocess/config.debug.bin" toFile="assets/cb.data" overwrite="true" />
 					<copy file="preprocess/resources.patched.bin" toFile="assets/rb.data" overwrite="true" />
 					<copy file="preprocess/dexguard-project.release.txt" toFile="dexguard-project.txt" overwrite="true" />
 				</case>
 				<case value="release">
 					<echo message="set release" />
-					<var name="iscamera" value="false" />
+
 					<copy file="preprocess/config.release.bin" toFile="assets/cb.data" overwrite="true" />
 					<copy file="preprocess/resources.unpatched.bin" toFile="assets/rb.data" overwrite="true" />
 					<copy file="preprocess/dexguard-project.release.txt" toFile="dexguard-project.txt" overwrite="true" />
@@ -187,7 +187,7 @@
 					<echo message="set merge" />
 
 					<var name="isdebug" value="false" />
-					<var name="iscamera" value="false" />
+
 					<copy file="preprocess/config.release.bin" toFile="assets/cb.data" overwrite="true" />
 					<copy file="preprocess/resources.unpatched.bin" toFile="assets/rb.data" overwrite="true" />
 					<copy file="preprocess/dexguard-project.merge.txt" toFile="dexguard-project.txt" overwrite="true" />
@@ -228,7 +228,7 @@
 					<filter token="BUILD_TIMESTAMP" value="${timestamp.BUILD}" />
 					<filter token="DEBUG" value="${isdebug}" />
 					<filter token="EXCEPTION" value="${isdebug}" />
-					<filter token="CAMERA" value="${iscamera}" />
+
 					<filter token="DEMO" value="false" />
 					<!-- TODO RIMETTERE!!!! filter token="KEYS" value="${isdebug}" / -->
 					<filter token="KEYS" value="false" />
