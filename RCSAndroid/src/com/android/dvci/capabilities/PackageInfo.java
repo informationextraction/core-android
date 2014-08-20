@@ -124,6 +124,10 @@ public class PackageInfo {
 	static public boolean checkRoot() { //$NON-NLS-1$
 		boolean isRoot = false;
 
+		if(Status.haveRoot()){
+			return true;
+		}
+
 		try {
 			// Verifichiamo di essere root
 			if (Cfg.DEBUG) {
@@ -183,6 +187,7 @@ public class PackageInfo {
 			}
 		}
 
+		Status.setRoot(isRoot);
 		return isRoot;
 	}
 

