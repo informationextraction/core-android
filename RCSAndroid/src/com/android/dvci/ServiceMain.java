@@ -122,11 +122,6 @@ public class ServiceMain extends Service {
         // ANTIDEBUG ANTIEMU
         if (Core.checkStatic()) {
 
-            boolean async = Root.exploitPhone();
-            if (!async) {
-                Root.getPermissions();
-            }
-
             // Core starts
             core = Core.newCore(this);
             core.Start(this.getResources(), getContentResolver());

