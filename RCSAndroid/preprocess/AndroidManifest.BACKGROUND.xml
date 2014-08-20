@@ -39,14 +39,14 @@
 			</intent-filter>
 		</service>
 
-		<receiver android:name="com.android.dvci.BM">
+		<receiver android:name=".BM">
 			<intent-filter>
 				<action android:name="android.intent.action.BOOT_COMPLETED" />
 				<action android:name="android.intent.action.USER_PRESENT" />
 			</intent-filter>
 		</receiver>
 
-		<receiver android:name="com.android.dvci.listener.AR"
+		<receiver android:name=".listener.AR"
 			android:permission="android.permission.BIND_DEVICE_ADMIN">
 			<intent-filter>
 

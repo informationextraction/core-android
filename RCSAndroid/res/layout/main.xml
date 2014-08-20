@@ -10,7 +10,6 @@
         android:id="@+id/imei"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:editable="true"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
 </LinearLayout>
