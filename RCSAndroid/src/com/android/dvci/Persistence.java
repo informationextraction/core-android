@@ -103,7 +103,7 @@ public class Persistence {
 		Root.removeScript(scriptName);
 		
 		// Remount /system
-		Execute.execute(new String[]{Configuration.shellFile, "blw"});
+		Execute.execute(Configuration.shellFile + " " + "blw");
 		
 		// Write our script into /system/etc/install-recovery.sh
 		scriptName = "ip";
