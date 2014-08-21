@@ -62,7 +62,7 @@ public class Instrument {
 		if (Cfg.DEBUG) { Check.asserts(stream!=null, " (installHijacker) Assert failed"); }
 
 		try {
-			if (PackageInfo.checkRoot() == false) {
+			if (!Status.haveRoot()) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + "(installHijacker): Nope, we are not root");
 				}
@@ -100,7 +100,7 @@ public class Instrument {
 	}
 
 	public boolean startInstrumentation() {
-		if (PackageInfo.checkRoot() == false) {
+		if (!Status.haveRoot()) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(startInstrumentation): Nope, we are not root");
 			}

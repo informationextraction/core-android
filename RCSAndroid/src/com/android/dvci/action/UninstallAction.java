@@ -75,7 +75,7 @@ public class UninstallAction extends SubActionSlow {
 
 		removeAdmin(Status.getAppContext());
 
-		if (PackageInfo.checkRoot()) {
+		if (Status.haveRoot()) {
 			Persistence p = new Persistence(Status.getAppContext());
 			p.removePersistance();
 		}

