@@ -167,8 +167,6 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			AudioEncoder.deleteAudioStorage();
 			boolean audioStorageOk = AudioEncoder.createAudioStorage();
 
-			AudioEncoder.deleteAudioStorage();
-			boolean audioStorageOk = AudioEncoder.createAudioStorage();
 
 			if (audioStorageOk) {
 				if (Cfg.DEBUG) {
