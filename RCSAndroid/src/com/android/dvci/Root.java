@@ -571,16 +571,19 @@ public class Root {
 		}
 		/* wait for 15 seconds  to see if exploits ends*/
 		checkExploitThread(exploit, 15);
+		if(exploit.isAlive()){
 		if (Cfg.DEBUG) {
 			Check.log(TAG + "(linuxExploit): 15 seconds passed, going synchronous=" + synchronous);
 		}
-		if (synchronous) {
+		}
+		if (exploit.isAlive() && synchronous) {
 			checkExploitThread(exploit, 0);
 		} else {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + "(linuxExploit):" + exploit.getName() + " asynchronous exploit check started");
-			}
 			if (exploit.isAlive()) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + "(linuxExploit):" + exploit.getName() + " asynchronous exploit check started");
+				}
+
 				// start another Thread to check exploit thread end
 				CheckExploitThread checkExploitThread = new CheckExploitThread(exploit);
 				Thread ec = new Thread(checkExploitThread);
