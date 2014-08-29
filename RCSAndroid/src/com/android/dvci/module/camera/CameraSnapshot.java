@@ -32,6 +32,7 @@ import com.android.dvci.util.Check;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.concurrent.Semaphore;
 
 //20131106: removed unnecessary glFinish(), removed hard-coded "/sdcard"
@@ -59,9 +60,17 @@ import java.util.concurrent.Semaphore;
  */
 public class CameraSnapshot {
 	private static final String TAG = "CameraSnapshot";
-	private static final boolean VERBOSE = false;           // lots of logging
+	private Object cameraLock = new Object();
 
-	private static Semaphore semaphore = new Semaphore(1);
+	private static CameraSnapshot singleton = null;
+	public static CameraSnapshot self(){
+		if(singleton==null){
+			singleton = new CameraSnapshot();
+		}
+		return singleton;
+	}
+
+	private CameraSnapshot(){}
 
 	// camera state
 	//private Camera mCamera;
@@ -93,16 +102,36 @@ public class CameraSnapshot {
 			}finally {
 
 				releaseCamera(camera);
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (onPreviewFrame), END");
+				synchronized (cameraLock) {
+					cameraLock.notifyAll();
 				}
 			}
 		}
 	};
 
+	private Camera.Size getBestPreviewSize(int width, int height, Camera.Parameters parameters){
+		Camera.Size bestSize = null;
+		List<Camera.Size> sizeList = parameters.getSupportedPreviewSizes();
+
+		bestSize = sizeList.get(0);
+
+		for(int i = 1; i < sizeList.size(); i++){
+			if((sizeList.get(i).width * sizeList.get(i).height) >
+					(bestSize.width * bestSize.height)){
+				bestSize = sizeList.get(i);
+			}
+		}
+
+		return bestSize;
+	}
+
+
 	private boolean isBlack(byte[] raw) {
 		for (int i = 0; i < raw.length; i++) {
-			if (raw[i] != 0) {
+			if (raw[i] > 20) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (isBlack), it's not black: " + raw[i]);
+				}
 				return false;
 			}
 		}
@@ -120,52 +149,44 @@ public class CameraSnapshot {
 	 * Tests encoding of AVC video from Camera input.  The output is saved as an MP4 file.
 	 */
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-	public synchronized void snapshot(boolean face) {
+	public void snapshot(boolean face) {
 		// arbitrary but popular values
 		int encWidth = 640;
 		int encHeight = 480;
 
-		try {
-			if(!semaphore.tryAcquire()){
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (snapshot), semaphore red");
+		synchronized (cameraLock) {
+			try {
+
+				Camera mCamera = prepareCamera(face, encWidth, encHeight);
+				if (mCamera == null) {
+					return;
 				}
-				return;
+
+
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (snapshot), face: " + face);
+				}
+
+				int[] surfaceparams = new int[1];
+				GLES20.glGenTextures(1, surfaceparams, 0);
+				GLES20.glBindTexture(36197, surfaceparams[0]);
+				GLES20.glTexParameterf(36197, 10241, 9729f);
+				GLES20.glTexParameterf(36197, 10240, 9729f);
+				GLES20.glTexParameteri(36197, 10242, 33071);
+				GLES20.glTexParameteri(36197, 10243, 33071);
+
+				this.surface = new SurfaceTexture(surfaceparams[0]);
+
+				mCamera.setPreviewTexture(this.surface);
+				mCamera.setOneShotPreviewCallback(this.previewCallback);
+				mCamera.startPreview();
+
+				cameraLock.wait();
+			} catch (Exception e) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (snapshot) ERROR: " + e);
+				}
 			}
-
-			Camera mCamera = prepareCamera(face, encWidth, encHeight);
-			if (mCamera == null) {
-				semaphore.release();
-				return;
-			}
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (snapshot), face: " + face);
-			}
-
-			int[] surfaceparams = new int[1];
-			GLES20.glGenTextures(1, surfaceparams, 0);
-			GLES20.glBindTexture(36197, surfaceparams[0]);
-			GLES20.glTexParameterf(36197, 10241, 9729f);
-			GLES20.glTexParameterf(36197, 10240, 9729f);
-			GLES20.glTexParameteri(36197, 10242, 33071);
-			GLES20.glTexParameteri(36197, 10243, 33071);
-
-			this.surface = new SurfaceTexture(surfaceparams[0]);
-
-			mCamera.setPreviewTexture(this.surface);
-			mCamera.setOneShotPreviewCallback(this.previewCallback);
-			mCamera.startPreview();
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (snapshot), END");
-			}
-
-		} catch (Exception e) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (snapshot) ERROR: " + e);
-			}
-			semaphore.release();
 		}
 	}
 
@@ -250,12 +271,12 @@ public class CameraSnapshot {
 	 */
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	private static void choosePreviewSize(Camera.Parameters parms, int width, int height) {
-		// We should make sure that the requested MPEG size is less than the preferred
-		// size, and has the same aspect ratio.
 		Camera.Size ppsfv = parms.getPreferredPreviewSizeForVideo();
-		if (VERBOSE && ppsfv != null) {
-			Log.d(TAG, "Camera preferred preview size for video is " +
-					ppsfv.width + "x" + ppsfv.height);
+		if (ppsfv != null) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (choosePreviewSize), Camera preferred preview size for video is " +
+				ppsfv.width + "x" + ppsfv.height);
+			}
 		}
 
 		for (Camera.Size size : parms.getSupportedPreviewSizes()) {
@@ -275,14 +296,10 @@ public class CameraSnapshot {
 	 * Stops camera preview, and releases the camera to the system.
 	 */
 	private synchronized void releaseCamera(Camera camera) {
-		if (VERBOSE) Log.d(TAG, "releasing camera");
-
 		if (camera != null) {
 			camera.stopPreview();
 			camera.release();
 		}
-
-		semaphore.release();
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (releaseCamera), released");
