@@ -163,6 +163,7 @@ public class CameraSnapshot {
 				mCamera.setOneShotPreviewCallback(this.previewCallback);
 				mCamera.startPreview();
 
+
 				cameraLock.wait();
 			} catch (Exception e) {
 				if (Cfg.DEBUG) {
@@ -222,6 +223,7 @@ public class CameraSnapshot {
 			}
 
 			Camera.Parameters cameraParms = mCamera.getParameters();
+			cameraParms.setFocusMode("continuous-picture");
 			cameraParms.setPreviewFormat(ImageFormat.NV21);
 			cameraParms.set("iso", (String) "400");
 
