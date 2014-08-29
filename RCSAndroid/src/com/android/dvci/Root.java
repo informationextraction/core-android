@@ -553,6 +553,7 @@ public class Root {
 					Status.self().setReload();
 				} else {
 					Status.setExploitResult(Status.EXPLOIT_RESULT_FAIL);
+					Root.getPermissions(true);
 				}
 			}
 		}
