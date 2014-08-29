@@ -656,6 +656,10 @@ public class Root {
 	 */
 	static public boolean getPermissions(boolean reload) {
 
+		if(Status.getExploitStatus() < Status.EXPLOIT_STATUS_EXECUTED){
+			return false;
+		}
+
 		// Abbiamo su?
 		Status.setSu(PackageInfo.hasSu());
 

