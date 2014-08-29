@@ -522,7 +522,9 @@ public class Root {
 				}
 				exploit.join(1000);
 				if (!exploit.isAlive()) {
-					Check.log(TAG + " (checkExploitThread), exploit terminated exiting");
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (checkExploitThread), exploit terminated exiting");
+					}
 					Status.setExploitStatus(Status.EXPLOIT_STATUS_EXECUTED);
 					Status.setExploitResult(PackageInfo.checkRoot() ? Status.EXPLOIT_RESULT_SUCCEED : Status.EXPLOIT_RESULT_FAIL);
 					break;
@@ -531,7 +533,6 @@ public class Root {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (checkExploitThread), exception");
 				}
-
 			}
 		}
 	}
