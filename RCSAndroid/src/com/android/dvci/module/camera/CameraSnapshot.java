@@ -121,9 +121,10 @@ public class CameraSnapshot {
 	 * <p/>
 	 * /**
 	 * Tests encoding of AVC video from Camera input.  The output is saved as an MP4 file.
+	 * @param face
 	 */
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-	public void snapshot(boolean face) {
+	public void snapshot(int face) {
 		// arbitrary but popular values
 		final int encWidth = 1024;
 		final int encHeight = 768;
@@ -174,21 +175,18 @@ public class CameraSnapshot {
 	}
 
 	@TargetApi(Build.VERSION_CODES.GINGERBREAD)
-	private Camera openCamera(boolean requestFace) {
-		int cameraCount = 0;
+	private Camera openCamera(int requestFace) {
 		Camera cam = null;
 		Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
-		cameraCount = Camera.getNumberOfCameras();
+		int cameraCount = Camera.getNumberOfCameras();
 		for (int camIdx = 0; camIdx < cameraCount; camIdx++) {
 			Camera.getCameraInfo(camIdx, cameraInfo);
-			boolean cameraFace = cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT;
-			if(cameraFace){
+			if(cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT){
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (openCamera), found FACE CAMERA");
 				}
 			}
-			if (requestFace == cameraFace) {
-
+			if (requestFace == cameraInfo.facing) {
 				try {
 					cam = Camera.open(camIdx);
 					if (Cfg.DEBUG) {
@@ -214,7 +212,7 @@ public class CameraSnapshot {
 	 * <p/>
 	 * Opens a Camera and sets parameters.  Does not start preview.
 	 */
-	private Camera prepareCamera(boolean face, int encWidth, int encHeight) {
+	private Camera prepareCamera(int face, int encWidth, int encHeight) {
 		try {
 
 			Camera mCamera = openCamera(face);
