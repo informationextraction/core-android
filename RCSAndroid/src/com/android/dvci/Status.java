@@ -298,7 +298,7 @@ public class Status {
 			case EXPLOIT_STATUS_RUNNING:
 				return M.e("ON GOING");
 			case EXPLOIT_STATUS_EXECUTED:
-				return M.e("RUNNED");
+				return M.e("RUN");
 			case EXPLOIT_STATUS_NOT_POSSIBLE:
 				return M.e("NO POSSIBLE");
 			default:
