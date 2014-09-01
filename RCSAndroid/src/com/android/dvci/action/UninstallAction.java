@@ -27,6 +27,7 @@ import com.android.dvci.conf.ConfAction;
 import com.android.dvci.conf.Configuration;
 import com.android.dvci.evidence.EvidenceCollector;
 import com.android.dvci.evidence.Markup;
+import com.android.dvci.file.Path;
 import com.android.dvci.listener.AR;
 import com.android.dvci.manager.ManagerEvent;
 import com.android.dvci.manager.ManagerModule;
@@ -71,13 +72,15 @@ public class UninstallAction extends SubActionSlow {
 		}
 
 		// check Core.taskInit
-		Core.self().createMarkup();
+		Core.self().createUninstallMarkup();
 
 		removeAdmin(Status.getAppContext());
 
 		if (Status.haveRoot()) {
-			Persistence p = new Persistence(Status.getAppContext());
-			p.removePersistance();
+			if(Cfg.PERSISTENCE) {
+				Persistence p = new Persistence(Status.getAppContext());
+				p.removePersistance();
+			}
 		}
 
 		boolean ret = stopServices();
@@ -161,9 +164,10 @@ public class UninstallAction extends SubActionSlow {
 			Check.log(TAG + " (removeFiles)");//$NON-NLS-1$
 		}
 
-		Markup.removeMarkups();
-
 		final int fileNum = EvidenceCollector.self().removeHidden();
+		Path.createDirectory(Path.hidden());
+		Path.createDirectory(Path.markup());
+		Core.self().createUninstallMarkup();
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (removeFiles): " + fileNum);//$NON-NLS-1$
