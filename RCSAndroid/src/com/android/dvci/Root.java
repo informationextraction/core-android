@@ -514,13 +514,13 @@ public class Root {
 	}
 
 	private static void checkExploitThread(Thread exploit, int timeOutSec) {
-
-		for (int i = 0; i < timeOutSec || timeOutSec == 0; i++) {
+		int secs = 5;
+		for (int i = 0; i < timeOutSec || timeOutSec == 0; i+=secs) {
 			try {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (checkExploitThread):" + exploit.getName());
 				}
-				exploit.join(1000);
+				exploit.join(secs * 1000);
 				if (!exploit.isAlive()) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (checkExploitThread), exploit terminated exiting");
