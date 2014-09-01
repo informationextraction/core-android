@@ -686,7 +686,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		long streamId = getStreamId(encodedFile);
 		int pid = getStreamPid(encodedFile);
 		boolean ret = callInfo.setStreamId(remote, streamId);
-		ret = callInfo.setStreamPid(remote, pid);
+		ret = callInfo.setStreamPid(pid);
 
 		if (!callInfo.update(false)) {
 			if (Cfg.DEBUG) {
@@ -721,7 +721,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 			if (callInfo.delay) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (encodeChunks) delay, just add a chunk: " + chunks.size());
+					Check.log(TAG + " (encodeChunks) delay, just add a chunk: " + chunks.size() +"monitored caller:" + caller+" monitored callee:" + callee);
 				}
 				chunks.add(new Chunk(encodedFile, begin, end, remote));
 				sort_chunks();
