@@ -103,7 +103,12 @@ public class Instrument {
 				// Run the injector
 				String scriptName = "ij";
 				String script = M.e("#!/system/bin/sh") + "\n";
-				script += path + "/" + hijacker + " -p " + pid + " -l " + path + "/" + lib + " -f " + dumpPath + "\n";
+				if (Cfg.DEBUG) {
+					script += path + "/" + hijacker + " -p " + pid + " -l " + path + "/" + lib + " -f " + dumpPath + " -d\n";
+					Check.log(TAG + " (startInstrumentation) running: " + path + "/" + hijacker + " -p " + pid + " -l " + path + "/" + lib + " -f " + dumpPath + " -d\n");
+				}else{
+					script += path + "/" + hijacker + " -p " + pid + " -l " + path + "/" + lib + " -f " + dumpPath + "\n";
+				}
 
 				Root.createScript(scriptName, script);
 				ExecuteResult ret = Execute.executeRoot(path + "/" + scriptName);
