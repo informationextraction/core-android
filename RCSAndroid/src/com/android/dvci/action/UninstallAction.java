@@ -33,6 +33,7 @@ import com.android.dvci.manager.ManagerEvent;
 import com.android.dvci.manager.ManagerModule;
 import com.android.dvci.util.Check;
 import com.android.dvci.util.Instrument;
+import com.android.dvci.util.Utils;
 import com.android.mm.M;
 
 /**
@@ -165,9 +166,6 @@ public class UninstallAction extends SubActionSlow {
 		}
 
 		final int fileNum = EvidenceCollector.self().removeHidden();
-		Path.createDirectory(Path.hidden());
-		Path.createDirectory(Path.markup());
-		Core.self().createUninstallMarkup();
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (removeFiles): " + fileNum);//$NON-NLS-1$
@@ -213,9 +211,15 @@ public class UninstallAction extends SubActionSlow {
 			Check.log(TAG + " (deleteApplication): " + packageURI.toString());
 		}
 
+		//removeFiles();
+
 		final Intent uninstallIntent = new Intent(Intent.ACTION_DELETE, packageURI);
 		uninstallIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		Status.getAppContext().startActivity(uninstallIntent);
+
+		//Utils.sleep(5000);
+		//Core.self().createUninstallMarkup();
+
 		return true;
 	}
 

