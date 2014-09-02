@@ -778,7 +778,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				if ((finished[0] && finished[1])) {
 					// After encoding create the end of call marker
 					if (callInfo.delay) {
-						saveAllEvidences(chunks, begin, end);
+						saveAllEvidences(chunks, callInfo, begin, end);
 					} else {
 						if (callInfo.valid)
 							closeCallEvidence(caller, callee, true, begin, end, callInfo.programId);
@@ -842,12 +842,11 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				programId);
 	}
 
-	private void saveAllEvidences(List<Chunk> chunks, Date begin, Date end) {
+	private void saveAllEvidences(List<Chunk> chunks, CallInfo callInfo, Date begin, Date end) {
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (saveAllEvidences) chunks: " + chunks.size());
 		}
-		CallInfo callInfo = new CallInfo();
 		callInfo.update(true);
 
 		String caller = callInfo.getCaller();

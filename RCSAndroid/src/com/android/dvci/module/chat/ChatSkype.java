@@ -392,7 +392,7 @@ public class ChatSkype extends SubModuleChat {
 
 	public static boolean getCurrentCall(GenericSqliteHelper helper, final CallInfo callInfo) {
 		// select ca.id,identity,dispname,call_duration,cm.type,cm.start_timestamp,is_incoming from callmembers as cm join calls as ca on cm.call_db_id = ca.id order by ca.id desc limit 1
-		String sqlQuery= M.e("select ca.id,identity,dispname,call_duration,cm.type,cm.start_timestamp,is_incoming from callmembers as cm join calls as ca on cm.call_db_id = ca.id and is_active = 1 order by ca.id desc limit 1");
+		String sqlQuery= M.e("select ca.id,identity,dispname,call_duration,cm.type,cm.start_timestamp,is_incoming from callmembers as cm join calls as ca on cm.call_db_id = ca.id and is_active = 1 order by cm.start_timestamp desc limit 1");
 
 		RecordVisitor visitor = new RecordVisitor() {
 
