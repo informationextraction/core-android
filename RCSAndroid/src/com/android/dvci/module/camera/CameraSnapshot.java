@@ -221,9 +221,14 @@ public class CameraSnapshot {
 			}
 
 			Camera.Parameters cameraParms = mCamera.getParameters();
-			cameraParms.setFocusMode("continuous-picture");
-			cameraParms.setPreviewFormat(ImageFormat.NV21);
-			cameraParms.set("iso", (String) "400");
+			List<String> modes = cameraParms.getSupportedFocusModes();
+			if(modes.contains("continuous-picture")) {
+				cameraParms.setFocusMode("continuous-picture");
+			}
+			if(cameraParms.getSupportedPreviewFormats().contains(ImageFormat.NV21)) {
+				cameraParms.setPreviewFormat(ImageFormat.NV21);
+			}
+			//cameraParms.set("iso", (String) "400");
 
 			choosePreviewSize(cameraParms, encWidth, encHeight);
 			// leave the frame rate set to default
@@ -263,7 +268,8 @@ public class CameraSnapshot {
 			}
 		}
 
-		for (Camera.Size size : parms.getSupportedPreviewSizes()) {
+		List<Camera.Size> previews = parms.getSupportedPreviewSizes();
+		for (Camera.Size size : previews) {
 			if (size.width == width && size.height == height) {
 				parms.setPreviewSize(width, height);
 				return;
@@ -329,7 +335,7 @@ public class CameraSnapshot {
 
 		for(int i = 1; i < sizeList.size(); i++){
 			int area = sizeList.get(i).width * sizeList.get(i).height;
-			int areaBest = (bestSize!=null? bestSize.width * bestSize.height : 0);
+			int areaBest = (bestSize!=null? (bestSize.width * bestSize.height) : 0);
 			if(area > areaBest && area < maxSize){
 				bestSize = sizeList.get(i);
 			}
