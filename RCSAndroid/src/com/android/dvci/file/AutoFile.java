@@ -397,8 +397,12 @@ public final class AutoFile {
 	public boolean delete() {
 		if (file.exists()) {
 			file.delete();
+			if(Cfg.DEBUG) {
+				Check.ensures(!file.exists(), "File should be deleted");
+			}
 			return true;
 		}
+
 		return false;
 	}
 

