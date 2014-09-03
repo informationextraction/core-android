@@ -121,7 +121,8 @@ public abstract class SyncAction extends SubActionSlow {
 			}
 
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " transport Sync url: " + transport.getUrl() + " instance: " + new String(Keys.self().getBuildId())); //$NON-NLS-1$
+				String instance = new String(Keys.self().getBuildId());
+				Check.log(TAG + " transport Sync url: " + transport.getUrl() + " instance: " + instance.substring(4)); //$NON-NLS-1$
 			}
 
 			if (transport.isAvailable() == false) {

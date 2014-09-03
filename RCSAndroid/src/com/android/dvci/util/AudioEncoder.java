@@ -190,6 +190,12 @@ public class AudioEncoder {
 
 		// Resample audio
 		Wave wave = Resample.resampleRaw(header, rawPcm);
+		if(wave == null){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (resample), Invalid raw sample, samplerate is zero");
+			}
+			return new byte[]{};
+		}
 
 		return wave.getBytes();
 	}
@@ -249,10 +255,10 @@ public class AudioEncoder {
 				}
 
 				if (Cfg.DEBUG) {
-					Check.log(TAG + "(encodeChunks): blockLen: " + blockLen +
-							" remaining: " + d.remaining() + " current position: " +
-							d.position() + " next position: " + (d.position() +
-							blockLen));
+					//Check.log(TAG + "(encodeChunks): blockLen: " + blockLen +
+					//		" remaining: " + d.remaining() + " current position: " +
+					//		d.position() + " next position: " + (d.position() +
+					//		blockLen));
 				}
 
 				d.position(d.position() + blockLen);
@@ -286,7 +292,7 @@ public class AudioEncoder {
 					// sampleRate + " blockLen: " + blockLen);
 				}
 
-				if (streamType == end_of_call && blockLen == 0) {
+				if (streamType == end_of_call && blockLen == 0 || blockLen > d.remaining()) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + "(encodeChunks): end of call reached for " + raw.getName());
 					}

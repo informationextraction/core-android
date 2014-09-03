@@ -42,6 +42,10 @@ public class Resample {
 		// Resample to 
 		Resampler resampler = new Resampler();
 		int sourceRate = header.getSampleRate();
+
+		if(sourceRate == 0){
+			return null;
+		}
 		
 		int targetRate = 8000;
 		byte[] resampledWaveData = resampler.reSample(data, header.getBitsPerSample(), sourceRate, targetRate);

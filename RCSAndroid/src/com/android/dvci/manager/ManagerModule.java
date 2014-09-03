@@ -245,7 +245,7 @@ public class ManagerModule extends Manager<BaseModule, String, String> {
 	/**
 	 * resets incremental logs before sync
 	 */
-	public void resetIncrementalLogs() {
+	public synchronized void resetIncrementalLogs() {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (resetIncrementalLogs)");
 		}

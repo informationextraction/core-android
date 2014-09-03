@@ -184,6 +184,12 @@ public class ChatTelegram extends SubModuleChat {
 			Path.unprotect(dbFile + "*", true);
 
 			helper = GenericSqliteHelper.openCopy(dbFile);
+			if(helper == null){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (start) cannot open db");
+				}
+				return;
+			}
 			helper.deleteAtEnd = false;
 
 			account = readAddressContacts();
