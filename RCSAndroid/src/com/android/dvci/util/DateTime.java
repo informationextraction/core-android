@@ -73,6 +73,9 @@ public final class DateTime {
 	 *            the date
 	 */
 	public DateTime(final Date date) {
+		if(Cfg.DEBUG){
+			Check.requires(date != null, "Null date");
+		}
 		// millisec e' UTC
 		final long millisecs = date.getTime();
 		this.date = new Date(millisecs);

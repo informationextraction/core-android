@@ -24,6 +24,8 @@ public class CallInfo {
 	public boolean delay;
 	public boolean realRate;
 	private long[] streamId = new long[2];
+	public Date begin;
+	public Date end;
 
 	public String getCaller() {
 		if (!incoming) {
@@ -37,6 +39,11 @@ public class CallInfo {
 			return account;
 		}
 		return peer;
+	}
+
+	public long getStreamId(boolean remote) {
+		int pos = remote ? 1 : 0;
+		return this.streamId[pos];
 	}
 
 	public boolean setStreamId(boolean remote, long streamId) {

