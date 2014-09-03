@@ -109,6 +109,12 @@ public class CallInfo {
 			this.delay = false;
 			this.realRate = false;
 
+			if(account == null){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (update) ERROR, cannot read Skype account ");
+					return false;
+				}
+			}
 			GenericSqliteHelper helper = ChatSkype.openSkypeDBHelper(account);
 
 			boolean ret = false;
