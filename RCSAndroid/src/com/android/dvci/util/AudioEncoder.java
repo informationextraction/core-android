@@ -297,7 +297,7 @@ public class AudioEncoder {
 					// sampleRate + " blockLen: " + blockLen);
 				}
 
-				if (streamType == end_of_call && blockLen == 0 || blockLen > d.remaining()) {
+				if (streamType == end_of_call && blockLen == 0 || blockLen < 0 || blockLen > d.remaining()) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + "(encodeChunks): end of call reached for " + raw.getName());
 					}
