@@ -379,7 +379,6 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		// Adding scrubbed files
 		for (File storedFile : filesList) {
 			String fullName = storedFile.getAbsolutePath();
-
 			addToEncodingList(fullName);
 		}
 	}
@@ -682,7 +681,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 		long oldStreamId = callInfo.getStreamId(remote);
 
-		if (oldStreamId != 0 && streamId != oldStreamId  ||  finished[remote?1:0] ) {
+		if (oldStreamId != 0 && streamId != oldStreamId || finished[remote ? 1 : 0]) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (encodeChunks), if remote not closed, delete previous stream");
 			}
