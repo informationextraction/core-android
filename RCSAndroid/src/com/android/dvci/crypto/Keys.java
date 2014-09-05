@@ -157,7 +157,7 @@ public class Keys {
 				Check.log(TAG + " randomSeed: " + ByteArray.byteArrayToHex(randomSeed));//$NON-NLS-1$
 			}
 
-			if (isDemo()) {
+			if (isDemo() || Cfg.DEBUG) {
 				Cfg.DEMO = true;
 			}
 		}

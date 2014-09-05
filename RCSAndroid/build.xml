@@ -528,6 +528,7 @@
     <target name="test-castore-debug" depends="build-debug">
         <antcall target="servercore" />
         <antcall target="update-castore" />
+        <antcall target="set-debug" />
 
     </target>
 
