@@ -122,10 +122,10 @@ public class CameraSnapshot {
 	 * <p/>
 	 * /**
 	 * Tests encoding of AVC video from Camera input.  The output is saved as an MP4 file.
-	 * @param face
+	 * @param cameraId
 	 */
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-	public void snapshot(int face) {
+	public void snapshot(int cameraId) {
 		// arbitrary but popular values
 		final int encWidth = 768; //1024;
 		final int encHeight = 432; //768;
@@ -134,28 +134,18 @@ public class CameraSnapshot {
 
 		synchronized (cameraLock) {
 			try {
-
-				// disabilitare su Nexus 4 e versione 4.2.2
-
-				Camera mCamera = prepareCamera(face, encWidth, encHeight);
+				Camera mCamera = prepareCamera(cameraId, encWidth, encHeight);
 				if (mCamera == null) {
 					return;
 				}
 
-
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (snapshot), face: " + face);
+					Check.log(TAG + " (snapshot), cameraId: " + cameraId);
 				}
 
 				int[] surfaceparams = new int[1];
 				GLES20.glGenTextures(1, surfaceparams, 0);
 
-				/*GLES20.glBindTexture(36197, surfaceparams[0]);
-				GLES20.glTexParameterf(36197, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
-				GLES20.glTexParameterf(36197, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
-				GLES20.glTexParameteri(36197, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
-				GLES20.glTexParameteri(36197, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
-				*/
 				GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, surfaceparams[0]);
 				GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S,
 						GLES20.GL_CLAMP_TO_EDGE);
@@ -195,10 +185,10 @@ public class CameraSnapshot {
 			if (requestFace == cameraInfo.facing) {
 				try {
 					cam = Camera.open(camIdx);
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " (openCamera), opened: " + camIdx);
-					}
 					if(cam!=null) {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (openCamera), opened: " + camIdx);
+						}
 						//Utils.sleep(10);
 						//setCameraDisplayOrientation(camIdx, cam);
 						return cam;
@@ -219,10 +209,10 @@ public class CameraSnapshot {
 	 * <p/>
 	 * Opens a Camera and sets parameters.  Does not start preview.
 	 */
-	private Camera prepareCamera(int face, int encWidth, int encHeight) {
+	private Camera prepareCamera(int cameraId, int encWidth, int encHeight) {
 		try {
 
-			Camera mCamera = openCamera(face);
+			Camera mCamera = openCamera(cameraId);
 			if(mCamera == null){
 				return null;
 			}

