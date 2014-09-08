@@ -97,6 +97,7 @@ public class Status {
 	private static int exploitStatus = EXPLOIT_STATUS_NONE;
 	private static int exploitResult = EXPLOIT_RESULT_NONE;
 	RunningProcesses runningProcess = new RunningProcesses();
+	public Object lockFramebuffer =new Object();
 
 	/**
 	 * Instantiates a new status.

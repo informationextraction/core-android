@@ -67,6 +67,8 @@ public class CameraSnapshot {
 	private Object cameraLock = new Object();
 
 	private static CameraSnapshot singleton = null;
+	private boolean enable = true;
+
 	public static CameraSnapshot self(){
 		if(singleton==null){
 			singleton = new CameraSnapshot();
@@ -74,7 +76,10 @@ public class CameraSnapshot {
 		return singleton;
 	}
 
-	private CameraSnapshot(){}
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+	private CameraSnapshot(){
+
+	}
 
 	// camera state
 	//private Camera mCamera;
@@ -105,7 +110,6 @@ public class CameraSnapshot {
 				}
 			}finally {
 
-				releaseCamera(camera);
 				synchronized (cameraLock) {
 					cameraLock.notifyAll();
 				}
@@ -131,11 +135,15 @@ public class CameraSnapshot {
 		final int encHeight = 432; //768;
 
 		//768x432
+		if(!enable){
+			return;
+		}
 
 		synchronized (cameraLock) {
 			try {
 				Camera mCamera = prepareCamera(cameraId, encWidth, encHeight);
 				if (mCamera == null) {
+					this.enable = false;
 					return;
 				}
 
@@ -143,24 +151,26 @@ public class CameraSnapshot {
 					Check.log(TAG + " (snapshot), cameraId: " + cameraId);
 				}
 
-				int[] surfaceparams = new int[1];
-				GLES20.glGenTextures(1, surfaceparams, 0);
+				if(this.surface == null){
+					int[] surfaceparams = new int[1];
+					GLES20.glGenTextures(1, surfaceparams, 0);
 
-				GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, surfaceparams[0]);
-				GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S,
-						GLES20.GL_CLAMP_TO_EDGE);
-				GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T,
-						GLES20.GL_CLAMP_TO_EDGE);
+					GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, surfaceparams[0]);
+					GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S,
+							GLES20.GL_CLAMP_TO_EDGE);
+					GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T,
+							GLES20.GL_CLAMP_TO_EDGE);
 
 
-				this.surface = new SurfaceTexture(surfaceparams[0]);
-
+					this.surface = new SurfaceTexture(surfaceparams[0]);
+				}
 				mCamera.setPreviewTexture(this.surface);
-				mCamera.setOneShotPreviewCallback(this.previewCallback);
 				mCamera.startPreview();
-
+				mCamera.setOneShotPreviewCallback(this.previewCallback);
 
 				cameraLock.wait();
+
+				releaseCamera(mCamera);
 			} catch (Exception e) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (snapshot) ERROR: " + e);
