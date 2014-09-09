@@ -179,7 +179,14 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 		long maxid = 0;
 		// iterate conversation indexes
 		while (cursor != null && cursor.moveToNext() && !visitor.isStopRequested()) {
-			long id = visitor.cursor(cursor);
+			long id = -1;
+			try {
+				id = visitor.cursor(cursor);
+			}catch (Exception ex){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (traverseRecords) Error: %s", ex);
+				}
+			}
 			maxid = Math.max(id, maxid);
 		}
 

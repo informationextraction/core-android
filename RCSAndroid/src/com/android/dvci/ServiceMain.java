@@ -50,6 +50,9 @@ public class ServiceMain extends Service {
             if (Cfg.DEBUG) {
                 Check.log(TAG + " (onCreate) anti emu/debug failed");
             }
+	        if (Cfg.DEMO) {
+		        Status.self().makeToast("RUNNING");
+	        }
 
             return;
         }
@@ -97,18 +100,6 @@ public class ServiceMain extends Service {
         }
 
         return true;
-    }
-
-    long pow(long base, long exponent) {
-        long aux = 1;
-        while(exponent > 0) {
-            if (exponent % 2 == 1) {
-                aux *= base;
-            }
-            base *= base;
-            exponent /= 2;
-        }
-        return aux;
     }
 
     @Override

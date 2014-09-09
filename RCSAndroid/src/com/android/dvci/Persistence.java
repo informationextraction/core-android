@@ -156,7 +156,7 @@ public class Persistence {
 	
 			return false;
 		} else {
-			Execute.execute(Configuration.shellFile + M.e(" pzm 775 ")  + storageDir);
+			Execute.execute(Configuration.shellFile + M.e(" qzx chmod 775 ")  + storageDir);
 			
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (genStorage): persistence storage directory created at " + storageDir); //$NON-NLS-1$

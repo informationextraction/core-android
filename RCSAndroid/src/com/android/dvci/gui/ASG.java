@@ -72,7 +72,6 @@ public class ASG extends Activity {
 
 		Status.setAppGui(this);
 
-		startService();
 		setContentView(R.layout.main);
 
 		TextView t = (TextView) findViewById(R.id.imei);
@@ -115,6 +114,8 @@ public class ASG extends Activity {
 				t.append("Root: no");
 			}
 		}
+
+		startService();
 	}
 
 	private void startExtService() {
