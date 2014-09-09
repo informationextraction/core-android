@@ -54,7 +54,7 @@ public class ModuleCamera extends BaseInstantModule {
 		//boolean force = conf.getBoolean("force", false);
 		//face = conf.getBoolean("face", false);
 
-		return Status.self().haveCamera;
+		return Status.self().haveCamera();
 	}
 
 	@Override

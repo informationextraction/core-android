@@ -807,7 +807,7 @@ public class Status {
 	}
 
 
-	public final boolean haveCamera = false;
+	private boolean haveCamera = false;
 	private boolean checkCameraHardware() {
 		if (Status.self().getAppContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
 			// this device has a camera
@@ -824,4 +824,7 @@ public class Status {
 		}
 	}
 
+	public boolean haveCamera() {
+		return haveCamera;
+	}
 }
