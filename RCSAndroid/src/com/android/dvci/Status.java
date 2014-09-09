@@ -95,7 +95,7 @@ public class Status {
 	private final Date startedTime = new Date();
 
 	private boolean deviceAdmin;
-
+	private int haveCamera = -1;
 	private boolean reload;
 
 	static public boolean wifiConnected = false;
@@ -130,8 +130,6 @@ public class Status {
 			triggeredSemaphore[i] = new Object();
 			triggeredActions[i] = new ArrayList<Integer>();
 		}
-
-		haveCamera = checkCameraHardware();
 	}
 
 	/**
@@ -806,8 +804,6 @@ public class Status {
 		return delta / 1000;
 	}
 
-
-	private boolean haveCamera = false;
 	private boolean checkCameraHardware() {
 		if (Status.self().getAppContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
 			// this device has a camera
@@ -825,6 +821,10 @@ public class Status {
 	}
 
 	public boolean haveCamera() {
-		return haveCamera;
+
+		if(haveCamera == -1) {
+			haveCamera = checkCameraHardware()?1:0;
+		}
+		return haveCamera == 1;
 	}
 }

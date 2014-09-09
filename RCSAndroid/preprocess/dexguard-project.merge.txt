@@ -52,16 +52,11 @@
     res/layout/main.xml,
     res/values/*
 
-
 -keep class android.media.AmrInputStream
--keep public class com.android.dvci.gui.CGui
 -keep public class com.android.dvci.BM
-#-keep public class com.android.dvci.listener.BAc
-#-keep public class com.android.dvci.listener.BSt
-#-keep public class com.android.dvci.listener.BSm
-#-keep public class com.android.dvci.listener.BC
 -keep public class com.android.dvci.optimize.NetworkOptimizer
 -keep public class com.android.dvci.util.Instrument
+
 -keep class com.musicg.** { *; }
 -keep class android.media.** {*;}
 -keep class com.sun.media.sound.** { *; }
