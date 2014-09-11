@@ -80,7 +80,7 @@ public abstract class SubModuleChat extends SubModule implements Observer<Standb
 				if (frequentNotification(process.processInfo)) {
 					Runnable runnable = getFrequentRunnable(process.processInfo);
 					if (runnable != null) {
-						future = Status.getStpe().scheduleAtFixedRate(runnable, 0, 2, TimeUnit.SECONDS);
+						future = Status.getStpe().scheduleAtFixedRate(runnable, 0, Cfg.FREQUENT_NOTIFICATION_PERIOD, TimeUnit.SECONDS);
 
 					}
 					return 1;

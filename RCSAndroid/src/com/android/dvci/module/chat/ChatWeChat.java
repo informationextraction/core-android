@@ -256,7 +256,7 @@ public class ChatWeChat extends SubModuleChat {
 				return createTime;
 			}
 		};
-		long lastCreationLine = helper.traverseRawQuery(sqlquery, new String[] { Long.toString(lastLine) }, visitor);
+		long lastCreationLine = helper.traverseRawQuery(sqlquery, new String[] { Long.toString(lastLine) }, visitor, true);
 
 		getModule().saveEvidence(messages);
 

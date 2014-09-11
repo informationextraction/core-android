@@ -246,7 +246,7 @@ public class ChatViber extends SubModuleChat {
 		};
 
 		String sqlquery = M.e("SELECT P._id,  I.number, I.display_name, I.contact_name, I.participant_type from participants as P join participants_info as I on P.participant_info_id = I._id where conversation_id = ?");
-		helper.traverseRawQuery(sqlquery, new String[] { thread_id }, visitor);
+		helper.traverseRawQuery(sqlquery, new String[] { thread_id }, visitor, true);
 
 	}
 
@@ -385,7 +385,7 @@ public class ChatViber extends SubModuleChat {
 			}
 		};
 
-		helper.traverseRawQuery(sqlQuery, new String[] {}, visitor);
+		helper.traverseRawQuery(sqlQuery, new String[] {}, visitor, true);
 		return callInfo.valid;
 	}
 

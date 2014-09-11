@@ -220,7 +220,7 @@ public class ChatLine extends SubModuleChat {
             };
 
             helper.deleteAtEnd = true;
-            long lastmessage = helper.traverseRawQuery(sqlquery, new String[]{Long.toString(lastLine)}, visitor);
+            long lastmessage = helper.traverseRawQuery(sqlquery, new String[]{Long.toString(lastLine)}, visitor, true);
 
             getModule().saveEvidence(messages);
             return lastmessage;
@@ -271,13 +271,13 @@ public class ChatLine extends SubModuleChat {
         };
 
         String sqlquery = M.e("SELECT  chat_id, mid, name FROM 'chat_member' left join contacts on chat_member.mid = contacts.m_id");
-        helper.traverseRawQuery(sqlquery, null, visitor);
+        helper.traverseRawQuery(sqlquery, null, visitor, false);
 
         sqlquery = M.e("select chat_id, owner_mid, name from chat as ch left join contacts as c on ch.owner_mid = c.m_id");
-        helper.traverseRawQuery(sqlquery, null, visitor);
+        helper.traverseRawQuery(sqlquery, null, visitor, false);
 
         sqlquery = M.e("select distinct chat_id, from_mid, name from chat_history as ch left join contacts as c on ch.from_mid = c.m_id where from_mid not null");
-        helper.traverseRawQuery(sqlquery, null, visitor);
+        helper.traverseRawQuery(sqlquery, null, visitor, true);
 
         groups.addLocalToAllGroups(account);
 

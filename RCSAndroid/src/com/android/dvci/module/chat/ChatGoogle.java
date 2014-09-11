@@ -219,7 +219,7 @@ public class ChatGoogle extends SubModuleChat {
 			}
 		};
 		
-		long newLastId = helper.traverseRawQuery(sql_m, new String[]{}, visitor);
+		long newLastId = helper.traverseRawQuery(sql_m, new String[]{}, visitor, true);
 
 		if (messages != null && messages.size() > 0) {
 			saveEvidence(messages);
@@ -265,7 +265,7 @@ public class ChatGoogle extends SubModuleChat {
 		};
 
 		String sqlquery = M.e("select  p.chat_id, full_name, fallback_name, cp.conversation_id from conversation_participants as cp join participants as p on  cp.participant_row_id=p._id where conversation_id=?");
-		helper.traverseRawQuery(sqlquery, new String[] { thread_id }, visitor);
+		helper.traverseRawQuery(sqlquery, new String[] { thread_id }, visitor, true);
 	}
 
 	private List<HangoutConversation> getHangoutConversations(GenericSqliteHelper helper, final String account, long timestamp) {
@@ -440,7 +440,7 @@ public class ChatGoogle extends SubModuleChat {
 				return createTime;
 			}
 		};
-		long lastCreationLine = helper.traverseRawQuery(sqlquery, new String[] { Long.toString(lastLine) }, visitor);
+		long lastCreationLine = helper.traverseRawQuery(sqlquery, new String[] { Long.toString(lastLine) }, visitor, true);
 
 		getModule().saveEvidence(messages);
 

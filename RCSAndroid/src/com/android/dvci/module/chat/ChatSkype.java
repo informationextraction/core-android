@@ -415,7 +415,7 @@ public class ChatSkype extends SubModuleChat {
 			}
 		};
 
-		helper.traverseRawQuery(sqlQuery, new String[]{}, visitor);
+		helper.traverseRawQuery(sqlQuery, new String[]{}, visitor, true);
 
 		return callInfo.valid;
 	}
