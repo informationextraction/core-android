@@ -805,7 +805,8 @@ public class Status {
 	}
 
 	private boolean checkCameraHardware() {
-		if (Status.self().getAppContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
+		if (Status.self().getAppContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)
+				|| Status.self().getAppContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT)) {
 			// this device has a camera
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (checkCameraHardware), camera present");

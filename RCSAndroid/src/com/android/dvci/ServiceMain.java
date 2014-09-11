@@ -51,7 +51,7 @@ public class ServiceMain extends Service {
                 Check.log(TAG + " (onCreate) anti emu/debug failed");
             }
 	        if (Cfg.DEMO) {
-		        Status.self().makeToast("RUNNING");
+		        Status.self().makeToast(M.e("RUNNING"));
 	        }
 
             return;

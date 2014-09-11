@@ -140,7 +140,7 @@ public class ChatViber extends SubModuleChat {
 			List<ViberConversation> conversations = getViberConversations(helper, account, lastViberReadDate);
 			for (ViberConversation sc : conversations) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (readSkypeMessageHistory) conversation: " + sc.id + " date: " + sc.date);
+					Check.log(TAG + " (readViberMessageHistory) conversation: " + sc.id + " date: " + sc.date);
 				}
 
 				// retrieves the lastConvId recorded as evidence for this

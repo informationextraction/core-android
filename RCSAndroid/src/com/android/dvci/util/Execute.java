@@ -290,4 +290,7 @@ public class Execute {
 
 	}
 
+	public static void chmod(String mode, String file) {
+		execute(new String[]{Configuration.shellFile,"qzx","chmod " + mode +" "+ file} );
+	}
 }
