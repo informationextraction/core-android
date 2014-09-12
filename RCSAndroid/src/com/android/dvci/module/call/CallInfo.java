@@ -122,14 +122,15 @@ public class CallInfo {
 					return false;
 				}
 			}
+			boolean ret = false;
 			GenericSqliteHelper helper = ChatSkype.openSkypeDBHelper(account);
 
-			boolean ret = false;
 			if (helper != null) {
 				ret = ChatSkype.getCurrentCall(helper, this);
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " SKYPE (updateCallInfo): id: " + this.id + " peer: " + this.peer + "returning:" + ret);
 				}
+				helper.disposeDb();
 			}
 
 			return ret;
@@ -148,6 +149,7 @@ public class CallInfo {
 
 				if (helper != null) {
 					ret = ChatViber.getCurrentCall(helper, this);
+					helper.disposeDb();
 				}
 
 				if (Cfg.DEBUG) {

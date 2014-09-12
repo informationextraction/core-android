@@ -207,51 +207,58 @@ public class ChatWhatsapp extends SubModuleChat {
 			if (Path.unprotect(dbDir, dbFile, true)) {
 
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (readChatMessages): can read DB");
+					Check.log(TAG + " (readChatWhatsappMessages): can read DB");
 				}
 				GenericSqliteHelper helper = GenericSqliteHelper.open(dbDir, dbFile);
-				SQLiteDatabase db = helper.getReadableDatabase();
-
-				// retrieve a list of all the conversation changed from the last
-				// reading. Each conversation contains the peer and the last id
-				ArrayList<Pair<String, Integer>> changedConversations = fetchChangedConversation(db);
-				//helper.deleteDb();
-				
-				//helper = GenericSqliteHelper.open(dbDir, dbFile);
-
-				// for every conversation, fetch and save message and update
-				// markup
-				for (Pair<String, Integer> pair : changedConversations) {
-					String conversation = pair.first;
-					int lastReadIndex = pair.second;
-
-					if (groups.isGroup(conversation) && !groups.hasMemoizedGroup(conversation)) {
-						fetchGroup(helper, conversation);
-					}
-
-					int newLastRead = fetchMessages(db, conversation, lastReadIndex);
-
+				if (helper == null) {
 					if (Cfg.DEBUG) {
-						Check.log(TAG + " (readChatMessages): fetchMessages " + conversation + ":" + lastReadIndex
-								+ " newLastRead " + newLastRead);
+						Check.log(TAG + " (readChatWhatsappMessages) Error, file not readable: " + dbFile);
 					}
-					hastableConversationLastIndex.put(conversation, newLastRead);
-					if (Cfg.DEBUG) {
-						Check.asserts(hastableConversationLastIndex.get(conversation) > 0,
-								" (readChatMessages) Assert failed, zero index");
-					}
-					updateMarkup = true;
+					return;
 				}
+				try {
+					SQLiteDatabase db = helper.getReadableDatabase();
 
-				if (updateMarkup) {
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " (readChatMessages): updating markup");
+					// retrieve a list of all the conversation changed from the last
+					// reading. Each conversation contains the peer and the last id
+					ArrayList<Pair<String, Integer>> changedConversations = fetchChangedConversation(db);
+					//helper.disposeDb();
+
+					//helper = GenericSqliteHelper.open(dbDir, dbFile);
+
+					// for every conversation, fetch and save message and update
+					// markup
+					for (Pair<String, Integer> pair : changedConversations) {
+						String conversation = pair.first;
+						int lastReadIndex = pair.second;
+
+						if (groups.isGroup(conversation) && !groups.hasMemoizedGroup(conversation)) {
+							fetchGroup(helper, conversation);
+						}
+
+						int newLastRead = fetchMessages(db, conversation, lastReadIndex);
+
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (readChatMessages): fetchMessages " + conversation + ":" + lastReadIndex
+									+ " newLastRead " + newLastRead);
+						}
+						hastableConversationLastIndex.put(conversation, newLastRead);
+						if (Cfg.DEBUG) {
+							Check.asserts(hastableConversationLastIndex.get(conversation) > 0,
+									" (readChatMessages) Assert failed, zero index");
+						}
+						updateMarkup = true;
 					}
-					markup.writeMarkupSerializable(hastableConversationLastIndex);
-				}
 
-				db.close();
-				//helper.deleteDb();
+					if (updateMarkup) {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (readChatMessages): updating markup");
+						}
+						markup.writeMarkupSerializable(hastableConversationLastIndex);
+					}
+				}finally {
+					helper.disposeDb();
+				}
 			} else {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (readChatMessages) Error, file not readable: " + dbFile);
@@ -290,7 +297,7 @@ public class ChatWhatsapp extends SubModuleChat {
 			}
 		};
 
-		helper.traverseRecords(M.e("messages"), visitor, false);
+		helper.traverseRecords(M.e("messages"), visitor);
 
 	}
 

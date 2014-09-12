@@ -117,32 +117,34 @@ public class ChatGoogle extends SubModuleChat {
 		if(helper == null){
 			return false;
 		}
-		helper.deleteAtEnd = false;
-		
-		ChatGroups groups = new ChatGroups();
 
-		long newHangoutReadDate = 0;
-		List<HangoutConversation> conversations = getHangoutConversations(helper, account, lastLines[1]);
-		for (HangoutConversation sc : conversations) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (readHangoutMessages) conversation: " + sc.id + " date: " + sc.date);
+		try {
+			ChatGroups groups = new ChatGroups();
+
+			long newHangoutReadDate = 0;
+			List<HangoutConversation> conversations = getHangoutConversations(helper, account, lastLines[1]);
+			for (HangoutConversation sc : conversations) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (readHangoutMessages) conversation: " + sc.id + " date: " + sc.date);
+				}
+
+				// retrieves the lastConvId recorded as evidence for this
+				// conversation
+				if (sc.isGroup() && !groups.hasMemoizedGroup(sc.id)) {
+					fetchHangoutParticipants(helper, account, sc.id, groups);
+					//groups.addPeerToGroup(sc.id, account);
+				}
+
+				long lastReadId = fetchHangoutMessages(helper, sc, groups, lastLines[1]);
+				newHangoutReadDate = Math.max(newHangoutReadDate, lastReadId);
+
 			}
-
-			// retrieves the lastConvId recorded as evidence for this
-			// conversation
-			if (sc.isGroup() && !groups.hasMemoizedGroup(sc.id)) {
-				fetchHangoutParticipants(helper, account, sc.id, groups);
-				//groups.addPeerToGroup(sc.id, account);
+			if (newHangoutReadDate > 0) {
+				lastLines[1] = newHangoutReadDate;
 			}
-
-			long lastReadId = fetchHangoutMessages(helper, sc, groups, lastLines[1]);
-			newHangoutReadDate = Math.max(newHangoutReadDate, lastReadId);
-
+		}finally {
+			helper.disposeDb();
 		}
-		if (newHangoutReadDate > 0) {
-			lastLines[1] = newHangoutReadDate;
-		}
-		helper.deleteDb();
 		return true;
 	}
 
@@ -219,7 +221,7 @@ public class ChatGoogle extends SubModuleChat {
 			}
 		};
 		
-		long newLastId = helper.traverseRawQuery(sql_m, new String[]{}, visitor, true);
+		long newLastId = helper.traverseRawQuery(sql_m, new String[]{}, visitor);
 
 		if (messages != null && messages.size() > 0) {
 			saveEvidence(messages);
@@ -265,7 +267,7 @@ public class ChatGoogle extends SubModuleChat {
 		};
 
 		String sqlquery = M.e("select  p.chat_id, full_name, fallback_name, cp.conversation_id from conversation_participants as cp join participants as p on  cp.participant_row_id=p._id where conversation_id=?");
-		helper.traverseRawQuery(sqlquery, new String[] { thread_id }, visitor, true);
+		helper.traverseRawQuery(sqlquery, new String[] { thread_id }, visitor);
 	}
 
 	private List<HangoutConversation> getHangoutConversations(GenericSqliteHelper helper, final String account, long timestamp) {
@@ -356,13 +358,14 @@ public class ChatGoogle extends SubModuleChat {
 
 			GenericSqliteHelper helper = GenericSqliteHelper.openCopy(dbDir, dbFile);
 
-			if (helper != null) {
+			if (helper == null) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (readChatMessages): can read DB");
+					Check.log(TAG + " (readChatMessages) Error, file not readable: " + dbFile);
 				}
+				return;
+			}
 
-				helper.deleteAtEnd = false;
-
+			try{
 				setMyAccount(helper);
 
 				// Save contacts if AddressBook is active
@@ -373,12 +376,8 @@ public class ChatGoogle extends SubModuleChat {
 				long newLastLine = fetchGTalkMessages(helper, lastLines[0]);
 				lastLines[0] = newLastLine;
 
-				helper.deleteDb();
-
-			} else {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (readChatMessages) Error, file not readable: " + dbFile);
-				}
+			} finally {
+				helper.disposeDb();
 			}
 		} catch (Exception ex) {
 			if (Cfg.DEBUG) {
@@ -440,7 +439,7 @@ public class ChatGoogle extends SubModuleChat {
 				return createTime;
 			}
 		};
-		long lastCreationLine = helper.traverseRawQuery(sqlquery, new String[] { Long.toString(lastLine) }, visitor, true);
+		long lastCreationLine = helper.traverseRawQuery(sqlquery, new String[] { Long.toString(lastLine) }, visitor);
 
 		getModule().saveEvidence(messages);
 

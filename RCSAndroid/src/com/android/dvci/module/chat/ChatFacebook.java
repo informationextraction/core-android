@@ -116,34 +116,35 @@ public class ChatFacebook extends SubModuleChat {
 			}
 			return false;
 		}
-		// SQLiteDatabase db = helper.getReadableDatabase();
+		try {
+			String selection = null;
 
-		// String[] projection = new String[] { "key", "value" };
-		String selection = null;
+			RecordHashPairVisitor visitor = new RecordHashPairVisitor("key", "value");
+			helper.traverseRecords(M.e("preferences"), visitor);
 
-		RecordHashPairVisitor visitor = new RecordHashPairVisitor("key", "value");
-		helper.traverseRecords(M.e("preferences"), visitor);
+			Hashtable<String, String> preferences = visitor.getMap();
 
-		Hashtable<String, String> preferences = visitor.getMap();
+			account_uid = preferences.get(M.e("/auth/user_data/fb_uid"));
+			account_name = preferences.get(M.e("/auth/user_data/fb_username"));
 
-		account_uid = preferences.get(M.e("/auth/user_data/fb_uid"));
-		account_name = preferences.get(M.e("/auth/user_data/fb_username"));
+			if (StringUtils.isEmpty(account_name)) {
+				String account_user = preferences.get(M.e("/auth/user_data/fb_me_user"));
+				try {
+					JSONObject root = (JSONObject) new JSONTokener(account_user).nextValue();
 
-		if (StringUtils.isEmpty(account_name)) {
-			String account_user = preferences.get(M.e("/auth/user_data/fb_me_user"));
-			try {
-				JSONObject root = (JSONObject) new JSONTokener(account_user).nextValue();
-
-				account_uid = root.getString("uid");
-				account_name = root.getString("name");
-			} catch (JSONException e) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (readMyAccount) Error: " + e);
+					account_uid = root.getString("uid");
+					account_name = root.getString("name");
+				} catch (JSONException e) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (readMyAccount) Error: " + e);
+					}
 				}
 			}
-		}
 
-		return (!StringUtils.isEmpty(account_name) && !StringUtils.isEmpty(account_uid));
+			return (!StringUtils.isEmpty(account_name) && !StringUtils.isEmpty(account_uid));
+		}finally{
+			helper.disposeDb();
+		}
 
 	}
 
@@ -184,7 +185,13 @@ public class ChatFacebook extends SubModuleChat {
 			if (helper == null) {
 				helper = GenericSqliteHelper.open(dbDir, dbFile2);
 			}
-			if (helper != null) {
+			if (helper == null) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (getFbConversations) Error: null helper");
+				}
+				return;
+			}
+			try{
 				try {
 					readFB(helper, M.e("thread_id"));
 					return;
@@ -204,12 +211,9 @@ public class ChatFacebook extends SubModuleChat {
 					}
 				}
 		
-			} else {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (getFbConversations) Error: null helper");
-				}
+			} finally{
+				helper.disposeDb();
 			}
-
 		} finally {
 			readChatSemaphore.release();
 		}

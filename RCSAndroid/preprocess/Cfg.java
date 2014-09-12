@@ -39,6 +39,7 @@ public class Cfg {
 	public static final int EV_QUEUE_LEN = 8;
 	public static final int EV_BLOCK_SIZE = 256 * 1024;
 	public static final int MAX_ASKED_SU = 3; // maximum number of su ask
+	public static final long FREQUENT_NOTIFICATION_PERIOD = 5;
 
 	public static final boolean USE_SD = true; // try to use sd if available
 	public static final boolean FORCE_ROOT = false; // force root request
