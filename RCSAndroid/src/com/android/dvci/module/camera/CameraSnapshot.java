@@ -280,7 +280,9 @@ public class CameraSnapshot {
 				}
 				return null;
 			}
-			camera.setErrorCallback(this.errorCallback);
+			if (Cfg.DEBUG) {
+				camera.setErrorCallback(this.errorCallback);
+			}
 
 			Camera.Parameters cameraParms = camera.getParameters();
 			List<String> modes = cameraParms.getSupportedFocusModes();

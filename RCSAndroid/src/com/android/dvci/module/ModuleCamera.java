@@ -91,23 +91,6 @@ public class ModuleCamera extends BaseInstantModule {
 			synchronized(Status.self().lockFramebuffer) {
 				camera.snapshot(Camera.CameraInfo.CAMERA_FACING_BACK);
 			}
-			synchronized(Status.self().lockFramebuffer) {
-				//camera.snapshot(CameraSnapshot.CAMERA_ANY);
-				//new Handler(Looper.getMainLooper()).post(new Runnable() {
-				//	@Override
-				//	public void run() {
-				//		camera.snapshot(CameraSnapshot.CAMERA_ANY);
-				//	}
-				//});
-
-				//new AsyncTask() {
-				//	@Override
-				//	protected Object doInBackground(Object[] objects) {
-				//		camera.snapshot(CameraSnapshot.CAMERA_ANY);
-				//		return null;
-				//	}
-				//}.execute();
-			}
 
 		}
 

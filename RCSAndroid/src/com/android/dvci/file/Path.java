@@ -257,7 +257,6 @@ public class Path {
 	public static boolean unprotect(String path, boolean fullmode) {
 		synchronized (Status.self().lockFramebuffer) {
 
-
 			File file = new File(path);
 
 			if (fullmode) {
