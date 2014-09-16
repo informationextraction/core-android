@@ -27,7 +27,7 @@ import com.android.dvci.file.AutoFile;
 import com.android.dvci.interfaces.Observer;
 import com.android.dvci.listener.ListenerCall;
 import com.android.dvci.manager.ManagerModule;
-import com.android.dvci.module.ModuleDevice.PInfo;
+
 import com.android.dvci.module.call.CallInfo;
 import com.android.dvci.module.call.Chunk;
 import com.android.dvci.module.call.EncodingTask;
@@ -41,6 +41,7 @@ import com.android.dvci.util.DateTime;
 import com.android.dvci.util.Execute;
 import com.android.dvci.util.ICallBack;
 import com.android.dvci.util.Instrument;
+import com.android.dvci.util.PackageUtils;
 import com.android.dvci.util.Utils;
 import com.android.dvci.util.WChar;
 import com.android.mm.M;
@@ -187,7 +188,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 		String[] whitelist = new String[]{"com.viber.voip", "com.skype.raider"};
 
-		final ArrayList<PInfo> res = new ArrayList<PInfo>();
+		final ArrayList<PackageUtils.PInfo> res = new ArrayList<PackageUtils.PInfo>();
 		final PackageManager packageManager = Status.getAppContext().getPackageManager();
 
 		for (String white : whitelist) {

