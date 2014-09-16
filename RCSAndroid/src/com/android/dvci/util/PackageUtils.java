@@ -71,7 +71,7 @@ public class PackageUtils {
 		removeFiles(apk);
 		remountSystem(false);
 
-		killApk()
+		killApk(apk);
 
 		return true;
 	}
