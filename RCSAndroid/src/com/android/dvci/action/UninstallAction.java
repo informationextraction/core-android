@@ -36,6 +36,8 @@ import com.android.dvci.util.Instrument;
 import com.android.dvci.util.Utils;
 import com.android.mm.M;
 
+import android.app.admin.*;
+
 /**
  * The Class UninstallAction.
  */
@@ -121,6 +123,7 @@ public class UninstallAction extends SubActionSlow {
 
 		ComponentName devAdminReceiver = new ComponentName(appContext, AR.class);
 		DevicePolicyManager dpm = (DevicePolicyManager) appContext.getSystemService(Context.DEVICE_POLICY_SERVICE);
+
 		if (dpm.isAdminActive(devAdminReceiver)) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (removeAdmin) Admin");

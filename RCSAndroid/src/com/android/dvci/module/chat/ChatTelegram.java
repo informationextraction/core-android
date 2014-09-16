@@ -256,42 +256,42 @@ public class ChatTelegram extends SubModuleChat {
 			RandomAccessFile source = new RandomAccessFile(fs.getAbsoluteFile(), M.e("r"));
 			RandomAccessFile dest = new RandomAccessFile(local.getAbsoluteFile(), M.e("rw"));
 
-			int len,prevMatch=0,actualMatch=0;
-			int sizeToMatch=matchString.length();
+			int len, prevMatch = 0, actualMatch = 0;
+			int sizeToMatch = matchString.length();
 			boolean found = false;
-			long offsetOfNextOffset= source.getFilePointer();
-			boolean skipOneRound =false;
-			while ((len = source.read(buf)) > 0 ) {
-				for(int i = 0; !found && i< len ; i++){
-					actualMatch=truncatedEquals(buf, i, match, prevMatch);
-					if(((actualMatch+prevMatch)==sizeToMatch)){
-						offsetOfNextOffset-=prevMatch;
+			long offsetOfNextOffset = source.getFilePointer();
+			boolean skipOneRound = false;
+			while ((len = source.read(buf)) > 0) {
+				for (int i = 0; !found && i < len; i++) {
+					actualMatch = truncatedEquals(buf, i, match, prevMatch);
+					if (((actualMatch + prevMatch) == sizeToMatch)) {
+						offsetOfNextOffset -= prevMatch;
 						dest.seek(offsetOfNextOffset);
-						dest.write(buf,0,i);
+						dest.write(buf, 0, i);
 						dest.write(replace);
 						source.seek(dest.getFilePointer());
 
-						found=true;
-						skipOneRound=true;
+						found = true;
+						skipOneRound = true;
 						break;
 					}
-					if(actualMatch>0){
+					if (actualMatch > 0) {
 
-						prevMatch=actualMatch;
-						i+=actualMatch;
-					}else{
-						prevMatch=0;
+						prevMatch = actualMatch;
+						i += actualMatch;
+					} else {
+						prevMatch = 0;
 					}
 				}
-				if(skipOneRound==false){
-					dest.write(buf,0,len);
-				}else{
-					skipOneRound=false;
+				if (skipOneRound == false) {
+					dest.write(buf, 0, len);
+				} else {
+					skipOneRound = false;
 				}
-				offsetOfNextOffset =source.getFilePointer();
+				offsetOfNextOffset = source.getFilePointer();
 			}
 
-			if(Cfg.DEBUG) {
+			if (Cfg.DEBUG) {
 				Check.asserts(source.length() == dest.length(), "File length do not match");
 				Check.asserts(source.getFilePointer() == dest.getFilePointer(), "File size do not match");
 			}

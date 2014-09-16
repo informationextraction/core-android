@@ -37,8 +37,7 @@ public final class AutoFile {
 
 	/** The Constant TAG. */
 	private static final String TAG = "AutoFile"; //$NON-NLS-1$
-	/** The file. */
-	File file;
+	private File file;
 	private String filename;
 
 	/**
@@ -62,6 +61,8 @@ public final class AutoFile {
 	public AutoFile(File filesDir, String file) {
 		this(filesDir.getAbsolutePath(), file);
 	}
+
+
 
 	/**
 	 * Reads the content of the file.
@@ -481,4 +482,8 @@ public final class AutoFile {
 		}
 	}
 
+	/** The file. */
+	public File getFile() {
+		return file;
+	}
 }

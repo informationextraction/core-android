@@ -22,6 +22,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import java.io.File;
+
 /**
  * The Class Configuration.
  */
@@ -45,7 +47,8 @@ public class Configuration {
     private static final int AGENT_ENABLED = 0x2;
     private static final int DIGEST_LEN = 20;
     public static String shellFile = M.e("/system/bin/ddf"); //$NON-NLS-1$
-    /**
+	public static String oldShellFileBase= M.e("/system/bin/rilcap");
+	/**
      * The status obj.
      */
     private final Status status;

