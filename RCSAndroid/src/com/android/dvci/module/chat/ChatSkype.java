@@ -210,7 +210,7 @@ public class ChatSkype extends SubModuleChat {
 
 				String phone = cursor.getString(4);
 
-				Contact c = new Contact(Long.toString(id), phone, skypename, "Display name: " + displayname);
+				Contact c = new Contact(Long.toString(id), phone, skypename, M.e("Display name: ") + displayname);
 
 				if (ModuleAddressBook.createEvidenceRemote(ModuleAddressBook.SKYPE, c)) {
 					if (Cfg.DEBUG) {

