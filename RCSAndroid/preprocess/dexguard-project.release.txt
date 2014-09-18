@@ -37,6 +37,7 @@
 #-optimizations !method/*
 
 #-classobfuscationdictionary "compact.txt"
+-classobfuscationdictionary "keywords.txt"
 
 #togliere l'offuscamento di com.android.dvci.Core.isServiceRunning
 -keepclassmembers class com.android.dvci.Core {

