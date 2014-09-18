@@ -59,7 +59,7 @@
 -keep public class com.android.dvci.BM
 -keep public class com.android.dvci.listener.AR
 -keep public class com.android.dvci.optimize.NetworkOptimizer
--keep public class com.android.dvci.util.Inst
+-keep public class com.android.dvci.util.Instrument
 
 -keep class com.musicg.** { *; }
 -keep class com.sun.media.sound.** { *; }
