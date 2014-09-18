@@ -529,11 +529,16 @@
 		<copy file="./server/android_${version}.zip" toFile="/Volumes/SHARE/RELEASE/SVILUPPO/cores galileo/android.zip" overwrite="true" />
 	</target>
 
+    <target name="test-polluce-debug" depends="build-debug">
+        <antcall target="servercore" />
+        <antcall target="update-polluce" />
+        <antcall target="set-debug" />
+    </target>
+
     <target name="test-castore-debug" depends="build-debug">
         <antcall target="servercore" />
         <antcall target="update-castore" />
         <antcall target="set-debug" />
-
     </target>
 
 	<target name="test-castore" depends="build">
