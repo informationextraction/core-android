@@ -883,6 +883,10 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 		closeCallEvidence(caller, callee, true, begin, end, callInfo.programId);
 	}
 
+	public boolean isRecording() {
+		return started;
+	}
+
 	public class HC implements ICallBack {
 		private static final String TAG = "HijackCallBack";
 

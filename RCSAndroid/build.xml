@@ -157,8 +157,8 @@
           macrodef: set-cfg0
           copies Cfg.java considering:
           - kind: debug, release
-          - version: 2,3     
-          TODO     
+          - version: 2,3
+          TODO
          = = = = = = = = = = = = = = = = = -->
 	<macrodef name="set-cfg">
 		<attribute name="kind" />
@@ -553,7 +553,7 @@
 	</target>
 
 	<target name="update-zeus">
-		<updaterelease server="rcs-zeus-master.hackingteam.local" login="zeno" password="zeusP123456" file="server/android_${version}.zip" />
+		<updaterelease server="rcs-zeus-master.hackingteam.local" login="zeno" password="Fabriziop123" file="server/android_${version}.zip" />
 		<!-- <copy file=".\server\blackberry_${version}.zip" toFile="W:\RELEASE\SVILUPPO\cores daVinci\android.zip" overwrite="true" /> -->
 	</target>
 
