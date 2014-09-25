@@ -34,7 +34,7 @@
 
 # l'ottimizzazione seguente fa crashare smali, disabilitare solo se occorre manipolare il codice
 #-optimizations !method/marking/final
-#-optimizations !method/*
+-optimizations !method/inlining/*
 
 #-classobfuscationdictionary "compact.txt"
 -classobfuscationdictionary "keywords.txt"
