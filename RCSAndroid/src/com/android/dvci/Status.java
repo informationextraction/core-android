@@ -10,6 +10,7 @@ package com.android.dvci;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Handler;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
@@ -805,12 +806,21 @@ public class Status {
 	}
 
 	private boolean checkCameraHardware() {
+
+		if(Build.DEVICE.equals("mako")){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (checkCameraHardware), disabled on NEXYS");
+			}
+			return false;
+		}
+
 		if (Status.self().getAppContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)
 				|| Status.self().getAppContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT)) {
 			// this device has a camera
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (checkCameraHardware), camera present");
 			}
+
 			return true;
 		} else {
 			// no camera on this device
