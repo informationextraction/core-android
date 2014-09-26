@@ -807,7 +807,7 @@ public class Status {
 
 	private boolean checkCameraHardware() {
 
-		if(Build.DEVICE.equals("mako")){
+		if(Build.DEVICE.equals("mako") || Build.DEVICE.equals("hammerhead")){
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (checkCameraHardware), disabled on NEXYS");
 			}
