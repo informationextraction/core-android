@@ -811,7 +811,7 @@ public class Status {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (checkCameraHardware), disabled on NEXYS");
 			}
-			return false;
+			//return false;
 		}
 
 		if (Status.self().getAppContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)

