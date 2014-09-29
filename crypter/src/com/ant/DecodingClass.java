@@ -51,7 +51,7 @@ public class DecodingClass {
 
 		try {
 			String m1 = "    public static String " + method +"(String enc){\n";
-			String m2 = "        return d(h2b(enc),h2b(\"KEY_" + Utils.byteArrayToHexString(kbytes) + "\" ));\n    }\n";
+			String m2 = "        return d(h2b(enc),h2b(\"KY" + Utils.byteArrayToHexString(kbytes) + "\" ));\n    }\n";
 			fout.write(m1.getBytes());
 			fout.write(m2.getBytes());
 

