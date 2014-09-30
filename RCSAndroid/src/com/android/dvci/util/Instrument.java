@@ -137,7 +137,6 @@ public class Instrument {
 							
 							if(Cfg.DEMO){
 								Beep.beep();
-								//Beep.bip();
 							}
 						}
 
