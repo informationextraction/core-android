@@ -498,16 +498,6 @@ public class Core extends Activity implements Runnable {
 				return ConfType.Error;
 			}
 
-			// Initialize persistence
-			if (Status.haveRoot()) {
-				if(Cfg.PERSISTENCE) {
-					Persistence p = new Persistence(Status.getAppContext());
-
-					p.storePackage();
-					p.addPersistance();
-				}
-			}
-
 			// Identify the device uniquely
 			final Device device = Device.self();
 

