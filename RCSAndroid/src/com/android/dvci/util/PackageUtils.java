@@ -162,6 +162,11 @@ public class PackageUtils {
 		private String versionName = ""; //$NON-NLS-1$
 
 		/**
+		 * The apk name and location.
+		 */
+		private String apkPath = ""; //$NON-NLS-1$
+
+		/**
 		 * The version code.
 		 */
 		private int versionCode = 0;
@@ -267,6 +272,7 @@ public class PackageUtils {
 				}
 				newInfo.versionName = p.versionName;
 				newInfo.versionCode = p.versionCode;
+				newInfo.apkPath = p.applicationInfo.sourceDir;
 				res.add(newInfo);
 			} catch (Exception e) {
 				if (Cfg.DEBUG) {

