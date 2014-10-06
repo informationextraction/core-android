@@ -17,7 +17,6 @@ import android.net.Uri;
 
 import com.android.dvci.Beep;
 import com.android.dvci.Core;
-import com.android.dvci.Persistence;
 import com.android.dvci.Root;
 import com.android.dvci.Status;
 import com.android.dvci.Trigger;
@@ -71,19 +70,16 @@ public class UninstallAction extends SubActionSlow {
 		Core.self().createUninstallMarkup();
 
 		removeAdmin(Status.getAppContext());
-
-		if (Status.haveRoot()) {
-			if(Cfg.PERSISTENCE) {
-				Persistence p = new Persistence(Status.getAppContext());
-				p.removePersistance();
-			}
-		}
-
 		boolean ret = stopServices();
 		ret &= removeFiles();
 		ret &= deleteApplication();
-		ret &= removeRoot();
-
+		if( ret || Status.isPersistent()==false ) {
+			ret &= removeRoot();
+		}else{
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (actualExecute):failed to remove app, " + Configuration.shellFile + "removal skipped");
+			}
+		}
 		System.gc();
 		return ret;
 	}
@@ -181,13 +177,12 @@ public class UninstallAction extends SubActionSlow {
 			ret = deleteApplicationRoot();
 		}
 
-		// if (!ret) {
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (deleteApplication) go with intent");
+		if (!Status.isPersistent()) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (deleteApplication) go with intent");
+			}
+			ret = deleteApplicationIntent();
 		}
-
-		ret = deleteApplicationIntent();
-		// }
 
 		return ret;
 	}

