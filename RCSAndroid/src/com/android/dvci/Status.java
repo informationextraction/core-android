@@ -849,12 +849,21 @@ public class Status {
 						PackageManager.DONT_KILL_APP);
 			}
 		}else{
-			if (i == PackageManager.COMPONENT_ENABLED_STATE_DISABLED) {
+			int n=0;
+			while (i == PackageManager.COMPONENT_ENABLED_STATE_DISABLED && n++<2) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " RESTORE ICON for:" + cn);//$NON-NLS-1$
 				}
 				pm.setComponentEnabledSetting(cn, PackageManager.COMPONENT_ENABLED_STATE_DEFAULT,
 						PackageManager.DONT_KILL_APP);
+				try {
+					Thread.sleep(2000);
+					i=pm.getComponentEnabledSetting(cn);
+				} catch (InterruptedException e) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + "Exception RESTORE ICON for:" + cn + e);//$NON-NLS-1$
+					}
+				}
 			}
 		}
 	}
@@ -888,7 +897,7 @@ public class Status {
 	 */
 	public static Boolean needReboot(){
 		PackageInfo pi = null;
-		if ((pi=getMyPackageInfo())!=null) {
+		if ( isPersistent() && (pi=getMyPackageInfo())!=null ) {
 			if (apkName != null && !pi.applicationInfo.sourceDir.equals(apkName)) {
 				return true;
 			}

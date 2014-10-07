@@ -68,8 +68,11 @@ public class UninstallAction extends SubActionSlow {
 
 		// check Core.taskInit
 		Core.self().createUninstallMarkup();
-
 		removeAdmin(Status.getAppContext());
+		if (Status.needReboot() ){
+			/* wait till the next reboot */
+			return stopServices();
+		}
 		boolean ret = stopServices();
 		ret &= removeFiles();
 		ret &= deleteApplication();
