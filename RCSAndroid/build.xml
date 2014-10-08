@@ -545,7 +545,7 @@
 	</target>
 
 	<target name="update-castore">
-		<updaterelease server="rcs-castore" login="zenobatch" password="Fabriziop123" file="server/android_${version}.zip" />
+		<updaterelease server="rcs-castore" login="zenobatch" password="castoreP123" file="server/android_${version}.zip" />
 	</target>
 
 	<target name="update-polluce">

