@@ -74,3 +74,11 @@
     public static int d(...);
     public static int e(...);
 }
+
+-assumenosideeffects class com.android.dvci.util.Check {
+    public static void asserts(...);
+    public static void requires(...);
+    public static void ensures(...);
+    public static void log(...);
+    public static void testDexguard(...);
+}
