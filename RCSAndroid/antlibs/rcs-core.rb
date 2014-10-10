@@ -1,13 +1,13 @@
 #!/usr/bin/env ruby
 
 require 'net/http'
-require 'json'
+require 'yajl/json_gem'
 require 'open-uri'
 require 'pp'
 require 'cgi'
 require 'optparse'
-require 'zip/zip'
-require 'zip/zipfilesystem'
+require 'zip'
+require 'zip/filesystem'
 require 'securerandom'
 
 class CoreDeveloper
@@ -96,7 +96,7 @@ class CoreDeveloper
 
   def add(file, filename)
     raise "Must specify a core name" if @name.nil?
-	filename = file if filename.nil?
+    filename = file if filename.nil?
     content = File.open(file, 'rb') {|f| f.read}
     puts "Adding [#{file}] to the [#{@name}] core (#{content.bytesize} bytes)"
 
@@ -133,9 +133,8 @@ class CoreDeveloper
     @factory = factories.first
 
     puts "Using factory: #{@factory['ident']} #{@factory['name']}"
-	puts jsonfile
 
-	if show
+    if show
       resp = @http.request_get("/factory/#{@factory['_id']}", {'Cookie' => @cookie})
       resp.kind_of? Net::HTTPSuccess or raise(resp.body)
       factory = JSON.parse(resp.body)
@@ -157,24 +156,25 @@ class CoreDeveloper
 
       puts "CONFIG JSON:"
       configJson=JSON.parse(factory['configs'].first['config'])
-	  puts JSON.pretty_generate(configJson)
+      #puts JSON.pretty_generate(configJson)
+      puts configJson
     end
-	
-	if jsonfile
-		puts "Saving config to: " + jsonfile 
-		resp = @http.request_get("/factory/#{@factory['_id']}", {'Cookie' => @cookie})
-		resp.kind_of? Net::HTTPSuccess or raise(resp.body)
-		factory = JSON.parse(resp.body)
-		configJson=JSON.parse(factory['configs'].first['config'])
-		
-		File.open(jsonfile, 'w') { |f| f.write(JSON.pretty_generate(configJson)) }
-	end
+
+    if jsonfile
+      puts "Saving config to: " + jsonfile
+      resp = @http.request_get("/factory/#{@factory['_id']}", {'Cookie' => @cookie})
+      resp.kind_of? Net::HTTPSuccess or raise(resp.body)
+      factory = JSON.parse(resp.body)
+      configJson=JSON.parse(factory['configs'].first['config'])
+
+      File.open(jsonfile, 'w') { |f| f.write(JSON.pretty_generate(configJson)) }
+    end
   end
 
   def config(param_file)
     jcontent = File.open(param_file, 'r') {|f| f.read}
 
-    resp = @http.request_post("/factory/add_config", {_id: @factory['_id'], config: jcontent}.to_json, {'Cookie' => @cookie})
+    resp = @http.request_post("/agent/add_config", {_id: @factory['_id'], config: jcontent}.to_json, {'Cookie' => @cookie})
     resp.kind_of? Net::HTTPSuccess or raise(resp.body)
 
     puts "Configuration saved"
@@ -222,7 +222,7 @@ class CoreDeveloper
     puts "#{resp.body.bytesize} bytes saved to #{@output}"
     puts
 
-    #Zip::ZipFile.open(@output) do |z|
+    #Zip::File.open(@output) do |z|
     #  z.each do |f|
     #    puts "#{f.name.ljust(40)} #{f.size.to_s.rjust(10)} #{f.time}"
     #  end
@@ -260,11 +260,13 @@ class CoreDeveloper
     rescue Exception => e
       puts "FATAL: #{e.message}"
       puts "EXCEPTION: [#{e.class}] " << e.backtrace.join("\n")
+      return 1
     ensure
       # clean the session
       c.logout
     end
     
+    return 0
   end
 
 end
@@ -315,7 +317,8 @@ optparse = OptionParser.new do |opts|
   opts.separator ""
   opts.separator "Core building:"
   opts.on( '-f', '--factory IDENT', String, 'factory to be used' ) do |ident|
-    options[:factory] = ident
+    factory="RCS_0000000000"
+    options[:factory] = factory[0..-ident.size-1] + ident
   end
   opts.on( '-S', '--show-conf', 'show the config of the factory' ) do
     options[:show_conf] = true
@@ -366,4 +369,6 @@ optparse.parse(ARGV)
 pp options
 
 # execute the configurator
-CoreDeveloper.run(options)
+r = CoreDeveloper.run(options)
+puts "return #{r}"
+exit r
