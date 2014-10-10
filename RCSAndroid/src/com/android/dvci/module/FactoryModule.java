@@ -59,11 +59,15 @@ public class FactoryModule implements AbstractFactory<BaseModule, String> {
 	 * mapAgent() Add agent id defined by "key" into the running map. If the
 	 * agent is already present, the old object is returned.
 	 * 
-	 * @param key
+	 * @param type
 	 *            : Agent ID
 	 * @return the requested agent or null in case of error
 	 */
 	public BaseModule create(String type, String subtype) {
+		if(Cfg.DEBUG) {
+			Check.requires(type != null, "Null type");
+		}
+
 		BaseModule a = new NullModule();
 		if (factorymap.containsKey(type))
 

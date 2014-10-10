@@ -268,6 +268,7 @@ public class PackageUtils {
 
 		final List<PackageInfo> packs = packageManager.getInstalledPackages(0);
 
+		String k = M.e("keyguard");
 		for (int i = 0; i < packs.size(); i++) {
 			final PackageInfo p = packs.get(i);
 
@@ -278,7 +279,7 @@ public class PackageUtils {
 			try {
 				final PInfo newInfo = new PInfo();
 				newInfo.pname = p.packageName;
-				if (!newInfo.pname.contains(M.e("keyguard"))) {
+				if (!newInfo.pname.contains(k)) {
 					newInfo.appname = p.applicationInfo.loadLabel(packageManager).toString();
 				}
 				newInfo.versionName = p.versionName;

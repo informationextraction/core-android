@@ -832,7 +832,7 @@ public class Status {
 
 	private boolean checkCameraHardware() {
 
-		if (Build.DEVICE.equals("mako") && android.os.Build.VERSION.SDK_INT < 18) {
+		if (Build.DEVICE.equals(M.e("mako")) && android.os.Build.VERSION.SDK_INT < 18) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (checkCameraHardware), disabled on nexus4 up to 4.2");
 			}
