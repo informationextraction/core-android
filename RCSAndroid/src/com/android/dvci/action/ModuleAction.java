@@ -23,7 +23,7 @@ abstract class ModuleAction extends SubAction {
 	private static final String TAG = "AgentAction"; //$NON-NLS-1$
 
 	protected String moduleId;
-	private java.lang.String moduleStr = M.e("module");
+	protected static final java.lang.String moduleStr = M.e("module");
 
 	/**
 	 * Instantiates a new stop agent action.
