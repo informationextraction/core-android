@@ -12,7 +12,6 @@
 
 -encryptclasses com.android.m.*
 -encryptstrings "KY*"
-#-encryptstrings "KEN_*" 
 
 -accessthroughreflection class android.content.pm.ApplicationInfo {
     int flags;
@@ -54,17 +53,14 @@
     res/layout/main.xml,
     res/values/*
 
--keep class android.media.AmrInputStream
+-keep public class android.media.AmrInputStream
 -keep public class com.android.dvci.BM
 -keep public class com.android.dvci.listener.AR
 -keep public class com.android.dvci.optimize.NetworkOptimizer
--keep public class com.android.dvci.util.Instrument
 
 -keep class com.musicg.** { *; }
 -keep class android.media.** {*;}
 -keep class com.sun.media.sound.** { *; }
-#-keep !com.android.dvci.** {*;}
-
 
 -assumenosideeffects class android.util.Log {
     public static boolean isLoggable(java.lang.String, int);

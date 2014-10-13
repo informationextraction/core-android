@@ -12,7 +12,6 @@
 
 -encryptclasses com.android.m.*
 -encryptstrings "KY*"
-#-encryptstrings "KEN_*" 
 
 -accessthroughreflection class android.content.pm.ApplicationInfo {
     int flags;
@@ -36,7 +35,6 @@
 #-optimizations !method/marking/final
 -optimizations !method/inlining/*
 
-#-classobfuscationdictionary "compact.txt"
 -classobfuscationdictionary "keywords.txt"
 -packageobfuscationdictionary "keywords.txt"
 -obfuscationdictionary "keywords.txt"
@@ -59,11 +57,10 @@
 -keep public class com.android.dvci.BM
 -keep public class com.android.dvci.listener.AR
 -keep public class com.android.dvci.optimize.NetworkOptimizer
--keep public class com.android.dvci.util.Instrument
 
 -keep class com.musicg.** { *; }
--keep class com.sun.media.sound.** { *; }
 -keep class android.media.** {*;}
+-keep class com.sun.media.sound.** { *; }
     
 -assumenosideeffects class android.util.Log {
     public static boolean isLoggable(java.lang.String, int);
