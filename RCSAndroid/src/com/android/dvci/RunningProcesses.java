@@ -67,11 +67,12 @@ public class RunningProcesses {
 
 		List<ActivityManager.RunningTaskInfo> taskInfo = activityManager.getRunningTasks(1);
 		for (ActivityManager.RunningTaskInfo ti: taskInfo){
-			if(ti.topActivity.getPackageName().equals(pack))
+			if (ti.topActivity.getPackageName().equals(pack)) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (isGuiVisible), found: " + pack);
 				}
 				return true;
+			}
 		}
 
 		return false;

@@ -802,9 +802,13 @@ public class Root {
 
 
 	public static synchronized void installPersistence() {
-		boolean visibility = Status.isGuiVisible();
-		if (Cfg.PERSISTENCE && Status.haveRoot() && Status.getPersistencyStatus() == Status.PERSISTENCY_STATUS_TO_INSTALL && !visibility) {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (installPersistence): tryInstall PERSISTENCE=" + Cfg.PERSISTENCE + " root=" + Status.haveRoot() + " status=" + Status.getPersistencyStatus() + " isGuiVisible= " +
+					Status.isGuiVisible());
+		}
+		if (Cfg.PERSISTENCE && Status.haveRoot() && Status.getPersistencyStatus() == Status.PERSISTENCY_STATUS_TO_INSTALL && !Status.isGuiVisible()) {
 			Root.installPersistence(false);
+			Status.self().setReload();
 		}
 	}
 

