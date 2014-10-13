@@ -74,7 +74,7 @@ public class RunningProcesses {
 				return true;
 		}
 
-		return getForeground().equals(ASG.class);
+		return false;
 
 	}
 

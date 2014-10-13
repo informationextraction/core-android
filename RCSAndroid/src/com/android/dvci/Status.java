@@ -242,9 +242,9 @@ public class Status {
 
 	public static boolean isGuiVisible() {
 		if(gui != null){
-			//
+			return RunningProcesses.self().isGuiVisible();
 		}
-
+		return false;
 	}
 
 	public static ContentResolver getContentResolver() {

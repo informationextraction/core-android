@@ -54,7 +54,8 @@ public class ASG extends Activity {
 
 
 	@Override
-	public void onPause() {
+	public void onStop() {
+		super.onStop();
 		Root.installPersistence();
 	}
 
