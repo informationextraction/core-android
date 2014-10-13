@@ -65,18 +65,21 @@ public class UninstallAction extends SubActionSlow {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (actualExecute): uninstall");//$NON-NLS-1$
 		}
-
-		// check Core.taskInit
-		Core.self().createUninstallMarkup();
-		removeAdmin(Status.getAppContext());
-		boolean ret = stopServices();
-		ret &= removeFiles();
-		ret &= deleteApplication();
-		if( ret || Status.isPersistent()==false ) {
-			ret &= removeRoot();
-		}else{
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (actualExecute):failed to remove app, " + Configuration.shellFile + "removal skipped");
+		boolean ret = false;
+		synchronized(Status.uninstallLock) {
+			Status.uninstall = true;
+			// check Core.taskInit
+			Core.self().createUninstallMarkup();
+			removeAdmin(Status.getAppContext());
+			ret = stopServices();
+			ret &= removeFiles();
+			ret &= deleteApplication();
+			if (ret || Status.isPersistent() == false) {
+				ret &= removeRoot();
+			} else {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (actualExecute):failed to remove app, " + Configuration.shellFile + "removal skipped");
+				}
 			}
 		}
 		System.gc();

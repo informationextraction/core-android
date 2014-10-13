@@ -99,6 +99,7 @@ public class Status {
 	static public boolean uninstall;
 
 	static WakeLock wl;
+	public static Object uninstallLock = new Object();
 
 	private final Date startedTime = new Date();
 

