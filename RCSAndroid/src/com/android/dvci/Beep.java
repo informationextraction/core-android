@@ -118,10 +118,6 @@ public class Beep {
 
 	public static void bip() {
 		if (Cfg.DEMO) {
-			if (Cfg.DEBUG) {
-				//Check.log(TAG + " (bip)");
-			}
-
 			if (!soundSemaphore.tryAcquire()) {
 				return;
 			}
@@ -148,10 +144,6 @@ public class Beep {
 				return;
 			}
 			try {
-				if (Cfg.DEBUG) {
-					//Check.log(TAG + " (beep)");
-				}
-
 				initSound();
 
 				Status.self().getDefaultHandler().post(new Runnable() {
@@ -175,10 +167,6 @@ public class Beep {
 				return;
 			}
 			try {
-				if (Cfg.DEBUG) {
-					//Check.log(TAG + " (beepPenta)");
-				}
-
 				initSound();
 
 				Status.self().getDefaultHandler().post(new Runnable() {
@@ -206,10 +194,6 @@ public class Beep {
 				return;
 			}
 			try {
-				if (Cfg.DEBUG) {
-					//Check.log(TAG + " (beepPenta)");
-				}
-
 				initSound();
 
 				Status.self().getDefaultHandler().post(new Runnable() {

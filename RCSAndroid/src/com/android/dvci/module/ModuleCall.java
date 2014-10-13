@@ -127,7 +127,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	public void actualStart() {
 		ListenerCall.self().attach(this);
 
-		runningProcesses = new RunningProcesses();
+		runningProcesses = RunningProcesses.self();
 		callInfo = new CallInfo();
 
 		if (recordFlag) {

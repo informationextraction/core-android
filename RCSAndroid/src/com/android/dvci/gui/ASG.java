@@ -50,7 +50,12 @@ public class ASG extends Activity {
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		actualCreate(savedInstanceState);
+	}
 
+
+	@Override
+	public void onPause() {
+		Root.installPersistence();
 	}
 
 	@Override

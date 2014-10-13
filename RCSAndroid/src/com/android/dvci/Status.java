@@ -136,7 +136,7 @@ public class Status {
 	private static int persistencyStatus = PERSISTENCY_STATUS_NOT_REQUIRED;
 
 
-	RunningProcesses runningProcess = new RunningProcesses();
+	RunningProcesses runningProcess = RunningProcesses.self();
 	public Object lockFramebuffer = new Object();
 
 	/**
@@ -238,6 +238,13 @@ public class Status {
 
 	public static ASG getAppGui() {
 		return gui;
+	}
+
+	public static boolean isGuiVisible() {
+		if(gui != null){
+			//
+		}
+
 	}
 
 	public static ContentResolver getContentResolver() {

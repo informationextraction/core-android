@@ -20,7 +20,7 @@ public abstract class SubModuleChat extends SubModule implements Observer<Standb
 
 	private static final String TAG = "SubModuleChat";
 	private ScheduledFuture future;
-	RunningProcesses runningProcesses = new RunningProcesses();
+	RunningProcesses runningProcesses = RunningProcesses.self();
 
 	@Override
 	protected void go() {

