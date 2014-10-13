@@ -197,9 +197,6 @@ public class ServiceMain extends Service {
             Check.log(TAG + " (onConfigurationChanged)"); //$NON-NLS-1$
         }
 
-        if (Cfg.DEMO) {
-            Toast.makeText(this, M.e("(onConfigurationChanged)"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
-        }
     }
 
     @Override
@@ -210,9 +207,6 @@ public class ServiceMain extends Service {
             Check.log(TAG + " (onLowMemory)"); //$NON-NLS-1$
         }
 
-        if (Cfg.DEMO) {
-            Toast.makeText(this, M.e("(onLowMemory)"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
-        }
     }
 
     @Override
@@ -222,10 +216,6 @@ public class ServiceMain extends Service {
         if (Cfg.DEBUG) {
             Check.log(TAG + " (onRebind)"); //$NON-NLS-1$
         }
-
-        if (Cfg.DEMO) {
-            Toast.makeText(this, M.e("(onRebind)"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
-        }
     }
 
     @Override
@@ -234,10 +224,6 @@ public class ServiceMain extends Service {
 
         if (Cfg.DEBUG) {
             Check.log(TAG + " (onUnbind)"); //$NON-NLS-1$
-        }
-
-        if (Cfg.DEMO) {
-            Toast.makeText(this, M.e("(onUnbind)"), Toast.LENGTH_LONG).show(); //$NON-NLS-1$
         }
 
         return ret;

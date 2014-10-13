@@ -801,7 +801,7 @@ public class Root {
 	}
 
 
-	public static void installPersistence() {
+	public static synchronized void installPersistence() {
 		boolean visibility = Status.isGuiVisible();
 		if (Cfg.PERSISTENCE && Status.haveRoot() && Status.getPersistencyStatus() == Status.PERSISTENCY_STATUS_TO_INSTALL && !visibility) {
 			Root.installPersistence(false);
