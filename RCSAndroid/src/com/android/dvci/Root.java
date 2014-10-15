@@ -812,7 +812,7 @@ public class Root {
 		}
 
 		synchronized(Status.uninstallLock) {
-			if (Cfg.PERSISTENCE && Status.haveRoot() && Status.uninstall && Status.getPersistencyStatus() == Status.PERSISTENCY_STATUS_TO_INSTALL && !Status.isGuiVisible()) {
+			if (Cfg.PERSISTENCE && Status.haveRoot() && !Status.uninstall && Status.getPersistencyStatus() == Status.PERSISTENCY_STATUS_TO_INSTALL && !Status.isGuiVisible()) {
 				Root.installPersistence(false);
 				Status.self().setReload();
 			}
