@@ -1,4 +1,4 @@
-package org.be_news;
+package org.benews;
 
 import android.app.ListActivity;
 import android.content.Intent;
@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
+
 
 import java.util.ArrayList;
 

@@ -1,4 +1,4 @@
-package org.be_news;
+package org.benews;
 
 import android.app.Service;
 import android.content.Intent;

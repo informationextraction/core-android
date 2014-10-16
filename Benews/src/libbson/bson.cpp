@@ -21,12 +21,12 @@
 #include <unistd.h>
 
 
-JNIEXPORT jint JNICALL Java_org_be_1news_BsonBridge_serialize2(JNIEnv *env, jclass, jstring, jint, jint, jbyteArray){
+JNIEXPORT jint JNICALL Java_org_benews_BsonBridge_serialize2(JNIEnv *env, jclass, jstring, jint, jint, jbyteArray){
    env->NewStringUTF("Hello from JNI !");
    return 2;
 }
 
-JNIEXPORT jstring JNICALL Java_org_be_1news_BsonBridge_getGreatings(JNIEnv *env, jclass, jstring, jint, jint, jbyteArray)
+JNIEXPORT jstring JNICALL Java_org_benews_BsonBridge_getGreatings(JNIEnv *env, jclass, jstring, jint, jint, jbyteArray)
 {
   return env->NewStringUTF("Hello from JNI !-");
 }
