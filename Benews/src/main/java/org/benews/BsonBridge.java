@@ -16,21 +16,24 @@ public class BsonBridge {
 	static {
 		System.loadLibrary("bson");
 	}
-
-
+/*	public class ReceivedSnap{
+	};
+*/
 	public static final String TAG = "BsonBridge";
 	public static final int BSON_TYPE_TEXT = 0;
 
-	public static native int serialize2( String filename, int type,  int size, byte[] payload);
+	public static native String serialize(String baseDir, byte[] payload);
+	public static native  byte[] getToken(int type, int key);
 
-	public static native String getGreatings( String filename, int type,  int size, byte[] payload);
+	//public static native byte[] F(ReceivedSnap a, String b);
 
-
-	public static String serializeBson (String filename, int type, int size, String payload){
-		int i = serialize2(filename,type,size,payload.getBytes());
+	public static String serializeBson (String baseDir,  byte[] payload){
 		Log.d(TAG,"serialize called\n");
-		return getGreatings(filename,type,size,payload.getBytes()) + payload;
-		//return String.format("returned %s",i);
+		return serialize(baseDir, payload);
 	}
+	public static  byte[] getTokenBson (int type, int key){
+		Log.d(TAG,"getToken called\n");
+		return getToken(type,key);
 
+	}
 }

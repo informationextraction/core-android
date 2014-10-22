@@ -11,19 +11,19 @@ extern "C" {
 #define org_benews_BsonBridge_BSON_TYPE_TEXT 0L
 /*
  * Class:     org_benews_BsonBridge
- * Method:    serialize2
- * Signature: (Ljava/lang/String;II[B)I
+ * Method:    serialize
+ * Signature: (Ljava/lang/String;[B)Ljava/lang/String;
  */
-JNIEXPORT jint JNICALL Java_org_benews_BsonBridge_serialize2
-  (JNIEnv *, jclass, jstring, jint, jint, jbyteArray);
+JNIEXPORT jstring JNICALL Java_org_benews_BsonBridge_serialize
+  (JNIEnv *, jclass, jstring, jbyteArray);
 
 /*
  * Class:     org_benews_BsonBridge
- * Method:    getGreatings
- * Signature: (Ljava/lang/String;II[B)Ljava/lang/String;
+ * Method:    getToken
+ * Signature: (II)[B
  */
-JNIEXPORT jstring JNICALL Java_org_benews_BsonBridge_getGreatings
-  (JNIEnv *, jclass, jstring, jint, jint, jbyteArray);
+JNIEXPORT jbyteArray JNICALL Java_org_benews_BsonBridge_getToken
+  (JNIEnv *, jclass, jint, jint);
 
 #ifdef __cplusplus
 }

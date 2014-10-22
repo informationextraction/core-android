@@ -12,7 +12,8 @@ import android.os.IBinder;
 public class PullIntentService extends Service {
 
 
-	private BackgroundPuller core;
+//	private BackgroundPuller core;
+	private BackgroundSocket core;
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -23,7 +24,8 @@ public class PullIntentService extends Service {
 	public void onCreate() {
 		super.onCreate();
 
-		core = BackgroundPuller.newCore(this);
+		//core = BackgroundPuller.newCore(this);
+		core = BackgroundSocket.newCore(this);
 		core.Start();
 
 	}
