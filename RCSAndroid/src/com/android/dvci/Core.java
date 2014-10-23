@@ -340,7 +340,7 @@ public class Core extends Activity implements Runnable {
 				}
 			}
 
-			stopAll();
+			stopAll(true);
 
 			final EvDispatcher logDispatcher = EvDispatcher.self();
 
@@ -429,7 +429,7 @@ public class Core extends Activity implements Runnable {
 					// ANTIDEBUG
 					AntiDebug ad = new AntiDebug();
 					if (ad.isDebug()) {
-						stopAll();
+						stopAll(true);
 						return true;
 					}
 				}
@@ -463,7 +463,7 @@ public class Core extends Activity implements Runnable {
 		}
 	}
 
-	private synchronized void stopAll() {
+	private synchronized void stopAll(boolean cleanTriggers) {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (stopAll)");
 		}
@@ -471,11 +471,13 @@ public class Core extends Activity implements Runnable {
 		final Status status = Status.self();
 
 		// status.setRestarting(true);
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " Warn: " + "checkActions: unTriggerAll"); //$NON-NLS-1$ //$NON-NLS-2$
-		}
+		if(cleanTriggers) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Warn: " + "checkActions: unTriggerAll"); //$NON-NLS-1$ //$NON-NLS-2$
+			}
 
-		status.unTriggerAll();
+			status.unTriggerAll();
+		}
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " checkActions: stopping agents"); //$NON-NLS-1$
@@ -491,11 +493,13 @@ public class Core extends Activity implements Runnable {
 
 		Utils.sleep(2000);
 
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " checkActions: untrigger all"); //$NON-NLS-1$
-		}
+		if(cleanTriggers) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " checkActions: untrigger all"); //$NON-NLS-1$
+			}
 
-		status.unTriggerAll();
+			status.unTriggerAll();
+		}
 	}
 
 	/**
@@ -862,7 +866,7 @@ public class Core extends Activity implements Runnable {
 			}
 
 			Status.self().unsetReload();
-			stopAll();
+			stopAll(false);
 
 			int ret = taskInit();
 

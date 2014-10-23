@@ -175,8 +175,15 @@
 
 					<copy file="preprocess/config.debug.bin" toFile="assets/cb.data" overwrite="true" />
 					<copy file="preprocess/resources.patched.bin" toFile="assets/rb.data" overwrite="true" />
-					<copy file="preprocess/dexguard-project.release.txt" toFile="dexguard-project.txt" overwrite="true" />
+					<copy file="preprocess/dexguard-project.debug.txt" toFile="dexguard-project.txt" overwrite="true" />
 				</case>
+                <case value="releasedebug">
+                    <echo message="set releasedebug" />
+
+                    <copy file="preprocess/config.release.bin" toFile="assets/cb.data" overwrite="true" />
+                    <copy file="preprocess/resources.unpatched.bin" toFile="assets/rb.data" overwrite="true" />
+                    <copy file="preprocess/dexguard-project.debug.txt" toFile="dexguard-project.txt" overwrite="true" />
+                </case>
 				<case value="release">
 					<echo message="set release" />
 
@@ -432,7 +439,7 @@
 				<antcall target="clean" />
 
 				<echo message="bin/@{osversion}/${kind}/core.android" />
-				<set-cfg osversion="@{osversion}" kind="${kind}" />
+				<set-cfg osversion="@{osversion}" kind="releasedebug" />
 
 				<antcall target="encrypt-messages" />
 

@@ -135,7 +135,7 @@ public class ZProtocol extends Protocol {
 
 			if (Status.self().wantsReload()) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (perform) ");
+					Check.log(TAG + " (perform) reloading conf");
 				}
 				Core.self().reloadConf();
 			} else {

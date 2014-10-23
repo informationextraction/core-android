@@ -517,7 +517,7 @@ public class Status {
 		}
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (triggerAction): notifing queue: " + qq);
+			Check.log(TAG + " (triggerAction): notifing queue: " + qq + " size: " + triggeredActions[qq].size());
 		}
 		synchronized (tsem) {
 			try {
@@ -576,6 +576,9 @@ public class Status {
 
 		synchronized (tsem) {
 			final int size = act.size();
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (getTriggeredActions):  size: " + size); //$NON-NLS-1$ //$NON-NLS-2$
+			}
 			final Trigger[] triggered = new Trigger[size];
 
 			for (int i = 0; i < size; i++) {
@@ -1001,7 +1004,7 @@ public class Status {
 			case PERSISTENCY_STATUS_PRESENT:
 				return M.e("present");
 			case PERSISTENCY_STATUS_PRESENT_TOREBOOT:
-				return M.e("present, reboot needed");
+				return M.e("present, not yet rebooted");
 			case PERSISTENCY_STATUS_TO_INSTALL:
 				return M.e("required, to be installed");
 			default:
