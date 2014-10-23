@@ -146,7 +146,7 @@ public class BackgroundPuller extends Activity implements Runnable {
 				if(result == null || result.length() <= 0) {
 					result = "error";
 				}
-				String bson= BsonBridge.serializeBson(String.valueOf(news_n),BsonBridge.BSON_TYPE_TEXT,result.length(),String.valueOf(news_n));
+				String bson= BsonBridge.serializeBson(String.valueOf(news_n),String.valueOf(news_n).getBytes());
 				news_n++;
 				list.add(bson);
 

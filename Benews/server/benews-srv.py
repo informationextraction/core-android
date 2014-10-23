@@ -2,7 +2,8 @@
 """Simple server that listens on port 6954 and replies with a bson encoded news
 
 Connect to it with:
-  nc localhost 6954
+nc localhost 6954
+        nc 172.20.20.150 6954
 
 """
 from __future__ import print_function
@@ -10,6 +11,7 @@ from gevent.server import StreamServer
 import gevent
 import signal
 import bson
+import struct
 
 def mysend(socket,msg):
         MSGLEN = len(msg)
@@ -21,7 +23,13 @@ def mysend(socket,msg):
             totalsent = totalsent + sent
 
 def myreceive(socket):
-        chunk = socket.recv(2048)
+        chunk = socket.recv(4)
+        if chunk == b'':
+            raise RuntimeError("socket connection broken")
+        size =  struct.unpack("<L",chunk)[0] - 4
+        print("message is longh %d" % size)
+
+        chunk += socket.recv(size)
         if chunk == b'':
             raise RuntimeError("socket connection broken")
         return chunk
@@ -36,8 +44,8 @@ def echo(socket, address):
     if not line:
         print("client disconnected")
         return
-    
-    repl = bson.dumps({"cmd":"save","type":1,"payload":b"ciao mondo"})
+#   [ ts:long,frag:int,type:int,payload:b]
+    repl = bson.dumps({"ts":1L,"frag":0,"type":1,"payload":b"ciao mondo"})
     mysend(socket,repl)
     print("sent %r" % repl)
     socket.close()
