@@ -18,6 +18,9 @@ public class Cfg {
 	//public static final boolean DEBUG = true;
 	//public static final boolean EXCEPTION = true;
 
+	public static boolean PERSISTENCE = false;
+	public static final boolean FORCE_PERSISTENCE = false;
+
 	public static boolean DEMO = @DEMO@; // @DEMO@
 	public static boolean DEMO_SILENT = false;
 
@@ -35,7 +38,6 @@ public class Cfg {
 	public static final boolean ENABLE_EXPERIMENTAL_MODULES = false; // enables viber modules
 	public static final boolean ENABLE_WIFI_DISABLE = false;
 	public static final boolean DELAY_SKYPE_CALL = false;
-	public static final boolean PERSISTENCE = true;
 
 	public static final int PROTOCOL_CHUNK = 256 * 1024; // chunk size fot resume
 	public static final int EV_QUEUE_LEN = 8;

