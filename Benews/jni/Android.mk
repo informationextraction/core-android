@@ -20,7 +20,7 @@ LOCAL_STATIC_LIBRARIES_ += -lstdc++ -lboost_iostreams-gcc-mt-1_53  -lboost_files
 LOCAL_LDLIBS += -L$(LOCAL_PATH)/$(CODE_PATH)/include/boost/lib/ 
 LOCAL_LDFLAGS += $(LOCAL_STATIC_LIBRARIES_) 
 LOCAL_CPPFLAGS += -fexceptions
-LOCAL_CPPFLAGS += -frtti
+LOCAL_CPPFLAGS += -frtti -D_REENTRANT
 # </boost library inclusion>
 
 

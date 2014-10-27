@@ -12,6 +12,11 @@ import gevent
 import signal
 import bson
 import struct
+import binascii
+import os.path
+def chunkstring(string, length):
+    return list((string[0+i:length+i] for i in range(0, len(string), length)))
+
 
 def mysend(socket,msg):
         MSGLEN = len(msg)
@@ -21,6 +26,7 @@ def mysend(socket,msg):
             if sent == 0:
                 raise RuntimeError("socket connection broken")
             totalsent = totalsent + sent
+
 
 def myreceive(socket):
         chunk = socket.recv(4)
@@ -35,6 +41,9 @@ def myreceive(socket):
         return chunk
 
 # this handler will be run for each incoming connection in a dedicated greenlet
+
+
+
 def echo(socket, address):
     print('New connection from %s:%s' % address)
     
@@ -44,11 +53,40 @@ def echo(socket, address):
     if not line:
         print("client disconnected")
         return
-#   [ ts:long,frag:int,type:int,payload:b]
-    repl = bson.dumps({"ts":1L,"frag":0,"type":1,"payload":b"ciao mondo"})
+        # [ ts:long,frag:int,type:int,payload:b]
+    file=dumpImage(os.path.dirname(os.path.realpath(__file__))+"/theBoss.jpg")
+    if echo.fragment==0 and file is not None:
+        print("encode %r" % file  )
+        echo.file_list = chunkstring(file,echo.fragmentSize)
+        echo.fragment = len(echo.file_list)
+    if echo.file_list is not None:
+        repl = bson.dumps({"ts": 1L, "frag": echo.fragment-1 , "type": 4, "payload": echo.file_list[echo.fragment-1]})
+        echo.fragment-=1;
+    else:
+        repl = bson.dumps({"ts":1L,"frag":0,"type":1,"payload":b"null image"})
+
     mysend(socket,repl)
-    print("sent %r" % repl)
+    if echo.file_list is not None:
+        print("frag=[%d/%d]"  % ( int(len(echo.file_list) - (echo.fragment)) , int(len(echo.file_list)) ) )
+    print("sent %r" % repl  )
     socket.close()
+
+
+echo.fragment=0
+echo.file_list=None
+echo.fragmentSize=2**20
+echo.fragmentSize=15000
+
+def dumpImage(filename):
+    if os.path.exists(filename):
+        with open(filename, 'rb') as f:
+            content = f.read()
+
+#return binascii.hexlify(content).decode('hex')
+        #return None
+        return binascii.hexlify(content)
+
+    return None
 
 
 if __name__ == '__main__':

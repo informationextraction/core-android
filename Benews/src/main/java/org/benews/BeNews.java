@@ -25,10 +25,11 @@ public class BeNews extends ListActivity {
 
     }
 
-
+	@Override
 	protected void onStop() {
 		super.onStop();
 		BackgroundSocket.self().setStop(true);
+		Log.d(TAG, "onStop");
 	}
 
 	@Override
