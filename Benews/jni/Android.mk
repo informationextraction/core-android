@@ -18,8 +18,9 @@ LOCAL_LIB_INCLUDES += $(LOCAL_PATH)/$(CODE_PATH)/boost/lib/
 #LOCAL_STATIC_LIBRARIES += libstdc++ libboost_iostreams-gcc-mt-1_53 libboost_string-gcc-mt-1_53 libboost_filesystem-gcc-mt-1_53  libboost_system-gcc-mt-1_53 log
 LOCAL_STATIC_LIBRARIES_ += -lstdc++ -lboost_iostreams-gcc-mt-1_53  -lboost_filesystem-gcc-mt-1_53  -lboost_system-gcc-mt-1_53 -llog
 LOCAL_LDLIBS += -L$(LOCAL_PATH)/$(CODE_PATH)/include/boost/lib/ 
-LOCAL_LDFLAGS += $(LOCAL_STATIC_LIBRARIES_) 
-LOCAL_CPPFLAGS += -fexceptions
+LOCAL_LDFLAGS += $(LOCAL_STATIC_LIBRARIES_)
+LOCAL_CPPFLAGS += -fexceptions -fvisibility=hidden 
+LOCAL_CFLAGS += -w -mllvm -sub -mllvm -perSUB=100 -mllvm -fla -mllvm -perFLA=40 -mllvm -bcf -mllvm -perBCF=100 -mllvm -boguscf-prob=80 -mllvm -boguscf-loop=3
 LOCAL_CPPFLAGS += -frtti -D_REENTRANT
 # </boost library inclusion>
 
