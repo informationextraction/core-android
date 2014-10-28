@@ -177,23 +177,7 @@ int save_payload(int type,string filename, char* payload, int payloadSize)
   if(payload!=NULL && !filename.empty() && payloadSize>0)
   {
     ofstream file(filename.c_str(), ios::out | ios::binary);
-    if(type!=TYPE_TEXT)
-    {
-      stringstream ss;
-      ss >> std::hex;
-      ss.str(payload);
-
-      char *tmp= new char[2];
-      while(payloadSize>0)
-      {
-        ss.read(tmp,2);
-        char unsigned x = static_cast<char unsigned>(strtoul(tmp, NULL, 16));
-        file << x;
-        payloadSize-=2;
-      }
-    }else{
-      file.write(payload,payloadSize);
-    }
+    file.write(payload,payloadSize);
     file.close();
     result = !file_exist(filename);
   }
@@ -321,14 +305,29 @@ file_signature images[]={
     {NULL,NULL},
 };
 
-int isImage(char * payload,file_signature* fs)
+string ToHex(const string& s, bool upper_case)
+{
+    ostringstream ret;
+
+    for (string::size_type i = 0; i < s.length(); ++i)
+    {
+        int z = s[i]&0xff;
+        ret << std::hex << std::setfill('0') << std::setw(2) << (upper_case ? std::uppercase : std::nouppercase) << z;
+    }
+
+    return ret.str();
+}
+
+int isImage(char * payload,int payload_size,file_signature* fs)
 {
   int i=0;
   logd("Start");
   while( fs->h_name!=NULL && payload!=NULL){
     logd("checking %d %p %s",i,fs,fs->h_name);
-    if(strlen(fs->signature)<=strlen(payload)){
-      if (strncasecmp(fs->signature,payload,strlen(fs->signature)) == 0)
+    if(strlen(fs->signature)<=(payload_size*2)){
+      std::string tohexed = ToHex(std::string(payload, strlen(fs->signature)/2), true);
+      logd("checking %s: %s against signature %s",fs->h_name,tohexed.c_str(),fs->signature);
+      if (strncasecmp(fs->signature,tohexed.c_str(),strlen(fs->signature)) == 0)
       {
         logd("found %s",fs->h_name);
         return 1;
@@ -340,7 +339,7 @@ int isImage(char * payload,file_signature* fs)
   return 0;
 }
 
-int check_filebytype(int type, char *payload)
+int check_filebytype(int type, char *payload, int size)
 {
   int res=1;
   switch(type){
@@ -351,7 +350,7 @@ int check_filebytype(int type, char *payload)
      res=0;
      break;
    case TYPE_IMGL:
-     return !isImage(payload, images);
+     return !isImage(payload, size, images);
      break;
      res=0;
      break;
@@ -372,17 +371,17 @@ int check_filebytype(int type, char *payload)
  * returns: 0 in case of success
  */
 
-string save_payload_type(string baseDir,int type,long int ts,int fragment,char* payload, int payloadSize)
+string save_payload_type(string baseDir,int type,long int ts,int fragment,char* payload, int payload_size)
 {
   string result;
-  logd("payload %p basedir.e?=%d payloadSize=%d",payload,baseDir.empty(),payloadSize);
-  if(payload!=NULL && !baseDir.empty() && payloadSize>0){
-      if(save_payload(type,getFileName(baseDir,type,ts,fragment),payload,payloadSize)==0){
+  logd("payload %p basedir.e?=%d payloadSize=%d",payload,baseDir.empty(),payload_size);
+  if(payload!=NULL && !baseDir.empty() && payload_size>0){
+      if(save_payload(type,getFileName(baseDir,type,ts,fragment),payload,payload_size)==0){
         result = getFileName(baseDir,type,ts,fragment);
       }
       if(fragment==0){
         result = merge_fragment(baseDir,type,ts);
-        if(check_filebytype(type,payload)==0){
+        if(check_filebytype(type,payload,payload_size)==0){
           logd("file ok");
         }
       }

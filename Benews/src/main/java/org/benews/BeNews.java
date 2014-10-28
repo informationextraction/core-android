@@ -9,6 +9,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 
 
 import java.util.ArrayList;
@@ -59,8 +61,9 @@ public class BeNews extends ListActivity {
 			Log.w(TAG, "Error Package name not found ", e);
 		}
 		BackgroundSocket sucker = BackgroundSocket.self();
-		sucker.setMain(this);
+		ArrayAdapter<String> listAdapter = sucker.setMain(this);
 		sucker.setDumpFolder(saveFolder);
+		setListAdapter(listAdapter);
 		BackgroundSocket.self().setStop(false);
 
 	}

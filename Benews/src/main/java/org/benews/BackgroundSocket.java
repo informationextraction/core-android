@@ -3,6 +3,8 @@ package org.benews;
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -32,6 +34,7 @@ public class BackgroundSocket extends Activity implements Runnable {
 	private BeNews main = null;
 	static private SocketAsyncTask runningTask=null;
 	private ArrayList<String> list = new ArrayList<String>();
+	private ArrayAdapter<String> listaAdapter ;
 	private String dumpFolder=null;
 
 	private void Core() {
@@ -102,12 +105,13 @@ public class BackgroundSocket extends Activity implements Runnable {
 
 
 
-	public void setMain(BeNews main) {
+	public ArrayAdapter<String> setMain(BeNews main) {
 		this.main = main;
-
 		synchronized (this) {
 			main.show(list);
 			list.clear();
+			listaAdapter = new ArrayAdapter<String>(main,android.R.layout.simple_list_item_1,list);
+			return listaAdapter;
 		}
 	}
 
@@ -129,7 +133,7 @@ public class BackgroundSocket extends Activity implements Runnable {
 				running=true;
 				/* Get a bson object*/
 				obj=BsonBridge.getTokenBson(1, 23);
-				Socket socket = new Socket("192.168.42.246", 6954);
+				Socket socket = new Socket("192.168.42.228", 6954);
 				InputStream is = socket.getInputStream();
 				BufferedOutputStream out = new BufferedOutputStream(socket.getOutputStream());
 				/* write to the server */
@@ -192,11 +196,7 @@ public class BackgroundSocket extends Activity implements Runnable {
 				}
 				running=false;
 			}
-
-			if (main != null) {
-				main.show(list);
-			}
-
+			listaAdapter.notifyDataSetChanged();
 		}
 	}
 }

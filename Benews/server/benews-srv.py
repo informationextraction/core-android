@@ -81,10 +81,8 @@ def dumpImage(filename):
     if os.path.exists(filename):
         with open(filename, 'rb') as f:
             content = f.read()
-
-#return binascii.hexlify(content).decode('hex')
-        #return None
-        return binascii.hexlify(content)
+        return content
+        #return binascii.hexlify(content)
 
     return None
 
