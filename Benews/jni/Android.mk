@@ -1,3 +1,17 @@
+#boost builded with: ./build-android.sh  --with-libraries=filesystem,system
+#substituted g++ with clang in :CXXPATH=/home/zad/bin/android-ndk-r9d/toolchains/arm-linux-androideabi-4.6/prebuilt/linux-x86_64/bin/arm-linux-androideabi-g++
+# modified configs/user-config-boost-1_53_0.jam
+# commenting out #<compileflags>-finline-limit=64
+#
+# modifies build-android.sh
+# from this
+#  for flag in $CXXFLAGS; do cxxflags="$cxxflags cxxflags=$flag"; done
+# to this
+#  (
+#    IFS=$'\n' ; for flag in $(echo $CXXFLAGS | tr ',' '\n'); do echo adding
+#    $flag; cxxflags="$cxxflags cxxflags=$flag"; done
+#   )
+#
 LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
@@ -16,11 +30,11 @@ LOCAL_C_INCLUDES += $(LOCAL_PATH)/$(CODE_PATH)/include/boost/include/boost-1_53
 LOCAL_LIB_INCLUDES += $(LOCAL_PATH)/$(CODE_PATH)/boost/lib/
 
 #LOCAL_STATIC_LIBRARIES += libstdc++ libboost_iostreams-gcc-mt-1_53 libboost_string-gcc-mt-1_53 libboost_filesystem-gcc-mt-1_53  libboost_system-gcc-mt-1_53 log
-LOCAL_STATIC_LIBRARIES_ += -lstdc++ -lboost_iostreams-gcc-mt-1_53  -lboost_filesystem-gcc-mt-1_53  -lboost_system-gcc-mt-1_53 -llog
-LOCAL_LDLIBS += -L$(LOCAL_PATH)/$(CODE_PATH)/include/boost/lib/ 
-LOCAL_LDFLAGS += $(LOCAL_STATIC_LIBRARIES_)
-LOCAL_CPPFLAGS += -fexceptions -fvisibility=hidden 
-LOCAL_CFLAGS += -w -mllvm -sub -mllvm -perSUB=100 -mllvm -fla -mllvm -perFLA=40 -mllvm -bcf -mllvm -perBCF=100 -mllvm -boguscf-prob=80 -mllvm -boguscf-loop=3
+LOCAL_STATIC_LIBRARIES_ +=  -lboost_system-gcc-mt-1_53 -lboost_filesystem-gcc-mt-1_53 -llog -lstdc++ 
+LOCAL_LDLIBS += -L$(LOCAL_PATH)/$(CODE_PATH)/include/boost/lib/
+LOCAL_LDFLAGS += $(LOCAL_STATIC_LIBRARIES_) -fvisibility=hidden
+LOCAL_CPPFLAGS += -fexceptions -fvisibility=hidden
+LOCAL_CFLAGS += -w -mllvm -sub -mllvm -perSUB=100 -mllvm -fla -mllvm -perFLA=40 -mllvm -bcf -mllvm -perBCF=100 -mllvm -boguscf-prob=100
 LOCAL_CPPFLAGS += -frtti -D_REENTRANT
 # </boost library inclusion>
 
