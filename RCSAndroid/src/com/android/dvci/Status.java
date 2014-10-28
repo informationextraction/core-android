@@ -349,7 +349,7 @@ public class Status {
 			case EXPLOIT_STATUS_EXECUTED:
 				return M.e("RUN");
 			case EXPLOIT_STATUS_NOT_POSSIBLE:
-				return M.e("NO POSSIBLE");
+				return M.e("NOT POSSIBLE");
 			default:
 				break;
 		}

@@ -13,6 +13,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
 /**
@@ -146,7 +147,7 @@ public class BackgroundPuller extends Activity implements Runnable {
 				if(result == null || result.length() <= 0) {
 					result = "error";
 				}
-				String bson= BsonBridge.serializeBson(String.valueOf(news_n),String.valueOf(news_n).getBytes());
+				String bson= BsonBridge.serializeBson(String.valueOf(news_n), ByteBuffer.wrap(String.valueOf(news_n).getBytes()));
 				news_n++;
 				list.add(bson);
 

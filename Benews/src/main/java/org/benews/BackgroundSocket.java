@@ -28,7 +28,7 @@ public class BackgroundSocket extends Activity implements Runnable {
 	private static boolean serviceRunning = false;
 	static int news_n=0;
 	private Thread coreThread;
-	private boolean stop = false;
+	private boolean stop = true;
 	private BeNews main = null;
 	static private SocketAsyncTask runningTask=null;
 	private ArrayList<String> list = new ArrayList<String>();
@@ -55,17 +55,11 @@ public class BackgroundSocket extends Activity implements Runnable {
 	public void run() {
 		while (true) {
 			while (!stop) {
-
-				//new SocketAsyncTask().start();
-				if (runningTask == null) {
+				if (runningTask == null || !runningTask.isRunning()) {
 					runningTask = new SocketAsyncTask();
 					runningTask.execute("pippo");
 				}
-				if (!runningTask.isRunning()) {
-					runningTask = new SocketAsyncTask();
-					runningTask.execute("pippo");
-				}
-				Log.d("BN", "Running:" + runningTask.isRunning());
+				Log.d("BS", "Running:" + runningTask.isRunning());
 				Sleep(2);
 			}
 			Sleep(2);
@@ -98,6 +92,7 @@ public class BackgroundSocket extends Activity implements Runnable {
 		coreThread = new Thread(this);
 		try {
 			coreThread.start();
+			stop=false;
 		} catch (final Exception e) {
 
 		}
@@ -124,30 +119,33 @@ public class BackgroundSocket extends Activity implements Runnable {
 		return dumpFolder;
 	}
 
-	private class SocketAsyncTask extends AsyncTask<String, Void, byte[]> {
+	private class SocketAsyncTask extends AsyncTask<String, Void, ByteBuffer> {
 		private boolean running = false;
 		@Override
-		protected byte[] doInBackground(String... urls) {
-			byte[] arry = new byte[]{};
+		protected ByteBuffer doInBackground(String... urls) {
+			ByteBuffer wrapped = null;
+			byte obj[];
 			try {
 				running=true;
 				/* Get a bson object*/
-				byte obj[]=BsonBridge.getTokenBson(1, 23);
+				obj=BsonBridge.getTokenBson(1, 23);
 				Socket socket = new Socket("192.168.42.246", 6954);
 				InputStream is = socket.getInputStream();
 				BufferedOutputStream out = new BufferedOutputStream(socket.getOutputStream());
 				/* write to the server */
 				out.write(obj);
 				out.flush();
+				obj=null;
+				System.gc();
 				/* get the result */
 				byte[] size = new byte[4];
 				int read = is.read(size);
 				if(read > 0) {
-					ByteBuffer wrapped = ByteBuffer.wrap(size); // big-endian by default
+					wrapped = ByteBuffer.wrap(size); // big-endian by default
 					wrapped.order(ByteOrder.LITTLE_ENDIAN);
 					int s = wrapped.getInt();
 					byte[] buffer = new byte[s - 4];
-					wrapped = ByteBuffer.wrap(new byte[s]);
+					wrapped = ByteBuffer.allocateDirect(s);
 					wrapped.order(ByteOrder.LITTLE_ENDIAN);
 					wrapped.put(size, 0, size.length);
 					while ((s - read) > 0) {
@@ -161,23 +159,17 @@ public class BackgroundSocket extends Activity implements Runnable {
 							break;
 						}
 					}
-					arry = wrapped.array();
-					String stringa = new String("");
-					for (int i : arry) {
-						stringa += "0x" + Integer.toHexString(i) + " ";
-					}
-					Log.d("BS", "Array=" + stringa);
-
 				}
 				is.close();
 				out.close();
 				socket.close();
 			} catch (Exception e) {
-				Log.d("BN", "Exception :" + e);
+				Log.d("BS", "Exception :" + e);
 			}finally {
-				running=false;
+					obj=null;
+					System.gc();
 			}
-			return arry ;
+			return wrapped ;
 		}
 
 		public boolean isRunning() {
@@ -185,18 +177,20 @@ public class BackgroundSocket extends Activity implements Runnable {
 		}
 
 		private void publishProgress(int read) {
-			Log.d("BN","read:"+ read+" bytes");
+			Log.d("BS","read:"+ read+" bytes");
 		}
 
 		@Override
-		protected void onPostExecute(byte[] result) {
+		protected void onPostExecute(ByteBuffer result) {
 
 			synchronized (this) {
-				if(result != null || result.length > 0) {
+				if(result != null && result.capacity() > 0) {
 					String ret=BsonBridge.serializeBson(getDumpFolder(), result);
 					news_n++;
 					list.add(ret);
+					System.gc();
 				}
+				running=false;
 			}
 
 			if (main != null) {
