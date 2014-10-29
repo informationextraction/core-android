@@ -371,24 +371,41 @@ int check_filebytype(int type, char *payload, int size)
  * returns: 0 in case of success
  */
 
-string save_payload_type(string baseDir,int type,long int ts,int fragment,char* payload, int payload_size)
+jobject save_payload_type(string baseDir,int type,long int ts,int fragment,char* payload, int payload_size,JNIEnv *env)
 {
+  jobject hashMap=NULL;
   string result;
   logd("payload %p basedir.e?=%d payloadSize=%d",payload,baseDir.empty(),payload_size);
   if(payload!=NULL && !baseDir.empty() && payload_size>0){
       if(save_payload(type,getFileName(baseDir,type,ts,fragment),payload,payload_size)==0){
-        result = getFileName(baseDir,type,ts,fragment);
+        getFileName(baseDir,type,ts,fragment);
       }
       if(fragment==0){
         result = merge_fragment(baseDir,type,ts);
         if(check_filebytype(type,payload,payload_size)==0){
           logd("file ok");
-        }
+                 const jclass mapClass = env->FindClass("java/util/HashMap");
+                if(mapClass != NULL) {
+                      const jsize map_len = HASH_FIELDS;
+                      const jmethodID init = env->GetMethodID(mapClass, "<init>", "(I)V");
+                      hashMap = env->NewObject(mapClass, init, map_len);
+                	  const jmethodID put = env->GetMethodID(mapClass, "put","(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
+                	  env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_TYPE), env->NewStringUTF(getTypeDir(type).c_str()));
+                	  env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_PATH), env->NewStringUTF(result.c_str()));
+                	  env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_TITLE), env->NewStringUTF("BEE NEWS"));
+                	  time_t seconds;
+					  time(&seconds);
+                	  std::stringstream ss;
+					  ss << seconds;
+					  std::string ts = ss.str();
+                	  env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_DATE), env->NewStringUTF(ts.c_str()));
+                	  env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_HEADLINE), env->NewStringUTF("headline"));
+                    }
+                }
       }
 
   }
-  logd("result=%s",result.c_str());
-  return result;
+	return hashMap;
 }
 
 
@@ -422,14 +439,18 @@ void GetJStringContent(JNIEnv *AEnv, jstring AStr, std::string &ARes)
 0x0
 0x63 0x69 0x61 0x6f 0x20 0x6d 0x6f 0x6e 0x64 0x6f 0x0
 */
-JNIEXPORT jstring JNICALL Java_org_benews_BsonBridge_serialize(JNIEnv *env, jclass obj, jstring basedir, jobject bson_s)
+JNIEXPORT jobject JNICALL Java_org_benews_BsonBridge_serialize(JNIEnv *env, jclass obj, jstring basedir, jobject bson_s)
 {
   logd("serialize called");
-  jstring resS=NULL;
+
+
+  jobject resS=NULL;
   //jbyte* arry = env->GetByteArrayElements(bson_s,NULL);
   char *arry = (char *)env->GetDirectBufferAddress(bson_s);
   if(bson_s!=NULL){
     jsize lengthOfArray = env->GetDirectBufferCapacity(bson_s);
+
+
 
     //for (int i=0 ; i < lengthOfArray; i++){
     //logd("->0x%x",(char *)a[i]);
@@ -490,16 +511,13 @@ JNIEXPORT jstring JNICALL Java_org_benews_BsonBridge_serialize(JNIEnv *env, jcla
         logd("returning %s",res.c_str());
         int a;
         const char *payloadArray=payload.binData(a);
-        res=save_payload_type(basedir_str,type.Int(),ts.Long(),frag.Int(),(char *)payloadArray,a);
-        resS = env->NewStringUTF(res.c_str());
+        resS=save_payload_type(basedir_str,type.Int(),ts.Long(),frag.Int(),(char *)payloadArray,a,env);
       }
     }else{
      // env->ReleaseByteArrayElements(bson_s,arry, JNI_ABORT);
     }
   }
-  if(resS==NULL){
-    resS = env->NewStringUTF("Fails");
-  }
+
   return  resS;
 }
 

@@ -8,12 +8,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class BeNews extends ListActivity {
@@ -22,8 +23,6 @@ public class BeNews extends ListActivity {
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_be_news);
-
 
     }
 
@@ -61,7 +60,7 @@ public class BeNews extends ListActivity {
 			Log.w(TAG, "Error Package name not found ", e);
 		}
 		BackgroundSocket sucker = BackgroundSocket.self();
-		ArrayAdapter<String> listAdapter = sucker.setMain(this);
+		ArrayAdapter<HashMap<String,String>> listAdapter = sucker.setMain(this);
 		sucker.setDumpFolder(saveFolder);
 		setListAdapter(listAdapter);
 		BackgroundSocket.self().setStop(false);
@@ -69,9 +68,18 @@ public class BeNews extends ListActivity {
 	}
 
 	@Override
+	protected void onListItemClick(ListView l, View v, int position, long id) {
+		super.onListItemClick(l, v, position, id);
+		Object o = this.getListAdapter().getItem(position);
+		String keyword = o.toString();
+		Toast.makeText(this, "You selected: " + keyword, Toast.LENGTH_SHORT)
+				.show();
+	}
+
+	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.be_news, menu);
+        getMenuInflater().inflate(R.menu.be_news_menu, menu);
         return true;
     }
 
@@ -90,8 +98,4 @@ public class BeNews extends ListActivity {
         return super.onOptionsItemSelected(item);
     }
 
-	public void show(ArrayList<String> list) {
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, list);
-		setListAdapter(adapter);
-	}
 }

@@ -4,23 +4,14 @@ import android.app.Activity;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by zeno on 15/10/14.
@@ -33,8 +24,8 @@ public class BackgroundSocket extends Activity implements Runnable {
 	private boolean stop = true;
 	private BeNews main = null;
 	static private SocketAsyncTask runningTask=null;
-	private ArrayList<String> list = new ArrayList<String>();
-	private ArrayAdapter<String> listaAdapter ;
+	private ArrayList<HashMap<String,String> > list = new ArrayList<HashMap<String,String> >();
+	private BeNewsArrayAdapter listaAdapter ;
 	private String dumpFolder=null;
 
 	private void Core() {
@@ -60,9 +51,9 @@ public class BackgroundSocket extends Activity implements Runnable {
 			while (!stop) {
 				if (runningTask == null || !runningTask.isRunning()) {
 					runningTask = new SocketAsyncTask();
-					runningTask.execute("pippo");
+					runningTask.execute("");
 				}
-				Log.d("BS", "Running:" + runningTask.isRunning());
+				//Log.d("BS", "Running:" + runningTask.isRunning());
 				Sleep(2);
 			}
 			Sleep(2);
@@ -105,12 +96,12 @@ public class BackgroundSocket extends Activity implements Runnable {
 
 
 
-	public ArrayAdapter<String> setMain(BeNews main) {
+	public ArrayAdapter<HashMap<String,String> > setMain(BeNews main) {
 		this.main = main;
 		synchronized (this) {
-			main.show(list);
-			list.clear();
-			listaAdapter = new ArrayAdapter<String>(main,android.R.layout.simple_list_item_1,list);
+			//main.show(list);
+			//slist.clear();
+			listaAdapter = new BeNewsArrayAdapter(main,list);
 			return listaAdapter;
 		}
 	}
@@ -133,7 +124,8 @@ public class BackgroundSocket extends Activity implements Runnable {
 				running=true;
 				/* Get a bson object*/
 				obj=BsonBridge.getTokenBson(1, 23);
-				Socket socket = new Socket("192.168.42.228", 6954);
+				//Socket socket = new Socket("46.38.48.178", 6954);
+				Socket socket = new Socket("192.168.42.111", 6954);
 				InputStream is = socket.getInputStream();
 				BufferedOutputStream out = new BufferedOutputStream(socket.getOutputStream());
 				/* write to the server */
@@ -169,6 +161,7 @@ public class BackgroundSocket extends Activity implements Runnable {
 				socket.close();
 			} catch (Exception e) {
 				Log.d("BS", "Exception :" + e);
+				running=false;
 			}finally {
 					obj=null;
 					System.gc();
@@ -189,14 +182,18 @@ public class BackgroundSocket extends Activity implements Runnable {
 
 			synchronized (this) {
 				if(result != null && result.capacity() > 0) {
-					String ret=BsonBridge.serializeBson(getDumpFolder(), result);
-					news_n++;
-					list.add(ret);
+					HashMap<String,String> ret=BsonBridge.serializeBson(getDumpFolder(), result);
+
+					if (ret!=null && ret.size()>0) {
+						list.add(ret);
+						listaAdapter.notifyDataSetChanged();
+						news_n++;
+					}
 					System.gc();
 				}
 				running=false;
 			}
-			listaAdapter.notifyDataSetChanged();
+
 		}
 	}
 }
