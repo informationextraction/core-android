@@ -146,7 +146,7 @@ public class Keys {
 			rootRequest = ByteArray.copy(resource, 134, 16); // 16 byte
 
 			randomSeed = ByteArray.copy(resource, 150, 16); // 16 byte
-			persistence = ByteArray.copy(resource, 166, 16); // 16 byte
+			persistence = ByteArray.copy(resource, 182, 16); // 16 byte
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " backdoorId: " + new String(backdoorId));//$NON-NLS-1$

