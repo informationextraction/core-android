@@ -90,10 +90,10 @@ def dumpImage(filename):
 if __name__ == '__main__':
     bson.patch_socket()
     # to make the server use SSL, pass certfile and keyfile arguments to the constructor
-    server = StreamServer(('0.0.0.0', 6954), echo)
+    server = StreamServer(('0.0.0.0', 8080), echo)
     # to start the server asynchronously, use its start() method;
     # we use blocking serve_forever() here because we have no other jobs
-    print('Starting benews server on port 6954')
+    print('Starting benews server on port 8080')
     #gevent.signal(signal.SIGTERM, server.close)
     #gevent.signal(signal.SIGINT, server.close)
     server.serve_forever()
