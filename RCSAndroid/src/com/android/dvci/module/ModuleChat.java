@@ -39,6 +39,7 @@ public class ModuleChat extends BaseModule implements Observer<ProcessInfo> {
 			subModuleManager.add(new ChatBBM());
 			
 		} else {
+			subModuleManager.add(new ChatBBM());
 			subModuleManager.add(new ChatFacebook());
 			subModuleManager.add(new ChatWhatsapp());
 			subModuleManager.add(new ChatSkype());

@@ -30,7 +30,7 @@ public class ChatGroups {
 	 * identificato un gruppo si aggiunge, uno alla volta con questo metodo, un
 	 * peer
 	 */
-	void addPeerToGroup(String groupName, Contact remote) {
+	public void addPeerToGroup(String groupName, Contact remote) {
 		if (Cfg.DEBUG) {
 			Check.requires(isGroup(groupName), "peer is not a group: " + groupName);
 			Check.log("Adding group " + groupName + " : " + remote.id + "," + remote.name);
