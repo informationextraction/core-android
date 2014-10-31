@@ -41,4 +41,4 @@ do
 	sleep 2
 	pid=`ssh $1 ps ax | grep benews-srv.py | grep -v grep| cut -d' ' -f1`
 done
-ssh $1 server/benews-srv.py&
+ssh $1 "cd server && ./benews-srv.py >/dev/null"  &
