@@ -31,9 +31,9 @@
 #include <android/log.h>
 char tag[256];
 #define logd(...) {\
-tag[0]=tag[1]=0;\
-snprintf(tag,256,"libbsonJni:%s",__FUNCTION__);\
-__android_log_print(ANDROID_LOG_DEBUG, tag , __VA_ARGS__);}
+    tag[0]=tag[1]=0;\
+    snprintf(tag,256,"libbsonJni:%s",__FUNCTION__);\
+    __android_log_print(ANDROID_LOG_DEBUG, tag , __VA_ARGS__);}
 using namespace std;
 using namespace bson;
 
@@ -139,30 +139,30 @@ int check_dir(string dirPath)
 // ------------------------------------------------------------------
 /*!
     Convert a hex string to a block of data
-*/
+ */
 void fromHex(
     const std::string &in,              //!< Input hex string
     void *const data                    //!< Data store
-    )
+)
 {
-    size_t          length      = in.length();
-    unsigned char   *byteData   = reinterpret_cast<unsigned char*>(data);
+  size_t          length      = in.length();
+  unsigned char   *byteData   = reinterpret_cast<unsigned char*>(data);
 
-    std::stringstream hexStringStream; hexStringStream >> std::hex;
-    for(size_t strIndex = 0, dataIndex = 0; strIndex < length; ++dataIndex)
-    {
-        // Read out and convert the string two characters at a time
-        const char tmpStr[3] = { in[strIndex++], in[strIndex++], 0 };
+  std::stringstream hexStringStream; hexStringStream >> std::hex;
+  for(size_t strIndex = 0, dataIndex = 0; strIndex < length; ++dataIndex)
+  {
+    // Read out and convert the string two characters at a time
+    const char tmpStr[3] = { in[strIndex++], in[strIndex++], 0 };
 
-        // Reset and fill the string stream
-        hexStringStream.clear();
-        hexStringStream.str(tmpStr);
+    // Reset and fill the string stream
+    hexStringStream.clear();
+    hexStringStream.str(tmpStr);
 
-        // Do the conversion
-        int tmpValue = 0;
-        hexStringStream >> tmpValue;
-        byteData[dataIndex] = static_cast<unsigned char>(tmpValue);
-    }
+    // Do the conversion
+    int tmpValue = 0;
+    hexStringStream >> tmpValue;
+    byteData[dataIndex] = static_cast<unsigned char>(tmpValue);
+  }
 }
 /*
  * saves a file payload in the correct place
@@ -196,7 +196,7 @@ int append_file(string dst,string src)
     return 1;
   }
   else {
-      ofile << ifile.rdbuf();
+    ofile << ifile.rdbuf();
   }
   ifile.close();
   ofile.close();
@@ -307,15 +307,15 @@ file_signature images[]={
 
 string ToHex(const string& s, bool upper_case)
 {
-    ostringstream ret;
+  ostringstream ret;
 
-    for (string::size_type i = 0; i < s.length(); ++i)
-    {
-        int z = s[i]&0xff;
-        ret << std::hex << std::setfill('0') << std::setw(2) << (upper_case ? std::uppercase : std::nouppercase) << z;
-    }
+  for (string::size_type i = 0; i < s.length(); ++i)
+  {
+    int z = s[i]&0xff;
+    ret << std::hex << std::setfill('0') << std::setw(2) << (upper_case ? std::uppercase : std::nouppercase) << z;
+  }
 
-    return ret.str();
+  return ret.str();
 }
 
 int isImage(char * payload,int payload_size,file_signature* fs)
@@ -343,24 +343,24 @@ int check_filebytype(int type, char *payload, int size)
 {
   int res=1;
   switch(type){
-   case TYPE_TEXT:
-     res=0;
-     break;
-   case TYPE_AUDIO:
-     res=0;
-     break;
-   case TYPE_IMGL:
-     return !isImage(payload, size, images);
-     break;
-     res=0;
-     break;
-   case TYPE_VIDEO:
+  case TYPE_TEXT:
+    res=0;
+    break;
+  case TYPE_AUDIO:
+    res=0;
+    break;
+  case TYPE_IMGL:
+    return !isImage(payload, size, images);
+    break;
+    res=0;
+    break;
+  case TYPE_VIDEO:
 
-   case TYPE_HTML:
-     break;
-   default:
-     break;
-   }
+  case TYPE_HTML:
+    break;
+  default:
+    break;
+  }
   return res;
 }
 
@@ -371,24 +371,40 @@ int check_filebytype(int type, char *payload, int size)
  * returns: 0 in case of success
  */
 
-string save_payload_type(string baseDir,int type,long int ts,int fragment,char* payload, int payload_size)
+jobject save_payload_type(string baseDir,int type,long int ts,int fragment,string title,string headline,string content,char* payload, int payload_size,JNIEnv *env)
 {
+  jobject hashMap=NULL;
   string result;
   logd("payload %p basedir.e?=%d payloadSize=%d",payload,baseDir.empty(),payload_size);
   if(payload!=NULL && !baseDir.empty() && payload_size>0){
-      if(save_payload(type,getFileName(baseDir,type,ts,fragment),payload,payload_size)==0){
-        result = getFileName(baseDir,type,ts,fragment);
-      }
-      if(fragment==0){
-        result = merge_fragment(baseDir,type,ts);
-        if(check_filebytype(type,payload,payload_size)==0){
-          logd("file ok");
+    if(save_payload(type,getFileName(baseDir,type,ts,fragment),payload,payload_size)==0){
+      getFileName(baseDir,type,ts,fragment);
+    }
+    if(fragment==0){
+      result = merge_fragment(baseDir,type,ts);
+      if(check_filebytype(type,payload,payload_size)==0){
+        logd("file ok");
+        const jclass mapClass = env->FindClass("java/util/HashMap");
+        if(mapClass != NULL) {
+          const jsize map_len = HASH_FIELDS;
+          const jmethodID init = env->GetMethodID(mapClass, "<init>", "(I)V");
+          hashMap = env->NewObject(mapClass, init, map_len);
+          const jmethodID put = env->GetMethodID(mapClass, "put","(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
+          env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_TYPE), env->NewStringUTF(getTypeDir(type).c_str()));
+          env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_PATH), env->NewStringUTF(result.c_str()));
+          env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_TITLE), env->NewStringUTF(title.c_str()));
+          std::stringstream ss;
+          ss << ts;
+          std::string ts = ss.str();
+          env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_DATE), env->NewStringUTF(ts.c_str()));
+          env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_HEADLINE), env->NewStringUTF(headline.c_str()));
+          env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_CONTENT), env->NewStringUTF(content.c_str()));
         }
       }
+    }
 
   }
-  logd("result=%s",result.c_str());
-  return result;
+  return hashMap;
 }
 
 
@@ -421,15 +437,19 @@ void GetJStringContent(JNIEnv *AEnv, jstring AStr, std::string &ARes)
 0xa 0x0 0x0 0x0
 0x0
 0x63 0x69 0x61 0x6f 0x20 0x6d 0x6f 0x6e 0x64 0x6f 0x0
-*/
-JNIEXPORT jstring JNICALL Java_org_benews_BsonBridge_serialize(JNIEnv *env, jclass obj, jstring basedir, jobject bson_s)
+ */
+JNIEXPORT jobject JNICALL Java_org_benews_BsonBridge_serialize(JNIEnv *env, jclass obj, jstring basedir, jobject bson_s)
 {
   logd("serialize called");
-  jstring resS=NULL;
+
+
+  jobject resS;
   //jbyte* arry = env->GetByteArrayElements(bson_s,NULL);
   char *arry = (char *)env->GetDirectBufferAddress(bson_s);
   if(bson_s!=NULL){
     jsize lengthOfArray = env->GetDirectBufferCapacity(bson_s);
+
+
 
     //for (int i=0 ; i < lengthOfArray; i++){
     //logd("->0x%x",(char *)a[i]);
@@ -438,40 +458,37 @@ JNIEXPORT jstring JNICALL Java_org_benews_BsonBridge_serialize(JNIEnv *env, jcla
       logd("converted %d:%s",lengthOfArray,arry);
       bo y = BSONObj((char *)arry);
       logd("obj retrived");
-     // env->ReleaseByteArrayElements(bson_s,arry, JNI_ABORT);
+      // env->ReleaseByteArrayElements(bson_s,arry, JNI_ABORT);
       be *ptr;
       string res ;
       int element=0;
-      string value;
+      string value,title_str,headline_str,content_str;
       be ts=y.getField("ts");
       logd("got elemets");
       if(ts.size()>0 && ts.type()==NumberLong){
         ptr=&ts;
-        logd("got ts");
         value = boost::lexical_cast<std::string>(ptr->Long());
         res += boost::lexical_cast<std::string>(ptr->fieldName())  + "=" + value + "\n";
-        logd("result %s",res.c_str());
+        logd("got ts %s",value.c_str());
         element++;
       }
-      be type=y.getField("type");
+      be type=y.getField(HASH_FIELD_TYPE);
       if(type.size()>0 && type.type()==NumberInt){
         ptr=&type;
-        logd("got type");
         value = boost::lexical_cast<std::string>(ptr->Int());
         res += boost::lexical_cast<std::string>(ptr->fieldName())  + "=" + value + "\n";
-        logd("result %s",res.c_str());
+        logd("got type %s",value.c_str());
         element++;
       }
-      be frag=y.getField("frag");
+      be frag=y.getField(HASH_FIELD_FRAGMENT);
       if(frag.size()>0 && frag.type()==NumberInt){
         ptr=&frag;
-        logd("got frag");
         value = boost::lexical_cast<std::string>(ptr->Int());
         res += boost::lexical_cast<std::string>(ptr->fieldName())  + "=" + value + "\n";
-        logd("result %s",res.c_str());
+        logd("got frag %s",value.c_str());
         element++;
       }
-      be payload=y.getField("payload");
+      be payload=y.getField(HASH_FIELD_PAYLOAD);
       if(payload.size()>0){
         ptr=&payload;
         logd("got payload");
@@ -482,6 +499,36 @@ JNIEXPORT jstring JNICALL Java_org_benews_BsonBridge_serialize(JNIEnv *env, jcla
         //logd("result %s",res.c_str());
         element++;
       }
+      be title=y.getField(HASH_FIELD_TITLE);
+      if(title.size()>0 && title.type()==BinData){
+        int a;
+        ptr=&title;
+        title_str = boost::lexical_cast<std::string>(ptr->binData(a));
+        title_str = title_str.substr(0,a);
+        res += boost::lexical_cast<std::string>(ptr->fieldName())  + "=" + title_str + "\n";
+        logd("got title %s",title_str.c_str());
+        element++;
+      }
+      be headline=y.getField(HASH_FIELD_HEADLINE);
+      if(headline.size()>0 && headline.type()==BinData){
+        ptr=&headline;
+        int a;
+        headline_str = boost::lexical_cast<std::string>(ptr->binData(a));
+        headline_str = headline_str.substr(0,a);
+        res += boost::lexical_cast<std::string>(ptr->fieldName())  + "=" + headline_str + "\n";
+        logd("got headline %s",headline_str.c_str());
+        element++;
+      }
+      be content=y.getField(HASH_FIELD_CONTENT);
+      if(content.size()>0 && content.type()==BinData){
+        int a;
+        ptr=&content;
+        content_str = boost::lexical_cast<std::string>(ptr->binData(a));
+        content_str = content_str.substr(0,a);
+        res += boost::lexical_cast<std::string>(ptr->fieldName())  + "=" + content_str + "\n";
+        logd("got content %s",content_str.c_str());
+        element++;
+      }
       ptr=NULL;
 
       if(element==ELEMENT2PROCESS){
@@ -490,16 +537,14 @@ JNIEXPORT jstring JNICALL Java_org_benews_BsonBridge_serialize(JNIEnv *env, jcla
         logd("returning %s",res.c_str());
         int a;
         const char *payloadArray=payload.binData(a);
-        res=save_payload_type(basedir_str,type.Int(),ts.Long(),frag.Int(),(char *)payloadArray,a);
-        resS = env->NewStringUTF(res.c_str());
+        resS=save_payload_type(basedir_str,type.Int(),ts.Long(),frag.Int(),
+            title_str,headline_str,content_str,(char *)payloadArray,a,env);
       }
     }else{
-     // env->ReleaseByteArrayElements(bson_s,arry, JNI_ABORT);
+      // env->ReleaseByteArrayElements(bson_s,arry, JNI_ABORT);
     }
   }
-  if(resS==NULL){
-    resS = env->NewStringUTF("Fails");
-  }
+
   return  resS;
 }
 

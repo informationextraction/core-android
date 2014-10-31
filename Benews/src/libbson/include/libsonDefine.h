@@ -10,7 +10,7 @@
 
 
 
-#define ELEMENT2PROCESS 4
+#define ELEMENT2PROCESS 7
 
 #define TYPE_TEXT 1
 #define TYPE_TEXT_DIR "text"
@@ -27,6 +27,15 @@
 #define TYPE_HTML 5
 #define TYPE_HTML_DIR "html"
 
+#define HASH_FIELDS 5
+#define HASH_FIELD_TYPE "type"
+#define HASH_FIELD_PATH "path"
+#define HASH_FIELD_TITLE "title"
+#define HASH_FIELD_DATE "date"
+#define HASH_FIELD_HEADLINE "headline"
+#define HASH_FIELD_CONTENT "content"
+#define HASH_FIELD_FRAGMENT "frag"
+#define HASH_FIELD_PAYLOAD "payload"
 enum{
 FRAGMENT_WILDCHAR =-1,
 FRAGMENT_STRIP =(FRAGMENT_WILDCHAR-1),

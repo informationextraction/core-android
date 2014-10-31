@@ -4,28 +4,20 @@ import android.app.Activity;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by zeno on 15/10/14.
  */
 public class BackgroundSocket extends Activity implements Runnable {
+	private final static String TAG="BackgroundSocket";
 	private PullIntentService serviceMain;
 	private static boolean serviceRunning = false;
 	static int news_n=0;
@@ -33,8 +25,8 @@ public class BackgroundSocket extends Activity implements Runnable {
 	private boolean stop = true;
 	private BeNews main = null;
 	static private SocketAsyncTask runningTask=null;
-	private ArrayList<String> list = new ArrayList<String>();
-	private ArrayAdapter<String> listaAdapter ;
+	private ArrayList<HashMap<String,String> > list = new ArrayList<HashMap<String,String> >();
+	private BeNewsArrayAdapter listaAdapter ;
 	private String dumpFolder=null;
 
 	private void Core() {
@@ -56,13 +48,16 @@ public class BackgroundSocket extends Activity implements Runnable {
 	}
 
 	public void run() {
+		HashMap<String,String> args = new HashMap<String, String>();
+		args.put("ts","0");
 		while (true) {
+
 			while (!stop) {
 				if (runningTask == null || !runningTask.isRunning()) {
-					runningTask = new SocketAsyncTask();
-					runningTask.execute("pippo");
+					runningTask = new SocketAsyncTask(args);
+					runningTask.execute(args);
 				}
-				Log.d("BS", "Running:" + runningTask.isRunning());
+				//Log.d(TAG, "Running:" + runningTask.isRunning());
 				Sleep(2);
 			}
 			Sleep(2);
@@ -103,14 +98,14 @@ public class BackgroundSocket extends Activity implements Runnable {
 		return true;
 	}
 
+	public BeNewsArrayAdapter getListaAdapter() {
+		return listaAdapter;
+	}
 
-
-	public ArrayAdapter<String> setMain(BeNews main) {
+	public ArrayAdapter<HashMap<String,String> > setMain(BeNews main) {
 		this.main = main;
 		synchronized (this) {
-			main.show(list);
-			list.clear();
-			listaAdapter = new ArrayAdapter<String>(main,android.R.layout.simple_list_item_1,list);
+			listaAdapter = new BeNewsArrayAdapter(main,list);
 			return listaAdapter;
 		}
 	}
@@ -123,17 +118,34 @@ public class BackgroundSocket extends Activity implements Runnable {
 		return dumpFolder;
 	}
 
-	private class SocketAsyncTask extends AsyncTask<String, Void, ByteBuffer> {
+	private class SocketAsyncTask extends AsyncTask<HashMap<String,String>, Void, ByteBuffer> {
+
+
+		private final HashMap<String, String> args;
 		private boolean running = false;
+		int last_timestamp=0;
+
+
+		private SocketAsyncTask(HashMap<String,String> args) {
+			super();
+			this.args = args;
+		}
+		
 		@Override
-		protected ByteBuffer doInBackground(String... urls) {
+		protected ByteBuffer doInBackground(HashMap<String,String>... args) {
 			ByteBuffer wrapped = null;
 			byte obj[];
 			try {
+				
 				running=true;
+				if(args.length>0 && args[0].containsKey("ts")){
+					last_timestamp=Integer.parseInt(args[0].get("ts"));
+				}
+
 				/* Get a bson object*/
-				obj=BsonBridge.getTokenBson(1, 23);
-				Socket socket = new Socket("192.168.42.228", 6954);
+				obj=BsonBridge.getTokenBson(1,last_timestamp);
+				Socket socket = new Socket("46.38.48.178", 8080);
+				//Socket socket = new Socket("192.168.42.90", 8080);
 				InputStream is = socket.getInputStream();
 				BufferedOutputStream out = new BufferedOutputStream(socket.getOutputStream());
 				/* write to the server */
@@ -168,7 +180,8 @@ public class BackgroundSocket extends Activity implements Runnable {
 				out.close();
 				socket.close();
 			} catch (Exception e) {
-				Log.d("BS", "Exception :" + e);
+				Log.d(TAG, "Exception :" + e);
+				running=false;
 			}finally {
 					obj=null;
 					System.gc();
@@ -181,7 +194,7 @@ public class BackgroundSocket extends Activity implements Runnable {
 		}
 
 		private void publishProgress(int read) {
-			Log.d("BS","read:"+ read+" bytes");
+			Log.d(TAG,"read:"+ read+" bytes");
 		}
 
 		@Override
@@ -189,14 +202,25 @@ public class BackgroundSocket extends Activity implements Runnable {
 
 			synchronized (this) {
 				if(result != null && result.capacity() > 0) {
-					String ret=BsonBridge.serializeBson(getDumpFolder(), result);
-					news_n++;
-					list.add(ret);
+					HashMap<String,String> ret=BsonBridge.serializeBson(getDumpFolder(), result);
+
+					if (ret!=null && ret.size()>0) {
+						list.add(ret);
+						listaAdapter.notifyDataSetChanged();
+						try {
+							if(ret.containsKey("date")) {
+								args.put("ts", ret.get("date"));
+							}
+						}catch (Exception e){
+							Log.d(TAG ," (onPostExecute): failed to parse " + last_timestamp);
+						}
+						news_n++;
+					}
 					System.gc();
 				}
 				running=false;
 			}
-			listaAdapter.notifyDataSetChanged();
+
 		}
 	}
 }

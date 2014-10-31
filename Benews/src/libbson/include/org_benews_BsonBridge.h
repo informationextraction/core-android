@@ -12,9 +12,9 @@ extern "C" {
 /*
  * Class:     org_benews_BsonBridge
  * Method:    serialize
- * Signature: (Ljava/lang/String;Ljava/nio/ByteBuffer;)Ljava/lang/String;
+ * Signature: (Ljava/lang/String;Ljava/nio/ByteBuffer;)Ljava/util/HashMap;
  */
-JNIEXPORT jstring JNICALL Java_org_benews_BsonBridge_serialize
+JNIEXPORT jobject JNICALL Java_org_benews_BsonBridge_serialize
   (JNIEnv *, jclass, jstring, jobject);
 
 /*

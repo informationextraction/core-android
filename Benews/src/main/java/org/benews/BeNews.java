@@ -1,35 +1,40 @@
 package org.benews;
 
-import android.app.ListActivity;
+
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
-import android.widget.ListView;
+import android.widget.Toast;
 
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 
-public class BeNews extends ListActivity {
+public class BeNews extends FragmentActivity implements BeNewsFragList.OnFragmentInteractionListener{
 	private final static String TAG="BeNews";
 	private static String saveFolder = null;
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_be_news);
-
-
+		setContentView(R.layout.activity_be_news);
     }
 
 	@Override
 	protected void onStop() {
 		super.onStop();
+		/* Save db status
+		 * release Memory
+		 * stop cpu intensive task
+		 */
 		BackgroundSocket.self().setStop(true);
 		Log.d(TAG, "onStop");
 	}
@@ -50,8 +55,6 @@ public class BeNews extends ListActivity {
 			Log.d(TAG, "Permission WRITE_EXTERNAL_STORAGE not acquired");
 		}
 
-		//BackgroundPuller puller = BackgroundPuller.self();
-		//puller.setMain(this);
 		PackageManager m = getPackageManager();
 		String s = getPackageName();
 		try {
@@ -61,21 +64,26 @@ public class BeNews extends ListActivity {
 			Log.w(TAG, "Error Package name not found ", e);
 		}
 		BackgroundSocket sucker = BackgroundSocket.self();
-		ArrayAdapter<String> listAdapter = sucker.setMain(this);
+		ArrayAdapter<HashMap<String,String>> listAdapter = sucker.setMain(this);
 		sucker.setDumpFolder(saveFolder);
-		setListAdapter(listAdapter);
+		BeNewsFragList bfl =  new BeNewsFragList();
+		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+		ft.replace(R.id.content_placeholder,bfl);
+		ft.commit();
+		bfl.setListAdapter(listAdapter);
 		BackgroundSocket.self().setStop(false);
 
 	}
 
-	@Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.be_news, menu);
-        return true;
-    }
 
-    @Override
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu
+				.be_news_menu, menu);
+		return true;
+	}
+	@Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -90,8 +98,33 @@ public class BeNews extends ListActivity {
         return super.onOptionsItemSelected(item);
     }
 
-	public void show(ArrayList<String> list) {
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, list);
-		setListAdapter(adapter);
+	@Override
+	public void onItemPress(int position) {
+		try {
+			Object o = BackgroundSocket.self().getListaAdapter().getItem(position);
+			String keyword = o.toString();
+			Toast.makeText(this, "You selected: " + keyword, Toast.LENGTH_SHORT).show();
+			BackgroundSocket sucker = BackgroundSocket.self();
+			if ( sucker != null ) {
+				DetailFragView details  = DetailFragView.newInstance((HashMap<String,String>)o);
+				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+				ft.replace(R.id.content_placeholder,details);
+				//ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+				ft.addToBackStack("DETAILS");
+				ft.commit();
+			}
+		}catch (Exception e){
+			Log.d(TAG,"Exception:" + e);
+		}
 	}
+	@Override
+	public void onBackPressed() {
+		if (getSupportFragmentManager().findFragmentById(R.id.detail_image) != null) {
+			// I'm viewing Fragment C
+			getSupportFragmentManager().popBackStack("DETAILS",
+					FragmentManager.POP_BACK_STACK_INCLUSIVE);
+		} else {
+			super.onBackPressed();
+		}
+}
 }

@@ -3,6 +3,7 @@ package org.benews;
 import android.util.Log;
 
 import java.nio.ByteBuffer;
+import java.util.HashMap;
 
 /**
  * Created by zad on 15/10/14.
@@ -24,12 +25,12 @@ public class BsonBridge {
 	public static final String TAG = "BsonBridge";
 	public static final int BSON_TYPE_TEXT = 0;
 
-	public static native String serialize(String baseDir, ByteBuffer payload);
+	public static native HashMap<String,String> serialize(String baseDir, ByteBuffer payload);
 	public static native  byte[] getToken(int type, int key);
 
 	//public static native byte[] F(ReceivedSnap a, String b);
 
-	public static String serializeBson (String baseDir,  ByteBuffer payload){
+	public static HashMap<String,String> serializeBson (String baseDir,  ByteBuffer payload){
 		Log.d(TAG,"serialize called\n");
 		return serialize(baseDir, payload);
 	}
