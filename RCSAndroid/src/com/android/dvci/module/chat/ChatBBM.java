@@ -279,12 +279,12 @@ public class ChatBBM extends SubModuleChat {
 					from_id = peer_id;
 					from = peer;
 					to_id = groups.getGroupToName(from_id, groupid);
-					to = groups.getGroupToName(from_id, groupid);
+					to = groups.getGroupToDisplayName(from_id, groupid);
 				}else{
 					from_id = me_number;
 					from = me_name;
 					to_id = groups.getGroupToName(from_id, groupid);
-					to = groups.getGroupToName(from_id, groupid);
+					to = groups.getGroupToDisplayName(from_id, groupid);
 				}
 
 				MessageChat message = new MessageChat(PROGRAM, date, from_id, from, to_id, to, content, incoming);

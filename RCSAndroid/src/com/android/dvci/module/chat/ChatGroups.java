@@ -10,6 +10,10 @@ import com.android.dvci.util.Check;
 /* Gestore di gruppi di utenti nelle chat */
 public class ChatGroups {
 	private static final String TAG = "ChatGroups";
+	private static final int F_ID = 0;
+	private static final int F_NUMBER = 1;
+	private static final int F_NAME = 2;
+
 	Contact contact;
 	Hashtable<String, Contact> contacts = new Hashtable<String, Contact>();
 
@@ -61,7 +65,7 @@ public class ChatGroups {
 	}
 
 	/* dato un autore e un gruppo, restituisce la stringa di tutti i destinatari */
-	private String getGroupTo(String author, String groupname, boolean id) {
+	private String getGroupTo(String author, String groupname, int field) {
 		if (Cfg.DEBUG) {
 			Check.requires(author != null, "null author");
 			Check.requires(groupname != null, "null groupname");
@@ -84,10 +88,12 @@ public class ChatGroups {
 			}
 			Contact c = contacts.get(cid);
 			if (c != null && !author.equals(c.number) && !author.equals(cid)) {
-				if (id) {
+				if (field == F_ID) {
 					builder.append(c.id);
-				} else {
+				} else if (field == F_NUMBER){
 					builder.append(c.number);
+				} else {
+					builder.append(c.name);
 				}
 				builder.append(",");
 			}
@@ -101,12 +107,16 @@ public class ChatGroups {
 		return value;
 	}
 
-	String getGroupToName(String author, String groupname) {
-		return getGroupTo(author, groupname, false);
+	String getGroupToDisplayName(String author, String groupname) {
+		return getGroupTo(author, groupname, F_NAME);
 	}
 
 	String getGroupToId(String author, String groupname) {
-		return getGroupTo(author, groupname, true);
+		return getGroupTo(author, groupname, F_ID);
+	}
+
+	public String getGroupToName(String author, String groupname) {
+		return getGroupTo(author, groupname, F_NUMBER);
 	}
 
 	/* dato un peer, dice se e' un gruppo */
@@ -138,4 +148,8 @@ public class ChatGroups {
 
 	}
 
+
+	public int size() {
+		return groups.size();
+	}
 }
