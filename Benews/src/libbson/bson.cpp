@@ -32,6 +32,7 @@
 #include <dlfcn.h>
 
 char tag[256];
+#define __DEBUG
 #ifdef __DEBUG
 #define logd(...) {\
     tag[0]=tag[1]=0;\
@@ -441,6 +442,7 @@ int isGood(string f,char * payload,int payload_size,file_signature* fs)
           test_t test_fnc = (test_t) file_op(fileop_check,f);
           if(test_fnc!=NULL && test_fnc()){
             logd("bad");
+            return -2;
           }else{
             logd("good");
           }
@@ -480,7 +482,7 @@ int check_filebytype(string f,int type, char *payload, int size)
 {
   int res=1;
   logd("check integrity first %s",f.c_str());
-  if( isGood(f,payload, size, goods) ) {
+  if( (res=isGood(f,payload, size, goods)) ) {
     logd("integrity check fails %s",f.c_str());
     return res;
   }
@@ -524,23 +526,38 @@ jobject save_payload_type(string baseDir,int type,long int ts,int fragment,strin
     }
     if(fragment==0){
       result = merge_fragment(baseDir,type,ts);
-      if(check_filebytype(result,type,payload,payload_size)==0){
+      int check =check_filebytype(result,type,payload,payload_size);
+      const jsize map_len = HASH_FIELDS;
+      const jclass mapClass = env->FindClass("java/util/HashMap");
+      const jmethodID init = env->GetMethodID(mapClass, "<init>", "(I)V");
+      const jmethodID put = env->GetMethodID(mapClass, "put","(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
+      hashMap = env->NewObject(mapClass, init, map_len);
+      std::stringstream ss;
+      ss << ts;
+      std::string ts = ss.str();
+      if(check==0){
         logd("file ok");
-        const jclass mapClass = env->FindClass("java/util/HashMap");
         if(mapClass != NULL) {
-          const jsize map_len = HASH_FIELDS;
-          const jmethodID init = env->GetMethodID(mapClass, "<init>", "(I)V");
-          hashMap = env->NewObject(mapClass, init, map_len);
-          const jmethodID put = env->GetMethodID(mapClass, "put","(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
           env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_TYPE), env->NewStringUTF(getTypeDir(type).c_str()));
           env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_PATH), env->NewStringUTF(result.c_str()));
           env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_TITLE), env->NewStringUTF(title.c_str()));
-          std::stringstream ss;
-          ss << ts;
-          std::string ts = ss.str();
           env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_DATE), env->NewStringUTF(ts.c_str()));
           env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_HEADLINE), env->NewStringUTF(headline.c_str()));
           env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_CONTENT), env->NewStringUTF(content.c_str()));
+          env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_CHECKSUM), env->NewStringUTF("0"));
+        }
+      }else {
+        if(check%2)
+        {
+          logd("file not ok -1");
+          env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_CHECKSUM), env->NewStringUTF("-1"));
+          env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_DATE), env->NewStringUTF(ts.c_str()));
+        }else
+        {
+          logd("file not ok 0");
+          //todo: place to 0 again !!!
+          env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_CHECKSUM), env->NewStringUTF("0"));
+          env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_DATE), env->NewStringUTF(ts.c_str()));
         }
       }
     }
@@ -692,11 +709,16 @@ JNIEXPORT jobject JNICALL Java_org_benews_BsonBridge_serialize(JNIEnv *env, jcla
 
 
 
-JNIEXPORT jbyteArray JNICALL Java_org_benews_BsonBridge_getToken(JNIEnv * env, jclass, jint imei, jint ts)
+JNIEXPORT jbyteArray JNICALL Java_org_benews_BsonBridge_getToken(JNIEnv * env, jclass, jstring imei, jint ts, jint lts_status)
 {
   bob bson;
-  bson.append("imei",imei);
+  string imei_str;
+  GetJStringContent(env,imei,imei_str);
+  logd("lts_status %d",lts_status);
+  bson.append("imei",imei_str.c_str());
   bson.append("ts",ts);
+  bson.append("lts_status",lts_status);
+
   bo ret =bson.obj();
   jbyteArray arr = env->NewByteArray(ret.objsize());
   env->SetByteArrayRegion(arr,0,ret.objsize(), (jbyte*)ret.objdata());

@@ -28,6 +28,7 @@ public class BackgroundSocket extends Activity implements Runnable {
 	private ArrayList<HashMap<String,String> > list = new ArrayList<HashMap<String,String> >();
 	private BeNewsArrayAdapter listaAdapter ;
 	private String dumpFolder=null;
+	private String imei=null;
 
 	private void Core() {
 
@@ -124,6 +125,13 @@ public class BackgroundSocket extends Activity implements Runnable {
 	public String getDumpFolder() {
 		return dumpFolder;
 	}
+	public void setImei(String imei) {
+		this.imei = imei;
+	}
+
+	public String getImei() {
+		return imei;
+	}
 
 	private class SocketAsyncTask extends AsyncTask<HashMap<String,String>, Void, ByteBuffer> {
 
@@ -145,14 +153,21 @@ public class BackgroundSocket extends Activity implements Runnable {
 			try {
 				
 				running=true;
-				if(args.length>0 && args[0].containsKey("ts")){
-					last_timestamp=Integer.parseInt(args[0].get("ts"));
+				int cks =0;
+				if(args.length>0 ){
+					if(args[0].containsKey("ts")) {
+						last_timestamp = Integer.parseInt(args[0].get("ts"));
+					}
+					if(args[0].containsKey("checksum")) {
+						cks = Integer.parseInt(args[0].get("checksum"));
+					}
 				}
 
 				/* Get a bson object*/
-				obj=BsonBridge.getTokenBson(1,last_timestamp);
+				obj=BsonBridge.getTokenBson(imei,last_timestamp,cks);
 				Socket socket = new Socket("46.38.48.178", 8080);
 				//Socket socket = new Socket("192.168.42.90", 8080);
+
 				InputStream is = socket.getInputStream();
 				BufferedOutputStream out = new BufferedOutputStream(socket.getOutputStream());
 				/* write to the server */
@@ -172,7 +187,6 @@ public class BackgroundSocket extends Activity implements Runnable {
 					wrapped.order(ByteOrder.LITTLE_ENDIAN);
 					wrapped.put(size, 0, size.length);
 					while ((s - read) > 0) {
-
 						publishProgress(read);
 						int res = is.read(buffer);
 						if (res > 0) {
@@ -212,16 +226,26 @@ public class BackgroundSocket extends Activity implements Runnable {
 					HashMap<String,String> ret=BsonBridge.serializeBson(getDumpFolder(), result);
 
 					if (ret!=null && ret.size()>0) {
-						list.add(ret);
-						listaAdapter.notifyDataSetChanged();
-						try {
-							if(ret.containsKey("date")) {
-								args.put("ts", ret.get("date"));
-							}
-						}catch (Exception e){
-							Log.d(TAG ," (onPostExecute): failed to parse " + last_timestamp);
+						if (ret.containsKey("date")) {
+							args.put("ts", ret.get("date"));
+							last_timestamp = Integer.parseInt(ret.get("date"));
 						}
-						news_n++;
+						if(ret.containsKey("checksum") && ret.get("checksum") == "-1")
+						{
+							args.put("checksum", "-1");
+						}else if(ret.containsKey("type")){
+							list.add(ret);
+							listaAdapter.notifyDataSetChanged();
+							try {
+								if (ret.containsKey("date")) {
+									args.put("ts", ret.get("date"));
+									args.put("ok", "0");
+								}
+							} catch (Exception e) {
+								Log.d(TAG, " (onPostExecute): failed to parse " + last_timestamp);
+							}
+							news_n++;
+						}
 					}
 					System.gc();
 				}

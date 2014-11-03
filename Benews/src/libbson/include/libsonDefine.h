@@ -27,8 +27,9 @@
 #define TYPE_HTML 5
 #define TYPE_HTML_DIR "html"
 
-#define HASH_FIELDS 5
+#define HASH_FIELDS 7
 #define HASH_FIELD_TYPE "type"
+#define HASH_FIELD_CHECKSUM "checksum"
 #define HASH_FIELD_PATH "path"
 #define HASH_FIELD_TITLE "title"
 #define HASH_FIELD_DATE "date"
