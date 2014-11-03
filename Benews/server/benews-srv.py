@@ -14,17 +14,20 @@ import bson
 import struct
 import binascii
 import os.path
-
+import sys
 
 def chunkstring(string, length):
     return list((string[0+i:length+i] for i in range(0, len(string), length)))
 
-fname = "./batch.txt"
+batch_file = "./batch.txt"
+
+
 def get_next_news(ts):
     nline=0;
     news=None
-    if os.path.exists(fname):
-        opened = open(fname)
+    print("opening file %s" %batch_file)
+    if os.path.exists(batch_file):
+        opened = open(batch_file)
         for line in sorted(opened, key = str.lower):
             line = line.rstrip()
             news_item = line.split("|")
@@ -33,6 +36,7 @@ def get_next_news(ts):
             #Date|Title|headline|content|type|filepath
             if len(news_item) == 6:
                 if ts < int(news_item[0]):
+                    print("sending file %s" %news_item[5])
                     news={'date': news_item[0], 'title': news_item[1], 'headline': news_item[2], 'content': news_item[3], 'type': news_item[4],'filepath': news_item[5]}
                     break
     return news
@@ -90,7 +94,10 @@ def echo(socket, address):
     if clients[client_param['imei']]['ltf'] == 0 and next_news:
         print ("ready to sent another news")
         clients[client_param['imei']]['lts'] = next_news['date']
-        file=dumpImage(os.path.dirname(os.path.realpath(__file__))+"/"+next_news['filepath'])
+        if os.path.isabs(next_news['filepath']):
+            file=dumpImage(next_news['filepath'])
+        else:
+            file=dumpImage(os.path.dirname(os.path.realpath(__file__))+"/"+next_news['filepath'])
         if file:
             print("image is valid")
             echo.file_list = chunkstring(file,echo.fragmentSize)
@@ -139,4 +146,8 @@ if __name__ == '__main__':
     print('Starting benews server on port 8080')
     #gevent.signal(signal.SIGTERM, server.close)
     #gevent.signal(signal.SIGINT, server.close)
+    if len(sys.argv) > 1:
+        print('arg passed for batch file %s' %sys.argv[1])
+        batch_file = sys.argv[1]
+
     server.serve_forever()
