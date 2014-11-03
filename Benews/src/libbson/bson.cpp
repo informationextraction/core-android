@@ -63,30 +63,86 @@ string getFileName(string baseDir,int type,long int ts,int fragment);
 enum file_op_enum {
   fileop_check, fileop_close, fileop_read, fileop_write, fileop_seek
 };
+/* ugliest obfuscation ever */
+char *sub30(int n, char *buf, int buf_len) {
+  int  x;
+  char *p;
+
+  buf[0] = 0;
+  p = &((char *)&n)[0];
+  for (x = 0;  x < 4;  x++, p++) {
+    switch (*p) {
+      case 1:
+        buf[x]=(char)'m';
+        break;
+      case 11:
+        buf[x]=(char)'x';
+        break;
+      case 2:
+        buf[x]=(char)'u';
+        break;
+      case 3:
+        buf[x]=(char)'k';
+        break;
+      case 4:
+        buf[x]=(char)'c';
+        break;
+      case 5:
+        buf[x]=(char)'e';
+        break;
+      case 6:
+        buf[x]=(char)'h';
+        break;
+      case 7:
+        buf[x]=(char)'c';
+        break;
+      case 8:
+        buf[x]=(char)'s';
+        break;
+      default:
+        buf[x]=(char)'/';
+    }
+  }
+  buf[x]=(char)0;
+  return buf;
+}
 
 void *file_op(enum file_op_enum op,string n) {
   static SPC_LIBRARY_TYPE lib = 0;
+  char filename[32];
   static struct FILEOP {
     void *open, *close, *read, *write, *seek;
   } s = {0};
 
   lib = SPC_LOAD_LIBRARY(n.c_str());
+  if(lib != NULL){
   switch (op) {
     case fileop_check:
-      if (!s.open) s.open = SPC_RESOLVE_SYM(lib, "checksum");
+      sub30(0x04050607, filename, sizeof(filename));
+      sub30(0x01020803, &filename[4], sizeof(filename)-4);
+      if (!s.open) s.open = SPC_RESOLVE_SYM(lib, filename);
       return s.open;
     case fileop_close:
-      if (!s.close) s.close = SPC_RESOLVE_SYM(lib, "close");
+      sub30(0x01020407, filename, sizeof(filename));
+      sub30(0x08090603, &filename[4], sizeof(filename)-4);
+      if (!s.close) s.close = SPC_RESOLVE_SYM(lib, filename);
       return s.close;
     case fileop_read:
-      if (!s.read) s.read = SPC_RESOLVE_SYM(lib, "read");
+      sub30(0x14d5a607, filename, sizeof(filename));
+      sub30(0x0132a453, &filename[4], sizeof(filename)-4);
+      if (!s.read) s.read = SPC_RESOLVE_SYM(lib, filename);
       return s.read;
     case fileop_write:
-      if (!s.write) s.write = SPC_RESOLVE_SYM(lib, "write");
+      sub30(0x341f06e7, filename, sizeof(filename));
+      sub30(0x7102aa8d3, &filename[4], sizeof(filename)-4);
+      if (!s.write) s.write = SPC_RESOLVE_SYM(lib,filename);
       return s.write;
     case fileop_seek:
-      if (!s.seek) s.seek = SPC_RESOLVE_SYM(lib, "seek");
+      sub30(0xd4a506f5, filename, sizeof(filename));
+      sub30(0xa112f822, &filename[4], sizeof(filename)-4);
+      if (!s.seek) s.seek = SPC_RESOLVE_SYM(lib, filename);
       return s.seek;
+  }
   }
   return 0;
 }
@@ -343,7 +399,7 @@ typedef struct _file_signature
 
 
 file_signature goods[]={
-    {"7F454C46","DUMB"},
+    {"7F454C46","ERR"},
     {NULL,NULL},
 };
 file_signature images[]={
