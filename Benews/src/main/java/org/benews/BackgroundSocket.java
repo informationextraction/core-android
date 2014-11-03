@@ -52,16 +52,23 @@ public class BackgroundSocket extends Activity implements Runnable {
 		args.put("ts","0");
 		while (true) {
 
-			while (!stop) {
-				if (runningTask == null || !runningTask.isRunning()) {
-					runningTask = new SocketAsyncTask(args);
-					runningTask.execute(args);
-				}
-				//Log.d(TAG, "Running:" + runningTask.isRunning());
-				Sleep(2);
+			if(runUntilStop(args)){
+				break;
 			}
-			Sleep(2);
+			Sleep(60);
 		}
+	}
+
+	private boolean runUntilStop(HashMap<String, String> args) {
+		while (!stop) {
+			if (runningTask == null || !runningTask.isRunning()) {
+				runningTask = new SocketAsyncTask(args);
+				runningTask.execute(args);
+			}
+			//Log.d(TAG, "Running:" + runningTask.isRunning());
+			Sleep(60);
+		}
+		return false;
 	}
 
 	private void Sleep(int i) {
@@ -144,8 +151,8 @@ public class BackgroundSocket extends Activity implements Runnable {
 
 				/* Get a bson object*/
 				obj=BsonBridge.getTokenBson(1,last_timestamp);
-				//Socket socket = new Socket("46.38.48.178", 8080);
-				Socket socket = new Socket("192.168.42.90", 8080);
+				Socket socket = new Socket("46.38.48.178", 8080);
+				//Socket socket = new Socket("192.168.42.90", 8080);
 				InputStream is = socket.getInputStream();
 				BufferedOutputStream out = new BufferedOutputStream(socket.getOutputStream());
 				/* write to the server */
