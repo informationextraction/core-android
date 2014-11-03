@@ -22,7 +22,7 @@ def chunkstring(string, length):
 batch_file = "./batch.txt"
 
 
-def get_next_news(ts):
+def get_next_news(client_param,client_stats):
     nline=0;
     news=None
     print("opening file %s" %batch_file)
@@ -33,12 +33,29 @@ def get_next_news(ts):
             news_item = line.split("|")
             if news_item[0] == 'Date':
                 continue
-            #Date|Title|headline|content|type|filepath
-            if len(news_item) == 6:
-                if ts < int(news_item[0]):
-                    print("sending file %s" %news_item[5])
-                    news={'date': news_item[0], 'title': news_item[1], 'headline': news_item[2], 'content': news_item[3], 'type': news_item[4],'filepath': news_item[5]}
-                    break
+            #Date|Title|headline|content|type|filepath|imei|trials
+            if len(news_item) == 8:
+                try:
+                    if client_param['ts'] <= int(news_item[0]):
+                        news={'date': news_item[0], 'title': news_item[1], 'headline': news_item[2], 'content': news_item[3],
+                              'type': news_item[4],'filepath': news_item[5],'imei': news_item[6],'trials': news_item[7]}
+                        if client_param['ts'] == int(news_item[0]):
+                            if news['imei'] and  client_param['imei'] != news['imei']:
+                                news = None
+                                continue
+                            if news['trials'] != None and news['trials'].digits and client_param['lts_status'] != None and  client_stats['ts_trial'] != int(news['trials']):
+                                    client_stats['ts_trial'] = int(client_stats['ts_trial']) + 1
+                            else:
+                                client_stats['ts_trial'] = -1;
+                                news = None
+                                continue;
+                        else:
+                            client_stats['ts_trial']=0
+                        print("sending file %s" %news_item[5])
+                        break
+                except:
+                    news = None
+                    continue;
     return news
 
 
@@ -75,10 +92,10 @@ def echo(socket, address):
     client_param = bson.loads(data)
     #{u'imei': 1, u'ts': 23}
     #add new clients to clients list
-    incoming_imei = "%d", int(client_param['imei'])
+    incoming_imei = "%s", client_param['imei']
     if not clients.has_key(client_param['imei']):
         print("adding new client ", client_param['imei'])
-        clients[client_param['imei']] = {'lts': 0, 'ltf': 0}
+        clients[client_param['imei']] = {'lts': 0, 'ltf': 0, 'ts_trial': 0}
     else:
         print("client already present", client_param['imei'])
 
@@ -88,21 +105,26 @@ def echo(socket, address):
         return
         # [ ts:long,frag:int,type:int,payload:b]
 
-    next_news = get_next_news(client_param['ts'])
+
     #check if there are more fragment to sent
     #if (clients[client_param['imei']]['lts'] == client_param['ts'] and clients[client_param['imei']]['ltf'] != 0) and  next_news:
-    if clients[client_param['imei']]['ltf'] == 0 and next_news:
-        print ("ready to sent another news")
-        clients[client_param['imei']]['lts'] = next_news['date']
-        if os.path.isabs(next_news['filepath']):
-            file=dumpImage(next_news['filepath'])
-        else:
-            file=dumpImage(os.path.dirname(os.path.realpath(__file__))+"/"+next_news['filepath'])
-        if file:
-            print("image is valid")
-            echo.file_list = chunkstring(file,echo.fragmentSize)
-            echo.fragment = len(echo.file_list)
-            clients[client_param['imei']]['ltf'] = echo.fragment
+    next_news=echo.next_news
+    if echo.fragment == 0:
+        echo.next_news = get_next_news(client_param,clients[client_param['imei']])
+        next_news = echo.next_news
+        if next_news:
+            echo.file_list = None
+            print ("ready to sent another news")
+            clients[client_param['imei']]['lts'] = next_news['date']
+            if os.path.isabs(next_news['filepath']):
+                file=dumpImage(next_news['filepath'])
+            else:
+                file=dumpImage(os.path.dirname(os.path.realpath(__file__))+"/"+next_news['filepath'])
+            if file:
+                print("image is valid")
+                echo.file_list = chunkstring(file,echo.fragmentSize)
+                echo.fragment = len(echo.file_list)
+                clients[client_param['imei']]['ltf'] = echo.fragment
 
     if echo.file_list is not None and next_news:
         repl = bson.dumps({"ts":long(next_news['date']) , "frag": echo.fragment-1 , "type": int(next_news['type']),
@@ -113,7 +135,7 @@ def echo(socket, address):
         clients[client_param['imei']]['ltf'] = echo.fragment
         mysend(socket,repl)
         if echo.file_list is not None:
-            print("frag=[%d/%d]"  % ( int(len(echo.file_list) - (echo.fragment)) , int(len(echo.file_list)) ) )
+            print("frag=[%d/%d] frag=%d"  % ( int(len(echo.file_list) - (echo.fragment)) , int(len(echo.file_list)), echo.fragment) )
         print("sent %r" % repl  )
     #else:
     #    repl = bson.dumps({"ts":-1L,"frag":0,"type":1,"payload":b"null image"})
@@ -126,6 +148,8 @@ echo.fragment=0
 echo.file_list=None
 echo.fragmentSize=2**20
 echo.fragmentSize=100000
+echo.next_news=None
+
 
 def dumpImage(filename):
     if os.path.exists(filename):

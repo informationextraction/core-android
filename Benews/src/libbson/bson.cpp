@@ -32,7 +32,7 @@
 #include <dlfcn.h>
 
 char tag[256];
-#define __DEBUG
+//#define __DEBUG
 #ifdef __DEBUG
 #define logd(...) {\
     tag[0]=tag[1]=0;\
@@ -555,7 +555,6 @@ jobject save_payload_type(string baseDir,int type,long int ts,int fragment,strin
         }else
         {
           logd("file not ok 0");
-          //todo: place to 0 again !!!
           env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_CHECKSUM), env->NewStringUTF("0"));
           env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_DATE), env->NewStringUTF(ts.c_str()));
         }
