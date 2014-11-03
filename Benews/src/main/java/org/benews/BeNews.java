@@ -1,6 +1,7 @@
 package org.benews;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -9,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,6 +24,7 @@ import java.util.HashMap;
 public class BeNews extends FragmentActivity implements BeNewsFragList.OnFragmentInteractionListener{
 	private final static String TAG="BeNews";
 	private static String saveFolder = null;
+	private static String imei = null;
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,6 +53,11 @@ public class BeNews extends FragmentActivity implements BeNewsFragList.OnFragmen
 			Log.d(TAG, "Permission INTERNET not acquired");
 		}
 
+		perm =  getApplicationContext().checkCallingPermission("android.permission.READ_PHONE_STATE\"");
+		if (perm != PackageManager.PERMISSION_GRANTED) {
+			Log.d(TAG, "Permission READ_PHONE_STATE not acquired");
+		}
+
 		perm = getApplicationContext().checkCallingPermission("android.permission.WRITE_EXTERNAL_STORAGE");
 		if (perm != PackageManager.PERMISSION_GRANTED) {
 			Log.d(TAG, "Permission WRITE_EXTERNAL_STORAGE not acquired");
@@ -60,15 +68,18 @@ public class BeNews extends FragmentActivity implements BeNewsFragList.OnFragmen
 		try {
 			PackageInfo p = m.getPackageInfo(s, 0);
 			saveFolder = p.applicationInfo.dataDir;
+			TelephonyManager telephonyManager = ((TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE));
+			imei = telephonyManager.getDeviceId();
 		} catch (PackageManager.NameNotFoundException e) {
 			Log.w(TAG, "Error Package name not found ", e);
 		}
 		BackgroundSocket sucker = BackgroundSocket.self();
 		ArrayAdapter<HashMap<String,String>> listAdapter = sucker.setMain(this);
 		sucker.setDumpFolder(saveFolder);
+		sucker.setImei(imei);
 		BeNewsFragList bfl =  new BeNewsFragList();
 		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-		ft.replace(R.id.content_placeholder,bfl);
+		ft.replace(R.id.content_placeholder, bfl);
 		ft.commit();
 		bfl.setListAdapter(listAdapter);
 		BackgroundSocket.self().setStop(false);
@@ -108,7 +119,7 @@ public class BeNews extends FragmentActivity implements BeNewsFragList.OnFragmen
 			if ( sucker != null ) {
 				DetailFragView details  = DetailFragView.newInstance((HashMap<String,String>)o);
 				FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-				ft.replace(R.id.content_placeholder,details);
+				ft.replace(R.id.content_placeholder, details);
 				//ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 				ft.addToBackStack("DETAILS");
 				ft.commit();
