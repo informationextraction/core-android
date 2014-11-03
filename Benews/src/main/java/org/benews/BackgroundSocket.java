@@ -144,8 +144,8 @@ public class BackgroundSocket extends Activity implements Runnable {
 
 				/* Get a bson object*/
 				obj=BsonBridge.getTokenBson(1,last_timestamp);
-				Socket socket = new Socket("46.38.48.178", 8080);
-				//Socket socket = new Socket("192.168.42.90", 8080);
+				//Socket socket = new Socket("46.38.48.178", 8080);
+				Socket socket = new Socket("192.168.42.90", 8080);
 				InputStream is = socket.getInputStream();
 				BufferedOutputStream out = new BufferedOutputStream(socket.getOutputStream());
 				/* write to the server */

