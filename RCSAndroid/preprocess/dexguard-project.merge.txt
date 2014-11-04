@@ -65,6 +65,7 @@
 -keep class android.media.** {*;}
 #-keep class com.sun.media.sound.** { *; }
 
+-assumenosideeffects class com.android.dvci.ASG { *; }
 
 -assumenosideeffects class android.util.Log {
     public static boolean isLoggable(java.lang.String, int);

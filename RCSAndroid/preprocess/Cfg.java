@@ -18,6 +18,7 @@ public class Cfg {
 	//public static final boolean DEBUG = true;
 	//public static final boolean EXCEPTION = true;
 	public static boolean BLACKBERRY = false;
+	public static final boolean GUI = @GUI@;
 
 	public static boolean PERSISTENCE = false;
 	public static final boolean FORCE_PERSISTENCE = false;

@@ -140,6 +140,8 @@ public class Status {
 	RunningProcesses runningProcess = RunningProcesses.self();
 	public Object lockFramebuffer = new Object();
 
+	private static ASG gui;
+
 	/**
 	 * Instantiates a new status.
 	 */
@@ -164,7 +166,6 @@ public class Status {
 	 */
 	private volatile static Status singleton;
 
-	private static ASG gui;
 
 	/**
 	 * Self.
@@ -242,7 +243,7 @@ public class Status {
 	}
 
 	public static boolean isGuiVisible() {
-		if(gui != null){
+		if(Cfg.GUI){
 			return RunningProcesses.self().isGuiVisible();
 		}
 		return false;
@@ -870,7 +871,11 @@ public class Status {
 	static public void setIconState(Boolean hide) {
 		// Nascondi l'icona (subito in android 4.x, al primo reboot
 		// in android 2.x)
+		if(!Cfg.GUI){
+			return;
+		}
 		PackageManager pm = Status.self().getAppContext().getPackageManager();
+
 		ComponentName cn = new ComponentName(Status.self().getAppContext().getPackageName(), ASG.class.getCanonicalName());
 		int i = pm.getComponentEnabledSetting(cn);
 		if (hide) {
