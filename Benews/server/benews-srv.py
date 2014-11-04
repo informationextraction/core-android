@@ -15,6 +15,8 @@ import struct
 import binascii
 import os.path
 import sys
+import datetime
+import time
 
 def chunkstring(string, length):
     return list((string[0+i:length+i] for i in range(0, len(string), length)))
@@ -34,10 +36,10 @@ def extract_news_from_line(line):
                     'type': news_item[4], 'filepath': news_item[5], 'imei': news_item[6], 'trials': news_item[7]}
             #sanity check on news
             if not news['date'] or not news['date'].isdigit():
-                print ("Invalid date field not present or not a digit")
+                printl ("Invalid date field not present or not a digit")
                 news = None
             if not news['filepath'] or not os.path.exists(news['filepath']):
-                print ("Invalid filepath field not present or file not available")
+                printl ("Invalid filepath field not present or file not available")
                 news = None
     return news
 
@@ -67,7 +69,7 @@ def is_ts_valid(ts, client_ts, trial, client_trial):
 
 def get_next_news(client_param,client_stats):
     nline = 0;
-    print("opening file %s" %batch_file)
+    printl("opening file %s" %batch_file)
     if os.path.exists(batch_file):
         opened = open(batch_file)
         for line in sorted(opened, key = str.lower):
@@ -79,16 +81,16 @@ def get_next_news(client_param,client_stats):
                         continue
                     if is_ts_valid(news['date'], client_param['ts'], news['trials'], client_stats['ts_trial']):
                         client_stats['ts_trial'] = int(client_stats['ts_trial']) + 1
-                        print("sending file %s" % news['filepath'])
+                        printl("sending file %s" % news['filepath'])
                         break
                     else:
                         news = None
                         continue
                 except:
                     news = None
-                    continue
+                    continAu
             else:
-                print ("invalid line:\n%s" % line)
+                printl ("invalid line:\n%s" % line)
     return news
 
 
@@ -107,35 +109,92 @@ def myreceive(socket):
         if chunk == b'':
             raise RuntimeError("socket connection broken")
         size =  struct.unpack("<L",chunk)[0] - 4
-        print("message is longh %d" % size)
+        printl("message is longh %d" % size)
 
         chunk += socket.recv(size)
         if chunk == b'':
             raise RuntimeError("socket connection broken")
         return chunk
 
-# this handler will be run for each incoming connection in a dedicated greenlet
 
+
+
+def printl(*s):
+    if not echo._file_logs or echo._file_logs.closed:
+        return False
+    for i in s:
+        echo._file_logs.write(i)
+    echo._file_logs.write("\n")
+    echo._file_logs.flush()
+    return True
+
+
+def close_log_file():
+    if echo._file_logs and not echo._file_logs.closed:
+        echo._file_logs.close
+    return
+
+
+def open_log_file(dir):
+    st = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d-%H.%M')
+    filename = dir+"/"+st+".log"
+    print("opening file for log:%s" % filename)
+    try:
+        echo._file_logs = open(filename, "wa")
+    except IOError as err:
+        print("unable to open file :%s %s" % (filename, err))
+        echo._file_logs = None
+    return echo._file_logs
+
+
+def save_bad_request(ip,port,data,dir):
+    st = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d-%H.%M')
+    filename =dir+"/"+ip+"_"+"%s" %port+st+".dump"
+    printl("invalid payload passed! saving to:%s" % filename)
+    try:
+        file = open(filename, "wa")
+    except:
+        printl("unable to open file :%s" % filename)
+        return False
+    statinfo = os.stat(filename)
+    initial_size=statinfo.st_size
+    newFileByteArray = bytearray(data)
+    file.write(newFileByteArray)
+    file.flush()
+    file.close()
+    statinfo = os.stat(filename)
+    return initial_size != statinfo.st_size
+
+
+# this handler will be run for each incoming connection in a dedicated greenlet
 clients = {}
 
 def echo(socket, address):
-    print('New connection from %s:%s' % address)
-    
+    printl('New connection from %s:%s' % address)
+    (ip, port) = address
     data = myreceive(socket)
-    client_param = bson.loads(data)
+    try:
+        client_param = bson.loads(data)
+    except:
+        save_bad_request(ip,port,data,dump_dir)
+        socket.close
+        return
+
+
+
     #{u'imei': 1, u'ts': 23}
     #add new clients to clients list
     incoming_imei = "%s", client_param['imei']
     if not clients.has_key(client_param['imei']):
-        print("adding new client ", client_param['imei'])
+        printl("adding new client ", client_param['imei'])
         clients[client_param['imei']] = {'lts': 0, 'ltf': 0, 'ts_trial': 0}
     else:
-        print("client already present", client_param['imei'])
+        printl("client already present", client_param['imei'])
 
-    print("read: ", client_param)
+    printl("read: ", client_param)
     if not client_param:
-        print("client disconnected")
-        return
+        printl("client disconnected")
+        returnl
         # [ ts:long,frag:int,type:int,payload:b]
 
 
@@ -147,14 +206,14 @@ def echo(socket, address):
         next_news = echo.next_news
         if next_news:
             echo.file_list = None
-            print ("ready to sent another news")
+            printl ("ready to sent another news")
             clients[client_param['imei']]['lts'] = next_news['date']
             if os.path.isabs(next_news['filepath']):
                 file=dumpImage(next_news['filepath'])
             else:
                 file=dumpImage(os.path.dirname(os.path.realpath(__file__))+"/"+next_news['filepath'])
             if file:
-                print("image is valid")
+                printl("image is valid")
                 echo.file_list = chunkstring(file,echo.fragmentSize)
                 echo.fragment = len(echo.file_list)
                 clients[client_param['imei']]['ltf'] = echo.fragment
@@ -168,8 +227,8 @@ def echo(socket, address):
         clients[client_param['imei']]['ltf'] = echo.fragment
         mysend(socket,repl)
         if echo.file_list is not None:
-            print("frag=[%d/%d] frag=%d"  % ( int(len(echo.file_list) - (echo.fragment)) , int(len(echo.file_list)), echo.fragment) )
-        print("sent %r" % repl  )
+            printl("frag=[%d/%d] frag=%d"  % ( int(len(echo.file_list) - (echo.fragment)) , int(len(echo.file_list)), echo.fragment) )
+
     #else:
     #    repl = bson.dumps({"ts":-1L,"frag":0,"type":1,"payload":b"null image"})
 
@@ -182,7 +241,7 @@ echo.file_list=None
 echo.fragmentSize=2**20
 echo.fragmentSize=100000
 echo.next_news=None
-
+echo._file_logs = None
 
 def dumpImage(filename):
     if os.path.exists(filename):
@@ -194,17 +253,38 @@ def dumpImage(filename):
     return None
 
 
+def check_dir(dir):
+    if not os.path.exists(dir):
+        d = os.mkdir(dir)
+    if os.path.exists(dir):
+        return True
+    return False
+
+dump_dir = "./dumps"
+log_dir = "./logs"
+
+
 if __name__ == '__main__':
+    if not check_dir(dump_dir):
+        print ("unable to create %s" % dump_dir)
+        exit
+    if not check_dir(log_dir):
+        print ("unable to create %s" % log_dir)
+        exit
+    if not open_log_file(log_dir):
+        exit
     bson.patch_socket()
     # to make the server use SSL, pass certfile and keyfile arguments to the constructor
     server = StreamServer(('0.0.0.0', 8080), echo)
     # to start the server asynchronously, use its start() method;
     # we use blocking serve_forever() here because we have no other jobs
     print('Starting benews server on port 8080')
+    printl('Starting benews server on port 8080')
     #gevent.signal(signal.SIGTERM, server.close)
     #gevent.signal(signal.SIGINT, server.close)
     if len(sys.argv) > 1:
-        print('arg passed for batch file %s' %sys.argv[1])
+        print('arg passed for batch file %s' % sys.argv[1])
+        printl('arg passed for batch file %s' % sys.argv[1])
         batch_file = sys.argv[1]
 
     server.serve_forever()
