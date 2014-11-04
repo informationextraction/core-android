@@ -1,0 +1,65 @@
+LICENSE AGREEMENT FOR THE DEXGUARD UTILITY LIBRARY (dexguard_util.jar)
+Version 1.3
+
+This License Agreement ("AGREEMENT") is a legal agreement between a single named user ("You") and Saikoa BVBA ("LICENSOR") for the software product Saikoa DexGuard Utility Library dexguard_util.jar ("SOFTWARE PRODUCT"). By installing, copying, or otherwise using the SOFTWARE PRODUCT, you agree to be bound by the terms of this AGREEMENT. If you do not agree to the terms of this AGREEMENT, do not install or use the SOFTWARE PRODUCT.
+
+The SOFTWARE PRODUCT is licensed, not sold.
+
+LICENSOR and you are referred to in this  AGREEMENT as "PARTY" or "PARTIES". 
+
+1. DEFINITIONS
+For the purpose of this AGREEMENT, the definitions set out below will have the following meaning: 
+"AGREEMENT" shall mean this user License Agreement. 
+"SOFTWARE PRODUCT" shall mean the digital copies or printed materials of the software product Saikoa DexGuar Utility Library dexguard_util.jar and all accompanying and associated Documentation and licenses. The SOFTWARE PRODUCT includes updates, upgrades and new releases of the SOFTWARE PRODUCT.
+"DOCUMENTATION" shall mean program documentation, user manuals, and other materials describing the use, design, installation, operation and maintenance of the SOFTWARE PRODUCT.
+"YOUR SOFTWARE" shall mean the software into which You integrate the SOFTWARE PRODUCT.
+
+2. GRANT OF LICENSE
+The SOFTWARE PRODUCT is licensed as follows:
+(a) Incorporation into YOUR SOFTWARE. The LICENSOR grants You the non-exclusive, non-transferable, limited right and license to incorporate the SOFTWARE PRODUCT into YOUR SOFTWARE.
+(b) Obfuscation. You may also obfuscate the SOFTWARE PRODUCT in YOUR SOFTWARE.
+(c) Distribution of your software. You may also distribute YOUR SOFTWARE with the incorporated SOFTWARE PRODUCT royalty-free.
+(d) Backup Copies. You may also make copies of the SOFTWARE PRODUCT as may be necessary for backup and archival purposes.
+
+3. DESCRIPTION OF OTHER RIGHTS AND LIMITATIONS
+(a) Integration with DexGuard. The SOFTWARE PRODUCT may only be used as part of  software that is processed by the DexGuard software product.
+(b) API exposure. You are not allowed to expose the API (Application Programming Interface) of the SOFTWARE PRODUCT or the functionality of the SOFTWARE PRODUCT to users of YOUR SOFTWARE.
+(c) Prohibition on Reverse Engineering, Decompilation, and Disassembly. You may not reverse engineer, decompile, or disassemble the SOFTWARE PRODUCT or its techniques, or assist third parties in these activities, except and only to the extent that such activity is expressly permitted by applicable law notwithstanding this limitation.
+(d) Malware. You may not use the he SOFTWARE PRODUCT for malware including but not limited to a computer virus, worm, time bomb, logic bomb, or other such computer program.
+(e) Rental. This AGREEMENT grants You the right to use the SOFTWARE PRODUCT in your own software only. You may not rent, lease, or lend the SOFTWARE PRODUCT. 
+(f) Support Services. The LICENSOR may provide You with support services related to the SOFTWARE PRODUCT ("SUPPORT SERVICES"). Any supplemental software code provided to You as part of the SUPPORT SERVICES shall be considered part of the SOFTWARE PRODUCT and subject to the terms and conditions of this AGREEMENT.
+(g) Compliance with AGREEMENT. You undertake to see that Your use of the SOFTWARE PRODUCT is in accordance at all times with this AGREEMENT. You assume full liability to pay any additional license fee to LICENSOR due to Your breach of this AGREEMENT. This provision shall not limit LICENSOR's right to assert other sanctions which may be invoked as a consequence of illegitimate use by You.
+(h) Compliance with Applicable Laws. You must comply with all applicable laws regarding use of the SOFTWARE PRODUCT.
+
+4. COPYRIGHT
+The SOFTWARE PRODUCT is protected by copyright laws and international copyright treaties, as well as other intellectual property laws and treaties.
+All title, including but not limited to copyrights, in and to the SOFTWARE PRODUCT and any copies thereof are owned by the LICENSOR or its suppliers. All title and intellectual property rights in and to the content which may be accessed through use of the SOFTWARE PRODUCT is the property of the respective content owner and may be protected by applicable copyright or other intellectual property laws and treaties. This  AGREEMENT grants You no rights to use such content. All rights not expressly granted are reserved by the LICENSOR.
+
+5. NO WARRANTIES
+The LICENSOR expressly disclaims any warranty for the SOFTWARE PRODUCT. The SOFTWARE PRODUCT is provided 'As Is' without any express or implied warranty of any kind, including but not limited to any warranties of merchantability, noninfringement, or fitness of a particular purpose. The LICENSOR does not warrant or assume responsibility for the accuracy or completeness of any information, text, graphics, links or other items contained within the SOFTWARE PRODUCT. The LICENSOR makes no warranties respecting any harm that may be caused by the transmission of a computer virus, worm, time bomb, logic bomb, or other such computer program. The LICENSOR disclaims any warranty that the SOFTWARE PRODUCT will meet Your requirements or that use of the SOFTWARE PRODUCT will be uninterrupted or error free. The LICENSOR further expressly disclaims any warranty or representation to Authorized Users or to any third party.
+
+6. LIMITATION OF LIABILITY
+In no event shall the LICENSOR be liable for any damages (including, without limitation, lost profits, business interruption, or lost information) rising out of 'Authorized Users' use of or inability to use the SOFTWARE PRODUCT, even if the LICENSOR has been advised of the possibility of such damages. In no event will the LICENSOR be liable for loss of data or for indirect, special, incidental, consequential (including lost profit), or other damages based in contract, tort or otherwise. The LICENSOR shall have no liability with respect to the content of the SOFTWARE PRODUCT or any part thereof, including but not limited to errors or omissions contained therein, libel, infringements of rights of publicity, privacy, trademark rights, business interruption, personal injury, loss of privacy, moral rights or the disclosure of confidential information.
+
+7. CONFIDENTIALITY AND NON-DISCLOSURE 
+The SOFTWARE PRODUCT, its DOCUMENTATION and any other proprietary information, technology or know how provided to You by LICENSOR in written, oral or any other form is the confidential information of LICENSOR ("CONFIDENTIAL INFORMATION"). You will hold all CONFIDENTIAL INFORMATION in confidence for a period of five (5) years from the date of termination or expiration of this AGREEMENT. You will use the CONFIDENTIAL INFORMATION as expressly authorized in this AGREEMENT and You will protect the CONFIDENTIAL INFORMATION from unauthorized use, dissemination, or publication by using the same degree of care as You would use to protect Your own confidential information, but no less than a reasonable degree of care. 
+ Unauthorized use or disclosure of CONFIDENTIAL INFORMATION may cause LICENSOR irreparable harm; therefore, LICENSOR will have the right to enforce this AGREEMENT and any of its provisions by injunctive or other equitable relief.
+CONFIDENTIAL INFORMATION does not include information that
+(a) is already known to the receiving party at the time it is disclosed and has not been obtained wrongfully,
+(b) becomes publicly known without fault of the receiving party,
+(c) is independently developed by the receiving party,
+(d) is approved for release in writing by the LICENSOR,
+(e) is disclosed without restriction by LICENSOR to a third party, or
+(f) is disclosed pursuant to legal obligations beyond the control of the disclosing and receiving parties.
+
+8. ENTIRE AGREEMENT
+This license agreement represents the entire agreement concerning the SOFTWARE PRODUCT between You and the LICENSOR, and it supersedes any prior proposal, representation, or understanding between the PARTIES.
+
+9. TERMINATION
+Without prejudice to any other rights, the LICENSOR may terminate this AGREEMENT if You fail to comply with the terms and conditions of this AGREEMENT. In such event, You must destroy all copies of the SOFTWARE PRODUCT in Your possession.
+
+10. SEVERABILITY
+If any court of law, having the jurisdiction to decide on this matter, rules that any provision of these terms and conditions of this AGREEMENT is invalid, then that provision will be removed from the terms and conditions without affecting the rest of the terms and conditions. The remaining provisions of the terms and conditions will continue to be valid and enforceable.
+
+11. GOVERNING LAW AND JURISDICTION
+This AGREEMENT shall be governed by and construed in accordance with the laws of Belgium. You and the LICENSOR agree to submit to the exclusive jurisdiction of the Belgian courts to resolve any legal matter arising from these terms and conditions. Notwithstanding this, You agree that the LICENSOR will still be allowed to apply for injunctive remedies (or an equivalent type of urgent legal relief) in any jurisdiction. 

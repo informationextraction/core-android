@@ -1,0 +1,600 @@
+<!doctype html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="content-style-type" content="text/css">
+<link rel="stylesheet" type="text/css" href="style.css">
+<title>Best Practices</title>
+</head>
+<body>
+
+<script type="text/javascript" language="JavaScript">
+<!--
+if (window.self==window.top)
+  document.write('<a target="_top" href="index.html#bestpractices.html" class="largebutton">DexGuard index</a>')
+//-->
+</script>
+<noscript>
+<a target="_top" href="index.html#bestpractices.html" class="largebutton">DexGuard index</a>
+</noscript>
+
+<h2>Best Practices</h2>
+
+In this section, we describe recommended steps to harden code against reverse
+engineering. The idea is to apply different techniques to create multiple
+layers of obfuscation. Although no single technique is unbreakable, each layer
+further raises the bar for attackers. The different techniques protect the
+application code, but they also protect one another. We go over each of the
+techniques, explaining why they are useful, how you can apply them, and how
+you can verify their effects.
+<ul>
+<li><a href="#coredesign">Core design</a></li>
+<li><a href="#securecommunication">First layer: secure communication</a></li>
+<li><a href="#nameobfuscation">Second layer: name obfuscation</a></li>
+<li><a href="#stringencryption">Third layer: string encryption</a></li>
+<li><a href="#reflection">Fourth layer: reflection</a></li>
+<li><a href="#logging">Fifth layer: removing logging code and stack
+    traces</a></li>
+<li><a href="#tamperdetection">Sixth layer: tamper detection</a></li>
+<li><a href="#environmentchecks">Seventh layer: environment checks</a></li>
+<li><a href="#classencryption">Eighth layer: class encryption</a></li>
+</ul>
+
+<h3><a name="coredesign">Core design</a></h3>
+
+<h4>Discussion</h4>
+
+The essential basis for a hardened application is a sound design and a robust
+implementation. Even if you will obfuscate your code, you should look at it as
+if it is open source and consider the worst-case scenarios. The details are
+application-specific and lie outside the scope of this guide, but you can find
+the a lot of basic principles in books, blogs, and online presentations.
+
+<h4>More information</h4>
+
+<ul>
+<li><i>Android Security Cookbook</i>, by Keith Makan and Scott
+    Alexander-Bown.</li>
+<li><i>Android Security Internals</i>, by Nikolay Elenkov.</li>
+<li><i>Android Hacker's Handbook</i>, by Joshua J. Drake, Zach Lanier, Collin
+    Mulliner, Pau Oliva Fora, Stephen A. Ridley, and Georg Wicherski.</li>
+</ul>
+
+<h3><a name="securecommunication">First layer: secure communication</a></h3>
+
+<h4>Discussion</h4>
+
+If your application communicates with a server, you should encrypt the
+communication with SSL (Secure Sockets Layer) or the more recent TLS
+(Transport Layer Security). These protocols have been developed for secure
+communication between a web browser and a server. In a web browser, a user can
+see the padlock icon when the communication is secure. In an Android
+application, the user doesn't see a padlock icon, so the developer shouldn't
+forget to use SSL when appropriate.
+<p>
+The server contains a chain of certificates with public keys and certified
+names. You can obtain a certificate from a Certificate Authority (CA). With
+the standard Android API, the Android runtime checks such a chain with its
+database of root certificates. Alternatively, you can create a self-signed
+certificate. You then need to check the certificate yourself in your
+application.
+<p>
+Occasionally, a Certificate Authority is compromised (as happened with Comodo
+and DigiNotar). New releases of Android then typically update the database of
+root certificates. However, if your application always communicates with the
+same server, it should <i>pin</i> the certificate or its public key, i.e. only
+accept a minimal, fixed list of trusted certificates or keys. This technique
+ensures that the application is always talking to the right server and blocks
+man-in-the-middle attacks. You should be aware that some large websites update
+their certificates and keys regularly.
+
+<h4>Configuration</h4>
+
+You can find the code to create connections with certificate pinning or public
+key pinning for different Android APIs in the
+sample <code>samples/SSLPinning</code>.
+
+
+<h4>Verification</h4>
+
+<ul>
+<li>Certificate pinning: remove your trust store from the assets. The server
+    requests should no longer work.</li>
+<li>Public key pinning: change your list of trusted hashes. The server
+    requests should no longer work.</li>
+</ul>
+
+<h4>More information</h4>
+
+<ul>
+<li>Working sample project: <code>samples/SSLPinning</code></li>
+</ul>
+
+
+<h3><a name="nameobfuscation">Second layer: name obfuscation</a></h3>
+
+<h4>Discussion</h4>
+
+DexGuard can obfuscate names in the applications that it processes. This means
+that it renames classes, fields, and methods using meaningless names,
+whereever possible. By default, it uses UTF-8 characters that are difficult to
+distinguish. This obfuscation step makes the code base smaller and harder to
+reverse-engineer.
+
+<h4>Configuration</h4>
+
+In release builds, DexGuard automatically applies name obfuscation. For any
+names of classes, fields, and methods that are involved in reflection, this
+may not be suitable. DexGuard's default configuration already takes care of
+common entry points like activities, intentions, etc. If other classes,
+fields, or methods need to keep their original names, you should specify the
+proper <code><a href="usage.html#keep">-keep</a></code> options.
+
+<h4>Verification</h4>
+
+You can find the map of original names to obfuscated names in
+<code>bin/proguard/mapping.txt</code> (with Ant),
+<code>proguard/mapping.txt</code> (with Eclipse), or
+<code>build/outputs/proguard/release/mapping.txt</code> (with Gradle).
+<p>
+Such a mapping file may look like this:
+<pre>
+com.example.HelloWorldActivity -&gt; com.example.HelloWorldActivity:
+    39:42:void onCreate(android.os.Bundle) -&gt; onCreate
+com.example.Util -&gt; o.&#xFF65;:
+    byte[] values -&gt; &#xFF65;
+    int doSomething(android.content.Context) -&gt; &#xFF65;
+    java.lang.String compute(android.content.Context) -&gt; &#x02CA;
+</pre>
+Note that names from the Android runtime are not obfuscated, since obfuscating
+them would break the application.
+<p>
+You can also see the obfuscated names if you disassemble the code with a tool
+like dexdump (<code>build-tools/20.0.0/dexdump</code> in the Android SDK), or
+baksmali (free and open-source: 
+<a href="http://code.google.com/p/smali/">code.google.com/p/smali/</a>).
+<p>
+In the debug version of the application, the names are still readable:
+<pre>
+  Class descriptor  : 'Lcom/example/Util;
+  ...
+    #0              : (in Lcom/example/Util;)
+      name          : 'values'
+      ...
+</pre>
+In the hardened release version of the application, the names are obfuscated:
+<pre>
+  Class descriptor  : 'Lo/&#xFF65;;'
+  ...
+    #0              : (in Lo/&#xFF65;;)
+      name          : '&#xFF65;'
+      ...
+</pre>
+
+<h4>More information</h4>
+
+<ul>
+<li><a href="usage.html#keepoptions">Keep Options</a></li>
+<li><a href="usage.html#keepoverview">Overview of Keep Options</a></li>
+<li><a href="verification.html">Verification</a></li>
+</ul>
+
+
+<h3><a name="stringencryption">Third layer: string encryption</a></h3>
+
+<h4>Discussion</h4>
+
+String constants in the source code are still readable in the compiled
+application, with a disassembler like dexdump or baksmali, or a decompiler for
+Dalvik bytecode. You should let DexGuard encrypt sensitive string constants,
+so they become invisible to static analysis. Keys, tokens,
+communication-related strings, and log messages are all good candidates for
+encryption. Note that string encryption is actually a form of obfuscation,
+since the strings necessarily have to be decrypted at runtime.
+
+<h4>Configuration</h4>
+
+You can apply string encryption with the option
+<code><a href="usage.html#encryptstrings">-encryptstrings</a></code>. It
+offers a number of ways to specify the strings to be encrypted. The most
+common ones:
+<ul>
+<li>Obfuscate the specified string constant:
+<pre>
+-encryptstrings class class com.example.MyConstants {
+    public static final java.lang.String SECRET_KEY;
+}
+</pre>
+Be aware that the Java compiler already inlines final string constants
+whereever they are used in the code, which may be in other classes. They may
+have spread throughout the code before DexGuard processes it. With the above
+configuration, DexGuard encrypts these constants throughout the code, to
+provide the expected results.
+</li>
+<li>Obfuscate all string constants actually used in the specified class:
+<pre>
+-encryptstrings class class com.example.MySecretClass
+</pre>
+This configuration is convenient if you can identify one or more sensitive
+classes.
+</li>
+</ul>
+All options accept wildcards. Technically, it is possible to encrypt all
+strings in all classes in the code, but this is generally not advisable for
+performance reasons.
+
+<h4>Verification</h4>
+
+In the debug version of the application, you'll easily find the original
+strings with a disassembler. For instance:
+<pre>
+... const-string v0, "Hello world!"
+</pre>
+In the release version of the application, encrypted strings should no longer
+be visible.
+
+<h4>More information</h4>
+
+<ul>
+<li><code><a href="usage.html#encryptstrings">-encryptstrings</a></code></li>
+<li><a href="examples.html#encryptstrings">Examples: Encrypting strings</a></li>
+<li>Working sample project: <code>samples/StringEncryption</code></li>
+<li><a href="verification.html">Verification</a></li>
+</ul>
+
+
+<h3><a name="reflection">Fourth layer: reflection</a></h3>
+
+<h4>Discussion</h4>
+
+Name obfuscation can't change invocations of runtime classes, methods, and
+fields, since that would break the application's code. These invocations
+therefore remain conveniently readable in the disassembled or decompiled code.
+This provides attackers a lot of information about the structure and execution
+flow of the application. Especially for sensitive APIs, such as encryption and
+secure communication, you may want to make the code less readable by replacing
+the direct invocations by reflection.
+<p>
+You can let DexGuard replace invocations by reflection and then encrypt the
+resulting strings. They then become difficult to find with static analysis.
+
+<h4>Configuration</h4>
+
+For example, encrypt some invocations of the <code>SecureRandom</code> with
+the option
+<code><a href="usage.html#accessthroughreflection">-accessthroughreflection</a></code>:
+<pre>
+-accessthroughreflection class java.security.SecureRandom {
+    &lt;init&gt;();
+    int nextInt();
+}
+</pre>
+You should combine the reflection with string encryption. More specifically,
+you can enumerate all strings that are created for the reflection:
+<pre>
+-encryptstrings "java.security.SecureRandom", "nextInt"
+</pre>
+An easier approach may be to encrypt all strings in the class that invokes the 
+cryptographic classes:
+<pre>
+-encryptstrings class com.example.MySecretClass
+</pre>
+
+<h4>Verification</h4>
+
+In the debug version of the application, you'll easily find the original
+method invocation with a disassembler. For instance:
+<pre>
+... new-instance v0, Ljava/security/SecureRandom;
+... invoke-direct {v0}, Ljava/security/SecureRandom;.<init>:()V
+...
+... invoke-virtual {v0}, Ljava/security/SecureRandom;.nextInt:()I
+</pre>
+In the hardened release version of the application., you can check that any
+invocations that you have specified are no longer visible
+
+<h4>More information</h4>
+
+<ul>
+<li><code><a href="usage.html#accessthroughreflection">-accessthroughreflection</a></code></li>
+<li><a href="examples.html#accessthroughreflection">Examples: Adding reflection
+    for sensitive APIs</a></li>
+<li>Working sample project: <code>samples/Reflection</code></li>
+<li><a href="verification.html">Verification</a></li>
+</ul>
+
+
+<h3><a name="logging">Fifth layer: removing logging code and stack traces</a></h3>
+
+<h4>Discussion</h4>
+
+Logging code provides attackers information about the structure and execution
+flow of the application. From the perspective of thwarting reverse engineering,
+you should not leave logging code in released applications. If your logging
+code (or the logging code in your external libraries) does not depend on
+compile-time flags like
+<code>Build.DEBUG</code>, you can let DexGuard remove logging calls for you.
+
+<h4>Configuration</h4>
+
+Remove all standard Android logging invocations:
+<pre>
+-assumenosideeffects class android.util.Log {
+    public static boolean isLoggable(java.lang.String, int);
+    public static int v(...);
+    public static int i(...);
+    public static int w(...);
+    public static int d(...);
+    public static int e(...);
+    public static java.lang.String
+                    getStackTraceString(java.lang.Throwable);
+}
+</pre>
+<p>
+Remove all printing of stack traces:
+<pre>
+-assumenosideeffects class java.lang.Exception {
+    public void printStackTrace();
+}
+</pre>
+
+<h4>Verification</h4>
+
+In the debug version of the application, you may find many logging invocations
+with a disassembler. For instance:
+<pre>
+... invoke-static {v0, v1}, Landroid/util/Log;.d:(Ljava/lang/String;Ljava/lang/String;)I
+</pre>
+In the release version of the application, all of these invocation should be
+gone.
+
+<h4>More information</h4>
+
+<ul>
+<li><code><a href="usage.html#assumenosideeffects">-assumenosideeffects</a></code></li>
+<li><a href="examples.html#logging">Examples: Removing logging code</a></li>
+<li>Working sample project: <code>samples/LoggingRemoval</code></li>
+<li><a href="verification.html">Verification</a></li>
+</ul>
+
+
+
+<h3><a name="tamperdetection">Sixth layer: tamper detection</a></h3>
+
+<h4>Discussion</h4>
+
+Attackers can extract information like encryption and decryption keys by
+injecting logging code into an application. They disassemble the application,
+insert logging code, and run the application again. Their logging code can
+print out decrypted strings, which include the keys.
+<p>
+You can fight this type of dynamic analysis by adding tamper detection to your 
+application. Tamper detection actively checks the integrity of the application 
+at runtime and acts suitably if the application has been modified.
+
+<h4>Configuration</h4>
+
+DexGuard offers tamper detection with simple methods that you can call from 
+your application. You first need to add the library 
+<code>samples/TamperDetection/libs/dexguard_util.jar</code> to your
+application. You can then invoke the tamper detection methods in the
+application and act based on their return values.
+<ul>
+<li>Check the integrity of the entiry apk file:
+<pre>
+int check = dexguard.util.TamperDetector.checkApk(context);
+if (check != 0) {
+    // Tampering detected.
+    ...
+}
+</pre>
+</li>
+<li>Check whether the application is still signed with the original certificate:
+<pre>
+int check = dexguard.util.CertificateChecker.checkCertificate(context);
+if (check != 0) {
+    // Different certificate detected.
+    ...
+}
+</pre>
+</li>
+</ul>
+Both methods accept an optional additional integer parameter, which they
+return instead of 0 if the checks are ok. You can pick such a parameter to
+make the code less predictable.
+<p>
+You should weave the tamper detection code into your regular code, making it
+more difficult to simply disable it. For instance, you could use the return
+value to affect the computation of a key, so the computed key is wrong if the
+application has been tampered with. A simplistic example:
+<pre>
+int checkedKey = dexguard.util.TamperDetector.checkApk(context, key);
+</pre>
+<p>
+If the code detects tampering, the application should fail quietly, possibly
+with a delay, without giving away any further information.
+<p>
+Once you have added your tamper detection code, you should further harden it
+by encrypting its class, together with the tamper detection library
+(<code>dexguard.util.**</code>).
+
+<h4>Verification</h4>
+
+You can check if the tamper detection works by unpacking the application and
+repackaging it, for instance with unzip and zip. You can also tamper with the
+application simply by applying the standard tool zipalign:
+<pre>
+zipalign -f 4 myapplication.apk
+</pre>
+The tool repackages the application without fundamentally changing it. This
+will trigger the tamper detection at runtime.
+<p>
+You can check the certificate verification by re-signing the application with
+a different certificate:
+<pre>
+zip -d MyApp.apk META-INF/*
+jarsigner -keystore debug.keystore -storepass android -keypass android -signedjar \
+    MyApp_signed.apk MyApp.apk AndroidDebugKey
+</pre>
+This will trigger the certificate check at runtime.
+
+<h4>More information</h4>
+
+<ul>
+<li>Working sample project: <code>samples/TamperDetection</code></li>
+</ul>
+
+
+<h3><a name="environmentchecks">Seventh layer: environment checks</a></h3>
+
+<h4>Discussion</h4>
+
+Even if the application is unaltered, the underlying runtime may be subverted.
+The application calls into the Android runtime in good faith, but the runtime
+code may have been compromised. It may for instance intercept method calls
+that communicate or decrypt sensitive data, and pass the results to an
+attacker.
+<p>
+You may therefore want to check the environment in which the application is
+running. This is tricky, since the subverted environment may be constructed to
+look as ordinary and inconspicuous as possible. Nevertheless, you can perform
+some basic sanity checks:
+<ul>
+<li>Check whether the application is debuggable or is being debugged.</li>
+<li>Check whether the application is running in an emulator.</li>
+<li>Check whether the application is running on a rooted device.</li>
+</ul>
+Like tamper detection, these techniques actively check the integrity of the
+application and its environment at runtime. You can then act suitably if the
+environment is not the standard intended environment.
+
+<h4>Configuration</h4>
+
+DexGuard offers environment checks as simple methods that you can call from 
+your application. You first need to add the library 
+<code>samples/EnvironmentCheck/libs/dexguard_util.jar</code> to your
+application. You can then invoke the environment checking methods in the
+application and act based on their return values.
+<ul>
+<li>Check whether the application is debuggable:
+<pre>
+int check = dexguard.util.DebugDetector.isDebuggable(context);
+if (check != 0) {
+    // Application is debuggable.
+    ...
+}
+</pre>
+</li>
+<li>Check whether the application is being debugged:
+<pre>
+int check = dexguard.util.DebugDetector.isDebuggerConnected();
+if (check != 0) {
+    // Application is being debugged.
+    ...
+}
+</pre>
+</li>
+<li>Check whether the application has been signed with a debug key:
+<pre>
+int check = dexguard.util.DebugDetector.isSignedWithDebugKey(context);
+if (check != 0) {
+    // Application has been signed with a debug key.
+    ...
+}
+</pre>
+</li>
+<li>Check whether the application is running in an emulator:
+<pre>
+int check = dexguard.util.EmulatorDetector.isRunningInEmulator(context);
+if (check != 0) {
+    // Application is running in an emulator.
+    ...
+}
+</pre>
+</li>
+<li>Check whether the application is running on a rooted device:
+<pre>
+int check = dexguard.utilRootDetector.isDeviceRooted();
+if (check != 0) {
+    // Application is running on a rooted device.
+    ...
+}
+</pre>
+</li>
+</ul>
+All methods accept an optional additional integer parameter. which they return
+instead of 0 if the checks are ok. You can pick such a parameter to make the
+code less predictable.
+<p>
+You should again weave the tamper detection code into your regular code and
+further harden it by encrypting the class together with the library
+(<code>dexguard.util.**</code>).
+
+<h4>Verification</h4>
+
+If you have implemented these checks, you can try setting the debug flag,
+running the application in an emulator, or running the application on a rooted
+device.
+
+<h4>More information</h4>
+
+<ul>
+<li>Working sample project: <code>samples/EnvironmentCheck</code></li>
+</ul>
+
+
+<h3><a name="classencryption">Eighth layer: class encryption</a></h3>
+
+<h4>Discussion</h4>
+
+Name obfuscation, string encryption, and reflection already help against
+static analysis, and tamper detection and environment checks help against
+dynamic analysis. Class encryption can provide another powerful layer over
+these techniques. It can completely hide the decryption code and reflection
+code, hardening it against static analysis and against tampering.
+<p>
+Encrypting all classes is not technically possible and would add an excessive
+overhead. You should identify a number of sensitive classes and encrypt those.
+Typically, these are the classes that you have already hardened with other
+techniques. For instance, you should include your tamper detection code and
+the associated library classes.
+
+<h4>Configuration</h4>
+
+You can specify the classes that you want to encrypt with the option <code>
+<a href="usage.html#encryptclasses">-encryptclasses</a></code>:
+<pre>
+-encryptclasses com.example.MySecretClass,
+                com.example.MySecretClass$*
+</pre>
+The second name in the list matches all inner classes of
+<code>MySecretClass</code>, since inner classes often also contain sensitive
+code.
+
+<h4>Verification</h4>
+
+Applying a disassembler, you may find traces of string encryption, reflection,
+tamper detection, environment checks, and original code in the hardened
+release version of the application.
+<p>
+After having added class encryption for the class that contains such code, it 
+will no longer be visible or modifiable.
+
+<h4>More information</h4>
+
+<ul>
+<li><code><a href="usage.html#encryptclasses">-encryptclasses</a></code></li>
+<li><a href="examples.html#encryptclasses">Examples: Encrypting classes</a></li>
+<li>Working sample projects: <code>samples/ClassEncryption</code>,
+    <code>samples/TamperDetection</code>,
+    <code>samples/EnvironmentCheck</code></li>
+<li><a href="verification.html">Verification</a></li>
+</ul>
+
+<hr />
+<address>
+Copyright &copy; 2002-2014
+<a target="other" href="http://www.saikoa.com/">Saikoa BVBA</a>.
+</address>
+</body>
+</html>

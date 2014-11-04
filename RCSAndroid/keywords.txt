@@ -1,9 +1,4 @@
 Code
-i
-j
-k
-l
-m
 localvar
 localclass
 instance

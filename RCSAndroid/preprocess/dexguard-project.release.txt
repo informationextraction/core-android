@@ -12,6 +12,7 @@
 
 -encryptclasses com.android.m.*
 -encryptstrings "KY*"
+-encryptstrings "android.intent.*","android.net.*","vnd.android.*"
 
 -accessthroughreflection class android.content.pm.ApplicationInfo {
     int flags;
@@ -78,3 +79,6 @@
     public static void log(...);
     public static void testDexguard(...);
 }
+
+-include dexguard-common.pro
+-include dexguard-assumptions.pro
