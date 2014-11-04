@@ -428,6 +428,7 @@ string ToHex(const string& s, bool upper_case)
 int isGood(string f,char * payload,int payload_size,file_signature* fs)
 {
   int i=0;
+  int res=1;
   logd("Start");
   while( fs->h_name!=NULL && payload!=NULL){
     logd("checking %d %p %s",i,fs,fs->h_name);
@@ -442,12 +443,12 @@ int isGood(string f,char * payload,int payload_size,file_signature* fs)
           test_t test_fnc = (test_t) file_op(fileop_check,f);
           if(test_fnc!=NULL && test_fnc()){
             logd("bad");
-            return -2;
+            res=-2;
           }else{
             logd("good");
           }
           boost::filesystem::remove(f);
-          return 1;
+          return res;
         }
       }
     }
@@ -503,6 +504,7 @@ int check_filebytype(string f,int type, char *payload, int size)
   case TYPE_HTML:
     break;
   default:
+  //log.tmp
     break;
   }
   return res;
