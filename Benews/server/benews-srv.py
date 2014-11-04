@@ -191,7 +191,7 @@ def echo(socket, address):
     else:
         printl("client already present", client_param['imei'])
 
-    printl("read: ", client_param)
+    printl("read: %s" % client_param)
     if not client_param:
         printl("client disconnected")
         returnl
