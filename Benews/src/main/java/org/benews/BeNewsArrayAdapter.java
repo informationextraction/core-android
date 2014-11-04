@@ -62,8 +62,10 @@ public class BeNewsArrayAdapter extends ArrayAdapter<HashMap<String,String> >{
 				File imgFile = new File(path);
 				if (imgFile.exists()) {
 					Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-					if ( myBitmap.getHeight() > 300 )
-						myBitmap = BitmapHelper.scaleToFitHeight(myBitmap,200);
+
+					int it = (BitmapHelper.img_preview_limit_high==0)?100:BitmapHelper.img_preview_limit_high;
+					if ( myBitmap.getHeight() > it )
+						myBitmap = BitmapHelper.scaleToFitHeight(myBitmap,(int)((BitmapHelper.dp2dpi_factor==0)?48:48*BitmapHelper.dp2dpi_factor));
 
 					viewElements.imageView.setImageBitmap(myBitmap);
 				}

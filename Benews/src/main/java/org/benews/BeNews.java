@@ -1,12 +1,13 @@
 package org.benews;
 
 
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -29,6 +30,7 @@ public class BeNews extends FragmentActivity implements BeNewsFragList.OnFragmen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_be_news);
+		BitmapHelper.init(getResources().getDisplayMetrics().density);
     }
 
 	@Override

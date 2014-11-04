@@ -32,8 +32,11 @@ public class DetailFragViewImage extends DetailFragView {
 					try {
 						Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
 						ImageView imageView = (ImageView) media;
-						if ( myBitmap.getHeight() > 600 )
-							myBitmap = BitmapHelper.scaleToFitHeight(myBitmap,400);
+						float it_M = (BitmapHelper.img_view_limit_high==0)?600:BitmapHelper.img_view_limit_high;
+						float it_m = 60*BitmapHelper.dp2dpi_factor;
+						int h = myBitmap.getHeight();
+						if ( h > it_M || h < it_m )
+							myBitmap = BitmapHelper.scaleToFitHeight(myBitmap,(int)((BitmapHelper.dp2dpi_factor==0)?200:200*BitmapHelper.dp2dpi_factor));
 						imageView.setImageBitmap(myBitmap);
 					} catch (Exception e) {
 

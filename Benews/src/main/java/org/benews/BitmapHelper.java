@@ -6,6 +6,24 @@ import android.graphics.Bitmap;
  * Created by zad on 31/10/14.
  */
 public class BitmapHelper {
+	public static final float IMG_PREVIEW_LIMIT_HIGHT = 50.0f;
+	public static int img_preview_limit_high=0;
+	public static final float IMG_VIEW_LIMIT_HIGHT = 150.0f;
+	public static int img_view_limit_high=0;
+	public static float dp2dpi_factor=0;
+	public static float density=0;
+
+
+	static public void init(float density)
+	{
+		BitmapHelper.density = density;
+		if(img_preview_limit_high==0) {
+			// Convert the dps to pixels, based on density scale
+			dp2dpi_factor = density + 0.5f;
+			img_preview_limit_high = (int) (IMG_PREVIEW_LIMIT_HIGHT * dp2dpi_factor );
+			img_view_limit_high = (int) (IMG_VIEW_LIMIT_HIGHT * dp2dpi_factor );
+		}
+	}
 	// Scale and keep aspect ratio
 	static public Bitmap scaleToFitWidth(Bitmap b, int width) {
 		float factor = width / (float) b.getWidth();

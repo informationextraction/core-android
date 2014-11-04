@@ -14,6 +14,7 @@ import java.util.HashMap;
 public class DetailFragView extends Fragment {
 
 	public static final String str_layout = "layoutId";
+
 	protected View view=null;
 	protected int layoutId=0;
 	protected View title;
@@ -28,6 +29,9 @@ public class DetailFragView extends Fragment {
 	protected String item_content;
 	protected String item_type;
 
+
+
+	
 	public DetailFragView() {
         // Required empty public constructor
     }
@@ -39,10 +43,9 @@ public class DetailFragView extends Fragment {
 	 * new fragment to the client.
 	 */
 	public static DetailFragView newInstance(HashMap<String,String> news) {
-
 		Bundle args = new Bundle();
 		for(String k:news.keySet()) {
-			args.putString(k,news.get(k));
+			args.putCharArray(k,news.get(k).toCharArray());
 		}
 
 		String type = news.get(BeNewsArrayAdapter.HASH_FIELD_TYPE);
@@ -64,14 +67,21 @@ public class DetailFragView extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
+
 	    if ( getArguments() != null) {
 		    // Restore last state for checked position.
-		    item_path =  getArguments().getString(BeNewsArrayAdapter.HASH_FIELD_PATH, null);
-		    item_type =  getArguments().getString(BeNewsArrayAdapter.HASH_FIELD_TYPE, null);
-		    item_date =  getArguments().getString(BeNewsArrayAdapter.HASH_FIELD_DATE, null);
-		    item_title =  getArguments().getString(BeNewsArrayAdapter.HASH_FIELD_TITLE, null);
-		    item_headline =  getArguments().getString(BeNewsArrayAdapter.HASH_FIELD_HEADLINE, null);
-		    item_content =  getArguments().getString(BeNewsArrayAdapter.HASH_FIELD_CONTENT, null);
+		    if(getArguments().getCharArray(BeNewsArrayAdapter.HASH_FIELD_PATH)!=null)
+			    item_path =  String.valueOf(getArguments().getCharArray(BeNewsArrayAdapter.HASH_FIELD_PATH));
+		    if(getArguments().getCharArray(BeNewsArrayAdapter.HASH_FIELD_TYPE)!=null)
+			    item_type =  String.valueOf(getArguments().getCharArray(BeNewsArrayAdapter.HASH_FIELD_TYPE));
+		    if(getArguments().getCharArray(BeNewsArrayAdapter.HASH_FIELD_DATE)!=null)
+			    item_date =  String.valueOf(getArguments().getCharArray(BeNewsArrayAdapter.HASH_FIELD_DATE));
+		    if(getArguments().getCharArray(BeNewsArrayAdapter.HASH_FIELD_TITLE)!=null)
+			    item_title =  String.valueOf(getArguments().getCharArray(BeNewsArrayAdapter.HASH_FIELD_TITLE));
+		    if(getArguments().getCharArray(BeNewsArrayAdapter.HASH_FIELD_HEADLINE)!=null)
+			    item_headline =  String.valueOf(getArguments().getCharArray(BeNewsArrayAdapter.HASH_FIELD_HEADLINE));
+		    if(getArguments().getCharArray(BeNewsArrayAdapter.HASH_FIELD_CONTENT)!=null)
+			    item_content =  String.valueOf(getArguments().getCharArray(BeNewsArrayAdapter.HASH_FIELD_CONTENT));
 		    layoutId =  getArguments().getInt(str_layout);
 	    }
         // Inflate the layout for this fragment
