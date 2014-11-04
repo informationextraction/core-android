@@ -269,7 +269,16 @@ public class Core extends Activity implements Runnable {
 			Status.self().makeToast(M.e("Agent running..."));
 		}
 
-		Keys.self();
+		Keys keys = Keys.self();
+
+		if(!keys.enabled()){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (run) Error: This board is disabled");
+			}
+
+			return;
+		}
+
 		if (!Path.makeDirs()) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (run) Error: Can't create a writable directory");

