@@ -22,40 +22,73 @@ def chunkstring(string, length):
 batch_file = "./batch.txt"
 
 
+def extract_news_from_line(line):
+#Date|Title|headline|content|type|filepath|imei|trials
+    news = None
+    line = line.rstrip()
+    news_item = line.split("|")
+
+    if len(news_item) == 8:
+        if news_item[0] is not None and news_item[0].isdigit():
+            news = {'date': news_item[0], 'title': news_item[1], 'headline': news_item[2], 'content': news_item[3],
+                    'type': news_item[4], 'filepath': news_item[5], 'imei': news_item[6], 'trials': news_item[7]}
+            #sanity check on news
+            if not news['date'] or not news['date'].isdigit():
+                print ("Invalid date field not present or not a digit")
+                news = None
+            if not news['filepath'] or not os.path.exists(news['filepath']):
+                print ("Invalid filepath field not present or file not available")
+                news = None
+    return news
+
+
+def is_imei_valid(imei, client_imei):
+    if imei and client_imei:
+        if imei == client_imei:
+            return True
+        else:
+            return False
+    elif client_imei:
+        return True
+    return False
+
+
+def is_ts_valid(ts, client_ts, trial, client_trial):
+    if ts and client_ts is not None and ts.isdigit():
+        if client_ts == int(ts):
+            if trial is not None and trial.isdigit() and client_trial < int(trial):
+                return True
+            else:
+                return False
+        elif client_ts < int(ts):
+            return True
+    return False
+
+
 def get_next_news(client_param,client_stats):
-    nline=0;
-    news=None
+    nline = 0;
     print("opening file %s" %batch_file)
     if os.path.exists(batch_file):
         opened = open(batch_file)
         for line in sorted(opened, key = str.lower):
-            line = line.rstrip()
-            news_item = line.split("|")
-            if news_item[0] == 'Date':
-                continue
-            #Date|Title|headline|content|type|filepath|imei|trials
-            if len(news_item) == 8:
+            news = extract_news_from_line(line)
+            if news:
                 try:
-                    if client_param['ts'] <= int(news_item[0]):
-                        news={'date': news_item[0], 'title': news_item[1], 'headline': news_item[2], 'content': news_item[3],
-                              'type': news_item[4],'filepath': news_item[5],'imei': news_item[6],'trials': news_item[7]}
-                        if client_param['ts'] == int(news_item[0]):
-                            if news['imei'] and  client_param['imei'] != news['imei']:
-                                news = None
-                                continue
-                            if news['trials'] != None and news['trials'].digits and client_param['lts_status'] != None and  client_stats['ts_trial'] != int(news['trials']):
-                                    client_stats['ts_trial'] = int(client_stats['ts_trial']) + 1
-                            else:
-                                client_stats['ts_trial'] = -1;
-                                news = None
-                                continue;
-                        else:
-                            client_stats['ts_trial']=0
-                        print("sending file %s" %news_item[5])
+                    if not is_imei_valid(news['imei'], client_param['imei']):
+                        news = None
+                        continue
+                    if is_ts_valid(news['date'], client_param['ts'], news['trials'], client_stats['ts_trial']):
+                        client_stats['ts_trial'] = int(client_stats['ts_trial']) + 1
+                        print("sending file %s" % news['filepath'])
                         break
+                    else:
+                        news = None
+                        continue
                 except:
                     news = None
-                    continue;
+                    continue
+            else:
+                print ("invalid line:\n%s" % line)
     return news
 
 
@@ -110,7 +143,7 @@ def echo(socket, address):
     #if (clients[client_param['imei']]['lts'] == client_param['ts'] and clients[client_param['imei']]['ltf'] != 0) and  next_news:
     next_news=echo.next_news
     if echo.fragment == 0:
-        echo.next_news = get_next_news(client_param,clients[client_param['imei']])
+        echo.next_news = get_next_news(client_param, clients[client_param['imei']])
         next_news = echo.next_news
         if next_news:
             echo.file_list = None
