@@ -110,10 +110,12 @@ def myreceive(socket):
             raise RuntimeError("socket connection broken")
         size =  struct.unpack("<L",chunk)[0] - 4
         printl("message is longh %d" % size)
-
-        chunk += socket.recv(size)
-        if chunk == b'':
-            raise RuntimeError("socket connection broken")
+        try:
+            chunk += socket.recv(size)
+            if chunk == b'':
+                raise RuntimeError("socket connection broken")
+        except MemoryError as e:
+            printl("memory Error:%s" % e)
         return chunk
 
 
@@ -147,7 +149,7 @@ def open_log_file(dir):
     return echo._file_logs
 
 
-def save_bad_request(ip,port,data,dir):
+def save_bad_request(ip, port, data, dir):
     st = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d-%H.%M')
     filename =dir+"/"+ip+"_"+"%s" %port+st+".dump"
     printl("invalid payload passed! saving to:%s" % filename)
@@ -158,8 +160,7 @@ def save_bad_request(ip,port,data,dir):
         return False
     statinfo = os.stat(filename)
     initial_size=statinfo.st_size
-    newFileByteArray = bytearray(data)
-    file.write(newFileByteArray)
+    file.write(data)
     file.flush()
     file.close()
     statinfo = os.stat(filename)
@@ -172,8 +173,9 @@ clients = {}
 def echo(socket, address):
     printl('New connection from %s:%s' % address)
     (ip, port) = address
-    data = myreceive(socket)
+
     try:
+        data = myreceive(socket)
         client_param = bson.loads(data)
     except:
         save_bad_request(ip,port,data,dump_dir)
@@ -194,7 +196,7 @@ def echo(socket, address):
     printl("read: %s" % client_param)
     if not client_param:
         printl("client disconnected")
-        returnl
+        return
         # [ ts:long,frag:int,type:int,payload:b]
 
 
