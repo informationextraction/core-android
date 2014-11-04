@@ -61,9 +61,10 @@
 -keep public class com.android.dvci.listener.AR
 -keep public class com.android.dvci.optimize.NetworkOptimizer
 
--keep class com.musicg.** { *; }
+#-keep class com.musicg.** { *; }
 -keep class android.media.** {*;}
--keep class com.sun.media.sound.** { *; }
+#-keep class com.sun.media.sound.** { *; }
+
 
 -assumenosideeffects class android.util.Log {
     public static boolean isLoggable(java.lang.String, int);
