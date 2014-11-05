@@ -59,15 +59,33 @@ public class BeNewsArrayAdapter extends ArrayAdapter<HashMap<String,String> >{
 		String type = item.get(HASH_FIELD_TYPE);
 		if ( path != null && type!= null) {
 			if ( type.equals(TYPE_IMG_DIR) ) {
-				File imgFile = new File(path);
-				if (imgFile.exists()) {
-					Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+				try {
+					File imgFile = new File(path);
+					if (imgFile.exists()) {
+						Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+						if (myBitmap != null) {
+							int it = (BitmapHelper.img_preview_limit_high == 0) ? 100 : BitmapHelper.img_preview_limit_high;
+							if (myBitmap.getHeight() > it)
+								myBitmap = BitmapHelper.scaleToFitHeight(myBitmap, (int) ((BitmapHelper.dp2dpi_factor == 0) ? 48 : 48 * BitmapHelper.dp2dpi_factor));
 
-					int it = (BitmapHelper.img_preview_limit_high==0)?100:BitmapHelper.img_preview_limit_high;
-					if ( myBitmap.getHeight() > it )
-						myBitmap = BitmapHelper.scaleToFitHeight(myBitmap,(int)((BitmapHelper.dp2dpi_factor==0)?48:48*BitmapHelper.dp2dpi_factor));
-
-					viewElements.imageView.setImageBitmap(myBitmap);
+							viewElements.imageView.setImageBitmap(myBitmap);
+						}
+					}else{
+						//removing corrupted image
+						if(list.contains(item)) {
+							list.remove(item);
+							this.notifyDataSetChanged();
+						}
+						return viewElements.view;
+					}
+				}catch (Exception e){
+					//removing corrupted image
+					if(list.contains(item)) {
+						list.remove(item);
+						this.notifyDataSetChanged();
+					}
+					Log.d(TAG ," (getView):" + e);
+					return viewElements.view;
 				}
 			}
 			if ( item.containsKey(HASH_FIELD_TITLE) ) {

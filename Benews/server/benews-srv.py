@@ -63,9 +63,9 @@ def is_imei_valid(imei, client_imei):
     return False
 
 
-def is_ts_valid(ts, client_ts, trial, client_trial):
+def is_ts_valid(ts, client_ts, trial, client_trial, client_cks=None):
     if ts and client_ts is not None and ts.isdigit():
-        if client_ts == int(ts):
+        if client_ts == int(ts) and ( client_cks and client_cks != 0):
             if trial is not None and trial.isdigit() and client_trial < int(trial):
                 return True
             else:
@@ -87,7 +87,7 @@ def get_next_news(client_param,client_stats):
                     if not is_imei_valid(news['imei'], client_param['imei']):
                         news = None
                         continue
-                    if is_ts_valid(news['date'], client_param['ts'], news['trials'], client_stats['ts_trial']):
+                    if is_ts_valid(news['date'], client_param['ts'], news['trials'], client_stats['ts_trial'], client_param['lts_status']):
                         client_stats['ts_trial'] = int(client_stats['ts_trial']) + 1
                         printl("sending file %s" % news['filepath'])
                         break
@@ -96,7 +96,7 @@ def get_next_news(client_param,client_stats):
                         continue
                 except:
                     news = None
-                    continAu
+                    continue
             else:
                 printl ("invalid line:\n%s" % line)
     return news
@@ -168,7 +168,7 @@ def save_bad_request(ip, port, data, dir):
         return False
     statinfo = os.stat(filename)
     initial_size=statinfo.st_size
-    if data in None:
+    if data is None:
         file.write("no data recived")
     else:
         file.write(data)
