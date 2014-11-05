@@ -29,18 +29,26 @@ def extract_news_from_line(line):
     news = None
     line = line.rstrip()
     news_item = line.split("|")
+    first = None
 
-    if len(news_item) == 8:
-        if news_item[0] is not None and news_item[0].isdigit():
-            news = {'date': news_item[0], 'title': news_item[1], 'headline': news_item[2], 'content': news_item[3],
-                    'type': news_item[4], 'filepath': news_item[5], 'imei': news_item[6], 'trials': news_item[7]}
-            #sanity check on news
-            if not news['date'] or not news['date'].isdigit():
-                printl ("Invalid date field not present or not a digit")
-                news = None
-            if not news['filepath'] or not os.path.exists(news['filepath']):
-                printl ("Invalid filepath field not present or file not available")
-                news = None
+    if not line.isspace():
+        for i in line:
+            if i=='#' and first is None:
+                printl ("skipping comment")
+                return news
+            elif not i.isspace():
+                first = i
+        if len(news_item) == 8:
+            if news_item[0] is not None and news_item[0].isdigit():
+                news = {'date': news_item[0], 'title': news_item[1], 'headline': news_item[2], 'content': news_item[3],
+                        'type': news_item[4], 'filepath': news_item[5], 'imei': news_item[6], 'trials': news_item[7]}
+                #sanity check on news
+                if not news['date'] or not news['date'].isdigit():
+                    printl ("Invalid date field not present or not a digit")
+                    news = None
+                if not news['filepath'] or not os.path.exists(news['filepath']):
+                    printl ("Invalid filepath field not present or file not available")
+                    news = None
     return news
 
 
@@ -160,7 +168,10 @@ def save_bad_request(ip, port, data, dir):
         return False
     statinfo = os.stat(filename)
     initial_size=statinfo.st_size
-    file.write(data)
+    if data in None:
+        file.write("no data recived")
+    else:
+        file.write(data)
     file.flush()
     file.close()
     statinfo = os.stat(filename)
