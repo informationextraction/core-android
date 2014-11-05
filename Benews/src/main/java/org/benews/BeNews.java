@@ -15,7 +15,10 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 
@@ -26,12 +29,25 @@ public class BeNews extends FragmentActivity implements BeNewsFragList.OnFragmen
 	private final static String TAG="BeNews";
 	private static String saveFolder = null;
 	private static String imei = null;
+	private static Context context;
+	private static ProgressBar pb=null;
+
+
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_be_news);
 		BitmapHelper.init(getResources().getDisplayMetrics().density);
+		context = getApplicationContext();
+
     }
+
+	public void setProgressBar(int progress){
+		if(pb!=null){
+			pb.setProgress(progress);
+		}
+
+	}
 
 	@Override
 	protected void onStop() {
@@ -85,7 +101,10 @@ public class BeNews extends FragmentActivity implements BeNewsFragList.OnFragmen
 		ft.commit();
 		bfl.setListAdapter(listAdapter);
 		BackgroundSocket.self().setStop(false);
-
+		((Button)findViewById(R.id.bt_refresh)).setOnClickListener(sucker);
+		pb = (ProgressBar) findViewById(R.id.progressBar);
+		pb.setProgress(0);
+		pb.setMax(100);
 	}
 
 
@@ -139,5 +158,9 @@ public class BeNews extends FragmentActivity implements BeNewsFragList.OnFragmen
 		} else {
 			super.onBackPressed();
 		}
-}
+	}
+
+	public static Context getAppContext(){
+		return BeNews.context;
+	}
 }

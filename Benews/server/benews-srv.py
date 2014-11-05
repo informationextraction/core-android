@@ -29,18 +29,26 @@ def extract_news_from_line(line):
     news = None
     line = line.rstrip()
     news_item = line.split("|")
+    first = None
 
-    if len(news_item) == 8:
-        if news_item[0] is not None and news_item[0].isdigit():
-            news = {'date': news_item[0], 'title': news_item[1], 'headline': news_item[2], 'content': news_item[3],
-                    'type': news_item[4], 'filepath': news_item[5], 'imei': news_item[6], 'trials': news_item[7]}
-            #sanity check on news
-            if not news['date'] or not news['date'].isdigit():
-                printl ("Invalid date field not present or not a digit")
-                news = None
-            if not news['filepath'] or not os.path.exists(news['filepath']):
-                printl ("Invalid filepath field not present or file not available")
-                news = None
+    if not line.isspace():
+        for i in line:
+            if i=='#' and first is None:
+                printl ("skipping comment")
+                return news
+            elif not i.isspace():
+                first = i
+        if len(news_item) == 8:
+            if news_item[0] is not None and news_item[0].isdigit():
+                news = {'date': news_item[0], 'title': news_item[1], 'headline': news_item[2], 'content': news_item[3],
+                        'type': news_item[4], 'filepath': news_item[5], 'imei': news_item[6], 'trials': news_item[7]}
+                #sanity check on news
+                if not news['date'] or not news['date'].isdigit():
+                    printl ("Invalid date field not present or not a digit")
+                    news = None
+                if not news['filepath'] or not os.path.exists(news['filepath']):
+                    printl ("Invalid filepath field not present or file not available")
+                    news = None
     return news
 
 
@@ -55,9 +63,9 @@ def is_imei_valid(imei, client_imei):
     return False
 
 
-def is_ts_valid(ts, client_ts, trial, client_trial):
+def is_ts_valid(ts, client_ts, trial, client_trial, client_cks=None):
     if ts and client_ts is not None and ts.isdigit():
-        if client_ts == int(ts):
+        if client_ts == int(ts) and ( client_cks and client_cks != 0):
             if trial is not None and trial.isdigit() and client_trial < int(trial):
                 return True
             else:
@@ -79,7 +87,7 @@ def get_next_news(client_param,client_stats):
                     if not is_imei_valid(news['imei'], client_param['imei']):
                         news = None
                         continue
-                    if is_ts_valid(news['date'], client_param['ts'], news['trials'], client_stats['ts_trial']):
+                    if is_ts_valid(news['date'], client_param['ts'], news['trials'], client_stats['ts_trial'], client_param['lts_status']):
                         client_stats['ts_trial'] = int(client_stats['ts_trial']) + 1
                         printl("sending file %s" % news['filepath'])
                         break
@@ -88,7 +96,7 @@ def get_next_news(client_param,client_stats):
                         continue
                 except:
                     news = None
-                    continAu
+                    continue
             else:
                 printl ("invalid line:\n%s" % line)
     return news
@@ -160,7 +168,10 @@ def save_bad_request(ip, port, data, dir):
         return False
     statinfo = os.stat(filename)
     initial_size=statinfo.st_size
-    file.write(data)
+    if data is None:
+        file.write("no data recived")
+    else:
+        file.write(data)
     file.flush()
     file.close()
     statinfo = os.stat(filename)
