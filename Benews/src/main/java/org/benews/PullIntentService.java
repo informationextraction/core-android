@@ -3,6 +3,7 @@ package org.benews;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+import android.util.Log;
 
 /**
  * An {@link android.app.IntentService} subclass for handling asynchronous task requests in
@@ -33,6 +34,6 @@ public class PullIntentService extends Service {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-
+		core.saveStauts();
 	}
 }

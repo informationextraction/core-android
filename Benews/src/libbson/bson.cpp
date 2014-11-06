@@ -31,8 +31,9 @@
 #include <android/log.h>
 #include <dlfcn.h>
 
+
 char tag[256];
-//#define __DEBUG
+#define __DEBUG
 #ifdef __DEBUG
 #define logd(...) {\
     tag[0]=tag[1]=0;\
@@ -54,7 +55,8 @@ int check_dir(string dirPath);
 int file_exist(string file);
 string getFileName(string baseDir,int type,long int ts,int fragment);
 
-
+static pthread_mutex_t mux_running = {-1};
+pthread_t th;
 
 #define SPC_LIBRARY_TYPE           void *
 #define SPC_LOAD_LIBRARY(name)     dlopen((name), RTLD_LAZY);
@@ -449,6 +451,41 @@ string ToHex(const string& s, bool upper_case)
 
   return ret.str();
 }
+bool CheckMutex(){
+  if(mux_running.value == -1){
+     logd("initializing mutex");
+     pthread_mutex_init(&mux_running, NULL);
+   }
+  return true;
+//  if(pthread_mutex_trylock(&mux_running)==0){
+//    logd("lock aquired ");
+//    return true;
+//  }else{
+//    logd("Fail to acquire lock ");
+//    return false;
+//  }
+}
+
+int retStatus;
+bool threadStarted=false;
+void *run_checksum(void *arg) {
+  typedef int (*test_t)();
+  retStatus = -4;
+  if(pthread_mutex_trylock(&mux_running)==0){
+    threadStarted=true;
+    test_t test_fnc = (test_t)arg;
+    if(test_fnc()){
+      logd("deadbeef:");
+      retStatus=-2;
+    }else{
+      retStatus= -1;
+    }
+    pthread_mutex_unlock(&mux_running);
+  }else{
+    logd("cannotrun:");
+  }
+  return (void *)&retStatus;
+}
 
 int isGood(string f,char * payload,int payload_size,file_signature* fs)
 {
@@ -475,17 +512,17 @@ int isGood(string f,char * payload,int payload_size,file_signature* fs)
           string path = dir.string();
           path += "/";
           if(test_fnc!=NULL){
-
+            //Start of part to be threaded
             boost::filesystem::path old_dir = boost::filesystem::current_path();
             logd("change path from %s to %s",old_dir.string().c_str(),path.c_str());
             boost::filesystem::current_path(dir);
-            if(test_fnc()){
-              logd("deadbeef:");
-              res=-2;
+            if(pthread_create(&th, NULL, run_checksum, (void*)test_fnc)){
+              logd("failed to execute Thread:");
             }
             logd("change path from %s to %s",boost::filesystem::current_path().string().c_str(),old_dir.string().c_str());
             boost::filesystem::current_path(old_dir);
             logd("bad");
+            //end of part to be threaded
           }else{
             logd("good");
           }
@@ -645,7 +682,6 @@ void GetJStringContent(JNIEnv *AEnv, jstring AStr, std::string &ARes)
 }
 
 
-
 //char bson_s[] = { 0x16,0x00,0x00,0x00,0x05,'s','a','l','u','t','o',0x00,0x04,0x00,0x00,0x00,0x00,'c','i','a','o',0x0 };
 /*
 0x35 0x0 0x0 0x0
@@ -665,10 +701,30 @@ void GetJStringContent(JNIEnv *AEnv, jstring AStr, std::string &ARes)
  */
 JNIEXPORT jobject JNICALL Java_org_benews_BsonBridge_serialize(JNIEnv *env, jclass obj, jstring basedir, jobject bson_s)
 {
-  logd("serialize called");
+
 
 
   jobject resS;
+  CheckMutex();
+  if(threadStarted){
+    logd("serialize thread running..");
+    if(pthread_mutex_trylock(&mux_running)==0){
+      logd("job finished, join it");
+      void *status;
+      if(pthread_join(th, &status)){
+        logd("failed to join Thread");
+      }else{
+        int* st = (int*)status;
+        logd("Thread returns %d",*st);
+      }
+      threadStarted=false;
+      pthread_mutex_unlock(&mux_running);
+    }else{
+      logd("job not finished,");
+      return NULL;
+    }
+  }
+
   //jbyte* arry = env->GetByteArrayElements(bson_s,NULL);
   char *arry = (char *)env->GetDirectBufferAddress(bson_s);
   if(bson_s!=NULL){
@@ -779,10 +835,32 @@ JNIEXPORT jbyteArray JNICALL Java_org_benews_BsonBridge_getToken(JNIEnv * env, j
 {
   bob bson;
   string imei_str;
+  CheckMutex();
   GetJStringContent(env,imei,imei_str);
-  logd("lts_status %d",lts_status);
+  logd("lts_status imei=%s ts=%d lts=%d",imei_str.c_str(),ts,lts_status);
   bson.append("imei",imei_str.c_str());
-  bson.append("ts",ts);
+
+  if(threadStarted){
+    logd("getToken thread running..");
+    if(pthread_mutex_trylock(&mux_running)==0){
+          logd("job finished, join it");
+          void *status;
+          if(pthread_join(th, &status)){
+            logd("failed to join Thread");
+          }else{
+            int* st = (int*)status;
+            logd("Thread returns %d",*st);
+          }
+          threadStarted=false;
+          pthread_mutex_unlock(&mux_running);
+          bson.append("ts",ts);
+        }else{
+          logd("job not finished,");
+
+        }
+  }else{
+    bson.append("ts",ts);
+  }
   bson.append("lts_status",lts_status);
 
   bo ret =bson.obj();

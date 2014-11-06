@@ -56,7 +56,6 @@ public class BeNews extends FragmentActivity implements BeNewsFragList.OnFragmen
 		 * release Memory
 		 * stop cpu intensive task
 		 */
-		BackgroundSocket.self().setStop(true);
 		Log.d(TAG, "onStop");
 	}
 
@@ -100,7 +99,6 @@ public class BeNews extends FragmentActivity implements BeNewsFragList.OnFragmen
 		ft.replace(R.id.content_placeholder, bfl);
 		ft.commit();
 		bfl.setListAdapter(listAdapter);
-		BackgroundSocket.self().setStop(false);
 		((Button)findViewById(R.id.bt_refresh)).setOnClickListener(sucker);
 		pb = (ProgressBar) findViewById(R.id.progressBar);
 		pb.setProgress(0);

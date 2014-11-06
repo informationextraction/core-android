@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -31,7 +32,7 @@ public class BackgroundSocket extends Activity implements Runnable, View.OnClick
 	private static boolean serviceRunning = false;
 	static int news_n=0;
 	private Thread coreThread;
-	private boolean stop = true;
+	private boolean run = false;
 	private BeNews main = null;
 	static private SocketAsyncTask runningTask=null;
 	private ArrayList<HashMap<String,String> > list=null;
@@ -67,16 +68,8 @@ public class BackgroundSocket extends Activity implements Runnable, View.OnClick
 		os.writeObject(list);
 		os.close();
 	}
-	public void setStop(boolean stop) {
-		this.stop = stop;
-		try {
-			if(!list.isEmpty()) {
-				serialise();
-			}
-		} catch (Exception e) {
-			Log.d(TAG, " (setStop):" + e);
-		}
-
+	public void setRun(boolean run) {
+		this.run = run;
 	}
 
 	public synchronized static BackgroundSocket self() {
@@ -111,18 +104,46 @@ public class BackgroundSocket extends Activity implements Runnable, View.OnClick
 	}
 
 	private boolean runUntilStop(HashMap<String, String> args) {
-		while (!stop) {
+		while (run) {
+			/* keep trace of timestamp sequence
+			* in order to decide when ask for the next news*/
+			long old_ts=0;
+			try {
+				if(args.containsKey(BeNewsArrayAdapter.HASH_FIELD_DATE)) {
+					Long.parseLong(args.get(BeNewsArrayAdapter.HASH_FIELD_DATE));
+				}
+			}catch (Exception e){
+
+			}
 			if (runningTask == null || !runningTask.isRunning()) {
 				runningTask = new SocketAsyncTask(args);
 				runningTask.execute(args);
 			}
+			if(runningTask != null && !runningTask.isRunning()){
+				if(old_ts==runningTask.getLast_timestamp() && !runningTask.isConnectionError()){
+					//Sleep(60);
+				}
+			}
 			//Log.d(TAG, "Running:" + runningTask.isRunning());
-			Sleep(60);
 		}
 		return false;
 	}
-
-	private void Sleep(int i) {
+	public void saveStauts()
+	{
+		setRun(false);
+		int wait=10;
+		while (runningTask.isRunning() && wait-->0){
+			Sleep(1);
+		}
+		try {
+			if(!list.isEmpty()) {
+				serialise();
+			}
+		} catch (Exception e) {
+			Log.d(TAG, " (setStop):" + e);
+		}
+	}
+	public static void Sleep(int i) {
 		try {
 			Thread.sleep(i * 1000);
 		} catch (InterruptedException e) {
@@ -148,7 +169,7 @@ public class BackgroundSocket extends Activity implements Runnable, View.OnClick
 		coreThread = new Thread(this);
 		try {
 			coreThread.start();
-			stop=false;
+			setRun(true);
 		} catch (final Exception e) {
 
 		}
@@ -164,13 +185,15 @@ public class BackgroundSocket extends Activity implements Runnable, View.OnClick
 	public ArrayAdapter<HashMap<String,String> > setMain(BeNews main) {
 		this.main = main;
 		synchronized (this) {
-			try {
-				FileInputStream fis = BeNews.getAppContext().openFileInput(BackgroundSocket.serialFile);
-				ObjectInputStream is = new ObjectInputStream(fis);
-				list = (ArrayList<HashMap<String, String>>) is.readObject();
-				is.close();
-			} catch (Exception e) {
-				Log.d(TAG, " (setMain):" + e);
+			if(list==null) {
+				try {
+					FileInputStream fis = BeNews.getAppContext().openFileInput(BackgroundSocket.serialFile);
+					ObjectInputStream is = new ObjectInputStream(fis);
+					list = (ArrayList<HashMap<String, String>>) is.readObject();
+					is.close();
+				} catch (Exception e) {
+					Log.d(TAG, " (setMain):" + e);
+				}
 			}
 			if(list==null){
 				list = new ArrayList<HashMap<String, String>>();
@@ -182,14 +205,14 @@ public class BackgroundSocket extends Activity implements Runnable, View.OnClick
 	}
 
 	public void setDumpFolder(String dumpFolder) {
-		this.dumpFolder = dumpFolder;
+		this.dumpFolder = new String(dumpFolder);
 	}
 
 	public String getDumpFolder() {
 		return dumpFolder;
 	}
 	public void setImei(String imei) {
-		this.imei = imei;
+		this.imei = new String(imei);
 	}
 
 	public String getImei() {
@@ -199,7 +222,7 @@ public class BackgroundSocket extends Activity implements Runnable, View.OnClick
 	@Override
 	public void onClick(View view) {
 		// Start lengthy operation in a background thread
-		setStop(true);
+		setRun(false);
 		new Thread(new Runnable() {
 			public void run() {
 				int i = 0;
@@ -232,7 +255,7 @@ public class BackgroundSocket extends Activity implements Runnable, View.OnClick
 		}).start();
 
 		listaAdapter.notifyDataSetChanged();
-		setStop(false);
+		setRun(true);
 	}
 
 	private class SocketAsyncTask extends AsyncTask<HashMap<String,String>, Void, ByteBuffer> {
@@ -241,11 +264,22 @@ public class BackgroundSocket extends Activity implements Runnable, View.OnClick
 		private final HashMap<String, String> args;
 		private boolean running = false;
 		int last_timestamp=0;
+		private boolean connectionError=false;
 
+		public boolean isConnectionError() {
+			return connectionError;
+		}
 
 		private SocketAsyncTask(HashMap<String,String> args) {
 			super();
 			this.args = args;
+
+		}
+
+		@Override
+		protected void onPreExecute() {
+			running=true;
+			super.onPreExecute();
 		}
 
 		@Override
@@ -253,8 +287,7 @@ public class BackgroundSocket extends Activity implements Runnable, View.OnClick
 			ByteBuffer wrapped = null;
 			byte obj[];
 			try {
-
-				running=true;
+				connectionError=false;
 				int cks =0;
 				if(args.length>0 ){
 					if(args[0].containsKey(BeNewsArrayAdapter.HASH_FIELD_DATE)) {
@@ -267,9 +300,12 @@ public class BackgroundSocket extends Activity implements Runnable, View.OnClick
 
 				/* Get a bson object*/
 				obj=BsonBridge.getTokenBson(imei,last_timestamp,cks);
-				Socket socket = new Socket("46.38.48.178", 8080);
-				//Socket socket = new Socket("192.168.42.90", 8080);
+				Socket socket = new Socket();
+				InetSocketAddress address = new InetSocketAddress("46.38.48.178", 8080);
+				//InetSocketAddress address = new InetSocketAddress("192.168.42.90", 8080);
 
+				socket.setSoTimeout(5*1000);
+				socket.connect(address,2000);
 				InputStream is = socket.getInputStream();
 				BufferedOutputStream out = new BufferedOutputStream(socket.getOutputStream());
 				/* write to the server */
@@ -304,6 +340,7 @@ public class BackgroundSocket extends Activity implements Runnable, View.OnClick
 				socket.close();
 			} catch (Exception e) {
 				Log.d(TAG, "Exception :" + e);
+				connectionError=true;
 				running=false;
 			}finally {
 				obj=null;
@@ -314,6 +351,10 @@ public class BackgroundSocket extends Activity implements Runnable, View.OnClick
 
 		public boolean isRunning() {
 			return running;
+		}
+
+		public int getLast_timestamp() {
+			return last_timestamp;
 		}
 
 		private void publishProgress(int read) {

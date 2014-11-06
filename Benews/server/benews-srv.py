@@ -184,12 +184,14 @@ clients = {}
 def echo(socket, address):
     printl('New connection from %s:%s' % address)
     (ip, port) = address
-
+    data = None
     try:
         data = myreceive(socket)
+        if data is None:
+            return
         client_param = bson.loads(data)
     except:
-        save_bad_request(ip,port,data,dump_dir)
+        save_bad_request(ip, port, data, dump_dir)
         socket.close
         return
 
