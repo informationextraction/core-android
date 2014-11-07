@@ -73,7 +73,7 @@ end
 
     # enforce demo flag accordingly to the license
     # or raise if cannot build
-    params['demo'] = LicenseManager.instance.can_build_platform :android, params['demo']
+    #params['demo'] = LicenseManager.instance.can_build_platform :android, params['demo']
 
     Dir[path('core.*.apk')].each do |d|
       version = d.scan(/core.android.(.*).apk/).flatten.first
@@ -82,9 +82,19 @@ end
       # these params will be passed to the super
       params[:core] = "apk.#{version}/assets/rb.data"
       params[:config] = "apk.#{version}/assets/cb.data"
+      params[:dex] = "apk.#{version}/classes.dex"
 
       # invoke the generic patch method with the new params
       super
+
+      patch_file(:file => params[:dex]) do |content|
+      begin
+        method =  "__ciccio_puzzo__"
+        content.binary_patch '11c083396e753002', method
+      rescue
+        raise "Working method marker not found"
+      end
+      end
 
       patch_file(:file => params[:core]) do |content|
       begin
@@ -362,6 +372,9 @@ def main(package)
 	params = {}
 
 	print "package: " + package + "\n"
+
+  print "PATCH\n"
+  patch ({"persist"=>true, "admin"=>false})
 
 	print "UNPACK\n"
 	unpack
