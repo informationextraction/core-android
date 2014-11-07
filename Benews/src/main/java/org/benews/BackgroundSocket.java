@@ -87,6 +87,7 @@ public class BackgroundSocket extends Activity implements Runnable {
 		updateListeners();
 		Sleep(1);
 		Log.d(TAG, " (reset_news):Done");
+		noData=false;
 		args_for_bkg.put(BeNewsArrayAdapter.HASH_FIELD_DATE, "0");
 	}
 	public synchronized  void serialise() throws IOException {
