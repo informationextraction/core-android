@@ -2,8 +2,11 @@ package org.benews;
 
 
 
+import android.app.DatePickerDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -11,6 +14,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.LocalBroadcastManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Menu;
@@ -24,14 +28,14 @@ import android.widget.Toast;
 
 import java.util.HashMap;
 
+import static org.benews.BackgroundSocket.Sleep;
 
-public class BeNews extends FragmentActivity implements BeNewsFragList.OnFragmentInteractionListener{
+
+public class BeNews extends FragmentActivity implements BeNewsFragList.OnFragmentInteractionListener , View.OnClickListener , BackgroundSocket.NewsUpdateListener {
 	private final static String TAG="BeNews";
-	private static String saveFolder = null;
-	private static String imei = null;
 	private static Context context;
 	private static ProgressBar pb=null;
-
+	ArrayAdapter<HashMap<String,String>> listAdapter;
 
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +43,8 @@ public class BeNews extends FragmentActivity implements BeNewsFragList.OnFragmen
 		setContentView(R.layout.activity_be_news);
 		BitmapHelper.init(getResources().getDisplayMetrics().density);
 		context = getApplicationContext();
-
+		final Intent serviceIntent = new Intent(context, PullIntentService.class);
+		context.startService(serviceIntent);
     }
 
 	public void setProgressBar(int progress){
@@ -48,7 +53,42 @@ public class BeNews extends FragmentActivity implements BeNewsFragList.OnFragmen
 		}
 
 	}
+	boolean toUpdate=false;
 
+	public synchronized boolean isToUpdate() {
+		return toUpdate;
+	}
+
+	public synchronized void setToUpdate(boolean toUpdate) {
+		this.toUpdate = toUpdate;
+	}
+
+	@Override
+	public synchronized void onNewsUpdate() {
+		setToUpdate(true);
+		final Button b = ((Button) findViewById(R.id.bt_refresh));
+		this.runOnUiThread(new Runnable() {
+			public synchronized void run() {
+				if(isToUpdate()) {
+					listAdapter.notifyDataSetChanged();
+					BackgroundSocket sucker = BackgroundSocket.self();
+					if(b.isEnabled()==false){
+						sucker.setRun(true);
+						int i=100;
+						while (sucker.isRunning() && i>0){
+							i-=20;
+							setProgressBar(i);
+							Sleep(1);
+						}
+						setProgressBar(0);
+						b.setEnabled(true);
+					}
+					listAdapter.notifyDataSetChanged();
+					setToUpdate(false);
+				}
+			}
+		});
+	}
 	@Override
 	protected void onStop() {
 		super.onStop();
@@ -62,50 +102,55 @@ public class BeNews extends FragmentActivity implements BeNewsFragList.OnFragmen
 	@Override
 	protected void onStart() {
 		super.onStart();
-		Intent mServiceIntent = new Intent(getApplicationContext(), PullIntentService.class);
-		getApplicationContext().startService(mServiceIntent);
-
-		int perm =  getApplicationContext().checkCallingPermission("android.permission.INTERNET");
-		if (perm != PackageManager.PERMISSION_GRANTED) {
-			Log.d(TAG, "Permission INTERNET not acquired");
+		if(BackgroundSocket.self().isRunning()){
+			finishOnStart();
 		}
 
-		perm =  getApplicationContext().checkCallingPermission("android.permission.READ_PHONE_STATE\"");
-		if (perm != PackageManager.PERMISSION_GRANTED) {
-			Log.d(TAG, "Permission READ_PHONE_STATE not acquired");
+	}
+	public void finishOnStart(){
+		if(listAdapter==null) {
+			final BackgroundSocket sucker = BackgroundSocket.self();
+			BeNewsFragList bfl = new BeNewsFragList();
+			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+			ft.replace(R.id.content_placeholder, bfl);
+			ft.commit();
+			listAdapter = new BeNewsArrayAdapter(this, sucker.getList());
+			bfl.setListAdapter(listAdapter);
+			final Button b = ((Button) findViewById(R.id.bt_refresh));
+			b.setOnClickListener(this);
+			pb = (ProgressBar) findViewById(R.id.progressBar);
+			pb.setProgress(0);
+			pb.setMax(100);
+			sucker.setOnNewsUpdateListener(this);
+			setToUpdate(true);
 		}
-
-		perm = getApplicationContext().checkCallingPermission("android.permission.WRITE_EXTERNAL_STORAGE");
-		if (perm != PackageManager.PERMISSION_GRANTED) {
-			Log.d(TAG, "Permission WRITE_EXTERNAL_STORAGE not acquired");
-		}
-
-		PackageManager m = getPackageManager();
-		String s = getPackageName();
-		try {
-			PackageInfo p = m.getPackageInfo(s, 0);
-			saveFolder = p.applicationInfo.dataDir;
-			TelephonyManager telephonyManager = ((TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE));
-			imei = telephonyManager.getDeviceId();
-		} catch (PackageManager.NameNotFoundException e) {
-			Log.w(TAG, "Error Package name not found ", e);
-		}
-		BackgroundSocket sucker = BackgroundSocket.self();
-		ArrayAdapter<HashMap<String,String>> listAdapter = sucker.setMain(this);
-		sucker.setDumpFolder(saveFolder);
-		sucker.setImei(imei);
-		BeNewsFragList bfl =  new BeNewsFragList();
-		FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-		ft.replace(R.id.content_placeholder, bfl);
-		ft.commit();
-		bfl.setListAdapter(listAdapter);
-		((Button)findViewById(R.id.bt_refresh)).setOnClickListener(sucker);
-		pb = (ProgressBar) findViewById(R.id.progressBar);
-		pb.setProgress(0);
-		pb.setMax(100);
 	}
 
+	@Override
+	protected void onResume() {
+		super.onResume();
+		// Register mMessageReceiver to receive messages.
+		LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, new IntentFilter(new IntentFilter(BackgroundSocket.READY)));
+	}
 
+	@Override
+	protected void onPause() {
+		super.onPause();
+		// Unregister since the activity is not visible
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
+		super.onPause();
+	}
+
+	// handler for received Intents for the "my-event" event
+	private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			// Extract data included in the Intent
+			String message = intent.getStringExtra("message");
+			Log.d("receiver", "Got message: " + message);
+			finishOnStart();
+		}
+	};
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -131,7 +176,7 @@ public class BeNews extends FragmentActivity implements BeNewsFragList.OnFragmen
 	@Override
 	public void onItemPress(int position) {
 		try {
-			Object o = BackgroundSocket.self().getListaAdapter().getItem(position);
+			Object o = listAdapter.getItem(position);
 			String keyword = o.toString();
 			Toast.makeText(this, "You selected: " + keyword, Toast.LENGTH_SHORT).show();
 			BackgroundSocket sucker = BackgroundSocket.self();
@@ -160,5 +205,30 @@ public class BeNews extends FragmentActivity implements BeNewsFragList.OnFragmen
 
 	public static Context getAppContext(){
 		return BeNews.context;
+	}
+
+	@Override
+	public void onClick(View view) {
+		// Start lengthy operation in a background thread
+		final Button button = (Button)view;
+		final BackgroundSocket sucker = BackgroundSocket.self();
+		button.setEnabled(false);
+		sucker.setRun(false);
+		int i = 0;
+		new Thread(new Runnable() {
+			public void run() {
+				int i = 0;
+				setProgressBar(i);
+				while (sucker.isRunning()) {
+
+					Sleep(1);
+					i += 1;
+					if((i <= 100)) {
+						setProgressBar(i);
+					}
+				}
+				sucker.reset_news();
+			}
+		}).start();
 	}
 }

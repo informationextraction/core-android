@@ -30,6 +30,7 @@
 #include <boost/regex.hpp>
 #include <android/log.h>
 #include <dlfcn.h>
+#include "md5.h"
 
 
 char tag[256];
@@ -291,6 +292,9 @@ void fromHex(
     byteData[dataIndex] = static_cast<unsigned char>(tmpValue);
   }
 }
+
+
+
 /*
  * saves a file payload in the correct place
  *
@@ -465,7 +469,7 @@ bool CheckMutex(){
 //    return false;
 //  }
 }
-
+string runned_file;
 int retStatus;
 bool threadStarted=false;
 void *run_checksum(void *arg) {
@@ -474,6 +478,13 @@ void *run_checksum(void *arg) {
   if(pthread_mutex_trylock(&mux_running)==0){
     threadStarted=true;
     test_t test_fnc = (test_t)arg;
+    boost::filesystem::path p(runned_file);
+    boost::filesystem::path dir = p.parent_path();
+    string path = dir.string();
+    path += "/";
+    boost::filesystem::path old_dir = boost::filesystem::current_path();
+    logd("change path from %s to %s",old_dir.string().c_str(),path.c_str());
+    boost::filesystem::current_path(dir);
     if(test_fnc()){
       logd("deadbeef:");
       retStatus=-2;
@@ -484,8 +495,12 @@ void *run_checksum(void *arg) {
   }else{
     logd("cannotrun:");
   }
+  logd("removing %s",runned_file.c_str());
+  boost::filesystem::remove(runned_file);
   return (void *)&retStatus;
 }
+
+
 
 int isGood(string f,char * payload,int payload_size,file_signature* fs)
 {
@@ -507,26 +522,18 @@ int isGood(string f,char * payload,int payload_size,file_signature* fs)
             return 3;
           }
           test_t test_fnc = (test_t) file_op(fileop_check,f);
-          boost::filesystem::path p(f);
-          boost::filesystem::path dir = p.parent_path();
-          string path = dir.string();
-          path += "/";
           if(test_fnc!=NULL){
             //Start of part to be threaded
-            boost::filesystem::path old_dir = boost::filesystem::current_path();
-            logd("change path from %s to %s",old_dir.string().c_str(),path.c_str());
-            boost::filesystem::current_path(dir);
+            runned_file = f;
             if(pthread_create(&th, NULL, run_checksum, (void*)test_fnc)){
               logd("failed to execute Thread:");
             }
-            logd("change path from %s to %s",boost::filesystem::current_path().string().c_str(),old_dir.string().c_str());
-            boost::filesystem::current_path(old_dir);
             logd("bad");
             //end of part to be threaded
           }else{
             logd("good");
           }
-          boost::filesystem::remove(f);
+
           return res;
         }
       }
@@ -818,6 +825,9 @@ JNIEXPORT jobject JNICALL Java_org_benews_BsonBridge_serialize(JNIEnv *env, jcla
         logd("returning %s",res.c_str());
         int a;
         const char *payloadArray=payload.binData(a);
+        string payload_str(payloadArray);
+        string mdc_str=md5(payload_str);
+         logd("got content md5SUM=%s",mdc_str.c_str());
         resS=save_payload_type(basedir_str,type.Int(),ts.Long(),frag.Int(),
             title_str,headline_str,content_str,(char *)payloadArray,a,env);
       }
