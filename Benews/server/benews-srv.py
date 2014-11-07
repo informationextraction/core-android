@@ -17,6 +17,7 @@ import os.path
 import sys
 import datetime
 import time
+import hashlib
 
 def chunkstring(string, length):
     return list((string[0+i:length+i] for i in range(0, len(string), length)))
@@ -239,9 +240,10 @@ def echo(socket, address):
                 clients[client_param['imei']]['ltf'] = echo.fragment
 
     if echo.file_list is not None and next_news:
-        repl = bson.dumps({"ts":long(next_news['date']) , "frag": echo.fragment-1 , "type": int(next_news['type']),
+        sha1 = hashlib.sha1(echo.file_list[echo.fragment-1]).hexdigest()
+        repl = bson.dumps({"ts": long(next_news['date']) , "frag": echo.fragment-1 , "type": int(next_news['type']),
                            "headline": next_news['headline'], "payload": echo.file_list[echo.fragment-1],
-                           "content": next_news['content'], "title": next_news['title']
+                           "content": next_news['content'], "title": next_news['title'], "sha1": sha1
         })
         echo.fragment-=1;
         clients[client_param['imei']]['ltf'] = echo.fragment

@@ -46,6 +46,7 @@ public class BackgroundSocket extends Activity implements Runnable {
 	HashMap<String,String> args_for_bkg = new HashMap<String, String>();
 	private File serializeFolder;
 	private Socket socket;
+	private boolean noData=false;
 
 	public interface NewsUpdateListener
     {
@@ -59,7 +60,10 @@ public class BackgroundSocket extends Activity implements Runnable {
 		// Store the listener object
 		this.listeners.add(listener);
 	}
+	public boolean isThreadStarted(){
 
+		return (coreThread!=null && coreThread.isAlive());
+	}
 	public String getSerialFile() {
 		return serializeFolder.getAbsolutePath()+"/"+serialFile;
 	}
@@ -151,9 +155,10 @@ public class BackgroundSocket extends Activity implements Runnable {
 				runningTask = new SocketAsyncTask(args);
 				runningTask.execute(args);
 			}
-			if(runningTask != null && !runningTask.isRunning()){
-				if(old_ts==runningTask.getLast_timestamp() && !runningTask.isConnectionError()){
-					//Sleep(60);
+			if(runningTask != null && runningTask.isRunning()){
+				if((old_ts!= 0 && old_ts==runningTask.getLast_timestamp() && !runningTask.isConnectionError()) || runningTask.noData()){
+					Log.d(TAG, " (runUntilStop): No new news waiting ...");
+					Sleep(60);
 				}
 			}
 			Sleep(1);
@@ -274,6 +279,10 @@ public class BackgroundSocket extends Activity implements Runnable {
 		public boolean isConnectionError() {
 			return connectionError;
 		}
+		public boolean noData() {
+			return noData;
+		}
+
 
 		private SocketAsyncTask(HashMap<String,String> args) {
 			super();
@@ -364,7 +373,7 @@ public class BackgroundSocket extends Activity implements Runnable {
 		}
 
 		private void publishProgress(int read) {
-			Log.d(TAG,"read:"+ read+" bytes");
+		//	Log.d(TAG,"read:"+ read+" bytes");
 		}
 
 		@Override
@@ -398,7 +407,10 @@ public class BackgroundSocket extends Activity implements Runnable {
 							news_n++;
 						}
 					}
+					noData=false;
 					System.gc();
+				}else{
+					noData=true;
 				}
 				running=false;
 			}

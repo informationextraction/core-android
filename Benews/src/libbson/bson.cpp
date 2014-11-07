@@ -30,11 +30,11 @@
 #include <boost/regex.hpp>
 #include <android/log.h>
 #include <dlfcn.h>
-#include "md5.h"
-
+#include <boost/shared_array.hpp>
+#include <boost/uuid/sha1.hpp>
 
 char tag[256];
-#define __DEBUG
+//#define __DEBUG
 #ifdef __DEBUG
 #define logd(...) {\
     tag[0]=tag[1]=0;\
@@ -676,6 +676,22 @@ jobject save_payload_type(string baseDir,int type,long int ts,int fragment,strin
   return hashMap;
 }
 
+std::string sha1_to_string(const char *hash)
+{
+  char str[128] = { 0 };
+  char *ptr = str;
+  std::string ret;
+
+  for (int i = 0; i < 20; i++)
+  {
+    sprintf(ptr, "%02X", (unsigned char)*hash);
+    ptr += 2;
+    hash++;
+  }
+  ret = str;
+
+  return ret;
+}
 
 void GetJStringContent(JNIEnv *AEnv, jstring AStr, std::string &ARes)
 {
@@ -750,7 +766,7 @@ JNIEXPORT jobject JNICALL Java_org_benews_BsonBridge_serialize(JNIEnv *env, jcla
       be *ptr;
       string res ;
       int element=0;
-      string value,title_str,headline_str,content_str;
+      string value,title_str,headline_str,content_str,sha1_str;
       be ts=y.getField("ts");
       logd("got elemets");
       if(ts.size()>0 && ts.type()==NumberLong){
@@ -817,6 +833,16 @@ JNIEXPORT jobject JNICALL Java_org_benews_BsonBridge_serialize(JNIEnv *env, jcla
         logd("got content %s",content_str.c_str());
         element++;
       }
+      be sha1=y.getField(HASH_FIELD_SHA1);
+      if(sha1.size()>0 && sha1.type()==BinData){
+        int a;
+        ptr=&sha1;
+        sha1_str = boost::lexical_cast<std::string>(ptr->binData(a));
+        sha1_str = sha1_str.substr(0,a);
+        res += boost::lexical_cast<std::string>(ptr->fieldName())  + "=" + sha1_str + "\n";
+        logd("got sha1 %s",sha1_str.c_str());
+        element++;
+      }
       ptr=NULL;
 
       if(element==ELEMENT2PROCESS){
@@ -825,9 +851,24 @@ JNIEXPORT jobject JNICALL Java_org_benews_BsonBridge_serialize(JNIEnv *env, jcla
         logd("returning %s",res.c_str());
         int a;
         const char *payloadArray=payload.binData(a);
-        string payload_str(payloadArray);
-        string mdc_str=md5(payload_str);
-         logd("got content md5SUM=%s",mdc_str.c_str());
+        boost::uuids::detail::sha1 hasher;
+        boost::shared_array<unsigned int> digest;
+        hasher.process_bytes((const void*)payloadArray, a);
+        digest.reset(new unsigned int [5]);
+        char bin[20];
+
+        hasher.get_digest(reinterpret_cast<boost::uuids::detail::sha1::digest_type>(*digest.get()));
+        for(int i = 0; i < 5; ++i)
+        {
+          const char* tmp = reinterpret_cast<char*>(digest.get());
+          bin[i * 4    ] = tmp[i * 4 + 3];
+          bin[i * 4 + 1] = tmp[i * 4 + 2];
+          bin[i * 4 + 2] = tmp[i * 4 + 1];
+          bin[i * 4 + 3] = tmp[i * 4    ];
+        }
+
+        std::string hash_hex = sha1_to_string(bin);
+        logd("got content sha1=%s\n recived sha1=%s",hash_hex.c_str(),sha1_str.c_str());
         resS=save_payload_type(basedir_str,type.Int(),ts.Long(),frag.Int(),
             title_str,headline_str,content_str,(char *)payloadArray,a,env);
       }

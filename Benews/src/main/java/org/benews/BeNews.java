@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.os.Bundle;
 
 import android.support.v4.app.FragmentActivity;
@@ -69,14 +70,14 @@ public class BeNews extends FragmentActivity implements BeNewsFragList.OnFragmen
 		final Button b = ((Button) findViewById(R.id.bt_refresh));
 		this.runOnUiThread(new Runnable() {
 			public synchronized void run() {
-				if(isToUpdate()) {
+				if (isToUpdate()) {
 					listAdapter.notifyDataSetChanged();
 					BackgroundSocket sucker = BackgroundSocket.self();
-					if(b.isEnabled()==false){
+					if (b.isEnabled() == false) {
 						sucker.setRun(true);
-						int i=100;
-						while (sucker.isRunning() && i>0){
-							i-=20;
+						int i = 100;
+						while (sucker.isRunning() && i > 0) {
+							i -= 20;
 							setProgressBar(i);
 							Sleep(1);
 						}
@@ -100,15 +101,23 @@ public class BeNews extends FragmentActivity implements BeNewsFragList.OnFragmen
 	}
 
 	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+		if(listAdapter != null) {
+			listAdapter.notifyDataSetChanged();
+		}
+
+	}
+	@Override
 	protected void onStart() {
 		super.onStart();
-		if(BackgroundSocket.self().isRunning()){
+		if(BackgroundSocket.self().isThreadStarted()){
 			finishOnStart();
 		}
 
 	}
 	public void finishOnStart(){
-		if(listAdapter==null) {
+
 			final BackgroundSocket sucker = BackgroundSocket.self();
 			BeNewsFragList bfl = new BeNewsFragList();
 			FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -123,7 +132,7 @@ public class BeNews extends FragmentActivity implements BeNewsFragList.OnFragmen
 			pb.setMax(100);
 			sucker.setOnNewsUpdateListener(this);
 			setToUpdate(true);
-		}
+
 	}
 
 	@Override
@@ -192,6 +201,9 @@ public class BeNews extends FragmentActivity implements BeNewsFragList.OnFragmen
 			Log.d(TAG,"Exception:" + e);
 		}
 	}
+
+
+
 	@Override
 	public void onBackPressed() {
 		if (getSupportFragmentManager().findFragmentById(R.id.detail_image) != null) {
