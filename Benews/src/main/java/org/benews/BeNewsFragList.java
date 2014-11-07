@@ -63,8 +63,8 @@ public class BeNewsFragList extends Fragment implements AbsListView.OnItemClickL
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_item_list, container, false);
 	    mListView = (AbsListView) view.findViewById(android.R.id.list);
-	    if( mListView.getAdapter() != mAdapter ){
-		    if( mAdapter != null ){
+	    if( mAdapter != null ){
+		    if( mListView.getAdapter() != mAdapter ){
 			    ((AdapterView<ListAdapter>) mListView).setAdapter(this.mAdapter);
 			    mListView.setOnItemClickListener(this);
 		    }

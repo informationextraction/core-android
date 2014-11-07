@@ -21,7 +21,7 @@ LOCAL_MODULE := libbson
 CODE_PATH := ../src/libbson
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(CODE_PATH)/include
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/$(CODE_PATH)/include/bsonl/
-LOCAL_SRC_FILES := $(CODE_PATH)/bson.cpp
+LOCAL_SRC_FILES := $(CODE_PATH)/md5.cpp $(CODE_PATH)/bson.cpp
 BUILD_PRODUCTS_DIR := $(shell pwd)/../libs/$(TARGET_ARCH_ABI)
 
 

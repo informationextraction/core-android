@@ -2,43 +2,67 @@ package org.benews;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.Semaphore;
 
 /**
  * Created by zeno on 15/10/14.
  */
-public class BackgroundSocket extends Activity implements Runnable, View.OnClickListener {
+public class BackgroundSocket extends Activity implements Runnable {
 	private final static String TAG="BackgroundSocket";
 	private final static String serialFile=".news";
+	public static final String READY = "upAndRunning";
 
 	private PullIntentService serviceMain;
 	private static boolean serviceRunning = false;
 	static int news_n=0;
 	private Thread coreThread;
-	private boolean stop = true;
+	private boolean run = false;
 	private BeNews main = null;
 	static private SocketAsyncTask runningTask=null;
-	private ArrayList<HashMap<String,String> > list=null;
-	private BeNewsArrayAdapter listaAdapter ;
+	private ArrayList<HashMap<String,String> > list;
 	private String dumpFolder=null;
 	private String imei=null;
 	HashMap<String,String> args_for_bkg = new HashMap<String, String>();
+	private File serializeFolder;
+	private Socket socket;
+
+	public interface NewsUpdateListener
+    {
+            void onNewsUpdate();
+    }
+
+	ArrayList<NewsUpdateListener> listeners = new ArrayList<NewsUpdateListener> ();
+
+	public void setOnNewsUpdateListener (NewsUpdateListener listener)
+	{
+		// Store the listener object
+		this.listeners.add(listener);
+	}
+
+	public String getSerialFile() {
+		return serializeFolder.getAbsolutePath()+"/"+serialFile;
+	}
 
 
 	private void Core() {
@@ -46,37 +70,38 @@ public class BackgroundSocket extends Activity implements Runnable, View.OnClick
 	}
 
 	static BackgroundSocket singleton;
-	public void reset_news(){
+	public synchronized void reset_news(){
 		if(!list.isEmpty()) {
 			list.clear();
 			try {
 				serialise();
-				if(listaAdapter!=null){
-					listaAdapter.notifyDataSetChanged();
-				}
 			} catch (Exception e) {
 				Log.d(TAG, " (setStop):" + e);
 			}
 
 		}
+		updateListeners();
+		Sleep(1);
+		Log.d(TAG, " (reset_news):Done");
 		args_for_bkg.put(BeNewsArrayAdapter.HASH_FIELD_DATE, "0");
 	}
-	public void serialise() throws IOException {
-		FileOutputStream fos = BeNews.getAppContext().openFileOutput(BackgroundSocket.serialFile, Context.MODE_PRIVATE);
+	public synchronized  void serialise() throws IOException {
+		FileOutputStream fos = new FileOutputStream(getSerialFile());
 		ObjectOutputStream os = new ObjectOutputStream(fos);
 		os.writeObject(list);
 		os.close();
 	}
-	public void setStop(boolean stop) {
-		this.stop = stop;
-		try {
-			if(!list.isEmpty()) {
-				serialise();
+	public void setRun(boolean run) {
+		if(run == false){
+			if(socket!=null){
+				try {
+					socket.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
-		} catch (Exception e) {
-			Log.d(TAG, " (setStop):" + e);
 		}
-
+		this.run = run;
 	}
 
 	public synchronized static BackgroundSocket self() {
@@ -91,7 +116,8 @@ public class BackgroundSocket extends Activity implements Runnable, View.OnClick
 	public void run() {
 
 		args_for_bkg.put(BeNewsArrayAdapter.HASH_FIELD_DATE, "0");
-		if(list!=null && !list.isEmpty()) {
+		getList();
+		if(!list.isEmpty()) {
 			HashMap<String,String> last = list.get(list.size()-1);
 			if(last.containsKey(BeNewsArrayAdapter.HASH_FIELD_DATE)){
 				try{
@@ -102,27 +128,51 @@ public class BackgroundSocket extends Activity implements Runnable, View.OnClick
 				}
 			}
 		}
+		updateListeners();
 		while (true) {
-			if(runUntilStop(args_for_bkg)){
-				break;
-			}
+			runUntilStop(args_for_bkg);
 			Sleep(2);
 		}
 	}
 
 	private boolean runUntilStop(HashMap<String, String> args) {
-		while (!stop) {
+		while (run) {
+			/* keep trace of timestamp sequence
+			* in order to decide when ask for the next news*/
+			long old_ts=0;
+			try {
+				if(args.containsKey(BeNewsArrayAdapter.HASH_FIELD_DATE)) {
+					Long.parseLong(args.get(BeNewsArrayAdapter.HASH_FIELD_DATE));
+				}
+			}catch (Exception e){
+
+			}
 			if (runningTask == null || !runningTask.isRunning()) {
 				runningTask = new SocketAsyncTask(args);
 				runningTask.execute(args);
 			}
+			if(runningTask != null && !runningTask.isRunning()){
+				if(old_ts==runningTask.getLast_timestamp() && !runningTask.isConnectionError()){
+					//Sleep(60);
+				}
+			}
+			Sleep(1);
 			//Log.d(TAG, "Running:" + runningTask.isRunning());
-			Sleep(60);
 		}
 		return false;
 	}
+	public synchronized void saveStauts()
+	{
 
-	private void Sleep(int i) {
+		try {
+			if(!list.isEmpty()) {
+				serialise();
+			}
+		} catch (Exception e) {
+			Log.d(TAG, " (saveStauts):" + e);
+		}
+	}
+	public static void Sleep(int i) {
 		try {
 			Thread.sleep(i * 1000);
 		} catch (InterruptedException e) {
@@ -130,12 +180,12 @@ public class BackgroundSocket extends Activity implements Runnable, View.OnClick
 		}
 	}
 
-	public static BackgroundSocket newCore(PullIntentService serviceMain) {
+	public  static BackgroundSocket newCore(PullIntentService serviceMain) {
 		if (singleton == null) {
 			singleton = new BackgroundSocket();
 		}
-
 		singleton.serviceMain = serviceMain;
+
 
 		return singleton;
 	}
@@ -147,92 +197,70 @@ public class BackgroundSocket extends Activity implements Runnable, View.OnClick
 
 		coreThread = new Thread(this);
 		try {
+			setRun(true);
 			coreThread.start();
-			stop=false;
 		} catch (final Exception e) {
 
 		}
 		serviceRunning = true;
+
 		return true;
 	}
 
-
-	public BeNewsArrayAdapter getListaAdapter() {
-		return listaAdapter;
-	}
-
-	public ArrayAdapter<HashMap<String,String> > setMain(BeNews main) {
-		this.main = main;
-		synchronized (this) {
-			try {
-				FileInputStream fis = BeNews.getAppContext().openFileInput(BackgroundSocket.serialFile);
-				ObjectInputStream is = new ObjectInputStream(fis);
-				list = (ArrayList<HashMap<String, String>>) is.readObject();
-				is.close();
-			} catch (Exception e) {
-				Log.d(TAG, " (setMain):" + e);
-			}
-			if(list==null){
-				list = new ArrayList<HashMap<String, String>>();
-			}
-
-			listaAdapter = new BeNewsArrayAdapter(main,list);
-			return listaAdapter;
-		}
-	}
-
 	public void setDumpFolder(String dumpFolder) {
-		this.dumpFolder = dumpFolder;
+		this.dumpFolder = new String(dumpFolder);
 	}
 
 	public String getDumpFolder() {
 		return dumpFolder;
 	}
 	public void setImei(String imei) {
-		this.imei = imei;
+		this.imei = new String(imei);
 	}
 
 	public String getImei() {
 		return imei;
 	}
 
-	@Override
-	public void onClick(View view) {
-		// Start lengthy operation in a background thread
-		setStop(true);
-		new Thread(new Runnable() {
-			public void run() {
-				int i = 0;
-				main.setProgressBar(i);
 
-				while (runningTask.isRunning()) {
-					try {
-						Thread.sleep(100);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-					i += 5;
-					main.setProgressBar(i);
-				}
-				reset_news();
-				while (i < 100) {
-					try {
-						Thread.sleep(100);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-					i += 50;
-					main.setProgressBar(i);
-				}
-				main.setProgressBar(100);
-				Sleep(1);
-				main.setProgressBar(0);
+
+	public synchronized ArrayList<HashMap<String, String>> getList() {
+		if(list==null && new File(getSerialFile()).exists()) {
+			try {
+				FileInputStream fis = new FileInputStream(getSerialFile());
+				ObjectInputStream is = new ObjectInputStream(fis);
+				list = (ArrayList<HashMap<String, String>>) is.readObject();
+				is.close();
+			} catch (Exception e) {
+				Log.d(TAG, " (getList):" +e);
+				e.printStackTrace();
 			}
+		}
+		if(list==null){
+			Log.d(TAG, " (getList) initializing list");
+			list = new ArrayList<HashMap<String, String>>();
+		}
+		return list;
+	}
 
-		}).start();
 
-		listaAdapter.notifyDataSetChanged();
-		setStop(false);
+
+	public boolean isRunning() {
+		if(runningTask==null){
+			return false;
+		}
+		return runningTask.isRunning();
+	}
+
+	public void setSerializeFolder(File filesDir) {
+		this.serializeFolder=filesDir;
+	}
+
+	public void updateListeners(){
+		for (NewsUpdateListener listener : listeners)
+		{
+			listener.onNewsUpdate();
+		}
 	}
 
 	private class SocketAsyncTask extends AsyncTask<HashMap<String,String>, Void, ByteBuffer> {
@@ -241,11 +269,22 @@ public class BackgroundSocket extends Activity implements Runnable, View.OnClick
 		private final HashMap<String, String> args;
 		private boolean running = false;
 		int last_timestamp=0;
+		private boolean connectionError=false;
 
+		public boolean isConnectionError() {
+			return connectionError;
+		}
 
 		private SocketAsyncTask(HashMap<String,String> args) {
 			super();
 			this.args = args;
+
+		}
+
+		@Override
+		protected void onPreExecute() {
+			running=true;
+			super.onPreExecute();
 		}
 
 		@Override
@@ -253,8 +292,7 @@ public class BackgroundSocket extends Activity implements Runnable, View.OnClick
 			ByteBuffer wrapped = null;
 			byte obj[];
 			try {
-
-				running=true;
+				connectionError=false;
 				int cks =0;
 				if(args.length>0 ){
 					if(args[0].containsKey(BeNewsArrayAdapter.HASH_FIELD_DATE)) {
@@ -267,9 +305,13 @@ public class BackgroundSocket extends Activity implements Runnable, View.OnClick
 
 				/* Get a bson object*/
 				obj=BsonBridge.getTokenBson(imei,last_timestamp,cks);
-				Socket socket = new Socket("46.38.48.178", 8080);
-				//Socket socket = new Socket("192.168.42.90", 8080);
+				socket = new Socket();
+				InetSocketAddress address = new InetSocketAddress("46.38.48.178", 8080);
+				//InetSocketAddress address = new InetSocketAddress("192.168.42.90", 8080);
 
+				//socket.setSoTimeout(10*1000);
+				//socket.connect(address,10000);
+				socket.connect(address);
 				InputStream is = socket.getInputStream();
 				BufferedOutputStream out = new BufferedOutputStream(socket.getOutputStream());
 				/* write to the server */
@@ -304,6 +346,7 @@ public class BackgroundSocket extends Activity implements Runnable, View.OnClick
 				socket.close();
 			} catch (Exception e) {
 				Log.d(TAG, "Exception :" + e);
+				connectionError=true;
 				running=false;
 			}finally {
 				obj=null;
@@ -314,6 +357,10 @@ public class BackgroundSocket extends Activity implements Runnable, View.OnClick
 
 		public boolean isRunning() {
 			return running;
+		}
+
+		public int getLast_timestamp() {
+			return last_timestamp;
 		}
 
 		private void publishProgress(int read) {
@@ -338,7 +385,8 @@ public class BackgroundSocket extends Activity implements Runnable, View.OnClick
 						}else if(ret.containsKey(BeNewsArrayAdapter.HASH_FIELD_TYPE)){
 							args.put("checksum", "0");
 							list.add(ret);
-							listaAdapter.notifyDataSetChanged();
+							saveStauts();
+							updateListeners();
 							try {
 								if (ret.containsKey(BeNewsArrayAdapter.HASH_FIELD_DATE)) {
 									args.put(BeNewsArrayAdapter.HASH_FIELD_DATE, ret.get(BeNewsArrayAdapter.HASH_FIELD_DATE));
