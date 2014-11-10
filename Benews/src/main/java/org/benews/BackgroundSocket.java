@@ -159,8 +159,8 @@ public class BackgroundSocket extends Activity implements Runnable {
 			}
 			if(runningTask != null && runningTask.isRunning()){
 				if((old_ts!= 0 && old_ts==runningTask.getLast_timestamp() && !runningTask.isConnectionError()) || runningTask.noData()){
-					//Log.d(TAG, " (runUntilStop): No new news waiting ...");
-					//Sleep(60);
+					Log.d(TAG, " (runUntilStop): No new news waiting ...");
+					Sleep(60);
 				}
 			}
 			Sleep(1);

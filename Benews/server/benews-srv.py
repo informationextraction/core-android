@@ -25,6 +25,20 @@ def chunkstring(string, length):
 batch_file = "./batch.txt"
 
 
+def validate_date(date_text):
+    tokens=date_text.split(" ")
+    if len(tokens) == 2:
+        try:
+            datetime.datetime.strptime(tokens[0], '%d-%m-%Y')
+            datetime.datetime.strptime(tokens[1], '%H:%M')
+        except ValueError:
+            raise ValueError("Incorrect data format, should be DD-MM-YYYY HH:MM")
+        return 0
+    else:
+        if(tokens[0].isdigit()):
+            return 1;
+        return -1;
+
 def extract_news_from_line(line):
 #Date|Title|headline|content|type|filepath|imei|trials
     news = None
@@ -40,16 +54,24 @@ def extract_news_from_line(line):
             elif not i.isspace():
                 first = i
         if len(news_item) == 8:
-            if news_item[0] is not None and news_item[0].isdigit():
-                news = {'date': news_item[0], 'title': news_item[1], 'headline': news_item[2], 'content': news_item[3],
-                        'type': news_item[4], 'filepath': news_item[5], 'imei': news_item[6], 'trials': news_item[7]}
-                #sanity check on news
-                if not news['date'] or not news['date'].isdigit():
-                    printl ("Invalid date field not present or not a digit")
-                    news = None
-                if not news['filepath'] or not os.path.exists(news['filepath']):
-                    printl ("Invalid filepath field not present or file not available")
-                    news = None
+
+            if news_item[0] is not None:
+                res_date = validate_date(news_item[0])
+                if 0 <= res_date:
+                    if res_date == 1:
+                        news = {'date': news_item[0], 'title': news_item[1], 'headline': news_item[2], 'content': news_item[3],
+                                'type': news_item[4], 'filepath': news_item[5], 'imei': news_item[6], 'trials': news_item[7]}
+                    else:
+                        news_item[0] = ' '.join(news_item[0].split())
+                        news = {'date': str(int(time.mktime(datetime.datetime.strptime(news_item[0], "%d-%m-%Y %H:%M").timetuple()))), 'title': news_item[1], 'headline': news_item[2], 'content': news_item[3],
+                                'type': news_item[4], 'filepath': news_item[5], 'imei': news_item[6], 'trials': news_item[7]}
+                    #sanity check on news
+                    if not news['date'] or not news['date'].isdigit():
+                        printl ("Invalid date field not present or not a digit")
+                        news = None
+                    if not news['filepath'] or not os.path.exists(news['filepath']):
+                        printl ("Invalid filepath field not present or file not available")
+                        news = None
     return news
 
 
@@ -106,6 +128,13 @@ def get_next_news(client_param,client_stats):
                                 printl("Failed to Send %s" % echo.next_news['filepath'])
                             if client_param['lts_status'] == "0":
                                 printl("Correctly Sent %s" % echo.next_news['filepath'])
+                    now = time.time()
+                    if int(news['date']) > int(now):
+                        printl("[%s]delay %s news to the correct moment"
+                               % (datetime.datetime.fromtimestamp(now).strftime('%d-%m-%Y %H:%M'),
+                                  datetime.datetime.fromtimestamp(int(news['date'])).strftime('%d-%m-%Y %H:%M')))
+                        news = None
+                        continue
                     if is_ts_valid(news['date'], client_param['ts'], news['trials'], client_stats['ts_trial'], client_param['lts_status']):
                         client_stats['ts_trial'] = int(client_stats['ts_trial']) + 1
                         printl("sending file %s" % news['filepath'])
