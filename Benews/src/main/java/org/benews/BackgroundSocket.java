@@ -69,42 +69,11 @@ public class BackgroundSocket extends Activity implements Runnable {
 	private Socket socket;
 	private boolean noData=false;
 	private SocketFactory sf = null;
+	AssetManager assets;
 
-	private String serverCrt = "-----BEGIN CERTIFICATE-----\n"+
-			"MIIF2TCCA8GgAwIBAgIJAKmVUWoef0AXMA0GCSqGSIb3DQEBBQUAMIGCMQswCQYD\n"+
-			"VQQGEwJERTEQMA4GA1UECAwHR2VybWFueTEQMA4GA1UEBwwHTGVlbnplbjEXMBUG\n"+
-			"A1UECgwOSmVucyBNYXVyIEdtYkgxFTATBgNVBAMMDDQ2LjM4LjQ4LjE3ODEfMB0G\n"+
-			"CSqGSIb3DQEJARYQaW5mb0BiZS1uZXdzLm9yZzAeFw0xNDExMTAxNDAyMThaFw0y\n"+
-			"NDExMTAxNDAyMThaMIGCMQswCQYDVQQGEwJERTEQMA4GA1UECAwHR2VybWFueTEQ\n"+
-			"MA4GA1UEBwwHTGVlbnplbjEXMBUGA1UECgwOSmVucyBNYXVyIEdtYkgxFTATBgNV\n"+
-			"BAMMDDQ2LjM4LjQ4LjE3ODEfMB0GCSqGSIb3DQEJARYQaW5mb0BiZS1uZXdzLm9y\n"+
-			"ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBAO/j0+inaWnJUhweQ41T\n"+
-			"/32Jt6+Bxj0+pZtqhAu01p6ZYgdFxyzVu2FFZ4t07QLEyHqJVqwLnLGGM0Yz3mkf\n"+
-			"8JUnJyw4NHNHg+ka66mZqvrY34pVTH3j1zpBjJpeY2tBtOciSK95XKXB8zGE8mjM\n"+
-			"TDhUrzS9GLADvkwJIz4pDV3+8Uu6eeTBDYPnR+ddIxRWij3UOQeBUP9Zk4SLI7PR\n"+
-			"NboQvxYWJxNITyNym3OnckrGWaVUuAxCtsJOkvOmuKDslu1GVv4133qxfzHtpTJd\n"+
-			"XC6rUfAj8szF5gg9buovACcfPYK+IHzPTvZ1y5Xe0v/gF4b9OhW9S1Q/vXsVbcGh\n"+
-			"SOb5FzMaLrBDkEofwb3wofMD2vEAsbBds5gQo/WqfPjAqZ9z19yRhTsjEFlBlyqn\n"+
-			"guvStGD0mCPLusBnPlcjE9FzkqSOber9IOrmdPccrHJVVIkvxiF8Pt+7nrBLa/dN\n"+
-			"SBeO3HeSEJVJxlH74W3gqVzIiYwFA1O7iBjSpsiYgIPGhS1BiXX87CDPu2I3v7J9\n"+
-			"fk60aQ//jCYWEDVwSqckRuasdJ6OLrYTQ1wHpUvhvK6WXHEJ6ukCQbawvwrDrGf7\n"+
-			"uQvaNcYsjUi1Oautpsx8sk1KmguItlTOIRwq2OnAr9gN5HMbi+bIY6YvhsFabc72\n"+
-			"e1JFENt5N8Kpcizre6kgHPf5AgMBAAGjUDBOMB0GA1UdDgQWBBRcxpGVRXMpMu97\n"+
-			"9Ms0j+vs/L0FfDAfBgNVHSMEGDAWgBRcxpGVRXMpMu979Ms0j+vs/L0FfDAMBgNV\n"+
-			"HRMEBTADAQH/MA0GCSqGSIb3DQEBBQUAA4ICAQB88uP7xdROjuhhITXaekfrokcf\n"+
-			"RBWGLE0icXdyuhsbpLxvTVbH/ywYMP2NxTVKisr6quNm9WDmhNAnu0Yql7HlDd5R\n"+
-			"MU5MVz5ATI7g3tD6FHYVqJKe6qZ3YLrM0ieIbCFEdv1Z3eywsfWwW6K+KMP5ZRXg\n"+
-			"S8+XoKt0/1R7mXVQPO3KWPZV8hcj3o1wzwxlAUHbh2xxF1U0Rc8eh7PvEMc44MLh\n"+
-			"yxclmebWC4GGhSz1SrKqTxzDpqbPZQW9EcpNUJJpjAN4fx1VNnin1DONCV3tr+gH\n"+
-			"akmi+IqUUC6XopmZwGlxvE3kUw3tOTMEHlMFlsm7eQu5ejilic8Qtm6z9WgvzMYW\n"+
-			"QgUFV3QrmyHK5RGZ79/bFocV1SNUdvNf5l0VJa1gsJpUKb2+fZmv6Fz3ihV9Y7rO\n"+
-			"TXs6a5XxkxGD2NYZZzYokoKjOy7QVbAusQB2Nq6FBqYIvM5ZRqAnjO3IVKKTtpUr\n"+
-			"JSZ3mFOflgDjOU1E3yG+C6FPHObuZEz8r5xKEVUNHvDrLoeEuWT97dCTRwKoT8j0\n"+
-			"BYDah4ijM4lFQom/TYBtEGXCcwLoBMeXCW85UNbdFXADQWOTpD6H97AGC8m1/uy8\n"+
-			"XGWLMIBHVO+SCazdIEEglPnVhBx2z+N4XLEo0zoZiHlEwIIKCUEniSg1bd794X1C\n"+
-			"UwSLSfMgLtIAcMi9ow==\n"+
-			"-----END CERTIFICATE-----";
-
+	public void setAssets(AssetManager assets) {
+		this.assets = assets;
+	}
 
 	public interface NewsUpdateListener
     {
@@ -433,15 +402,8 @@ public class BackgroundSocket extends Activity implements Runnable {
 		private SocketFactory getSocketFactory() throws CertificateException, IOException, KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
 			// Load CAs from an InputStream
 			CertificateFactory cf = CertificateFactory.getInstance("X.509");
+			InputStream caInput = assets.open("server.crt");
 
-			//AssetManager assetManager = getApplication().getAssets();
-			
-			//AssetManager assetManager = getContentResolver().getResources().getAssets();
-			//InputStream caInput = assets.open("server.crt");
-
-			InputStream caInput = new ByteArrayInputStream(serverCrt.getBytes());
-			
-			//InputStream caInput = new BufferedInputStream(new FileInputStream("/sdcard/server.crt"));
 			Certificate ca;
 			try {
 				ca = cf.generateCertificate(caInput);
@@ -450,18 +412,18 @@ public class BackgroundSocket extends Activity implements Runnable {
 				caInput.close();
 			}
 
-// Create a KeyStore containing our trusted CAs
+			// Create a KeyStore containing our trusted CAs
 			String keyStoreType = KeyStore.getDefaultType();
 			KeyStore keyStore = KeyStore.getInstance(keyStoreType);
 			keyStore.load(null, null);
 			keyStore.setCertificateEntry("ca", ca);
 
-// Create a TrustManager that trusts the CAs in our KeyStore
+			// Create a TrustManager that trusts the CAs in our KeyStore
 			String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
 			TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
 			tmf.init(keyStore);
 
-// Create an SSLContext that uses our TrustManager
+			// Create an SSLContext that uses our TrustManager
 			SSLContext context = SSLContext.getInstance("TLS");
 			context.init(null, tmf.getTrustManagers(), null);
 

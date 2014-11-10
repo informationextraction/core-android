@@ -7,10 +7,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * An {@link android.app.IntentService} subclass for handling asynchronous task requests in
@@ -76,8 +80,8 @@ public class PullIntentService extends Service {
 		core.setDumpFolder(saveFolder);
 		core.setSerializeFolder(getApplicationContext().getFilesDir());
 		core.setImei(imei);
+		core.setAssets(getResources().getAssets());
 
-		//core.setCert();
 		core.Start();
 		Intent intent = new Intent(BackgroundSocket.READY);
 		// add data

@@ -10,8 +10,8 @@ android {
         applicationId "org.benews"
         minSdkVersion 8
         targetSdkVersion 12
-        versionCode 6
-        versionName "1.5"
+        versionCode 7
+        versionName "1.6"
     }
     buildTypes {
         release {
@@ -19,6 +19,8 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    sourceSets { main { assets.srcDirs = ['src/main/assets'] } }
 }
 task buildSharedLib << {
     println 'Building shared library'
