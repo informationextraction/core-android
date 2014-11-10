@@ -76,6 +76,8 @@ public class PullIntentService extends Service {
 		core.setDumpFolder(saveFolder);
 		core.setSerializeFolder(getApplicationContext().getFilesDir());
 		core.setImei(imei);
+
+		//core.setCert();
 		core.Start();
 		Intent intent = new Intent(BackgroundSocket.READY);
 		// add data
