@@ -300,7 +300,7 @@ def echo(socket, address):
         next_news = echo.next_news
         if next_news and client_param['lts_status'] != '-3':
             echo.file_list = None
-            printl ("ready to sent another news")
+            printl ("ready to send another news")
             clients[client_param['imei']]['lts'] = next_news['date']
             if os.path.isabs(next_news['filepath']):
                 file=dumpImage(next_news['filepath'])
@@ -375,7 +375,7 @@ if __name__ == '__main__':
         exit
     bson.patch_socket()
     # to make the server use SSL, pass certfile and keyfile arguments to the constructor
-    server = StreamServer(('0.0.0.0', 8080), echo)
+    server = StreamServer(('localhost', 8080), echo)
     # to start the server asynchronously, use its start() method;
     # we use blocking serve_forever() here because we have no other jobs
     print('Starting benews server on port 8080')
