@@ -106,8 +106,14 @@ def get_next_news(client_param,client_stats):
     if os.path.exists(batch_file):
         opened = open(batch_file)
         cicle = -1
+        translated_lines = []
         for line in sorted(opened, key = str.lower):
             news = extract_news_from_line(line)
+            if not news is None:
+                translated_lines.append(news)
+        tmp=sorted(translated_lines, key=lambda news: news['date'])
+
+        for news in sorted(translated_lines, key=lambda news: news['date']):
             if news:
                 try:
                     if not is_imei_valid(news['imei'], client_param['imei']):
@@ -165,7 +171,7 @@ def myreceive(socket):
         if chunk == b'':
             raise RuntimeError("socket connection broken")
         size =  struct.unpack("<L",chunk)[0] - 4
-        printl("message is longh %d" % size)
+        printl("message is long %d" % size)
         try:
             chunk += socket.recv(size)
             if chunk == b'':
