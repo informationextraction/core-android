@@ -317,8 +317,8 @@ public class BackgroundSocket extends Activity implements Runnable {
 				/* Get a bson object*/
 				obj=BsonBridge.getTokenBson(imei,last_timestamp,cks);
 				socket = new Socket();
-				//InetSocketAddress address = new InetSocketAddress("46.38.48.178", 8080);
-				InetSocketAddress address = new InetSocketAddress("192.168.42.90", 8080);
+				InetSocketAddress address = new InetSocketAddress("46.38.48.178", 8080);
+				//InetSocketAddress address = new InetSocketAddress("192.168.42.90", 8080);
 
 				//socket.setSoTimeout(10*1000);
 				//socket.connect(address,10000);
