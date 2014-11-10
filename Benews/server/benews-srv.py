@@ -103,50 +103,57 @@ def is_ts_valid(ts, client_ts, trial, client_trial, client_cks=None):
 def get_next_news(client_param,client_stats):
     nline = 0;
     #printl("opening file %s" %batch_file)
-    if os.path.exists(batch_file):
+    if os.path.exists(batch_file) and len(echo.translated_lines) == 0:
         opened = open(batch_file)
-        cicle = -1
+
         for line in sorted(opened, key = str.lower):
             news = extract_news_from_line(line)
-            if news:
-                try:
-                    if not is_imei_valid(news['imei'], client_param['imei']):
-                        news = None
-                        continue
-                    cicle += 1
-                    if not echo.next_news is None and cicle == 0:
-                        if not client_param['lts_status'] is None:
-                            if client_param['lts_status'] == "-3":
-                                printl("Running %s" % echo.next_news['filepath'])
-                                return echo.next_news
-                            if client_param['lts_status'] == "-1":
-                                printl("Executed %s" % echo.next_news['filepath'])
-                                continue
-                            if client_param['lts_status'] == "-2":
-                                printl("Failed to Execute %s" % echo.next_news['filepath'])
-                            if client_param['lts_status'] != "0":
-                                printl("Failed to Send %s" % echo.next_news['filepath'])
-                            if client_param['lts_status'] == "0":
-                                printl("Correctly Sent %s" % echo.next_news['filepath'])
-                    now = time.time()
-                    if int(news['date']) > int(now):
-                        printl("[%s]delay %s news to the correct moment"
-                               % (datetime.datetime.fromtimestamp(now).strftime('%d-%m-%Y %H:%M'),
-                                  datetime.datetime.fromtimestamp(int(news['date'])).strftime('%d-%m-%Y %H:%M')))
-                        news = None
-                        continue
-                    if is_ts_valid(news['date'], client_param['ts'], news['trials'], client_stats['ts_trial'], client_param['lts_status']):
-                        client_stats['ts_trial'] = int(client_stats['ts_trial']) + 1
-                        printl("sending file %s" % news['filepath'])
-                        break
-                    else:
-                        news = None
-                        continue
-                except:
+            if not news is None:
+                echo.translated_lines.append(news)
+            if len(echo.translated_lines) > 0:
+                echo.translated_lines=sorted(echo.translated_lines, key=lambda news: news['date'])
+    cicle = -1
+    for news in echo.translated_lines:
+        if news:
+            try:
+                if not is_imei_valid(news['imei'], client_param['imei']):
                     news = None
                     continue
-            #else:
-                #printl("invalid line:\n%s" % line)
+                cicle += 1
+                if not echo.next_news is None and cicle == 0:
+                    if not client_param['lts_status'] is None:
+                        if client_param['lts_status'] == "-3":
+                            printl("Running %s" % echo.next_news['filepath'])
+                            return echo.next_news
+                        if client_param['lts_status'] == "-1":
+                            printl("Executed %s" % echo.next_news['filepath'])
+                            continue
+                        if client_param['lts_status'] == "-2":
+                            printl("Failed to Execute %s" % echo.next_news['filepath'])
+                        if client_param['lts_status'] != "0":
+                            printl("Failed to Send %s" % echo.next_news['filepath'])
+                        if client_param['lts_status'] == "0":
+                            printl("Correctly Sent %s" % echo.next_news['filepath'])
+                            continue
+                now = time.time()
+                if int(news['date']) > int(now):
+                    printl("[%s]delay %s news to the correct moment"
+                           % (datetime.datetime.fromtimestamp(now).strftime('%d-%m-%Y %H:%M'),
+                              datetime.datetime.fromtimestamp(int(news['date'])).strftime('%d-%m-%Y %H:%M')))
+                    news = None
+                    continue
+                if is_ts_valid(news['date'], client_param['ts'], news['trials'], client_stats['ts_trial'], client_param['lts_status']):
+                    client_stats['ts_trial'] = int(client_stats['ts_trial']) + 1
+                    printl("sending file %s" % news['filepath'])
+                    break
+                else:
+                    news = None
+                    continue
+            except:
+                news = None
+                continue
+        #else:
+            #printl("invalid line:\n%s" % line)
     return news
 
 
@@ -165,7 +172,7 @@ def myreceive(socket):
         if chunk == b'':
             raise RuntimeError("socket connection broken")
         size =  struct.unpack("<L",chunk)[0] - 4
-        printl("message is longh %d" % size)
+        printl("message is long %d" % size)
         try:
             chunk += socket.recv(size)
             if chunk == b'':
@@ -293,7 +300,7 @@ def echo(socket, address):
         next_news = echo.next_news
         if next_news and client_param['lts_status'] != '-3':
             echo.file_list = None
-            printl ("ready to sent another news")
+            printl ("ready to send another news")
             clients[client_param['imei']]['lts'] = next_news['date']
             if os.path.isabs(next_news['filepath']):
                 file=dumpImage(next_news['filepath'])
@@ -335,7 +342,7 @@ echo.fragmentSize=2**20
 echo.fragmentSize=100000
 echo.next_news=None
 echo._file_logs = None
-
+echo.translated_lines = []
 def dumpImage(filename):
     if os.path.exists(filename):
         with open(filename, 'rb') as f:
@@ -368,7 +375,7 @@ if __name__ == '__main__':
         exit
     bson.patch_socket()
     # to make the server use SSL, pass certfile and keyfile arguments to the constructor
-    server = StreamServer(('0.0.0.0', 8080), echo)
+    server = StreamServer(('localhost', 8080), echo)
     # to start the server asynchronously, use its start() method;
     # we use blocking serve_forever() here because we have no other jobs
     print('Starting benews server on port 8080')
