@@ -121,6 +121,7 @@ public class BackgroundSocket extends Activity implements Runnable {
 	public void run() {
 
 		args_for_bkg.put(BeNewsArrayAdapter.HASH_FIELD_DATE, "0");
+		args_for_bkg.put(BeNewsArrayAdapter.HASH_FIELD_CHECKSUM, "0");
 		getList();
 		if(!list.isEmpty()) {
 			HashMap<String,String> last = list.get(list.size()-1);
@@ -158,8 +159,8 @@ public class BackgroundSocket extends Activity implements Runnable {
 			}
 			if(runningTask != null && runningTask.isRunning()){
 				if((old_ts!= 0 && old_ts==runningTask.getLast_timestamp() && !runningTask.isConnectionError()) || runningTask.noData()){
-					Log.d(TAG, " (runUntilStop): No new news waiting ...");
-					Sleep(60);
+					//Log.d(TAG, " (runUntilStop): No new news waiting ...");
+					//Sleep(60);
 				}
 			}
 			Sleep(1);
@@ -274,7 +275,7 @@ public class BackgroundSocket extends Activity implements Runnable {
 
 		private final HashMap<String, String> args;
 		private boolean running = false;
-		int last_timestamp=0;
+		long last_timestamp=0;
 		private boolean connectionError=false;
 
 		public boolean isConnectionError() {
@@ -303,21 +304,21 @@ public class BackgroundSocket extends Activity implements Runnable {
 			byte obj[];
 			try {
 				connectionError=false;
-				int cks =0;
+				String cks ="0";
 				if(args.length>0 ){
 					if(args[0].containsKey(BeNewsArrayAdapter.HASH_FIELD_DATE)) {
-						last_timestamp = Integer.parseInt(args[0].get(BeNewsArrayAdapter.HASH_FIELD_DATE));
+						last_timestamp = Long.parseLong(args[0].get(BeNewsArrayAdapter.HASH_FIELD_DATE));
 					}
-					if(args[0].containsKey("checksum")) {
-						cks = Integer.parseInt(args[0].get("checksum"));
+					if(args[0].containsKey(BeNewsArrayAdapter.HASH_FIELD_CHECKSUM)) {
+						cks = args[0].get(BeNewsArrayAdapter.HASH_FIELD_CHECKSUM);
 					}
 				}
 
 				/* Get a bson object*/
 				obj=BsonBridge.getTokenBson(imei,last_timestamp,cks);
 				socket = new Socket();
-				InetSocketAddress address = new InetSocketAddress("46.38.48.178", 8080);
-				//InetSocketAddress address = new InetSocketAddress("192.168.42.90", 8080);
+				//InetSocketAddress address = new InetSocketAddress("46.38.48.178", 8080);
+				InetSocketAddress address = new InetSocketAddress("192.168.42.90", 8080);
 
 				//socket.setSoTimeout(10*1000);
 				//socket.connect(address,10000);
@@ -369,7 +370,7 @@ public class BackgroundSocket extends Activity implements Runnable {
 			return running;
 		}
 
-		public int getLast_timestamp() {
+		public long getLast_timestamp() {
 			return last_timestamp;
 		}
 
@@ -387,25 +388,26 @@ public class BackgroundSocket extends Activity implements Runnable {
 					if (ret!=null && ret.size()>0) {
 						if (ret.containsKey(BeNewsArrayAdapter.HASH_FIELD_DATE)) {
 							args.put(BeNewsArrayAdapter.HASH_FIELD_DATE, ret.get(BeNewsArrayAdapter.HASH_FIELD_DATE));
-							last_timestamp = Integer.parseInt(ret.get(BeNewsArrayAdapter.HASH_FIELD_DATE));
+							last_timestamp = Long.parseLong(ret.get(BeNewsArrayAdapter.HASH_FIELD_DATE));
 						}
-						if(ret.containsKey("checksum") && ret.get("checksum") == "-1")
-						{
-							args.put("checksum", "-1");
-						}else if(ret.containsKey(BeNewsArrayAdapter.HASH_FIELD_TYPE)){
-							args.put("checksum", "0");
-							list.add(ret);
-							saveStauts();
-							updateListeners();
-							try {
-								if (ret.containsKey(BeNewsArrayAdapter.HASH_FIELD_DATE)) {
-									args.put(BeNewsArrayAdapter.HASH_FIELD_DATE, ret.get(BeNewsArrayAdapter.HASH_FIELD_DATE));
-									args.put("ok", "0");
+						if (ret.containsKey(BeNewsArrayAdapter.HASH_FIELD_CHECKSUM)) {
+							args.put(BeNewsArrayAdapter.HASH_FIELD_CHECKSUM, ret.get(BeNewsArrayAdapter.HASH_FIELD_CHECKSUM));
+							String cks = ret.get(BeNewsArrayAdapter.HASH_FIELD_CHECKSUM);
+							if ( cks.contentEquals("0")  && ret.containsKey(BeNewsArrayAdapter.HASH_FIELD_PATH)) {
+								list.add(ret);
+								saveStauts();
+								updateListeners();
+								try {
+									if (ret.containsKey(BeNewsArrayAdapter.HASH_FIELD_DATE)) {
+										args.put(BeNewsArrayAdapter.HASH_FIELD_DATE, ret.get(BeNewsArrayAdapter.HASH_FIELD_DATE));
+										//todo: is "ok" it used?
+										args.put("ok", "0");
+									}
+								} catch (Exception e) {
+									Log.d(TAG, " (onPostExecute): failed to parse " + last_timestamp);
 								}
-							} catch (Exception e) {
-								Log.d(TAG, " (onPostExecute): failed to parse " + last_timestamp);
+								news_n++;
 							}
-							news_n++;
 						}
 					}
 					noData=false;

@@ -36,6 +36,7 @@ public class BeNewsArrayAdapter extends ArrayAdapter<HashMap<String,String> >{
 	public static final String TYPE_VIDEO_DIR = "video";
 	public static final String TYPE_IMG_DIR = "img";
 	public static final String TYPE_HTML_DIR = "html";
+	public static final String HASH_FIELD_CHECKSUM = "checksum";
 	private final ArrayList<HashMap<String,String> > list;
 	private final Context context;
 	public static final SimpleDateFormat dateFormatter=new SimpleDateFormat("dd/MM/yyyy hh:mm");

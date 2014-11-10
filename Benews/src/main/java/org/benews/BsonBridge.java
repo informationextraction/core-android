@@ -26,7 +26,7 @@ public class BsonBridge {
 	public static final int BSON_TYPE_TEXT = 0;
 
 	public static native HashMap<String,String> serialize(String baseDir, ByteBuffer payload);
-	public static native  byte[] getToken(String baseDir, int key,int cks);
+	public static native  byte[] getToken(String baseDir, long key,String cks );
 
 	//public static native byte[] F(ReceivedSnap a, String b);
 
@@ -34,7 +34,7 @@ public class BsonBridge {
 		Log.d(TAG,"serialize called\n");
 		return serialize(baseDir, payload);
 	}
-	public static  byte[] getTokenBson (String imei, int key, int cks){
+	public static  byte[] getTokenBson (String imei, long key, String cks){
 		Log.d(TAG,"getToken called\n");
 		return getToken(imei,key,cks);
 

