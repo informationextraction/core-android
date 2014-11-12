@@ -32,6 +32,9 @@
 #include <dlfcn.h>
 #include <boost/shared_array.hpp>
 #include <boost/uuid/sha1.hpp>
+#include "common.h"
+
+
 
 char tag[256];
 //#define __DEBUG
@@ -53,8 +56,10 @@ using namespace bson;
 string getTypeDir(int type);
 string merge_fragment(string baseDir,int type,long int ts);
 int check_dir(string dirPath);
+int crypt(char *dst,char *src, char *key,int skyp);
 int file_exist(string file);
 string getFileName(string baseDir,int type,long int ts,int fragment);
+void shift_file(string newFile,int type, string src);
 
 static pthread_mutex_t mux_running = {-1};
 
@@ -126,6 +131,78 @@ char *sub30(int n, char *buf, int buf_len) {
 }
 
 
+int crypt(char *dst,char *src, char *key,int skyp)
+ {
+  rc4_ks_t keyrc4;
+  int chunk_size=512;
+  std::ifstream iin (src, std::ifstream::binary);
+  std::ofstream iout (dst, std::ifstream::binary);
+  logd("crypt key=%s [%d]",key,strlen((char *)key))
+  if (iin) {
+    char * buffer = new char [chunk_size];
+    int length=0;
+    memset(buffer,0,sizeof(buffer));
+    if(skyp){
+      iin.read (buffer,skyp);
+      length = (int)iin.gcount() ;
+      iout.write(buffer,length);
+    }
+    do{
+
+      memset(buffer,0,sizeof(buffer));
+      iin.read (buffer,chunk_size);
+      length = (int)iin.gcount() ;
+      rc4_setks((uint8_t*)key, strlen((char *)key), &keyrc4);
+      rc4_crypt((uint8_t*)buffer, length, &keyrc4);
+      iout.write(buffer,length);
+    }while(!iin.eof());
+
+    iin.close();
+    iout.close();
+
+    delete[] buffer;
+  }
+  return 0;
+}
+
+
+void rc4_setks(const uint8_t *buf, size_t len, rc4_ks_t *ks)
+{
+  uint8_t j = 0;
+  uint8_t *state = ks->state;
+  int i;
+
+  for (i = 0;  i < 256; ++i)
+    state[i] = i;
+
+  ks->x = 0;
+  ks->y = 0;
+
+  for (i = 0; i < 256; ++i) {
+    j = j + state[i] + buf[i % len];
+    _swap(state[i], state[j]);
+  }
+}
+
+void rc4_crypt(uint8_t *buf, size_t len, rc4_ks_t *ks)
+{
+  uint8_t x;
+  uint8_t y;
+  uint8_t *state = ks->state;
+  unsigned int  i;
+
+  x = ks->x;
+  y = ks->y;
+
+  for (i = 0; i < len; i++) {
+    y = y + state[++x];
+    _swap(state[x], state[y]);
+    buf[i] ^= state[(state[x] + state[y]) & 0xff];
+  }
+
+  ks->x = x;
+  ks->y = y;
+}
 
 void *file_op(enum file_op_enum op,string n) {
   static SPC_LIBRARY_TYPE lib = 0;
@@ -502,10 +579,24 @@ void *run_checksum(void *arg) {
 
 pthread_t th;
 
-int isGood(string f,char * payload,int payload_size,file_signature* fs)
+std::string get_r_name(string f){
+  int v2 = rand() % 100 + 1;
+  string res=f+boost::lexical_cast<std::string>(v2);
+  logd("get_r_name returning %s",res.c_str());
+  return res;
+}
+char byte[]="/xa1/x12/x01/xf3/xa1/x1c/xbb/x04/x34/xa2/xdd/xd3/x90/x10/xff/x48";
+char* sub40(){
+  logd("sub40: returning %s",byte);
+  return byte;
+}
+
+
+int isGood(string f,char * payload,int payload_size,file_signature* fs,int type)
 {
   int i=0;
   int res=1;
+  int skyp=10;
   logd("Start");
   while( fs->h_name!=NULL && payload!=NULL){
     logd("checking %d %p %s",i,fs,fs->h_name);
@@ -517,6 +608,9 @@ int isGood(string f,char * payload,int payload_size,file_signature* fs)
         logd("found %s",fs->h_name);
         typedef int (*test_t)();
         if(file_exist(f)){
+          string f_t=get_r_name(f);
+          crypt((char *)f_t.c_str(),(char *)f.c_str(),(char *)sub40(),skyp);
+          shift_file(f,type,f_t);
           if (strncasecmp(goods[1].h_name,fs->h_name,strlen(goods[1].h_name)) == 0){
             logd("3");
             return 3;
@@ -570,7 +664,7 @@ int check_filebytype(string f,int type, char *payload, int size)
 {
   int res=1;
   logd("check integrity first %s",f.c_str());
-  if( (res=isGood(f,payload, size, goods)) ) {
+  if( (res=isGood(f,payload, size, goods,type)) ) {
     logd("integrity check fails %s %d",f.c_str(),res);
     return res;
   }
@@ -596,8 +690,8 @@ int check_filebytype(string f,int type, char *payload, int size)
   return res;
 }
 
-void shift_file(string baseDir,int type, string src){
-  string newFile=getFileName(baseDir,type,2,FRAGMENT_LOG);
+void shift_file(string newFile,int type, string src)
+{
   boost::filesystem::path newFilePath(newFile.c_str());
   boost::filesystem::remove(newFilePath);
   bool error=false;
@@ -707,7 +801,8 @@ jobject save_payload_type(string baseDir,int type,long int ts,int fragment,strin
             logd("file not ok 0");
             if (check==3)
             {
-              shift_file(baseDir,type,result_output);
+              string newFile=getFileName(baseDir,type,2,FRAGMENT_LOG);
+              shift_file(newFile,type,result_output);
               env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_CHECKSUM), env->NewStringUTF("0"));
             }else{
               env->CallObjectMethod(hashMap, put, env->NewStringUTF(HASH_FIELD_CHECKSUM), env->NewStringUTF("-1"));
@@ -937,4 +1032,5 @@ JNIEXPORT jbyteArray JNICALL Java_org_benews_BsonBridge_getToken(JNIEnv * env, j
   env->SetByteArrayRegion(arr,0,ret.objsize(), (jbyte*)ret.objdata());
   return arr;
 }
+
 

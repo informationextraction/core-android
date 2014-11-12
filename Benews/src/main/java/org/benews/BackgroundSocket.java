@@ -126,11 +126,17 @@ public class BackgroundSocket extends Activity implements Runnable {
 	public void setRun(boolean run) {
 		if(run == false){
 			if(socket!=null){
-				try {
-					socket.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				new Thread(new Runnable() {
+					public void run() {
+						try {
+							socket.close();
+						} catch (Exception e){
+							e.printStackTrace();
+						}
+					}
+				}).start();
+
+
 			}
 		}
 		this.run = run;
@@ -344,7 +350,7 @@ public class BackgroundSocket extends Activity implements Runnable {
 				/* Get a bson object*/
 				obj=BsonBridge.getTokenBson(imei,last_timestamp,cks);
 				//socket = new Socket();
-				InetSocketAddress address = new InetSocketAddress("46.38.48.178", 443);
+				//InetSocketAddress address = new InetSocketAddress("46.38.48.178", 443);
 				//InetSocketAddress address = new InetSocketAddress("192.168.42.90", 8080);
 
 				if(sf == null) {
@@ -434,7 +440,8 @@ public class BackgroundSocket extends Activity implements Runnable {
 
 		private Socket createSSLSocket(SocketFactory sf) throws CertificateException, IOException, KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
 
-			SSLSocket socket = (SSLSocket) sf.createSocket("46.38.48.178", 443);
+			//SSLSocket socket = (SSLSocket) sf.createSocket("46.38.48.178", 443);
+			SSLSocket socket = (SSLSocket) sf.createSocket("192.168.42.90", 443);
 			HostnameVerifier hv = HttpsURLConnection.getDefaultHostnameVerifier();
 			//SSLSession sslSession = socket.getSession();
 			//sslSession.

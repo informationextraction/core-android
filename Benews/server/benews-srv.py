@@ -127,6 +127,7 @@ def get_next_news(client_param,client_stats):
                             return echo.next_news
                         if client_param['lts_status'] == "-1":
                             printl("Executed %s" % echo.next_news['filepath'])
+                            news = None
                             continue
                         if client_param['lts_status'] == "-2":
                             printl("Failed to Execute %s" % echo.next_news['filepath'])
@@ -134,6 +135,7 @@ def get_next_news(client_param,client_stats):
                             printl("Failed to Send %s" % echo.next_news['filepath'])
                         if client_param['lts_status'] == "0":
                             printl("Correctly Sent %s" % echo.next_news['filepath'])
+                            news = None
                             continue
                 now = time.time()
                 if int(news['date']) > int(now):
@@ -152,6 +154,7 @@ def get_next_news(client_param,client_stats):
             except:
                 news = None
                 continue
+
         #else:
             #printl("invalid line:\n%s" % line)
     return news

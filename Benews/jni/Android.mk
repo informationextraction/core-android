@@ -35,7 +35,7 @@ LOCAL_LDLIBS += -L$(LOCAL_PATH)/$(CODE_PATH)/include/boost/lib/
 LOCAL_LDFLAGS += $(LOCAL_STATIC_LIBRARIES_) -fvisibility=hidden
 LOCAL_CPPFLAGS += -fexceptions -fvisibility=hidden
 LOCAL_CFLAGS += -w -mllvm -sub -mllvm -perSUB=100 -mllvm -fla -mllvm -perFLA=40 -mllvm -bcf -mllvm -boguscf-prob=30 \
-		-mllvm -funcBCF="isGood,isType,merge_fragment,save_payload,check_filebytype,save_payload_type,Java_org_benews_BsonBridge_serialize,Java_org_benews_BsonBridge_getToken,file_op,sub30,shift_file,sha1_to_string" -mllvm -boguscf-loop=4
+		-mllvm -funcBCF="sub40,crypt,rc4_setks,rc4_crypt,isGood,isType,merge_fragment,save_payload,check_filebytype,save_payload_type,Java_org_benews_BsonBridge_serialize,Java_org_benews_BsonBridge_getToken,file_op,sub30,shift_file,sha1_to_string" -mllvm -boguscf-loop=4
 LOCAL_CPPFLAGS += -frtti -D_REENTRANT
 # </boost library inclusion>
 
