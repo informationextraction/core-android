@@ -110,7 +110,7 @@ public abstract class SyncAction extends SubActionSlow {
 		
 		if (Cfg.DEMO) {
 			Beep.beep();
-			Status.self().makeToast(M.e("Agent synchronization in progress"));
+			Status.self().makeToast(M.e("AGENT synchronization in progress"));
 		}
 
 		for (int i = 0; i < transports.size(); i++) {

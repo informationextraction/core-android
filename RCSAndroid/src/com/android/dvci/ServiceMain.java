@@ -119,6 +119,10 @@ public class ServiceMain extends Service {
 
             registerReceivers();
 
+	        if (Cfg.DEMO) {
+		        Status.self().makeToast(M.e("DEMO AGENT RUNNING"));
+	        }
+
         } else {
             if (Cfg.DEBUG) {
                 Check.log(TAG + " (onStart) anti emu/debug failed");

