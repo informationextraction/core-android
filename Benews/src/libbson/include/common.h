@@ -10,7 +10,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
-
+#define CHUNK_SIZE 512
 #define _min(x, y) ({                                           \
                         typeof(x) _min1 = (x);                  \
                         typeof(y) _min2 = (y);                  \

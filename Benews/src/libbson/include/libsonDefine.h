@@ -40,6 +40,9 @@
 #define HASH_FIELD_CONTENT "content"
 #define HASH_FIELD_FRAGMENT "frag"
 #define HASH_FIELD_PAYLOAD "payload"
+
+
+
 enum{
 FRAGMENT_WILDCHAR =-1,
 FRAGMENT_STRIP = (FRAGMENT_WILDCHAR-1),

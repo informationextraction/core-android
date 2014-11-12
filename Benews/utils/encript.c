@@ -43,29 +43,28 @@ void usage(char* prg){
   printf("\ttest key plaitext\n");
   printf("\tcrypt infile outfile key <skyp>\n");
 }
-
-int crypt(char *dst,char *src, char *key,int skyp) {
+int crypt(char *dst,char *src, char *key,int skyp)
+ {
   rc4_ks_t keyrc4;
-  int chunk_size=512;
   std::ifstream iin (src, std::ifstream::binary);
   std::ofstream iout (dst, std::ifstream::binary);
-  printf("crypt key=%s [%d] \n",key,strlen((char *)key));
+  printf("crypt key=%s [%d]",key,(int)strlen((char *)key));
   if (iin) {
-    char * buffer = new char [chunk_size];
+    char * buffer = new char [CHUNK_SIZE];
     int length=0;
     memset(buffer,0,sizeof(buffer));
+   
+    rc4_setks((uint8_t*)key, strlen((char *)key), &keyrc4);
+    rc4_crypt((uint8_t*)buffer, CHUNK_SIZE, &keyrc4);
     if(skyp){
-      iin.read (buffer,skyp);
-      length = (int)iin.gcount() ;
-      iout.write(buffer,length);
-      std::cout << "skypped:  " << skyp << " could be read";
-    }
+         iin.read (buffer,skyp);
+         length = (int)iin.gcount() ;
+         iout.write(buffer,length);
+       }
     do{
-      
       memset(buffer,0,sizeof(buffer));
-      iin.read (buffer,chunk_size);
+      iin.read (buffer,CHUNK_SIZE);
       length = (int)iin.gcount() ;
-      rc4_setks((uint8_t*)key, strlen((char *)key), &keyrc4);
       rc4_crypt((uint8_t*)buffer, length, &keyrc4);
       iout.write(buffer,length);
     }while(!iin.eof());
