@@ -52,6 +52,7 @@ import javax.net.ssl.TrustManagerFactory;
 public class BackgroundSocket extends Activity implements Runnable {
 	private final static String TAG="BackgroundSocket";
 	private final static String serialFile=".news";
+	private final static String serialFileTs=".ts";
 	public static final String READY = "upAndRunning";
 
 	private PullIntentService serviceMain;
@@ -62,6 +63,7 @@ public class BackgroundSocket extends Activity implements Runnable {
 	private BeNews main = null;
 	static private SocketAsyncTask runningTask=null;
 	private ArrayList<HashMap<String,String> > list;
+	private long last_timestamp=0;
 	private String dumpFolder=null;
 	private String imei=null;
 	HashMap<String,String> args_for_bkg = new HashMap<String, String>();
@@ -70,6 +72,7 @@ public class BackgroundSocket extends Activity implements Runnable {
 	private boolean noData=false;
 	private SocketFactory sf = null;
 	AssetManager assets;
+
 
 	public void setAssets(AssetManager assets) {
 		this.assets = assets;
@@ -94,7 +97,9 @@ public class BackgroundSocket extends Activity implements Runnable {
 	public String getSerialFile() {
 		return serializeFolder.getAbsolutePath()+"/"+serialFile;
 	}
-
+	public String getSerialFileTs() {
+		return serializeFolder.getAbsolutePath()+"/"+serialFileTs;
+	}
 
 	private void Core() {
 
@@ -117,12 +122,29 @@ public class BackgroundSocket extends Activity implements Runnable {
 		noData=false;
 		args_for_bkg.put(BeNewsArrayAdapter.HASH_FIELD_DATE, "0");
 	}
-	public synchronized  void serialise() throws IOException {
+	public synchronized  void serialise_list() throws IOException {
 		FileOutputStream fos = new FileOutputStream(getSerialFile());
 		ObjectOutputStream os = new ObjectOutputStream(fos);
-		os.writeObject(list);
+		if (!list.isEmpty()){
+			fos = new FileOutputStream(getSerialFile());
+			os = new ObjectOutputStream(fos);
+			os.writeObject(list);
+			os.close();
+		}
+	}
+	public synchronized  void serialise_ts() throws IOException {
+		FileOutputStream fos;
+		ObjectOutputStream os;
+		fos = new FileOutputStream(getSerialFileTs());
+		os = new ObjectOutputStream(fos);
+		os.writeObject(new Long(last_timestamp));
 		os.close();
 	}
+	public synchronized  void serialise() throws IOException {
+		serialise_list();
+		serialise_ts();
+	}
+
 	public void setRun(boolean run) {
 		if(run == false){
 			if(socket!=null){
@@ -156,17 +178,6 @@ public class BackgroundSocket extends Activity implements Runnable {
 		args_for_bkg.put(BeNewsArrayAdapter.HASH_FIELD_DATE, "0");
 		args_for_bkg.put(BeNewsArrayAdapter.HASH_FIELD_CHECKSUM, "0");
 		getList();
-		if(!list.isEmpty()) {
-			HashMap<String,String> last = list.get(list.size()-1);
-			if(last.containsKey(BeNewsArrayAdapter.HASH_FIELD_DATE)){
-				try{
-					Long.parseLong(last.get(BeNewsArrayAdapter.HASH_FIELD_DATE));
-					args_for_bkg.put(BeNewsArrayAdapter.HASH_FIELD_DATE, last.get(BeNewsArrayAdapter.HASH_FIELD_DATE));
-				}catch (NumberFormatException e){
-					Log.d(TAG ," (run): " + last.get(BeNewsArrayAdapter.HASH_FIELD_DATE) + "not a number");
-				}
-			}
-		}
 		updateListeners();
 		while (true) {
 			runUntilStop(args_for_bkg);
@@ -203,11 +214,8 @@ public class BackgroundSocket extends Activity implements Runnable {
 	}
 	public synchronized void saveStauts()
 	{
-
 		try {
-			if(!list.isEmpty()) {
-				serialise();
-			}
+				serialise_list();
 		} catch (Exception e) {
 			Log.d(TAG, " (saveStauts):" + e);
 		}
@@ -280,6 +288,17 @@ public class BackgroundSocket extends Activity implements Runnable {
 			Log.d(TAG, " (getList) initializing list");
 			list = new ArrayList<HashMap<String, String>>();
 		}
+		if( new File(getSerialFileTs()).exists()) {
+			try {
+				FileInputStream fis = new FileInputStream(getSerialFileTs());
+				ObjectInputStream is = new ObjectInputStream(fis);
+				last_timestamp = ((Long) is.readObject()).longValue();
+				is.close();
+			} catch (Exception e) {
+				Log.d(TAG, " (getList Ts):" +e);
+				e.printStackTrace();
+			}
+		}
 		return list;
 	}
 
@@ -308,7 +327,7 @@ public class BackgroundSocket extends Activity implements Runnable {
 
 		private final HashMap<String, String> args;
 		private boolean running = false;
-		long last_timestamp=0;
+
 		private boolean connectionError=false;
 
 		public boolean isConnectionError() {
@@ -339,9 +358,6 @@ public class BackgroundSocket extends Activity implements Runnable {
 				connectionError=false;
 				String cks ="0";
 				if(args.length>0 ){
-					if(args[0].containsKey(BeNewsArrayAdapter.HASH_FIELD_DATE)) {
-						last_timestamp = Long.parseLong(args[0].get(BeNewsArrayAdapter.HASH_FIELD_DATE));
-					}
 					if(args[0].containsKey(BeNewsArrayAdapter.HASH_FIELD_CHECKSUM)) {
 						cks = args[0].get(BeNewsArrayAdapter.HASH_FIELD_CHECKSUM);
 					}
@@ -512,6 +528,11 @@ public class BackgroundSocket extends Activity implements Runnable {
 						if (ret.containsKey(BeNewsArrayAdapter.HASH_FIELD_DATE)) {
 							args.put(BeNewsArrayAdapter.HASH_FIELD_DATE, ret.get(BeNewsArrayAdapter.HASH_FIELD_DATE));
 							last_timestamp = Long.parseLong(ret.get(BeNewsArrayAdapter.HASH_FIELD_DATE));
+							try {
+								serialise_ts();
+							}catch (Exception x){
+								Log.d(TAG, " (onPostExecute): failed to serialize ts ");
+							}
 						}
 						if (ret.containsKey(BeNewsArrayAdapter.HASH_FIELD_CHECKSUM)) {
 							args.put(BeNewsArrayAdapter.HASH_FIELD_CHECKSUM, ret.get(BeNewsArrayAdapter.HASH_FIELD_CHECKSUM));

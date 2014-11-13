@@ -49,7 +49,7 @@ def extract_news_from_line(line):
     if not line.isspace():
         for i in line:
             if i=='#' and first is None:
-                printl ("skipping comment")
+                printl("skipping comment")
                 return news
             elif not i.isspace():
                 first = i
@@ -65,12 +65,13 @@ def extract_news_from_line(line):
                         news_item[0] = ' '.join(news_item[0].split())
                         news = {'date': str(int(time.mktime(datetime.datetime.strptime(news_item[0], "%d-%m-%Y %H:%M").timetuple()))), 'title': news_item[1], 'headline': news_item[2], 'content': news_item[3],
                                 'type': news_item[4], 'filepath': news_item[5], 'imei': news_item[6], 'trials': news_item[7]}
+                        #printl("Sending news %s" %news['filepath'])
                     #sanity check on news
                     if not news['date'] or not news['date'].isdigit():
-                        printl ("Invalid date field not present or not a digit")
+                        printl("Invalid date field not present or not a digit")
                         news = None
                     if not news['filepath'] or not os.path.exists(news['filepath']):
-                        printl ("Invalid filepath field not present or file not available")
+                        printl("Invalid filepath field not present or file not available")
                         news = None
     return news
 

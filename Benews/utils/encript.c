@@ -22,28 +22,76 @@
 #include <stdlib.h>
 #include <iostream>     // std::cout
 #include <fstream>      // std::fstream
+#include <string>
+#include <sstream> 
+#include <iomanip>
+using namespace std;
+std::string ToHex(const std::string& s, bool upper_case)
+{
+  ostringstream ret;
+  for (std::string::size_type i = 0; i < s.length(); ++i)
+  {
+    int z = s[i]&0xff;
+    ret << std::hex << std::setfill('0') << std::setw(2) << (upper_case ? std::uppercase : std::nouppercase) << z;
+  }
+  return ret.str();
+}
+string HexToStr(char* s)
+{
+  ostringstream ret;
+  if(s!=NULL)
+  {
+
+    int size = strlen(s);
+    char z[3];
+    z[2]='\0';
+    for (string::size_type i = 0; i < size;)
+    {
+      std::stringstream ss;
+      unsigned int n=0;
+      z[0]= s[i];
+      z[1]= s[i+1];
+      ss << std::hex << z;
+      ss >> n;
+      ret << (char) n;
+      i+=2;
+    }
+  }
+  return ret.str();
+}
 
 void test(char *key,char* text)
 {
   rc4_ks_t keyrc4;
+  char *buffer = new char [(size_t) strlen((char *)key)];
+  char output1[strlen(text)];
+  memset(buffer,0,sizeof(buffer));
+  memset(output1,0,sizeof(output1));
   rc4_setks((uint8_t*)key,(size_t) strlen((char *)key), &keyrc4);
-  char output1[strlen(text)+1];
-  strcpy( output1, text );
-  printf("INPUT text=%s key=%s buf=%s\n", text,key,output1);
+  rc4_crypt((uint8_t*) output1,(size_t) strlen((char *)text), &keyrc4);
+  strcpy( output1,text);
   rc4_crypt((uint8_t*)output1,(size_t) sizeof(output1), &keyrc4);
-  printf("ENC %s\n", output1);
+  std::string tohexed = ToHex(std::string(output1, strlen(text)), true);
+  //printf("[%d]key=\"%s\"  text=\"%s\"\n",strlen(key),key,text);
+  printf("%s\n",tohexed.c_str());
+
+  memset(buffer,0,sizeof(buffer));
   rc4_setks((uint8_t*)key, strlen((char *)key), &keyrc4);
+  rc4_crypt((uint8_t*)buffer,(size_t) strlen((char *)key), &keyrc4);
+  std::string dehexed = HexToStr((char*)tohexed.c_str());
+  memcpy(output1,dehexed.c_str(),(size_t) sizeof(output1));
+  //printf("[%d]",sizeof(output1));
   rc4_crypt((uint8_t*)output1,(size_t) sizeof(output1), &keyrc4);
-  printf("DEC %s\n", output1);
+  //printf("%s\n",output1);
 }
 
 void usage(char* prg){
   printf("%s\n",prg);
   printf("commands available:\n");
   printf("\ttest key plaitext\n");
-  printf("\tcrypt infile outfile key <skyp>\n");
+  printf("\tcrypt infile outfile key <skip>\n");
 }
-int crypt(char *dst,char *src, char *key,int skyp)
+int crypt(char *dst,char *src, char *key,int skip)
  {
   rc4_ks_t keyrc4;
   std::ifstream iin (src, std::ifstream::binary);
@@ -56,8 +104,8 @@ int crypt(char *dst,char *src, char *key,int skyp)
    
     rc4_setks((uint8_t*)key, strlen((char *)key), &keyrc4);
     rc4_crypt((uint8_t*)buffer, CHUNK_SIZE, &keyrc4);
-    if(skyp){
-         iin.read (buffer,skyp);
+    if(skip){
+         iin.read (buffer,skip);
          length = (int)iin.gcount() ;
          iout.write(buffer,length);
        }
