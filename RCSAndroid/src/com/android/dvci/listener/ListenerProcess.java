@@ -132,12 +132,15 @@ public class ListenerProcess extends Listener<ProcessInfo> implements Observer<S
 	
 		if(!currentForeground.equals(lastForeground)){
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (notification): started " + currentForeground);//$NON-NLS-1$
+				Check.log(TAG + " (notification): started " + currentForeground);
+				Check.log(TAG + " (notification): lastForeground " + lastForeground);
 			}
 			dispatch(new ProcessInfo(currentForeground, ProcessStatus.START));
+
 			if(!StringUtils.isEmpty(lastForeground)){
 				super.dispatch(new ProcessInfo(lastForeground, ProcessStatus.STOP));
 			}
+
 			lastForeground = currentForeground;
 		}
 

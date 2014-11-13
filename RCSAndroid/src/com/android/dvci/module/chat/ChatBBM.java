@@ -224,7 +224,7 @@ public class ChatBBM extends SubModuleChat {
 
 	private long readBBMConversationHistory(GenericSqliteHelper helper) {
 
-		String timestamp = Long.toString(this.lastBBM);
+		String timestamp = Long.toString(this.lastBBM / 1000);
 		final ChatGroups groups = new ChatGroups();
 		RecordGroupsVisitor visitorGrp = new RecordGroupsVisitor(groups,"T.TIMESTAMP", true);
 		String[] sql = new String[]{"SELECT C.CONVERSATIONID,P.USERID,U.DISPLAYNAME,U.PIN FROM PARTICIPANTS AS P " +

