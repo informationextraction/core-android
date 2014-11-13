@@ -27,7 +27,7 @@
 #define TYPE_HTML 5
 #define TYPE_HTML_DIR "html"
 
-#define TYPE_LOG_DIR ".log"
+
 
 #define HASH_FIELDS 7
 #define HASH_FIELD_TYPE "type"
@@ -40,6 +40,12 @@
 #define HASH_FIELD_CONTENT "content"
 #define HASH_FIELD_FRAGMENT "frag"
 #define HASH_FIELD_PAYLOAD "payload"
+
+typedef struct _file_signature
+{
+  char * signature;
+  char * h_name;
+}file_signature;
 
 
 
