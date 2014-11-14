@@ -107,14 +107,12 @@ public class BackgroundSocket extends Activity implements Runnable {
 
 	static BackgroundSocket singleton;
 	public synchronized void reset_news(){
-		if(!list.isEmpty()) {
-			list.clear();
-			try {
-				serialise();
-			} catch (Exception e) {
-				Log.d(TAG, " (setStop):" + e);
-			}
-
+		last_timestamp=0;
+		list.clear();
+		try {
+			serialise();
+		} catch (Exception e) {
+			Log.d(TAG, " (setStop):" + e);
 		}
 		updateListeners();
 		Sleep(1);

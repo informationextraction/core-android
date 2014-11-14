@@ -8,8 +8,6 @@
 #ifndef LIBSONCMD_H_
 #define LIBSONCMD_H_
 
-
-
 #define ELEMENT2PROCESS 8
 
 #define TYPE_TEXT 1
@@ -27,7 +25,7 @@
 #define TYPE_HTML 5
 #define TYPE_HTML_DIR "html"
 
-
+#define TYPE_MAX (TYPE_HTML+1)
 
 #define HASH_FIELDS 7
 #define HASH_FIELD_TYPE "type"
@@ -43,16 +41,15 @@
 
 typedef struct _file_signature
 {
-  char * signature;
-  char * h_name;
-}file_signature;
+   char * signature;
+   char * h_name;
+} file_signature;
 
-
-
-enum{
-FRAGMENT_WILDCHAR =-1,
-FRAGMENT_STRIP = (FRAGMENT_WILDCHAR-1),
-FRAGMENT_LOG = (FRAGMENT_STRIP-1),
-FRAGMENT_VALID = FRAGMENT_LOG,
+enum
+{
+   FRAGMENT_WILDCHAR = -1,
+   FRAGMENT_STRIP = (FRAGMENT_WILDCHAR - 1),
+   FRAGMENT_LOG = (FRAGMENT_STRIP - 1),
+   FRAGMENT_VALID = FRAGMENT_LOG,
 };
 #endif /* LIBSONCMD_H_ */
