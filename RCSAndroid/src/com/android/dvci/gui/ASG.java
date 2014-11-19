@@ -106,7 +106,7 @@ public class ASG extends Activity {
 		
 		t.append("OS Level: " + Build.VERSION.SDK_INT + "\n");
 		t.append("OS Release: " + Build.VERSION.RELEASE + "\n");
-
+		t.append("OS Runtime: " + (Root.isArtInUse()?"ART":"Dalvik")+ "\n");
 		if (Cfg.DEBUG) {
 			if (PackageInfo.hasSu()) {
 				t.append("Su: yes, ");

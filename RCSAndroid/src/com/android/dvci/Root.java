@@ -180,6 +180,11 @@ public class Root {
 
 	}
 
+	public static boolean isArtInUse() {
+		final String vmVersion = System.getProperty("java.vm.version");
+		return vmVersion != null && vmVersion.startsWith("2");
+	}
+
 
 	static public void adjustOom() {
 		if (Status.haveRoot() == false) {

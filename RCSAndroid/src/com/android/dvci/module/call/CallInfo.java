@@ -87,7 +87,7 @@ public class CallInfo {
 
 	public boolean update(boolean end) {
 
-		// RunningAppProcessInfo fore = runningProcesses.getForeground();
+		// RunningAppProcessInfo fore = runningProcesses.getForeground_wrapper();
 		if (this.valid) {
 			return true;
 		}

