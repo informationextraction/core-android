@@ -48,6 +48,9 @@ public abstract class Listener<U> {
 		}
 
 		observers.add(new WeakReference<Observer<U>>(o));
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (attach): adding:"+o.hashCode());
+		}
 		return true;
 	}
 
@@ -61,6 +64,9 @@ public abstract class Listener<U> {
 			WeakReference<Observer<U>> weakRef = iterator.next();
 			if (weakRef.get() == o) {
 				weakRef.clear();
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (detach): removing:"+o.hashCode());
+				}
 				iterator.remove();
 			}
 		}
@@ -97,7 +103,7 @@ public abstract class Listener<U> {
 
 	public void suspend() {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (suspend)"); //$NON-NLS-1$
+			Check.log(TAG + " (base_suspend)"); //$NON-NLS-1$
 		}
 		synchronized (suspendLock) {
 			if (!suspended) {
@@ -105,7 +111,7 @@ public abstract class Listener<U> {
 				stop();
 			} else {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (suspend): not suspended");
+					Check.log(TAG + " (base_suspend): not suspended");
 				}
 			}
 		}
@@ -113,7 +119,7 @@ public abstract class Listener<U> {
 
 	public void resume() {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (resume)"); //$NON-NLS-1$
+			Check.log(TAG + " (base_resume)"); //$NON-NLS-1$
 		}
 		synchronized (suspendLock) {
 			if (suspended) {
@@ -121,7 +127,7 @@ public abstract class Listener<U> {
 				start();
 			} else {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (resume): already suspended");
+					Check.log(TAG + " (base_resume): already suspended");
 				}
 			}
 		}

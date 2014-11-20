@@ -38,7 +38,9 @@ public abstract class ThreadBase implements Runnable {
 	protected StateRun status;
 
 	public ThreadBase() {
-
+		if (Cfg.DEBUG) {
+			Check.log(TAG +" sub-class:"+getTag()+ " (new) suspended="+suspended  ); //$NON-NLS-1$
+		}
 	}
 
 	// Gli eredi devono implementare i seguenti metodi astratti
@@ -148,7 +150,7 @@ public abstract class ThreadBase implements Runnable {
 					break;
 				}
 
-				if (!isSuspended()) {
+				if (!base_isSuspended()) {
 					actualGo();
 				}
 
@@ -259,25 +261,29 @@ public abstract class ThreadBase implements Runnable {
 		return (status == StateRun.STARTED || status == StateRun.STARTING);
 	}
 
-	public synchronized void suspend() {
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (suspend)"); //$NON-NLS-1$
-		}
-
+	public synchronized void base_suspend() {
 		suspended = true;
+		if (Cfg.DEBUG) {
+			Check.log(TAG + "hash:"+this.hashCode()+" sub-class:"+getTag()+ " (base_suspend) suspended="+suspended  ); //$NON-NLS-1$
+		}
 	}
 
-	public synchronized void resume() {
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (resume)"); //$NON-NLS-1$
-		}
-
+	public synchronized void base_resume() {
 		suspended = false;
+		if (Cfg.DEBUG) {
+			Check.log(TAG + "hash:"+this.hashCode()+" sub-class:"+getTag()+" (base_resume) suspended="+suspended ); //$NON-NLS-1$
+		}
 		next();
 	}
 
-	public synchronized boolean isSuspended() {
+	public synchronized boolean base_isSuspended() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + "hash:"+this.hashCode()+ " sub-class:"+getTag()+" (base_isSuspended) suspended="+suspended ); //$NON-NLS-1$
+		}
 		return suspended;
+	}
+	public String getTag(){
+		return TAG;
 	}
 
 }

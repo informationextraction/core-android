@@ -153,13 +153,13 @@ public class ListenerProcess extends Listener<ProcessInfo> implements Observer<S
 		synchronized (standbyLock) {
 			if (b.getStatus()) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (notification): try to resume");
+					Check.log(TAG + " (notification): try to base_resume");
 				}
 				
 				resume();
 			} else {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (notification): try to suspend");
+					Check.log(TAG + " (notification): try to base_suspend");
 				}
 				
 				suspend();

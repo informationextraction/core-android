@@ -36,12 +36,11 @@ public class BSt extends BroadcastReceiver {
 
 			return;
 		}
+		final boolean on = intent.getAction().equals(Intent.ACTION_SCREEN_ON);
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " standby notification, action: " + intent.getAction());//$NON-NLS-1$
+			Check.log(TAG + " standby notification, action: " + intent.getAction() + "standBy is:" + on );//$NON-NLS-1$
 		}
-
-		final boolean on = intent.getAction().equals(Intent.ACTION_SCREEN_ON);
 
 		ListenerStandby.self().dispatch(new Standby(on));
 	}
