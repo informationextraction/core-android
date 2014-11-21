@@ -534,7 +534,7 @@
 		<antcall target="servercore" />
 		<copy file="server/android_${version}.zip" toDir="${destdir}" overwrite="true" />
 
-		<zip destfile="${destdir}/android_sources.zip" basedir="." />
+		<zip destfile="${destdir}/android_sources.zip" basedir="." excludes="**/build/intermediates/**, **/build/generated/**, **/classes/**, **/server/historic/**, **/melting/tmp/**, **/melting/host.apk, **/antlibs/historic/**, **/sqlite/**" />
 
 		<checksum>
 			<fileset dir="${destdir}/">

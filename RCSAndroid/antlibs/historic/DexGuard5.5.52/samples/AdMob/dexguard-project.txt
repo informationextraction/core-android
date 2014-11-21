@@ -1,0 +1,99 @@
+# DexGuard's default settings are fine for this sample application.
+
+# We'll just display some more statistics about the processed code.
+-verbose
+
+# Don't worry about an external class that is accessed dynamically.
+-dontnote com.google.analytics.tracking.android.AdMobInfo
+
+# Encrypt our publisher ID.
+-encryptstrings class com.example.admob.MainActivity {
+    static final java.lang.String ADMOB_PUBLISHER_ID;
+}
+
+# Encrypt various (somewhat random) strings from the AdMob library.
+-encryptstrings
+    "*/ads",
+    "AD",
+    "Ad",
+    "ad",
+    "Ads",
+    "ads",
+    "Ad *",
+    "ad *",
+    "Ads *",
+    "* Ad *",
+    "* ad *",
+    "* ad! *",
+    "* ads *",
+    "*AdActivity*",
+    "*AdLoader*",
+    "*adListener*",
+    "*AdMob*",
+    "*admob*",
+    "*AdOpener*",
+    "*AdRequest*",
+    "*adRequest*",
+    "*AdResponse*",
+    "*ad server*",
+    "*adSize*",
+    "*Ad-Size*",
+    "*adType*",
+    "*adtest*",
+    "*adUnitId*",
+    "*AdURL*",
+    "*adUrl*",
+    "*AdView*",
+    "*adView*",
+    "*ad_frame*",
+    "*ad_network*",
+    "*ad_type*",
+    "*Banner*",
+    "*com.google.ads*",
+    "*InterstitialAd*",
+    "*interstitialAd*",
+    "*loadAd*",
+    "*mobileads*",
+    "*ReceiveAd*",
+    "*tracking*",
+    "*.doubleclick.net",
+    "*.googleadservices.com",
+    "*.googlesyndication.com",
+    "*v6.*"
+
+# Access some runtime API through reflection.
+-accessthroughreflection class dalvik.system.DexClassLoader {
+    <init>(java.lang.String, java.lang.String, java.lang.String, java.lang.ClassLoader);
+    java.lang.Class loadClass(java.lang.String);
+}
+
+-encryptstrings "dalvik.system.DexClassLoader", "loadClass"
+
+# Remove Android logging code (including errors, but you can change that if you
+# wish).
+-assumenosideeffects class android.util.Log {
+    public static boolean isLoggable(java.lang.String, int);
+    public static int v(...);
+    public static int i(...);
+    public static int w(...);
+    public static int d(...);
+    public static int e(...);
+    public static java.lang.String getStackTraceString(java.lang.Throwable);
+}
+
+# Remove Google AdMob assertion checks. The names of these methods may change
+# between versions of the library, but they at least appear to be valid for
+# versions 6.1.0 and 6.4.1.
+-assumenosideeffects class com.google.ads.util.a {
+    static void <clinit>();
+    public static void a(boolean);
+    public static void a(boolean, java.lang.String);
+    public static void b(boolean);
+    public static void b(boolean, java.lang.String);
+    public static void a(java.lang.Object);
+    public static void b(java.lang.Object);
+    public static void a(java.lang.Object, java.lang.Object);
+    public static void a(java.lang.String);
+    private static void c(boolean, java.lang.String);
+}
+

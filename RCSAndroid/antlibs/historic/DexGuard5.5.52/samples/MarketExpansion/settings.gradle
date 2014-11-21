@@ -1,0 +1,5 @@
+include ':downloader_sample'
+include ':downloader_library'
+include ':zip_file'
+include ':MarketLicensing'
+project(':MarketLicensing').projectDir = file('../MarketLicensing/library')

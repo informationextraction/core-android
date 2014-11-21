@@ -1,0 +1,21 @@
+This sample illustrates how DexGuard can harden an application that uses the
+License Verification Library for the Google Play market.
+
+Our copy of the library has been improved manually in a few respects:
+
+- The string "com.android.vending.licensing.ILicensingService", originally
+  encrypted with trivial Base64 encoding in LicenseChecker.java, has been
+  restored, so DexGuard can encrypt it properly.
+- A fundamental switch statement in LicenseValidator.java has been obfuscated.
+- Some exceptions have been replaced by more generic exceptions.
+- Internal exception messages have been removed.
+
+Before building and running the sample, you should adapt it for your own Google
+Play publisher account:
+
+- src/com/example/android/market/licensing/MainActivity.java:
+    BASE64_PUBLIC_KEY must specify the public key from your Google Play profile.
+    SALT should define a random byte sequence.
+
+The sample configuration dexguard-project.txt then shows how to apply additional
+layers of obfuscation to the combined code of the application and the library.
