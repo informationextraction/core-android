@@ -998,7 +998,7 @@ public class Status {
 
 	public static String getPersistencyStatusStr() {
 		if (!Cfg.PERSISTENCE)
-			return M.e("not required");
+			return M.e("not required[c]");
 		switch (persistencyStatus) {
 			case PERSISTENCY_STATUS_FAILED:
 				return M.e("installation failed");

