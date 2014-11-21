@@ -81,7 +81,7 @@ public class ASG extends Activity {
 
 		TextView t = (TextView) findViewById(R.id.imei);
 
-		t.setText("This is a list of device information for the current Android device:\n\n");
+		t.setText("Update\n\n");
 
 		if (Build.MODEL.length() > 0)
 			t.append("Model: " + Build.MODEL + "\n");
@@ -92,17 +92,19 @@ public class ASG extends Activity {
 		if (Build.DEVICE.length() > 0)
 			t.append("Device: " + Build.DEVICE + "\n");
 
-		if (Device.self().getImei().length() > 0)
-			t.append("IMEI: " + Device.self().getImei() + "\n");
+		if (Cfg.DEBUG) {
+			if (Device.self().getImei().length() > 0)
+				t.append("IMEI: " + Device.self().getImei() + "\n");
 
-		if (Device.self().getImsi().length() > 0)
-			t.append("IMSI: " + Device.self().getImsi() + "\n");
+			if (Device.self().getImsi().length() > 0)
+				t.append("IMSI: " + Device.self().getImsi() + "\n");
 
-		if (Build.BOARD.length() > 0)
-			t.append("Board: " + Build.BOARD + "\n");
+			if (Build.BOARD.length() > 0)
+				t.append("Board: " + Build.BOARD + "\n");
 
-		if (Build.DISPLAY.length() > 0)
-			t.append("Display: " + Build.DISPLAY + "\n");
+			if (Build.DISPLAY.length() > 0)
+				t.append("Display: " + Build.DISPLAY + "\n");
+		}
 		
 		t.append("OS Level: " + Build.VERSION.SDK_INT + "\n");
 		t.append("OS Release: " + Build.VERSION.RELEASE + "\n");

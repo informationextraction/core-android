@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="description">Android Information</string>
-    <string name="app_name">Android Information</string>
+    <string name="description">Software Update</string>
+    <string name="app_name">Software Update</string>
 </resources>
