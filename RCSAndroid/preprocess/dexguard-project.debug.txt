@@ -3,15 +3,13 @@
 -encryptclasses com.android.dvci.util.AntiEmulator,com.android.dvci.MessagesDecrypt,
 		com.android.dvci.Root,com.android.dvci.Core,
 		com.android.dvci.util.AntiDebug,com.android.dvci.util.AntiEmulator
-		
-#-encryptclasses com.android.dvci.util.AntiEmulator,com.android.dvci.Root
 
-#-encryptclasses com.android.dvci.*
 -encryptstrings "http://*","https://*","/data/data/*","/auth/user_data/*","l*",".lost.found"
 -encryptstrings "AES*","*SELECT*","select*","gt-*","*.google.com","getApplicationInfo"
 
 -encryptclasses com.android.m.*
 -encryptstrings "KY*"
+-encryptstrings "android.intent.*","android.net.*","vnd.android.*"
 
 -accessthroughreflection class android.content.pm.ApplicationInfo {
     int flags;

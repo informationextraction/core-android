@@ -167,9 +167,9 @@ public class PackageInfo {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (checkRoot): isRoot NOOOOO"); //$NON-NLS-1$ //$NON-NLS-2$
 					}
-					if (!sentInfo) {
-						EvidenceBuilder.info("Root: NO");
-					}
+					//if (!sentInfo) {
+					//	EvidenceBuilder.info("Root: NO");
+					//}
 				}
 				sentInfo = true;
 			}
