@@ -251,7 +251,7 @@ public class ModuleMicL extends ModuleMic {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (onError) Error: " + what);//$NON-NLS-1$
 		}
-		base_suspend();
+		suspend();
 	}
 	@Override
 	public String getTag() {

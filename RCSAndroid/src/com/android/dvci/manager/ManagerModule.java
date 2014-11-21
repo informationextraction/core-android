@@ -149,7 +149,7 @@ public class ManagerModule extends Manager<BaseModule, String, String> {
 		}
 
 		// Agent mapped and running
-		if (a.isRunning() || a.base_isSuspended()) {
+		if (a.isRunning() || a.isSuspended()) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " Agent " + key + " is already running or suspended");//$NON-NLS-1$ //$NON-NLS-2$
 			}

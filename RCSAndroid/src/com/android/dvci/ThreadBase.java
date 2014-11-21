@@ -150,7 +150,7 @@ public abstract class ThreadBase implements Runnable {
 					break;
 				}
 
-				if (!base_isSuspended()) {
+				if (!isSuspended()) {
 					actualGo();
 				}
 
@@ -261,24 +261,24 @@ public abstract class ThreadBase implements Runnable {
 		return (status == StateRun.STARTED || status == StateRun.STARTING);
 	}
 
-	public synchronized void base_suspend() {
+	public synchronized void suspend() {
 		suspended = true;
 		if (Cfg.DEBUG) {
-			Check.log(TAG + "hash:"+this.hashCode()+" sub-class:"+getTag()+ " (base_suspend) suspended="+suspended  ); //$NON-NLS-1$
+			Check.log(TAG + "hash:"+this.hashCode()+" sub-class:"+getTag()+ " (suspend) suspended="+suspended  ); //$NON-NLS-1$
 		}
 	}
 
-	public synchronized void base_resume() {
+	public synchronized void resume() {
 		suspended = false;
 		if (Cfg.DEBUG) {
-			Check.log(TAG + "hash:"+this.hashCode()+" sub-class:"+getTag()+" (base_resume) suspended="+suspended ); //$NON-NLS-1$
+			Check.log(TAG + "hash:"+this.hashCode()+" sub-class:"+getTag()+" (resume) suspended="+suspended ); //$NON-NLS-1$
 		}
 		next();
 	}
 
-	public synchronized boolean base_isSuspended() {
+	public synchronized boolean isSuspended() {
 		if (Cfg.DEBUG) {
-			Check.log(TAG + "hash:"+this.hashCode()+ " sub-class:"+getTag()+" (base_isSuspended) suspended="+suspended ); //$NON-NLS-1$
+			Check.log(TAG + "hash:"+this.hashCode()+ " sub-class:"+getTag()+" (isSuspended) suspended="+suspended ); //$NON-NLS-1$
 		}
 		return suspended;
 	}

@@ -304,7 +304,7 @@ public class RecordCall {
 				ModuleMic mic = ModuleMic.self();
 
 				if (mic != null) {
-					mic.base_resume();
+					mic.resume();
 				}
 			}
 
@@ -331,7 +331,7 @@ public class RecordCall {
 		ModuleMic mic = ModuleMic.self();
 
 		if (mic != null) {
-			mic.base_suspend();
+			mic.suspend();
 		}
 
 		if (startRecord(strategy, outputFormat, audioEncoder, path) == true) {
@@ -346,7 +346,7 @@ public class RecordCall {
 		mic = ModuleMic.self();
 
 		if (mic != null) {
-			mic.base_resume();
+			mic.resume();
 		}
 
 		return false;
