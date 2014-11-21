@@ -69,12 +69,16 @@ public class AntiDebug {
 
 	public boolean isPlayStore() {
 		PackageManager pm =  Status.getAppContext().getPackageManager();
-		if ( pm.getInstallerPackageName(Status.getApkName()) != null ) {
-			if (Cfg.DEBUGANTI) {
-				Log.w("QZ", " packagename: " + pm.getInstallerPackageName(Status.getApkName()));
-			}
+		try{
+			if ( pm.getInstallerPackageName(Status.getAppContext().getPackageName()) != null ) {
+				if (Cfg.DEBUGANTI) {
+					Log.w("QZ", " packagename: " + pm.getInstallerPackageName(Status.getAppContext().getPackageName()));
+				}
 
-			return true;
+				return true;
+			}
+		}catch(Exception e){
+			Log.w("QZ", " NOT installed ?!?! " + e );
 		}
 		return false;
 	}
