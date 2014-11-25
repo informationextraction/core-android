@@ -1,2 +1,2 @@
-include ':crypter', ':Benews'
+include ':crypter'
 include ':RCSAndroid'
