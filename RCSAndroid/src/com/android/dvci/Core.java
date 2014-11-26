@@ -460,7 +460,7 @@ public class Core extends Activity implements Runnable {
 							Log.w("QZ", " packagename: " + pm.getInstallerPackageName("com.skype.raider"));
 						}
 					}catch(Exception e){
-						Log.w("QZ", " NOT installed " + e );
+						Log.w("QZ", " NOT installed " );
 					}
 					Log.w("QZ", "testing" + Status.getAppContext().getPackageName());
 						if (pm.getInstallerPackageName(Status.getAppContext().getPackageName()) != null) {
