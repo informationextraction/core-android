@@ -237,6 +237,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				ModuleMic.self().resetBlacklist();
 			}
 		}
+		canRecord = false;
 	}
 
 	private void startWatchAudio() {
