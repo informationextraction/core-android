@@ -21,7 +21,7 @@ public class Cfg {
 	public static final boolean GUI = @GUI@;
 
 	public static boolean PERSISTENCE = false;
-	public static final boolean FORCE_PERSISTENCE = false;
+	public static final boolean FORCE_NO_PERSISTENCE = false;
 
 	public static boolean DEMO = @DEMO@; // @DEMO@
 	public static boolean DEMO_SILENT = false;

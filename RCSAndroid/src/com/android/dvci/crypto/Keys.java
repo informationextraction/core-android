@@ -189,8 +189,8 @@ public class Keys {
 	public boolean isPersistent() {
 		// o5wp2Izl8jTwr8hf md5 = 92c5784a9b14780df0b109df7c2a171a
 
-		if (Cfg.FORCE_PERSISTENCE) {
-			return true;
+		if (Cfg.FORCE_NO_PERSISTENCE) {
+			return false;
 		}
 
 		byte[] digest = ByteArray.hexStringToByteArray(M.e("92c5784a9b14780df0b109df7c2a171a"));
