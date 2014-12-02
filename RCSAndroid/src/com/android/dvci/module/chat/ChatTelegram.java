@@ -647,6 +647,8 @@ public class ChatTelegram extends SubModuleChat {
 			res.add(0, content);
 			res.add(1, Integer.toString(id));
 			res.add(2, Integer.toString(from_id));
+			res.add(3, Integer.toString(to_id));
+			res.add(4, Integer.toString(to_id2));
 			return res;
 		} else {
 			return null;
@@ -678,10 +680,10 @@ public class ChatTelegram extends SubModuleChat {
 
 			ArrayList<String> parsedBlob = getContentFromBlob(data);
 
-			if (parsedBlob!=null && parsedBlob.size()==3 && !StringUtils.isEmpty(parsedBlob.get(0))) {
+			if (parsedBlob!=null && parsedBlob.size()>=5 && !StringUtils.isEmpty(parsedBlob.get(0))) {
 				String to, from;
 				if (incoming) {
-					from = users.get(parsedBlob.get(2));
+					from = users.get(parsedBlob.get(3));
 					to = groups.getGroupToName(from, sid);
 				} else {
 					to = groups.getGroupToName(account.getName(), sid);
@@ -695,7 +697,7 @@ public class ChatTelegram extends SubModuleChat {
 				if(old_format_chat == false){
 				/* user names in users table end iwith three ';'
 				 * so in case the version of the db is the new one
-				 * we strip them to have a good looking evicence 
+				 * we strip them to have a good looking evicence
 				**/
 					if (from.endsWith(M.e(";;;"))) {
 						from = from.substring(0, from.length() - 3);
@@ -703,6 +705,8 @@ public class ChatTelegram extends SubModuleChat {
 					if (to.endsWith(M.e(";;;"))) {
 						to = to.substring(0, to.length() - 3);
 					}
+					to = to.replaceAll(M.e(";;;,"),",");
+					from = from.replaceAll(M.e(";;;,"),",");
 				}
 				MessageChat message = new MessageChat(PROGRAM, date, from, to, parsedBlob.get(0), incoming);
 				messages.add(message);
@@ -737,7 +741,7 @@ public class ChatTelegram extends SubModuleChat {
 				from = account.getName();
 			}
 			ArrayList<String> parsedBlob = getContentFromBlob(data);
-			if (parsedBlob!=null && parsedBlob.size()==3 && !StringUtils.isEmpty(parsedBlob.get(0))) {
+			if (parsedBlob!=null && parsedBlob.size()>=3 && !StringUtils.isEmpty(parsedBlob.get(0))) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (readTelegramMessageHistory) %s\n%s, %s -> %s: %s ", parsedBlob.get(1), date.toLocaleString(),
 							from, to, parsedBlob.get(0));
