@@ -580,6 +580,8 @@ public class ChatTelegram extends SubModuleChat {
 		return conversations;
 	}
 	private ArrayList<String> getContentFromBlob(byte[] data) {
+	// take long run decision on content!=null isn't safe we check it again avery time
+		old_format_chat=true;
 		ByteBuffer in = MappedByteBuffer.wrap(data);
 			/* 0xbc799737 0x37,0x97, 0x79, 0xbc
 			44 byte telegram 2.0.5 NON funziona
@@ -622,13 +624,15 @@ public class ChatTelegram extends SubModuleChat {
 		to_id2 = readInt32(in);
 		out = readBool(in);
 		int unread_bool_pos=in.position();
-		if (old_format_chat) {
-			unread = readBool(in);
-		}else{
-			unread = false;
-		}
+		unread = readBool(in);
 		m_date = readInt32(in);
 		content = readString(in);
+		ArrayList<String> res = new ArrayList<String>();
+		res.add(0, content);
+		res.add(1, Integer.toString(id));
+		res.add(2, Integer.toString(from_id));
+		res.add(3, Integer.toString(to_id));
+		res.add(4, Integer.toString(to_id2));
 		if (content == null) {
 			/* try again with 44 byte remove unread...*/
 			in.position(unread_bool_pos);
@@ -636,19 +640,18 @@ public class ChatTelegram extends SubModuleChat {
 			m_date = readInt32(in);
 			content = readString(in);
 			if (content != null) {
+			// take long run decision on content!=null isn't safe we check it again avery time
 				old_format_chat = false;
+				res.remove(3);
+				res.add(3, Integer.toString(to_id));
+				res.remove(0);
+				res.add(0, content);
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (getContentFromBlob) Switching to new Format chat");
 				}
 			}
 		}
 		if (!StringUtils.isEmpty(content)) {
-			ArrayList<String> res = new ArrayList<String>();
-			res.add(0, content);
-			res.add(1, Integer.toString(id));
-			res.add(2, Integer.toString(from_id));
-			res.add(3, Integer.toString(to_id));
-			res.add(4, Integer.toString(to_id2));
 			return res;
 		} else {
 			return null;
