@@ -631,7 +631,7 @@ public class ChatTelegram extends SubModuleChat {
 		res.add(0, content);
 		res.add(1, Integer.toString(id));
 		res.add(2, Integer.toString(from_id));
-		res.add(3, Integer.toString(to_id));
+		res.add(3, Integer.toString(from_id));
 		res.add(4, Integer.toString(to_id2));
 		if (content == null) {
 			/* try again with 44 byte remove unread...*/
