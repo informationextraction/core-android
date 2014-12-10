@@ -9,7 +9,7 @@ android {
 
     buildToolsVersion "19.1.0"
     defaultConfig {
-            packageName "com.android.dvci"
+            applicationId "com.android.dvci"
             minSdkVersion 8
             targetSdkVersion 19
             versionCode 1

