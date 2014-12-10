@@ -181,7 +181,11 @@ public class ManagerModule extends Manager<BaseModule, String, String> {
 
 	private BaseModule makeAgent(String type) {
 		if (instances.containsKey(type) == true) {
-			return instances.get(type);
+			BaseModule a =  instances.get(type);
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (makeAgent) Module:"+ type +"already present:"+a.hashCode() );
+			}
+			return a;
 		}
 
 		final BaseModule base = factory.create(type, null);
@@ -189,7 +193,9 @@ public class ManagerModule extends Manager<BaseModule, String, String> {
 		if (base != null) {
 			instances.put(type, base);
 		}
-
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (makeAgent) Module:"+ type +" created :"+base.hashCode() );
+		}
 		return base;
 	}
 
@@ -229,6 +235,9 @@ public class ManagerModule extends Manager<BaseModule, String, String> {
 		if (t != null) {
 			try {
 				t.join();
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (stop) " + moduleId + " stopped and joined");//$NON-NLS-1$ //$NON-NLS-2$
+				}
 			} catch (final InterruptedException e) {
 				if (Cfg.EXCEPTION) {
 					Check.log(e);
@@ -239,6 +248,10 @@ public class ManagerModule extends Manager<BaseModule, String, String> {
 				}
 			}
 			threads.remove(a);
+		}else{
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (stop) " + moduleId + " stopped but not joined");//$NON-NLS-1$ //$NON-NLS-2$
+			}
 		}
 	}
 

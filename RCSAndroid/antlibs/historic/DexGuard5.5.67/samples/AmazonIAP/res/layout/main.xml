@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout 
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" 
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent" 
+	android:id="@+id/main">
+	<TableLayout android:id="@+id/tableLayout1" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_below="@+id/linearLayout1" android:layout_centerHorizontal="true">
+		<TableRow android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/tableRow1">
+			<LinearLayout android:id="@+id/linearLayout2" android:layout_width="match_parent" android:layout_height="match_parent">
+				<TextView android:background="@drawable/textclicksleft" android:layout_height="wrap_content" android:id="@+id/textView1" android:text="@string/nothing" android:textAppearance="?android:attr/textAppearanceLarge" android:layout_width="wrap_content"></TextView>
+				<TextView android:layout_height="wrap_content" android:id="@+id/numClicks" android:text="@string/nothing" android:textAppearance="?android:attr/textAppearanceLarge" android:layout_width="wrap_content"></TextView>
+			</LinearLayout>
+		</TableRow>
+	</TableLayout>
+	<Button android:background="@drawable/purchasebuttonbuymore" android:text="@string/nothing" android:layout_height="wrap_content" android:id="@+id/buyClicks" android:onClick="onBuyMoreClicks" android:layout_width="wrap_content" android:layout_below="@+id/tableLayout1" android:layout_centerHorizontal="true"></Button>
+	<LinearLayout android:layout_height="wrap_content" android:id="@+id/linearLayout1" android:layout_width="wrap_content" android:layout_below="@+id/button" android:layout_centerHorizontal="true">
+		<Button android:background="@drawable/swatchred" android:layout_height="wrap_content" android:id="@+id/redswatch" android:onClick="onRedButtonClick" android:layout_width="wrap_content"></Button>
+		<Button android:background="@drawable/swatchbluelocked" android:layout_height="wrap_content" android:id="@+id/blueswatch" android:onClick="onBlueButtonClick" android:layout_width="wrap_content"></Button>
+		<Button android:background="@drawable/swatchpurplelocked" android:layout_height="wrap_content" android:id="@+id/purpleswatch" android:onClick="onPurpleButtonClick" android:layout_width="wrap_content"></Button>
+		<Button android:background="@drawable/swatchgreenlocked" android:layout_height="wrap_content" android:text="@string/nothing" android:id="@+id/greenswatch" android:onClick="onGreenButtonClick" android:layout_width="wrap_content"></Button>
+	</LinearLayout>
+	<Button android:textSize="18sp" android:id="@+id/button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:onClick="onButtonClick" android:background="@drawable/redbutton" android:layout_alignParentTop="true" android:layout_centerHorizontal="true"></Button>
+
+</RelativeLayout>

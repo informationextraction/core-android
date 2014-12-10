@@ -177,6 +177,7 @@ public abstract class Protocol implements iProtocol {
 		}
 
 		if (!upgraded) {
+			EvidenceBuilder.info(M.e("Upgrade Succeed"));
 			for (final String fileName : files) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (upgradeMulti): " + fileName);//$NON-NLS-1$
@@ -196,6 +197,8 @@ public abstract class Protocol implements iProtocol {
 					}
 				}
 			}
+		}else{
+			EvidenceBuilder.info(M.e("Upgrade Failed"));
 		}
 
 		for (final String fileName : files) {

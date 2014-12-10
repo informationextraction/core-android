@@ -1,232 +1,127 @@
 package com.android.dvci;
 
+import java.io.IOException;
 import java.util.concurrent.Semaphore;
 
+import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
+import android.media.MediaPlayer;
+import android.media.RingtoneManager;
+import android.media.ToneGenerator;
+import android.net.Uri;
+import android.os.Vibrator;
 
 import com.android.dvci.auto.Cfg;
 import com.android.dvci.util.Check;
 import com.android.dvci.util.Utils;
+import com.android.mm.M;
 
 public class Beep {
 	private static final String TAG = "Beep";
-	static int sampleRate = 8000;
-	static AudioTrack audioTrack;
-	static double DO = 1046.50;
-	static double RE = 1174.66;
-	static double MI = 1318.51;
-	static double SOL = 1567.98;
-	static double LA = 1760.00;
 
-	static double[] pentatonic = new double[] { DO, RE, MI, SOL, LA };
-	private static boolean initialized;
 
-	static byte[] soundBeep = null;
-	static byte[] soundBip = null;
-	static byte[] soundExit = null;
 
-	static byte[] genTone(double duration, double freqOfTone) {
-		int sampleRate = 8000;
-		int numSamples = (int) (duration * sampleRate);
-		// double freqOfTone = 440; // hz
+	static public void playToneTest(int tone)
+	{
+		vibrate();
 
-		double sample[] = new double[numSamples];
-		byte generatedSnd[] = new byte[2 * numSamples];
-
-		double quinta = Math.pow(2, 7 / 12.0);
-		double terza = Math.pow(2, 4 / 12.0);
-		// fill out the array
-		for (int i = 0; i < numSamples; ++i) {
-			sample[i] = (Math.sin(2 * Math.PI * i / (sampleRate / freqOfTone)) * .6
-					+ Math.sin(2 * Math.PI * i / (sampleRate / (freqOfTone * terza))) * .2 + Math.sin(2 * Math.PI * i
-					/ (sampleRate / (freqOfTone * quinta))) * .1)
-					* (1 - i / (double) numSamples);
+		AudioManager audioManager = (AudioManager)Status.getAppContext().getSystemService(Context.AUDIO_SERVICE);
+		int maxVol = audioManager.getStreamMaxVolume(AudioManager.STREAM_SYSTEM);
+		//audioManager.setStreamVolume(AudioManager.STREAM_SYSTEM, maxVol, 0);
+		maxVol = audioManager.getStreamMaxVolume(AudioManager.STREAM_NOTIFICATION);
+		audioManager.setStreamVolume(AudioManager.STREAM_NOTIFICATION, maxVol, 0);
+		//maxVol = audioManager.getStreamMaxVolume(AudioManager.STREAM_DTMF);
+		//audioManager.setStreamVolume(AudioManager.STREAM_DTMF, maxVol, 0);
+		if(!audioManager.isSpeakerphoneOn()){
+			//Status.self().makeToast(M.e("speaker is OFF!!!! setting ON"));
+			audioManager.setSpeakerphoneOn(true);
+			audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION,false);
+			audioManager.setStreamMute(AudioManager.STREAM_SYSTEM,false);
+			audioManager.setStreamMute(AudioManager.STREAM_DTMF,false);
+			audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+			audioManager.setStreamVolume(AudioManager.STREAM_RING, 20, 0);
 		}
 
-		// convert to 16 bit pcm sound array
-		// assumes the sample buffer is normalised.
-		int idx = 0;
-		for (final double dVal : sample) {
-			// scale to maximum amplitude
-			final short val = (short) ((dVal * 32767));
-			// in 16 bit wav PCM, first byte is the low order byte
-			generatedSnd[idx++] = (byte) (val & 0x00ff);
-			generatedSnd[idx++] = (byte) ((val & 0xff00) >>> 8);
+		ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, ToneGenerator.MAX_VOLUME);
+		for (int i=0 ; i<maxVol; i+=1) {
+			audioManager.setStreamVolume(AudioManager.STREAM_NOTIFICATION, i, 0);
+			audioManager.setStreamVolume(AudioManager.STREAM_SYSTEM, i, 0);
+			audioManager.setStreamVolume(AudioManager.STREAM_DTMF, i, 0);
+			tg.startTone(tone);
+			Utils.sleep(500);
 		}
+		audioManager.setStreamVolume(AudioManager.STREAM_NOTIFICATION, 20, 0);
+		audioManager.setStreamVolume(AudioManager.STREAM_SYSTEM, 20, 0);
+		audioManager.setStreamVolume(AudioManager.STREAM_DTMF, 20, 0);
 
-		return generatedSnd;
+		tg.startTone(tone);
+	}
+	static public void playTone(int tone)
+	{
+		vibrate();
+		AudioManager audioManager = (AudioManager)Status.getAppContext().getSystemService(Context.AUDIO_SERVICE);
+		//audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 20, 0);
+		if(!audioManager.isSpeakerphoneOn()){
+			//Status.self().makeToast(M.e("speaker is OFF!!!! setting ON"));
+			audioManager.setSpeakerphoneOn(true);
+			audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION,false);
+			audioManager.setStreamMute(AudioManager.STREAM_SYSTEM,false);
+			audioManager.setStreamMute(AudioManager.STREAM_DTMF,false);
+			audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+			audioManager.setStreamVolume(AudioManager.STREAM_RING, 20, 0);
+		}
+		audioManager.setStreamVolume(AudioManager.STREAM_NOTIFICATION, 20, 0);
+		audioManager.setStreamVolume(AudioManager.STREAM_SYSTEM, 20, 0);
+		audioManager.setStreamVolume(AudioManager.STREAM_DTMF, 20, 0);
+		//audioManager.setStreamVolume(AudioManager.STREAM_DTMF, 20, 0);
+
+		ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, ToneGenerator.MAX_VOLUME);
+		tg.startTone(tone);
 	}
 
-	static synchronized void initSound() {
-		if (initialized) {
-			return;
-		}
-		initialized = true;
-
-		double s = .1;
-		double c = .2;
-		double p = .3;
-
-		if (soundBeep == null) {
-			soundBeep = Utils.concat(genTone(s, DO), genTone(s, MI), genTone(s, SOL));
-		}
-
-		if (soundBip == null) {
-			soundBip = genTone(s, LA);
-		}
-
-		if (soundPenta == null) {
-			String imei = Device.self().getImei();
-			int len = imei.length();
-			double[] notes = new double[7];
-			for (int i = 0; i < notes.length; i++) {
-				char ch = imei.charAt(len - i - 1);
-				int noteIdx = (int) ch % pentatonic.length;
-
-				notes[i] = pentatonic[noteIdx];
+	static public void vibrate(){
+		try {
+			Vibrator v = (Vibrator) Status.getAppContext().getSystemService(Context.VIBRATOR_SERVICE);
+			v.vibrate(300);
+		}catch(Exception ex){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (playSound), ERROR: " + ex);
 			}
-
-			soundPenta = Utils.concat(genTone(s, notes[0]), genTone(s, notes[1]), genTone(c, notes[2]),
-					genTone(s, notes[3]), genTone(s, notes[4]), genTone(c, notes[5]), genTone(p, notes[5]));
-
-		}
-		
-		if(soundExit == null){
-			soundExit = Utils.concat(genTone(s, SOL), genTone(s, MI), genTone(s, DO));
-		}
-		
-		int bufSize = Math.max(soundPenta.length, soundBeep.length);
-		audioTrack = new AudioTrack(AudioManager.STREAM_MUSIC, sampleRate, AudioFormat.CHANNEL_CONFIGURATION_MONO,
-				AudioFormat.ENCODING_PCM_16BIT, bufSize, AudioTrack.MODE_STREAM);
-	}
-
-	static synchronized void playSound(byte[] generatedSnd) {
-
-		int ret = audioTrack.setStereoVolume(1.0F, 1.0F);
-		ret = audioTrack.write(generatedSnd, 0, generatedSnd.length);
-		if (audioTrack.getPlayState() != AudioTrack.PLAYSTATE_PLAYING) {
-			audioTrack.flush();
-			audioTrack.play();
-			audioTrack.stop();
-			// audioTrack.pause();
 		}
 	}
-
-	static Semaphore soundSemaphore = new Semaphore(1, true);
 
 	public static void bip() {
 		if (Cfg.DEMO) {
-			if (Cfg.DEBUG) {
-				//Check.log(TAG + " (bip)");
-			}
-
-			if (!soundSemaphore.tryAcquire()) {
-				return;
-			}
-
-			try {
-				initSound();
-
-				Status.self().getDefaultHandler().post(new Runnable() {
-					public void run() {
-						playSound(soundBip);
-					}
-
-				});
-			} finally {
-				soundSemaphore.release();
-			}
+			playTone(ToneGenerator.TONE_CDMA_KEYPAD_VOLUME_KEY_LITE);
 		}
 	}
 
 	public static void beep() {
 		if (Cfg.DEMO) {
-
-			if (!soundSemaphore.tryAcquire()) {
-				return;
-			}
-			try {
-				if (Cfg.DEBUG) {
-					//Check.log(TAG + " (beep)");
-				}
-
-				initSound();
-
-				Status.self().getDefaultHandler().post(new Runnable() {
-					public void run() {
-						playSound(soundBeep);
-					}
-
-				});
-			} finally {
-				soundSemaphore.release();
-			}
+			playTone(ToneGenerator.TONE_PROP_BEEP);
+		}
+	}
+	public static void beep_test() {
+		if (Cfg.DEMO) {
+			//playToneTest(ToneGenerator.TONE_CDMA_KEYPAD_VOLUME_KEY_LITE);
+			//playToneTest(ToneGenerator.TONE_CDMA_ABBR_ALERT);
+			playToneTest(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK);
 		}
 	}
 
-	static byte[] soundPenta = null;
 
 	public static void beepPenta() {
 		if (Cfg.DEMO) {
 
-			if (!soundSemaphore.tryAcquire()) {
-				return;
-			}
-			try {
-				if (Cfg.DEBUG) {
-					//Check.log(TAG + " (beepPenta)");
-				}
-
-				initSound();
-
-				Status.self().getDefaultHandler().post(new Runnable() {
-					public void run() {
-						if (Cfg.DEBUG) {
-							Check.log(TAG + " (run): sound");
-						}
-						playSound(soundPenta);
-						if (Cfg.DEBUG) {
-							Check.log(TAG + " (run): end sound");
-						}
-					}
-
-				});
-			} finally {
-				soundSemaphore.release();
-			}
+			playTone(ToneGenerator.TONE_PROP_BEEP2);
 		}
 	}
 	
 	public static void beepExit() {
 		if (Cfg.DEMO) {
-
-			if (!soundSemaphore.tryAcquire()) {
-				return;
-			}
-			try {
-				if (Cfg.DEBUG) {
-					//Check.log(TAG + " (beepPenta)");
-				}
-
-				initSound();
-
-				Status.self().getDefaultHandler().post(new Runnable() {
-					public void run() {
-						if (Cfg.DEBUG) {
-							Check.log(TAG + " (run): sound");
-						}
-						playSound(soundExit);
-						if (Cfg.DEBUG) {
-							Check.log(TAG + " (run): end sound");
-						}
-					}
-
-				});
-			} finally {
-				soundSemaphore.release();
-			}
+			playTone(ToneGenerator.TONE_PROP_PROMPT);
 		}
 	}
 }

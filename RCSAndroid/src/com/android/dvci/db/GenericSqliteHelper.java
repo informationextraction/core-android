@@ -130,21 +130,24 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 		}
 	}
 
+	public long traverseRecords(String table, RecordVisitor visitor) {
+		return traverseRecords(table,visitor,false);
+	}
+
 	/**
 	 * Traverse all the records of a table on a projection. Visitor pattern
 	 * implementation
 	 *
 	 * @param table
-	 * @param projection
-	 * @param selection
 	 * @param visitor
 	 */
-	public long traverseRecords(String table, RecordVisitor visitor) {
+	public long traverseRecords(String table, RecordVisitor visitor, boolean distinct) {
 		synchronized (lockObject) {
 			db = getReadableDatabase();
 			SQLiteQueryBuilder queryBuilderIndex = new SQLiteQueryBuilder();
 
 			queryBuilderIndex.setTables(table);
+			queryBuilderIndex.setDistinct(distinct);
 			Cursor cursor = queryBuilderIndex.query(db, visitor.getProjection(), visitor.getSelection(), null, null,
 					null, visitor.getOrder());
 

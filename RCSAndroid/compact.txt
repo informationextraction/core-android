@@ -6,13 +6,13 @@
 #     java -jar dexguard.jar ..... -obfuscationdictionary compact.txt
 #
 
-Code
-V
-I
-Z
-B
-C
-S
-F
-D
-L
+Cl
+Ve
+Ie
+Ze
+Be
+Ce
+Se
+Fe
+De
+Le

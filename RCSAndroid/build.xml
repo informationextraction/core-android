@@ -172,13 +172,23 @@
 					<echo message="set debug" />
 
 					<var name="isdebug" value="true" />
+                    <var name="gui" value="true" />
 
 					<copy file="preprocess/config.debug.bin" toFile="assets/cb.data" overwrite="true" />
 					<copy file="preprocess/resources.patched.bin" toFile="assets/rb.data" overwrite="true" />
-					<copy file="preprocess/dexguard-project.release.txt" toFile="dexguard-project.txt" overwrite="true" />
+					<copy file="preprocess/dexguard-project.debug.txt" toFile="dexguard-project.txt" overwrite="true" />
 				</case>
+                <case value="releasedebug">
+                    <echo message="set releasedebug" />
+                    <var name="gui" value="true" />
+
+                    <copy file="preprocess/config.release.bin" toFile="assets/cb.data" overwrite="true" />
+                    <copy file="preprocess/resources.unpatched.bin" toFile="assets/rb.data" overwrite="true" />
+                    <copy file="preprocess/dexguard-project.debug.txt" toFile="dexguard-project.txt" overwrite="true" />
+                </case>
 				<case value="release">
 					<echo message="set release" />
+                    <var name="gui" value="true" />
 
 					<copy file="preprocess/config.release.bin" toFile="assets/cb.data" overwrite="true" />
 					<copy file="preprocess/resources.unpatched.bin" toFile="assets/rb.data" overwrite="true" />
@@ -188,6 +198,7 @@
 					<echo message="set merge" />
 
 					<var name="isdebug" value="false" />
+                    <var name="gui" value="false" />
 
 					<copy file="preprocess/config.release.bin" toFile="assets/cb.data" overwrite="true" />
 					<copy file="preprocess/resources.unpatched.bin" toFile="assets/rb.data" overwrite="true" />
@@ -200,12 +211,14 @@
 				<then>
 					<!-- Alzare l'api level in caso di 3.x o 4.x -->
 					<echo message="Copy BackGround" />
+
 					<copy file="preprocess/AndroidManifest.BACKGROUND.xml" tofile="AndroidManifest.xml" overwrite="true">
 						<filterset>
 							<filter token="CAVEAT" value="QUESTO FILE E' GENERATO DA build.xml. MODIFICATE IL FILE IN PREPROCESS" />
 							<filter token="DEBUGGABLE" value="${isdebug}" />
 						</filterset>
 					</copy>
+                    <var name="gui" value="false" />
 				</then>
 				<else>
 					<echo message="Copy Activity" />
@@ -230,7 +243,8 @@
 					<filter token="DEBUG" value="${isdebug}" />
 					<filter token="EXCEPTION" value="${isdebug}" />
 
-					<filter token="DEMO" value="false" />
+					<filter token="DEMO" value="${isdebug}" />
+                    <filter token="GUI" value="${gui}" />
 					<!-- TODO RIMETTERE!!!! filter token="KEYS" value="${isdebug}" / -->
 					<filter token="KEYS" value="false" />
 					<filter token="FILE" value="true" />
@@ -242,6 +256,15 @@
 					<filter token="RNDMSG" value="${randomKeyMessages}" />
 				</filterset>
 			</copy>
+
+            <switch value="${gui}">
+                <case value="true">
+                    <echo message="gui" />
+                </case>
+                <default>
+                    <echo message="no gui" />
+                </default>
+            </switch>
 
 			<switch value="${isdebug}">
 				<case value="true">
@@ -410,7 +433,6 @@
 				<mkdir dir="output/${kind}/" />
 				<copy file="${filename}" toFile="output/${kind}/core.android.@{osversion}.apk" overwrite="true" />
 			</sequential>
-
 		</for>
 
 		<antcall target="merge" />
@@ -432,7 +454,7 @@
 				<antcall target="clean" />
 
 				<echo message="bin/@{osversion}/${kind}/core.android" />
-				<set-cfg osversion="@{osversion}" kind="${kind}" />
+				<set-cfg osversion="@{osversion}" kind="releasedebug" />
 
 				<antcall target="encrypt-messages" />
 
@@ -512,7 +534,7 @@
 		<antcall target="servercore" />
 		<copy file="server/android_${version}.zip" toDir="${destdir}" overwrite="true" />
 
-		<zip destfile="${destdir}/android_sources.zip" basedir="." />
+		<zip destfile="${destdir}/android_sources.zip" basedir="." excludes="**/build/intermediates/**, **/build/generated/**, **/classes/**, **/server/historic/**, **/melting/tmp/**, **/melting/host.apk, **/antlibs/historic/**, **/sqlite/**" />
 
 		<checksum>
 			<fileset dir="${destdir}/">
@@ -545,7 +567,7 @@
 	</target>
 
 	<target name="update-castore">
-		<updaterelease server="rcs-castore" login="zenobatch" password="Fabriziop123" file="server/android_${version}.zip" />
+		<updaterelease server="rcs-castore" login="zenobatch" password="castoreP123" file="server/android_${version}.zip" />
 	</target>
 
 	<target name="update-polluce">

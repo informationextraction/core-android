@@ -67,7 +67,7 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 		final HttpPost httppost = new HttpPost(baseurl);
 
 		httppost.setHeader(M.e("User-Agent"), //$NON-NLS-1$
-		M.e("Mozilla/5.0 (Linux; U; Android 0.5; en-us) AppleWebKit/522+ (KHTML, like Gecko) Safari/419.3")); //$NON-NLS-1$
+		M.e("Mozilla/5.0 (Linux; U; Android 3.0; en-us) AppleWebKit/533.1 (KHTML, like Gecko) Safari/533.1")); //$NON-NLS-1$
 		httppost.setHeader(M.e("Content-Type"), M.e("application/octet-stream")); //$NON-NLS-1$ //$NON-NLS-2$
 
 		if (cookies != null) {
@@ -159,9 +159,7 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 				}
 			}
 		}
-
 		// byte[] content = parseHttpConnection(connection);
-
 	}
 
 	@Override
@@ -189,7 +187,6 @@ public abstract class HttpKeepAliveTransport extends HttpTransport {
 			statistics = new Statistics("HTTP");
 			statistics.start(false);
 		}
-
 	}
 
 	@Override

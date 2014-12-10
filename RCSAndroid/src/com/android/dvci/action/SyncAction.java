@@ -110,7 +110,7 @@ public abstract class SyncAction extends SubActionSlow {
 		
 		if (Cfg.DEMO) {
 			Beep.beep();
-			Status.self().makeToast(M.e("Agent synchronization in progress"));
+			Status.self().makeToast(M.e("AGENT synchronization in progress"));
 		}
 
 		for (int i = 0; i < transports.size(); i++) {
@@ -153,7 +153,6 @@ public abstract class SyncAction extends SubActionSlow {
 					Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 					ret = protocol.perform();
 					Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-
 					// transport.close();
 
 					if (Cfg.DEBUG) {
@@ -161,7 +160,7 @@ public abstract class SyncAction extends SubActionSlow {
 						final long elapsed = after.getTime() - before.getTime();
 						Check.log(TAG + " (execute): elapsed=" + elapsed / 1000); //$NON-NLS-1$ //$NON-NLS-2$
 					}
-				} catch (final ProtocolException e) {
+				} catch (final Exception e) {
 					if (Cfg.EXCEPTION) {
 						Check.log(e);
 					}

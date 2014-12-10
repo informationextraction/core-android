@@ -1,0 +1,28 @@
+# DexGuard's default settings are fine for this sample application.
+
+# Display some more statistics about the processed code.
+-verbose
+
+# Access sensitive runtime APIs through reflection.
+# We also encrypt the resulting strings, adding another layer of obfuscation.
+-accessthroughreflection class com.example.HelloWorldActivity {
+    android.content.pm.PackageManager getPackageManager();
+    java.lang.String getPackageName();
+}
+
+-encryptstrings "com.example.HelloWorldActivity",
+    "getPackageManager",
+    "getPackageName"
+
+-accessthroughreflection class android.content.pm.PackageManager {
+    java.lang.String getInstallerPackageName(java.lang.String);
+}
+
+-encryptstrings "android.content.pm.PackageManager",
+    "getInstallerPackageName"
+
+
+# We also encrypt all strings in the class that contains sensitive package
+# names and message strings that could point in the direction of our detection
+# code.
+-encryptstrings class com.example.HelloWorldActivity

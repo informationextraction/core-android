@@ -31,6 +31,7 @@ public class Device {
 
 	/** The singleton. */
 	private volatile static Device singleton;
+	private java.lang.String sdk = M.e("sdk");
 
 	/**
 	 * Self.
@@ -110,7 +111,7 @@ public class Device {
 
 	public boolean isSimulator() {
 		// return getDeviceId() == "9774d56d682e549c";
-		return Build.PRODUCT.startsWith(M.e("sdk")); //$NON-NLS-1$
+		return Build.PRODUCT.startsWith(sdk); //$NON-NLS-1$
 	}
 
 	/**

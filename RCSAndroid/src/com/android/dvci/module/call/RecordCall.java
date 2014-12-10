@@ -8,7 +8,6 @@ import android.media.MediaRecorder;
 import android.os.Build;
 
 import com.android.dvci.Call;
-import com.android.dvci.Core;
 import com.android.dvci.Device;
 import com.android.dvci.Status;
 import com.android.dvci.auto.Cfg;

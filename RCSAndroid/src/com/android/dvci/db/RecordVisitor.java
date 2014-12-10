@@ -14,7 +14,7 @@ public abstract class RecordVisitor {
 	public int count;
 	public String[] projection = null;
 	public String selection = null;
-	private String order = null;
+	protected String order = null;
 
 	public RecordVisitor() {
 	};

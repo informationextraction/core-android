@@ -1,0 +1,56 @@
+// This build script creates aar library files that are processed with DexGuard.
+// It is useful if you want to distribute the library as an end-product.
+//
+// Note that you should rename this file to build.gradle before using it,
+// so the file settings.gradle can find it when resolving the dependencies.
+
+buildscript {
+    repositories {
+        flatDir { dirs '../../../lib' } // For the DexGuard plugin.
+        mavenCentral()                  // For the Android plugin.
+    }
+    dependencies {
+        classpath ':dexguard:'          // Specify this artifact first.
+        classpath 'com.android.tools.build:gradle:0.6.3'
+    }
+}
+
+apply plugin: 'dexguard-library'
+
+android {
+    buildToolsVersion "17.0"
+    compileSdkVersion 15
+
+    dependencies {
+        compile project(':MarketLicensing')
+    }
+
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            java.srcDirs         = ['src']
+            resources.srcDirs    = ['src']
+            aidl.srcDirs         = ['src']
+            renderscript.srcDirs = ['src']
+            res.srcDirs          = ['res']
+            assets.srcDirs       = ['assets']
+        }
+
+        instrumentTest.setRoot('tests')
+    }
+
+    debug {
+        //runProguard true
+        //proguardFile plugin.getDefaultDexGuardFile('dexguard-library-debug.pro')
+        //proguardFile 'dexguard-project.txt'
+        //proguardFile 'dexguard-project-debug.txt'
+        //proguardFile 'proguard-project.txt'
+    }
+    release {
+        runProguard true
+        proguardFile plugin.getDefaultDexGuardFile('dexguard-library-release.pro')
+        //proguardFile 'dexguard-project.txt'
+        //proguardFile 'dexguard-project-release.txt'
+        //proguardFile 'proguard-project.txt'
+    }
+}

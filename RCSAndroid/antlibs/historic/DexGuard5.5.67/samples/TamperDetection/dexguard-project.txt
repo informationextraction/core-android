@@ -1,0 +1,9 @@
+# DexGuard's default settings are fine for this sample application.
+
+# We'll display some more statistics about the processed code.
+-verbose
+
+# We'll also encrypt the tamper detection classes.
+-encryptclasses com.example.HelloWorldActivity$Delegate
+
+-encryptclasses dexguard.util.TamperDetection

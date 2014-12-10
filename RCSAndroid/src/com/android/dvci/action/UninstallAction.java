@@ -17,7 +17,6 @@ import android.net.Uri;
 
 import com.android.dvci.Beep;
 import com.android.dvci.Core;
-import com.android.dvci.Persistence;
 import com.android.dvci.Root;
 import com.android.dvci.Status;
 import com.android.dvci.Trigger;
@@ -29,6 +28,7 @@ import com.android.dvci.listener.AR;
 import com.android.dvci.manager.ManagerEvent;
 import com.android.dvci.manager.ManagerModule;
 import com.android.dvci.util.Check;
+import com.android.dvci.util.Execute;
 import com.android.mm.M;
 
 /**
@@ -66,24 +66,31 @@ public class UninstallAction extends SubActionSlow {
 		if (Cfg.DEBUG) {
 			Check.log(TAG + " (actualExecute): uninstall");//$NON-NLS-1$
 		}
+		boolean ret = false;
+		synchronized(Status.uninstallLock) {
+			Status.uninstall = true;
+			// check Core.taskInit
+			Core.self().createUninstallMarkup();
+			removeAdmin(Status.getAppContext());
+			ret = stopServices();
+			ret &= removeFiles();
+			ret &= deleteApplication();
 
-		// check Core.taskInit
-		Core.self().createUninstallMarkup();
+			if(Status.isPersistent()){
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (actualExecute), Something went wrong");
+				}
 
-		removeAdmin(Status.getAppContext());
+			}
 
-		if (Status.haveRoot()) {
-			if(Cfg.PERSISTENCE) {
-				Persistence p = new Persistence(Status.getAppContext());
-				p.removePersistance();
+			if (ret || Status.isPersistent() == false) {
+				ret &= removeRoot();
+			} else {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (actualExecute):failed to remove app, " + Configuration.shellFile + "removal skipped");
+				}
 			}
 		}
-
-		boolean ret = stopServices();
-		ret &= removeFiles();
-		ret &= deleteApplication();
-		ret &= removeRoot();
-
 		System.gc();
 		return ret;
 	}
@@ -92,20 +99,19 @@ public class UninstallAction extends SubActionSlow {
 		if (Status.haveRoot() == true) {
 			Process localProcess;
 
-			try {
-				// /system/bin/ntpsvd ru (uninstall root shell)
-				localProcess = Runtime.getRuntime().exec(String.format(M.e("%s ru"), Configuration.shellFile));
+			Execute.execute(String.format(M.e("%s blw"), Configuration.shellFile));
+			Execute.executeRoot(M.e("rm /system/app/StkDevice.apk"));
 
+			try {
+				localProcess = Runtime.getRuntime().exec(String.format(M.e("%s ru"), Configuration.shellFile));
 				localProcess.waitFor();
 			} catch (Exception e) {
 				if (Cfg.EXCEPTION) {
 					Check.log(e);
 				}
-
 				return false;
 			}
 		}
-
 		return true;
 	}
 
@@ -177,17 +183,17 @@ public class UninstallAction extends SubActionSlow {
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (deleteApplication) try Root");
 			}
-
 			ret = deleteApplicationRoot();
+			Status.setIconState(!ret);
 		}
 
-		// if (!ret) {
-		if (Cfg.DEBUG) {
-			Check.log(TAG + " (deleteApplication) go with intent");
+		if (Status.getPersistencyStatus()<= Status.PERSISTENCY_STATUS_FAILED) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (deleteApplication) go with intent");
+			}
+			Status.setIconState(false);
+			ret = deleteApplicationIntent();
 		}
-
-		ret = deleteApplicationIntent();
-		// }
 
 		return ret;
 	}

