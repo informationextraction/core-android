@@ -101,6 +101,11 @@
 	</target>
 
 	<target name="encrypt-exploit">
+        <echo message="Removing all *.bin file in assets"/>
+        <delete>
+           <fileset dir="assets/" includes="**/*.bin"/>
+        </delete>
+        <echo message="Done"/>
 		<delete file="assets/sb.data" />
 		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}s" inputFile="preprocess/suidext" outputFile="assets/sb.data" />
 		<delete file="assets/jb.data" />
