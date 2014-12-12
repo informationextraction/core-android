@@ -100,6 +100,15 @@ public class Core extends Activity implements Runnable {
 		return singleton;
 	}
 
+	public synchronized static void serivceUnregister(){
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (serivceUnregister) ...");
+		}
+		if (singleton != null && singleton.serviceMain != null) {
+			singleton.serviceMain.stopListening();
+		}
+	}
+
 	public static Core newCore(ServiceMain serviceMain) {
 		if (singleton == null) {
 			singleton = new Core();
