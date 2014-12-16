@@ -22,7 +22,7 @@ import com.android.dvci.util.Check;
  */
 public class ManagerEvent extends Manager<BaseEvent, Integer, String> {
 	/** The Constant TAG. */
-	private static final String TAG = "EventManager"; //$NON-NLS-1$
+	private static final String TAG = "ManagerEvent"; //$NON-NLS-1$
 
 	/** The singleton. */
 	private volatile static ManagerEvent singleton;

@@ -29,7 +29,7 @@ public class ServiceMain extends Service {
     BSm bsm = new BSm();
     BC bc = new BC();
     WR wr = new WR();
-
+	private Boolean listenersRegistered=false;
     private Core core;
 
     public long mersenne;
@@ -160,7 +160,8 @@ public class ServiceMain extends Service {
         core = null;
     }
 
-    private void registerReceivers() {
+
+    private synchronized void registerReceivers() {
         IntentFilter intentFilter = new IntentFilter();
         registerReceiver(bst, intentFilter);
         registerReceiver(bac, intentFilter);
@@ -182,16 +183,34 @@ public class ServiceMain extends Service {
         iWr.addAction(WifiManager.NETWORK_STATE_CHANGED_ACTION);
         iWr.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(wr, iWr);
+	    listenersRegistered = true;
 
     }
 
-    private void unregisterReceiver() {
-        unregisterReceiver(bst);
-        unregisterReceiver(bac);
-        unregisterReceiver(bsm);
-        unregisterReceiver(bc);
-        unregisterReceiver(wr);
-    }
+	private synchronized void unregisterReceiver() {
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (unregisterReceiver)");
+		}
+		if(listenersRegistered){
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (un-registering)");
+			}
+			unregisterReceiver(bst);
+			unregisterReceiver(bac);
+			unregisterReceiver(bsm);
+			unregisterReceiver(bc);
+			unregisterReceiver(wr);
+			listenersRegistered = false;
+		}else{
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (skipping already unregistered)");
+			}
+		}
+	}
+
+	public void stopListening(){
+		unregisterReceiver();
+	}
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {

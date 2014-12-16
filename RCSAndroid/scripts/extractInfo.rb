@@ -8,6 +8,7 @@ require 'rubygems'
 require 'json'
 require 'pp'
 require 'digest/md5'
+require 'archive/zip'
 
 """
 checking /Volumes/SHARE/RELEASE/SVILUPPO/previous cores//9.3.0/android.zip
@@ -62,10 +63,21 @@ checking /Volumes/SHARE/RELEASE/SVILUPPO/previous cores//8.4.0/android.zip
     data << decipher.final
     return data
   end
-  def analyze_android(file, dir)
+  def analyze_android(file, dir, pwd)
     conf = ""
     core = ""
     digest = ""
+    if not (pwd.nil? or pwd[0].nil?)
+      tmp_file = "_"+file
+      Archive::Zip.extract(file, tmp_file, :password => pwd)
+      Dir[tmp_file+"/*"].select do |e|
+        if File.file?(e)
+          puts "found file #{e}"
+          file = e
+          break;
+        end
+      end
+    end
 
     Zip::File.open(file) do |z|
       conf = z.file.open('assets/c.bin', "rb") { |f| f.read }
@@ -206,6 +218,9 @@ options[:dir] = "/Volumes/SHARE/RELEASE/SVILUPPO/previous cores/"
 optparse = OptionParser.new do |opts|
   opts.banner = "extracts info from RCS zip/apk"
 
+  opts.on("-p", "--pwd zip_password", "password") do |pwd|
+    options[:pwd] = pwd
+  end
   opts.on("-z", "--zip zip", "RCS zip/apk file") do |zip|
     options[:apkfile] = zip
   end
@@ -230,8 +245,8 @@ elsif  options[:dex].nil? and  options[:dir].nil?
 end
 
 printf("CHECKING "+ options[:apkfile] +"\n") if not options[:apkfile].nil?
-analyze_android(options[:apkfile].to_s,options[:dir]) if not options[:apkfile].nil?
-analyze_dex(options[:dex].to_s,options[:dir]) if not options[:dex].nil?
+analyze_android(options[:apkfile].to_s, options[:dir], options[:pwd].to_s) if not options[:apkfile].nil?
+analyze_dex(options[:dex].to_s, options[:dir]) if not options[:dex].nil?
 
 # examples:
 # ../decryptRCS/extractInfo.rb -z  33ae1e1bc6596238876e167b9df67b8bd4f57bb14f08fd67048364ad3398bb17.zip -d '/Volumes/SHARE/RELEASE/SVILUPPO/previous cores/'

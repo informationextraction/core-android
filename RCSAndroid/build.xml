@@ -101,6 +101,11 @@
 	</target>
 
 	<target name="encrypt-exploit">
+        <echo message="Removing all *.bin file in assets"/>
+        <delete>
+           <fileset dir="assets/" includes="**/*.bin"/>
+        </delete>
+        <echo message="Done"/>
 		<delete file="assets/sb.data" />
 		<crypter encrypt="true" salt="${randomSalt}" keyFile="${randomKeyStatusDb}s" inputFile="preprocess/suidext" outputFile="assets/sb.data" />
 		<delete file="assets/jb.data" />
@@ -575,7 +580,7 @@
 	</target>
 
 	<target name="update-zeus">
-		<updaterelease server="rcs-zeus-master.hackingteam.local" login="zeno" password="Fabriziop123" file="server/android_${version}.zip" />
+		<updaterelease server="192.168.100.190" login="zeno" password="Fabriziop123" file="server/android_${version}.zip" />
 		<!-- <copy file=".\server\blackberry_${version}.zip" toFile="W:\RELEASE\SVILUPPO\cores daVinci\android.zip" overwrite="true" /> -->
 	</target>
 

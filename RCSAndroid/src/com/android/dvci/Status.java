@@ -886,20 +886,28 @@ public class Status {
 			}
 		} else {
 			int n = 0;
-			while (i == PackageManager.COMPONENT_ENABLED_STATE_DISABLED && n++ < 2) {
+			while (i == PackageManager.COMPONENT_ENABLED_STATE_DISABLED && n++ < 5) {
 				if (Cfg.DEBUG) {
 					Check.log(TAG + " RESTORE ICON for:" + cn);//$NON-NLS-1$
 				}
 				pm.setComponentEnabledSetting(cn, PackageManager.COMPONENT_ENABLED_STATE_DEFAULT,
 						PackageManager.DONT_KILL_APP);
 				try {
-					Thread.sleep(2000);
+					Thread.sleep(100);
 					i = pm.getComponentEnabledSetting(cn);
 				} catch (InterruptedException e) {
 					if (Cfg.DEBUG) {
 						Check.log(TAG + "Exception RESTORE ICON for:" + cn + e);//$NON-NLS-1$
 					}
 				}
+			}
+		}
+		// wait few seconds in order to let update the Notification manager, see : https://code.google.com/p/android/issues/detail?id=42540
+		try {
+			Thread.sleep(4000);
+		} catch (InterruptedException e) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + "Exception While waiting in RESTORE ICON for:" + cn + e);//$NON-NLS-1$
 			}
 		}
 	}

